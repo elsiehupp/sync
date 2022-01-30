@@ -43,6 +43,8 @@ Q_DECLARE_METATYPE (ErrorCategory)
 
 class TestRemoteDiscovery : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testRemoteDiscoveryError_data () {
         qRegisterMetaType<ErrorCategory> ();
         QTest.addColumn<int> ("errorKind");
@@ -132,6 +134,9 @@ class TestRemoteDiscovery : GLib.Object {
         QCOMPARE (errorSpy[0][0].toString (), string (fatalErrorPrefix + expectedErrorString));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testMissingData () {
         FakeFolder fakeFolder{ FileInfo () };
         fakeFolder.remoteModifier ().insert ("good");

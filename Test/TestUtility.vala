@@ -15,17 +15,25 @@ OCSYNC_EXPORT extern bool fsCasePreserving_override;
 
 class TestUtility : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private void on_init_test_case () {
         QStandardPaths.setTestModeEnabled (true);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_format_fingerprint () {
         QVERIFY2 (formatFingerprint ("68ac906495480a3404beee4874ed853a037a7a8f")
                  == "68:ac:90:64:95:48:0a:34:04:be:ee:48:74:ed:85:3a:03:7a:7a:8f",
 		"Utility.formatFingerprint () is broken");
     }
 
-    private void on_test_octets_to_string () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_test_octets_to_"" {
         QLocale.setDefault (QLocale ("en"));
         QCOMPARE (octetsToString (999) , string ("999 B"));
         QCOMPARE (octetsToString (1024) , string ("1 KB"));
@@ -48,6 +56,9 @@ class TestUtility : GLib.Object {
         QCOMPARE (octetsToString (1024LL*1024*1024), string ("1 GB"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_launch_on_startup () {
         string postfix = string.number (Occ.Utility.rand ());
 
@@ -61,7 +72,10 @@ class TestUtility : GLib.Object {
         QVERIFY (hasLaunchOnStartup (appName) == false);
     }
 
-    private void on_test_duration_to_descriptive_string () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_test_duration_to_descriptive_"" {
         QLocale.setDefault (QLocale ("C"));
         //Note: in order for the plural to work we would need to load the english translation
 
@@ -102,6 +116,9 @@ class TestUtility : GLib.Object {
 
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_version_of_installed_binary () {
         if (isLinux ()) {
             // pass the cmd client from our build dir
@@ -119,6 +136,9 @@ class TestUtility : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_time_ago () {
         // Both times in same timezone
         QDateTime d1 = QDateTime.fromString ("2015-01-24T09:20:30+01:00", Qt.ISODate);
@@ -143,6 +163,9 @@ class TestUtility : GLib.Object {
         QCOMPARE (s, QLatin1String ("Less than a minute ago"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_fs_case_preserving () {
         QVERIFY (isMac () || isWindows () ? fsCasePreserving () : ! fsCasePreserving ());
         QScopedValueRollback<bool> scope (Occ.fsCasePreserving_override);
@@ -152,6 +175,9 @@ class TestUtility : GLib.Object {
         QVERIFY (! fsCasePreserving ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_file_names_equal () {
         QTemporaryDir dir;
         QVERIFY (dir.isValid ());
@@ -179,6 +205,9 @@ class TestUtility : GLib.Object {
         dir.remove ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_sanitize_for_file_name_data () {
         QTest.addColumn<string> ("input");
         QTest.addColumn<string> ("output");
@@ -194,6 +223,9 @@ class TestUtility : GLib.Object {
             << "a b c d";
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSanitizeForFileName () {
         QFETCH (string, input);
         QFETCH (string, output);
@@ -201,11 +233,11 @@ class TestUtility : GLib.Object {
     }
 
     void testNormalizeEtag () {
-        GLib.ByteArray str;
+        GLib.ByteArray string_value;
 
 const int CHECK_NORMALIZE_ETAG (TEST, EXPECT)
-    str = Occ.Utility.normalizeEtag (TEST);
-    QCOMPARE (str.constData (), EXPECT);
+    string_value = Occ.Utility.normalizeEtag (TEST);
+    QCOMPARE (string_value.constData (), EXPECT);
 
         CHECK_NORMALIZE_ETAG ("foo", "foo");
         CHECK_NORMALIZE_ETAG ("\"foo\"", "foo");
@@ -219,6 +251,9 @@ const int CHECK_NORMALIZE_ETAG (TEST, EXPECT)
         CHECK_NORMALIZE_ETAG ("\"foo-gzip\"", "foo");
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_is_path_windows_drive_partition_root () {
         // should always return false on non-Windows
         QVERIFY (!isPathWindowsDrivePartitionRoot ("c:"));

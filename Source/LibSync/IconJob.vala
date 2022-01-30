@@ -16,13 +16,17 @@ namespace Occ {
 ***********************************************************/
 class IconJob : GLib.Object {
 
-    public IconJob (AccountPointer account, GLib.Uri url, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public IconJob (AccountPointer account, GLib.Uri url, GLib.Object parent = new GLib.Object ());
 
 signals:
     void job_finished (GLib.ByteArray icon_data);
     void error (QNetworkReply.NetworkError error_type);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_finished ();
 };
 

@@ -2,6 +2,8 @@
 
 class TestCapabilities : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPushNotificationsAvailable_pushNotificationsForActivitiesAvailable_returnTrue () {
         string[] typeList;
         typeList.append ("activities");
@@ -18,6 +20,9 @@ class TestCapabilities : GLib.Object {
         QCOMPARE (activitiesPushNotificationsAvailable, true);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPushNotificationsAvailable_pushNotificationsForActivitiesNotAvailable_returnFalse () {
         string[] typeList;
         typeList.append ("noactivities");
@@ -34,6 +39,9 @@ class TestCapabilities : GLib.Object {
         QCOMPARE (activitiesPushNotificationsAvailable, false);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPushNotificationsAvailable_pushNotificationsForFilesAvailable_returnTrue () {
         string[] typeList;
         typeList.append ("files");
@@ -50,6 +58,9 @@ class TestCapabilities : GLib.Object {
         QCOMPARE (filesPushNotificationsAvailable, true);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPushNotificationsAvailable_pushNotificationsForFilesNotAvailable_returnFalse () {
         string[] typeList;
         typeList.append ("nofiles");
@@ -66,6 +77,9 @@ class TestCapabilities : GLib.Object {
         QCOMPARE (filesPushNotificationsAvailable, false);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPushNotificationsAvailable_pushNotificationsForNotificationsAvailable_returnTrue () {
         string[] typeList;
         typeList.append ("notifications");
@@ -82,6 +96,9 @@ class TestCapabilities : GLib.Object {
         QCOMPARE (notificationsPushNotificationsAvailable, true);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPushNotificationsAvailable_pushNotificationsForNotificationsNotAvailable_returnFalse () {
         string[] typeList;
         typeList.append ("nonotifications");
@@ -98,6 +115,9 @@ class TestCapabilities : GLib.Object {
         QCOMPARE (notificationsPushNotificationsAvailable, false);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPushNotificationsAvailable_pushNotificationsNotAvailable_returnFalse () {
         const var &capabilities = Occ.Capabilities (QVariantMap ());
         const var activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
@@ -109,6 +129,9 @@ class TestCapabilities : GLib.Object {
         QCOMPARE (notificationsPushNotificationsAvailable, false);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPushNotificationsWebSocketUrl_urlAvailable_returnUrl () {
         string websocketUrl ("testurl");
 
@@ -126,6 +149,9 @@ class TestCapabilities : GLib.Object {
         QCOMPARE (capabilities.pushNotificationsWebSocketUrl (), websocketUrl);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testUserStatus_userStatusAvailable_returnTrue () {
         QVariantMap userStatusMap;
         userStatusMap["enabled"] = true;
@@ -138,6 +164,9 @@ class TestCapabilities : GLib.Object {
         QVERIFY (capabilities.userStatus ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testUserStatus_userStatusNotAvailable_returnFalse () {
         QVariantMap userStatusMap;
         userStatusMap["enabled"] = false;
@@ -150,6 +179,9 @@ class TestCapabilities : GLib.Object {
         QVERIFY (!capabilities.userStatus ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testUserStatus_userStatusNotInCapabilites_returnFalse () {
         QVariantMap capabilitiesMap;
 
@@ -158,6 +190,9 @@ class TestCapabilities : GLib.Object {
         QVERIFY (!capabilities.userStatus ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testUserStatusSupportsEmoji_supportsEmojiAvailable_returnTrue () {
         QVariantMap userStatusMap;
         userStatusMap["enabled"] = true;
@@ -171,6 +206,9 @@ class TestCapabilities : GLib.Object {
         QVERIFY (capabilities.userStatus ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testUserStatusSupportsEmoji_supportsEmojiNotAvailable_returnFalse () {
         QVariantMap userStatusMap;
         userStatusMap["enabled"] = true;
@@ -184,6 +222,9 @@ class TestCapabilities : GLib.Object {
         QVERIFY (!capabilities.userStatusSupportsEmoji ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testUserStatusSupportsEmoji_supportsEmojiNotInCapabilites_returnFalse () {
         QVariantMap userStatusMap;
         userStatusMap["enabled"] = true;
@@ -196,6 +237,9 @@ class TestCapabilities : GLib.Object {
         QVERIFY (!capabilities.userStatusSupportsEmoji ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testShareDefaultPermissions_defaultSharePermissionsNotInCapabilities_returnZero () {
         QVariantMap filesSharingMap;
         filesSharingMap["api_enabled"] = false;
@@ -209,6 +253,9 @@ class TestCapabilities : GLib.Object {
         QCOMPARE (defaultSharePermissionsNotInCapabilities, {});
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testShareDefaultPermissions_defaultSharePermissionsAvailable_returnPermissions () {
         QVariantMap filesSharingMap;
         filesSharingMap["api_enabled"] = true;
@@ -223,6 +270,9 @@ class TestCapabilities : GLib.Object {
         QCOMPARE (defaultSharePermissionsAvailable, 31);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testBulkUploadAvailable_bulkUploadAvailable_returnTrue () {
         QVariantMap bulkuploadMap;
         bulkuploadMap["bulkupload"] = "1.0";

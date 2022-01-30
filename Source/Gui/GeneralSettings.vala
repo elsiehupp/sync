@@ -34,13 +34,19 @@ namespace Ui {
 ***********************************************************/
 class General_settings : Gtk.Widget {
 
+    /***********************************************************
+    ***********************************************************/
     public General_settings (Gtk.Widget parent = nullptr);
     ~General_settings () override;
     public QSize size_hint () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void on_style_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_save_misc_settings ();
     private void on_toggle_launch_on_startup (bool);
     private void on_toggle_optional_server_notifications (bool);
@@ -56,8 +62,12 @@ class General_settings : Gtk.Widget {
     private void on_toggle_auto_update_check ();
 #endif
 
+    /***********************************************************
+    ***********************************************************/
     private void customize_style ();
 
+    /***********************************************************
+    ***********************************************************/
     private Ui.General_settings _ui;
     private QPointer<Ignore_list_editor> _ignore_editor;
     private bool _currently_loading = false;
@@ -105,7 +115,7 @@ QVector<Zip_entry> create_file_list () {
     const var logger = Occ.Logger.instance ();
 
     if (!logger.log_dir ().is_empty ()) {
-        list.append ({string (), "logs"});
+        list.append ({"", "logs"});
 
         QDir dir (logger.log_dir ());
         const var info_list = dir.entry_info_list (QDir.Files);
@@ -341,7 +351,7 @@ void General_settings.on_update_check_now () {
 void General_settings.on_toggle_auto_update_check () {
     ConfigFile cfg_file;
     bool is_checked = _ui.auto_check_for_updates_check_box.is_checked ();
-    cfg_file.set_auto_update_check (is_checked, string ());
+    cfg_file.set_auto_update_check (is_checked, "");
 }
 #endif // defined (BUILD_UPDATER)
 
@@ -388,7 +398,7 @@ void General_settings.on_ignore_files_editor () {
 }
 
 void General_settings.on_create_debug_archive () {
-    const var filename = QFileDialog.get_save_file_name (this, _("Create Debug Archive"), string (), _("Zip Archives") + " (*.zip)");
+    const var filename = QFileDialog.get_save_file_name (this, _("Create Debug Archive"), "", _("Zip Archives") + " (*.zip)");
     if (filename.is_empty ()) {
         return;
     }

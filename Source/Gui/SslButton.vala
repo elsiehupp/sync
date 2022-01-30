@@ -25,15 +25,23 @@ namespace Occ {
 ***********************************************************/
 class Ssl_button : QToolButton {
 
+    /***********************************************************
+    ***********************************************************/
     public Ssl_button (Gtk.Widget parent = nullptr);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void update_account_state (AccountState account_state);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void on_update_menu ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private QMenu build_cert_menu (QMenu parent, QSslCertificate &cert,
         const GLib.List<QSslCertificate> &user_approved, int pos, GLib.List<QSslCertificate> &system_ca_certificates);
     private QPointer<AccountState> _account_state;
@@ -52,9 +60,11 @@ class Ssl_button : QToolButton {
         set_menu (_menu);
     }
 
+    /***********************************************************
+    ***********************************************************/
     static string add_cert_details_field (string key, string value) {
         if (value.is_empty ())
-            return string ();
+            return "";
 
         return QLatin1String ("<tr><td style=\"vertical-align : top;\"><b>") + key
             + QLatin1String ("</b></td><td style=\"vertical-align : bottom;\">") + value
@@ -84,8 +94,8 @@ class Ssl_button : QToolButton {
             + QLatin1String ("<br/>")
             + Utility.escape (Utility.format_fingerprint (sha265hash.mid (sha265hash.length () / 2), false));
         string serial = string.from_utf8 (cert.serial_number ());
-        string effective_date = cert.effective_date ().date ().to_string ();
-        string expiry_date = cert.expiry_date ().date ().to_string ();
+        string effective_date = cert.effective_date ().date ().to_"";
+        string expiry_date = cert.expiry_date ().date ().to_"";
         string sna = string[] (cert.subject_alternative_names ().values ()).join (" ");
 
         string details;
@@ -201,7 +211,7 @@ class Ssl_button : QToolButton {
         }
 
         if (account.url ().scheme () == QLatin1String ("https")) {
-            string ssl_version = account._session_cipher.protocol_string ()
+            string ssl_version = account._session_cipher.protocol_""
                 + ", " + account._session_cipher.authentication_method ()
                 + ", " + account._session_cipher.key_exchange_method ()
                 + ", " + account._session_cipher.encryption_method ();

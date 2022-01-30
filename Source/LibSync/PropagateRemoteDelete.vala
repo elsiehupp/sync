@@ -19,20 +19,32 @@ class PropagateRemoteDelete : PropagateItemJob {
     QPointer<DeleteJob> _job;
     AbstractPropagateRemoteDeleteEncrypted _delete_encrypted_helper = nullptr;
 
+    /***********************************************************
+    ***********************************************************/
     public PropagateRemoteDelete (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item) {
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
     public void create_delete_job (string filename);
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_abort (PropagatorJob.AbortType abort_type) override;
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_likely_finished_quickly () override {
         return !_item.is_directory ();
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_delete_job_finished ();
 };
 
@@ -54,7 +66,7 @@ class PropagateRemoteDelete : PropagateItemJob {
                     if (_delete_encrypted_helper.network_error () != QNetworkReply.NoError && _delete_encrypted_helper.network_error () != QNetworkReply.ContentNotFoundError) {
                         status = classify_error (_delete_encrypted_helper.network_error (), _item._http_error_code, &propagator ()._another_sync_needed);
                     }
-                    on_done (status, _delete_encrypted_helper.error_string ());
+                    on_done (status, _delete_encrypted_helper.error_"");
                 } else {
                     on_done (SyncFileItem.Success);
                 }
@@ -100,7 +112,7 @@ class PropagateRemoteDelete : PropagateItemJob {
         if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
             SyncFileItem.Status status = classify_error (err, _item._http_error_code,
                 &propagator ()._another_sync_needed);
-            on_done (status, _job.error_string ());
+            on_done (status, _job.error_"");
             return;
         }
 
@@ -115,7 +127,7 @@ class PropagateRemoteDelete : PropagateItemJob {
             on_done (SyncFileItem.NormalError,
                 _("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                     .arg (_item._http_error_code)
-                    .arg (_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ()));
+                    .arg (_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_""));
             return;
         }
 

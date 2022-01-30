@@ -36,6 +36,8 @@ static QueryItems make (string key1, string value1,
 
 class TestConcatUrl : public GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testFolder () {
         QFETCH (string, base);
         QFETCH (string, concat);
@@ -50,6 +52,9 @@ class TestConcatUrl : public GLib.Object {
         QCOMPARE (result, expectedFull);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testFolder_data () {
         QTest.addColumn<string> ("base");
         QTest.addColumn<string> ("concat");

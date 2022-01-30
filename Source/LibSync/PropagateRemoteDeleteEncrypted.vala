@@ -16,11 +16,17 @@ namespace Occ {
 
 class Propagate_remote_delete_encrypted : AbstractPropagateRemoteDeleteEncrypted {
 
+    /***********************************************************
+    ***********************************************************/
     public Propagate_remote_delete_encrypted (OwncloudPropagator propagator, SyncFileItemPtr item, GLib.Object parent);
 
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_folder_un_locked_successfully (GLib.ByteArray folder_id) override;
     private void on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code) override;
 };

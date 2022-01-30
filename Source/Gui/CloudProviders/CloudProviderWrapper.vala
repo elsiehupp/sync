@@ -36,28 +36,48 @@ using namespace Occ;
 
 class CloudProviderWrapper : GLib.Object {
 
-    public CloudProviderWrapper (GLib.Object parent = nullptr, Folder folder = nullptr, int folder_id = 0, CloudProvidersProviderExporter* cloudprovider = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public CloudProviderWrapper (GLib.Object parent = new GLib.Object (), Folder folder = nullptr, int folder_id = 0, CloudProvidersProviderExporter* cloudprovider = nullptr);
     ~CloudProviderWrapper () override;
     public Cloud_providers_account_exporter* account_exporter ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public Folder* folder ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public GMenu_model* get_menu_model ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public GAction_group* get_action_group ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void update_status_text (string status_text);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void update_pause_status ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_sync_started ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void on_sync_finished (SyncResult &);
 
@@ -68,6 +88,8 @@ class CloudProviderWrapper : GLib.Object {
     public void on_sync_paused_changed (Folder*, bool);
 
 
+    /***********************************************************
+    ***********************************************************/
     private Folder _folder;
     private CloudProvidersProviderExporter _cloud_provider;
     private Cloud_providers_account_exporter _cloud_provider_account;
@@ -237,11 +259,11 @@ void CloudProviderWrapper.on_sync_started () {
 void CloudProviderWrapper.on_sync_finished (SyncResult &result) {
     if (result.status () == result.Success || result.status () == result.Problem) {
         cloud_providers_account_exporter_set_status (_cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
-        update_status_text (result.status_string ());
+        update_status_text (result.status_"");
         return;
     }
     cloud_providers_account_exporter_set_status (_cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_ERROR);
-    update_status_text (result.status_string ());
+    update_status_text (result.status_"");
 }
 
 GMenu_model* CloudProviderWrapper.get_menu_model () {

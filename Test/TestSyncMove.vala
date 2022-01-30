@@ -73,6 +73,8 @@ bool expectAndWipeConflict (FileModifier &local, FileInfo state, string path) {
 
 class TestSyncMove : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private void on_test_move_custom_remote_root () {
         FileInfo subFolder (QStringLiteral ("AS"), { { QStringLiteral ("f1"), 4 } });
         FileInfo folder (QStringLiteral ("A"), { subFolder });
@@ -102,9 +104,12 @@ class TestSyncMove : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testRemoteChangeInMovedFolder () {
         // issue #5192
-        FakeFolder fakeFolder{ FileInfo{ string (), { FileInfo{ QStringLiteral ("folder"), { FileInfo{ QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
+        FakeFolder fakeFolder{ FileInfo{ "", { FileInfo{ QStringLiteral ("folder"), { FileInfo{ QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
@@ -123,9 +128,12 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), oldState);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSelectiveSyncMovedFolder () {
         // issue #5224
-        FakeFolder fakeFolder{ FileInfo{ string (), { FileInfo{ QStringLiteral ("parentFolder"), { FileInfo{ QStringLiteral ("subFolderA"), { { QStringLiteral ("fileA.txt"), 400 } } }, FileInfo{ QStringLiteral ("subFolderB"), { { QStringLiteral ("fileB.txt"), 400 } } } } } } } };
+        FakeFolder fakeFolder{ FileInfo{ "", { FileInfo{ QStringLiteral ("parentFolder"), { FileInfo{ QStringLiteral ("subFolderA"), { { QStringLiteral ("fileA.txt"), 400 } } }, FileInfo{ QStringLiteral ("subFolderB"), { { QStringLiteral ("fileB.txt"), 400 } } } } } } } };
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         var expectedServerState = fakeFolder.currentRemoteState ();
@@ -179,6 +187,9 @@ class TestSyncMove : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testLocalMoveDetection () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
@@ -263,6 +274,9 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (printDbData (fakeFolder.dbState ()), printDbData (remoteInfo));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDuplicateFileId_data () {
         QTest.addColumn<string> ("prefix");
 
@@ -339,6 +353,9 @@ class TestSyncMove : GLib.Object {
         counter.on_reset ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testMovePropagation () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         var &local = fakeFolder.localModifier ();
@@ -724,12 +741,18 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (counter.nPUT, 0);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDeepHierarchy_data () {
         QTest.addColumn<bool> ("local");
         QTest.newRow ("remote") << false;
         QTest.newRow ("local") << true;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDeepHierarchy () {
         QFETCH (bool, local);
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
@@ -771,6 +794,9 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (counter.nPUT, local ? 5 : 0);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void renameOnBothSides () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         OperationCounter counter;
@@ -809,6 +835,9 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (counter.nMOVE, 2);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void moveFileToDifferentFolderOnBothSides () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         OperationCounter counter;
@@ -852,6 +881,9 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testMovedWithError_data () {
         QTest.addColumn<Vfs.Mode> ("vfsMode");
 
@@ -859,6 +891,9 @@ class TestSyncMove : GLib.Object {
         QTest.newRow ("Vfs.WithSuffix") << Vfs.WithSuffix;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testMovedWithError () {
         QFETCH (Vfs.Mode, vfsMode);
         const var getName = [vfsMode] (string s) { {f (vfsMode == Vfs.WithSuffix)
@@ -869,7 +904,7 @@ class TestSyncMove : GLib.Object {
         };
         const string src = "folder/folderA/file.txt";
         const string dest = "folder/folderB/file.txt";
-        FakeFolder fakeFolder{ FileInfo{ string (), { FileInfo{ QStringLiteral ("folder"), { FileInfo{ QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
+        FakeFolder fakeFolder{ FileInfo{ "", { FileInfo{ QStringLiteral ("folder"), { FileInfo{ QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
         var syncOpts = fakeFolder.syncEngine ().syncOptions ();
         syncOpts._parallelNetworkJobs = 0;
         fakeFolder.syncEngine ().setSyncOptions (syncOpts);

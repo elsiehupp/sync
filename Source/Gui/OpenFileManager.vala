@@ -60,7 +60,7 @@ static string find_default_file_manager () {
     p.wait_for_finished ();
     string file_name = string.from_utf8 (p.read_all ().trimmed ());
     if (file_name.is_empty ())
-        return string ();
+        return "";
 
     QFileInfo fi;
     string[] dirs = xdg_data_dirs ();
@@ -75,7 +75,7 @@ static string find_default_file_manager () {
             }
         }
     }
-    return string ();
+    return "";
 }
 
 // early dolphin versions did not have --select
@@ -91,9 +91,11 @@ void show_in_file_manager (string local_path) {
     string app;
     string[] args;
 
+    /***********************************************************
+    ***********************************************************/
     static string default_manager = find_default_file_manager ();
     QSettings desktop_file (default_manager, QSettings.IniFormat);
-    string exec = desktop_file.value ("Desktop Entry/Exec").to_string ();
+    string exec = desktop_file.value ("Desktop Entry/Exec").to_"";
 
     string file_to_open = QFileInfo (local_path).absolute_file_path ();
     string path_to_open = QFileInfo (local_path).absolute_path ();
@@ -124,11 +126,13 @@ void show_in_file_manager (string local_path) {
         can_handle_file = true;
     }
 
+    /***********************************************************
+    ***********************************************************/
     static string name;
     if (name.is_empty ()) {
-        name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name[%1]").arg (q_app.property ("ui_lang").to_string ())).to_string ();
+        name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name[%1]").arg (q_app.property ("ui_lang").to_"")).to_"";
         if (name.is_empty ()) {
-            name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name")).to_string ();
+            name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name")).to_"";
         }
     }
 
@@ -141,7 +145,7 @@ void show_in_file_manager (string local_path) {
     // fixme : needs to append --icon, according to http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#exec-variables
     string[].iterator it = std.find (args.begin (), args.end (), string.from_latin1 ("%i"));
     if (it != args.end ()) {
-        (*it) = desktop_file.value ("Desktop Entry/Icon").to_string ();
+        (*it) = desktop_file.value ("Desktop Entry/Icon").to_"";
         args.insert (it, string.from_latin1 ("--icon")); // before
     }
 

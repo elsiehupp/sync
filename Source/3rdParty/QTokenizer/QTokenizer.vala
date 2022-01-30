@@ -106,6 +106,8 @@ struct QTokenizerPrivate {
 template <class T, class Const_iterator = typename T.Const_iterator>
 class QTokenizer {
 
+    /***********************************************************
+    ***********************************************************/
     public using char_type = typename T.value_type;
 
 
@@ -118,8 +120,8 @@ class QTokenizer {
     Example Usage:
 
     \code
-        string str = ...;
-        QByte_array_tokenizer tokenizer (str, "; ");
+        string string_value = ...;
+        QByte_array_tokenizer tokenizer (string_value, "; ");
         tokenizer.set_quote_characters ("\"'");
         tokenizer.set_return_delimiters (true);
         while (tokenizer.has_next ()) {
@@ -234,12 +236,16 @@ class QTokenizer {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private friend class QStringTokenizer;
     private unowned<QTokenizerPrivate<T, Const_iterator> > d;
 };
 
 class QStringTokenizer : QTokenizer<string> {
 
+    /***********************************************************
+    ***********************************************************/
     public QStringTokenizer (string string, string delim) :
         QTokenizer<string, string.Const_iterator> (string, delim) {}
     /***********************************************************

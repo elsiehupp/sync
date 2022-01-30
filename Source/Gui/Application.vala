@@ -44,23 +44,41 @@ Q_DECLARE_LOGGING_CATEGORY (lc_application)
 ***********************************************************/
 class Application : SharedTools.QtSingleApplication {
 
+    /***********************************************************
+    ***********************************************************/
     public Application (int &argc, char **argv);
-    ~Application () override;
 
-    public bool give_help ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
     public void show_help ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void show_hint (std.string error_hint);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public bool debug_mode ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool background_mode ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public bool version_only (); // only display the version?
     public void show_version ();
@@ -74,6 +92,8 @@ class Application : SharedTools.QtSingleApplication {
     public void on_owncloud_wizard_done (int);
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_crash ();
 
 
@@ -109,6 +129,8 @@ protected slots:
     void on_gui_is_showing_settings ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void set_help ();
 
 
@@ -118,13 +140,21 @@ protected slots:
     ***********************************************************/
     private bool config_version_migration ();
 
+    /***********************************************************
+    ***********************************************************/
     private QPointer<OwncloudGui> _gui;
 
+    /***********************************************************
+    ***********************************************************/
     private Theme _theme;
 
+    /***********************************************************
+    ***********************************************************/
     private bool _help_only;
-    private bool _version_only;
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private QElapsedTimer _started_at;
 
     // options from command line:
@@ -139,8 +169,12 @@ protected slots:
     private bool _debug_mode;
     private bool _background_mode;
 
+    /***********************************************************
+    ***********************************************************/
     private ClientProxy _proxy;
 
+    /***********************************************************
+    ***********************************************************/
     private QNetworkConfigurationManager _network_configuration_manager;
     private QTimer _check_connection_timer;
 
@@ -154,6 +188,8 @@ protected slots:
 
 namespace {
 
+    /***********************************************************
+    ***********************************************************/
     static const char options_c[] =
         "Options:\n"
         "  --help, -h           : show this help screen.\n"
@@ -194,7 +230,7 @@ bool Application.config_version_migration () {
 
     // Did the client version change?
     // (The client version is adjusted further down)
-    bool version_changed = config_file.client_version_string () != MIRALL_VERSION_STRING;
+    bool version_changed = config_file.client_version_"" != MIRALL_VERSION_STRING;
 
     // We want to message the user either for destructive changes,
     // or if we're ignoring something and the client version changed.
@@ -679,7 +715,7 @@ void Application.parse_options (string[] &options) {
                 on_open_virtual_file (option);
             });
         } else {
-            show_hint ("Unrecognized option '" + option.to_std_string () + "'");
+            show_hint ("Unrecognized option '" + option.to_std_"" + "'");
         }
     }
 }
@@ -717,7 +753,7 @@ void Application.show_version () {
 void Application.show_hint (std.string error_hint) {
     static string bin_name = QFileInfo (QCoreApplication.application_file_path ()).file_name ();
     std.cerr << error_hint << std.endl;
-    std.cerr << "Try '" << bin_name.to_std_string () << " --help' for more information" << std.endl;
+    std.cerr << "Try '" << bin_name.to_std_"" << " --help' for more information" << std.endl;
     std.exit (1);
 }
 

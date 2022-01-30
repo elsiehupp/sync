@@ -13,6 +13,8 @@ using namespace Occ;
 
 class TestLockedFiles : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testBasicLockFileWatcher () {
         QTemporaryDir tmp;
         int count = 0;

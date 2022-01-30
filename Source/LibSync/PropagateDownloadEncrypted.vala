@@ -8,21 +8,37 @@ namespace Occ {
 
 class Propagate_download_encrypted : GLib.Object {
 
-    public Propagate_download_encrypted (OwncloudPropagator propagator, string local_parent_path, SyncFileItemPtr item, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public Propagate_download_encrypted (OwncloudPropagator propagator, string local_parent_path, SyncFileItemPtr item, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_start ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public bool decrypt_file (GLib.
 
-    public bool decrypt_file (GLib.File& tmp_file);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string error_string ();
+    /***********************************************************
+    ***********************************************************/
+    public void on_check_folder_id (string_value
 
-
-    public void on_check_folder_id (string[] &list);
-
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_check_folder_encrypted_metadata (QJsonDocument &json);
 
 
@@ -38,6 +54,8 @@ signals:
     void decryption_finished ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private OwncloudPropagator _propagator;
     private string _local_parent_path;
     private SyncFileItemPtr _item;
@@ -148,8 +166,8 @@ bool Propagate_download_encrypted.decrypt_file (GLib.File& tmp_file) {
 
         // we decripted the temporary into another temporary, so good bye old one
         if (!tmp_file.remove ()) {
-                GLib.debug (lc_propagate_download_encrypted) << "Failed to remove temporary file" << tmp_file.error_string ();
-                _error_string = tmp_file.error_string ();
+                GLib.debug (lc_propagate_download_encrypted) << "Failed to remove temporary file" << tmp_file.error_"";
+                _error_string = tmp_file.error_"";
                 return false;
         }
 
@@ -159,7 +177,7 @@ bool Propagate_download_encrypted.decrypt_file (GLib.File& tmp_file) {
         return true;
 }
 
-string Propagate_download_encrypted.error_string () {
+string Propagate_download_encrypted.error_"" {
     return _error_string;
 }
 

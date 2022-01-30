@@ -39,6 +39,8 @@ relative to the folder that is being synced, without a starting slash.
 ***********************************************************/
 class LocalDiscoveryTracker : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public LocalDiscoveryTracker ();
 
 

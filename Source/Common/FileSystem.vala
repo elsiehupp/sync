@@ -155,7 +155,7 @@ namespace FileSystem {
         GLib.File orig (origin_file_name);
         on_success = orig.rename (destination_file_name);
         if (!on_success) {
-            error = orig.error_string ();
+            error = orig.error_"";
         }
 
         if (!on_success) {
@@ -189,7 +189,7 @@ namespace FileSystem {
         on_success = true;
         bool dest_exists = file_exists (destination_file_name);
         if (dest_exists && !GLib.File.remove (destination_file_name)) {
-            *error_string = orig.error_string ();
+            *error_string = orig.error_"";
             GLib.warn (lc_file_system) << "Target file could not be removed.";
             on_success = false;
         }
@@ -197,7 +197,7 @@ namespace FileSystem {
             on_success = orig.rename (destination_file_name);
         }
         if (!on_success) {
-            *error_string = orig.error_string ();
+            *error_string = orig.error_"";
             GLib.warn (lc_file_system) << "Renaming temp file to final failed : " << *error_string;
             return false;
         }
@@ -218,7 +218,7 @@ namespace FileSystem {
         GLib.File f (file_name);
         if (!f.remove ()) {
             if (error_string) {
-                *error_string = f.error_string ();
+                *error_string = f.error_"";
             }
             return false;
         }
@@ -317,11 +317,11 @@ namespace FileSystem {
         error.clear ();
 
         if (!file.open (GLib.File.ReadOnly)) {
-            error = file.error_string ();
+            error = file.error_"";
             return false;
         }
         if (!file.seek (seek)) {
-            error = file.error_string ();
+            error = file.error_"";
             return false;
         }
         return true;
@@ -373,6 +373,8 @@ namespace FileSystem {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static GLib.File.Permissions get_default_write_permissions () {
         GLib.File.Permissions result = GLib.File.Write_user;
         mode_t mask = umask (0);

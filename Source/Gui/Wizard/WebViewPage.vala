@@ -10,14 +10,20 @@ namespace Occ {
 
 class Web_view_page : Abstract_credentials_wizard_page {
 
+    /***********************************************************
+    ***********************************************************/
     public Web_view_page (Gtk.Widget parent = nullptr);
-    ~Web_view_page () override;
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void initialize_page () override;
     public void cleanup_page () override;
     public int next_id () override;
     public bool is_complete () override;
 
+    /***********************************************************
+    ***********************************************************/
     public AbstractCredentials* get_credentials () override;
     public void set_connected ();
 
@@ -25,20 +31,36 @@ signals:
     void connect_to_oc_url (string&);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_url_catched (string user, string pass, string host);
 
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private void resize_wizard ();
+    /***********************************************************
+    ***********************************************************/
     private bool try_to_set_wizard_size (int width, int height);
 
+    /***********************************************************
+    ***********************************************************/
     private OwncloudWizard _oc_wizard;
-    private WebView _web_view;
 
-    private string _user;
+    /***********************************************************
+    ***********************************************************/
+    private 
+
+    /***********************************************************
+    ***********************************************************/
     private string _pass;
 
+    /***********************************************************
+    ***********************************************************/
     private bool _use_system_proxy;
 
+    /***********************************************************
+    ***********************************************************/
     private QSize _original_wizard_size;
 };
 
@@ -142,7 +164,7 @@ signals:
         AccountPointer account = _oc_wizard.account ();
         account.set_url (host);
 
-        q_c_info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_string ();
+        q_c_info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_"";
         emit connect_to_oc_url (host);
     }
 

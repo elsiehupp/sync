@@ -88,8 +88,12 @@ struct LocalInfo {
 ***********************************************************/
 class DiscoverySingleLocalDirectoryJob : GLib.Object, public QRunnable {
 
-    public DiscoverySingleLocalDirectoryJob (AccountPointer &account, string local_path, Occ.Vfs vfs, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public DiscoverySingleLocalDirectoryJob (AccountPointer &account, string local_path, Occ.Vfs vfs, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public void run () override;
 signals:
     void on_finished (QVector<LocalInfo> result);
@@ -99,6 +103,8 @@ signals:
     void item_discovered (SyncFileItemPtr item);
     void child_ignored (bool b);
 
+    /***********************************************************
+    ***********************************************************/
     private string _local_path;
     private AccountPointer _account;
     private Occ.Vfs* _vfs;
@@ -112,14 +118,22 @@ signals:
 ***********************************************************/
 class DiscoverySingleDirectoryJob : GLib.Object {
 
-    public DiscoverySingleDirectoryJob (AccountPointer &account, string path, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public DiscoverySingleDirectoryJob (AccountPointer &account, string path, GLib.Object parent = new GLib.Object ());
     // Specify that this is the root and we need to check the data-fingerprint
     public void set_is_root_path () {
         _is_root_path = true;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void on_start ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_abort ();
 
     // This is not actually a network job, it is just a job
@@ -129,6 +143,8 @@ signals:
     void finished (HttpResult<QVector<RemoteInfo>> &result);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_directory_listing_iterated_slot (string , QMap<string, string> &);
     private void on_ls_job_finished_without_error_slot ();
     private void on_ls_job_finished_with_error_slot (QNetworkReply *);
@@ -137,6 +153,8 @@ signals:
     private void on_metadata_error (GLib.ByteArray& file_id, int http_return_code);
 
 
+    /***********************************************************
+    ***********************************************************/
     private QVector<RemoteInfo> _results;
     private string _sub_path;
     private GLib.ByteArray _first_etag;
@@ -158,6 +176,8 @@ signals:
     private QPointer<LsColJob> _ls_col_job;
 
 
+    /***********************************************************
+    ***********************************************************/
     private public GLib.ByteArray _data_fingerprint;
 };
 
@@ -267,11 +287,17 @@ class DiscoveryPhase : GLib.Object {
     public bool _ignore_hidden_files = false;
     public std.function<bool (string )> _should_discover_localy;
 
+    /***********************************************************
+    ***********************************************************/
     public void start_job (ProcessDirectoryJob *);
 
+    /***********************************************************
+    ***********************************************************/
     public void set_selective_sync_block_list (string[] &list);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void set_selective_sync_allow_list (string[] &list);
 
     // output
@@ -641,6 +667,8 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
         }
     }
 
+    /***********************************************************
+    ***********************************************************/
     static void property_map_to_remote_info (QMap<string, string> &map, RemoteInfo &result) {
         for (var it = map.const_begin (); it != map.const_end (); ++it) {
             string property = it.key ();
@@ -776,10 +804,10 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
     }
 
     void DiscoverySingleDirectoryJob.on_ls_job_finished_with_error_slot (QNetworkReply r) {
-        string content_type = r.header (QNetworkRequest.ContentTypeHeader).to_string ();
+        string content_type = r.header (QNetworkRequest.ContentTypeHeader).to_"";
         int http_code = r.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
-        string msg = r.error_string ();
-        GLib.warn (lc_discovery) << "LSCOL job error" << r.error_string () << http_code << r.error ();
+        string msg = r.error_"";
+        GLib.warn (lc_discovery) << "LSCOL job error" << r.error_"" << http_code << r.error ();
         if (r.error () == QNetworkReply.NoError
             && !content_type.contains ("application/xml; charset=utf-8")) {
             msg = _("Server error : PROPFIND reply is not XML formatted!");

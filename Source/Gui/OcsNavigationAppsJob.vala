@@ -15,6 +15,8 @@ Fetching enabled apps from the OCS Apps API
 ***********************************************************/
 class OcsNavigationAppsJob : Ocs_job {
 
+    /***********************************************************
+    ***********************************************************/
     public OcsNavigationAppsJob (AccountPointer account);
 
 
@@ -34,6 +36,8 @@ signals:
     void apps_job_finished (QJsonDocument &reply, int status_code);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_job_done (QJsonDocument &reply, int status_code);
 };
 

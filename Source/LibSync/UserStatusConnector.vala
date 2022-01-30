@@ -41,6 +41,8 @@ class UserStatus {
     Q_PROPERTY (OnlineStatus state MEMBER _state)
 
 
+    /***********************************************************
+    ***********************************************************/
     public enum class OnlineStatus : uint8 {
         Online,
         DoNotDisturb,
@@ -49,8 +51,12 @@ class UserStatus {
         Invisible
     };
 
+    /***********************************************************
+    ***********************************************************/
     public UserStatus ();
 
+    /***********************************************************
+    ***********************************************************/
     public UserStatus (string id, string message, string icon,
         OnlineStatus state, bool message_predefined, Optional<ClearAt> &clear_at = {});
 
@@ -65,17 +71,29 @@ class UserStatus {
     //  Q_REQUIRED_RESULT
     public Optional<ClearAt> clear_at ();
 
+    /***********************************************************
+    ***********************************************************/
     public void set_id (string id);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_message (string message);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void set_state (OnlineStatus 
 
-    public void set_state (OnlineStatus state);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
-    public void set_icon (string icon);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void set_message_predefined (bool value);
 
@@ -89,6 +107,8 @@ class UserStatus {
     public GLib.Uri state_icon ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private string _id;
     private string _message;
     private string _icon;
@@ -99,6 +119,8 @@ class UserStatus {
 
 class UserStatusConnector : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public enum class Error {
         CouldNotFetchUserStatus,
         CouldNotFetchPredefinedUserStatuses,
@@ -108,19 +130,31 @@ class UserStatusConnector : GLib.Object {
         CouldNotClearMessage
     };
 
-    public UserStatusConnector (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public UserStatusConnector (GLib.Object parent = new GLib.Object ());
 
     ~UserStatusConnector () override;
 
-    public virtual void fetch_user_status () = 0;
+    /***********************************************************
+    ***********************************************************/
+    public virtual void fetch_user_status ();
 
-    public virtual void fetch_predefined_statuses () = 0;
+    /***********************************************************
+    ***********************************************************/
+    public virtual void fetch_predefined_statuses ();
 
-    public virtual void set_user_status (UserStatus &user_status) = 0;
+    /***********************************************************
+    ***********************************************************/
+    public virtual void set_user_status (UserStatus &user_status);
 
-    public virtual void clear_message () = 0;
+    /***********************************************************
+    ***********************************************************/
+    public virtual void clear_message ();
 
-    public virtual UserStatus user_status () = 0;
+    /***********************************************************
+    ***********************************************************/
+    public virtual UserStatus user_status ();
 
 signals:
     void user_status_fetched (UserStatus &user_status);

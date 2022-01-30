@@ -43,63 +43,121 @@ class User : GLib.Object {
     Q_PROPERTY (bool is_connected READ is_connected NOTIFY account_state_changed)
     Q_PROPERTY (Unified_search_results_list_model* unified_search_results_list_model READ get_unified_search_results_list_model CONSTANT)
 
-    public User (AccountStatePtr &account, bool &is_current = false, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public User (AccountStatePtr &account, bool &is_current = false, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public AccountPointer account ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public AccountStatePtr account_state ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool is_connected ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public bool is_current_user ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_current_user (bool &is_current);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public Folder get_folder ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public ActivityListModel get_activity_model ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public Unified_search_results_list_model get_u
 
-    public Unified_search_results_list_model get_unified_search_results_list_model ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void open_local_folder ();
-
-
+    /***********************************************************
+    ***********************************************************/
     public string name ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string server (bool shortened = true);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public bool has_local_folder ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool server_has_talk ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public bool server_has_
 
-    public bool server_has_user_status ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public AccountApp talk_app ();
-
-
+    /***********************************************************
+    ***********************************************************/
     public bool has_activities ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public AccountAppList app_list ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public QImage avatar ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void login ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void logout ();
 
@@ -138,39 +196,73 @@ signals:
     void desktop_notifications_allowed_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_item_completed (string folder, SyncFileItemPtr &item);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_progress_info (string folder, ProgressInfo &progress);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void on_add_error (string folder_alias, string message, ErrorCategory category);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_add_error_to_gui (string folder_alias, SyncFileItem.Status status, string error_message, string subject = {});
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void on_notification_request_finished (int status_c
 
-    public void on_notification_request_finished (int status_code);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_notify_network_error (QNetworkReply reply);
-
-
+    /***********************************************************
+    ***********************************************************/
     public void on_end_notification_request (int reply_code);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_notify_server_finished (string reply, int reply_code);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void on_send_notific
 
-    public void on_send_notification_request (string account_name, string link, GLib.ByteArray verb, int row);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_build_notification_display (Activity_list &list);
-
-
+    /***********************************************************
+    ***********************************************************/
     public void on_refresh_notifications ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_refresh_activities ();
 
 
@@ -189,31 +281,47 @@ signals:
     public void on_rebuild_navigation_app_list ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_push_notifications_ready ();
     private void on_disconnect_push_notifications ();
     private void on_received_push_notification (Account account);
     private void on_received_push_activity (Account account);
     private void on_check_expired_activities ();
 
+    /***********************************************************
+    ***********************************************************/
     private void connect_push_notifications ();
-    private bool check_push_notifications_are_ready ();
 
-    private bool is_activity_of_current_account (Folder folder);
+    /***********************************************************
+    ***********************************************************/
+    private 
+
+    /***********************************************************
+    ***********************************************************/
     private bool is_unsolvable_conflict (SyncFileItemPtr &item);
 
+    /***********************************************************
+    ***********************************************************/
     private void show_desktop_notification (string title, string message);
 
 
+    /***********************************************************
+    ***********************************************************/
     private AccountStatePtr _account;
     private bool _is_current_user;
     private ActivityListModel _activity_model;
     private Unified_search_results_list_model _unified_search_results_model;
     private Activity_list _blocklisted_notifications;
 
+    /***********************************************************
+    ***********************************************************/
     private QTimer _expired_activities_check_timer;
     private QTimer _notification_check_timer;
     private QHash<AccountState *, QElapsedTimer> _time_since_last_check;
 
+    /***********************************************************
+    ***********************************************************/
     private QElapsedTimer _gui_log_timer;
     private Notification_cache _notification_cache;
 
@@ -226,51 +334,97 @@ class User_model : QAbstractListModel {
     Q_PROPERTY (User* current_user READ current_user NOTIFY new_user_selected)
     Q_PROPERTY (int current_user_id READ current_user_id NOTIFY new_user_selected)
 
+    /***********************************************************
+    ***********************************************************/
     public static User_model instance ();
-    ~User_model () override = default;
 
-    public void add_user (AccountStatePtr &user, bool &is_current = false);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
     public int current_user_index ();
 
+    /***********************************************************
+    ***********************************************************/
     public int row_count (QModelIndex &parent = QModelIndex ()) override;
 
-    public QVariant data (QModelIndex &index, int role = Qt.Display_role) override;
+    /***********************************************************
+    ***********************************************************/
+    public QVariant data (QModelIndex &in
 
-    public QImage avatar_by_id (int &id);
+    /***********************************************************
+    ***********************************************************/
+    public QImage avatar_by_id (
 
+    /***********************************************************
+    ***********************************************************/
     public User current_user ();
 
-    public int find_user_id_for_account (AccountState account);
+    /***********************************************************
+    ***********************************************************/
+    public int find_user_id_for_account (AccountS
 
+    /***********************************************************
+    ***********************************************************/
     public void fetch_current_activity_model ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void open_current_account_local_folder ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void open_current_
 
-    public void open_current_account_talk ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void open_current_account_server ();
-
-
+    /***********************************************************
+    ***********************************************************/
     public int num_users ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string current_user_server ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public int current_user_id ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool is_user_connected (int &id);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void switch_current_user (int &id);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void login (int &id);
 
 
@@ -297,6 +451,8 @@ class User_model : QAbstractListModel {
         Id_role
     };
 
+    /***********************************************************
+    ***********************************************************/
     public AccountAppList app_list ();
 
 signals:
@@ -307,50 +463,74 @@ signals:
     protected QHash<int, GLib.ByteArray> role_names () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private static User_model _instance;
-    private User_model (GLib.Object parent = nullptr);
+    private User_model (GLib.Object parent = new GLib.Object ());
     private GLib.List<User> _users;
     private int _current_user_id = 0;
     private bool _init = true;
 
+    /***********************************************************
+    ***********************************************************/
     private void build_user_list ();
 };
 
 class Image_provider : QQuick_image_provider {
 
+    /***********************************************************
+    ***********************************************************/
     public Image_provider ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public QImage request_image (string id, QSize size, QSize &requested_size) override;
 };
 
 class User_apps_model : QAbstractListModel {
 
+    /***********************************************************
+    ***********************************************************/
     public static User_apps_model instance ();
-    ~User_apps_model () override = default;
 
-    public int row_count (QModelIndex &parent = QModelIndex ()) override;
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public QVariant data (QModelIndex &index, int role = Qt.Display_role) override;
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public enum User_apps_roles {
         Name_role = Qt.User_role + 1,
         Url_role,
         Icon_url_role
     };
 
+    /***********************************************************
+    ***********************************************************/
     public void build_app_list ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_open_app_url (GLib.Uri url);
 
 
     protected QHash<int, GLib.ByteArray> role_names () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private static User_apps_model _instance;
-    private User_apps_model (GLib.Object parent = nullptr);
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private AccountAppList _apps;
 };
 
@@ -728,7 +908,7 @@ void User.on_add_error (string folder_alias, string message, ErrorCategory categ
         Activity activity;
         activity._type = Activity.Sync_result_type;
         activity._status = SyncResult.Error;
-        activity._date_time = QDateTime.from_string (QDateTime.current_date_time ().to_string (), Qt.ISODate);
+        activity._date_time = QDateTime.from_string (QDateTime.current_date_time ().to_"", Qt.ISODate);
         activity._subject = message;
         activity._message = folder_instance.short_gui_local_path ();
         activity._link = folder_instance.short_gui_local_path ();
@@ -762,7 +942,7 @@ void User.on_add_error_to_gui (string folder_alias, SyncFileItem.Status status, 
         activity._type = Activity.Sync_file_item_type;
         activity._status = status;
         const var current_date_time = QDateTime.current_date_time ();
-        activity._date_time = QDateTime.from_string (current_date_time.to_string (), Qt.ISODate);
+        activity._date_time = QDateTime.from_string (current_date_time.to_"", Qt.ISODate);
         activity._expire_at_msecs = current_date_time.add_m_secs (activity_default_expiration_time_msecs).to_m_secs_since_epoch ();
         activity._subject = !subject.is_empty () ? subject : folder_instance.short_gui_local_path ();
         activity._message = error_message;
@@ -912,7 +1092,7 @@ string User.name () {
 }
 
 string User.server (bool shortened) {
-    string server_url = _account.account ().url ().to_string ();
+    string server_url = _account.account ().url ().to_"";
     if (shortened) {
         server_url.replace (QLatin1String ("https://"), QLatin1String (""));
         server_url.replace (QLatin1String ("http://"), QLatin1String (""));
@@ -946,7 +1126,7 @@ QImage User.avatar () {
 
 string User.avatar_url () {
     if (avatar ().is_null ()) {
-        return string ();
+        return "";
     }
 
     return QStringLiteral ("image://avatars/") + _account.account ().id ();
@@ -1377,7 +1557,7 @@ QVariant User_apps_model.data (QModelIndex &index, int role) {
     } else if (role == Url_role) {
         return _apps[index.row ()].url ();
     } else if (role == Icon_url_role) {
-        return _apps[index.row ()].icon_url ().to_string ();
+        return _apps[index.row ()].icon_url ().to_"";
     }
     return QVariant ();
 }

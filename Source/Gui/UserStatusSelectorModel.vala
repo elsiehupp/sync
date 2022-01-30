@@ -44,62 +44,114 @@ class User_status_selector_model : GLib.Object {
     Q_PROPERTY (GLib.Uri dnd_icon READ dnd_icon CONSTANT)
     Q_PROPERTY (GLib.Uri invisible_icon READ invisible_icon CONSTANT)
 
-    public User_status_selector_model (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public User_status_selector_model (GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public User_status_selector_model (std.shared_ptr<UserStatusConnector> user_status_connector,
-        GLib.Object parent = nullptr);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public User_status_selector_model (std.shared_ptr<UserStatusConnector> user_status_connector,
         std.unique_ptr<DateTimeProvider> date_time_provider,
-        GLib.Object parent = nullptr);
+        GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public User_status_selector_model (UserStatus &user_status,
         std.unique_ptr<DateTimeProvider> date_time_provider,
-        GLib.Object parent = nullptr);
+        GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public User_status_selector_model (UserStatus &user_status,
-        GLib.Object parent = nullptr);
 
-    public Q_INVOKABLE void on_load (int id);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public Q_REQUIRED_RESULT UserStatus.OnlineStatus online_status ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public Q_INVOKABLE void set_online_status (Occ.UserStatus.OnlineStatus status);
+    /***********************************************************
+    ***********************************************************/
+    public Q_INVOKABLE void set_online_status (Occ.Use
 
-    public Q_REQUIRED_RESULT GLib.Uri online_icon ();
+    /***********************************************************
+    ***********************************************************/
+    public Q_REQUIRED_RESULT GLib.Uri online_icon ()
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public Q_REQUIRED_RESULT GLib.Uri away_icon ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public Q_REQUIRED_RESULT GLib.Uri dnd_icon ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public Q_REQUIRED_RESULT GLib.Uri invisible_icon ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public Q_REQUIRED_RESULT string user_status_message ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public Q_INVOKABLE void set_user_status_mess
 
-    public Q_INVOKABLE void set_user_status_message (string message);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_user_status_emoji (string emoji);
-
-
+    /***********************************************************
+    ***********************************************************/
     public Q_REQUIRED_RESULT string user_status_emoji ();
 
+    /***********************************************************
+    ***********************************************************/
     public Q_INVOKABLE void set_user_status ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public Q_INVOKABLE void clear_user_status ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public Q_REQUIRED_RESULT int predefined_statuses_count ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public Q_INVOKABLE UserStatus predefined_status (
 
-    public Q_INVOKABLE UserStatus predefined_status (int index);
-
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public Q_INVOKABLE string predefined_status_clear_at (int index);
 
 
@@ -124,6 +176,8 @@ signals:
     void on_finished ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private enum class Clear_stage_type {
         Dont_clear,
         Half_hour,
@@ -133,6 +187,8 @@ signals:
         Week
     };
 
+    /***********************************************************
+    ***********************************************************/
     private void on_init ();
     private void on_reset ();
     private void on_user_status_fetched (UserStatus &user_status);
@@ -152,13 +208,19 @@ signals:
     private void set_error (string reason);
     private void clear_error ();
 
+    /***********************************************************
+    ***********************************************************/
     private std.shared_ptr<UserStatusConnector> _user_status_connector {};
     private std.vector<UserStatus> _predefined_statuses;
     private UserStatus _user_status;
     private std.unique_ptr<DateTimeProvider> _date_time_provider;
 
+    /***********************************************************
+    ***********************************************************/
     private string _error_message;
 
+    /***********************************************************
+    ***********************************************************/
     private std.vector<Clear_stage_type> _clear_stages = {
         Clear_stage_type.Dont_clear,
         Clear_stage_type.Half_hour,

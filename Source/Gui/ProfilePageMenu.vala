@@ -11,15 +11,23 @@ namespace Occ {
 
 class Profile_page_menu : Gtk.Widget {
 
+    /***********************************************************
+    ***********************************************************/
     public Profile_page_menu (AccountPointer account, string share_with_user_id, Gtk.Widget parent = nullptr);
-    ~Profile_page_menu () override;
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void exec (QPoint &global_position);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_hovercard_fetched ();
-    private void on_icon_loaded (std.size_t &hovercard_action_index);
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private OcsProfileConnector _profile_connector;
     private QMenu _menu;
 };

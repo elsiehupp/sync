@@ -13,10 +13,16 @@ namespace Occ {
 ***********************************************************/
 class Owncloud_http_creds_page : Abstract_credentials_wizard_page {
 
+    /***********************************************************
+    ***********************************************************/
     public Owncloud_http_creds_page (Gtk.Widget parent);
 
+    /***********************************************************
+    ***********************************************************/
     public AbstractCredentials get_credentials () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void initialize_page () override;
     public void cleanup_page () override;
     public bool validate_page () override;
@@ -24,20 +30,28 @@ class Owncloud_http_creds_page : Abstract_credentials_wizard_page {
     public void set_connected ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_set_error_string (string err);
 
 signals:
     void connect_to_oc_url (string );
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_style_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_start_spinner ();
     private void on_stop_spinner ();
     private void setup_customization ();
     private void customize_style ();
 
+    /***********************************************************
+    ***********************************************************/
     private Ui_Owncloud_http_creds_page _ui;
     private bool _connected;
     private QProgress_indicator _progress_indi;
@@ -152,7 +166,7 @@ signals:
             oc_wizard.account ().clear_cookie_jar ();
 
             emit complete_changed ();
-            emit connect_to_oc_url (field ("OCUrl").to_string ().simplified ());
+            emit connect_to_oc_url (field ("OCUrl").to_"".simplified ());
 
             return false;
         } else {

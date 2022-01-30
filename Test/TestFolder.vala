@@ -11,6 +11,8 @@ using namespace Occ;
 
 class TestFolder : public GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testFolder () {
         QFETCH (string, folder);
         QFETCH (string, expectedFolder);
@@ -19,6 +21,9 @@ class TestFolder : public GLib.Object {
         delete f;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testFolder_data () {
         QTest.addColumn<string> ("folder");
         QTest.addColumn<string> ("expectedFolder");

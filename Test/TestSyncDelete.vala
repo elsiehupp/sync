@@ -12,6 +12,8 @@ using namespace Occ;
 
 class TestSyncDelete : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDeleteDirectoryWithNewFile () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
@@ -36,6 +38,9 @@ class TestSyncDelete : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void issue1329 () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 

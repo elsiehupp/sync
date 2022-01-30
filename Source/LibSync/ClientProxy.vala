@@ -23,16 +23,28 @@ namespace Occ {
 ***********************************************************/
 class ClientProxy : GLib.Object {
 
-    public ClientProxy (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public ClientProxy (GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public static bool is_using_system_default ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public static void lookup_system_proxy_async (GLib.Uri url, GLib.Object dst, char slot);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public static string print_q_network_proxy (QNetworkProxy &proxy);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public static const char proxy_type_to_c_str (QNetworkProxy.ProxyType type);
 
 
@@ -41,14 +53,20 @@ class ClientProxy : GLib.Object {
 
 class SystemProxyRunnable : GLib.Object, public QRunnable {
 
+    /***********************************************************
+    ***********************************************************/
     public SystemProxyRunnable (GLib.Uri url);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void run () override;
 signals:
     void system_proxy_looked_up (QNetworkProxy &url);
 
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.Uri _url;
 };
 
@@ -57,6 +75,8 @@ signals:
         base (parent);
     }
 
+    /***********************************************************
+    ***********************************************************/
     static QNetworkProxy proxy_from_config (ConfigFile &cfg) {
         QNetworkProxy proxy;
 

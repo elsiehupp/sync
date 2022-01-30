@@ -22,21 +22,33 @@ class Sync_status_summary : GLib.Object {
     Q_PROPERTY (string sync_status_string READ sync_status_string NOTIFY sync_status_string_changed)
     Q_PROPERTY (string sync_status_detail_string READ sync_status_detail_string NOTIFY sync_status_detail_string_changed)
 
-    public Sync_status_summary (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public Sync_status_summary (GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public double sync_progress ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public GLib.Uri sync_icon ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public bool syncing ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
+    public string sync_status_"";
 
-    public string sync_status_string ();
 
-
-    public string sync_status_detail_string ();
+    public string sync_status_detail_"";
 
 signals:
     void sync_progress_changed ();
@@ -46,16 +58,24 @@ signals:
     void sync_status_detail_string_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_load ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void connect_to_folders_progress (Folder.Map &map);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_folder_list_changed (Occ.Folder.Map &folder_map);
     private void on_folder_progress_info (ProgressInfo &progress);
     private void on_folder_sync_state_changed (Folder folder);
     private void on_is_connected_changed ();
 
+    /***********************************************************
+    ***********************************************************/
     private void set_sync_state_for_folder (Folder folder);
     private void mark_folder_as_error (Folder folder);
     private void mark_folder_as_success (Folder folder);
@@ -66,6 +86,8 @@ signals:
     private bool reload_needed (AccountState account_state);
     private void init_sync_state ();
 
+    /***********************************************************
+    ***********************************************************/
     private void set_sync_progress (double value);
     private void set_syncing (bool value);
     private void set_sync_status_string (string value);
@@ -73,9 +95,13 @@ signals:
     private void set_sync_icon (GLib.Uri value);
     private void set_account_state (AccountStatePtr account_state);
 
+    /***********************************************************
+    ***********************************************************/
     private AccountStatePtr _account_state;
-    private std.set<string> _folders_with_errors;
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private GLib.Uri _sync_icon = Theme.instance ().sync_status_ok ();
     private double _progress = 1.0;
     private bool _is_syncing = false;
@@ -304,11 +330,11 @@ namespace {
         emit sync_status_string_changed ();
     }
 
-    string Sync_status_summary.sync_status_string () {
+    string Sync_status_summary.sync_status_"" {
         return _sync_status_string;
     }
 
-    string Sync_status_summary.sync_status_detail_string () {
+    string Sync_status_summary.sync_status_detail_"" {
         return _sync_status_detail_string;
     }
 

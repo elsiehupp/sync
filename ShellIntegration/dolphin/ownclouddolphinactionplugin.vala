@@ -31,10 +31,14 @@
 
 class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
-    public OwncloudDolphinPluginAction (GLib.Object* parent, GLib.List<QVariant>&)
+    /***********************************************************
+    ***********************************************************/
+    public OwncloudDolphinPluginAction (GLib.Object parent, GLib.List<QVariant>&)
         : KAbstractFileItemActionPlugin (parent) { }
 
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.List<QAction> actions (KFileItemListProperties& fileItemInfos, Gtk.Widget* parentWidget) override {
         var helper = OwncloudDolphinPluginHelper.instance ();
         if (!helper.isConnected () || !fileItemInfos.isLocal ())
@@ -96,6 +100,8 @@ class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.List<QAction> legacyActions (KFileItemListProperties &fileItemInfos, Gtk.Widget parentWidget) {
         GLib.List<GLib.Uri> urls = fileItemInfos.urlList ();
         if (urls.count () != 1)

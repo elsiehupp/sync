@@ -28,6 +28,8 @@ See: https://docs.nextcloud.com/server/latest/developer_manual/client_apis/Login
 ***********************************************************/
 class Flow2Auth : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public enum TokenAction {
         action_open_browser = 1,
         action_copy_link_to_clipboard
@@ -39,21 +41,33 @@ class Flow2Auth : GLib.Object {
         status_copy_link_to_clipboard
     };
 
+    /***********************************************************
+    ***********************************************************/
     public Flow2Auth (Account account, GLib.Object parent);
-    ~Flow2Auth () override;
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public enum Result {
         NotSupported,
         LoggedIn,
         Error
     };
 
+    /***********************************************************
+    ***********************************************************/
     public void on_start ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void open_browser ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void copy_link_to_clipboard ();
 
 
@@ -64,19 +78,27 @@ signals:
     The state has changed.
     when logged in, app_password has the value of the app password.
     ***********************************************************/
-    void result (Flow2Auth.Result result, string error_string = string (),
-                const string user = string (), string app_password = string ());
+    void result (Flow2Auth.Result result, string error_string = "",
+                const string user = "", string app_password = "");
 
     void status_changed (PollStatus status, int seconds_left);
 
+    /***********************************************************
+    ***********************************************************/
     public void on_poll_now ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_poll_timer_timeout ();
 
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private void fetch_new_token (TokenAction action);
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private Account _account;
     private GLib.Uri _login_url;
     private string _poll_token;
@@ -131,13 +153,13 @@ signals:
         emit status_changed (PollStatus.status_fetch_token, 0);
 
         // Step 1 : Initiate a login, do an anonymous POST request
-        GLib.Uri url = Utility.concat_url_path (_account.url ().to_string (), QLatin1String ("/index.php/login/v2"));
+        GLib.Uri url = Utility.concat_url_path (_account.url ().to_"", QLatin1String ("/index.php/login/v2"));
         _enforce_https = url.scheme () == QStringLiteral ("https");
 
         // add 'Content-Length : 0' header (see https://github.com/nextcloud/desktop/issues/1473)
         QNetworkRequest req;
         req.set_header (QNetworkRequest.ContentLengthHeader, "0");
-        req.set_header (QNetworkRequest.UserAgentHeader, Utility.friendly_user_agent_string ());
+        req.set_header (QNetworkRequest.UserAgentHeader, Utility.friendly_user_agent_"");
 
         var job = _account.send_request ("POST", url, req);
         job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
@@ -150,29 +172,29 @@ signals:
 
             if (reply.error () == QNetworkReply.NoError && json_parse_error.error == QJsonParseError.NoError
                 && !json.is_empty ()) {
-                poll_token = json.value ("poll").to_object ().value ("token").to_string ();
-                poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_string ();
+                poll_token = json.value ("poll").to_object ().value ("token").to_"";
+                poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_"";
                 if (_enforce_https && GLib.Uri (poll_endpoint).scheme () != QStringLiteral ("https")) {
                     GLib.warn (lc_flow2auth) << "Can not poll endpoint because the returned url" << poll_endpoint << "does not on_start with https";
                     emit result (Error, _("The polling URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
                 }
-                login_url = json["login"].to_string ();
+                login_url = json["login"].to_"";
             }
 
             if (reply.error () != QNetworkReply.NoError || json_parse_error.error != QJsonParseError.NoError
                 || json.is_empty () || poll_token.is_empty () || poll_endpoint.is_empty () || login_url.is_empty ()) {
                 string error_reason;
-                string error_from_json = json["error"].to_string ();
+                string error_from_json = json["error"].to_"";
                 if (!error_from_json.is_empty ()) {
                     error_reason = _("Error returned from the server : <em>%1</em>")
                                       .arg (error_from_json.to_html_escaped ());
                 } else if (reply.error () != QNetworkReply.NoError) {
                     error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
-                                      .arg (reply.error_string ().to_html_escaped ());
+                                      .arg (reply.error_"".to_html_escaped ());
                 } else if (json_parse_error.error != QJsonParseError.NoError) {
                     error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                      .arg (json_parse_error.error_string ());
+                                      .arg (json_parse_error.error_"");
                 } else {
                     error_reason = _("The reply from the server did not contain all expected fields");
                 }
@@ -263,29 +285,29 @@ signals:
 
             if (reply.error () == QNetworkReply.NoError && json_parse_error.error == QJsonParseError.NoError
                 && !json.is_empty ()) {
-                server_url = json["server"].to_string ();
+                server_url = json["server"].to_"";
                 if (_enforce_https && server_url.scheme () != QStringLiteral ("https")) {
                     GLib.warn (lc_flow2auth) << "Returned server url" << server_url << "does not on_start with https";
                     emit result (Error, _("The returned server URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
                 }
-                login_name = json["login_name"].to_string ();
-                app_password = json["app_password"].to_string ();
+                login_name = json["login_name"].to_"";
+                app_password = json["app_password"].to_"";
             }
 
             if (reply.error () != QNetworkReply.NoError || json_parse_error.error != QJsonParseError.NoError
                 || json.is_empty () || server_url.is_empty () || login_name.is_empty () || app_password.is_empty ()) {
                 string error_reason;
-                string error_from_json = json["error"].to_string ();
+                string error_from_json = json["error"].to_"";
                 if (!error_from_json.is_empty ()) {
                     error_reason = _("Error returned from the server : <em>%1</em>")
                                       .arg (error_from_json.to_html_escaped ());
                 } else if (reply.error () != QNetworkReply.NoError) {
                     error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
-                                      .arg (reply.error_string ().to_html_escaped ());
+                                      .arg (reply.error_"".to_html_escaped ());
                 } else if (json_parse_error.error != QJsonParseError.NoError) {
                     error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                      .arg (json_parse_error.error_string ());
+                                      .arg (json_parse_error.error_"");
                 } else {
                     error_reason = _("The reply from the server did not contain all expected fields");
                 }
@@ -308,11 +330,11 @@ signals:
             _poll_timer.stop ();
 
             // Success
-            q_c_info (lc_flow2auth) << "Success getting the app_password for user : " << login_name << ", server : " << server_url.to_string ();
+            q_c_info (lc_flow2auth) << "Success getting the app_password for user : " << login_name << ", server : " << server_url.to_"";
 
             _account.set_url (server_url);
 
-            emit result (LoggedIn, string (), login_name, app_password);
+            emit result (LoggedIn, "", login_name, app_password);
 
             // Forget sensitive data
             app_password.clear ();

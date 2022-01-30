@@ -27,8 +27,12 @@ namespace Occ {
 ***********************************************************/
 class Owncloud_advanced_setup_page : QWizard_page {
 
+    /***********************************************************
+    ***********************************************************/
     public Owncloud_advanced_setup_page (OwncloudWizard wizard);
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_complete () override;
     public void initialize_page () override;
     public int next_id () override;
@@ -36,17 +40,29 @@ class Owncloud_advanced_setup_page : QWizard_page {
     public string local_folder ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public string[] selective_sync_blocklist ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool use_virtual_file_sync ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public bool is_confirm_big_folder_checked ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_set_remote_folder (string remote_folder);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void set_multiple_folders_exist (bool exist);
 
@@ -57,12 +73,18 @@ signals:
     void create_local_and_remote_folders (string , string );
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_set_error_string (string );
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_style_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_select_folder ();
     private void on_sync_everything_clicked ();
     private void on_selective_sync_clicked ();
@@ -70,8 +92,12 @@ signals:
     private void on_quota_retrieved (QVariantMap &result);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void set_radio_checked (QRadio_button radio);
 
+    /***********************************************************
+    ***********************************************************/
     private void setup_customization ();
     private void update_status ();
     private bool on_data_changed ();
@@ -93,6 +119,8 @@ signals:
     // TODO : remove when UX decision is made
     private void refresh_virtual_files_availibility (string path);
 
+    /***********************************************************
+    ***********************************************************/
     private Ui_Owncloud_advanced_setup_page _ui;
     private bool _checking = false;
     private bool _created = false;
@@ -158,7 +186,7 @@ signals:
             _ui.conf_trailling_size_label.hide ();
         }
 
-        _ui.r_virtual_file_sync.on_set_text (_("Use &virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? string () : _(" (experimental)")));
+        _ui.r_virtual_file_sync.on_set_text (_("Use &virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
     }
 
     void Owncloud_advanced_setup_page.setup_customization () {
@@ -264,7 +292,7 @@ signals:
 
     void Owncloud_advanced_setup_page.set_user_information () {
         const var account = _oc_wizard.account ();
-        const var server_url = account.url ().to_string ();
+        const var server_url = account.url ().to_"";
         set_server_address_label_url (server_url);
         const var user_name = account.dav_display_name ();
         _ui.user_name_label.on_set_text (user_name);
@@ -281,7 +309,7 @@ signals:
             set_radio_checked (_ui.r_sync_everything);
             _ui.r_virtual_file_sync.set_enabled (false);
         } else {
-            _ui.r_virtual_file_sync.on_set_text (_("Use &virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? string () : _(" (experimental)")));
+            _ui.r_virtual_file_sync.on_set_text (_("Use &virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
             _ui.r_virtual_file_sync.set_enabled (true);
         }
         //
@@ -292,7 +320,7 @@ signals:
             return;
         }
 
-        const var pretty_url = url.to_string ().mid (url.scheme ().size () + 3); // + 3 because we need to remove ://
+        const var pretty_url = url.to_"".mid (url.scheme ().size () + 3); // + 3 because we need to remove ://
         _ui.server_address_label.on_set_text (pretty_url);
     }
 
@@ -383,7 +411,7 @@ signals:
     }
 
     string Owncloud_advanced_setup_page.local_folder () {
-        string folder = wizard ().property ("local_folder").to_string ();
+        string folder = wizard ().property ("local_folder").to_"";
         return folder;
     }
 
@@ -411,7 +439,7 @@ signals:
         }
 
         if (!_created) {
-            on_set_error_string (string ());
+            on_set_error_string ("");
             _checking = true;
             on_start_spinner ();
             emit complete_changed ();
@@ -518,11 +546,11 @@ signals:
                     if (s > 0) {
                         _ui.l_selective_sync_size_label.on_set_text (_(" (%1)").arg (Utility.octets_to_string (s)));
                     } else {
-                        _ui.l_selective_sync_size_label.on_set_text (string ());
+                        _ui.l_selective_sync_size_label.on_set_text ("");
                     }
                 } else {
                     set_radio_checked (_ui.r_sync_everything);
-                    _ui.l_selective_sync_size_label.on_set_text (string ());
+                    _ui.l_selective_sync_size_label.on_set_text ("");
                 }
                 wizard ().set_property ("blocklist", _selective_sync_blocklist);
             }
@@ -544,7 +572,7 @@ signals:
     }
 
     void Owncloud_advanced_setup_page.on_sync_everything_clicked () {
-        _ui.l_selective_sync_size_label.on_set_text (string ());
+        _ui.l_selective_sync_size_label.on_set_text ("");
         set_radio_checked (_ui.r_sync_everything);
         _selective_sync_blocklist.clear ();
 
@@ -569,7 +597,7 @@ signals:
     }
 
     string Owncloud_advanced_setup_page.check_local_space (int64 remote_size) {
-        return (available_local_space ()>remote_size) ? string () : _("There isn't enough free space in the local folder!");
+        return (available_local_space ()>remote_size) ? "" : _("There isn't enough free space in the local folder!");
     }
 
     void Owncloud_advanced_setup_page.on_style_changed () {

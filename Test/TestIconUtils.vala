@@ -8,12 +8,16 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 class TestIconUtils : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public TestIconUtils () {
         Q_INIT_RESOURCE (resources);
         Q_INIT_RESOURCE (theme);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDrawSvgWithCustomFillColor () {
         const string blackSvgDirPath{string{Occ.Theme.themePrefix} + QStringLiteral ("black")};
         const QDir blackSvgDir (blackSvgDirPath);
@@ -34,6 +38,9 @@ class TestIconUtils : GLib.Object {
         QVERIFY (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (whiteSvgDirPath + QStringLiteral ("/") + whiteImages.at (0), QColorConstants.Svg.blue).isNull ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testCreateSvgPixmapWithCustomColor () {
         const QDir blackSvgDir (string (string{Occ.Theme.themePrefix}) + QStringLiteral ("black"));
         const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
@@ -52,6 +59,9 @@ class TestIconUtils : GLib.Object {
         QVERIFY (!Occ.Ui.IconUtils.createSvgImageWithCustomColor (whiteImages.at (0), QColorConstants.Svg.blue).isNull ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPixmapForBackground () {
         const QDir blackSvgDir (string (string{Occ.Theme.themePrefix}) + QStringLiteral ("black"));
         const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));

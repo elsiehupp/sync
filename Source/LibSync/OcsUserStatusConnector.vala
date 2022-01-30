@@ -28,25 +28,41 @@ namespace Occ {
 
 class OcsUserStatusConnector : UserStatusConnector {
 
-    public OcsUserStatusConnector (AccountPointer account, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public OcsUserStatusConnector (AccountPointer account, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public void fetch_user_status () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void fetch_predefined_statuses () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void set_user_status (UserStatus &user_status) override;
 
+    /***********************************************************
+    ***********************************************************/
     public void clear_message () override;
 
+    /***********************************************************
+    ***********************************************************/
     public UserStatus user_status () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_user_status_fetched (QJsonDocument &json, int status_code);
     private void on_predefined_statuses_fetched (QJsonDocument &json, int status_code);
     private void on_user_status_online_status_set (QJsonDocument &json, int status_code);
     private void on_user_status_message_set (QJsonDocument &json, int status_code);
     private void on_message_cleared (QJsonDocument &json, int status_code);
 
+    /***********************************************************
+    ***********************************************************/
     private void log_response (string message, QJsonDocument &json, int status_code);
     private void start_fetch_user_status_job ();
     private void start_fetch_predefined_statuses ();
@@ -55,17 +71,25 @@ class OcsUserStatusConnector : UserStatusConnector {
     private void set_user_status_message_predefined (UserStatus &user_status);
     private void set_user_status_message_custom (UserStatus &user_status);
 
+    /***********************************************************
+    ***********************************************************/
     private AccountPointer _account;
 
+    /***********************************************************
+    ***********************************************************/
     private bool _user_status_supported = false;
-    private bool _user_status_emojis_supported = false;
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private QPointer<JsonApiJob> _clear_message_job {};
     private QPointer<JsonApiJob> _set_message_job {};
     private QPointer<JsonApiJob> _set_online_status_job {};
     private QPointer<JsonApiJob> _get_predefined_stauses_job {};
     private QPointer<JsonApiJob> _get_user_status_job {};
 
+    /***********************************************************
+    ***********************************************************/
     private UserStatus _user_status;
 };
 
@@ -124,9 +148,9 @@ class OcsUserStatusConnector : UserStatusConnector {
     Occ.UserStatus json_extract_user_status (QJsonObject json) {
         const var clear_at = json_extract_clear_at (json);
 
-        const Occ.UserStatus user_status (json.value ("message_id").to_string (),
-            json.value ("message").to_string ().trimmed (),
-            json.value ("icon").to_string ().trimmed (), string_to_user_online_status (json.value ("status").to_string ()),
+        const Occ.UserStatus user_status (json.value ("message_id").to_"",
+            json.value ("message").to_"".trimmed (),
+            json.value ("icon").to_"".trimmed (), string_to_user_online_status (json.value ("status").to_""),
             json.value ("message_is_predefined").to_bool (false), clear_at);
 
         return user_status;

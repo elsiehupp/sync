@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 class TestLongWindowsPath : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testLongPathStat_data () {
         QTest.addColumn<string> ("name");
 
@@ -48,6 +50,9 @@ class TestLongWindowsPath : GLib.Object {
                                                            "olonglonglonglong/自己的云.txt");
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testLongPathStat () {
         QTemporaryDir tmp;
         QFETCH (string, name);

@@ -33,10 +33,16 @@ Q_DECLARE_LOGGING_CATEGORY (lc_propagate_upload_nG)
 ***********************************************************/
 class UploadDevice : QIODevice {
 
+    /***********************************************************
+    ***********************************************************/
     public UploadDevice (string file_name, int64 on_start, int64 size, BandwidthManager bwm);
-    ~UploadDevice () override;
 
-    public bool open (QIODevice.Open_mode mode) override;
+    /***********************************************************
+    ***********************************************************/
+    public 
+
+    /***********************************************************
+    ***********************************************************/
     public void close () override;
 
     public int64 write_data (char *, int64) override;
@@ -47,18 +53,32 @@ class UploadDevice : QIODevice {
     public bool is_sequential () override;
     public bool seek (int64 pos) override;
 
+    /***********************************************************
+    ***********************************************************/
     public void set_bandwidth_limited (bool);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool is_bandwidth_limited () {
         return _bandwidth_limited;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void set_choked (bool);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool is_choked () {
         return _choked;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void give_bandwidth_quota (int64 bwq);
 
 
@@ -80,6 +100,8 @@ class UploadDevice : QIODevice {
     private bool _choked = false; // if upload is paused (read_data () will return 0)
     private friend class BandwidthManager;
 
+    /***********************************************************
+    ***********************************************************/
     public void on_job_upload_progress (int64 sent, int64 t);
 };
 
@@ -89,6 +111,8 @@ class UploadDevice : QIODevice {
 ***********************************************************/
 class PUTFile_job : AbstractNetworkJob {
 
+    /***********************************************************
+    ***********************************************************/
     private QIODevice _device;
     private QMap<GLib.ByteArray, GLib.ByteArray> _headers;
     private string _error_string;
@@ -98,16 +122,20 @@ class PUTFile_job : AbstractNetworkJob {
 
     // Takes ownership of the device
     public PUTFile_job (AccountPointer account, string path, std.unique_ptr<QIODevice> device,
-        const QMap<GLib.ByteArray, GLib.ByteArray> &headers, int chunk, GLib.Object parent = nullptr)
+        const QMap<GLib.ByteArray, GLib.ByteArray> &headers, int chunk, GLib.Object parent = new GLib.Object ())
         : AbstractNetworkJob (account, path, parent)
         , _device (device.release ())
         , _headers (headers)
         , _chunk (chunk) {
         _device.set_parent (this);
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public PUTFile_job (AccountPointer account, GLib.Uri url, std.unique_ptr<QIODevice> device,
-        const QMap<GLib.ByteArray, GLib.ByteArray> &headers, int chunk, GLib.Object parent = nullptr)
-        : AbstractNetworkJob (account, string (), parent)
+        const QMap<GLib.ByteArray, GLib.ByteArray> &headers, int chunk, GLib.Object parent = new GLib.Object ())
+        : AbstractNetworkJob (account, "", parent)
         , _device (device.release ())
         , _headers (headers)
         , _url (url)
@@ -116,22 +144,34 @@ class PUTFile_job : AbstractNetworkJob {
     }
     ~PUTFile_job () override;
 
+    /***********************************************************
+    ***********************************************************/
     public int _chunk;
 
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
 
+    /***********************************************************
+    ***********************************************************/
     public bool on_finished () override;
 
+    /***********************************************************
+    ***********************************************************/
     public QIODevice device () {
         return _device;
     }
 
 
-    public string error_string () override {
-        return _error_string.is_empty () ? AbstractNetworkJob.error_string () : _error_string;
+    /***********************************************************
+    ***********************************************************/
+    public string error_"" override {
+        return _error_string.is_empty () ? AbstractNetworkJob.error_"" : _error_string;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public std.chrono.milliseconds ms_since_start () {
         return std.chrono.milliseconds (_request_timer.elapsed ());
     }
@@ -154,6 +194,8 @@ class PollJob : AbstractNetworkJob {
     string _local_path;
 
 
+    /***********************************************************
+    ***********************************************************/
     public SyncFileItemPtr _item;
     // Takes ownership of the device
     public PollJob (AccountPointer account, string path, SyncFileItemPtr &item,
@@ -165,6 +207,8 @@ class PollJob : AbstractNetworkJob {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
     public bool on_finished () override;
 
@@ -230,6 +274,8 @@ class PropagateUploadFileCommon : PropagateItemJob {
     protected GLib.ByteArray _transmission_checksum_header;
 
 
+    /***********************************************************
+    ***********************************************************/
     public PropagateUploadFileCommon (OwncloudPropagator propagator, SyncFileItemPtr &item);
 
 
@@ -249,12 +295,20 @@ class PropagateUploadFileCommon : PropagateItemJob {
     public void setup_encrypted_file (string& path, string& filename, uint64 size);
 
 
+    /***********************************************************
+    ***********************************************************/
     public void setup_unencrypted_file ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void start_upload_file ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void call_unlock_folder ();
 
 
@@ -262,6 +316,9 @@ class PropagateUploadFileCommon : PropagateItemJob {
         return _item._size < propagator ().small_file_size ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_compute_content_checksum ();
     // Content checksum computed, compute the transmission checksum
     private void on_compute_transmission_checksum (GLib.ByteArray content_checksum_type, GLib.ByteArray content_checksum);
@@ -273,24 +330,36 @@ class PropagateUploadFileCommon : PropagateItemJob {
     private void on_on_error_start_folder_unlock (SyncFileItem.Status status, string error_string);
 
 
-    public virtual void do_start_upload () = 0;
+    /***********************************************************
+    ***********************************************************/
+    public virtual void do_start_upload ();
 
+    /***********************************************************
+    ***********************************************************/
     public void start_poll_job (string path);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_finalize ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void abort_with_error (SyncFileItem.Status status, string error);
 
 
     public void on_job_destroyed (GLib.Object job);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_poll_finished ();
 
 
-    protected void on_done (SyncFileItem.Status status, string error_string = string ()) override;
+    protected void on_done (SyncFileItem.Status status, string error_string = "") override;
 
 
     /***********************************************************
@@ -333,6 +402,8 @@ class PropagateUploadFileCommon : PropagateItemJob {
     ***********************************************************/
     protected QMap<GLib.ByteArray, GLib.ByteArray> headers ();
 
+    /***********************************************************
+    ***********************************************************/
     private Propagate_upload_encrypted _upload_encrypted_helper;
     private bool _uploading_encrypted;
     private Upload_status _upload_status;
@@ -362,6 +433,8 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
     private int _chunk_count = 0; /// Total number of chunks for this file
     private uint32 _transfer_id = 0; /// transfer id (part of the url)
 
+    /***********************************************************
+    ***********************************************************/
     private int64 chunk_size () {
         // Old chunking does not use dynamic chunking algorithm, and does not adjusts the chunk size respectively,
         // thus this value should be used as the one classifing item to be chunked
@@ -369,15 +442,23 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public PropagateUploadFileV1 (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateUploadFileCommon (propagator, item) {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void do_start_upload () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void on_abort (PropagatorJob.AbortType abort_type) override;
 
+    /***********************************************************
+    ***********************************************************/
     private void on_start_next_chunk ();
     private void on_put_finished ();
     private void on_upload_progress (int64, int64);
@@ -391,6 +472,8 @@ Propagation job, impementing the new chunking agorithm
 ***********************************************************/
 class PropagateUploadFileNG : PropagateUploadFileCommon {
 
+    /***********************************************************
+    ***********************************************************/
     private int64 _sent = 0; /// amount of data (bytes) that was already sent
     private uint32 _transfer_id = 0; /// transfer id (part of the url)
     private int _current_chunk = 0; /// Id of the next chunk that will be sent
@@ -413,19 +496,29 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     private GLib.Uri chunk_url (int chunk = -1);
 
 
+    /***********************************************************
+    ***********************************************************/
     public PropagateUploadFileNG (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateUploadFileCommon (propagator, item) {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void do_start_upload () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void start_new_upload ();
     private void on_start_next_chunk ();
 
+    /***********************************************************
+    ***********************************************************/
     public void on_abort (AbortType abort_type) override;
 
+    /***********************************************************
+    ***********************************************************/
     private void on_propfind_finished ();
     private void on_propfind_finished_with_error ();
     private void on_propfind_iterate (string name, QMap<string, string> &properties);
@@ -456,7 +549,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
 
         if (reply ().error () != QNetworkReply.NoError) {
-            GLib.warn (lc_put_job) << " Network error : " << reply ().error_string ();
+            GLib.warn (lc_put_job) << " Network error : " << reply ().error_"";
         }
 
         connect (reply (), &QNetworkReply.upload_progress, this, &PUTFile_job.upload_progress);
@@ -468,8 +561,8 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     bool PUTFile_job.on_finished () {
         _device.close ();
 
-        q_c_info (lc_put_job) << "PUT of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
-                         << reply_status_string ()
+        q_c_info (lc_put_job) << "PUT of" << reply ().request ().url ().to_"" << "FINISHED WITH STATUS"
+                         << reply_status_""
                          << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute)
                          << reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute);
 
@@ -493,7 +586,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             _item._http_error_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
             _item._request_id = request_id ();
             _item._status = classify_error (err, _item._http_error_code);
-            _item._error_string = error_string ();
+            _item._error_string = error_"";
 
             if (_item._status == SyncFileItem.FatalError || _item._http_error_code >= 400) {
                 if (_item._status != SyncFileItem.FatalError
@@ -514,7 +607,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         GLib.ByteArray json_data = reply ().read_all ().trimmed ();
         QJsonParseError json_parse_error;
         QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
-        q_c_info (lc_poll_job) << ">" << json_data << "<" << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int () << json << json_parse_error.error_string ();
+        q_c_info (lc_poll_job) << ">" << json_data << "<" << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int () << json << json_parse_error.error_"";
         if (json_parse_error.error != QJsonParseError.NoError) {
             _item._error_string = _("Invalid JSON reply from the poll URL");
             _item._status = SyncFileItem.NormalError;
@@ -522,7 +615,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             return true;
         }
 
-        var status = json["status"].to_string ();
+        var status = json["status"].to_"";
         if (status == QLatin1String ("on_init") || status == QLatin1String ("started")) {
             QTimer.single_shot (5 * 1000, this, &PollJob.on_start);
             return false;
@@ -533,11 +626,11 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         if (status == QLatin1String ("on_finished")) {
             _item._status = SyncFileItem.Success;
-            _item._file_id = json["file_id"].to_string ().to_utf8 ();
-            _item._etag = parse_etag (json["ETag"].to_string ().to_utf8 ());
+            _item._file_id = json["file_id"].to_"".to_utf8 ();
+            _item._etag = parse_etag (json["ETag"].to_"".to_utf8 ());
         } else { // error
             _item._status = classify_error (QNetworkReply.Unknown_content_error, _item._http_error_code);
-            _item._error_string = json["error_message"].to_string ();
+            _item._error_string = json["error_message"].to_"";
         }
 
         SyncJournalDb.PollInfo info;
@@ -559,7 +652,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         , _uploading_encrypted (false) {
         const var path = _item._file;
         const var slash_position = path.last_index_of ('/');
-        const var parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
+        const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
         SyncJournalFileRecord parent_rec;
         bool ok = propagator._journal.get_file_record (parent_path, &parent_rec);
@@ -575,7 +668,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     void PropagateUploadFileCommon.on_start () {
         const var path = _item._file;
         const var slash_position = path.last_index_of ('/');
-        const var parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
+        const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
         if (!_item._rename_target.is_empty () && _item._file != _item._rename_target) {
             // Try to rename the file
@@ -897,7 +990,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         var c = _file.read (data, maxlen);
         if (c < 0) {
-            on_set_error_string (_file.error_string ());
+            on_set_error_string (_file.error_"");
             return -1;
         }
         _read += c;
@@ -1169,7 +1262,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         if (_uploading_encrypted) {
             _upload_status = {
-                SyncFileItem.Success, string ()
+                SyncFileItem.Success, ""
             };
             connect (_upload_encrypted_helper, &Propagate_upload_encrypted.folder_unlocked, this, &PropagateUploadFileCommon.on_folder_unlocked);
             _upload_encrypted_helper.unlock_folder ();

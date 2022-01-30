@@ -31,8 +31,8 @@
 // #include <common/utility.h>
 // #include <common/constants.h>
 
-QDebug operator<< (QDebug out, std.string& str) {
-    out << string.from_std_string (str);
+QDebug operator<< (QDebug out, std.string& string_value) {
+    out << string.from_std_string (string_value);
     return out;
 }
 
@@ -102,6 +102,8 @@ namespace EncryptionHelper {
 //
 class CipherCtx {
 
+    /***********************************************************
+    ***********************************************************/
     public CipherCtx () : _ctx (EVP_CIPHER_CTX_new ()) {
     }
 
@@ -110,6 +112,8 @@ class CipherCtx {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public operator EVP_CIPHER_CTX* () {
         return _ctx;
     }
@@ -121,19 +125,29 @@ class CipherCtx {
 
 class StreamingDecryptor {
 
+    /***********************************************************
+    ***********************************************************/
     public StreamingDecryptor (GLib.ByteArray key, GLib.ByteArray iv, uint64 total_size);
-    ~StreamingDecryptor () = default;
 
-    public GLib.ByteArray chunk_decryption (char input, uint64 chunk_size);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool is_initialized ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public bool is_finished ();
 
 
     //  Q_DISABLE_COPY (StreamingDecryptor)
 
+    /***********************************************************
+    ***********************************************************/
     private CipherCtx _ctx;
     private bool _is_initialized = false;
     private bool _is_finished = false;
@@ -144,25 +158,39 @@ class StreamingDecryptor {
 
 class ClientSideEncryption : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public ClientSideEncryption ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void initialize (AccountPointer &account);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void generate_key_pair (AccountPointer &account);
     private void generate_c_sR (AccountPointer &account, EVP_PKEY *key_pair);
     private void encrypt_private_key (AccountPointer &account);
 
 
+    /***********************************************************
+    ***********************************************************/
     public void forget_sensitive_data (AccountPointer &account);
 
+    /***********************************************************
+    ***********************************************************/
     public bool new_mnemonic_generated ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_request_mnemonic ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_public_key_fetched (QKeychain.Job incoming);
     private void on_private_key_fetched (QKeychain.Job incoming);
     private void on_mnemonic_key_fetched (QKeychain.Job incoming);
@@ -173,19 +201,27 @@ signals:
     void show_mnemonic (string& mnemonic);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void get_private_key_from_server (AccountPointer &account);
     private void get_public_key_from_server (AccountPointer &account);
     private void fetch_and_validate_public_key_from_server (AccountPointer &account);
     private void decrypt_private_key (AccountPointer &account, GLib.ByteArray key);
 
+    /***********************************************************
+    ***********************************************************/
     private void fetch_from_key_chain (AccountPointer &account);
 
+    /***********************************************************
+    ***********************************************************/
     private bool check_public_key_validity (AccountPointer &account);
     private bool check_server_public_key_validity (GLib.ByteArray server_public_key_string);
     private void write_private_key (AccountPointer &account);
     private void write_certificate (AccountPointer &account);
     private void write_mnemonic (AccountPointer &account);
 
+    /***********************************************************
+    ***********************************************************/
     private bool is_initialized = false;
 
 
@@ -213,17 +249,29 @@ struct EncryptedFile {
 
 class FolderMetadata {
 
+    /***********************************************************
+    ***********************************************************/
     public FolderMetadata (AccountPointer account, GLib.ByteArray& metadata = GLib.ByteArray (), int status_code = -1);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public GLib.ByteArray encrypted_metadata ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void add_encrypted_file (EncryptedFile& f);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void remove_encrypted_file (EncryptedFile& f);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void remove_all_encrypted_files ();
 
@@ -238,12 +286,20 @@ class FolderMetadata {
     private void setup_empty_metadata ();
     private void setup_existing_metadata (GLib.ByteArray& metadata);
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.ByteArray encrypt_metadata_key (GLib.ByteArray& metadata_key);
-    private GLib.ByteArray decrypt_metadata_key (GLib.ByteArray& encrypted_key);
 
-    private GLib.ByteArray encrypt_json_object (GLib.ByteArray& obj, GLib.ByteArray pass);
+    /***********************************************************
+    ***********************************************************/
+    private 
+
+    /***********************************************************
+    ***********************************************************/
     private GLib.ByteArray decrypt_json_object (GLib.ByteArray& encrypted_json_blob, GLib.ByteArray& pass);
 
+    /***********************************************************
+    ***********************************************************/
     private QVector<EncryptedFile> _files;
     private QMap<int, GLib.ByteArray> _metadata_keys;
     private AccountPointer _account;
@@ -1005,7 +1061,7 @@ void ClientSideEncryption.initialize (AccountPointer &account) {
 
 void ClientSideEncryption.fetch_from_key_chain (AccountPointer &account) {
     const string kck = AbstractCredentials.keychain_key (
-                account.url ().to_string (),
+                account.url ().to_"",
                 account.credentials ().user () + e2e_cert,
                 account.id ()
     );
@@ -1089,7 +1145,7 @@ void ClientSideEncryption.on_public_key_fetched (Job incoming) {
     q_c_info (lc_cse ()) << "Public key fetched from keychain";
 
     const string kck = AbstractCredentials.keychain_key (
-                account.url ().to_string (),
+                account.url ().to_"",
                 account.credentials ().user () + e2e_private,
                 account.id ()
     );
@@ -1126,7 +1182,7 @@ void ClientSideEncryption.on_private_key_fetched (Job incoming) {
     q_c_info (lc_cse ()) << "Private key fetched from keychain";
 
     const string kck = AbstractCredentials.keychain_key (
-                account.url ().to_string (),
+                account.url ().to_"",
                 account.credentials ().user () + e2e_mnemonic,
                 account.id ()
     );
@@ -1162,7 +1218,7 @@ void ClientSideEncryption.on_mnemonic_key_fetched (QKeychain.Job incoming) {
 
 void ClientSideEncryption.write_private_key (AccountPointer &account) {
     const string kck = AbstractCredentials.keychain_key (
-                account.url ().to_string (),
+                account.url ().to_"",
                 account.credentials ().user () + e2e_private,
                 account.id ()
     );
@@ -1180,7 +1236,7 @@ void ClientSideEncryption.write_private_key (AccountPointer &account) {
 
 void ClientSideEncryption.write_certificate (AccountPointer &account) {
     const string kck = AbstractCredentials.keychain_key (
-                account.url ().to_string (),
+                account.url ().to_"",
                 account.credentials ().user () + e2e_cert,
                 account.id ()
     );
@@ -1198,7 +1254,7 @@ void ClientSideEncryption.write_certificate (AccountPointer &account) {
 
 void ClientSideEncryption.write_mnemonic (AccountPointer &account) {
     const string kck = AbstractCredentials.keychain_key (
-                account.url ().to_string (),
+                account.url ().to_"",
                 account.credentials ().user () + e2e_mnemonic,
                 account.id ()
     );
@@ -1218,12 +1274,12 @@ void ClientSideEncryption.forget_sensitive_data (AccountPointer &account) {
     _private_key = GLib.ByteArray ();
     _certificate = QSslCertificate ();
     _public_key = QSslKey ();
-    _mnemonic = string ();
+    _mnemonic = "";
 
     var start_delete_job = [account] (string user) {
         var job = new DeletePasswordJob (Theme.instance ().app_name ());
         job.set_insecure_fallback (false);
-        job.set_key (AbstractCredentials.keychain_key (account.url ().to_string (), user, account.id ()));
+        job.set_key (AbstractCredentials.keychain_key (account.url ().to_"", user, account.id ()));
         job.on_start ();
     };
 
@@ -1337,7 +1393,7 @@ void ClientSideEncryption.generate_c_sR (AccountPointer &account, EVP_PKEY *key_
 
     connect (job, &SignPublicKeyApiJob.json_received, [this, account] (QJsonDocument& json, int ret_code) {
         if (ret_code == 200) {
-            string cert = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("public-key").to_string ();
+            string cert = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("public-key").to_"";
             _certificate = QSslCertificate (cert.to_local8Bit (), QSsl.Pem);
             _public_key = _certificate.public_key ();
             fetch_and_validate_public_key_from_server (account);
@@ -1355,7 +1411,7 @@ void ClientSideEncryption.encrypt_private_key (AccountPointer &account) {
 
     emit mnemonic_generated (_mnemonic);
 
-    string pass_phrase = list.join (string ()).to_lower ();
+    string pass_phrase = list.join ("").to_lower ();
     q_c_info (lc_cse ()) << "Passphrase Generated:" << pass_phrase;
 
     var salt = EncryptionHelper.generate_random (40);
@@ -1411,7 +1467,7 @@ void ClientSideEncryption.decrypt_private_key (AccountPointer &account, GLib.Byt
             prev = dialog.text_value ();
 
             _mnemonic = prev;
-            string mnemonic = prev.split (" ").join (string ()).to_lower ();
+            string mnemonic = prev.split (" ").join ("").to_lower ();
             q_c_info (lc_cse ()) << "mnemonic:" << mnemonic;
 
             // split off salt
@@ -1433,7 +1489,7 @@ void ClientSideEncryption.decrypt_private_key (AccountPointer &account, GLib.Byt
                 break;
             }
         } else {
-            _mnemonic = string ();
+            _mnemonic = "";
             _private_key = GLib.ByteArray ();
             q_c_info (lc_cse ()) << "Cancelled";
             break;
@@ -1448,7 +1504,7 @@ void ClientSideEncryption.get_private_key_from_server (AccountPointer &account) 
     var job = new JsonApiJob (account, e2ee_base_url () + "private-key", this);
     connect (job, &JsonApiJob.json_received, [this, account] (QJsonDocument& doc, int ret_code) {
             if (ret_code == 200) {
-                string key = doc.object ()["ocs"].to_object ()["data"].to_object ()["private-key"].to_string ();
+                string key = doc.object ()["ocs"].to_object ()["data"].to_object ()["private-key"].to_"";
                 q_c_info (lc_cse ()) << key;
                 q_c_info (lc_cse ()) << "Found private key, lets decrypt it!";
                 decrypt_private_key (account, key.to_local8Bit ());
@@ -1466,7 +1522,7 @@ void ClientSideEncryption.get_public_key_from_server (AccountPointer &account) {
     var job = new JsonApiJob (account, e2ee_base_url () + "public-key", this);
     connect (job, &JsonApiJob.json_received, [this, account] (QJsonDocument& doc, int ret_code) {
             if (ret_code == 200) {
-                string public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-keys"].to_object ()[account.dav_user ()].to_string ();
+                string public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-keys"].to_object ()[account.dav_user ()].to_"";
                 _certificate = QSslCertificate (public_key.to_local8Bit (), QSsl.Pem);
                 _public_key = _certificate.public_key ();
                 q_c_info (lc_cse ()) << "Found Public key, requesting Server Public Key. Public key:" << public_key;
@@ -1486,7 +1542,7 @@ void ClientSideEncryption.fetch_and_validate_public_key_from_server (AccountPoin
     var job = new JsonApiJob (account, e2ee_base_url () + "server-key", this);
     connect (job, &JsonApiJob.json_received, [this, account] (QJsonDocument& doc, int ret_code) {
         if (ret_code == 200) {
-            const var server_public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-key"].to_string ().to_latin1 ();
+            const var server_public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-key"].to_"".to_latin1 ();
             q_c_info (lc_cse ()) << "Found Server Public key, checking it. Server public key:" << server_public_key;
             if (check_server_public_key_validity (server_public_key)) {
                 if (_private_key.is_empty ()) {
@@ -1537,12 +1593,12 @@ q_c_info (lc_cse_metadata ()) << doc.to_json (QJsonDocument.Compact);
 string meta_data_str = doc.object ()["ocs"]
                         .to_object ()["data"]
                         .to_object ()["meta-data"]
-                        .to_string ();
+                        .to_"";
 
 QJsonDocument meta_data_doc = QJsonDocument.from_json (meta_data_str.to_local8Bit ());
 QJsonObject metadata_obj = meta_data_doc.object ()["metadata"].to_object ();
 QJsonObject metadata_keys = metadata_obj["metadata_keys"].to_object ();
-GLib.ByteArray sharing = metadata_obj["sharing"].to_string ().to_local8Bit ();
+GLib.ByteArray sharing = metadata_obj["sharing"].to_"".to_local8Bit ();
 QJsonObject files = meta_data_doc.object ()["files"].to_object ();
 
 QJsonDocument debug_helper;
@@ -1552,7 +1608,7 @@ GLib.debug (lc_cse) << "Keys : " << debug_helper.to_json (QJsonDocument.Compact)
 // Iterate over the document to store the keys. I'm unsure that the keys are in order,
 // perhaps it's better to store a map instead of a vector, perhaps this just doesn't matter.
 for (var it = metadata_keys.const_begin (), end = metadata_keys.const_end (); it != end; it++) {
-    GLib.ByteArray curr_b64Pass = it.value ().to_string ().to_local8Bit ();
+    GLib.ByteArray curr_b64Pass = it.value ().to_"".to_local8Bit ();
     /***********************************************************
     We have to base64 decode the metadatakey here. This was a misunderstanding in the RFC
     Now we should be compatible with Android and IOS. Maybe we can fix it later.
@@ -1577,7 +1633,7 @@ for (var it = metadata_keys.const_begin (), end = metadata_keys.const_end (); it
       var sharing_doc = QJsonDocument.from_json (sharing_decrypted);
       var sharing_obj = sharing_doc.object ();
       for (var it = sharing_obj.const_begin (), end = sharing_obj.const_end (); it != end; it++) {
-        _sharing.push_back ({it.key (), it.value ().to_string ()});
+        _sharing.push_back ({it.key (), it.value ().to_""});
       }
   } else {
       GLib.debug (lc_cse) << "Skipping sharing section since it is empty";
@@ -1589,19 +1645,19 @@ for (var it = metadata_keys.const_begin (), end = metadata_keys.const_end (); it
 
         var file_obj = it.value ().to_object ();
         file.metadata_key = file_obj["metadata_key"].to_int ();
-        file.authentication_tag = GLib.ByteArray.from_base64 (file_obj["authentication_tag"].to_string ().to_local8Bit ());
-        file.initialization_vector = GLib.ByteArray.from_base64 (file_obj["initialization_vector"].to_string ().to_local8Bit ());
+        file.authentication_tag = GLib.ByteArray.from_base64 (file_obj["authentication_tag"].to_"".to_local8Bit ());
+        file.initialization_vector = GLib.ByteArray.from_base64 (file_obj["initialization_vector"].to_"".to_local8Bit ());
 
         //Decrypt encrypted part
         GLib.ByteArray key = _metadata_keys[file.metadata_key];
-        var encrypted_file = file_obj["encrypted"].to_string ().to_local8Bit ();
+        var encrypted_file = file_obj["encrypted"].to_"".to_local8Bit ();
         var decrypted_file = decrypt_json_object (encrypted_file, key);
         var decrypted_file_doc = QJsonDocument.from_json (decrypted_file);
         var decrypted_file_obj = decrypted_file_doc.object ();
 
-        file.original_filename = decrypted_file_obj["filename"].to_string ();
-        file.encryption_key = GLib.ByteArray.from_base64 (decrypted_file_obj["key"].to_string ().to_local8Bit ());
-        file.mimetype = decrypted_file_obj["mimetype"].to_string ().to_local8Bit ();
+        file.original_filename = decrypted_file_obj["filename"].to_"";
+        file.encryption_key = GLib.ByteArray.from_base64 (decrypted_file_obj["key"].to_"".to_local8Bit ());
+        file.mimetype = decrypted_file_obj["mimetype"].to_"".to_local8Bit ();
         file.file_version = decrypted_file_obj["version"].to_int ();
 
         // In case we wrongly stored "inode/directory" we try to recover from it
@@ -1757,10 +1813,10 @@ QVector<EncryptedFile> FolderMetadata.files () {
 
 bool EncryptionHelper.file_encryption (GLib.ByteArray key, GLib.ByteArray iv, GLib.File input, GLib.File output, GLib.ByteArray& return_tag) {
     if (!input.open (QIODevice.ReadOnly)) {
-      GLib.debug (lc_cse) << "Could not open input file for reading" << input.error_string ();
+      GLib.debug (lc_cse) << "Could not open input file for reading" << input.error_"";
     }
     if (!output.open (QIODevice.WriteOnly)) {
-      GLib.debug (lc_cse) << "Could not oppen output file for writing" << output.error_string ();
+      GLib.debug (lc_cse) << "Could not oppen output file for writing" << output.error_"";
     }
 
     // Init

@@ -18,16 +18,28 @@ namespace Occ {
 
 class Vfs_xAttr : Vfs {
 
-    public Vfs_xAttr (GLib.Object parent = nullptr);
-    ~Vfs_xAttr () override;
+    /***********************************************************
+    ***********************************************************/
+    public Vfs_xAttr (GLib.Object parent = new GLib.Object ());
 
-    public Mode mode () override;
+    /***********************************************************
+    ***********************************************************/
+    public 
+
+    /***********************************************************
+    ***********************************************************/
     public string file_suffix () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void stop () override;
-    public void unregister_folder () override;
 
-    public bool socket_api_pin_state_actions_shown () override;
+    /***********************************************************
+    ***********************************************************/
+    public 
+
+    /***********************************************************
+    ***********************************************************/
     public bool is_hydrating () override;
 
     public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_id) override;
@@ -36,19 +48,25 @@ class Vfs_xAttr : Vfs {
     public Result<void, string> dehydrate_placeholder (SyncFileItem &item) override;
     public Result<ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem &item, string replaces_file) override;
 
+    /***********************************************************
+    ***********************************************************/
     public bool needs_metadata_update (SyncFileItem &item) override;
     public bool is_dehydrated_placeholder (string file_path) override;
     public bool stat_type_virtual_file (csync_file_stat_t stat, void stat_data) override;
 
+    /***********************************************************
+    ***********************************************************/
     public bool set_pin_state (string folder_path, PinState state) override;
     public Optional<PinState> pin_state (string folder_path) override;
     public AvailabilityResult availability (string folder_path) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_file_status_changed (string system_file_name, SyncFileStatus file_status) override;
 
 
-    protected void start_impl (VfsSetupParams &params) override;
+    protected void start_impl (VfsSetupParams &parameters) override;
 };
 
 class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xAttr> {
@@ -67,7 +85,7 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
     }
 
     string Vfs_xAttr.file_suffix () {
-        return string ();
+        return "";
     }
 
     void Vfs_xAttr.start_impl (VfsSetupParams &) {
@@ -109,7 +127,7 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
         }
 
         if (!file.open (GLib.File.ReadWrite | GLib.File.Truncate)) {
-            return file.error_string ();
+            return file.error_"";
         }
 
         file.write (" ");
@@ -164,8 +182,8 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
         const var path = GLib.ByteArray (*parent_path + '/' + stat.path);
         const var pin = [=] {
             const var absolute_path = string.from_utf8 (path);
-            Q_ASSERT (absolute_path.starts_with (params ().filesystem_path.to_utf8 ()));
-            const var folder_path = absolute_path.mid (params ().filesystem_path.length ());
+            Q_ASSERT (absolute_path.starts_with (parameters ().filesystem_path.to_utf8 ()));
+            const var folder_path = absolute_path.mid (parameters ().filesystem_path.length ());
             return pin_state (folder_path);
         } ();
 

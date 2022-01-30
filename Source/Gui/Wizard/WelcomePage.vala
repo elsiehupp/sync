@@ -17,6 +17,8 @@ namespace Ui {
 
 class Welcome_page : QWizard_page {
 
+    /***********************************************************
+    ***********************************************************/
     public Welcome_page (OwncloudWizard oc_wizard);
     ~Welcome_page () override;
     public int next_id () override;
@@ -24,6 +26,8 @@ class Welcome_page : QWizard_page {
     public void set_login_button_default ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void setup_ui ();
     private void customize_style ();
     private void style_slide_show ();
@@ -32,8 +36,12 @@ class Welcome_page : QWizard_page {
     private void setup_create_account_button ();
     private void setup_host_your_own_server_label ();
 
+    /***********************************************************
+    ***********************************************************/
     private QScopedPointer<Ui.Welcome_page> _ui;
 
+    /***********************************************************
+    ***********************************************************/
     private OwncloudWizard _oc_wizard;
     private WizardCommon.Pages _next_page = WizardCommon.Page_Server_setup;
 };

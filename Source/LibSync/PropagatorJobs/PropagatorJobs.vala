@@ -35,12 +35,20 @@ static const char content_md5Header_c[] = "Content-MD5";
 ***********************************************************/
 class PropagateLocalRemove : PropagateItemJob {
 
+    /***********************************************************
+    ***********************************************************/
     public PropagateLocalRemove (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item) {
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private bool remove_recursively (string path);
     private string _error;
     private bool _move_to_trash;
@@ -52,10 +60,16 @@ class PropagateLocalRemove : PropagateItemJob {
 ***********************************************************/
 class PropagateLocalMkdir : PropagateItemJob {
 
+    /***********************************************************
+    ***********************************************************/
     public PropagateLocalMkdir (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item)
         , _delete_existing_file (false) {
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
 
 
@@ -68,9 +82,13 @@ class PropagateLocalMkdir : PropagateItemJob {
     public void set_delete_existing_file (bool enabled);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void start_local_mkdir ();
-    private void start_demangling_name (string parent_path);
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private bool _delete_existing_file;
 };
 
@@ -80,9 +98,15 @@ class PropagateLocalMkdir : PropagateItemJob {
 ***********************************************************/
 class PropagateLocalRename : PropagateItemJob {
 
+    /***********************************************************
+    ***********************************************************/
     public PropagateLocalRename (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item) {
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
     public JobParallelism parallelism () override {
         return _item.is_directory () ? WaitForFinished : FullParallelism;
@@ -159,7 +183,7 @@ class PropagateLocalRename : PropagateItemJob {
             }
         } else {
             if (_item.is_directory ()) {
-                if (QDir (filename).exists () && !remove_recursively (string ())) {
+                if (QDir (filename).exists () && !remove_recursively ("")) {
                     on_done (SyncFileItem.NormalError, _error);
                     return;
                 }

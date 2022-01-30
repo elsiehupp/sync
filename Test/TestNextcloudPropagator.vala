@@ -14,11 +14,16 @@ string createDownloadTmpFileName (string previous);
 
 class TestNextcloudPropagator : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testUpdateErrorFromSession () {
         //OwncloudPropagator propagator (nullptr, QLatin1String ("test1"), QLatin1String ("test2"), new ProgressDatabase);
         QVERIFY ( true );
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testTmpDownloadFileNameGeneration () {
         string fn;
         // without dir
@@ -55,6 +60,9 @@ class TestNextcloudPropagator : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testParseEtag () {
         using Test = QPair<const char*, char>;
         GLib.List<Test> tests;

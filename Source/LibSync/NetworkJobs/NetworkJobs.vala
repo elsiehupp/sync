@@ -55,15 +55,21 @@ using HttpResult = Result<T, HttpError>;
 ***********************************************************/
 class EntityExistsJob : AbstractNetworkJob {
 
-    public EntityExistsJob (AccountPointer account, string path, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public EntityExistsJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_start () override;
 
 signals:
     void exists (QNetworkReply *);
 
 
+    /***********************************************************
+    ***********************************************************/
     private on_ bool on_finished () override;
 };
 
@@ -76,15 +82,21 @@ This does not* delete files, it does a http request.
 ***********************************************************/
 class DeleteApiJob : AbstractNetworkJob {
 
-    public DeleteApiJob (AccountPointer account, string path, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public DeleteApiJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_start () override;
 
 signals:
     void result (int http_code);
 
 
+    /***********************************************************
+    ***********************************************************/
     private on_ bool on_finished () override;
 };
 
@@ -99,8 +111,12 @@ struct ExtraFolderInfo {
 ***********************************************************/
 class LsColXMLParser : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public LsColXMLParser ();
 
+    /***********************************************************
+    ***********************************************************/
     public bool parse (GLib.ByteArray xml,
                QHash<string, ExtraFolderInfo> *sizes,
                const string expected_path);
@@ -114,11 +130,17 @@ signals:
 
 class LsColJob : AbstractNetworkJob {
 
-    public LsColJob (AccountPointer account, string path, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public LsColJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public LsColJob (AccountPointer account, GLib.Uri url, GLib.Object parent = nullptr);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void on_start () override;
     public QHash<string, ExtraFolderInfo> _folder_infos;
@@ -135,6 +157,8 @@ class LsColJob : AbstractNetworkJob {
     public void set_properties (GLib.List<GLib.ByteArray> properties);
 
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.List<GLib.ByteArray> properties ();
 
 signals:
@@ -144,9 +168,13 @@ signals:
     void finished_without_error ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private on_ bool on_finished () override;
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private GLib.List<GLib.ByteArray> _properties;
     private GLib.Uri _url; // Used instead of path () if the url is specified in the constructor
 };
@@ -163,9 +191,13 @@ There is also the LsColJob which can be used to list collections
 ***********************************************************/
 class PropfindJob : AbstractNetworkJob {
 
-    public PropfindJob (AccountPointer account, string path, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public PropfindJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_start () override;
 
 
@@ -180,6 +212,8 @@ class PropfindJob : AbstractNetworkJob {
     public void set_properties (GLib.List<GLib.ByteArray> properties);
 
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.List<GLib.ByteArray> properties ();
 
 signals:
@@ -187,9 +221,13 @@ signals:
     void finished_with_error (QNetworkReply reply = nullptr);
 
 
+    /***********************************************************
+    ***********************************************************/
     private on_ bool on_finished () override;
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private GLib.List<GLib.ByteArray> _properties;
 };
 
@@ -207,8 +245,10 @@ class AvatarJob : AbstractNetworkJob {
     @param user_id The user for which to obtain the avatar
     @param size The size of the avatar (square so size*size)
     ***********************************************************/
-    public AvatarJob (AccountPointer account, string user_id, int size, GLib.Object parent = nullptr);
+    public AvatarJob (AccountPointer account, string user_id, int size, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
 
 
@@ -225,9 +265,13 @@ signals:
     void avatar_pixmap (QImage &);
 
 
+    /***********************************************************
+    ***********************************************************/
     private on_ bool on_finished () override;
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private GLib.Uri _avatar_url;
 };
 #endif
@@ -243,9 +287,13 @@ WARNING : Untested!
 ***********************************************************/
 class ProppatchJob : AbstractNetworkJob {
 
-    public ProppatchJob (AccountPointer account, string path, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public ProppatchJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_start () override;
 
 
@@ -260,6 +308,8 @@ class ProppatchJob : AbstractNetworkJob {
     public void set_properties (QMap<GLib.ByteArray, GLib.ByteArray> properties);
 
 
+    /***********************************************************
+    ***********************************************************/
     public QMap<GLib.ByteArray, GLib.ByteArray> properties ();
 
 signals:
@@ -267,9 +317,13 @@ signals:
     void finished_with_error ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private on_ bool on_finished () override;
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private QMap<GLib.ByteArray, GLib.ByteArray> _properties;
 };
 
@@ -282,16 +336,28 @@ class MkColJob : AbstractNetworkJob {
     QMap<GLib.ByteArray, GLib.ByteArray> _extra_headers;
 
 
-    public MkColJob (AccountPointer account, string path, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public MkColJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public MkColJob (AccountPointer account, string path, QMap<GLib.ByteArray, GLib.ByteArray> &extra_headers, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public MkColJob (AccountPointer account, GLib.Uri url,);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
+    public st QMap<GLib.ByteArray, GLib.ByteArray> &extra_headers, GLib.Object parent = new GLib.Object ());
 
-    public st QMap<GLib.ByteArray, GLib.ByteArray> &extra_headers, GLib.Object parent = nullptr);
+
     public void on_start () override;
 
 signals:
@@ -299,6 +365,8 @@ signals:
     void finished_without_error ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private bool on_finished () override;
 };
 
@@ -308,14 +376,24 @@ signals:
 ***********************************************************/
 class CheckServerJob : AbstractNetworkJob {
 
-    public CheckServerJob (AccountPointer account, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public CheckServerJob (AccountPointer account, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_start () override;
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public static string version (QJsonObject &info);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public static string version_string (QJsonObject &info);
 
 
@@ -347,14 +425,20 @@ signals:
     void timeout (GLib.Uri url);
 
 
+    /***********************************************************
+    ***********************************************************/
     private bool on_finished () override;
-    private void on_timed_out () override;
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private on_ virtual void meta_data_changed_slot ();
     private on_ virtual void encrypted_slot ();
     private void on_redirected (QNetworkReply reply, GLib.Uri target_url, int redirect_count);
 
 
+    /***********************************************************
+    ***********************************************************/
     private bool _subdir_fallback;
 
 
@@ -378,9 +462,13 @@ signals:
 ***********************************************************/
 class RequestEtagJob : AbstractNetworkJob {
 
-    public RequestEtagJob (AccountPointer account, string path, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public RequestEtagJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_start () override;
 
 signals:
@@ -388,6 +476,8 @@ signals:
     void finished_with_result (HttpResult<GLib.ByteArray> &etag);
 
 
+    /***********************************************************
+    ***********************************************************/
     private on_ bool on_finished () override;
 };
 
@@ -408,6 +498,8 @@ The received QVariantMap is null in case of error
 ***********************************************************/
 class JsonApiJob : AbstractNetworkJob {
 
+    /***********************************************************
+    ***********************************************************/
     public enum class Verb {
         Get,
         Post,
@@ -415,12 +507,14 @@ class JsonApiJob : AbstractNetworkJob {
         Delete,
     };
 
-    public JsonApiJob (AccountPointer &account, string path, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public JsonApiJob (AccountPointer &account, string path, GLib.Object parent = new GLib.Object ());
 
 
     /***********************************************************
     @brief add_query_params - add more parameters to the ocs call
-    @param params : list pairs of strings containing the parameter name and the value.
+    @param parameters : list pairs of strings containing the parameter name and the value.
 
     All parameters from the passed list are appended to the query. Not
     that the format=json para
@@ -428,16 +522,24 @@ class JsonApiJob : AbstractNetworkJob {
 
     This function needs to be called before on_start () obviously.
     ***********************************************************/
-    public void add_query_params (QUrlQuery &params);
+    public void add_query_params (QUrlQuery &parameters);
 
 
+    /***********************************************************
+    ***********************************************************/
     public void add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value);
 
+    /***********************************************************
+    ***********************************************************/
     public void set_body (QJsonDocument &body);
 
+    /***********************************************************
+    ***********************************************************/
     public void set_verb (Verb value);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public on_ void on_start () override;
 
 
@@ -468,13 +570,19 @@ signals:
     void allow_desktop_notifications_changed (bool is_allowed);
 
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.ByteArray _body;
     private QUrlQuery _additional_params;
     private QNetworkRequest _request;
 
+    /***********************************************************
+    ***********************************************************/
     private Verb _verb = Verb.Get;
 
-    private GLib.ByteArray verb_to_string ();
+    /***********************************************************
+    ***********************************************************/
+    private GLib.ByteArray verb_to_"";
 };
 
 /***********************************************************
@@ -483,6 +591,8 @@ signals:
 ***********************************************************/
 class DetermineAuthTypeJob : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public enum AuthType {
         NoAuthType, // used only before we got a chance to probe the server
 #ifdef WITH_WEBENGINE
@@ -494,16 +604,24 @@ class DetermineAuthTypeJob : GLib.Object {
     };
     Q_ENUM (AuthType)
 
-    public DetermineAuthTypeJob (AccountPointer account, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public DetermineAuthTypeJob (AccountPointer account, GLib.Object parent = new GLib.Object ());
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_start ();
 signals:
     void auth_type (AuthType);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void check_all_done ();
 
+    /***********************************************************
+    ***********************************************************/
     private AccountPointer _account;
     private AuthType _result_get = NoAuthType;
     private AuthType _result_propfind = NoAuthType;
@@ -521,8 +639,12 @@ Primarily adds timeout and redirection handling.
 ***********************************************************/
 class SimpleNetworkJob : AbstractNetworkJob {
 
-    public SimpleNetworkJob (AccountPointer account, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public SimpleNetworkJob (AccountPointer account, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public QNetworkReply start_request (GLib.ByteArray verb, GLib.Uri url,
         QNetworkRequest req = QNetworkRequest (),
         QIODevice request_body = nullptr);
@@ -530,6 +652,8 @@ class SimpleNetworkJob : AbstractNetworkJob {
 signals:
     void finished_signal (QNetworkReply reply);
 
+    /***********************************************************
+    ***********************************************************/
     private on_ bool on_finished () override;
 };
 
@@ -593,14 +717,14 @@ void RequestEtagJob.on_start () {
     send_request ("PROPFIND", make_dav_url (path ()), req, buf);
 
     if (reply ().error () != QNetworkReply.NoError) {
-        GLib.warn (lc_etag_job) << "request network error : " << reply ().error_string ();
+        GLib.warn (lc_etag_job) << "request network error : " << reply ().error_"";
     }
     AbstractNetworkJob.on_start ();
 }
 
 bool RequestEtagJob.on_finished () {
     q_c_info (lc_etag_job) << "Request Etag of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                      <<  reply_status_string ();
+                      <<  reply_status_"";
 
     var http_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (http_code == 207) {
@@ -611,7 +735,7 @@ bool RequestEtagJob.on_finished () {
         while (!reader.at_end ()) {
             QXmlStreamReader.TokenType type = reader.read_next ();
             if (type == QXmlStreamReader.StartElement && reader.namespace_uri () == QLatin1String ("DAV:")) {
-                string name = reader.name ().to_string ();
+                string name = reader.name ().to_"";
                 if (name == QLatin1String ("getetag")) {
                     var etag_text = reader.read_element_text ();
                     var parsed_tag = parse_etag (etag_text.to_utf8 ());
@@ -627,7 +751,7 @@ bool RequestEtagJob.on_finished () {
         emit finished_with_result (etag);
     } else {
         emit finished_with_result (HttpError {
-            http_code, error_string ()
+            http_code, error_""
         });
     }
     return true;
@@ -646,7 +770,7 @@ MkColJob.MkColJob (AccountPointer account, string path, QMap<GLib.ByteArray, GLi
 
 MkColJob.MkColJob (AccountPointer account, GLib.Uri url,
     const QMap<GLib.ByteArray, GLib.ByteArray> &extra_headers, GLib.Object parent)
-    : AbstractNetworkJob (account, string (), parent)
+    : AbstractNetworkJob (account, "", parent)
     , _url (url)
     , _extra_headers (extra_headers) {
 }
@@ -670,7 +794,7 @@ void MkColJob.on_start () {
 
 bool MkColJob.on_finished () {
     q_c_info (lc_mk_col_job) << "MKCOL of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                       << reply_status_string ();
+                       << reply_status_"";
 
     if (reply ().error () != QNetworkReply.NoError) {
         Q_EMIT finished_with_error (reply ());
@@ -689,7 +813,7 @@ static string read_contents_as_string (QXmlStreamReader &reader) {
         QXmlStreamReader.TokenType type = reader.read_next ();
         if (type == QXmlStreamReader.StartElement) {
             level++;
-            result += "<" + reader.name ().to_string () + ">";
+            result += "<" + reader.name ().to_"" + ">";
         } else if (type == QXmlStreamReader.Characters) {
             result += reader.text ();
         } else if (type == QXmlStreamReader.EndElement) {
@@ -697,7 +821,7 @@ static string read_contents_as_string (QXmlStreamReader &reader) {
             if (level < 0) {
                 break;
             }
-            result += "</" + reader.name ().to_string () + ">";
+            result += "</" + reader.name ().to_"" + ">";
         }
 
     } while (!reader.at_end ());
@@ -722,7 +846,7 @@ bool LsColXMLParser.parse (GLib.ByteArray xml, QHash<string, ExtraFolderInfo> *f
 
     while (!reader.at_end ()) {
         QXmlStreamReader.TokenType type = reader.read_next ();
-        string name = reader.name ().to_string ();
+        string name = reader.name ().to_"";
         // Start elements with DAV:
         if (type == QXmlStreamReader.StartElement && reader.namespace_uri () == QLatin1String ("DAV:")) {
             if (name == QLatin1String ("href")) {
@@ -769,7 +893,7 @@ bool LsColXMLParser.parse (GLib.ByteArray xml, QHash<string, ExtraFolderInfo> *f
             } else if (name == QLatin1String ("fileid")) {
                 (*file_info)[current_href].file_id = property_content.to_utf8 ();
             }
-            current_tmp_properties.insert (reader.name ().to_string (), property_content);
+            current_tmp_properties.insert (reader.name ().to_"", property_content);
         }
 
         // End elements with DAV:
@@ -798,7 +922,7 @@ bool LsColXMLParser.parse (GLib.ByteArray xml, QHash<string, ExtraFolderInfo> *f
 
     if (reader.has_error ()) {
         // XML Parser error? Whatever had been emitted before will come as directory_listing_iterated
-        GLib.warn (lc_ls_col_job) << "ERROR" << reader.error_string () << xml;
+        GLib.warn (lc_ls_col_job) << "ERROR" << reader.error_"" << xml;
         return false;
     } else if (!inside_multi_status) {
         GLib.warn (lc_ls_col_job) << "ERROR no WebDAV response?" << xml;
@@ -817,7 +941,7 @@ LsColJob.LsColJob (AccountPointer account, string path, GLib.Object parent)
 }
 
 LsColJob.LsColJob (AccountPointer account, GLib.Uri url, GLib.Object parent)
-    : AbstractNetworkJob (account, string (), parent)
+    : AbstractNetworkJob (account, "", parent)
     , _url (url) {
 }
 
@@ -873,9 +997,9 @@ void LsColJob.on_start () {
 // not all in one big blob at the end.
 bool LsColJob.on_finished () {
     q_c_info (lc_ls_col_job) << "LSCOL of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                       << reply_status_string ();
+                       << reply_status_"";
 
-    string content_type = reply ().header (QNetworkRequest.ContentTypeHeader).to_string ();
+    string content_type = reply ().header (QNetworkRequest.ContentTypeHeader).to_"";
     int http_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (http_code == 207 && content_type.contains ("application/xml; charset=utf-8")) {
         LsColXMLParser parser;
@@ -936,11 +1060,11 @@ void CheckServerJob.on_timed_out () {
 }
 
 string CheckServerJob.version (QJsonObject &info) {
-    return info.value (QLatin1String ("version")).to_string ();
+    return info.value (QLatin1String ("version")).to_"";
 }
 
 string CheckServerJob.version_string (QJsonObject &info) {
-    return info.value (QLatin1String ("versionstring")).to_string ();
+    return info.value (QLatin1String ("versionstring")).to_"";
 }
 
 bool CheckServerJob.installed (QJsonObject &info) {
@@ -1014,7 +1138,7 @@ bool CheckServerJob.on_finished () {
         var status = QJsonDocument.from_json (body, &error);
         // empty or invalid response
         if (error.error != QJsonParseError.NoError || status.is_null ()) {
-            GLib.warn (lc_check_server_job) << "status.php from server is not valid JSON!" << body << reply ().request ().url () << error.error_string ();
+            GLib.warn (lc_check_server_job) << "status.php from server is not valid JSON!" << body << reply ().request ().url () << error.error_"";
         }
 
         q_c_info (lc_check_server_job) << "status.php returns : " << status << " " << reply ().error () << " Reply : " << reply ();
@@ -1079,7 +1203,7 @@ GLib.List<GLib.ByteArray> PropfindJob.properties () {
 
 bool PropfindJob.on_finished () {
     q_c_info (lc_propfind_job) << "PROPFIND of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                          << reply_status_string ();
+                          << reply_status_"";
 
     int http_result_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 
@@ -1096,9 +1220,9 @@ bool PropfindJob.on_finished () {
             QXmlStreamReader.TokenType type = reader.read_next ();
             if (type == QXmlStreamReader.StartElement) {
                 if (!cur_element.is_empty () && cur_element.top () == QLatin1String ("prop")) {
-                    items.insert (reader.name ().to_string (), reader.read_element_text (QXmlStreamReader.SkipChildElements));
+                    items.insert (reader.name ().to_"", reader.read_element_text (QXmlStreamReader.SkipChildElements));
                 } else {
-                    cur_element.push (reader.name ().to_string ());
+                    cur_element.push (reader.name ().to_"");
                 }
             }
             if (type == QXmlStreamReader.EndElement) {
@@ -1108,14 +1232,14 @@ bool PropfindJob.on_finished () {
             }
         }
         if (reader.has_error ()) {
-            GLib.warn (lc_propfind_job) << "XML parser error : " << reader.error_string ();
+            GLib.warn (lc_propfind_job) << "XML parser error : " << reader.error_"";
             emit finished_with_error (reply ());
         } else {
             emit result (items);
         }
     } else {
         GLib.warn (lc_propfind_job) << "*not* successful, http result code is" << http_result_code
-                                 << (http_result_code == 302 ? reply ().header (QNetworkRequest.LocationHeader).to_string () : QLatin1String (""));
+                                 << (http_result_code == 302 ? reply ().header (QNetworkRequest.LocationHeader).to_"" : QLatin1String (""));
         emit finished_with_error (reply ());
     }
     return true;
@@ -1125,7 +1249,7 @@ bool PropfindJob.on_finished () {
 
 #ifndef TOKEN_AUTH_ONLY
 AvatarJob.AvatarJob (AccountPointer account, string user_id, int size, GLib.Object parent)
-    : AbstractNetworkJob (account, string (), parent) {
+    : AbstractNetworkJob (account, "", parent) {
     if (account.server_version_int () >= Account.make_server_version (10, 0, 0)) {
         _avatar_url = Utility.concat_url_path (account.url (), string ("remote.php/dav/avatars/%1/%2.png").arg (user_id, string.number (size)));
     } else {
@@ -1235,7 +1359,7 @@ QMap<GLib.ByteArray, GLib.ByteArray> ProppatchJob.properties () {
 
 bool ProppatchJob.on_finished () {
     q_c_info (lc_proppatch_job) << "PROPPATCH of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                           << reply_status_string ();
+                           << reply_status_"";
 
     int http_result_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 
@@ -1243,7 +1367,7 @@ bool ProppatchJob.on_finished () {
         emit success ();
     } else {
         GLib.warn (lc_proppatch_job) << "*not* successful, http result code is" << http_result_code
-                                  << (http_result_code == 302 ? reply ().header (QNetworkRequest.LocationHeader).to_string () : QLatin1String (""));
+                                  << (http_result_code == 302 ? reply ().header (QNetworkRequest.LocationHeader).to_"" : QLatin1String (""));
         emit finished_with_error ();
     }
     return true;
@@ -1271,8 +1395,8 @@ JsonApiJob.JsonApiJob (AccountPointer &account, string path, GLib.Object parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
-void JsonApiJob.add_query_params (QUrlQuery &params) {
-    _additional_params = params;
+void JsonApiJob.add_query_params (QUrlQuery &parameters) {
+    _additional_params = parameters;
 }
 
 void JsonApiJob.add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
@@ -1291,7 +1415,7 @@ void JsonApiJob.set_verb (Verb value) {
     _verb = value;
 }
 
-GLib.ByteArray JsonApiJob.verb_to_string () {
+GLib.ByteArray JsonApiJob.verb_to_"" {
     switch (_verb) {
     case Verb.Get:
         return "GET";
@@ -1310,7 +1434,7 @@ void JsonApiJob.on_start () {
     var query = _additional_params;
     query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
     GLib.Uri url = Utility.concat_url_path (account ().url (), path (), query);
-    const var http_verb = verb_to_string ();
+    const var http_verb = verb_to_"";
     if (!_body.is_empty ()) {
         send_request (http_verb, url, _request, _body);
     } else {
@@ -1321,12 +1445,12 @@ void JsonApiJob.on_start () {
 
 bool JsonApiJob.on_finished () {
     q_c_info (lc_json_api_job) << "JsonApiJob of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                         << reply_status_string ();
+                         << reply_status_"";
 
     int status_code = 0;
     int http_status_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (reply ().error () != QNetworkReply.NoError) {
-        GLib.warn (lc_json_api_job) << "Network error : " << path () << error_string () << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute);
+        GLib.warn (lc_json_api_job) << "Network error : " << path () << error_"" << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute);
         status_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
         emit json_received (QJsonDocument (), status_code);
         return true;
@@ -1365,7 +1489,7 @@ bool JsonApiJob.on_finished () {
     var json = QJsonDocument.from_json (json_str.to_utf8 (), &error);
     // empty or invalid response and status code is != 304 because json_str is expected to be empty
     if ( (error.error != QJsonParseError.NoError || json.is_null ()) && http_status_code != not_modified_status_code) {
-        GLib.warn (lc_json_api_job) << "invalid JSON!" << json_str << error.error_string ();
+        GLib.warn (lc_json_api_job) << "invalid JSON!" << json_str << error.error_"";
         emit json_received (json, status_code);
         return true;
     }
@@ -1504,7 +1628,7 @@ void DetermineAuthTypeJob.check_all_done () {
 }
 
 SimpleNetworkJob.SimpleNetworkJob (AccountPointer account, GLib.Object parent)
-    : AbstractNetworkJob (account, string (), parent) {
+    : AbstractNetworkJob (account, "", parent) {
 }
 
 QNetworkReply *SimpleNetworkJob.start_request (GLib.ByteArray verb, GLib.Uri url,
@@ -1535,12 +1659,12 @@ void DeleteApiJob.on_start () {
 bool DeleteApiJob.on_finished () {
     q_c_info (lc_json_api_job) << "JsonApiJob of" << reply ().request ().url () << "FINISHED WITH STATUS"
                          << reply ().error ()
-                         << (reply ().error () == QNetworkReply.NoError ? QLatin1String ("") : error_string ());
+                         << (reply ().error () == QNetworkReply.NoError ? QLatin1String ("") : error_"");
 
     int http_status = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 
     if (reply ().error () != QNetworkReply.NoError) {
-        GLib.warn (lc_json_api_job) << "Network error : " << path () << error_string () << http_status;
+        GLib.warn (lc_json_api_job) << "Network error : " << path () << error_"" << http_status;
         emit result (http_status);
         return true;
     }
@@ -1566,7 +1690,7 @@ void fetch_private_link_url (AccountPointer account, string remote_path,
         << "http://owncloud.org/ns:privatelink");
     job.on_set_timeout (10 * 1000);
     GLib.Object.connect (job, &PropfindJob.result, target, [=] (QVariantMap &result) {
-        var private_link_url = result["privatelink"].to_string ();
+        var private_link_url = result["privatelink"].to_"";
         var numeric_file_id = result["fileid"].to_byte_array ();
         if (!private_link_url.is_empty ()) {
             target_fun (private_link_url);

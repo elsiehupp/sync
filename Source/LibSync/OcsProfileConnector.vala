@@ -20,11 +20,17 @@ namespace Occ {
 
 struct HovercardAction {
 
+    /***********************************************************
+    ***********************************************************/
     public HovercardAction ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public HovercardAction (string title, GLib.Uri icon_url, GLib.Uri link);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public string _title;
     public GLib.Uri _icon_url;
     public QPixmap _icon;
@@ -37,11 +43,17 @@ struct Hovercard {
 
 class OcsProfileConnector : GLib.Object {
 
-    public OcsProfileConnector (AccountPointer account, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public OcsProfileConnector (AccountPointer account, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public void fetch_hovercard (string user_id);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public const Hovercard &hovercard ();
 
 signals:
@@ -50,8 +62,12 @@ signals:
     void icon_loaded (std.size_t hovercard_action_index);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_hovercard_fetched (QJsonDocument &json, int status_code);
 
+    /***********************************************************
+    ***********************************************************/
     private void fetch_icons ();
     private void start_fetch_icon_job (std.size_t hovercard_action_index);
     private void set_hovercard_action_icon (std.size_t index, QPixmap &pixmap);
@@ -154,7 +170,7 @@ signals:
 
     void OcsProfileConnector.set_hovercard_action_icon (std.size_t index, QPixmap &pixmap) {
         var &hovercard_action = _current_hovercard._actions[index];
-        QPixmapCache.insert (hovercard_action._icon_url.to_string (), pixmap);
+        QPixmapCache.insert (hovercard_action._icon_url.to_"", pixmap);
         hovercard_action._icon = pixmap;
         emit icon_loaded (index);
     }

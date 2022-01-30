@@ -12,15 +12,23 @@ using namespace Occ;
 
 class CloudProviderManager : GLib.Object {
 
-    public CloudProviderManager (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public CloudProviderManager (GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void register_signals ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void on_folder_list_changed (Folder.Map &folder_map);
 
 
+    /***********************************************************
+    ***********************************************************/
     private QMap<string, CloudProviderWrapper> _map;
     private uint32 _folder_index;
 };

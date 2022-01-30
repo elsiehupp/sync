@@ -31,6 +31,8 @@ class ActivityListModel : QAbstractListModel {
 
     Q_PROPERTY (AccountState account_state READ account_state CONSTANT)
 
+    /***********************************************************
+    ***********************************************************/
     public enum Data_role {
         Action_icon_role = Qt.User_role + 1,
         User_icon_role,
@@ -52,46 +54,86 @@ class ActivityListModel : QAbstractListModel {
         Shareable_role,
     };
 
-    public ActivityListModel (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public ActivityListModel (GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public ActivityListModel (AccountState account_state,
-        GLib.Object parent = nullptr);
 
-    public QVariant data (QModelIndex &index, int role) override;
+    /***********************************************************
+    ***********************************************************/
+    public 
+
+    /***********************************************************
+    ***********************************************************/
     public int row_count (QModelIndex &parent = QModelIndex ()) override;
 
+    /***********************************************************
+    ***********************************************************/
     public bool can_fetch_more (QModelIndex &) override;
     public void fetch_more (QModelIndex &) override;
 
     public Activity_list activity_list () {
         return _final_list;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public Activity_list errors_list () {
-        return _notification_errors_lists;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void add_notification_to_activity_list (Activity activity);
 
 
+    /***********************************************************
+    ***********************************************************/
     public void clear_notifications ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void add_error_to_activity_list (Activity activity);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void add_ignored_file_to_list (Activity new_activity);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void add_sync_file_item_to_activity_list (Activity activity);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void remove_activity_from_activity_list (int row);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void remove_activity_from_activity_list (Activity activity);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public Q_INVOKABLE void trigger_default_action (int activity_index);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public Q_INVOKABLE void trigger_action (int activity_index, int action_index);
 
     public AccountState account_state ();
@@ -119,9 +161,13 @@ signals:
 
     protected virtual void start_fetch_job ();
 
+    /***********************************************************
+    ***********************************************************/
     private void combine_activity_lists ();
-    private bool can_fetch_activities ();
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private Activity_list _activity_lists;
     private Activity_list _sync_file_item_lists;
     private Activity_list _notification_lists;
@@ -131,16 +177,24 @@ signals:
     private Activity_list _final_list;
     private int _current_item = 0;
 
+    /***********************************************************
+    ***********************************************************/
     private bool _display_actions = true;
 
+    /***********************************************************
+    ***********************************************************/
     private int _total_activities_fetched = 0;
     private int _max_activities = 100;
     private int _max_activities_days = 30;
     private bool _show_more_activities_available_entry = false;
 
+    /***********************************************************
+    ***********************************************************/
     private QPointer<ConflictDialog> _current_conflict_dialog;
-    private QPointer<Invalid_filename_dialog> _current_invalid_filename_dialog;
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private AccountState _account_state = nullptr;
     private bool _currently_fetching = false;
     private bool _done_fetching = false;
@@ -228,7 +282,7 @@ signals:
                     }
                 }
             }
-            return string ();
+            return "";
         case Path_role:
             if (!a._file.is_empty ()) {
                 const var folder = FolderMan.instance ().folder (a._folder);
@@ -242,7 +296,7 @@ signals:
                 const var local_files = FolderMan.instance ().find_file_in_local_folders (QFileInfo (rel_path).path (), ast.account ());
 
                 if (local_files.is_empty ()) {
-                    return string ();
+                    return "";
                 }
 
                 // If this is an E2EE file or folder, pretend we got no path, this leads to
@@ -251,13 +305,13 @@ signals:
                     SyncJournalFileRecord record;
                     folder.journal_database ().get_file_record (a._file.mid (1), &record);
                     if (record.is_valid () && (record._is_e2e_encrypted || !record._e2e_mangled_name.is_empty ())) {
-                        return string ();
+                        return "";
                     }
                 }
 
                 return GLib.Uri.from_local_file (local_files.const_first ());
             }
-            return string ();
+            return "";
         case Absolute_path_role: {
             const var folder = FolderMan.instance ().folder (a._folder);
             string rel_path (a._file);
@@ -270,11 +324,11 @@ signals:
                     return local_files.const_first ();
                 } else {
                     q_warning ("File not local folders while processing absolute path request.");
-                    return string ();
+                    return "";
                 }
             } else {
                 q_warning ("Received an absolute path request for an activity without a file path.");
-                return string ();
+                return "";
             }
         }
         case Actions_links_role: {
@@ -361,7 +415,7 @@ signals:
         case Display_actions:
             return _display_actions;
         case Shareable_role:
-            return !data (index, Path_role).to_string ().is_empty () && _display_actions && a._file_action != "file_deleted" && a._status != SyncFileItem.FileIgnored;
+            return !data (index, Path_role).to_"".is_empty () && _display_actions && a._file_action != "file_deleted" && a._status != SyncFileItem.FileIgnored;
         default:
             return QVariant ();
         }
@@ -392,10 +446,10 @@ signals:
         GLib.Object.connect (job, &JsonApiJob.json_received,
             this, &ActivityListModel.activities_received);
 
-        QUrlQuery params;
-        params.add_query_item (QLatin1String ("since"), string.number (_current_item));
-        params.add_query_item (QLatin1String ("limit"), string.number (50));
-        job.add_query_params (params);
+        QUrlQuery parameters;
+        parameters.add_query_item (QLatin1String ("since"), string.number (_current_item));
+        parameters.add_query_item (QLatin1String ("limit"), string.number (50));
+        job.add_query_params (parameters);
 
         _currently_fetching = true;
         q_c_info (lc_activity) << "Start fetching activities for " << _account_state.account ().display_name ();
@@ -425,16 +479,16 @@ signals:
 
             Activity a;
             a._type = Activity.Activity_type;
-            a._object_type = json.value ("object_type").to_string ();
+            a._object_type = json.value ("object_type").to_"";
             a._acc_name = ast.account ().display_name ();
             a._id = json.value ("activity_id").to_int ();
-            a._file_action = json.value ("type").to_string ();
-            a._subject = json.value ("subject").to_string ();
-            a._message = json.value ("message").to_string ();
-            a._file = json.value ("object_name").to_string ();
-            a._link = GLib.Uri (json.value ("link").to_string ());
-            a._date_time = QDateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
-            a._icon = json.value ("icon").to_string ();
+            a._file_action = json.value ("type").to_"";
+            a._subject = json.value ("subject").to_"";
+            a._message = json.value ("message").to_"";
+            a._file = json.value ("object_name").to_"";
+            a._link = GLib.Uri (json.value ("link").to_"");
+            a._date_time = QDateTime.from_string (json.value ("datetime").to_"", Qt.ISODate);
+            a._icon = json.value ("icon").to_"";
 
             list.append (a);
             _current_item = list.last ()._id;

@@ -137,9 +137,13 @@ signals:
     void etag_response_header_received (GLib.ByteArray value, int status_code);
 
 
+    /***********************************************************
+    ***********************************************************/
     private bool on_finished () override;
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private GLib.ByteArray _verb;
     private GLib.List<QPair<string, string>> _params;
     private QVector<int> _pass_status_codes;
@@ -174,6 +178,8 @@ signals:
         _request.set_raw_header (header_name, value);
     }
 
+    /***********************************************************
+    ***********************************************************/
     static QUrlQuery percent_encode_query_items (
         const GLib.List<QPair<string, string>> &items) {
         QUrlQuery result;
@@ -230,7 +236,7 @@ signals:
                              << _verb
                              << Utility.concat_url_path (account ().url (), path ())
                              << _params
-                             << error.error_string ()
+                             << error.error_""
                              << ":" << reply_data;
         } else {
             status_code  = get_json_return_code (json, message);
@@ -259,7 +265,7 @@ signals:
         //TODO proper checking
         var meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
         int code = meta.value ("statuscode").to_int ();
-        message = meta.value ("message").to_string ();
+        message = meta.value ("message").to_"";
 
         return code;
     }

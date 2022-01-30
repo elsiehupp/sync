@@ -106,8 +106,12 @@ namespace Occ {
 
 class HeaderBanner : Gtk.Widget {
 
+    /***********************************************************
+    ***********************************************************/
     public HeaderBanner (Gtk.Widget parent = nullptr);
 
+    /***********************************************************
+    ***********************************************************/
     public void setup (string title, QPixmap &logo, QPixmap &banner,
                const Qt.Text_format title_format, string style_sheet);
 
@@ -115,6 +119,8 @@ class HeaderBanner : Gtk.Widget {
     protected void paint_event (QPaint_event event) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private QLabel title_label;
     private QLabel logo_label;
     private QGrid_layout layout;

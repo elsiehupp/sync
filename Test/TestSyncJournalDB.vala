@@ -15,24 +15,35 @@ class TestSyncJournalDB : GLib.Object {
     QTemporaryDir _tempDir;
 
 
+    /***********************************************************
+    ***********************************************************/
     public TestSyncJournalDB ()
         : _database ( (_tempDir.path () + "/sync.db")) {
         QVERIFY (_tempDir.isValid ());
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public int64 dropMsecs (QDateTime time) {
         return Utility.qDateTimeToTime_t (time);
     }
 
-    private void on_init_test_case () {
-    }
 
+    /***********************************************************
+    ***********************************************************/
+    private void on_init_test_case () {}
+
+
+    private
     private void on_cleanup_test_case () {
         const string file = _database.databaseFilePath ();
         GLib.File.remove (file);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testFileRecord () {
         SyncJournalFileRecord record;
         QVERIFY (_database.getFileRecord (QByteArrayLiteral ("nonexistant"), &record));
@@ -79,6 +90,9 @@ class TestSyncJournalDB : GLib.Object {
         QVERIFY (!record.isValid ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testFileRecordChecksum () { {// Try with and without a checksum
         {
             SyncJournalFileRecord record;
@@ -114,6 +128,9 @@ class TestSyncJournalDB : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDownloadInfo () {
         using Info = SyncJournalDb.DownloadInfo;
         Info record = _database.getDownloadInfo ("nonexistant");
@@ -133,6 +150,9 @@ class TestSyncJournalDB : GLib.Object {
         QVERIFY (!wipedRecord._valid);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testUploadInfo () {
         using Info = SyncJournalDb.UploadInfo;
         Info record = _database.getUploadInfo ("nonexistant");
@@ -154,6 +174,9 @@ class TestSyncJournalDB : GLib.Object {
         QVERIFY (!wipedRecord._valid);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testNumericId () {
         SyncJournalFileRecord record;
 
@@ -166,6 +189,9 @@ class TestSyncJournalDB : GLib.Object {
         QCOMPARE (record.numericFileId (), GLib.ByteArray ("123456789"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testConflictRecord () {
         ConflictRecord record;
         record.path = "abc";
@@ -187,6 +213,9 @@ class TestSyncJournalDB : GLib.Object {
         QVERIFY (!_database.conflictRecord (record.path).isValid ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testAvoidReadFromDbOnNextSync () {
         var invalidEtag = GLib.ByteArray ("_invalid_");
         var initialEtag = GLib.ByteArray ("etag");
@@ -252,6 +281,9 @@ class TestSyncJournalDB : GLib.Object {
         QCOMPARE (getEtag ("foodir/sub"), initialEtag);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testRecursiveDelete () {
         var makeEntry = [&] (GLib.ByteArray path) {
             SyncJournalFileRecord record;
@@ -302,6 +334,9 @@ class TestSyncJournalDB : GLib.Object {
         QVERIFY (checkElements ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPinState () {
         var make = [&] (GLib.ByteArray path, PinState state) {
             _database.internalPinStates ().setForPath (path, state);
@@ -435,6 +470,8 @@ class TestSyncJournalDB : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private SyncJournalDb _database;
 };
 

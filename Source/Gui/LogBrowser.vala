@@ -38,6 +38,8 @@ namespace Occ {
 ***********************************************************/
 class Log_browser : Gtk.Dialog {
 
+    /***********************************************************
+    ***********************************************************/
     public Log_browser (Gtk.Widget parent = nullptr);
     ~Log_browser () override;
 

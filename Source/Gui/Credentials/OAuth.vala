@@ -38,23 +38,33 @@ Normal workfl
 ***********************************************************/
 class OAuth : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public OAuth (Account account, GLib.Object parent)
         : GLib.Object (parent)
         , _account (account) {
     }
     ~OAuth () override;
 
+    /***********************************************************
+    ***********************************************************/
     public enum Result {
         NotSupported,
         LoggedIn,
         Error
     };
 
+    /***********************************************************
+    ***********************************************************/
     public void on_start ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool open_browser ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public GLib.Uri authorisation_link ();
 
@@ -63,18 +73,24 @@ signals:
     The state has changed.
     when logged in, token has the value of the token.
     ***********************************************************/
-    void result (OAuth.Result result, string user = string (), string token = string (), string refresh_token = string ());
+    void result (OAuth.Result result, string user = "", string token = "", string refresh_token = "");
 
 
+    /***********************************************************
+    ***********************************************************/
     private Account _account;
-    private QTcpServer _server;
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private public string _expected_user;
 };
 
 
     OAuth.~OAuth () = default;
 
+    /***********************************************************
+    ***********************************************************/
     static void http_reply_and_close (QTcpSocket socket, char code, char html,
         const char more_headers = nullptr) {
         if (!socket)
@@ -98,7 +114,7 @@ signals:
     void OAuth.on_start () {
         // Listen on the socket to get a port which will be used in the redirect_uri
         if (!_server.listen (QHostAddress.LocalLost)) {
-            emit result (NotSupported, string ());
+            emit result (NotSupported, "");
             return;
         }
 
@@ -121,7 +137,7 @@ signals:
 
                     string code = rx_match.captured (1); // The 'code' is the first capture of the regexp
 
-                    GLib.Uri request_token = Utility.concat_url_path (_account.url ().to_string (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
+                    GLib.Uri request_token = Utility.concat_url_path (_account.url ().to_"", QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
                     QNetworkRequest req;
                     req.set_header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
 
@@ -143,22 +159,22 @@ signals:
                         var json_data = reply.read_all ();
                         QJsonParseError json_parse_error;
                         QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
-                        string access_token = json["access_token"].to_string ();
-                        string refresh_token = json["refresh_token"].to_string ();
-                        string user = json["user_id"].to_string ();
-                        GLib.Uri message_url = json["message_url"].to_string ();
+                        string access_token = json["access_token"].to_"";
+                        string refresh_token = json["refresh_token"].to_"";
+                        string user = json["user_id"].to_"";
+                        GLib.Uri message_url = json["message_url"].to_"";
 
                         if (reply.error () != QNetworkReply.NoError || json_parse_error.error != QJsonParseError.NoError
                             || json_data.is_empty () || json.is_empty () || refresh_token.is_empty () || access_token.is_empty ()
-                            || json["token_type"].to_string () != QLatin1String ("Bearer")) {
+                            || json["token_type"].to_"" != QLatin1String ("Bearer")) {
                             string error_reason;
-                            string error_from_json = json["error"].to_string ();
+                            string error_from_json = json["error"].to_"";
                             if (!error_from_json.is_empty ()) {
                                 error_reason = _("Error returned from the server : <em>%1</em>")
                                                   .arg (error_from_json.to_html_escaped ());
                             } else if (reply.error () != QNetworkReply.NoError) {
                                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
-                                                  .arg (reply.error_string ().to_html_escaped ());
+                                                  .arg (reply.error_"".to_html_escaped ());
                             } else if (json_data.is_empty ()) {
                                 // Can happen if a funky load balancer strips away POST data, e.g. BigIP APM my.policy
                                 error_reason = _("Empty JSON from OAuth2 redirect");
@@ -167,7 +183,7 @@ signals:
                                 // soon as you access json["whatever"] the debug output json will claim to have "whatever":null
                             } else if (json_parse_error.error != QJsonParseError.NoError) {
                                 error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                                  .arg (json_parse_error.error_string ());
+                                                  .arg (json_parse_error.error_"");
                             } else {
                                 error_reason = _("The reply from the server did not contain all expected fields");
                             }
@@ -229,7 +245,7 @@ signals:
     bool OAuth.open_browser () {
         if (!Utility.open_browser (authorisation_link ())) {
             // We cannot open the browser, then we claim we don't support OAuth.
-            emit result (NotSupported, string ());
+            emit result (NotSupported, "");
             return false;
         }
         return true;

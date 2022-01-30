@@ -10,15 +10,21 @@ namespace Occ {
 
 class FileActivityListModel : ActivityListModel {
 
-    public FileActivityListModel (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public FileActivityListModel (GLib.Object parent = new GLib.Object ());
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_load (AccountState account_state, string file_id);
 
 
     protected void start_fetch_job () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private string _file_id;
 };
     FileActivityListModel.FileActivityListModel (GLib.Object parent)
@@ -59,11 +65,11 @@ class FileActivityListModel : ActivityListModel {
         GLib.Object.connect (job, &JsonApiJob.json_received,
             this, &FileActivityListModel.activities_received);
 
-        QUrlQuery params;
-        params.add_query_item (QStringLiteral ("sort"), QStringLiteral ("asc"));
-        params.add_query_item (QStringLiteral ("object_type"), "files");
-        params.add_query_item (QStringLiteral ("object_id"), _file_id);
-        job.add_query_params (params);
+        QUrlQuery parameters;
+        parameters.add_query_item (QStringLiteral ("sort"), QStringLiteral ("asc"));
+        parameters.add_query_item (QStringLiteral ("object_type"), "files");
+        parameters.add_query_item (QStringLiteral ("object_id"), _file_id);
+        job.add_query_params (parameters);
         set_done_fetching (true);
         set_hide_old_activities (true);
         job.on_start ();

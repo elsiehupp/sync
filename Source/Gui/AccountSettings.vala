@@ -48,11 +48,17 @@ namespace Ui {
 class AccountSettings : Gtk.Widget {
     Q_PROPERTY (AccountState* account_state MEMBER _account_state)
 
+    /***********************************************************
+    ***********************************************************/
     public AccountSettings (AccountState account_state, Gtk.Widget parent = nullptr);
     ~AccountSettings () override;
     public QSize size_hint () override {
         return OwncloudGui.settings_dialog_size ();
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public bool can_encrypt_or_decrypt (FolderStatusModel.SubFolderInfo* folder_info);
 
 signals:
@@ -64,21 +70,35 @@ signals:
     void style_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_open_oC ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_update_quota (int64 total, int64 used);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void on_account_state_chan
 
-    public void on_account_state_changed ();
-
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_style_changed ();
 
 
     public AccountState on_accounts_state () {
         return _account_state;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void on_hide_selective_sync_widget ();
 
 protected slots:
@@ -118,6 +138,8 @@ protected slots:
                                   const QVector<int> &roles);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void show_connection_label (string message,
         string[] errors = string[] ());
     private bool event (QEvent *) override;
@@ -128,8 +150,12 @@ protected slots:
     /// Returns the alias of the selected folder, empty string if none
     private string selected_folder_alias ();
 
+    /***********************************************************
+    ***********************************************************/
     private Ui.AccountSettings _ui;
 
+    /***********************************************************
+    ***********************************************************/
     private FolderStatusModel _model;
     private GLib.Uri _OCUrl;
     private bool _was_disabled_before;
@@ -138,6 +164,8 @@ protected slots:
     private QAction _toggle_sign_in_out_action;
     private QAction _add_account_action;
 
+    /***********************************************************
+    ***********************************************************/
     private bool _menu_shown;
 };
 
@@ -145,6 +173,8 @@ protected slots:
 
 
 
+    /***********************************************************
+    ***********************************************************/
     static const char progress_bar_style_c[] =
         "QProgressBar {"
         "border : 1px solid grey;"
@@ -327,8 +357,8 @@ protected slots:
         q_c_info (lc_account_settings) << "Current folder encryption status code:" << status;
         var job = qobject_cast<EncryptFolderJob> (sender ());
         Q_ASSERT (job);
-        if (!job.error_string ().is_empty ()) {
-            QMessageBox.warning (nullptr, _("Warning"), job.error_string ());
+        if (!job.error_"".is_empty ()) {
+            QMessageBox.warning (nullptr, _("Warning"), job.error_"");
         }
 
         const var folder = job.property (property_folder).value<Folder> ();
@@ -345,7 +375,7 @@ protected slots:
         QModelIndex selected = _ui._folder_list.selection_model ().current_index ();
         if (!selected.is_valid ())
             return "";
-        return _model.data (selected, FolderStatusDelegate.FolderAliasRole).to_string ();
+        return _model.data (selected, FolderStatusDelegate.FolderAliasRole).to_"";
     }
 
     void AccountSettings.on_toggle_sign_in_state () {
@@ -454,12 +484,12 @@ protected slots:
         const string file_name = [this, &selected, &classification] {
             string result;
             if (classification == FolderStatusModel.RootFolder) {
-                const var alias = _model.data (selected, FolderStatusDelegate.FolderAliasRole).to_string ();
+                const var alias = _model.data (selected, FolderStatusDelegate.FolderAliasRole).to_"";
                 if (var folder = FolderMan.instance ().folder (alias)) {
                     result = folder.path ();
                 }
             } else {
-                result = _model.data (selected, FolderStatusDelegate.FolderPathRole).to_string ();
+                result = _model.data (selected, FolderStatusDelegate.FolderPathRole).to_"";
             }
 
             if (result.ends_with ('/')) {
@@ -480,7 +510,7 @@ protected slots:
         QModelIndex selected = _ui._folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || _model.classify (selected) != FolderStatusModel.SubFolder)
             return;
-        string file_name = _model.data (selected, FolderStatusDelegate.FolderPathRole).to_string ();
+        string file_name = _model.data (selected, FolderStatusDelegate.FolderPathRole).to_"";
         open_ignored_files_dialog (file_name);
     }
 
@@ -517,7 +547,7 @@ protected slots:
         var ac = menu.add_action (_("Open folder"));
         connect (ac, &QAction.triggered, this, &AccountSettings.on_open_current_local_sub_folder);
 
-        var file_name = _model.data (index, FolderStatusDelegate.FolderPathRole).to_string ();
+        var file_name = _model.data (index, FolderStatusDelegate.FolderPathRole).to_"";
         if (!GLib.File.exists (file_name)) {
             ac.set_enabled (false);
         }
@@ -597,7 +627,7 @@ protected slots:
         }
 
         tv.set_current_index (index);
-        string alias = _model.data (index, FolderStatusDelegate.FolderAliasRole).to_string ();
+        string alias = _model.data (index, FolderStatusDelegate.FolderAliasRole).to_"";
         bool folder_paused = _model.data (index, FolderStatusDelegate.FolderSyncPaused).to_bool ();
         bool folder_connected = _model.data (index, FolderStatusDelegate.FolderAccountConnected).to_bool ();
         var folder_man = FolderMan.instance ();
@@ -663,7 +693,7 @@ protected slots:
             && !folder.virtual_files_enabled () && Vfs.check_availability (folder.path ())) {
             const var mode = best_available_vfs_mode ();
             if (mode == Vfs.WindowsCfApi || ConfigFile ().show_experimental_options ()) {
-                ac = menu.add_action (_("Enable virtual file support %1 …").arg (mode == Vfs.WindowsCfApi ? string () : _(" (experimental)")));
+                ac = menu.add_action (_("Enable virtual file support %1 …").arg (mode == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
                 // TODO : remove when UX decision is made
                 ac.set_enabled (!Utility.is_path_windows_drive_partition_root (folder.path ()));
                 //
@@ -692,7 +722,7 @@ protected slots:
             } else {
                 QToolTip.show_text (
                     QCursor.pos (),
-                    _model.data (indx, Qt.ToolTipRole).to_string (),
+                    _model.data (indx, Qt.ToolTipRole).to_"",
                     this);
             }
             return;
@@ -738,9 +768,9 @@ protected slots:
 
         FolderDefinition definition;
         definition.local_path = FolderDefinition.prepare_local_path (
-            folder_wizard.field (QLatin1String ("source_folder")).to_string ());
+            folder_wizard.field (QLatin1String ("source_folder")).to_"");
         definition.target_path = FolderDefinition.prepare_target_path (
-            folder_wizard.property ("target_path").to_string ());
+            folder_wizard.property ("target_path").to_"");
 
         if (folder_wizard.property ("use_virtual_files").to_bool ()) {
             definition.virtual_files_mode = best_available_vfs_mode ();
@@ -840,7 +870,7 @@ protected slots:
         QModelIndex selected = _ui._folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || _model.classify (selected) != FolderStatusModel.SubFolder)
             return;
-        string file_name = _model.data (selected, FolderStatusDelegate.FolderPathRole).to_string ();
+        string file_name = _model.data (selected, FolderStatusDelegate.FolderPathRole).to_"";
         GLib.Uri url = GLib.Uri.from_local_file (file_name);
         QDesktopServices.open_url (url);
     }
@@ -1003,15 +1033,15 @@ protected slots:
             string msg = message;
             Theme.replace_link_color_string_background_aware (msg);
             _ui.connect_label.on_set_text (msg);
-            _ui.connect_label.set_tool_tip (string ());
-            _ui.connect_label.set_style_sheet (string ());
+            _ui.connect_label.set_tool_tip ("");
+            _ui.connect_label.set_style_sheet ("");
         } else {
             errors.prepend (message);
             string msg = errors.join (QLatin1String ("\n"));
             GLib.debug (lc_account_settings) << msg;
             Theme.replace_link_color_string (msg, QColor ("#c1c8e6"));
             _ui.connect_label.on_set_text (msg);
-            _ui.connect_label.set_tool_tip (string ());
+            _ui.connect_label.set_tool_tip ("");
             _ui.connect_label.set_style_sheet (err_style);
         }
         _ui.account_status.set_visible (!message.is_empty ());
@@ -1120,7 +1150,7 @@ protected slots:
             _ui.quota_progress_bar.set_tool_tip (tool_tip);
         } else {
             _ui.quota_progress_bar.set_visible (false);
-            _ui.quota_info_label.set_tool_tip (string ());
+            _ui.quota_info_label.set_tool_tip ("");
 
             /* -1 means not computed; -2 means unknown; -3 means unlimited  (#owncloud/client/issues/3940)*/
             if (total == 0 || total == -1) {
@@ -1138,15 +1168,15 @@ protected slots:
             _ui.ssl_button.update_account_state (_account_state);
             AccountPointer account = _account_state.account ();
             GLib.Uri safe_url (account.url ());
-            safe_url.set_password (string ()); // Remove the password from the URL to avoid showing it in the UI
+            safe_url.set_password (""); // Remove the password from the URL to avoid showing it in the UI
             const var folders = FolderMan.instance ().map ().values ();
             for (Folder folder : folders) {
                 _model.on_update_folder_state (folder);
             }
 
             const string server = string.from_latin1 ("<a href=\"%1\">%2</a>")
-                                       .arg (Utility.escape (account.url ().to_string ()),
-                                           Utility.escape (safe_url.to_string ()));
+                                       .arg (Utility.escape (account.url ().to_""),
+                                           Utility.escape (safe_url.to_""));
             string server_with_user = server;
             if (AbstractCredentials cred = account.credentials ()) {
                 string user = account.dav_display_name ();
@@ -1256,7 +1286,7 @@ protected slots:
 
             // Make sure the folder itself is expanded
             Folder f = FolderMan.instance ().folder (alias);
-            QModelIndex folder_indx = _model.index_for_path (f, string ());
+            QModelIndex folder_indx = _model.index_for_path (f, "");
             if (!_ui._folder_list.is_expanded (folder_indx)) {
                 _ui._folder_list.set_expanded (folder_indx, true);
             }

@@ -22,26 +22,36 @@ namespace Ui {
 ***********************************************************/
 class Network_settings : Gtk.Widget {
 
+    /***********************************************************
+    ***********************************************************/
     public Network_settings (Gtk.Widget parent = nullptr);
     ~Network_settings () override;
     public QSize size_hint () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_save_proxy_settings ();
     private void on_save_bw_limit_settings ();
 
     /// Red marking of host field if empty and enabled
     private void on_check_empty_proxy_host ();
 
+    /***********************************************************
+    ***********************************************************/
     private void on_check_account_localhost ();
 
 
     protected void show_event (QShow_event event) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void load_proxy_settings ();
-    private void load_bWLimit_settings ();
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private Ui.Network_settings _ui;
 };
 
@@ -232,7 +242,7 @@ class Network_settings : Gtk.Widget {
         if (_ui.host_line_edit.is_enabled () && _ui.host_line_edit.text ().is_empty ()) {
             _ui.host_line_edit.set_style_sheet ("border : 1px solid red");
         } else {
-            _ui.host_line_edit.set_style_sheet (string ());
+            _ui.host_line_edit.set_style_sheet ("");
         }
     }
 

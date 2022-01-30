@@ -50,21 +50,29 @@ struct Emoji {
 
 class EmojiCategoriesModel : QAbstractListModel {
 
+    /***********************************************************
+    ***********************************************************/
     public QVariant data (QModelIndex &index, int role) override;
     public int row_count (QModelIndex &parent = QModelIndex ()) override;
     public QHash<int, GLib.ByteArray> role_names () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private enum Roles {
         EmojiRole = 0,
         LabelRole
     };
 
+    /***********************************************************
+    ***********************************************************/
     private struct Category {
         string emoji;
         string label;
     };
 
+    /***********************************************************
+    ***********************************************************/
     private static const std.vector<Category> categories;
 };
 
@@ -84,19 +92,31 @@ class EmojiModel : GLib.Object {
     Q_PROPERTY (QVariantList symbols MEMBER symbols CONSTANT)
     Q_PROPERTY (QVariantList flags MEMBER flags CONSTANT)
 
-    public EmojiModel (GLib.Object parent = nullptr)
+    /***********************************************************
+    ***********************************************************/
+    public EmojiModel (GLib.Object parent = new GLib.Object ())
         : GLib.Object (parent) {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public Q_INVOKABLE QVariantList history ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public Q_INVOKABLE void set_category (string category);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public Q_INVOKABLE void emoji_
 
-    public Q_INVOKABLE void emoji_used (QVariant &model_data);
-
+    /***********************************************************
+    ***********************************************************/
     public QVariantList model ();
 
 
@@ -107,6 +127,8 @@ signals:
     void model_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private static const QVariantList people;
     private static const QVariantList nature;
     private static const QVariantList food;
@@ -116,9 +138,13 @@ signals:
     private static const QVariantList symbols;
     private static const QVariantList flags;
 
+    /***********************************************************
+    ***********************************************************/
     private QSettings _settings;
-    private string _category = "history";
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private EmojiCategoriesModel _emoji_categories_model;
 };
 

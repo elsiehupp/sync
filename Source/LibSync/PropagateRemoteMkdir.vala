@@ -21,8 +21,12 @@ class PropagateRemoteMkdir : PropagateItemJob {
     Propagate_upload_encrypted _upload_encrypted_helper;
     friend class PropagateDirectory; // So it can access the _item;
 
+    /***********************************************************
+    ***********************************************************/
     public PropagateRemoteMkdir (OwncloudPropagator propagator, SyncFileItemPtr &item);
 
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
     public void on_abort (PropagatorJob.AbortType abort_type) override;
 
@@ -41,6 +45,8 @@ class PropagateRemoteMkdir : PropagateItemJob {
     public void set_delete_existing (bool enabled);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_mkdir ();
     private void on_start_mkcol_job ();
     private void on_start_encrypted_mkcol_job (string path, string filename, uint64 size);
@@ -49,6 +55,8 @@ class PropagateRemoteMkdir : PropagateItemJob {
     private void on_success ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void finalize_mk_col_job (QNetworkReply.NetworkError err, string job_http_reason_phrase_string, string job_path);
 };
 
@@ -58,7 +66,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         , _upload_encrypted_helper (nullptr) {
         const var path = _item._file;
         const var slash_position = path.last_index_of ('/');
-        const var parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
+        const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
         SyncJournalFileRecord parent_rec;
         bool ok = propagator._journal.get_file_record (parent_path, &parent_rec);
@@ -158,7 +166,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         propfind_job.set_properties ({"http://owncloud.org/ns:permissions"});
         connect (propfind_job, &PropfindJob.result, this, [this, job_path] (QVariantMap &result){
             propagator ()._active_job_list.remove_one (this);
-            _item._remote_perm = RemotePermissions.from_server_string (result.value (QStringLiteral ("permissions")).to_string ());
+            _item._remote_perm = RemotePermissions.from_server_string (result.value (QStringLiteral ("permissions")).to_"");
 
             if (!_upload_encrypted_helper && !_item._is_encrypted) {
                 on_success ();
@@ -186,7 +194,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
     void PropagateRemoteMkdir.on_mkdir () {
         const var path = _item._file;
         const var slash_position = path.last_index_of ('/');
-        const var parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
+        const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
         SyncJournalFileRecord parent_rec;
         bool ok = propagator ()._journal.get_file_record (parent_path, &parent_rec);
@@ -224,9 +232,9 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
         _item._file_id = _job.reply ().raw_header ("OC-File_id");
 
-        _item._error_string = _job.error_string ();
+        _item._error_string = _job.error_"";
 
-        const var job_http_reason_phrase_string = _job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ();
+        const var job_http_reason_phrase_string = _job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_"";
 
         const var job_path = _job.path ();
 

@@ -13,22 +13,34 @@ namespace Occ {
 /// Label that can elide its text
 class ElidedLabel : QLabel {
 
+    /***********************************************************
+    ***********************************************************/
     public ElidedLabel (Gtk.Widget parent = nullptr);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public ElidedLabel (string text, Gtk.Widget parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_set_text (string text);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public const string text () {
         return _text;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_elide_mode (Qt.TextElideMode elide_mode);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public Qt.TextElideMode elide_mode () {
         return _elide_mode;
     }
@@ -37,6 +49,8 @@ class ElidedLabel : QLabel {
     protected void resize_event (QResizeEvent event) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private string _text;
     private Qt.TextElideMode _elide_mode = Qt.ElideNone;
 };

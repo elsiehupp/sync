@@ -11,12 +11,20 @@ namespace Occ {
 
 class PreparedSqlQuery {
 
+    /***********************************************************
+    ***********************************************************/
     private SqlQuery _query;
-    private bool _ok;
 
-    private friend class PreparedSqlQueryManager;
+    /***********************************************************
+    ***********************************************************/
+    private 
 
+    /***********************************************************
+    ***********************************************************/
+    private 
 
+    /***********************************************************
+    ***********************************************************/
     private PreparedSqlQuery (SqlQuery query, bool ok = true) {
         _query = query;
         _ok = ok;
@@ -27,6 +35,8 @@ class PreparedSqlQuery {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public to_bool () {
         return _ok;
     }
@@ -47,6 +57,8 @@ class PreparedSqlQuery {
 ***********************************************************/
 class PreparedSqlQueryManager {
 
+    /***********************************************************
+    ***********************************************************/
     public enum Key {
         Key.GET_FILE_RECORD_QUERY,
         Key.GET_FILE_RECORD_QUERY_BY_MANGLED_NAME,
@@ -92,6 +104,8 @@ class PreparedSqlQueryManager {
     };
 
 
+    /***********************************************************
+    ***********************************************************/
     public PreparedSqlQueryManager () = default;
 
 
@@ -128,6 +142,8 @@ class PreparedSqlQueryManager {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private SqlQuery _queries[Prepared_query_count];
     private Q_DISABLE_COPY (PreparedSqlQueryManager)
 };

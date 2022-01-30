@@ -24,10 +24,14 @@ namespace Occ {
 ***********************************************************/
 class Folder_watcher_private : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public Folder_watcher_private () = default;
     public Folder_watcher_private (Folder_watcher p, string path);
     ~Folder_watcher_private () override;
 
+    /***********************************************************
+    ***********************************************************/
     public int test_watch_count () {
         return _path_to_watch.size ();
     }
@@ -45,8 +49,12 @@ protected slots:
     protected void remove_folders_below (string path);
 
 
+    /***********************************************************
+    ***********************************************************/
     private Folder_watcher _parent;
 
+    /***********************************************************
+    ***********************************************************/
     private string _folder;
     private QHash<int, string> _watch_to_path;
     private QMap<string, int> _path_to_watch;

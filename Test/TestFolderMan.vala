@@ -15,6 +15,8 @@ class TestFolderMan : public GLib.Object {
 
     FolderMan _fm;
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testCheckPathValidityForNewFolder () {
         QTemporaryDir dir;
         ConfigFile.setConfDir (dir.path ()); // we don't want to pollute the user's config file
@@ -51,12 +53,12 @@ class TestFolderMan : public GLib.Object {
         // those should be allowed
         // string FolderMan.checkPathValidityForNewFolder (string& path, GLib.Uri serverUrl, bool forNewDirectory)
 
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free"), string ());
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/free2/"), string ());
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free"), "");
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/free2/"), "");
         // Not an existing directory . Ok
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/bliblablu"), string ());
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free/bliblablu"), string ());
-        // QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/bliblablu/some/more"), string ());
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/bliblablu"), "");
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free/bliblablu"), "");
+        // QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/bliblablu/some/more"), "");
 
         // A file . Error
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/file.txt").isNull ());
@@ -73,8 +75,8 @@ class TestFolderMan : public GLib.Object {
         // Now it will work because the account is different
         GLib.Uri url3 ("http://anotherexample.org");
         url3.setUserName ("dummy");
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1", url3), string ());
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/", url3), string ());
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1", url3), "");
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/", url3), "");
 
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath).isNull ());
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1/folder").isNull ());
@@ -96,7 +98,7 @@ class TestFolderMan : public GLib.Object {
         // link 3 points to an existing sync folder. To make it fail, the account must be the same
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/link3", url2).isNull ());
         // while with a different account, this is fine
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/link3", url3), string ());
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/link3", url3), "");
 
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/link4").isNull ());
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/link3/folder").isNull ());
@@ -124,6 +126,9 @@ class TestFolderMan : public GLib.Object {
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/sub/subsub/sub").isNull ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testFindGoodPathForNewSyncFolder () {
         // SETUP
 

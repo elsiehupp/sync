@@ -14,6 +14,8 @@ class DesktopServiceHook : GLib.Object {
 signals:
     void hooked (GLib.Uri );
 
+    /***********************************************************
+    ***********************************************************/
     public DesktopServiceHook () {
         QDesktopServices.setUrlHandler ("oauthtest", this, "hooked");
     }
@@ -23,11 +25,15 @@ static const GLib.Uri sOAuthTestServer ("oauthtest://someserver/owncloud");
 
 class FakePostReply : QNetworkReply {
 
+    /***********************************************************
+    ***********************************************************/
     public std.unique_ptr<QIODevice> payload;
     public bool aborted = false;
     public bool redirectToPolicy = false;
     public bool redirectToToken = false;
 
+    /***********************************************************
+    ***********************************************************/
     public FakePostReply (QNetworkAccessManager.Operation op, QNetworkRequest &request,
                   std.unique_ptr<QIODevice> payload_, GLib.Object parent)
         : QNetworkReply{parent}, payload{std.move (payload_)} {
@@ -74,9 +80,15 @@ class FakePostReply : QNetworkReply {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_abort () override {
         aborted = true;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public int64 bytesAvailable () override {
         if (aborted)
             return 0;
@@ -91,6 +103,8 @@ class FakePostReply : QNetworkReply {
 // Reply with a small delay
 class SlowFakePostReply : FakePostReply {
 
+    /***********************************************************
+    ***********************************************************/
     public using FakePostReply.FakePostReply;
     public void respond () override {
         // override of FakePostReply.respond, will call the real one with a delay.
@@ -101,23 +115,35 @@ class SlowFakePostReply : FakePostReply {
 class OAuthTestCase : GLib.Object {
     DesktopServiceHook desktopServiceHook;
 
+    /***********************************************************
+    ***********************************************************/
     public enum State { StartState, BrowserOpened, TokenAsked, CustomState } state = StartState;
 
+    /***********************************************************
+    ***********************************************************/
     public bool replyToBrowserOk = false;
     public bool gotAuthOk = false;
     public virtual bool on_done () { return replyToBrowserOk && gotAuthOk; }
 
 
+    /***********************************************************
+    ***********************************************************/
     public FakeQNAM *fakeQnam = nullptr;
     public QNetworkAccessManager realQNAM;
     public QPointer<QNetworkReply> browserReply = nullptr;
     public string code = generateEtag ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public Occ.AccountPointer account;
 
+    /***********************************************************
+    ***********************************************************/
     public QScopedPointer<OAuth> oauth;
 
+    /***********************************************************
+    ***********************************************************/
     public virtual void test () {
         fakeQnam = new FakeQNAM ({});
         account = Occ.Account.create ();
@@ -140,6 +166,8 @@ class OAuthTestCase : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public virtual void openBrowserHook (GLib.Uri url) {
         QCOMPARE (state, StartState);
         state = BrowserOpened;
@@ -155,6 +183,8 @@ class OAuthTestCase : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public virtual QNetworkReply createBrowserReply (QNetworkRequest &request) {
         browserReply = realQNAM.get (request);
         GLib.Object.connect (browserReply, &QNetworkReply.on_finished, this, &OAuthTestCase.browserReplyFinished);
@@ -162,6 +192,8 @@ class OAuthTestCase : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public virtual void browserReplyFinished () {
         QCOMPARE (sender (), browserReply.data ());
         QCOMPARE (state, TokenAsked);
@@ -170,6 +202,8 @@ class OAuthTestCase : GLib.Object {
         replyToBrowserOk = true;
     };
 
+    /***********************************************************
+    ***********************************************************/
     public virtual QNetworkReply tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest &req) {
         ASSERT (state == BrowserOpened);
         state = TokenAsked;
@@ -182,6 +216,8 @@ class OAuthTestCase : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public virtual GLib.ByteArray tokenReplyPayload () {
         QJsonDocument jsondata (QJsonObject{ { "access_token", "123" }, { "refresh_token" , "456" }, { "message_url",  "owncloud://on_success"}, { "user_id", "789" }, { "token_type", "Bearer" }
         });
@@ -189,6 +225,8 @@ class OAuthTestCase : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public virtual void oauthResult (OAuth.Result result, string user, string token , string refreshToken) {
         QCOMPARE (state, TokenAsked);
         QCOMPARE (result, OAuth.LoggedIn);
@@ -201,6 +239,8 @@ class OAuthTestCase : GLib.Object {
 
 class TestOAuth : public GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testBasic () {
         OAuthTestCase test;
         test.test ();
@@ -232,6 +272,9 @@ class TestOAuth : public GLib.Object {
         test.test ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testRandomConnections () {
         // Test that we can send random garbage to the litening socket and it does not prevent the connection
         struct Test : OAuthTestCase {
@@ -281,6 +324,9 @@ class TestOAuth : public GLib.Object {
         test.test ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testTokenUrlHasRedirect () {
         struct Test : OAuthTestCase {
             int redirectsDone = 0;

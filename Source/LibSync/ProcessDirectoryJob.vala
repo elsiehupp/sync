@@ -46,6 +46,8 @@ class ProcessDirectoryJob : GLib.Object {
 
     struct PathTuple;
 
+    /***********************************************************
+    ***********************************************************/
     public enum Query_mode {
         Normal_query,
         Parent_dont_exist, // Do not query this folder because it does not exist
@@ -82,25 +84,35 @@ class ProcessDirectoryJob : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_start ();
     /***********************************************************
     Start up to nb_jobs, return the number of job started; emit finished () when done
     ***********************************************************/
     public int process_sub_jobs (int nb_jobs);
 
+    /***********************************************************
+    ***********************************************************/
     public void set_inside_encrypted_tree (bool is_inside_encrypted_tree) {
         _is_inside_encrypted_tree = is_inside_encrypted_tree;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_inside_encrypted_tree () {
         return _is_inside_encrypted_tree;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public SyncFileItemPtr _dir_item;
 
 
+    /***********************************************************
+    ***********************************************************/
     private struct Entries {
         string name_override;
         SyncJournalFileRecord db_entry;
@@ -145,6 +157,8 @@ class ProcessDirectoryJob : GLib.Object {
         }
     };
 
+    /***********************************************************
+    ***********************************************************/
     private bool check_for_invalid_file_name (PathTuple &path, std.map<string, Entries> &entries, Entries &entry);
 
 
@@ -193,6 +207,8 @@ class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     private bool check_permissions (SyncFileItemPtr &item);
 
+    /***********************************************************
+    ***********************************************************/
     private struct Move_permission_result {
         // whether moving/renaming the source is ok
         bool source_ok = false;
@@ -218,9 +234,11 @@ class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     private void db_error ();
 
-    private void add_virtual_file_suffix (string str);
-    private bool has_virtual_file_suffix (string str);
-    private void chop_virtual_file_suffix (string str);
+    /***********************************************************
+    ***********************************************************/
+    private void add_virtual_file_suffix (string string_value);
+    private bool has_virtual_file_suffix (string string_value);
+    private void chop_virtual_file_suffix (string string_value);
 
 
     /***********************************************************
@@ -267,8 +285,12 @@ class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     private void setup_database_pin_state_actions (SyncJournalFileRecord &record);
 
+    /***********************************************************
+    ***********************************************************/
     private int64 _last_sync_timestamp = 0;
 
+    /***********************************************************
+    ***********************************************************/
     private Query_mode _query_server = Query_mode.Normal_query;
     private Query_mode _query_local = Query_mode.Normal_query;
 
@@ -281,6 +303,8 @@ class ProcessDirectoryJob : GLib.Object {
     private bool _server_query_done = false;
     private bool _local_query_done = false;
 
+    /***********************************************************
+    ***********************************************************/
     private RemotePermissions _root_permissions;
     private QPointer<DiscoverySingleDirectoryJob> _server_job;
 
@@ -307,8 +331,12 @@ class ProcessDirectoryJob : GLib.Object {
     private std.deque<ProcessDirectoryJob> _queued_jobs;
     private QVector<ProcessDirectoryJob> _running_jobs;
 
+    /***********************************************************
+    ***********************************************************/
     private DiscoveryPhase _discovery_data;
 
+    /***********************************************************
+    ***********************************************************/
     private PathTuple _current_folder;
     private bool _child_modified = false; // the directory contains modified item what would prevent deletion
     private bool _child_ignored = false; // The directory contains ignored item that would prevent deletion
@@ -747,7 +775,7 @@ signals:
         item._is_encrypted = server_entry.is_e2e_encrypted;
         item._encrypted_file_name = [=] {
             if (server_entry.e2e_mangled_name.is_empty ()) {
-                return string ();
+                return "";
             }
 
             Q_ASSERT (_discovery_data._remote_folder.starts_with ('/'));
@@ -1871,23 +1899,23 @@ signals:
         _discovery_data.fatal_error (_("Error while reading the database"));
     }
 
-    void ProcessDirectoryJob.add_virtual_file_suffix (string ==&str) {
-        str.append (_discovery_data._sync_options._vfs.file_suffix ());
+    void ProcessDirectoryJob.add_virtual_file_suffix (string ==&string_value) {
+        string_value.append (_discovery_data._sync_options._vfs.file_suffix ());
     }
 
-    bool ProcessDirectoryJob.has_virtual_file_suffix (string str) {
+    bool ProcessDirectoryJob.has_virtual_file_suffix (string string_value) {
         if (!is_vfs_with_suffix ())
             return false;
-        return str.ends_with (_discovery_data._sync_options._vfs.file_suffix ());
+        return string_value.ends_with (_discovery_data._sync_options._vfs.file_suffix ());
     }
 
-    void ProcessDirectoryJob.chop_virtual_file_suffix (string str) {
+    void ProcessDirectoryJob.chop_virtual_file_suffix (string string_value) {
         if (!is_vfs_with_suffix ())
             return;
-        bool has_suffix = has_virtual_file_suffix (str);
+        bool has_suffix = has_virtual_file_suffix (string_value);
         ASSERT (has_suffix);
         if (has_suffix)
-            str.chop (_discovery_data._sync_options._vfs.file_suffix ().size ());
+            string_value.chop (_discovery_data._sync_options._vfs.file_suffix ().size ());
     }
 
     DiscoverySingleDirectoryJob *ProcessDirectoryJob.start_async_server_query () {

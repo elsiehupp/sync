@@ -25,7 +25,7 @@ namespace {
             return current + next.at (0);
         };
 
-        return std.accumulate (std.cbegin (words), std.cend (words), string (), add_first_letter);
+        return std.accumulate (std.cbegin (words), std.cend (words), "", add_first_letter);
     }
 }
 
@@ -39,6 +39,8 @@ class Link_share;
 
 class Share_dialog : Gtk.Dialog {
 
+    /***********************************************************
+    ***********************************************************/
     public Share_dialog (QPointer<AccountState> account_state,
         const string share_path,
         const string local_path,
@@ -49,12 +51,16 @@ class Share_dialog : Gtk.Dialog {
     ~Share_dialog () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_done (int r) override;
     private void on_propfind_received (QVariantMap &result);
     private void on_propfind_error ();
     private void on_thumbnail_fetched (int &status_code, GLib.ByteArray reply);
     private void on_account_state_changed (int state);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_shares_fetched (GLib.List<unowned<Share>> &shares);
     private void on_add_link_share_widget (unowned<Link_share> &link_share);
     private void on_delete_share ();
@@ -72,12 +78,18 @@ signals:
     protected void change_event (QEvent *) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void show_sharing_ui ();
     private Share_link_widget add_link_share_widget (unowned<Link_share> &link_share);
     private void init_link_share_widget ();
 
+    /***********************************************************
+    ***********************************************************/
     private Ui.Share_dialog _ui;
 
+    /***********************************************************
+    ***********************************************************/
     private QPointer<AccountState> _account_state;
     private string _share_path;
     private string _local_path;
@@ -87,12 +99,16 @@ signals:
     private Share_dialog_start_page _start_page;
     private Share_manager _manager = nullptr;
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.List<Share_link_widget> _link_widget_list;
     private Share_link_widget* _empty_share_link_widget = nullptr;
     private Share_user_group_widget _user_group_widget = nullptr;
     private QProgress_indicator _progress_indicator = nullptr;
 };
 
+    /***********************************************************
+    ***********************************************************/
     static const int thumbnail_size = 40;
 
     Share_dialog.Share_dialog (QPointer<AccountState> account_state,
@@ -147,7 +163,7 @@ signals:
         _ui.grid_layout.remove_widget (_ui.label_name);
         if (oc_dir.is_empty ()) {
             _ui.grid_layout.add_widget (_ui.label_name, 0, 1, 2, 1);
-            _ui.label_share_path.on_set_text (string ());
+            _ui.label_share_path.on_set_text ("");
         } else {
             _ui.grid_layout.add_widget (_ui.label_name, 0, 1, 1, 1);
             _ui.grid_layout.add_widget (_ui.label_share_path, 1, 1, 1, 1);
@@ -295,11 +311,11 @@ signals:
 
     void Share_dialog.on_propfind_received (QVariantMap &result) {
         const QVariant received_permissions = result["share-permissions"];
-        if (!received_permissions.to_string ().is_empty ()) {
+        if (!received_permissions.to_"".is_empty ()) {
             _max_sharing_permissions = static_cast<Share_permissions> (received_permissions.to_int ());
             q_c_info (lc_sharing) << "Received sharing permissions for" << _share_path << _max_sharing_permissions;
         }
-        var private_link_url = result["privatelink"].to_string ();
+        var private_link_url = result["privatelink"].to_"";
         var numeric_file_id = result["fileid"].to_byte_array ();
         if (!private_link_url.is_empty ()) {
             q_c_info (lc_sharing) << "Received private link url for" << _share_path << private_link_url;
@@ -360,8 +376,8 @@ signals:
     void Share_dialog.on_create_link_share () {
         if (_manager) {
             const var ask_optional_password = _account_state.account ().capabilities ().share_public_link_ask_optional_password ();
-            const var password = ask_optional_password ? create_random_password () : string ();
-            _manager.create_link_share (_share_path, string (), password);
+            const var password = ask_optional_password ? create_random_password () : "";
+            _manager.create_link_share (_share_path, "", password);
         }
     }
 
@@ -394,7 +410,7 @@ signals:
                                                  _("Password for share required"),
                                                  _("Please enter a password for your link share:"),
                                                  QLineEdit.Password,
-                                                 string (),
+                                                 "",
                                                  &ok);
 
         if (!ok) {
@@ -405,7 +421,7 @@ signals:
 
         if (_manager) {
             // Try to create the link share again with the newly entered password
-            _manager.create_link_share (_share_path, string (), password);
+            _manager.create_link_share (_share_path, "", password);
         }
     }
 

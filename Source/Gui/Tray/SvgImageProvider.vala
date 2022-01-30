@@ -15,9 +15,13 @@ namespace Ui {
 
 class Svg_image_provider : QQuick_image_provider {
 
+    /***********************************************************
+    ***********************************************************/
     public Svg_image_provider ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public QImage request_image (string id, QSize size, QSize &requested_size) override;
 };
 

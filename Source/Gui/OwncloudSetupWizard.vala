@@ -34,26 +34,38 @@ class OwncloudSetupWizard : GLib.Object {
     public static void run_wizard (GLib.Object obj, char amember, Gtk.Widget parent = nullptr);
 
 
+    /***********************************************************
+    ***********************************************************/
     public static bool bring_wizard_to_front_if_visible ();
 signals:
     // overall dialog close signal.
     void own_cloud_wizard_done (int);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_check_server (string );
-    private void on_system_proxy_lookup_done (QNetworkProxy &proxy);
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private void on_find_server ();
     private void on_find_server_behind_redirect ();
     private void on_found_server (GLib.Uri , QJsonObject &);
     private void on_no_server_found (QNetworkReply reply);
     private void on_no_server_found_timeout (GLib.Uri url);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_determine_auth_type ();
 
+    /***********************************************************
+    ***********************************************************/
     private void on_connect_to_oCUrl (string );
-    private void on_auth_error ();
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private void on_create_local_and_remote_folders (string , string );
     private void on_remote_folder_exists (QNetworkReply *);
     private void on_create_remote_folder_finished (QNetworkReply reply);
@@ -61,7 +73,9 @@ signals:
     private void on_skip_folder_configuration ();
 
 
-    private OwncloudSetupWizard (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    private OwncloudSetupWizard (GLib.Object parent = new GLib.Object ());
     ~OwncloudSetupWizard () override;
     private void start_wizard ();
     private void test_owncloud_connect ();
@@ -71,6 +85,8 @@ signals:
     private AccountState apply_account_changes ();
     private bool check_downgrade_advised (QNetworkReply reply);
 
+    /***********************************************************
+    ***********************************************************/
     private OwncloudWizard _oc_wizard;
     private string _init_local_folder;
     private string _remote_folder;
@@ -100,6 +116,8 @@ signals:
         _oc_wizard.delete_later ();
     }
 
+    /***********************************************************
+    ***********************************************************/
     static QPointer<OwncloudSetupWizard> wiz = nullptr;
 
     void OwncloudSetupWizard.run_wizard (GLib.Object obj, char amember, Gtk.Widget parent) {
@@ -128,7 +146,7 @@ signals:
         account.set_credentials (CredentialsFactory.create ("dummy"));
         account.set_url (Theme.instance ().override_server_url ());
         _oc_wizard.set_account (account);
-        _oc_wizard.set_oCUrl (account.url ().to_string ());
+        _oc_wizard.set_oCUrl (account.url ().to_"");
 
         _remote_folder = Theme.instance ().default_server_folder ();
         // remote_folder may be empty, which means /
@@ -287,7 +305,7 @@ signals:
         var server_version = CheckServerJob.version (info);
 
         _oc_wizard.on_append_to_configuration_log (_("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
-                                                .arg (Utility.escape (url.to_string ()),
+                                                .arg (Utility.escape (url.to_""),
                                                     Utility.escape (Theme.instance ().app_name_gui ()),
                                                     Utility.escape (CheckServerJob.version_string (info)),
                                                     Utility.escape (server_version)));
@@ -299,7 +317,7 @@ signals:
         if (url != _oc_wizard.account ().url ()) {
             // We might be redirected, update the account
             _oc_wizard.account ().set_url (url);
-            q_c_info (lc_wizard) << " was redirected to" << url.to_string ();
+            q_c_info (lc_wizard) << " was redirected to" << url.to_"";
         }
 
         on_determine_auth_type ();
@@ -315,8 +333,8 @@ signals:
         } else {
             msg = _("Failed to connect to %1 at %2:<br/>%3")
                       .arg (Utility.escape (Theme.instance ().app_name_gui ()),
-                          Utility.escape (_oc_wizard.account ().url ().to_string ()),
-                          Utility.escape (job.error_string ()));
+                          Utility.escape (_oc_wizard.account ().url ().to_""),
+                          Utility.escape (job.error_""));
         }
         bool is_downgrade_advised = check_downgrade_advised (reply);
 
@@ -331,7 +349,7 @@ signals:
     void OwncloudSetupWizard.on_no_server_found_timeout (GLib.Uri url) {
         _oc_wizard.on_display_error (
             _("Timeout while trying to connect to %1 at %2.")
-                .arg (Utility.escape (Theme.instance ().app_name_gui ()), Utility.escape (url.to_string ())),
+                .arg (Utility.escape (Theme.instance ().app_name_gui ()), Utility.escape (url.to_"")),
                     false);
     }
 
@@ -399,7 +417,7 @@ signals:
         // the updated server URL, similar to redirects on status.php.
         GLib.Uri redirect_url = reply.attribute (QNetworkRequest.RedirectionTargetAttribute).to_url ();
         if (!redirect_url.is_empty ()) {
-            q_c_info (lc_wizard) << "Authed request was redirected to" << redirect_url.to_string ();
+            q_c_info (lc_wizard) << "Authed request was redirected to" << redirect_url.to_"";
 
             // strip the expected path
             string path = redirect_url.path ();
@@ -408,14 +426,14 @@ signals:
                 path.chop (expected_path.size ());
                 redirect_url.set_path (path);
 
-                q_c_info (lc_wizard) << "Setting account url to" << redirect_url.to_string ();
+                q_c_info (lc_wizard) << "Setting account url to" << redirect_url.to_"";
                 _oc_wizard.account ().set_url (redirect_url);
                 test_owncloud_connect ();
                 return;
             }
             error_msg = _("The authenticated request to the server was redirected to "
                           "\"%1\". The URL is bad, the server is misconfigured.")
-                           .arg (Utility.escape (redirect_url.to_string ()));
+                           .arg (Utility.escape (redirect_url.to_""));
 
             // A 404 is actually a on_success : we were authorized to know that the folder does
             // not exist. It will be created later...
@@ -428,7 +446,7 @@ signals:
             if (!_oc_wizard.account ().credentials ().still_valid (reply)) {
                 error_msg = _("Access forbidden by server. To verify that you have proper access, "
                               "<a href=\"%1\">click here</a> to access the service with your browser.")
-                               .arg (Utility.escape (_oc_wizard.account ().url ().to_string ()));
+                               .arg (Utility.escape (_oc_wizard.account ().url ().to_""));
             } else {
                 error_msg = job.error_string_parsing_body ();
             }
@@ -504,7 +522,7 @@ signals:
                     Example: https://cloud.example.com/remote.php/dav//
 
             ***********************************************************/
-            q_c_info (lc_wizard) << "Sanitize got URL path:" << string (_oc_wizard.account ().url ().to_string () + '/' + _oc_wizard.account ().dav_path () + remote_folder);
+            q_c_info (lc_wizard) << "Sanitize got URL path:" << string (_oc_wizard.account ().url ().to_"" + '/' + _oc_wizard.account ().dav_path () + remote_folder);
 
             string new_dav_path = _oc_wizard.account ().dav_path (),
                     new_remote_folder = remote_folder;
@@ -525,7 +543,7 @@ signals:
 
             string new_url_path = new_dav_path + '/' + new_remote_folder;
 
-            q_c_info (lc_wizard) << "Sanitized to URL path:" << _oc_wizard.account ().url ().to_string () + '/' + new_url_path;
+            q_c_info (lc_wizard) << "Sanitized to URL path:" << _oc_wizard.account ().url ().to_"" + '/' + new_url_path;
             /***********************************************************
             END - Sanitize URL paths to eliminate double-slashes
             ***********************************************************/
@@ -555,7 +573,7 @@ signals:
                 create_remote_folder ();
             }
         } else {
-            error = _("Error : %1").arg (job.error_string ());
+            error = _("Error : %1").arg (job.error_"");
             ok = false;
         }
 
@@ -611,7 +629,7 @@ signals:
     }
 
     void OwncloudSetupWizard.finalize_setup (bool on_success) {
-        const string local_folder = _oc_wizard.property ("local_folder").to_string ();
+        const string local_folder = _oc_wizard.property ("local_folder").to_"";
         if (on_success) {
             if (! (local_folder.is_empty () || _remote_folder.is_empty ())) {
                 _oc_wizard.on_append_to_configuration_log (

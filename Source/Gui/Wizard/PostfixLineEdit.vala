@@ -21,6 +21,8 @@ Useful e.g. for setting a fixed domain name.
 
 class Postfix_line_edit : QLineEdit {
 
+    /***********************************************************
+    ***********************************************************/
     public Postfix_line_edit (Gtk.Widget parent);
 
 
@@ -51,6 +53,8 @@ class Postfix_line_edit : QLineEdit {
     protected void paint_event (QPaint_event pe) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private string _postfix;
 };
 

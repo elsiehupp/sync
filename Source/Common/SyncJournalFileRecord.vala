@@ -16,6 +16,8 @@ namespace Occ {
 ***********************************************************/
 class SyncJournalFileRecord {
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_valid () {
         return !_path.is_empty ();
     }
@@ -31,28 +33,50 @@ class SyncJournalFileRecord {
     public GLib.ByteArray numeric_file_id ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public QDateTime mod_date_time () {
         return Utility.q_date_time_from_time_t (_modtime);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_directory () {
         return _type == ItemTypeDirectory;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public bool is_file () {
         return _type == ItemTypeFile || _type == ItemTypeVirtualFileDehydration;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public bool is_virtual_file () {
         return _type == ItemTypeVirtualFile || _type == ItemTypeVirtualFileDownload;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public string path () {
         return string.from_utf8 (_path);
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public string e2e_mangled_name () {
         return string.from_utf8 (_e2e_mangled_name);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.ByteArray _path;
     public uint64 _inode = 0;
     public int64 _modtime = 0;
@@ -73,36 +97,76 @@ operator== (SyncJournalFileRecord &lhs,
 
 class SyncJournalErrorBlocklistRecord {
 
+    /***********************************************************
+    ***********************************************************/
     public enum Category {
-        /// Normal errors have no special behavior
+        /***********************************************************
+        Normal errors have no special behavior
+        ***********************************************************/
         Normal = 0,
-        /// These get a special summary message
+
+        /***********************************************************
+        These get a special summary message
+        ***********************************************************/
         InsufficientRemoteStorage
     };
 
-    /// The number of times the operation was unsuccessful so far.
+
+    /***********************************************************
+    The number of times the operation was unsuccessful so far.
+    ***********************************************************/
     public int _retry_count = 0;
 
-    /// The last error string.
+
+    /***********************************************************
+    The last error string.
+    ***********************************************************/
     public string _error_string;
-    /// The error category. Sometimes used for special actions.
+
+
+    /***********************************************************
+    The error category. Sometimes used for special actions.
+    ***********************************************************/
     public Category _error_category = Category.Normal;
 
+    /***********************************************************
+    ***********************************************************/
     public int64 _last_try_modtime = 0;
+
+
+    /***********************************************************
+    ***********************************************************/
     public GLib.ByteArray _last_try_etag;
 
-    /// The last time the operation was attempted (in s since epoch).
+
+    /***********************************************************
+    The last time the operation was attempted (in s since epoch).
+    ***********************************************************/
     public int64 _last_try_time = 0;
 
-    /// The number of seconds the file shall be ignored.
+
+    /***********************************************************
+    The number of seconds the file shall be ignored.
+    ***********************************************************/
     public int64 _ignore_duration = 0;
 
+    /***********************************************************
+    ***********************************************************/
     public string _file;
+
+
+    /***********************************************************
+    ***********************************************************/
     public string _rename_target;
 
-    /// The last X-Request-ID of the request that failled
+
+    /***********************************************************
+    The last X-Request-ID of the request that failled
+    ***********************************************************/
     public GLib.ByteArray _request_id;
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_valid ();
 };
 
@@ -123,7 +187,10 @@ class ConflictRecord {
     ***********************************************************/
     public GLib.ByteArray path;
 
-    /// File id of the base file
+
+    /***********************************************************
+    File id of the base file
+    ***********************************************************/
     public GLib.ByteArray base_file_id;
 
 
@@ -153,6 +220,8 @@ class ConflictRecord {
     ***********************************************************/
     public GLib.ByteArray initial_base_path;
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_valid () {
         return !path.is_empty ();
     }

@@ -19,7 +19,9 @@ namespace Occ {
 
 class PushNotifications : GLib.Object {
 
-    public PushNotifications (Account account, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public PushNotifications (Account account, GLib.Object parent = new GLib.Object ());
 
     ~PushNotifications () override;
 
@@ -98,6 +100,8 @@ signals:
     void connection_lost ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_web_socket_connected ();
     private void on_web_socket_disconnected ();
     private void on_web_socket_text_message_received (string message);
@@ -107,6 +111,8 @@ signals:
     private void on_ping_timed_out ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void open_web_socket ();
     private void reconnect_to_web_socket ();
     private void close_web_socket ();
@@ -117,16 +123,22 @@ signals:
     private void start_ping_timer ();
     private void start_ping_timed_out_timer ();
 
+    /***********************************************************
+    ***********************************************************/
     private void handle_authenticated ();
     private void handle_notify_file ();
     private void handle_invalid_credentials ();
     private void handle_notify_notification ();
     private void handle_notify_activity ();
 
+    /***********************************************************
+    ***********************************************************/
     private void emit_files_changed ();
     private void emit_notifications_changed ();
     private void emit_activities_changed ();
 
+    /***********************************************************
+    ***********************************************************/
     private Account _account = nullptr;
     private QWeb_socket _web_socket;
     private uint8 _failed_authentication_attempts_count = 0;
@@ -134,6 +146,8 @@ signals:
     private uint32 _reconnect_timer_interval = 20 * 1000;
     private bool _is_ready = false;
 
+    /***********************************************************
+    ***********************************************************/
     private QTimer _ping_timer;
     private QTimer _ping_timed_out_timer;
     private bool _pong_received_from_web_socket_server = false;
@@ -142,7 +156,7 @@ signals:
     PushNotifications.PushNotifications (Account account, GLib.Object parent)
         : GLib.Object (parent)
         , _account (account)
-        , _web_socket (new QWeb_socket (string (), QWeb_socket_protocol.Version_latest, this)) {
+        , _web_socket (new QWeb_socket ("", QWeb_socket_protocol.Version_latest, this)) {
         connect (_web_socket, QOverload<QAbstract_socket.Socket_error>.of (&QWeb_socket.error), this, &PushNotifications.on_web_socket_error);
         connect (_web_socket, &QWeb_socket.ssl_errors, this, &PushNotifications.on_web_socket_ssl_errors);
         connect (_web_socket, &QWeb_socket.connected, this, &PushNotifications.on_web_socket_connected);

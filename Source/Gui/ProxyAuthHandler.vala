@@ -37,6 +37,8 @@ fairly complicated to handle.
 ***********************************************************/
 class ProxyAuthHandler : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public static ProxyAuthHandler instance ();
 
     ~ProxyAuthHandler () override;
@@ -46,9 +48,13 @@ class ProxyAuthHandler : GLib.Object {
         QAuthenticator authenticator);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_sender_destroyed (GLib.Object *);
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private ProxyAuthHandler ();
 
     /// Runs the Proxy_auth_dialog and returns true if new credentials were entered.
@@ -60,12 +66,16 @@ class ProxyAuthHandler : GLib.Object {
     /// Stores the current credentials in the keychain.
     private void store_creds_in_keychain ();
 
+    /***********************************************************
+    ***********************************************************/
     private template<class T, typename Pointer_to_member_function>
     private void exec_await (T *sender,
                    Pointer_to_member_function signal,
                    int &counter,
                    const QEventLoop.Process_events_flags flags = QEventLoop.All_events);
 
+    /***********************************************************
+    ***********************************************************/
     private string keychain_username_key ();
     private string keychain_password_key ();
 
@@ -73,6 +83,8 @@ class ProxyAuthHandler : GLib.Object {
     /// to a different proxy.
     private string _proxy;
 
+    /***********************************************************
+    ***********************************************************/
     private string _username;
     private string _password;
 
@@ -86,6 +98,8 @@ class ProxyAuthHandler : GLib.Object {
     private int _waiting_for_dialog = 0;
     private int _waiting_for_keychain = 0;
 
+    /***********************************************************
+    ***********************************************************/
     private QPointer<Proxy_auth_dialog> _dialog;
 
     /// The QSettings instance to securely store username/password in the keychain.
@@ -264,7 +278,7 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
     GLib.debug (lc_proxy) << "trying to load" << _proxy;
 
     if (!_waiting_for_keychain) {
-        _username = _settings.value (keychain_username_key ()).to_string ();
+        _username = _settings.value (keychain_username_key ()).to_"";
         if (_username.is_empty ()) {
             return false;
         }
@@ -293,7 +307,7 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
 
     _username.clear ();
     if (_read_password_job.error () != EntryNotFound) {
-        GLib.warn (lc_proxy) << "ReadPasswordJob failed with" << _read_password_job.error_string ();
+        GLib.warn (lc_proxy) << "ReadPasswordJob failed with" << _read_password_job.error_"";
     }
     return false;
 }
@@ -321,7 +335,7 @@ void ProxyAuthHandler.store_creds_in_keychain () {
 
     job.delete_later ();
     if (job.error () != NoError) {
-        GLib.warn (lc_proxy) << "WritePasswordJob failed with" << job.error_string ();
+        GLib.warn (lc_proxy) << "WritePasswordJob failed with" << job.error_"";
     }
 }
 

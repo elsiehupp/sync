@@ -30,6 +30,8 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
     using StatusMap = QHash<GLib.ByteArray, GLib.ByteArray>;
     StatusMap m_status;
 
+    /***********************************************************
+    ***********************************************************/
     public OwncloudDolphinPlugin () {
         var helper = OwncloudDolphinPluginHelper.instance ();
         GLib.Object.connect (helper, &OwncloudDolphinPluginHelper.commandRecieved,
@@ -37,6 +39,8 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public string[] getOverlays (GLib.Uri& url) override {
         var helper = OwncloudDolphinPluginHelper.instance ();
         if (!helper.isConnected ())
@@ -55,6 +59,9 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
         return string[] ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private string[] overlaysForString (GLib.ByteArray status) {
         string[] r;
         if (status.startsWith ("NOP"))
@@ -75,6 +82,9 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
         return r;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void slotCommandRecieved (GLib.ByteArray line) {
 
         GLib.List<GLib.ByteArray> tokens = line.split (':');

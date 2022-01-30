@@ -13,22 +13,36 @@ class ConflictSolver : GLib.Object {
     Q_PROPERTY (string local_version_filename READ local_version_filename WRITE on_set_local_version_filename NOTIFY local_version_filename_changed)
     Q_PROPERTY (string remote_version_filename READ remote_version_filename WRITE on_set_remote_version_filename NOTIFY remote_version_filename_changed)
 
+    /***********************************************************
+    ***********************************************************/
     public enum Solution {
         KeepLocalVersion,
         KeepRemoteVersion,
         KeepBothVersions
     };
 
+    /***********************************************************
+    ***********************************************************/
     public ConflictSolver (Gtk.Widget parent = nullptr);
 
+    /***********************************************************
+    ***********************************************************/
     public string local_version_filename ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string remote_version_filename ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool exec (Solution solution);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void on_set_local_version_filename (string local_version_filename);
 
 
@@ -39,10 +53,14 @@ signals:
     void remote_version_filename_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private bool delete_local_version ();
     private bool rename_local_version ();
     private bool overwrite_remote_version ();
 
+    /***********************************************************
+    ***********************************************************/
     private Gtk.Widget _parent_widget;
     private string _local_version_filename;
     private string _remote_version_filename;

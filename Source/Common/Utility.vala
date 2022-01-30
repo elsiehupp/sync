@@ -74,9 +74,9 @@ namespace Utility {
 
     OCSYNC_EXPORT string octets_to_string (int64 octets);
 
-    OCSYNC_EXPORT GLib.ByteArray user_agent_string ();
+    OCSYNC_EXPORT GLib.ByteArray user_agent_"";
 
-    OCSYNC_EXPORT GLib.ByteArray friendly_user_agent_string ();
+    OCSYNC_EXPORT GLib.ByteArray friendly_user_agent_"";
     /***********************************************************
     @brief Return whether launch on startup is enabled system wide.
 
@@ -115,7 +115,7 @@ namespace Utility {
     @return the formatted string.
     ***********************************************************/
 
-    OCSYNC_EXPORT string compact_format_double (double value, int prec, string unit = string ());
+    OCSYNC_EXPORT string compact_format_double (double value, int prec, string unit = "");
 
     // porting methods
 
@@ -187,9 +187,9 @@ namespace Utility {
     // of the output.
     // If command is empty, the function calls the running application which, on
     // Linux, might have changed while this one is running.
-    // For Mac and Windows, it returns string ()
+    // For Mac and Windows, it returns ""
 
-    OCSYNC_EXPORT GLib.ByteArray version_of_installed_binary (string command = string ());
+    OCSYNC_EXPORT GLib.ByteArray version_of_installed_binary (string command = "");
 
     OCSYNC_EXPORT
 
@@ -249,7 +249,7 @@ namespace Utility {
     with the given parent. If no parent is specified, the caller must destroy the settings
     ***********************************************************/
 
-    OCSYNC_EXPORT std.unique_ptr<QSettings> settings_with_group (string group, GLib.Object parent = nullptr);
+    OCSYNC_EXPORT std.unique_ptr<QSettings> settings_with_group (string group, GLib.Object parent = new GLib.Object ());
 
 
     /***********************************************************
@@ -431,7 +431,7 @@ static QLatin1String platform () {
     return QSysInfo.product_type ();
 }
 
-GLib.ByteArray Utility.user_agent_string () {
+GLib.ByteArray Utility.user_agent_"" {
     return "Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture : %6 OsArchitecture : %7)"
         .arg (platform (),
             MIRALL_VERSION_STRING,
@@ -443,7 +443,7 @@ GLib.ByteArray Utility.user_agent_string () {
         .to_latin1 ();
 }
 
-GLib.ByteArray Utility.friendly_user_agent_string () {
+GLib.ByteArray Utility.friendly_user_agent_"" {
     const var pattern = "%1 (Desktop Client - %2)";
     const var user_agent = pattern.arg (QSysInfo.machine_host_name (), platform ());
     return user_agent.to_utf8 ();
@@ -475,17 +475,17 @@ int64 Utility.free_disk_space (string path) {
 string Utility.compact_format_double (double value, int prec, string unit) {
     QLocale locale = QLocale.system ();
     char dec_point = locale.decimal_point ();
-    string str = locale.to_string (value, 'f', prec);
-    while (str.ends_with ('0') || str.ends_with (dec_point)) {
-        if (str.ends_with (dec_point)) {
-            str.chop (1);
+    string string_value = locale.to_string (value, 'f', prec);
+    while (string_value.ends_with ('0') || string_value.ends_with (dec_point)) {
+        if (string_value.ends_with (dec_point)) {
+            string_value.chop (1);
             break;
         }
-        str.chop (1);
+        string_value.chop (1);
     }
     if (!unit.is_empty ())
-        str += (' ' + unit);
-    return str;
+        string_value += (' ' + unit);
+    return string_value;
 }
 
 string Utility.escape (string in) {
@@ -549,7 +549,7 @@ namespace {
 // limitation unless we fake more arguments
 // (it must be in the form ("context", "source", "comment", n)
 #undef QT_TRANSLATE_NOOP
-const int QT_TRANSLATE_NOOP (ctx, str, ...) str
+const int QT_TRANSLATE_NOOP (ctx, string_value, ...) string_value
     Q_DECL_CONSTEXPR Period periods[] = { { QT_TRANSLATE_NOOP ("Utility", "%n year (s)", 0, _), 365 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n month (s)", 0, _), 30 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n day (s)", 0, _), 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n hour (s)", 0, _), 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n minute (s)", 0, _), 60 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n second (s)", 0, _), 1000LL }, { nullptr, 0 }
     };
 } // anonymous namespace
@@ -657,10 +657,10 @@ GLib.ByteArray Utility.version_of_installed_binary (string command) {
         if (binary.is_empty ()) {
             binary = q_app.arguments ()[0];
         }
-        string[] params;
-        params << "--version";
+        string[] parameters;
+        parameters << "--version";
         QProcess process;
-        process.on_start (binary, params);
+        process.on_start (binary, parameters);
         process.wait_for_finished (); // sets current thread to sleep and waits for ping_process end
         re = process.read_all_standard_output ();
         int newline = re.index_of ('\n');
@@ -903,6 +903,8 @@ string Utility.sanitize_for_file_name (string name) {
 
 
 
+    /***********************************************************
+    ***********************************************************/
     static void setup_fav_link_private (string folder) {
         // Nautilus : add to ~/.gtk-bookmarks
         GLib.File gtk_bookmarks (QDir.home_path () + QLatin1String ("/.config/gtk-3.0/bookmarks"));
@@ -917,6 +919,8 @@ string Utility.sanitize_for_file_name (string name) {
         }
     }
 
+    /***********************************************************
+    ***********************************************************/
     static void remove_fav_link_private (string folder) {
         Q_UNUSED (folder)
     }
@@ -979,6 +983,8 @@ string Utility.sanitize_for_file_name (string name) {
         }
     }
 
+    /***********************************************************
+    ***********************************************************/
     static inline bool has_dark_systray_private () {
         return true;
     }

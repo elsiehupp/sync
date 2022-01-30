@@ -12,6 +12,8 @@ using namespace Occ;
 
 class TestSelectiveSync : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSelectiveSyncBigFolders () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         SyncOptions options;

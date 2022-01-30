@@ -27,13 +27,23 @@ namespace Occ {
 ***********************************************************/
 class HttpCredentialsGui : HttpCredentials {
 
+    /***********************************************************
+    ***********************************************************/
     public HttpCredentialsGui ()
         : HttpCredentials () {
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public HttpCredentialsGui (string user, string password,
             const GLib.ByteArray client_cert_bundle, GLib.ByteArray client_cert_password)
         : HttpCredentials (user, password, client_cert_bundle, client_cert_password) {
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public HttpCredentialsGui (string user, string password, string refresh_token,
             const GLib.ByteArray client_cert_bundle, GLib.ByteArray client_cert_password)
         : HttpCredentials (user, password, client_cert_bundle, client_cert_password) {
@@ -54,8 +64,12 @@ class HttpCredentialsGui : HttpCredentials {
         return _async_auth ? _async_auth.authorisation_link () : GLib.Uri ();
     }
 
+    /***********************************************************
+    ***********************************************************/
     static string request_app_password_text (Account account);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_async_auth_result (OAuth.Result, string user, string access_token, string refresh_token);
     private void on_show_dialog ();
     private void on_ask_from_user_async ();
@@ -63,6 +77,8 @@ class HttpCredentialsGui : HttpCredentials {
 signals:
     void authorisation_link_changed ();
 
+    /***********************************************************
+    ***********************************************************/
     private QScopedPointer<OAuth, QScopedPointerObjectDeleteLater<OAuth>> _async_auth;
 };
 
@@ -169,7 +185,7 @@ void HttpCredentialsGui.on_show_dialog () {
 
 string HttpCredentialsGui.request_app_password_text (Account account) {
     int version = account.server_version_int ();
-    var url = account.url ().to_string ();
+    var url = account.url ().to_"";
     if (url.ends_with ('/'))
         url.chop (1);
 
@@ -180,7 +196,7 @@ string HttpCredentialsGui.request_app_password_text (Account account) {
     } else if (version >= Account.make_server_version (11, 0, 0)) {
         url += QLatin1String ("/index.php/settings/user/security#security");
     } else {
-        return string ();
+        return "";
     }
 
     return _("<a href=\"%1\">Click here</a> to request an app password from the web interface.")

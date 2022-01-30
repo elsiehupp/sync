@@ -31,18 +31,28 @@ namespace {
 
 class Propagate_remote_delete_encrypted_root_folder : AbstractPropagateRemoteDeleteEncrypted {
 
+    /***********************************************************
+    ***********************************************************/
     public Propagate_remote_delete_encrypted_root_folder (OwncloudPropagator propagator, SyncFileItemPtr item, GLib.Object parent);
 
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_folder_un_locked_successfully (GLib.ByteArray folder_id) override;
     private void on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code) override;
     private void on_delete_nested_remote_item_finished ();
 
+    /***********************************************************
+    ***********************************************************/
     private void delete_nested_remote_item (string filename);
-    private void decrypt_and_remote_delete ();
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private QMap<string, Occ.SyncJournalFileRecord> _nested_items; // Nested files and folders
 };
 
@@ -120,7 +130,7 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
         return;
     }
 
-    const string encrypted_file_name = delete_job.property (encrypted_file_name_property_key).to_string ();
+    const string encrypted_file_name = delete_job.property (encrypted_file_name_property_key).to_"";
 
     if (!encrypted_file_name.is_empty ()) {
         const var nested_item = _nested_items.take (encrypted_file_name);
@@ -139,7 +149,7 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
 
     if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
         store_first_error (err);
-        store_first_error_string (delete_job.error_string ());
+        store_first_error_string (delete_job.error_"");
         GLib.warn (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Delete nested item on_finished with error" << err << ".";
     } else if (http_error_code != 204 && http_error_code != 404) {
         // A 404 reply is also considered a on_success here : We want to make sure
@@ -152,7 +162,7 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
         // throw an error.
         store_first_error_string (_("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                         .arg (http_error_code)
-                        .arg (delete_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ()));
+                        .arg (delete_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_""));
         if (_item._http_error_code == 0) {
             _item._http_error_code = http_error_code;
         }

@@ -12,6 +12,8 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 class FakeUserStatusConnector : Occ.UserStatusConnector {
 
+    /***********************************************************
+    ***********************************************************/
     public void fetchUserStatus () override {
         if (_couldNotFetchUserStatus) {
             emit error (Error.CouldNotFetchUserStatus);
@@ -28,6 +30,8 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void fetchPredefinedStatuses () override {
         if (_couldNotFetchPredefinedUserStatuses) {
             emit error (Error.CouldNotFetchPredefinedUserStatuses);
@@ -37,6 +41,8 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void setUserStatus (Occ.UserStatus &userStatus) override {
         if (_couldNotSetUserStatusMessage) {
             emit error (Error.CouldNotSetUserStatus);
@@ -48,6 +54,8 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void clearMessage () override {
         if (_couldNotClearUserStatusMessage) {
             emit error (Error.CouldNotClearMessage);
@@ -57,58 +65,82 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public Occ.UserStatus userStatus () override {
         return {}; // Not implemented
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void setFakeUserStatus (Occ.UserStatus &userStatus) {
         _userStatus = userStatus;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void setFakePredefinedStatuses (
         const std.vector<Occ.UserStatus> &statuses) {
         _predefinedStatuses = statuses;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public Occ.UserStatus userStatusSetByCallerOfSetUserStatus () { return _userStatusSetByCallerOfSetUserStatus; }
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool messageCleared () { return _isMessageCleared; }
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void setErrorCouldNotFetchPredefinedUserStatuses (bool value) {
         _couldNotFetchPredefinedUserStatuses = value;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void setErrorCouldNotFetchUserStatus (bool value) {
         _couldNotFetchUserStatus = value;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void setErrorCouldNotSetUserStatusMessage (bool value) {
         _couldNotSetUserStatusMessage = value;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void setErrorUserStatusNotSupported (bool value) {
         _userStatusNotSupported = value;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void setErrorEmojisNotSupported (bool value) {
         _emojisNotSupported = value;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void setErrorCouldNotClearUserStatusMessage (bool value) {
         _couldNotClearUserStatusMessage = value;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private Occ.UserStatus _userStatusSetByCallerOfSetUserStatus;
     private Occ.UserStatus _userStatus;
     private std.vector<Occ.UserStatus> _predefinedStatuses;
@@ -123,14 +155,23 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
 
 class FakeDateTimeProvider : Occ.DateTimeProvider {
 
+    /***********************************************************
+    ***********************************************************/
     public void setCurrentDateTime (QDateTime &dateTime) { _dateTime = dateTime; }
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public QDateTime currentDateTime () override { return _dateTime; }
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public QDate currentDate () override { return _dateTime.date (); }
 
+
+    /***********************************************************
+    ***********************************************************/
     private QDateTime _dateTime;
 };
 
@@ -169,6 +210,8 @@ static QDateTime createDateTime (int year = 2021, int month = 7, int day = 27,
 
 class TestSetUserStatusDialog : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testCtor_fetchStatusAndPredefinedStatuses () {
         const QDateTime currentDateTime (QDateTime.currentDateTime ());
 
@@ -218,6 +261,9 @@ class TestSetUserStatusDialog : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testCtor_noStatusSet_showSensibleDefaults () {
         Occ.UserStatusSelectorModel model (nullptr, nullptr);
 
@@ -226,6 +272,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (model.clearAt (), _("Don't clear"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testCtor_fetchStatusButNoStatusSet_showSensibleDefaults () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         fakeUserStatusJob.setFakeUserStatus ({ "", "", "",
@@ -238,6 +287,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (model.clearAt (), _("Don't clear"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetOnlineStatus_emitOnlineStatusChanged () {
         const Occ.UserStatus.OnlineStatus onlineStatus (Occ.UserStatus.OnlineStatus.Invisible);
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
@@ -250,6 +302,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (onlineStatusChangedSpy.count (), 1);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetUserStatus_setCustomMessage_userStatusSetCorrect () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
@@ -278,6 +333,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (clearAt._period, 60 * 30);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetUserStatusMessage_predefinedStatusWasSet_userStatusSetCorrect () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         fakeUserStatusJob.setFakePredefinedStatuses (createFakePredefinedStatuses (createDateTime ()));
@@ -305,6 +363,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (clearAt._period, 60 * 30);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetUserStatusEmoji_predefinedStatusWasSet_userStatusSetCorrect () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         fakeUserStatusJob.setFakePredefinedStatuses (createFakePredefinedStatuses (createDateTime ()));
@@ -332,6 +393,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (clearAt._period, 60 * 30);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetPredefinedStatus_emitUserStatusChangedAndSetUserStatus () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
@@ -361,6 +425,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (model.clearAt (), _("1 hour"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetClear_setClearAtStage0_emitClearAtChangedAndClearAtSet () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
@@ -373,6 +440,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (model.clearAt (), _("Don't clear"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetClear_setClearAtStage1_emitClearAtChangedAndClearAtSet () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
@@ -385,6 +455,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (model.clearAt (), _("30 minutes"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetClear_setClearAtStage2_emitClearAtChangedAndClearAtSet () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
@@ -397,6 +470,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (model.clearAt (), _("1 hour"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetClear_setClearAtStage3_emitClearAtChangedAndClearAtSet () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
@@ -409,6 +485,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (model.clearAt (), _("4 hours"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetClear_setClearAtStage4_emitClearAtChangedAndClearAtSet () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
@@ -421,6 +500,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (model.clearAt (), _("Today"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetClear_setClearAtStage5_emitClearAtChangedAndClearAtSet () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
@@ -433,6 +515,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (model.clearAt (), _("This week"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testClearAtStages () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
@@ -449,6 +534,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (clearAtValues[5], _("This week"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testClearAt_clearAtTimestamp () { {onst var currentTime = createDateTime ();
         {
             Occ.UserStatus userStatus;
@@ -550,6 +638,9 @@ class TestSetUserStatusDialog : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testClearAt_clearAtEndOf () { {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
@@ -574,6 +665,9 @@ class TestSetUserStatusDialog : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testClearAt_clearAtAfterPeriod () { {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
@@ -598,6 +692,9 @@ class TestSetUserStatusDialog : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testClearUserStatus () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
@@ -607,6 +704,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QVERIFY (fakeUserStatusJob.messageCleared ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testError_couldNotFetchPredefinedStatuses_emitError () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         fakeUserStatusJob.setErrorCouldNotFetchPredefinedUserStatuses (true);
@@ -616,6 +716,9 @@ class TestSetUserStatusDialog : GLib.Object {
             _("Could not fetch predefined statuses. Make sure you are connected to the server."));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testError_couldNotFetchUserStatus_emitError () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         fakeUserStatusJob.setErrorCouldNotFetchUserStatus (true);
@@ -625,6 +728,9 @@ class TestSetUserStatusDialog : GLib.Object {
             _("Could not fetch user status. Make sure you are connected to the server."));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testError_userStatusNotSupported_emitError () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         fakeUserStatusJob.setErrorUserStatusNotSupported (true);
@@ -634,6 +740,9 @@ class TestSetUserStatusDialog : GLib.Object {
             _("User status feature is not supported. You will not be able to set your user status."));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testError_couldSetUserStatus_emitError () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         fakeUserStatusJob.setErrorCouldNotSetUserStatusMessage (true);
@@ -644,6 +753,9 @@ class TestSetUserStatusDialog : GLib.Object {
             _("Could not set user status. Make sure you are connected to the server."));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testError_emojisNotSupported_emitError () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         fakeUserStatusJob.setErrorEmojisNotSupported (true);
@@ -653,6 +765,9 @@ class TestSetUserStatusDialog : GLib.Object {
             _("Emojis feature is not supported. Some user status functionality may not work."));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testError_couldNotClearMessage_emitError () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         fakeUserStatusJob.setErrorCouldNotClearUserStatusMessage (true);
@@ -663,6 +778,9 @@ class TestSetUserStatusDialog : GLib.Object {
             _("Could not clear user status message. Make sure you are connected to the server."));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testError_setUserStatus_clearErrorMessage () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
@@ -675,6 +793,9 @@ class TestSetUserStatusDialog : GLib.Object {
         QVERIFY (model.errorMessage ().isEmpty ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testError_clearUserStatus_clearErrorMessage () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);

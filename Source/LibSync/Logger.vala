@@ -35,30 +35,56 @@ namespace Occ {
 ***********************************************************/
 class Logger : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_logging_to_file ();
 
+    /***********************************************************
+    ***********************************************************/
     public void do_log (QtMsgType type, QMessageLogContext &ctx, string message);
 
+    /***********************************************************
+    ***********************************************************/
     public static Logger instance ();
 
+    /***********************************************************
+    ***********************************************************/
     public void post_gui_log (string title, string message);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void post_optional_gui_log (string title, string message);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void post_gui_messag
 
-    public void post_gui_message (string title, string message);
-
+    /***********************************************************
+    ***********************************************************/
     public string log_file ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_log_file (string name);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_log_expire (int expire);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string log_dir ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void set_log_dir (string dir);
 
     public void set_log_flush (bool flush);
@@ -66,6 +92,10 @@ class Logger : GLib.Object {
     public bool log_debug () {
         return _log_debug;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void set_log_debug (bool debug);
 
 
@@ -92,12 +122,22 @@ class Logger : GLib.Object {
     ***********************************************************/
     public void disable_temporary_folder_log_dir ();
 
+    /***********************************************************
+    ***********************************************************/
     public void add_log_rule (GLib.Set<string> &rules) {
         set_log_rules (_log_rules + rules);
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void remove_log_rule (GLib.Set<string> &rules) {
-        set_log_rules (_log_rules - rules);
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void set_log_rules (GLib.Set<string> &rules);
 
 signals:
@@ -108,15 +148,25 @@ signals:
     void optional_gui_log (string , string );
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_enter_next_log_file ();
 
 
-    private Logger (GLib.Object parent = nullptr);
-    ~Logger () override;
+    /***********************************************************
+    ***********************************************************/
+    private Logger (GLib.Object parent = new GLib.Object ());
 
-    private void close ();
+    /***********************************************************
+    ***********************************************************/
+    private 
+
+    /***********************************************************
+    ***********************************************************/
     private void dump_crash_log ();
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.File _log_file;
     private bool _do_file_flush = false;
     private int _log_expire = 0;
@@ -250,7 +300,7 @@ void Logger.set_log_flush (bool flush) {
 }
 
 void Logger.set_log_debug (bool debug) {
-    const GLib.Set<string> rules = {debug ? QStringLiteral ("nextcloud.*.debug=true") : string ()};
+    const GLib.Set<string> rules = {debug ? QStringLiteral ("nextcloud.*.debug=true") : ""};
     if (debug) {
         add_log_rule (rules);
     } else {
@@ -278,9 +328,9 @@ void Logger.disable_temporary_folder_log_dir () {
         return;
 
     on_enter_next_log_file ();
-    set_log_dir (string ());
+    set_log_dir ("");
     set_log_debug (false);
-    set_log_file (string ());
+    set_log_file ("");
     _temporary_folder_log_dir = false;
 }
 

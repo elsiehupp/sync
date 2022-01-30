@@ -21,18 +21,30 @@ namespace SharedTools {
 
 class QtLocalPeer : GLib.Object {
 
-    public QtLocalPeer (GLib.Object parent = nullptr, string app_id = string ());
+    /***********************************************************
+    ***********************************************************/
+    public QtLocalPeer (GLib.Object parent = new GLib.Object (), string app_id = "");
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool is_client ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public bool on_send_message (string message, int timeout, bool block);
 
 
     public string application_id () {
         return id;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public static string app_session_id (string app_id);
 
 signals:
@@ -119,7 +131,7 @@ bool QtLocalPeer.is_client () {
         q_warning ("Qt_singleCoreApplication : could not on_cleanup socket");
     bool res = server.listen (socket_name);
     if (!res)
-        q_warning ("Qt_singleCoreApplication : listen on local socket failed, %s", q_printable (server.error_string ()));
+        q_warning ("Qt_singleCoreApplication : listen on local socket failed, %s", q_printable (server.error_""));
     GLib.Object.connect (server, &QLocal_server.new_connection, this, &QtLocalPeer.receive_connection);
     return false;
 }
@@ -183,7 +195,7 @@ void QtLocalPeer.receive_connection () {
     } while (remaining && got >= 0 && socket.wait_for_ready_read (2000));
     //### error check : got<0
     if (got < 0) {
-        q_warning () << "QtLocalPeer : Message reception failed" << socket.error_string ();
+        q_warning () << "QtLocalPeer : Message reception failed" << socket.error_"";
         delete socket;
         return;
     }

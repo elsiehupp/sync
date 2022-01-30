@@ -70,15 +70,25 @@ Q_DECLARE_LOGGING_CATEGORY (lc_socket_api)
 ***********************************************************/
 class SocketApi : GLib.Object {
 
-    public SocketApi (GLib.Object parent = nullptr);
-    ~SocketApi () override;
+    /***********************************************************
+    ***********************************************************/
+    public SocketApi (GLib.Object parent = new GLib.Object ());
 
-    public void on_update_folder_view (Folder f);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_unregister_path (string alias);
+    /***********************************************************
+    ***********************************************************/
+    public void on_unregister_path (string alias)
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_register_path (string alias);
 
 
@@ -89,11 +99,15 @@ signals:
     void file_activity_command_received (string share_path, string local_path);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_new_connection ();
     private void on_lost_connection ();
     private void on_socket_destroyed (GLib.Object obj);
     private void on_read_socket ();
 
+    /***********************************************************
+    ***********************************************************/
     static void copy_url_to_clipboard (string link);
     static void email_private_link (string link);
     static void open_private_link (string link);
@@ -120,6 +134,8 @@ signals:
         string server_relative_path;
     };
 
+    /***********************************************************
+    ***********************************************************/
     private void broadcast_message (string msg, bool do_wait = false);
 
     // opens share dialog, sends reply
@@ -216,8 +232,12 @@ signals:
     private void command_ASYNC_TRIGGER_MENU_ACTION (unowned<Socket_api_job> &job);
 #endif
 
+    /***********************************************************
+    ***********************************************************/
     private string build_register_path_message (string path);
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.Set<string> _registered_aliases;
     private QMap<QIODevice *, unowned<Socket_listener>> _listeners;
     private Socket_api_server _local_server;
@@ -322,7 +342,7 @@ static inline string remove_trailing_slash (string path) {
     return path;
 }
 
-static string build_message (string verb, string path, string status = string ()) {
+static string build_message (string verb, string path, string status = "") {
     string msg (verb);
 
     if (!status.is_empty ()) {
@@ -508,7 +528,7 @@ void SocketApi.on_read_socket () {
             var job_id = arguments[0];
 
             var socket_api_job = unowned<Socket_api_job> (
-                new Socket_api_job (job_id.to_string (), listener, json), &GLib.Object.delete_later);
+                new Socket_api_job (job_id.to_"", listener, json), &GLib.Object.delete_later);
             if (index_of_method != -1) {
                 static_meta_object.method (index_of_method)
                     .invoke (this, Qt.QueuedConnection,
@@ -522,8 +542,8 @@ void SocketApi.on_read_socket () {
             QJsonParseError error;
             const var json = QJsonDocument.from_json (argument.to_utf8 (), &error).object ();
             if (error.error != QJsonParseError.NoError) {
-                GLib.warn (lc_socket_api ()) << "Invalid json" << argument.to_string () << error.error_string ();
-                listener.send_error (error.error_string ());
+                GLib.warn (lc_socket_api ()) << "Invalid json" << argument.to_"" << error.error_"";
+                listener.send_error (error.error_"");
                 return;
             }
             var socket_api_job = unowned<Socket_api_job_v2>.create (listener, command, json);
@@ -541,7 +561,7 @@ void SocketApi.on_read_socket () {
                 // to ensure that listener is still valid we need to call it with Qt.Direct_connection
                 ASSERT (thread () == QThread.current_thread ())
                 static_meta_object.method (index_of_method)
-                    .invoke (this, Qt.Direct_connection, Q_ARG (string, argument.to_string ()),
+                    .invoke (this, Qt.Direct_connection, Q_ARG (string, argument.to_""),
                         Q_ARG (Socket_listener *, listener.data ()));
             }
         }
@@ -571,7 +591,7 @@ void SocketApi.on_unregister_path (string alias) {
 
     Folder f = FolderMan.instance ().folder (alias);
     if (f)
-        broadcast_message (build_message (QLatin1String ("UNREGISTER_PATH"), remove_trailing_slash (f.path ()), string ()), true);
+        broadcast_message (build_message (QLatin1String ("UNREGISTER_PATH"), remove_trailing_slash (f.path ()), ""), true);
 
     _registered_aliases.remove (alias);
 }
@@ -651,7 +671,7 @@ void SocketApi.process_share_request (string local_file, Socket_listener listene
 }
 
 void SocketApi.on_broadcast_status_push_message (string system_path, SyncFileStatus file_status) {
-    string msg = build_message (QLatin1String ("STATUS"), system_path, file_status.to_socket_api_string ());
+    string msg = build_message (QLatin1String ("STATUS"), system_path, file_status.to_socket_api_"");
     Q_ASSERT (!system_path.ends_with ('/'));
     uint32 directory_hash = q_hash (system_path.left (system_path.last_index_of ('/')));
     for (var &listener : q_as_const (_listeners)) {
@@ -678,7 +698,7 @@ void SocketApi.command_RETRIEVE_FILE_STATUS (string argument, Socket_listener li
         listener.register_monitored_directory (q_hash (directory));
 
         SyncFileStatus file_status = file_data.sync_file_status ();
-        status_string = file_status.to_socket_api_string ();
+        status_string = file_status.to_socket_api_"";
     }
 
     const string message = QLatin1String ("STATUS:") % status_string % ':' % QDir.to_native_separators (argument);
@@ -726,15 +746,15 @@ void SocketApi.command_EDIT (string local_file, Socket_listener listener) {
 
     var job = new JsonApiJob (file_data.folder.account_state ().account (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing/open"), this);
 
-    QUrlQuery params;
-    params.add_query_item ("path", file_data.server_relative_path);
-    params.add_query_item ("editor_id", editor.id ());
-    job.add_query_params (params);
+    QUrlQuery parameters;
+    parameters.add_query_item ("path", file_data.server_relative_path);
+    parameters.add_query_item ("editor_id", editor.id ());
+    job.add_query_params (parameters);
     job.set_verb (JsonApiJob.Verb.Post);
 
     GLib.Object.connect (job, &JsonApiJob.json_received, [] (QJsonDocument &json){
         var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-        var url = GLib.Uri (data.value ("url").to_string ());
+        var url = GLib.Uri (data.value ("url").to_"");
 
         if (!url.is_empty ())
             Utility.open_browser (url);
@@ -747,6 +767,8 @@ void SocketApi.command_EDIT (string local_file, Socket_listener listener) {
 
 class Get_or_create_public_link_share : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public Get_or_create_public_link_share (AccountPointer &account, string local_file,
         GLib.Object parent)
         : GLib.Object (parent)
@@ -764,12 +786,16 @@ class Get_or_create_public_link_share : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void run () {
         GLib.debug (lc_public_link) << "Fetching shares";
         _share_manager.fetch_shares (_local_file);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_shares_fetched (GLib.List<unowned<Share>> &shares) {
         var share_name = SocketApi._("Context menu share");
 
@@ -781,27 +807,33 @@ class Get_or_create_public_link_share : GLib.Object {
 
             if (link_share.get_name () == share_name) {
                 GLib.debug (lc_public_link) << "Found existing share, reusing";
-                return on_success (link_share.get_link ().to_string ());
+                return on_success (link_share.get_link ().to_"");
             }
         }
 
         // otherwise create a new one
         GLib.debug (lc_public_link) << "Creating new share";
-        _share_manager.create_link_share (_local_file, share_name, string ());
+        _share_manager.create_link_share (_local_file, share_name, "");
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_link_share_created (unowned<Link_share> &share) {
         GLib.debug (lc_public_link) << "New share created";
-        on_success (share.get_link ().to_string ());
+        on_success (share.get_link ().to_"");
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_password_required () {
         bool ok = false;
         string password = QInputDialog.get_text (nullptr,
                                                  _("Password for share required"),
                                                  _("Please enter a password for your link share:"),
                                                  QLineEdit.Normal,
-                                                 string (),
+                                                 "",
                                                  &ok);
 
         if (!ok) {
@@ -810,15 +842,21 @@ class Get_or_create_public_link_share : GLib.Object {
         }
 
         // Try to create the link share again with the newly entered password
-        _share_manager.create_link_share (_local_file, string (), password);
+        _share_manager.create_link_share (_local_file, "", password);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_link_share_requires_password (string message) {
         q_c_info (lc_public_link) << "Could not create link share:" << message;
         emit error (message);
         delete_later ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_server_error (int code, string message) {
         GLib.warn (lc_public_link) << "Share fetch/create error" << code << message;
         QMessageBox.warning (
@@ -836,11 +874,16 @@ signals:
     void error (string message);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_success (string link) {
         emit done (link);
         delete_later ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private AccountPointer _account;
     private Share_manager _share_manager;
     private string _local_file;
@@ -850,11 +893,15 @@ signals:
 
 class Get_or_create_public_link_share : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public Get_or_create_public_link_share (AccountPointer &, string ,
         std.function<void (string link)>, GLib.Object *) {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void run () {
     }
 };
@@ -1015,7 +1062,7 @@ void SocketApi.command_MOVE_ITEM (string local_file, Socket_listener *) {
         nullptr,
         _("Select new location …"),
         default_dir_and_name,
-        string (), nullptr, QFileDialog.Hide_name_filter_details);
+        "", nullptr, QFileDialog.Hide_name_filter_details);
     if (target.is_empty ())
         return;
 
@@ -1360,7 +1407,7 @@ void SocketApi.command_ASYNC_LIST_WIDGETS (unowned<Socket_api_job> &job) {
     for (var &widget : all_objects (QApplication.all_widgets ())) {
         var object_name = widget.object_name ();
         if (!object_name.is_empty ()) {
-            response += object_name + ":" + widget.property ("text").to_string () + ", ";
+            response += object_name + ":" + widget.property ("text").to_"" + ", ";
         }
     }
     job.resolve (response);
@@ -1369,18 +1416,18 @@ void SocketApi.command_ASYNC_LIST_WIDGETS (unowned<Socket_api_job> &job) {
 void SocketApi.command_ASYNC_INVOKE_WIDGET_METHOD (unowned<Socket_api_job> &job) {
     var &arguments = job.arguments ();
 
-    var widget = find_widget (arguments["object_name"].to_string ());
+    var widget = find_widget (arguments["object_name"].to_"");
     if (!widget) {
         job.reject (QLatin1String ("widget not found"));
         return;
     }
 
-    QMetaObject.invoke_method (widget, arguments["method"].to_string ().to_utf8 ().const_data ());
+    QMetaObject.invoke_method (widget, arguments["method"].to_"".to_utf8 ().const_data ());
     job.resolve ();
 }
 
 void SocketApi.command_ASYNC_GET_WIDGET_PROPERTY (unowned<Socket_api_job> &job) {
-    string widget_name = job.arguments ()[QLatin1String ("object_name")].to_string ();
+    string widget_name = job.arguments ()[QLatin1String ("object_name")].to_"";
     var widget = find_widget (widget_name);
     if (!widget) {
         string message = string (QLatin1String ("Widget not found : 2 : %1")).arg (widget_name);
@@ -1388,7 +1435,7 @@ void SocketApi.command_ASYNC_GET_WIDGET_PROPERTY (unowned<Socket_api_job> &job) 
         return;
     }
 
-    var property_name = job.arguments ()[QLatin1String ("property")].to_string ();
+    var property_name = job.arguments ()[QLatin1String ("property")].to_"";
 
     var segments = property_name.split ('.');
 
@@ -1419,14 +1466,14 @@ void SocketApi.command_ASYNC_GET_WIDGET_PROPERTY (unowned<Socket_api_job> &job) 
 
 void SocketApi.command_ASYNC_SET_WIDGET_PROPERTY (unowned<Socket_api_job> &job) {
     var &arguments = job.arguments ();
-    string widget_name = arguments["object_name"].to_string ();
+    string widget_name = arguments["object_name"].to_"";
     var widget = find_widget (widget_name);
     if (!widget) {
         string message = string (QLatin1String ("Widget not found : 4 : %1")).arg (widget_name);
         job.reject (message);
         return;
     }
-    widget.set_property (arguments["property"].to_string ().to_utf8 ().const_data (),
+    widget.set_property (arguments["property"].to_"".to_utf8 ().const_data (),
         arguments["value"]);
 
     job.resolve ();
@@ -1434,8 +1481,8 @@ void SocketApi.command_ASYNC_SET_WIDGET_PROPERTY (unowned<Socket_api_job> &job) 
 
 void SocketApi.command_ASYNC_WAIT_FOR_WIDGET_SIGNAL (unowned<Socket_api_job> &job) {
     var &arguments = job.arguments ();
-    string widget_name = arguments["object_name"].to_string ();
-    var widget = find_widget (arguments["object_name"].to_string ());
+    string widget_name = arguments["object_name"].to_"";
+    var widget = find_widget (arguments["object_name"].to_"");
     if (!widget) {
         string message = string (QLatin1String ("Widget not found : 5 : %1")).arg (widget_name);
         job.reject (message);
@@ -1446,7 +1493,7 @@ void SocketApi.command_ASYNC_WAIT_FOR_WIDGET_SIGNAL (unowned<Socket_api_job> &jo
         job.resolve ("signal emitted");
     });
 
-    var signal_signature = arguments["signal_signature"].to_string ();
+    var signal_signature = arguments["signal_signature"].to_"";
     signal_signature.prepend ("2");
     var utf8 = signal_signature.to_utf8 ();
     var signal_signature_final = utf8.const_data ();
@@ -1456,7 +1503,7 @@ void SocketApi.command_ASYNC_WAIT_FOR_WIDGET_SIGNAL (unowned<Socket_api_job> &jo
 void SocketApi.command_ASYNC_TRIGGER_MENU_ACTION (unowned<Socket_api_job> &job) {
     var &arguments = job.arguments ();
 
-    var object_name = arguments["object_name"].to_string ();
+    var object_name = arguments["object_name"].to_"";
     var widget = find_widget (object_name);
     if (!widget) {
         string message = string (QLatin1String ("Object not found : 1 : %1")).arg (object_name);
@@ -1469,7 +1516,7 @@ void SocketApi.command_ASYNC_TRIGGER_MENU_ACTION (unowned<Socket_api_job> &job) 
         // foo is the popupwidget!
         var actions = child_widget.actions ();
         for (var action : actions) {
-            if (action.object_name () == arguments["action_name"].to_string ()) {
+            if (action.object_name () == arguments["action_name"].to_"") {
                 action.trigger ();
 
                 job.resolve ("action found");
@@ -1478,19 +1525,19 @@ void SocketApi.command_ASYNC_TRIGGER_MENU_ACTION (unowned<Socket_api_job> &job) 
         }
     }
 
-    string message = string (QLatin1String ("Action not found : 1 : %1")).arg (arguments["action_name"].to_string ());
+    string message = string (QLatin1String ("Action not found : 1 : %1")).arg (arguments["action_name"].to_"");
     job.reject (message);
 }
 
 void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned<Socket_api_job> &job) {
-    var widget = find_widget (job.arguments ()[QLatin1String ("query_string")].to_string ());
+    var widget = find_widget (job.arguments ()[QLatin1String ("query_string")].to_"");
     if (!widget) {
-        string message = string (QLatin1String ("Object not found : 6 : %1")).arg (job.arguments ()["query_string"].to_string ());
+        string message = string (QLatin1String ("Object not found : 6 : %1")).arg (job.arguments ()["query_string"].to_"");
         job.reject (message);
         return;
     }
 
-    var property_name = job.arguments ()[QLatin1String ("property_path")].to_string ();
+    var property_name = job.arguments ()[QLatin1String ("property_path")].to_"";
 
     var segments = property_name.split ('.');
 
@@ -1514,7 +1561,7 @@ void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned<Socket_api_job> &job)
         }
     }
 
-    var icon_name = job.arguments ()[QLatin1String ("icon_name")].to_string ();
+    var icon_name = job.arguments ()[QLatin1String ("icon_name")].to_"";
     if (value.name () == icon_name) {
         job.resolve ();
     } else {
@@ -1547,7 +1594,7 @@ void Socket_api_job.reject (string response) {
 Socket_api_job_v2.Socket_api_job_v2 (unowned<Socket_listener> &socket_listener, GLib.ByteArray command, QJsonObject &arguments)
     : _socket_listener (socket_listener)
     , _command (command)
-    , _job_id (arguments[QStringLiteral ("id")].to_string ())
+    , _job_id (arguments[QStringLiteral ("id")].to_"")
     , _arguments (arguments[QStringLiteral ("arguments")].to_object ()) {
     ASSERT (!_job_id.is_empty ())
 }
@@ -1636,6 +1683,8 @@ void Socket_api_job_v2.do_finish (QJsonObject &obj) {
         }
 
 
+    /***********************************************************
+    ***********************************************************/
     public slots:
         void closure_slot () {
             callback_ ();
@@ -1654,7 +1703,7 @@ void Socket_api_job_v2.do_finish (QJsonObject &obj) {
             , _arguments (arguments) {
         }
 
-        public void resolve (string response = string ());
+        public void resolve (string response = "");
 
         public void resolve (QJsonObject &response);
 

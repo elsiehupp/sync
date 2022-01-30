@@ -55,6 +55,8 @@ bool discoveryInstruction (SyncFileItemVector &spy, string path, SyncInstruction
 
 class TestPermissions : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void t7pl () {
         FakeFolder fakeFolder{ FileInfo () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -321,6 +323,9 @@ class TestPermissions : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ static void setAllPerm (FileInfo fi, RemotePermissions perm) {
         fi.permissions = perm;
         for (var &subFi : fi.children)

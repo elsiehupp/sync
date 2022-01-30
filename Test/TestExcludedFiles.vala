@@ -616,6 +616,9 @@ private on_ void check_csync_is_windows_reserved_word () {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void check_csync_excluded_performance2 () {
         const int N = 1000;
         int totalRc = 0;
@@ -629,6 +632,9 @@ private on_ void check_csync_is_windows_reserved_word () {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void check_csync_exclude_expand_escapes () {
         extern void csync_exclude_expand_escapes (GLib.ByteArray input);
 
@@ -645,6 +651,9 @@ private on_ void check_csync_is_windows_reserved_word () {
         QVERIFY (0 == strcmp (line.constData (), "\\"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void check_version_directive () {
         ExcludedFiles excludes;
         excludes.setClientVersion (ExcludedFiles.Version (2, 5, 0));
@@ -656,6 +665,9 @@ private on_ void check_csync_is_windows_reserved_word () {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testAddExcludeFilePath_addSameFilePath_listSizeDoesNotIncrease () {
         excludedFiles.on_reset (new ExcludedFiles ());
         const var filePath = string ("exclude/.sync-exclude.lst");
@@ -666,6 +678,9 @@ private on_ void check_csync_is_windows_reserved_word () {
         QCOMPARE (excludedFiles._excludeFiles.size (), 1);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testAddExcludeFilePath_addDifferentFilePaths_listSizeIncrease () {
         excludedFiles.on_reset (new ExcludedFiles ());
 
@@ -678,6 +693,9 @@ private on_ void check_csync_is_windows_reserved_word () {
         QCOMPARE (excludedFiles._excludeFiles.size (), 2);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testAddExcludeFilePath_addDefaultExcludeFile_returnCorrectMap () {
         const string basePath ("syncFolder/");
         const string folder1 ("syncFolder/folder1/");
@@ -698,6 +716,9 @@ private on_ void check_csync_is_windows_reserved_word () {
         QCOMPARE (excludedFiles._excludeFiles[folder2].first (), folder2ExcludeList);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testReloadExcludeFiles_fileDoesNotExist_returnFalse () {
         excludedFiles.on_reset (new ExcludedFiles ());
         const string nonExistingFile ("directory/.sync-exclude.lst");
@@ -706,6 +727,9 @@ private on_ void check_csync_is_windows_reserved_word () {
         QCOMPARE (excludedFiles._allExcludes.size (), 0);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testReloadExcludeFiles_fileExists_returnTrue () {
         const var tempDir = QStandardPaths.writableLocation (QStandardPaths.TempLocation);
         excludedFiles.on_reset (new ExcludedFiles (tempDir + "/"));

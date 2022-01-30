@@ -24,28 +24,48 @@
 
 class OWNCLOUDDOLPHINPLUGINHELPER_EXPORT OwncloudDolphinPluginHelper : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public static OwncloudDolphinPluginHelper instance ();
 
+    /***********************************************************
+    ***********************************************************/
     public bool isConnected ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void sendCommand (char data);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public QVector<string> paths () { return _paths; }
 
 
     public string contextMenuTitle () {
         return _strings.value ("CONTEXT_MENU_TITLE", APPLICATION_NAME);
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public string shareActionTitle () {
-        return _strings.value ("SHARE_MENU_TITLE", "Share …");
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
     public string contextMenuIconName () {
         return _strings.value ("CONTEXT_MENU_ICON", APPLICATION_ICON_NAME);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public string copyPrivateLinkTitle () { return _strings["COPY_PRIVATE_LINK_MENU_TITLE"]; }}
 
 

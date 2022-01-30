@@ -16,14 +16,24 @@ namespace Occ {
 ***********************************************************/
 class DeleteJob : AbstractNetworkJob {
 
-    public DeleteJob (AccountPointer account, string path, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public DeleteJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public DeleteJob (AccountPointer account, GLib.Uri url, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_start () override;
+    /***********************************************************
+    ***********************************************************/
     public bool on_finished () override;
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.ByteArray folder_token ();
 
 
@@ -33,6 +43,8 @@ signals:
     void finished_signal ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.Uri _url; // Only used if the constructor taking a url is taken.
     private GLib.ByteArray _folder_token;
 };
@@ -42,7 +54,7 @@ signals:
     }
 
     DeleteJob.DeleteJob (AccountPointer account, GLib.Uri url, GLib.Object parent)
-        : AbstractNetworkJob (account, string (), parent)
+        : AbstractNetworkJob (account, "", parent)
         , _url (url) {
     }
 
@@ -59,14 +71,14 @@ signals:
         }
 
         if (reply ().error () != QNetworkReply.NoError) {
-            GLib.warn (lc_delete_job) << " Network error : " << reply ().error_string ();
+            GLib.warn (lc_delete_job) << " Network error : " << reply ().error_"";
         }
         AbstractNetworkJob.on_start ();
     }
 
     bool DeleteJob.on_finished () {
         q_c_info (lc_delete_job) << "DELETE of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                           << reply_status_string ();
+                           << reply_status_"";
 
         emit finished_signal ();
         return true;

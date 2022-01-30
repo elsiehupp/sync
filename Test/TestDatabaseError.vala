@@ -12,6 +12,8 @@ using namespace Occ;
 
 class TestDatabaseError : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDatabaseError () {
         /* This test will make many iteration, at each iteration, the iᵗʰ database access will fail.
          * The test ensure that if there is a failure, the next sync recovers. And if there was

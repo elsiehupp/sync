@@ -62,6 +62,9 @@ class TestLocalDiscovery : GLib.Object {
         QVERIFY (tracker.localDiscoveryPaths ().empty ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testLocalDiscoveryDecision () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         var &engine = fakeFolder.syncEngine ();
@@ -155,6 +158,9 @@ class TestLocalDiscovery : GLib.Object {
         QVERIFY (tracker.localDiscoveryPaths ().empty ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDirectoryAndSubDirectory () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
@@ -193,6 +199,9 @@ class TestLocalDiscovery : GLib.Object {
         QVERIFY (!fakeFolder.currentRemoteState ().find ("C/bar"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testCreateFileWithTrailingSpaces_localAndRemoteTrimmedDoNotExist_renameAndUploadFile () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -243,6 +252,9 @@ class TestLocalDiscovery : GLib.Object {
         QVERIFY (!fakeFolder.currentLocalState ().find (fileWithSpaces6));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testCreateFileWithTrailingSpaces_localTrimmedDoesExist_dontRenameAndUploadFile () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -260,6 +272,9 @@ class TestLocalDiscovery : GLib.Object {
         QVERIFY (fakeFolder.currentLocalState ().find (fileTrimmed));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testCreateFileWithTrailingSpaces_localTrimmedAlsoCreated_dontRenameAndUploadFile () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());

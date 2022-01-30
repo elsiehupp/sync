@@ -40,6 +40,8 @@ This class is thread safe. All public functions lock the mutex.
 class SyncJournalDb : GLib.Object {
 
 
+    /***********************************************************
+    ***********************************************************/
     private SqlDatabase _database;
     private string _database_file;
     private QRecursiveMutex _mutex; // Public functions are protected with the mutex.
@@ -71,10 +73,14 @@ class SyncJournalDb : GLib.Object {
     ***********************************************************/
     private GLib.ByteArray _journal_mode;
 
+    /***********************************************************
+    ***********************************************************/
     private PreparedSqlQueryManager _query_manager;
 
 
-    public SyncJournalDb (string db_file_path, GLib.Object parent = nullptr) {
+    /***********************************************************
+    ***********************************************************/
+    public SyncJournalDb (string db_file_path, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this._database_file = db_file_path;
         this._transaction = 0;
@@ -93,14 +99,16 @@ class SyncJournalDb : GLib.Object {
     }
 
 
-    /// Create a journal path for a specific configuration
+    /***********************************************************
+    Create a journal path for a specific configuration
+    ***********************************************************/
     public static string make_database_name (string local_path,
         GLib.Uri remote_url,
         string remote_path,
         string user) {
         string journal_path = ".sync_";
 
-        string key = "%1@%2:%3".arg (user, remote_url.to_string (), remote_path);
+        string key = "%1@%2:%3".arg (user, remote_url.to_"", remote_path);
 
         GLib.ByteArray ba = QCryptographicHash.hash (key.to_utf8 (), QCryptographicHash.Md5);
         journal_path += string.from_latin1 (ba.left (6).to_hex ()) + ".db";
@@ -120,21 +128,29 @@ class SyncJournalDb : GLib.Object {
         }
 
         // Error during creation, just keep the original and throw errors later
-        GLib.warn (lc_database) << "Could not find a writable database path" << file.file_name () << file.error_string ();
+        GLib.warn (lc_database) << "Could not find a writable database path" << file.file_name () << file.error_"";
         return journal_path;
     }
 
 
-    /// Migrate a csync_journal to the new path, if necessary. Returns false on error
+    /***********************************************************
+    Migrate a csync_journal to the new path, if necessary.
+    Returns false on error
+    ***********************************************************/
     public static bool maybe_migrate_database (string local_path, string absolute_journal_path);
 
 
-    // To verify that the record could be found check with SyncJournalFileRecord.is_valid ()
+    /***********************************************************
+    To verify that the record could be found check with
+    SyncJournalFileRecord.is_valid ()
+    ***********************************************************/
     public bool get_file_record (string filename, SyncJournalFileRecord record) {
         return get_file_record (filename.to_utf8 (), record);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool get_file_record (GLib.ByteArray filename, SyncJournalFileRecord record) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -177,6 +193,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool get_file_record_by_e2e_mangled_name (string mangled_name, SyncJournalFileRecord record) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -221,6 +239,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool get_file_record_by_inode (uint64 inode, SyncJournalFileRecord record) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -253,6 +273,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool get_file_records_by_file_id (GLib.ByteArray file_id, std.function<void (SyncJournalFileRecord &)> row_callback) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -288,6 +310,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool get_files_below_path (GLib.ByteArray path, std.function<void (SyncJournalFileRecord&)> row_callback) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -350,6 +374,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool list_files_in_path (GLib.ByteArray path, std.function<void (SyncJournalFileRecord&)> row_callback) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -388,6 +414,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public Result<void, string> set_file_record (SyncJournalFileRecord &_record) {
         SyncJournalFileRecord record = _record;
         QMutexLocker locker = new QMutexLocker (&_mutex);
@@ -406,7 +434,7 @@ class SyncJournalDb : GLib.Object {
 
         q_c_info (lc_database) << "Updating file record for path:" << record.path () << "inode:" << record._inode
                     << "modtime:" << record._modtime << "type:" << record._type
-                    << "etag:" << record._etag << "file_id:" << record._file_id << "remote_perm:" << record._remote_perm.to_string ()
+                    << "etag:" << record._etag << "file_id:" << record._file_id << "remote_perm:" << record._remote_perm.to_""
                     << "file_size:" << record._file_size << "checksum:" << record._checksum_header
                     << "e2e_mangled_name:" << record.e2e_mangled_name () << "is_e2e_encrypted:" << record._is_e2e_encrypted;
 
@@ -467,6 +495,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void key_value_store_set (string key, QVariant value) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
         if (!check_connect ()) {
@@ -484,6 +514,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public int64 key_value_store_get_int (string key, int64 default_value) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
         if (!check_connect ()) {
@@ -507,6 +539,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void key_value_store_delete (string key) {
         const var query = _query_manager.get (PreparedSqlQueryManager.DeleteKeyValueStoreQuery, QByteArrayLiteral ("DELETE FROM key_value_store WHERE key=?1;"), _database);
         if (!query) {
@@ -559,6 +593,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool update_file_record_checksum (string filename,
         GLib.ByteArray content_checksum,
         GLib.ByteArray content_checksum_type) {
@@ -588,6 +624,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool update_local_metadata (string filename,
         int64 modtime, int64 size, uint64 inode) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
@@ -616,7 +654,9 @@ class SyncJournalDb : GLib.Object {
     }
 
 
-    /// Return value for has_hydrated_or_dehydrated_files ()
+    /***********************************************************
+    Return value for has_hydrated_or_dehydrated_files ()
+    ***********************************************************/
     public struct HasHydratedDehydrated {
         bool has_hydrated = false;
         bool has_dehydrated = false;
@@ -660,6 +700,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool exists () {
         QMutexLocker locker = new QMutexLocker (&_mutex);
         return (!_database_file.is_empty () && GLib.File.exists (_database_file));
@@ -680,11 +722,15 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public string database_file_path () {
         return _database_file;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public static int64 get_pHash (GLib.ByteArray file) {
         int64 h = 0;
         int len = file.length ();
@@ -694,6 +740,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_error_blocklist_entry (SyncJournalErrorBlocklistRecord item) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -728,6 +776,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void wipe_error_blocklist_entry (string file) {
         if (file.is_empty ()) {
             return;
@@ -746,6 +796,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void wipe_error_blocklist_category (SyncJournalErrorBlocklistRecord.Category category) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
         if (check_connect ()) {
@@ -760,6 +812,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public int wipe_error_blocklist () {
         QMutexLocker locker = new QMutexLocker (&_mutex);
         if (check_connect ()) {
@@ -777,6 +831,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public int on_error_block_list_entry_count () {
         int re = 0;
 
@@ -795,6 +851,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public struct DownloadInfo {
         string _tmpfile;
         GLib.ByteArray _etag;
@@ -803,6 +861,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public struct UploadInfo {
         int _chunk = 0;
         uint32 _transferid = 0;
@@ -822,6 +882,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public struct PollInfo {
         string _file; // The relative path of a file
         string _url; // the poll url. (This pollinfo is invalid if _url is empty)
@@ -830,6 +892,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public DownloadInfo get_download_info (string file) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -855,6 +919,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_download_info (string file, DownloadInfo i) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -883,6 +949,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public QVector<DownloadInfo> get_and_delete_stale_download_infos (GLib.Set<string> keep) {
         QVector<SyncJournalDb.DownloadInfo> empty_result;
         QMutexLocker locker = new QMutexLocker (&_mutex);
@@ -922,6 +990,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public int on_download_info_count () {
         int re = 0;
 
@@ -940,6 +1010,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public UploadInfo get_upload_info (string file) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -973,6 +1045,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_upload_info (string file, UploadInfo i) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -1043,6 +1117,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public SyncJournalErrorBlocklistRecord error_blocklist_entry (string file) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
         SyncJournalErrorBlocklistRecord entry;
@@ -1074,6 +1150,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool delete_stale_error_blocklist_entries (GLib.Set<string> keep) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -1103,7 +1181,9 @@ class SyncJournalDb : GLib.Object {
     }
 
 
-    /// Delete flags table entries that have no metadata correspondent
+    /***********************************************************
+    Delete flags table entries that have no metadata correspondent
+    ***********************************************************/
     public void delete_stale_flags_entries () {
         QMutexLocker locker = new QMutexLocker (&_mutex);
         if (!check_connect ())
@@ -1119,6 +1199,8 @@ class SyncJournalDb : GLib.Object {
     //  }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void avoid_renames_on_next_sync (GLib.ByteArray path) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -1137,6 +1219,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_poll_info (PollInfo info) {
         QMutexLocker locker = new QMutexLocker (&_mutex);
         if (!check_connect ()) {
@@ -1159,6 +1243,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public QVector<PollInfo> get_poll_infos () {
         QMutexLocker locker = new QMutexLocker (&_mutex);
 
@@ -1185,6 +1271,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public enum SelectiveSyncListType {
         /***********************************************************
         The block list is the list of folders that are unselected in the selective sync dialog.
@@ -1278,6 +1366,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void schedule_path_for_remote_discovery (GLib.ByteArray file_name);
 
 
@@ -1304,6 +1394,8 @@ class SyncJournalDb : GLib.Object {
     public void commit (string context, bool start_trans = true);
 
 
+    /***********************************************************
+    ***********************************************************/
     public void commit_if_needed_and_start_new_transaction (string context);
 
 
@@ -1344,21 +1436,31 @@ class SyncJournalDb : GLib.Object {
 
     GLib.ByteArray data_fingerprint ();
 
-    // Conflict record functions
+    /***********************************************************
+    Conflict record functions
+    ***********************************************************/
 
-    /// Store a new or updated record in the database
+    /***********************************************************
+    Store a new or updated record in the database
+    ***********************************************************/
     public void set_conflict_record (ConflictRecord record);
 
 
-    /// Retrieve a conflict record by path of the file with the conflict tag
+    /***********************************************************
+    Retrieve a conflict record by path of the file with the conflict tag
+    ***********************************************************/
     public ConflictRecord conflict_record (GLib.ByteArray path);
 
 
-    /// Delete a conflict record by path of the file with the conflict tag
+    /***********************************************************
+    Delete a conflict record by path of the file with the conflict tag
+    ***********************************************************/
     public void delete_conflict_record (GLib.ByteArray path);
 
 
-    /// Return all paths of files with a conflict tag in the name and records in the database
+    /***********************************************************
+    Return all paths of files with a conflict tag in the name and records in the database
+    ***********************************************************/
     public QByte_array_list conflict_record_paths ();
 
 
@@ -1471,6 +1573,8 @@ class SyncJournalDb : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public friend struct PinStateInterface;
 
 
@@ -1491,32 +1595,58 @@ class SyncJournalDb : GLib.Object {
     public int autotest_fail_counter = -1;
 
 
+    /***********************************************************
+    ***********************************************************/
     private int get_file_record_count ();
 
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private bool update_database_structure ();
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-
+    /***********************************************************
+    ***********************************************************/
     private bool update_metadata_table_structure ();
 
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private bool update_error_blocklist_table_structure ();
+    /***********************************************************
+    ***********************************************************/
+    private 
 
+    /***********************************************************
+    ***********************************************************/
+    private bool sql_fail (string log, 
 
-    private bool sql_fail (string log, SqlQuery query);
+    /***********************************************************
+    ***********************************************************/
+    private 
 
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private void commit_internal (string context, bool start_trans = true);
-
-
+    /***********************************************************
+    ***********************************************************/
     private void start_transaction ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void commit_transaction ();
 
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private QVector<GLib.ByteArray> table_columns (GLib.ByteArray table);
-
+    /***********************************************************
+    ***********************************************************/
+    private 
 
     private bool check_connect ();
 
@@ -1552,6 +1682,8 @@ class SyncJournalDb : GLib.Object {
             " FROM metadata"
             "  LEFT JOIN checksumtype as contentchecksumtype ON metadata.content_checksum_type_id == contentchecksumtype.id"
 
+    /***********************************************************
+    ***********************************************************/
     static void fill_file_record_from_get_query (SyncJournalFileRecord &record, SqlQuery &query) {
         record._path = query.byte_array_value (0);
         record._inode = query.int64_value (1);
@@ -1567,6 +1699,8 @@ class SyncJournalDb : GLib.Object {
         record._is_e2e_encrypted = query.int_value (11) > 0;
     }
 
+    /***********************************************************
+    ***********************************************************/
     static GLib.ByteArray default_journal_mode (string db_path) {
         Q_UNUSED (db_path)
         return "WAL";
@@ -2328,6 +2462,8 @@ class SyncJournalDb : GLib.Object {
 
 
 
+    /***********************************************************
+    ***********************************************************/
     static void to_download_info (SqlQuery &query, SyncJournalDb.DownloadInfo res) {
         bool ok = true;
         res._tmpfile = query.string_value (0);
@@ -2336,6 +2472,8 @@ class SyncJournalDb : GLib.Object {
         res._valid = ok;
     }
 
+    /***********************************************************
+    ***********************************************************/
     static bool delete_batch (SqlQuery &query, string[] &entries, string name) {
         if (entries.is_empty ())
             return true;

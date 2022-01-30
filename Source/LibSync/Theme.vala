@@ -63,6 +63,8 @@ class Theme : GLib.Object {
     Q_PROPERTY (QColor error_box_background_color READ error_box_background_color CONSTANT)
     Q_PROPERTY (QColor error_box_border_color READ error_box_border_color CONSTANT)
 
+    /***********************************************************
+    ***********************************************************/
     public enum Custom_media_type {
         o_c_setup_top, // own_cloud connect page
         o_c_setup_side,
@@ -166,16 +168,28 @@ class Theme : GLib.Object {
     ***********************************************************/
     public GLib.Uri status_invisible_image_source ();
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.Uri sync_status_ok ();
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.Uri sync_status_error ();
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.Uri sync_status_running ();
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.Uri sync_status_pause ();
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.Uri sync_status_warning ();
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.Uri folder_offline ();
 
 
@@ -188,8 +202,12 @@ class Theme : GLib.Object {
 #ifndef TOKEN_AUTH_ONLY
     public static string hidpi_file_name (string file_name, QPaint_device dev = nullptr);
 
+    /***********************************************************
+    ***********************************************************/
     public static string hidpi_file_name (string icon_name, QColor &background_color, QPaint_device dev = nullptr);
 
+    /***********************************************************
+    ***********************************************************/
     public static bool is_hidpi (QPaint_device dev = nullptr);
 
 
@@ -198,15 +216,25 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual QIcon sync_state_icon (SyncResult.Status, bool sys_tray = false);
 
+    /***********************************************************
+    ***********************************************************/
     public virtual QIcon folder_disabled_icon ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public virtual QIcon folder_offline_icon (bool sys_tray = false);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public virtual QIcon application_icon ();
-#endif
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public virtual string status_header_text (SyncResult.Status);
 
 
@@ -313,7 +341,7 @@ class Theme : GLib.Object {
     Override to encforce a particular locale, i.e. "de" or "pt_BR"
     ***********************************************************/
     public virtual string enforced_locale () {
-        return string ();
+        return "";
     }
 
 
@@ -342,6 +370,8 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual QColor wizard_header_background_color ();
 
+    /***********************************************************
+    ***********************************************************/
     public virtual QPixmap wizard_application_logo ();
 
 
@@ -441,6 +471,8 @@ class Theme : GLib.Object {
     public virtual bool link_sharing ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public virtual bool user_group_sharing ();
 
 
@@ -538,6 +570,8 @@ class Theme : GLib.Object {
     public virtual string oauth_client_id ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public virtual string oauth_client_secret ();
 
 
@@ -694,6 +728,8 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual bool show_virtual_files_option ();
 
+    /***********************************************************
+    ***********************************************************/
     public virtual bool enforce_virtual_files_sync_folder ();
 
 
@@ -714,6 +750,8 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual QColor error_box_border_color ();
 
+    /***********************************************************
+    ***********************************************************/
     public static constexpr const char theme_prefix = ":/client/theme/";
 
 
@@ -735,9 +773,13 @@ signals:
     void systray_use_mono_icons_changed (bool);
 
 
+    /***********************************************************
+    ***********************************************************/
     private Theme (Theme const &);
-    private Theme &operator= (Theme const &);
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private static Theme _instance;
     private bool _mono = false;
 #ifndef TOKEN_AUTH_ONLY
@@ -1046,7 +1088,7 @@ string Theme.help_url () {
 string Theme.conflict_help_url () {
     var base_url = help_url ();
     if (base_url.is_empty ())
-        return string ();
+        return "";
     if (!base_url.ends_with ('/'))
         base_url.append ('/');
     return base_url + QStringLiteral ("conflicts.html");
@@ -1056,7 +1098,7 @@ string Theme.override_server_url () {
 #ifdef APPLICATION_SERVER_URL
     return string.from_latin1 (APPLICATION_SERVER_URL);
 #else
-    return string ();
+    return "";
 #endif
 }
 
@@ -1085,7 +1127,7 @@ bool Theme.forbid_bad_s_sL () {
 }
 
 string Theme.force_config_auth_type () {
-    return string ();
+    return "";
 }
 
 string Theme.default_client_folder () {
@@ -1147,7 +1189,7 @@ string Theme.git_sHA1 () {
                     .arg (__DATE__)
                     .arg (__TIME__)
                     .arg (q_version ())
-                    .arg (QSslSocket.ssl_library_version_string ());
+                    .arg (QSslSocket.ssl_library_version_"");
 #endif
     return dev_string;
 }
@@ -1351,19 +1393,19 @@ Theme.User_iDType Theme.user_iDType () {
 }
 
 string Theme.custom_user_iD () {
-    return string ();
+    return "";
 }
 
 string Theme.user_iDHint () {
-    return string ();
+    return "";
 }
 
 string Theme.wizard_url_postfix () {
-    return string ();
+    return "";
 }
 
 string Theme.wizard_url_hint () {
-    return string ();
+    return "";
 }
 
 string Theme.quota_base_folder () {
@@ -1392,7 +1434,7 @@ string Theme.version_switch_output () {
     if (!QGuiApplication.platform_name ().is_empty ())
         stream << "Using Qt platform plugin '" << QGuiApplication.platform_name () << "'" << Qt.endl;
 
-    stream << "Using '" << QSslSocket.ssl_library_version_string () << "'" << Qt.endl;
+    stream << "Using '" << QSslSocket.ssl_library_version_"" << "'" << Qt.endl;
     stream << "Running on " << Utility.platform_name () << ", " << QSysInfo.current_cpu_architecture () << Qt.endl;
     return help_text;
 }

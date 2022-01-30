@@ -20,19 +20,29 @@ namespace Occ {
 
 class Owncloud_oauth_creds_page : Abstract_credentials_wizard_page {
 
+    /***********************************************************
+    ***********************************************************/
     public Owncloud_oauth_creds_page ();
 
+    /***********************************************************
+    ***********************************************************/
     public AbstractCredentials get_credentials () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void initialize_page () override;
     public void cleanup_page () override;
     public int next_id () override;
     public void set_connected ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_complete () override;
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_async_auth_result (OAuth.Result, string user, string token,
         const string reniew_token);
 
@@ -40,6 +50,8 @@ signals:
     void connect_to_oc_url (string );
 
 
+    /***********************************************************
+    ***********************************************************/
     public string _user;
     public string _token;
     public string _refresh_token;
@@ -111,7 +123,7 @@ protected slots:
             _refresh_token = refresh_token;
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             Q_ASSERT (oc_wizard);
-            emit connect_to_oc_url (oc_wizard.account ().url ().to_string ());
+            emit connect_to_oc_url (oc_wizard.account ().url ().to_"");
             break;
         }
         }

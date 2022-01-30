@@ -69,7 +69,7 @@ class UserStatusConnector;
 ***********************************************************/
 class AbstractSslErrorHandler {
     public virtual ~AbstractSslErrorHandler () = default;
-    public virtual bool handle_errors (GLib.List<QSslError>, QSslConfiguration &conf, GLib.List<QSslCertificate> *, AccountPointer) = 0;
+    public virtual bool handle_errors (GLib.List<QSslError>, QSslConfiguration &conf, GLib.List<QSslCertificate> *, AccountPointer);
 };
 
 /***********************************************************
@@ -86,11 +86,17 @@ class Account : GLib.Object {
     Q_PROPERTY (string display_name MEMBER _display_name)
     Q_PROPERTY (GLib.Uri url MEMBER _url)
 
+    /***********************************************************
+    ***********************************************************/
     public static AccountPointer create ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public ~Account () override;
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public AccountPointer shared_from_this ();
 
 
@@ -103,17 +109,25 @@ class Account : GLib.Object {
     public string dav_user ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_dav_user (string new_dav_user);
 
+    /***********************************************************
+    ***********************************************************/
     public string dav_display_name ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void set_dav_display_name (string new_display_name);
 
 #ifndef TOKEN_AUTH_ONLY
     public QImage avatar ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_avatar (QImage &img);
 #endif
 
@@ -130,6 +144,8 @@ class Account : GLib.Object {
     public void set_url (GLib.Uri url);
 
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.Uri url () {
         return _url;
     }
@@ -168,6 +184,8 @@ class Account : GLib.Object {
     public AbstractCredentials credentials ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_credentials (AbstractCredentials cred);
 
 
@@ -183,9 +201,13 @@ class Account : GLib.Object {
         QNetworkRequest req = QNetworkRequest (),
         QIODevice data = nullptr);
 
+    /***********************************************************
+    ***********************************************************/
     public QNetworkReply send_raw_request (GLib.ByteArray verb,
-        const GLib.Uri url, QNetworkRequest req, GLib.ByteArray data);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public QNetworkReply send_raw_request (GLib.ByteArray verb,
         const GLib.Uri url, QNetworkRequest req, QHttpMultiPart data);
 
@@ -208,9 +230,15 @@ class Account : GLib.Object {
     public QSslConfiguration get_or_create_ssl_config ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public QSslConfiguration ssl_configuration () {
         return _ssl_configuration;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void set_ssl_configuration (QSslConfiguration &config);
     // Because of bugs in Qt, we use this to store info needed for the SSL Button
     public QSslCipher _session_cipher;
@@ -224,9 +252,15 @@ class Account : GLib.Object {
     public GLib.List<QSslCertificate> approved_certs () {
         return _approved_certs;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void set_approved_certs (GLib.List<QSslCertificate> certs);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void add_approved_certs (GLib.List<QSslCertificate> certs);
 
     // Usually when a user explicitly rejects a certificate we don't
@@ -241,13 +275,15 @@ class Account : GLib.Object {
     public QVariant credential_setting (string key);
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_credential_setting (string key, QVariant &value);
 
 
     /***********************************************************
     Assign a client certificate
     ***********************************************************/
-    public void set_certificate (GLib.ByteArray certficate = GLib.ByteArray (), string private_key = string ());
+    public void set_certificate (GLib.ByteArray certficate = GLib.ByteArray (), string private_key = "");
 
 
     /***********************************************************
@@ -256,6 +292,8 @@ class Account : GLib.Object {
     public const Capabilities &capabilities ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_capabilities (QVariantMap &caps);
 
 
@@ -277,9 +315,13 @@ class Account : GLib.Object {
     ***********************************************************/
     public int server_version_int ();
 
+    /***********************************************************
+    ***********************************************************/
     public static int make_server_version (int major_version, int minor_version, int patch_version);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void set_server_version (string version);
 
 
@@ -297,6 +339,8 @@ class Account : GLib.Object {
     ***********************************************************/
     public bool server_version_unsupported ();
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_username_prefill_supported ();
 
 
@@ -306,22 +350,38 @@ class Account : GLib.Object {
     public bool is_http2Supported () {
         return _http2Supported;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void set_http2Supported (bool value) {
         _http2Supported = value;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void clear_cookie_jar ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void lend_cookie_jar_to (QNetworkAccessManager guest);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public string cookie_jar_path ();
 
+    /***********************************************************
+    ***********************************************************/
     public void reset_network_access_manager ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public QNetworkAccessManager network_access_manager ();
 
 
@@ -336,26 +396,42 @@ class Account : GLib.Object {
     public void retrieve_app_password ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void write_app_password_once (string app_password);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void delete_app_password ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void delete_app_token ();
 
     /// Direct Editing
     // Check for the direct_editing capability
     public void fetch_direct_editors (GLib.Uri direct_editing_uRL, string direct_editing_e_tag);
 
+    /***********************************************************
+    ***********************************************************/
     public void setup_user_status_connector ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void try_setup_push_notifications ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public PushNotifications push_notifications ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void set_push_notifications_reconnect_interval (int interval);
 
     public std.shared_ptr<UserStatusConnector> user_status_connector ();
@@ -365,6 +441,8 @@ class Account : GLib.Object {
     public void on_clear_qnam_cache ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_handle_ssl_errors (QNetworkReply *, GLib.List<QSslError>);
 
 signals:
@@ -402,11 +480,17 @@ protected slots:
     void on_direct_editing_recieved (QJsonDocument &json);
 
 
-    private Account (GLib.Object parent = nullptr);
-    private void set_shared_this (AccountPointer shared_this);
+    /***********************************************************
+    ***********************************************************/
+    private Account (GLib.Object parent = new GLib.Object ());
 
-    private static string dav_path_base ();
+    /***********************************************************
+    ***********************************************************/
+    private 
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private QWeakPointer<Account> _shared_this;
     private string _id;
     private string _dav_user;
@@ -429,6 +513,8 @@ protected slots:
     ***********************************************************/
     private GLib.Uri _user_visible_url;
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.List<QSslCertificate> _approved_certs;
     private QSslConfiguration _ssl_configuration;
     private Capabilities _capabilities;
@@ -441,20 +527,30 @@ protected slots:
     /// Certificates that were explicitly rejected by the user
     private GLib.List<QSslCertificate> _rejected_certificates;
 
+    /***********************************************************
+    ***********************************************************/
     private static string _config_file_name;
 
+    /***********************************************************
+    ***********************************************************/
     private ClientSideEncryption _e2e;
 
     /// Used in RemoteWipe
     private bool _wrote_app_password = false;
 
+    /***********************************************************
+    ***********************************************************/
     private friend class AccountManager;
 
     // Direct Editing
     private string _last_direct_editing_e_tag;
 
+    /***********************************************************
+    ***********************************************************/
     private PushNotifications _push_notifications = nullptr;
 
+    /***********************************************************
+    ***********************************************************/
     private std.shared_ptr<UserStatusConnector> _user_status_connector;
 
 
@@ -475,10 +571,17 @@ protected slots:
     public void set_remote_wipe_requested_HACK () {
         _is_remote_wipe_requested_HACK = true;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public bool is_remote_wipe_requested_HACK () {
         return _is_remote_wipe_requested_HACK;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private bool _is_remote_wipe_requested_HACK = false;
     // <-- FIXME MS@2019-12-07
 };
@@ -843,10 +946,10 @@ void Account.set_credential_setting (string key, QVariant &value) {
 void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> errors) {
     NetworkJobTimeoutPauser pauser (reply);
     string out;
-    QDebug (&out) << "SSL-Errors happened for url " << reply.url ().to_string ();
+    QDebug (&out) << "SSL-Errors happened for url " << reply.url ().to_"";
     foreach (QSslError &error, errors) {
         QDebug (&out) << "\t_error in " << error.certificate () << ":"
-                     << error.error_string () << " (" << error.error () << ")"
+                     << error.error_"" << " (" << error.error () << ")"
                      << "\n";
     }
 
@@ -1024,7 +1127,7 @@ void Account.write_app_password_once (string app_password){
         return;
 
     const string kck = AbstractCredentials.keychain_key (
-                url ().to_string (),
+                url ().to_"",
                 dav_user () + app_password,
                 id ()
     );
@@ -1038,7 +1141,7 @@ void Account.write_app_password_once (string app_password){
         if (write_job.error () == NoError)
             q_c_info (lc_account) << "app_password stored in keychain";
         else
-            GLib.warn (lc_account) << "Unable to store app_password in keychain" << write_job.error_string ();
+            GLib.warn (lc_account) << "Unable to store app_password in keychain" << write_job.error_"";
 
         // We don't try this again on error, to not raise CPU consumption
         _wrote_app_password = true;
@@ -1048,7 +1151,7 @@ void Account.write_app_password_once (string app_password){
 
 void Account.retrieve_app_password (){
     const string kck = AbstractCredentials.keychain_key (
-                url ().to_string (),
+                url ().to_"",
                 credentials ().user () + app_password,
                 id ()
     );
@@ -1072,7 +1175,7 @@ void Account.retrieve_app_password (){
 
 void Account.delete_app_password () {
     const string kck = AbstractCredentials.keychain_key (
-                url ().to_string (),
+                url ().to_"",
                 credentials ().user () + app_password,
                 id ()
     );
@@ -1090,7 +1193,7 @@ void Account.delete_app_password () {
         if (delete_job.error () == NoError)
             q_c_info (lc_account) << "app_password deleted from keychain";
         else
-            GLib.warn (lc_account) << "Unable to delete app_password from keychain" << delete_job.error_string ();
+            GLib.warn (lc_account) << "Unable to delete app_password from keychain" << delete_job.error_"";
 
         // Allow storing a new app password on re-login
         _wrote_app_password = false;
@@ -1137,8 +1240,8 @@ void Account.on_direct_editing_recieved (QJsonDocument &json) {
     foreach (var editor_key, editors.keys ()) {
         var editor = editors.value (editor_key).to_object ();
 
-        const string id = editor.value ("id").to_string ();
-        const string name = editor.value ("name").to_string ();
+        const string id = editor.value ("id").to_"";
+        const string name = editor.value ("name").to_"";
 
         if (!id.is_empty () && !name.is_empty ()) {
             var mime_types = editor.value ("mimetypes").to_array ();
@@ -1147,11 +1250,11 @@ void Account.on_direct_editing_recieved (QJsonDocument &json) {
             var direct_editor = new DirectEditor (id, name);
 
             foreach (var mime_type, mime_types) {
-                direct_editor.add_mimetype (mime_type.to_string ().to_latin1 ());
+                direct_editor.add_mimetype (mime_type.to_"".to_latin1 ());
             }
 
             foreach (var optional_mime_type, optional_mime_types) {
-                direct_editor.add_optional_mimetype (optional_mime_type.to_string ().to_latin1 ());
+                direct_editor.add_optional_mimetype (optional_mime_type.to_"".to_latin1 ());
             }
 
             _capabilities.add_direct_editor (direct_editor);

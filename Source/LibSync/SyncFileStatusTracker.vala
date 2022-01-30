@@ -21,11 +21,17 @@ overlay icons in the shell.
 ***********************************************************/
 class SyncFileStatusTracker : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public SyncFileStatusTracker (SyncEngine sync_engine);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public SyncFileStatus file_status (string relative_path);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void on_path_touched (string file_name);
     // path relative to folder
@@ -35,18 +41,24 @@ signals:
     void on_file_status_changed (string system_file_name, SyncFileStatus file_status);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_about_to_propagate (SyncFileItemVector &items);
     private void on_item_completed (SyncFileItemPtr &item);
     private void on_sync_finished ();
     private void on_sync_engine_running_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private struct Path_comparator {
         bool operator () ( const string& lhs, string& rhs );
     };
     private using Problems_map = std.map<string, SyncFileStatus.SyncFileStatusTag, Path_comparator>;
     private SyncFileStatus.SyncFileStatusTag lookup_problem (string path_to_match, Problems_map &problem_map);
 
+    /***********************************************************
+    ***********************************************************/
     private enum Shared_flag {
         Unknown_shared,
         Not_shared,
@@ -58,13 +70,19 @@ signals:
     };
     private SyncFileStatus resolve_sync_and_error_status (string relative_path, Shared_flag shared_state, Path_known_flag is_path_known = Path_known);
 
+    /***********************************************************
+    ***********************************************************/
     private void invalidate_parent_paths (string path);
     private string get_system_destination (string relative_path);
     private void inc_sync_count_and_emit_status_changed (string relative_path, Shared_flag shared_state);
     private void dec_sync_count_and_emit_status_changed (string relative_path, Shared_flag shared_state);
 
+    /***********************************************************
+    ***********************************************************/
     private SyncEngine _sync_engine;
 
+    /***********************************************************
+    ***********************************************************/
     private Problems_map _sync_problems;
     private GLib.Set<string> _dirty_paths;
     // Counts the number direct children currently being synced (has unfinished propagation jobs).
@@ -73,11 +91,15 @@ signals:
     private QHash<string, int> _sync_count;
 };
 
+    /***********************************************************
+    ***********************************************************/
     static int path_compare ( const string& lhs, string& rhs ) {
         // Should match Utility.fs_case_preserving, we want don't want to pay for the runtime check on every comparison.
         return lhs.compare (rhs, Qt.CaseSensitive);
     }
 
+    /***********************************************************
+    ***********************************************************/
     static bool path_starts_with ( const string& lhs, string& rhs ) {
         return lhs.starts_with (rhs, Qt.CaseSensitive);
     }
@@ -131,6 +153,8 @@ signals:
             || item._has_blocklist_entry;
     }
 
+    /***********************************************************
+    ***********************************************************/
     static inline bool has_excluded_status (SyncFileItem &item) {
         const var status = item._status;
         return item._instruction == CSYNC_INSTRUCTION_IGNORE
@@ -156,7 +180,7 @@ signals:
 
         if (relative_path.is_empty ()) {
             // This is the root sync folder, it doesn't have an entry in the database and won't be walked by csync, so resolve manually.
-            return resolve_sync_and_error_status (string (), Not_shared);
+            return resolve_sync_and_error_status ("", Not_shared);
         }
 
         // The SyncEngine won't notify us at all for CSYNC_FILE_SILENTLY_EXCLUDED
@@ -217,7 +241,7 @@ signals:
             if (last_slash_index != -1)
                 inc_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), Unknown_shared);
             else if (!relative_path.is_empty ())
-                inc_sync_count_and_emit_status_changed (string (), Unknown_shared);
+                inc_sync_count_and_emit_status_changed ("", Unknown_shared);
         }
     }
 
@@ -238,7 +262,7 @@ signals:
             if (last_slash_index != -1)
                 dec_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), Unknown_shared);
             else if (!relative_path.is_empty ())
-                dec_sync_count_and_emit_status_changed (string (), Unknown_shared);
+                dec_sync_count_and_emit_status_changed ("", Unknown_shared);
         }
     }
 
@@ -331,7 +355,7 @@ signals:
     }
 
     void SyncFileStatusTracker.on_sync_engine_running_changed () {
-        emit file_status_changed (get_system_destination (string ()), resolve_sync_and_error_status (string (), Not_shared));
+        emit file_status_changed (get_system_destination (""), resolve_sync_and_error_status ("", Not_shared));
     }
 
     SyncFileStatus SyncFileStatusTracker.resolve_sync_and_error_status (string relative_path, Shared_flag shared_flag, Path_known_flag is_path_known) {

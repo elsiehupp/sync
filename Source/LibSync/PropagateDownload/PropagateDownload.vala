@@ -56,11 +56,11 @@ class GETFileJob : AbstractNetworkJob {
     // DOES NOT take ownership of the device.
     public GETFileJob (AccountPointer account, string path, QIODevice device,
         const QMap<GLib.ByteArray, GLib.ByteArray> &headers, GLib.ByteArray expected_etag_for_resume,
-        int64 resume_start, GLib.Object parent = nullptr);
+        int64 resume_start, GLib.Object parent = new GLib.Object ());
     // For direct_download_url:
     public GETFileJob (AccountPointer account, GLib.Uri url, QIODevice device,
         const QMap<GLib.ByteArray, GLib.ByteArray> &headers, GLib.ByteArray expected_etag_for_resume,
-        int64 resume_start, GLib.Object parent = nullptr);
+        int64 resume_start, GLib.Object parent = new GLib.Object ());
     ~GETFileJob () override {
         if (_bandwidth_manager) {
             _bandwidth_manager.on_unregister_download_job (this);
@@ -68,6 +68,8 @@ class GETFileJob : AbstractNetworkJob {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
     public bool on_finished () override {
         if (_save_body_to_file && reply ().bytes_available ()) {
@@ -85,57 +87,101 @@ class GETFileJob : AbstractNetworkJob {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void cancel ();
 
+    /***********************************************************
+    ***********************************************************/
     public void new_reply_hook (QNetworkReply reply) override;
 
+    /***********************************************************
+    ***********************************************************/
     public void set_bandwidth_manager (BandwidthManager bwm);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_choked (bool c);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void set_bandwidth_limited (bool b);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void give_bandwidth_quota (int64 q);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public int64 current_download_position ();
 
-    public string error_string () override;
+    public string error_"" override;
     public void on_set_error_string (string s) {
         _error_string = s;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public SyncFileItem.Status error_status () {
         return _error_status;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void set_error_status (SyncFileItem.Status &s) {
         _error_status = s;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_timed_out () override;
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.ByteArray etag () {
         return _etag;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public int64 resume_start () {
-        return _resume_start;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
     public time_t last_modified () {
         return _last_modified;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public int64 content_length () {
         return _content_length;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public int64 expected_content_length () {
-        return _expected_content_length;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void set_expected_content_length (int64 size) {
         _expected_content_length = size;
     }
@@ -147,6 +193,8 @@ signals:
     void finished_signal ();
     void download_progress (int64, int64);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_ready_read ();
     private void on_meta_data_changed ();
 };
@@ -160,18 +208,22 @@ class GETEncrypted_file_job : GETFileJob {
     // DOES NOT take ownership of the device.
     public GETEncrypted_file_job (AccountPointer account, string path, QIODevice device,
         const QMap<GLib.ByteArray, GLib.ByteArray> &headers, GLib.ByteArray expected_etag_for_resume,
-        int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent = nullptr);
+        int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent = new GLib.Object ());
 
 
+    /***********************************************************
+    ***********************************************************/
     public GETEncrypted_file_job (AccountPointer account, GLib.Uri url, QIODevice device,
         const QMap<GLib.ByteArray, GLib.ByteArray> &headers, GLib.ByteArray expected_etag_for_resume,
-        int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent = nullptr);
+        int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent = new GLib.Object ());
     ~GETEncrypted_file_job () override = default;
 
 
     protected int64 write_to_device (GLib.ByteArray data) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private unowned<EncryptionHelper.StreamingDecryptor> _decryptor;
     private EncryptedFile _encrypted_file_info = {};
     private GLib.ByteArray _pending_bytes;
@@ -218,12 +270,18 @@ This is the flow:
 ***********************************************************/
 class PropagateDownloadFile : PropagateItemJob {
 
+    /***********************************************************
+    ***********************************************************/
     public PropagateDownloadFile (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item)
         , _resume_start (0)
         , _download_progress (0)
         , _delete_existing (false) {
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
     public int64 committed_disk_space () override;
 
@@ -260,14 +318,20 @@ class PropagateDownloadFile : PropagateItemJob {
     /// Called when it's time to update the database metadata
     private void update_metadata (bool is_conflict);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_abort (PropagatorJob.AbortType abort_type) override;
     private void on_download_progress (int64, int64);
     private void on_checksum_fail (string error_message);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void start_after_is_encrypted_is_checked ();
-    private void delete_existing_folder ();
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private int64 _resume_start;
     private int64 _download_progress;
     private QPointer<GETFileJob> _job;
@@ -277,8 +341,12 @@ class PropagateDownloadFile : PropagateItemJob {
     private EncryptedFile _encrypted_info;
     private ConflictRecord _conflict_record;
 
+    /***********************************************************
+    ***********************************************************/
     private QElapsedTimer _stopwatch;
 
+    /***********************************************************
+    ***********************************************************/
     private Propagate_download_encrypted _download_encrypted_helper = nullptr;
 };
 
@@ -292,7 +360,7 @@ string create_download_tmp_file_name (string previous) {
     // work with both pathed filenames and only filenames
     if (slash_pos == -1) {
         tmp_file_name = previous;
-        tmp_path = string ();
+        tmp_path = "";
     } else {
         tmp_file_name = previous.mid (slash_pos + 1);
         tmp_path = previous.left (slash_pos);
@@ -463,7 +531,7 @@ void GETFileJob.on_meta_data_changed () {
             // device doesn't support range, just try again from scratch
             _device.close ();
             if (!_device.open (QIODevice.WriteOnly)) {
-                _error_string = _device.error_string ();
+                _error_string = _device.error_"";
                 _error_status = SyncFileItem.NormalError;
                 reply ().on_abort ();
                 return;
@@ -548,7 +616,7 @@ void GETFileJob.on_ready_read () {
 
         const int64 written_bytes = write_to_device (GLib.ByteArray.from_raw_data (buffer.const_data (), read_bytes));
         if (written_bytes != read_bytes) {
-            _error_string = _device.error_string ();
+            _error_string = _device.error_"";
             _error_status = SyncFileItem.NormalError;
             GLib.warn (lc_get_job) << "Error while writing to file" << written_bytes << read_bytes << _error_string;
             reply ().on_abort ();
@@ -562,8 +630,8 @@ void GETFileJob.on_ready_read () {
             _bandwidth_manager.on_unregister_download_job (this);
         }
         if (!_has_emitted_finished_signal) {
-            q_c_info (lc_get_job) << "GET of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
-                             << reply_status_string ()
+            q_c_info (lc_get_job) << "GET of" << reply ().request ().url ().to_"" << "FINISHED WITH STATUS"
+                             << reply_status_""
                              << reply ().raw_header ("Content-Range") << reply ().raw_header ("Content-Length");
 
             emit finished_signal ();
@@ -592,11 +660,11 @@ void GETFileJob.on_timed_out () {
     reply ().on_abort ();
 }
 
-string GETFileJob.error_string () {
+string GETFileJob.error_"" {
     if (!_error_string.is_empty ()) {
         return _error_string;
     }
-    return AbstractNetworkJob.error_string ();
+    return AbstractNetworkJob.error_"";
 }
 
 GETEncrypted_file_job.GETEncrypted_file_job (AccountPointer account, string path, QIODevice device,
@@ -674,7 +742,7 @@ void PropagateDownloadFile.on_start () {
 
     const var path = _item._file;
     const var slash_position = path.last_index_of ('/');
-    const var parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
+    const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
     SyncJournalFileRecord parent_rec;
     propagator ()._journal.get_file_record (parent_path, &parent_rec);
@@ -876,7 +944,7 @@ void PropagateDownloadFile.start_download () {
         FileSystem.set_file_read_only (_tmp_file.file_name (), false);
     if (!_tmp_file.open (QIODevice.Append | QIODevice.Unbuffered)) {
         GLib.warn (lc_propagate_download) << "could not open temporary file" << _tmp_file.file_name ();
-        on_done (SyncFileItem.NormalError, _tmp_file.error_string ());
+        on_done (SyncFileItem.NormalError, _tmp_file.error_"");
         return;
     }
     // Hide temporary after creation
@@ -1004,7 +1072,7 @@ void PropagateDownloadFile.on_get_finished () {
         // the whole sync and allows for a custom error message.
         QNetworkReply reply = job.reply ();
         if (err == QNetworkReply.OperationCanceledError && reply.property (owncloud_custom_soft_error_string_c).is_valid ()) {
-            job.on_set_error_string (reply.property (owncloud_custom_soft_error_string_c).to_string ());
+            job.on_set_error_string (reply.property (owncloud_custom_soft_error_string_c).to_"");
             job.set_error_status (SyncFileItem.SoftError);
         } else if (bad_range_header) {
             // Can't do this in classify_error () because 416 without a
@@ -1022,7 +1090,7 @@ void PropagateDownloadFile.on_get_finished () {
 
         GLib.ByteArray error_body;
         string error_string = _item._http_error_code >= 400 ? job.error_string_parsing_body (&error_body)
-                                                           : job.error_string ();
+                                                           : job.error_"";
         SyncFileItem.Status status = job.error_status ();
         if (status == SyncFileItem.NoStatus) {
             status = classify_error (err, _item._http_error_code,
@@ -1182,7 +1250,7 @@ namespace { // Anonymous namespace for the recall feature
 
         GLib.File file = new GLib.File (file_path);
         if (!file.open (QIODevice.ReadOnly)) {
-            GLib.warn (lc_propagate_download) << "Could not open recall file" << file.error_string ();
+            GLib.warn (lc_propagate_download) << "Could not open recall file" << file.error_"";
             return;
         }
         QFileInfo existing_file (file_path);
@@ -1218,6 +1286,8 @@ namespace { // Anonymous namespace for the recall feature
         }
     }
 
+    /***********************************************************
+    ***********************************************************/
     static void preserve_group_ownership (string file_name, QFileInfo &fi) {
 #ifdef Q_OS_UNIX
         int chown_err = chown (file_name.to_local8Bit ().const_data (), -1, fi.group_id ());
@@ -1259,7 +1329,7 @@ void PropagateDownloadFile.content_checksum_computed (GLib.ByteArray checksum_ty
         if (_download_encrypted_helper.decrypt_file (_tmp_file)) {
           download_finished ();
         } else {
-          on_done (SyncFileItem.NormalError, _download_encrypted_helper.error_string ());
+          on_done (SyncFileItem.NormalError, _download_encrypted_helper.error_"");
         }
 
     } else {

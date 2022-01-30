@@ -142,9 +142,13 @@ signals:
     void share_job_finished (QJsonDocument reply, QVariant value);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_job_done (QJsonDocument reply);
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private QVariant _value;
 };
 
@@ -179,7 +183,7 @@ signals:
         if (date.is_valid ()) {
             add_param (string.from_latin1 ("expire_date"), date.to_string ("yyyy-MM-dd"));
         } else {
-            add_param (string.from_latin1 ("expire_date"), string ());
+            add_param (string.from_latin1 ("expire_date"), "");
         }
         _value = date;
 

@@ -17,6 +17,8 @@ namespace Occ {
 
 class AbstractCredentials : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public AbstractCredentials ();
     // No need for virtual destructor - GLib.Object already has one.
 
@@ -29,16 +31,18 @@ class AbstractCredentials : GLib.Object {
     ***********************************************************/
     public virtual void set_account (Account account);
 
-    public virtual string auth_type () = 0;
-    public virtual string user () = 0;
-    public virtual string password () = 0;
-    public virtual QNetworkAccessManager create_qNAM () = 0;
+    /***********************************************************
+    ***********************************************************/
+    public virtual string auth_type ();
+    public virtual string user ();
+    public virtual string password ();
+    public virtual QNetworkAccessManager create_qNAM ();
 
 
     /***********************************************************
     Whether there are credentials that can be used for a connection attempt.
     ***********************************************************/
-    public virtual bool ready () = 0;
+    public virtual bool ready ();
 
 
     /***********************************************************
@@ -54,7 +58,7 @@ class AbstractCredentials : GLib.Object {
 
     Should set _was_fetched = true, and later emit fetched () when done.
     ***********************************************************/
-    public virtual void fetch_from_keychain () = 0;
+    public virtual void fetch_from_keychain ();
 
 
     /***********************************************************
@@ -62,10 +66,12 @@ class AbstractCredentials : GLib.Object {
 
     Should emit asked () when done.
     ***********************************************************/
-    public virtual void ask_from_user () = 0;
+    public virtual void ask_from_user ();
 
-    public virtual bool still_valid (QNetworkReply reply) = 0;
-    public virtual void persist () = 0;
+    /***********************************************************
+    ***********************************************************/
+    public virtual bool still_valid (QNetworkReply reply);
+    public virtual void persist ();
 
 
     /***********************************************************
@@ -78,7 +84,7 @@ class AbstractCredentials : GLib.Object {
 
     ready () must return false afterwards.
     ***********************************************************/
-    public virtual void invalidate_token () = 0;
+    public virtual void invalidate_token ();
 
 
     /***********************************************************
@@ -88,8 +94,10 @@ class AbstractCredentials : GLib.Object {
 
     For http auth, this would clear the session cookie and password.
     ***********************************************************/
-    public virtual void forget_sensitive_data () = 0;
+    public virtual void forget_sensitive_data ();
 
+    /***********************************************************
+    ***********************************************************/
     public static string keychain_key (string url, string user, string account_id);
 
 
@@ -135,11 +143,11 @@ signals:
         string u (url);
         if (u.is_empty ()) {
             GLib.warn (lc_credentials) << "Empty url in key_chain, error!";
-            return string ();
+            return "";
         }
         if (user.is_empty ()) {
             GLib.warn (lc_credentials) << "Error : User is empty!";
-            return string ();
+            return "";
         }
 
         if (!u.ends_with (char ('/'))) {

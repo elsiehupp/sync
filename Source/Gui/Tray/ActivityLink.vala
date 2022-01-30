@@ -33,6 +33,8 @@ class Activity_link {
     Q_PROPERTY (GLib.ByteArray verb MEMBER _verb)
     Q_PROPERTY (bool primary MEMBER _primary)
 
+    /***********************************************************
+    ***********************************************************/
     public string _label;
     public string _link;
     public GLib.ByteArray _verb;
@@ -57,8 +59,12 @@ contains all the information describing a single activity.
 ***********************************************************/
 class Activity {
 
+    /***********************************************************
+    ***********************************************************/
     public using Identifier = QPair<qlonglong, string>;
 
+    /***********************************************************
+    ***********************************************************/
     public enum Type {
         Activity_type,
         Notification_type,
@@ -66,6 +72,8 @@ class Activity {
         Sync_file_item_type
     };
 
+    /***********************************************************
+    ***********************************************************/
     public Type _type;
     public qlonglong _id;
     public string _file_action;

@@ -124,8 +124,10 @@ abstract class ComputeChecksumBase : GLib.Object {
     }
 
 
-    /// Creates a checksum header from type and value.
-    //  OCSYNC_EXPORT
+    /***********************************************************
+    Creates a checksum header from type and value.
+    OCSYNC_EXPORT
+    ***********************************************************/
     GLib.ByteArray make_checksum_header (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
         if (checksum_type.is_empty () || checksum.is_empty ())
             return GLib.ByteArray ();
@@ -135,8 +137,11 @@ abstract class ComputeChecksumBase : GLib.Object {
         return header;
     }
 
-    /// Parses a checksum header
-    //  OCSYNC_EXPORT
+
+    /***********************************************************
+    Parses a checksum header
+    OCSYNC_EXPORT
+    ***********************************************************/
     bool parse_checksum_header (GLib.ByteArray header, GLib.ByteArray type, GLib.ByteArray checksum) {
         if (header.is_empty ()) {
             type.clear ();
@@ -154,8 +159,11 @@ abstract class ComputeChecksumBase : GLib.Object {
         return true;
     }
 
-    /// Convenience for getting the type from a checksum header, null if none
-    //  OCSYNC_EXPORT
+
+    /***********************************************************
+    Convenience for getting the type from a checksum header, null if none
+    OCSYNC_EXPORT
+    ***********************************************************/
     GLib.ByteArray parse_checksum_header_type (GLib.ByteArray header) {
         const var idx = header.index_of (':');
         if (idx < 0) {
@@ -164,8 +172,11 @@ abstract class ComputeChecksumBase : GLib.Object {
         return header.left (idx);
     }
 
-    /// Checks OWNCLOUD_DISABLE_CHECKSUM_UPLOAD
-    //  OCSYNC_EXPORT
+
+    /***********************************************************
+    Checks OWNCLOUD_DISABLE_CHECKSUM_UPLOAD
+    OCSYNC_EXPORT
+    ***********************************************************/
     bool upload_checksum_enabled () {
         static bool enabled = q_environment_variable_is_empty ("OWNCLOUD_DISABLE_CHECKSUM_UPLOAD");
         return enabled;
@@ -173,20 +184,30 @@ abstract class ComputeChecksumBase : GLib.Object {
 
 
 
-    // Exported functions for the tests.
+    /***********************************************************
+    Exported functions for the tests.
+    ***********************************************************/
 
 
-    //  OCSYNC_EXPORT
+    /***********************************************************
+    OCSYNC_EXPORT
+    ***********************************************************/
     GLib.ByteArray calc_md5 (QIODevice device) {
         return calc_crypto_hash (device, QCryptographicHash.Md5);
     }
 
-    //  OCSYNC_EXPORT
+
+    /***********************************************************
+    OCSYNC_EXPORT
+    ***********************************************************/
     GLib.ByteArray calc_sha1 (QIODevice device) {
         return calc_crypto_hash (device, QCryptographicHash.Sha1);
     }
 
-    //  OCSYNC_EXPORT
+
+    /***********************************************************
+    OCSYNC_EXPORT
+    ***********************************************************/
     GLib.ByteArray calc_adler32 (QIODevice device) {
         if (device.size () == 0) {
             return GLib.ByteArray ();
@@ -205,6 +226,8 @@ abstract class ComputeChecksumBase : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     static GLib.ByteArray calc_crypto_hash (QIODevice device, QCryptographicHash.Algorithm algo) {
         GLib.ByteArray arr;
         QCryptographicHash crypto ( algo );
@@ -216,6 +239,8 @@ abstract class ComputeChecksumBase : GLib.Object {
     }
     
 
+    /***********************************************************
+    ***********************************************************/
     static bool checksum_computation_enabled () {
         static bool enabled = q_environment_variable_is_empty ("OWNCLOUD_DISABLE_CHECKSUM_COMPUTATIONS");
         return enabled;
@@ -229,12 +254,16 @@ Computes the checksum of a file.
 ***********************************************************/
 class ComputeChecksum : ComputeChecksumBase {
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.ByteArray _checksum_type;
 
     // watcher for the checksum calculation thread
     private QFuture_watcher<GLib.ByteArray> _watcher;
 
-    public ComputeChecksum (GLib.Object parent = nullptr) {
+    /***********************************************************
+    ***********************************************************/
+    public ComputeChecksum (GLib.Object parent = new GLib.Object ()) {
         GLib.Object (parent);
     }
 
@@ -250,6 +279,8 @@ class ComputeChecksum : ComputeChecksumBase {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.ByteArray checksum_type () {
         return _checksum_type;
     }
@@ -323,7 +354,7 @@ class ComputeChecksum : ComputeChecksumBase {
     public static GLib.ByteArray compute_now_on_file (string file_path, GLib.ByteArray checksum_type) {
         GLib.File file = new GLib.File (file_path);
         if (!file.open (QIODevice.ReadOnly)) {
-            GLib.warn (lc_checksums) << "Could not open file" << file_path << "for reading and computing checksum" << file.error_string ();
+            GLib.warn (lc_checksums) << "Could not open file" << file_path << "for reading and computing checksum" << file.error_"";
             return GLib.ByteArray ();
         }
 
@@ -334,6 +365,8 @@ class ComputeChecksum : ComputeChecksumBase {
     signal void done (GLib.ByteArray checksum_type, GLib.ByteArray checksum);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_calculation_done () {
         GLib.ByteArray checksum = _watcher.future ().result ();
         if (!checksum.is_null ()) {
@@ -344,6 +377,8 @@ class ComputeChecksum : ComputeChecksumBase {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void start_impl (std.unique_ptr<QIODevice> device) {
         connect (&_watcher, &QFuture_watcher_base.on_finished,
             this, &ComputeChecksum.on_calculation_done,
@@ -359,10 +394,10 @@ class ComputeChecksum : ComputeChecksumBase {
             if (!shared_device.open (QIODevice.ReadOnly)) {
                 if (var file = qobject_cast<GLib.File> (shared_device.data ())) {
                     GLib.warn (lc_checksums) << "Could not open file" << file.file_name ()
-                            << "for reading to compute a checksum" << file.error_string ();
+                            << "for reading to compute a checksum" << file.error_"";
                 } else {
                     GLib.warn (lc_checksums) << "Could not open device" << shared_device.data ()
-                            << "for reading to compute a checksum" << shared_device.error_string ();
+                            << "for reading to compute a checksum" << shared_device.error_"";
                 }
                 return GLib.ByteArray ();
             }
@@ -379,10 +414,14 @@ Checks whether a file's checksum matches the expected value.
 ***********************************************************/
 class ValidateChecksumHeader : ComputeChecksumBase {
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.ByteArray _expected_checksum_type;
     private GLib.ByteArray _expected_checksum;
 
-    public ValidateChecksumHeader (GLib.Object parent = nullptr) {
+    /***********************************************************
+    ***********************************************************/
+    public ValidateChecksumHeader (GLib.Object parent = new GLib.Object ()) {
         base (parent);
     }
 
@@ -419,6 +458,8 @@ class ValidateChecksumHeader : ComputeChecksumBase {
     signal void validation_failed (string error_message);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_checksum_calculated (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
         if (checksum_type != _expected_checksum_type) {
             emit validation_failed (_("The checksum header contained an unknown checksum type \"%1\"").arg (string.from_latin1 (_expected_checksum_type)));
@@ -432,6 +473,8 @@ class ValidateChecksumHeader : ComputeChecksumBase {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private ComputeChecksum prepare_start (GLib.ByteArray checksum_header) {
         // If the incoming header is empty no validation can happen. Just continue.
         if (checksum_header.is_empty ()) {
@@ -459,6 +502,8 @@ Hooks checksum computations into csync.
 ***********************************************************/
 class CSyncChecksumHook : ComputeChecksumBase {
 
+    /***********************************************************
+    ***********************************************************/
     public CSyncChecksumHook () = default;
 
     /***********************************************************

@@ -29,12 +29,16 @@ using SyncFileItemPtr = unowned<SyncFileItem>;
 class SyncFileItem {
     Q_GADGET
 
+    /***********************************************************
+    ***********************************************************/
     public enum Direction {
         None = 0,
         Up,
         Down
     };
 
+    /***********************************************************
+    ***********************************************************/
     public enum Status { // stored in 4 bits
         NoStatus,
 
@@ -84,6 +88,8 @@ class SyncFileItem {
         BlocklistedError
     };
 
+    /***********************************************************
+    ***********************************************************/
     public SyncJournalFileRecord to_sync_journal_file_record_with_inode (string local_file_name);
 
 
@@ -95,6 +101,8 @@ class SyncFileItem {
     ***********************************************************/
     public static SyncFileItemPtr from_sync_journal_file_record (SyncJournalFileRecord &record);
 
+    /***********************************************************
+    ***********************************************************/
     public SyncFileItem ()
         : _type (ItemTypeSkip)
         , _direction (None)
@@ -108,11 +116,15 @@ class SyncFileItem {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public friend bool operator== (SyncFileItem &item1, SyncFileItem &item2) {
         return item1._original_file == item2._original_file;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public friend bool operator< (SyncFileItem &item1, SyncFileItem &item2) {
         // Sort by destination
         var d1 = item1.destination ();
@@ -147,6 +159,8 @@ class SyncFileItem {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public string destination () {
         if (!_rename_target.is_empty ()) {
             return _rename_target;
@@ -155,11 +169,15 @@ class SyncFileItem {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_empty () {
         return _file.is_empty ();
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_directory () {
         return _type == ItemTypeDirectory;
     }
@@ -223,11 +241,17 @@ class SyncFileItem {
     /// the encrypted name on the server.
     public string _encrypted_file_name;
 
+    /***********************************************************
+    ***********************************************************/
     public ItemType _type BITFIELD (3);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public Direction _direction BITFIELD (3);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public bool _server_has_ignored_files BITFIELD (1);
 
@@ -249,6 +273,8 @@ class SyncFileItem {
     public Status _status BITFIELD (4);
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool _is_restoration BITFIELD (1); // The original operation was forbidden, and this is a restoration
     public bool _is_selective_sync BITFIELD (1); // The file is removed or ignored because it is in the selective sync list
     public bool _is_encrypted BITFIELD (1); // The file is E2EE or the content of the directory should be E2EE
@@ -280,6 +306,8 @@ class SyncFileItem {
     public int64 _previous_size = 0;
     public time_t _previous_modtime = 0;
 
+    /***********************************************************
+    ***********************************************************/
     public string _direct_download_url;
     public string _direct_download_cookies;
 };

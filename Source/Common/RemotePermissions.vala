@@ -29,8 +29,12 @@ class RemotePermissions {
     private uint16 _value = 0;
     private static constexpr int not_null_mask = 0x1;
 
+    /***********************************************************
+    ***********************************************************/
     static const char letters[] = " WDNVCKRSMm";
 
+    /***********************************************************
+    ***********************************************************/
     private template <typename Char> // can be 'char' or 'ushort' if conversion from string
     private void from_array (Char remote_permissions) {
         _value = not_null_mask;
@@ -44,6 +48,8 @@ class RemotePermissions {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public enum Permissions {
         Can_write = 1,             // W
         Can_delete = 2,            // D
@@ -63,10 +69,16 @@ class RemotePermissions {
         PermissionsCount = IsMountedSub
     };
 
-    /// null permissions
+
+    /***********************************************************
+    null permissions
+    ***********************************************************/
     public RemotePermissions () = default;
 
-    /// array with one character per permission, "" is null, " " is non-null but empty
+
+    /***********************************************************
+    array with one character per permission, "" is null, " " is non-null but empty
+    ***********************************************************/
     public GLib.ByteArray to_database_value () {
         GLib.ByteArray result;
         if (is_null ())
@@ -83,12 +95,18 @@ class RemotePermissions {
         return result;
     }
 
-    /// output for display purposes, no defined format (same as to_database_value in practice)
-    public string to_string () {
+
+    /***********************************************************
+    output for display purposes, no defined format (same as to_database_value in practice)
+    ***********************************************************/
+    public string to_"" {
         return string.from_utf8 (to_database_value ());
     }
 
-    /// read value that was written with to_database_value ()
+
+    /***********************************************************
+    read value that was written with to_database_value ()
+    ***********************************************************/
     public static RemotePermissions from_database_value (GLib.ByteArray value) {
         if (value.is_empty ())
             return {};
@@ -97,7 +115,10 @@ class RemotePermissions {
         return perm;
     }
 
-    /// read a permissions string received from the server, never null
+
+    /***********************************************************
+    read a permissions string received from the server, never null
+    ***********************************************************/
     public static RemotePermissions from_server_string (string ) {
         RemotePermissions perm;
         perm.from_array (value.utf16 ());
@@ -105,36 +126,52 @@ class RemotePermissions {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool has_permission (Permissions permissions) {
         return _value & (1 << static_cast<int> (permissions));
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void set_permission (Permissions permissions) {
         _value |= (1 << static_cast<int> (permissions)) | not_null_mask;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void unset_permission (Permissions permissions) {
         _value &= ~ (1 << static_cast<int> (permissions));
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_null () {
         return ! (_value & not_null_mask);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public friend bool operator== (RemotePermissions a, RemotePermissions b) {
         return a._value == b._value;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public friend bool operator!= (RemotePermissions a, RemotePermissions b) {
         return ! (a == b);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public friend QDebug operator<< (QDebug &dbg, RemotePermissions remote_permissions) {
-        return dbg << remote_permissions.to_string ();
+        return dbg << remote_permissions.to_"";
     }
 }
 

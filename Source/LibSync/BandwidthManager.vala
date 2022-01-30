@@ -20,41 +20,77 @@ namespace Occ {
 ***********************************************************/
 class BandwidthManager : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public BandwidthManager (OwncloudPropagator p);
-    ~BandwidthManager () override;
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool using_absolute_upload_limit () {
         return _current_upload_limit > 0;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public bool using_relative_upload_limit () {
-        return _current_upload_limit < 0;
     }
-    public bool using_absolute_download_limit () {
-        return _current_download_limit > 0;
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public urn _current_download_limit > 0;
     }
     public bool using_relative_download_limit () {
         return _current_download_limit < 0;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_register_upload_device (UploadDevice *);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_unregister_upload_device (GLib.Object *);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_register_download_job (GETFileJob *);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void on_unregister_download_job (GLib.Obj
 
-    public void on_unregister_download_job (GLib.Object *);
+    /***********************************************************
+    ***********************************************************/
+    public void on_absolute_limit_timer_expire
 
-    public void on_absolute_limit_timer_expired ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_switching_timer_expired ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_relative_upload_measuring_timer_expired ();
-
-
+    /***********************************************************
+    ***********************************************************/
     public void on_relative_upload_delay_timer_expired ();
 
     public void on_relative_download_measuring_timer_expired ();
@@ -77,6 +113,8 @@ class BandwidthManager : GLib.Object {
     private GLib.List<UploadDevice> _absolute_upload_device_list;
     private GLib.List<UploadDevice> _relative_upload_device_list;
 
+    /***********************************************************
+    ***********************************************************/
     private QTimer _relative_upload_measuring_timer;
 
     // for relative bw limiting, we need to wait this amount before measuring again
@@ -89,6 +127,8 @@ class BandwidthManager : GLib.Object {
     private int64 _relative_upload_limit_progress_at_measuring_restart;
     private int64 _current_upload_limit;
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.List<GETFileJob> _download_job_list;
     private QTimer _relative_download_measuring_timer;
 
@@ -101,6 +141,8 @@ class BandwidthManager : GLib.Object {
     // for measuring how much progress we made at on_start
     private int64 _relative_download_limit_progress_at_measuring_restart;
 
+    /***********************************************************
+    ***********************************************************/
     private int64 _current_download_limit;
 };
 

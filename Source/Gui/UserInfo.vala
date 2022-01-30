@@ -58,11 +58,19 @@ Here follows the state machine
 ***********************************************************/
 class UserInfo : GLib.Object {
 
-    public UserInfo (Occ.AccountState account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public UserInfo (Occ.AccountState account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public int64 last_quota_total_bytes () {
         return _last_quota_total_bytes;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public int64 last_quota_used_bytes () {
         return _last_quota_used_bytes;
     }
@@ -76,9 +84,13 @@ class UserInfo : GLib.Object {
     public void set_active (bool active);
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_fetch_info ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_update_last_info (QJsonDocument &json);
     private void on_account_state_changed ();
     private void on_request_failed ();
@@ -89,12 +101,18 @@ signals:
     void fetched_last_info (UserInfo user_info);
 
 
+    /***********************************************************
+    ***********************************************************/
     private bool can_get_info ();
 
+    /***********************************************************
+    ***********************************************************/
     private QPointer<AccountState> _account_state;
     private bool _allow_disconnected_account_state;
     private bool _fetch_avatar_image;
 
+    /***********************************************************
+    ***********************************************************/
     private int64 _last_quota_total_bytes;
     private int64 _last_quota_used_bytes;
     private QTimer _job_restart_timer;
@@ -184,11 +202,11 @@ signals:
         AccountPointer account = _account_state.account ();
 
         // User Info
-        string user = obj_data.value ("id").to_string ();
+        string user = obj_data.value ("id").to_"";
         if (!user.is_empty ()) {
             account.set_dav_user (user);
         }
-        string display_name = obj_data.value ("display-name").to_string ();
+        string display_name = obj_data.value ("display-name").to_"";
         if (!display_name.is_empty ()) {
             account.set_dav_display_name (display_name);
         }

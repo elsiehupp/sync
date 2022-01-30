@@ -44,13 +44,19 @@ const int SQLITE_DO (A) {
 class SqlDatabase {
     // Q_DISABLE_COPY (SqlDatabase)
 
+    /***********************************************************
+    ***********************************************************/
     private Sqlite3 _database = nullptr;
     private string _error; // last error string
     private int _err_id = 0;
 
+    /***********************************************************
+    ***********************************************************/
     private friend class SqlQuery;
     private GLib.Set<SqlQuery> _queries;
 
+    /***********************************************************
+    ***********************************************************/
     public SqlDatabase () = default;
 
 
@@ -59,11 +65,15 @@ class SqlDatabase {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_open () {
         return _database != nullptr;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool open_or_create_read_write (string filename) {
         if (is_open ()) {
             return true;
@@ -105,6 +115,8 @@ class SqlDatabase {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool open_read_only (string filename) {
         if (is_open ()) {
             return true;
@@ -124,6 +136,8 @@ class SqlDatabase {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool transaction () {
         if (!_database) {
             return false;
@@ -133,6 +147,8 @@ class SqlDatabase {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool commit () {
         if (!_database) {
             return false;
@@ -142,6 +158,8 @@ class SqlDatabase {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void close () {
         if (_database) {
             foreach (var q, _queries) {
@@ -155,6 +173,8 @@ class SqlDatabase {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public string error () {
         const string err (_error);
         // _error.clear ();
@@ -162,11 +182,15 @@ class SqlDatabase {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public Sqlite3 sqlite_database () {
         return _database;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private enum class CheckDbResult {
         Ok,
         CheckDbResult.CANT_PREPARE,
@@ -174,6 +198,8 @@ class SqlDatabase {
         Not_ok,
     };
 
+    /***********************************************************
+    ***********************************************************/
     private bool open_helper (string filename, int sqlite_flags) {
         if (is_open ()) {
             return true;
@@ -206,6 +232,8 @@ class SqlDatabase {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private CheckDbResult check_database () {
         // quick_check can fail with a disk IO error when diskspace is low
         SqlQuery quick_check (*this);
@@ -261,6 +289,8 @@ There is basically 3 ways to initialize and use a query:
 class SqlQuery {
     // Q_DISABLE_COPY (SqlQuery)
 
+    /***********************************************************
+    ***********************************************************/
     private SqlDatabase _sqldatabase = nullptr;
     private Sqlite3 _database = nullptr;
     private Sqlite3Stmt _stmt = nullptr;
@@ -268,18 +298,26 @@ class SqlQuery {
     private int _err_id;
     private GLib.ByteArray _sql;
 
+    /***********************************************************
+    ***********************************************************/
     private friend class SqlDatabase;
     private friend class PreparedSqlQueryManager;
 
+    /***********************************************************
+    ***********************************************************/
     public SqlQuery () = default;
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public SqlQuery (SqlDatabase &database)
         : _sqldatabase (&database)
         , _database (database.sqlite_database ()) {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public SqlQuery (GLib.ByteArray sql, SqlDatabase database)
         : _sqldatabase (&database)
         , _database (database.sqlite_database ()) {
@@ -331,48 +369,66 @@ class SqlQuery {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public string error () {
         return _error;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public int error_id () {
         return _err_id;
     }
 
 
-    /// Checks whether the value at the given column index is NULL
+    /***********************************************************
+    Checks whether the value at the given column index is NULL
+    ***********************************************************/
     public bool null_value (int index) {
         return sqlite3_column_type (_stmt, index) == SQLITE_NULL;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public string string_value (int index) {
         return string.from_utf16 (static_cast<const ushort> (sqlite3_column_text16 (_stmt, index)));
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public int int_value (int index) {
         return sqlite3_column_int (_stmt, index);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public uint64 int64_value (int index) {
         return sqlite3_column_int64 (_stmt, index);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.ByteArray byte_array_value (int index) {
         return GLib.ByteArray (static_cast<const char> (sqlite3_column_blob (_stmt, index)),
             sqlite3_column_bytes (_stmt, index));
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_select () {
         return starts_with_insensitive (_sql, QByteArrayLiteral ("SELECT"));
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_pragma () {
         return starts_with_insensitive (_sql, QByteArrayLiteral ("PRAGMA"));
     }
@@ -387,6 +443,8 @@ class SqlQuery {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool exec () {
         GLib.debug (lc_sql) << "SQL exec" << _sql;
 
@@ -430,12 +488,16 @@ class SqlQuery {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public struct NextResult {
         bool ok = false;
         bool has_data = false;
     };
 
 
+    /***********************************************************
+    ***********************************************************/
     public NextResult next () {
         const bool first_step = !Sqlite3Stmt_busy (_stmt);
 
@@ -462,6 +524,8 @@ class SqlQuery {
         return result;
     }
 
+    /***********************************************************
+    ***********************************************************/
     public template<class T, typename std.enable_if<std.is_enum<T>.value, int>.type = 0>
     public void bind_value (int pos, T &value) {
         GLib.debug (lc_sql) << "SQL bind" << pos << value;
@@ -469,6 +533,8 @@ class SqlQuery {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public template<class T, typename std.enable_if<!std.is_enum<T>.value, int>.type = 0>
     public void bind_value (int pos, T &value) {
         GLib.debug (lc_sql) << "SQL bind" << pos << value;
@@ -476,22 +542,30 @@ class SqlQuery {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void bind_value (int pos, GLib.ByteArray value) {
         GLib.debug (lc_sql) << "SQL bind" << pos << string.from_utf8 (value);
         bind_value_internal (pos, value);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public const GLib.ByteArray last_query () {
         return _sql;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public int num_rows_affected () {
         return sqlite3_changes (_database);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void reset_and_clear_bindings () {
         if (_stmt) {
             SQLITE_DO (sqlite3_reset (_stmt));
@@ -500,6 +574,8 @@ class SqlQuery {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void bind_value_internal (int pos, QVariant &value) {
         int res = -1;
         if (!_stmt) {
@@ -522,24 +598,24 @@ class SqlQuery {
             break;
         case QVariant.Date_time: {
             const QDateTime date_time = value.to_date_time ();
-            const string str = date_time.to_string ("yyyy-MM-dd_thh:mm:ss.zzz");
-            res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
-                str.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
+            const string string_value = date_time.to_string ("yyyy-MM-dd_thh:mm:ss.zzz");
+            res = sqlite3_bind_text16 (_stmt, pos, string_value.utf16 (),
+                string_value.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
             break;
         }
         case QVariant.Time: {
             const QTime time = value.to_time ();
-            const string str = time.to_string ("hh:mm:ss.zzz");
-            res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
-                str.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
+            const string string_value = time.to_string ("hh:mm:ss.zzz");
+            res = sqlite3_bind_text16 (_stmt, pos, string_value.utf16 (),
+                string_value.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
             break;
         }
         case QVariant.String: {
-            if (!value.to_string ().is_null ()) {
+            if (!value.to_"".is_null ()) {
                 // lifetime of string == lifetime of its qvariant
-                const var str = static_cast<const string> (value.const_data ());
-                res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
-                    (str.size ()) * static_cast<int> (sizeof (char)), SQLITE_TRANSIENT);
+                const var string_value = static_cast<const string> (value.const_data ());
+                res = sqlite3_bind_text16 (_stmt, pos, string_value.utf16 (),
+                    (string_value.size ()) * static_cast<int> (sizeof (char)), SQLITE_TRANSIENT);
             } else {
                 res = sqlite3_bind_null (_stmt, pos);
             }
@@ -551,10 +627,10 @@ class SqlQuery {
             break;
         }
         default: {
-            string str = value.to_string ();
+            string string_value = value.to_"";
             // SQLITE_TRANSIENT makes sure that sqlite buffers the data
-            res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
-                (str.size ()) * static_cast<int> (sizeof (char)), SQLITE_TRANSIENT);
+            res = sqlite3_bind_text16 (_stmt, pos, string_value.utf16 (),
+                (string_value.size ()) * static_cast<int> (sizeof (char)), SQLITE_TRANSIENT);
             break;
         }
         }
@@ -565,6 +641,8 @@ class SqlQuery {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void finish () {
         if (!_stmt)
             return;

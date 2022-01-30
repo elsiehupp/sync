@@ -10,18 +10,27 @@ using namespace Occ;
 
 class TestSyncFileItem : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private void on_init_test_case () {
     }
 
-    private void on_cleanup_test_case () {
-    }
 
+    /***********************************************************
+    ***********************************************************/
+    private void on_cleanup_test_case () {}
+
+
+    private
     private on_ SyncFileItem createItem ( const string& file ) {
         SyncFileItem i;
         i._file = file;
         return i;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testComparator_data () {
         QTest.addColumn<SyncFileItem> ("a");
         QTest.addColumn<SyncFileItem> ("b");
@@ -41,6 +50,9 @@ class TestSyncFileItem : GLib.Object {
         QTest.newRow ("move3") << createItem ("abc") << movedItem1 << createItem ("ijk");
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testComparator () {
         QFETCH ( SyncFileItem , a );
         QFETCH ( SyncFileItem , b );

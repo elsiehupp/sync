@@ -37,6 +37,8 @@ class QProgress_indicator : Gtk.Widget {
     Q_PROPERTY (bool displayed_when_stopped READ is_displayed_when_stopped WRITE on_set_displayed_when_stopped)
     Q_PROPERTY (QColor color READ color WRITE on_set_color)
 
+    /***********************************************************
+    ***********************************************************/
     public QProgress_indicator (Gtk.Widget* parent = nullptr);
 
 
@@ -75,6 +77,8 @@ class QProgress_indicator : Gtk.Widget {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public QSize size_hint () override;
     public int height_for_width (int w) override;
 
@@ -119,6 +123,8 @@ class QProgress_indicator : Gtk.Widget {
     protected void timer_event (QTimerEvent * event) override;
     protected void paint_event (QPaint_event * event) override;
 
+    /***********************************************************
+    ***********************************************************/
     private int m_angle = 0;
     private int m_timer_id = -1;
     private int m_delay = 40;

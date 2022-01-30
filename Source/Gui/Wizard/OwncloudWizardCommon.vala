@@ -54,9 +54,9 @@ namespace WizardCommon {
             label.set_alignment (Qt.Align_top | Qt.Align_right);
             label.set_visible (true);
         } else {
-            string str = variant.to_string ();
-            if (!str.is_empty ()) {
-                label.on_set_text (str);
+            string string_value = variant.to_"";
+            if (!string_value.is_empty ()) {
+                label.on_set_text (string_value);
                 label.set_text_format (Qt.RichText);
                 label.set_visible (true);
                 label.set_open_external_links (true);

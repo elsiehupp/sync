@@ -32,8 +32,12 @@ namespace Occ {
 
 class Access_manager_factory : QQml_network_access_manager_factory {
 
+    /***********************************************************
+    ***********************************************************/
     public Access_manager_factory ();
 
+    /***********************************************************
+    ***********************************************************/
     public QNetworkAccessManager* create (GLib.Object parent) override;
 };
 
@@ -53,9 +57,13 @@ class Systray
     Q_PROPERTY (string window_title READ window_title CONSTANT)
     Q_PROPERTY (bool use_normal_window READ use_normal_window CONSTANT)
 
+    /***********************************************************
+    ***********************************************************/
     public static Systray instance ();
-    ~Systray () override = default;
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public enum class Task_bar_position {
         Bottom,
         Left,
@@ -63,31 +71,57 @@ class Systray
         Right
     };
 
+    /***********************************************************
+    ***********************************************************/
     public void set_tray_engine (QQml_application_engine tray_engine);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void create ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void show_message (string title,
 
-    public void show_message (string title, string message, Message_icon icon = Information);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_tool_tip (string tip);
-
-
+    /***********************************************************
+    ***********************************************************/
     public bool is_open ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string window_title ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public bool use_normal_window ();
 
-    public Q_INVOKABLE void pause_resume_sync ();
+    /***********************************************************
+    ***********************************************************/
+    public Q_INVOKABLE void pause_resume_sy
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public Q_INVOKABLE bool sync_is_paused ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public Q_INVOKABLE void set_opened ();
 
@@ -114,18 +148,28 @@ signals:
     void show_file_activity_dialog (string share_path, string local_path);
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_new_user_selected ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_unpause_all_folders ();
     private void on_pause_all_folders ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void set_pause_on_all_folders_helper (bool pause);
 
+    /***********************************************************
+    ***********************************************************/
     private static Systray _instance;
-    private Systray ();
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private QScreen current_screen ();
     private QRect current_screen_rect ();
     private QPoint compute_window_reference_point ();
@@ -134,10 +178,14 @@ signals:
     private QRect taskbar_geometry ();
     private QPoint compute_window_position (int width, int height);
 
+    /***********************************************************
+    ***********************************************************/
     private bool _is_open = false;
     private bool _sync_is_paused = true;
     private QPointer<QQml_application_engine> _tray_engine;
 
+    /***********************************************************
+    ***********************************************************/
     private Access_manager_factory _access_manager_factory;
 };
 

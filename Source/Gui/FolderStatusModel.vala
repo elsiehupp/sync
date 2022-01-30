@@ -29,12 +29,18 @@ namespace Occ {
 ***********************************************************/
 class FolderStatusModel : QAbstractItemModel {
 
+    /***********************************************************
+    ***********************************************************/
     public enum {File_id_role = Qt.User_role+1};
 
-    public FolderStatusModel (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public FolderStatusModel (GLib.Object parent = new GLib.Object ());
     ~FolderStatusModel () override;
     public void set_account_state (AccountState account_state);
 
+    /***********************************************************
+    ***********************************************************/
     public Qt.Item_flags flags (QModelIndex &) override;
     public QVariant data (QModelIndex &index, int role) override;
     public bool set_data (QModelIndex &index, QVariant &value, int role = Qt.Edit_role) override;
@@ -47,8 +53,12 @@ class FolderStatusModel : QAbstractItemModel {
     public void reset_and_fetch (QModelIndex &parent);
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool has_children (QModelIndex &parent = QModelIndex ()) override;
 
+    /***********************************************************
+    ***********************************************************/
     public struct SubFolderInfo {
         Folder _folder = nullptr;
         string _name; // Folder name to be displayed in the UI
@@ -90,8 +100,12 @@ class FolderStatusModel : QAbstractItemModel {
         Progress _progress;
     };
 
+    /***********************************************************
+    ***********************************************************/
     public QVector<SubFolderInfo> _folders;
 
+    /***********************************************************
+    ***********************************************************/
     public enum ItemType {
         RootFolder,
         SubFolder,
@@ -101,9 +115,13 @@ class FolderStatusModel : QAbstractItemModel {
     public ItemType classify (QModelIndex &index);
 
 
+    /***********************************************************
+    ***********************************************************/
     public SubFolderInfo info_for_index (QModelIndex &index);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool is_any_ancestor_encrypted (QModelIndex &index);
     // If the selective sync check boxes were changed
     public bool is_dirty () {
@@ -118,17 +136,29 @@ class FolderStatusModel : QAbstractItemModel {
     public QModelIndex index_for_path (Folder f, string path);
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_update_folder_state (Folder *);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_apply_selective_sync ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void on_reset_folders ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_sync_all_pending_big_folders ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void on_sync_no_pending_big_folders ();
 
@@ -136,6 +166,8 @@ class FolderStatusModel : QAbstractItemModel {
     public void on_set_progress (ProgressInfo &progress);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_update_directories (string[] &);
     private void on_gather_permissions (string name, QMap<string, string> &properties);
     private void on_gather_encryption_status (string href, QMap<string, string> &properties);
@@ -152,6 +184,8 @@ class FolderStatusModel : QAbstractItemModel {
     private void on_show_fetch_progress ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private string[] create_block_list (Occ.FolderStatusModel.SubFolderInfo &root,
         const string[] &old_block_list);
     private const AccountState _account_state = nullptr;
@@ -828,9 +862,9 @@ void FolderStatusModel.on_update_directories (string[] &list) {
     }
 
     std.set<string> selective_sync_undecided_set; // not GLib.Set because it's not sorted
-    foreach (string str, selective_sync_undecided_list) {
-        if (str.starts_with (parent_info._path) || parent_info._path == QLatin1String ("/")) {
-            selective_sync_undecided_set.insert (str);
+    foreach (string string_value, selective_sync_undecided_list) {
+        if (string_value.starts_with (parent_info._path) || parent_info._path == QLatin1String ("/")) {
+            selective_sync_undecided_set.insert (string_value);
         }
     }
     const var permission_map = job.property (property_permission_map).to_map ();
@@ -855,8 +889,8 @@ void FolderStatusModel.on_update_directories (string[] &list) {
         new_info._folder = parent_info._folder;
         new_info._path_idx = parent_info._path_idx;
         new_info._path_idx << new_subs.size ();
-        new_info._is_external = permission_map.value (remove_trailing_slash (path)).to_string ().contains ("M");
-        new_info._is_encrypted = encryption_map.value (remove_trailing_slash (path)).to_string () == QStringLiteral ("1");
+        new_info._is_external = permission_map.value (remove_trailing_slash (path)).to_"".contains ("M");
+        new_info._is_encrypted = encryption_map.value (remove_trailing_slash (path)).to_"" == QStringLiteral ("1");
         new_info._path = relative_path;
 
         SyncJournalFileRecord record;
@@ -887,11 +921,11 @@ void FolderStatusModel.on_update_directories (string[] &list) {
         } else if (parent_info._checked == Qt.Checked) {
             new_info._checked = Qt.Checked;
         } else {
-            foreach (string str, selective_sync_block_list) {
-                if (str == relative_path || str == QLatin1String ("/")) {
+            foreach (string string_value, selective_sync_block_list) {
+                if (string_value == relative_path || string_value == QLatin1String ("/")) {
                     new_info._checked = Qt.Unchecked;
                     break;
-                } else if (str.starts_with (relative_path)) {
+                } else if (string_value.starts_with (relative_path)) {
                     new_info._checked = Qt.Partially_checked;
                 }
             }
@@ -946,8 +980,8 @@ void FolderStatusModel.on_lscol_finished_with_error (QNetworkReply r) {
     }
     var parent_info = info_for_index (idx);
     if (parent_info) {
-        GLib.debug (lc_folder_status) << r.error_string ();
-        parent_info._last_error_string = r.error_string ();
+        GLib.debug (lc_folder_status) << r.error_"";
+        parent_info._last_error_string = r.error_"";
         var error = r.error ();
 
         parent_info.reset_subs (this, idx);

@@ -36,10 +36,14 @@ using namespace Occ;
 ***********************************************************/
 class Cmd : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public Cmd () : GLib.Object () {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_transmission_progress_slot () {
     }
 };
@@ -74,6 +78,8 @@ CmdOptions opts = nullptr;
 
 class EchoDisabler {
 
+    /***********************************************************
+    ***********************************************************/
     public EchoDisabler () {
         tcgetattr (STDIN_FILENO, &tios);
         termios tios_new = tios;
@@ -86,6 +92,8 @@ class EchoDisabler {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private termios tios;
 };
 
@@ -100,6 +108,8 @@ string query_password (string user) {
 #ifndef TOKEN_AUTH_ONLY
 class HttpCredentialsText : HttpCredentials {
 
+    /***********************************************************
+    ***********************************************************/
     public HttpCredentialsText (string user, string password)
         : HttpCredentials (user, password)
         , // FIXME : not working with client certs yet (qknight)
@@ -107,6 +117,8 @@ class HttpCredentialsText : HttpCredentials {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void ask_from_user () override {
         _password = .query_password (user ());
         _ready = true;
@@ -115,16 +127,22 @@ class HttpCredentialsText : HttpCredentials {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_s_sLTrusted (bool is_trusted) {
         _ssl_trusted = is_trusted;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool ssl_is_trusted () override {
         return _ssl_trusted;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private bool _ssl_trusted;
 };
 #endif /* TOKEN_AUTH_ONLY */
@@ -348,8 +366,8 @@ int main (int argc, char **argv) {
     host_url.set_scheme (host_url.scheme ().replace ("owncloud", "http"));
 
     GLib.Uri credential_free_url = host_url;
-    credential_free_url.set_user_name (string ());
-    credential_free_url.set_password (string ());
+    credential_free_url.set_user_name ("");
+    credential_free_url.set_password ("");
 
     const string folder = options.remote_path;
 
@@ -397,7 +415,7 @@ int main (int argc, char **argv) {
         var caps = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
         q_debug () << "Server capabilities" << caps;
         account.set_capabilities (caps.to_variant_map ());
-        account.set_server_version (caps["core"].to_object ()["status"].to_object ()["version"].to_string ());
+        account.set_server_version (caps["core"].to_object ()["status"].to_object ()["version"].to_"");
         loop.quit ();
     });
     job.on_start ();
@@ -411,8 +429,8 @@ int main (int argc, char **argv) {
     job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"));
     GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument &json) {
         const QJsonObject data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-        account.set_dav_user (data.value ("id").to_string ());
-        account.set_dav_display_name (data.value ("display-name").to_string ());
+        account.set_dav_user (data.value ("id").to_"");
+        account.set_dav_display_name (data.value ("display-name").to_"");
         loop.quit ();
     });
     job.on_start ();

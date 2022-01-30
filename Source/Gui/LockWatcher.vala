@@ -38,7 +38,9 @@ the file is still being locked.
 
 class LockWatcher : GLib.Object {
 
-    public LockWatcher (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public LockWatcher (GLib.Object parent = new GLib.Object ());
 
 
     /***********************************************************
@@ -69,9 +71,13 @@ signals:
     void file_unlocked (string path);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_check_files ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private GLib.Set<string> _watched_paths;
     private QTimer _timer;
 };

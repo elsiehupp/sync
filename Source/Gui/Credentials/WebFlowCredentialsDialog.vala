@@ -15,14 +15,24 @@ namespace Occ {
 
 class WebFlowCredentialsDialog : Gtk.Dialog {
 
+    /***********************************************************
+    ***********************************************************/
     public WebFlowCredentialsDialog (Account account, bool use_flow2, Gtk.Widget parent = nullptr);
 
+    /***********************************************************
+    ***********************************************************/
     public void set_url (GLib.Uri url);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_info (string msg);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void set_error (string error);
 
     public bool is_using_flow2 () {
@@ -34,9 +44,13 @@ class WebFlowCredentialsDialog : Gtk.Dialog {
     protected void change_event (QEvent *) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_flow_2_auth_result (Flow2Auth.Result, string error_string, string user, string app_password);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_show_settings_dialog ();
 
 signals:
@@ -46,8 +60,12 @@ signals:
     void on_close ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void customize_style ();
 
+    /***********************************************************
+    ***********************************************************/
     private bool _use_flow2;
 
     Flow2AuthWidget _flow_2_auth_widget;
@@ -55,6 +73,8 @@ signals:
     private WebView _web_view;
 #endif // WITH_WEBENGINE
 
+    /***********************************************************
+    ***********************************************************/
     private QLabel _error_label;
     private QLabel _info_label;
     private QVBoxLayout _layout;
@@ -208,7 +228,7 @@ void WebFlowCredentialsDialog.on_show_settings_dialog () {
 void WebFlowCredentialsDialog.on_flow_2_auth_result (Flow2Auth.Result r, string error_string, string user, string app_password) {
     Q_UNUSED (error_string)
     if (r == Flow2Auth.LoggedIn) {
-        emit url_catched (user, app_password, string ());
+        emit url_catched (user, app_password, "");
     } else {
         // bring window to top
         on_show_settings_dialog ();

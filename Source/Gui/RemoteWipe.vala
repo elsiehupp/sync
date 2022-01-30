@@ -16,7 +16,9 @@ namespace Occ {
 
 class RemoteWipe : GLib.Object {
 
-    public RemoteWipe (AccountPointer account, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public RemoteWipe (AccountPointer account, GLib.Object parent = new GLib.Object ());
 
 signals:
     /***********************************************************
@@ -53,6 +55,8 @@ signals:
     private void on_notify_server_success_job_slot ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private AccountPointer _account;
     private string _app_password;
     private bool _account_removed;
@@ -60,13 +64,15 @@ signals:
     private QNetworkReply _network_reply_check;
     private QNetworkReply _network_reply_success;
 
+    /***********************************************************
+    ***********************************************************/
     private friend class .Test_remote_wipe;
 };
 
     RemoteWipe.RemoteWipe (AccountPointer account, GLib.Object parent)
         : GLib.Object (parent),
           _account (account),
-          _app_password (string ()),
+          _app_password (""),
           _account_removed (false),
           _network_manager (nullptr),
           _network_reply_check (nullptr),
@@ -88,7 +94,7 @@ signals:
             return;
 
         _app_password = pwd;
-        GLib.Uri request_url = Utility.concat_url_path (_account.url ().to_string (),
+        GLib.Uri request_url = Utility.concat_url_path (_account.url ().to_"",
                                                  QLatin1String ("/index.php/core/wipe/check"));
         QNetworkRequest request;
         request.set_header (QNetworkRequest.ContentTypeHeader,
@@ -115,16 +121,16 @@ signals:
         if (_network_reply_check.error () != QNetworkReply.NoError ||
                 json_parse_error.error != QJsonParseError.NoError) {
             string error_reason;
-            string error_from_json = json["error"].to_string ();
+            string error_from_json = json["error"].to_"";
             if (!error_from_json.is_empty ()) {
                 GLib.warn (lc_remote_wipe) << string ("Error returned from the server : <em>%1<em>")
                                            .arg (error_from_json.to_html_escaped ());
             } else if (_network_reply_check.error () != QNetworkReply.NoError) {
                 GLib.warn (lc_remote_wipe) << string ("There was an error accessing the 'token' endpoint : <br><em>%1</em>")
-                                  .arg (_network_reply_check.error_string ().to_html_escaped ());
+                                  .arg (_network_reply_check.error_"".to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 GLib.warn (lc_remote_wipe) << string ("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                  .arg (json_parse_error.error_string ());
+                                  .arg (json_parse_error.error_"");
             } else {
                 GLib.warn (lc_remote_wipe) <<  string ("The reply from the server did not contain all expected fields");
             }
@@ -167,7 +173,7 @@ signals:
 
     void RemoteWipe.on_notify_server_success_job (AccountState account_state, bool data_wiped){
         if (_account_removed && data_wiped && _account == account_state.account ()){
-            GLib.Uri request_url = Utility.concat_url_path (_account.url ().to_string (),
+            GLib.Uri request_url = Utility.concat_url_path (_account.url ().to_"",
                                                      QLatin1String ("/index.php/core/wipe/on_success"));
             QNetworkRequest request;
             request.set_header (QNetworkRequest.ContentTypeHeader,
@@ -190,16 +196,16 @@ signals:
         if (_network_reply_success.error () != QNetworkReply.NoError ||
                 json_parse_error.error != QJsonParseError.NoError) {
             string error_reason;
-            string error_from_json = json["error"].to_string ();
+            string error_from_json = json["error"].to_"";
             if (!error_from_json.is_empty ()) {
                 GLib.warn (lc_remote_wipe) << string ("Error returned from the server : <em>%1</em>")
                                   .arg (error_from_json.to_html_escaped ());
             } else if (_network_reply_success.error () != QNetworkReply.NoError) {
                 GLib.warn (lc_remote_wipe) << string ("There was an error accessing the 'on_success' endpoint : <br><em>%1</em>")
-                                  .arg (_network_reply_success.error_string ().to_html_escaped ());
+                                  .arg (_network_reply_success.error_"".to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 GLib.warn (lc_remote_wipe) << string ("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                  .arg (json_parse_error.error_string ());
+                                  .arg (json_parse_error.error_"");
             } else {
                 GLib.warn (lc_remote_wipe) << string ("The reply from the server did not contain all expected fields.");
             }

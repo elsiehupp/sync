@@ -22,6 +22,8 @@ using namespace Occ.Utility;
         private bool _successDown;
         private bool _errorSeen;
 
+    /***********************************************************
+    ***********************************************************/
     public slots:
 
     void slotUpValidated (GLib.ByteArray& type, GLib.ByteArray& checksum) {
@@ -39,6 +41,8 @@ using namespace Occ.Utility;
          _errorSeen = true;
     }
 
+    /***********************************************************
+    ***********************************************************/
     static GLib.ByteArray shellSum ( const GLib.ByteArray& cmd, string& file ) {
         QProcess md5;
         string[] args;
@@ -55,6 +59,9 @@ using namespace Occ.Utility;
         return sumShell;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private slots:
 
     void on_init_test_case () {

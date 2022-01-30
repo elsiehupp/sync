@@ -19,6 +19,9 @@ class TestClientSideEncryption : GLib.Object {
         return data.split ('|').join ("fA==");
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void shouldEncryptPrivateKeys () {
         // GIVEN
         const var encryptionKey = QByteArrayLiteral ("foo");
@@ -45,6 +48,9 @@ class TestClientSideEncryption : GLib.Object {
         QCOMPARE (salt, originalSalt);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void shouldDecryptPrivateKeys () {
         // GIVEN
         const var encryptionKey = QByteArrayLiteral ("foo");
@@ -61,6 +67,9 @@ class TestClientSideEncryption : GLib.Object {
         QCOMPARE (salt, originalSalt);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void shouldDecryptPrivateKeysInOldStorageFormat () {
         // GIVEN
         const var encryptionKey = QByteArrayLiteral ("foo");
@@ -77,6 +86,9 @@ class TestClientSideEncryption : GLib.Object {
         QCOMPARE (salt, originalSalt);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void shouldSymmetricEncryptStrings () {
         // GIVEN
         const var encryptionKey = QByteArrayLiteral ("foo");
@@ -100,6 +112,9 @@ class TestClientSideEncryption : GLib.Object {
         QVERIFY (!iv.isEmpty ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void shouldSymmetricDecryptStrings () {
         // GIVEN
         const var encryptionKey = QByteArrayLiteral ("foo");
@@ -113,6 +128,9 @@ class TestClientSideEncryption : GLib.Object {
         QCOMPARE (data, originalData);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void shouldSymmetricDecryptStringsInOldStorageFormat () {
         // GIVEN
         const var encryptionKey = QByteArrayLiteral ("foo");
@@ -126,6 +144,9 @@ class TestClientSideEncryption : GLib.Object {
         QCOMPARE (data, originalData);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testStreamingDecryptor_data () {
         QTest.addColumn<int> ("totalBytes");
         QTest.addColumn<int> ("bytesToRead");
@@ -136,6 +157,9 @@ class TestClientSideEncryption : GLib.Object {
         QTest.newRow ("data4") << 272 << 256;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testStreamingDecryptor () {
         QFETCH (int, totalBytes);
 

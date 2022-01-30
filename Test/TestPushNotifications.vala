@@ -48,6 +48,8 @@ bool failThreeAuthenticationAttempts (FakeWebSocketServer &fakeServer, Occ.Accou
 
 class TestPushNotifications : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testTryReconnect_capabilitesReportPushNotificationsAvailable_reconnectForEver () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
@@ -61,6 +63,9 @@ class TestPushNotifications : GLib.Object {
         QVERIFY (fakeServer.authenticateAccount (account));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetup_correctCredentials_authenticateAndEmitReady () {
         FakeWebSocketServer fakeServer;
         std.unique_ptr<QSignalSpy> filesChangedSpy;
@@ -81,6 +86,9 @@ class TestPushNotifications : GLib.Object {
             }));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testOnWebSocketTextMessageReceived_notifyFileMessage_emitFilesChanged () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
@@ -95,6 +103,9 @@ class TestPushNotifications : GLib.Object {
         QVERIFY (verifyCalledOnceWithAccount (filesChangedSpy, account));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testOnWebSocketTextMessageReceived_notifyActivityMessage_emitNotification () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
@@ -111,6 +122,9 @@ class TestPushNotifications : GLib.Object {
         QVERIFY (verifyCalledOnceWithAccount (activitySpy, account));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testOnWebSocketTextMessageReceived_notifyNotificationMessage_emitNotification () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
@@ -127,6 +141,9 @@ class TestPushNotifications : GLib.Object {
         QVERIFY (verifyCalledOnceWithAccount (notificationSpy, account));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testOnWebSocketTextMessageReceived_invalidCredentialsMessage_reconnectWebSocket () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
@@ -149,6 +166,9 @@ class TestPushNotifications : GLib.Object {
         QCOMPARE (secondPasswordSent, account.credentials ().password ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testOnWebSocketError_connectionLost_emitConnectionLost () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
@@ -167,6 +187,9 @@ class TestPushNotifications : GLib.Object {
         QCOMPARE (pushNotificationsDisabledSpy.count (), 1);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSetup_maxConnectionAttemptsReached_disablePushNotifications () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
@@ -177,6 +200,9 @@ class TestPushNotifications : GLib.Object {
         QCOMPARE (pushNotificationsDisabledSpy.count (), 1);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testOnWebSocketSslError_sslError_disablePushNotifications () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
@@ -193,6 +219,9 @@ class TestPushNotifications : GLib.Object {
         QCOMPARE (pushNotificationsDisabledSpy.count (), 1);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testAccount_web_socket_connectionLost_emitNotificationsDisabled () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
@@ -219,6 +248,9 @@ class TestPushNotifications : GLib.Object {
         QCOMPARE (accountSent, account.data ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testAccount_web_socket_authenticationFailed_emitNotificationsDisabled () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
@@ -234,6 +266,9 @@ class TestPushNotifications : GLib.Object {
         QCOMPARE (accountSent, account.data ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPingTimeout_pingTimedOut_reconnect () {
         FakeWebSocketServer fakeServer;
         std.unique_ptr<QSignalSpy> filesChangedSpy;

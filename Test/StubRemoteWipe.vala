@@ -13,8 +13,8 @@ Occ.FolderMan *Occ.FolderMan.instance () { return static_cast<FolderMan> (new GL
 void Occ.FolderMan.wipeDone (Occ.AccountState*, bool) { }
 Occ.Folder* Occ.FolderMan.addFolder (Occ.AccountState*, Occ.FolderDefinition const &) { return nullptr; }
 void Occ.FolderMan.slotWipeFolderForAccount (Occ.AccountState*) { }
-string Occ.FolderMan.unescapeAlias (string const&){ return string (); }
-string Occ.FolderMan.escapeAlias (string const&){ return string (); }
+string Occ.FolderMan.unescapeAlias (string const&){ return ""; }
+string Occ.FolderMan.escapeAlias (string const&){ return ""; }
 void Occ.FolderMan.scheduleFolder (Occ.Folder*){ }
 Occ.SocketApi *Occ.FolderMan.socketApi (){ return new SocketApi;  }
 const Occ.Folder.Map &Occ.FolderMan.map () { return Occ.Folder.Map (); }

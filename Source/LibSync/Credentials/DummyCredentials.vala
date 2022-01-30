@@ -8,6 +8,8 @@ namespace Occ {
 
 class DummyCredentials : AbstractCredentials {
 
+    /***********************************************************
+    ***********************************************************/
     public string _user;
     public string _password;
     public string auth_type () override;
@@ -33,7 +35,7 @@ class DummyCredentials : AbstractCredentials {
 
     string DummyCredentials.password () {
         Q_UNREACHABLE ();
-        return string ();
+        return "";
     }
 
     QNetworkAccessManager *DummyCredentials.create_qNAM () {

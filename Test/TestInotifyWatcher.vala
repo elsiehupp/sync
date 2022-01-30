@@ -10,8 +10,12 @@ using namespace Occ;
 
 class TestInotifyWatcher : public FolderWatcherPrivate {
 
+    /***********************************************************
+    ***********************************************************/
     private string _root;
 
+    /***********************************************************
+    ***********************************************************/
     private void on_init_test_case () {
         _root = QDir.tempPath () + "/" + "test_" + string.number (Occ.Utility.rand ());
         qDebug () << "creating test directory tree in " << _root;
@@ -52,6 +56,9 @@ class TestInotifyWatcher : public FolderWatcherPrivate {
         QVERIFY2 (ok, "findFoldersBelow failed.");
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_cleanup_test_case () {
         if ( _root.startsWith (QDir.tempPath () )) {
            system ( string ("rm -rf %1").arg (_root).toLocal8Bit () );

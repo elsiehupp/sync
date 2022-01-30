@@ -17,6 +17,8 @@ Fetching sharees from the OCS Sharee API
 ***********************************************************/
 class Ocs_sharee_job : Ocs_job {
 
+    /***********************************************************
+    ***********************************************************/
     public Ocs_sharee_job (AccountPointer account);
 
 
@@ -36,6 +38,8 @@ signals:
     void sharee_job_finished (QJsonDocument &reply);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_job_done (QJsonDocument &reply);
 };
 
@@ -56,7 +60,7 @@ signals:
         add_param (string.from_latin1 ("item_type"), item_type);
         add_param (string.from_latin1 ("page"), string.number (page));
         add_param (string.from_latin1 ("per_page"), string.number (per_page));
-        add_param (string.from_latin1 ("lookup"), QVariant (lookup).to_string ());
+        add_param (string.from_latin1 ("lookup"), QVariant (lookup).to_"");
 
         on_start ();
     }

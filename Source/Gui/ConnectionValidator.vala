@@ -73,8 +73,12 @@ Here follows the state machine
 
 class ConnectionValidator : GLib.Object {
 
-    public ConnectionValidator (AccountStatePtr account_state, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public ConnectionValidator (AccountStatePtr account_state, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public enum Status {
         Undefined,
         Connected,
@@ -99,6 +103,8 @@ class ConnectionValidator : GLib.Object {
     public void on_check_server_and_auth ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_system_proxy_lookup_done (QNetworkProxy &proxy);
 
     /// Checks authentication only.
@@ -136,6 +142,8 @@ protected slots:
     ***********************************************************/
     private bool set_and_check_server_version (string version);
 
+    /***********************************************************
+    ***********************************************************/
     private string[] _errors;
     private AccountStatePtr _account_state;
     private AccountPointer _account;
@@ -217,7 +225,7 @@ protected slots:
 
         // Update server url in case of redirection
         if (_account.url () != url) {
-            q_c_info (lc_connection_validator ()) << "status.php was redirected to" << url.to_string ();
+            q_c_info (lc_connection_validator ()) << "status.php was redirected to" << url.to_"";
             _account.set_url (url);
             _account.wants_account_saved (_account.data ());
         }
@@ -240,7 +248,7 @@ protected slots:
     // status.php could not be loaded (network or server issue!).
     void ConnectionValidator.on_no_status_found (QNetworkReply reply) {
         var job = qobject_cast<CheckServerJob> (sender ());
-        GLib.warn (lc_connection_validator) << reply.error () << job.error_string () << reply.peek (1024);
+        GLib.warn (lc_connection_validator) << reply.error () << job.error_"" << reply.peek (1024);
         if (reply.error () == QNetworkReply.SslHandshakeFailedError) {
             report_result (SslError);
             return;
@@ -250,15 +258,15 @@ protected slots:
             // Note: Why would this happen on a status.php request?
             _errors.append (_("Authentication error : Either username or password are wrong."));
         } else {
-            //_errors.append (_("Unable to connect to %1").arg (_account.url ().to_string ()));
-            _errors.append (job.error_string ());
+            //_errors.append (_("Unable to connect to %1").arg (_account.url ().to_""));
+            _errors.append (job.error_"");
         }
         report_result (StatusNotFound);
     }
 
     void ConnectionValidator.on_job_timeout (GLib.Uri url) {
         Q_UNUSED (url);
-        //_errors.append (_("Unable to connect to %1").arg (url.to_string ()));
+        //_errors.append (_("Unable to connect to %1").arg (url.to_""));
         _errors.append (_("Timeout"));
         report_result (Timeout);
     }
@@ -292,7 +300,7 @@ protected slots:
 
         } else if (reply.error () == QNetworkReply.AuthenticationRequiredError
             || !_account.credentials ().still_valid (reply)) {
-            GLib.warn (lc_connection_validator) << "******** Password is wrong!" << reply.error () << job.error_string ();
+            GLib.warn (lc_connection_validator) << "******** Password is wrong!" << reply.error () << job.error_"";
             _errors << _("The provided credentials are not correct");
             stat = CredentialsWrong;
 
@@ -333,14 +341,14 @@ protected slots:
         _account.set_capabilities (caps.to_variant_map ());
 
         // New servers also report the version in the capabilities
-        string server_version = caps["core"].to_object ()["status"].to_object ()["version"].to_string ();
+        string server_version = caps["core"].to_object ()["status"].to_object ()["version"].to_"";
         if (!server_version.is_empty () && !set_and_check_server_version (server_version)) {
             return;
         }
 
         // Check for the direct_editing capability
-        GLib.Uri direct_editing_uRL = GLib.Uri (caps["files"].to_object ()["direct_editing"].to_object ()["url"].to_string ());
-        string direct_editing_e_tag = caps["files"].to_object ()["direct_editing"].to_object ()["etag"].to_string ();
+        GLib.Uri direct_editing_uRL = GLib.Uri (caps["files"].to_object ()["direct_editing"].to_object ()["url"].to_"");
+        string direct_editing_e_tag = caps["files"].to_object ()["direct_editing"].to_object ()["etag"].to_"";
         _account.fetch_direct_editors (direct_editing_uRL, direct_editing_e_tag);
 
         fetch_user ();

@@ -26,15 +26,23 @@ namespace Ui {
 ***********************************************************/
 class Ignore_list_editor : Gtk.Dialog {
 
+    /***********************************************************
+    ***********************************************************/
     public Ignore_list_editor (Gtk.Widget parent = nullptr);
-    ~Ignore_list_editor () override;
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool ignore_hidden_files ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_restore_defaults (QAbstractButton button);
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private void setup_table_read_only_items ();
     private string read_only_tooltip;
     private Ui.Ignore_list_editor ui;

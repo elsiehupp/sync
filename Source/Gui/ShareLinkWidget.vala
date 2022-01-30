@@ -43,6 +43,8 @@ class Share;
 ***********************************************************/
 class Share_link_widget : Gtk.Widget {
 
+    /***********************************************************
+    ***********************************************************/
     public Share_link_widget (AccountPointer account,
         const string share_path,
         const string local_path,
@@ -50,24 +52,44 @@ class Share_link_widget : Gtk.Widget {
         Gtk.Widget parent = nullptr);
     ~Share_link_widget () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void toggle_button (bool show);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void setup_ui_options ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_link_share (unowned<Link_share> link_share);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public unowned<Link_share> get_link_share (
 
-    public unowned<Link_share> get_link_share ();
+    /***********************************************************
+    ***********************************************************/
+    public void on_focus_password_line_edit 
 
-    public void on_focus_password_line_edit ();
-
+    /***********************************************************
+    ***********************************************************/
     public void on_delete_share_fetched ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_toggle_share_link_animation (bool on_start);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void on_server_error (int code, string message);
 
 
@@ -77,25 +99,41 @@ class Share_link_widget : Gtk.Widget {
     public void on_style_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_create_share_link (bool clicked);
-    private void on_copy_link_share (bool clicked);
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private void on_create_password ();
     private void on_password_set ();
     private void on_password_set_error (int code, string message);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_create_note ();
-    private void on_note_set ();
 
-    private void on_set_expire_date ();
+    /***********************************************************
+    ***********************************************************/
+    private 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_expire_date_set ();
 
+    /***********************************************************
+    ***********************************************************/
     private void on_context_menu_button_clicked ();
-    private void on_link_context_menu_action_triggered (QAction action);
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private void on_delete_animation_finished ();
     private void on_animation_finished ();
 
+    /***********************************************************
+    ***********************************************************/
     private void on_create_label ();
     private void on_label_set ();
 
@@ -108,8 +146,12 @@ signals:
     void create_password_processed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_display_error (string error_message);
 
+    /***********************************************************
+    ***********************************************************/
     private void toggle_password_options (bool enable = true);
     private void toggle_note_options (bool enable = true);
     private void toggle_expire_date_options (bool enable = true);
@@ -463,7 +505,7 @@ void Share_link_widget.on_note_set () {
 void Share_link_widget.on_copy_link_share (bool clicked) {
     Q_UNUSED (clicked);
 
-    QApplication.clipboard ().on_set_text (_link_share.get_link ().to_string ());
+    QApplication.clipboard ().on_set_text (_link_share.get_link ().to_"");
 }
 
 void Share_link_widget.on_expire_date_set () {
@@ -549,7 +591,7 @@ void Share_link_widget.toggle_note_options (bool enable) {
     _ui.note_label.set_visible (enable);
     _ui.text_edit_note.set_visible (enable);
     _ui.confirm_note.set_visible (enable);
-    _ui.text_edit_note.on_set_text (enable && _link_share ? _link_share.get_note () : string ());
+    _ui.text_edit_note.on_set_text (enable && _link_share ? _link_share.get_note () : "");
 
     if (!enable && _link_share && !_link_share.get_note ().is_empty ()) {
         _link_share.set_note ({});

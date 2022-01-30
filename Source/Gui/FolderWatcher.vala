@@ -112,18 +112,24 @@ protected slots:
     void change_detected (string[] &paths);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_start_notification_test_when_ready ();
 
 
     protected QHash<string, int> _pending_pathes;
 
 
+    /***********************************************************
+    ***********************************************************/
     private QScopedPointer<Folder_watcher_private> _d;
     private QElapsedTimer _timer;
     private GLib.Set<string> _last_paths;
     private Folder _folder;
     private bool _is_reliable = true;
 
+    /***********************************************************
+    ***********************************************************/
     private void append_sub_paths (QDir dir, string[]& sub_paths);
 
 
@@ -132,6 +138,8 @@ protected slots:
     ***********************************************************/
     private string _test_notification_path;
 
+    /***********************************************************
+    ***********************************************************/
     private friend class Folder_watcher_private;
 };
 

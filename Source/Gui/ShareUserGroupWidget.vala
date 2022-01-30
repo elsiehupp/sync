@@ -54,7 +54,9 @@ class Share_manager;
 
 class Avatar_event_filter : GLib.Object {
 
-    public Avatar_event_filter (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public Avatar_event_filter (GLib.Object parent = new GLib.Object ());
 
 signals:
     void clicked ();
@@ -70,6 +72,8 @@ signals:
 ***********************************************************/
 class Share_user_group_widget : Gtk.Widget {
 
+    /***********************************************************
+    ***********************************************************/
     public Share_user_group_widget (AccountPointer account,
         const string share_path,
         const string local_path,
@@ -82,21 +86,33 @@ signals:
     void toggle_public_link_share (bool);
     void style_changed ();
 
+    /***********************************************************
+    ***********************************************************/
     public void on_get_shares ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_share_created (unowned<Share> &share);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void on_style_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_shares_fetched (GLib.List<unowned<Share>> &shares);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_sharee_line_edit_text_changed (string text);
     private void on_search_for_sharees (Sharee_model.Lookup_mode lookup_mode);
     private void on_line_edit_text_edited (string text);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_line_edit_return ();
     private void on_completer_activated (QModelIndex &index);
     private void on_completer_highlighted (QModelIndex &index);
@@ -105,15 +121,23 @@ signals:
     private void on_private_link_share ();
     private void on_display_error (int code, string message);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_private_link_open_browser ();
     private void on_private_link_copy ();
     private void on_private_link_email ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void customize_style ();
 
+    /***********************************************************
+    ***********************************************************/
     private void activate_sharee_line_edit ();
 
+    /***********************************************************
+    ***********************************************************/
     private Ui.Share_user_group_widget _ui;
     private QScroll_area _parent_scroll_area;
     private AccountPointer _account;
@@ -122,16 +146,24 @@ signals:
     private Share_permissions _max_sharing_permissions;
     private string _private_link_url;
 
+    /***********************************************************
+    ***********************************************************/
     private QCompleter _completer;
     private Sharee_model _completer_model;
     private QTimer _completion_timer;
 
+    /***********************************************************
+    ***********************************************************/
     private bool _is_file;
     private bool _disable_completer_activated; // in order to avoid that we share the contents twice
     private Share_manager _manager;
 
+    /***********************************************************
+    ***********************************************************/
     private QProgress_indicator _pi_sharee;
 
+    /***********************************************************
+    ***********************************************************/
     private string _last_created_share_id;
 };
 
@@ -140,6 +172,8 @@ The widget displayed for each user/group share
 ***********************************************************/
 class Share_user_line : Gtk.Widget {
 
+    /***********************************************************
+    ***********************************************************/
     public Share_user_line (AccountPointer account,
         unowned<User_group_share> Share,
         Share_permissions max_sharing_permissions,
@@ -147,74 +181,122 @@ class Share_user_line : Gtk.Widget {
         Gtk.Widget parent = nullptr);
     ~Share_user_line () override;
 
+    /***********************************************************
+    ***********************************************************/
     public unowned<Share> share ();
 
 signals:
     void visual_deletion_done ();
     void resize_requested ();
 
+    /***********************************************************
+    ***********************************************************/
     public void on_style_changed ();
 
+    /***********************************************************
+    ***********************************************************/
     public void on_focus_password_line_edit ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_delete_share_button_clicked ();
     private void on_permissions_changed ();
     private void on_edit_permissions_changed ();
     private void on_password_checkbox_changed ();
     private void on_delete_animation_finished ();
 
+    /***********************************************************
+    ***********************************************************/
     private void on_refresh_password_options ();
 
+    /***********************************************************
+    ***********************************************************/
     private void on_refresh_password_line_edit_placeholder ();
 
+    /***********************************************************
+    ***********************************************************/
     private void on_password_set ();
-    private void on_password_set_error (int status_code, string message);
 
-    private void on_share_deleted ();
+    /***********************************************************
+    ***********************************************************/
+    private 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_permissions_set ();
 
-    private void on_avatar_loaded (QImage avatar);
+    /***********************************************************
+    ***********************************************************/
+    private void on_avatar_loaded (QImage avat
 
+    /***********************************************************
+    ***********************************************************/
     private void on_set_password_confirmed ();
 
-    private void on_line_edit_password_return_pressed ();
+    /***********************************************************
+    ***********************************************************/
+    private void on_line_edit_password_return_pr
 
+    /***********************************************************
+    ***********************************************************/
     private void on_confirm_password_clicked ();
 
+    /***********************************************************
+    ***********************************************************/
     private void on_avatar_context_menu (QPoint &global_position);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void display_permissions ();
     private void load_avatar ();
     private void set_default_avatar (int avatar_size);
     private void customize_style ();
 
+    /***********************************************************
+    ***********************************************************/
     private QPixmap pixmap_for_sharee_type (Sharee.Type type, QColor &background_color = QColor ());
-    private QColor background_color_for_sharee_type (Sharee.Type type);
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private void show_note_options (bool show);
     private void toggle_note_options (bool enable);
     private void on_note_confirm_button_clicked ();
     private void set_note (string note);
 
+    /***********************************************************
+    ***********************************************************/
     private void toggle_expire_date_options (bool enable);
     private void show_expire_date_options (bool show, QDate &initial_date = QDate ());
     private void set_expire_date ();
 
+    /***********************************************************
+    ***********************************************************/
     private void toggle_password_set_progress_animation (bool show);
 
+    /***********************************************************
+    ***********************************************************/
     private void enable_progess_indicator_animation (bool enable);
-    private void disable_progess_indicator_animation ();
 
-    private QDate max_expiration_date_for_share (Share.Share_type type, QDate &fallback_date);
+    /***********************************************************
+    ***********************************************************/
+    private 
+
+    /***********************************************************
+    ***********************************************************/
     private bool enforce_expiration_date_for_share (Share.Share_type type);
 
+    /***********************************************************
+    ***********************************************************/
     private Ui.Share_user_line _ui;
     private AccountPointer _account;
     private unowned<User_group_share> _share;
     private bool _is_file;
 
+    /***********************************************************
+    ***********************************************************/
     private Profile_page_menu _profile_page_menu;
 
     // _permission_edit is a checkbox
@@ -440,7 +522,7 @@ signals:
             layout.add_widget (s);
 
             if (!_last_created_share_id.is_empty () && share.get_id () == _last_created_share_id) {
-                _last_created_share_id = string ();
+                _last_created_share_id = "";
                 if (_account.capabilities ().share_email_password_enabled () && !_account.capabilities ().share_email_password_enforced ()) {
                     just_created_share_that_needs_password = s;
                 }
@@ -544,7 +626,7 @@ signals:
         https://github.com/owncloud/client/issues/4996
          */
 
-        _last_created_share_id = string ();
+        _last_created_share_id = "";
 
         string password;
         if (sharee.type () == Sharee.Email && _account.capabilities ().share_email_password_enforced ()) {
@@ -558,7 +640,7 @@ signals:
                     _("Password for share required"),
                     _("Please enter a password for your email share:"),
                     QLineEdit.Password,
-                    string (),
+                    "",
                     &ok);
             } while (password.is_empty () && ok);
 
@@ -577,7 +659,7 @@ signals:
     void Share_user_group_widget.on_completer_highlighted (QModelIndex &index) {
         // By default the completer would set the text to Edit_role,
         // override that here.
-        _ui.sharee_line_edit.on_set_text (index.data (Qt.Display_role).to_string ());
+        _ui.sharee_line_edit.on_set_text (index.data (Qt.Display_role).to_"");
     }
 
     void Share_user_group_widget.on_display_error (int code, string message) {
@@ -941,7 +1023,7 @@ signals:
             } else {
                 // do not call on_refresh_password_options here, as it will be called after the network request is complete
                 toggle_password_set_progress_animation (true);
-                _share.set_password (string ());
+                _share.set_password ("");
             }
         } else {
             on_refresh_password_options ();
@@ -1146,7 +1228,7 @@ signals:
 
         if (!enable) {
             // Delete note
-            _share.set_note (string ());
+            _share.set_note ("");
         }
     }
 

@@ -93,7 +93,7 @@ int c_utimes (string uri, struct timeval times) {
     FILETIME Last_modification_time;
     HANDLE h_file;
 
-    var wuri = uri.to_std_w_string ();
+    var wuri = uri.to_std_w_"";
 
     if (times) {
         Unix_timeval_to_file_time (times[0], &Last_access_time);

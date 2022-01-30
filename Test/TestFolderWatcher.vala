@@ -69,6 +69,8 @@ const int CHECK_WATCH_COUNT (n) QCOMPARE (_watcher.testLinuxWatchCount (), (n))
 const int CHECK_WATCH_COUNT (n) do {} while (false)
 #endif
 
+    /***********************************************************
+    ***********************************************************/
     public TestFolderWatcher () {
         QDir rootDir (_root.path ());
         _rootPath = rootDir.canonicalPath ();
@@ -90,6 +92,8 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public int countFolders (string path) {
         int n = 0;
         for (var &sub : QDir (path).entryList (QDir.Dirs | QDir.NoDotAndDotDot))
@@ -97,15 +101,24 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         return n;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_init () {
         _pathChangedSpy.clear ();
         CHECK_WATCH_COUNT (countFolders (_rootPath) + 1);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_cleanup () {
         CHECK_WATCH_COUNT (countFolders (_rootPath) + 1);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testACreate () { // create a new file
         string file (_rootPath + "/foo.txt");
         string cmd;
@@ -116,12 +129,18 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         QVERIFY (waitForPathChanged (file));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testATouch () { // touch an existing file.
         string file (_rootPath + "/a1/random.bin");
         touch (file);
         QVERIFY (waitForPathChanged (file));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testMove3LevelDirWithFile () {
         string file (_rootPath + "/a0/b/c/empty.txt");
         mkdir (_rootPath + "/a0");
@@ -132,6 +151,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         QVERIFY (waitForPathChanged (_rootPath + "/a/b/c/empty.txt"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testCreateADir () {
         string file (_rootPath+"/a1/b1/new_dir");
         mkdir (file);
@@ -143,12 +165,18 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         QVERIFY (waitForPathChanged (file2));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testRemoveADir () {
         string file (_rootPath+"/a1/b3/c3");
         rmdir (file);
         QVERIFY (waitForPathChanged (file));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testRemoveAFile () {
         string file (_rootPath+"/a1/b2/todelete.bin");
         QVERIFY (GLib.File.exists (file));
@@ -158,6 +186,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         QVERIFY (waitForPathChanged (file));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testRenameAFile () {
         string file1 (_rootPath+"/a2/renamefile");
         string file2 (_rootPath+"/a2/renamefile.renamed");
@@ -169,6 +200,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         QVERIFY (waitForPathChanged (file2));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testMoveAFile () {
         string old_file (_rootPath+"/a1/movefile");
         string new_file (_rootPath+"/a2/movefile.renamed");
@@ -180,6 +214,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         QVERIFY (waitForPathChanged (new_file));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testRenameDirectorySameBase () {
         string old_file (_rootPath+"/a1/b1");
         string new_file (_rootPath+"/a1/brename");
@@ -201,6 +238,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         QVERIFY (waitForPathChanged (dir));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testRenameDirectoryDifferentBase () {
         string old_file (_rootPath+"/a1/brename");
         string new_file (_rootPath+"/bren");

@@ -353,9 +353,13 @@ signals:
     protected void resize_event (QResizeEvent event) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private KMessageWidgetPrivate const d;
-    private friend class KMessageWidgetPrivate;
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private Q_PRIVATE_SLOT (d, void on_time_line_changed (qreal))
     private Q_PRIVATE_SLOT (d, void on_time_line_finished ())
 };
@@ -396,6 +400,8 @@ Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
 class KMessageWidgetPrivate {
     public void on_init (KMessageWidget *);
 
+    /***********************************************************
+    ***********************************************************/
     public KMessageWidget q;
     public QFrame content = nullptr;
     public QLabel icon_label = nullptr;
@@ -405,23 +411,39 @@ class KMessageWidgetPrivate {
     public QIcon icon;
     public bool ignore_show_event_doing_animated_show = false;
 
+    /***********************************************************
+    ***********************************************************/
     public KMessageWidget.Message_type message_type;
     public bool word_wrap;
     public GLib.List<QToolButton> buttons;
     public QPixmap content_snap_shot;
 
+    /***********************************************************
+    ***********************************************************/
     public void create_layout ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void apply_style_sheet ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void update_snap_shot (
 
-    public void update_snap_shot ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void update_layout ();
-
-
+    /***********************************************************
+    ***********************************************************/
     public void on_time_line_changed (qreal);
 
 

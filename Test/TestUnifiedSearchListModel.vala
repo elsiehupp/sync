@@ -16,7 +16,9 @@ overrides QDesktopServices.openUrl
  **/
 class FakeDesktopServicesUrlHandler : GLib.Object {
 
-    public FakeDesktopServicesUrlHandler (GLib.Object parent = nullptr)
+    /***********************************************************
+    ***********************************************************/
+    public FakeDesktopServicesUrlHandler (GLib.Object parent = new GLib.Object ())
         : GLib.Object (parent) {}
 
 signals:
@@ -29,11 +31,15 @@ is a simple structure that represents initial list of providers and their proper
  **/
 class FakeProvider {
 
+    /***********************************************************
+    ***********************************************************/
     public string _id;
     public string _name;
     public int32 _order = std.numeric_limits<int32>.max ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public uint32 _numItemsToInsert = 5; // how many fake resuls to insert
 };
 
@@ -76,6 +82,8 @@ class FakeSearchResultsStorage { {lass Provider {
     FakeSearchResultsStorage () = default;
 
 
+    /***********************************************************
+    ***********************************************************/
     public static FakeSearchResultsStorage instance () {
         if (!_instance) {
             _instance = new FakeSearchResultsStorage ();
@@ -85,6 +93,8 @@ class FakeSearchResultsStorage { {lass Provider {
         return _instance;
     };
 
+    /***********************************************************
+    ***********************************************************/
     public static void destroy () {
         if (_instance) {
             delete _instance;
@@ -94,6 +104,8 @@ class FakeSearchResultsStorage { {lass Provider {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_init () {
         if (!_searchResultsData.isEmpty ()) {
             return;
@@ -142,6 +154,8 @@ class FakeSearchResultsStorage { {lass Provider {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public const GLib.List<QVariant> resultsForProvider (string providerId, int cursor) {
         GLib.List<QVariant> list;
 
@@ -160,6 +174,8 @@ class FakeSearchResultsStorage { {lass Provider {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public const QVector<Provider.SearchResult> resultsForProviderAsVector (string providerId, int cursor) {
         QVector<Provider.SearchResult> results;
 
@@ -181,6 +197,8 @@ class FakeSearchResultsStorage { {lass Provider {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public const GLib.ByteArray queryProvider (string providerId, string searchTerm, int cursor) {
         if (!_searchResultsData.contains (providerId)) {
             return fake404Response;
@@ -211,16 +229,29 @@ class FakeSearchResultsStorage { {lass Provider {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public const GLib.ByteArray fakeProvidersResponseJson () { return _providersResponse; }
 
+
+    /***********************************************************
+    ***********************************************************/
     private static FakeSearchResultsStorage _instance;
 
+    /***********************************************************
+    ***********************************************************/
     private static const int pageSize = 5;
 
+    /***********************************************************
+    ***********************************************************/
     private QMap<string, Provider> _searchResultsData;
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.ByteArray _providersResponse = fake404Response;
 
+    /***********************************************************
+    ***********************************************************/
     private QVariantMap _metaSuccess;
 };
 
@@ -230,18 +261,28 @@ FakeSearchResultsStorage *FakeSearchResultsStorage._instance = nullptr;
 
 class TestUnifiedSearchListmodel : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public TestUnifiedSearchListmodel () = default;
 
+    /***********************************************************
+    ***********************************************************/
     public QScopedPointer<FakeQNAM> fakeQnam;
     public Occ.AccountPointer account;
     public QScopedPointer<Occ.AccountState> accountState;
     public QScopedPointer<Occ.UnifiedSearchResultsListModel> model;
     public QScopedPointer<QAbstractItemModelTester> modelTester;
 
+    /***********************************************************
+    ***********************************************************/
     public QScopedPointer<FakeDesktopServicesUrlHandler> fakeDesktopServicesUrlHandler;
 
+    /***********************************************************
+    ***********************************************************/
     public static const int searchResultsReplyDelay = 100;
 
+    /***********************************************************
+    ***********************************************************/
     private void on_init_test_case () {
         fakeQnam.on_reset (new FakeQNAM ({}));
         account = Occ.Account.create ();
@@ -297,6 +338,9 @@ class TestUnifiedSearchListmodel : GLib.Object {
         fakeDesktopServicesUrlHandler.on_reset (new FakeDesktopServicesUrlHandler);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_set_search_term_start_stop_search () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
@@ -329,6 +373,9 @@ class TestUnifiedSearchListmodel : GLib.Object {
         QVERIFY (!model.isSearchInProgress ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_set_search_term_results_found () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
@@ -354,6 +401,9 @@ class TestUnifiedSearchListmodel : GLib.Object {
         QVERIFY (model.rowCount () > 0);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_set_search_term_results_not_found () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
@@ -379,6 +429,9 @@ class TestUnifiedSearchListmodel : GLib.Object {
         QVERIFY (model.rowCount () == 0);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_fetch_more_clicked () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
@@ -478,6 +531,9 @@ class TestUnifiedSearchListmodel : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_search_term_result_tickled () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
@@ -535,6 +591,9 @@ class TestUnifiedSearchListmodel : GLib.Object {
         QCOMPARE (urlOpenTriggeredViaDesktopServices, urlForClickedResult);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_set_search_term_results_error () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
@@ -564,6 +623,9 @@ class TestUnifiedSearchListmodel : GLib.Object {
         QVERIFY (!model.errorString ().isEmpty ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_cleanup_test_case () {
         FakeSearchResultsStorage.destroy ();
     }

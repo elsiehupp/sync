@@ -32,8 +32,10 @@ struct SingleUploadFileData {
 ***********************************************************/
 class PutMultiFileJob : AbstractNetworkJob {
 
+    /***********************************************************
+    ***********************************************************/
     public PutMultiFileJob (AccountPointer account, GLib.Uri url,
-                             std.vector<SingleUploadFileData> devices, GLib.Object parent = nullptr)
+                             std.vector<SingleUploadFileData> devices, GLib.Object parent = new GLib.Object ())
         : AbstractNetworkJob (account, {}, parent)
         , _devices (std.move (devices))
         , _url (url) {
@@ -47,15 +49,23 @@ class PutMultiFileJob : AbstractNetworkJob {
 
     ~PutMultiFileJob () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
 
+    /***********************************************************
+    ***********************************************************/
     public bool on_finished () override;
 
-    public string error_string () override {
-        return _error_string.is_empty () ? AbstractNetworkJob.error_string () : _error_string;
+    /***********************************************************
+    ***********************************************************/
+    public string error_"" override {
+        return _error_string.is_empty () ? AbstractNetworkJob.error_"" : _error_string;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public std.chrono.milliseconds ms_since_start () {
         return std.chrono.milliseconds (_request_timer.elapsed ());
     }
@@ -65,6 +75,8 @@ signals:
     void upload_progress (int64, int64);
 
 
+    /***********************************************************
+    ***********************************************************/
     private QHttpMultiPart _body;
     private std.vector<SingleUploadFileData> _devices;
     private string _error_string;
@@ -95,7 +107,7 @@ signals:
         send_request ("POST", _url, req, &_body);
 
         if (reply ().error () != QNetworkReply.NoError) {
-            GLib.warn (lc_put_multi_file_job) << " Network error : " << reply ().error_string ();
+            GLib.warn (lc_put_multi_file_job) << " Network error : " << reply ().error_"";
         }
 
         connect (reply (), &QNetworkReply.upload_progress, this, &PutMultiFileJob.upload_progress);
@@ -109,8 +121,8 @@ signals:
             one_device._device.close ();
         }
 
-        q_c_info (lc_put_multi_file_job) << "POST of" << reply ().request ().url ().to_string () << path () << "FINISHED WITH STATUS"
-                         << reply_status_string ()
+        q_c_info (lc_put_multi_file_job) << "POST of" << reply ().request ().url ().to_"" << path () << "FINISHED WITH STATUS"
+                         << reply_status_""
                          << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute)
                          << reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute);
 

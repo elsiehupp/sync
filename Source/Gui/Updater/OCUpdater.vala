@@ -56,6 +56,8 @@ Simple class diagram of the updater:
 
 class UpdaterScheduler : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public UpdaterScheduler (GLib.Object parent);
 
 signals:
@@ -63,9 +65,13 @@ signals:
     void request_restart ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_timer_fired ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private QTimer _update_check_timer; /** Timer for the regular update check. */
 };
 
@@ -75,6 +81,8 @@ signals:
 ***********************************************************/
 class OCUpdater : Updater {
 
+    /***********************************************************
+    ***********************************************************/
     public enum Download_state {
         Unknown = 0,
         Checking_server,
@@ -86,23 +94,37 @@ class OCUpdater : Updater {
         Update_only_available_through_system
     };
 
+    /***********************************************************
+    ***********************************************************/
     public enum Update_status_string_format {
         PlainText,
         Html,
     };
     public OCUpdater (GLib.Uri url);
 
+    /***********************************************************
+    ***********************************************************/
     public void set_update_url (GLib.Uri url);
 
+    /***********************************************************
+    ***********************************************************/
     public bool perform_update ();
 
+    /***********************************************************
+    ***********************************************************/
     public void check_for_update () override;
 
+    /***********************************************************
+    ***********************************************************/
     public string status_string (Update_status_string_format format = PlainText);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public int download_state ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void set_download_state (Download_state state);
 
@@ -120,11 +142,13 @@ protected slots:
     void on_open_update_url ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_version_info_arrived ();
     private void on_timed_out ();
 
 
-    protected virtual void version_info_arrived (Update_info &info) = 0;
+    protected virtual void version_info_arrived (Update_info &info);
     protected bool update_succeeded ();
     protected QNetworkAccessManager qnam () {
         return _access_manager;
@@ -134,6 +158,8 @@ protected slots:
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.Uri _update_url;
     private int _state;
     private QNetworkAccessManager _access_manager;
@@ -147,16 +173,24 @@ protected slots:
 ***********************************************************/
 class NSISUpdater : OCUpdater {
 
+    /***********************************************************
+    ***********************************************************/
     public NSISUpdater (GLib.Uri url);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool handle_startup () override;
 
+    /***********************************************************
+    ***********************************************************/
     private void on_set_seen_version ();
     private void on_download_finished ();
     private void on_write_file ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void wipe_update_data ();
     private void show_no_url_dialog (Update_info &info);
     private void show_update_error_dialog (string target_version);
@@ -174,20 +208,32 @@ class NSISUpdater : OCUpdater {
 ***********************************************************/
 class Passive_update_notifier : OCUpdater {
 
+    /***********************************************************
+    ***********************************************************/
     public Passive_update_notifier (GLib.Uri url);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool handle_startup () override {
         return false;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void background_check_for_update () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void version_info_arrived (Update_info &info) override;
     private GLib.ByteArray _running_app_version;
 };
 
 
+    /***********************************************************
+    ***********************************************************/
     static const char update_available_c[] = "Updater/update_available";
     static const char update_target_version_c[] = "Updater/update_target_version";
     static const char update_target_version_string_c[] = "Updater/update_target_version_string";
@@ -253,7 +299,7 @@ class Passive_update_notifier : OCUpdater {
     bool OCUpdater.perform_update () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
-        string update_file = settings.value (update_available_c).to_string ();
+        string update_file = settings.value (update_available_c).to_"";
         if (!update_file.is_empty () && GLib.File (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
             const var message_box_start_installer = new QMessageBox (QMessageBox.Information,
@@ -296,7 +342,7 @@ class Passive_update_notifier : OCUpdater {
     }
 
     string OCUpdater.status_string (Update_status_string_format format) {
-        string update_version = _update_info.version_string ();
+        string update_version = _update_info.version_"";
 
         switch (download_state ()) {
         case Downloading:
@@ -341,14 +387,14 @@ class Passive_update_notifier : OCUpdater {
         // or once for system based updates.
         if (_state == OCUpdater.Download_complete || (old_state != OCUpdater.Update_only_available_through_system
                                                          && _state == OCUpdater.Update_only_available_through_system)) {
-            emit new_update_available (_("Update Check"), status_string ());
+            emit new_update_available (_("Update Check"), status_"");
         }
     }
 
     void OCUpdater.on_start_installer () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
-        string update_file = settings.value (update_available_c).to_string ();
+        string update_file = settings.value (update_available_c).to_"";
         settings.set_value (auto_update_attempted_c, true);
         settings.sync ();
         q_c_info (lc_updater) << "Running updater" << update_file;
@@ -396,7 +442,7 @@ class Passive_update_notifier : OCUpdater {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
 
-        int64 target_version_int = Helper.string_version_to_int (settings.value (update_target_version_c).to_string ());
+        int64 target_version_int = Helper.string_version_to_int (settings.value (update_target_version_c).to_"");
         int64 current_version = Helper.current_version_to_int ();
         return current_version >= target_version_int;
     }
@@ -406,7 +452,7 @@ class Passive_update_notifier : OCUpdater {
         var reply = qobject_cast<QNetworkReply> (sender ());
         reply.delete_later ();
         if (reply.error () != QNetworkReply.NoError) {
-            GLib.warn (lc_updater) << "Failed to reach version check url : " << reply.error_string ();
+            GLib.warn (lc_updater) << "Failed to reach version check url : " << reply.error_"";
             set_download_state (Download_timed_out);
             return;
         }
@@ -443,7 +489,7 @@ class Passive_update_notifier : OCUpdater {
     void NSISUpdater.wipe_update_data () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
-        string update_file_name = settings.value (update_available_c).to_string ();
+        string update_file_name = settings.value (update_available_c).to_"";
         if (!update_file_name.is_empty ())
             GLib.File.remove (update_file_name);
         settings.remove (update_available_c);
@@ -467,16 +513,16 @@ class Passive_update_notifier : OCUpdater {
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
 
         // remove previously downloaded but not used installer
-        GLib.File old_target_file (settings.value (update_available_c).to_string ());
+        GLib.File old_target_file (settings.value (update_available_c).to_"");
         if (old_target_file.exists ()) {
             old_target_file.remove ();
         }
 
         GLib.File.copy (_file.file_name (), _target_file);
         set_download_state (Download_complete);
-        q_c_info (lc_updater) << "Downloaded" << url.to_string () << "to" << _target_file;
+        q_c_info (lc_updater) << "Downloaded" << url.to_"" << "to" << _target_file;
         settings.set_value (update_target_version_c, update_info ().version ());
-        settings.set_value (update_target_version_string_c, update_info ().version_string ());
+        settings.set_value (update_target_version_string_c, update_info ().version_"");
         settings.set_value (update_available_c, _target_file);
     }
 
@@ -484,14 +530,14 @@ class Passive_update_notifier : OCUpdater {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
         int64 info_version = Helper.string_version_to_int (info.version ());
-        var seen_string = settings.value (seen_version_c).to_string ();
+        var seen_string = settings.value (seen_version_c).to_"";
         int64 seen_version = Helper.string_version_to_int (seen_string);
         int64 curr_version = Helper.current_version_to_int ();
         q_c_info (lc_updater) << "Version info arrived:"
                 << "Your version:" << curr_version
                 << "Skipped version:" << seen_version << seen_string
                 << "Available version:" << info_version << info.version ()
-                << "Available version string:" << info.version_string ()
+                << "Available version string:" << info.version_""
                 << "Web url:" << info.web ()
                 << "Download url:" << info.download_url ();
         if (info.version ().is_empty ()) {
@@ -548,7 +594,7 @@ class Passive_update_notifier : OCUpdater {
         string txt = _("<p>A new version of the %1 Client is available.</p>"
                          "<p><b>%2</b> is available for download. The installed version is %3.</p>")
                           .arg (Utility.escape (Theme.instance ().app_name_gui ()),
-                              Utility.escape (info.version_string ()), Utility.escape (client_version ()));
+                              Utility.escape (info.version_""), Utility.escape (client_version ()));
 
         lbl.on_set_text (txt);
         lbl.set_text_format (Qt.RichText);
@@ -637,7 +683,7 @@ class Passive_update_notifier : OCUpdater {
     bool NSISUpdater.handle_startup () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
-        string update_file_name = settings.value (update_available_c).to_string ();
+        string update_file_name = settings.value (update_available_c).to_"";
         // has the previous run downloaded an update?
         if (!update_file_name.is_empty () && GLib.File (update_file_name).exists ()) {
             q_c_info (lc_updater) << "An updater file is available";
@@ -652,8 +698,8 @@ class Passive_update_notifier : OCUpdater {
                 } else {
                     // var update failed. Ask user what to do
                     q_c_info (lc_updater) << "The requested update attempt has failed"
-                            << settings.value (update_target_version_c).to_string ();
-                    show_update_error_dialog (settings.value (update_target_version_string_c).to_string ());
+                            << settings.value (update_target_version_c).to_"";
+                    show_update_error_dialog (settings.value (update_target_version_string_c).to_"");
                     return false;
                 }
             } else {

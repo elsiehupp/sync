@@ -22,22 +22,36 @@ namespace Occ {
 
 class Flow2Auth_creds_page : Abstract_credentials_wizard_page {
 
+    /***********************************************************
+    ***********************************************************/
     public Flow2Auth_creds_page ();
 
+    /***********************************************************
+    ***********************************************************/
     public AbstractCredentials get_credentials () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void initialize_page () override;
     public void cleanup_page () override;
     public int next_id () override;
     public void set_connected ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_complete () override;
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_flow_2_auth_result (Flow2Auth.Result, string error_string, string user, string app_password);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void on_poll_now ();
 
 
@@ -49,10 +63,14 @@ signals:
     void style_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public string _user;
     public string _app_password;
 
 
+    /***********************************************************
+    ***********************************************************/
     private Flow2AuthWidget _flow_2_auth_widget = nullptr;
     private QVBoxLayout _layout = nullptr;
 };
@@ -121,7 +139,7 @@ signals:
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             Q_ASSERT (oc_wizard);
 
-            emit connect_to_oc_url (oc_wizard.account ().url ().to_string ());
+            emit connect_to_oc_url (oc_wizard.account ().url ().to_"");
             break;
         }
         }

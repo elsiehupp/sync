@@ -49,6 +49,8 @@ static void setChunkSize (SyncEngine &engine, int64 size) {
 
 class TestChunkingNG : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testFileUpload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
@@ -381,6 +383,9 @@ class TestChunkingNG : GLib.Object {
         QCOMPARE (fakeFolder.uploadState ().children.count (), 0);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testCreateConflictWhileSyncing () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
@@ -436,6 +441,9 @@ class TestChunkingNG : GLib.Object {
         QCOMPARE (fakeFolder.uploadState ().children.count (), 0); // The last sync cleaned the chunks
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testModifyLocalFileWhileUploading () {
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
@@ -474,6 +482,9 @@ class TestChunkingNG : GLib.Object {
         QVERIFY (fakeFolder.uploadState ().children.first ().name != chunkingId);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testResumeServerDeletedChunks () {
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
@@ -504,6 +515,9 @@ class TestChunkingNG : GLib.Object {
         QTest.newRow ("small file") << false;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void connectionDroppedBeforeEtagRecieved () {
         QFETCH (bool, chunking);
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
@@ -559,6 +573,9 @@ class TestChunkingNG : GLib.Object {
         QCOMPARE (nGET, 0);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPercentEncoding () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });

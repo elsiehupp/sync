@@ -20,6 +20,8 @@ namespace Ui {
 ***********************************************************/
 class Owncloud_connection_method_dialog : Gtk.Dialog {
 
+    /***********************************************************
+    ***********************************************************/
     public Owncloud_connection_method_dialog (Gtk.Widget parent = nullptr);
     ~Owncloud_connection_method_dialog () override;
     public enum {
@@ -33,15 +35,23 @@ class Owncloud_connection_method_dialog : Gtk.Dialog {
     public void set_url (GLib.Uri );
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_return_no_tls ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_return_client_side_tls ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void return_back ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private Ui.Owncloud_connection_method_dialog ui;
 };
 
@@ -56,7 +66,7 @@ class Owncloud_connection_method_dialog : Gtk.Dialog {
     }
 
     void Owncloud_connection_method_dialog.set_url (GLib.Uri url) {
-        ui.label.on_set_text (_("<html><head/><body><p>Failed to connect to the secure server address <em>%1</em>. How do you wish to proceed?</p></body></html>").arg (url.to_display_string ().to_html_escaped ()));
+        ui.label.on_set_text (_("<html><head/><body><p>Failed to connect to the secure server address <em>%1</em>. How do you wish to proceed?</p></body></html>").arg (url.to_display_"".to_html_escaped ()));
     }
 
     void Owncloud_connection_method_dialog.on_return_no_tls () {

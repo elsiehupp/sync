@@ -101,26 +101,48 @@ class KirigamiWheelEvent : GLib.Object {
     Q_PROPERTY (bool accepted READ is_accepted WRITE set_accepted)
 
 
-    public KirigamiWheelEvent (GLib.Object parent = nullptr);
-    ~KirigamiWheelEvent () override;
+    /***********************************************************
+    ***********************************************************/
+    public KirigamiWheelEvent (GLib.Object parent = new GLib.Object ());
 
-    public void initialize_from_event (QWheel_event event);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public qreal x ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
     public qreal y ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public QPoint_f angle_delta ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public QPoint_f pixel_del
 
-    public QPoint_f pixel_delta ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public int buttons ();
-
-
+    /***********************************************************
+    ***********************************************************/
     public int modifiers ();
 
 
@@ -133,6 +155,8 @@ class KirigamiWheelEvent : GLib.Object {
     public void set_accepted (bool accepted);
 
 
+    /***********************************************************
+    ***********************************************************/
     private qreal m_x = 0;
     private qreal m_y = 0;
     private QPoint_f m_angle_delta;
@@ -146,13 +170,21 @@ class KirigamiWheelEvent : GLib.Object {
 class GlobalWheelFilter : GLib.Object {
 
 
-    public GlobalWheelFilter (GLib.Object parent = nullptr);
-    ~GlobalWheelFilter () override;
+    /***********************************************************
+    ***********************************************************/
+    public GlobalWheelFilter (GLib.Object parent = new GLib.Object ());
 
-    public static GlobalWheelFilter self ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_item_handler_association (QQuick_item item, WheelHandler handler);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void remove_item_handler_association (QQuick_item item, WheelHandler handler);
 
@@ -195,11 +227,17 @@ class WheelHandler : GLib.Object {
     Q_PROPERTY (bool scroll_flickable_target MEMBER m_scroll_flickable_target NOTIFY scroll_flickable_target_changed)
 
 
-    public WheelHandler (GLib.Object parent = nullptr);
-    ~WheelHandler () override;
+    /***********************************************************
+    ***********************************************************/
+    public WheelHandler (GLib.Object parent = new GLib.Object ());
 
-    public QQuick_item target ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void set_target (QQuick_item target);
 
@@ -210,11 +248,15 @@ signals:
     void wheel (KirigamiWheelEvent wheel);
 
 
+    /***********************************************************
+    ***********************************************************/
     private QPointer<QQuick_item> m_target;
     private bool m_block_target_wheel = true;
     private bool m_scroll_flickable_target = true;
     private KirigamiWheelEvent m_wheel_event;
 
+    /***********************************************************
+    ***********************************************************/
     private friend class GlobalWheelFilter;
 };
 
@@ -400,7 +442,7 @@ class GlobalWheelFilter_singleton {
         target.meta_object ().invoke_method (target, "cancel_flick");
     }
 
-    ////////////////////////////
+
     KirigamiWheelEvent.KirigamiWheelEvent (GLib.Object parent) {
         base (parent);}
 
@@ -453,7 +495,7 @@ class GlobalWheelFilter_singleton {
         m_accepted = accepted;
     }
 
-    ///////////////////////////////
+
 
     WheelHandler.WheelHandler (GLib.Object parent) {
         base (parent);

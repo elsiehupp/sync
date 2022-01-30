@@ -45,13 +45,19 @@ class Format_warnings_wizard_page : QWizard_page {
 ***********************************************************/
 class Folder_wizard_local_path : Format_warnings_wizard_page {
 
+    /***********************************************************
+    ***********************************************************/
     public Folder_wizard_local_path (AccountPointer &account);
-    ~Folder_wizard_local_path () override;
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool is_complete () override;
     public void initialize_page () override;
     public void cleanup_page () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void set_folder_map (Folder.Map &fm) {
         _folder_map = fm;
     }
@@ -59,6 +65,8 @@ protected slots:
     void on_choose_local_folder ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private Ui_Folder_wizard_source_page _ui;
     private Folder.Map _folder_map;
     private AccountPointer _account;
@@ -71,17 +79,23 @@ protected slots:
 
 class Folder_wizard_remote_path : Format_warnings_wizard_page {
 
+    /***********************************************************
+    ***********************************************************/
     public Folder_wizard_remote_path (AccountPointer &account);
-    ~Folder_wizard_remote_path () override;
 
-    public bool is_complete () override;
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void initialize_page () override;
     public void cleanup_page () override;
 
 protected slots:
 
-    void show_warn (string  = string ());
+    void show_warn (string  = "");
     void on_add_remote_folder ();
     void on_create_remote_folder (string );
     void on_create_remote_folder_finished ();
@@ -97,6 +111,8 @@ protected slots:
     void on_typed_path_found (string[] &subpaths);
 
 
+    /***********************************************************
+    ***********************************************************/
     private LsColJob run_ls_col_job (string path);
     private void recursive_insert (QTree_widget_item parent, string[] path_trail, string path);
     private bool select_by_path (string path);
@@ -113,18 +129,28 @@ protected slots:
 ***********************************************************/
 class Folder_wizard_selective_sync : QWizard_page {
 
+    /***********************************************************
+    ***********************************************************/
     public Folder_wizard_selective_sync (AccountPointer &account);
-    ~Folder_wizard_selective_sync () override;
 
-    public bool validate_page () override;
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void initialize_page () override;
     public void cleanup_page () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_virtual_files_checkbox_clicked ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private Selective_sync_widget _selective_sync;
     private QCheckBox _virtual_files_check_box = nullptr;
 };
@@ -135,19 +161,27 @@ class Folder_wizard_selective_sync : QWizard_page {
 ***********************************************************/
 class FolderWizard : QWizard {
 
+    /***********************************************************
+    ***********************************************************/
     public enum {
         Page_Source,
         Page_Target,
         Page_Selective_sync
     };
 
+    /***********************************************************
+    ***********************************************************/
     public FolderWizard (AccountPointer account, Gtk.Widget parent = nullptr);
-    ~FolderWizard () override;
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool event_filter (GLib.Object watched, QEvent event) override;
     public void resize_event (QResizeEvent event) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private Folder_wizard_local_path _folder_wizard_source_page;
     private Folder_wizard_remote_path _folder_wizard_target_page;
     private Folder_wizard_selective_sync _folder_wizard_selective_sync_page;
@@ -278,7 +312,7 @@ class FolderWizard : QWizard {
 
         string parent ('/');
         if (current) {
-            parent = current.data (0, Qt.User_role).to_string ();
+            parent = current.data (0, Qt.User_role).to_"";
         }
 
         var dlg = new QInputDialog (this);
@@ -297,7 +331,7 @@ class FolderWizard : QWizard {
         QTree_widget_item current = _ui.folder_tree_widget.current_item ();
         string full_path;
         if (current) {
-            full_path = current.data (0, Qt.User_role).to_string ();
+            full_path = current.data (0, Qt.User_role).to_"";
         }
         full_path += "/" + folder;
 
@@ -334,7 +368,7 @@ class FolderWizard : QWizard {
         // is selected in the tree view.
         int http_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
         if (http_code == 404) {
-            show_warn (string ()); // hides the warning pane
+            show_warn (""); // hides the warning pane
             return;
         }
         var job = qobject_cast<LsColJob> (sender ());
@@ -343,6 +377,8 @@ class FolderWizard : QWizard {
                      .arg (job.error_string_parsing_body ()));
     }
 
+    /***********************************************************
+    ***********************************************************/
     static QTree_widget_item find_first_child (QTree_widget_item parent, string text) {
         for (int i = 0; i < parent.child_count (); ++i) {
             QTree_widget_item child = parent.child (i);
@@ -357,7 +393,7 @@ class FolderWizard : QWizard {
         if (path_trail.is_empty ())
             return;
 
-        const string parent_path = parent.data (0, Qt.User_role).to_string ();
+        const string parent_path = parent.data (0, Qt.User_role).to_"";
         const string folder_name = path_trail.first ();
         string folder_path;
         if (parent_path == QLatin1String ("/")) {
@@ -459,13 +495,13 @@ class FolderWizard : QWizard {
     }
 
     void Folder_wizard_remote_path.on_item_expanded (QTree_widget_item item) {
-        string dir = item.data (0, Qt.User_role).to_string ();
+        string dir = item.data (0, Qt.User_role).to_"";
         run_ls_col_job (dir);
     }
 
     void Folder_wizard_remote_path.on_current_item_changed (QTree_widget_item item) {
         if (item) {
-            string dir = item.data (0, Qt.User_role).to_string ();
+            string dir = item.data (0, Qt.User_role).to_"";
 
             // We don't want to allow creating subfolders in encrypted folders outside of the sync logic
             const var encrypted = _encrypted_paths.contains (dir);
@@ -535,7 +571,7 @@ class FolderWizard : QWizard {
             return false;
 
         string[] warn_strings;
-        string dir = _ui.folder_tree_widget.current_item ().data (0, Qt.User_role).to_string ();
+        string dir = _ui.folder_tree_widget.current_item ().data (0, Qt.User_role).to_"";
         if (!dir.starts_with ('/')) {
             dir.prepend ('/');
         }
@@ -589,7 +625,7 @@ class FolderWizard : QWizard {
         layout.add_widget (_selective_sync);
 
         if (Theme.instance ().show_virtual_files_option () && best_available_vfs_mode () != Vfs.Off) {
-            _virtual_files_check_box = new QCheckBox (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? string () : _(" (experimental)")));
+            _virtual_files_check_box = new QCheckBox (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
             connect (_virtual_files_check_box, &QCheckBox.clicked, this, &Folder_wizard_selective_sync.on_virtual_files_checkbox_clicked);
             connect (_virtual_files_check_box, &QCheckBox.state_changed, this, [this] (int state) {
                 _selective_sync.set_enabled (state == Qt.Unchecked);
@@ -602,7 +638,7 @@ class FolderWizard : QWizard {
     Folder_wizard_selective_sync.~Folder_wizard_selective_sync () = default;
 
     void Folder_wizard_selective_sync.initialize_page () {
-        string target_path = wizard ().property ("target_path").to_string ();
+        string target_path = wizard ().property ("target_path").to_"";
         if (target_path.starts_with ('/')) {
             target_path = target_path.mid (1);
         }
@@ -617,14 +653,14 @@ class FolderWizard : QWizard {
 
         if (_virtual_files_check_box) {
             // TODO : remove when UX decision is made
-            if (Utility.is_path_windows_drive_partition_root (wizard ().field (QStringLiteral ("source_folder")).to_string ())) {
+            if (Utility.is_path_windows_drive_partition_root (wizard ().field (QStringLiteral ("source_folder")).to_"")) {
                 _virtual_files_check_box.set_checked (false);
                 _virtual_files_check_box.set_enabled (false);
                 _virtual_files_check_box.on_set_text (_("Virtual files are not supported for Windows partition roots as local folder. Please choose a valid subfolder under drive letter."));
             } else {
                 _virtual_files_check_box.set_checked (best_available_vfs_mode () == Vfs.WindowsCfApi);
                 _virtual_files_check_box.set_enabled (true);
-                _virtual_files_check_box.on_set_text (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? string () : _(" (experimental)")));
+                _virtual_files_check_box.on_set_text (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
 
                 if (Theme.instance ().enforce_virtual_files_sync_folder ()) {
                     _virtual_files_check_box.set_checked (true);
@@ -640,7 +676,7 @@ class FolderWizard : QWizard {
     bool Folder_wizard_selective_sync.validate_page () {
         const bool use_virtual_files = _virtual_files_check_box && _virtual_files_check_box.is_checked ();
         if (use_virtual_files) {
-            const var availability = Vfs.check_availability (wizard ().field (QStringLiteral ("source_folder")).to_string ());
+            const var availability = Vfs.check_availability (wizard ().field (QStringLiteral ("source_folder")).to_"");
             if (!availability) {
                 var msg = new QMessageBox (QMessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error (), QMessageBox.Ok, this);
                 msg.set_attribute (Qt.WA_DeleteOnClose);
@@ -654,7 +690,7 @@ class FolderWizard : QWizard {
     }
 
     void Folder_wizard_selective_sync.cleanup_page () {
-        string target_path = wizard ().property ("target_path").to_string ();
+        string target_path = wizard ().property ("target_path").to_"";
         string alias = QFileInfo (target_path).file_name ();
         if (alias.is_empty ())
             alias = Theme.instance ().app_name ();

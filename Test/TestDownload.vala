@@ -19,6 +19,8 @@ class BrokenFakeGetReply : FakeGetReply {
     using FakeGetReply.FakeGetReply;
     public int fakeSize = stopAfter;
 
+    /***********************************************************
+    ***********************************************************/
     public int64 bytesAvailable () override {
         if (aborted)
             return 0;
@@ -26,6 +28,8 @@ class BrokenFakeGetReply : FakeGetReply {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public int64 readData (char data, int64 maxlen) override {
         int64 len = std.min (int64{ fakeSize }, maxlen);
         std.fill_n (data, len, payload);
@@ -46,6 +50,8 @@ SyncFileItemPtr getItem (QSignalSpy &spy, string path) {
 
 class TestDownload : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testResume () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().setIgnoreHiddenFiles (true);
@@ -79,6 +85,9 @@ class TestDownload : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testErrorMessage () {
         // This test's main goal is to test that the error string from the server is shown in the UI
 
@@ -111,6 +120,9 @@ class TestDownload : GLib.Object {
         QVERIFY (getItem (completeSpy, "A/broken")._errorString.contains (serverMessage));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void serverMaintenence () {
         // Server in maintenance must on_abort the sync.
 
@@ -135,6 +147,9 @@ class TestDownload : GLib.Object {
         QVERIFY (getItem (completeSpy, "A/broken")._errorString.contains ("System in maintenance mode"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testMoveFailsInAConflict () {
         // Test for https://github.com/owncloud/client/issues/7015
         // We want to test the case in which the renaming of the original to the conflict file succeeds,
@@ -157,7 +172,7 @@ class TestDownload : GLib.Object {
             propConnected = true;
             connect (propagator.data (), &OwncloudPropagator.touchedFile, [&] (string s) {
                 if (s.contains ("conflicted copy")) {
-                    QCOMPARE (conflictFile, string ());
+                    QCOMPARE (conflictFile, "");
                     conflictFile = s;
                     return;
                 }
@@ -192,6 +207,9 @@ class TestDownload : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testHttp2Resend () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.remoteModifier ().insert ("A/resendme", 300);

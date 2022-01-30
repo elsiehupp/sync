@@ -12,11 +12,15 @@ using namespace Occ;
 class StatusPushSpy : QSignalSpy {
     SyncEngine &_syncEngine;
 
+    /***********************************************************
+    ***********************************************************/
     public StatusPushSpy (SyncEngine &syncEngine)
         : QSignalSpy (&syncEngine.syncFileStatusTracker (), SIGNAL (fileStatusChanged (string&, SyncFileStatus)))
         , _syncEngine (syncEngine) { }
 
 
+    /***********************************************************
+    ***********************************************************/
     public SyncFileStatus statusOf (string relativePath) {
         QFileInfo file (_syncEngine.localPath (), relativePath);
         // Start from the end to get the latest status
@@ -28,6 +32,8 @@ class StatusPushSpy : QSignalSpy {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool statusEmittedBefore (string firstPath, string secondPath) {
         QFileInfo firstFile (_syncEngine.localPath (), firstPath);
         QFileInfo secondFile (_syncEngine.localPath (), secondPath);
@@ -60,6 +66,9 @@ class TestSyncFileStatusTracker : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void parentsGetSyncStatusUploadDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.localModifier ().appendByte ("B/b1");
@@ -91,6 +100,9 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void parentsGetSyncStatusNewFileUploadDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.localModifier ().insert ("B/b0");
@@ -122,6 +134,9 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void parentsGetSyncStatusNewDirDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.remoteModifier ().mkdir ("D");
@@ -150,6 +165,9 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void parentsGetSyncStatusNewDirUpload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.localModifier ().mkdir ("D");
@@ -178,6 +196,9 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void parentsGetSyncStatusDeleteUpDown () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.remoteModifier ().remove ("B/b1");
@@ -206,6 +227,9 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void warningStatusForExcludedFile () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().excludedFiles ().addManualExclude ("A/a1");
@@ -256,6 +280,9 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void warningStatusForExcludedFile_CasePreserving () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().excludedFiles ().addManualExclude ("B");
@@ -274,6 +301,9 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("b"), SyncFileStatus (Utility.fsCasePreserving () ? SyncFileStatus.StatusExcluded : SyncFileStatus.StatusNone));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void parentsGetWarningStatusForError () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.serverErrorPaths ().append ("A/a1");
@@ -374,6 +404,9 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void parentsGetWarningStatusForError_SibblingStartsWithPath () {
         // A is a parent of A/a1, but A/a is not even if it's a substring of A/a1
         FakeFolder fakeFolder{{string{},{ {QStringLiteral ("A"), { {QStringLiteral ("a"), 4}, {QStringLiteral ("a1"), 4}
@@ -420,6 +453,9 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("C/c1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void sharedStatus () {
         SyncFileStatus sharedUpToDateStatus (SyncFileStatus.StatusUpToDate);
         sharedUpToDateStatus.setShared (true);
@@ -458,6 +494,9 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void renameError () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.serverErrorPaths ().append ("A/a1");

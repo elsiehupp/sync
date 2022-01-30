@@ -8,11 +8,17 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 class HttpServer : QTcpServer {
 
-    public HttpServer (int16 port, GLib.Object* parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public HttpServer (int16 port, GLib.Object parent = new GLib.Object ());
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void incomingConnection (int socket);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_read_client ();
     private void on_discard_client ();
 };
@@ -36,7 +42,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-HttpServer.HttpServer (uint16 port, GLib.Object* parent)
+HttpServer.HttpServer (uint16 port, GLib.Object parent)
     : QTcpServer (parent) {
     listen (QHostAddress.Any, port);
 }

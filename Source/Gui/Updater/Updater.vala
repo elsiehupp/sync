@@ -19,20 +19,28 @@ Q_DECLARE_LOGGING_CATEGORY (lc_updater)
 
 class Updater : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public struct Helper {
         static int64 string_version_to_int (string version);
         static int64 current_version_to_int ();
         static int64 version_to_int (int64 major, int64 minor, int64 patch, int64 build);
     };
 
+    /***********************************************************
+    ***********************************************************/
     public static Updater instance ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public static GLib.Uri update_url ();
-
-    public virtual void check_for_update () = 0;
-    public virtual void background_check_for_update () = 0;
-    public virtual bool handle_startup () = 0;
+    /***********************************************************
+    ***********************************************************/
+    public 
+    public virtual void check_for_update ();
+    public virtual void background_check_for_update ();
+    public virtual bool handle_startup ();
 
 
     protected static string client_version ();
@@ -41,6 +49,8 @@ class Updater : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static string get_system_info ();
     private static QUrlQuery get_query_params ();
     private static Updater create ();
@@ -130,7 +140,7 @@ class Updater : GLib.Object {
 
         return string.from_local8Bit (output.to_base64 ());
     #else
-        return string ();
+        return "";
     #endif
     }
 

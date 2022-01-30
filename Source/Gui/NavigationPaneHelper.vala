@@ -14,18 +14,32 @@ namespace Occ {
 
 class NavigationPaneHelper : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public NavigationPaneHelper (FolderMan folder_man);
 
+    /***********************************************************
+    ***********************************************************/
     public bool show_in_explorer_navigation_pane () {
         return _show_in_explorer_navigation_pane;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void set_show_in_explorer_navigation_pane (bool show);
 
+    /***********************************************************
+    ***********************************************************/
     public void schedule_update_cloud_storage_registry ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void update_cloud_storage_registry ();
 
+    /***********************************************************
+    ***********************************************************/
     private FolderMan _folder_man;
     private bool _show_in_explorer_navigation_pane;
     private QTimer _update_cloud_storage_registry_timer;
@@ -79,10 +93,10 @@ class NavigationPaneHelper : GLib.Object {
                     // If it already exists, unmark it for removal, this is a valid sync root.
                     entries_to_remove.remove_one (folder.navigation_pane_clsid ());
 
-                    string clsid_str = folder.navigation_pane_clsid ().to_string ();
-                    string clsid_path = string () % R" (Software\Classes\CLSID\)" % clsid_str;
-                    string clsid_path_wow64 = string () % R" (Software\Classes\Wow6432Node\CLSID\)" % clsid_str;
-                    string namespace_path = string () % R" (Software\Microsoft\Windows\Current_version\Explorer\Desktop\Name_space\)" % clsid_str;
+                    string clsid_str = folder.navigation_pane_clsid ().to_"";
+                    string clsid_path = "" % R" (Software\Classes\CLSID\)" % clsid_str;
+                    string clsid_path_wow64 = "" % R" (Software\Classes\Wow6432Node\CLSID\)" % clsid_str;
+                    string namespace_path = "" % R" (Software\Microsoft\Windows\Current_version\Explorer\Desktop\Name_space\)" % clsid_str;
 
                     string title = folder.short_gui_remote_path_or_app_name ();
                     // Write the account name in the sidebar only when using more than one account.
@@ -104,10 +118,10 @@ class NavigationPaneHelper : GLib.Object {
 
         // Then remove anything that isn't in our folder list anymore.
         foreach (var &clsid, entries_to_remove) {
-            string clsid_str = clsid.to_string ();
-            string clsid_path = string () % R" (Software\Classes\CLSID\)" % clsid_str;
-            string clsid_path_wow64 = string () % R" (Software\Classes\Wow6432Node\CLSID\)" % clsid_str;
-            string namespace_path = string () % R" (Software\Microsoft\Windows\Current_version\Explorer\Desktop\Name_space\)" % clsid_str;
+            string clsid_str = clsid.to_"";
+            string clsid_path = "" % R" (Software\Classes\CLSID\)" % clsid_str;
+            string clsid_path_wow64 = "" % R" (Software\Classes\Wow6432Node\CLSID\)" % clsid_str;
+            string namespace_path = "" % R" (Software\Microsoft\Windows\Current_version\Explorer\Desktop\Name_space\)" % clsid_str;
 
             q_c_info (lc_nav_pane) << "Explorer Cloud storage provider : now unused, removing own CLSID" << clsid_str;
         }

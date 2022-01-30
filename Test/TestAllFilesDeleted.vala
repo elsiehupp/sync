@@ -27,6 +27,8 @@ we the user choose to remove all files SyncJournalDb.clearFileTable makes works 
 ***********************************************************/
 class TestAllFilesDeleted : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testAllFilesDeletedKeep_data () {
         QTest.addColumn<bool> ("deleteOnRemote");
         QTest.newRow ("local") << false;
@@ -80,6 +82,9 @@ class TestAllFilesDeleted : GLib.Object {
                  selectiveSyncBlockList);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testAllFilesDeletedDelete_data () {
         testAllFilesDeletedKeep_data ();
     }
@@ -119,6 +124,9 @@ class TestAllFilesDeleted : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState ().children.count (), 0);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testNotDeleteMetaDataChange () {
         /***********************************************************
          * This test make sure that we don't popup a file deleted message if all the metadata have
@@ -147,6 +155,9 @@ class TestAllFilesDeleted : GLib.Object {
         QCOMPARE (fakeFolder.currentRemoteState (), expectedState);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testResetServer () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
@@ -178,12 +189,18 @@ class TestAllFilesDeleted : GLib.Object {
 
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDataFingetPrint_data () {
         QTest.addColumn<bool> ("hasInitialFingerPrint");
         QTest.newRow ("initial finger print") << true;
         QTest.newRow ("no initial finger print") << false;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDataFingetPrint () {
         QFETCH (bool, hasInitialFingerPrint);
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
@@ -265,6 +282,9 @@ class TestAllFilesDeleted : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSingleFileRenamed () {
         FakeFolder fakeFolder{FileInfo{}};
 
@@ -289,6 +309,9 @@ class TestAllFilesDeleted : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSelectiveSyncNoPopup () {
         // Unselecting all folder should not cause the popup to be shown
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};

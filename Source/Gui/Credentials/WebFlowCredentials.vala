@@ -39,9 +39,13 @@ class WebFlowCredentials : AbstractCredentials {
     /// Don't add credentials if this is set on a QNetworkRequest
     public static constexpr QNetworkRequest.Attribute DontAddCredentialsAttribute = QNetworkRequest.User;
 
+    /***********************************************************
+    ***********************************************************/
     public WebFlowCredentials ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public WebFlowCredentials (
             const string user,
             const string password,
@@ -49,16 +53,24 @@ class WebFlowCredentials : AbstractCredentials {
             const QSslKey &key = QSslKey (),
             const GLib.List<QSslCertificate> &ca_certificates = GLib.List<QSslCertificate> ());
 
+    /***********************************************************
+    ***********************************************************/
     public string auth_type () override;
     public string user () override;
     public string password () override;
     public QNetworkAccessManager create_qNAM () override;
 
+    /***********************************************************
+    ***********************************************************/
     public bool ready () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void fetch_from_keychain () override;
-    public void ask_from_user () override;
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool still_valid (QNetworkReply reply) override;
     public void persist () override;
     public void invalidate_token () override;
@@ -68,17 +80,27 @@ class WebFlowCredentials : AbstractCredentials {
     public void set_account (Account account) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_authentication (QNetworkReply reply, QAuthenticator authenticator);
-    private void on_finished (QNetworkReply reply);
 
-    private void on_ask_from_user_credentials_provided (string user, string pass, string host);
+    /***********************************************************
+    ***********************************************************/
+    private 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_ask_from_user_cancelled ();
 
+    /***********************************************************
+    ***********************************************************/
     private void on_read_client_cert_pem_job_done (KeychainChunk.ReadJob read_job);
     private void on_read_client_key_pem_job_done (KeychainChunk.ReadJob read_job);
     private void on_read_client_ca_certs_pem_job_done (KeychainChunk.ReadJob read_job);
     private void on_read_password_job_done (QKeychain.Job incoming_job);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_write_client_cert_pem_job_done (KeychainChunk.WriteJob write_job);
     private void on_write_client_key_pem_job_done (KeychainChunk.WriteJob write_job);
     private void on_write_client_ca_certs_pem_job_done (KeychainChunk.WriteJob write_job);
@@ -146,7 +168,9 @@ namespace {
 
 class WebFlowCredentialsAccessManager : AccessManager {
 
-    public WebFlowCredentialsAccessManager (WebFlowCredentials cred, GLib.Object parent = nullptr)
+    /***********************************************************
+    ***********************************************************/
+    public WebFlowCredentialsAccessManager (WebFlowCredentials cred, GLib.Object parent = new GLib.Object ())
         : AccessManager (parent)
         , _cred (cred) {
     }
@@ -330,7 +354,7 @@ void WebFlowCredentials.on_ask_from_user_cancelled () {
 bool WebFlowCredentials.still_valid (QNetworkReply reply) {
     if (reply.error () != QNetworkReply.NoError) {
         GLib.warn (lc_web_flow_credentials ()) << reply.error ();
-        GLib.warn (lc_web_flow_credentials ()) << reply.error_string ();
+        GLib.warn (lc_web_flow_credentials ()) << reply.error_"";
     }
     return (reply.error () != QNetworkReply.AuthenticationRequiredError);
 }
@@ -423,7 +447,7 @@ void WebFlowCredentials.on_write_client_ca_certs_pem_job_done (KeychainChunk.Wri
     // errors / next ca cert?
     if (write_job && !_client_ssl_ca_certificates.is_empty ()) {
         if (write_job.error () != NoError) {
-            GLib.warn (lc_web_flow_credentials) << "Error while writing client CA cert" << write_job.error_string ();
+            GLib.warn (lc_web_flow_credentials) << "Error while writing client CA cert" << write_job.error_"";
         }
 
         if (!_client_ssl_ca_certificates_write_queue.is_empty ()) {
@@ -440,7 +464,7 @@ void WebFlowCredentials.on_write_client_ca_certs_pem_job_done (KeychainChunk.Wri
 #endif
     job.set_insecure_fallback (false);
     connect (job, &Job.on_finished, this, &WebFlowCredentials.on_write_job_done);
-    job.set_key (keychain_key (_account.url ().to_string (), _user, _account.id ()));
+    job.set_key (keychain_key (_account.url ().to_"", _user, _account.id ()));
     job.set_text_data (_password);
     job.on_start ();
 }
@@ -451,7 +475,7 @@ void WebFlowCredentials.on_write_job_done (QKeychain.Job job) {
     case NoError:
         break;
     default:
-        GLib.warn (lc_web_flow_credentials) << "Error while writing password" << job.error_string ();
+        GLib.warn (lc_web_flow_credentials) << "Error while writing password" << job.error_"";
     }
 }
 
@@ -468,14 +492,14 @@ void WebFlowCredentials.invalidate_token () {
 }
 
 void WebFlowCredentials.forget_sensitive_data () {
-    _password = string ();
+    _password = "";
     _ready = false;
 
     fetch_user ();
 
     _account.delete_app_password ();
 
-    const string kck = keychain_key (_account.url ().to_string (), _user, _account.id ());
+    const string kck = keychain_key (_account.url ().to_"", _user, _account.id ());
     if (kck.is_empty ()) {
         GLib.debug (lc_web_flow_credentials ()) << "InvalidateToken : User is empty, bailing out!";
         return;
@@ -499,7 +523,7 @@ void WebFlowCredentials.set_account (Account account) {
 }
 
 string WebFlowCredentials.fetch_user () {
-    _user = _account.credential_setting (USER_C).to_string ();
+    _user = _account.credential_setting (USER_C).to_"";
     return _user;
 }
 
@@ -527,6 +551,8 @@ void WebFlowCredentials.on_finished (QNetworkReply reply) {
     if (reply.error () == QNetworkReply.NoError) {
         _credentials_valid = true;
 
+        /***********************************************************
+        ***********************************************************/
         /// Used later for remote wipe
         _account.write_app_password_once (_password);
     }
@@ -578,7 +604,7 @@ void WebFlowCredentials.on_read_client_key_pem_job_done (KeychainChunk.ReadJob r
         }
         client_key_pem.clear ();
     } else {
-        GLib.warn (lc_web_flow_credentials) << "Unable to read client key" << read_job.error_string ();
+        GLib.warn (lc_web_flow_credentials) << "Unable to read client key" << read_job.error_"";
     }
 
     // Start fetching client CA certs
@@ -618,16 +644,16 @@ void WebFlowCredentials.on_read_client_ca_certs_pem_job_done (KeychainChunk.Read
         } else {
             if (read_job.error () != QKeychain.Error.EntryNotFound ||
                 ( (read_job.error () == QKeychain.Error.EntryNotFound) && _client_ssl_ca_certificates.count () == 0)) {
-                GLib.warn (lc_web_flow_credentials) << "Unable to read client CA cert slot" << string.number (_client_ssl_ca_certificates.count ()) << read_job.error_string ();
+                GLib.warn (lc_web_flow_credentials) << "Unable to read client CA cert slot" << string.number (_client_ssl_ca_certificates.count ()) << read_job.error_"";
             }
         }
     }
 
     // Now fetch the actual server password
     const string kck = keychain_key (
-        _account.url ().to_string (),
+        _account.url ().to_"",
         _user,
-        _keychain_migration ? string () : _account.id ());
+        _keychain_migration ? "" : _account.id ());
 
     var job = new ReadPasswordJob (Theme.instance ().app_name (), this);
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)

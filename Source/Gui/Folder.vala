@@ -93,6 +93,8 @@ class FolderDefinition {
 ***********************************************************/
 class Folder : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public enum class ChangeReason {
         Other,
         UnLock
@@ -102,10 +104,12 @@ class Folder : GLib.Object {
     /***********************************************************
     Create a new Folder
     ***********************************************************/
-    public Folder (FolderDefinition &definition, AccountState account_state, std.unique_ptr<Vfs> vfs, GLib.Object parent = nullptr);
+    public Folder (FolderDefinition &definition, AccountState account_state, std.unique_ptr<Vfs> vfs, GLib.Object parent = new GLib.Object ());
 
     ~Folder () override;
 
+    /***********************************************************
+    ***********************************************************/
     public using Map = QMap<string, Folder>;
     public using MapIterator = QMapIterator<string, Folder>;
 
@@ -124,6 +128,8 @@ class Folder : GLib.Object {
     public string alias ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public string short_gui_remote_path_or_app_name (); // since 2.0 we don't want to show aliases anymore, show the path instead
 
     /***********************************************************
@@ -158,9 +164,15 @@ class Folder : GLib.Object {
     ***********************************************************/
     public string remote_path_trailing_slash ();
 
+    /***********************************************************
+    ***********************************************************/
     public void set_navigation_pane_clsid (QUuid &clsid) {
         _definition.navigation_pane_clsid = clsid;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public QUuid navigation_pane_clsid () {
         return _definition.navigation_pane_clsid;
     }
@@ -177,6 +189,8 @@ class Folder : GLib.Object {
     ***********************************************************/
     public void set_sync_paused (bool);
 
+    /***********************************************************
+    ***********************************************************/
     public bool sync_paused ();
 
 
@@ -185,6 +199,8 @@ class Folder : GLib.Object {
     ***********************************************************/
     public bool can_sync ();
 
+    /***********************************************************
+    ***********************************************************/
     public void prepare_to_sync ();
 
 
@@ -216,10 +232,16 @@ class Folder : GLib.Object {
     ***********************************************************/
     public virtual void wipe_for_removal ();
 
+    /***********************************************************
+    ***********************************************************/
     public void on_associated_account_removed ();
 
+    /***********************************************************
+    ***********************************************************/
     public void set_sync_state (SyncResult.Status state);
 
+    /***********************************************************
+    ***********************************************************/
     public void set_dirty_network_limits ();
 
 
@@ -230,29 +252,57 @@ class Folder : GLib.Object {
     public bool ignore_hidden_files ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_ignore_hidden_files (bool ignore);
 
     // Used by the Socket API
     public SyncJournalDb journal_database () {
         return &_journal;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public SyncEngine &sync_engine () {
-        return _engine;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
     public Vfs &vfs () {
         return _vfs;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public RequestEtagJob etag_job () {
         return _request_etag_job;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public std.chrono.milliseconds msec_since_last_sync () {
-        return std.chrono.milliseconds (_time_since_last_sync_done.elapsed ());
     }
-    public std.chrono.milliseconds msec_last_sync_duration () {
-        return _last_sync_duration;
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public urn _last_sync_duration;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
     public int consecutive_follow_up_syncs () {
         return _consecutive_follow_up_syncs;
     }
@@ -324,8 +374,12 @@ class Folder : GLib.Object {
     public bool virtual_files_enabled ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_virtual_files_enabled (bool enabled);
 
+    /***********************************************************
+    ***********************************************************/
     public void set_root_pin_state (PinState state);
 
 
@@ -335,13 +389,21 @@ class Folder : GLib.Object {
     public bool is_vfs_on_off_switch_pending () {
         return _vfs_on_off_pending;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void set_vfs_on_off_switch_pending (bool pending) {
         _vfs_on_off_pending = pending;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void switch_to_virtual_files ();
 
+    /***********************************************************
+    ***********************************************************/
     public void process_switched_to_virtual_files ();
 
 
@@ -350,6 +412,8 @@ class Folder : GLib.Object {
     ***********************************************************/
     public bool supports_selective_sync ();
 
+    /***********************************************************
+    ***********************************************************/
     public string file_from_local_path (string local_path);
 
 signals:
@@ -385,12 +449,20 @@ signals:
     ***********************************************************/
     public void on_start_sync (string[] &path_list = string[] ());
 
+    /***********************************************************
+    ***********************************************************/
     public int on_discard_download_progress ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public int on_download_info_count ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public int on_wipe_error_blocklist ();
 
 
@@ -439,6 +511,8 @@ signals:
     public void on_next_sync_full_local_discovery ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_sync_started ();
     private void on_sync_finished (bool);
 
@@ -448,19 +522,31 @@ signals:
     ***********************************************************/
     private void on_sync_error (string message, ErrorCategory category = ErrorCategory.Normal);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_add_error_to_gui (SyncFileItem.Status status, string error_message, string subject = {});
 
+    /***********************************************************
+    ***********************************************************/
     private void on_transmission_progress (ProgressInfo &pi);
-    private void on_item_completed (SyncFileItemPtr &);
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private void on_run_etag_job ();
     private void on_etag_retrieved (GLib.ByteArray , QDateTime &tp);
     private void on_etag_retrieved_from_sync_engine (GLib.ByteArray , QDateTime &time);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_emit_finished_delayed ();
 
+    /***********************************************************
+    ***********************************************************/
     private void on_new_big_folder_discovered (string , bool is_external);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_log_propagation_start ();
 
 
@@ -507,16 +593,28 @@ signals:
     private void on_hydration_done ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void connect_sync_root ();
 
+    /***********************************************************
+    ***********************************************************/
     private bool reload_excludes ();
 
+    /***********************************************************
+    ***********************************************************/
     private void show_sync_result_popup ();
 
+    /***********************************************************
+    ***********************************************************/
     private void check_local_path ();
 
+    /***********************************************************
+    ***********************************************************/
     private void set_sync_options ();
 
+    /***********************************************************
+    ***********************************************************/
     private enum LogStatus {
         Log_status_remove,
         Log_status_rename,
@@ -528,17 +626,27 @@ signals:
         Log_status_file_locked
     };
 
+    /***********************************************************
+    ***********************************************************/
     private void create_gui_log (string filename, LogStatus status, int count,
-        const string rename_target = string ());
 
-    private void start_vfs ();
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private void correct_placeholder_files ();
+    /***********************************************************
+    ***********************************************************/
+    private 
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private AccountStatePtr _account_state;
     private FolderDefinition _definition;
     private string _canonical_local_path; // As returned with QFileInfo:canonical_file_path.  Always ends with "/"
 
+    /***********************************************************
+    ***********************************************************/
     private SyncResult _sync_result;
     private QScopedPointer<SyncEngine> _engine;
     private QPointer<RequestEtagJob> _request_etag_job;
@@ -556,10 +664,16 @@ signals:
     /// Reset when no follow-up is requested.
     private int _consecutive_follow_up_syncs;
 
+    /***********************************************************
+    ***********************************************************/
     private mutable SyncJournalDb _journal;
 
+    /***********************************************************
+    ***********************************************************/
     private QScopedPointer<SyncRunFileLog> _file_log;
 
+    /***********************************************************
+    ***********************************************************/
     private QTimer _schedule_self_timer;
 
 
@@ -869,17 +983,17 @@ void Folder.prepare_to_sync () {
 }
 
 void Folder.on_run_etag_job () {
-    q_c_info (lc_folder) << "Trying to check" << remote_url ().to_string () << "for changes via ETag check. (time since last sync:" << (_time_since_last_sync_done.elapsed () / 1000) << "s)";
+    q_c_info (lc_folder) << "Trying to check" << remote_url ().to_"" << "for changes via ETag check. (time since last sync:" << (_time_since_last_sync_done.elapsed () / 1000) << "s)";
 
     AccountPointer account = _account_state.account ();
 
     if (_request_etag_job) {
-        q_c_info (lc_folder) << remote_url ().to_string () << "has ETag job queued, not trying to sync";
+        q_c_info (lc_folder) << remote_url ().to_"" << "has ETag job queued, not trying to sync";
         return;
     }
 
     if (!can_sync ()) {
-        q_c_info (lc_folder) << "Not syncing.  :" << remote_url ().to_string () << _definition.paused << AccountState.state_string (_account_state.state ());
+        q_c_info (lc_folder) << "Not syncing.  :" << remote_url ().to_"" << _definition.paused << AccountState.state_string (_account_state.state ());
         return;
     }
 
@@ -1119,7 +1233,7 @@ void Folder.on_watched_path_changed (string path, ChangeReason reason) {
             && !FileSystem.file_changed (path, record._file_size, record._modtime)) {
             spurious = true;
 
-            if (var pin_state = _vfs.pin_state (relative_path.to_string ())) {
+            if (var pin_state = _vfs.pin_state (relative_path.to_"")) {
                 if (*pin_state == PinState.PinState.ALWAYS_LOCAL && record.is_virtual_file ())
                     spurious = false;
                 if (*pin_state == PinState.VfsItemAvailability.ONLINE_ONLY && record.is_file ())
@@ -1202,7 +1316,7 @@ void Folder.set_virtual_files_enabled (bool enabled) {
 }
 
 void Folder.set_root_pin_state (PinState state) {
-    if (!_vfs.set_pin_state (string (), state)) {
+    if (!_vfs.set_pin_state ("", state)) {
         GLib.warn (lc_folder) << "Could not set root pin state of" << _definition.alias;
     }
 
@@ -1345,7 +1459,7 @@ void Folder.on_start_sync (string[] &path_list) {
     _sync_result.set_status (SyncResult.Sync_prepare);
     emit sync_state_change ();
 
-    q_c_info (lc_folder) << "*** Start syncing " << remote_url ().to_string () << " -" << APPLICATION_NAME << "client version"
+    q_c_info (lc_folder) << "*** Start syncing " << remote_url ().to_"" << " -" << APPLICATION_NAME << "client version"
                      << q_printable (Theme.instance ().version ());
 
     _file_log.on_start (path ());
@@ -1359,6 +1473,8 @@ void Folder.on_start_sync (string[] &path_list) {
     set_dirty_network_limits ();
     set_sync_options ();
 
+    /***********************************************************
+    ***********************************************************/
     static std.chrono.milliseconds full_local_discovery_interval = [] () {
         var interval = ConfigFile ().full_local_discovery_interval ();
         GLib.ByteArray env = qgetenv ("OWNCLOUD_FULL_LOCAL_DISCOVERY_INTERVAL");
@@ -1468,7 +1584,7 @@ void Folder.on_sync_started () {
 void Folder.on_sync_finished (bool on_success) {
     q_c_info (lc_folder) << "Client version" << q_printable (Theme.instance ().version ())
                      << " Qt" << q_version ()
-                     << " SSL " << QSslSocket.ssl_library_version_string ().to_utf8 ().data ()
+                     << " SSL " << QSslSocket.ssl_library_version_"".to_utf8 ().data ()
         ;
 
     bool sync_error = !_sync_result.error_strings ().is_empty ();
@@ -1811,15 +1927,15 @@ void FolderDefinition.save (QSettings &settings, FolderDefinition &folder) {
 bool FolderDefinition.on_load (QSettings &settings, string alias,
     FolderDefinition folder) {
     folder.alias = FolderMan.unescape_alias (alias);
-    folder.local_path = settings.value (QLatin1String ("local_path")).to_string ();
-    folder.journal_path = settings.value (QLatin1String ("journal_path")).to_string ();
-    folder.target_path = settings.value (QLatin1String ("target_path")).to_string ();
+    folder.local_path = settings.value (QLatin1String ("local_path")).to_"";
+    folder.journal_path = settings.value (QLatin1String ("journal_path")).to_"";
+    folder.target_path = settings.value (QLatin1String ("target_path")).to_"";
     folder.paused = settings.value (QLatin1String ("paused")).to_bool ();
     folder.ignore_hidden_files = settings.value (QLatin1String ("ignore_hidden_files"), QVariant (true)).to_bool ();
     folder.navigation_pane_clsid = settings.value (QLatin1String ("navigation_pane_clsid")).to_uuid ();
 
     folder.virtual_files_mode = Vfs.Off;
-    string vfs_mode_string = settings.value (QStringLiteral ("virtual_files_mode")).to_string ();
+    string vfs_mode_string = settings.value (QStringLiteral ("virtual_files_mode")).to_"";
     if (!vfs_mode_string.is_empty ()) {
         if (var mode = Vfs.mode_from_string (vfs_mode_string)) {
             folder.virtual_files_mode = *mode;

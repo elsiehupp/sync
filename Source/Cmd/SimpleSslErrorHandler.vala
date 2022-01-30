@@ -12,6 +12,8 @@ namespace Occ {
 ***********************************************************/
 class Simple_sslErrorHandler : Occ.AbstractSslErrorHandler {
 
+    /***********************************************************
+    ***********************************************************/
     public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration &conf, GLib.List<QSslCertificate> *certs, Occ.AccountPointer) override;
 };
 

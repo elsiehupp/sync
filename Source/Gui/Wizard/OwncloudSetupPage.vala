@@ -31,36 +31,66 @@ namespace Occ {
 ***********************************************************/
 class Owncloud_setup_page : QWizard_page {
 
+    /***********************************************************
+    ***********************************************************/
     public Owncloud_setup_page (Gtk.Widget parent = nullptr);
-    ~Owncloud_setup_page () override;
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool is_complete () override;
     public void initialize_page () override;
     public int next_id () override;
     public void set_server_url (string );
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_allow_password_storage (bool);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool validate_page () override;);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public string url (););
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string local_folder (););
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void on_set_remote_folder (string remote_fo);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_multiple_folders_exist (bool exist);
-    public void on_set_auth_type (DetermineAuthTypeJob.AuthType type);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void on_set_auth_type (De
 
-    public void on_set_error_string (string , bool retry_http_only);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void on_start_spinner ();
 
@@ -83,18 +113,26 @@ signals:
     void determine_auth_type (string );
 
 
+    /***********************************************************
+    ***********************************************************/
     private void set_logo ();
     private void customize_style ();
     private void setup_server_address_description_label ();
 
+    /***********************************************************
+    ***********************************************************/
     private Ui_Owncloud_setup_page _ui;
 
+    /***********************************************************
+    ***********************************************************/
     private string _o_c_url;
     private string _oc_user;
     private bool _auth_type_known = false;
     private bool _checking = false;
     private DetermineAuthTypeJob.AuthType _auth_type = DetermineAuthTypeJob.Basic;
 
+    /***********************************************************
+    ***********************************************************/
     private QProgress_indicator _progress_indi;
     private OwncloudWizard _oc_wizard;
     private AddCertificateDialog add_cert_dial = nullptr;
@@ -289,7 +327,7 @@ signals:
                 return false;
             }
 
-            on_set_error_string (string (), false);
+            on_set_error_string ("", false);
             _checking = true;
             on_start_spinner ();
             emit complete_changed ();
@@ -330,7 +368,7 @@ signals:
                     switch (ret_val) {
                     case Owncloud_connection_method_dialog.No_TLS: {
                         url.set_scheme ("http");
-                        _ui.le_url.set_full_text (url.to_string ());
+                        _ui.le_url.set_full_text (url.to_"");
                         // skip ahead to next page, since the user would expect us to retry automatically
                         wizard ().next ();
                     } break;

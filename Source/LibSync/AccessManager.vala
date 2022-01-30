@@ -26,9 +26,13 @@ namespace Occ {
 ***********************************************************/
 class AccessManager : QNetworkAccessManager {
 
+    /***********************************************************
+    ***********************************************************/
     public static GLib.ByteArray generate_request_id ();
 
-    public AccessManager (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public AccessManager (GLib.Object parent = new GLib.Object ());
 
     protected QNetworkReply create_request (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice outgoing_data = nullptr) override;
 };
@@ -52,7 +56,7 @@ class AccessManager : QNetworkAccessManager {
 
         // Respect request specific user agent if any
         if (!new_request.header (QNetworkRequest.UserAgentHeader).is_valid ()) {
-            new_request.set_header (QNetworkRequest.UserAgentHeader, Utility.user_agent_string ());
+            new_request.set_header (QNetworkRequest.UserAgentHeader, Utility.user_agent_"");
         }
 
         // Some firewalls reject requests that have a "User-Agent" but no "Accept" header
@@ -67,7 +71,7 @@ class AccessManager : QNetworkAccessManager {
 
         // Generate a new request id
         GLib.ByteArray request_id = generate_request_id ();
-        q_info (lc_access_manager) << op << verb << new_request.url ().to_string () << "has X-Request-ID" << request_id;
+        q_info (lc_access_manager) << op << verb << new_request.url ().to_"" << "has X-Request-ID" << request_id;
         new_request.set_raw_header ("X-Request-ID", request_id);
 
     #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 4)

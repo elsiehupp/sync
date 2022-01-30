@@ -10,27 +10,38 @@ using namespace Occ;
 
 class TestXmlParse : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private bool _success;
     private string[] _subdirs;
     private string[] _items;
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_directory_listing_sub_folders (string[]& list) {
         qDebug () << "subfolders : " << list;
         _subdirs.append (list);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_directory_listing_iterated (string& item, QMap<string,string>& ) {
         qDebug () << "     item : " << item;
         _items.append (item);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_finished_successfully () {
         _success = true;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_init () {
         qDebug () << Q_FUNC_INFO;
         _success = false;
@@ -38,9 +49,13 @@ class TestXmlParse : GLib.Object {
         _items.clear ();
     }
 
-    private void on_cleanup () {
-    }
 
+    /***********************************************************
+    ***********************************************************/
+    private void on_cleanup () {}
+
+
+    private
     private void on_test_parser1 () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
@@ -114,6 +129,9 @@ class TestXmlParse : GLib.Object {
         QVERIFY (_subdirs.size () == 1);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_parser_broken_xml () {
         const GLib.ByteArray testXml = "X<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
@@ -184,6 +202,9 @@ class TestXmlParse : GLib.Object {
         QVERIFY (_subdirs.size () == 0);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_parser_empty_xml_no_dav () {
         const GLib.ByteArray testXml = "<html><body>I am under construction</body></html>";
 
@@ -206,6 +227,9 @@ class TestXmlParse : GLib.Object {
         QVERIFY (_subdirs.size () == 0);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_parser_empty_xml () {
         const GLib.ByteArray testXml = "";
 
@@ -228,6 +252,9 @@ class TestXmlParse : GLib.Object {
         QVERIFY (_subdirs.size () == 0);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_parser_truncated_xml () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
@@ -261,6 +288,9 @@ class TestXmlParse : GLib.Object {
         QVERIFY (!_success);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_parser_bogus_href1 () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
@@ -325,6 +355,9 @@ class TestXmlParse : GLib.Object {
         QVERIFY (!_success);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_parser_bogus_href2 () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
@@ -389,6 +422,9 @@ class TestXmlParse : GLib.Object {
         QVERIFY (!_success);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_parser_denormalized_path () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
@@ -462,6 +498,9 @@ class TestXmlParse : GLib.Object {
         QVERIFY (_subdirs.size () == 1);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_parser_denormalized_path_outside_namespace () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
@@ -527,6 +566,9 @@ class TestXmlParse : GLib.Object {
         QVERIFY (!_success);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_href_url_encoding () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"

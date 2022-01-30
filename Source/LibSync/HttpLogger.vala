@@ -97,17 +97,17 @@ namespace HttpLogger {
             header << q_make_pair (key, request.raw_header (key));
         }
         log_http (request_verb (operation, request),
-            request.url ().to_string (),
+            request.url ().to_"",
             request.raw_header (XRequestId ()),
-            request.header (QNetworkRequest.ContentTypeHeader).to_string (),
+            request.header (QNetworkRequest.ContentTypeHeader).to_"",
             header,
             device);
 
         GLib.Object.connect (reply, &QNetworkReply.on_finished, reply, [reply] {
             log_http (request_verb (*reply),
-                reply.url ().to_string (),
+                reply.url ().to_"",
                 reply.request ().raw_header (XRequestId ()),
-                reply.header (QNetworkRequest.ContentTypeHeader).to_string (),
+                reply.header (QNetworkRequest.ContentTypeHeader).to_"",
                 reply.raw_header_pairs (),
                 reply);
         });

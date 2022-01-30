@@ -20,22 +20,40 @@ namespace SharedTools {
 
 class QtSingleApplication : QApplication {
 
+    /***********************************************************
+    ***********************************************************/
     public QtSingleApplication (string id, int &argc, char **argv);
-    ~QtSingleApplication () override;
 
-    public bool is_running (int64 pid = -1);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_activation_window (Gtk.Widget* aw, bool activate_on_message = true);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
     public Gtk.Widget* activation_window ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool event (QEvent event) override;
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string application_id ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void set_block (bool value);
 
 
@@ -49,6 +67,8 @@ signals:
     void file_open_request (string file);
 
 
+    /***********************************************************
+    ***********************************************************/
     private string instances_file_name (string app_id);
 
     int64 first_peer;
@@ -92,8 +112,12 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 
 namespace SharedTools {
 
+    /***********************************************************
+    ***********************************************************/
     static const int instances_size = 1024;
 
+    /***********************************************************
+    ***********************************************************/
     static string instances_lock_filename (string app_session_id) {
         const char slash = '/';
         string res = QDir.temp_path ();
@@ -120,7 +144,7 @@ namespace SharedTools {
         if (!created) {
             if (!instances.attach ()) {
                 q_warning () << "Failed to initialize instances shared memory : "
-                           << instances.error_string ();
+                           << instances.error_"";
                 delete instances;
                 instances = nullptr;
                 return;

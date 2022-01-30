@@ -23,6 +23,8 @@ Allows to fetch Unified Search result icon from the server or used a local resou
 
 class Unified_search_result_image_provider : QQuick_async_image_provider {
 
+    /***********************************************************
+    ***********************************************************/
     public QQuick_image_response request_image_response (string id, QSize &requested_size) override;
 };
 }
@@ -89,6 +91,9 @@ namespace {
             set_image_and_emit_finished ();
         }
 
+
+    /***********************************************************
+    ***********************************************************/
     private slots:
         void on_process_network_reply () {
             const var reply = qobject_cast<QNetworkReply> (sender ());

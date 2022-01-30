@@ -79,7 +79,7 @@ static const char move_to_trash_c[] = "move_to_trash";
 
 const char cert_path[] = "http_certificate_path";
 const char cert_passwd[] = "http_certificate_passwd";
-string ConfigFile._conf_dir = string ();
+string ConfigFile._conf_dir = "";
 bool ConfigFile._asked_user = false;
 
 namespace {
@@ -103,19 +103,31 @@ namespace Occ {
 ***********************************************************/
 class ConfigFile {
 
+    /***********************************************************
+    ***********************************************************/
     public ConfigFile ();
 
+    /***********************************************************
+    ***********************************************************/
     public enum Scope {
         UserScope,
         SystemScope
     };
 
+    /***********************************************************
+    ***********************************************************/
     public string config_path ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string config_file ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public string exclude_file (Scope scope);
 
 
@@ -128,42 +140,52 @@ class ConfigFile {
     ***********************************************************/
     public string backup ();
 
+    /***********************************************************
+    ***********************************************************/
     public bool exists ();
 
+    /***********************************************************
+    ***********************************************************/
     public string default_connection ();
 
     // the certs do not depend on a connection.
     public GLib.ByteArray ca_certs ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_ca_certs (GLib.ByteArray );
 
-    public bool password_storage_allowed (string connection = string ());
+    /***********************************************************
+    ***********************************************************/
+    public bool password_storage_allowed (string connection = "");
 
 
     /***********************************************************
     Server poll interval in milliseconds
     ***********************************************************/
 
-    public std.chrono.milliseconds remote_poll_interval (string connection = string ());
+    /***********************************************************
+    ***********************************************************/
+    public std.chrono.milliseconds remote_poll_interval (string connection = "");
 
 
     /***********************************************************
     Set poll interval. Value in milliseconds has to be larger than 5000
     ***********************************************************/
-    public void set_remote_poll_interval (std.chrono.milliseconds interval, string connection = string ());
+    public void set_remote_poll_interval (std.chrono.milliseconds interval, string connection = "");
 
 
     /***********************************************************
     Interval to check for new notifications
     ***********************************************************/
-    public std.chrono.milliseconds notification_refresh_interval (string connection = string ());
+    public std.chrono.milliseconds notification_refresh_interval (string connection = "");
 
 
     /***********************************************************
     Force sync interval, in milliseconds
     ***********************************************************/
-    public std.chrono.milliseconds force_sync_interval (string connection = string ());
+    public std.chrono.milliseconds force_sync_interval (string connection = "");
 
 
     /***********************************************************
@@ -173,36 +195,68 @@ class ConfigFile {
     ***********************************************************/
     public std.chrono.milliseconds full_local_discovery_interval ();
 
+    /***********************************************************
+    ***********************************************************/
     public bool mono_icons ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_mono_icons (bool);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool prompt_delete_files ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void set_prompt_delete_f
 
-    public void set_prompt_delete_files (bool prompt_delete_files);
-
+    /***********************************************************
+    ***********************************************************/
     public bool crash_reporter ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_crash_reporter (bool enabled);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool automatic_log_dir ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void set_automatic_log_dir (bo
 
-    public void set_automatic_log_dir (bool enabled);
-
+    /***********************************************************
+    ***********************************************************/
     public string log_dir ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_log_dir (string dir);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool log_debug ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void set_log_debug 
 
-    public void set_log_debug (bool enabled);
-
+    /***********************************************************
+    ***********************************************************/
     public int log_expire ();
 
 
@@ -218,22 +272,34 @@ class ConfigFile {
 
     // proxy settings
     public void set_proxy_type (int proxy_type,
-        const string host = string (),
+        const string host = "",
         int port = 0, bool needs_auth = false,
-        const string user = string (),
-        const string pass = string ());
+        const string user = "",
+        const string pass = "");
 
+    /***********************************************************
+    ***********************************************************/
     public int proxy_type ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string proxy_host_name ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public int proxy_port ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool proxy_needs_auth ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public string proxy_user ();
 
@@ -247,11 +313,17 @@ class ConfigFile {
     public int use_upload_limit ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public int use_download_limit ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_use_upload_limit (int);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void set_use_download_limit (int);
     /***********************************************************
@@ -260,11 +332,17 @@ class ConfigFile {
     public int upload_limit ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public int download_limit ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_upload_limit (int kbytes);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void set_download_limit (int kbytes);
     /***********************************************************
@@ -273,12 +351,20 @@ class ConfigFile {
     public QPair<bool, int64> new_big_folder_size_limit ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_new_big_folder_size_limit (bool is_checked, int64 mbytes);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool use_new_big_folder_size_limit ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public bool confirm_external_storage ();
 
 
@@ -291,33 +377,61 @@ class ConfigFile {
     public bool move_to_trash ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_move_to_trash (bool);
 
+    /***********************************************************
+    ***********************************************************/
     public bool show_main_dialog_as_normal_window ();
 
+    /***********************************************************
+    ***********************************************************/
     public static bool set_conf_dir (string value);
 
+    /***********************************************************
+    ***********************************************************/
     public bool optional_server_notifications ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_optional_server_notifications (bool show);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool show_in_explorer_navigation_pane ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void set_show_in
 
-    public void set_show_in_explorer_navigation_pane (bool show);
-
+    /***********************************************************
+    ***********************************************************/
     public int timeout ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public int64 chunk_size ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public int64 max_chunk_size ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public int64 min_chunk_size ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public std.chrono.milliseconds target_chunk_upload_duration ();
 
@@ -327,18 +441,22 @@ class ConfigFile {
     public void restore_geometry (Gtk.Widget w);
 
     // how often the check about new versions runs
-    public std.chrono.milliseconds update_check_interval (string connection = string ());
+    public std.chrono.milliseconds update_check_interval (string connection = "");
 
     // skip_update_check completely disables the updater and hides its UI
-    public bool skip_update_check (string connection = string ());
+    public bool skip_update_check (string connection = "");
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_skip_update_check (bool, string );
 
     // auto_update_check allows the user to make the choice in the UI
-    public bool auto_update_check (string connection = string ());
+    public bool auto_update_check (string connection = "");
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_auto_update_check (bool, string );
 
 
@@ -349,21 +467,37 @@ class ConfigFile {
     ***********************************************************/
     public int update_segment ();
 
+    /***********************************************************
+    ***********************************************************/
     public string update_channel ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_update_channel (string channel);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void save_geometry_header (QHeaderView header);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void restore_geometry_header
 
-    public void restore_geometry_header (QHeaderView header);
-
+    /***********************************************************
+    ***********************************************************/
     public string certificate_path ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_certificate_path (string c_path);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public string certificate_passwd ();
 
@@ -375,9 +509,11 @@ class ConfigFile {
     The client version that last used this settings file.
     Updated by config_version_migration () at client startup.
     ***********************************************************/
-    public string client_version_string ();
+    public string client_version_"";
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_client_version_string (string version);
 
 
@@ -385,7 +521,7 @@ class ConfigFile {
     Returns a new settings pre-set in a specific group.  The Settings will be created
     with the given parent. If no parent is specified, the caller must destroy the settings
     ***********************************************************/
-    public static std.unique_ptr<QSettings> settings_with_group (string group, GLib.Object parent = nullptr);
+    public static std.unique_ptr<QSettings> settings_with_group (string group, GLib.Object parent = new GLib.Object ());
 
     /// Add the system and user exclude file path to the ExcludedFiles instance.
     public static void setup_default_exclude_file_paths (ExcludedFiles &excluded_files);
@@ -398,15 +534,23 @@ class ConfigFile {
     protected bool data_exists (string group, string key);
 
 
-    private QVariant get_value (string param, string group = string (),
+    /***********************************************************
+    ***********************************************************/
+    private QVariant get_value (string param, string group = "",
         const QVariant &default_value = QVariant ());
     private void set_value (string key, QVariant &value);
 
+    /***********************************************************
+    ***********************************************************/
     private string keychain_proxy_password_key ();
 
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private using SharedCreds = unowned<AbstractCredentials>;
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private static bool _asked_user;
     private static string _o_c_version;
     private static string _conf_dir;
@@ -643,7 +787,7 @@ string ConfigFile.exclude_file (Scope scope) {
     }
 
     ASSERT (false);
-    return string ();
+    return "";
 }
 
 string ConfigFile.exclude_file_from_system () {
@@ -676,7 +820,7 @@ string ConfigFile.exclude_file_from_system () {
 
 string ConfigFile.backup () {
     string base_file = config_file ();
-    var version_string = client_version_string ();
+    var version_string = client_version_"";
     if (!version_string.is_empty ())
         version_string.prepend ('_');
     string backup_file =
@@ -837,7 +981,7 @@ bool ConfigFile.skip_update_check (string connection) {
         con = default_connection ();
 
     QVariant fallback = get_value (QLatin1String (skip_update_check_c), con, false);
-    fallback = get_value (QLatin1String (skip_update_check_c), string (), fallback);
+    fallback = get_value (QLatin1String (skip_update_check_c), "", fallback);
 
     QVariant value = get_policy_setting (QLatin1String (skip_update_check_c), fallback);
     return value.to_bool ();
@@ -861,7 +1005,7 @@ bool ConfigFile.auto_update_check (string connection) {
         con = default_connection ();
 
     QVariant fallback = get_value (QLatin1String (auto_update_check_c), con, true);
-    fallback = get_value (QLatin1String (auto_update_check_c), string (), fallback);
+    fallback = get_value (QLatin1String (auto_update_check_c), "", fallback);
 
     QVariant value = get_policy_setting (QLatin1String (auto_update_check_c), fallback);
     return value.to_bool ();
@@ -905,7 +1049,7 @@ string ConfigFile.update_channel () {
     }
 
     QSettings settings (config_file (), QSettings.IniFormat);
-    return settings.value (QLatin1String (update_channel_c), default_update_channel).to_string ();
+    return settings.value (QLatin1String (update_channel_c), default_update_channel).to_"";
 }
 
 void ConfigFile.set_update_channel (string channel) {
@@ -993,7 +1137,7 @@ int ConfigFile.proxy_type () {
 }
 
 string ConfigFile.proxy_host_name () {
-    return get_value (QLatin1String (proxy_host_c)).to_string ();
+    return get_value (QLatin1String (proxy_host_c)).to_"";
 }
 
 int ConfigFile.proxy_port () {
@@ -1005,7 +1149,7 @@ bool ConfigFile.proxy_needs_auth () {
 }
 
 string ConfigFile.proxy_user () {
-    return get_value (QLatin1String (proxy_user_c)).to_string ();
+    return get_value (QLatin1String (proxy_user_c)).to_"";
 }
 
 string ConfigFile.proxy_password () {
@@ -1039,11 +1183,11 @@ string ConfigFile.keychain_proxy_password_key () {
 }
 
 int ConfigFile.use_upload_limit () {
-    return get_value (use_upload_limit_c, string (), 0).to_int ();
+    return get_value (use_upload_limit_c, "", 0).to_int ();
 }
 
 int ConfigFile.use_download_limit () {
-    return get_value (use_download_limit_c, string (), 0).to_int ();
+    return get_value (use_download_limit_c, "", 0).to_int ();
 }
 
 void ConfigFile.set_use_upload_limit (int val) {
@@ -1055,11 +1199,11 @@ void ConfigFile.set_use_download_limit (int val) {
 }
 
 int ConfigFile.upload_limit () {
-    return get_value (upload_limit_c, string (), 10).to_int ();
+    return get_value (upload_limit_c, "", 10).to_int ();
 }
 
 int ConfigFile.download_limit () {
-    return get_value (download_limit_c, string (), 80).to_int ();
+    return get_value (download_limit_c, "", 80).to_int ();
 }
 
 void ConfigFile.set_upload_limit (int kbytes) {
@@ -1072,7 +1216,7 @@ void ConfigFile.set_download_limit (int kbytes) {
 
 QPair<bool, int64> ConfigFile.new_big_folder_size_limit () {
     var default_value = Theme.instance ().new_big_folder_size_limit ();
-    const var fallback = get_value (new_big_folder_size_limit_c, string (), default_value).to_long_long ();
+    const var fallback = get_value (new_big_folder_size_limit_c, "", default_value).to_long_long ();
     const var value = get_policy_setting (QLatin1String (new_big_folder_size_limit_c), fallback).to_long_long ();
     const bool use = value >= 0 && use_new_big_folder_size_limit ();
     return q_make_pair (use, q_max<int64> (0, value));
@@ -1084,12 +1228,12 @@ void ConfigFile.set_new_big_folder_size_limit (bool is_checked, int64 mbytes) {
 }
 
 bool ConfigFile.confirm_external_storage () {
-    const var fallback = get_value (confirm_external_storage_c, string (), true);
+    const var fallback = get_value (confirm_external_storage_c, "", true);
     return get_policy_setting (QLatin1String (confirm_external_storage_c), fallback).to_bool ();
 }
 
 bool ConfigFile.use_new_big_folder_size_limit () {
-    const var fallback = get_value (use_new_big_folder_size_limit_c, string (), true);
+    const var fallback = get_value (use_new_big_folder_size_limit_c, "", true);
     return get_policy_setting (QLatin1String (use_new_big_folder_size_limit_c), fallback).to_bool ();
 }
 
@@ -1098,7 +1242,7 @@ void ConfigFile.set_confirm_external_storage (bool is_checked) {
 }
 
 bool ConfigFile.move_to_trash () {
-    return get_value (move_to_trash_c, string (), false).to_bool ();
+    return get_value (move_to_trash_c, "", false).to_bool ();
 }
 
 void ConfigFile.set_move_to_trash (bool is_checked) {
@@ -1154,7 +1298,7 @@ void ConfigFile.set_automatic_log_dir (bool enabled) {
 string ConfigFile.log_dir () {
     const var default_log_dir = string (config_path () + QStringLiteral ("/logs"));
     QSettings settings (config_file (), QSettings.IniFormat);
-    return settings.value (QLatin1String (log_dir_c), default_log_dir).to_string ();
+    return settings.value (QLatin1String (log_dir_c), default_log_dir).to_"";
 }
 
 void ConfigFile.set_log_dir (string dir) {
@@ -1198,7 +1342,7 @@ bool ConfigFile.show_experimental_options () {
 }
 
 string ConfigFile.certificate_path () {
-    return retrieve_data (string (), QLatin1String (cert_path)).to_string ();
+    return retrieve_data ("", QLatin1String (cert_path)).to_"";
 }
 
 void ConfigFile.set_certificate_path (string c_path) {
@@ -1208,7 +1352,7 @@ void ConfigFile.set_certificate_path (string c_path) {
 }
 
 string ConfigFile.certificate_passwd () {
-    return retrieve_data (string (), QLatin1String (cert_passwd)).to_string ();
+    return retrieve_data ("", QLatin1String (cert_passwd)).to_"";
 }
 
 void ConfigFile.set_certificate_passwd (string c_passwd) {
@@ -1217,9 +1361,9 @@ void ConfigFile.set_certificate_passwd (string c_passwd) {
     settings.sync ();
 }
 
-string ConfigFile.client_version_string () {
+string ConfigFile.client_version_"" {
     QSettings settings (config_file (), QSettings.IniFormat);
-    return settings.value (QLatin1String (client_version_c), string ()).to_string ();
+    return settings.value (QLatin1String (client_version_c), "").to_"";
 }
 
 void ConfigFile.set_client_version_string (string version) {

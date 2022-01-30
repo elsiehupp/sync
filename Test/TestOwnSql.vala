@@ -14,6 +14,8 @@ class TestOwnSql : GLib.Object {
 
     QTemporaryDir _tempDir;
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testOpenDb () {
         QFileInfo fi ( _tempDir.path () + "/testdatabase.sqlite" );
         QVERIFY ( !fi.exists () ); // must not exist
@@ -22,6 +24,9 @@ class TestOwnSql : GLib.Object {
         QVERIFY (fi.exists ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testCreate () {
         const char sql = "CREATE TABLE addresses ( id INTEGER, name VARCHAR (4096), "
                 "address VARCHAR (4096), entered INTEGER (8), PRIMARY KEY (id));";
@@ -31,6 +36,9 @@ class TestOwnSql : GLib.Object {
         QVERIFY (q.exec ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testIsSelect () {
         SqlQuery q (_database);
         q.prepare ("SELECT id FROM addresses;");
@@ -40,6 +48,9 @@ class TestOwnSql : GLib.Object {
         QVERIFY ( !q.isSelect ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testInsert () {
         const char sql = "INSERT INTO addresses (id, name, address, entered) VALUES "
                 " (1, 'Gonzo Alberto', 'Moriabata 24, Palermo', 1403100844);";
@@ -48,6 +59,9 @@ class TestOwnSql : GLib.Object {
         QVERIFY (q.exec ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testInsert2 () {
         const char sql = "INSERT INTO addresses (id, name, address, entered) VALUES "
                 " (?1, ?2, ?3, ?4);";
@@ -60,6 +74,9 @@ class TestOwnSql : GLib.Object {
         QVERIFY (q.exec ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSelect () {
         const char sql = "SELECT * FROM addresses;";
 
@@ -73,6 +90,9 @@ class TestOwnSql : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSelect2 () {
         const char sql = "SELECT * FROM addresses WHERE id=?1";
         SqlQuery q (_database);
@@ -85,6 +105,9 @@ class TestOwnSql : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPragma () {
         const char sql = "PRAGMA table_info (addresses)";
 
@@ -97,6 +120,9 @@ class TestOwnSql : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testUnicode () {
         const char sql = "INSERT INTO addresses (id, name, address, entered) VALUES "
                 " (?1, ?2, ?3, ?4);";
@@ -109,6 +135,9 @@ class TestOwnSql : GLib.Object {
         QVERIFY (q.exec ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testReadUnicode () {
         const char sql = "SELECT * FROM addresses WHERE id=3;";
         SqlQuery q (_database);
@@ -122,6 +151,9 @@ class TestOwnSql : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDestructor () {
         // This test make sure that the destructor of SqlQuery works even if the SqlDatabase
         // is destroyed before
@@ -135,6 +167,8 @@ class TestOwnSql : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private SqlDatabase _database;
 };
 

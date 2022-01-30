@@ -19,6 +19,8 @@ class Result {
     };
     bool _is_error;
 
+    /***********************************************************
+    ***********************************************************/
     public Result (T value)
         : _result (std.move (value))
         , _is_error (false) {
@@ -32,6 +34,8 @@ class Result {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public Result (Result &&other)
         : _is_error (other._is_error) {
         if (_is_error) {
@@ -42,6 +46,8 @@ class Result {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public Result (Result &other)
         : _is_error (other._is_error) {
         if (_is_error) {
@@ -52,6 +58,8 @@ class Result {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public Result &operator= (Result &&other) {
         if (&other != this) {
             _is_error = other._is_error;
@@ -65,6 +73,8 @@ class Result {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public Result &operator= (Result &other) {
         if (&other != this) {
             _is_error = other._is_error;
@@ -86,45 +96,63 @@ class Result {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public to_bool () {
         return !_is_error;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public const T &operator* () & {
         ASSERT (!_is_error);
         return _result;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public T operator* () && {
         ASSERT (!_is_error);
         return std.move (_result);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public const T *operator. () {
         ASSERT (!_is_error);
         return &_result;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public const T &get () {
         ASSERT (!_is_error)
         return _result;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public const Error &error () & {
         ASSERT (_is_error);
         return _error;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public Error error () && {
         ASSERT (_is_error);
         return std.move (_error);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_valid () {
         return !_is_error;
     }
@@ -137,6 +165,8 @@ namespace detail {
 template <typename Error>
 class Result<void, Error> : Result<detail.NoResultData, Error> {
 
+    /***********************************************************
+    ***********************************************************/
     public using Result<detail.NoResultData, Error>.Result;
     public Result () : Result (detail.NoResultData{}) {}
 };
@@ -148,8 +178,12 @@ struct OptionalNoErrorData{};
 template <typename T>
 class Optional : Result<T, detail.OptionalNoErrorData> {
 
+    /***********************************************************
+    ***********************************************************/
     public using Result<T, detail.OptionalNoErrorData>.Result;
 
+    /***********************************************************
+    ***********************************************************/
     public Optional ()
         : Optional (detail.OptionalNoErrorData{}) {
     }

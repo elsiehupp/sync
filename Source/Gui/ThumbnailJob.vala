@@ -16,8 +16,12 @@ Once the job has on_finished the job_finished signal will be emitted.
 ***********************************************************/
 class Thumbnail_job : AbstractNetworkJob {
 
-    public Thumbnail_job (string path, AccountPointer account, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public Thumbnail_job (string path, AccountPointer account, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public on_ void on_start () override;
 signals:
     /***********************************************************
@@ -30,6 +34,8 @@ signals:
     ***********************************************************/
     void job_finished (int status_code, GLib.ByteArray reply);
 
+    /***********************************************************
+    ***********************************************************/
     private bool on_finished () override;
 };
 

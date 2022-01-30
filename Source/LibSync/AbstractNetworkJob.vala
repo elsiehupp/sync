@@ -42,35 +42,53 @@ int AbstractNetworkJob.http_timeout = q_environment_variable_int_value ("OWNCLOU
 ***********************************************************/
 class AbstractNetworkJob : GLib.Object {
 
-    public AbstractNetworkJob (AccountPointer account, string path, GLib.Object parent = nullptr);
-    ~AbstractNetworkJob () override;
+    /***********************************************************
+    ***********************************************************/
+    public AbstractNetworkJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
 
-    public virtual void on_start ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public AccountPointer account () {
         return _account;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_path (string path);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public string path () {
         return _path;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_reply (QNetworkReply reply);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public QNetworkReply reply () {
         return _reply;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void set_ignore_credential_failure (bool ignore);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool ignore_credential_failure () {
         return _ignore_credential_failure;
     }
@@ -90,11 +108,15 @@ class AbstractNetworkJob : GLib.Object {
     public void set_follow_redirects (bool follow);
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool follow_redirects () {
         return _follow_redirects;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public GLib.ByteArray response_timestamp ();
 
 
@@ -104,9 +126,15 @@ class AbstractNetworkJob : GLib.Object {
     ***********************************************************/
     public GLib.ByteArray request_id ();
 
+    /***********************************************************
+    ***********************************************************/
     public int64 timeout_msec () {
         return _timer.interval ();
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public bool timed_out () {
         return _timedout;
     }
@@ -115,7 +143,7 @@ class AbstractNetworkJob : GLib.Object {
     /***********************************************************
     Returns an error message, if any.
     ***********************************************************/
-    public virtual string error_string ();
+    public virtual string error_"";
 
 
     /***********************************************************
@@ -147,9 +175,13 @@ class AbstractNetworkJob : GLib.Object {
     static int http_timeout;
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_set_timeout (int64 msec);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_reset_timeout ();
 signals:
     /***********************************************************
@@ -232,7 +264,7 @@ signals:
 
     Returning true triggers a delete_later () of this job.
     ***********************************************************/
-    protected virtual bool on_finished () = 0;
+    protected virtual bool on_finished ();
 
 
     /***********************************************************
@@ -249,9 +281,11 @@ signals:
     // GET requests that don't set up any HTTP body or other flags.
     protected bool _follow_redirects;
 
-    protected string reply_status_string ();
+    protected string reply_status_"";
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_finished ();
     private void on_timeout ();
 
@@ -259,6 +293,8 @@ signals:
     protected AccountPointer _account;
 
 
+    /***********************************************************
+    ***********************************************************/
     private QNetworkReply add_timer (QNetworkReply reply);
     private bool _ignore_credential_failure;
     private QPointer<QNetworkReply> _reply; // (QPointer because the NetworkManager may be destroyed before the jobs at exit)
@@ -279,10 +315,14 @@ signals:
 ***********************************************************/
 class NetworkJobTimeoutPauser {
 
+    /***********************************************************
+    ***********************************************************/
     public NetworkJobTimeoutPauser (QNetworkReply reply);
     ~NetworkJobTimeoutPauser ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private QPointer<QTimer> _timer;
 };
 
@@ -302,9 +342,9 @@ Builds a error message based on the error and the reply body.
 string error_message (string base_error, GLib.ByteArray body);
 
 /***********************************************************
-Nicer error_string () for QNetworkReply
+Nicer error_"" for QNetworkReply
 
-By default QNetworkReply.error_string () often produces messages like
+By default QNetworkReply.error_"" often produces messages like
   "Error downloading <url> - server replied : <reason>"
 but the "downloading" part invariably confuses people since the
 error might very well have been produced by a PUT request.
@@ -442,7 +482,7 @@ void AbstractNetworkJob.on_finished () {
     _timer.stop ();
 
     if (_reply.error () == QNetworkReply.SslHandshakeFailedError) {
-        GLib.warn (lc_network_job) << "SslHandshakeFailedError : " << error_string () << " : can be caused by a webserver wanting SSL client certificates";
+        GLib.warn (lc_network_job) << "SslHandshakeFailedError : " << error_"" << " : can be caused by a webserver wanting SSL client certificates";
     }
     // Qt doesn't yet transparently resend HTTP2 requests, do so here
     const var max_http2Resends = 3;
@@ -481,7 +521,7 @@ void AbstractNetworkJob.on_finished () {
             return;
 
         if (!_ignore_credential_failure || _reply.error () != QNetworkReply.AuthenticationRequiredError) {
-            GLib.warn (lc_network_job) << _reply.error () << error_string ()
+            GLib.warn (lc_network_job) << _reply.error () << error_""
                                     << _reply.attribute (QNetworkRequest.HttpStatusCodeAttribute);
             if (_reply.error () == QNetworkReply.ProxyAuthenticationRequiredError) {
                 GLib.warn (lc_network_job) << _reply.raw_header ("Proxy-Authenticate");
@@ -569,7 +609,7 @@ GLib.ByteArray AbstractNetworkJob.request_id () {
     return  _reply ? _reply.request ().raw_header ("X-Request-ID") : GLib.ByteArray ();
 }
 
-string AbstractNetworkJob.error_string () {
+string AbstractNetworkJob.error_"" {
     if (_timedout) {
         return _("Connection timed out");
     } else if (!reply ()) {
@@ -582,9 +622,9 @@ string AbstractNetworkJob.error_string () {
 }
 
 string AbstractNetworkJob.error_string_parsing_body (GLib.ByteArray body) {
-    string base = error_string ();
+    string base = error_"";
     if (base.is_empty () || !reply ()) {
-        return string ();
+        return "";
     }
 
     GLib.ByteArray reply_body = reply ().read_all ();
@@ -629,13 +669,13 @@ void AbstractNetworkJob.on_timed_out () {
     }
 }
 
-string AbstractNetworkJob.reply_status_string () {
+string AbstractNetworkJob.reply_status_"" {
     Q_ASSERT (reply ());
     if (reply ().error () == QNetworkReply.NoError) {
         return QLatin1String ("OK");
     } else {
         string enum_str = QMetaEnum.from_type<QNetworkReply.NetworkError> ().value_to_key (static_cast<int> (reply ().error ()));
-        return QStringLiteral ("%1 %2").arg (enum_str, error_string ());
+        return QStringLiteral ("%1 %2").arg (enum_str, error_"");
     }
 }
 
@@ -656,7 +696,7 @@ string extract_error_message (GLib.ByteArray error_response) {
     QXmlStreamReader reader (error_response);
     reader.read_next_start_element ();
     if (reader.name () != "error") {
-        return string ();
+        return "";
     }
 
     string exception;
@@ -685,16 +725,16 @@ string error_message (string base_error, GLib.ByteArray body) {
 }
 
 string network_reply_error_string (QNetworkReply &reply) {
-    string base = reply.error_string ();
+    string base = reply.error_"";
     int http_status = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
-    string http_reason = reply.attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ();
+    string http_reason = reply.attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_"";
 
     // Only adjust HTTP error messages of the expected format.
     if (http_reason.is_empty () || http_status == 0 || !base.contains (http_reason)) {
         return base;
     }
 
-    return AbstractNetworkJob._(R" (Server replied "%1 %2" to "%3 %4")").arg (string.number (http_status), http_reason, HttpLogger.request_verb (reply), reply.request ().url ().to_display_string ());
+    return AbstractNetworkJob._(R" (Server replied "%1 %2" to "%3 %4")").arg (string.number (http_status), http_reason, HttpLogger.request_verb (reply), reply.request ().url ().to_display_"");
 }
 
 void AbstractNetworkJob.retry () {

@@ -10,6 +10,8 @@ using namespace Occ;
 
 class TestCookies : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testCookies () {
         QTemporaryDir tmp;
         const string nonexistingPath = tmp.filePath ("someNonexistingDir/test.db");

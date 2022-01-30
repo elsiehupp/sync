@@ -21,25 +21,35 @@ namespace Occ {
 ***********************************************************/
 class CookieJar : QNetworkCookieJar {
 
-    public CookieJar (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public CookieJar (GLib.Object parent = new GLib.Object ());
     ~CookieJar () override;
     public bool set_cookies_from_url (GLib.List<QNetworkCookie> &cookie_list, GLib.Uri url) override;
     public GLib.List<QNetworkCookie> cookies_for_url (GLib.Uri url) override;
 
+    /***********************************************************
+    ***********************************************************/
     public void clear_session_cookies ();
 
     using QNetworkCookieJar.set_all_cookies;
     using QNetworkCookieJar.all_cookies;
 
+    /***********************************************************
+    ***********************************************************/
     public bool save (string file_name);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool restore (string file_name);
 
 signals:
     void new_cookies_for_url (GLib.List<QNetworkCookie> &cookie_list, GLib.Uri url);
 
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.List<QNetworkCookie> remove_expired (GLib.List<QNetworkCookie> &cookies);
 };
 

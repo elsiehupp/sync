@@ -15,31 +15,47 @@ namespace Ui {
 
 class IgnoreListTableWidget : Gtk.Widget {
 
+    /***********************************************************
+    ***********************************************************/
     public IgnoreListTableWidget (Gtk.Widget parent = nullptr);
-    ~IgnoreListTableWidget () override;
 
-    public void read_ignore_file (string file, bool read_only = false);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public int add_pattern (string pattern, bool deletable, bool read_only);
+    /***********************************************************
+    ***********************************************************/
+    public int add_pattern (string patte
 
+    /***********************************************************
+    ***********************************************************/
     public void on_remove_all_items ();
 
 
     public void on_write_ignore_file (string  file);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_item_selection_changed ();
     private void on_remove_current_item ();
     private void on_add_pattern ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void setup_table_read_only_items ();
     private string read_only_tooltip;
     private Ui.IgnoreListTableWidget ui;
 };
 
 
+    /***********************************************************
+    ***********************************************************/
     static constexpr int pattern_col = 0;
     static constexpr int deletable_col = 1;
     static constexpr int read_only_rows = 3;
@@ -134,7 +150,7 @@ class IgnoreListTableWidget : Gtk.Widget {
         bool ok_clicked = false;
         string pattern = QInputDialog.get_text (this, _("Add Ignore Pattern"),
             _("Add a new ignore pattern:"),
-            QLineEdit.Normal, string (), &ok_clicked);
+            QLineEdit.Normal, "", &ok_clicked);
 
         if (!ok_clicked || pattern.is_empty ())
             return;

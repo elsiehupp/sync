@@ -33,49 +33,93 @@ server
 ***********************************************************/
 class Capabilities {
 
+    /***********************************************************
+    ***********************************************************/
     public Capabilities (QVariantMap &capabilities);
 
+    /***********************************************************
+    ***********************************************************/
     public bool share_a_p_i ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool share_email_password_enabled ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public bool share_email_password_e
 
-    public bool share_email_password_enforced ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool share_public_link ();
-
-
+    /***********************************************************
+    ***********************************************************/
     public bool share_public_link_allow_upload ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool share_public_link_supports_upload_only ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public bool share_public_link_ask_optional_passwor
 
-    public bool share_public_link_ask_optional_password ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool share_public_link_enforce_password ();
+    /***********************************************************
+    ***********************************************************/
+    public bool share_public_link_enforce_expire_date
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool share_public_link_enforce_expire_date ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public bool share_internal_enfor
 
-    public int share_public_link_expire_date_days ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool share_internal_enforce_expire_date ();
+    /***********************************************************
+    ***********************************************************/
+    public bool share_remote_enf
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public int share_internal_expire_date_days ();
-
-
-    public bool share_remote_enforce_expire_date ();
-
-
-    public int share_remote_expire_date_days ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public bool share_public_link_multiple ();
 
@@ -202,14 +246,22 @@ class Capabilities {
     public void add_direct_editor (DirectEditor* direct_editor);
 
 
+    /***********************************************************
+    ***********************************************************/
     public DirectEditor* get_direct_editor_for_mimetype (QMimeType &mime_type);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public DirectEditor* get_direct_editor_for_optional_mimetype (QMimeType &mime_type);
 
 
+    /***********************************************************
+    ***********************************************************/
     private QVariantMap _capabilities;
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.List<DirectEditor> _direct_editors;
 };
 
@@ -217,32 +269,54 @@ class Capabilities {
 
 class DirectEditor : GLib.Object {
 
-    public DirectEditor (string id, string name, GLib.Object* parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public DirectEditor (string id, string name, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public void add_mimetype (GLib.ByteArray mime_type);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void add_optional_mimetype (GLib.ByteArray mime_type);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool has_mimetype (QMimeType &mime_type);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public bool has_optio
 
-    public bool has_optional_mimetype (QMimeType &mime_type);
-
+    /***********************************************************
+    ***********************************************************/
     public string id ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string name ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public GLib.List<GLib.ByteArray> mime_types ();
 
 
     public GLib.List<GLib.ByteArray> optional_mime_types ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private string _id;
-    private string _name;
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private GLib.List<GLib.ByteArray> _mime_types;
     private GLib.List<GLib.ByteArray> _optional_mime_types;
 };
@@ -390,7 +464,7 @@ class DirectEditor : GLib.Object {
     GLib.ByteArray Capabilities.preferred_upload_checksum_type () {
         return q_environment_variable ("OWNCLOUD_CONTENT_CHECKSUM_TYPE",
                                     _capabilities.value (QStringLiteral ("checksums")).to_map ()
-                                    .value (QStringLiteral ("preferred_upload_type"), QStringLiteral ("SHA1")).to_string ()).to_utf8 ();
+                                    .value (QStringLiteral ("preferred_upload_type"), QStringLiteral ("SHA1")).to_"").to_utf8 ();
     }
 
     GLib.ByteArray Capabilities.upload_checksum_type () {
@@ -456,7 +530,7 @@ class DirectEditor : GLib.Object {
     }
 
     GLib.Uri Capabilities.push_notifications_web_socket_url () {
-        const var websocket = _capabilities["notify_push"].to_map ()["endpoints"].to_map ()["websocket"].to_string ();
+        const var websocket = _capabilities["notify_push"].to_map ()["endpoints"].to_map ()["websocket"].to_"";
         return GLib.Uri (websocket);
     }
 
@@ -477,7 +551,7 @@ class DirectEditor : GLib.Object {
     }
 
     string Capabilities.invalid_filename_regex () {
-        return _capabilities[QStringLiteral ("dav")].to_map ()[QStringLiteral ("invalid_filename_regex")].to_string ();
+        return _capabilities[QStringLiteral ("dav")].to_map ()[QStringLiteral ("invalid_filename_regex")].to_"";
     }
 
     bool Capabilities.upload_conflict_files () {
@@ -521,7 +595,7 @@ class DirectEditor : GLib.Object {
 
     /*-------------------------------------------------------------------------------------*/
 
-    DirectEditor.DirectEditor (string id, string name, GLib.Object* parent)
+    DirectEditor.DirectEditor (string id, string name, GLib.Object parent)
         : GLib.Object (parent)
         , _id (id)
         , _name (name) {

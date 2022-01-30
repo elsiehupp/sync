@@ -49,14 +49,22 @@ class BulkPropagatorJob : PropagatorJob {
     };
 
 
+    /***********************************************************
+    ***********************************************************/
     public BulkPropagatorJob (OwncloudPropagator propagator,
-                               const std.deque<SyncFileItemPtr> &items);
 
-    public bool on_schedule_self_or_child () override;
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public JobParallelism parallelism () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_start_upload_file (SyncFileItemPtr item, UploadFileInfo file_to_upload);
 
     // Content checksum computed, compute the transmission checksum
@@ -74,28 +82,46 @@ class BulkPropagatorJob : PropagatorJob {
                                       SyncFileItem.Status status,
                                       const string error_string);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_put_finished ();
 
+    /***********************************************************
+    ***********************************************************/
     private void on_upload_progress (SyncFileItemPtr item, int64 sent, int64 total);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_job_destroyed (GLib.Object job);
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private void do_start_upload (SyncFileItemPtr item,
                        UploadFileInfo file_to_upload,
                        GLib.ByteArray transmission_checksum_header);
 
+    /***********************************************************
+    ***********************************************************/
     private void adjust_last_job_timeout (AbstractNetworkJob job,
-                              int64 file_size);
 
-    private void on_finalize (QJsonObject &full_reply);
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private void finalize_one_file (BulkUploadItem &one_file);
+    /***********************************************************
+    ***********************************************************/
+    private 
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private void on_put_finished_one_file (BulkUploadItem &single_file,
                                 Occ.PutMultiFileJob job,
                                 const QJsonObject &full_reply_object);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_done (SyncFileItemPtr item,
               SyncFileItem.Status status,
               const string error_string);
@@ -106,6 +132,8 @@ class BulkPropagatorJob : PropagatorJob {
     ***********************************************************/
     private QMap<GLib.ByteArray, GLib.ByteArray> headers (SyncFileItemPtr item);
 
+    /***********************************************************
+    ***********************************************************/
     private void abort_with_error (SyncFileItemPtr item,
                         SyncFileItem.Status status,
                         const string error);
@@ -125,46 +153,74 @@ class BulkPropagatorJob : PropagatorJob {
     private void common_error_handling (SyncFileItemPtr item,
                              const string error_message);
 
+    /***********************************************************
+    ***********************************************************/
     private bool check_file_still_exists (SyncFileItemPtr item,
                               const bool on_finished,
                               const string full_file_path);
 
+    /***********************************************************
+    ***********************************************************/
     private bool check_file_changed (SyncFileItemPtr item,
                           const bool on_finished,
                           const string full_file_path);
 
+    /***********************************************************
+    ***********************************************************/
     private void compute_file_id (SyncFileItemPtr item,
-                       const QJsonObject &file_reply);
 
-    private void handle_file_restoration (SyncFileItemPtr item,
-                               const string error_string);
+    /***********************************************************
+    ***********************************************************/
+    private 
 
+    /***********************************************************
+    ***********************************************************/
+    private                    const string error_string);
+
+    /***********************************************************
+    ***********************************************************/
     private void handle_bulk_upload_block_list (SyncFileItemPtr item);
 
-    private void handle_job_done_errors (SyncFileItemPtr item,
-                             SyncFileItem.Status status);
+    /***********************************************************
+    ***********************************************************/
+    private void handle_job_done_er
 
-    private void trigger_upload ();
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private void check_propagation_is_done ();
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private std.deque<SyncFileItemPtr> _items;
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private QVector<AbstractNetworkJob> _jobs; /// network jobs that are currently in transit
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private GLib.Set<string> _pending_checksum_files;
+    /***********************************************************
+    ***********************************************************/
+    private 
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private std.vector<BulkUploadItem> _files_to_upload;
 
+    /***********************************************************
+    ***********************************************************/
     private SyncFileItem.Status _final_status = SyncFileItem.Status.NoStatus;
 };
 
 
 
     GLib.ByteArray get_etag_from_json_reply (QJsonObject &reply) {
-        const var oc_etag = Occ.parse_etag (reply.value ("OC-ETag").to_string ().to_latin1 ());
-        const var ETag = Occ.parse_etag (reply.value ("ETag").to_string ().to_latin1 ());
-        const var  etag = Occ.parse_etag (reply.value ("etag").to_string ().to_latin1 ());
+        const var oc_etag = Occ.parse_etag (reply.value ("OC-ETag").to_"".to_latin1 ());
+        const var ETag = Occ.parse_etag (reply.value ("ETag").to_"".to_latin1 ());
+        const var  etag = Occ.parse_etag (reply.value ("etag").to_"".to_latin1 ());
         GLib.ByteArray ret = oc_etag;
         if (ret.is_empty ()) {
             ret = ETag;
@@ -179,7 +235,7 @@ class BulkPropagatorJob : PropagatorJob {
     }
 
     GLib.ByteArray get_header_from_json_reply (QJsonObject &reply, GLib.ByteArray header_name) {
-        return reply.value (header_name).to_string ().to_latin1 ();
+        return reply.value (header_name).to_"".to_latin1 ();
     }
 
     constexpr var batch_size = 100;
@@ -310,7 +366,7 @@ class BulkPropagatorJob : PropagatorJob {
             var device = std.make_unique<UploadDevice> (
                     single_file._local_path, 0, single_file._file_size, &propagator ()._bandwidth_manager);
             if (!device.open (QIODevice.ReadOnly)) {
-                GLib.warn (lc_bulk_propagator_job) << "Could not prepare upload device : " << device.error_string ();
+                GLib.warn (lc_bulk_propagator_job) << "Could not prepare upload device : " << device.error_"";
 
                 // If the file is currently locked, we want to retry the sync
                 // when it becomes available again.
@@ -318,7 +374,7 @@ class BulkPropagatorJob : PropagatorJob {
                     emit propagator ().seen_locked_file (single_file._local_path);
                 }
 
-                abort_with_error (single_file._item, SyncFileItem.NormalError, device.error_string ());
+                abort_with_error (single_file._item, SyncFileItem.NormalError, device.error_"");
                 emit finished (SyncFileItem.NormalError);
 
                 return;
@@ -462,7 +518,7 @@ class BulkPropagatorJob : PropagatorJob {
         single_file._item._response_time_stamp = job.response_timestamp ();
         single_file._item._request_id = job.request_id ();
         if (single_file._item._http_error_code != 200) {
-            common_error_handling (single_file._item, file_reply[QStringLiteral ("message")].to_string ());
+            common_error_handling (single_file._item, file_reply[QStringLiteral ("message")].to_"");
             return;
         }
 

@@ -2089,8 +2089,8 @@ namespace Occ {
 
     string get_unified_string (string[]& w_list) {
         string ret;
-        for (var& str : w_list) {
-            ret += str;
+        for (var& string_value : w_list) {
+            ret += string_value;
         }
         return ret;
     }

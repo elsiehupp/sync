@@ -32,22 +32,34 @@ class Sharee {
         Room = 10
     };
 
+    /***********************************************************
+    ***********************************************************/
     public Sharee (string share_with,
         const string display_name,
         const Type type);
 
+    /***********************************************************
+    ***********************************************************/
     public string format ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string share_with ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public string display_name ();
 
 
     public Type type ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private string _share_with;
     private string _display_name;
     private Type _type;
@@ -55,22 +67,34 @@ class Sharee {
 
 class Sharee_model : QAbstractListModel {
 
+    /***********************************************************
+    ***********************************************************/
     public enum Lookup_mode {
         Local_search = 0,
         Global_search = 1
     };
 
-    public Sharee_model (AccountPointer &account, string type, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public Sharee_model (AccountPointer &account, string type, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public using Sharee_set = QVector<unowned<Sharee>>; // FIXME : make it a GLib.Set<Sharee> when Sharee can be compared
     public void fetch (string search, Sharee_set &blocklist, Lookup_mode lookup_mode);
 
 
+    /***********************************************************
+    ***********************************************************/
     public int row_count (QModelIndex &parent = QModelIndex ()) override;
-    public QVariant data (QModelIndex &index, int role) override;
 
-    public unowned<Sharee> get_sharee (int at);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public string current_search () {
         return _search;
     }
@@ -80,16 +104,26 @@ signals:
     void display_error_message (int code, string );
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_sharees_fetched (QJsonDocument &reply);
 
+    /***********************************************************
+    ***********************************************************/
+    private 
 
-    private unowned<Sharee> parse_sharee (QJsonObject &data);
+    /***********************************************************
+    ***********************************************************/
     private void set_new_sharees (QVector<unowned<Sharee>> &new_sharees);
 
+    /***********************************************************
+    ***********************************************************/
     private AccountPointer _account;
     private string _search;
     private string _type;
 
+    /***********************************************************
+    ***********************************************************/
     private QVector<unowned<Sharee>> _sharees;
     private QVector<unowned<Sharee>> _sharee_blocklist;
 };
@@ -186,10 +220,10 @@ signals:
     }
 
     unowned<Sharee> Sharee_model.parse_sharee (QJsonObject &data) {
-        string display_name = data.value ("label").to_string ();
-        const string share_with = data.value ("value").to_object ().value ("share_with").to_string ();
+        string display_name = data.value ("label").to_"";
+        const string share_with = data.value ("value").to_object ().value ("share_with").to_"";
         Sharee.Type type = (Sharee.Type)data.value ("value").to_object ().value ("share_type").to_int ();
-        const string additional_info = data.value ("value").to_object ().value ("share_with_additional_info").to_string ();
+        const string additional_info = data.value ("value").to_object ().value ("share_with_additional_info").to_"";
         if (!additional_info.is_empty ()) {
             display_name = _("%1 (%2)", "sharee (share_with_additional_info)").arg (display_name, additional_info);
         }

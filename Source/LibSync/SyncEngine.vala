@@ -57,13 +57,19 @@ enum Another_sync_needed {
 ***********************************************************/
 class SyncEngine : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public SyncEngine (AccountPointer account, string local_path,
         const string remote_path, SyncJournalDb journal);
     ~SyncEngine () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void on_start_sync ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void set_network_limits (int upload, int download);
 
 
@@ -72,31 +78,57 @@ class SyncEngine : GLib.Object {
     ***********************************************************/
     public void on_abort ();
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_sync_running () {
         return _sync_running;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public SyncOptions sync_options () {
         return _sync_options;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void set_sync_options (SyncOptions &options) {
-        _sync_options = options;
     }
-    public bool ignore_hidden_files () {
-        return _ignore_hidden_files;
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public urn _ignore_hidden_files;
     }
     public void set_ignore_hidden_files (bool ignore) {
         _ignore_hidden_files = ignore;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public ExcludedFiles &excluded_files () {
         return _excluded_files;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public Utility.StopWatch &stop_watch () {
-        return _stop_watch;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
     public SyncFileStatusTracker &sync_file_status_tracker () {
         return _sync_file_status_tracker;
     }
@@ -110,14 +142,24 @@ class SyncEngine : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool was_file_touched (string fn);
 
+    /***********************************************************
+    ***********************************************************/
     public AccountPointer account ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public SyncJournalDb journal () {
         return _journal;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public string local_path () {
         return _local_path;
     }
@@ -180,6 +222,8 @@ class SyncEngine : GLib.Object {
     ***********************************************************/
     public static void wipe_virtual_files (string local_path, SyncJournalDb &journal, Vfs &vfs);
 
+    /***********************************************************
+    ***********************************************************/
     public static void switch_to_virtual_files (string local_path, SyncJournalDb &journal, Vfs &vfs);
 
     // for the test
@@ -227,6 +271,8 @@ signals:
     void seen_locked_file (string file_name);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_folder_discovered (bool local, string folder);
     private void on_root_etag_received (GLib.ByteArray , QDateTime &time);
 
@@ -246,6 +292,8 @@ signals:
     ***********************************************************/
     private void on_new_item (SyncFileItemPtr &item);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_item_completed (SyncFileItemPtr &item);
     private void on_discovery_finished ();
     private void on_propagation_finished (bool on_success);
@@ -270,10 +318,14 @@ signals:
     ***********************************************************/
     private void on_summary_error (string message);
 
+    /***********************************************************
+    ***********************************************************/
     private void on_insufficient_local_storage ();
     private void on_insufficient_remote_storage ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private bool check_error_blocklisting (SyncFileItem &item);
 
     // Cleans up unnecessary downloadinfo entries in the journal as well
@@ -292,11 +344,15 @@ signals:
     // on_cleanup and emit the on_finished signal
     private void on_finalize (bool on_success);
 
+    /***********************************************************
+    ***********************************************************/
     private static bool s_any_sync_running; //true when one sync is running somewhere (for debugging)
 
     // Must only be acessed during update and reconcile
     private QVector<SyncFileItemPtr> _sync_items;
 
+    /***********************************************************
+    ***********************************************************/
     private AccountPointer _account;
     private bool _needs_update;
     private bool _sync_running;
@@ -307,13 +363,19 @@ signals:
     private QScopedPointer<DiscoveryPhase> _discovery_phase;
     private unowned<OwncloudPropagator> _propagator;
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.Set<string> _bulk_upload_block_list;
 
     // List of all files with conflicts
     private GLib.Set<string> _seen_conflict_files;
 
+    /***********************************************************
+    ***********************************************************/
     private QScopedPointer<ProgressInfo> _progress_info;
 
+    /***********************************************************
+    ***********************************************************/
     private QScopedPointer<ExcludedFiles> _excluded_files;
     private QScopedPointer<SyncFileStatusTracker> _sync_file_status_tracker;
     private Utility.StopWatch _stop_watch;
@@ -341,10 +403,14 @@ signals:
     // If ignored files should be ignored
     private bool _ignore_hidden_files = false;
 
+    /***********************************************************
+    ***********************************************************/
     private int _upload_limit;
     private int _download_limit;
     private SyncOptions _sync_options;
 
+    /***********************************************************
+    ***********************************************************/
     private Another_sync_needed _another_sync_needed;
 
 
@@ -353,6 +419,8 @@ signals:
     ***********************************************************/
     private QMulti_map<QElapsedTimer, string> _touched_files;
 
+    /***********************************************************
+    ***********************************************************/
     private QElapsedTimer _last_update_progress_callback_call;
 
 
@@ -513,6 +581,8 @@ signals:
         return true;
     }
 
+    /***********************************************************
+    ***********************************************************/
     static bool is_file_transfer_instruction (SyncInstructions instruction) {
         return instruction == CSYNC_INSTRUCTION_CONFLICT
             || instruction == CSYNC_INSTRUCTION_NEW
@@ -777,7 +847,7 @@ signals:
                                       << free_bytes << "bytes and require at least" << min_free << "bytes";
                 _another_sync_needed = DelayedFollowUp;
                 Q_EMIT sync_error (_("Only %1 are available, need at least %2 to on_start",
-                    "Placeholders are postfixed with file sizes using Utility.octets_to_string ()")
+                    "Placeholders are postfixed with file sizes using Utility.octets_to_""")
                                      .arg (
                                          Utility.octets_to_string (free_bytes),
                                          Utility.octets_to_string (min_free)));
@@ -802,7 +872,7 @@ signals:
         string ver_str ("Using Qt ");
         ver_str.append (q_version ());
 
-        ver_str.append (" SSL library ").append (QSslSocket.ssl_library_version_string ().to_utf8 ().data ());
+        ver_str.append (" SSL library ").append (QSslSocket.ssl_library_version_"".to_utf8 ().data ());
         ver_str.append (" on ").append (Utility.platform_name ());
         q_c_info (lc_engine) << ver_str;
 
@@ -967,7 +1037,7 @@ signals:
         _progress_info._status = ProgressInfo.Reconcile;
         emit transmission_progress (*_progress_info);
 
-        //    q_c_info (lc_engine) << "Permissions of the root folder : " << _csync_ctx.remote.root_perms.to_string ();
+        //    q_c_info (lc_engine) << "Permissions of the root folder : " << _csync_ctx.remote.root_perms.to_"";
         var finish = [this]{
             var database_fingerprint = _journal.data_fingerprint ();
             // If database_fingerprint is empty, this means that there was no information in the database

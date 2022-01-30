@@ -23,6 +23,8 @@ Value class containing the options given to the sync engine
 ***********************************************************/
 class SyncOptions {
 
+    /***********************************************************
+    ***********************************************************/
     public SyncOptions ();
     ~SyncOptions ();
 

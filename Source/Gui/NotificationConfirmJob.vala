@@ -23,6 +23,8 @@ All the communication logic is handled in this class.
 ***********************************************************/
 class Notification_confirm_job : AbstractNetworkJob {
 
+    /***********************************************************
+    ***********************************************************/
     public Notification_confirm_job (AccountPointer account);
 
 
@@ -49,9 +51,13 @@ signals:
     void job_finished (string reply, int reply_code);
 
 
+    /***********************************************************
+    ***********************************************************/
     private bool on_finished () override;
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private GLib.ByteArray _verb;
     private GLib.Uri _link;
 };
@@ -68,7 +74,7 @@ signals:
 
     void Notification_confirm_job.on_start () {
         if (!_link.is_valid ()) {
-            GLib.warn (lc_notifications_job) << "Attempt to trigger invalid URL : " << _link.to_string ();
+            GLib.warn (lc_notifications_job) << "Attempt to trigger invalid URL : " << _link.to_"";
             return;
         }
         QNetworkRequest req;

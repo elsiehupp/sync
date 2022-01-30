@@ -22,17 +22,27 @@ namespace Occ {
 ***********************************************************/
 class NetrcParser {
 
+    /***********************************************************
+    ***********************************************************/
     public using Login_pair = QPair<string, string>;
 
-    public NetrcParser (string file = string ());
+    /***********************************************************
+    ***********************************************************/
+    public NetrcParser (string file = "");
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool parse ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public Login_pair find (string machine);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void try_add_entry_and_clear (string machine, Login_pair &pair, bool &is_default);
     private QHash<string, Login_pair> _entries;
     private Login_pair _default;
@@ -61,7 +71,7 @@ class NetrcParser {
         } else if (!machine.is_empty () && !pair.first.is_empty ()) {
             _entries.insert (machine, pair);
         }
-        pair = q_make_pair (string (), string ());
+        pair = q_make_pair ("", "");
         machine.clear ();
         is_default = false;
     }
@@ -104,7 +114,7 @@ class NetrcParser {
         }
         try_add_entry_and_clear (machine, pair, is_default);
 
-        if (!_entries.is_empty () || _default != q_make_pair (string (), string ())) {
+        if (!_entries.is_empty () || _default != q_make_pair ("", "")) {
             return true;
         } else {
             return false;

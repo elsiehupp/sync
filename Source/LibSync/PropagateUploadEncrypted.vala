@@ -30,24 +30,42 @@ folder_not_encrypted () if the file is within a folder that's not encrypted.
 
 class Propagate_upload_encrypted : GLib.Object {
 
-    public Propagate_upload_encrypted (OwncloudPropagator propagator, string remote_parent_path, SyncFileItemPtr item, GLib.Object parent = nullptr);
-    ~Propagate_upload_encrypted () override = default;
+    /***********************************************************
+    ***********************************************************/
+    public Propagate_upload_encrypted (OwncloudPropagator propagator, string remote_parent_path, SyncFileItemPtr item, GLib.Object parent = new GLib.Object ());
 
-    public void on_start ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void unlock_folder ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public bool is_unlock_running () {
         return _is_unlock_running;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public bool is_folder_locked () {
-        return _is_folder_locked;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
     public const GLib.ByteArray folder_token () {
         return _folder_token;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_folder_encrypted_id_received (string[] &list);
     private void on_folder_encrypted_id_error (QNetworkReply r);
     private void on_folder_locked_successfully (GLib.ByteArray& file_id, GLib.ByteArray& token);
@@ -65,19 +83,31 @@ signals:
     void folder_unlocked (GLib.ByteArray folder_id, int http_status);
 
 
+    /***********************************************************
+    ***********************************************************/
     private OwncloudPropagator _propagator;
     private string _remote_parent_path;
     private SyncFileItemPtr _item;
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.ByteArray _folder_token;
-    private GLib.ByteArray _folder_id;
 
-    private QElapsedTimer _folder_lock_first_try;
+    /***********************************************************
+    ***********************************************************/
+    private 
+
+    /***********************************************************
+    ***********************************************************/
     private bool _current_locking_in_progress = false;
 
+    /***********************************************************
+    ***********************************************************/
     private bool _is_unlock_running = false;
     private bool _is_folder_locked = false;
 
+    /***********************************************************
+    ***********************************************************/
     private GLib.ByteArray _generated_key;
     private GLib.ByteArray _generated_iv;
     private FolderMetadata _metadata;

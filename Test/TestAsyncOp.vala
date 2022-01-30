@@ -14,6 +14,8 @@ class FakeAsyncReply : FakeReply {
     GLib.ByteArray _pollLocation;
 
 
+    /***********************************************************
+    ***********************************************************/
     public FakeAsyncReply (GLib.ByteArray pollLocation, QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object parent)
         : FakeReply { parent }
         , _pollLocation (pollLocation) {
@@ -34,12 +36,16 @@ class FakeAsyncReply : FakeReply {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public void on_abort () override {}
     public int64 readData (char *, int64) override { return 0; }
 };
 
 class TestAsyncOp : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void asyncUploadOperations () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } } });

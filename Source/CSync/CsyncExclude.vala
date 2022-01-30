@@ -55,8 +55,12 @@ entirely.
 ***********************************************************/
 class ExcludedFiles : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public using Version = std.tuple<int, int, int>;
 
+    /***********************************************************
+    ***********************************************************/
     public ExcludedFiles (string local_path = "/");
     ~ExcludedFiles () override;
 
@@ -98,6 +102,8 @@ class ExcludedFiles : GLib.Object {
     public void add_manual_exclude (string expr);
 
 
+    /***********************************************************
+    ***********************************************************/
     public void add_manual_exclude (string expr, string base_path);
 
 
@@ -224,11 +230,17 @@ class ExcludedFiles : GLib.Object {
     ***********************************************************/
     private void prepare (Base_path_string &base_path);
 
+    /***********************************************************
+    ***********************************************************/
     private void prepare ();
 
+    /***********************************************************
+    ***********************************************************/
     private static string extract_bname_trigger (string exclude, bool wildcards_match_slash);
-    private static string convert_to_regexp_syntax (string exclude, bool wildcards_match_slash);
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private string _local_path;
 
     /// Files to load excludes from
@@ -248,6 +260,8 @@ class ExcludedFiles : GLib.Object {
     private QMap<Base_path_string, QRegularExpression> _full_regex_file;
     private QMap<Base_path_string, QRegularExpression> _full_regex_dir;
 
+    /***********************************************************
+    ***********************************************************/
     private bool _exclude_conflict_files = true;
 
 
@@ -266,6 +280,8 @@ class ExcludedFiles : GLib.Object {
     ***********************************************************/
     private Version _client_version;
 
+    /***********************************************************
+    ***********************************************************/
     private friend class Test_excluded_files;
 };
 

@@ -20,11 +20,17 @@ class Move_job : AbstractNetworkJob {
     const GLib.Uri _url; // Only used (instead of path) when the constructor taking an URL is used
     QMap<GLib.ByteArray, GLib.ByteArray> _extra_headers;
 
-    public Move_job (AccountPointer account, string path, string destination, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public Move_job (AccountPointer account, string path, string destination, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public Move_job (AccountPointer account, GLib.Uri url, string destination,
-        QMap<GLib.ByteArray, GLib.ByteArray> _extra_headers, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public p<GLib.ByteArray, GLib.ByteArray> _extra_headers, GLib.Object parent = new GLib.Object ());
 
     public void on_start () override;
     public bool on_finished () override;
@@ -40,9 +46,15 @@ signals:
 class PropagateRemoteMove : PropagateItemJob {
     QPointer<Move_job> _job;
 
+    /***********************************************************
+    ***********************************************************/
     public PropagateRemoteMove (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item) {
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void on_start () override;
     public void on_abort (PropagatorJob.AbortType abort_type) override;
     public JobParallelism parallelism () override {
@@ -56,6 +68,8 @@ class PropagateRemoteMove : PropagateItemJob {
     public static bool adjust_selective_sync (SyncJournalDb journal, string from, string to);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_move_job_finished ();
     private void on_finalize ();
 };
@@ -68,7 +82,7 @@ class PropagateRemoteMove : PropagateItemJob {
 
     Move_job.Move_job (AccountPointer account, GLib.Uri url, string destination,
         QMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent)
-        : AbstractNetworkJob (account, string (), parent)
+        : AbstractNetworkJob (account, "", parent)
         , _destination (destination)
         , _url (url)
         , _extra_headers (extra_headers) {
@@ -87,14 +101,14 @@ class PropagateRemoteMove : PropagateItemJob {
         }
 
         if (reply ().error () != QNetworkReply.NoError) {
-            GLib.warn (lc_propagate_remote_move) << " Network error : " << reply ().error_string ();
+            GLib.warn (lc_propagate_remote_move) << " Network error : " << reply ().error_"";
         }
         AbstractNetworkJob.on_start ();
     }
 
     bool Move_job.on_finished () {
         q_c_info (lc_move_job) << "MOVE of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                          << reply_status_string ();
+                          << reply_status_"";
 
         emit finished_signal ();
         return true;
@@ -120,7 +134,7 @@ class PropagateRemoteMove : PropagateItemJob {
 
                 const var path = _item._file;
                 const var slash_position = path.last_index_of ('/');
-                const var parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
+                const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
                 SyncJournalFileRecord parent_rec;
                 bool ok = propagator ()._journal.get_file_record (parent_path, &parent_rec);
@@ -132,7 +146,7 @@ class PropagateRemoteMove : PropagateItemJob {
                 const var remote_parent_path = parent_rec._e2e_mangled_name.is_empty () ? parent_path : parent_rec._e2e_mangled_name;
 
                 const var last_slash_position = _item._encrypted_file_name.last_index_of ('/');
-                const var encrypted_name = last_slash_position >= 0 ? _item._encrypted_file_name.mid (last_slash_position + 1) : string ();
+                const var encrypted_name = last_slash_position >= 0 ? _item._encrypted_file_name.mid (last_slash_position + 1) : "";
 
                 if (!encrypted_name.is_empty ()) {
                     _item._encrypted_file_name = remote_parent_path + "/" + encrypted_name;
@@ -231,7 +245,7 @@ class PropagateRemoteMove : PropagateItemJob {
         if (err != QNetworkReply.NoError) {
             SyncFileItem.Status status = classify_error (err, _item._http_error_code,
                 &propagator ()._another_sync_needed);
-            on_done (status, _job.error_string ());
+            on_done (status, _job.error_"");
             return;
         }
 
@@ -242,7 +256,7 @@ class PropagateRemoteMove : PropagateItemJob {
             on_done (SyncFileItem.NormalError,
                 _("Wrong HTTP code returned by server. Expected 201, but received \"%1 %2\".")
                     .arg (_item._http_error_code)
-                    .arg (_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ()));
+                    .arg (_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_""));
             return;
         }
 

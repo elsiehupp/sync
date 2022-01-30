@@ -28,15 +28,21 @@ gets updated while a tooltip is shown.
 ***********************************************************/
 class ToolTipUpdater : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public ToolTipUpdater (QTreeView tree_view);
 
 
     protected bool event_filter (GLib.Object obj, QEvent ev) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_data_changed (QModelIndex &top_left, QModelIndex &bottom_right, QVector<int> &roles);
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private QTreeView _tree_view;
     private QPoint _tool_tip_pos;
 };
@@ -86,5 +92,5 @@ void ToolTipUpdater.on_data_changed (QModelIndex &top_left,
     }
 
     // Update the currently active tooltip
-    QToolTip.show_text (_tool_tip_pos, _tree_view.model ().data (index, Qt.ToolTipRole).to_string ());
+    QToolTip.show_text (_tool_tip_pos, _tree_view.model ().data (index, Qt.ToolTipRole).to_"");
 }

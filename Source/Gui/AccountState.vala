@@ -32,6 +32,8 @@ using AccountAppList = GLib.List<AccountApp>;
 class AccountState : GLib.Object, public QSharedData {
     Q_PROPERTY (AccountPointer account MEMBER _account)
 
+    /***********************************************************
+    ***********************************************************/
     public enum State {
         /***********************************************************
         Not even attempting to connect, most likely because the
@@ -108,20 +110,36 @@ class AccountState : GLib.Object, public QSharedData {
     ***********************************************************/
     public void write_to_settings (QSettings &settings);
 
+    /***********************************************************
+    ***********************************************************/
     public AccountPointer account ();
 
+    /***********************************************************
+    ***********************************************************/
     public ConnectionStatus connection_status ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string[] connection_errors ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public State state ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public static string state_st
 
-    public static string state_string (State state);
-
+    /***********************************************************
+    ***********************************************************/
     public bool is_signed_out ();
 
+    /***********************************************************
+    ***********************************************************/
     public AccountAppList app_list ();
 
 
@@ -151,6 +169,8 @@ class AccountState : GLib.Object, public QSharedData {
     Move from SignedOut state to Disconnected (attempting to connect)
     public void sign_in ();
 
+    /***********************************************************
+    ***********************************************************/
     public bool is_connected ();
 
 
@@ -223,6 +243,8 @@ class AccountState : GLib.Object, public QSharedData {
     ***********************************************************/
     public void on_check_connectivity ();
 
+    /***********************************************************
+    ***********************************************************/
     private void set_state (State state);
     private void fetch_navigation_apps ();
 
@@ -250,6 +272,8 @@ class AccountState : GLib.Object, public QSharedData {
     protected void on_ocs_error (int status_code, string message);
 
 
+    /***********************************************************
+    ***********************************************************/
     private AccountPointer _account;
     private State _state;
     private ConnectionStatus _connection_status;
@@ -287,30 +311,46 @@ class AccountState : GLib.Object, public QSharedData {
     ***********************************************************/
     private AccountAppList _apps;
 
+    /***********************************************************
+    ***********************************************************/
     private bool _is_desktop_notifications_allowed;
 };
 
 class AccountApp : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public AccountApp (string name, GLib.Uri url,
         const string id, GLib.Uri icon_url,
-        GLib.Object* parent = nullptr);
+        GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     public string name ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public GLib.Uri url ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public string id ();
 
 
     public GLib.Uri icon_url ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private string _name;
-    private GLib.Uri _url;
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private string _id;
     private GLib.Uri _icon_url;
 };
@@ -538,7 +578,7 @@ class AccountApp : GLib.Object {
 
     void AccountState.on_connection_validator_result (ConnectionValidator.Status status, string[] &errors) {
         if (is_signed_out ()) {
-            GLib.warn (lc_account_state) << "Signed out, ignoring" << status << _account.url ().to_string ();
+            GLib.warn (lc_account_state) << "Signed out, ignoring" << status << _account.url ().to_"";
             return;
         }
 
@@ -617,7 +657,7 @@ class AccountApp : GLib.Object {
         // make sure it changes account state and icons
         sign_out_by_ui ();
 
-        q_c_info (lc_account_state) << "Invalid credentials for" << _account.url ().to_string ()
+        q_c_info (lc_account_state) << "Invalid credentials for" << _account.url ().to_""
                                << "checking for remote wipe request";
 
         _waiting_for_new_credentials = false;
@@ -628,7 +668,7 @@ class AccountApp : GLib.Object {
         if (is_signed_out () || _waiting_for_new_credentials)
             return;
 
-        q_c_info (lc_account_state) << "Invalid credentials for" << _account.url ().to_string ()
+        q_c_info (lc_account_state) << "Invalid credentials for" << _account.url ().to_""
                                << "asking user";
 
         _waiting_for_new_credentials = true;
@@ -648,14 +688,14 @@ class AccountApp : GLib.Object {
         // Make a connection attempt, no matter whether the credentials are
         // ready or not - we want to check whether we can get an SSL connection
         // going before bothering the user for a password.
-        q_c_info (lc_account_state) << "Fetched credentials for" << _account.url ().to_string ()
+        q_c_info (lc_account_state) << "Fetched credentials for" << _account.url ().to_""
                                << "attempting to connect";
         _waiting_for_new_credentials = false;
         on_check_connectivity ();
     }
 
     void AccountState.on_credentials_asked (AbstractCredentials credentials) {
-        q_c_info (lc_account_state) << "Credentials asked for" << _account.url ().to_string ()
+        q_c_info (lc_account_state) << "Credentials asked for" << _account.url ().to_""
                                << "are they ready?" << credentials.ready ();
 
         _waiting_for_new_credentials = false;
@@ -717,8 +757,8 @@ class AccountApp : GLib.Object {
                         for (QJsonValue &value : nav_links) {
                             var nav_link = value.to_object ();
 
-                            var app = new AccountApp (nav_link.value ("name").to_string (), GLib.Uri (nav_link.value ("href").to_string ()),
-                                nav_link.value ("id").to_string (), GLib.Uri (nav_link.value ("icon").to_string ()));
+                            var app = new AccountApp (nav_link.value ("name").to_"", GLib.Uri (nav_link.value ("href").to_""),
+                                nav_link.value ("id").to_"", GLib.Uri (nav_link.value ("icon").to_""));
 
                             _apps << app;
                         }

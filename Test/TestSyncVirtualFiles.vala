@@ -58,6 +58,8 @@ unowned<Vfs> setupVfs (FakeFolder &folder) {
 
 class TestSyncVirtualFiles : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private void on_test_virtual_file_lifecycle_data () {
         QTest.addColumn<bool> ("doLocalDiscovery");
 
@@ -65,6 +67,9 @@ class TestSyncVirtualFiles : GLib.Object {
         QTest.newRow ("skip local discovery") << false;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_virtual_file_lifecycle () {
         QFETCH (bool, doLocalDiscovery);
 
@@ -187,6 +192,9 @@ class TestSyncVirtualFiles : GLib.Object {
         on_cleanup ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_virtual_file_conflict () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
@@ -257,6 +265,9 @@ class TestSyncVirtualFiles : GLib.Object {
         on_cleanup ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_with_normal_sync () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         setupVfs (fakeFolder);
@@ -292,6 +303,9 @@ class TestSyncVirtualFiles : GLib.Object {
         on_cleanup ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_virtual_file_download () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
@@ -406,6 +420,9 @@ class TestSyncVirtualFiles : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_virtual_file_download_resume () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
@@ -446,6 +463,9 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (!dbRecord (fakeFolder, "A/a1" DVSUFFIX).isValid ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_new_files_not_virtual () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
@@ -465,6 +485,9 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (!fakeFolder.currentLocalState ().find ("A/a2" DVSUFFIX));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_download_recursive () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
@@ -560,6 +583,9 @@ class TestSyncVirtualFiles : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_rename_to_virtual () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         setupVfs (fakeFolder);
@@ -600,6 +626,9 @@ class TestSyncVirtualFiles : GLib.Object {
         on_cleanup ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_rename_virtual () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
@@ -655,6 +684,9 @@ class TestSyncVirtualFiles : GLib.Object {
         on_cleanup ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_rename_virtual2 () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
@@ -832,6 +864,9 @@ class TestSyncVirtualFiles : GLib.Object {
         QCOMPARE (fakeFolder.currentRemoteState (), expectedRemoteState);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_wipe_virtual_suffix_files () {
         FakeFolder fakeFolder{ FileInfo{} };
         setupVfs (fakeFolder);
@@ -876,6 +911,9 @@ class TestSyncVirtualFiles : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_new_virtuals () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
@@ -1129,6 +1167,9 @@ class TestSyncVirtualFiles : GLib.Object {
         on_cleanup ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_availability () {
         FakeFolder fakeFolder{ FileInfo () };
         var vfs = setupVfs (fakeFolder);
@@ -1194,6 +1235,9 @@ class TestSyncVirtualFiles : GLib.Object {
         QCOMPARE (r.error (), Vfs.AvailabilityError.NoSuchItem);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_pin_state_locals () {
         FakeFolder fakeFolder{ FileInfo () };
         var vfs = setupVfs (fakeFolder);
@@ -1275,6 +1319,9 @@ class TestSyncVirtualFiles : GLib.Object {
         QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename" DVSUFFIX), PinState.VfsItemAvailability.ONLINE_ONLY);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_incompatible_pins () {
         FakeFolder fakeFolder{ FileInfo () };
         var vfs = setupVfs (fakeFolder);
@@ -1313,6 +1360,9 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.currentLocalState ().find ("local/file1" DVSUFFIX));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_test_place_holder_exist () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.remoteModifier ().insert ("A/a1" DVSUFFIX, 111);
@@ -1345,7 +1395,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
         on_cleanup ();
         // Dehydrate
-        QVERIFY (vfs.setPinState (string (), PinState.VfsItemAvailability.ONLINE_ONLY));
+        QVERIFY (vfs.setPinState ("", PinState.VfsItemAvailability.ONLINE_ONLY));
         QVERIFY (!fakeFolder.syncOnce ());
 
         QVERIFY (itemInstruction (completeSpy, "A/igno" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));

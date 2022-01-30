@@ -18,12 +18,18 @@ namespace Occ {
 
 class Socket_upload_job : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public Socket_upload_job (unowned<Socket_api_job_v2> &job);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_start ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private unowned<Socket_api_job_v2> _api_job;
     private string _local_path;
     private string _remote_path;
@@ -47,15 +53,15 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> &job)
     : _api_job (job) {
     connect (job.data (), &Socket_api_job_v2.on_finished, this, &Socket_upload_job.delete_later);
 
-    _local_path = _api_job.arguments ()[QLatin1String ("local_path")].to_string ();
-    _remote_path = _api_job.arguments ()[QLatin1String ("remote_path")].to_string ();
+    _local_path = _api_job.arguments ()[QLatin1String ("local_path")].to_"";
+    _remote_path = _api_job.arguments ()[QLatin1String ("remote_path")].to_"";
     if (!_remote_path.starts_with ('/')) {
         _remote_path = '/' + _remote_path;
     }
 
-    _pattern = job.arguments ()[QLatin1String ("pattern")].to_string ();
+    _pattern = job.arguments ()[QLatin1String ("pattern")].to_"";
     // TODO : use uuid
-    const var accname = job.arguments ()[QLatin1String ("account")][QLatin1String ("name")].to_string ();
+    const var accname = job.arguments ()[QLatin1String ("account")][QLatin1String ("name")].to_"";
     var account = AccountManager.instance ().account (accname);
 
     if (!QFileInfo (_local_path).is_absolute ()) {
@@ -98,7 +104,7 @@ void Socket_upload_job.on_start () {
     var opt = _engine.sync_options ();
     opt.set_file_pattern (_pattern);
     if (!opt.file_regex ().is_valid ()) {
-        _api_job.failure (opt.file_regex ().error_string ());
+        _api_job.failure (opt.file_regex ().error_"");
         return;
     }
     _engine.set_sync_options (opt);
@@ -110,7 +116,7 @@ void Socket_upload_job.on_start () {
         if (reply.error () == 202) {
             _api_job.failure (QStringLiteral ("Destination %1 already exists").arg (_remote_path));
         } else {
-            _api_job.failure (reply.error_string ());
+            _api_job.failure (reply.error_"");
         }
     });
     mkdir.on_start ();

@@ -65,15 +65,23 @@ namespace Ui {
 
 class Invalid_filename_dialog : Gtk.Dialog {
 
+    /***********************************************************
+    ***********************************************************/
     public Invalid_filename_dialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent = nullptr);
 
     ~Invalid_filename_dialog () override;
 
+    /***********************************************************
+    ***********************************************************/
     public void on_accept () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private std.unique_ptr<Ui.Invalid_filename_dialog> _ui;
 
+    /***********************************************************
+    ***********************************************************/
     private AccountPointer _account;
     private Folder _folder;
     private string _file_path;
@@ -81,6 +89,8 @@ class Invalid_filename_dialog : Gtk.Dialog {
     private string _original_file_name;
     private string _new_filename;
 
+    /***********************************************************
+    ***********************************************************/
     private void on_filename_line_edit_text_changed (string text);
     private void on_move_job_finished ();
     private void on_remote_file_already_exists (QVariantMap &values);
@@ -138,7 +148,7 @@ class Invalid_filename_dialog : Gtk.Dialog {
         if (!values.contains ("permissions")) {
             return;
         }
-        const var remote_permissions = RemotePermissions.from_server_string (values["permissions"].to_string ());
+        const var remote_permissions = RemotePermissions.from_server_string (values["permissions"].to_"");
         if (!remote_permissions.has_permission (remote_permissions.Can_rename)
             || !remote_permissions.has_permission (remote_permissions.Can_move)) {
             _ui.error_label.on_set_text (

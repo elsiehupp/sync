@@ -14,25 +14,43 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 class FakeWebSocketServer : GLib.Object {
 
-    public FakeWebSocketServer (uint16 port = 12345, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public FakeWebSocketServer (uint16 port = 12345, GLib.Object parent = new GLib.Object ());
 
     ~FakeWebSocketServer () override;
 
+    /***********************************************************
+    ***********************************************************/
     public QWebSocket authenticateAccount (
-        const Occ.AccountPointer account, std.function<void (Occ.PushNotifications pushNotifications)> beforeAuthentication = [] (Occ.PushNotifications *) {}, std.function<void (void)> afterAuthentication = [] {});
 
-    public void close ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public bool waitForTextMessages ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public uint32 textMessagesCount ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string textMessage (int messageNumber);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public QWebSocket socketForTextMessage (int messageNumber);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void clearTextMessages ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
     public static Occ.AccountPointer createAccount (string username = "user", string password = "password");
 
 signals:
@@ -40,22 +58,32 @@ signals:
     void processTextMessage (QWebSocket sender, string message);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_process_next_message_internal (string message);
     private void on_new_connection ();
     private void on_socket_disconnected ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private QWebSocketServer _webSocketServer;
-    private GLib.List<QWebSocket> _clients;
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private std.unique_ptr<QSignalSpy> _processTextMessageSpy;
 };
 
 class CredentialsStub : Occ.AbstractCredentials {
 
+    /***********************************************************
+    ***********************************************************/
     public CredentialsStub (string user, string password);
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public string authType () override;
     public string user () override;
     public string password () override;
@@ -64,12 +92,16 @@ class CredentialsStub : Occ.AbstractCredentials {
     public void fetchFromKeychain () override;
     public void askFromUser () override;
 
+    /***********************************************************
+    ***********************************************************/
     public bool stillValid (QNetworkReply reply) override;
     public void persist () override;
     public void invalidateToken () override;
     public void forgetSensitiveData () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private string _user;
     private string _password;
 };

@@ -49,6 +49,8 @@ int itemSuccessfullyCompletedGetRank (ItemCompletedSpy &spy, string path) {
 
 class TestSyncEngine : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testFileDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
@@ -58,6 +60,9 @@ class TestSyncEngine : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testFileUpload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
@@ -67,6 +72,9 @@ class TestSyncEngine : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDirDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
@@ -80,6 +88,9 @@ class TestSyncEngine : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDirUpload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
@@ -93,6 +104,9 @@ class TestSyncEngine : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDirUploadWithDelayedAlgorithm () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"bulkupload", "1.0"} } } });
@@ -124,6 +138,9 @@ class TestSyncEngine : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testLocalDelete () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
@@ -133,6 +150,9 @@ class TestSyncEngine : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testRemoteDelete () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
@@ -142,6 +162,9 @@ class TestSyncEngine : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testEmlLocalChecksum () {
         FakeFolder fakeFolder{FileInfo{}};
         fakeFolder.localModifier ().insert ("a1.eml", 64, 'A');
@@ -185,10 +208,13 @@ class TestSyncEngine : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSelectiveSyncBug () {
         // issue owncloud/enterprise#1965 : files from selective-sync ignored
         // folders are uploaded anyway is some circumstances.
-        FakeFolder fakeFolder{FileInfo{ string (), {
+        FakeFolder fakeFolder{FileInfo{ "", {
             FileInfo { QStringLiteral ("parentFolder"), {
                 FileInfo{ QStringLiteral ("subFolderA"), { { QStringLiteral ("fileA.txt"), 400 }, { QStringLiteral ("fileB.txt"), 400, 'o' }, {nfo { QStringLiteral ("subsubFolder") { QStringLiteral ("fileC.txt"), 400 },
                         { QStringLiteral ("fileD.txt"), 400, 'o' }
@@ -248,6 +274,9 @@ class TestSyncEngine : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void abortAfterFailedMkdir () {
         FakeFolder fakeFolder{FileInfo{}};
         QSignalSpy finishedSpy (&fakeFolder.syncEngine (), SIGNAL (on_finished (bool)));
@@ -277,6 +306,9 @@ class TestSyncEngine : GLib.Object {
         QVERIFY (!record._fileId.isEmpty ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDirDownloadWithError () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
@@ -313,6 +345,9 @@ class TestSyncEngine : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testFakeConflict_data () {
         QTest.addColumn<bool> ("sameMtime");
         QTest.addColumn<GLib.ByteArray> ("checksums");
@@ -352,6 +387,9 @@ class TestSyncEngine : GLib.Object {
             << 0;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testFakeConflict () {
         QFETCH (bool, sameMtime);
         QFETCH (GLib.ByteArray, checksums);
@@ -619,6 +657,9 @@ class TestSyncEngine : GLib.Object {
         QVERIFY (!fakeFolder.currentRemoteState ().find ("C/myfile.txt"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testDiscoveryHiddenFile () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         QVERIFY (fakeFolder.syncOnce ());
@@ -644,6 +685,9 @@ class TestSyncEngine : GLib.Object {
         QVERIFY (fakeFolder.currentRemoteState ().find ("B/.hidden"));
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testNoLocalEncoding () {
         var utf8Locale = QTextCodec.codecForLocale ();
         if (utf8Locale.mibEnum () != 106) {
@@ -719,6 +763,9 @@ class TestSyncEngine : GLib.Object {
         QCOMPARE (nPUT, 3);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testPropagatePermissions () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         var perm = QFileDevice.Permission (0x7704); // user/owner : rwx, group : r, other : -
@@ -738,6 +785,9 @@ class TestSyncEngine : GLib.Object {
         QCOMPARE (QFileInfo (fakeFolder.localPath () + conflictName).permissions (), perm);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testEmptyLocalButHasRemote () {
         FakeFolder fakeFolder{ FileInfo{} };
         fakeFolder.remoteModifier ().mkdir ("foo");

@@ -20,15 +20,23 @@ the base class for Propagate Remote Delete Encrypted jobs
 ***********************************************************/
 class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator propagator, SyncFileItemPtr item, GLib.Object parent);
-    ~AbstractPropagateRemoteDeleteEncrypted () override = default;
 
-    public QNetworkReply.NetworkError network_error ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string error_string ();
+    /***********************************************************
+    ***********************************************************/
+    public string error_"";
 
-    public virtual void on_start () = 0;
+    public virtual void on_start ();
 
 signals:
     void on_finished (bool on_success);
@@ -42,7 +50,7 @@ signals:
     protected void on_try_lock (GLib.ByteArray folder_id);
     protected void on_folder_locked_successfully (GLib.ByteArray folder_id, GLib.ByteArray token);
     protected virtual void on_folder_un_locked_successfully (GLib.ByteArray folder_id);
-    protected virtual void on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code) = 0;
+    protected virtual void on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code);
     protected void on_delete_remote_item_finished ();
 
     protected void delete_remote_item (string filename);
@@ -71,7 +79,7 @@ QNetworkReply.NetworkError AbstractPropagateRemoteDeleteEncrypted.network_error 
     return _network_error;
 }
 
-string AbstractPropagateRemoteDeleteEncrypted.error_string () {
+string AbstractPropagateRemoteDeleteEncrypted.error_"" {
     return _error_string;
 }
 
@@ -147,7 +155,7 @@ void AbstractPropagateRemoteDeleteEncrypted.on_delete_remote_item_finished () {
     _item._request_id = delete_job.request_id ();
 
     if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
-        store_first_error_string (delete_job.error_string ());
+        store_first_error_string (delete_job.error_"");
         store_first_error (err);
 
         task_failed ();
@@ -164,7 +172,7 @@ void AbstractPropagateRemoteDeleteEncrypted.on_delete_remote_item_finished () {
         // throw an error.
         store_first_error_string (_("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                        .arg (_item._http_error_code)
-                       .arg (delete_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ()));
+                       .arg (delete_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_""));
 
         task_failed ();
         return;

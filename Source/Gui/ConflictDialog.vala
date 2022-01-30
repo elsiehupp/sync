@@ -23,18 +23,32 @@ namespace Ui {
 
 class ConflictDialog : Gtk.Dialog {
 
+    /***********************************************************
+    ***********************************************************/
     public ConflictDialog (Gtk.Widget parent = nullptr);
-    ~ConflictDialog () override;
 
-    public string base_filename ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
     public string local_version_filename ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public string remote_version_filename ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public void on_set_base_filename (string base_filename);
 
 
@@ -46,9 +60,13 @@ class ConflictDialog : Gtk.Dialog {
     void on_accept () override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void update_widgets ();
-    private void update_button_states ();
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private string _base_filename;
     private QScopedPointer<Ui.ConflictDialog> _ui;
     private ConflictSolver _solver;
@@ -147,11 +165,11 @@ namespace {
         QMimeDatabase mime_database;
 
         const var update_group = [this, &mime_database] (string filename, QLabel link_label, string link_text, QLabel mtime_label, QLabel size_label, QToolButton button) {
-            const var file_url = GLib.Uri.from_local_file (filename).to_string ();
+            const var file_url = GLib.Uri.from_local_file (filename).to_"";
             link_label.on_set_text ("<a href='%1'>%2</a>".arg (file_url).arg (link_text));
 
             const var info = QFileInfo (filename);
-            mtime_label.on_set_text (info.last_modified ().to_string ());
+            mtime_label.on_set_text (info.last_modified ().to_"");
             size_label.on_set_text (locale ().formatted_data_size (info.size ()));
 
             const var mime = mime_database.mime_type_for_file (filename);

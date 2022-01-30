@@ -182,10 +182,10 @@ void PropagateUploadFileNG.on_delete_job_finished () {
         SyncFileItem.Status status = classify_error (err, http_status);
         if (status == SyncFileItem.FatalError) {
             _item._request_id = job.request_id ();
-            abort_with_error (status, job.error_string ());
+            abort_with_error (status, job.error_"");
             return;
         } else {
-            GLib.warn (lc_propagate_upload_nG) << "DeleteJob errored out" << job.error_string () << job.reply ().url ();
+            GLib.warn (lc_propagate_upload_nG) << "DeleteJob errored out" << job.error_"" << job.reply ().url ();
             _remove_job_error = true;
             // Let the other jobs finish
         }
@@ -303,7 +303,7 @@ void PropagateUploadFileNG.on_start_next_chunk () {
     var device = std.make_unique<UploadDevice> (
             file_name, _sent, _current_chunk_size, &propagator ()._bandwidth_manager);
     if (!device.open (QIODevice.ReadOnly)) {
-        GLib.warn (lc_propagate_upload_nG) << "Could not prepare upload device : " << device.error_string ();
+        GLib.warn (lc_propagate_upload_nG) << "Could not prepare upload device : " << device.error_"";
 
         // If the file is currently locked, we want to retry the sync
         // when it becomes available again.
@@ -311,7 +311,7 @@ void PropagateUploadFileNG.on_start_next_chunk () {
             emit propagator ().seen_locked_file (file_name);
         }
         // Soft error because this is likely caused by the user modifying his files while syncing
-        abort_with_error (SyncFileItem.SoftError, device.error_string ());
+        abort_with_error (SyncFileItem.SoftError, device.error_"");
         return;
     }
 

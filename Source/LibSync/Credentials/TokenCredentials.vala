@@ -21,12 +21,18 @@ namespace Occ {
 
 class TokenCredentials : AbstractCredentials {
 
+    /***********************************************************
+    ***********************************************************/
     public friend class TokenCredentialsAccessManager;
     public TokenCredentials ();
 
 
+    /***********************************************************
+    ***********************************************************/
     public TokenCredentials (string user, string password, string token);
 
+    /***********************************************************
+    ***********************************************************/
     public string auth_type () override;
     public QNetworkAccessManager create_qNAM () override;
     public bool ready () override;
@@ -40,9 +46,13 @@ class TokenCredentials : AbstractCredentials {
 
     string password ();
 
+    /***********************************************************
+    ***********************************************************/
     private void on_authentication (QNetworkReply *, QAuthenticator *);
 
-
+    /***********************************************************
+    ***********************************************************/
+    private 
     private string _user;
     private string _password;
     private string _token; // the cookies
@@ -59,7 +69,7 @@ class TokenCredentials : AbstractCredentials {
     class TokenCredentialsAccessManager : AccessManager {
 
         public friend class TokenCredentials;
-        public TokenCredentialsAccessManager (TokenCredentials cred, GLib.Object parent = nullptr)
+        public TokenCredentialsAccessManager (TokenCredentials cred, GLib.Object parent = new GLib.Object ())
             : AccessManager (parent)
             , _cred (cred) {
         }
@@ -146,9 +156,9 @@ class TokenCredentials : AbstractCredentials {
         q_c_info (lc_token_credentials) << "Invalidating token";
         _ready = false;
         _account.clear_cookie_jar ();
-        _token = string ();
-        _user = string ();
-        _password = string ();
+        _token = "";
+        _user = "";
+        _password = "";
     }
 
     void TokenCredentials.forget_sensitive_data () {
@@ -163,7 +173,7 @@ class TokenCredentials : AbstractCredentials {
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,
         // those credentials were invalid and we terminate.
-        GLib.warn (lc_token_credentials) << "Stop request : Authentication failed for " << reply.url ().to_string ();
+        GLib.warn (lc_token_credentials) << "Stop request : Authentication failed for " << reply.url ().to_"";
         reply.set_property (authentication_failed_c, true);
         reply.close ();
     }

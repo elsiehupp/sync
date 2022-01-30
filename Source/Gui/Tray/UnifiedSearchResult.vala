@@ -26,6 +26,8 @@ struct Unified_search_result {
         Fetch_more_trigger,
     };
 
+    /***********************************************************
+    ***********************************************************/
     static string type_as_string (Unified_search_result.Type type);
 
     string _title;

@@ -56,6 +56,8 @@ SyncJournalFileRecord dbRecord (FakeFolder &folder, string path) {
 
 class TestSyncConflict : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testNoUpload () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -77,6 +79,9 @@ class TestSyncConflict : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testUploadAfterDownload () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
@@ -126,6 +131,9 @@ class TestSyncConflict : GLib.Object {
         QCOMPARE (remote.find ("A/a2").size, 6);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testSeparateUpload () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
@@ -300,6 +308,9 @@ class TestSyncConflict : GLib.Object {
         QVERIFY (!fakeFolder.syncJournal ().conflictRecord (a2conflict).isValid ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testConflictFileBaseName_data () {
         QTest.addColumn<string> ("input");
         QTest.addColumn<string> ("output");
@@ -372,12 +383,18 @@ class TestSyncConflict : GLib.Object {
             << "a/b/foo_conflict-123.txt";
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testConflictFileBaseName () {
         QFETCH (string, input);
         QFETCH (string, output);
         QCOMPARE (Utility.conflictFileBaseNameFromPattern (input.toUtf8 ()), output.toUtf8 ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testLocalDirRemoteFileConflict () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
@@ -455,6 +472,9 @@ class TestSyncConflict : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testLocalFileRemoteDirConflict () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
@@ -506,6 +526,9 @@ class TestSyncConflict : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testTypeConflictWithMove () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         ItemCompletedSpy completeSpy (fakeFolder);
@@ -538,6 +561,9 @@ class TestSyncConflict : GLib.Object {
         // Currently a1 and b1 don't get moved, but redownloaded
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testTypeChange () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         ItemCompletedSpy completeSpy (fakeFolder);

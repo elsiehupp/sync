@@ -31,8 +31,12 @@ inline static QFont make_alias_font (QFont &normal_font) {
 ***********************************************************/
 class FolderStatusDelegate : QStyled_item_delegate {
 
+    /***********************************************************
+    ***********************************************************/
     public FolderStatusDelegate ();
 
+    /***********************************************************
+    ***********************************************************/
     public enum datarole {
         FolderAliasRole = Qt.User_role + 100,
         Header_role,
@@ -69,23 +73,37 @@ class FolderStatusDelegate : QStyled_item_delegate {
     public static QRect options_button_rect (QRect within, Qt.Layout_direction direction);
 
 
+    /***********************************************************
+    ***********************************************************/
     public static QRect add_button_rect (QRect within, Qt.Layout_direction direction);
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public static QRect errors_list_rect (QRect within);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-
+    /***********************************************************
+    ***********************************************************/
     public static int root_folder_height_without_errors (QFontMetrics &fm, QFontMetrics &alias_fm);
 
 
     public void on_style_changed ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void customize_style ();
 
+    /***********************************************************
+    ***********************************************************/
     private static string add_folder_text ();
-    private QPersistent_model_index _pressed_index;
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private QIcon _icon_more;
 };
 

@@ -18,12 +18,17 @@ SyncJournalFileRecord journalRecord (FakeFolder &folder, GLib.ByteArray path) {
 
 class TestBlocklist : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     private on_ void testBlocklistBasic_data () {
         QTest.addColumn<bool> ("remote");
         QTest.newRow ("remote") << true;
         QTest.newRow ("local") << false;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private on_ void testBlocklistBasic () {
         QFETCH (bool, remote);
 

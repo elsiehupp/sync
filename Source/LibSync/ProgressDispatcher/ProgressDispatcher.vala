@@ -21,6 +21,8 @@ namespace Occ {
 ***********************************************************/
 class ProgressInfo : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public ProgressInfo ();
 
 
@@ -34,6 +36,8 @@ class ProgressInfo : GLib.Object {
     Records the status of the sync run
     ***********************************************************/
     public enum Status {
+        /***********************************************************
+        ***********************************************************/
         /// Emitted once at on_start
         Starting,
 
@@ -43,9 +47,13 @@ class ProgressInfo : GLib.Object {
         ***********************************************************/
         Discovery,
 
+        /***********************************************************
+        ***********************************************************/
         /// Emitted once when reconcile starts
         Reconcile,
 
+        /***********************************************************
+        ***********************************************************/
         /// Emitted during propagation, with progress data
         Propagation,
 
@@ -84,13 +92,21 @@ class ProgressInfo : GLib.Object {
     ***********************************************************/
     public void adjust_totals_for_file (SyncFileItem &item);
 
+    /***********************************************************
+    ***********************************************************/
     public int64 total_files ();
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public int64 completed_files ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public int64 total_size ();
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public int64 completed_size ();
 
@@ -120,9 +136,13 @@ class ProgressInfo : GLib.Object {
     Holds estimates about progress, returned to the user.
     ***********************************************************/
     public struct Estimates {
+        /***********************************************************
+        ***********************************************************/
         /// Estimated completion amount per second. (of bytes or files)
         int64 estimated_bandwidth;
 
+        /***********************************************************
+        ***********************************************************/
         /// Estimated time remaining in milliseconds.
         uint64 estimated_eta;
     };
@@ -231,6 +251,8 @@ class ProgressInfo : GLib.Object {
     // Triggers the update () slot every second once propagation started.
     private QTimer _update_estimates_timer;
 
+    /***********************************************************
+    ***********************************************************/
     private Progress _size_progress;
     private Progress _file_progress;
 
@@ -275,6 +297,8 @@ class Progress_dispatcher : GLib.Object {
 
     friend class Folder; // only allow Folder class to access the setting slots.
 
+    /***********************************************************
+    ***********************************************************/
     public static Progress_dispatcher instance ();
     ~Progress_dispatcher () override;
 
@@ -318,8 +342,12 @@ signals:
     protected void set_progress_info (string folder, ProgressInfo &progress);
 
 
-    private Progress_dispatcher (GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    private Progress_dispatcher (GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
     private QElapsedTimer _timer;
     private static Progress_dispatcher _instance;
 };
@@ -390,7 +418,7 @@ signals:
         case CSYNC_INSTRUCTION_EVAL:
             break;
         }
-        return string ();
+        return "";
     }
 
     bool Progress.is_warning_kind (SyncFileItem.Status kind) {
@@ -464,6 +492,8 @@ signals:
         return _update_estimates_timer.is_active ();
     }
 
+    /***********************************************************
+    ***********************************************************/
     static bool should_count_progress (SyncFileItem &item) {
         const var instruction = item._instruction;
 

@@ -15,21 +15,37 @@ namespace Occ {
 
 class Flow2AuthWidget : Gtk.Widget {
 
+    /***********************************************************
+    ***********************************************************/
     public Flow2AuthWidget (Gtk.Widget parent = nullptr);
-    ~Flow2AuthWidget () override;
 
-    public void start_auth (Account account);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void reset_auth (Account account = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public void reset_auth (Account accoun
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void set_error (string error);
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public void on_auth_result (Flow2Auth.Result, string error_string, string user,
 
-    public void on_auth_result (Flow2Auth.Result, string error_string, string user, string app_password);
-
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public void on_poll_now ();
 
 
@@ -43,6 +59,8 @@ signals:
     void poll_now ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private Account _account = nullptr;
     private QScopedPointer<Flow2Auth> _async_auth;
     private Ui_Flow2Auth_widget _ui;
@@ -52,11 +70,15 @@ protected slots:
     void on_copy_link_to_clipboard ();
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_start_spinner ();
     private void on_stop_spinner (bool show_status_label);
     private void customize_style ();
     private void set_logo ();
 
+    /***********************************************************
+    ***********************************************************/
     private QProgress_indicator _progress_indi;
     private int _status_update_skip_count = 0;
 };

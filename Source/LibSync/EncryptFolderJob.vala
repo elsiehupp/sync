@@ -12,22 +12,32 @@ namespace Occ {
 
 class EncryptFolderJob : GLib.Object {
 
+    /***********************************************************
+    ***********************************************************/
     public enum Status {
         Success = 0,
         Error,
     };
 
-    public EncryptFolderJob (AccountPointer &account, SyncJournalDb journal, string path, GLib.ByteArray file_id, GLib.Object parent = nullptr);
+    /***********************************************************
+    ***********************************************************/
+    public EncryptFolderJob (AccountPointer &account, SyncJournalDb journal, string path, GLib.ByteArray file_id, GLib.Object parent = new GLib.Object ());
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_start ();
-
-    public string error_string ();
+    /***********************************************************
+    ***********************************************************/
+    public 
+    public string error_"";
 
 signals:
     void on_finished (int status);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_encryption_flag_success (GLib.ByteArray folder_id);
     private void on_encryption_flag_error (GLib.ByteArray folder_id, int http_return_code);
     private void on_lock_for_encryption_success (GLib.ByteArray folder_id, GLib.ByteArray token);
@@ -38,6 +48,8 @@ signals:
     private void on_update_metadata_error (GLib.ByteArray folder_id, int http_return_code);
 
 
+    /***********************************************************
+    ***********************************************************/
     private AccountPointer _account;
     private SyncJournalDb _journal;
     private string _path;
@@ -61,7 +73,7 @@ signals:
         job.on_start ();
     }
 
-    string EncryptFolderJob.error_string () {
+    string EncryptFolderJob.error_"" {
         return _error_string;
     }
 

@@ -75,19 +75,33 @@ class OwncloudGui;
 class SettingsDialog : Gtk.Dialog {
     Q_PROPERTY (Gtk.Widget* current_page READ current_page)
 
+    /***********************************************************
+    ***********************************************************/
     public SettingsDialog (OwncloudGui gui, Gtk.Widget parent = nullptr);
-    ~SettingsDialog () override;
 
-    public Gtk.Widget* current_page ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public on_ void show_first_page ();
+    /***********************************************************
+    ***********************************************************/
+    public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public on_ void show_issues_list (AccountState account);
+    /***********************************************************
+    ***********************************************************/
+    public on_ void show_issues_list (AccountStat
 
+    /***********************************************************
+    ***********************************************************/
+    public 
 
-    public void on_switch_page (QAction action);
-
+    /***********************************************************
+    ***********************************************************/
+    public 
 
     public void on_account_avatar_changed ();
 
@@ -104,17 +118,27 @@ signals:
     protected void change_event (QEvent *) override;
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_account_added (AccountState *);
     private void on_account_removed (AccountState *);
 
 
+    /***********************************************************
+    ***********************************************************/
     private void customize_style ();
 
+    /***********************************************************
+    ***********************************************************/
     private QAction create_color_aware_action (string icon_name, string file_name);
-    private QAction create_action_with_icon (QIcon &icon, string text, string icon_path = string ());
 
-    private Ui.SettingsDialog const _ui;
+    /***********************************************************
+    ***********************************************************/
+    private 
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private QAction_group _action_group;
     // Maps the actions from the action group to the corresponding widgets
     private QHash<QAction *, Gtk.Widget> _action_group_widgets;
@@ -123,8 +147,12 @@ signals:
     // case the account avatar changes
     private QHash<Account *, QAction> _action_for_account;
 
+    /***********************************************************
+    ***********************************************************/
     private QTool_bar _tool_bar;
 
+    /***********************************************************
+    ***********************************************************/
     private OwncloudGui _gui;
 };
 
@@ -378,7 +406,7 @@ signals:
         _tool_bar.set_style_sheet (TOOLBAR_CSS ().arg (background, dark, highlight_color, highlight_text_color));
 
         Q_FOREACH (QAction a, _action_group.actions ()) {
-            QIcon icon = Theme.create_color_aware_icon (a.property ("icon_path").to_string (), palette ());
+            QIcon icon = Theme.create_color_aware_icon (a.property ("icon_path").to_"", palette ());
             a.set_icon (icon);
             var btn = qobject_cast<QToolButton> (_tool_bar.widget_for_action (a));
             if (btn)
@@ -388,6 +416,8 @@ signals:
 
 class Tool_button_action : QWidget_action {
 
+    /***********************************************************
+    ***********************************************************/
     public Tool_button_action (QIcon &icon, string text, GLib.Object parent)
         : QWidget_action (parent) {
         on_set_text (text);
@@ -395,6 +425,8 @@ class Tool_button_action : QWidget_action {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public Gtk.Widget create_widget (Gtk.Widget parent) override {
         var toolbar = qobject_cast<QTool_bar> (parent);
         if (!toolbar) {

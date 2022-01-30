@@ -26,6 +26,8 @@ namespace Ui {
 ***********************************************************/
 class SslDialogErrorHandler : AbstractSslErrorHandler {
 
+    /***********************************************************
+    ***********************************************************/
     public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration &conf, GLib.List<QSslCertificate> *certs, AccountPointer) override;
 };
 
@@ -35,24 +37,36 @@ class SslDialogErrorHandler : AbstractSslErrorHandler {
 ***********************************************************/
 class Ssl_error_dialog : Gtk.Dialog {
 
+    /***********************************************************
+    ***********************************************************/
     public Ssl_error_dialog (AccountPointer account, Gtk.Widget parent = nullptr);
     ~Ssl_error_dialog () override;
     public bool check_failing_certs_known (GLib.List<QSslError> &errors);
 
 
+    /***********************************************************
+    ***********************************************************/
     public bool trust_connection ();
 
-
+    /***********************************************************
+    ***********************************************************/
+    public 
     public GLib.List<QSslCertificate> unknown_certs () {
         return _unknown_certs;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private string style_sheet ();
-    private bool _all_trusted;
 
-    private string cert_div (QSslCertificate);
+    /***********************************************************
+    ***********************************************************/
+    private 
 
+    /***********************************************************
+    ***********************************************************/
+    private 
     private GLib.List<QSslCertificate> _unknown_certs;
     private string _custom_config_handle;
     private Ui.Ssl_error_dialog _ui;
@@ -146,11 +160,11 @@ class Ssl_error_dialog : Gtk.Dialog {
             if (trusted_certs.contains (error.certificate ()) || _unknown_certs.contains (error.certificate ())) {
                 continue;
             }
-            error_strings += error.error_string ();
+            error_strings += error.error_"";
             if (!error.certificate ().is_null ()) {
                 _unknown_certs.append (error.certificate ());
             } else {
-                additional_error_strings.append (error.error_string ());
+                additional_error_strings.append (error.error_"");
             }
         }
 
@@ -173,7 +187,7 @@ class Ssl_error_dialog : Gtk.Dialog {
             // add the errors for this cert
             foreach (QSslError err, errors) {
                 if (err.certificate () == cert) {
-                    msg += QL ("<p>") + err.error_string () + QL ("</p>");
+                    msg += QL ("<p>") + err.error_"" + QL ("</p>");
                 }
             }
             msg += QL ("</div>");
@@ -240,8 +254,8 @@ class Ssl_error_dialog : Gtk.Dialog {
         msg += _("Fingerprint (SHA-256) : <tt>%1</tt>").arg (sha256sum) + QL ("<br/>");
         msg += _("Fingerprint (SHA-512) : <tt>%1</tt>").arg (sha512sum) + QL ("<br/>");
         msg += QL ("<br/>");
-        msg += _("Effective Date : %1").arg (cert.effective_date ().to_string ()) + QL ("<br/>");
-        msg += _("Expiration Date : %1").arg (cert.expiry_date ().to_string ()) + QL ("</p>");
+        msg += _("Effective Date : %1").arg (cert.effective_date ().to_"") + QL ("<br/>");
+        msg += _("Expiration Date : %1").arg (cert.expiry_date ().to_"") + QL ("</p>");
 
         msg += QL ("</div>");
 
