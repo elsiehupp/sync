@@ -157,7 +157,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
         }
 
         if (!file.open (GLib.File.ReadWrite | GLib.File.Truncate))
-            return file.error_"";
+            return file.error_string ();
 
         file.write (" ");
         file.close ();

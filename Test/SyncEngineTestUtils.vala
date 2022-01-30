@@ -39,7 +39,7 @@ inline string getFilePathFromUrl (GLib.Uri url) {
 }
 
 inline GLib.ByteArray generateEtag () {
-    return GLib.ByteArray.number (QDateTime.currentDateTimeUtc ().toMSecsSinceEpoch (), 16) + GLib.ByteArray.number (Occ.Utility.rand (), 16);
+    return GLib.ByteArray.number (GLib.DateTime.currentDateTimeUtc ().toMSecsSinceEpoch (), 16) + GLib.ByteArray.number (Occ.Utility.rand (), 16);
 }
 inline GLib.ByteArray generateFileId () {
     return GLib.ByteArray.number (Occ.Utility.rand (), 16);
@@ -85,7 +85,7 @@ class FileModifier {
     public virtual void appendByte (string relativePath);
     public virtual void mkdir (string relativePath);
     public virtual void rename (string relativePath, string relativeDestinationDirectory);
-    public virtual void setModTime (string relativePath, QDateTime &modTime);
+    public virtual void setModTime (string relativePath, GLib.DateTime &modTime);
 };
 
 class DiskFileModifier : FileModifier {
@@ -103,7 +103,7 @@ class DiskFileModifier : FileModifier {
     ***********************************************************/
     public void mkdir (string relativePath) override;
     public void rename (string from, string to) override;
-    public void setModTime (string relativePath, QDateTime &modTime) override;
+    public void setModTime (string relativePath, GLib.DateTime &modTime) override;
 };
 
 class FileInfo : FileModifier {
@@ -150,7 +150,7 @@ class FileInfo : FileModifier {
 
     /***********************************************************
     ***********************************************************/
-    public void setModTime (string relativePath, QDateTime &modTime) override;
+    public void setModTime (string relativePath, GLib.DateTime &modTime) override;
 
     /***********************************************************
     ***********************************************************/
@@ -202,7 +202,7 @@ class FileInfo : FileModifier {
     public bool isDir = true;
     public bool isShared = false;
     public Occ.RemotePermissions permissions; // When uset, defaults to everything
-    public QDateTime lastModified = QDateTime.currentDateTimeUtc ().addDays (-7);
+    public GLib.DateTime lastModified = GLib.DateTime.currentDateTimeUtc ().addDays (-7);
 
 
     /***********************************************************
@@ -873,7 +873,7 @@ void DiskFileModifier.insert (string relativePath, int64 size, char contentChar)
     file.write (buf.data (), size % buf.size ());
     file.close ();
     // Set the mtime 30 seconds in the past, for some tests that need to make sure that the mtime differs.
-    Occ.FileSystem.setModTime (file.fileName (), Occ.Utility.qDateTimeToTime_t (QDateTime.currentDateTimeUtc ().addSecs (-30)));
+    Occ.FileSystem.setModTime (file.fileName (), Occ.Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ().addSecs (-30)));
     QCOMPARE (file.size (), size);
 }
 
@@ -903,7 +903,7 @@ void DiskFileModifier.rename (string from, string to) {
     QVERIFY (_rootDir.rename (from, to));
 }
 
-void DiskFileModifier.setModTime (string relativePath, QDateTime &modTime) {
+void DiskFileModifier.setModTime (string relativePath, GLib.DateTime &modTime) {
     Occ.FileSystem.setModTime (_rootDir.filePath (relativePath), Occ.Utility.qDateTimeToTime_t (modTime));
 }
 
@@ -973,7 +973,7 @@ void FileInfo.rename (string oldPath, string newPath) {
     dir.children.insert (newPathComponents.fileName (), std.move (fi));
 }
 
-void FileInfo.setModTime (string relativePath, QDateTime &modTime) {
+void FileInfo.setModTime (string relativePath, GLib.DateTime &modTime) {
     FileInfo file = findInvalidatingEtags (relativePath);
     Q_ASSERT (file);
     file.lastModified = modTime;
@@ -1945,7 +1945,7 @@ Occ.SyncFileItemPtr ItemCompletedSpy.findItemWithExpectedRank (string path, int 
 
 FakeReply.FakeReply (GLib.Object parent)
     : QNetworkReply (parent) {
-    setRawHeader (QByteArrayLiteral ("Date"), QDateTime.currentDateTimeUtc ().toString (Qt.RFC2822Date).toUtf8 ());
+    setRawHeader (QByteArrayLiteral ("Date"), GLib.DateTime.currentDateTimeUtc ().toString (Qt.RFC2822Date).toUtf8 ());
 }
 
 FakeReply.~FakeReply () = default;

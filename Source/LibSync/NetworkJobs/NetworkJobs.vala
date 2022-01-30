@@ -472,7 +472,7 @@ class RequestEtagJob : AbstractNetworkJob {
     public void on_start () override;
 
 signals:
-    void on_etag_retrieved (GLib.ByteArray etag, QDateTime &time);
+    void on_etag_retrieved (GLib.ByteArray etag, GLib.DateTime &time);
     void finished_with_result (HttpResult<GLib.ByteArray> &etag);
 
 
@@ -717,7 +717,7 @@ void RequestEtagJob.on_start () {
     send_request ("PROPFIND", make_dav_url (path ()), req, buf);
 
     if (reply ().error () != QNetworkReply.NoError) {
-        GLib.warn (lc_etag_job) << "request network error : " << reply ().error_"";
+        GLib.warn (lc_etag_job) << "request network error : " << reply ().error_string ();
     }
     AbstractNetworkJob.on_start ();
 }
@@ -747,11 +747,11 @@ bool RequestEtagJob.on_finished () {
                 }
             }
         }
-        emit etag_retrieved (etag, QDateTime.from_string (string.from_utf8 (_response_timestamp), Qt.RFC2822Date));
+        emit etag_retrieved (etag, GLib.DateTime.from_string (string.from_utf8 (_response_timestamp), Qt.RFC2822Date));
         emit finished_with_result (etag);
     } else {
         emit finished_with_result (HttpError {
-            http_code, error_""
+            http_code, error_string ()
         });
     }
     return true;
@@ -922,7 +922,7 @@ bool LsColXMLParser.parse (GLib.ByteArray xml, QHash<string, ExtraFolderInfo> *f
 
     if (reader.has_error ()) {
         // XML Parser error? Whatever had been emitted before will come as directory_listing_iterated
-        GLib.warn (lc_ls_col_job) << "ERROR" << reader.error_"" << xml;
+        GLib.warn (lc_ls_col_job) << "ERROR" << reader.error_string () << xml;
         return false;
     } else if (!inside_multi_status) {
         GLib.warn (lc_ls_col_job) << "ERROR no WebDAV response?" << xml;
@@ -1138,7 +1138,7 @@ bool CheckServerJob.on_finished () {
         var status = QJsonDocument.from_json (body, &error);
         // empty or invalid response
         if (error.error != QJsonParseError.NoError || status.is_null ()) {
-            GLib.warn (lc_check_server_job) << "status.php from server is not valid JSON!" << body << reply ().request ().url () << error.error_"";
+            GLib.warn (lc_check_server_job) << "status.php from server is not valid JSON!" << body << reply ().request ().url () << error.error_string ();
         }
 
         q_c_info (lc_check_server_job) << "status.php returns : " << status << " " << reply ().error () << " Reply : " << reply ();
@@ -1232,7 +1232,7 @@ bool PropfindJob.on_finished () {
             }
         }
         if (reader.has_error ()) {
-            GLib.warn (lc_propfind_job) << "XML parser error : " << reader.error_"";
+            GLib.warn (lc_propfind_job) << "XML parser error : " << reader.error_string ();
             emit finished_with_error (reply ());
         } else {
             emit result (items);
@@ -1450,7 +1450,7 @@ bool JsonApiJob.on_finished () {
     int status_code = 0;
     int http_status_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (reply ().error () != QNetworkReply.NoError) {
-        GLib.warn (lc_json_api_job) << "Network error : " << path () << error_"" << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute);
+        GLib.warn (lc_json_api_job) << "Network error : " << path () << error_string () << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute);
         status_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
         emit json_received (QJsonDocument (), status_code);
         return true;
@@ -1489,7 +1489,7 @@ bool JsonApiJob.on_finished () {
     var json = QJsonDocument.from_json (json_str.to_utf8 (), &error);
     // empty or invalid response and status code is != 304 because json_str is expected to be empty
     if ( (error.error != QJsonParseError.NoError || json.is_null ()) && http_status_code != not_modified_status_code) {
-        GLib.warn (lc_json_api_job) << "invalid JSON!" << json_str << error.error_"";
+        GLib.warn (lc_json_api_job) << "invalid JSON!" << json_str << error.error_string ();
         emit json_received (json, status_code);
         return true;
     }
@@ -1659,12 +1659,12 @@ void DeleteApiJob.on_start () {
 bool DeleteApiJob.on_finished () {
     q_c_info (lc_json_api_job) << "JsonApiJob of" << reply ().request ().url () << "FINISHED WITH STATUS"
                          << reply ().error ()
-                         << (reply ().error () == QNetworkReply.NoError ? QLatin1String ("") : error_"");
+                         << (reply ().error () == QNetworkReply.NoError ? QLatin1String ("") : error_string ());
 
     int http_status = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 
     if (reply ().error () != QNetworkReply.NoError) {
-        GLib.warn (lc_json_api_job) << "Network error : " << path () << error_"" << http_status;
+        GLib.warn (lc_json_api_job) << "Network error : " << path () << error_string () << http_status;
         emit result (http_status);
         return true;
     }

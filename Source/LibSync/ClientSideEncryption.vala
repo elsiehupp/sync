@@ -1813,10 +1813,10 @@ QVector<EncryptedFile> FolderMetadata.files () {
 
 bool EncryptionHelper.file_encryption (GLib.ByteArray key, GLib.ByteArray iv, GLib.File input, GLib.File output, GLib.ByteArray& return_tag) {
     if (!input.open (QIODevice.ReadOnly)) {
-      GLib.debug (lc_cse) << "Could not open input file for reading" << input.error_"";
+      GLib.debug (lc_cse) << "Could not open input file for reading" << input.error_string ();
     }
     if (!output.open (QIODevice.WriteOnly)) {
-      GLib.debug (lc_cse) << "Could not oppen output file for writing" << output.error_"";
+      GLib.debug (lc_cse) << "Could not oppen output file for writing" << output.error_string ();
     }
 
     // Init

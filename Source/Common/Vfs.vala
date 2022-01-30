@@ -631,7 +631,7 @@ class VfsOff : Vfs {
         // Attempting to load the plugin is essential as it could have dependencies that
         // can't be resolved and thus not be available after all.
         if (!loader.on_load ()) {
-            GLib.warn (lc_plugin) << "Plugin failed to load:" << loader.error_"";
+            GLib.warn (lc_plugin) << "Plugin failed to load:" << loader.error_string ();
             return false;
         }
 
@@ -698,7 +698,7 @@ class VfsOff : Vfs {
         QPluginLoader loader (plugin_path);
         var plugin = loader.instance ();
         if (!plugin) {
-            q_c_critical (lc_plugin) << "Could not load plugin" << plugin_path << loader.error_"";
+            q_c_critical (lc_plugin) << "Could not load plugin" << plugin_path << loader.error_string ();
             return nullptr;
         }
 

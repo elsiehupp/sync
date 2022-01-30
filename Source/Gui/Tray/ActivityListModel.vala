@@ -471,7 +471,7 @@ signals:
 
         _currently_fetching = false;
 
-        QDateTime oldest_date = QDateTime.current_date_time ();
+        GLib.DateTime oldest_date = GLib.DateTime.current_date_time ();
         oldest_date = oldest_date.add_days (_max_activities_days * -1);
 
         foreach (var activ, activities) {
@@ -487,7 +487,7 @@ signals:
             a._message = json.value ("message").to_"";
             a._file = json.value ("object_name").to_"";
             a._link = GLib.Uri (json.value ("link").to_"");
-            a._date_time = QDateTime.from_string (json.value ("datetime").to_"", Qt.ISODate);
+            a._date_time = GLib.DateTime.from_string (json.value ("datetime").to_"", Qt.ISODate);
             a._icon = json.value ("icon").to_"";
 
             list.append (a);
@@ -710,7 +710,7 @@ signals:
                 a._acc_name = _account_state.account ().display_name ();
                 a._id = -1;
                 a._subject = _("For more activities please open the Activity app.");
-                a._date_time = QDateTime.current_date_time ();
+                a._date_time = GLib.DateTime.current_date_time ();
 
                 AccountApp app = _account_state.find_app (QLatin1String ("activity"));
                 if (app) {

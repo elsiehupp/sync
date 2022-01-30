@@ -250,7 +250,7 @@ QKeychain.Error Job.error () {
     return _error;
 }
 
-string Job.error_"" {
+string Job.error_string () {
     return _error_string;
 }
 
@@ -312,7 +312,7 @@ bool WriteJob.exec () {
     wait_loop.exec ();
 
     if (error () != NoError) {
-        GLib.warn (lc_keychain_chunk) << "WritePasswordJob failed with" << error_"";
+        GLib.warn (lc_keychain_chunk) << "WritePasswordJob failed with" << error_string ();
         return false;
     }
 
@@ -325,10 +325,10 @@ void WriteJob.on_write_job_done (QKeychain.Job incoming_job) {
     // Errors? (write_job can be nullptr here, see : WriteJob.on_start)
     if (write_job) {
         _error = write_job.error ();
-        _error_string = write_job.error_"";
+        _error_string = write_job.error_string ();
 
         if (write_job.error () != NoError) {
-            GLib.warn (lc_keychain_chunk) << "Error while writing" << write_job.key () << "chunk" << write_job.error_"";
+            GLib.warn (lc_keychain_chunk) << "Error while writing" << write_job.key () << "chunk" << write_job.error_string ();
             _chunk_buffer.clear ();
         }
     }
@@ -441,7 +441,7 @@ bool ReadJob.exec () {
     _chunk_count = 0;
     _chunk_buffer.clear ();
     if (error () != EntryNotFound) {
-        GLib.warn (lc_keychain_chunk) << "ReadPasswordJob failed with" << error_"";
+        GLib.warn (lc_keychain_chunk) << "ReadPasswordJob failed with" << error_string ();
     }
     return false;
 }
@@ -461,7 +461,7 @@ void ReadJob.on_read_job_done (QKeychain.Job incoming_job) {
                 // Could be that the backend was not yet available. Wait some extra seconds.
                 // (Issues #4274 and #6522)
                 // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
-                q_c_info (lc_keychain_chunk) << "Backend unavailable (yet?) Retrying in a few seconds." << read_job.error_"";
+                q_c_info (lc_keychain_chunk) << "Backend unavailable (yet?) Retrying in a few seconds." << read_job.error_string ();
                 QTimer.single_shot (10000, this, &ReadJob.on_start);
                 _retry_on_key_chain_error = false;
                 read_job.delete_later ();
@@ -472,8 +472,8 @@ void ReadJob.on_read_job_done (QKeychain.Job incoming_job) {
         if (read_job.error () != QKeychain.EntryNotFound ||
             ( (read_job.error () == QKeychain.EntryNotFound) && _chunk_count == 0)) {
             _error = read_job.error ();
-            _error_string = read_job.error_"";
-            GLib.warn (lc_keychain_chunk) << "Unable to read" << read_job.key () << "chunk" << string.number (_chunk_count) << read_job.error_"";
+            _error_string = read_job.error_string ();
+            GLib.warn (lc_keychain_chunk) << "Unable to read" << read_job.key () << "chunk" << string.number (_chunk_count) << read_job.error_string ();
         }
     }
 
@@ -534,7 +534,7 @@ bool DeleteJob.exec () {
 
     _chunk_count = 0;
     if (error () != EntryNotFound) {
-        GLib.warn (lc_keychain_chunk) << "DeletePasswordJob failed with" << error_"";
+        GLib.warn (lc_keychain_chunk) << "DeletePasswordJob failed with" << error_string ();
     }
     return false;
 }
@@ -550,8 +550,8 @@ void DeleteJob.on_delete_job_done (QKeychain.Job incoming_job) {
         if (delete_job.error () != QKeychain.EntryNotFound ||
             ( (delete_job.error () == QKeychain.EntryNotFound) && _chunk_count == 0)) {
             _error = delete_job.error ();
-            _error_string = delete_job.error_"";
-            GLib.warn (lc_keychain_chunk) << "Unable to delete" << delete_job.key () << "chunk" << string.number (_chunk_count) << delete_job.error_"";
+            _error_string = delete_job.error_string ();
+            GLib.warn (lc_keychain_chunk) << "Unable to delete" << delete_job.key () << "chunk" << string.number (_chunk_count) << delete_job.error_string ();
         }
     }
 

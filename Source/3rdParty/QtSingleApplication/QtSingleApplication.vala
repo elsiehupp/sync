@@ -144,7 +144,7 @@ namespace SharedTools {
         if (!created) {
             if (!instances.attach ()) {
                 q_warning () << "Failed to initialize instances shared memory : "
-                           << instances.error_"";
+                           << instances.error_string ();
                 delete instances;
                 instances = nullptr;
                 return;

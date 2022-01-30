@@ -149,7 +149,7 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
 
     if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
         store_first_error (err);
-        store_first_error_string (delete_job.error_"");
+        store_first_error_string (delete_job.error_string ());
         GLib.warn (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Delete nested item on_finished with error" << err << ".";
     } else if (http_error_code != 204 && http_error_code != 404) {
         // A 404 reply is also considered a on_success here : We want to make sure

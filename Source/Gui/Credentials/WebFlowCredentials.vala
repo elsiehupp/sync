@@ -354,7 +354,7 @@ void WebFlowCredentials.on_ask_from_user_cancelled () {
 bool WebFlowCredentials.still_valid (QNetworkReply reply) {
     if (reply.error () != QNetworkReply.NoError) {
         GLib.warn (lc_web_flow_credentials ()) << reply.error ();
-        GLib.warn (lc_web_flow_credentials ()) << reply.error_"";
+        GLib.warn (lc_web_flow_credentials ()) << reply.error_string ();
     }
     return (reply.error () != QNetworkReply.AuthenticationRequiredError);
 }
@@ -447,7 +447,7 @@ void WebFlowCredentials.on_write_client_ca_certs_pem_job_done (KeychainChunk.Wri
     // errors / next ca cert?
     if (write_job && !_client_ssl_ca_certificates.is_empty ()) {
         if (write_job.error () != NoError) {
-            GLib.warn (lc_web_flow_credentials) << "Error while writing client CA cert" << write_job.error_"";
+            GLib.warn (lc_web_flow_credentials) << "Error while writing client CA cert" << write_job.error_string ();
         }
 
         if (!_client_ssl_ca_certificates_write_queue.is_empty ()) {
@@ -475,7 +475,7 @@ void WebFlowCredentials.on_write_job_done (QKeychain.Job job) {
     case NoError:
         break;
     default:
-        GLib.warn (lc_web_flow_credentials) << "Error while writing password" << job.error_"";
+        GLib.warn (lc_web_flow_credentials) << "Error while writing password" << job.error_string ();
     }
 }
 
@@ -604,7 +604,7 @@ void WebFlowCredentials.on_read_client_key_pem_job_done (KeychainChunk.ReadJob r
         }
         client_key_pem.clear ();
     } else {
-        GLib.warn (lc_web_flow_credentials) << "Unable to read client key" << read_job.error_"";
+        GLib.warn (lc_web_flow_credentials) << "Unable to read client key" << read_job.error_string ();
     }
 
     // Start fetching client CA certs
@@ -644,7 +644,7 @@ void WebFlowCredentials.on_read_client_ca_certs_pem_job_done (KeychainChunk.Read
         } else {
             if (read_job.error () != QKeychain.Error.EntryNotFound ||
                 ( (read_job.error () == QKeychain.Error.EntryNotFound) && _client_ssl_ca_certificates.count () == 0)) {
-                GLib.warn (lc_web_flow_credentials) << "Unable to read client CA cert slot" << string.number (_client_ssl_ca_certificates.count ()) << read_job.error_"";
+                GLib.warn (lc_web_flow_credentials) << "Unable to read client CA cert slot" << string.number (_client_ssl_ca_certificates.count ()) << read_job.error_string ();
             }
         }
     }

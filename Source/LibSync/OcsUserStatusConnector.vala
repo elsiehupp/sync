@@ -6,7 +6,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 // #include <networkjobs.h>
 
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <QtGlobal>
 // #include <QJsonDocument>
 // #include <QJsonValue>
@@ -189,11 +189,11 @@ class OcsUserStatusConnector : UserStatusConnector {
             return QDate.current_date ().add_days (days + 1).start_of_day ().to_time_t ();
         }
         GLib.warn (lc_ocs_user_status_connector) << "Can not handle clear at endof day type" << clear_at._endof;
-        return QDateTime.current_date_time ().to_time_t ();
+        return GLib.DateTime.current_date_time ().to_time_t ();
     }
 
     uint64 clear_at_period_to_timestamp (Occ.ClearAt &clear_at) {
-        return QDateTime.current_date_time ().add_secs (clear_at._period).to_time_t ();
+        return GLib.DateTime.current_date_time ().add_secs (clear_at._period).to_time_t ();
     }
 
     uint64 clear_at_to_timestamp (Occ.ClearAt &clear_at) {

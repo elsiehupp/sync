@@ -71,7 +71,7 @@ signals:
         }
 
         if (reply ().error () != QNetworkReply.NoError) {
-            GLib.warn (lc_delete_job) << " Network error : " << reply ().error_"";
+            GLib.warn (lc_delete_job) << " Network error : " << reply ().error_string ();
         }
         AbstractNetworkJob.on_start ();
     }

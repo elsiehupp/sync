@@ -82,7 +82,7 @@ class TestUtility : GLib.Object {
         uint64 sec = 1000;
         uint64 hour = 3600 * sec;
 
-        QDateTime current = QDateTime.currentDateTimeUtc ();
+        GLib.DateTime current = GLib.DateTime.currentDateTimeUtc ();
 
         QCOMPARE (durationToDescriptiveString2 (0), string ("0 second (s)") );
         QCOMPARE (durationToDescriptiveString2 (5), string ("0 second (s)") );
@@ -141,19 +141,19 @@ class TestUtility : GLib.Object {
     ***********************************************************/
     private void on_test_time_ago () {
         // Both times in same timezone
-        QDateTime d1 = QDateTime.fromString ("2015-01-24T09:20:30+01:00", Qt.ISODate);
-        QDateTime d2 = QDateTime.fromString ("2015-01-23T09:20:30+01:00", Qt.ISODate);
+        GLib.DateTime d1 = GLib.DateTime.fromString ("2015-01-24T09:20:30+01:00", Qt.ISODate);
+        GLib.DateTime d2 = GLib.DateTime.fromString ("2015-01-23T09:20:30+01:00", Qt.ISODate);
         string s = timeAgoInWords (d2, d1);
         QCOMPARE (s, QLatin1String ("1 day ago"));
 
         // Different timezones
-        QDateTime earlyTS = QDateTime.fromString ("2015-01-24T09:20:30+01:00", Qt.ISODate);
-        QDateTime laterTS = QDateTime.fromString ("2015-01-24T09:20:30-01:00", Qt.ISODate);
+        GLib.DateTime earlyTS = GLib.DateTime.fromString ("2015-01-24T09:20:30+01:00", Qt.ISODate);
+        GLib.DateTime laterTS = GLib.DateTime.fromString ("2015-01-24T09:20:30-01:00", Qt.ISODate);
         s = timeAgoInWords (earlyTS, laterTS);
         QCOMPARE (s, QLatin1String ("2 hours ago"));
 
         // 'Now' in whatever timezone
-        earlyTS = QDateTime.currentDateTime ();
+        earlyTS = GLib.DateTime.currentDateTime ();
         laterTS = earlyTS;
         s = timeAgoInWords (earlyTS, laterTS );
         QCOMPARE (s, QLatin1String ("now"));

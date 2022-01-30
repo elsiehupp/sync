@@ -248,7 +248,7 @@ protected slots:
     // status.php could not be loaded (network or server issue!).
     void ConnectionValidator.on_no_status_found (QNetworkReply reply) {
         var job = qobject_cast<CheckServerJob> (sender ());
-        GLib.warn (lc_connection_validator) << reply.error () << job.error_"" << reply.peek (1024);
+        GLib.warn (lc_connection_validator) << reply.error () << job.error_string () << reply.peek (1024);
         if (reply.error () == QNetworkReply.SslHandshakeFailedError) {
             report_result (SslError);
             return;
@@ -259,7 +259,7 @@ protected slots:
             _errors.append (_("Authentication error : Either username or password are wrong."));
         } else {
             //_errors.append (_("Unable to connect to %1").arg (_account.url ().to_""));
-            _errors.append (job.error_"");
+            _errors.append (job.error_string ());
         }
         report_result (StatusNotFound);
     }
@@ -300,7 +300,7 @@ protected slots:
 
         } else if (reply.error () == QNetworkReply.AuthenticationRequiredError
             || !_account.credentials ().still_valid (reply)) {
-            GLib.warn (lc_connection_validator) << "******** Password is wrong!" << reply.error () << job.error_"";
+            GLib.warn (lc_connection_validator) << "******** Password is wrong!" << reply.error () << job.error_string ();
             _errors << _("The provided credentials are not correct");
             stat = CredentialsWrong;
 

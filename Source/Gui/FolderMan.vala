@@ -1392,7 +1392,7 @@ void FolderMan.on_schedule_folder_by_time () {
             q_c_info (lc_folder_man) << "Scheduling folder" << f.alias ()
                                 << ", the last" << f.consecutive_failing_syncs () << "syncs failed"
                                 << ", another_sync_needed" << f.sync_engine ().is_another_sync_needed ()
-                                << ", last status:" << f.sync_result ().status_""
+                                << ", last status:" << f.sync_result ().status_string ()
                                 << ", time since last sync:" << msecs_since_sync.count ();
 
             schedule_folder (f);

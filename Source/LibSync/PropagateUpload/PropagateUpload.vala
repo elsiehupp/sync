@@ -165,8 +165,8 @@ class PUTFile_job : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public string error_"" override {
-        return _error_string.is_empty () ? AbstractNetworkJob.error_"" : _error_string;
+    public string error_string () override {
+        return _error_string.is_empty () ? AbstractNetworkJob.error_string () : _error_string;
     }
 
 
@@ -549,7 +549,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
 
         if (reply ().error () != QNetworkReply.NoError) {
-            GLib.warn (lc_put_job) << " Network error : " << reply ().error_"";
+            GLib.warn (lc_put_job) << " Network error : " << reply ().error_string ();
         }
 
         connect (reply (), &QNetworkReply.upload_progress, this, &PUTFile_job.upload_progress);
@@ -586,7 +586,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             _item._http_error_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
             _item._request_id = request_id ();
             _item._status = classify_error (err, _item._http_error_code);
-            _item._error_string = error_"";
+            _item._error_string = error_string ();
 
             if (_item._status == SyncFileItem.FatalError || _item._http_error_code >= 400) {
                 if (_item._status != SyncFileItem.FatalError
@@ -607,7 +607,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         GLib.ByteArray json_data = reply ().read_all ().trimmed ();
         QJsonParseError json_parse_error;
         QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
-        q_c_info (lc_poll_job) << ">" << json_data << "<" << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int () << json << json_parse_error.error_"";
+        q_c_info (lc_poll_job) << ">" << json_data << "<" << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int () << json << json_parse_error.error_string ();
         if (json_parse_error.error != QJsonParseError.NoError) {
             _item._error_string = _("Invalid JSON reply from the poll URL");
             _item._status = SyncFileItem.NormalError;
@@ -990,7 +990,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         var c = _file.read (data, maxlen);
         if (c < 0) {
-            on_set_error_string (_file.error_"");
+            on_set_error_string (_file.error_string ());
             return -1;
         }
         _read += c;

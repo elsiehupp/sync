@@ -236,7 +236,7 @@ signals:
                              << _verb
                              << Utility.concat_url_path (account ().url (), path ())
                              << _params
-                             << error.error_""
+                             << error.error_string ()
                              << ":" << reply_data;
         } else {
             status_code  = get_json_return_code (json, message);

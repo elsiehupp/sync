@@ -9,7 +9,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 // #include <string>
 // #include <QMetaType>
 // #include <GLib.Uri>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <QtGlobal>
 // #include <QVariant>
 
@@ -43,7 +43,7 @@ class UserStatus {
 
     /***********************************************************
     ***********************************************************/
-    public enum class OnlineStatus : uint8 {
+    public enum OnlineStatus : uint8 {
         Online,
         DoNotDisturb,
         Away,
@@ -60,45 +60,79 @@ class UserStatus {
     public UserStatus (string id, string message, string icon,
         OnlineStatus state, bool message_predefined, Optional<ClearAt> &clear_at = {});
 
-    //  Q_REQUIRED_RESULT
+
+    /***********************************************************
+    Q_REQUIRED_RESULT
+    ***********************************************************/
     public string id ();
-    //  Q_REQUIRED_RESULT
+
+
+    /***********************************************************
+    Q_REQUIRED_RESULT
+    ***********************************************************/
     public string message ();
-    //  Q_REQUIRED_RESULT
+
+
+    /***********************************************************
+    Q_REQUIRED_RESULT
+    ***********************************************************/
     public string icon ();
-    //  Q_REQUIRED_RESULT
+
+
+    /***********************************************************
+    Q_REQUIRED_RESULT
+    ***********************************************************/
     public OnlineStatus state ();
-    //  Q_REQUIRED_RESULT
-    public Optional<ClearAt> clear_at ();
+
+
+    /***********************************************************
+    Q_REQUIRED_RESULT
+    ***********************************************************/
+    public Optional<ClearAt> clear_at () {
+        return _clear_at;
+    }
 
     /***********************************************************
     ***********************************************************/
-    public void set_id (string id);
+    public void set_id (string id) {
+        _id = id;
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    public void UserStatus.set_message (string message) {
+        _message = message;
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    public void set_state (OnlineStatus state) {
+        _state = state;
+    }
+
+
 
     /***********************************************************
     ***********************************************************/
-    public void set_state (OnlineStatus 
+    public void set_icon (string icon) {
+        _icon = icon;
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    public void set_message_predefined (bool value) {
+        _message_predefined = value;
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-    public void set_message_predefined (bool value);
-
-
-    public void set_clear_at (Optional<ClearAt> &date_time);
+    public void set_clear_at (Optional<ClearAt> date_time) {
+        _clear_at = date_time;
+    }
 
     //  Q_REQUIRED_RESULT
     public bool message_predefined ();
@@ -217,33 +251,6 @@ signals:
         Q_UNREACHABLE ();
     }
 
-    Optional<ClearAt> UserStatus.clear_at () {
-        return _clear_at;
-    }
-
-    void UserStatus.set_id (string id) {
-        _id = id;
-    }
-
-    void UserStatus.set_message (string message) {
-        _message = message;
-    }
-
-    void UserStatus.set_state (OnlineStatus state) {
-        _state = state;
-    }
-
-    void UserStatus.set_icon (string icon) {
-        _icon = icon;
-    }
-
-    void UserStatus.set_message_predefined (bool value) {
-        _message_predefined = value;
-    }
-
-    void UserStatus.set_clear_at (Optional<ClearAt> &date_time) {
-        _clear_at = date_time;
-    }
 
     UserStatusConnector.UserStatusConnector (GLib.Object parent) {
         base (parent);

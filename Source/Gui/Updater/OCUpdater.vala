@@ -387,7 +387,7 @@ class Passive_update_notifier : OCUpdater {
         // or once for system based updates.
         if (_state == OCUpdater.Download_complete || (old_state != OCUpdater.Update_only_available_through_system
                                                          && _state == OCUpdater.Update_only_available_through_system)) {
-            emit new_update_available (_("Update Check"), status_"");
+            emit new_update_available (_("Update Check"), status_string ());
         }
     }
 
@@ -452,7 +452,7 @@ class Passive_update_notifier : OCUpdater {
         var reply = qobject_cast<QNetworkReply> (sender ());
         reply.delete_later ();
         if (reply.error () != QNetworkReply.NoError) {
-            GLib.warn (lc_updater) << "Failed to reach version check url : " << reply.error_"";
+            GLib.warn (lc_updater) << "Failed to reach version check url : " << reply.error_string ();
             set_download_state (Download_timed_out);
             return;
         }

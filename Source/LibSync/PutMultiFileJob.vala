@@ -59,8 +59,8 @@ class PutMultiFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public string error_"" override {
-        return _error_string.is_empty () ? AbstractNetworkJob.error_"" : _error_string;
+    public string error_string () override {
+        return _error_string.is_empty () ? AbstractNetworkJob.error_string () : _error_string;
     }
 
 
@@ -107,7 +107,7 @@ signals:
         send_request ("POST", _url, req, &_body);
 
         if (reply ().error () != QNetworkReply.NoError) {
-            GLib.warn (lc_put_multi_file_job) << " Network error : " << reply ().error_"";
+            GLib.warn (lc_put_multi_file_job) << " Network error : " << reply ().error_string ();
         }
 
         connect (reply (), &QNetworkReply.upload_progress, this, &PutMultiFileJob.upload_progress);

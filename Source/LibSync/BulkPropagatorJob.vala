@@ -366,7 +366,7 @@ class BulkPropagatorJob : PropagatorJob {
             var device = std.make_unique<UploadDevice> (
                     single_file._local_path, 0, single_file._file_size, &propagator ()._bandwidth_manager);
             if (!device.open (QIODevice.ReadOnly)) {
-                GLib.warn (lc_bulk_propagator_job) << "Could not prepare upload device : " << device.error_"";
+                GLib.warn (lc_bulk_propagator_job) << "Could not prepare upload device : " << device.error_string ();
 
                 // If the file is currently locked, we want to retry the sync
                 // when it becomes available again.
@@ -374,7 +374,7 @@ class BulkPropagatorJob : PropagatorJob {
                     emit propagator ().seen_locked_file (single_file._local_path);
                 }
 
-                abort_with_error (single_file._item, SyncFileItem.NormalError, device.error_"");
+                abort_with_error (single_file._item, SyncFileItem.NormalError, device.error_string ());
                 emit finished (SyncFileItem.NormalError);
 
                 return;

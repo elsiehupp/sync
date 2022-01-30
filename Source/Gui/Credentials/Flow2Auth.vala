@@ -191,10 +191,10 @@ signals:
                                       .arg (error_from_json.to_html_escaped ());
                 } else if (reply.error () != QNetworkReply.NoError) {
                     error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
-                                      .arg (reply.error_"".to_html_escaped ());
+                                      .arg (reply.error_string ().to_html_escaped ());
                 } else if (json_parse_error.error != QJsonParseError.NoError) {
                     error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                      .arg (json_parse_error.error_"");
+                                      .arg (json_parse_error.error_string ());
                 } else {
                     error_reason = _("The reply from the server did not contain all expected fields");
                 }
@@ -304,10 +304,10 @@ signals:
                                       .arg (error_from_json.to_html_escaped ());
                 } else if (reply.error () != QNetworkReply.NoError) {
                     error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
-                                      .arg (reply.error_"".to_html_escaped ());
+                                      .arg (reply.error_string ().to_html_escaped ());
                 } else if (json_parse_error.error != QJsonParseError.NoError) {
                     error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                      .arg (json_parse_error.error_"");
+                                      .arg (json_parse_error.error_string ());
                 } else {
                     error_reason = _("The reply from the server did not contain all expected fields");
                 }

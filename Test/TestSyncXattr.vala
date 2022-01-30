@@ -109,7 +109,7 @@ class TestSyncXAttr : GLib.Object {
         // Create a virtual file for a new remote file
         fakeFolder.remoteModifier ().mkdir ("A");
         fakeFolder.remoteModifier ().insert ("A/a1", 64);
-        var someDate = QDateTime (QDate (1984, 07, 30), QTime (1,3,2));
+        var someDate = GLib.DateTime (QDate (1984, 07, 30), QTime (1,3,2));
         fakeFolder.remoteModifier ().setModTime ("A/a1", someDate);
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1");

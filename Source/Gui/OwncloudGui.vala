@@ -380,7 +380,7 @@ void OwncloudGui.on_sync_state_change (Folder folder) {
 
     var result = folder.sync_result ();
 
-    q_c_info (lc_application) << "Sync state changed for folder " << folder.remote_url ().to_"" << " : " << result.status_"";
+    q_c_info (lc_application) << "Sync state changed for folder " << folder.remote_url ().to_"" << " : " << result.status_string ();
 
     if (result.status () == SyncResult.Success
         || result.status () == SyncResult.Problem

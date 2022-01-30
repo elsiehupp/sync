@@ -187,7 +187,7 @@ class AccountState : GLib.Object, public QSharedData {
     the server to validate the connection if the last successful etag job
     was not so long ago.
     ***********************************************************/
-    public void tag_last_successfull_e_tag_request (QDateTime &tp);
+    public void tag_last_successfull_e_tag_request (GLib.DateTime &tp);
 
 
     /***********************************************************
@@ -279,7 +279,7 @@ class AccountState : GLib.Object, public QSharedData {
     private ConnectionStatus _connection_status;
     private string[] _connection_errors;
     private bool _waiting_for_new_credentials;
-    private QDateTime _time_of_last_e_tag_check;
+    private GLib.DateTime _time_of_last_e_tag_check;
     private QPointer<ConnectionValidator> _connection_validator;
     private GLib.ByteArray _notifications_etag_response_header;
     private GLib.ByteArray _navigation_apps_etag_response_header;
@@ -487,7 +487,7 @@ class AccountApp : GLib.Object {
         return _state == Connected;
     }
 
-    void AccountState.tag_last_successfull_e_tag_request (QDateTime &tp) {
+    void AccountState.tag_last_successfull_e_tag_request (GLib.DateTime &tp) {
         _time_of_last_e_tag_check = tp;
     }
 
@@ -541,7 +541,7 @@ class AccountApp : GLib.Object {
         // IF the account is connected the connection check can be skipped
         // if the last successful etag check job is not so long ago.
         const var polltime = std.chrono.duration_cast<std.chrono.seconds> (ConfigFile ().remote_poll_interval ());
-        const var elapsed = _time_of_last_e_tag_check.secs_to (QDateTime.current_date_time_utc ());
+        const var elapsed = _time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
         if (is_connected () && _time_of_last_e_tag_check.is_valid ()
             && elapsed <= polltime.count ()) {
             GLib.debug (lc_account_state) << account ().display_name () << "The last ETag check succeeded within the last " << polltime.count () << "s (" << elapsed << "s). No connection check needed!";

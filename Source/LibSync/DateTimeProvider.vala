@@ -1,6 +1,6 @@
 #pragma once
 
-// #include <QDateTime>
+// #include <GLib.DateTime>
 
 namespace Occ {
 
@@ -10,7 +10,7 @@ class DateTimeProvider {
 
     /***********************************************************
     ***********************************************************/
-    public virtual QDateTime current_date_time ();
+    public virtual GLib.DateTime current_date_time ();
 
     /***********************************************************
     ***********************************************************/
@@ -20,8 +20,8 @@ class DateTimeProvider {
 
     DateTimeProvider.~DateTimeProvider () = default;
 
-    QDateTime DateTimeProvider.current_date_time () {
-        return QDateTime.current_date_time ();
+    GLib.DateTime DateTimeProvider.current_date_time () {
+        return GLib.DateTime.current_date_time ();
     }
 
     QDate DateTimeProvider.current_date () {

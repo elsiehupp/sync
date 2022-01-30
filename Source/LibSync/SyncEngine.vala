@@ -233,7 +233,7 @@ class SyncEngine : GLib.Object {
 
 signals:
     // During update, before reconcile
-    void root_etag (GLib.ByteArray , QDateTime &);
+    void root_etag (GLib.ByteArray , GLib.DateTime &);
 
     // after the above signals. with the items that actually need propagating
     void about_to_propagate (SyncFileItemVector &);
@@ -274,7 +274,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private void on_folder_discovered (bool local, string folder);
-    private void on_root_etag_received (GLib.ByteArray , QDateTime &time);
+    private void on_root_etag_received (GLib.ByteArray , GLib.DateTime &time);
 
 
     /***********************************************************
@@ -498,7 +498,7 @@ signals:
         _clear_touched_files_timer.set_interval (30 * 1000);
         connect (&_clear_touched_files_timer, &QTimer.timeout, this, &SyncEngine.on_clear_touched_files);
         connect (this, &SyncEngine.on_finished, [this] (bool /* on_finished */) {
-            _journal.key_value_store_set ("last_sync", QDateTime.current_secs_since_epoch ());
+            _journal.key_value_store_set ("last_sync", GLib.DateTime.current_secs_since_epoch ());
         });
     }
 
@@ -530,7 +530,7 @@ signals:
         item._has_blocklist_entry = true;
 
         // If duration has expired, it's not blocklisted anymore
-        time_t now = Utility.q_date_time_to_time_t (QDateTime.current_date_time_utc ());
+        time_t now = Utility.q_date_time_to_time_t (GLib.DateTime.current_date_time_utc ());
         if (now >= entry._last_try_time + entry._ignore_duration) {
             q_c_info (lc_engine) << "blocklist entry for " << item._file << " has expired!";
             return false;
@@ -1001,7 +1001,7 @@ signals:
         emit transmission_progress (*_progress_info);
     }
 
-    void SyncEngine.on_root_etag_received (GLib.ByteArray e, QDateTime &time) {
+    void SyncEngine.on_root_etag_received (GLib.ByteArray e, GLib.DateTime &time) {
         if (_remote_root_etag.is_empty ()) {
             GLib.debug (lc_engine) << "Root etag:" << e;
             _remote_root_etag = e;

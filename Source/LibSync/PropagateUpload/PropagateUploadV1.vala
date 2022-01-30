@@ -113,7 +113,7 @@ void PropagateUploadFileV1.on_start_next_chunk () {
     var device = std.make_unique<UploadDevice> (
             file_name, chunk_start, current_chunk_size, &propagator ()._bandwidth_manager);
     if (!device.open (QIODevice.ReadOnly)) {
-        GLib.warn (lc_propagate_upload_v1) << "Could not prepare upload device : " << device.error_"";
+        GLib.warn (lc_propagate_upload_v1) << "Could not prepare upload device : " << device.error_string ();
 
         // If the file is currently locked, we want to retry the sync
         // when it becomes available again.
@@ -121,7 +121,7 @@ void PropagateUploadFileV1.on_start_next_chunk () {
             emit propagator ().seen_locked_file (file_name);
         }
         // Soft error because this is likely caused by the user modifying his files while syncing
-        abort_with_error (SyncFileItem.SoftError, device.error_"");
+        abort_with_error (SyncFileItem.SoftError, device.error_string ());
         return;
     }
 

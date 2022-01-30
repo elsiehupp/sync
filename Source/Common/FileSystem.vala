@@ -4,7 +4,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <QDir>
 // #include <GLib.Uri>
 // #include <GLib.File>
@@ -155,7 +155,7 @@ namespace FileSystem {
         GLib.File orig (origin_file_name);
         on_success = orig.rename (destination_file_name);
         if (!on_success) {
-            error = orig.error_"";
+            error = orig.error_string ();
         }
 
         if (!on_success) {
@@ -189,7 +189,7 @@ namespace FileSystem {
         on_success = true;
         bool dest_exists = file_exists (destination_file_name);
         if (dest_exists && !GLib.File.remove (destination_file_name)) {
-            *error_string = orig.error_"";
+            *error_string = orig.error_string ();
             GLib.warn (lc_file_system) << "Target file could not be removed.";
             on_success = false;
         }
@@ -197,7 +197,7 @@ namespace FileSystem {
             on_success = orig.rename (destination_file_name);
         }
         if (!on_success) {
-            *error_string = orig.error_"";
+            *error_string = orig.error_string ();
             GLib.warn (lc_file_system) << "Renaming temp file to final failed : " << *error_string;
             return false;
         }
@@ -218,7 +218,7 @@ namespace FileSystem {
         GLib.File f (file_name);
         if (!f.remove ()) {
             if (error_string) {
-                *error_string = f.error_"";
+                *error_string = f.error_string ();
             }
             return false;
         }
@@ -291,7 +291,7 @@ namespace FileSystem {
                << GLib.Uri.to_percent_encoding (f.absolute_file_path (), "~_-./")
                << "\n"
                << "Deletion_date="
-               << QDateTime.current_date_time ().to_string (Qt.ISODate)
+               << GLib.DateTime.current_date_time ().to_string (Qt.ISODate)
                << '\n';
         info_file.close ();
 
@@ -317,11 +317,11 @@ namespace FileSystem {
         error.clear ();
 
         if (!file.open (GLib.File.ReadOnly)) {
-            error = file.error_"";
+            error = file.error_string ();
             return false;
         }
         if (!file.seek (seek)) {
-            error = file.error_"";
+            error = file.error_string ();
             return false;
         }
         return true;

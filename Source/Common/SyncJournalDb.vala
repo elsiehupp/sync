@@ -23,7 +23,7 @@ const int IS_PREFIX_PATH_OR_EQUAL (prefix, path) {
     " (" path " == " prefix " OR " IS_PREFIX_PATH_OF (prefix, path) ")"
 }
 
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <QHash>
 // #include <QMutex>
 // #include <QVariant>
@@ -128,7 +128,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         // Error during creation, just keep the original and throw errors later
-        GLib.warn (lc_database) << "Could not find a writable database path" << file.file_name () << file.error_"";
+        GLib.warn (lc_database) << "Could not find a writable database path" << file.file_name () << file.error_string ();
         return journal_path;
     }
 

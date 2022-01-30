@@ -534,8 +534,8 @@ signals:
     ***********************************************************/
     private 
     private void on_run_etag_job ();
-    private void on_etag_retrieved (GLib.ByteArray , QDateTime &tp);
-    private void on_etag_retrieved_from_sync_engine (GLib.ByteArray , QDateTime &time);
+    private void on_etag_retrieved (GLib.ByteArray , GLib.DateTime &tp);
+    private void on_etag_retrieved_from_sync_engine (GLib.ByteArray , GLib.DateTime &time);
 
     /***********************************************************
     ***********************************************************/
@@ -1008,7 +1008,7 @@ void Folder.on_run_etag_job () {
     // The _request_etag_job is var deleting itself on finish. Our guard pointer _request_etag_job will then be null.
 }
 
-void Folder.on_etag_retrieved (GLib.ByteArray etag, QDateTime &tp) {
+void Folder.on_etag_retrieved (GLib.ByteArray etag, GLib.DateTime &tp) {
     // re-enable sync if it was disabled because network was down
     FolderMan.instance ().set_sync_enabled (true);
 
@@ -1021,7 +1021,7 @@ void Folder.on_etag_retrieved (GLib.ByteArray etag, QDateTime &tp) {
     _account_state.tag_last_successfull_e_tag_request (tp);
 }
 
-void Folder.on_etag_retrieved_from_sync_engine (GLib.ByteArray etag, QDateTime &time) {
+void Folder.on_etag_retrieved_from_sync_engine (GLib.ByteArray etag, GLib.DateTime &time) {
     q_c_info (lc_folder) << "Root etag from during sync:" << etag;
     account_state ().tag_last_successfull_e_tag_request (time);
     _last_etag = etag;

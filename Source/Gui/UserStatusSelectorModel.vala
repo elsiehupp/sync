@@ -9,7 +9,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 // #include <userstatusconnector.h>
 // #include <theme.h>
 
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <QLoggingCategory>
 
 // #include <algorithm>

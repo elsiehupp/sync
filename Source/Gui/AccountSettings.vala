@@ -357,8 +357,8 @@ protected slots:
         q_c_info (lc_account_settings) << "Current folder encryption status code:" << status;
         var job = qobject_cast<EncryptFolderJob> (sender ());
         Q_ASSERT (job);
-        if (!job.error_"".is_empty ()) {
-            QMessageBox.warning (nullptr, _("Warning"), job.error_"");
+        if (!job.error_string ().is_empty ()) {
+            QMessageBox.warning (nullptr, _("Warning"), job.error_string ());
         }
 
         const var folder = job.property (property_folder).value<Folder> ();

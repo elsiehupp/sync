@@ -49,7 +49,7 @@ class SyncRunFileLog {
 
     /***********************************************************
     ***********************************************************/
-    private string date_time_str (QDateTime &dt);
+    private string date_time_str (GLib.DateTime &dt);
 
     /***********************************************************
     ***********************************************************/
@@ -62,7 +62,7 @@ class SyncRunFileLog {
 
     SyncRunFileLog.SyncRunFileLog () = default;
 
-    string SyncRunFileLog.date_time_str (QDateTime &dt) {
+    string SyncRunFileLog.date_time_str (GLib.DateTime &dt) {
         return dt.to_string (Qt.ISODate);
     }
 
@@ -128,7 +128,7 @@ class SyncRunFileLog {
 
         _total_duration.on_start ();
         _lap_duration.on_start ();
-        _out << "#=#=#=# Syncrun started " << date_time_str (QDateTime.current_date_time_utc ()) << endl;
+        _out << "#=#=#=# Syncrun started " << date_time_str (GLib.DateTime.current_date_time_utc ()) << endl;
     }
     void SyncRunFileLog.log_item (SyncFileItem &item) {
         // don't log the directory items that are in the list
@@ -170,13 +170,13 @@ class SyncRunFileLog {
     }
 
     void SyncRunFileLog.log_lap (string name) {
-        _out << "#=#=#=#=# " << name << " " << date_time_str (QDateTime.current_date_time_utc ())
+        _out << "#=#=#=#=# " << name << " " << date_time_str (GLib.DateTime.current_date_time_utc ())
              << " (last step : " << _lap_duration.restart () << " msec"
              << ", total : " << _total_duration.elapsed () << " msec)" << endl;
     }
 
     void SyncRunFileLog.finish () {
-        _out << "#=#=#=# Syncrun on_finished " << date_time_str (QDateTime.current_date_time_utc ())
+        _out << "#=#=#=# Syncrun on_finished " << date_time_str (GLib.DateTime.current_date_time_utc ())
              << " (last step : " << _lap_duration.elapsed () << " msec"
              << ", total : " << _total_duration.elapsed () << " msec)" << endl;
         _file.close ();

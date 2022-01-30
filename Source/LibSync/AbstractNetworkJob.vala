@@ -27,7 +27,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QNetworkReply>
 // #include <QPointer>
 // #include <QElapsedTimer>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <QTimer>
 
 namespace Occ {
@@ -143,7 +143,7 @@ class AbstractNetworkJob : GLib.Object {
     /***********************************************************
     Returns an error message, if any.
     ***********************************************************/
-    public virtual string error_"";
+    public virtual string error_string ();
 
 
     /***********************************************************
@@ -342,9 +342,9 @@ Builds a error message based on the error and the reply body.
 string error_message (string base_error, GLib.ByteArray body);
 
 /***********************************************************
-Nicer error_"" for QNetworkReply
+Nicer error_string () for QNetworkReply
 
-By default QNetworkReply.error_"" often produces messages like
+By default QNetworkReply.error_string () often produces messages like
   "Error downloading <url> - server replied : <reason>"
 but the "downloading" part invariably confuses people since the
 error might very well have been produced by a PUT request.
@@ -482,7 +482,7 @@ void AbstractNetworkJob.on_finished () {
     _timer.stop ();
 
     if (_reply.error () == QNetworkReply.SslHandshakeFailedError) {
-        GLib.warn (lc_network_job) << "SslHandshakeFailedError : " << error_"" << " : can be caused by a webserver wanting SSL client certificates";
+        GLib.warn (lc_network_job) << "SslHandshakeFailedError : " << error_string () << " : can be caused by a webserver wanting SSL client certificates";
     }
     // Qt doesn't yet transparently resend HTTP2 requests, do so here
     const var max_http2Resends = 3;
@@ -521,7 +521,7 @@ void AbstractNetworkJob.on_finished () {
             return;
 
         if (!_ignore_credential_failure || _reply.error () != QNetworkReply.AuthenticationRequiredError) {
-            GLib.warn (lc_network_job) << _reply.error () << error_""
+            GLib.warn (lc_network_job) << _reply.error () << error_string ()
                                     << _reply.attribute (QNetworkRequest.HttpStatusCodeAttribute);
             if (_reply.error () == QNetworkReply.ProxyAuthenticationRequiredError) {
                 GLib.warn (lc_network_job) << _reply.raw_header ("Proxy-Authenticate");
@@ -609,7 +609,7 @@ GLib.ByteArray AbstractNetworkJob.request_id () {
     return  _reply ? _reply.request ().raw_header ("X-Request-ID") : GLib.ByteArray ();
 }
 
-string AbstractNetworkJob.error_"" {
+string AbstractNetworkJob.error_string () {
     if (_timedout) {
         return _("Connection timed out");
     } else if (!reply ()) {
@@ -622,7 +622,7 @@ string AbstractNetworkJob.error_"" {
 }
 
 string AbstractNetworkJob.error_string_parsing_body (GLib.ByteArray body) {
-    string base = error_"";
+    string base = error_string ();
     if (base.is_empty () || !reply ()) {
         return "";
     }
@@ -675,7 +675,7 @@ string AbstractNetworkJob.reply_status_"" {
         return QLatin1String ("OK");
     } else {
         string enum_str = QMetaEnum.from_type<QNetworkReply.NetworkError> ().value_to_key (static_cast<int> (reply ().error ()));
-        return QStringLiteral ("%1 %2").arg (enum_str, error_"");
+        return QStringLiteral ("%1 %2").arg (enum_str, error_string ());
     }
 }
 
@@ -725,7 +725,7 @@ string error_message (string base_error, GLib.ByteArray body) {
 }
 
 string network_reply_error_string (QNetworkReply &reply) {
-    string base = reply.error_"";
+    string base = reply.error_string ();
     int http_status = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     string http_reason = reply.attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_"";
 

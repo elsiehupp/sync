@@ -21,7 +21,7 @@ class TestUploadReset : GLib.Object {
 
         const int size = 100 * 1000 * 1000; // 100 MB
         fakeFolder.localModifier ().insert ("A/a0", size);
-        QDateTime modTime = QDateTime.currentDateTime ();
+        GLib.DateTime modTime = GLib.DateTime.currentDateTime ();
         fakeFolder.localModifier ().setModTime ("A/a0", modTime);
 
         // Create a transfer id, so we can make the final MOVE fail

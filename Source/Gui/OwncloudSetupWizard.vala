@@ -334,7 +334,7 @@ signals:
             msg = _("Failed to connect to %1 at %2:<br/>%3")
                       .arg (Utility.escape (Theme.instance ().app_name_gui ()),
                           Utility.escape (_oc_wizard.account ().url ().to_""),
-                          Utility.escape (job.error_""));
+                          Utility.escape (job.error_string ()));
         }
         bool is_downgrade_advised = check_downgrade_advised (reply);
 
@@ -573,7 +573,7 @@ signals:
                 create_remote_folder ();
             }
         } else {
-            error = _("Error : %1").arg (job.error_"");
+            error = _("Error : %1").arg (job.error_string ());
             ok = false;
         }
 

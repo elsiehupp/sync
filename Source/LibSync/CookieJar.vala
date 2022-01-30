@@ -5,7 +5,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 // #include <GLib.File>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <QLoggingCategory>
 // #include <QNetworkCookie>
 // #include <QDataStream>
@@ -155,7 +155,7 @@ signals:
     GLib.List<QNetworkCookie> CookieJar.remove_expired (GLib.List<QNetworkCookie> &cookies) {
         GLib.List<QNetworkCookie> updated_list;
         foreach (QNetworkCookie &cookie, cookies) {
-            if (cookie.expiration_date () > QDateTime.current_date_time_utc () && !cookie.is_session_cookie ()) {
+            if (cookie.expiration_date () > GLib.DateTime.current_date_time_utc () && !cookie.is_session_cookie ()) {
                 updated_list << cookie;
             }
         }

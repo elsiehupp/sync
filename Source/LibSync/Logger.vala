@@ -22,7 +22,7 @@ constexpr int CrashLogSize = 20;
 }
 
 // #include <GLib.List>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <GLib.File>
 // #include <QTextStream>
 // #include <qmutex.h>
@@ -389,7 +389,7 @@ void Logger.on_enter_next_log_file () {
         }
 
         // Tentative new log name, will be adjusted if one like this already exists
-        QDateTime now = QDateTime.current_date_time ();
+        GLib.DateTime now = GLib.DateTime.current_date_time ();
         string new_log_name = now.to_string ("yyyy_mMdd_HHmm") + "_owncloud.log";
 
         // Expire old log files and deal with conflicts

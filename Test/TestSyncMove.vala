@@ -520,7 +520,7 @@ class TestSyncMove : GLib.Object {
             // (Previous version of the client (<=2.5) would not need this because it was always doing
             // checksum comparison for all renames. But newer version no longer does it if the file is
             // renamed because the parent folder is renamed)
-            local.setModTime ("AM/a2m", QDateTime.currentDateTimeUtc ().addDays (3));
+            local.setModTime ("AM/a2m", GLib.DateTime.currentDateTimeUtc ().addDays (3));
             local.rename ("AM", "A2");
             remote.setContents ("BM/b2m", 'C');
             remote.rename ("BM", "B2");
@@ -659,8 +659,8 @@ class TestSyncMove : GLib.Object {
         fakeFolder.setServerOverride (counter.functor ());
 
         // Changing the mtime on the server (without invalidating the etag)
-        fakeFolder.remoteModifier ().find ("A/a1").lastModified = QDateTime.currentDateTimeUtc ().addSecs (-50000);
-        fakeFolder.remoteModifier ().find ("A/a2").lastModified = QDateTime.currentDateTimeUtc ().addSecs (-40000);
+        fakeFolder.remoteModifier ().find ("A/a1").lastModified = GLib.DateTime.currentDateTimeUtc ().addSecs (-50000);
+        fakeFolder.remoteModifier ().find ("A/a2").lastModified = GLib.DateTime.currentDateTimeUtc ().addSecs (-40000);
 
         // Move a few files
         fakeFolder.remoteModifier ().rename ("A/a1", "A/a1_server_renamed");

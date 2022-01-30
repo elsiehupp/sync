@@ -14,7 +14,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 // #include <QPointer>
 // #include <QVariant>
 // #include <QTimer>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 
 namespace Occ {
 
@@ -116,7 +116,7 @@ signals:
     private int64 _last_quota_total_bytes;
     private int64 _last_quota_used_bytes;
     private QTimer _job_restart_timer;
-    private QDateTime _last_info_received; // the time at which the user info and quota was received last
+    private GLib.DateTime _last_info_received; // the time at which the user info and quota was received last
     private bool _active; // if we should check at regular interval (when the UI is visible)
     private QPointer<JsonApiJob> _job; // the currently running job
 };
@@ -151,7 +151,7 @@ signals:
         if (can_get_info ()) {
             // Obviously assumes there will never be more than thousand of hours between last info
             // received and now, hence why we static_cast
-            var elapsed = static_cast<int> (_last_info_received.msecs_to (QDateTime.current_date_time ()));
+            var elapsed = static_cast<int> (_last_info_received.msecs_to (GLib.DateTime.current_date_time ()));
             if (_last_info_received.is_null () || elapsed >= default_interval_t) {
                 on_fetch_info ();
             } else {
@@ -223,7 +223,7 @@ signals:
         }
 
         _job_restart_timer.on_start (default_interval_t);
-        _last_info_received = QDateTime.current_date_time ();
+        _last_info_received = GLib.DateTime.current_date_time ();
 
         // Avatar Image
         if (_fetch_avatar_image) {

@@ -30,7 +30,7 @@ class EncryptFolderJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public 
-    public string error_"";
+    public string error_string ();
 
 signals:
     void on_finished (int status);
@@ -73,7 +73,7 @@ signals:
         job.on_start ();
     }
 
-    string EncryptFolderJob.error_"" {
+    string EncryptFolderJob.error_string () {
         return _error_string;
     }
 

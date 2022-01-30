@@ -160,11 +160,11 @@ class Ssl_error_dialog : Gtk.Dialog {
             if (trusted_certs.contains (error.certificate ()) || _unknown_certs.contains (error.certificate ())) {
                 continue;
             }
-            error_strings += error.error_"";
+            error_strings += error.error_string ();
             if (!error.certificate ().is_null ()) {
                 _unknown_certs.append (error.certificate ());
             } else {
-                additional_error_strings.append (error.error_"");
+                additional_error_strings.append (error.error_string ());
             }
         }
 
@@ -187,7 +187,7 @@ class Ssl_error_dialog : Gtk.Dialog {
             // add the errors for this cert
             foreach (QSslError err, errors) {
                 if (err.certificate () == cert) {
-                    msg += QL ("<p>") + err.error_"" + QL ("</p>");
+                    msg += QL ("<p>") + err.error_string () + QL ("</p>");
                 }
             }
             msg += QL ("</div>");
@@ -244,7 +244,7 @@ class Ssl_error_dialog : Gtk.Dialog {
 
         msg += QL ("<p>");
 
-        if (cert.effective_date () < QDateTime (QDate (2016, 1, 1), QTime (), Qt.UTC)) {
+        if (cert.effective_date () < GLib.DateTime (QDate (2016, 1, 1), QTime (), Qt.UTC)) {
         string sha1sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha1).to_hex ());
             msg += _("Fingerprint (SHA1) : <tt>%1</tt>").arg (sha1sum) + QL ("<br/>");
         }

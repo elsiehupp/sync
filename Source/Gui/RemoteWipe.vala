@@ -127,10 +127,10 @@ signals:
                                            .arg (error_from_json.to_html_escaped ());
             } else if (_network_reply_check.error () != QNetworkReply.NoError) {
                 GLib.warn (lc_remote_wipe) << string ("There was an error accessing the 'token' endpoint : <br><em>%1</em>")
-                                  .arg (_network_reply_check.error_"".to_html_escaped ());
+                                  .arg (_network_reply_check.error_string ().to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 GLib.warn (lc_remote_wipe) << string ("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                  .arg (json_parse_error.error_"");
+                                  .arg (json_parse_error.error_string ());
             } else {
                 GLib.warn (lc_remote_wipe) <<  string ("The reply from the server did not contain all expected fields");
             }
@@ -202,10 +202,10 @@ signals:
                                   .arg (error_from_json.to_html_escaped ());
             } else if (_network_reply_success.error () != QNetworkReply.NoError) {
                 GLib.warn (lc_remote_wipe) << string ("There was an error accessing the 'on_success' endpoint : <br><em>%1</em>")
-                                  .arg (_network_reply_success.error_"".to_html_escaped ());
+                                  .arg (_network_reply_success.error_string ().to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 GLib.warn (lc_remote_wipe) << string ("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                  .arg (json_parse_error.error_"");
+                                  .arg (json_parse_error.error_string ());
             } else {
                 GLib.warn (lc_remote_wipe) << string ("The reply from the server did not contain all expected fields.");
             }

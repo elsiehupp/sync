@@ -392,7 +392,7 @@ namespace {
         return _search_term;
     }
 
-    string Unified_search_results_list_model.error_"" {
+    string Unified_search_results_list_model.error_string () {
         return _error_string;
     }
 
@@ -513,9 +513,9 @@ namespace {
             q_c_critical (lc_unified_search) << string ("%1 : Failed to fetch search providers for '%2'. Error : %3")
                                                .arg (status_code)
                                                .arg (_search_term)
-                                               .arg (job.error_"");
+                                               .arg (job.error_string ());
             _error_string +=
-                _("Failed to fetch search providers for '%1'. Error : %2").arg (_search_term).arg (job.error_"")
+                _("Failed to fetch search providers for '%1'. Error : %2").arg (_search_term).arg (job.error_string ())
                 + '\n';
             emit error_string_changed ();
             return;
@@ -575,9 +575,9 @@ namespace {
             q_c_critical (lc_unified_search) << string ("%1 : Search has failed for '%2'. Error : %3")
                                                .arg (status_code)
                                                .arg (_search_term)
-                                               .arg (job.error_"");
+                                               .arg (job.error_string ());
             _error_string +=
-                _("Search has failed for '%1'. Error : %2").arg (_search_term).arg (job.error_"") + '\n';
+                _("Search has failed for '%1'. Error : %2").arg (_search_term).arg (job.error_string ()) + '\n';
             emit error_string_changed ();
             return;
         }

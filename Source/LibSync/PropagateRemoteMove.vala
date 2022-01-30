@@ -101,7 +101,7 @@ class PropagateRemoteMove : PropagateItemJob {
         }
 
         if (reply ().error () != QNetworkReply.NoError) {
-            GLib.warn (lc_propagate_remote_move) << " Network error : " << reply ().error_"";
+            GLib.warn (lc_propagate_remote_move) << " Network error : " << reply ().error_string ();
         }
         AbstractNetworkJob.on_start ();
     }
@@ -245,7 +245,7 @@ class PropagateRemoteMove : PropagateItemJob {
         if (err != QNetworkReply.NoError) {
             SyncFileItem.Status status = classify_error (err, _item._http_error_code,
                 &propagator ()._another_sync_needed);
-            on_done (status, _job.error_"");
+            on_done (status, _job.error_string ());
             return;
         }
 

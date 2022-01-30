@@ -408,7 +408,7 @@ class TestSyncEngine : GLib.Object {
         var &remoteInfo = fakeFolder.remoteModifier ();
 
         // Base mtime with no ms content (filesystem is seconds only)
-        var mtime = QDateTime.currentDateTimeUtc ().addDays (-4);
+        var mtime = GLib.DateTime.currentDateTimeUtc ().addDays (-4);
         mtime.setMSecsSinceEpoch (mtime.toMSecsSinceEpoch () / 1000 * 1000);
 
         fakeFolder.localModifier ().setContents ("A/a1", 'C');
@@ -438,9 +438,9 @@ class TestSyncEngine : GLib.Object {
      * of propagation.
      */
     private on_ void testSyncFileItemProperties () {
-        var initialMtime = QDateTime.currentDateTimeUtc ().addDays (-7);
-        var changedMtime = QDateTime.currentDateTimeUtc ().addDays (-4);
-        var changedMtime2 = QDateTime.currentDateTimeUtc ().addDays (-3);
+        var initialMtime = GLib.DateTime.currentDateTimeUtc ().addDays (-7);
+        var changedMtime = GLib.DateTime.currentDateTimeUtc ().addDays (-4);
+        var changedMtime2 = GLib.DateTime.currentDateTimeUtc ().addDays (-3);
 
         // Base mtime with no ms content (filesystem is seconds only)
         initialMtime.setMSecsSinceEpoch (initialMtime.toMSecsSinceEpoch () / 1000 * 1000);
@@ -804,7 +804,7 @@ class TestSyncEngine : GLib.Object {
         FakeFolder fakeFolder{ FileInfo{} };
         fakeFolder.remoteModifier ().mkdir ("foo");
         fakeFolder.remoteModifier ().insert ("foo/bar");
-        var datetime = QDateTime.currentDateTime ();
+        var datetime = GLib.DateTime.currentDateTime ();
         datetime.setSecsSinceEpoch (datetime.toSecsSinceEpoch ()); // wipe ms
         fakeFolder.remoteModifier ().find ("foo").lastModified = datetime;
 

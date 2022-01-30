@@ -259,11 +259,11 @@ void CloudProviderWrapper.on_sync_started () {
 void CloudProviderWrapper.on_sync_finished (SyncResult &result) {
     if (result.status () == result.Success || result.status () == result.Problem) {
         cloud_providers_account_exporter_set_status (_cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
-        update_status_text (result.status_"");
+        update_status_text (result.status_string ());
         return;
     }
     cloud_providers_account_exporter_set_status (_cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_ERROR);
-    update_status_text (result.status_"");
+    update_status_text (result.status_string ());
 }
 
 GMenu_model* CloudProviderWrapper.get_menu_model () {

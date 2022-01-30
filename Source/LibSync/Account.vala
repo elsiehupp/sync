@@ -949,7 +949,7 @@ void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> err
     QDebug (&out) << "SSL-Errors happened for url " << reply.url ().to_"";
     foreach (QSslError &error, errors) {
         QDebug (&out) << "\t_error in " << error.certificate () << ":"
-                     << error.error_"" << " (" << error.error () << ")"
+                     << error.error_string () << " (" << error.error () << ")"
                      << "\n";
     }
 
@@ -1141,7 +1141,7 @@ void Account.write_app_password_once (string app_password){
         if (write_job.error () == NoError)
             q_c_info (lc_account) << "app_password stored in keychain";
         else
-            GLib.warn (lc_account) << "Unable to store app_password in keychain" << write_job.error_"";
+            GLib.warn (lc_account) << "Unable to store app_password in keychain" << write_job.error_string ();
 
         // We don't try this again on error, to not raise CPU consumption
         _wrote_app_password = true;
@@ -1193,7 +1193,7 @@ void Account.delete_app_password () {
         if (delete_job.error () == NoError)
             q_c_info (lc_account) << "app_password deleted from keychain";
         else
-            GLib.warn (lc_account) << "Unable to delete app_password from keychain" << delete_job.error_"";
+            GLib.warn (lc_account) << "Unable to delete app_password from keychain" << delete_job.error_string ();
 
         // Allow storing a new app password on re-login
         _wrote_app_password = false;

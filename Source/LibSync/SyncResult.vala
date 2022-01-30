@@ -6,7 +6,7 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 
 // #include <string[]>
 // #include <QHash>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 
 namespace Occ {
 
@@ -32,65 +32,234 @@ class SyncResult {
         Paused
     };
 
-    /***********************************************************
-    ***********************************************************/
-    public SyncResult ();
 
     /***********************************************************
     ***********************************************************/
-    public 
+    private Status _status = Undefined;
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    private SyncFileItemVector _sync_items;
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    private GLib.DateTime _sync_time;
+
 
     /***********************************************************
     ***********************************************************/
-    public string error_"";
+    private string _folder;
+
+
+    /***********************************************************
+    when the sync tool support this...
+    ***********************************************************/
+    private string[] _errors;
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    private bool _found_files_not_synced = false;
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    private bool _folder_structure_was_changed = false;
+
 
     /***********************************************************
     ***********************************************************/
-    public void clear_errors 
+    // count new, removed and updated items
+    private int _num_new_items = 0;
+
 
     /***********************************************************
     ***********************************************************/
-    public void set_status (Status);
+    private int _num_removed_items = 0;
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    private int _num_updated_items = 0;
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    private int _num_renamed_items = 0;
+
 
     /***********************************************************
     ***********************************************************/
-    public string status_str
+    private int _num_new_conflict_items = 0;
+
 
     /***********************************************************
     ***********************************************************/
-    public 
-    public QDateTime sync_time ();
+    private int _num_old_conflict_items = 0;
 
 
-    public void set_folder (string folder);
+    /***********************************************************
+    ***********************************************************/
+    private int _num_error_items = 0;
 
 
-    public string folder ();
+    /***********************************************************
+    ***********************************************************/
+    private int _num_locked_items = 0;
 
+    /***********************************************************
+    ***********************************************************/
+    private SyncFileItemPtr _first_item_new;
+
+
+    /***********************************************************
+    ***********************************************************/
+    private SyncFileItemPtr _first_item_deleted;
+
+
+    /***********************************************************
+    ***********************************************************/
+    private SyncFileItemPtr _first_item_updated;
+
+
+    /***********************************************************
+    ***********************************************************/
+    private SyncFileItemPtr _first_item_renamed;
+
+
+    /***********************************************************
+    ***********************************************************/
+    private SyncFileItemPtr _first_new_conflict_item;
+
+
+    /***********************************************************
+    ***********************************************************/
+    private SyncFileItemPtr _first_item_error;
+
+
+    /***********************************************************
+    ***********************************************************/
+    private SyncFileItemPtr _first_item_locked;
+
+
+    /***********************************************************
+    ***********************************************************/
+    public SyncResult () = default;
+
+
+    /***********************************************************
+    ***********************************************************/
+    public string[] error_strings () {
+        return _errors;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void append_error_string (string err) {
+        _errors.append (err);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public SyncResult.Status status () {
+        return _status;
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_reset () {
+        *this = SyncResult ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public string error_string () {
+        if (_errors.is_empty ())
+            return "";
+        return _errors.first ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void clear_errors () {
+        _errors.clear ();
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public void set_status (Status stat) {
+        _status = stat;
+        _sync_time = GLib.DateTime.current_date_time_utc ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public string status_string () {
+        switch (status ()) {
+        case Undefined:
+            return "Undefined";
+            break;
+        case NotYetStarted:
+            return "Not yet Started";
+            break;
+        case Sync_running:
+            return "Sync Running";
+            break;
+        case Success:
+            return "Success";
+            break;
+        case Error:
+            return "Error";
+            break;
+        case Setup_error:
+            return "Setup_error";
+            break;
+        case Sync_prepare:
+            return "Sync_prepare";
+            break;
+        case Problem:
+            return "Success, some files were ignored.";
+            break;
+        case Sync_abort_requested:
+            return "Sync Request aborted by user";
+            break;
+        case Paused:
+            return "Sync Paused";
+            break;
+        }
+        return "";
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public GLib.DateTime sync_time () {
+        return _sync_time;
+    }
+    
+
+    /***********************************************************
+    ***********************************************************/
+    public void set_folder (string folder) {
+        _folder = folder;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public string folder () {
+        return _folder;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
     public bool found_files_not_synced () {
         return _found_files_not_synced;
     }
@@ -113,54 +282,55 @@ class SyncResult {
     /***********************************************************
     ***********************************************************/
     public int num_removed_items () {
+        return _num_removed_items;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public 
+    public int num_updated_items () {
+        return _num_updated_items;
     }
 
-
-    /***********************************************************
-    ***********************************************************/
-    public urn _num_updated_items;
-    }
 
 
     /***********************************************************
     ***********************************************************/
     public int num_renamed_items () {
+        return _num_renamed_items;
     }
-
 
     /***********************************************************
     ***********************************************************/
-    public 
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public urn _num_new_conflict_items;
+    public int num_new_conflict_items () {
+        return _num_new_conflict_items;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public int num_old_conflict_items () {
+        return _num_old_conflict_items;
+    }\
+
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void set_num_old_conflict_items (int n) {
+        _num_old_conflict_items = n;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public 
-    public void set_num_old_conflict_items (int n) {
-        _num_old_conflict_items = n;
-    }
     public int num_error_items () {
         return _num_error_items;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public bool has_unresolved_conflicts () {
         return _num_new_conflict_items + _num_old_conflict_items > 0;
     }
@@ -221,9 +391,17 @@ class SyncResult {
     ***********************************************************/
     public urn _first_new_conflict_item;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public const SyncFileItemPtr &first_item_error () {
         return _first_item_error;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public const SyncFileItemPtr &first_item_locked () {
         return _first_item_locked;
     }
@@ -231,128 +409,7 @@ class SyncResult {
 
     /***********************************************************
     ***********************************************************/
-    public void process_completed_item (SyncFileItemPtr &item);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private Status _status = Undefined;
-    private SyncFileItemVector _sync_items;
-    private QDateTime _sync_time;
-    private string _folder;
-    /***********************************************************
-    when the sync tool support this...
-    ***********************************************************/
-    private string[] _errors;
-    private bool _found_files_not_synced = false;
-    private bool _folder_structure_was_changed = false;
-
-    // count new, removed and updated items
-    private int _num_new_items = 0;
-    private int _num_removed_items = 0;
-    private int _num_updated_items = 0;
-    private int _num_renamed_items = 0;
-    private int _num_new_conflict_items = 0;
-    private int _num_old_conflict_items = 0;
-    private int _num_error_items = 0;
-    private int _num_locked_items = 0;
-
-    /***********************************************************
-    ***********************************************************/
-    private SyncFileItemPtr _first_item_new;
-    private SyncFileItemPtr _first_item_deleted;
-    private SyncFileItemPtr _first_item_updated;
-    private SyncFileItemPtr _first_item_renamed;
-    private SyncFileItemPtr _first_new_conflict_item;
-    private SyncFileItemPtr _first_item_error;
-    private SyncFileItemPtr _first_item_locked;
-};
-
-    SyncResult.SyncResult () = default;
-
-    SyncResult.Status SyncResult.status () {
-        return _status;
-    }
-
-    void SyncResult.on_reset () {
-        *this = SyncResult ();
-    }
-
-    string SyncResult.status_"" {
-        string re;
-        Status stat = status ();
-
-        switch (stat) {
-        case Undefined:
-            re = QLatin1String ("Undefined");
-            break;
-        case NotYetStarted:
-            re = QLatin1String ("Not yet Started");
-            break;
-        case Sync_running:
-            re = QLatin1String ("Sync Running");
-            break;
-        case Success:
-            re = QLatin1String ("Success");
-            break;
-        case Error:
-            re = QLatin1String ("Error");
-            break;
-        case Setup_error:
-            re = QLatin1String ("Setup_error");
-            break;
-        case Sync_prepare:
-            re = QLatin1String ("Sync_prepare");
-            break;
-        case Problem:
-            re = QLatin1String ("Success, some files were ignored.");
-            break;
-        case Sync_abort_requested:
-            re = QLatin1String ("Sync Request aborted by user");
-            break;
-        case Paused:
-            re = QLatin1String ("Sync Paused");
-            break;
-        }
-        return re;
-    }
-
-    void SyncResult.set_status (Status stat) {
-        _status = stat;
-        _sync_time = QDateTime.current_date_time_utc ();
-    }
-
-    QDateTime SyncResult.sync_time () {
-        return _sync_time;
-    }
-
-    string[] SyncResult.error_strings () {
-        return _errors;
-    }
-
-    void SyncResult.append_error_string (string err) {
-        _errors.append (err);
-    }
-
-    string SyncResult.error_"" {
-        if (_errors.is_empty ())
-            return "";
-        return _errors.first ();
-    }
-
-    void SyncResult.clear_errors () {
-        _errors.clear ();
-    }
-
-    void SyncResult.set_folder (string folder) {
-        _folder = folder;
-    }
-
-    string SyncResult.folder () {
-        return _folder;
-    }
-
-    void SyncResult.process_completed_item (SyncFileItemPtr &item) {
+    public void process_completed_item (SyncFileItemPtr item) {
         if (Progress.is_warning_kind (item._status)) {
             // Count any error conditions, error strings will have priority anyway.
             _found_files_not_synced = true;
@@ -424,5 +481,7 @@ class SyncResult {
         }
     }
 
-    } // ns mirall
+}
+
+} // ns mirall
     

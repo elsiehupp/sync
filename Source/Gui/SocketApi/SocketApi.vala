@@ -542,8 +542,8 @@ void SocketApi.on_read_socket () {
             QJsonParseError error;
             const var json = QJsonDocument.from_json (argument.to_utf8 (), &error).object ();
             if (error.error != QJsonParseError.NoError) {
-                GLib.warn (lc_socket_api ()) << "Invalid json" << argument.to_"" << error.error_"";
-                listener.send_error (error.error_"");
+                GLib.warn (lc_socket_api ()) << "Invalid json" << argument.to_"" << error.error_string ();
+                listener.send_error (error.error_string ());
                 return;
             }
             var socket_api_job = unowned<Socket_api_job_v2>.create (listener, command, json);

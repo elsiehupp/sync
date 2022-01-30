@@ -5,7 +5,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 // #include <string>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 
 namespace Occ {
 
@@ -35,7 +35,7 @@ class SyncJournalFileRecord {
 
     /***********************************************************
     ***********************************************************/
-    public QDateTime mod_date_time () {
+    public GLib.DateTime mod_date_time () {
         return Utility.q_date_time_from_time_t (_modtime);
     }
 

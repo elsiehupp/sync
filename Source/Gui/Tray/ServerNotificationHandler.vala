@@ -135,7 +135,7 @@ signals:
                 }
             }
             a._link = link;
-            a._date_time = QDateTime.from_string (json.value ("datetime").to_"", Qt.ISODate);
+            a._date_time = GLib.DateTime.from_string (json.value ("datetime").to_"", Qt.ISODate);
 
             var actions = json.value ("actions").to_array ();
             foreach (var action, actions) {

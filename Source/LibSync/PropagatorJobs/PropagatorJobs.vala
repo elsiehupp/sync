@@ -10,7 +10,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <qdiriterator.h>
 // #include <qtemporaryfile.h>
 // #include <qsavefile.h>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <qstack.h>
 // #include <QCoreApplication>
 

@@ -12,7 +12,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 // #include <QFileInfo>
 // #include <QTextCodec>
 // #include <cstring>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 
 // #pragma once
 
@@ -139,7 +139,7 @@ class DiscoverySingleDirectoryJob : GLib.Object {
     // This is not actually a network job, it is just a job
 signals:
     void first_directory_permissions (RemotePermissions);
-    void etag (GLib.ByteArray , QDateTime &time);
+    void etag (GLib.ByteArray , GLib.DateTime &time);
     void finished (HttpResult<QVector<RemoteInfo>> &result);
 
 
@@ -676,7 +676,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
             if (property == QLatin1String ("resourcetype")) {
                 result.is_directory = value.contains (QLatin1String ("collection"));
             } else if (property == QLatin1String ("getlastmodified")) {
-                const var date = QDateTime.from_string (value, Qt.RFC2822Date);
+                const var date = GLib.DateTime.from_string (value, Qt.RFC2822Date);
                 Q_ASSERT (date.is_valid ());
                 result.modtime = date.to_time_t ();
             } else if (property == QLatin1String ("getcontentlength")) {
@@ -794,11 +794,11 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
             delete_later ();
             return;
         } else if (_is_e2e_encrypted) {
-            emit etag (_first_etag, QDateTime.from_string (string.from_utf8 (_ls_col_job.response_timestamp ()), Qt.RFC2822Date));
+            emit etag (_first_etag, GLib.DateTime.from_string (string.from_utf8 (_ls_col_job.response_timestamp ()), Qt.RFC2822Date));
             on_fetch_e2e_metadata ();
             return;
         }
-        emit etag (_first_etag, QDateTime.from_string (string.from_utf8 (_ls_col_job.response_timestamp ()), Qt.RFC2822Date));
+        emit etag (_first_etag, GLib.DateTime.from_string (string.from_utf8 (_ls_col_job.response_timestamp ()), Qt.RFC2822Date));
         emit finished (_results);
         delete_later ();
     }
@@ -806,8 +806,8 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
     void DiscoverySingleDirectoryJob.on_ls_job_finished_with_error_slot (QNetworkReply r) {
         string content_type = r.header (QNetworkRequest.ContentTypeHeader).to_"";
         int http_code = r.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
-        string msg = r.error_"";
-        GLib.warn (lc_discovery) << "LSCOL job error" << r.error_"" << http_code << r.error ();
+        string msg = r.error_string ();
+        GLib.warn (lc_discovery) << "LSCOL job error" << r.error_string () << http_code << r.error ();
         if (r.error () == QNetworkReply.NoError
             && !content_type.contains ("application/xml; charset=utf-8")) {
             msg = _("Server error : PROPFIND reply is not XML formatted!");

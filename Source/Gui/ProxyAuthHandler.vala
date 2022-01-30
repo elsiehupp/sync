@@ -307,7 +307,7 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
 
     _username.clear ();
     if (_read_password_job.error () != EntryNotFound) {
-        GLib.warn (lc_proxy) << "ReadPasswordJob failed with" << _read_password_job.error_"";
+        GLib.warn (lc_proxy) << "ReadPasswordJob failed with" << _read_password_job.error_string ();
     }
     return false;
 }
@@ -335,7 +335,7 @@ void ProxyAuthHandler.store_creds_in_keychain () {
 
     job.delete_later ();
     if (job.error () != NoError) {
-        GLib.warn (lc_proxy) << "WritePasswordJob failed with" << job.error_"";
+        GLib.warn (lc_proxy) << "WritePasswordJob failed with" << job.error_string ();
     }
 }
 

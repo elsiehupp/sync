@@ -42,7 +42,7 @@ int main (int argc, char argv[]) {
     reporter.set_report_data ("Version", CRASHREPORTER_VERSION_STRING);
     reporter.set_report_data ("Release_channel", CRASHREPORTER_RELEASE_CHANNEL);
 
-    //reporter.set_report_data ( "timestamp", GLib.ByteArray.number ( QDateTime.current_date_time ().to_time_t () ) );
+    //reporter.set_report_data ( "timestamp", GLib.ByteArray.number ( GLib.DateTime.current_date_time ().to_time_t () ) );
 
     // add parameters
 

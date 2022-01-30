@@ -25,7 +25,7 @@ class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public int64 dropMsecs (QDateTime time) {
+    public int64 dropMsecs (GLib.DateTime time) {
         return Utility.qDateTimeToTime_t (time);
     }
 
@@ -53,7 +53,7 @@ class TestSyncJournalDB : GLib.Object {
         // Use a value that exceeds uint32 and isn't representable by the
         // signed int being cast to uint64 either (like uint64.max would be)
         record._inode = std.numeric_limits<uint32>.max () + 12ull;
-        record._modtime = dropMsecs (QDateTime.currentDateTime ());
+        record._modtime = dropMsecs (GLib.DateTime.currentDateTime ());
         record._type = ItemTypeDirectory;
         record._etag = "789789";
         record._fileId = "abcd";
@@ -73,7 +73,7 @@ class TestSyncJournalDB : GLib.Object {
         QVERIFY (storedRecord == record);
 
         // Update metadata
-        record._modtime = dropMsecs (QDateTime.currentDateTime ().addDays (1));
+        record._modtime = dropMsecs (GLib.DateTime.currentDateTime ().addDays (1));
         // try a value that only fits uint64, not int64
         record._inode = std.numeric_limits<uint64>.max () - std.numeric_limits<uint32>.max () - 1;
         record._type = ItemTypeFile;
@@ -99,7 +99,7 @@ class TestSyncJournalDB : GLib.Object {
             record._path = "foo-checksum";
             record._remotePerm = RemotePermissions.fromDbValue (" ");
             record._checksumHeader = "MD5:mychecksum";
-            record._modtime = Utility.qDateTimeToTime_t (QDateTime.currentDateTimeUtc ());
+            record._modtime = Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ());
             QVERIFY (_database.setFileRecord (record));
 
             SyncJournalFileRecord storedRecord;
@@ -110,7 +110,7 @@ class TestSyncJournalDB : GLib.Object {
 
             // qDebug ()<< "OOOOO " << storedRecord._modtime.toTime_t () << record._modtime.toTime_t ();
 
-            // Attention : compare time_t types here, as QDateTime seem to maintain
+            // Attention : compare time_t types here, as GLib.DateTime seem to maintain
             // milliseconds internally, which disappear in sqlite. Go for full seconds here.
             QVERIFY (storedRecord._modtime == record._modtime);
             QVERIFY (storedRecord == record);
@@ -118,7 +118,7 @@ class TestSyncJournalDB : GLib.Object {
             SyncJournalFileRecord record;
             record._path = "foo-nochecksum";
             record._remotePerm = RemotePermissions.fromDbValue ("RW");
-            record._modtime = Utility.qDateTimeToTime_t (QDateTime.currentDateTimeUtc ());
+            record._modtime = Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ());
 
             QVERIFY (_database.setFileRecord (record));
 
@@ -162,7 +162,7 @@ class TestSyncJournalDB : GLib.Object {
         record._chunk = 12;
         record._transferid = 812974891;
         record._size = 12894789147;
-        record._modtime = dropMsecs (QDateTime.currentDateTime ());
+        record._modtime = dropMsecs (GLib.DateTime.currentDateTime ());
         record._valid = true;
         _database.setUploadInfo ("foo", record);
 

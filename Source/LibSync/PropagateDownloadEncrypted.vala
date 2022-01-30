@@ -166,8 +166,8 @@ bool Propagate_download_encrypted.decrypt_file (GLib.File& tmp_file) {
 
         // we decripted the temporary into another temporary, so good bye old one
         if (!tmp_file.remove ()) {
-                GLib.debug (lc_propagate_download_encrypted) << "Failed to remove temporary file" << tmp_file.error_"";
-                _error_string = tmp_file.error_"";
+                GLib.debug (lc_propagate_download_encrypted) << "Failed to remove temporary file" << tmp_file.error_string ();
+                _error_string = tmp_file.error_string ();
                 return false;
         }
 
@@ -177,7 +177,7 @@ bool Propagate_download_encrypted.decrypt_file (GLib.File& tmp_file) {
         return true;
 }
 
-string Propagate_download_encrypted.error_"" {
+string Propagate_download_encrypted.error_string () {
     return _error_string;
 }
 

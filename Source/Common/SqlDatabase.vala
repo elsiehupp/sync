@@ -4,7 +4,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <QLoggingCategory>
 // #include <string>
 // #include <GLib.File>
@@ -597,7 +597,7 @@ class SqlQuery {
             res = sqlite3_bind_int64 (_stmt, pos, value.to_long_long ());
             break;
         case QVariant.Date_time: {
-            const QDateTime date_time = value.to_date_time ();
+            const GLib.DateTime date_time = value.to_date_time ();
             const string string_value = date_time.to_string ("yyyy-MM-dd_thh:mm:ss.zzz");
             res = sqlite3_bind_text16 (_stmt, pos, string_value.utf16 (),
                 string_value.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);

@@ -104,7 +104,7 @@ void Socket_upload_job.on_start () {
     var opt = _engine.sync_options ();
     opt.set_file_pattern (_pattern);
     if (!opt.file_regex ().is_valid ()) {
-        _api_job.failure (opt.file_regex ().error_"");
+        _api_job.failure (opt.file_regex ().error_string ());
         return;
     }
     _engine.set_sync_options (opt);
@@ -116,7 +116,7 @@ void Socket_upload_job.on_start () {
         if (reply.error () == 202) {
             _api_job.failure (QStringLiteral ("Destination %1 already exists").arg (_remote_path));
         } else {
-            _api_job.failure (reply.error_"");
+            _api_job.failure (reply.error_string ());
         }
     });
     mkdir.on_start ();

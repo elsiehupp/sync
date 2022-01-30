@@ -121,7 +121,7 @@ class GETFileJob : AbstractNetworkJob {
 
     public int64 current_download_position ();
 
-    public string error_"" override;
+    public string error_string () override;
     public void on_set_error_string (string s) {
         _error_string = s;
     }
@@ -531,7 +531,7 @@ void GETFileJob.on_meta_data_changed () {
             // device doesn't support range, just try again from scratch
             _device.close ();
             if (!_device.open (QIODevice.WriteOnly)) {
-                _error_string = _device.error_"";
+                _error_string = _device.error_string ();
                 _error_status = SyncFileItem.NormalError;
                 reply ().on_abort ();
                 return;
@@ -616,7 +616,7 @@ void GETFileJob.on_ready_read () {
 
         const int64 written_bytes = write_to_device (GLib.ByteArray.from_raw_data (buffer.const_data (), read_bytes));
         if (written_bytes != read_bytes) {
-            _error_string = _device.error_"";
+            _error_string = _device.error_string ();
             _error_status = SyncFileItem.NormalError;
             GLib.warn (lc_get_job) << "Error while writing to file" << written_bytes << read_bytes << _error_string;
             reply ().on_abort ();
@@ -660,11 +660,11 @@ void GETFileJob.on_timed_out () {
     reply ().on_abort ();
 }
 
-string GETFileJob.error_"" {
+string GETFileJob.error_string () {
     if (!_error_string.is_empty ()) {
         return _error_string;
     }
-    return AbstractNetworkJob.error_"";
+    return AbstractNetworkJob.error_string ();
 }
 
 GETEncrypted_file_job.GETEncrypted_file_job (AccountPointer account, string path, QIODevice device,
@@ -944,7 +944,7 @@ void PropagateDownloadFile.start_download () {
         FileSystem.set_file_read_only (_tmp_file.file_name (), false);
     if (!_tmp_file.open (QIODevice.Append | QIODevice.Unbuffered)) {
         GLib.warn (lc_propagate_download) << "could not open temporary file" << _tmp_file.file_name ();
-        on_done (SyncFileItem.NormalError, _tmp_file.error_"");
+        on_done (SyncFileItem.NormalError, _tmp_file.error_string ());
         return;
     }
     // Hide temporary after creation
@@ -1090,7 +1090,7 @@ void PropagateDownloadFile.on_get_finished () {
 
         GLib.ByteArray error_body;
         string error_string = _item._http_error_code >= 400 ? job.error_string_parsing_body (&error_body)
-                                                           : job.error_"";
+                                                           : job.error_string ();
         SyncFileItem.Status status = job.error_status ();
         if (status == SyncFileItem.NoStatus) {
             status = classify_error (err, _item._http_error_code,
@@ -1237,7 +1237,7 @@ namespace { // Anonymous namespace for the recall feature
             dot_location = recall_file_name.size ();
         }
 
-        string time_string = QDateTime.current_date_time_utc ().to_string ("yyyy_mMdd-hhmmss");
+        string time_string = GLib.DateTime.current_date_time_utc ().to_string ("yyyy_mMdd-hhmmss");
         recall_file_name.insert (dot_location, "_.sys.admin#recall#-" + time_string);
 
         return recall_file_name;
@@ -1250,7 +1250,7 @@ namespace { // Anonymous namespace for the recall feature
 
         GLib.File file = new GLib.File (file_path);
         if (!file.open (QIODevice.ReadOnly)) {
-            GLib.warn (lc_propagate_download) << "Could not open recall file" << file.error_"";
+            GLib.warn (lc_propagate_download) << "Could not open recall file" << file.error_string ();
             return;
         }
         QFileInfo existing_file (file_path);
@@ -1329,7 +1329,7 @@ void PropagateDownloadFile.content_checksum_computed (GLib.ByteArray checksum_ty
         if (_download_encrypted_helper.decrypt_file (_tmp_file)) {
           download_finished ();
         } else {
-          on_done (SyncFileItem.NormalError, _download_encrypted_helper.error_"");
+          on_done (SyncFileItem.NormalError, _download_encrypted_helper.error_string ());
         }
 
     } else {

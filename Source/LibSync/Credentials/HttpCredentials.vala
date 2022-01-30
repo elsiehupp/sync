@@ -397,7 +397,7 @@ class HttpCredentials : AbstractCredentials {
             // Could be that the backend was not yet available. Wait some extra seconds.
             // (Issues #4274 and #6522)
             // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
-            q_c_info (lc_http_credentials) << "Backend unavailable (yet?) Retrying in a few seconds." << incoming.error_"";
+            q_c_info (lc_http_credentials) << "Backend unavailable (yet?) Retrying in a few seconds." << incoming.error_string ();
             QTimer.single_shot (10000, this, &HttpCredentials.fetch_from_keychain_helper);
             _retry_on_key_chain_error = false;
             return true;
@@ -414,7 +414,7 @@ class HttpCredentials : AbstractCredentials {
         if (read_job.error () == QKeychain.NoError) {
             _client_cert_password = read_job.binary_data ();
         } else {
-            GLib.warn (lc_http_credentials) << "Could not retrieve client cert password from keychain" << read_job.error_"";
+            GLib.warn (lc_http_credentials) << "Could not retrieve client cert password from keychain" << read_job.error_string ();
         }
 
         if (!unpack_client_cert_bundle ()) {
@@ -534,7 +534,7 @@ class HttpCredentials : AbstractCredentials {
             // we come here if the password is empty or any other keychain
             // error happend.
 
-            _fetch_error_string = job.error () != QKeychain.EntryNotFound ? job.error_"" : "";
+            _fetch_error_string = job.error () != QKeychain.EntryNotFound ? job.error_string () : "";
 
             _password = "";
             _ready = false;
@@ -575,7 +575,7 @@ class HttpCredentials : AbstractCredentials {
             string access_token = json["access_token"].to_"";
             if (json_parse_error.error != QJsonParseError.NoError || json.is_empty ()) {
                 // Invalid or empty JSON : Network error maybe?
-                GLib.warn (lc_http_credentials) << "Error while refreshing the token" << reply.error_"" << json_data << json_parse_error.error_"";
+                GLib.warn (lc_http_credentials) << "Error while refreshing the token" << reply.error_string () << json_data << json_parse_error.error_string ();
             } else if (access_token.is_empty ()) {
                 // If the json was valid, but the reply did not contain an access token, the token
                 // is considered expired. (Usually the HTTP reply code is 400)
@@ -696,7 +696,7 @@ class HttpCredentials : AbstractCredentials {
     void HttpCredentials.on_write_client_cert_password_job_done (QKeychain.Job finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
             GLib.warn (lc_http_credentials) << "Could not write client cert password to credentials"
-                                         << finished_job.error () << finished_job.error_"";
+                                         << finished_job.error () << finished_job.error_string ();
         }
 
         on_write_password_to_keychain ();
@@ -705,7 +705,7 @@ class HttpCredentials : AbstractCredentials {
     void HttpCredentials.on_write_client_cert_pem_job_done (QKeychain.Job finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
             GLib.warn (lc_http_credentials) << "Could not write client cert to credentials"
-                                         << finished_job.error () << finished_job.error_"";
+                                         << finished_job.error () << finished_job.error_string ();
         }
 
         // write ssl key if there is one
@@ -725,7 +725,7 @@ class HttpCredentials : AbstractCredentials {
     void HttpCredentials.on_write_client_key_pem_job_done (QKeychain.Job finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
             GLib.warn (lc_http_credentials) << "Could not write client key to credentials"
-                                         << finished_job.error () << finished_job.error_"";
+                                         << finished_job.error () << finished_job.error_string ();
         }
 
         on_write_password_to_keychain ();
@@ -744,7 +744,7 @@ class HttpCredentials : AbstractCredentials {
     void HttpCredentials.on_write_job_done (QKeychain.Job job) {
         if (job && job.error () != QKeychain.NoError) {
             GLib.warn (lc_http_credentials) << "Error while writing password"
-                                         << job.error () << job.error_"";
+                                         << job.error () << job.error_string ();
         }
     }
 

@@ -826,7 +826,7 @@ string ConfigFile.backup () {
     string backup_file =
         string ("%1.backup_%2%3")
             .arg (base_file)
-            .arg (QDateTime.current_date_time ().to_string ("yyyy_mMdd_HHmmss"))
+            .arg (GLib.DateTime.current_date_time ().to_string ("yyyy_mMdd_HHmmss"))
             .arg (version_string);
 
     // If this exact file already exists it's most likely that a backup was

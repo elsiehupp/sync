@@ -17,7 +17,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <GLib.Uri>
 // #include <QProcess>
 // #include <QThread>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <QSysInfo>
 // #include <QStandardPaths>
 // #include <QCollator>
@@ -37,7 +37,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 #include "utility_unix.cpp"
 
 // #include <string>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <QElapsedTimer>
 // #include <QLoggingCategory>
 // #include <QMap>
@@ -121,11 +121,11 @@ namespace Utility {
 
     OCSYNC_EXPORT string escape (string );
 
-    // conversion function QDateTime <. time_t   (because the ones builtin work on only unsigned 32bit)
+    // conversion function GLib.DateTime <. time_t   (because the ones builtin work on only unsigned 32bit)
 
-    OCSYNC_EXPORT QDateTime q_date_time_from_time_t (int64 t);
+    OCSYNC_EXPORT GLib.DateTime q_date_time_from_time_t (int64 t);
 
-    OCSYNC_EXPORT int64 q_date_time_to_time_t (QDateTime &t);
+    OCSYNC_EXPORT int64 q_date_time_to_time_t (GLib.DateTime &t);
 
 
     /***********************************************************
@@ -207,12 +207,12 @@ namespace Utility {
     If the second parameter is ommitted, the current time is used.
     ***********************************************************/
 
-    OCSYNC_EXPORT string time_ago_in_words (QDateTime &dt, QDateTime &from = QDateTime ());
+    OCSYNC_EXPORT string time_ago_in_words (GLib.DateTime &dt, GLib.DateTime &from = GLib.DateTime ());
 
     class StopWatch {
 
         private QMap<string, uint64> _lap_times;
-        private QDateTime _start_time;
+        private GLib.DateTime _start_time;
         private QElapsedTimer _timer;
 
 
@@ -222,8 +222,8 @@ namespace Utility {
         public void on_reset ();
 
         // out helpers, return the measured times.
-        public QDateTime start_time ();
-        public QDateTime time_of_lap (string lap_name);
+        public GLib.DateTime start_time ();
+        public GLib.DateTime time_of_lap (string lap_name);
         public uint64 duration_of_lap (string lap_name);
     };
 
@@ -274,7 +274,7 @@ namespace Utility {
     ***********************************************************/
 
     OCSYNC_EXPORT string make_conflict_file_name (
-        const string fn, QDateTime &dt, string user);
+        const string fn, GLib.DateTime &dt, string user);
 
 
     /***********************************************************
@@ -528,11 +528,11 @@ bool Utility.file_names_equal (string fn1, string fn2) {
     return re;
 }
 
-QDateTime Utility.q_date_time_from_time_t (int64 t) {
-    return QDateTime.from_m_secs_since_epoch (t * 1000);
+GLib.DateTime Utility.q_date_time_from_time_t (int64 t) {
+    return GLib.DateTime.from_m_secs_since_epoch (t * 1000);
 }
 
-int64 Utility.q_date_time_to_time_t (QDateTime &t) {
+int64 Utility.q_date_time_to_time_t (GLib.DateTime &t) {
     return t.to_m_secs_since_epoch () / 1000;
 }
 
@@ -671,8 +671,8 @@ GLib.ByteArray Utility.version_of_installed_binary (string command) {
     return re;
 }
 
-string Utility.time_ago_in_words (QDateTime &dt, QDateTime &from) {
-    QDateTime now = QDateTime.current_date_time_utc ();
+string Utility.time_ago_in_words (GLib.DateTime &dt, GLib.DateTime &from) {
+    GLib.DateTime now = GLib.DateTime.current_date_time_utc ();
 
     if (from.is_valid ()) {
         now = from;
@@ -726,7 +726,7 @@ string Utility.time_ago_in_words (QDateTime &dt, QDateTime &from) {
 static const char STOPWATCH_END_TAG[] = "_STOPWATCH_END";
 
 void Utility.StopWatch.on_start () {
-    _start_time = QDateTime.current_date_time_utc ();
+    _start_time = GLib.DateTime.current_date_time_utc ();
     _timer.on_start ();
 }
 
@@ -752,18 +752,18 @@ uint64 Utility.StopWatch.add_lap_time (string lap_name) {
     return re;
 }
 
-QDateTime Utility.StopWatch.start_time () {
+GLib.DateTime Utility.StopWatch.start_time () {
     return _start_time;
 }
 
-QDateTime Utility.StopWatch.time_of_lap (string lap_name) {
+GLib.DateTime Utility.StopWatch.time_of_lap (string lap_name) {
     uint64 t = duration_of_lap (lap_name);
     if (t) {
-        QDateTime re (_start_time);
+        GLib.DateTime re (_start_time);
         return re.add_m_secs (t);
     }
 
-    return QDateTime ();
+    return GLib.DateTime ();
 }
 
 uint64 Utility.StopWatch.duration_of_lap (string lap_name) {
@@ -798,7 +798,7 @@ GLib.Uri Utility.concat_url_path (GLib.Uri url, string concat_path,
 }
 
 string Utility.make_conflict_file_name (
-    const string fn, QDateTime &dt, string user) {
+    const string fn, GLib.DateTime &dt, string user) {
     string conflict_file_name (fn);
     // Add conflict tag before the extension.
     int dot_location = conflict_file_name.last_index_of ('.');

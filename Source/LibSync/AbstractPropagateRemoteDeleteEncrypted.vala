@@ -34,7 +34,7 @@ class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string error_"";
+    public string error_string ();
 
     public virtual void on_start ();
 
@@ -79,7 +79,7 @@ QNetworkReply.NetworkError AbstractPropagateRemoteDeleteEncrypted.network_error 
     return _network_error;
 }
 
-string AbstractPropagateRemoteDeleteEncrypted.error_"" {
+string AbstractPropagateRemoteDeleteEncrypted.error_string () {
     return _error_string;
 }
 
@@ -155,7 +155,7 @@ void AbstractPropagateRemoteDeleteEncrypted.on_delete_remote_item_finished () {
     _item._request_id = delete_job.request_id ();
 
     if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
-        store_first_error_string (delete_job.error_"");
+        store_first_error_string (delete_job.error_string ());
         store_first_error (err);
 
         task_failed ();

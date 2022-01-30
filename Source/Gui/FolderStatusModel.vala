@@ -980,8 +980,8 @@ void FolderStatusModel.on_lscol_finished_with_error (QNetworkReply r) {
     }
     var parent_info = info_for_index (idx);
     if (parent_info) {
-        GLib.debug (lc_folder_status) << r.error_"";
-        parent_info._last_error_string = r.error_"";
+        GLib.debug (lc_folder_status) << r.error_string ();
+        parent_info._last_error_string = r.error_string ();
         var error = r.error ();
 
         parent_info.reset_subs (this, idx);

@@ -232,7 +232,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
         _item._file_id = _job.reply ().raw_header ("OC-File_id");
 
-        _item._error_string = _job.error_"";
+        _item._error_string = _job.error_string ();
 
         const var job_http_reason_phrase_string = _job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_"";
 

@@ -341,7 +341,7 @@ void GetMetadataApiJob.on_start () {
 bool GetMetadataApiJob.on_finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (ret_code != 200) {
-        q_c_info (lc_cse_job ()) << "error requesting the metadata" << path () << error_"" << ret_code;
+        q_c_info (lc_cse_job ()) << "error requesting the metadata" << path () << error_string () << ret_code;
         emit error (_file_id, ret_code);
         return true;
     }
@@ -379,7 +379,7 @@ void StoreMetaDataApiJob.on_start () {
 bool StoreMetaDataApiJob.on_finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 		if (ret_code != 200) {
-			q_c_info (lc_cse_job ()) << "error sending the metadata" << path () << error_"" << ret_code;
+			q_c_info (lc_cse_job ()) << "error sending the metadata" << path () << error_string () << ret_code;
 			emit error (_file_id, ret_code);
 		}
 
@@ -427,7 +427,7 @@ void UpdateMetadataApiJob.on_start () {
 bool UpdateMetadataApiJob.on_finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 		if (ret_code != 200) {
-			q_c_info (lc_cse_job ()) << "error updating the metadata" << path () << error_"" << ret_code;
+			q_c_info (lc_cse_job ()) << "error updating the metadata" << path () << error_string () << ret_code;
 			emit error (_file_id, ret_code);
 		}
 
@@ -458,7 +458,7 @@ void UnlockEncryptFolderApiJob.on_start () {
 bool UnlockEncryptFolderApiJob.on_finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (ret_code != 200) {
-        q_c_info (lc_cse_job ()) << "error unlocking file" << path () << error_"" << ret_code;
+        q_c_info (lc_cse_job ()) << "error unlocking file" << path () << error_string () << ret_code;
         q_c_info (lc_cse_job ()) << "Full Error Log" << reply ().read_all ();
         emit error (_file_id, ret_code);
         return true;
@@ -487,7 +487,7 @@ void DeleteMetadataApiJob.on_start () {
 bool DeleteMetadataApiJob.on_finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (ret_code != 200) {
-        q_c_info (lc_cse_job ()) << "error removing metadata for" << path () << error_"" << ret_code;
+        q_c_info (lc_cse_job ()) << "error removing metadata for" << path () << error_string () << ret_code;
         q_c_info (lc_cse_job ()) << "Full Error Log" << reply ().read_all ();
         emit error (_file_id, ret_code);
         return true;
@@ -516,7 +516,7 @@ void LockEncryptFolderApiJob.on_start () {
 bool LockEncryptFolderApiJob.on_finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (ret_code != 200) {
-        q_c_info (lc_cse_job ()) << "error locking file" << path () << error_"" << ret_code;
+        q_c_info (lc_cse_job ()) << "error locking file" << path () << error_string () << ret_code;
         emit error (_file_id, ret_code);
         return true;
     }
@@ -554,7 +554,7 @@ bool SetEncryptionFlagApiJob.on_finished () {
     if (ret_code == 200) {
         emit success (_file_id);
     } else {
-        q_c_info (lc_cse_job ()) << "Setting the encrypted flag failed with" << path () << error_"" << ret_code;
+        q_c_info (lc_cse_job ()) << "Setting the encrypted flag failed with" << path () << error_string () << ret_code;
         emit error (_file_id, ret_code);
     }
     return true;
@@ -586,7 +586,7 @@ void StorePrivateKeyApiJob.on_start () {
 bool StorePrivateKeyApiJob.on_finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (ret_code != 200)
-        q_c_info (lc_store_private_key_api_job ()) << "Sending private key ended with"  << path () << error_"" << ret_code;
+        q_c_info (lc_store_private_key_api_job ()) << "Sending private key ended with"  << path () << error_string () << ret_code;
 
     QJsonParseError error;
     var json = QJsonDocument.from_json (reply ().read_all (), &error);
@@ -619,7 +619,7 @@ void SignPublicKeyApiJob.on_start () {
 }
 
 bool SignPublicKeyApiJob.on_finished () {
-    q_c_info (lc_store_private_key_api_job ()) << "Sending CSR ended with"  << path () << error_"" << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute);
+    q_c_info (lc_store_private_key_api_job ()) << "Sending CSR ended with"  << path () << error_string () << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute);
 
     QJsonParseError error;
     var json = QJsonDocument.from_json (reply ().read_all (), &error);

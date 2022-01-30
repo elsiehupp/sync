@@ -66,7 +66,7 @@ class PropagateRemoteDelete : PropagateItemJob {
                     if (_delete_encrypted_helper.network_error () != QNetworkReply.NoError && _delete_encrypted_helper.network_error () != QNetworkReply.ContentNotFoundError) {
                         status = classify_error (_delete_encrypted_helper.network_error (), _item._http_error_code, &propagator ()._another_sync_needed);
                     }
-                    on_done (status, _delete_encrypted_helper.error_"");
+                    on_done (status, _delete_encrypted_helper.error_string ());
                 } else {
                     on_done (SyncFileItem.Success);
                 }
@@ -112,7 +112,7 @@ class PropagateRemoteDelete : PropagateItemJob {
         if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
             SyncFileItem.Status status = classify_error (err, _item._http_error_code,
                 &propagator ()._another_sync_needed);
-            on_done (status, _job.error_"");
+            on_done (status, _job.error_string ());
             return;
         }
 

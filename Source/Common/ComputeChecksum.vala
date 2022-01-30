@@ -354,7 +354,7 @@ class ComputeChecksum : ComputeChecksumBase {
     public static GLib.ByteArray compute_now_on_file (string file_path, GLib.ByteArray checksum_type) {
         GLib.File file = new GLib.File (file_path);
         if (!file.open (QIODevice.ReadOnly)) {
-            GLib.warn (lc_checksums) << "Could not open file" << file_path << "for reading and computing checksum" << file.error_"";
+            GLib.warn (lc_checksums) << "Could not open file" << file_path << "for reading and computing checksum" << file.error_string ();
             return GLib.ByteArray ();
         }
 
@@ -394,10 +394,10 @@ class ComputeChecksum : ComputeChecksumBase {
             if (!shared_device.open (QIODevice.ReadOnly)) {
                 if (var file = qobject_cast<GLib.File> (shared_device.data ())) {
                     GLib.warn (lc_checksums) << "Could not open file" << file.file_name ()
-                            << "for reading to compute a checksum" << file.error_"";
+                            << "for reading to compute a checksum" << file.error_string ();
                 } else {
                     GLib.warn (lc_checksums) << "Could not open device" << shared_device.data ()
-                            << "for reading to compute a checksum" << shared_device.error_"";
+                            << "for reading to compute a checksum" << shared_device.error_string ();
                 }
                 return GLib.ByteArray ();
             }

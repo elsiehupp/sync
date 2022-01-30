@@ -17,7 +17,7 @@ class TestCookies : GLib.Object {
         const string nonexistingPath = tmp.filePath ("someNonexistingDir/test.db");
         QNetworkCookie cookieA = QNetworkCookie ("foo", "bar");
         // tomorrow rounded
-        cookieA.setExpirationDate (QDateTime.currentDateTimeUtc ().addDays (1).date ().startOfDay ());
+        cookieA.setExpirationDate (GLib.DateTime.currentDateTimeUtc ().addDays (1).date ().startOfDay ());
         const GLib.List<QNetworkCookie> cookies = {cookieA, QNetworkCookie ("foo2", "bar")};
         CookieJar jar;
         jar.setAllCookies (cookies);

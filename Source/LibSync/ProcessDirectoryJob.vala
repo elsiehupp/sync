@@ -346,7 +346,7 @@ class ProcessDirectoryJob : GLib.Object {
 signals:
     void on_finished ();
     // The root etag of this directory was fetched
-    void etag (GLib.ByteArray , QDateTime &time);
+    void etag (GLib.ByteArray , GLib.DateTime &time);
 };
 
     bool ProcessDirectoryJob.check_for_invalid_file_name (PathTuple &path,

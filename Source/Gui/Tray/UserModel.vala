@@ -3,7 +3,7 @@ const int USERMODEL_H
 
 // #include <QAbstractListModel>
 // #include <QImage>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 // #include <string[]>
 // #include <QQuick_image_provider>
 // #include <QHash>
@@ -660,7 +660,7 @@ void User.on_received_push_activity (Account account) {
 
 void User.on_check_expired_activities () {
     for (Activity &activity : _activity_model.errors_list ()) {
-        if (activity._expire_at_msecs > 0 && QDateTime.current_date_time ().to_m_secs_since_epoch () >= activity._expire_at_msecs) {
+        if (activity._expire_at_msecs > 0 && GLib.DateTime.current_date_time ().to_m_secs_since_epoch () >= activity._expire_at_msecs) {
             _activity_model.remove_activity_from_activity_list (activity);
         }
     }
@@ -908,7 +908,7 @@ void User.on_add_error (string folder_alias, string message, ErrorCategory categ
         Activity activity;
         activity._type = Activity.Sync_result_type;
         activity._status = SyncResult.Error;
-        activity._date_time = QDateTime.from_string (QDateTime.current_date_time ().to_"", Qt.ISODate);
+        activity._date_time = GLib.DateTime.from_string (GLib.DateTime.current_date_time ().to_"", Qt.ISODate);
         activity._subject = message;
         activity._message = folder_instance.short_gui_local_path ();
         activity._link = folder_instance.short_gui_local_path ();
@@ -941,8 +941,8 @@ void User.on_add_error_to_gui (string folder_alias, SyncFileItem.Status status, 
         Activity activity;
         activity._type = Activity.Sync_file_item_type;
         activity._status = status;
-        const var current_date_time = QDateTime.current_date_time ();
-        activity._date_time = QDateTime.from_string (current_date_time.to_"", Qt.ISODate);
+        const var current_date_time = GLib.DateTime.current_date_time ();
+        activity._date_time = GLib.DateTime.from_string (current_date_time.to_"", Qt.ISODate);
         activity._expire_at_msecs = current_date_time.add_m_secs (activity_default_expiration_time_msecs).to_m_secs_since_epoch ();
         activity._subject = !subject.is_empty () ? subject : folder_instance.short_gui_local_path ();
         activity._message = error_message;
@@ -974,7 +974,7 @@ void User.process_completed_sync_item (Folder folder, SyncFileItemPtr &item) {
     Activity activity;
     activity._type = Activity.Sync_file_item_type; //client activity
     activity._status = item._status;
-    activity._date_time = QDateTime.current_date_time ();
+    activity._date_time = GLib.DateTime.current_date_time ();
     activity._message = item._original_file;
     activity._link = folder.account_state ().account ().url ();
     activity._acc_name = folder.account_state ().account ().display_name ();

@@ -43,7 +43,7 @@ namespace {
     ***********************************************************/
     inline bool file_is_still_changing (Occ.SyncFileItem &item) {
         const var modtime = Occ.Utility.q_date_time_from_time_t (item._modtime);
-        const int64 ms_since_mod = modtime.msecs_to (QDateTime.current_date_time_utc ());
+        const int64 ms_since_mod = modtime.msecs_to (GLib.DateTime.current_date_time_utc ());
 
         return std.chrono.milliseconds (ms_since_mod) < Occ.SyncEngine.minimum_file_age_for_upload
             // if the mtime is too much in the future we do* upload the file
@@ -1007,7 +1007,7 @@ signals:
         entry._error_string = item._error_string;
         entry._last_try_modtime = item._modtime;
         entry._last_try_etag = item._etag;
-        entry._last_try_time = Utility.q_date_time_to_time_t (QDateTime.current_date_time_utc ());
+        entry._last_try_time = Utility.q_date_time_to_time_t (GLib.DateTime.current_date_time_utc ());
         entry._rename_target = item._rename_target;
         entry._retry_count = old._retry_count + 1;
         entry._request_id = item._request_id;

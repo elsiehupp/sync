@@ -6,7 +6,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 // #include <QTest>
 // #include <QSignalSpy>
-// #include <QDateTime>
+// #include <GLib.DateTime>
 
 // #include <memory>
 
@@ -157,7 +157,7 @@ class FakeDateTimeProvider : Occ.DateTimeProvider {
 
     /***********************************************************
     ***********************************************************/
-    public void setCurrentDateTime (QDateTime &dateTime) { _dateTime = dateTime; }
+    public void setCurrentDateTime (GLib.DateTime &dateTime) { _dateTime = dateTime; }
 
     /***********************************************************
     ***********************************************************/
@@ -172,11 +172,11 @@ class FakeDateTimeProvider : Occ.DateTimeProvider {
 
     /***********************************************************
     ***********************************************************/
-    private QDateTime _dateTime;
+    private GLib.DateTime _dateTime;
 };
 
 static std.vector<Occ.UserStatus>
-createFakePredefinedStatuses (QDateTime &currentTime) {
+createFakePredefinedStatuses (GLib.DateTime &currentTime) {
     std.vector<Occ.UserStatus> statuses;
 
     const string userStatusId ("fake-id");
@@ -196,11 +196,11 @@ createFakePredefinedStatuses (QDateTime &currentTime) {
     return statuses;
 }
 
-static QDateTime createDateTime (int year = 2021, int month = 7, int day = 27,
+static GLib.DateTime createDateTime (int year = 2021, int month = 7, int day = 27,
     int hour = 12, int minute = 0, int second = 0) {
     QDate fakeDate (year, month, day);
     QTime fakeTime (hour, minute, second);
-    QDateTime fakeDateTime;
+    GLib.DateTime fakeDateTime;
 
     fakeDateTime.setDate (fakeDate);
     fakeDateTime.setTime (fakeTime);
@@ -213,7 +213,7 @@ class TestSetUserStatusDialog : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testCtor_fetchStatusAndPredefinedStatuses () {
-        const QDateTime currentDateTime (QDateTime.currentDateTime ());
+        const GLib.DateTime currentDateTime (GLib.DateTime.currentDateTime ());
 
         const string userStatusId ("fake-id");
         const string userStatusMessage ("Some status");
