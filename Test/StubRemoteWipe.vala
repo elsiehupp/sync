@@ -2,7 +2,7 @@
 
 Occ.AccountManager *Occ.AccountManager.instance () { return static_cast<AccountManager> (new GLib.Object); }
 void Occ.AccountManager.save (bool) { }
-Occ.AccountState *Occ.AccountManager.addAccount (AccountPtr& ac) { return new Occ.AccountState (ac); }
+Occ.AccountState *Occ.AccountManager.addAccount (AccountPointer& ac) { return new Occ.AccountState (ac); }
 void Occ.AccountManager.deleteAccount (AccountState *) { }
 void Occ.AccountManager.accountRemoved (Occ.AccountState*) { }
 GLib.List<Occ.AccountStatePtr> Occ.AccountManager.accounts () { return GLib.List<Occ.AccountStatePtr> (); }

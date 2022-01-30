@@ -79,7 +79,7 @@ signals:
             url += "index.php/login/flow";
         }
         q_c_info (lc_wizard_webiew_page ()) << "Url to auth at : " << url;
-        _web_view.set_url (QUrl (url));
+        _web_view.set_url (GLib.Uri (url));
 
         _original_wizard_size = _oc_wizard.size ();
         resize_wizard ();
@@ -139,7 +139,7 @@ signals:
         _user = user;
         _pass = pass;
 
-        AccountPtr account = _oc_wizard.account ();
+        AccountPointer account = _oc_wizard.account ();
         account.set_url (host);
 
         q_c_info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_string ();

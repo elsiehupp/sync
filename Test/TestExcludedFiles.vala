@@ -243,8 +243,8 @@ private on_ void check_csync_excluded_per_dir () {
     QVERIFY (QDir (tempDir).mkpath (fooDir));
 
     const var fooExcludeList = string (tempDir + '/' + fooDir + "/.sync-exclude.lst");
-    QFile excludeList (fooExcludeList);
-    QVERIFY (excludeList.open (QFile.WriteOnly));
+    GLib.File excludeList (fooExcludeList);
+    QVERIFY (excludeList.open (GLib.File.WriteOnly));
     QCOMPARE (excludeList.write ("bar"), 3);
     excludeList.close ();
 
@@ -714,8 +714,8 @@ private on_ void check_csync_is_windows_reserved_word () {
         QVERIFY (QDir (tempDir).mkpath (subTempDir));
 
         const var existingFilePath = string (tempDir + '/' + subTempDir + "/.sync-exclude.lst");
-        QFile excludeList (existingFilePath);
-        QVERIFY (excludeList.open (QFile.WriteOnly));
+        GLib.File excludeList (existingFilePath);
+        QVERIFY (excludeList.open (GLib.File.WriteOnly));
         excludeList.close ();
 
         excludedFiles.addExcludeFilePath (existingFilePath);

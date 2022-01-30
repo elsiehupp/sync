@@ -64,7 +64,7 @@ signals:
             // default, handled in ui file
             break;
         case Theme.User_iDEmail:
-            _ui.username_label.on_set_text (tr ("&Email"));
+            _ui.username_label.on_set_text (_("&Email"));
             break;
         case Theme.User_iDCustom:
             _ui.username_label.on_set_text (theme.custom_user_iD ());
@@ -74,8 +74,8 @@ signals:
         }
         _ui.le_username.set_placeholder_text (theme.user_iDHint ());
 
-        set_title (WizardCommon.title_template ().arg (tr ("Connect to %1").arg (Theme.instance ().app_name_gui ())));
-        set_sub_title (WizardCommon.sub_title_template ().arg (tr ("Enter user credentials")));
+        set_title (WizardCommon.title_template ().arg (_("Connect to %1").arg (Theme.instance ().app_name_gui ())));
+        set_sub_title (WizardCommon.sub_title_template ().arg (_("Enter user credentials")));
 
         _ui.result_layout.add_widget (_progress_indi);
         on_stop_spinner ();
@@ -109,7 +109,7 @@ signals:
                 _ui.le_username.on_set_text (user);
             }
         } else {
-            QUrl url = oc_wizard.account ().url ();
+            GLib.Uri url = oc_wizard.account ().url ();
 
             // If the final url does not have a username, check the
             // user specified url too. Sometimes redirects can lose

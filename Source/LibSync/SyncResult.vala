@@ -271,7 +271,7 @@ class SyncResult {
         // Process the item to the gui
         if (item._status == SyncFileItem.FatalError || item._status == SyncFileItem.NormalError) {
             // : this displays an error string (%2) for a file %1
-            append_error_string (GLib.Object.tr ("%1 : %2").arg (item._file, item._error_string));
+            append_error_string (GLib.Object._("%1 : %2").arg (item._file, item._error_string));
             _num_error_items++;
             if (!_first_item_error) {
                 _first_item_error = item;

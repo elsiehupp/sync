@@ -14,7 +14,7 @@ class Propagate_download_encrypted : GLib.Object {
     public void on_start ();
 
 
-    public bool decrypt_file (QFile& tmp_file);
+    public bool decrypt_file (GLib.File& tmp_file);
 
 
     public string error_string ();
@@ -80,13 +80,13 @@ void Propagate_download_encrypted.on_start () {
 }
 
 void Propagate_download_encrypted.on_folder_id_error () {
-    q_c_debug (lc_propagate_download_encrypted) << "Failed to get encrypted metadata of folder";
+    GLib.debug (lc_propagate_download_encrypted) << "Failed to get encrypted metadata of folder";
 }
 
 void Propagate_download_encrypted.on_check_folder_id (string[] &list) {
     var job = qobject_cast<LsColJob> (sender ());
     const string folder_id = list.first ();
-    q_c_debug (lc_propagate_download_encrypted) << "Received id of folder" << folder_id;
+    GLib.debug (lc_propagate_download_encrypted) << "Received id of folder" << folder_id;
 
     const ExtraFolderInfo &folder_info = job._folder_infos.value (folder_id);
 
@@ -106,18 +106,18 @@ void Propagate_download_encrypted.on_folder_encrypted_metadata_error (GLib.ByteA
 }
 
 void Propagate_download_encrypted.on_check_folder_encrypted_metadata (QJsonDocument &json) {
-    q_c_debug (lc_propagate_download_encrypted) << "Metadata Received reading"
+    GLib.debug (lc_propagate_download_encrypted) << "Metadata Received reading"
                                                                                 << _item._instruction << _item._file << _item._encrypted_file_name;
     const string filename = _info.file_name ();
     var meta = new FolderMetadata (_propagator.account (), json.to_json (QJsonDocument.Compact));
     const QVector<EncryptedFile> files = meta.files ();
 
-    const string encrypted_filename = _item._encrypted_file_name.section (QLatin1Char ('/'), -1);
+    const string encrypted_filename = _item._encrypted_file_name.section ('/', -1);
     for (EncryptedFile &file : files) {
         if (encrypted_filename == file.encrypted_filename) {
             _encrypted_info = file;
 
-            q_c_debug (lc_propagate_download_encrypted) << "Found matching encrypted metadata for file, starting download";
+            GLib.debug (lc_propagate_download_encrypted) << "Found matching encrypted metadata for file, starting download";
             emit file_metadata_found ();
             return;
         }
@@ -130,25 +130,25 @@ void Propagate_download_encrypted.on_check_folder_encrypted_metadata (QJsonDocum
 // TODO : Fix this. Exported in the wrong place.
 string create_download_tmp_file_name (string previous);
 
-bool Propagate_download_encrypted.decrypt_file (QFile& tmp_file) {
+bool Propagate_download_encrypted.decrypt_file (GLib.File& tmp_file) {
         const string tmp_file_name = create_download_tmp_file_name (_item._file + QLatin1String ("_dec"));
-        q_c_debug (lc_propagate_download_encrypted) << "Content Checksum Computed starting decryption" << tmp_file_name;
+        GLib.debug (lc_propagate_download_encrypted) << "Content Checksum Computed starting decryption" << tmp_file_name;
 
         tmp_file.close ();
-        QFile _tmp_output (_propagator.full_local_path (tmp_file_name), this);
+        GLib.File _tmp_output (_propagator.full_local_path (tmp_file_name), this);
         EncryptionHelper.file_decryption (_encrypted_info.encryption_key,
                                                                          _encrypted_info.initialization_vector,
                                                                          &tmp_file,
                                                                          &_tmp_output);
 
-        q_c_debug (lc_propagate_download_encrypted) << "Decryption on_finished" << tmp_file.file_name () << _tmp_output.file_name ();
+        GLib.debug (lc_propagate_download_encrypted) << "Decryption on_finished" << tmp_file.file_name () << _tmp_output.file_name ();
 
         tmp_file.close ();
         _tmp_output.close ();
 
         // we decripted the temporary into another temporary, so good bye old one
         if (!tmp_file.remove ()) {
-                q_c_debug (lc_propagate_download_encrypted) << "Failed to remove temporary file" << tmp_file.error_string ();
+                GLib.debug (lc_propagate_download_encrypted) << "Failed to remove temporary file" << tmp_file.error_string ();
                 _error_string = tmp_file.error_string ();
                 return false;
         }

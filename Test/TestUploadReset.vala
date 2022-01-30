@@ -41,21 +41,21 @@ class TestUploadReset : GLib.Object {
         QCOMPARE (uploadInfo._errorCount, 1);
         QCOMPARE (uploadInfo._transferid, 1U);
 
-        fakeFolder.syncEngine ().journal ().wipeErrorBlacklist ();
+        fakeFolder.syncEngine ().journal ().wipeErrorBlocklist ();
         QVERIFY (!fakeFolder.syncOnce ());
 
         uploadInfo = fakeFolder.syncEngine ().journal ().getUploadInfo ("A/a0");
         QCOMPARE (uploadInfo._errorCount, 2);
         QCOMPARE (uploadInfo._transferid, 1U);
 
-        fakeFolder.syncEngine ().journal ().wipeErrorBlacklist ();
+        fakeFolder.syncEngine ().journal ().wipeErrorBlocklist ();
         QVERIFY (!fakeFolder.syncOnce ());
 
         uploadInfo = fakeFolder.syncEngine ().journal ().getUploadInfo ("A/a0");
         QCOMPARE (uploadInfo._errorCount, 3);
         QCOMPARE (uploadInfo._transferid, 1U);
 
-        fakeFolder.syncEngine ().journal ().wipeErrorBlacklist ();
+        fakeFolder.syncEngine ().journal ().wipeErrorBlocklist ();
         QVERIFY (!fakeFolder.syncOnce ());
 
         uploadInfo = fakeFolder.syncEngine ().journal ().getUploadInfo ("A/a0");

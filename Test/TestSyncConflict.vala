@@ -422,7 +422,7 @@ class TestSyncConflict : GLib.Object {
         QVERIFY (conflicts[2].contains ("Z"));
         QCOMPARE (conflicts[2].toUtf8 (), conflictRecords[2]);
         QVERIFY (QFileInfo (fakeFolder.localPath () + conflicts[2]).isDir ());
-        QVERIFY (QFile.exists (fakeFolder.localPath () + conflicts[2] + "/foo"));
+        QVERIFY (GLib.File.exists (fakeFolder.localPath () + conflicts[2] + "/foo"));
 
         // 2)
         QVERIFY (itemConflict (completeSpy, "A/a1"));
@@ -430,7 +430,7 @@ class TestSyncConflict : GLib.Object {
         QVERIFY (conflicts[0].contains ("A/a1"));
         QCOMPARE (conflicts[0].toUtf8 (), conflictRecords[0]);
         QVERIFY (QFileInfo (fakeFolder.localPath () + conflicts[0]).isDir ());
-        QVERIFY (QFile.exists (fakeFolder.localPath () + conflicts[0] + "/bar"));
+        QVERIFY (GLib.File.exists (fakeFolder.localPath () + conflicts[0] + "/bar"));
 
         // 3)
         QVERIFY (itemConflict (completeSpy, "B"));
@@ -438,7 +438,7 @@ class TestSyncConflict : GLib.Object {
         QVERIFY (conflicts[1].contains ("B"));
         QCOMPARE (conflicts[1].toUtf8 (), conflictRecords[1]);
         QVERIFY (QFileInfo (fakeFolder.localPath () + conflicts[1]).isDir ());
-        QVERIFY (QFile.exists (fakeFolder.localPath () + conflicts[1] + "/zzz"));
+        QVERIFY (GLib.File.exists (fakeFolder.localPath () + conflicts[1] + "/zzz"));
 
         // The contents of the conflict directories will only be uploaded after
         // another sync.

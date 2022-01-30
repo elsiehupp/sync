@@ -1,6 +1,6 @@
 
 
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <Gtk.Widget>
 // #include <QWeb_engine_page>
 // #include <QWeb_engine_profile>
@@ -26,7 +26,7 @@ class WebView : Gtk.Widget {
 
     public WebView (Gtk.Widget parent = nullptr);
     ~WebView () override;
-    public void set_url (QUrl url);
+    public void set_url (GLib.Uri url);
 
 signals:
     void on_url_catched (string user, string pass, string host);
@@ -68,12 +68,12 @@ class Web_engine_page : QWeb_engine_page {
 
 
     public QWeb_engine_page * create_window (QWeb_engine_page.Web_window_type type) override;
-    public void set_url (QUrl url);
+    public void set_url (GLib.Uri url);
 
 
     protected bool certificate_error (QWeb_engine_certificate_error &certificate_error) override;
 
-    protected bool accept_navigation_request (QUrl url, QWeb_engine_page.Navigation_type type, bool is_main_frame) override;
+    protected bool accept_navigation_request (GLib.Uri url, QWeb_engine_page.Navigation_type type, bool is_main_frame) override;
 
 
     private bool _enforce_https = false;
@@ -86,7 +86,7 @@ class External_web_engine_page : QWeb_engine_page {
     public External_web_engine_page (QWeb_engine_profile profile, GLib.Object* parent = nullptr);
 
 
-    public bool accept_navigation_request (QUrl url, QWeb_engine_page.Navigation_type type, bool is_main_frame) override;
+    public bool accept_navigation_request (GLib.Uri url, QWeb_engine_page.Navigation_type type, bool is_main_frame) override;
 };
 
 WebView.WebView (Gtk.Widget parent)
@@ -114,7 +114,7 @@ WebView.WebView (Gtk.Widget parent)
     Set a proper accept langauge to the language of the client
     code from : http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection
     ***********************************************************/ {
-        string system_locale = QLocale.system ().name ().replace (QChar.from_latin1 ('_'),QChar.from_latin1 ('-'));
+        string system_locale = QLocale.system ().name ().replace (char.from_latin1 ('_'),char.from_latin1 ('-'));
         string accept_language;
         if (system_locale == QLatin1String ("C")) {
             accept_language = string.from_latin1 ("en,*");
@@ -133,7 +133,7 @@ WebView.WebView (Gtk.Widget parent)
     connect (_scheme_handler, &Web_view_page_url_scheme_handler.on_url_catched, this, &WebView.on_url_catched);
 }
 
-void WebView.set_url (QUrl url) {
+void WebView.set_url (GLib.Uri url) {
     _page.set_url (url);
 }
 
@@ -165,7 +165,7 @@ Web_view_page_url_scheme_handler.Web_view_page_url_scheme_handler (GLib.Object p
 }
 
 void Web_view_page_url_scheme_handler.request_started (QWeb_engine_url_request_job request) {
-    QUrl url = request.request_url ();
+    GLib.Uri url = request.request_url ();
 
     string path = url.path ().mid (1); // get undecoded path
     const string[] parts = path.split ("&");
@@ -184,13 +184,13 @@ void Web_view_page_url_scheme_handler.request_started (QWeb_engine_url_request_j
         }
     }
 
-    q_c_debug (lc_wizard_webiew ()) << "Got raw user from request path : " << user;
+    GLib.debug (lc_wizard_webiew ()) << "Got raw user from request path : " << user;
 
-    user = user.replace (QChar ('+'), QChar (' '));
-    password = password.replace (QChar ('+'), QChar (' '));
+    user = user.replace (char ('+'), char (' '));
+    password = password.replace (char ('+'), char (' '));
 
-    user = QUrl.from_percent_encoding (user.to_utf8 ());
-    password = QUrl.from_percent_encoding (password.to_utf8 ());
+    user = GLib.Uri.from_percent_encoding (user.to_utf8 ());
+    password = GLib.Uri.from_percent_encoding (password.to_utf8 ());
 
     if (!server.starts_with ("http://") && !server.starts_with ("https://")) {
         server = "https://" + server;
@@ -210,7 +210,7 @@ QWeb_engine_page * Web_engine_page.create_window (QWeb_engine_page.Web_window_ty
     return view;
 }
 
-void Web_engine_page.set_url (QUrl url) {
+void Web_engine_page.set_url (GLib.Uri url) {
     QWeb_engine_page.set_url (url);
     _enforce_https = url.scheme () == QStringLiteral ("https");
 }
@@ -224,8 +224,8 @@ bool Web_engine_page.certificate_error (QWeb_engine_certificate_error &certifica
     This is just a quick fix for now.
     ***********************************************************/
     QMessageBox message_box;
-    message_box.on_set_text (tr ("Invalid certificate detected"));
-    message_box.set_informative_text (tr ("The host \"%1\" provided an invalid certificate. Continue?").arg (certificate_error.url ().host ()));
+    message_box.on_set_text (_("Invalid certificate detected"));
+    message_box.set_informative_text (_("The host \"%1\" provided an invalid certificate. Continue?").arg (certificate_error.url ().host ()));
     message_box.set_icon (QMessageBox.Warning);
     message_box.set_standard_buttons (QMessageBox.Yes|QMessageBox.No);
     message_box.set_default_button (QMessageBox.No);
@@ -235,7 +235,7 @@ bool Web_engine_page.certificate_error (QWeb_engine_certificate_error &certifica
     return ret == QMessageBox.Yes;
 }
 
-bool Web_engine_page.accept_navigation_request (QUrl url, QWeb_engine_page.Navigation_type type, bool is_main_frame) {
+bool Web_engine_page.accept_navigation_request (GLib.Uri url, QWeb_engine_page.Navigation_type type, bool is_main_frame) {
     Q_UNUSED (type);
     Q_UNUSED (is_main_frame);
 
@@ -250,7 +250,7 @@ External_web_engine_page.External_web_engine_page (QWeb_engine_profile profile, 
 
 }
 
-bool External_web_engine_page.accept_navigation_request (QUrl url, QWeb_engine_page.Navigation_type type, bool is_main_frame) {
+bool External_web_engine_page.accept_navigation_request (GLib.Uri url, QWeb_engine_page.Navigation_type type, bool is_main_frame) {
     Q_UNUSED (type);
     Q_UNUSED (is_main_frame);
     Utility.open_browser (url);

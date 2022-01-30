@@ -26,7 +26,7 @@ class Ocs_share_job : Ocs_job {
     /***********************************************************
     Constructor for new shares or listing of shares
     ***********************************************************/
-    public Ocs_share_job (AccountPtr account);
+    public Ocs_share_job (AccountPointer account);
 
 
     /***********************************************************
@@ -149,7 +149,7 @@ signals:
 };
 
 
-    Ocs_share_job.Ocs_share_job (AccountPtr account)
+    Ocs_share_job.Ocs_share_job (AccountPointer account)
         : Ocs_job (account) {
         set_path ("ocs/v2.php/apps/files_sharing/api/v1/shares");
         connect (this, &Ocs_job.job_finished, this, &Ocs_share_job.on_job_done);

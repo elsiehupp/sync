@@ -33,7 +33,7 @@ class User : GLib.Object {
     Q_PROPERTY (string name READ name NOTIFY name_changed)
     Q_PROPERTY (string server READ server CONSTANT)
     Q_PROPERTY (bool server_has_user_status READ server_has_user_status CONSTANT)
-    Q_PROPERTY (QUrl status_icon READ status_icon NOTIFY status_changed)
+    Q_PROPERTY (GLib.Uri status_icon READ status_icon NOTIFY status_changed)
     Q_PROPERTY (string status_emoji READ status_emoji NOTIFY status_changed)
     Q_PROPERTY (string status_message READ status_message NOTIFY status_changed)
     Q_PROPERTY (bool desktop_notifications_allowed READ is_desktop_notifications_allowed NOTIFY desktop_notifications_allowed_changed)
@@ -45,7 +45,7 @@ class User : GLib.Object {
 
     public User (AccountStatePtr &account, bool &is_current = false, GLib.Object parent = nullptr);
 
-    public AccountPtr account ();
+    public AccountPointer account ();
 
 
     public AccountStatePtr account_state ();
@@ -119,7 +119,7 @@ class User : GLib.Object {
     public string status_message ();
 
 
-    public QUrl status_icon ();
+    public GLib.Uri status_icon ();
 
 
     public string status_emoji ();
@@ -208,7 +208,7 @@ signals:
     private bool _is_current_user;
     private ActivityListModel _activity_model;
     private Unified_search_results_list_model _unified_search_results_model;
-    private Activity_list _blacklisted_notifications;
+    private Activity_list _blocklisted_notifications;
 
     private QTimer _expired_activities_check_timer;
     private QTimer _notification_check_timer;
@@ -342,7 +342,7 @@ class User_apps_model : QAbstractListModel {
     public void build_app_list ();
 
 
-    public void on_open_app_url (QUrl url);
+    public void on_open_app_url (GLib.Uri url);
 
 
     protected QHash<int, GLib.ByteArray> role_names () override;
@@ -428,8 +428,8 @@ void User.on_build_notification_display (Activity_list &list) {
     _activity_model.clear_notifications ();
 
     foreach (var activity, list) {
-        if (_blacklisted_notifications.contains (activity)) {
-            q_c_info (lc_activity) << "Activity in blacklist, skip";
+        if (_blocklisted_notifications.contains (activity)) {
+            q_c_info (lc_activity) << "Activity in blocklist, skip";
             continue;
         }
         const var message = AccountManager.instance ().accounts ().count () == 1 ? "" : activity._acc_name;
@@ -440,7 +440,7 @@ void User.on_build_notification_display (Activity_list &list) {
 
 void User.on_set_notification_refresh_interval (std.chrono.milliseconds interval) {
     if (!check_push_notifications_are_ready ()) {
-        q_c_debug (lc_activity) << "Starting Notification refresh timer with " << interval.count () / 1000 << " sec interval";
+        GLib.debug (lc_activity) << "Starting Notification refresh timer with " << interval.count () / 1000 << " sec interval";
         _notification_check_timer.on_start (interval.count ());
     }
 }
@@ -538,7 +538,7 @@ void User.on_refresh () {
 
     // Fetch Activities only if visible and if last check is longer than 15 secs ago
     if (timer.is_valid () && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {
-        q_c_debug (lc_activity) << "Do not check as last check is only secs ago : " << timer.elapsed () / 1000;
+        GLib.debug (lc_activity) << "Do not check as last check is only secs ago : " << timer.elapsed () / 1000;
         return;
     }
     if (_account.data () && _account.data ().is_connected ()) {
@@ -570,7 +570,7 @@ void User.on_refresh_notifications () {
 
         snh.on_fetch_notifications ();
     } else {
-        q_c_warning (lc_activity) << "Notification request counter not zero.";
+        GLib.warn (lc_activity) << "Notification request counter not zero.";
     }
 }
 
@@ -585,10 +585,10 @@ void User.on_notification_request_finished (int status_code) {
 
     // the ocs API returns stat code 100 or 200 inside the xml if it succeeded.
     if (status_code != OCS_SUCCESS_STATUS_CODE && status_code != OCS_SUCCESS_STATUS_CODE_V2) {
-        q_c_warning (lc_activity) << "Notification Request to Server failed, leave notification visible.";
+        GLib.warn (lc_activity) << "Notification Request to Server failed, leave notification visible.";
     } else {
         // to do use the model to rebuild the list or remove the item
-        q_c_warning (lc_activity) << "Notification Request to Server successed, rebuilding list.";
+        GLib.warn (lc_activity) << "Notification Request to Server successed, rebuilding list.";
         _activity_model.remove_activity_from_activity_list (row);
     }
 }
@@ -610,7 +610,7 @@ void User.on_send_notification_request (string account_name, string link, GLib.B
         AccountStatePtr acc = AccountManager.instance ().account (account_name);
         if (acc) {
             var job = new Notification_confirm_job (acc.account ());
-            QUrl l (link);
+            GLib.Uri l (link);
             job.set_link_and_verb (l, verb);
             job.set_property ("activity_row", QVariant.from_value (row));
             connect (job, &AbstractNetworkJob.network_error,
@@ -624,7 +624,7 @@ void User.on_send_notification_request (string account_name, string link, GLib.B
             _notification_requests_running++;
         }
     } else {
-        q_c_warning (lc_activity) << "Notification Links : Invalid verb:" << verb;
+        GLib.warn (lc_activity) << "Notification Links : Invalid verb:" << verb;
     }
 }
 
@@ -637,7 +637,7 @@ void User.on_notify_network_error (QNetworkReply reply) {
     int result_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 
     on_end_notification_request (result_code);
-    q_c_warning (lc_activity) << "Server notify job failed with code " << result_code;
+    GLib.warn (lc_activity) << "Server notify job failed with code " << result_code;
 }
 
 void User.on_notify_server_finished (string reply, int reply_code) {
@@ -723,7 +723,7 @@ void User.on_add_error (string folder_alias, string message, ErrorCategory categ
         return;
 
     if (folder_instance.account_state () == _account.data ()) {
-        q_c_warning (lc_activity) << "Item " << folder_instance.short_gui_local_path () << " retrieved resulted in " << message;
+        GLib.warn (lc_activity) << "Item " << folder_instance.short_gui_local_path () << " retrieved resulted in " << message;
 
         Activity activity;
         activity._type = Activity.Sync_result_type;
@@ -737,7 +737,7 @@ void User.on_add_error (string folder_alias, string message, ErrorCategory categ
 
         if (category == ErrorCategory.InsufficientRemoteStorage) {
             Activity_link link;
-            link._label = tr ("Retry all uploads");
+            link._label = _("Retry all uploads");
             link._link = folder_instance.path ();
             link._verb = "";
             link._primary = true;
@@ -756,7 +756,7 @@ void User.on_add_error_to_gui (string folder_alias, SyncFileItem.Status status, 
     }
 
     if (folder_instance.account_state () == _account.data ()) {
-        q_c_warning (lc_activity) << "Item " << folder_instance.short_gui_local_path () << " retrieved resulted in " << error_message;
+        GLib.warn (lc_activity) << "Item " << folder_instance.short_gui_local_path () << " retrieved resulted in " << error_message;
 
         Activity activity;
         activity._type = Activity.Sync_file_item_type;
@@ -813,23 +813,23 @@ void User.process_completed_sync_item (Folder folder, SyncFileItemPtr &item) {
     }
 
     if (item._status == SyncFileItem.NoStatus || item._status == SyncFileItem.Success) {
-        q_c_warning (lc_activity) << "Item " << item._file << " retrieved successfully.";
+        GLib.warn (lc_activity) << "Item " << item._file << " retrieved successfully.";
 
         if (item._direction != SyncFileItem.Up) {
-            activity._message = tr ("Synced %1").arg (item._original_file);
+            activity._message = _("Synced %1").arg (item._original_file);
         } else if (activity._file_action == "file_renamed") {
-            activity._message = tr ("You renamed %1").arg (item._original_file);
+            activity._message = _("You renamed %1").arg (item._original_file);
         } else if (activity._file_action == "file_deleted") {
-            activity._message = tr ("You deleted %1").arg (item._original_file);
+            activity._message = _("You deleted %1").arg (item._original_file);
         } else if (activity._file_action == "file_created") {
-            activity._message = tr ("You created %1").arg (item._original_file);
+            activity._message = _("You created %1").arg (item._original_file);
         } else {
-            activity._message = tr ("You changed %1").arg (item._original_file);
+            activity._message = _("You changed %1").arg (item._original_file);
         }
 
         _activity_model.add_sync_file_item_to_activity_list (activity);
     } else {
-        q_c_warning (lc_activity) << "Item " << item._file << " retrieved resulted in error " << item._error_string;
+        GLib.warn (lc_activity) << "Item " << item._file << " retrieved resulted in error " << item._error_string;
         activity._subject = item._error_string;
 
         if (item._status == SyncFileItem.Status.FileIgnored) {
@@ -851,11 +851,11 @@ void User.on_item_completed (string folder, SyncFileItemPtr &item) {
         return;
     }
 
-    q_c_warning (lc_activity) << "Item " << item._file << " retrieved resulted in " << item._error_string;
+    GLib.warn (lc_activity) << "Item " << item._file << " retrieved resulted in " << item._error_string;
     process_completed_sync_item (folder_instance, item);
 }
 
-AccountPtr User.account () {
+AccountPointer User.account () {
     return _account.account ();
 }
 
@@ -889,7 +889,7 @@ void User.open_local_folder () {
     const var folder = get_folder ();
 
     if (folder) {
-        QDesktopServices.open_url (QUrl.from_local_file (folder.path ()));
+        QDesktopServices.open_url (GLib.Uri.from_local_file (folder.path ()));
     }
 }
 
@@ -928,7 +928,7 @@ string User.status_message () {
     return _account.account ().user_status_connector ().user_status ().message ();
 }
 
-QUrl User.status_icon () {
+GLib.Uri User.status_icon () {
     return _account.account ().user_status_connector ().user_status ().state_icon ();
 }
 
@@ -1119,7 +1119,7 @@ Q_INVOKABLE void User_model.open_current_account_talk () {
     if (talk_app) {
         Utility.open_browser (talk_app.url ());
     } else {
-        q_c_warning (lc_activity) << "The Talk app is not enabled on" << current_user ().server ();
+        GLib.warn (lc_activity) << "The Talk app is not enabled on" << current_user ().server ();
     }
 }
 
@@ -1164,14 +1164,14 @@ Q_INVOKABLE void User_model.remove_account (int &id) {
         return;
 
     QMessageBox message_box (QMessageBox.Question,
-        tr ("Confirm Account Removal"),
-        tr ("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
+        _("Confirm Account Removal"),
+        _("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
            "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
             .arg (_users[id].name ()),
         QMessageBox.NoButton);
     QPushButton yes_button =
-        message_box.add_button (tr ("Remove connection"), QMessageBox.YesRole);
-    message_box.add_button (tr ("Cancel"), QMessageBox.NoRole);
+        message_box.add_button (_("Remove connection"), QMessageBox.YesRole);
+    message_box.add_button (_("Cancel"), QMessageBox.NoRole);
 
     message_box.exec ();
     if (message_box.clicked_button () != yes_button) {
@@ -1358,7 +1358,7 @@ void User_apps_model.build_app_list () {
     }
 }
 
-void User_apps_model.on_open_app_url (QUrl url) {
+void User_apps_model.on_open_app_url (GLib.Uri url) {
     Utility.open_browser (url);
 }
 

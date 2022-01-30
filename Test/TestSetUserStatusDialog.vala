@@ -200,7 +200,7 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (model.userStatusMessage (), userStatusMessage);
         QCOMPARE (model.userStatusEmoji (), userStatusIcon);
         QCOMPARE (model.onlineStatus (), userStatusState);
-        QCOMPARE (model.clearAt (), tr ("1 day"));
+        QCOMPARE (model.clearAt (), _("1 day"));
 
         // Were predefined statuses fetched correctly?
         const var predefinedStatusesCount = model.predefinedStatusesCount ();
@@ -223,7 +223,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
         QCOMPARE (model.userStatusMessage (), "");
         QCOMPARE (model.userStatusEmoji (), "😀");
-        QCOMPARE (model.clearAt (), tr ("Don't clear"));
+        QCOMPARE (model.clearAt (), _("Don't clear"));
     }
 
     private on_ void testCtor_fetchStatusButNoStatusSet_showSensibleDefaults () {
@@ -235,7 +235,7 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (model.onlineStatus (), Occ.UserStatus.OnlineStatus.Online);
         QCOMPARE (model.userStatusMessage (), "");
         QCOMPARE (model.userStatusEmoji (), "😀");
-        QCOMPARE (model.clearAt (), tr ("Don't clear"));
+        QCOMPARE (model.clearAt (), _("Don't clear"));
     }
 
     private on_ void testSetOnlineStatus_emitOnlineStatusChanged () {
@@ -358,7 +358,7 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (model.userStatusMessage (), fakePredefinedUserStatus.message ());
         QCOMPARE (model.userStatusEmoji (), fakePredefinedUserStatus.icon ());
         QCOMPARE (model.onlineStatus (), fakePredefinedUserStatus.state ());
-        QCOMPARE (model.clearAt (), tr ("1 hour"));
+        QCOMPARE (model.clearAt (), _("1 hour"));
     }
 
     private on_ void testSetClear_setClearAtStage0_emitClearAtChangedAndClearAtSet () {
@@ -370,7 +370,7 @@ class TestSetUserStatusDialog : GLib.Object {
         model.setClearAt (clearAtIndex);
 
         QCOMPARE (clearAtChangedSpy.count (), 1);
-        QCOMPARE (model.clearAt (), tr ("Don't clear"));
+        QCOMPARE (model.clearAt (), _("Don't clear"));
     }
 
     private on_ void testSetClear_setClearAtStage1_emitClearAtChangedAndClearAtSet () {
@@ -382,7 +382,7 @@ class TestSetUserStatusDialog : GLib.Object {
         model.setClearAt (clearAtIndex);
 
         QCOMPARE (clearAtChangedSpy.count (), 1);
-        QCOMPARE (model.clearAt (), tr ("30 minutes"));
+        QCOMPARE (model.clearAt (), _("30 minutes"));
     }
 
     private on_ void testSetClear_setClearAtStage2_emitClearAtChangedAndClearAtSet () {
@@ -394,7 +394,7 @@ class TestSetUserStatusDialog : GLib.Object {
         model.setClearAt (clearAtIndex);
 
         QCOMPARE (clearAtChangedSpy.count (), 1);
-        QCOMPARE (model.clearAt (), tr ("1 hour"));
+        QCOMPARE (model.clearAt (), _("1 hour"));
     }
 
     private on_ void testSetClear_setClearAtStage3_emitClearAtChangedAndClearAtSet () {
@@ -406,7 +406,7 @@ class TestSetUserStatusDialog : GLib.Object {
         model.setClearAt (clearAtIndex);
 
         QCOMPARE (clearAtChangedSpy.count (), 1);
-        QCOMPARE (model.clearAt (), tr ("4 hours"));
+        QCOMPARE (model.clearAt (), _("4 hours"));
     }
 
     private on_ void testSetClear_setClearAtStage4_emitClearAtChangedAndClearAtSet () {
@@ -418,7 +418,7 @@ class TestSetUserStatusDialog : GLib.Object {
         model.setClearAt (clearAtIndex);
 
         QCOMPARE (clearAtChangedSpy.count (), 1);
-        QCOMPARE (model.clearAt (), tr ("Today"));
+        QCOMPARE (model.clearAt (), _("Today"));
     }
 
     private on_ void testSetClear_setClearAtStage5_emitClearAtChangedAndClearAtSet () {
@@ -430,23 +430,23 @@ class TestSetUserStatusDialog : GLib.Object {
         model.setClearAt (clearAtIndex);
 
         QCOMPARE (clearAtChangedSpy.count (), 1);
-        QCOMPARE (model.clearAt (), tr ("This week"));
+        QCOMPARE (model.clearAt (), _("This week"));
     }
 
     private on_ void testClearAtStages () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
 
-        QCOMPARE (model.clearAt (), tr ("Don't clear"));
+        QCOMPARE (model.clearAt (), _("Don't clear"));
         const var clearAtValues = model.clearAtValues ();
         QCOMPARE (clearAtValues.count (), 6);
 
-        QCOMPARE (clearAtValues[0], tr ("Don't clear"));
-        QCOMPARE (clearAtValues[1], tr ("30 minutes"));
-        QCOMPARE (clearAtValues[2], tr ("1 hour"));
-        QCOMPARE (clearAtValues[3], tr ("4 hours"));
-        QCOMPARE (clearAtValues[4], tr ("Today"));
-        QCOMPARE (clearAtValues[5], tr ("This week"));
+        QCOMPARE (clearAtValues[0], _("Don't clear"));
+        QCOMPARE (clearAtValues[1], _("30 minutes"));
+        QCOMPARE (clearAtValues[2], _("1 hour"));
+        QCOMPARE (clearAtValues[3], _("4 hours"));
+        QCOMPARE (clearAtValues[4], _("Today"));
+        QCOMPARE (clearAtValues[5], _("This week"));
     }
 
     private on_ void testClearAt_clearAtTimestamp () { {onst var currentTime = createDateTime ();
@@ -462,7 +462,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
             Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
 
-            QCOMPARE (model.clearAt (), tr ("Less than a minute"));
+            QCOMPARE (model.clearAt (), _("Less than a minute"));
         }
  {
             Occ.UserStatus userStatus;
@@ -476,7 +476,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
             Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
 
-            QCOMPARE (model.clearAt (), tr ("1 minute"));
+            QCOMPARE (model.clearAt (), _("1 minute"));
         }
  {
             Occ.UserStatus userStatus;
@@ -490,7 +490,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
             Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
 
-            QCOMPARE (model.clearAt (), tr ("30 minutes"));
+            QCOMPARE (model.clearAt (), _("30 minutes"));
         }
  {
             Occ.UserStatus userStatus;
@@ -504,7 +504,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
             Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
 
-            QCOMPARE (model.clearAt (), tr ("1 hour"));
+            QCOMPARE (model.clearAt (), _("1 hour"));
         }
  {
             Occ.UserStatus userStatus;
@@ -518,7 +518,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
             Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
 
-            QCOMPARE (model.clearAt (), tr ("4 hours"));
+            QCOMPARE (model.clearAt (), _("4 hours"));
         }
  {
             Occ.UserStatus userStatus;
@@ -532,7 +532,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
             Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
 
-            QCOMPARE (model.clearAt (), tr ("1 day"));
+            QCOMPARE (model.clearAt (), _("1 day"));
         }
  {
             Occ.UserStatus userStatus;
@@ -546,7 +546,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
             Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
 
-            QCOMPARE (model.clearAt (), tr ("7 days"));
+            QCOMPARE (model.clearAt (), _("7 days"));
         }
     }
 
@@ -559,7 +559,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
             Occ.UserStatusSelectorModel model (userStatus);
 
-            QCOMPARE (model.clearAt (), tr ("Today"));
+            QCOMPARE (model.clearAt (), _("Today"));
         }
  {
             Occ.UserStatus userStatus;
@@ -570,7 +570,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
             Occ.UserStatusSelectorModel model (userStatus);
 
-            QCOMPARE (model.clearAt (), tr ("This week"));
+            QCOMPARE (model.clearAt (), _("This week"));
         }
     }
 
@@ -583,7 +583,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
             Occ.UserStatusSelectorModel model (userStatus);
 
-            QCOMPARE (model.clearAt (), tr ("30 minutes"));
+            QCOMPARE (model.clearAt (), _("30 minutes"));
         }
  {
             Occ.UserStatus userStatus;
@@ -594,7 +594,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
             Occ.UserStatusSelectorModel model (userStatus);
 
-            QCOMPARE (model.clearAt (), tr ("1 hour"));
+            QCOMPARE (model.clearAt (), _("1 hour"));
         }
     }
 
@@ -613,7 +613,7 @@ class TestSetUserStatusDialog : GLib.Object {
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
 
         QCOMPARE (model.errorMessage (),
-            tr ("Could not fetch predefined statuses. Make sure you are connected to the server."));
+            _("Could not fetch predefined statuses. Make sure you are connected to the server."));
     }
 
     private on_ void testError_couldNotFetchUserStatus_emitError () {
@@ -622,7 +622,7 @@ class TestSetUserStatusDialog : GLib.Object {
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
 
         QCOMPARE (model.errorMessage (),
-            tr ("Could not fetch user status. Make sure you are connected to the server."));
+            _("Could not fetch user status. Make sure you are connected to the server."));
     }
 
     private on_ void testError_userStatusNotSupported_emitError () {
@@ -631,7 +631,7 @@ class TestSetUserStatusDialog : GLib.Object {
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
 
         QCOMPARE (model.errorMessage (),
-            tr ("User status feature is not supported. You will not be able to set your user status."));
+            _("User status feature is not supported. You will not be able to set your user status."));
     }
 
     private on_ void testError_couldSetUserStatus_emitError () {
@@ -641,7 +641,7 @@ class TestSetUserStatusDialog : GLib.Object {
         model.setUserStatus ();
 
         QCOMPARE (model.errorMessage (),
-            tr ("Could not set user status. Make sure you are connected to the server."));
+            _("Could not set user status. Make sure you are connected to the server."));
     }
 
     private on_ void testError_emojisNotSupported_emitError () {
@@ -650,7 +650,7 @@ class TestSetUserStatusDialog : GLib.Object {
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
 
         QCOMPARE (model.errorMessage (),
-            tr ("Emojis feature is not supported. Some user status functionality may not work."));
+            _("Emojis feature is not supported. Some user status functionality may not work."));
     }
 
     private on_ void testError_couldNotClearMessage_emitError () {
@@ -660,7 +660,7 @@ class TestSetUserStatusDialog : GLib.Object {
         model.clearUserStatus ();
 
         QCOMPARE (model.errorMessage (),
-            tr ("Could not clear user status message. Make sure you are connected to the server."));
+            _("Could not clear user status message. Make sure you are connected to the server."));
     }
 
     private on_ void testError_setUserStatus_clearErrorMessage () {

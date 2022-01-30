@@ -31,7 +31,7 @@ namespace Occ {
 
 
 namespace {
-    const char user_c[] = "user";
+    const char USER_C[] = "user";
     const char is_oauth_c[] = "oauth";
     const char client_cert_bundle_c[] = "client_cert_pkcs12";
     const char client_cert_password_c[] = "_client_cert_password";
@@ -301,7 +301,7 @@ class HttpCredentials : AbstractCredentials {
     }
 
     string HttpCredentials.fetch_user () {
-        _user = _account.credential_setting (QLatin1String (user_c)).to_string ();
+        _user = _account.credential_setting (QLatin1String (USER_C)).to_string ();
         return _user;
     }
 
@@ -392,11 +392,11 @@ class HttpCredentials : AbstractCredentials {
         if (read_job.error () == QKeychain.NoError) {
             _client_cert_password = read_job.binary_data ();
         } else {
-            q_c_warning (lc_http_credentials) << "Could not retrieve client cert password from keychain" << read_job.error_string ();
+            GLib.warn (lc_http_credentials) << "Could not retrieve client cert password from keychain" << read_job.error_string ();
         }
 
         if (!unpack_client_cert_bundle ()) {
-            q_c_warning (lc_http_credentials) << "Could not unpack client cert bundle";
+            GLib.warn (lc_http_credentials) << "Could not unpack client cert bundle";
         }
         _client_cert_bundle.clear ();
         _client_cert_password.clear ();
@@ -447,7 +447,7 @@ class HttpCredentials : AbstractCredentials {
                 _client_ssl_key = QSslKey (client_key_pem, QSsl.Ec);
             }
             if (_client_ssl_key.is_null ()) {
-                q_c_warning (lc_http_credentials) << "Could not load SSL key into Qt!";
+                GLib.warn (lc_http_credentials) << "Could not load SSL key into Qt!";
             }
         }
 
@@ -482,7 +482,7 @@ class HttpCredentials : AbstractCredentials {
         // If we can't find the credentials at the keys that include the account id,
         // try to read them from the legacy locations that don't have a account id.
         if (!_keychain_migration && error == QKeychain.EntryNotFound) {
-            q_c_warning (lc_http_credentials)
+            GLib.warn (lc_http_credentials)
                 << "Could not find keychain entries, attempting to read from legacy locations";
             _keychain_migration = true;
             fetch_from_keychain_helper ();
@@ -497,7 +497,7 @@ class HttpCredentials : AbstractCredentials {
         }
 
         if (_user.is_empty ()) {
-            q_c_warning (lc_http_credentials) << "Strange : User is empty!";
+            GLib.warn (lc_http_credentials) << "Strange : User is empty!";
         }
 
         if (!_refresh_token.is_empty () && error == QKeychain.NoError) {
@@ -523,7 +523,7 @@ class HttpCredentials : AbstractCredentials {
         if (_keychain_migration && _ready) {
             persist ();
             delete_old_keychain_entries ();
-            q_c_warning (lc_http_credentials) << "Migrated old keychain entries";
+            GLib.warn (lc_http_credentials) << "Migrated old keychain entries";
         }
     }
 
@@ -531,7 +531,7 @@ class HttpCredentials : AbstractCredentials {
         if (_refresh_token.is_empty ())
             return false;
 
-        QUrl request_token = Utility.concat_url_path (_account.url (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
+        GLib.Uri request_token = Utility.concat_url_path (_account.url (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
         QNetworkRequest req;
         req.set_header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
 
@@ -542,7 +542,7 @@ class HttpCredentials : AbstractCredentials {
 
         var request_body = new QBuffer;
         QUrlQuery arguments (string ("grant_type=refresh_token&refresh_token=%1").arg (_refresh_token));
-        request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
+        request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
         var job = _account.send_request ("POST", request_token, req, request_body);
         job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
@@ -553,11 +553,11 @@ class HttpCredentials : AbstractCredentials {
             string access_token = json["access_token"].to_string ();
             if (json_parse_error.error != QJsonParseError.NoError || json.is_empty ()) {
                 // Invalid or empty JSON : Network error maybe?
-                q_c_warning (lc_http_credentials) << "Error while refreshing the token" << reply.error_string () << json_data << json_parse_error.error_string ();
+                GLib.warn (lc_http_credentials) << "Error while refreshing the token" << reply.error_string () << json_data << json_parse_error.error_string ();
             } else if (access_token.is_empty ()) {
                 // If the json was valid, but the reply did not contain an access token, the token
                 // is considered expired. (Usually the HTTP reply code is 400)
-                q_c_debug (lc_http_credentials) << "Expired refresh token. Logging out";
+                GLib.debug (lc_http_credentials) << "Expired refresh token. Logging out";
                 _refresh_token.clear ();
             } else {
                 _ready = true;
@@ -589,7 +589,7 @@ class HttpCredentials : AbstractCredentials {
 
         const string kck = keychain_key (_account.url ().to_string (), _user, _account.id ());
         if (kck.is_empty ()) {
-            q_c_warning (lc_http_credentials) << "InvalidateToken : User is empty, bailing out!";
+            GLib.warn (lc_http_credentials) << "InvalidateToken : User is empty, bailing out!";
             return;
         }
 
@@ -630,7 +630,7 @@ class HttpCredentials : AbstractCredentials {
             return;
         }
 
-        _account.set_credential_setting (QLatin1String (user_c), _user);
+        _account.set_credential_setting (QLatin1String (USER_C), _user);
         _account.set_credential_setting (QLatin1String (is_oauth_c), is_using_oAuth ());
         if (!_client_cert_bundle.is_empty ()) {
             // Note that the _client_cert_bundle will often be cleared after usage,
@@ -673,7 +673,7 @@ class HttpCredentials : AbstractCredentials {
 
     void HttpCredentials.on_write_client_cert_password_job_done (QKeychain.Job finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
-            q_c_warning (lc_http_credentials) << "Could not write client cert password to credentials"
+            GLib.warn (lc_http_credentials) << "Could not write client cert password to credentials"
                                          << finished_job.error () << finished_job.error_string ();
         }
 
@@ -682,7 +682,7 @@ class HttpCredentials : AbstractCredentials {
 
     void HttpCredentials.on_write_client_cert_pem_job_done (QKeychain.Job finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
-            q_c_warning (lc_http_credentials) << "Could not write client cert to credentials"
+            GLib.warn (lc_http_credentials) << "Could not write client cert to credentials"
                                          << finished_job.error () << finished_job.error_string ();
         }
 
@@ -702,7 +702,7 @@ class HttpCredentials : AbstractCredentials {
 
     void HttpCredentials.on_write_client_key_pem_job_done (QKeychain.Job finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
-            q_c_warning (lc_http_credentials) << "Could not write client key to credentials"
+            GLib.warn (lc_http_credentials) << "Could not write client key to credentials"
                                          << finished_job.error () << finished_job.error_string ();
         }
 
@@ -721,7 +721,7 @@ class HttpCredentials : AbstractCredentials {
 
     void HttpCredentials.on_write_job_done (QKeychain.Job job) {
         if (job && job.error () != QKeychain.NoError) {
-            q_c_warning (lc_http_credentials) << "Error while writing password"
+            GLib.warn (lc_http_credentials) << "Error while writing password"
                                          << job.error () << job.error_string ();
         }
     }
@@ -732,7 +732,7 @@ class HttpCredentials : AbstractCredentials {
         Q_UNUSED (authenticator)
         // Because of issue #4326, we need to set the login and password manually at every requests
         // Thus, if we reach this signal, those credentials were invalid and we terminate.
-        q_c_warning (lc_http_credentials) << "Stop request : Authentication failed for " << reply.url ().to_string ();
+        GLib.warn (lc_http_credentials) << "Stop request : Authentication failed for " << reply.url ().to_string ();
         reply.set_property (authentication_failed_c, true);
 
         if (_is_renewing_oauth_token) {

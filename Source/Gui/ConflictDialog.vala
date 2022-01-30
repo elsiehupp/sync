@@ -10,7 +10,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 // #include <QFileInfo>
 // #include <QMimeDatabase>
 // #include <QPushButton>
-// #include <QUrl>
+// #include <GLib.Uri>
 
 // #include <Gtk.Dialog>
 
@@ -79,16 +79,16 @@ namespace {
         _ui.setup_ui (this);
         force_header_font (_ui.conflict_message);
         _ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
-        _ui.button_box.button (QDialogButtonBox.Ok).on_set_text (tr ("Keep selected version"));
+        _ui.button_box.button (QDialogButtonBox.Ok).on_set_text (_("Keep selected version"));
 
         connect (_ui.local_version_radio, &QCheckBox.toggled, this, &ConflictDialog.update_button_states);
         connect (_ui.local_version_button, &QToolButton.clicked, this, [=] {
-            QDesktopServices.open_url (QUrl.from_local_file (_solver.local_version_filename ()));
+            QDesktopServices.open_url (GLib.Uri.from_local_file (_solver.local_version_filename ()));
         });
 
         connect (_ui.remote_version_radio, &QCheckBox.toggled, this, &ConflictDialog.update_button_states);
         connect (_ui.remote_version_button, &QToolButton.clicked, this, [=] {
-            QDesktopServices.open_url (QUrl.from_local_file (_solver.remote_version_filename ()));
+            QDesktopServices.open_url (GLib.Uri.from_local_file (_solver.remote_version_filename ()));
         });
 
         connect (_solver, &ConflictSolver.local_version_filename_changed, this, &ConflictDialog.update_widgets);
@@ -115,7 +115,7 @@ namespace {
         }
 
         _base_filename = base_filename;
-        _ui.conflict_message.on_set_text (tr ("Conflicting versions of %1.").arg (_base_filename));
+        _ui.conflict_message.on_set_text (_("Conflicting versions of %1.").arg (_base_filename));
     }
 
     void ConflictDialog.on_set_local_version_filename (string local_version_filename) {
@@ -147,8 +147,8 @@ namespace {
         QMimeDatabase mime_database;
 
         const var update_group = [this, &mime_database] (string filename, QLabel link_label, string link_text, QLabel mtime_label, QLabel size_label, QToolButton button) {
-            const var file_url = QUrl.from_local_file (filename).to_string ();
-            link_label.on_set_text (QStringLiteral ("<a href='%1'>%2</a>").arg (file_url).arg (link_text));
+            const var file_url = GLib.Uri.from_local_file (filename).to_string ();
+            link_label.on_set_text ("<a href='%1'>%2</a>".arg (file_url).arg (link_text));
 
             const var info = QFileInfo (filename);
             mtime_label.on_set_text (info.last_modified ().to_string ());
@@ -165,7 +165,7 @@ namespace {
         const var local_version = _solver.local_version_filename ();
         update_group (local_version,
                     _ui.local_version_link,
-                    tr ("Open local version"),
+                    _("Open local version"),
                     _ui.local_version_mtime,
                     _ui.local_version_size,
                     _ui.local_version_button);
@@ -173,7 +173,7 @@ namespace {
         const var remote_version = _solver.remote_version_filename ();
         update_group (remote_version,
                     _ui.remote_version_link,
-                    tr ("Open server version"),
+                    _("Open server version"),
                     _ui.remote_version_mtime,
                     _ui.remote_version_size,
                     _ui.remote_version_button);
@@ -190,10 +190,10 @@ namespace {
         const var is_remote_picked = _ui.remote_version_radio.is_checked ();
         _ui.button_box.button (QDialogButtonBox.Ok).set_enabled (is_local_picked || is_remote_picked);
 
-        const var text = is_local_picked && is_remote_picked ? tr ("Keep both versions")
-                        : is_local_picked ? tr ("Keep local version")
-                        : is_remote_picked ? tr ("Keep server version")
-                        : tr ("Keep selected version");
+        const var text = is_local_picked && is_remote_picked ? _("Keep both versions")
+                        : is_local_picked ? _("Keep local version")
+                        : is_remote_picked ? _("Keep server version")
+                        : _("Keep selected version");
         _ui.button_box.button (QDialogButtonBox.Ok).on_set_text (text);
     }
 

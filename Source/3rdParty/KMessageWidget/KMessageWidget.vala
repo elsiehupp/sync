@@ -441,7 +441,7 @@ class KMessageWidgetPrivate {
         GLib.Object.connect (time_line, SIGNAL (on_finished ()), q, SLOT (on_time_line_finished ()));
 
         content = new QFrame (q);
-        content.set_object_name (QStringLiteral ("content_widget"));
+        content.set_object_name ("content_widget");
         content.set_size_policy (QSize_policy.Expanding, QSize_policy.Fixed);
 
         word_wrap = false;
@@ -457,8 +457,8 @@ class KMessageWidgetPrivate {
         GLib.Object.connect (text_label, &QLabel.link_hovered, q, &KMessageWidget.link_hovered);
 
         var close_action = new QAction (q);
-        close_action.on_set_text (KMessageWidget.tr ("&Close"));
-        close_action.set_tool_tip (KMessageWidget.tr ("Close message"));
+        close_action.on_set_text (KMessageWidget._("&Close"));
+        close_action.set_tool_tip (KMessageWidget._("Close message"));
         close_action.set_icon (QIcon (":/client/theme/close.svg")); // ivan : NC customization
 
         GLib.Object.connect (close_action, &QAction.triggered, q, &KMessageWidget.animated_hide);

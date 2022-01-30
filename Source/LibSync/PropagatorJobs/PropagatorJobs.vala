@@ -18,7 +18,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #pragma once
 
-// #include <QFile>
+// #include <GLib.File>
 
 namespace Occ {
 
@@ -146,7 +146,7 @@ class PropagateLocalRename : PropagateItemJob {
         q_c_info (lc_propagate_local_remove) << "Going to delete:" << filename;
 
         if (propagator ().local_file_name_clash (_item._file)) {
-            on_done (SyncFileItem.NormalError, tr ("Could not remove %1 because of a local file name clash").arg (QDir.to_native_separators (filename)));
+            on_done (SyncFileItem.NormalError, _("Could not remove %1 because of a local file name clash").arg (QDir.to_native_separators (filename)));
             return;
         }
 
@@ -200,7 +200,7 @@ class PropagateLocalRename : PropagateItemJob {
                 string remove_error;
                 if (!FileSystem.remove (new_dir_str, &remove_error)) {
                     on_done (SyncFileItem.NormalError,
-                        tr ("could not delete file %1, error : %2")
+                        _("could not delete file %1, error : %2")
                             .arg (new_dir_str, remove_error));
                     return;
                 }
@@ -214,14 +214,14 @@ class PropagateLocalRename : PropagateItemJob {
         }
 
         if (Utility.fs_case_preserving () && propagator ().local_file_name_clash (_item._file)) {
-            q_c_warning (lc_propagate_local_mkdir) << "New folder to create locally already exists with different case:" << _item._file;
-            on_done (SyncFileItem.NormalError, tr ("Attention, possible case sensitivity clash with %1").arg (new_dir_str));
+            GLib.warn (lc_propagate_local_mkdir) << "New folder to create locally already exists with different case:" << _item._file;
+            on_done (SyncFileItem.NormalError, _("Attention, possible case sensitivity clash with %1").arg (new_dir_str));
             return;
         }
         emit propagator ().touched_file (new_dir_str);
         QDir local_dir (propagator ().local_path ());
         if (!local_dir.mkpath (_item._file)) {
-            on_done (SyncFileItem.NormalError, tr ("Could not create folder %1").arg (new_dir_str));
+            on_done (SyncFileItem.NormalError, _("Could not create folder %1").arg (new_dir_str));
             return;
         }
 
@@ -234,10 +234,10 @@ class PropagateLocalRename : PropagateItemJob {
         new_item._etag = "_invalid_";
         const var result = propagator ().update_metadata (new_item);
         if (!result) {
-            on_done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
+            on_done (SyncFileItem.FatalError, _("Error updating metadata : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (new_item._file));
+            on_done (SyncFileItem.SoftError, _("The file %1 is currently in use").arg (new_item._file));
             return;
         }
         propagator ()._journal.commit ("local_mkdir");
@@ -259,7 +259,7 @@ class PropagateLocalRename : PropagateItemJob {
         // to _item.rename_target and the file is not moved as a result.
         if (_item._file != _item._rename_target) {
             propagator ().report_progress (*_item, 0);
-            q_c_debug (lc_propagate_local_rename) << "MOVE " << existing_file << " => " << target_file;
+            GLib.debug (lc_propagate_local_rename) << "MOVE " << existing_file << " => " << target_file;
 
             if (string.compare (_item._file, _item._rename_target, Qt.CaseInsensitive) != 0
                 && propagator ().local_file_name_clash (_item._rename_target)) {
@@ -269,7 +269,7 @@ class PropagateLocalRename : PropagateItemJob {
                 // Fixme : the file that is the reason for the clash could be named here,
                 // it would have to come out the local_file_name_clash function
                 on_done (SyncFileItem.NormalError,
-                    tr ("File %1 cannot be renamed to %2 because of a local file name clash")
+                    _("File %1 cannot be renamed to %2 because of a local file name clash")
                         .arg (QDir.to_native_separators (_item._file))
                         .arg (QDir.to_native_separators (_item._rename_target)));
                 return;
@@ -291,7 +291,7 @@ class PropagateLocalRename : PropagateItemJob {
         var &vfs = propagator ().sync_options ()._vfs;
         var pin_state = vfs.pin_state (_item._original_file);
         if (!vfs.set_pin_state (_item._original_file, PinState.PinState.INHERITED)) {
-            q_c_warning (lc_propagate_local_rename) << "Could not set pin state of" << _item._original_file << "to inherited";
+            GLib.warn (lc_propagate_local_rename) << "Could not set pin state of" << _item._original_file << "to inherited";
         }
 
         const var old_file = _item._file;
@@ -303,22 +303,22 @@ class PropagateLocalRename : PropagateItemJob {
             }
             const var result = propagator ().update_metadata (new_item);
             if (!result) {
-                on_done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
+                on_done (SyncFileItem.FatalError, _("Error updating metadata : %1").arg (result.error ()));
                 return;
             } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-                on_done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (new_item._file));
+                on_done (SyncFileItem.SoftError, _("The file %1 is currently in use").arg (new_item._file));
                 return;
             }
         } else {
             propagator ()._renamed_directories.insert (old_file, _item._rename_target);
             if (!PropagateRemoteMove.adjust_selective_sync (propagator ()._journal, old_file, _item._rename_target)) {
-                on_done (SyncFileItem.FatalError, tr ("Failed to rename file"));
+                on_done (SyncFileItem.FatalError, _("Failed to rename file"));
                 return;
             }
         }
         if (pin_state && *pin_state != PinState.PinState.INHERITED
             && !vfs.set_pin_state (_item._rename_target, *pin_state)) {
-            on_done (SyncFileItem.NormalError, tr ("Error setting pin state"));
+            on_done (SyncFileItem.NormalError, _("Error setting pin state"));
             return;
         }
 

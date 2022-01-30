@@ -119,7 +119,7 @@ abstract class ComputeChecksumBase : GLib.Object {
             }
             return _checksums.mid (i, end - i);
         }
-        q_c_warning (lc_checksums) << "Failed to parse" << _checksums;
+        GLib.warn (lc_checksums) << "Failed to parse" << _checksums;
         return {};
     }
 
@@ -262,7 +262,7 @@ class ComputeChecksum : ComputeChecksumBase {
     ***********************************************************/
     public void on_start (string file_path) {
         q_c_info (lc_checksums) << "Computing" << checksum_type () << "checksum of" << file_path << "in a thread";
-        start_impl (std.make_unique<QFile> (file_path));
+        start_impl (std.make_unique<GLib.File> (file_path));
     }
 
 
@@ -288,7 +288,7 @@ class ComputeChecksum : ComputeChecksumBase {
     ***********************************************************/
     public static GLib.ByteArray compute_now (QIODevice device, GLib.ByteArray checksum_type) {
         if (!checksum_computation_enabled ()) {
-            q_c_warning (lc_checksums) << "Checksum computation disabled by environment variable";
+            GLib.warn (lc_checksums) << "Checksum computation disabled by environment variable";
             return GLib.ByteArray ();
         }
 
@@ -311,7 +311,7 @@ class ComputeChecksum : ComputeChecksumBase {
     #endif
         // for an unknown checksum or no checksum, we're done right now
         if (!checksum_type.is_empty ()) {
-            q_c_warning (lc_checksums) << "Unknown checksum type:" << checksum_type;
+            GLib.warn (lc_checksums) << "Unknown checksum type:" << checksum_type;
         }
         return GLib.ByteArray ();
     }
@@ -321,9 +321,9 @@ class ComputeChecksum : ComputeChecksumBase {
     Computes the checksum synchronously on file. Convenience wrapper for compute_now ().
     ***********************************************************/
     public static GLib.ByteArray compute_now_on_file (string file_path, GLib.ByteArray checksum_type) {
-        QFile file = new QFile (file_path);
+        GLib.File file = new GLib.File (file_path);
         if (!file.open (QIODevice.ReadOnly)) {
-            q_c_warning (lc_checksums) << "Could not open file" << file_path << "for reading and computing checksum" << file.error_string ();
+            GLib.warn (lc_checksums) << "Could not open file" << file_path << "for reading and computing checksum" << file.error_string ();
             return GLib.ByteArray ();
         }
 
@@ -357,11 +357,11 @@ class ComputeChecksum : ComputeChecksumBase {
         var type = checksum_type ();
         _watcher.set_future (Qt_concurrent.run ([shared_device, type] () {
             if (!shared_device.open (QIODevice.ReadOnly)) {
-                if (var file = qobject_cast<QFile> (shared_device.data ())) {
-                    q_c_warning (lc_checksums) << "Could not open file" << file.file_name ()
+                if (var file = qobject_cast<GLib.File> (shared_device.data ())) {
+                    GLib.warn (lc_checksums) << "Could not open file" << file.file_name ()
                             << "for reading to compute a checksum" << file.error_string ();
                 } else {
-                    q_c_warning (lc_checksums) << "Could not open device" << shared_device.data ()
+                    GLib.warn (lc_checksums) << "Could not open device" << shared_device.data ()
                             << "for reading to compute a checksum" << shared_device.error_string ();
                 }
                 return GLib.ByteArray ();
@@ -421,11 +421,11 @@ class ValidateChecksumHeader : ComputeChecksumBase {
 
     private void on_checksum_calculated (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
         if (checksum_type != _expected_checksum_type) {
-            emit validation_failed (tr ("The checksum header contained an unknown checksum type \"%1\"").arg (string.from_latin1 (_expected_checksum_type)));
+            emit validation_failed (_("The checksum header contained an unknown checksum type \"%1\"").arg (string.from_latin1 (_expected_checksum_type)));
             return;
         }
         if (checksum != _expected_checksum) {
-            emit validation_failed (tr (R" (The downloaded file does not match the checksum, it will be resumed. "%1" != "%2")").arg (string.from_utf8 (_expected_checksum), string.from_utf8 (checksum)));
+            emit validation_failed (_(R" (The downloaded file does not match the checksum, it will be resumed. "%1" != "%2")").arg (string.from_utf8 (_expected_checksum), string.from_utf8 (checksum)));
             return;
         }
         emit validated (checksum_type, checksum);
@@ -440,8 +440,8 @@ class ValidateChecksumHeader : ComputeChecksumBase {
         }
 
         if (!parse_checksum_header (checksum_header, &_expected_checksum_type, &_expected_checksum)) {
-            q_c_warning (lc_checksums) << "Checksum header malformed:" << checksum_header;
-            emit validation_failed (tr ("The checksum header is malformed."));
+            GLib.warn (lc_checksums) << "Checksum header malformed:" << checksum_header;
+            emit validation_failed (_("The checksum header is malformed."));
             return nullptr;
         }
 
@@ -476,7 +476,7 @@ class CSyncChecksumHook : ComputeChecksumBase {
         q_c_info (lc_checksums) << "Computing" << type << "checksum of" << path << "in the csync hook";
         GLib.ByteArray checksum = ComputeChecksum.compute_now_on_file (string.from_utf8 (path), type);
         if (checksum.is_null ()) {
-            q_c_warning (lc_checksums) << "Failed to compute checksum" << type << "for" << path;
+            GLib.warn (lc_checksums) << "Failed to compute checksum" << type << "for" << path;
             return nullptr;
         }
 

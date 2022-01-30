@@ -37,12 +37,12 @@ class Theme : GLib.Object {
     Q_PROPERTY (bool branded READ is_branded CONSTANT)
     Q_PROPERTY (string app_name_gui READ app_name_gui CONSTANT)
     Q_PROPERTY (string app_name READ app_name CONSTANT)
-    Q_PROPERTY (QUrl state_online_image_source READ state_online_image_source CONSTANT)
-    Q_PROPERTY (QUrl state_offline_image_source READ state_offline_image_source CONSTANT)
-    Q_PROPERTY (QUrl status_online_image_source READ status_online_image_source CONSTANT)
-    Q_PROPERTY (QUrl status_do_not_disturb_image_source READ status_do_not_disturb_image_source CONSTANT)
-    Q_PROPERTY (QUrl status_away_image_source READ status_away_image_source CONSTANT)
-    Q_PROPERTY (QUrl status_invisible_image_source READ status_invisible_image_source CONSTANT)
+    Q_PROPERTY (GLib.Uri state_online_image_source READ state_online_image_source CONSTANT)
+    Q_PROPERTY (GLib.Uri state_offline_image_source READ state_offline_image_source CONSTANT)
+    Q_PROPERTY (GLib.Uri status_online_image_source READ status_online_image_source CONSTANT)
+    Q_PROPERTY (GLib.Uri status_do_not_disturb_image_source READ status_do_not_disturb_image_source CONSTANT)
+    Q_PROPERTY (GLib.Uri status_away_image_source READ status_away_image_source CONSTANT)
+    Q_PROPERTY (GLib.Uri status_invisible_image_source READ status_invisible_image_source CONSTANT)
 #ifndef TOKEN_AUTH_ONLY
     Q_PROPERTY (QIcon folder_disabled_icon READ folder_disabled_icon CONSTANT)
     Q_PROPERTY (QIcon folder_offline_icon READ folder_offline_icon CONSTANT)
@@ -127,56 +127,56 @@ class Theme : GLib.Object {
 
     /***********************************************************
     @brief Returns full path to an online state icon
-    @return QUrl full path to an icon
+    @return GLib.Uri full path to an icon
     ***********************************************************/
-    public QUrl state_online_image_source ();
+    public GLib.Uri state_online_image_source ();
 
 
     /***********************************************************
     @brief Returns full path to an offline state icon
-    @return QUrl full path to an icon
+    @return GLib.Uri full path to an icon
     ***********************************************************/
-    public QUrl state_offline_image_source ();
+    public GLib.Uri state_offline_image_source ();
 
 
     /***********************************************************
     @brief Returns full path to an online user status icon
-    @return QUrl full path to an icon
+    @return GLib.Uri full path to an icon
     ***********************************************************/
-    public QUrl status_online_image_source ();
+    public GLib.Uri status_online_image_source ();
 
 
     /***********************************************************
     @brief Returns full path to an do not disturb user status icon
-    @return QUrl full path to an icon
+    @return GLib.Uri full path to an icon
     ***********************************************************/
-    public QUrl status_do_not_disturb_image_source ();
+    public GLib.Uri status_do_not_disturb_image_source ();
 
 
     /***********************************************************
     @brief Returns full path to an away user status icon
-    @return QUrl full path to an icon
+    @return GLib.Uri full path to an icon
     ***********************************************************/
-    public QUrl status_away_image_source ();
+    public GLib.Uri status_away_image_source ();
 
 
     /***********************************************************
     @brief Returns full path to an invisible user status icon
-    @return QUrl full path to an icon
+    @return GLib.Uri full path to an icon
     ***********************************************************/
-    public QUrl status_invisible_image_source ();
+    public GLib.Uri status_invisible_image_source ();
 
-    public QUrl sync_status_ok ();
+    public GLib.Uri sync_status_ok ();
 
-    public QUrl sync_status_error ();
+    public GLib.Uri sync_status_error ();
 
-    public QUrl sync_status_running ();
+    public GLib.Uri sync_status_running ();
 
-    public QUrl sync_status_pause ();
+    public GLib.Uri sync_status_pause ();
 
-    public QUrl sync_status_warning ();
+    public GLib.Uri sync_status_warning ();
 
-    public QUrl folder_offline ();
+    public GLib.Uri folder_offline ();
 
 
     /***********************************************************
@@ -756,14 +756,14 @@ signals:
 
 namespace {
 
-QUrl image_path_to_url (string image_path) {
+GLib.Uri image_path_to_url (string image_path) {
     if (image_path.starts_with (':')) {
-        var url = QUrl ();
+        var url = GLib.Uri ();
         url.set_scheme (QStringLiteral ("qrc"));
         url.set_path (image_path.mid (1));
         return url;
     } else {
-        return QUrl.from_local_file (image_path);
+        return GLib.Uri.from_local_file (image_path);
     }
 }
 
@@ -834,51 +834,51 @@ string Theme.app_name () {
     return APPLICATION_SHORTNAME;
 }
 
-QUrl Theme.state_online_image_source () {
+GLib.Uri Theme.state_online_image_source () {
     return image_path_to_url (theme_image_path ("state-ok"));
 }
 
-QUrl Theme.state_offline_image_source () {
+GLib.Uri Theme.state_offline_image_source () {
     return image_path_to_url (theme_image_path ("state-offline", 16));
 }
 
-QUrl Theme.status_online_image_source () {
+GLib.Uri Theme.status_online_image_source () {
     return image_path_to_url (theme_image_path ("user-status-online", 16));
 }
 
-QUrl Theme.status_do_not_disturb_image_source () {
+GLib.Uri Theme.status_do_not_disturb_image_source () {
     return image_path_to_url (theme_image_path ("user-status-dnd", 16));
 }
 
-QUrl Theme.status_away_image_source () {
+GLib.Uri Theme.status_away_image_source () {
     return image_path_to_url (theme_image_path ("user-status-away", 16));
 }
 
-QUrl Theme.status_invisible_image_source () {
+GLib.Uri Theme.status_invisible_image_source () {
     return image_path_to_url (theme_image_path ("user-status-invisible", 64));
 }
 
-QUrl Theme.sync_status_ok () {
+GLib.Uri Theme.sync_status_ok () {
     return image_path_to_url (theme_image_path ("state-ok", 16));
 }
 
-QUrl Theme.sync_status_error () {
+GLib.Uri Theme.sync_status_error () {
     return image_path_to_url (theme_image_path ("state-error", 16));
 }
 
-QUrl Theme.sync_status_running () {
+GLib.Uri Theme.sync_status_running () {
     return image_path_to_url (theme_image_path ("state-sync", 16));
 }
 
-QUrl Theme.sync_status_pause () {
+GLib.Uri Theme.sync_status_pause () {
     return image_path_to_url (theme_image_path ("state-pause", 16));
 }
 
-QUrl Theme.sync_status_warning () {
+GLib.Uri Theme.sync_status_warning () {
     return image_path_to_url (theme_image_path ("state-warning", 16));
 }
 
-QUrl Theme.folder_offline () {
+GLib.Uri Theme.folder_offline () {
     return image_path_to_url (theme_image_path ("state-offline"));
 }
 
@@ -972,7 +972,7 @@ string Theme.theme_image_path (string name, int size, bool sys_tray) {
 
     const string png_path = file_path + ".png";
     // Use the SVG as fallback if a PNG is missing so that we get a chance to display something
-    if (QFile.exists (png_path)) {
+    if (GLib.File.exists (png_path)) {
         return png_path;
     } else {
         return svg_path;
@@ -996,11 +996,11 @@ string Theme.hidpi_file_name (string file_name, QPaint_device dev) {
     }
     // try to find a 2x version
 
-    const int dot_index = file_name.last_index_of (QLatin1Char ('.'));
+    const int dot_index = file_name.last_index_of ('.');
     if (dot_index != -1) {
         string at2xfile_name = file_name;
         at2xfile_name.insert (dot_index, QStringLiteral ("@2x"));
-        if (QFile.exists (at2xfile_name)) {
+        if (GLib.File.exists (at2xfile_name)) {
             return at2xfile_name;
         }
     }
@@ -1154,33 +1154,33 @@ string Theme.git_sHA1 () {
 
 string Theme.about () {
     // Shorten Qt's OS name : "macOS Mojave (10.14)" . "macOS"
-    string[] os_string_list = Utility.platform_name ().split (QLatin1Char (' '));
+    string[] os_string_list = Utility.platform_name ().split (' ');
     string os_name = os_string_list.at (0);
 
     string dev_string;
     // : Example text : "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
-    dev_string = tr ("<p>%1 Desktop Client</p>")
+    dev_string = _("<p>%1 Desktop Client</p>")
               .arg (APPLICATION_NAME);
 
-    dev_string += tr ("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
+    dev_string += _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
               .arg (string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION)) + string (" (%1)").arg (os_name))
               .arg (help_url ());
 
-    dev_string += tr ("<p><small>Using virtual files plugin : %1</small></p>")
+    dev_string += _("<p><small>Using virtual files plugin : %1</small></p>")
                      .arg (Vfs.mode_to_string (best_available_vfs_mode ()));
     dev_string += QStringLiteral ("<br>%1")
-              .arg (QSysInfo.product_type () % QLatin1Char ('-') % QSysInfo.kernel_version ());
+              .arg (QSysInfo.product_type () % '-' % QSysInfo.kernel_version ());
 
     return dev_string;
 }
 
 string Theme.about_details () {
     string dev_string;
-    dev_string = tr ("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
+    dev_string = _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
               .arg (MIRALL_VERSION_STRING)
               .arg (help_url ());
 
-    dev_string += tr ("<p>This release was supplied by %1</p>")
+    dev_string += _("<p>This release was supplied by %1</p>")
               .arg (APPLICATION_VENDOR);
 
     dev_string += git_sHA1 ();
@@ -1209,7 +1209,7 @@ QVariant Theme.custom_media (Custom_media_type type) {
     }
 
     string img_path = string (Theme.theme_prefix) + string.from_latin1 ("colored/%1.png").arg (key);
-    if (QFile.exists (img_path)) {
+    if (GLib.File.exists (img_path)) {
         QPixmap pix (img_path);
         if (pix.is_null ()) {
             // pixmap loading hasn't succeeded. We take the text instead.

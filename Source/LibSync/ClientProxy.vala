@@ -5,12 +5,12 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 // #include <QLoggingCategory>
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QThreadPool>
 
 // #include <QNetworkProxy>
 // #include <QRunnable>
-// #include <QUrl>
+// #include <GLib.Uri>
 
 // #include <csync.h>
 
@@ -28,7 +28,7 @@ class ClientProxy : GLib.Object {
     public static bool is_using_system_default ();
 
 
-    public static void lookup_system_proxy_async (QUrl url, GLib.Object dst, char slot);
+    public static void lookup_system_proxy_async (GLib.Uri url, GLib.Object dst, char slot);
 
     public static string print_q_network_proxy (QNetworkProxy &proxy);
 
@@ -41,7 +41,7 @@ class ClientProxy : GLib.Object {
 
 class SystemProxyRunnable : GLib.Object, public QRunnable {
 
-    public SystemProxyRunnable (QUrl url);
+    public SystemProxyRunnable (GLib.Uri url);
 
 
     public void run () override;
@@ -49,7 +49,7 @@ signals:
     void system_proxy_looked_up (QNetworkProxy &url);
 
 
-    private QUrl _url;
+    private GLib.Uri _url;
 };
 
 
@@ -151,13 +151,13 @@ signals:
         }
     }
 
-    void ClientProxy.lookup_system_proxy_async (QUrl url, GLib.Object dst, char slot) {
+    void ClientProxy.lookup_system_proxy_async (GLib.Uri url, GLib.Object dst, char slot) {
         var runnable = new SystemProxyRunnable (url);
         GLib.Object.connect (runnable, SIGNAL (system_proxy_looked_up (QNetworkProxy)), dst, slot);
         QThreadPool.global_instance ().on_start (runnable); // takes ownership and deletes
     }
 
-    SystemProxyRunnable.SystemProxyRunnable (QUrl url)
+    SystemProxyRunnable.SystemProxyRunnable (GLib.Uri url)
         : GLib.Object ()
         , QRunnable ()
         , _url (url) {

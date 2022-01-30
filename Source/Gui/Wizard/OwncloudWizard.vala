@@ -37,10 +37,10 @@ class OwncloudWizard : QWizard {
 
     public OwncloudWizard (Gtk.Widget parent = nullptr);
 
-    public void set_account (AccountPtr account);
+    public void set_account (AccountPointer account);
 
 
-    public AccountPtr account ();
+    public AccountPointer account ();
 
 
     public void set_oCUrl (string );
@@ -60,7 +60,7 @@ class OwncloudWizard : QWizard {
     public string local_folder ();
 
 
-    public string[] selective_sync_blacklist ();
+    public string[] selective_sync_blocklist ();
 
 
     public bool use_virtual_file_sync ();
@@ -130,7 +130,7 @@ signals:
     private int calculate_longest_side_of_wizard_pages (GLib.List<QSize> &page_sizes);
     private GLib.List<QSize> calculate_wizard_page_sizes ();
 
-    private AccountPtr _account;
+    private AccountPointer _account;
     private Welcome_page _welcome_page;
     private Owncloud_setup_page _setup_page;
     private Owncloud_http_creds_page _http_creds_page;
@@ -194,12 +194,12 @@ signals:
         connect (this, &QWizard.custom_button_clicked, this, &OwncloudWizard.skip_folder_configuration);
 
         Theme theme = Theme.instance ();
-        set_window_title (tr ("Add %1 account").arg (theme.app_name_gui ()));
+        set_window_title (_("Add %1 account").arg (theme.app_name_gui ()));
         set_wizard_style (QWizard.Modern_style);
         set_option (QWizard.No_back_button_on_start_page);
         set_option (QWizard.No_back_button_on_last_page);
         set_option (QWizard.No_cancel_button);
-        set_button_text (QWizard.Custom_button1, tr ("Skip folders configuration"));
+        set_button_text (QWizard.Custom_button1, _("Skip folders configuration"));
 
         // Change the next buttons size policy since we hide it on the
         // welcome page but want it to fill it's space that we don't get
@@ -261,11 +261,11 @@ signals:
         });
     }
 
-    void OwncloudWizard.set_account (AccountPtr account) {
+    void OwncloudWizard.set_account (AccountPointer account) {
         _account = account;
     }
 
-    AccountPtr OwncloudWizard.account () {
+    AccountPointer OwncloudWizard.account () {
         return _account;
     }
 
@@ -273,8 +273,8 @@ signals:
         return (_advanced_setup_page.local_folder ());
     }
 
-    string[] OwncloudWizard.selective_sync_blacklist () {
-        return _advanced_setup_page.selective_sync_blacklist ();
+    string[] OwncloudWizard.selective_sync_blocklist () {
+        return _advanced_setup_page.selective_sync_blocklist ();
     }
 
     bool OwncloudWizard.use_virtual_file_sync () {
@@ -329,7 +329,7 @@ signals:
             break;
 
         case WizardCommon.Page_Server_setup:
-            q_c_warning (lc_wizard, "Should not happen at this stage.");
+            GLib.warn (lc_wizard, "Should not happen at this stage.");
             break;
         }
 
@@ -361,7 +361,7 @@ signals:
 
     // TODO : update this function
     void OwncloudWizard.on_current_page_changed (int id) {
-        q_c_debug (lc_wizard) << "Current Wizard page changed to " << id;
+        GLib.debug (lc_wizard) << "Current Wizard page changed to " << id;
 
         const var set_next_button_as_default = [this] () {
             var next_button = qobject_cast<QPushButton> (button (QWizard.Next_button));
@@ -430,7 +430,7 @@ signals:
 
     void OwncloudWizard.on_append_to_configuration_log (string msg, Log_type /*type*/) {
         _setup_log << msg;
-        q_c_debug (lc_wizard) << "Setup-Log : " << msg;
+        GLib.debug (lc_wizard) << "Setup-Log : " << msg;
     }
 
     void OwncloudWizard.set_oCUrl (string url) {
@@ -495,8 +495,8 @@ signals:
         case Vfs.WithSuffix:
             msg_box = new QMessageBox (
                 QMessageBox.Warning,
-                tr ("Enable experimental feature?"),
-                tr ("When the \"virtual files\" mode is enabled no files will be downloaded initially. "
+                _("Enable experimental feature?"),
+                _("When the \"virtual files\" mode is enabled no files will be downloaded initially. "
                    "Instead, a tiny \"%1\" file will be created for each file that exists on the server. "
                    "The contents can be downloaded by running these files or by using their context menu."
                    "\n\n"
@@ -510,8 +510,8 @@ signals:
                    "issues that come up.")
                     .arg (APPLICATION_DOTVIRTUALFILE_SUFFIX),
                 QMessageBox.NoButton, receiver);
-            accept_button = msg_box.add_button (tr ("Enable experimental placeholder mode"), QMessageBox.AcceptRole);
-            msg_box.add_button (tr ("Stay safe"), QMessageBox.RejectRole);
+            accept_button = msg_box.add_button (_("Enable experimental placeholder mode"), QMessageBox.AcceptRole);
+            msg_box.add_button (_("Stay safe"), QMessageBox.RejectRole);
             break;
         case Vfs.XAttr:
         case Vfs.Off:

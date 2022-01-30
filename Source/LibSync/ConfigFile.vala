@@ -11,7 +11,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <QCoreApplication>
 // #include <QDir>
-// #include <QFile>
+// #include <GLib.File>
 // #include <QFileInfo>
 // #include <QLoggingCategory>
 // #include <QSettings>
@@ -31,7 +31,7 @@ const int DEFAULT_MAX_LOG_LINES 20000
 namespace chrono = std.chrono;
 
 
-//static const char ca_certs_key_c[] = "CaCertificates"; only used from account
+//static const char CA_CERTS_KEY_C[] = "CaCertificates"; only used from account
 static const char remote_poll_interval_c[] = "remote_poll_interval";
 static const char force_sync_interval_c[] = "force_sync_interval";
 static const char full_local_discovery_interval_c[] = "full_local_discovery_interval";
@@ -428,7 +428,7 @@ bool copy_dir_recursive (string from_dir, string to_dir) {
         string from = from_dir + copy_file;
         string to = to_dir + copy_file;
 
-        if (QFile.copy (from, to) == false) {
+        if (GLib.File.copy (from, to) == false) {
             return false;
         }
     }
@@ -614,8 +614,8 @@ string ConfigFile.config_path () {
     }
     string dir = _conf_dir;
 
-    if (!dir.ends_with (QLatin1Char ('/')))
-        dir.append (QLatin1Char ('/'));
+    if (!dir.ends_with ('/'))
+        dir.append ('/');
     return dir;
 }
 
@@ -688,8 +688,8 @@ string ConfigFile.backup () {
     // If this exact file already exists it's most likely that a backup was
     // already done. (two backup calls directly after each other, potentially
     // even with source alterations in between!)
-    if (!QFile.exists (backup_file)) {
-        QFile f (base_file);
+    if (!GLib.File.exists (backup_file)) {
+        GLib.File f (base_file);
         f.copy (backup_file);
     }
     return backup_file;
@@ -700,7 +700,7 @@ string ConfigFile.config_file () {
 }
 
 bool ConfigFile.exists () {
-    QFile file = new QFile (config_file ());
+    GLib.File file = new GLib.File (config_file ());
     return file.exists ();
 }
 
@@ -752,7 +752,7 @@ chrono.milliseconds ConfigFile.remote_poll_interval (string connection) {
     var default_poll_interval = chrono.milliseconds (DEFAULT_REMOTE_POLL_INTERVAL);
     var remote_interval = milliseconds_value (settings, remote_poll_interval_c, default_poll_interval);
     if (remote_interval < chrono.seconds (5)) {
-        q_c_warning (lc_config_file) << "Remote Interval is less than 5 seconds, reverting to" << DEFAULT_REMOTE_POLL_INTERVAL;
+        GLib.warn (lc_config_file) << "Remote Interval is less than 5 seconds, reverting to" << DEFAULT_REMOTE_POLL_INTERVAL;
         remote_interval = default_poll_interval;
     }
     return remote_interval;
@@ -764,7 +764,7 @@ void ConfigFile.set_remote_poll_interval (chrono.milliseconds interval, string c
         con = default_connection ();
 
     if (interval < chrono.seconds (5)) {
-        q_c_warning (lc_config_file) << "Remote Poll interval of " << interval.count () << " is below five seconds.";
+        GLib.warn (lc_config_file) << "Remote Poll interval of " << interval.count () << " is below five seconds.";
         return;
     }
     QSettings settings (config_file (), QSettings.IniFormat);
@@ -785,7 +785,7 @@ chrono.milliseconds ConfigFile.force_sync_interval (string connection) {
     var default_interval = chrono.hours (2);
     var interval = milliseconds_value (settings, force_sync_interval_c, default_interval);
     if (interval < poll_interval) {
-        q_c_warning (lc_config_file) << "Force sync interval is less than the remote poll inteval, reverting to" << poll_interval.count ();
+        GLib.warn (lc_config_file) << "Force sync interval is less than the remote poll inteval, reverting to" << poll_interval.count ();
         interval = poll_interval;
     }
     return interval;
@@ -807,7 +807,7 @@ chrono.milliseconds ConfigFile.notification_refresh_interval (string connection)
     var default_interval = chrono.minutes (5);
     var interval = milliseconds_value (settings, notification_refresh_interval_c, default_interval);
     if (interval < chrono.minutes (1)) {
-        q_c_warning (lc_config_file) << "Notification refresh interval smaller than one minute, setting to one minute";
+        GLib.warn (lc_config_file) << "Notification refresh interval smaller than one minute, setting to one minute";
         interval = chrono.minutes (1);
     }
     return interval;
@@ -825,7 +825,7 @@ chrono.milliseconds ConfigFile.update_check_interval (string connection) {
 
     var min_interval = chrono.minutes (5);
     if (interval < min_interval) {
-        q_c_warning (lc_config_file) << "Update check interval less than five minutes, resetting to 5 minutes";
+        GLib.warn (lc_config_file) << "Update check interval less than five minutes, resetting to 5 minutes";
         interval = min_interval;
     }
     return interval;
@@ -1245,14 +1245,14 @@ void ConfigFile.setup_default_exclude_file_paths (ExcludedFiles &excluded_files)
     string system_list = cfg.exclude_file (ConfigFile.SystemScope);
     string user_list = cfg.exclude_file (ConfigFile.UserScope);
 
-    if (!QFile.exists (user_list)) {
+    if (!GLib.File.exists (user_list)) {
         q_c_info (lc_config_file) << "User defined ignore list does not exist:" << user_list;
-        if (!QFile.copy (system_list, user_list)) {
+        if (!GLib.File.copy (system_list, user_list)) {
             q_c_info (lc_config_file) << "Could not copy over default list to:" << user_list;
         }
     }
 
-    if (!QFile.exists (user_list)) {
+    if (!GLib.File.exists (user_list)) {
         q_c_info (lc_config_file) << "Adding system ignore list to csync:" << system_list;
         excluded_files.add_exclude_file_path (system_list);
     } else {

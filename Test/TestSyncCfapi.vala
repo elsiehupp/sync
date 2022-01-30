@@ -436,7 +436,7 @@ class TestSyncCfApi : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-            fakeFolder.syncJournal ().wipeErrorBlacklist ();
+            fakeFolder.syncJournal ().wipeErrorBlocklist ();
         };
         on_cleanup ();
 
@@ -702,9 +702,9 @@ class TestSyncCfApi : GLib.Object {
                 && QFileInfo (fakeFolder.localPath () + path).exists ();
         };
         var hasDehydratedDbEntries = [&] (string path) {
-            SyncJournalFileRecord rec;
-            fakeFolder.syncJournal ().getFileRecord (path, &rec);
-            return rec.isValid () && rec._type == ItemTypeVirtualFile;
+            SyncJournalFileRecord record;
+            fakeFolder.syncJournal ().getFileRecord (path, &record);
+            return record.isValid () && record._type == ItemTypeVirtualFile;
         };
 
         QVERIFY (isDehydrated ("A/a1"));
@@ -1151,8 +1151,8 @@ class TestSyncCfApi : GLib.Object {
         bool openResult = false;
         bool readResult = false;
         std.thread t ([&] {
-            QFile file = new QFile (fakeFolder.localPath () + "online/sub/file1");
-            openResult = file.open (QFile.ReadOnly);
+            GLib.File file = new GLib.File (fakeFolder.localPath () + "online/sub/file1");
+            openResult = file.open (GLib.File.ReadOnly);
             readResult = !file.readAll ().isEmpty ();
             file.close ();
             QMetaObject.invokeMethod (&loop, &QEventLoop.quit, Qt.QueuedConnection);

@@ -8,7 +8,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 // #include <string>
 // #include <QMetaType>
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QDateTime>
 // #include <QtGlobal>
 // #include <QVariant>
@@ -86,7 +86,7 @@ class UserStatus {
     public bool message_predefined ();
 
     //  Q_REQUIRED_RESULT
-    public QUrl state_icon ();
+    public GLib.Uri state_icon ();
 
 
     private string _id;
@@ -164,7 +164,7 @@ signals:
         return _message_predefined;
     }
 
-    QUrl UserStatus.state_icon () {
+    GLib.Uri UserStatus.state_icon () {
         switch (_state) {
         case UserStatus.OnlineStatus.Away:
             return Theme.instance ().status_away_image_source ();

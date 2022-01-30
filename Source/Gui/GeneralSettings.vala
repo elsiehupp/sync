@@ -86,7 +86,7 @@ Zip_entry file_info_to_zip_entry (QFileInfo &info) {
 
 Zip_entry file_info_to_log_zip_entry (QFileInfo &info) {
     var entry = file_info_to_zip_entry (info);
-    entry.zip_filename.prepend (QStringLiteral ("logs/"));
+    entry.zip_filename.prepend ("logs/");
     return entry;
 }
 
@@ -105,7 +105,7 @@ QVector<Zip_entry> create_file_list () {
     const var logger = Occ.Logger.instance ();
 
     if (!logger.log_dir ().is_empty ()) {
-        list.append ({string (), QStringLiteral ("logs")});
+        list.append ({string (), "logs"});
 
         QDir dir (logger.log_dir ());
         const var info_list = dir.entry_info_list (QDir.Files);
@@ -132,8 +132,8 @@ void create_debug_archive (string filename) {
         if (entry.local_filename.is_empty ()) {
             zip.add_directory (entry.zip_filename);
         } else {
-            QFile file = new QFile (entry.local_filename);
-            if (!file.open (QFile.ReadOnly)) {
+            GLib.File file = new GLib.File (entry.local_filename);
+            if (!file.open (GLib.File.ReadOnly)) {
                 continue;
             }
             zip.add_file (entry.zip_filename, &file);
@@ -154,7 +154,7 @@ General_settings.General_settings (Gtk.Widget parent)
 
     connect (_ui.server_notifications_check_box, &QAbstractButton.toggled,
         this, &General_settings.on_toggle_optional_server_notifications);
-    _ui.server_notifications_check_box.set_tool_tip (tr ("Server notifications that require attention."));
+    _ui.server_notifications_check_box.set_tool_tip (_("Server notifications that require attention."));
 
     connect (_ui.show_in_explorer_navigation_pane_check_box, &QAbstractButton.toggled, this, &General_settings.on_show_in_explorer_navigation_pane);
 
@@ -163,7 +163,7 @@ General_settings.General_settings (Gtk.Widget parent)
     if (Utility.has_system_launch_on_startup (Theme.instance ().app_name ())) {
         _ui.autostart_check_box.set_checked (true);
         _ui.autostart_check_box.set_disabled (true);
-        _ui.autostart_check_box.set_tool_tip (tr ("You cannot disable autostart because system-wide autostart is enabled."));
+        _ui.autostart_check_box.set_tool_tip (_("You cannot disable autostart because system-wide autostart is enabled."));
     } else {
         const bool has_auto_start = Utility.has_launch_on_startup (Theme.instance ().app_name ());
         // make sure the binary location is correctly set
@@ -269,7 +269,7 @@ void General_settings.on_update_info () {
 
         _ui.update_state_label.set_open_external_links (false);
         connect (_ui.update_state_label, &QLabel.link_activated, this, [] (string link) {
-            Utility.open_browser (QUrl (link));
+            Utility.open_browser (GLib.Uri (link));
         });
         _ui.update_state_label.on_set_text (status);
 
@@ -294,8 +294,8 @@ void General_settings.on_update_channel_changed (string channel) {
 
     var msg_box = new QMessageBox (
         QMessageBox.Warning,
-        tr ("Change update channel?"),
-        tr ("The update channel determines which client updates will be offered "
+        _("Change update channel?"),
+        _("The update channel determines which client updates will be offered "
            "for installation. The \"stable\" channel contains only upgrades that "
            "are considered reliable, while the versions in the \"beta\" channel "
            "may contain newer features and bugfixes, but have not yet been tested "
@@ -308,8 +308,8 @@ void General_settings.on_update_channel_changed (string channel) {
            "version."),
         QMessageBox.NoButton,
         this);
-    var accept_button = msg_box.add_button (tr ("Change update channel"), QMessageBox.AcceptRole);
-    msg_box.add_button (tr ("Cancel"), QMessageBox.RejectRole);
+    var accept_button = msg_box.add_button (_("Change update channel"), QMessageBox.AcceptRole);
+    msg_box.add_button (_("Cancel"), QMessageBox.RejectRole);
     connect (msg_box, &QMessageBox.on_finished, msg_box, [this, channel, msg_box, accept_button] {
         msg_box.delete_later ();
         if (msg_box.clicked_button () == accept_button) {
@@ -388,13 +388,13 @@ void General_settings.on_ignore_files_editor () {
 }
 
 void General_settings.on_create_debug_archive () {
-    const var filename = QFileDialog.get_save_file_name (this, tr ("Create Debug Archive"), string (), tr ("Zip Archives") + " (*.zip)");
+    const var filename = QFileDialog.get_save_file_name (this, _("Create Debug Archive"), string (), _("Zip Archives") + " (*.zip)");
     if (filename.is_empty ()) {
         return;
     }
 
     create_debug_archive (filename);
-    QMessageBox.information (this, tr ("Debug Archive Created"), tr ("Debug archive is created at %1").arg (filename));
+    QMessageBox.information (this, _("Debug Archive Created"), _("Debug archive is created at %1").arg (filename));
 }
 
 void General_settings.on_show_legal_notice () {

@@ -11,20 +11,20 @@
 using namespace Occ;
 
 SyncJournalFileRecord journalRecord (FakeFolder &folder, GLib.ByteArray path) {
-    SyncJournalFileRecord rec;
-    folder.syncJournal ().getFileRecord (path, &rec);
-    return rec;
+    SyncJournalFileRecord record;
+    folder.syncJournal ().getFileRecord (path, &record);
+    return record;
 }
 
-class TestBlacklist : GLib.Object {
+class TestBlocklist : GLib.Object {
 
-    private on_ void testBlacklistBasic_data () {
+    private on_ void testBlocklistBasic_data () {
         QTest.addColumn<bool> ("remote");
         QTest.newRow ("remote") << true;
         QTest.newRow ("local") << false;
     }
 
-    private on_ void testBlacklistBasic () {
+    private on_ void testBlocklistBasic () {
         QFETCH (bool, remote);
 
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
@@ -54,18 +54,18 @@ class TestBlacklist : GLib.Object {
         var initialEtag = journalRecord (fakeFolder, "A")._etag;
         QVERIFY (!initialEtag.isEmpty ());
 
-        // The first sync and the download will fail - the item will be blacklisted
+        // The first sync and the download will fail - the item will be blocklisted
         modifier.insert (testFileName);
-        fakeFolder.serverErrorPaths ().append (testFileName, 500); // will be blacklisted
+        fakeFolder.serverErrorPaths ().append (testFileName, 500); // will be blocklisted
         QVERIFY (!fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
             QCOMPARE (it._status, SyncFileItem.NormalError); // initial error visible
             QCOMPARE (it._instruction, CSYNC_INSTRUCTION_NEW);
 
-            var entry = fakeFolder.syncJournal ().errorBlacklistEntry (testFileName);
+            var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
             QVERIFY (entry.isValid ());
-            QCOMPARE (entry._errorCategory, SyncJournalErrorBlacklistRecord.Normal);
+            QCOMPARE (entry._errorCategory, SyncJournalErrorBlocklistRecord.Normal);
             QCOMPARE (entry._retryCount, 1);
             QCOMPARE (counter, 1);
             QVERIFY (entry._ignoreDuration > 0);
@@ -80,12 +80,12 @@ class TestBlacklist : GLib.Object {
         QVERIFY (!fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.BlacklistedError);
+            QCOMPARE (it._status, SyncFileItem.BlocklistedError);
             QCOMPARE (it._instruction, CSYNC_INSTRUCTION_IGNORE); // no retry happened!
 
-            var entry = fakeFolder.syncJournal ().errorBlacklistEntry (testFileName);
+            var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
             QVERIFY (entry.isValid ());
-            QCOMPARE (entry._errorCategory, SyncJournalErrorBlacklistRecord.Normal);
+            QCOMPARE (entry._errorCategory, SyncJournalErrorBlocklistRecord.Normal);
             QCOMPARE (entry._retryCount, 1);
             QCOMPARE (counter, 1);
             QVERIFY (entry._ignoreDuration > 0);
@@ -96,21 +96,21 @@ class TestBlacklist : GLib.Object {
         }
         on_cleanup ();
 
-        // Let's expire the blacklist entry to verify it gets retried {
-            var entry = fakeFolder.syncJournal ().errorBlacklistEntry (testFileName);
+        // Let's expire the blocklist entry to verify it gets retried {
+            var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
             entry._ignoreDuration = 1;
             entry._lastTryTime -= 1;
-            fakeFolder.syncJournal ().setErrorBlacklistEntry (entry);
+            fakeFolder.syncJournal ().setErrorBlocklistEntry (entry);
         }
         QVERIFY (!fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.BlacklistedError); // blacklisted as it's just a retry
+            QCOMPARE (it._status, SyncFileItem.BlocklistedError); // blocklisted as it's just a retry
             QCOMPARE (it._instruction, CSYNC_INSTRUCTION_NEW); // retry!
 
-            var entry = fakeFolder.syncJournal ().errorBlacklistEntry (testFileName);
+            var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
             QVERIFY (entry.isValid ());
-            QCOMPARE (entry._errorCategory, SyncJournalErrorBlacklistRecord.Normal);
+            QCOMPARE (entry._errorCategory, SyncJournalErrorBlocklistRecord.Normal);
             QCOMPARE (entry._retryCount, 2);
             QCOMPARE (counter, 2);
             QVERIFY (entry._ignoreDuration > 0);
@@ -126,12 +126,12 @@ class TestBlacklist : GLib.Object {
         QVERIFY (!fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.BlacklistedError);
+            QCOMPARE (it._status, SyncFileItem.BlocklistedError);
             QCOMPARE (it._instruction, CSYNC_INSTRUCTION_NEW); // retry!
 
-            var entry = fakeFolder.syncJournal ().errorBlacklistEntry (testFileName);
+            var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
             QVERIFY (entry.isValid ());
-            QCOMPARE (entry._errorCategory, SyncJournalErrorBlacklistRecord.Normal);
+            QCOMPARE (entry._errorCategory, SyncJournalErrorBlocklistRecord.Normal);
             QCOMPARE (entry._retryCount, 3);
             QCOMPARE (counter, 3);
             QVERIFY (entry._ignoreDuration > 0);
@@ -144,10 +144,10 @@ class TestBlacklist : GLib.Object {
 
         // When the error goes away and the item is retried, the sync succeeds
         fakeFolder.serverErrorPaths ().clear (); {
-            var entry = fakeFolder.syncJournal ().errorBlacklistEntry (testFileName);
+            var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
             entry._ignoreDuration = 1;
             entry._lastTryTime -= 1;
-            fakeFolder.syncJournal ().setErrorBlacklistEntry (entry);
+            fakeFolder.syncJournal ().setErrorBlocklistEntry (entry);
         }
         QVERIFY (fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
@@ -155,7 +155,7 @@ class TestBlacklist : GLib.Object {
             QCOMPARE (it._status, SyncFileItem.Success);
             QCOMPARE (it._instruction, CSYNC_INSTRUCTION_NEW);
 
-            var entry = fakeFolder.syncJournal ().errorBlacklistEntry (testFileName);
+            var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
             QVERIFY (!entry.isValid ());
             QCOMPARE (counter, 4);
 
@@ -168,5 +168,5 @@ class TestBlacklist : GLib.Object {
     }
 };
 
-QTEST_GUILESS_MAIN (TestBlacklist)
-#include "testblacklist.moc"
+QTEST_GUILESS_MAIN (TestBlocklist)
+#include "testblocklist.moc"

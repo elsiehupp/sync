@@ -84,7 +84,7 @@ class TestAsyncOp : GLib.Object {
                 };
                 return new FakeAsyncReply ("/async-poll/" + file.toUtf8 (), op, request, &fakeFolder.syncEngine ());
             } else if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
-                string file = getFilePathFromUrl (QUrl.fromEncoded (request.rawHeader ("Destination")));
+                string file = getFilePathFromUrl (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
                 Q_ASSERT (testCases.contains (file));
                 var &testCase = testCases[file];
                 Q_ASSERT (!testCase.perform);
@@ -166,7 +166,7 @@ class TestAsyncOp : GLib.Object {
                 return waitAndChain (waitForeverCallback) (tc, request);
             })));
 
-        fakeFolder.syncJournal ().wipeErrorBlacklist ();
+        fakeFolder.syncJournal ().wipeErrorBlocklist ();
 
         // This second sync will redo the files that had errors
         // But the waiting folder will not complete before it is aborted.

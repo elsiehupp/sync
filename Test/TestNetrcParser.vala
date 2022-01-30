@@ -19,24 +19,24 @@ const char testfileEmptyC[] = "netrctestEmpty";
 class TestNetrcParser : GLib.Object {
 
     private void on_init_test_case () {
-        QFile netrc (testfileC);
+        GLib.File netrc (testfileC);
         QVERIFY (netrc.open (QIODevice.WriteOnly));
         netrc.write ("machine foo login bar password baz\n");
         netrc.write ("machine broken login bar2 dontbelonghere password baz2 extratokens dontcare andanother\n");
         netrc.write ("machine\nfunnysplit\tlogin bar3 password baz3\n");
         netrc.write ("machine frob login \"user with spaces\" password 'space pwd'\n");
-        QFile netrcWithDefault (testfileWithDefaultC);
+        GLib.File netrcWithDefault (testfileWithDefaultC);
         QVERIFY (netrcWithDefault.open (QIODevice.WriteOnly));
         netrcWithDefault.write ("machine foo login bar password baz\n");
         netrcWithDefault.write ("default login user password pass\n");
-        QFile netrcEmpty (testfileEmptyC);
+        GLib.File netrcEmpty (testfileEmptyC);
         QVERIFY (netrcEmpty.open (QIODevice.WriteOnly));
     }
 
     private void on_cleanup_test_case () {
-        QVERIFY (QFile.remove (testfileC));
-        QVERIFY (QFile.remove (testfileWithDefaultC));
-        QVERIFY (QFile.remove (testfileEmptyC));
+        QVERIFY (GLib.File.remove (testfileC));
+        QVERIFY (GLib.File.remove (testfileWithDefaultC));
+        QVERIFY (GLib.File.remove (testfileEmptyC));
     }
 
     private void on_test_valid_netrc () {

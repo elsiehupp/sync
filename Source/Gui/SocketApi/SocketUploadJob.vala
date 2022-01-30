@@ -49,8 +49,8 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> &job)
 
     _local_path = _api_job.arguments ()[QLatin1String ("local_path")].to_string ();
     _remote_path = _api_job.arguments ()[QLatin1String ("remote_path")].to_string ();
-    if (!_remote_path.starts_with (QLatin1Char ('/'))) {
-        _remote_path = QLatin1Char ('/') + _remote_path;
+    if (!_remote_path.starts_with ('/')) {
+        _remote_path = '/' + _remote_path;
     }
 
     _pattern = job.arguments ()[QLatin1String ("pattern")].to_string ();
@@ -68,7 +68,7 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> &job)
     }
 
     _database = new SyncJournalDb (_tmp.file_name (), this);
-    _engine = new SyncEngine (account.account (), _local_path.ends_with (QLatin1Char ('/')) ? _local_path : _local_path + QLatin1Char ('/'), _remote_path, _database);
+    _engine = new SyncEngine (account.account (), _local_path.ends_with ('/') ? _local_path : _local_path + '/', _remote_path, _database);
     _engine.set_parent (_database);
 
     connect (_engine, &Occ.SyncEngine.item_completed, this, [this] (Occ.SyncFileItemPtr item) {

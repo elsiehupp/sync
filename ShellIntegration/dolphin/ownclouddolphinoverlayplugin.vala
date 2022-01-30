@@ -37,7 +37,7 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
     }
 
 
-    public string[] getOverlays (QUrl& url) override {
+    public string[] getOverlays (GLib.Uri& url) override {
         var helper = OwncloudDolphinPluginHelper.instance ();
         if (!helper.isConnected ())
             return string[] ();
@@ -93,6 +93,6 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
             return;
         status = tokens[1];
 
-        emit overlaysChanged (QUrl.fromLocalFile (string.fromUtf8 (name)), overlaysForString (status));
+        emit overlaysChanged (GLib.Uri.fromLocalFile (string.fromUtf8 (name)), overlaysForString (status));
     }
 };

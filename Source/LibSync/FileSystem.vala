@@ -4,7 +4,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFile>
+// #include <GLib.File>
 // #include <QFileInfo>
 // #include <QDir>
 // #include <QDirIterator>
@@ -101,10 +101,10 @@ namespace FileSystem {
 
     bool FileSystem.file_equals (string fn1, string fn2) {
         // compare two files with given filename and return true if they have the same content
-        QFile f1 (fn1);
-        QFile f2 (fn2);
+        GLib.File f1 (fn1);
+        GLib.File f2 (fn2);
         if (!f1.open (QIODevice.ReadOnly) || !f2.open (QIODevice.ReadOnly)) {
-            q_c_warning (lc_file_system) << "file_equals : Failed to open " << fn1 << "or" << fn2;
+            GLib.warn (lc_file_system) << "file_equals : Failed to open " << fn1 << "or" << fn2;
             return false;
         }
 
@@ -134,7 +134,7 @@ namespace FileSystem {
             result = stat.modtime;
         } else {
             result = Utility.q_date_time_to_time_t (QFileInfo (filename).last_modified ());
-            q_c_warning (lc_file_system) << "Could not get modification time for" << filename
+            GLib.warn (lc_file_system) << "Could not get modification time for" << filename
                                     << "with csync, using QFileInfo:" << result;
         }
         return result;
@@ -146,7 +146,7 @@ namespace FileSystem {
         times[0].tv_usec = times[1].tv_usec = 0;
         int rc = c_utimes (filename, times);
         if (rc != 0) {
-            q_c_warning (lc_file_system) << "Error setting mtime for" << filename
+            GLib.warn (lc_file_system) << "Error setting mtime for" << filename
                                     << "failed : rc" << rc << ", errno:" << errno;
             return false;
         }
@@ -191,7 +191,7 @@ namespace FileSystem {
             // we never want to go into this branch for .lnk files
             bool is_dir = fi.is_dir () && !fi.is_sym_link () && !FileSystem.is_junction (fi.absolute_file_path ());
             if (is_dir) {
-                remove_ok = remove_recursively (path + QLatin1Char ('/') + di.file_name (), on_deleted, errors); // recursive
+                remove_ok = remove_recursively (path + '/' + di.file_name (), on_deleted, errors); // recursive
             } else {
                 string remove_error;
                 remove_ok = FileSystem.remove (di.file_path (), &remove_error);
@@ -203,7 +203,7 @@ namespace FileSystem {
                         errors.append (QCoreApplication.translate ("FileSystem", "Error removing \"%1\" : %2")
                                            .arg (QDir.to_native_separators (di.file_path ()), remove_error));
                     }
-                    q_c_warning (lc_file_system) << "Error removing " << di.file_path () << ':' << remove_error;
+                    GLib.warn (lc_file_system) << "Error removing " << di.file_path () << ':' << remove_error;
                 }
             }
             if (!remove_ok)
@@ -219,7 +219,7 @@ namespace FileSystem {
                     errors.append (QCoreApplication.translate ("FileSystem", "Could not remove folder \"%1\"")
                                        .arg (QDir.to_native_separators (path)));
                 }
-                q_c_warning (lc_file_system) << "Error removing folder" << path;
+                GLib.warn (lc_file_system) << "Error removing folder" << path;
             }
         }
         return all_removed;

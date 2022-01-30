@@ -20,7 +20,7 @@ class FakeDesktopServicesUrlHandler : GLib.Object {
         : GLib.Object (parent) {}
 
 signals:
-    void resultClicked (QUrl url);
+    void resultClicked (GLib.Uri url);
 };
 
 /***********************************************************
@@ -233,7 +233,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
     public TestUnifiedSearchListmodel () = default;
 
     public QScopedPointer<FakeQNAM> fakeQnam;
-    public Occ.AccountPtr account;
+    public Occ.AccountPointer account;
     public QScopedPointer<Occ.AccountState> accountState;
     public QScopedPointer<Occ.UnifiedSearchResultsListModel> model;
     public QScopedPointer<QAbstractItemModelTester> modelTester;
@@ -246,7 +246,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
         fakeQnam.on_reset (new FakeQNAM ({}));
         account = Occ.Account.create ();
         account.setCredentials (new FakeCredentials{fakeQnam.data ()});
-        account.setUrl (QUrl ( ("http://example.de")));
+        account.setUrl (GLib.Uri ( ("http://example.de")));
 
         accountState.on_reset (new Occ.AccountState (account));
 
@@ -274,7 +274,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
             // handle search for provider
             } else if (path.startsWith (QStringLiteral ("/ocs/v2.php/search/providers")) && !searchTerm.isEmpty ()) {
                 const var pathSplit = path.mid (string (QStringLiteral ("/ocs/v2.php/search/providers")).size ())
-                                           .split (QLatin1Char ('/'), Qt.SkipEmptyParts);
+                                           .split ('/', Qt.SkipEmptyParts);
 
                 if (!pathSplit.isEmpty () && path.contains (pathSplit.first ())) {
                     reply = new FakePayloadReply (op, req,
@@ -520,7 +520,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
                 urlForClickedResult = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).toString ();
 
                 if (!providerId.isEmpty () && !urlForClickedResult.isEmpty ()) {
-                    model.resultClicked (providerId, QUrl (urlForClickedResult));
+                    model.resultClicked (providerId, GLib.Uri (urlForClickedResult));
                     break;
                 }
             }

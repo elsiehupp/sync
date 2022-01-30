@@ -19,7 +19,7 @@ using namespace QKeychain;
 // #include <QPointer>
 // #include <QScopedPointer>
 // #include <QSettings>
-// #include <QSet>
+// #include <GLib.Set>
 
 namespace QKeychain {
 }
@@ -100,7 +100,7 @@ class ProxyAuthHandler : GLib.Object {
     /// To distinguish between a new QNAM asking for credentials and credentials
     /// failing for an existing QNAM, we keep track of the senders of the
     /// proxy_auth_required signal here.
-    private QSet<GLib.Object> _gave_credentials_to;
+    private GLib.Set<GLib.Object> _gave_credentials_to;
 };
 
 } // namespace Occ
@@ -136,7 +136,7 @@ void ProxyAuthHandler.on_handle_proxy_authentication_required (
         return;
     }
 
-    string key = proxy.host_name () + QLatin1Char (':') + string.number (proxy.port ());
+    string key = proxy.host_name () + ':' + string.number (proxy.port ());
 
     // If the proxy server has changed, forget what we know.
     if (key != _proxy) {
@@ -167,7 +167,7 @@ void ProxyAuthHandler.on_handle_proxy_authentication_required (
         sending_qnam = account.shared_network_access_manager ().data ();
     }
     if (!sending_qnam) {
-        q_c_warning (lc_proxy) << "Could not get the sending QNAM for" << sender ();
+        GLib.warn (lc_proxy) << "Could not get the sending QNAM for" << sender ();
     }
 
     q_c_info (lc_proxy) << "Proxy auth required for" << key << proxy.type ();
@@ -261,7 +261,7 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
         return false;
     }
 
-    q_c_debug (lc_proxy) << "trying to load" << _proxy;
+    GLib.debug (lc_proxy) << "trying to load" << _proxy;
 
     if (!_waiting_for_keychain) {
         _username = _settings.value (keychain_username_key ()).to_string ();
@@ -293,7 +293,7 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
 
     _username.clear ();
     if (_read_password_job.error () != EntryNotFound) {
-        q_c_warning (lc_proxy) << "ReadPasswordJob failed with" << _read_password_job.error_string ();
+        GLib.warn (lc_proxy) << "ReadPasswordJob failed with" << _read_password_job.error_string ();
     }
     return false;
 }
@@ -321,7 +321,7 @@ void ProxyAuthHandler.store_creds_in_keychain () {
 
     job.delete_later ();
     if (job.error () != NoError) {
-        q_c_warning (lc_proxy) << "WritePasswordJob failed with" << job.error_string ();
+        GLib.warn (lc_proxy) << "WritePasswordJob failed with" << job.error_string ();
     }
 }
 

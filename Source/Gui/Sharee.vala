@@ -60,10 +60,10 @@ class Sharee_model : QAbstractListModel {
         Global_search = 1
     };
 
-    public Sharee_model (AccountPtr &account, string type, GLib.Object parent = nullptr);
+    public Sharee_model (AccountPointer &account, string type, GLib.Object parent = nullptr);
 
-    public using Sharee_set = QVector<unowned<Sharee>>; // FIXME : make it a QSet<Sharee> when Sharee can be compared
-    public void fetch (string search, Sharee_set &blacklist, Lookup_mode lookup_mode);
+    public using Sharee_set = QVector<unowned<Sharee>>; // FIXME : make it a GLib.Set<Sharee> when Sharee can be compared
+    public void fetch (string search, Sharee_set &blocklist, Lookup_mode lookup_mode);
 
 
     public int row_count (QModelIndex &parent = QModelIndex ()) override;
@@ -86,12 +86,12 @@ signals:
     private unowned<Sharee> parse_sharee (QJsonObject &data);
     private void set_new_sharees (QVector<unowned<Sharee>> &new_sharees);
 
-    private AccountPtr _account;
+    private AccountPointer _account;
     private string _search;
     private string _type;
 
     private QVector<unowned<Sharee>> _sharees;
-    private QVector<unowned<Sharee>> _sharee_blacklist;
+    private QVector<unowned<Sharee>> _sharee_blocklist;
 };
 
     Sharee.Sharee (string share_with,
@@ -132,15 +132,15 @@ signals:
         return _type;
     }
 
-    Sharee_model.Sharee_model (AccountPtr &account, string type, GLib.Object parent)
+    Sharee_model.Sharee_model (AccountPointer &account, string type, GLib.Object parent)
         : QAbstractListModel (parent)
         , _account (account)
         , _type (type) {
     }
 
-    void Sharee_model.fetch (string search, Sharee_set &blacklist, Lookup_mode lookup_mode) {
+    void Sharee_model.fetch (string search, Sharee_set &blocklist, Lookup_mode lookup_mode) {
         _search = search;
-        _sharee_blacklist = blacklist;
+        _sharee_blocklist = blocklist;
         var job = new Ocs_sharee_job (_account);
         connect (job, &Ocs_sharee_job.sharee_job_finished, this, &Sharee_model.on_sharees_fetched);
         connect (job, &Ocs_job.ocs_error, this, &Sharee_model.display_error_message);
@@ -169,8 +169,8 @@ signals:
         QVector<unowned<Sharee>> filtered_sharees;
         foreach (var &sharee, new_sharees) {
             bool found = false;
-            foreach (var &blacklist_sharee, _sharee_blacklist) {
-                if (sharee.type () == blacklist_sharee.type () && sharee.share_with () == blacklist_sharee.share_with ()) {
+            foreach (var &blocklist_sharee, _sharee_blocklist) {
+                if (sharee.type () == blocklist_sharee.type () && sharee.share_with () == blocklist_sharee.share_with ()) {
                     found = true;
                     break;
                 }
@@ -191,7 +191,7 @@ signals:
         Sharee.Type type = (Sharee.Type)data.value ("value").to_object ().value ("share_type").to_int ();
         const string additional_info = data.value ("value").to_object ().value ("share_with_additional_info").to_string ();
         if (!additional_info.is_empty ()) {
-            display_name = tr ("%1 (%2)", "sharee (share_with_additional_info)").arg (display_name, additional_info);
+            display_name = _("%1 (%2)", "sharee (share_with_additional_info)").arg (display_name, additional_info);
         }
 
         return unowned<Sharee> (new Sharee (share_with, display_name, type));

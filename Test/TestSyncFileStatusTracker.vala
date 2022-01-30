@@ -302,12 +302,12 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("B/b0"), SyncFileStatus (SyncFileStatus.StatusError));
         statusSpy.clear ();
 
-        // Remove the error and on_start a second sync, the blacklist should kick in
+        // Remove the error and on_start a second sync, the blocklist should kick in
         fakeFolder.serverErrorPaths ().clear ();
         fakeFolder.scheduleSync ();
         fakeFolder.execUntilBeforePropagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
-        // A/a1 and B/b0 should be on the black list for the next few seconds
+        // A/a1 and B/b0 should be on the block list for the next few seconds
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusWarning));
         QCOMPARE (statusSpy.statusOf ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
         QCOMPARE (statusSpy.statusOf ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
@@ -351,9 +351,9 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("C/c1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         statusSpy.clear ();
 
-        // Another sync after clearing the blacklist entry, everything should return to order.
-        fakeFolder.syncEngine ().journal ().wipeErrorBlacklistEntry ("A/a1");
-        fakeFolder.syncEngine ().journal ().wipeErrorBlacklistEntry ("B/b0");
+        // Another sync after clearing the blocklist entry, everything should return to order.
+        fakeFolder.syncEngine ().journal ().wipeErrorBlocklistEntry ("A/a1");
+        fakeFolder.syncEngine ().journal ().wipeErrorBlocklistEntry ("B/b0");
         fakeFolder.scheduleSync ();
         fakeFolder.execUntilBeforePropagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);

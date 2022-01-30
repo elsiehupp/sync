@@ -52,7 +52,7 @@ class SyncFileItem {
         ***********************************************************/
         Conflict,
 
-        FileIgnored, ///< The file is in the ignored list (or blacklisted with no retries left)
+        FileIgnored, ///< The file is in the ignored list (or blocklisted with no retries left)
         FileLocked, ///< The file is locked
         Restoration, ///< The file was restored because what should have been done was not allowed
 
@@ -74,14 +74,14 @@ class SyncFileItem {
         DetailError,
 
         /***********************************************************
-        For files whose errors were blacklisted
+        For files whose errors were blocklisted
 
-        If an file is blacklisted due to an error it isn't even reattempted. These
+        If an file is blocklisted due to an error it isn't even reattempted. These
         errors should appear in the issues tab but should be silent otherwise.
 
-        A SoftError caused by blacklisting.
+        A SoftError caused by blocklisting.
         ***********************************************************/
-        BlacklistedError
+        BlocklistedError
     };
 
     public SyncJournalFileRecord to_sync_journal_file_record_with_inode (string local_file_name);
@@ -93,14 +93,14 @@ class SyncFileItem {
     This is intended in particular for read-update-write cycles that need
     to go through a a SyncFileItem, like PollJob.
     ***********************************************************/
-    public static SyncFileItemPtr from_sync_journal_file_record (SyncJournalFileRecord &rec);
+    public static SyncFileItemPtr from_sync_journal_file_record (SyncJournalFileRecord &record);
 
     public SyncFileItem ()
         : _type (ItemTypeSkip)
         , _direction (None)
         , _server_has_ignored_files (false)
-        , _has_blacklist_entry (false)
-        , _error_may_be_blacklisted (false)
+        , _has_blocklist_entry (false)
+        , _error_may_be_blocklisted (false)
         , _status (NoStatus)
         , _is_restoration (false)
         , _is_selective_sync (false)
@@ -231,19 +231,19 @@ class SyncFileItem {
 
     public bool _server_has_ignored_files BITFIELD (1);
 
-    /// Whether there's an entry in the blacklist table.
+    /// Whether there's an entry in the blocklist table.
     /// Note: that entry may have retries left, so this can be true
     /// without the status being FileIgnored.
-    public bool _has_blacklist_entry BITFIELD (1);
+    public bool _has_blocklist_entry BITFIELD (1);
 
 
     /***********************************************************
-    If true and NormalError, this error may be blacklisted
+    If true and NormalError, this error may be blocklisted
 
     Note that non-local errors (http_error_code!=0) may also be
-    blacklisted independently of this flag.
+    blocklisted independently of this flag.
     ***********************************************************/
-    public bool _error_may_be_blacklisted BITFIELD (1);
+    public bool _error_may_be_blocklisted BITFIELD (1);
 
     // Variables useful to report to the user
     public Status _status BITFIELD (4);
@@ -292,54 +292,54 @@ using SyncFileItemVector = QVector<SyncFileItemPtr>;
 
 
     SyncJournalFileRecord SyncFileItem.to_sync_journal_file_record_with_inode (string local_file_name) {
-        SyncJournalFileRecord rec;
-        rec._path = destination ().to_utf8 ();
-        rec._modtime = _modtime;
+        SyncJournalFileRecord record;
+        record._path = destination ().to_utf8 ();
+        record._modtime = _modtime;
 
         // Some types should never be written to the database when propagation completes
-        rec._type = _type;
-        if (rec._type == ItemTypeVirtualFileDownload)
-            rec._type = ItemTypeFile;
-        if (rec._type == ItemTypeVirtualFileDehydration)
-            rec._type = ItemTypeVirtualFile;
+        record._type = _type;
+        if (record._type == ItemTypeVirtualFileDownload)
+            record._type = ItemTypeFile;
+        if (record._type == ItemTypeVirtualFileDehydration)
+            record._type = ItemTypeVirtualFile;
 
-        rec._etag = _etag;
-        rec._file_id = _file_id;
-        rec._file_size = _size;
-        rec._remote_perm = _remote_perm;
-        rec._server_has_ignored_files = _server_has_ignored_files;
-        rec._checksum_header = _checksum_header;
-        rec._e2e_mangled_name = _encrypted_file_name.to_utf8 ();
-        rec._is_e2e_encrypted = _is_encrypted;
+        record._etag = _etag;
+        record._file_id = _file_id;
+        record._file_size = _size;
+        record._remote_perm = _remote_perm;
+        record._server_has_ignored_files = _server_has_ignored_files;
+        record._checksum_header = _checksum_header;
+        record._e2e_mangled_name = _encrypted_file_name.to_utf8 ();
+        record._is_e2e_encrypted = _is_encrypted;
 
         // Update the inode if possible
-        rec._inode = _inode;
-        if (FileSystem.get_inode (local_file_name, &rec._inode)) {
-            q_c_debug (lc_file_item) << local_file_name << "Retrieved inode " << rec._inode << " (previous item inode : " << _inode << ")";
+        record._inode = _inode;
+        if (FileSystem.get_inode (local_file_name, &record._inode)) {
+            GLib.debug (lc_file_item) << local_file_name << "Retrieved inode " << record._inode << " (previous item inode : " << _inode << ")";
         } else {
             // use the "old" inode coming with the item for the case where the
             // filesystem stat fails. That can happen if the the file was removed
             // or renamed meanwhile. For the rename case we still need the inode to
             // detect the rename though.
-            q_c_warning (lc_file_item) << "Failed to query the 'inode' for file " << local_file_name;
+            GLib.warn (lc_file_item) << "Failed to query the 'inode' for file " << local_file_name;
         }
-        return rec;
+        return record;
     }
 
-    SyncFileItemPtr SyncFileItem.from_sync_journal_file_record (SyncJournalFileRecord &rec) {
+    SyncFileItemPtr SyncFileItem.from_sync_journal_file_record (SyncJournalFileRecord &record) {
         var item = SyncFileItemPtr.create ();
-        item._file = rec.path ();
-        item._inode = rec._inode;
-        item._modtime = rec._modtime;
-        item._type = rec._type;
-        item._etag = rec._etag;
-        item._file_id = rec._file_id;
-        item._size = rec._file_size;
-        item._remote_perm = rec._remote_perm;
-        item._server_has_ignored_files = rec._server_has_ignored_files;
-        item._checksum_header = rec._checksum_header;
-        item._encrypted_file_name = rec.e2e_mangled_name ();
-        item._is_encrypted = rec._is_e2e_encrypted;
+        item._file = record.path ();
+        item._inode = record._inode;
+        item._modtime = record._modtime;
+        item._type = record._type;
+        item._etag = record._etag;
+        item._file_id = record._file_id;
+        item._size = record._file_size;
+        item._remote_perm = record._remote_perm;
+        item._server_has_ignored_files = record._server_has_ignored_files;
+        item._checksum_header = record._checksum_header;
+        item._encrypted_file_name = record.e2e_mangled_name ();
+        item._is_encrypted = record._is_e2e_encrypted;
         return item;
     }
 

@@ -34,7 +34,7 @@ struct Unified_search_result {
     string _provider_name;
     bool _is_rounded = false;
     int32 _order = std.numeric_limits<int32>.max ();
-    QUrl _resource_url;
+    GLib.Uri _resource_url;
     string _icons;
     Type _type = Type.Default;
 };

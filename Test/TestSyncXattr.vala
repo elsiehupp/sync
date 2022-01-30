@@ -417,7 +417,7 @@ class TestSyncXAttr : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-            fakeFolder.syncJournal ().wipeErrorBlacklist ();
+            fakeFolder.syncJournal ().wipeErrorBlocklist ();
         };
         on_cleanup ();
 
@@ -683,9 +683,9 @@ class TestSyncXAttr : GLib.Object {
                 && QFileInfo (fakeFolder.localPath () + path).exists ();
         };
         var hasDehydratedDbEntries = [&] (string path) {
-            SyncJournalFileRecord rec;
-            fakeFolder.syncJournal ().getFileRecord (path, &rec);
-            return rec.isValid () && rec._type == ItemTypeVirtualFile;
+            SyncJournalFileRecord record;
+            fakeFolder.syncJournal ().getFileRecord (path, &record);
+            return record.isValid () && record._type == ItemTypeVirtualFile;
         };
 
         QVERIFY (isDehydrated ("A/a1"));

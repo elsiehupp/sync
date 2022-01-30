@@ -414,7 +414,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-            fakeFolder.syncJournal ().wipeErrorBlacklist ();
+            fakeFolder.syncJournal ().wipeErrorBlocklist ();
         };
         on_cleanup ();
 

@@ -204,8 +204,8 @@ static void add_settings_to_job (Account account, QKeychain.Job job) {
 /***********************************************************
 Job
 ***********************************************************/
-Job.Job (GLib.Object parent)
-    : GLib.Object (parent) {
+Job.Job (GLib.Object parent) {
+    base (parent);
     _service_name = Theme.instance ().app_name ();
 }
 
@@ -280,7 +280,7 @@ bool WriteJob.exec () {
     wait_loop.exec ();
 
     if (error () != NoError) {
-        q_c_warning (lc_keychain_chunk) << "WritePasswordJob failed with" << error_string ();
+        GLib.warn (lc_keychain_chunk) << "WritePasswordJob failed with" << error_string ();
         return false;
     }
 
@@ -296,7 +296,7 @@ void WriteJob.on_write_job_done (QKeychain.Job incoming_job) {
         _error_string = write_job.error_string ();
 
         if (write_job.error () != NoError) {
-            q_c_warning (lc_keychain_chunk) << "Error while writing" << write_job.key () << "chunk" << write_job.error_string ();
+            GLib.warn (lc_keychain_chunk) << "Error while writing" << write_job.key () << "chunk" << write_job.error_string ();
             _chunk_buffer.clear ();
         }
     }
@@ -312,7 +312,7 @@ void WriteJob.on_write_job_done (QKeychain.Job incoming_job) {
 
         // keep the limit
         if (_chunk_count > KeychainChunk.MaxChunks) {
-            q_c_warning (lc_keychain_chunk) << "Maximum chunk count exceeded while writing" << write_job.key () << "chunk" << string.number (index) << "cutting off after" << string.number (KeychainChunk.MaxChunks) << "chunks";
+            GLib.warn (lc_keychain_chunk) << "Maximum chunk count exceeded while writing" << write_job.key () << "chunk" << string.number (index) << "cutting off after" << string.number (KeychainChunk.MaxChunks) << "chunks";
 
             write_job.delete_later ();
 
@@ -409,7 +409,7 @@ bool ReadJob.exec () {
     _chunk_count = 0;
     _chunk_buffer.clear ();
     if (error () != EntryNotFound) {
-        q_c_warning (lc_keychain_chunk) << "ReadPasswordJob failed with" << error_string ();
+        GLib.warn (lc_keychain_chunk) << "ReadPasswordJob failed with" << error_string ();
     }
     return false;
 }
@@ -441,7 +441,7 @@ void ReadJob.on_read_job_done (QKeychain.Job incoming_job) {
             ( (read_job.error () == QKeychain.EntryNotFound) && _chunk_count == 0)) {
             _error = read_job.error ();
             _error_string = read_job.error_string ();
-            q_c_warning (lc_keychain_chunk) << "Unable to read" << read_job.key () << "chunk" << string.number (_chunk_count) << read_job.error_string ();
+            GLib.warn (lc_keychain_chunk) << "Unable to read" << read_job.key () << "chunk" << string.number (_chunk_count) << read_job.error_string ();
         }
     }
 
@@ -502,7 +502,7 @@ bool DeleteJob.exec () {
 
     _chunk_count = 0;
     if (error () != EntryNotFound) {
-        q_c_warning (lc_keychain_chunk) << "DeletePasswordJob failed with" << error_string ();
+        GLib.warn (lc_keychain_chunk) << "DeletePasswordJob failed with" << error_string ();
     }
     return false;
 }
@@ -519,7 +519,7 @@ void DeleteJob.on_delete_job_done (QKeychain.Job incoming_job) {
             ( (delete_job.error () == QKeychain.EntryNotFound) && _chunk_count == 0)) {
             _error = delete_job.error ();
             _error_string = delete_job.error_string ();
-            q_c_warning (lc_keychain_chunk) << "Unable to delete" << delete_job.key () << "chunk" << string.number (_chunk_count) << delete_job.error_string ();
+            GLib.warn (lc_keychain_chunk) << "Unable to delete" << delete_job.key () << "chunk" << string.number (_chunk_count) << delete_job.error_string ();
         }
     }
 

@@ -5,7 +5,7 @@ Copyright (C) 2015 by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <Gtk.Dialog>
 
 namespace Occ {
@@ -30,7 +30,7 @@ class Owncloud_connection_method_dialog : Gtk.Dialog {
     };
 
     // The URL that was tried
-    public void set_url (QUrl );
+    public void set_url (GLib.Uri );
 
 
     public void on_return_no_tls ();
@@ -55,8 +55,8 @@ class Owncloud_connection_method_dialog : Gtk.Dialog {
         connect (ui.btn_back, &QAbstractButton.clicked, this, &Owncloud_connection_method_dialog.return_back);
     }
 
-    void Owncloud_connection_method_dialog.set_url (QUrl url) {
-        ui.label.on_set_text (tr ("<html><head/><body><p>Failed to connect to the secure server address <em>%1</em>. How do you wish to proceed?</p></body></html>").arg (url.to_display_string ().to_html_escaped ()));
+    void Owncloud_connection_method_dialog.set_url (GLib.Uri url) {
+        ui.label.on_set_text (_("<html><head/><body><p>Failed to connect to the secure server address <em>%1</em>. How do you wish to proceed?</p></body></html>").arg (url.to_display_string ().to_html_escaped ()));
     }
 
     void Owncloud_connection_method_dialog.on_return_no_tls () {

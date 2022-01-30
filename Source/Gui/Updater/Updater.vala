@@ -4,7 +4,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QUrlQuery>
 // #include <QProcess>
 
@@ -28,7 +28,7 @@ class Updater : GLib.Object {
     public static Updater instance ();
 
 
-    public static QUrl update_url ();
+    public static GLib.Uri update_url ();
 
     public virtual void check_for_update () = 0;
     public virtual void background_check_for_update () = 0;
@@ -57,13 +57,13 @@ class Updater : GLib.Object {
         return _instance;
     }
 
-    QUrl Updater.update_url () {
-        QUrl update_base_url (string.from_local8Bit (qgetenv ("OCC_UPDATE_URL")));
+    GLib.Uri Updater.update_url () {
+        GLib.Uri update_base_url (string.from_local8Bit (qgetenv ("OCC_UPDATE_URL")));
         if (update_base_url.is_empty ()) {
-            update_base_url = QUrl (QLatin1String (APPLICATION_UPDATE_URL));
+            update_base_url = GLib.Uri (QLatin1String (APPLICATION_UPDATE_URL));
         }
         if (!update_base_url.is_valid () || update_base_url.host () == ".") {
-            return QUrl ();
+            return GLib.Uri ();
         }
 
         var url_query = get_query_params ();
@@ -124,7 +124,7 @@ class Updater : GLib.Object {
         });
         process.wait_for_finished ();
         GLib.ByteArray output = process.read_all_standard_output ();
-        q_c_debug (lc_updater) << "Sys Info size : " << output.length ();
+        GLib.debug (lc_updater) << "Sys Info size : " << output.length ();
         if (output.length () > 1024)
             output.clear (); // don't send too much.
 
@@ -137,9 +137,9 @@ class Updater : GLib.Object {
     // To test, cmake with -DAPPLICATION_UPDATE_URL="http://127.0.0.1:8080/test.rss"
     Updater *Updater.create () {
         var url = update_url ();
-        q_c_debug (lc_updater) << url;
+        GLib.debug (lc_updater) << url;
         if (url.is_empty ()) {
-            q_c_warning (lc_updater) << "Not a valid updater URL, will not do update check";
+            GLib.warn (lc_updater) << "Not a valid updater URL, will not do update check";
             return nullptr;
         }
         // the best we can do is notify about updates

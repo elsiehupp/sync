@@ -14,7 +14,7 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 using namespace Occ;
 
 // #include <string>
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <Gtk.Widget>
 
 namespace Occ {
@@ -25,7 +25,7 @@ namespace Utility {
 
     If launching the browser fails, display a message.
     ***********************************************************/
-    bool open_browser (QUrl url, Gtk.Widget error_widget_parent = nullptr);
+    bool open_browser (GLib.Uri url, Gtk.Widget error_widget_parent = nullptr);
 
 
     /***********************************************************
@@ -67,7 +67,7 @@ namespace Utility {
 
 
 
-bool Utility.open_browser (QUrl url, Gtk.Widget error_widget_parent) {
+bool Utility.open_browser (GLib.Uri url, Gtk.Widget error_widget_parent) {
     const string[] allowed_url_schemes = {
         "http",
         "https",
@@ -75,7 +75,7 @@ bool Utility.open_browser (QUrl url, Gtk.Widget error_widget_parent) {
     };
 
     if (!allowed_url_schemes.contains (url.scheme ())) {
-        q_c_warning (lc_utility) << "URL format is not supported, or it has been compromised for:" << url.to_string ();
+        GLib.warn (lc_utility) << "URL format is not supported, or it has been compromised for:" << url.to_string ();
         return false;
     }
 
@@ -89,14 +89,14 @@ bool Utility.open_browser (QUrl url, Gtk.Widget error_widget_parent) {
                     "URL %1. Maybe no default browser is configured?")
                     .arg (url.to_string ()));
         }
-        q_c_warning (lc_utility) << "QDesktopServices.open_url failed for" << url;
+        GLib.warn (lc_utility) << "QDesktopServices.open_url failed for" << url;
         return false;
     }
     return true;
 }
 
 bool Utility.open_email_composer (string subject, string body, Gtk.Widget error_widget_parent) {
-    QUrl url (QLatin1String ("mailto:"));
+    GLib.Uri url (QLatin1String ("mailto:"));
     QUrlQuery query;
     query.set_query_items ({
         {
@@ -120,7 +120,7 @@ bool Utility.open_email_composer (string subject, string body, Gtk.Widget error_
                     "create a new message. Maybe no default email client is "
                     "configured?"));
         }
-        q_c_warning (lc_utility) << "QDesktopServices.open_url failed for" << url;
+        GLib.warn (lc_utility) << "QDesktopServices.open_url failed for" << url;
         return false;
     }
     return true;

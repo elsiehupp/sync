@@ -146,10 +146,10 @@ void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo &progr
     if (!progress._last_completed_item.is_empty () && should_show_in_recents_menu (progress._last_completed_item)) {
         string kind_str = Progress.as_result_string (progress._last_completed_item);
         string time_str = QTime.current_time ().to_string ("hh:mm");
-        string action_text = tr ("%1 (%2, %3)").arg (progress._last_completed_item._file, kind_str, time_str);
+        string action_text = _("%1 (%2, %3)").arg (progress._last_completed_item._file, kind_str, time_str);
         if (f) {
             string full_path = f.path () + '/' + progress._last_completed_item._file;
-            if (QFile (full_path).exists ()) {
+            if (GLib.File (full_path).exists ()) {
                 if (_recently_changed.length () > 5)
                     _recently_changed.remove_first ();
                 _recently_changed.append (q_make_pair (action_text, full_path));
@@ -163,27 +163,27 @@ void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo &progr
     // Build status details text
     string msg;
     if (!progress._current_discovered_remote_folder.is_empty ()) {
-        msg =  tr ("Checking for changes in \"%1\"").arg (progress._current_discovered_remote_folder);
+        msg =  _("Checking for changes in \"%1\"").arg (progress._current_discovered_remote_folder);
     } else if (progress.total_size () == 0) {
         int64 current_file = progress.current_file ();
         int64 total_file_count = q_max (progress.total_files (), current_file);
         if (progress.trust_eta ()) {
-            msg = tr ("Syncing %1 of %2  (%3 left)")
+            msg = _("Syncing %1 of %2  (%3 left)")
                     .arg (current_file)
                     .arg (total_file_count)
                     .arg (Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
         } else {
-            msg = tr ("Syncing %1 of %2")
+            msg = _("Syncing %1 of %2")
                     .arg (current_file)
                     .arg (total_file_count);
         }
     } else {
         string total_size_str = Utility.octets_to_string (progress.total_size ());
         if (progress.trust_eta ()) {
-            msg = tr ("Syncing %1 (%2 left)")
+            msg = _("Syncing %1 (%2 left)")
                     .arg (total_size_str, Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
         } else {
-            msg = tr ("Syncing %1")
+            msg = _("Syncing %1")
                     .arg (total_size_str);
         }
     }
@@ -204,7 +204,7 @@ void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo &progr
                 g_clear_object (&item);
             }
         } else {
-            item = menu_item_new (tr ("No recently changed files"), nullptr);
+            item = menu_item_new (_("No recently changed files"), nullptr);
             g_menu_append_item (_recent_menu, item);
             g_clear_object (&item);
         }
@@ -218,10 +218,10 @@ void CloudProviderWrapper.update_status_text (string status_text) {
 
 void CloudProviderWrapper.update_pause_status () {
     if (_paused) {
-        update_status_text (tr ("Sync paused"));
+        update_status_text (_("Sync paused"));
         cloud_providers_account_exporter_set_status (_cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_ERROR);
     } else {
-        update_status_text (tr ("Syncing"));
+        update_status_text (_("Syncing"));
         cloud_providers_account_exporter_set_status (_cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_SYNCING);
     }
 }
@@ -253,42 +253,42 @@ GMenu_model* CloudProviderWrapper.get_menu_model () {
     _main_menu = g_menu_new ();
 
     section = g_menu_new ();
-    item = menu_item_new (tr ("Open website"), "cloudprovider.openwebsite");
+    item = menu_item_new (_("Open website"), "cloudprovider.openwebsite");
     g_menu_append_item (section, item);
     g_clear_object (&item);
     g_menu_append_section (_main_menu, nullptr, G_MENU_MODEL (section));
     g_clear_object (&section);
 
     _recent_menu = g_menu_new ();
-    item = menu_item_new (tr ("No recently changed files"), nullptr);
+    item = menu_item_new (_("No recently changed files"), nullptr);
     g_menu_append_item (_recent_menu, item);
     g_clear_object (&item);
 
     section = g_menu_new ();
-    item = menu_item_new_submenu (tr ("Recently changed"), G_MENU_MODEL (_recent_menu));
+    item = menu_item_new_submenu (_("Recently changed"), G_MENU_MODEL (_recent_menu));
     g_menu_append_item (section, item);
     g_clear_object (&item);
     g_menu_append_section (_main_menu, nullptr, G_MENU_MODEL (section));
     g_clear_object (&section);
 
     section = g_menu_new ();
-    item = menu_item_new (tr ("Pause synchronization"), "cloudprovider.pause");
+    item = menu_item_new (_("Pause synchronization"), "cloudprovider.pause");
     g_menu_append_item (section, item);
     g_clear_object (&item);
     g_menu_append_section (_main_menu, nullptr, G_MENU_MODEL (section));
     g_clear_object (&section);
 
     section = g_menu_new ();
-    item = menu_item_new (tr ("Help"), "cloudprovider.openhelp");
+    item = menu_item_new (_("Help"), "cloudprovider.openhelp");
     g_menu_append_item (section, item);
     g_clear_object (&item);
-    item = menu_item_new (tr ("Settings"), "cloudprovider.opensettings");
+    item = menu_item_new (_("Settings"), "cloudprovider.opensettings");
     g_menu_append_item (section, item);
     g_clear_object (&item);
-    item = menu_item_new (tr ("Log out"), "cloudprovider.logout");
+    item = menu_item_new (_("Log out"), "cloudprovider.logout");
     g_menu_append_item (section, item);
     g_clear_object (&item);
-    item = menu_item_new (tr ("Quit sync client"), "cloudprovider.quit");
+    item = menu_item_new (_("Quit sync client"), "cloudprovider.quit");
     g_menu_append_item (section, item);
     g_clear_object (&item);
     g_menu_append_section (_main_menu, nullptr, G_MENU_MODEL (section));

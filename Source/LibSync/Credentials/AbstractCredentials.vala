@@ -134,21 +134,21 @@ signals:
     string AbstractCredentials.keychain_key (string url, string user, string account_id) {
         string u (url);
         if (u.is_empty ()) {
-            q_c_warning (lc_credentials) << "Empty url in key_chain, error!";
+            GLib.warn (lc_credentials) << "Empty url in key_chain, error!";
             return string ();
         }
         if (user.is_empty ()) {
-            q_c_warning (lc_credentials) << "Error : User is empty!";
+            GLib.warn (lc_credentials) << "Error : User is empty!";
             return string ();
         }
 
-        if (!u.ends_with (QChar ('/'))) {
-            u.append (QChar ('/'));
+        if (!u.ends_with (char ('/'))) {
+            u.append (char ('/'));
         }
 
-        string key = user + QLatin1Char (':') + u;
+        string key = user + ':' + u;
         if (!account_id.is_empty ()) {
-            key += QLatin1Char (':') + account_id;
+            key += ':' + account_id;
         }
         return key;
     }

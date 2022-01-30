@@ -64,7 +64,7 @@ protected slots:
             _socket.on_reset (new QSocket_notifier (_fd, QSocket_notifier.Read));
             connect (_socket.data (), &QSocket_notifier.activated, this, &Folder_watcher_private.on_received_notification);
         } else {
-            q_c_warning (lc_folder_watcher) << "notify_init () failed : " << strerror (errno);
+            GLib.warn (lc_folder_watcher) << "notify_init () failed : " << strerror (errno);
         }
 
         QMetaObject.invoke_method (this, "on_add_folder_recursive", Q_ARG (string, path));
@@ -76,7 +76,7 @@ protected slots:
     bool Folder_watcher_private.find_folders_below (QDir &dir, string[] &full_list) {
         bool ok = true;
         if (! (dir.exists () && dir.is_readable ())) {
-            q_c_debug (lc_folder_watcher) << "Non existing path coming in : " << dir.absolute_path ();
+            GLib.debug (lc_folder_watcher) << "Non existing path coming in : " << dir.absolute_path ();
             ok = false;
         } else {
             string[] name_filter;
@@ -111,7 +111,7 @@ protected slots:
             if (_parent._is_reliable && (errno == ENOMEM || errno == ENOSPC)) {
                 _parent._is_reliable = false;
                 emit _parent.became_unreliable (
-                    tr ("This problem usually happens when the inotify watches are exhausted. "
+                    _("This problem usually happens when the inotify watches are exhausted. "
                        "Check the FAQ for details."));
             }
         }
@@ -122,14 +122,14 @@ protected slots:
             return;
 
         int subdirs = 0;
-        q_c_debug (lc_folder_watcher) << " (+) Watcher:" << path;
+        GLib.debug (lc_folder_watcher) << " (+) Watcher:" << path;
 
         QDir in_path (path);
         inotify_register_path (in_path.absolute_path ());
 
         string[] all_subfolders;
         if (!find_folders_below (QDir (path), all_subfolders)) {
-            q_c_warning (lc_folder_watcher) << "Could not traverse all sub folders";
+            GLib.warn (lc_folder_watcher) << "Could not traverse all sub folders";
         }
         QStringListIterator subfolders_it (all_subfolders);
         while (subfolders_it.has_next ()) {
@@ -138,17 +138,17 @@ protected slots:
             if (folder.exists () && !_path_to_watch.contains (folder.absolute_path ())) {
                 subdirs++;
                 if (_parent.path_is_ignored (subfolder)) {
-                    q_c_debug (lc_folder_watcher) << "* Not adding" << folder.path ();
+                    GLib.debug (lc_folder_watcher) << "* Not adding" << folder.path ();
                     continue;
                 }
                 inotify_register_path (folder.absolute_path ());
             } else {
-                q_c_debug (lc_folder_watcher) << "    `. discarded:" << folder.path ();
+                GLib.debug (lc_folder_watcher) << "    `. discarded:" << folder.path ();
             }
         }
 
         if (subdirs > 0) {
-            q_c_debug (lc_folder_watcher) << "    `. and" << subdirs << "subdirectories";
+            GLib.debug (lc_folder_watcher) << "    `. and" << subdirs << "subdirectories";
         }
     }
 
@@ -184,7 +184,7 @@ protected slots:
             // cast an inotify_event
             event = (struct inotify_event *)&buffer[i];
             if (!event) {
-                q_c_debug (lc_folder_watcher) << "NULL event";
+                GLib.debug (lc_folder_watcher) << "NULL event";
                 continue;
             }
 
@@ -235,7 +235,7 @@ protected slots:
             inotify_rm_watch (_fd, wid);
             _watch_to_path.remove (wid);
             it = _path_to_watch.erase (it);
-            q_c_debug (lc_folder_watcher) << "Removed watch for" << it_path;
+            GLib.debug (lc_folder_watcher) << "Removed watch for" << it_path;
         }
     }
 

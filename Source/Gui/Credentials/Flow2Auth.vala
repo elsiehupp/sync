@@ -15,7 +15,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 
 // #pragma once
 // #include <QPointer>
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QTimer>
 
 namespace Occ {
@@ -57,7 +57,7 @@ class Flow2Auth : GLib.Object {
     public void copy_link_to_clipboard ();
 
 
-    public QUrl authorisation_link ();
+    public GLib.Uri authorisation_link ();
 
 signals:
     /***********************************************************
@@ -78,7 +78,7 @@ signals:
     private void fetch_new_token (TokenAction action);
 
     private Account _account;
-    private QUrl _login_url;
+    private GLib.Uri _login_url;
     private string _poll_token;
     private string _poll_endpoint;
     private QTimer _poll_timer;
@@ -109,7 +109,7 @@ signals:
         open_browser ();
     }
 
-    QUrl Flow2Auth.authorisation_link () {
+    GLib.Uri Flow2Auth.authorisation_link () {
         return _login_url;
     }
 
@@ -131,7 +131,7 @@ signals:
         emit status_changed (PollStatus.status_fetch_token, 0);
 
         // Step 1 : Initiate a login, do an anonymous POST request
-        QUrl url = Utility.concat_url_path (_account.url ().to_string (), QLatin1String ("/index.php/login/v2"));
+        GLib.Uri url = Utility.concat_url_path (_account.url ().to_string (), QLatin1String ("/index.php/login/v2"));
         _enforce_https = url.scheme () == QStringLiteral ("https");
 
         // add 'Content-Length : 0' header (see https://github.com/nextcloud/desktop/issues/1473)
@@ -152,9 +152,9 @@ signals:
                 && !json.is_empty ()) {
                 poll_token = json.value ("poll").to_object ().value ("token").to_string ();
                 poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_string ();
-                if (_enforce_https && QUrl (poll_endpoint).scheme () != QStringLiteral ("https")) {
-                    q_c_warning (lc_flow2auth) << "Can not poll endpoint because the returned url" << poll_endpoint << "does not on_start with https";
-                    emit result (Error, tr ("The polling URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
+                if (_enforce_https && GLib.Uri (poll_endpoint).scheme () != QStringLiteral ("https")) {
+                    GLib.warn (lc_flow2auth) << "Can not poll endpoint because the returned url" << poll_endpoint << "does not on_start with https";
+                    emit result (Error, _("The polling URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
                 }
                 login_url = json["login"].to_string ();
@@ -165,18 +165,18 @@ signals:
                 string error_reason;
                 string error_from_json = json["error"].to_string ();
                 if (!error_from_json.is_empty ()) {
-                    error_reason = tr ("Error returned from the server : <em>%1</em>")
+                    error_reason = _("Error returned from the server : <em>%1</em>")
                                       .arg (error_from_json.to_html_escaped ());
                 } else if (reply.error () != QNetworkReply.NoError) {
-                    error_reason = tr ("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
+                    error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                                       .arg (reply.error_string ().to_html_escaped ());
                 } else if (json_parse_error.error != QJsonParseError.NoError) {
-                    error_reason = tr ("Could not parse the JSON returned from the server : <br><em>%1</em>")
+                    error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
                                       .arg (json_parse_error.error_string ());
                 } else {
-                    error_reason = tr ("The reply from the server did not contain all expected fields");
+                    error_reason = _("The reply from the server did not contain all expected fields");
                 }
-                q_c_warning (lc_flow2auth) << "Error when getting the login_url" << json << error_reason;
+                GLib.warn (lc_flow2auth) << "Error when getting the login_url" << json << error_reason;
                 emit result (Error, error_reason);
                 _poll_timer.stop ();
                 _is_busy = false;
@@ -219,7 +219,7 @@ signals:
                 }
                 break;
             case action_copy_link_to_clipboard:
-                QApplication.clipboard ().on_set_text (authorisation_link ().to_string (QUrl.FullyEncoded));
+                QApplication.clipboard ().on_set_text (authorisation_link ().to_string (GLib.Uri.FullyEncoded));
                 emit status_changed (PollStatus.status_copy_link_to_clipboard, 0);
                 break;
             }
@@ -249,7 +249,7 @@ signals:
 
         var request_body = new QBuffer;
         QUrlQuery arguments (string ("token=%1").arg (_poll_token));
-        request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
+        request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
         var job = _account.send_request ("POST", _poll_endpoint, req, request_body);
         job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
@@ -258,15 +258,15 @@ signals:
             var json_data = reply.read_all ();
             QJsonParseError json_parse_error;
             QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
-            QUrl server_url;
+            GLib.Uri server_url;
             string login_name, app_password;
 
             if (reply.error () == QNetworkReply.NoError && json_parse_error.error == QJsonParseError.NoError
                 && !json.is_empty ()) {
                 server_url = json["server"].to_string ();
                 if (_enforce_https && server_url.scheme () != QStringLiteral ("https")) {
-                    q_c_warning (lc_flow2auth) << "Returned server url" << server_url << "does not on_start with https";
-                    emit result (Error, tr ("The returned server URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
+                    GLib.warn (lc_flow2auth) << "Returned server url" << server_url << "does not on_start with https";
+                    emit result (Error, _("The returned server URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
                 }
                 login_name = json["login_name"].to_string ();
@@ -278,18 +278,18 @@ signals:
                 string error_reason;
                 string error_from_json = json["error"].to_string ();
                 if (!error_from_json.is_empty ()) {
-                    error_reason = tr ("Error returned from the server : <em>%1</em>")
+                    error_reason = _("Error returned from the server : <em>%1</em>")
                                       .arg (error_from_json.to_html_escaped ());
                 } else if (reply.error () != QNetworkReply.NoError) {
-                    error_reason = tr ("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
+                    error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                                       .arg (reply.error_string ().to_html_escaped ());
                 } else if (json_parse_error.error != QJsonParseError.NoError) {
-                    error_reason = tr ("Could not parse the JSON returned from the server : <br><em>%1</em>")
+                    error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
                                       .arg (json_parse_error.error_string ());
                 } else {
-                    error_reason = tr ("The reply from the server did not contain all expected fields");
+                    error_reason = _("The reply from the server did not contain all expected fields");
                 }
-                q_c_debug (lc_flow2auth) << "Error when polling for the app_password" << json << error_reason;
+                GLib.debug (lc_flow2auth) << "Error when polling for the app_password" << json << error_reason;
 
                 // We get a 404 until authentication is done, so don't show this error in the GUI.
                 if (reply.error () != QNetworkReply.ContentNotFoundError)

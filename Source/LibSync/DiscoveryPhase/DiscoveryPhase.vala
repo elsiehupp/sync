@@ -7,8 +7,8 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 // #include <csync_exclude.h>
 
 // #include <QLoggingCategory>
-// #include <QUrl>
-// #include <QFile>
+// #include <GLib.Uri>
+// #include <GLib.File>
 // #include <QFileInfo>
 // #include <QTextCodec>
 // #include <cstring>
@@ -20,7 +20,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 // #include <string[]>
 // #include <csync.h>
 // #include <QMap>
-// #include <QSet>
+// #include <GLib.Set>
 // #include <QMutex>
 // #include <QWaitCondition>
 // #include <QRunnable>
@@ -88,7 +88,7 @@ struct LocalInfo {
 ***********************************************************/
 class DiscoverySingleLocalDirectoryJob : GLib.Object, public QRunnable {
 
-    public DiscoverySingleLocalDirectoryJob (AccountPtr &account, string local_path, Occ.Vfs vfs, GLib.Object parent = nullptr);
+    public DiscoverySingleLocalDirectoryJob (AccountPointer &account, string local_path, Occ.Vfs vfs, GLib.Object parent = nullptr);
 
     public void run () override;
 signals:
@@ -100,7 +100,7 @@ signals:
     void child_ignored (bool b);
 
     private string _local_path;
-    private AccountPtr _account;
+    private AccountPointer _account;
     private Occ.Vfs* _vfs;
 
 };
@@ -112,7 +112,7 @@ signals:
 ***********************************************************/
 class DiscoverySingleDirectoryJob : GLib.Object {
 
-    public DiscoverySingleDirectoryJob (AccountPtr &account, string path, GLib.Object parent = nullptr);
+    public DiscoverySingleDirectoryJob (AccountPointer &account, string path, GLib.Object parent = nullptr);
     // Specify that this is the root and we need to check the data-fingerprint
     public void set_is_root_path () {
         _is_root_path = true;
@@ -142,7 +142,7 @@ signals:
     private GLib.ByteArray _first_etag;
     private GLib.ByteArray _file_id;
     private GLib.ByteArray _local_file_id;
-    private AccountPtr _account;
+    private AccountPointer _account;
     // The first result is for the directory itself and need to be ignored.
     // This flag is true if it was already ignored.
     private bool _ignored_first;
@@ -219,15 +219,15 @@ class DiscoveryPhase : GLib.Object {
     int _currently_active_jobs = 0;
 
     // both must contain a sorted list
-    string[] _selective_sync_black_list;
-    string[] _selective_sync_white_list;
+    string[] _selective_sync_block_list;
+    string[] _selective_sync_allow_list;
 
     void schedule_more_jobs ();
 
-    bool is_in_selective_sync_black_list (string path);
+    bool is_in_selective_sync_block_list (string path);
 
     // Check if the new folder should be deselected or not.
-    // May be async. "Return" via the callback, true if the item is blacklisted
+    // May be async. "Return" via the callback, true if the item is blocklisted
     void check_selective_sync_new_folder (string path, RemotePermissions rp,
         std.function<void (bool)> callback);
 
@@ -259,20 +259,20 @@ class DiscoveryPhase : GLib.Object {
     public string _local_dir; // absolute path to the local directory. ends with '/'
     public string _remote_folder; // remote folder, ends with '/'
     public SyncJournalDb _statedatabase;
-    public AccountPtr _account;
+    public AccountPointer _account;
     public SyncOptions _sync_options;
     public ExcludedFiles _excludes;
     public QRegularExpression _invalid_filename_rx; // FIXME : maybe move in ExcludedFiles
-    public string[] _server_blacklisted_files; // The blacklist from the capabilities
+    public string[] _server_blocklisted_files; // The blocklist from the capabilities
     public bool _ignore_hidden_files = false;
     public std.function<bool (string )> _should_discover_localy;
 
     public void start_job (ProcessDirectoryJob *);
 
-    public void set_selective_sync_black_list (string[] &list);
+    public void set_selective_sync_block_list (string[] &list);
 
 
-    public void set_selective_sync_white_list (string[] &list);
+    public void set_selective_sync_allow_list (string[] &list);
 
     // output
     public GLib.ByteArray _data_fingerprint;
@@ -309,7 +309,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
             return true;
         }
 
-        string path_slash = path + QLatin1Char ('/');
+        string path_slash = path + '/';
 
         // Since the list is sorted, we can do a binary search.
         // If the path is a prefix of another item or right after in the lexical order.
@@ -323,18 +323,18 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
             return false;
         }
         --it;
-        Q_ASSERT (it.ends_with (QLatin1Char ('/'))); // Folder.set_selective_sync_black_list makes sure of that
+        Q_ASSERT (it.ends_with ('/')); // Folder.set_selective_sync_block_list makes sure of that
         return path_slash.starts_with (*it);
     }
 
-    bool DiscoveryPhase.is_in_selective_sync_black_list (string path) {
-        if (_selective_sync_black_list.is_empty ()) {
-            // If there is no black list, everything is allowed
+    bool DiscoveryPhase.is_in_selective_sync_block_list (string path) {
+        if (_selective_sync_block_list.is_empty ()) {
+            // If there is no block list, everything is allowed
             return false;
         }
 
-        // Block if it is in the black list
-        if (find_path_in_list (_selective_sync_black_list, path)) {
+        // Block if it is in the block list
+        if (find_path_in_list (_selective_sync_block_list, path)) {
             return true;
         }
 
@@ -350,9 +350,9 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
             // Note: DiscoverySingleDirectoryJob.on_directory_listing_iterated_slot make sure that only the
             // root of a mounted storage has 'M', all sub entries have 'm'
 
-            // Only allow it if the white list contains exactly this path (not parents)
+            // Only allow it if the allow list contains exactly this path (not parents)
             // We want to ask confirmation for external storage even if the parents where selected
-            if (_selective_sync_white_list.contains (path + QLatin1Char ('/'))) {
+            if (_selective_sync_allow_list.contains (path + '/')) {
                 return callback (false);
             }
 
@@ -360,8 +360,8 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
             return callback (true);
         }
 
-        // If this path or the parent is in the white list, then we do not block this file
-        if (find_path_in_list (_selective_sync_white_list, path)) {
+        // If this path or the parent is in the allow list, then we do not block this file
+        if (find_path_in_list (_selective_sync_allow_list, path)) {
             return callback (false);
         }
 
@@ -386,13 +386,13 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
                 emit new_big_folder (path, false);
                 return callback (true);
             } else {
-                // it is not too big, put it in the white list (so we will not do more query for the children)
+                // it is not too big, put it in the allow list (so we will not do more query for the children)
                 // and and do not block.
                 var p = path;
-                if (!p.ends_with (QLatin1Char ('/')))
-                    p += QLatin1Char ('/');
-                _selective_sync_white_list.insert (
-                    std.upper_bound (_selective_sync_white_list.begin (), _selective_sync_white_list.end (), p),
+                if (!p.ends_with ('/'))
+                    p += '/';
+                _selective_sync_allow_list.insert (
+                    std.upper_bound (_selective_sync_allow_list.begin (), _selective_sync_allow_list.end (), p),
                     p);
                 return callback (false);
             }
@@ -437,18 +437,18 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
                         // re-creation of virtual files count as a delete
                         || ( (*it)._type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)
                         || ( (*it)._is_restoration && instruction == CSYNC_INSTRUCTION_NEW))) {
-                    q_c_warning (lc_discovery) << "ENFORCE (FAILING)" << original_path;
-                    q_c_warning (lc_discovery) << "instruction == CSYNC_INSTRUCTION_REMOVE" << (instruction == CSYNC_INSTRUCTION_REMOVE);
-                    q_c_warning (lc_discovery) << " ( (*it)._type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)"
+                    GLib.warn (lc_discovery) << "ENFORCE (FAILING)" << original_path;
+                    GLib.warn (lc_discovery) << "instruction == CSYNC_INSTRUCTION_REMOVE" << (instruction == CSYNC_INSTRUCTION_REMOVE);
+                    GLib.warn (lc_discovery) << " ( (*it)._type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)"
                                            << ( (*it)._type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW);
-                    q_c_warning (lc_discovery) << " ( (*it)._is_restoration && instruction == CSYNC_INSTRUCTION_NEW))"
+                    GLib.warn (lc_discovery) << " ( (*it)._is_restoration && instruction == CSYNC_INSTRUCTION_NEW))"
                                            << ( (*it)._is_restoration && instruction == CSYNC_INSTRUCTION_NEW);
-                    q_c_warning (lc_discovery) << "instruction" << instruction;
-                    q_c_warning (lc_discovery) << " (*it)._type" << (*it)._type;
-                    q_c_warning (lc_discovery) << " (*it)._is_restoration " << (*it)._is_restoration;
+                    GLib.warn (lc_discovery) << "instruction" << instruction;
+                    GLib.warn (lc_discovery) << " (*it)._type" << (*it)._type;
+                    GLib.warn (lc_discovery) << " (*it)._is_restoration " << (*it)._is_restoration;
                     Q_ASSERT (false);
-                    add_error_to_gui (SyncFileItem.Status.FatalError, tr ("Error while canceling delete of a file"), original_path);
-                    emit fatal_error (tr ("Error while canceling delete of %1").arg (original_path));
+                    add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
+                    emit fatal_error (_("Error while canceling delete of %1").arg (original_path));
                 }
                 (*it)._instruction = CSYNC_INSTRUCTION_NONE;
                 result = true;
@@ -488,14 +488,14 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
         job.on_start ();
     }
 
-    void DiscoveryPhase.set_selective_sync_black_list (string[] &list) {
-        _selective_sync_black_list = list;
-        std.sort (_selective_sync_black_list.begin (), _selective_sync_black_list.end ());
+    void DiscoveryPhase.set_selective_sync_block_list (string[] &list) {
+        _selective_sync_block_list = list;
+        std.sort (_selective_sync_block_list.begin (), _selective_sync_block_list.end ());
     }
 
-    void DiscoveryPhase.set_selective_sync_white_list (string[] &list) {
-        _selective_sync_white_list = list;
-        std.sort (_selective_sync_white_list.begin (), _selective_sync_white_list.end ());
+    void DiscoveryPhase.set_selective_sync_allow_list (string[] &list) {
+        _selective_sync_allow_list = list;
+        std.sort (_selective_sync_allow_list.begin (), _selective_sync_allow_list.end ());
     }
 
     void DiscoveryPhase.schedule_more_jobs () {
@@ -505,7 +505,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
         }
     }
 
-    DiscoverySingleLocalDirectoryJob.DiscoverySingleLocalDirectoryJob (AccountPtr &account, string local_path, Occ.Vfs vfs, GLib.Object parent)
+    DiscoverySingleLocalDirectoryJob.DiscoverySingleLocalDirectoryJob (AccountPointer &account, string local_path, Occ.Vfs vfs, GLib.Object parent)
      : GLib.Object (parent), QRunnable (), _local_path (local_path), _account (account), _vfs (vfs) {
         q_register_meta_type<QVector<LocalInfo> > ("QVector<LocalInfo>");
     }
@@ -519,13 +519,13 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
         var dh = csync_vio_local_opendir (local_path);
         if (!dh) {
             q_c_info (lc_discovery) << "Error while opening directory" << (local_path) << errno;
-            string error_string = tr ("Error while opening directory %1").arg (local_path);
+            string error_string = _("Error while opening directory %1").arg (local_path);
             if (errno == EACCES) {
-                error_string = tr ("Directory not accessible on client, permission denied");
+                error_string = _("Directory not accessible on client, permission denied");
                 emit finished_non_fatal_error (error_string);
                 return;
             } else if (errno == ENOENT) {
-                error_string = tr ("Directory not found : %1").arg (local_path);
+                error_string = _("Directory not found : %1").arg (local_path);
             } else if (errno == ENOTDIR) {
                 // Not a directory..
                 // Just consider it is empty
@@ -556,7 +556,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
                 item._file = _local_path + i.name;
                 item._instruction = CSYNC_INSTRUCTION_IGNORE;
                 item._status = SyncFileItem.NormalError;
-                item._error_string = tr ("Filename encoding is not valid");
+                item._error_string = _("Filename encoding is not valid");
                 emit item_discovered (item);
                 continue;
             }
@@ -574,21 +574,21 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
             csync_vio_local_closedir (dh);
 
             // Note: Windows vio converts any error into EACCES
-            q_c_warning (lc_discovery) << "readdir failed for file in " << local_path << " - errno : " << errno;
-            emit finished_fatal_error (tr ("Error while reading directory %1").arg (local_path));
+            GLib.warn (lc_discovery) << "readdir failed for file in " << local_path << " - errno : " << errno;
+            emit finished_fatal_error (_("Error while reading directory %1").arg (local_path));
             return;
         }
 
         errno = 0;
         csync_vio_local_closedir (dh);
         if (errno != 0) {
-            q_c_warning (lc_discovery) << "closedir failed for file in " << local_path << " - errno : " << errno;
+            GLib.warn (lc_discovery) << "closedir failed for file in " << local_path << " - errno : " << errno;
         }
 
         emit finished (results);
     }
 
-    DiscoverySingleDirectoryJob.DiscoverySingleDirectoryJob (AccountPtr &account, string path, GLib.Object parent)
+    DiscoverySingleDirectoryJob.DiscoverySingleDirectoryJob (AccountPointer &account, string path, GLib.Object parent)
         : GLib.Object (parent)
         , _sub_path (path)
         , _account (account)
@@ -755,7 +755,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
             // This is a sanity check, if we haven't _ignored_first then it means we never received any on_directory_listing_iterated_slot
             // which means somehow the server XML was bogus
             emit finished (HttpError {
-                0, tr ("Server error : PROPFIND reply is not XML formatted!")
+                0, _("Server error : PROPFIND reply is not XML formatted!")
             });
             delete_later ();
             return;
@@ -779,10 +779,10 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
         string content_type = r.header (QNetworkRequest.ContentTypeHeader).to_string ();
         int http_code = r.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
         string msg = r.error_string ();
-        q_c_warning (lc_discovery) << "LSCOL job error" << r.error_string () << http_code << r.error ();
+        GLib.warn (lc_discovery) << "LSCOL job error" << r.error_string () << http_code << r.error ();
         if (r.error () == QNetworkReply.NoError
             && !content_type.contains ("application/xml; charset=utf-8")) {
-            msg = tr ("Server error : PROPFIND reply is not XML formatted!");
+            msg = _("Server error : PROPFIND reply is not XML formatted!");
         }
         emit finished (HttpError {
             http_code, msg
@@ -800,7 +800,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
     }
 
     void DiscoverySingleDirectoryJob.on_metadata_received (QJsonDocument &json, int status_code) {
-        q_c_debug (lc_discovery) << "Metadata received, applying it to the result list";
+        GLib.debug (lc_discovery) << "Metadata received, applying it to the result list";
         Q_ASSERT (_sub_path.starts_with ('/'));
 
         const var metadata = FolderMetadata (_account, json.to_json (QJsonDocument.Compact), status_code);
@@ -822,7 +822,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
             const var encrypted_file_info = find_encrypted_file (result.name);
             if (encrypted_file_info) {
                 result.is_e2e_encrypted = true;
-                result.e2e_mangled_name = _sub_path.mid (1) + QLatin1Char ('/') + result.name;
+                result.e2e_mangled_name = _sub_path.mid (1) + '/' + result.name;
                 result.name = encrypted_file_info.original_filename;
             }
             return result;
@@ -833,7 +833,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string original
     }
 
     void DiscoverySingleDirectoryJob.on_metadata_error (GLib.ByteArray file_id, int http_return_code) {
-        q_c_warning (lc_discovery) << "E2EE Metadata job error. Trying to proceed without it." << file_id << http_return_code;
+        GLib.warn (lc_discovery) << "E2EE Metadata job error. Trying to proceed without it." << file_id << http_return_code;
         emit finished (_results);
         delete_later ();
     }

@@ -89,9 +89,8 @@ string QtLocalPeer.app_session_id (string app_id) {
     uint16 id_num = q_checksum (idc.const_data (), idc.size ());
     //### could do : two 16bit checksums over separate halves of id, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
 
-    string res = QLatin1String ("qtsingleapplication-")
-                 + string.number (id_num, 16);
-    res += QLatin1Char ('-') + string.number (.getuid (), 16);
+    string res = "qtsingleapplication-" + string.number (id_num, 16);
+    res += '-' + string.number (.getuid (), 16);
     return res;
 }
 
@@ -103,8 +102,8 @@ QtLocalPeer.QtLocalPeer (GLib.Object parent, string app_id)
     socket_name = app_session_id (id);
     server = new QLocal_server (this);
     string lock_name = QDir (QDir.temp_path ()).absolute_path ()
-                       + QLatin1Char ('/') + socket_name
-                       + QLatin1String ("-lockfile");
+                       + '/' + socket_name
+                       + "-lockfile";
     lock_file.set_file_name (lock_name);
     lock_file.open (QIODevice.ReadWrite);
 }

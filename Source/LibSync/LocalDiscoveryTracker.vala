@@ -115,14 +115,14 @@ class LocalDiscoveryTracker : GLib.Object {
 LocalDiscoveryTracker.LocalDiscoveryTracker () = default;
 
 void LocalDiscoveryTracker.add_touched_path (string relative_path) {
-    q_c_debug (lc_local_discovery_tracker) << "inserted touched" << relative_path;
+    GLib.debug (lc_local_discovery_tracker) << "inserted touched" << relative_path;
     _local_discovery_paths.insert (relative_path);
 }
 
 void LocalDiscoveryTracker.start_sync_full_discovery () {
     _local_discovery_paths.clear ();
     _previous_local_discovery_paths.clear ();
-    q_c_debug (lc_local_discovery_tracker) << "full discovery";
+    GLib.debug (lc_local_discovery_tracker) << "full discovery";
 }
 
 void LocalDiscoveryTracker.start_sync_partial_discovery () {
@@ -130,7 +130,7 @@ void LocalDiscoveryTracker.start_sync_partial_discovery () {
         string[] paths;
         for (var &path : _local_discovery_paths)
             paths.append (path);
-        q_c_debug (lc_local_discovery_tracker) << "partial discovery with paths : " << paths;
+        GLib.debug (lc_local_discovery_tracker) << "partial discovery with paths : " << paths;
     }
 
     _previous_local_discovery_paths = std.move (_local_discovery_paths);
@@ -155,25 +155,25 @@ void LocalDiscoveryTracker.on_item_completed (SyncFileItemPtr &item) {
                && (item._instruction == CSYNC_INSTRUCTION_NONE
                       || item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA))) {
         if (_previous_local_discovery_paths.erase (item._file.to_utf8 ()))
-            q_c_debug (lc_local_discovery_tracker) << "wiped successful item" << item._file;
+            GLib.debug (lc_local_discovery_tracker) << "wiped successful item" << item._file;
         if (!item._rename_target.is_empty () && _previous_local_discovery_paths.erase (item._rename_target.to_utf8 ()))
-            q_c_debug (lc_local_discovery_tracker) << "wiped successful item" << item._rename_target;
+            GLib.debug (lc_local_discovery_tracker) << "wiped successful item" << item._rename_target;
     } else {
         _local_discovery_paths.insert (item._file.to_utf8 ());
-        q_c_debug (lc_local_discovery_tracker) << "inserted error item" << item._file;
+        GLib.debug (lc_local_discovery_tracker) << "inserted error item" << item._file;
     }
 }
 
 void LocalDiscoveryTracker.on_sync_finished (bool on_success) {
     if (on_success) {
-        q_c_debug (lc_local_discovery_tracker) << "sync on_success, forgetting last sync's local discovery path list";
+        GLib.debug (lc_local_discovery_tracker) << "sync on_success, forgetting last sync's local discovery path list";
     } else {
         // On overall-failure we can't forget about last sync's local discovery
         // paths yet, reuse them for the next sync again.
         // C++17 : Could use std.set.merge ().
         _local_discovery_paths.insert (
             _previous_local_discovery_paths.begin (), _previous_local_discovery_paths.end ());
-        q_c_debug (lc_local_discovery_tracker) << "sync failed, keeping last sync's local discovery path list";
+        GLib.debug (lc_local_discovery_tracker) << "sync failed, keeping last sync's local discovery path list";
     }
     _previous_local_discovery_paths.clear ();
 }

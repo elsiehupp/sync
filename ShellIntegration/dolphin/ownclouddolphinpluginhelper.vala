@@ -103,7 +103,7 @@ signals:
 // #include <QtNetwork/QLocalSocket>
 // #include <qcoreevent.h>
 // #include <QStandardPaths>
-// #include <QFile>
+// #include <GLib.File>
 
 OwncloudDolphinPluginHelper* OwncloudDolphinPluginHelper.instance () {
     static OwncloudDolphinPluginHelper self;
@@ -150,7 +150,7 @@ void OwncloudDolphinPluginHelper.tryConnect () {
     if (socketPath.isEmpty ())
         return;
 
-    _socket.connectToServer (socketPath + QLatin1String ("/socket"));
+    _socket.connectToServer (socketPath + "/socket");
 }
 
 void OwncloudDolphinPluginHelper.slotReadyRead () {
@@ -170,9 +170,9 @@ void OwncloudDolphinPluginHelper.slotReadyRead () {
             _paths.append (file);
             continue;
         } else if (line.startsWith ("STRING:")) {
-            var args = string.fromUtf8 (line).split (QLatin1Char (':'));
+            var args = string.fromUtf8 (line).split (':');
             if (args.size () >= 3) {
-                _strings[args[1]] = args.mid (2).join (QLatin1Char (':'));
+                _strings[args[1]] = args.mid (2).join (':');
             }
             continue;
         } else if (line.startsWith ("VERSION:")) {

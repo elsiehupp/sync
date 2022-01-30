@@ -10,8 +10,8 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 // #include <random>
 // #include <qcoreapplication.h>
 // #include <string[]>
-// #include <QUrl>
-// #include <QFile>
+// #include <GLib.Uri>
+// #include <GLib.File>
 // #include <QFileInfo>
 // #include <QJsonDocument>
 // #include <QJsonObject>
@@ -51,7 +51,7 @@ static void null_message_handler (QtMsgType, QMessageLogContext &, string ) {
 struct CmdOptions {
     string source_dir;
     string target_url;
-    string remote_path = QStringLiteral ("/");
+    string remote_path = "/";
     string config_directory;
     string user;
     string password;
@@ -255,16 +255,16 @@ void selective_sync_fixup (Occ.SyncJournalDb journal, string[] &new_list) {
 
     bool ok = false;
 
-    const var selective_sync_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
-    const QSet<string> old_black_list_set (selective_sync_list.begin (), selective_sync_list.end ());
+    const var selective_sync_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, &ok);
+    const GLib.Set<string> old_block_list_set (selective_sync_list.begin (), selective_sync_list.end ());
     if (ok) {
-        const QSet<string> black_list_set (new_list.begin (), new_list.end ());
-        const var changes = (old_black_list_set - black_list_set) + (black_list_set - old_black_list_set);
+        const GLib.Set<string> block_list_set (new_list.begin (), new_list.end ());
+        const var changes = (old_block_list_set - block_list_set) + (block_list_set - old_block_list_set);
         for (var &it : changes) {
             journal.schedule_path_for_remote_discovery (it);
         }
 
-        journal.set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, new_list);
+        journal.set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, new_list);
     }
 }
 
@@ -289,7 +289,7 @@ int main (int argc, char **argv) {
         q_set_message_pattern ("%{time MM-dd hh:mm:ss:zzz} [ %{type} %{category} ]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}");
     }
 
-    AccountPtr account = Account.create ();
+    AccountPointer account = Account.create ();
 
     if (!account) {
         q_fatal ("Could not initialize account!");
@@ -303,7 +303,7 @@ int main (int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    QUrl host_url = QUrl.from_user_input ( (options.target_url.ends_with (QLatin1Char ('/')) || options.target_url.ends_with (QLatin1Char ('\\'))) ? options.target_url.chopped (1) : options.target_url);
+    GLib.Uri host_url = GLib.Uri.from_user_input ( (options.target_url.ends_with ('/') || options.target_url.ends_with ('\\')) ? options.target_url.chopped (1) : options.target_url);
 
     // Order of retrieval attempt (later attempts override earlier ones):
     // 1. From URL
@@ -347,7 +347,7 @@ int main (int argc, char **argv) {
 
     host_url.set_scheme (host_url.scheme ().replace ("owncloud", "http"));
 
-    QUrl credential_free_url = host_url;
+    GLib.Uri credential_free_url = host_url;
     credential_free_url.set_user_name (string ());
     credential_free_url.set_password (string ());
 
@@ -428,16 +428,16 @@ restart_sync:
 
     string[] selective_sync_list;
     if (!options.unsyncedfolders.is_empty ()) {
-        QFile f (options.unsyncedfolders);
-        if (!f.open (QFile.ReadOnly)) {
+        GLib.File f (options.unsyncedfolders);
+        if (!f.open (GLib.File.ReadOnly)) {
             q_critical () << "Could not open file containing the list of unsynced folders : " << options.unsyncedfolders;
         } else {
             // filter out empty lines and comments
             selective_sync_list = string.from_utf8 (f.read_all ()).split ('\n').filter (QRegularExpression ("\\S+")).filter (QRegularExpression ("^[^#]"));
 
             for (int i = 0; i < selective_sync_list.count (); ++i) {
-                if (!selective_sync_list.at (i).ends_with (QLatin1Char ('/'))) {
-                    selective_sync_list[i].append (QLatin1Char ('/'));
+                if (!selective_sync_list.at (i).ends_with ('/')) {
+                    selective_sync_list[i].append ('/');
                 }
             }
         }
@@ -477,7 +477,7 @@ restart_sync:
         engine.excluded_files ().add_exclude_file_path (options.exclude);
     }
     // Load the system list if available, or if there's no user-provided list
-    if (!has_user_exclude_file || QFile.exists (system_exclude_file)) {
+    if (!has_user_exclude_file || GLib.File.exists (system_exclude_file)) {
         engine.excluded_files ().add_exclude_file_path (system_exclude_file);
     }
 

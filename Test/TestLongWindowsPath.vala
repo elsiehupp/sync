@@ -57,8 +57,8 @@ class TestLongWindowsPath : GLib.Object {
         qDebug () << longPath;
         QVERIFY (longPath.dir ().mkpath ("."));
 
-        QFile file = new QFile (longPath.filePath ());
-        QVERIFY (file.open (QFile.WriteOnly));
+        GLib.File file = new GLib.File (longPath.filePath ());
+        QVERIFY (file.open (GLib.File.WriteOnly));
         QVERIFY (file.write (data.constData ()) == data.size ());
         file.close ();
 

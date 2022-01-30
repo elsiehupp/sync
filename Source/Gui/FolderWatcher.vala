@@ -22,7 +22,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QElapsedTimer>
 // #include <QHash>
 // #include <QScopedPointer>
-// #include <QSet>
+// #include <GLib.Set>
 // #include <QDir>
 
 
@@ -120,7 +120,7 @@ protected slots:
 
     private QScopedPointer<Folder_watcher_private> _d;
     private QElapsedTimer _timer;
-    private QSet<string> _last_paths;
+    private GLib.Set<string> _last_paths;
     private Folder _folder;
     private bool _is_reliable = true;
 
@@ -155,7 +155,7 @@ protected slots:
 
     #ifndef OWNCLOUD_TEST
         if (_folder.is_file_excluded_absolute (path) && !Utility.is_conflict_file (path)) {
-            q_c_debug (lc_folder_watcher) << "* Ignoring file" << path;
+            GLib.debug (lc_folder_watcher) << "* Ignoring file" << path;
             return true;
         }
     #endif
@@ -195,17 +195,17 @@ protected slots:
         }
 
         var path = _test_notification_path;
-        if (QFile.exists (path)) {
+        if (GLib.File.exists (path)) {
             var mtime = FileSystem.get_mod_time (path);
             FileSystem.set_mod_time (path, mtime + 1);
         } else {
-            QFile f (path);
+            GLib.File f (path);
             f.open (QIODevice.WriteOnly | QIODevice.Append);
         }
 
         QTimer.single_shot (5000, this, [this] () {
             if (!_test_notification_path.is_empty ())
-                emit became_unreliable (tr ("The watcher did not receive a test notification."));
+                emit became_unreliable (_("The watcher did not receive a test notification."));
             _test_notification_path.clear ();
         });
     }
@@ -235,7 +235,7 @@ protected slots:
         //   - why do we skip the file altogether instead of e.g. reducing the upload frequency?
 
         // Check if the same path was reported within the last second.
-        QSet<string> paths_set = paths.to_set ();
+        GLib.Set<string> paths_set = paths.to_set ();
         if (paths_set == _last_paths && _timer.elapsed () < 1000) {
             // the same path was reported within the last second. Skip.
             return;
@@ -243,7 +243,7 @@ protected slots:
         _last_paths = paths_set;
         _timer.restart ();
 
-        QSet<string> changed_paths;
+        GLib.Set<string> changed_paths;
 
         // ------- handle ignores:
         for (int i = 0; i < paths.size (); ++i) {

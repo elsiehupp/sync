@@ -1,7 +1,7 @@
 //  #pragma once
 
 // #include <Gtk.Widget>
-// #include <QFile>
+// #include <GLib.File>
 // #include <QInputDialog>
 // #include <QLineEdit>
 // #include <QMessageBox>
@@ -50,7 +50,7 @@ class IgnoreListTableWidget : Gtk.Widget {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         ui.setup_ui (this);
 
-        ui.description_label.on_set_text (tr ("Files or folders matching a pattern will not be synchronized.\n\n"
+        ui.description_label.on_set_text (_("Files or folders matching a pattern will not be synchronized.\n\n"
                                          "Items where deletion is allowed will be deleted if they prevent a "
                                          "directory from being removed. "
                                          "This is useful for meta data."));
@@ -96,10 +96,10 @@ class IgnoreListTableWidget : Gtk.Widget {
     }
 
     void IgnoreListTableWidget.on_write_ignore_file (string  file) {
-        QFile ignores (file);
+        GLib.File ignores (file);
         if (ignores.open (QIODevice.WriteOnly)) {
             // rewrites the whole file since now the user can also remove system patterns
-            QFile.resize (file, 0);
+            GLib.File.resize (file, 0);
             for (int row = 0; row < ui.table_widget.row_count (); ++row) {
                 QTable_widget_item pattern_item = ui.table_widget.item (row, pattern_col);
                 QTable_widget_item deletable_item = ui.table_widget.item (row, deletable_col);
@@ -114,8 +114,8 @@ class IgnoreListTableWidget : Gtk.Widget {
                 }
             }
         } else {
-            QMessageBox.warning (this, tr ("Could not open file"),
-                tr ("Cannot write changes to \"%1\".").arg (file));
+            QMessageBox.warning (this, _("Could not open file"),
+                _("Cannot write changes to \"%1\".").arg (file));
         }
         ignores.close (); //close the file before reloading stuff.
 
@@ -132,8 +132,8 @@ class IgnoreListTableWidget : Gtk.Widget {
 
     void IgnoreListTableWidget.on_add_pattern () {
         bool ok_clicked = false;
-        string pattern = QInputDialog.get_text (this, tr ("Add Ignore Pattern"),
-            tr ("Add a new ignore pattern:"),
+        string pattern = QInputDialog.get_text (this, _("Add Ignore Pattern"),
+            _("Add a new ignore pattern:"),
             QLineEdit.Normal, string (), &ok_clicked);
 
         if (!ok_clicked || pattern.is_empty ())
@@ -144,7 +144,7 @@ class IgnoreListTableWidget : Gtk.Widget {
     }
 
     void IgnoreListTableWidget.read_ignore_file (string file, bool read_only) {
-        QFile ignores (file);
+        GLib.File ignores (file);
         if (ignores.open (QIODevice.ReadOnly)) {
             while (!ignores.at_end ()) {
                 string line = string.from_utf8 (ignores.read_line ());

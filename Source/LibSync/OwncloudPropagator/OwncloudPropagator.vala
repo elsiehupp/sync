@@ -69,7 +69,7 @@ Uploads will still run and downloads that are small enough will continue too.
 ***********************************************************/
 int64 free_space_limit ();
 
-void blacklist_update (SyncJournalDb journal, SyncFileItem &item);
+void blocklist_update (SyncJournalDb journal, SyncFileItem &item);
 
 
 /***********************************************************
@@ -435,18 +435,18 @@ class OwncloudPropagator : GLib.Object {
     public bool _finished_emited; // used to ensure that on_finished is only emitted once
 
 
-    public OwncloudPropagator (AccountPtr account, string local_dir,
+    public OwncloudPropagator (AccountPointer account, string local_dir,
                        const string remote_folder, SyncJournalDb progress_database,
-                       QSet<string> &bulk_upload_black_list)
+                       GLib.Set<string> &bulk_upload_block_list)
         : _journal (progress_database)
         , _finished_emited (false)
         , _bandwidth_manager (this)
         , _another_sync_needed (false)
         , _chunk_size (10 * 1000 * 1000) // 10 MB, overridden in set_sync_options
         , _account (account)
-        , _local_dir ( (local_dir.ends_with (QChar ('/'))) ? local_dir : local_dir + '/')
-        , _remote_folder ( (remote_folder.ends_with (QChar ('/'))) ? remote_folder : remote_folder + '/')
-        , _bulk_upload_black_list (bulk_upload_black_list) {
+        , _local_dir ( (local_dir.ends_with (char ('/'))) ? local_dir : local_dir + '/')
+        , _remote_folder ( (remote_folder.ends_with (char ('/'))) ? remote_folder : remote_folder + '/')
+        , _bulk_upload_block_list (bulk_upload_block_list) {
         q_register_meta_type<PropagatorJob.AbortType> ("PropagatorJob.AbortType");
     }
 
@@ -599,7 +599,7 @@ class OwncloudPropagator : GLib.Object {
     }
 
 
-    public AccountPtr account ();
+    public AccountPointer account ();
 
     public enum DiskSpaceResult {
         DiskSpaceOk,
@@ -668,11 +668,11 @@ class OwncloudPropagator : GLib.Object {
 
     public void clear_delayed_tasks ();
 
-    public void add_to_bulk_upload_black_list (string file);
+    public void add_to_bulk_upload_block_list (string file);
 
-    public void remove_from_bulk_upload_black_list (string file);
+    public void remove_from_bulk_upload_block_list (string file);
 
-    public bool is_in_bulk_upload_black_list (string file);
+    public bool is_in_bulk_upload_block_list (string file);
 
 
     private on_ void abort_timeout () {
@@ -725,7 +725,7 @@ signals:
 
     private void reset_delayed_upload_tasks ();
 
-    private AccountPtr _account;
+    private AccountPointer _account;
     private QScopedPointer<PropagateRootDirectory> _root_job;
     private SyncOptions _sync_options;
     private bool _job_scheduled = false;
@@ -736,7 +736,7 @@ signals:
     private std.deque<SyncFileItemPtr> _delayed_tasks;
     private bool _schedule_delayed_tasks = false;
 
-    private QSet<string> &_bulk_upload_black_list;
+    private GLib.Set<string> &_bulk_upload_block_list;
 
     private static bool _allow_delayed_upload;
 };
@@ -747,12 +747,12 @@ signals:
 ***********************************************************/
 class CleanupPollsJob : GLib.Object {
     QVector<SyncJournalDb.PollInfo> _poll_infos;
-    AccountPtr _account;
+    AccountPointer _account;
     SyncJournalDb _journal;
     string _local_path;
     unowned<Vfs> _vfs;
 
-    public CleanupPollsJob (QVector<SyncJournalDb.PollInfo> &poll_infos, AccountPtr account, SyncJournalDb journal, string local_path,
+    public CleanupPollsJob (QVector<SyncJournalDb.PollInfo> &poll_infos, AccountPointer account, SyncJournalDb journal, string local_path,
                              const unowned<Vfs> &vfs, GLib.Object parent = nullptr)
         : GLib.Object (parent)
         , _poll_infos (poll_infos)
@@ -832,13 +832,13 @@ signals:
         }
     }
 
-    static int64 get_min_blacklist_time () {
-        return q_max (q_environment_variable_int_value ("OWNCLOUD_BLACKLIST_TIME_MIN"),
+    static int64 get_min_blocklist_time () {
+        return q_max (q_environment_variable_int_value ("OWNCLOUD_BLOCKLIST_TIME_MIN"),
             25); // 25 seconds
     }
 
-    static int64 get_max_blacklist_time () {
-        int v = q_environment_variable_int_value ("OWNCLOUD_BLACKLIST_TIME_MAX");
+    static int64 get_max_blocklist_time () {
+        int v = q_environment_variable_int_value ("OWNCLOUD_BLOCKLIST_TIME_MAX");
         if (v > 0)
             return v;
         return 24 * 60 * 60; // 1 day
@@ -846,13 +846,13 @@ signals:
 
 
     /***********************************************************
-    Creates a blacklist entry, possibly taking into account an old one.
+    Creates a blocklist entry, possibly taking into account an old one.
 
     The old entry may be invalid, then a fresh entry is created.
     ***********************************************************/
-    static SyncJournalErrorBlacklistRecord create_blacklist_entry (
-        const SyncJournalErrorBlacklistRecord &old, SyncFileItem &item) {
-        SyncJournalErrorBlacklistRecord entry;
+    static SyncJournalErrorBlocklistRecord create_blocklist_entry (
+        const SyncJournalErrorBlocklistRecord &old, SyncFileItem &item) {
+        SyncJournalErrorBlocklistRecord entry;
         entry._file = item._file;
         entry._error_string = item._error_string;
         entry._last_try_modtime = item._modtime;
@@ -862,22 +862,22 @@ signals:
         entry._retry_count = old._retry_count + 1;
         entry._request_id = item._request_id;
 
-        static int64 min_blacklist_time (get_min_blacklist_time ());
-        static int64 max_blacklist_time (q_max (get_max_blacklist_time (), min_blacklist_time));
+        static int64 min_blocklist_time (get_min_blocklist_time ());
+        static int64 max_blocklist_time (q_max (get_max_blocklist_time (), min_blocklist_time));
 
         // The factor of 5 feels natural : 25s, 2 min, 10 min, ~1h, ~5h, ~24h
         entry._ignore_duration = old._ignore_duration * 5;
 
         if (item._http_error_code == 403) {
-            q_c_warning (lc_propagator) << "Probably firewall error : " << item._http_error_code << ", blacklisting up to 1h only";
+            GLib.warn (lc_propagator) << "Probably firewall error : " << item._http_error_code << ", blocklisting up to 1h only";
             entry._ignore_duration = q_min (entry._ignore_duration, int64 (60 * 60));
 
         } else if (item._http_error_code == 413 || item._http_error_code == 415) {
-            q_c_warning (lc_propagator) << "Fatal Error condition" << item._http_error_code << ", maximum blacklist ignore time!";
-            entry._ignore_duration = max_blacklist_time;
+            GLib.warn (lc_propagator) << "Fatal Error condition" << item._http_error_code << ", maximum blocklist ignore time!";
+            entry._ignore_duration = max_blocklist_time;
         }
 
-        entry._ignore_duration = q_bound (min_blacklist_time, entry._ignore_duration, max_blacklist_time);
+        entry._ignore_duration = q_bound (min_blocklist_time, entry._ignore_duration, max_blocklist_time);
 
         if (item._status == SyncFileItem.SoftError) {
             // Track these errors, but don't actively suppress them.
@@ -885,7 +885,7 @@ signals:
         }
 
         if (item._http_error_code == 507) {
-            entry._error_category = SyncJournalErrorBlacklistRecord.InsufficientRemoteStorage;
+            entry._error_category = SyncJournalErrorBlocklistRecord.InsufficientRemoteStorage;
         }
 
         return entry;
@@ -893,15 +893,15 @@ signals:
 
 
     /***********************************************************
-    Updates, creates or removes a blacklist entry for the given item.
+    Updates, creates or removes a blocklist entry for the given item.
 
     May adjust the status or item._error_string.
     ***********************************************************/
-    void blacklist_update (SyncJournalDb journal, SyncFileItem &item) {
-        SyncJournalErrorBlacklistRecord old_entry = journal.error_blacklist_entry (item._file);
+    void blocklist_update (SyncJournalDb journal, SyncFileItem &item) {
+        SyncJournalErrorBlocklistRecord old_entry = journal.error_blocklist_entry (item._file);
 
-        bool may_blacklist =
-            item._error_may_be_blacklisted // explicitly flagged for blacklisting
+        bool may_blocklist =
+            item._error_may_be_blocklisted // explicitly flagged for blocklisting
             || ( (item._status == SyncFileItem.NormalError
                     || item._status == SyncFileItem.SoftError
                     || item._status == SyncFileItem.DetailError)
@@ -909,23 +909,23 @@ signals:
                    );
 
         // No new entry? Possibly remove the old one, then done.
-        if (!may_blacklist) {
+        if (!may_blocklist) {
             if (old_entry.is_valid ()) {
-                journal.wipe_error_blacklist_entry (item._file);
+                journal.wipe_error_blocklist_entry (item._file);
             }
             return;
         }
 
-        var new_entry = create_blacklist_entry (old_entry, item);
-        journal.set_error_blacklist_entry (new_entry);
+        var new_entry = create_blocklist_entry (old_entry, item);
+        journal.set_error_blocklist_entry (new_entry);
 
-        // Suppress the error if it was and continues to be blacklisted.
+        // Suppress the error if it was and continues to be blocklisted.
         // An ignore_duration of 0 mean we're tracking the error, but not actively
         // suppressing it.
-        if (item._has_blacklist_entry && new_entry._ignore_duration > 0) {
-            item._status = SyncFileItem.BlacklistedError;
+        if (item._has_blocklist_entry && new_entry._ignore_duration > 0) {
+            item._status = SyncFileItem.BlocklistedError;
 
-            q_c_info (lc_propagator) << "blacklisting " << item._file
+            q_c_info (lc_propagator) << "blocklisting " << item._file
                                  << " for " << new_entry._ignore_duration
                                  << ", retry count " << new_entry._retry_count;
 
@@ -935,7 +935,7 @@ signals:
         // Some soft errors might become louder on repeat occurrence
         if (item._status == SyncFileItem.SoftError
             && new_entry._retry_count > 1) {
-            q_c_warning (lc_propagator) << "escalating soft error on " << item._file
+            GLib.warn (lc_propagator) << "escalating soft error on " << item._file
                                     << " to normal error, " << item._http_error_code;
             item._status = SyncFileItem.NormalError;
             return;
@@ -954,7 +954,7 @@ signals:
                 || _item._status == SyncFileItem.Conflict) {
                 _item._status = SyncFileItem.Restoration;
             } else {
-                _item._error_string += tr ("; Restoration Failed : %1").arg (error_string);
+                _item._error_string += _("; Restoration Failed : %1").arg (error_string);
             }
         } else {
             if (_item._error_string.is_empty ()) {
@@ -968,30 +968,30 @@ signals:
             _item._status = SyncFileItem.SoftError;
         }
 
-        // Blacklist handling
+        // Blocklist handling
         switch (_item._status) {
         case SyncFileItem.SoftError:
         case SyncFileItem.FatalError:
         case SyncFileItem.NormalError:
         case SyncFileItem.DetailError:
-            // Check the blacklist, possibly adjusting the item (including its status)
-            blacklist_update (propagator ()._journal, _item);
+            // Check the blocklist, possibly adjusting the item (including its status)
+            blocklist_update (propagator ()._journal, _item);
             break;
         case SyncFileItem.Success:
         case SyncFileItem.Restoration:
-            if (_item._has_blacklist_entry) {
-                // wipe blacklist entry.
-                propagator ()._journal.wipe_error_blacklist_entry (_item._file);
-                // remove a blacklist entry in case the file was moved.
+            if (_item._has_blocklist_entry) {
+                // wipe blocklist entry.
+                propagator ()._journal.wipe_error_blocklist_entry (_item._file);
+                // remove a blocklist entry in case the file was moved.
                 if (_item._original_file != _item._file) {
-                    propagator ()._journal.wipe_error_blacklist_entry (_item._original_file);
+                    propagator ()._journal.wipe_error_blocklist_entry (_item._original_file);
                 }
             }
             break;
         case SyncFileItem.Conflict:
         case SyncFileItem.FileIgnored:
         case SyncFileItem.NoStatus:
-        case SyncFileItem.BlacklistedError:
+        case SyncFileItem.BlocklistedError:
         case SyncFileItem.FileLocked:
         case SyncFileItem.FileNameInvalid:
             // nothing
@@ -999,7 +999,7 @@ signals:
         }
 
         if (_item.has_error_status ())
-            q_c_warning (lc_propagator) << "Could not complete propagation of" << _item.destination () << "by" << this << "with status" << _item._status << "and error:" << _item._error_string;
+            GLib.warn (lc_propagator) << "Could not complete propagation of" << _item.destination () << "by" << this << "with status" << _item._status << "and error:" << _item._error_string;
         else
             q_c_info (lc_propagator) << "Completed propagation of" << _item.destination () << "by" << this << "with status" << _item._status;
         emit propagator ().item_completed (_item);
@@ -1022,7 +1022,7 @@ signals:
             || status == SyncFileItem.Restoration) {
             on_done (SyncFileItem.SoftError, msg);
         } else {
-            on_done (status, tr ("A file or folder was removed from a read only share, but restoring failed : %1").arg (msg));
+            on_done (status, _("A file or folder was removed from a read only share, but restoring failed : %1").arg (msg));
         }
     }
 
@@ -1037,9 +1037,9 @@ signals:
 
         var path_components = parent_path.split ('/');
         while (!path_components.is_empty ()) {
-            SyncJournalFileRecord rec;
-            propagator ()._journal.get_file_record (path_components.join ('/'), &rec);
-            if (rec.is_valid () && rec._is_e2e_encrypted) {
+            SyncJournalFileRecord record;
+            propagator ()._journal.get_file_record (path_components.join ('/'), &record);
+            if (record.is_valid () && record._is_e2e_encrypted) {
                 return true;
             }
             path_components.remove_last ();
@@ -1114,7 +1114,7 @@ signals:
 
         job.set_delete_existing (delete_existing);
 
-        remove_from_bulk_upload_black_list (item._file);
+        remove_from_bulk_upload_block_list (item._file);
 
         return job;
     }
@@ -1143,7 +1143,7 @@ signals:
 
         const var regex = sync_options ().file_regex ();
         if (regex.is_valid ()) {
-            QSet<QStringRef> names;
+            GLib.Set<QStringRef> names;
             for (var &i : items) {
                 if (regex.match (i._file).has_match ()) {
                     int index = -1;
@@ -1151,7 +1151,7 @@ signals:
                     do {
                         ref = i._file.mid_ref (0, index);
                         names.insert (ref);
-                        index = ref.last_index_of (QLatin1Char ('/'));
+                        index = ref.last_index_of ('/');
                     } while (index > 0);
                 }
             }
@@ -1195,7 +1195,7 @@ signals:
                 } else if (item._instruction == CSYNC_INSTRUCTION_RENAME) {
                     // all is good, the rename will be executed before the directory deletion
                 } else {
-                    q_c_warning (lc_propagator) << "WARNING :  Job within a removed directory?  This should not happen!"
+                    GLib.warn (lc_propagator) << "WARNING :  Job within a removed directory?  This should not happen!"
                                             << item._file << item._instruction;
                 }
             }
@@ -1324,7 +1324,7 @@ signals:
         Q_ASSERT (!file.is_empty ());
 
         if (!file.is_empty () && Utility.fs_case_preserving ()) {
-            q_c_debug (lc_propagator) << "CaseClashCheck for " << file;
+            GLib.debug (lc_propagator) << "CaseClashCheck for " << file;
             // On Linux, the file system is case sensitive, but this code is useful for testing.
             // Just check that there is no other file with the same name and different casing.
             QFileInfo file_info (file);
@@ -1382,7 +1382,7 @@ signals:
                 }
             }
             if (_active_job_list.count () < maximum_active_transfer_job () + likely_finished_quickly_count) {
-                q_c_debug (lc_propagator) << "Can pump in another request! active_jobs =" << _active_job_list.count ();
+                GLib.debug (lc_propagator) << "Can pump in another request! active_jobs =" << _active_job_list.count ();
                 if (_root_job.on_schedule_self_or_child ()) {
                     schedule_next_job ();
                 }
@@ -1394,7 +1394,7 @@ signals:
         emit progress (item, bytes);
     }
 
-    AccountPtr OwncloudPropagator.account () {
+    AccountPointer OwncloudPropagator.account () {
         return _account;
     }
 
@@ -1422,7 +1422,7 @@ signals:
         string rename_error;
         var conflict_mod_time = FileSystem.get_mod_time (fn);
         if (conflict_mod_time <= 0) {
-            *error = tr ("Impossible to get modification time for file in conflict %1").arg (fn);
+            *error = _("Impossible to get modification time for file in conflict %1").arg (fn);
             return false;
         }
         string conflict_user_name;
@@ -1513,7 +1513,7 @@ signals:
     }
 
     bool OwncloudPropagator.is_delayed_upload_item (SyncFileItemPtr &item) {
-        return account ().capabilities ().bulk_upload () && !_schedule_delayed_tasks && !item._is_encrypted && _sync_options._min_chunk_size > item._size && !is_in_bulk_upload_black_list (item._file);
+        return account ().capabilities ().bulk_upload () && !_schedule_delayed_tasks && !item._is_encrypted && _sync_options._min_chunk_size > item._size && !is_in_bulk_upload_block_list (item._file);
     }
 
     void OwncloudPropagator.set_schedule_delayed_tasks (bool active) {
@@ -1524,18 +1524,18 @@ signals:
         _delayed_tasks.clear ();
     }
 
-    void OwncloudPropagator.add_to_bulk_upload_black_list (string file) {
-        q_c_debug (lc_propagator) << "black list for bulk upload" << file;
-        _bulk_upload_black_list.insert (file);
+    void OwncloudPropagator.add_to_bulk_upload_block_list (string file) {
+        GLib.debug (lc_propagator) << "block list for bulk upload" << file;
+        _bulk_upload_block_list.insert (file);
     }
 
-    void OwncloudPropagator.remove_from_bulk_upload_black_list (string file) {
-        q_c_debug (lc_propagator) << "black list for bulk upload" << file;
-        _bulk_upload_black_list.remove (file);
+    void OwncloudPropagator.remove_from_bulk_upload_block_list (string file) {
+        GLib.debug (lc_propagator) << "block list for bulk upload" << file;
+        _bulk_upload_block_list.remove (file);
     }
 
-    bool OwncloudPropagator.is_in_bulk_upload_black_list (string file) {
-        return _bulk_upload_black_list.contains (file);
+    bool OwncloudPropagator.is_in_bulk_upload_block_list (string file) {
+        return _bulk_upload_block_list.contains (file);
     }
 
     // ================================================================================
@@ -1609,7 +1609,7 @@ signals:
             _tasks_to_do.remove (0);
             PropagatorJob job = propagator ().create_job (next_task);
             if (!job) {
-                q_c_warning (lc_directory) << "Useless task found for file" << next_task.destination () << "instruction" << next_task._instruction;
+                GLib.warn (lc_directory) << "Useless task found for file" << next_task.destination () << "instruction" << next_task._instruction;
                 continue;
             }
             append_job (job);
@@ -1649,7 +1649,7 @@ signals:
             || status == SyncFileItem.NormalError
             || status == SyncFileItem.SoftError
             || status == SyncFileItem.DetailError
-            || status == SyncFileItem.BlacklistedError) {
+            || status == SyncFileItem.BlocklistedError) {
             _has_error = status;
         }
 
@@ -1758,8 +1758,8 @@ signals:
 
                 if (_item._modtime <= 0) {
                     status = _item._status = SyncFileItem.NormalError;
-                    _item._error_string = tr ("Error updating metadata due to invalid modified time");
-                    q_c_warning (lc_directory) << "Error writing to the database for file" << _item._file;
+                    _item._error_string = _("Error updating metadata due to invalid modified time");
+                    GLib.warn (lc_directory) << "Error writing to the database for file" << _item._file;
                 }
 
                 FileSystem.set_mod_time (propagator ().full_local_path (_item.destination ()), _item._modtime);
@@ -1774,11 +1774,11 @@ signals:
                 const var result = propagator ().update_metadata (*_item);
                 if (!result) {
                     status = _item._status = SyncFileItem.FatalError;
-                    _item._error_string = tr ("Error updating metadata : %1").arg (result.error ());
-                    q_c_warning (lc_directory) << "Error writing to the database for file" << _item._file << "with" << result.error ();
+                    _item._error_string = _("Error updating metadata : %1").arg (result.error ());
+                    GLib.warn (lc_directory) << "Error writing to the database for file" << _item._file << "with" << result.error ();
                 } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
                     _item._status = SyncFileItem.SoftError;
-                    _item._error_string = tr ("File is currently in use");
+                    _item._error_string = _("File is currently in use");
                 }
             }
         }
@@ -1923,12 +1923,12 @@ signals:
             delete_later ();
             return;
         } else if (job._item._status != SyncFileItem.Success) {
-            q_c_warning (lc_cleanup_polls) << "There was an error with file " << job._item._file << job._item._error_string;
+            GLib.warn (lc_cleanup_polls) << "There was an error with file " << job._item._file << job._item._error_string;
         } else {
             if (!OwncloudPropagator.static_update_metadata (*job._item, _local_path, _vfs.data (), _journal)) {
-                q_c_warning (lc_cleanup_polls) << "database error";
+                GLib.warn (lc_cleanup_polls) << "database error";
                 job._item._status = SyncFileItem.FatalError;
-                job._item._error_string = tr ("Error writing metadata to the database");
+                job._item._error_string = _("Error writing metadata to the database");
                 emit aborted (job._item._error_string);
                 delete_later ();
                 return;
@@ -1956,7 +1956,7 @@ signals:
             ret = etag;
         }
         if (oc_etag.length () > 0 && oc_etag != etag) {
-            q_c_debug (lc_propagator) << "Quite peculiar, we have an etag != OC-Etag [no problem!]" << etag << oc_etag;
+            GLib.debug (lc_propagator) << "Quite peculiar, we have an etag != OC-Etag [no problem!]" << etag << oc_etag;
         }
         return ret;
     }

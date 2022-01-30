@@ -131,7 +131,7 @@ class TestSyncMove : GLib.Object {
         var expectedServerState = fakeFolder.currentRemoteState ();
 
         // Remove subFolderA with selectiveSync:
-        fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList, { "parentFolder/subFolderA/" });
+        fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, { "parentFolder/subFolderA/" });
         fakeFolder.syncEngine ().journal ().schedulePathForRemoteDiscovery (QByteArrayLiteral ("parentFolder/subFolderA/"));
 
         fakeFolder.syncOnce ();
@@ -896,7 +896,7 @@ class TestSyncMove : GLib.Object {
         // sync1 file gets detected as error, instruction is still NEW_FILE
         fakeFolder.syncOnce ();
 
-        // sync2 file is in error state, checkErrorBlacklisting sets instruction to IGNORED
+        // sync2 file is in error state, checkErrorBlocklisting sets instruction to IGNORED
         fakeFolder.syncOnce ();
 
         if (vfsMode != Vfs.Off) {

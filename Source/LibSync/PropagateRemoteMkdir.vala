@@ -4,7 +4,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFile>
+// #include <GLib.File>
 // #include <QLoggingCategory>
 // #pragma once
 
@@ -71,7 +71,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         if (propagator ()._abort_requested)
             return;
 
-        q_c_debug (lc_propagate_remote_mkdir) << _item._file;
+        GLib.debug (lc_propagate_remote_mkdir) << _item._file;
 
         propagator ()._active_job_list.append (this);
 
@@ -91,7 +91,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         if (propagator ()._abort_requested)
             return;
 
-        q_c_debug (lc_propagate_remote_mkdir) << _item._file;
+        GLib.debug (lc_propagate_remote_mkdir) << _item._file;
 
         _job = new MkColJob (propagator ().account (),
             propagator ().full_remote_path (_item._file),
@@ -109,7 +109,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
             return;
 
         q_debug () << filename;
-        q_c_debug (lc_propagate_remote_mkdir) << filename;
+        GLib.debug (lc_propagate_remote_mkdir) << filename;
 
         var job = new MkColJob (propagator ().account (),
                                 propagator ().full_remote_path (filename), {{"e2e-token", _upload_encrypted_helper.folder_token () }},
@@ -147,7 +147,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
             // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
             // throw an error.
             on_done (SyncFileItem.NormalError,
-                tr ("Wrong HTTP code returned by server. Expected 201, but received \"%1 %2\".")
+                _("Wrong HTTP code returned by server. Expected 201, but received \"%1 %2\".")
                     .arg (_item._http_error_code)
                     .arg (job_http_reason_phrase_string));
             return;
@@ -207,7 +207,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
             this, &PropagateRemoteMkdir.on_start_encrypted_mkcol_job);
         connect (_upload_encrypted_helper, &Propagate_upload_encrypted.error,
             [] {
-                q_c_debug (lc_propagate_remote_mkdir) << "Error setting up encryption.";
+                GLib.debug (lc_propagate_remote_mkdir) << "Error setting up encryption.";
             });
         _upload_encrypted_helper.on_start ();
     }
@@ -242,7 +242,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
     }
 
     void PropagateRemoteMkdir.on_encrypt_folder_finished () {
-        q_c_debug (lc_propagate_remote_mkdir) << "Success making the new folder encrypted";
+        GLib.debug (lc_propagate_remote_mkdir) << "Success making the new folder encrypted";
         propagator ()._active_job_list.remove_one (this);
         _item._is_encrypted = true;
         on_success ();
@@ -257,10 +257,10 @@ class PropagateRemoteMkdir : PropagateItemJob {
         // save the file id already so we can detect rename or remove
         const var result = propagator ().update_metadata (item_copy);
         if (!result) {
-            on_done (SyncFileItem.FatalError, tr ("Error writing metadata to the database : %1").arg (result.error ()));
+            on_done (SyncFileItem.FatalError, _("Error writing metadata to the database : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_done (SyncFileItem.FatalError, tr ("The file %1 is currently in use").arg (_item._file));
+            on_done (SyncFileItem.FatalError, _("The file %1 is currently in use").arg (_item._file));
             return;
         }
 

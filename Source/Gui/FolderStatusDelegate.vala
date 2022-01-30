@@ -95,7 +95,7 @@ FolderStatusDelegate.FolderStatusDelegate ()
 }
 
 string FolderStatusDelegate.add_folder_text () {
-    return tr ("Add Folder Sync Connection");
+    return _("Add Folder Sync Connection");
 }
 
 // allocate each item size in listview.
@@ -350,7 +350,7 @@ void FolderStatusDelegate.paint (QPainter painter, QStyleOptionViewItem &option,
 
     // Sync File Progress Bar : Show it if sync_file is not empty.
     if (show_progess) {
-        int file_name_text_height = sub_fm.bounding_rect (tr ("File")).height ();
+        int file_name_text_height = sub_fm.bounding_rect (_("File")).height ();
         int bar_height = 7; // same height as quota bar
         int overall_width = option.rect.right () - alias_margin - options_button_visual_rect.width () - next_to_icon;
 

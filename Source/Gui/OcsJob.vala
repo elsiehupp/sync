@@ -11,7 +11,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 // #include <QVector>
 // #include <GLib.List>
 // #include <QPair>
-// #include <QUrl>
+// #include <GLib.Uri>
 
 const int OCS_SUCCESS_STATUS_CODE 100
 // Apparantly the v2.php URLs can return that
@@ -34,7 +34,7 @@ All OCS jobs (e.g. sharing) should extend this class.
 class Ocs_job : AbstractNetworkJob {
 
 
-    protected Ocs_job (AccountPtr account);
+    protected Ocs_job (AccountPointer account);
 
 
     /***********************************************************
@@ -146,7 +146,7 @@ signals:
     private QNetworkRequest _request;
 };
 
-    Ocs_job.Ocs_job (AccountPtr account)
+    Ocs_job.Ocs_job (AccountPointer account)
         : AbstractNetworkJob (account, "") {
         _pass_status_codes.append (OCS_SUCCESS_STATUS_CODE);
         _pass_status_codes.append (OCS_SUCCESS_STATUS_CODE_V2);
@@ -167,7 +167,7 @@ signals:
     }
 
     void Ocs_job.append_path (string id) {
-        set_path (path () + QLatin1Char ('/') + id);
+        set_path (path () + '/' + id);
     }
 
     void Ocs_job.add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
@@ -181,8 +181,8 @@ signals:
         // the query items, see #5042
         foreach (var &item, items) {
             result.add_query_item (
-                QUrl.to_percent_encoding (item.first),
-                QUrl.to_percent_encoding (item.second));
+                GLib.Uri.to_percent_encoding (item.first),
+                GLib.Uri.to_percent_encoding (item.second));
         }
         return result;
     }
@@ -203,14 +203,14 @@ signals:
                 if (!post_data.is_empty ()) {
                     post_data.append ("&");
                 }
-                post_data.append (QUrl.to_percent_encoding (tmp.first));
+                post_data.append (GLib.Uri.to_percent_encoding (tmp.first));
                 post_data.append ("=");
-                post_data.append (QUrl.to_percent_encoding (tmp.second));
+                post_data.append (GLib.Uri.to_percent_encoding (tmp.second));
             }
             buffer.set_data (post_data);
         }
         query_items.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
-        QUrl url = Utility.concat_url_path (account ().url (), path (), query_items);
+        GLib.Uri url = Utility.concat_url_path (account ().url (), path (), query_items);
         send_request (_verb, url, _request, buffer);
         AbstractNetworkJob.on_start ();
     }
@@ -226,7 +226,7 @@ signals:
         // when it is null we might have a 304 so get status code from reply () and gives a warning...
         if (error.error != QJsonParseError.NoError) {
             status_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
-            q_c_warning (lc_ocs) << "Could not parse reply to"
+            GLib.warn (lc_ocs) << "Could not parse reply to"
                              << _verb
                              << Utility.concat_url_path (account ().url (), path ())
                              << _params
@@ -238,7 +238,7 @@ signals:
 
         //... then it checks for the status_code
         if (!_pass_status_codes.contains (status_code)) {
-            q_c_warning (lc_ocs) << "Reply to"
+            GLib.warn (lc_ocs) << "Reply to"
                              << _verb
                              << Utility.concat_url_path (account ().url (), path ())
                              << _params

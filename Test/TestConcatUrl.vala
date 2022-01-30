@@ -7,7 +7,7 @@
 
 // #include <QtTest>
 
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <string>
 
 using namespace Occ;
@@ -41,10 +41,10 @@ class TestConcatUrl : public GLib.Object {
         QFETCH (string, concat);
         QFETCH (QueryItems, query);
         QFETCH (string, expected);
-        QUrl baseUrl ("http://example.com" + base);
+        GLib.Uri baseUrl ("http://example.com" + base);
         QUrlQuery urlQuery;
         urlQuery.setQueryItems (query);
-        QUrl resultUrl = Utility.concatUrlPath (baseUrl, concat, urlQuery);
+        GLib.Uri resultUrl = Utility.concatUrlPath (baseUrl, concat, urlQuery);
         string result = string.fromUtf8 (resultUrl.toEncoded ());
         string expectedFull = "http://example.com" + expected;
         QCOMPARE (result, expectedFull);

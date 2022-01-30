@@ -16,7 +16,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 // #pragma once
 
 // #include <QBuffer>
-// #include <QFile>
+// #include <GLib.File>
 // #include <QElapsedTimer>
 
 namespace Occ {
@@ -63,7 +63,7 @@ class UploadDevice : QIODevice {
 
 
     /// The local file to read data from
-    private QFile _file;
+    private GLib.File _file;
 
     /// Start of the file data to use
     private int64 _start = 0;
@@ -92,12 +92,12 @@ class PUTFile_job : AbstractNetworkJob {
     private QIODevice _device;
     private QMap<GLib.ByteArray, GLib.ByteArray> _headers;
     private string _error_string;
-    private QUrl _url;
+    private GLib.Uri _url;
     private QElapsedTimer _request_timer;
 
 
     // Takes ownership of the device
-    public PUTFile_job (AccountPtr account, string path, std.unique_ptr<QIODevice> device,
+    public PUTFile_job (AccountPointer account, string path, std.unique_ptr<QIODevice> device,
         const QMap<GLib.ByteArray, GLib.ByteArray> &headers, int chunk, GLib.Object parent = nullptr)
         : AbstractNetworkJob (account, path, parent)
         , _device (device.release ())
@@ -105,7 +105,7 @@ class PUTFile_job : AbstractNetworkJob {
         , _chunk (chunk) {
         _device.set_parent (this);
     }
-    public PUTFile_job (AccountPtr account, QUrl url, std.unique_ptr<QIODevice> device,
+    public PUTFile_job (AccountPointer account, GLib.Uri url, std.unique_ptr<QIODevice> device,
         const QMap<GLib.ByteArray, GLib.ByteArray> &headers, int chunk, GLib.Object parent = nullptr)
         : AbstractNetworkJob (account, string (), parent)
         , _device (device.release ())
@@ -156,7 +156,7 @@ class PollJob : AbstractNetworkJob {
 
     public SyncFileItemPtr _item;
     // Takes ownership of the device
-    public PollJob (AccountPtr account, string path, SyncFileItemPtr &item,
+    public PollJob (AccountPointer account, string path, SyncFileItemPtr &item,
         SyncJournalDb journal, string local_path, GLib.Object parent)
         : AbstractNetworkJob (account, path, parent)
         , _journal (journal)
@@ -410,7 +410,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     Return the URL of a chunk.
     If chunk == -1, returns the URL of the parent folder containing the chunks
     ***********************************************************/
-    private QUrl chunk_url (int chunk = -1);
+    private GLib.Uri chunk_url (int chunk = -1);
 
 
     public PropagateUploadFileNG (OwncloudPropagator propagator, SyncFileItemPtr &item)
@@ -456,7 +456,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
 
         if (reply ().error () != QNetworkReply.NoError) {
-            q_c_warning (lc_put_job) << " Network error : " << reply ().error_string ();
+            GLib.warn (lc_put_job) << " Network error : " << reply ().error_string ();
         }
 
         connect (reply (), &QNetworkReply.upload_progress, this, &PUTFile_job.upload_progress);
@@ -479,8 +479,8 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     void PollJob.on_start () {
         on_set_timeout (120 * 1000);
-        QUrl account_url = account ().url ();
-        QUrl final_url = QUrl.from_user_input (account_url.scheme () + QLatin1String ("://") + account_url.authority ()
+        GLib.Uri account_url = account ().url ();
+        GLib.Uri final_url = GLib.Uri.from_user_input (account_url.scheme () + QLatin1String ("://") + account_url.authority ()
             + (path ().starts_with ('/') ? QLatin1String ("") : QLatin1String ("/")) + path ());
         send_request ("GET", final_url);
         connect (reply (), &QNetworkReply.download_progress, this, &AbstractNetworkJob.on_reset_timeout, Qt.UniqueConnection);
@@ -516,7 +516,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
         q_c_info (lc_poll_job) << ">" << json_data << "<" << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int () << json << json_parse_error.error_string ();
         if (json_parse_error.error != QJsonParseError.NoError) {
-            _item._error_string = tr ("Invalid JSON reply from the poll URL");
+            _item._error_string = _("Invalid JSON reply from the poll URL");
             _item._status = SyncFileItem.NormalError;
             emit finished_signal ();
             return true;
@@ -581,7 +581,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             // Try to rename the file
             const var original_file_path_absolute = propagator ().full_local_path (_item._file);
             const var new_file_path_absolute = propagator ().full_local_path (_item._rename_target);
-            const var rename_success = QFile.rename (original_file_path_absolute, new_file_path_absolute);
+            const var rename_success = GLib.File.rename (original_file_path_absolute, new_file_path_absolute);
             if (!rename_success) {
                 on_done (SyncFileItem.NormalError, "File contains trailing spaces and couldn't be renamed");
                 return;
@@ -590,8 +590,8 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             _item._modtime = FileSystem.get_mod_time (new_file_path_absolute);
             Q_ASSERT (_item._modtime > 0);
             if (_item._modtime <= 0) {
-                q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
-                on_on_error_start_folder_unlock (SyncFileItem.NormalError, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
+                GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+                on_on_error_start_folder_unlock (SyncFileItem.NormalError, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
                 return;
             }
         }
@@ -617,14 +617,14 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         connect (_upload_encrypted_helper, &Propagate_upload_encrypted.finalized,
                 this, &PropagateUploadFileCommon.setup_encrypted_file);
         connect (_upload_encrypted_helper, &Propagate_upload_encrypted.error, [this] {
-            q_c_debug (lc_propagate_upload) << "Error setting up encryption.";
-            on_done (SyncFileItem.FatalError, tr ("Failed to upload encrypted file."));
+            GLib.debug (lc_propagate_upload) << "Error setting up encryption.";
+            on_done (SyncFileItem.FatalError, _("Failed to upload encrypted file."));
         });
         _upload_encrypted_helper.on_start ();
     }
 
     void PropagateUploadFileCommon.setup_encrypted_file (string& path, string& filename, uint64 size) {
-        q_c_debug (lc_propagate_upload) << "Starting to upload encrypted file" << path << filename << size;
+        GLib.debug (lc_propagate_upload) << "Starting to upload encrypted file" << path << filename << size;
         _uploading_encrypted = true;
         _file_to_upload._path = path;
         _file_to_upload._file = filename;
@@ -647,7 +647,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         // Check if the specific file can be accessed
         if (propagator ().has_case_clash_accessibility_problem (_file_to_upload._file)) {
-            on_done (SyncFileItem.NormalError, tr ("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").arg (QDir.to_native_separators (_item._file)));
+            on_done (SyncFileItem.NormalError, _("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").arg (QDir.to_native_separators (_item._file)));
             return;
         }
 
@@ -655,10 +655,10 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         const int64 quota_guess = propagator ()._folder_quota.value (
             QFileInfo (_file_to_upload._file).path (), std.numeric_limits<int64>.max ());
         if (_file_to_upload._size > quota_guess) {
-            // Necessary for blacklisting logic
+            // Necessary for blocklisting logic
             _item._http_error_code = 507;
             emit propagator ().insufficient_remote_storage ();
-            on_done (SyncFileItem.DetailError, tr ("Upload of %1 exceeds the quota for the folder").arg (Utility.octets_to_string (_file_to_upload._size)));
+            on_done (SyncFileItem.DetailError, _("Upload of %1 exceeds the quota for the folder").arg (Utility.octets_to_string (_file_to_upload._size)));
             return;
         }
 
@@ -694,7 +694,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         // probably temporary one.
         _item._modtime = FileSystem.get_mod_time (file_path);
         if (_item._modtime <= 0) {
-            on_on_error_start_folder_unlock (SyncFileItem.NormalError, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
+            on_on_error_start_folder_unlock (SyncFileItem.NormalError, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
             return;
         }
 
@@ -764,15 +764,15 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         const string original_file_path = propagator ().full_local_path (_item._file);
 
         if (!FileSystem.file_exists (full_file_path)) {
-            return on_on_error_start_folder_unlock (SyncFileItem.SoftError, tr ("File Removed (on_start upload) %1").arg (full_file_path));
+            return on_on_error_start_folder_unlock (SyncFileItem.SoftError, _("File Removed (on_start upload) %1").arg (full_file_path));
         }
         if (_item._modtime <= 0) {
-            on_on_error_start_folder_unlock (SyncFileItem.NormalError, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
+            on_on_error_start_folder_unlock (SyncFileItem.NormalError, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
             return;
         }
         Q_ASSERT (_item._modtime > 0);
         if (_item._modtime <= 0) {
-            q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+            GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
         }
         time_t prev_modtime = _item._modtime; // the _item value was set in PropagateUploadFile.on_start ()
         // but a potential checksum calculation could have taken some time during which the file could
@@ -780,17 +780,17 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         _item._modtime = FileSystem.get_mod_time (original_file_path);
         if (_item._modtime <= 0) {
-            on_on_error_start_folder_unlock (SyncFileItem.NormalError, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
+            on_on_error_start_folder_unlock (SyncFileItem.NormalError, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
             return;
         }
         Q_ASSERT (_item._modtime > 0);
         if (_item._modtime <= 0) {
-            q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+            GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
         }
         if (prev_modtime != _item._modtime) {
             propagator ()._another_sync_needed = true;
             q_debug () << "prev_modtime" << prev_modtime << "Curr" << _item._modtime;
-            return on_on_error_start_folder_unlock (SyncFileItem.SoftError, tr ("Local file changed during syncing. It will be resumed."));
+            return on_on_error_start_folder_unlock (SyncFileItem.SoftError, _("Local file changed during syncing. It will be resumed."));
         }
 
         _file_to_upload._size = FileSystem.get_size (full_file_path);
@@ -801,7 +801,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         // or not yet fully copied to the destination.
         if (file_is_still_changing (*_item)) {
             propagator ()._another_sync_needed = true;
-            return on_on_error_start_folder_unlock (SyncFileItem.SoftError, tr ("Local file changed during sync."));
+            return on_on_error_start_folder_unlock (SyncFileItem.SoftError, _("Local file changed during sync."));
         }
 
         do_start_upload ();
@@ -810,7 +810,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     void PropagateUploadFileCommon.on_folder_unlocked (GLib.ByteArray folder_id, int http_return_code) {
         q_debug () << "Failed to unlock encrypted folder" << folder_id;
         if (_upload_status.status == SyncFileItem.NoStatus && http_return_code != 200) {
-            on_done (SyncFileItem.FatalError, tr ("Failed to unlock encrypted folder."));
+            on_done (SyncFileItem.FatalError, _("Failed to unlock encrypted folder."));
         } else {
             on_done (_upload_status.status, _upload_status.message);
         }
@@ -969,7 +969,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         info._modtime = _item._modtime;
         Q_ASSERT (_item._modtime > 0);
         if (_item._modtime <= 0) {
-            q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+            GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
         }
         info._file_size = _item._size;
         propagator ()._journal.set_poll_info (info);
@@ -1019,7 +1019,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     void PropagateUploadFileCommon.common_error_handling (AbstractNetworkJob job) {
         GLib.ByteArray reply_content;
         string error_string = job.error_string_parsing_body (&reply_content);
-        q_c_debug (lc_propagate_upload) << reply_content; // display the XML error in the debug
+        GLib.debug (lc_propagate_upload) << reply_content; // display the XML error in the debug
 
         if (_item._http_error_code == 412) {
             // Precondition Failed : Either an etag or a checksum mismatch.
@@ -1052,7 +1052,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
             // Set up the error
             status = SyncFileItem.DetailError;
-            error_string = tr ("Upload of %1 exceeds the quota for the folder").arg (Utility.octets_to_string (_file_to_upload._size));
+            error_string = _("Upload of %1 exceeds the quota for the folder").arg (Utility.octets_to_string (_file_to_upload._size));
             emit propagator ().insufficient_remote_storage ();
         }
 
@@ -1087,7 +1087,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         headers[QByteArrayLiteral ("Content-Type")] = QByteArrayLiteral ("application/octet-stream");
         Q_ASSERT (_item._modtime > 0);
         if (_item._modtime <= 0) {
-            q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+            GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
         }
         headers[QByteArrayLiteral ("X-OC-Mtime")] = GLib.ByteArray.number (int64 (_item._modtime));
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS"))
@@ -1143,10 +1143,10 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         // Update the database entry
         const var result = propagator ().update_metadata (*_item);
         if (!result) {
-            on_done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
+            on_done (SyncFileItem.FatalError, _("Error updating metadata : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (_item._file));
+            on_done (SyncFileItem.SoftError, _("The file %1 is currently in use").arg (_item._file));
             return;
         }
 
@@ -1158,7 +1158,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             const var pin = vfs.pin_state (_item._file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
                 if (!vfs.set_pin_state (_item._file, PinState.PinState.UNSPECIFIED)) {
-                    q_c_warning (lc_propagate_upload) << "Could not set pin state of" << _item._file << "to unspecified";
+                    GLib.warn (lc_propagate_upload) << "Could not set pin state of" << _item._file << "to unspecified";
                 }
             }
         }

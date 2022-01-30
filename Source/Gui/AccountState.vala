@@ -30,7 +30,7 @@ using AccountAppList = GLib.List<AccountApp>;
 @ingroup gui
 ***********************************************************/
 class AccountState : GLib.Object, public QSharedData {
-    Q_PROPERTY (AccountPtr account MEMBER _account)
+    Q_PROPERTY (AccountPointer account MEMBER _account)
 
     public enum State {
         /***********************************************************
@@ -89,7 +89,7 @@ class AccountState : GLib.Object, public QSharedData {
     /***********************************************************
     Use the account as parent
     ***********************************************************/
-    public AccountState (AccountPtr account);
+    public AccountState (AccountPointer account);
     ~AccountState () override;
 
 
@@ -98,7 +98,7 @@ class AccountState : GLib.Object, public QSharedData {
 
     Use from AccountManager with a prepared QSettings object only.
     ***********************************************************/
-    public static AccountState load_from_settings (AccountPtr account, QSettings &settings);
+    public static AccountState load_from_settings (AccountPointer account, QSettings &settings);
 
 
     /***********************************************************
@@ -108,7 +108,7 @@ class AccountState : GLib.Object, public QSharedData {
     ***********************************************************/
     public void write_to_settings (QSettings &settings);
 
-    public AccountPtr account ();
+    public AccountPointer account ();
 
     public ConnectionStatus connection_status ();
 
@@ -250,7 +250,7 @@ class AccountState : GLib.Object, public QSharedData {
     protected void on_ocs_error (int status_code, string message);
 
 
-    private AccountPtr _account;
+    private AccountPointer _account;
     private State _state;
     private ConnectionStatus _connection_status;
     private string[] _connection_errors;
@@ -292,31 +292,31 @@ class AccountState : GLib.Object, public QSharedData {
 
 class AccountApp : GLib.Object {
 
-    public AccountApp (string name, QUrl url,
-        const string id, QUrl icon_url,
+    public AccountApp (string name, GLib.Uri url,
+        const string id, GLib.Uri icon_url,
         GLib.Object* parent = nullptr);
 
     public string name ();
 
 
-    public QUrl url ();
+    public GLib.Uri url ();
 
 
     public string id ();
 
 
-    public QUrl icon_url ();
+    public GLib.Uri icon_url ();
 
 
     private string _name;
-    private QUrl _url;
+    private GLib.Uri _url;
 
     private string _id;
-    private QUrl _icon_url;
+    private GLib.Uri _icon_url;
 };
 
 
-    AccountState.AccountState (AccountPtr account)
+    AccountState.AccountState (AccountPointer account)
         : GLib.Object ()
         , _account (account)
         , _state (AccountState.Disconnected)
@@ -344,7 +344,7 @@ class AccountApp : GLib.Object {
 
     AccountState.~AccountState () = default;
 
-    AccountState *AccountState.load_from_settings (AccountPtr account, QSettings & /*settings*/) {
+    AccountState *AccountState.load_from_settings (AccountPointer account, QSettings & /*settings*/) {
         var account_state = new AccountState (account);
         return account_state;
     }
@@ -352,7 +352,7 @@ class AccountApp : GLib.Object {
     void AccountState.write_to_settings (QSettings & /*settings*/) {
     }
 
-    AccountPtr AccountState.account () {
+    AccountPointer AccountState.account () {
         return _account;
     }
 
@@ -401,23 +401,23 @@ class AccountApp : GLib.Object {
     string AccountState.state_string (State state) {
         switch (state) {
         case SignedOut:
-            return tr ("Signed out");
+            return _("Signed out");
         case Disconnected:
-            return tr ("Disconnected");
+            return _("Disconnected");
         case Connected:
-            return tr ("Connected");
+            return _("Connected");
         case ServiceUnavailable:
-            return tr ("Service unavailable");
+            return _("Service unavailable");
         case MaintenanceMode:
-            return tr ("Maintenance mode");
+            return _("Maintenance mode");
         case NetworkError:
-            return tr ("Network error");
+            return _("Network error");
         case ConfigurationError:
-            return tr ("Configuration error");
+            return _("Configuration error");
         case AskingCredentials:
-            return tr ("Asking Credentials");
+            return _("Asking Credentials");
         }
-        return tr ("Unknown account state");
+        return _("Unknown account state");
     }
 
     bool AccountState.is_signed_out () {
@@ -486,7 +486,7 @@ class AccountApp : GLib.Object {
         }
 
         if (_connection_validator) {
-            q_c_warning (lc_account_state) << "ConnectionValidator already running, ignoring" << account ().display_name ();
+            GLib.warn (lc_account_state) << "ConnectionValidator already running, ignoring" << account ().display_name ();
             return;
         }
 
@@ -504,7 +504,7 @@ class AccountApp : GLib.Object {
         const var elapsed = _time_of_last_e_tag_check.secs_to (QDateTime.current_date_time_utc ());
         if (is_connected () && _time_of_last_e_tag_check.is_valid ()
             && elapsed <= polltime.count ()) {
-            q_c_debug (lc_account_state) << account ().display_name () << "The last ETag check succeeded within the last " << polltime.count () << "s (" << elapsed << "s). No connection check needed!";
+            GLib.debug (lc_account_state) << account ().display_name () << "The last ETag check succeeded within the last " << polltime.count () << "s (" << elapsed << "s). No connection check needed!";
             return;
         }
 
@@ -538,7 +538,7 @@ class AccountApp : GLib.Object {
 
     void AccountState.on_connection_validator_result (ConnectionValidator.Status status, string[] &errors) {
         if (is_signed_out ()) {
-            q_c_warning (lc_account_state) << "Signed out, ignoring" << status << _account.url ().to_string ();
+            GLib.warn (lc_account_state) << "Signed out, ignoring" << status << _account.url ().to_string ();
             return;
         }
 
@@ -693,19 +693,19 @@ class AccountApp : GLib.Object {
 
     void AccountState.on_etag_response_header_received (GLib.ByteArray value, int status_code){
         if (status_code == 200){
-            q_c_debug (lc_account_state) << "New navigation apps ETag Response Header received " << value;
+            GLib.debug (lc_account_state) << "New navigation apps ETag Response Header received " << value;
             set_navigation_apps_etag_response_header (value);
         }
     }
 
     void AccountState.on_ocs_error (int status_code, string message) {
-        q_c_debug (lc_account_state) << "Error " << status_code << " while fetching new navigation apps : " << message;
+        GLib.debug (lc_account_state) << "Error " << status_code << " while fetching new navigation apps : " << message;
     }
 
     void AccountState.on_navigation_apps_fetched (QJsonDocument &reply, int status_code) {
         if (_account){
             if (status_code == 304) {
-                q_c_warning (lc_account_state) << "Status code " << status_code << " Not Modified - No new navigation apps.";
+                GLib.warn (lc_account_state) << "Status code " << status_code << " Not Modified - No new navigation apps.";
             } else {
                 _apps.clear ();
 
@@ -717,8 +717,8 @@ class AccountApp : GLib.Object {
                         for (QJsonValue &value : nav_links) {
                             var nav_link = value.to_object ();
 
-                            var app = new AccountApp (nav_link.value ("name").to_string (), QUrl (nav_link.value ("href").to_string ()),
-                                nav_link.value ("id").to_string (), QUrl (nav_link.value ("icon").to_string ()));
+                            var app = new AccountApp (nav_link.value ("name").to_string (), GLib.Uri (nav_link.value ("href").to_string ()),
+                                nav_link.value ("id").to_string (), GLib.Uri (nav_link.value ("icon").to_string ()));
 
                             _apps << app;
                         }
@@ -748,8 +748,8 @@ class AccountApp : GLib.Object {
         return nullptr;
     }
 
-    AccountApp.AccountApp (string name, QUrl url,
-        const string id, QUrl icon_url,
+    AccountApp.AccountApp (string name, GLib.Uri url,
+        const string id, GLib.Uri icon_url,
         GLib.Object parent)
         : GLib.Object (parent)
         , _name (name)
@@ -762,7 +762,7 @@ class AccountApp : GLib.Object {
         return _name;
     }
 
-    QUrl AccountApp.url () {
+    GLib.Uri AccountApp.url () {
         return _url;
     }
 
@@ -770,7 +770,7 @@ class AccountApp : GLib.Object {
         return _id;
     }
 
-    QUrl AccountApp.icon_url () {
+    GLib.Uri AccountApp.icon_url () {
         return _icon_url;
     }
 

@@ -7,7 +7,7 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 // #pragma once
 
 // #include <QLabel>
-// #include <QUrl>
+// #include <GLib.Uri>
 
 namespace Occ {
 
@@ -15,7 +15,7 @@ class Link_label : QLabel {
 
     public Link_label (Gtk.Widget parent = nullptr);
 
-    public void set_url (QUrl url);
+    public void set_url (GLib.Uri url);
 
 signals:
     void clicked ();
@@ -30,14 +30,14 @@ signals:
 
     private void set_font_underline (bool value);
 
-    private QUrl url;
+    private GLib.Uri url;
 };
 
     Link_label.Link_label (Gtk.Widget parent) : QLabel (parent) {
 
     }
 
-    void Link_label.set_url (QUrl url) {
+    void Link_label.set_url (GLib.Uri url) {
         this.url = url;
     }
 

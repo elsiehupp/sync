@@ -95,7 +95,7 @@ namespace SharedTools {
     static const int instances_size = 1024;
 
     static string instances_lock_filename (string app_session_id) {
-        const QChar slash (QLatin1Char ('/'));
+        const char slash = '/';
         string res = QDir.temp_path ();
         if (!res.ends_with (slash))
             res += slash;
@@ -144,7 +144,7 @@ namespace SharedTools {
         // Add current pid to list and terminate it
         *pids++ = QCoreApplication.application_pid ();
         *pids = 0;
-        pid_peer = new QtLocalPeer (this, app_id + QLatin1Char ('-') +
+        pid_peer = new QtLocalPeer (this, app_id + '-' +
                                   string.number (QCoreApplication.application_pid ()));
         connect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.message_received);
         pid_peer.is_client ();
@@ -185,7 +185,7 @@ namespace SharedTools {
                 return false;
         }
 
-        QtLocalPeer peer (this, app_id + QLatin1Char ('-') + string.number (pid, 10));
+        QtLocalPeer peer (this, app_id + '-' + string.number (pid, 10));
         return peer.is_client ();
     }
 
@@ -196,7 +196,7 @@ namespace SharedTools {
                 return false;
         }
 
-        QtLocalPeer peer (this, app_id + QLatin1Char ('-') + string.number (pid, 10));
+        QtLocalPeer peer (this, app_id + '-' + string.number (pid, 10));
         return peer.on_send_message (message, timeout, block);
     }
 

@@ -39,7 +39,7 @@ class BulkPropagatorJob : PropagatorJob {
     };
 
     struct BulkUploadItem {
-        AccountPtr _account;
+        AccountPointer _account;
         SyncFileItemPtr _item;
         UploadFileInfo _file_to_upload;
         string _remote_path;
@@ -139,7 +139,7 @@ class BulkPropagatorJob : PropagatorJob {
     private void handle_file_restoration (SyncFileItemPtr item,
                                const string error_string);
 
-    private void handle_bulk_upload_black_list (SyncFileItemPtr item);
+    private void handle_bulk_upload_block_list (SyncFileItemPtr item);
 
     private void handle_job_done_errors (SyncFileItemPtr item,
                              SyncFileItem.Status status);
@@ -152,7 +152,7 @@ class BulkPropagatorJob : PropagatorJob {
 
     private QVector<AbstractNetworkJob> _jobs; /// network jobs that are currently in transit
 
-    private QSet<string> _pending_checksum_files;
+    private GLib.Set<string> _pending_checksum_files;
 
     private std.vector<BulkUploadItem> _files_to_upload;
 
@@ -173,7 +173,7 @@ class BulkPropagatorJob : PropagatorJob {
             ret = etag;
         }
         if (oc_etag.length () > 0 && oc_etag != etag && oc_etag != ETag) {
-            q_c_debug (Occ.lc_bulk_propagator_job) << "Quite peculiar, we have an etag != OC-Etag [no problem!]" << etag << ETag << oc_etag;
+            GLib.debug (Occ.lc_bulk_propagator_job) << "Quite peculiar, we have an etag != OC-Etag [no problem!]" << etag << ETag << oc_etag;
         }
         return ret;
     }
@@ -231,7 +231,7 @@ class BulkPropagatorJob : PropagatorJob {
 
         // Check if the specific file can be accessed
         if (propagator ().has_case_clash_accessibility_problem (file_to_upload._file)) {
-            on_done (item, SyncFileItem.NormalError, tr ("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").arg (QDir.to_native_separators (item._file)));
+            on_done (item, SyncFileItem.NormalError, _("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").arg (QDir.to_native_separators (item._file)));
             return;
         }
 
@@ -266,18 +266,18 @@ class BulkPropagatorJob : PropagatorJob {
             // Try to rename the file
             const var original_file_path_absolute = propagator ().full_local_path (item._file);
             const var new_file_path_absolute = propagator ().full_local_path (item._rename_target);
-            const var rename_success = QFile.rename (original_file_path_absolute, new_file_path_absolute);
+            const var rename_success = GLib.File.rename (original_file_path_absolute, new_file_path_absolute);
             if (!rename_success) {
                 on_done (item, SyncFileItem.NormalError, "File contains trailing spaces and couldn't be renamed");
                 return;
             }
-            q_c_warning (lc_bulk_propagator_job ()) << item._file << item._rename_target;
+            GLib.warn (lc_bulk_propagator_job ()) << item._file << item._rename_target;
             file_to_upload._file = item._file = item._rename_target;
             file_to_upload._path = propagator ().full_local_path (file_to_upload._file);
             item._modtime = FileSystem.get_mod_time (new_file_path_absolute);
             if (item._modtime <= 0) {
                 _pending_checksum_files.remove (item._file);
-                on_on_error_start_folder_unlock (item, SyncFileItem.NormalError, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (item._file)));
+                on_on_error_start_folder_unlock (item, SyncFileItem.NormalError, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (item._file)));
                 check_propagation_is_done ();
                 return;
             }
@@ -310,7 +310,7 @@ class BulkPropagatorJob : PropagatorJob {
             var device = std.make_unique<UploadDevice> (
                     single_file._local_path, 0, single_file._file_size, &propagator ()._bandwidth_manager);
             if (!device.open (QIODevice.ReadOnly)) {
-                q_c_warning (lc_bulk_propagator_job) << "Could not prepare upload device : " << device.error_string ();
+                GLib.warn (lc_bulk_propagator_job) << "Could not prepare upload device : " << device.error_string ();
 
                 // If the file is currently locked, we want to retry the sync
                 // when it becomes available again.
@@ -398,7 +398,7 @@ class BulkPropagatorJob : PropagatorJob {
 
         if (!FileSystem.file_exists (full_file_path)) {
             _pending_checksum_files.remove (item._file);
-            on_on_error_start_folder_unlock (item, SyncFileItem.SoftError, tr ("File Removed (on_start upload) %1").arg (full_file_path));
+            on_on_error_start_folder_unlock (item, SyncFileItem.SoftError, _("File Removed (on_start upload) %1").arg (full_file_path));
             check_propagation_is_done ();
             return;
         }
@@ -409,7 +409,7 @@ class BulkPropagatorJob : PropagatorJob {
         item._modtime = FileSystem.get_mod_time (original_file_path);
         if (item._modtime <= 0) {
             _pending_checksum_files.remove (item._file);
-            on_on_error_start_folder_unlock (item, SyncFileItem.NormalError, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (item._file)));
+            on_on_error_start_folder_unlock (item, SyncFileItem.NormalError, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (item._file)));
             check_propagation_is_done ();
             return;
         }
@@ -417,7 +417,7 @@ class BulkPropagatorJob : PropagatorJob {
             propagator ()._another_sync_needed = true;
             _pending_checksum_files.remove (item._file);
             q_debug () << "trigger another sync after checking modified time of item" << item._file << "prev_modtime" << prev_modtime << "Curr" << item._modtime;
-            on_on_error_start_folder_unlock (item, SyncFileItem.SoftError, tr ("Local file changed during syncing. It will be resumed."));
+            on_on_error_start_folder_unlock (item, SyncFileItem.SoftError, _("Local file changed during syncing. It will be resumed."));
             check_propagation_is_done ();
             return;
         }
@@ -431,7 +431,7 @@ class BulkPropagatorJob : PropagatorJob {
         if (file_is_still_changing (*item)) {
             propagator ()._another_sync_needed = true;
             _pending_checksum_files.remove (item._file);
-            on_on_error_start_folder_unlock (item, SyncFileItem.SoftError, tr ("Local file changed during sync."));
+            on_on_error_start_folder_unlock (item, SyncFileItem.SoftError, _("Local file changed during sync."));
             check_propagation_is_done ();
             return;
         }
@@ -500,7 +500,7 @@ class BulkPropagatorJob : PropagatorJob {
         if (get_header_from_json_reply (file_reply, "X-OC-MTime") != "accepted") {
             // X-OC-MTime is supported since owncloud 5.0.   But not when chunking.
             // Normally Owncloud 6 always puts X-OC-MTime
-            q_c_warning (lc_bulk_propagator_job) << "Server does not support X-OC-MTime" << get_header_from_json_reply (file_reply, "X-OC-MTime");
+            GLib.warn (lc_bulk_propagator_job) << "Server does not support X-OC-MTime" << get_header_from_json_reply (file_reply, "X-OC-MTime");
             // Well, the mtime was not set
         }
     }
@@ -556,10 +556,10 @@ class BulkPropagatorJob : PropagatorJob {
         // Update the database entry
         const var result = propagator ().update_metadata (*one_file._item);
         if (!result) {
-            on_done (one_file._item, SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
+            on_done (one_file._item, SyncFileItem.FatalError, _("Error updating metadata : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_done (one_file._item, SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (one_file._item._file));
+            on_done (one_file._item, SyncFileItem.SoftError, _("The file %1 is currently in use").arg (one_file._item._file));
             return;
         }
 
@@ -570,7 +570,7 @@ class BulkPropagatorJob : PropagatorJob {
             var &vfs = propagator ().sync_options ()._vfs;
             const var pin = vfs.pin_state (one_file._item._file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY && !vfs.set_pin_state (one_file._item._file, PinState.PinState.UNSPECIFIED)) {
-                q_c_warning (lc_bulk_propagator_job) << "Could not set pin state of" << one_file._item._file << "to unspecified";
+                GLib.warn (lc_bulk_propagator_job) << "Could not set pin state of" << one_file._item._file << "to unspecified";
             }
         }
 
@@ -616,8 +616,8 @@ class BulkPropagatorJob : PropagatorJob {
         }
 
         if (item._status != SyncFileItem.Success) {
-            // Blacklist handling
-            handle_bulk_upload_black_list (item);
+            // Blocklist handling
+            handle_bulk_upload_block_list (item);
             propagator ()._another_sync_needed = true;
         }
 
@@ -713,7 +713,7 @@ class BulkPropagatorJob : PropagatorJob {
                                                  const string full_file_path) {
         if (!FileSystem.file_exists (full_file_path)) {
             if (!on_finished) {
-                abort_with_error (item, SyncFileItem.SoftError, tr ("The local file was removed during sync."));
+                abort_with_error (item, SyncFileItem.SoftError, _("The local file was removed during sync."));
                 return false;
             } else {
                 propagator ()._another_sync_needed = true;
@@ -729,7 +729,7 @@ class BulkPropagatorJob : PropagatorJob {
         if (!FileSystem.verify_file_unchanged (full_file_path, item._size, item._modtime)) {
             propagator ()._another_sync_needed = true;
             if (!on_finished) {
-                abort_with_error (item, SyncFileItem.SoftError, tr ("Local file changed during sync."));
+                abort_with_error (item, SyncFileItem.SoftError, _("Local file changed during sync."));
                 // FIXME :  the legacy code was retrying for a few seconds.
                 //         and also checking that after the last chunk, and removed the file in case of INSTRUCTION_NEW
                 return false;
@@ -744,7 +744,7 @@ class BulkPropagatorJob : PropagatorJob {
         const var fid = get_header_from_json_reply (file_reply, "OC-FileID");
         if (!fid.is_empty ()) {
             if (!item._file_id.is_empty () && item._file_id != fid) {
-                q_c_warning (lc_bulk_propagator_job) << "File ID changed!" << item._file_id << fid;
+                GLib.warn (lc_bulk_propagator_job) << "File ID changed!" << item._file_id << fid;
             }
             item._file_id = fid;
         }
@@ -757,7 +757,7 @@ class BulkPropagatorJob : PropagatorJob {
                 || item._status == SyncFileItem.Conflict) {
                 item._status = SyncFileItem.Restoration;
             } else {
-                item._error_string += tr ("; Restoration Failed : %1").arg (error_string);
+                item._error_string += _("; Restoration Failed : %1").arg (error_string);
             }
         } else {
             if (item._error_string.is_empty ()) {
@@ -766,14 +766,14 @@ class BulkPropagatorJob : PropagatorJob {
         }
     }
 
-    void BulkPropagatorJob.handle_bulk_upload_black_list (SyncFileItemPtr item) {
-        propagator ().add_to_bulk_upload_black_list (item._file);
+    void BulkPropagatorJob.handle_bulk_upload_block_list (SyncFileItemPtr item) {
+        propagator ().add_to_bulk_upload_block_list (item._file);
     }
 
     void BulkPropagatorJob.handle_job_done_errors (SyncFileItemPtr item,
                                                 SyncFileItem.Status status) {
         if (item.has_error_status ()) {
-            q_c_warning (lc_propagator) << "Could not complete propagation of" << item.destination () << "by" << this << "with status" << item._status << "and error:" << item._error_string;
+            GLib.warn (lc_propagator) << "Could not complete propagation of" << item.destination () << "by" << this << "with status" << item._status << "and error:" << item._error_string;
         } else {
             q_c_info (lc_propagator) << "Completed propagation of" << item.destination () << "by" << this << "with status" << item._status;
         }
@@ -784,7 +784,7 @@ class BulkPropagatorJob : PropagatorJob {
         }
 
         switch (item._status) {
-        case SyncFileItem.BlacklistedError:
+        case SyncFileItem.BlocklistedError:
         case SyncFileItem.Conflict:
         case SyncFileItem.FatalError:
         case SyncFileItem.FileIgnored:

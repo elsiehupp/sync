@@ -78,10 +78,10 @@ class Welcome_page : QWizard_page {
         const var wizard_talk_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-talk.png", background_color)
                                                                : Theme.hidpi_file_name (":/client/theme/colored/wizard-talk.png");
 
-        _ui.slide_show.add_slide (wizard_nextcloud_icon_file_name, tr ("Keep your data secure and under your control"));
-        _ui.slide_show.add_slide (wizard_files_icon_file_name, tr ("Secure collaboration & file exchange"));
-        _ui.slide_show.add_slide (wizard_groupware_icon_file_name, tr ("Easy-to-use web mail, calendaring & contacts"));
-        _ui.slide_show.add_slide (wizard_talk_icon_file_name, tr ("Screensharing, online meetings & web conferences"));
+        _ui.slide_show.add_slide (wizard_nextcloud_icon_file_name, _("Keep your data secure and under your control"));
+        _ui.slide_show.add_slide (wizard_files_icon_file_name, _("Secure collaboration & file exchange"));
+        _ui.slide_show.add_slide (wizard_groupware_icon_file_name, _("Easy-to-use web mail, calendaring & contacts"));
+        _ui.slide_show.add_slide (wizard_talk_icon_file_name, _("Screensharing, online meetings & web conferences"));
 
         const var is_dark_background = Theme.is_dark_color (background_color);
         _ui.slide_show_next_button.set_icon (theme.ui_theme_icon (string ("control-next.svg"), is_dark_background));
@@ -97,7 +97,7 @@ class Welcome_page : QWizard_page {
     void Welcome_page.setup_login_button () {
         const var app_name = Theme.instance ().app_name_gui ();
 
-        _ui.login_button.on_set_text (tr ("Log in to your %1").arg (app_name));
+        _ui.login_button.on_set_text (_("Log in to your %1").arg (app_name));
         connect (_ui.login_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
             _next_page = WizardCommon.Page_Server_setup;
             _oc_wizard.next ();
@@ -120,9 +120,9 @@ class Welcome_page : QWizard_page {
     }
 
     void Welcome_page.setup_host_your_own_server_label () {
-        _ui.host_your_own_server_label.on_set_text (tr ("Host your own server"));
+        _ui.host_your_own_server_label.on_set_text (_("Host your own server"));
         _ui.host_your_own_server_label.set_alignment (Qt.AlignCenter);
-        _ui.host_your_own_server_label.set_url (QUrl ("https://docs.nextcloud.com/server/latest/admin_manual/installation/#installation"));
+        _ui.host_your_own_server_label.set_url (GLib.Uri ("https://docs.nextcloud.com/server/latest/admin_manual/installation/#installation"));
     }
 
     int Welcome_page.next_id () {

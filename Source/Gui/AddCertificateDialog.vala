@@ -56,7 +56,7 @@ class AddCertificateDialog : Gtk.Dialog {
     }
 
     void AddCertificateDialog.on_push_button_browse_certificate_clicked () {
-        string file_name = QFileDialog.get_open_file_name (this, tr ("Select a certificate"), "", tr ("Certificate files (*.p12 *.pfx)"));
+        string file_name = QFileDialog.get_open_file_name (this, _("Select a certificate"), "", _("Certificate files (*.p12 *.pfx)"));
         ui.line_edit_certificate_path.on_set_text (file_name);
     }
 

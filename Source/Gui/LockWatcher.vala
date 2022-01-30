@@ -15,7 +15,7 @@ static const int check_frequency = 20 * 1000; // ms
 
 // #include <GLib.List>
 // #include <string>
-// #include <QSet>
+// #include <GLib.Set>
 // #include <QTimer>
 
 // #include <chrono>
@@ -72,7 +72,7 @@ signals:
     private void on_check_files ();
 
 
-    private QSet<string> _watched_paths;
+    private GLib.Set<string> _watched_paths;
     private QTimer _timer;
 };
 }
@@ -84,8 +84,8 @@ signals:
 
 
 
-LockWatcher.LockWatcher (GLib.Object parent)
-    : GLib.Object (parent) {
+LockWatcher.LockWatcher (GLib.Object parent) {
+    base (parent);
     connect (&_timer, &QTimer.timeout,
         this, &LockWatcher.on_check_files);
     _timer.on_start (check_frequency);
@@ -105,7 +105,7 @@ bool LockWatcher.contains (string path) {
 }
 
 void LockWatcher.on_check_files () {
-    QSet<string> unlocked;
+    GLib.Set<string> unlocked;
 
     foreach (string path, _watched_paths) {
         if (!FileSystem.is_file_locked (path)) {

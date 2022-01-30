@@ -76,7 +76,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 // #include <memory>
 
 // #include <QtCore/QLoggingCategory>
-// #include <QtCore/QFile>
+// #include <QtCore/GLib.File>
 
 
 /***********************************************************
@@ -93,7 +93,7 @@ static int _csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf);
 csync_vio_handle_t csync_vio_local_opendir (string name) {
     QScopedPointer<csync_vio_handle_t> handle (new csync_vio_handle_t{});
 
-    var dirname = QFile.encode_name (name);
+    var dirname = GLib.File.encode_name (name);
 
     handle.dh = _topendir (dirname.const_data ());
     if (!handle.dh) {
@@ -123,11 +123,11 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t ha
   } while (qstrcmp (dirent.d_name, ".") == 0 || qstrcmp (dirent.d_name, "..") == 0);
 
   file_stat = std.make_unique<csync_file_stat_t> ();
-  file_stat.path = QFile.decode_name (dirent.d_name).to_utf8 ();
+  file_stat.path = GLib.File.decode_name (dirent.d_name).to_utf8 ();
   GLib.ByteArray full_path = handle.path % '/' % GLib.ByteArray () % const_cast<const char> (dirent.d_name);
   if (file_stat.path.is_null ()) {
       file_stat.original_path = full_path;
-      q_c_warning (lc_c_sync_v_iOLocal) << "Invalid characters in file/directory name, please rename:" << dirent.d_name << handle.path;
+      GLib.warn (lc_c_sync_v_iOLocal) << "Invalid characters in file/directory name, please rename:" << dirent.d_name << handle.path;
   }
 
   /* Check for availability of d_type, see manpage. */
@@ -171,7 +171,7 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t ha
 }
 
 int csync_vio_local_stat (string uri, csync_file_stat_t buf) {
-    return _csync_vio_local_stat_mb (QFile.encode_name (uri).const_data (), buf);
+    return _csync_vio_local_stat_mb (GLib.File.encode_name (uri).const_data (), buf);
 }
 
 static int _csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf) {

@@ -32,7 +32,7 @@ class Svg_image_provider : QQuick_image_provider {
         const var id_split = id.split (QStringLiteral ("/"), Qt.Skip_empty_parts);
 
         if (id_split.is_empty ()) {
-            q_c_warning (lc_svg_image_provider) << "Image id is incorrect!";
+            GLib.warn (lc_svg_image_provider) << "Image id is incorrect!";
             return {};
         }
 
@@ -40,7 +40,7 @@ class Svg_image_provider : QQuick_image_provider {
         const var pixmap_color = id_split.size () > 1 ? QColor (id_split.at (1)) : QColor_constants.Svg.black;
 
         if (pixmap_name.is_empty () || !pixmap_color.is_valid ()) {
-            q_c_warning (lc_svg_image_provider) << "Image id is incorrect!";
+            GLib.warn (lc_svg_image_provider) << "Image id is incorrect!";
             return {};
         }
 

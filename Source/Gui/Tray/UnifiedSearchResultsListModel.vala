@@ -69,7 +69,7 @@ class Unified_search_results_list_model : QAbstractListModel {
 
     public string error_string ();
 
-    public void result_clicked (string provider_id, QUrl resource_url);
+    public void result_clicked (string provider_id, GLib.Uri resource_url);
 
 
     public void fetch_more_trigger_clicked (string provider_id);
@@ -172,25 +172,25 @@ namespace {
     }
 
     string icon_url_for_default_icon_name (string default_icon_name) {
-        const QUrl url_for_icon{default_icon_name};
+        const GLib.Uri url_for_icon{default_icon_name};
 
         if (url_for_icon.is_valid () && !url_for_icon.scheme ().is_empty ()) {
             return default_icon_name;
         }
 
         if (default_icon_name.starts_with (QStringLiteral ("icon-"))) {
-            const var parts = default_icon_name.split (QLatin1Char ('-'));
+            const var parts = default_icon_name.split ('-');
 
             if (parts.size () > 1) {
                 const string icon_file_path = QStringLiteral (":/client/theme/") + parts[1] + QStringLiteral (".svg");
 
-                if (QFile.exists (icon_file_path)) {
+                if (GLib.File.exists (icon_file_path)) {
                     return icon_file_path;
                 }
 
                 const string black_icon_file_path = QStringLiteral (":/client/theme/black/") + parts[1] + QStringLiteral (".svg");
 
-                if (QFile.exists (black_icon_file_path)) {
+                if (GLib.File.exists (black_icon_file_path)) {
                     return black_icon_file_path;
                 }
             }
@@ -205,42 +205,42 @@ namespace {
         return QStringLiteral (":/client/theme/change.svg");
     }
 
-    string generate_url_for_thumbnail (string thumbnail_url, QUrl server_url) {
+    string generate_url_for_thumbnail (string thumbnail_url, GLib.Uri server_url) {
         var server_url_copy = server_url;
         var thumbnail_url_copy = thumbnail_url;
 
-        if (thumbnail_url_copy.starts_with (QLatin1Char ('/')) || thumbnail_url_copy.starts_with (QLatin1Char ('\\'))) {
+        if (thumbnail_url_copy.starts_with ('/') || thumbnail_url_copy.starts_with ('\\')) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
-            const string[] thumbnail_url_copy_splitted = thumbnail_url_copy.contains (QLatin1Char ('?'))
-                ? thumbnail_url_copy.split (QLatin1Char ('?'), Qt.Skip_empty_parts)
+            const string[] thumbnail_url_copy_splitted = thumbnail_url_copy.contains ('?')
+                ? thumbnail_url_copy.split ('?', Qt.Skip_empty_parts)
                 : string[]{thumbnail_url_copy};
             Q_ASSERT (!thumbnail_url_copy_splitted.is_empty ());
             server_url_copy.set_path (thumbnail_url_copy_splitted[0]);
             thumbnail_url_copy = server_url_copy.to_string ();
             if (thumbnail_url_copy_splitted.size () > 1) {
-                thumbnail_url_copy += QLatin1Char ('?') + thumbnail_url_copy_splitted[1];
+                thumbnail_url_copy += '?' + thumbnail_url_copy_splitted[1];
             }
         }
 
         return thumbnail_url_copy;
     }
 
-    string generate_url_for_icon (string fallack_icon, QUrl server_url) {
+    string generate_url_for_icon (string fallack_icon, GLib.Uri server_url) {
         var server_url_copy = server_url;
 
         var fallack_icon_copy = fallack_icon;
 
-        if (fallack_icon_copy.starts_with (QLatin1Char ('/')) || fallack_icon_copy.starts_with (QLatin1Char ('\\'))) {
+        if (fallack_icon_copy.starts_with ('/') || fallack_icon_copy.starts_with ('\\')) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
             const string[] fallack_icon_path_splitted =
-                fallack_icon_copy.contains (QLatin1Char ('?')) ? fallack_icon_copy.split (QLatin1Char ('?')) : string[]{fallack_icon_copy};
+                fallack_icon_copy.contains ('?') ? fallack_icon_copy.split ('?') : string[]{fallack_icon_copy};
             Q_ASSERT (!fallack_icon_path_splitted.is_empty ());
             server_url_copy.set_path (fallack_icon_path_splitted[0]);
             fallack_icon_copy = server_url_copy.to_string ();
             if (fallack_icon_path_splitted.size () > 1) {
-                fallack_icon_copy += QLatin1Char ('?') + fallack_icon_path_splitted[1];
+                fallack_icon_copy += '?' + fallack_icon_path_splitted[1];
             }
         } else if (!fallack_icon_copy.is_empty ()) {
             // could be one of names for standard icons (e.g. icon-mail)
@@ -253,14 +253,14 @@ namespace {
         return fallack_icon_copy;
     }
 
-    string icons_from_thumbnail_and_fallback_icon (string thumbnail_url, string fallack_icon, QUrl server_url) {
+    string icons_from_thumbnail_and_fallback_icon (string thumbnail_url, string fallack_icon, GLib.Uri server_url) {
         if (thumbnail_url.is_empty () && fallack_icon.is_empty ()) {
             return {};
         }
 
         if (server_url.is_empty ()) {
             const string[] list_images = {thumbnail_url, fallack_icon};
-            return list_images.join (QLatin1Char (';'));
+            return list_images.join (';');
         }
 
         const var url_for_thumbnail = generate_url_for_thumbnail (thumbnail_url, server_url);
@@ -275,7 +275,7 @@ namespace {
         }
 
         const string[] list_images{url_for_thumbnail, url_for_fallack_icon};
-        return list_images.join (QLatin1Char (';'));
+        return list_images.join (';');
     }
 
     constexpr int search_term_editing_finished_search_start_delay = 800;
@@ -394,24 +394,24 @@ namespace {
         return !_search_job_connections.is_empty ();
     }
 
-    void Unified_search_results_list_model.result_clicked (string provider_id, QUrl resource_url) {
+    void Unified_search_results_list_model.result_clicked (string provider_id, GLib.Uri resource_url) {
         const QUrlQuery url_query{resource_url};
-        const var dir = url_query.query_item_value (QStringLiteral ("dir"), QUrl.Component_formatting_option.Fully_decoded);
+        const var dir = url_query.query_item_value (QStringLiteral ("dir"), GLib.Uri.Component_formatting_option.Fully_decoded);
         const var file_name =
-            url_query.query_item_value (QStringLiteral ("scrollto"), QUrl.Component_formatting_option.Fully_decoded);
+            url_query.query_item_value (QStringLiteral ("scrollto"), GLib.Uri.Component_formatting_option.Fully_decoded);
 
         if (provider_id.contains (QStringLiteral ("file"), Qt.CaseInsensitive) && !dir.is_empty () && !file_name.is_empty ()) {
             if (!_account_state || !_account_state.account ()) {
                 return;
             }
 
-            const string relative_path = dir + QLatin1Char ('/') + file_name;
+            const string relative_path = dir + '/' + file_name;
             const var local_files =
                 FolderMan.instance ().find_file_in_local_folders (QFileInfo (relative_path).path (), _account_state.account ());
 
             if (!local_files.is_empty ()) {
                 q_c_info (lc_unified_search) << "Opening file:" << local_files.const_first ();
-                QDesktopServices.open_url (QUrl.from_local_file (local_files.const_first ()));
+                QDesktopServices.open_url (GLib.Uri.from_local_file (local_files.const_first ()));
                 return;
             }
         }
@@ -456,7 +456,7 @@ namespace {
 
         if (!job) {
             q_c_critical (lc_unified_search) << string ("Failed to fetch providers.").arg (_search_term);
-            _error_string += tr ("Failed to fetch providers.") + QLatin1Char ('\n');
+            _error_string += _("Failed to fetch providers.") + '\n';
             emit error_string_changed ();
             return;
         }
@@ -467,8 +467,8 @@ namespace {
                                                .arg (_search_term)
                                                .arg (job.error_string ());
             _error_string +=
-                tr ("Failed to fetch search providers for '%1'. Error : %2").arg (_search_term).arg (job.error_string ())
-                + QLatin1Char ('\n');
+                _("Failed to fetch search providers for '%1'. Error : %2").arg (_search_term).arg (job.error_string ())
+                + '\n';
             emit error_string_changed ();
             return;
         }
@@ -500,7 +500,7 @@ namespace {
 
         if (!job) {
             q_c_critical (lc_unified_search) << string ("Search has failed for '%2'.").arg (_search_term);
-            _error_string += tr ("Search has failed for '%2'.").arg (_search_term) + QLatin1Char ('\n');
+            _error_string += _("Search has failed for '%2'.").arg (_search_term) + '\n';
             emit error_string_changed ();
             return;
         }
@@ -529,7 +529,7 @@ namespace {
                                                .arg (_search_term)
                                                .arg (job.error_string ());
             _error_string +=
-                tr ("Search has failed for '%1'. Error : %2").arg (_search_term).arg (job.error_string ()) + QLatin1Char ('\n');
+                _("Search has failed for '%1'. Error : %2").arg (_search_term).arg (job.error_string ()) + '\n';
             emit error_string_changed ();
             return;
         }
@@ -628,8 +628,8 @@ namespace {
 
         QVector<Unified_search_result> new_entries;
 
-        const var make_resource_url = [] (string resource_url, QUrl account_url) {
-            QUrl final_resurce_url (resource_url);
+        const var make_resource_url = [] (string resource_url, GLib.Uri account_url) {
+            GLib.Uri final_resurce_url (resource_url);
             if (final_resurce_url.scheme ().is_empty () && account_url.scheme ().is_empty ()) {
                 final_resurce_url = account_url;
                 final_resurce_url.set_path (resource_url);
@@ -651,7 +651,7 @@ namespace {
             result._subline = entry_map.value (QStringLiteral ("subline")).to_string ();
 
             const var resource_url = entry_map.value (QStringLiteral ("resource_url")).to_string ();
-            const var account_url = (_account_state && _account_state.account ()) ? _account_state.account ().url () : QUrl ();
+            const var account_url = (_account_state && _account_state.account ()) ? _account_state.account ().url () : GLib.Uri ();
 
             result._resource_url = make_resource_url (resource_url, account_url);
             result._icons = icons_from_thumbnail_and_fallback_icon (entry_map.value (QStringLiteral ("thumbnail_url")).to_string (),

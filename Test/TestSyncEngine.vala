@@ -207,12 +207,12 @@ class TestSyncEngine : GLib.Object {
         var expectedServerState = fakeFolder.currentRemoteState ();
 
         // Remove subFolderA with selectiveSync:
-        fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList, {"parentFolder/subFolderA/"});
+        fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {"parentFolder/subFolderA/"});
         fakeFolder.syncEngine ().journal ().schedulePathForRemoteDiscovery (QByteArrayLiteral ("parentFolder/subFolderA/"));
         var getEtag = [&] (GLib.ByteArray file) {
-            SyncJournalFileRecord rec;
-            fakeFolder.syncJournal ().getFileRecord (file, &rec);
-            return rec._etag;
+            SyncJournalFileRecord record;
+            fakeFolder.syncJournal ().getFileRecord (file, &record);
+            return record._etag;
         };
         QVERIFY (getEtag ("parentFolder") == "_invalid_");
         QVERIFY (getEtag ("parentFolder/subFolderA") == "_invalid_");
@@ -270,11 +270,11 @@ class TestSyncEngine : GLib.Object {
         fakeFolder.remoteModifier ().insert ("NewFolder/foo");
         QVERIFY (!fakeFolder.syncOnce ());
 
-        SyncJournalFileRecord rec;
-        fakeFolder.syncJournal ().getFileRecord (QByteArrayLiteral ("NewFolder"), &rec);
-        QVERIFY (rec.isValid ());
-        QCOMPARE (rec._etag, QByteArrayLiteral ("_invalid_"));
-        QVERIFY (!rec._fileId.isEmpty ());
+        SyncJournalFileRecord record;
+        fakeFolder.syncJournal ().getFileRecord (QByteArrayLiteral ("NewFolder"), &record);
+        QVERIFY (record.isValid ());
+        QCOMPARE (record._etag, QByteArrayLiteral ("_invalid_"));
+        QVERIFY (!record._fileId.isEmpty ());
     }
 
     private on_ void testDirDownloadWithError () {
@@ -297,7 +297,7 @@ class TestSyncEngine : GLib.Object {
         QVERIFY (!fakeFolder.syncOnce ());
         QCoreApplication.processEvents (); // should not crash
 
-        QSet<string> seen;
+        GLib.Set<string> seen;
         for (GLib.List<QVariant> &args : completeSpy) {
             var item = args[0].value<SyncFileItemPtr> ();
             qDebug () << item._file << item.isDirectory () << item._status;
@@ -722,8 +722,8 @@ class TestSyncEngine : GLib.Object {
     private on_ void testPropagatePermissions () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         var perm = QFileDevice.Permission (0x7704); // user/owner : rwx, group : r, other : -
-        QFile.setPermissions (fakeFolder.localPath () + "A/a1", perm);
-        QFile.setPermissions (fakeFolder.localPath () + "A/a2", perm);
+        GLib.File.setPermissions (fakeFolder.localPath () + "A/a1", perm);
+        GLib.File.setPermissions (fakeFolder.localPath () + "A/a2", perm);
         fakeFolder.syncOnce (); // get the metadata-only change out of the way
         fakeFolder.remoteModifier ().appendByte ("A/a1");
         fakeFolder.remoteModifier ().appendByte ("A/a2");

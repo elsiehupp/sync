@@ -52,14 +52,14 @@ void Propagate_remote_delete_encrypted.on_folder_un_locked_successfully (GLib.By
 
 void Propagate_remote_delete_encrypted.on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code) {
     if (status_code == 404) {
-        q_c_debug (PROPAGATE_REMOVE_ENCRYPTED) << "Metadata not found, but let's proceed with removing the file anyway.";
+        GLib.debug (PROPAGATE_REMOVE_ENCRYPTED) << "Metadata not found, but let's proceed with removing the file anyway.";
         delete_remote_item (_item._encrypted_file_name);
         return;
     }
 
     FolderMetadata metadata (_propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
 
-    q_c_debug (PROPAGATE_REMOVE_ENCRYPTED) << "Metadata Received, preparing it for removal of the file";
+    GLib.debug (PROPAGATE_REMOVE_ENCRYPTED) << "Metadata Received, preparing it for removal of the file";
 
     const QFileInfo info (_propagator.full_local_path (_item._file));
     const string file_name = info.file_name ();
@@ -81,7 +81,7 @@ void Propagate_remote_delete_encrypted.on_folder_encrypted_metadata_received (QJ
         return;
     }
 
-    q_c_debug (PROPAGATE_REMOVE_ENCRYPTED) << "Metadata updated, sending to the server.";
+    GLib.debug (PROPAGATE_REMOVE_ENCRYPTED) << "Metadata updated, sending to the server.";
 
     var job = new UpdateMetadataApiJob (_propagator.account (), _folder_id, metadata.encrypted_metadata (), _folder_token);
     connect (job, &UpdateMetadataApiJob.on_success, this, [this] (GLib.ByteArray& file_id) {

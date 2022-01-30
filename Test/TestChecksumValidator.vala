@@ -68,7 +68,7 @@ using namespace Occ.Utility;
         QFileInfo fi (file);
         QVERIFY (fi.exists ());
 
-        QFile fileDevice (file);
+        GLib.File fileDevice (file);
         fileDevice.open (QIODevice.ReadOnly);
         GLib.ByteArray sum = calcMd5 (&fileDevice);
         fileDevice.close ();
@@ -87,7 +87,7 @@ using namespace Occ.Utility;
         QFileInfo fi (file);
         QVERIFY (fi.exists ());
 
-        QFile fileDevice (file);
+        GLib.File fileDevice (file);
         fileDevice.open (QIODevice.ReadOnly);
         GLib.ByteArray sum = calcSha1 (&fileDevice);
         fileDevice.close ();
@@ -110,7 +110,7 @@ using namespace Occ.Utility;
 
         connect (vali, SIGNAL (on_done (GLib.ByteArray,GLib.ByteArray)), SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
 
-        var file = new QFile (_testfile, vali);
+        var file = new GLib.File (_testfile, vali);
         file.open (QIODevice.ReadOnly);
         _expected = calcAdler32 (file);
         qDebug () << "XX Expected Checksum : " << _expected;
@@ -131,7 +131,7 @@ using namespace Occ.Utility;
         vali.setChecksumType (_expectedType);
         connect (vali, SIGNAL (on_done (GLib.ByteArray,GLib.ByteArray)), this, SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
 
-        var file = new QFile (_testfile, vali);
+        var file = new GLib.File (_testfile, vali);
         file.open (QIODevice.ReadOnly);
         _expected = calcMd5 (file);
         vali.on_start (_testfile);
@@ -150,7 +150,7 @@ using namespace Occ.Utility;
         vali.setChecksumType (_expectedType);
         connect (vali, SIGNAL (on_done (GLib.ByteArray,GLib.ByteArray)), this, SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
 
-        var file = new QFile (_testfile, vali);
+        var file = new GLib.File (_testfile, vali);
         file.open (QIODevice.ReadOnly);
         _expected = calcSha1 (file);
 
@@ -171,7 +171,7 @@ using namespace Occ.Utility;
         connect (vali, &ValidateChecksumHeader.validated, this, &TestChecksumValidator.slotDownValidated);
         connect (vali, &ValidateChecksumHeader.validationFailed, this, &TestChecksumValidator.slotDownError);
 
-        var file = new QFile (_testfile, vali);
+        var file = new GLib.File (_testfile, vali);
         file.open (QIODevice.ReadOnly);
         _expected = calcAdler32 (file);
 

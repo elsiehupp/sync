@@ -16,7 +16,7 @@ namespace Occ {
 ***********************************************************/
 class IconJob : GLib.Object {
 
-    public IconJob (AccountPtr account, QUrl url, GLib.Object parent = nullptr);
+    public IconJob (AccountPointer account, GLib.Uri url, GLib.Object parent = nullptr);
 
 signals:
     void job_finished (GLib.ByteArray icon_data);
@@ -26,7 +26,7 @@ signals:
     private void on_finished ();
 };
 
-    IconJob.IconJob (AccountPtr account, QUrl url, GLib.Object parent)
+    IconJob.IconJob (AccountPointer account, GLib.Uri url, GLib.Object parent)
         : GLib.Object (parent) {
         QNetworkRequest request (url);
     #if (QT_VERSION >= 0x050600)

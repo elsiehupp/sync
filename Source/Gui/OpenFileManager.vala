@@ -9,7 +9,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QProcess>
 // #include <QSettings>
 // #include <QDir>
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QDesktopServices>
 // #include <QApplication>
 
@@ -34,15 +34,15 @@ void show_in_file_manager (string local_path);
 static string[] xdg_data_dirs () {
     string[] dirs;
     // http://standards.freedesktop.org/basedir-spec/latest/
-    string xdg_data_dirs_env = QFile.decode_name (qgetenv ("XDG_DATA_DIRS"));
+    string xdg_data_dirs_env = GLib.File.decode_name (qgetenv ("XDG_DATA_DIRS"));
     if (xdg_data_dirs_env.is_empty ()) {
         dirs.append (string.from_latin1 ("/usr/local/share"));
         dirs.append (string.from_latin1 ("/usr/share"));
     } else {
-        dirs = xdg_data_dirs_env.split (QLatin1Char (':'));
+        dirs = xdg_data_dirs_env.split (':');
     }
     // local location
-    string xdg_data_home = QFile.decode_name (qgetenv ("XDG_DATA_HOME"));
+    string xdg_data_home = GLib.File.decode_name (qgetenv ("XDG_DATA_HOME"));
     if (xdg_data_home.is_empty ()) {
         xdg_data_home = QDir.home_path () + "/.local/share";
     }
@@ -56,7 +56,7 @@ static string find_default_file_manager () {
     p.on_start ("xdg-mime", string[] () << "query"
                                       << "default"
                                       << "inode/directory",
-        QFile.ReadOnly);
+        GLib.File.ReadOnly);
     p.wait_for_finished ();
     string file_name = string.from_utf8 (p.read_all ().trimmed ());
     if (file_name.is_empty ())
@@ -81,7 +81,7 @@ static string find_default_file_manager () {
 // early dolphin versions did not have --select
 static bool check_dolphin_can_select () {
     QProcess p;
-    p.on_start ("dolphin", string[] () << "--help", QFile.ReadOnly);
+    p.on_start ("dolphin", string[] () << "--help", GLib.File.ReadOnly);
     p.wait_for_finished ();
     return p.read_all ().contains ("--select");
 }
@@ -119,7 +119,7 @@ void show_in_file_manager (string local_path) {
         }
     }
 
-    // whitelist
+    // allowlist
     if (app.contains ("nautilus") || app.contains ("nemo")) {
         can_handle_file = true;
     }
@@ -150,7 +150,7 @@ void show_in_file_manager (string local_path) {
 
     if (app.is_empty () || args.is_empty () || !can_handle_file) {
         // fall back : open the default file manager, without ever selecting the file
-        QDesktopServices.open_url (QUrl.from_local_file (path_to_open));
+        QDesktopServices.open_url (GLib.Uri.from_local_file (path_to_open));
     } else {
         QProcess.start_detached (app, args);
     }

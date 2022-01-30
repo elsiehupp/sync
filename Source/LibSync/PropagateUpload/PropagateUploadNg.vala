@@ -12,13 +12,13 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 namespace Occ {
 
-QUrl PropagateUploadFileNG.chunk_url (int chunk) {
+GLib.Uri PropagateUploadFileNG.chunk_url (int chunk) {
     string path = QLatin1String ("remote.php/dav/uploads/")
         + propagator ().account ().dav_user ()
-        + QLatin1Char ('/') + string.number (_transfer_id);
+        + '/' + string.number (_transfer_id);
     if (chunk >= 0) {
         // We need to do add leading 0 because the server orders the chunk alphabetically
-        path += QLatin1Char ('/') + string.number (chunk).right_justified (16, '0'); // 1e16 is 10 petabyte
+        path += '/' + string.number (chunk).right_justified (16, '0'); // 1e16 is 10 petabyte
     }
     return Utility.concat_url_path (propagator ().account ().url (), path);
 }
@@ -59,7 +59,7 @@ void PropagateUploadFileNG.do_start_upload () {
     const SyncJournalDb.UploadInfo progress_info = propagator ()._journal.get_upload_info (_item._file);
     Q_ASSERT (_item._modtime > 0);
     if (_item._modtime <= 0) {
-        q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+        GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
     }
     if (progress_info._valid && progress_info.is_chunked () && progress_info._modtime == _item._modtime
             && progress_info._size == _item._size) {
@@ -185,7 +185,7 @@ void PropagateUploadFileNG.on_delete_job_finished () {
             abort_with_error (status, job.error_string ());
             return;
         } else {
-            q_c_warning (lc_propagate_upload_nG) << "DeleteJob errored out" << job.error_string () << job.reply ().url ();
+            GLib.warn (lc_propagate_upload_nG) << "DeleteJob errored out" << job.error_string () << job.reply ().url ();
             _remove_job_error = true;
             // Let the other jobs finish
         }
@@ -206,7 +206,7 @@ void PropagateUploadFileNG.start_new_upload () {
     ASSERT (propagator ()._active_job_list.count (this) == 1);
     Q_ASSERT (_item._modtime > 0);
     if (_item._modtime <= 0) {
-        q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+        GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
     }
     _transfer_id = uint32 (Utility.rand () ^ uint32 (_item._modtime) ^ (uint32 (_file_to_upload._size) << 16) ^ q_hash (_file_to_upload._file));
     _sent = 0;
@@ -219,7 +219,7 @@ void PropagateUploadFileNG.start_new_upload () {
     pi._transferid = _transfer_id;
     Q_ASSERT (_item._modtime > 0);
     if (_item._modtime <= 0) {
-        q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+        GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
     }
     pi._modtime = _item._modtime;
     pi._content_checksum = _item._checksum_header;
@@ -280,7 +280,7 @@ void PropagateUploadFileNG.on_start_next_chunk () {
         // "If-Match applies to the source, but we are interested in comparing the etag of the destination
         var if_match = headers.take (QByteArrayLiteral ("If-Match"));
         if (!if_match.is_empty ()) {
-            headers[QByteArrayLiteral ("If")] = "<" + QUrl.to_percent_encoding (destination, "/") + "> ([" + if_match + "])";
+            headers[QByteArrayLiteral ("If")] = "<" + GLib.Uri.to_percent_encoding (destination, "/") + "> ([" + if_match + "])";
         }
         if (!_transmission_checksum_header.is_empty ()) {
             q_c_info (lc_propagate_upload) << destination << _transmission_checksum_header;
@@ -303,7 +303,7 @@ void PropagateUploadFileNG.on_start_next_chunk () {
     var device = std.make_unique<UploadDevice> (
             file_name, _sent, _current_chunk_size, &propagator ()._bandwidth_manager);
     if (!device.open (QIODevice.ReadOnly)) {
-        q_c_warning (lc_propagate_upload_nG) << "Could not prepare upload device : " << device.error_string ();
+        GLib.warn (lc_propagate_upload_nG) << "Could not prepare upload device : " << device.error_string ();
 
         // If the file is currently locked, we want to retry the sync
         // when it becomes available again.
@@ -319,7 +319,7 @@ void PropagateUploadFileNG.on_start_next_chunk () {
     headers["OC-Chunk-Offset"] = GLib.ByteArray.number (_sent);
 
     _sent += _current_chunk_size;
-    QUrl url = chunk_url (_current_chunk);
+    GLib.Uri url = chunk_url (_current_chunk);
 
     // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
     var device_ptr = device.get (); // for connections later
@@ -395,7 +395,7 @@ void PropagateUploadFileNG.on_put_finished () {
     const string full_file_path (propagator ().full_local_path (_item._file));
     if (!FileSystem.file_exists (full_file_path)) {
         if (!_finished) {
-            abort_with_error (SyncFileItem.SoftError, tr ("The local file was removed during sync."));
+            abort_with_error (SyncFileItem.SoftError, _("The local file was removed during sync."));
             return;
         } else {
             propagator ()._another_sync_needed = true;
@@ -405,21 +405,21 @@ void PropagateUploadFileNG.on_put_finished () {
     // Check whether the file changed since discovery - this acts on the original file.
     Q_ASSERT (_item._modtime > 0);
     if (_item._modtime <= 0) {
-        q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+        GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
     }
     if (!FileSystem.verify_file_unchanged (full_file_path, _item._size, _item._modtime)) {
         propagator ()._another_sync_needed = true;
         if (!_finished) {
-            abort_with_error (SyncFileItem.SoftError, tr ("Local file changed during sync."));
+            abort_with_error (SyncFileItem.SoftError, _("Local file changed during sync."));
             return;
         }
     }
 
     if (!_finished) {
-        // Deletes an existing blacklist entry on successful chunk upload
-        if (_item._has_blacklist_entry) {
-            propagator ()._journal.wipe_error_blacklist_entry (_item._file);
-            _item._has_blacklist_entry = false;
+        // Deletes an existing blocklist entry on successful chunk upload
+        if (_item._has_blocklist_entry) {
+            propagator ()._journal.wipe_error_blocklist_entry (_item._file);
+            _item._has_blocklist_entry = false;
         }
 
         // Reset the error count on successful chunk upload
@@ -448,7 +448,7 @@ void PropagateUploadFileNG.on_move_job_finished () {
     if (_item._http_error_code == 202) {
         string path = string.from_utf8 (job.reply ().raw_header ("OC-Job_status-Location"));
         if (path.is_empty ()) {
-            on_done (SyncFileItem.NormalError, tr ("Poll URL missing"));
+            on_done (SyncFileItem.NormalError, _("Poll URL missing"));
             return;
         }
         _finished = true;
@@ -457,19 +457,19 @@ void PropagateUploadFileNG.on_move_job_finished () {
     }
 
     if (_item._http_error_code != 201 && _item._http_error_code != 204) {
-        abort_with_error (SyncFileItem.NormalError, tr ("Unexpected return code from server (%1)").arg (_item._http_error_code));
+        abort_with_error (SyncFileItem.NormalError, _("Unexpected return code from server (%1)").arg (_item._http_error_code));
         return;
     }
 
     GLib.ByteArray fid = job.reply ().raw_header ("OC-FileID");
     if (fid.is_empty ()) {
-        q_c_warning (lc_propagate_upload_nG) << "Server did not return a OC-FileID" << _item._file;
-        abort_with_error (SyncFileItem.NormalError, tr ("Missing File ID from server"));
+        GLib.warn (lc_propagate_upload_nG) << "Server did not return a OC-FileID" << _item._file;
+        abort_with_error (SyncFileItem.NormalError, _("Missing File ID from server"));
         return;
     } else {
         // the old file id should only be empty for new files uploaded
         if (!_item._file_id.is_empty () && _item._file_id != fid) {
-            q_c_warning (lc_propagate_upload_nG) << "File ID changed!" << _item._file_id << fid;
+            GLib.warn (lc_propagate_upload_nG) << "File ID changed!" << _item._file_id << fid;
         }
         _item._file_id = fid;
     }
@@ -477,8 +477,8 @@ void PropagateUploadFileNG.on_move_job_finished () {
     _item._etag = get_etag_from_reply (job.reply ());
     ;
     if (_item._etag.is_empty ()) {
-        q_c_warning (lc_propagate_upload_nG) << "Server did not return an ETAG" << _item._file;
-        abort_with_error (SyncFileItem.NormalError, tr ("Missing ETag from server"));
+        GLib.warn (lc_propagate_upload_nG) << "Server did not return an ETAG" << _item._file;
+        abort_with_error (SyncFileItem.NormalError, _("Missing ETag from server"));
         return;
     }
     on_finalize ();

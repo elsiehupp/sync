@@ -10,7 +10,7 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 
 // #include <QLoggingCategory>
 // #include <QMap>
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <string>
 // #include <QElapsedTimer>
 // #include <QHttpMultiPart>
@@ -32,7 +32,7 @@ struct SingleUploadFileData {
 ***********************************************************/
 class PutMultiFileJob : AbstractNetworkJob {
 
-    public PutMultiFileJob (AccountPtr account, QUrl url,
+    public PutMultiFileJob (AccountPointer account, GLib.Uri url,
                              std.vector<SingleUploadFileData> devices, GLib.Object parent = nullptr)
         : AbstractNetworkJob (account, {}, parent)
         , _devices (std.move (devices))
@@ -68,7 +68,7 @@ signals:
     private QHttpMultiPart _body;
     private std.vector<SingleUploadFileData> _devices;
     private string _error_string;
-    private QUrl _url;
+    private GLib.Uri _url;
     private QElapsedTimer _request_timer;
 };
 
@@ -95,7 +95,7 @@ signals:
         send_request ("POST", _url, req, &_body);
 
         if (reply ().error () != QNetworkReply.NoError) {
-            q_c_warning (lc_put_multi_file_job) << " Network error : " << reply ().error_string ();
+            GLib.warn (lc_put_multi_file_job) << " Network error : " << reply ().error_string ();
         }
 
         connect (reply (), &QNetworkReply.upload_progress, this, &PutMultiFileJob.upload_progress);

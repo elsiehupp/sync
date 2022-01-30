@@ -192,15 +192,15 @@ Systray.Systray ()
 
     var context_menu = new QMenu ();
     if (AccountManager.instance ().accounts ().is_empty ()) {
-        context_menu.add_action (tr ("Add account"), this, &Systray.open_account_wizard);
+        context_menu.add_action (_("Add account"), this, &Systray.open_account_wizard);
     } else {
-        context_menu.add_action (tr ("Open main dialog"), this, &Systray.open_main_dialog);
+        context_menu.add_action (_("Open main dialog"), this, &Systray.open_main_dialog);
     }
 
-    var pause_action = context_menu.add_action (tr ("Pause sync"), this, &Systray.on_pause_all_folders);
-    var resume_action = context_menu.add_action (tr ("Resume sync"), this, &Systray.on_unpause_all_folders);
-    context_menu.add_action (tr ("Settings"), this, &Systray.open_settings);
-    context_menu.add_action (tr ("Exit %1").arg (Theme.instance ().app_name_gui ()), this, &Systray.shutdown);
+    var pause_action = context_menu.add_action (_("Pause sync"), this, &Systray.on_pause_all_folders);
+    var resume_action = context_menu.add_action (_("Resume sync"), this, &Systray.on_unpause_all_folders);
+    context_menu.add_action (_("Settings"), this, &Systray.open_settings);
+    context_menu.add_action (_("Exit %1").arg (Theme.instance ().app_name_gui ()), this, &Systray.shutdown);
     set_context_menu (context_menu);
 
     connect (context_menu, &QMenu.about_to_show, [=] {
@@ -209,7 +209,7 @@ Systray.Systray ()
         const var all_paused = std.all_of (std.cbegin (folders), std.cend (folders), [] (Folder f) {
             return f.sync_paused ();
         });
-        const var pause_text = folders.size () > 1 ? tr ("Pause sync for all") : tr ("Pause sync");
+        const var pause_text = folders.size () > 1 ? _("Pause sync for all") : _("Pause sync");
         pause_action.on_set_text (pause_text);
         pause_action.set_visible (!all_paused);
         pause_action.set_enabled (!all_paused);
@@ -217,7 +217,7 @@ Systray.Systray ()
         const var any_paused = std.any_of (std.cbegin (folders), std.cend (folders), [] (Folder f) {
             return f.sync_paused ();
         });
-        const var resume_text = folders.size () > 1 ? tr ("Resume sync for all") : tr ("Resume sync");
+        const var resume_text = folders.size () > 1 ? _("Resume sync for all") : _("Resume sync");
         resume_action.on_set_text (resume_text);
         resume_action.set_visible (any_paused);
         resume_action.set_enabled (any_paused);
@@ -237,7 +237,7 @@ void Systray.create () {
         if (!AccountManager.instance ().accounts ().is_empty ()) {
             _tray_engine.root_context ().set_context_property ("activity_model", User_model.instance ().current_activity_model ());
         }
-        _tray_engine.on_load (QStringLiteral ("qrc:/qml/src/gui/tray/Window.qml"));
+        _tray_engine.on_load ("qrc:/qml/src/gui/tray/Window.qml");
     }
     hide_window ();
     emit activated (QSystemTrayIcon.Activation_reason.Unknown);
@@ -339,7 +339,7 @@ void Systray.show_message (string title, string message, Message_icon icon) {
 }
 
 void Systray.set_tool_tip (string tip) {
-    QSystemTrayIcon.set_tool_tip (tr ("%1 : %2").arg (Theme.instance ().app_name_gui (), tip));
+    QSystemTrayIcon.set_tool_tip (_("%1 : %2").arg (Theme.instance ().app_name_gui (), tip));
 }
 
 bool Systray.sync_is_paused () {
@@ -437,10 +437,10 @@ QPoint Systray.compute_window_reference_point () {
     const var taskbar_screen_edge = taskbar_orientation ();
     const var screen_rect = current_screen_rect ();
 
-    q_c_debug (lc_systray) << "screen_rect:" << screen_rect;
-    q_c_debug (lc_systray) << "taskbar_rect:" << taskbar_rect;
-    q_c_debug (lc_systray) << "taskbar_screen_edge:" << taskbar_screen_edge;
-    q_c_debug (lc_systray) << "tray_icon_center:" << tray_icon_center;
+    GLib.debug (lc_systray) << "screen_rect:" << screen_rect;
+    GLib.debug (lc_systray) << "taskbar_rect:" << taskbar_rect;
+    GLib.debug (lc_systray) << "taskbar_screen_edge:" << taskbar_screen_edge;
+    GLib.debug (lc_systray) << "tray_icon_center:" << tray_icon_center;
 
     switch (taskbar_screen_edge) {
     case Task_bar_position.Bottom:
@@ -506,10 +506,10 @@ QPoint Systray.compute_window_position (int width, int height) {
         return rect.translated (offset);
     } ();
 
-    q_c_debug (lc_systray) << "taskbar_screen_edge:" << taskbar_screen_edge;
-    q_c_debug (lc_systray) << "screen_rect:" << screen_rect;
-    q_c_debug (lc_systray) << "window_rect (reference)" << QRect (top_left, bottom_right);
-    q_c_debug (lc_systray) << "window_rect (adjusted)" << window_rect;
+    GLib.debug (lc_systray) << "taskbar_screen_edge:" << taskbar_screen_edge;
+    GLib.debug (lc_systray) << "screen_rect:" << screen_rect;
+    GLib.debug (lc_systray) << "window_rect (reference)" << QRect (top_left, bottom_right);
+    GLib.debug (lc_systray) << "window_rect (adjusted)" << window_rect;
 
     return window_rect.top_left ();
 }

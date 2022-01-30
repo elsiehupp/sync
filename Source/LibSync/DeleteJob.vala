@@ -16,10 +16,10 @@ namespace Occ {
 ***********************************************************/
 class DeleteJob : AbstractNetworkJob {
 
-    public DeleteJob (AccountPtr account, string path, GLib.Object parent = nullptr);
+    public DeleteJob (AccountPointer account, string path, GLib.Object parent = nullptr);
 
 
-    public DeleteJob (AccountPtr account, QUrl url, GLib.Object parent = nullptr);
+    public DeleteJob (AccountPointer account, GLib.Uri url, GLib.Object parent = nullptr);
 
     public void on_start () override;
     public bool on_finished () override;
@@ -33,15 +33,15 @@ signals:
     void finished_signal ();
 
 
-    private QUrl _url; // Only used if the constructor taking a url is taken.
+    private GLib.Uri _url; // Only used if the constructor taking a url is taken.
     private GLib.ByteArray _folder_token;
 };
 
-    DeleteJob.DeleteJob (AccountPtr account, string path, GLib.Object parent)
+    DeleteJob.DeleteJob (AccountPointer account, string path, GLib.Object parent)
         : AbstractNetworkJob (account, path, parent) {
     }
 
-    DeleteJob.DeleteJob (AccountPtr account, QUrl url, GLib.Object parent)
+    DeleteJob.DeleteJob (AccountPointer account, GLib.Uri url, GLib.Object parent)
         : AbstractNetworkJob (account, string (), parent)
         , _url (url) {
     }
@@ -59,7 +59,7 @@ signals:
         }
 
         if (reply ().error () != QNetworkReply.NoError) {
-            q_c_warning (lc_delete_job) << " Network error : " << reply ().error_string ();
+            GLib.warn (lc_delete_job) << " Network error : " << reply ().error_string ();
         }
         AbstractNetworkJob.on_start ();
     }

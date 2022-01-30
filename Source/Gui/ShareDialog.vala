@@ -108,7 +108,7 @@ signals:
         , _share_path (share_path)
         , _local_path (local_path)
         , _max_sharing_permissions (max_sharing_permissions)
-        , _private_link_url (account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (QUrl.FullyEncoded))
+        , _private_link_url (account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded))
         , _start_page (start_page) {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         set_attribute (Qt.WA_DeleteOnClose);
@@ -130,7 +130,7 @@ signals:
 
         // Set filename
         string file_name = QFileInfo (_share_path).file_name ();
-        _ui.label_name.on_set_text (tr ("%1").arg (file_name));
+        _ui.label_name.on_set_text (_("%1").arg (file_name));
         QFont f (_ui.label_name.font ());
         f.set_point_size (q_round (f.point_size () * 1.4));
         _ui.label_name.set_font (f);
@@ -151,10 +151,10 @@ signals:
         } else {
             _ui.grid_layout.add_widget (_ui.label_name, 0, 1, 1, 1);
             _ui.grid_layout.add_widget (_ui.label_share_path, 1, 1, 1, 1);
-            _ui.label_share_path.on_set_text (tr ("Folder : %2").arg (oc_dir));
+            _ui.label_share_path.on_set_text (_("Folder : %2").arg (oc_dir));
         }
 
-        this.set_window_title (tr ("%1 Sharing").arg (Theme.instance ().app_name_gui ()));
+        this.set_window_title (_("%1 Sharing").arg (Theme.instance ().app_name_gui ()));
 
         if (!account_state.account ().capabilities ().share_a_p_i ()) {
             return;
@@ -179,10 +179,10 @@ signals:
 
         bool sharing_possible = true;
         if (!account_state.account ().capabilities ().share_public_link ()) {
-            q_c_warning (lc_sharing) << "Link shares have been disabled";
+            GLib.warn (lc_sharing) << "Link shares have been disabled";
             sharing_possible = false;
         } else if (! (max_sharing_permissions & Share_permission_share)) {
-            q_c_warning (lc_sharing) << "The file cannot be shared because it does not have sharing permission.";
+            GLib.warn (lc_sharing) << "The file cannot be shared because it does not have sharing permission.";
             sharing_possible = false;
         }
 
@@ -306,7 +306,7 @@ signals:
             _private_link_url = private_link_url;
         } else if (!numeric_file_id.is_empty ()) {
             q_c_info (lc_sharing) << "Received numeric file id for" << _share_path << numeric_file_id;
-            _private_link_url = _account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (QUrl.FullyEncoded);
+            _private_link_url = _account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded);
         }
 
         show_sharing_ui ();
@@ -329,7 +329,7 @@ signals:
 
         if (!can_reshare) {
             var label = new QLabel (this);
-            label.on_set_text (tr ("The file cannot be shared because it does not have sharing permission."));
+            label.on_set_text (_("The file cannot be shared because it does not have sharing permission."));
             label.set_word_wrap (true);
             _ui.vertical_layout.insert_widget (1, label);
             return;
@@ -391,8 +391,8 @@ signals:
     void Share_dialog.on_link_share_requires_password () {
         bool ok = false;
         string password = QInputDialog.get_text (this,
-                                                 tr ("Password for share required"),
-                                                 tr ("Please enter a password for your link share:"),
+                                                 _("Password for share required"),
+                                                 _("Please enter a password for your link share:"),
                                                  QLineEdit.Password,
                                                  string (),
                                                  &ok);
@@ -419,7 +419,7 @@ signals:
 
     void Share_dialog.on_thumbnail_fetched (int &status_code, GLib.ByteArray reply) {
         if (status_code != 200) {
-            q_c_warning (lc_sharing) << "Thumbnail status code : " << status_code;
+            GLib.warn (lc_sharing) << "Thumbnail status code : " << status_code;
             return;
         }
 
@@ -432,7 +432,7 @@ signals:
 
     void Share_dialog.on_account_state_changed (int state) {
         bool enabled = (state == AccountState.State.Connected);
-        q_c_debug (lc_sharing) << "Account connected?" << enabled;
+        GLib.debug (lc_sharing) << "Account connected?" << enabled;
 
         if (_user_group_widget) {
             _user_group_widget.set_enabled (enabled);

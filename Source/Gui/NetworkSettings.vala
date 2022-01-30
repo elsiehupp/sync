@@ -50,12 +50,12 @@ class Network_settings : Gtk.Widget {
         , _ui (new Ui.Network_settings) {
         _ui.setup_ui (this);
 
-        _ui.host_line_edit.set_placeholder_text (tr ("Hostname of proxy server"));
-        _ui.user_line_edit.set_placeholder_text (tr ("Username for proxy server"));
-        _ui.password_line_edit.set_placeholder_text (tr ("Password for proxy server"));
+        _ui.host_line_edit.set_placeholder_text (_("Hostname of proxy server"));
+        _ui.user_line_edit.set_placeholder_text (_("Username for proxy server"));
+        _ui.password_line_edit.set_placeholder_text (_("Password for proxy server"));
 
-        _ui.type_combo_box.add_item (tr ("HTTP (S) proxy"), QNetworkProxy.HttpProxy);
-        _ui.type_combo_box.add_item (tr ("SOCKS5 proxy"), QNetworkProxy.Socks5Proxy);
+        _ui.type_combo_box.add_item (_("HTTP (S) proxy"), QNetworkProxy.HttpProxy);
+        _ui.type_combo_box.add_item (_("SOCKS5 proxy"), QNetworkProxy.Socks5Proxy);
 
         _ui.auth_requiredcheck_box.set_enabled (true);
 

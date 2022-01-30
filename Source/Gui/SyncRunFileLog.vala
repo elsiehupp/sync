@@ -8,7 +8,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <qfileinfo.h>
 
-// #include <QFile>
+// #include <GLib.File>
 // #include <QTextStream>
 // #include <QScopedPointer>
 // #include <QElapsedTimer>
@@ -39,7 +39,7 @@ class SyncRunFileLog {
 
     private string date_time_str (QDateTime &dt);
 
-    private QScopedPointer<QFile> _file;
+    private QScopedPointer<GLib.File> _file;
     private QTextStream _out;
     private QElapsedTimer _total_duration;
     private QElapsedTimer _lap_duration;
@@ -65,9 +65,9 @@ class SyncRunFileLog {
         string filename = logpath + QLatin1String ("/") + filename_single + QLatin1String ("_sync.log");
 
         int depth_index = 2;
-        while (QFile.exists (filename)) {
+        while (GLib.File.exists (filename)) {
 
-            QFile file = new QFile (filename);
+            GLib.File file = new GLib.File (filename);
             file.open (QIODevice.ReadOnly| QIODevice.Text);
             QTextStream in (&file);
             string line = in.read_line ();
@@ -93,10 +93,10 @@ class SyncRunFileLog {
         if (exists && info.size () > logfile_max_size) {
             exists = false;
             string new_filename = filename + QLatin1String (".1");
-            QFile.remove (new_filename);
-            QFile.rename (filename, new_filename);
+            GLib.File.remove (new_filename);
+            GLib.File.rename (filename, new_filename);
         }
-        _file.on_reset (new QFile (filename));
+        _file.on_reset (new GLib.File (filename));
 
         _file.open (QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text);
         _out.set_device (_file.data ());
@@ -131,7 +131,7 @@ class SyncRunFileLog {
             }
         }
 
-        const QChar L = QLatin1Char ('|');
+        const char L = '|';
         _out << ts << L;
         _out << L;
         if (item._instruction != CSYNC_INSTRUCTION_RENAME) {

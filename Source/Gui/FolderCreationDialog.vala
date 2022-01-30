@@ -46,9 +46,9 @@ class FolderCreationDialog : Gtk.Dialog {
 
         connect (ui.new_folder_name_edit, &QLineEdit.text_changed, this, &FolderCreationDialog.on_new_folder_name_edit_text_edited);
 
-        const string suggested_folder_name_prefix = GLib.Object.tr ("New folder");
+        const string suggested_folder_name_prefix = GLib.Object._("New folder");
 
-        const string new_folder_full_path = _destination + QLatin1Char ('/') + suggested_folder_name_prefix;
+        const string new_folder_full_path = _destination + '/' + suggested_folder_name_prefix;
         if (!QDir (new_folder_full_path).exists ()) {
             ui.new_folder_name_edit.on_set_text (suggested_folder_name_prefix);
         } else {
@@ -79,7 +79,7 @@ class FolderCreationDialog : Gtk.Dialog {
         }
 
         if (!QDir (_destination).mkdir (ui.new_folder_name_edit.text ())) {
-            QMessageBox.critical (this, tr ("Error"), tr ("Could not create a folder! Check your write permissions."));
+            QMessageBox.critical (this, _("Error"), _("Could not create a folder! Check your write permissions."));
         }
 
         Gtk.Dialog.on_accept ();

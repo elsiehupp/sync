@@ -13,8 +13,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QSettings>
 // #include <QTextStream>
 // #include <QDir>
-// #include <QFile>
-// #include <QUrl>
+// #include <GLib.File>
+// #include <GLib.Uri>
 // #include <QProcess>
 // #include <QThread>
 // #include <QDateTime>
@@ -41,7 +41,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QElapsedTimer>
 // #include <QLoggingCategory>
 // #include <QMap>
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QUrlQuery>
 // #include <functional>
 // #include <memory>
@@ -239,8 +239,8 @@ namespace Utility {
     Appends concat_path and query_items to the url
     ***********************************************************/
 
-    OCSYNC_EXPORT QUrl concat_url_path (
-        const QUrl url, string concat_path,
+    OCSYNC_EXPORT GLib.Uri concat_url_path (
+        const GLib.Uri url, string concat_path,
         const QUrlQuery &query_items = {});
 
 
@@ -346,14 +346,14 @@ bool Utility.write_random_file (string fname, int size) {
     string rand_string;
     for (int i = 0; i < size; i++) {
         int r = rand () % 128;
-        rand_string.append (QChar (r));
+        rand_string.append (char (r));
     }
 
-    QFile file = new QFile (fname);
+    GLib.File file = new GLib.File (fname);
     if (file.open (QIODevice.WriteOnly | QIODevice.Text)) {
         QTextStream out (&file);
         out << rand_string;
-        // optional, as QFile destructor will already do it:
+        // optional, as GLib.File destructor will already do it:
         file.close ();
         return true;
     }
@@ -371,7 +371,7 @@ string Utility.format_fingerprint (GLib.ByteArray fmhash, bool colon_separated) 
 
     string fp = string.from_latin1 (hash.trimmed ());
     if (colon_separated) {
-        fp.replace (QLatin1Char (' '), QLatin1Char (':'));
+        fp.replace (' ', ':');
     }
 
     return fp;
@@ -432,9 +432,9 @@ static QLatin1String platform () {
 }
 
 GLib.ByteArray Utility.user_agent_string () {
-    return QStringLiteral ("Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture : %6 OsArchitecture : %7)")
+    return "Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture : %6 OsArchitecture : %7)"
         .arg (platform (),
-            QStringLiteral (MIRALL_VERSION_STRING),
+            MIRALL_VERSION_STRING,
             q_app.application_name (),
             QSysInfo.product_type (),
             QSysInfo.kernel_version (),
@@ -444,7 +444,7 @@ GLib.ByteArray Utility.user_agent_string () {
 }
 
 GLib.ByteArray Utility.friendly_user_agent_string () {
-    const var pattern = QStringLiteral ("%1 (Desktop Client - %2)");
+    const var pattern = "%1 (Desktop Client - %2)";
     const var user_agent = pattern.arg (QSysInfo.machine_host_name (), platform ());
     return user_agent.to_utf8 ();
 }
@@ -474,9 +474,9 @@ int64 Utility.free_disk_space (string path) {
 
 string Utility.compact_format_double (double value, int prec, string unit) {
     QLocale locale = QLocale.system ();
-    QChar dec_point = locale.decimal_point ();
+    char dec_point = locale.decimal_point ();
     string str = locale.to_string (value, 'f', prec);
-    while (str.ends_with (QLatin1Char ('0')) || str.ends_with (dec_point)) {
+    while (str.ends_with ('0') || str.ends_with (dec_point)) {
         if (str.ends_with (dec_point)) {
             str.chop (1);
             break;
@@ -484,7 +484,7 @@ string Utility.compact_format_double (double value, int prec, string unit) {
         str.chop (1);
     }
     if (!unit.is_empty ())
-        str += (QLatin1Char (' ') + unit);
+        str += (' ' + unit);
     return str;
 }
 
@@ -588,7 +588,7 @@ string Utility.duration_to_descriptive_string1 (uint64 msecs) {
 string Utility.file_name_for_gui_use (string f_name) {
     if (is_mac ()) {
         string n (f_name);
-        return n.replace (QLatin1Char (':'), QLatin1Char ('/'));
+        return n.replace (':', '/');
     }
     return f_name;
 }
@@ -658,7 +658,7 @@ GLib.ByteArray Utility.version_of_installed_binary (string command) {
             binary = q_app.arguments ()[0];
         }
         string[] params;
-        params << QStringLiteral ("--version");
+        params << "--version";
         QProcess process;
         process.on_start (binary, params);
         process.wait_for_finished (); // sets current thread to sleep and waits for ping_process end
@@ -679,40 +679,40 @@ string Utility.time_ago_in_words (QDateTime &dt, QDateTime &from) {
     }
 
     if (dt.days_to (now) == 1) {
-        return GLib.Object.tr ("%n day ago", "", dt.days_to (now));
+        return GLib.Object._("%n day ago", "", dt.days_to (now));
     } else if (dt.days_to (now) > 1) {
-        return GLib.Object.tr ("%n days ago", "", dt.days_to (now));
+        return GLib.Object._("%n days ago", "", dt.days_to (now));
     } else {
         int64 secs = dt.secs_to (now);
         if (secs < 0) {
-            return GLib.Object.tr ("in the future");
+            return GLib.Object._("in the future");
         }
 
         if (floor (secs / 3600.0) > 0) {
             int hours = floor (secs / 3600.0);
             if (hours == 1) {
-                return (GLib.Object.tr ("%n hour ago", "", hours));
+                return (GLib.Object._("%n hour ago", "", hours));
             } else {
-                return (GLib.Object.tr ("%n hours ago", "", hours));
+                return (GLib.Object._("%n hours ago", "", hours));
             }
         } else {
             int minutes = q_round (secs / 60.0);
 
             if (minutes == 0) {
                 if (secs < 5) {
-                    return GLib.Object.tr ("now");
+                    return GLib.Object._("now");
                 } else {
-                    return GLib.Object.tr ("Less than a minute ago");
+                    return GLib.Object._("Less than a minute ago");
                 }
 
             } else if (minutes == 1) {
-                return (GLib.Object.tr ("%n minute ago", "", minutes));
+                return (GLib.Object._("%n minute ago", "", minutes));
             } else {
-                return (GLib.Object.tr ("%n minutes ago", "", minutes));
+                return (GLib.Object._("%n minutes ago", "", minutes));
             }
         }
     }
-    return GLib.Object.tr ("Some time ago");
+    return GLib.Object._("Some time ago");
 }
 
 
@@ -777,21 +777,21 @@ void Utility.sort_filenames (string[] &file_names) {
     std.sort (file_names.begin (), file_names.end (), collator);
 }
 
-QUrl Utility.concat_url_path (QUrl url, string concat_path,
+GLib.Uri Utility.concat_url_path (GLib.Uri url, string concat_path,
     const QUrlQuery &query_items) {
     string path = url.path ();
     if (!concat_path.is_empty ()) {
         // avoid '//'
-        if (path.ends_with (QLatin1Char ('/')) && concat_path.starts_with (QLatin1Char ('/'))) {
+        if (path.ends_with ('/') && concat_path.starts_with ('/')) {
             path.chop (1);
         } // avoid missing '/'
-        else if (!path.ends_with (QLatin1Char ('/')) && !concat_path.starts_with (QLatin1Char ('/'))) {
-            path += QLatin1Char ('/');
+        else if (!path.ends_with ('/') && !concat_path.starts_with ('/')) {
+            path += '/';
         }
         path += concat_path; // put the complete path together
     }
 
-    QUrl tmp_url = url;
+    GLib.Uri tmp_url = url;
     tmp_url.set_path (path);
     tmp_url.set_query (query_items);
     return tmp_url;
@@ -801,20 +801,20 @@ string Utility.make_conflict_file_name (
     const string fn, QDateTime &dt, string user) {
     string conflict_file_name (fn);
     // Add conflict tag before the extension.
-    int dot_location = conflict_file_name.last_index_of (QLatin1Char ('.'));
+    int dot_location = conflict_file_name.last_index_of ('.');
     // If no extension, add it at the end  (take care of cases like foo/.hidden or foo.bar/file)
-    if (dot_location <= conflict_file_name.last_index_of (QLatin1Char ('/')) + 1) {
+    if (dot_location <= conflict_file_name.last_index_of ('/') + 1) {
         dot_location = conflict_file_name.size ();
     }
 
-    string conflict_marker = QStringLiteral (" (conflicted copy ");
+    string conflict_marker = " (conflicted copy ";
     if (!user.is_empty ()) {
         // Don't allow parens in the user name, to ensure
         // we can find the beginning and end of the conflict tag.
-        const var user_name = sanitize_for_file_name (user).replace (QLatin1Char (' ('), QLatin1Char ('_')).replace (QLatin1Char (')'), QLatin1Char ('_'));;
-        conflict_marker += user_name + QLatin1Char (' ');
+        const var user_name = sanitize_for_file_name (user).replace ('(', '_').replace (')', '_');
+        conflict_marker += user_name + ' ';
     }
-    conflict_marker += dt.to_string (QStringLiteral ("yyyy-MM-dd hhmmss")) + QLatin1Char (')');
+    conflict_marker += dt.to_string ("yyyy-MM-dd hhmmss") + ')';
 
     conflict_file_name.insert (dot_location, conflict_marker);
     return conflict_file_name;
@@ -840,13 +840,15 @@ bool Utility.is_conflict_file (char name) {
 }
 
 bool Utility.is_conflict_file (string name) {
-    var bname = name.mid_ref (name.last_index_of (QLatin1Char ('/')) + 1);
+    var bname = name.mid_ref (name.last_index_of ('/') + 1);
 
-    if (bname.contains (QStringLiteral ("_conflict-")))
+    if (bname.contains ("_conflict-")) {
         return true;
+    }
 
-    if (bname.contains (QStringLiteral (" (conflicted copy")))
+    if (bname.contains (" (conflicted copy")) {
         return true;
+    }
 
     return false;
 }
@@ -886,13 +888,13 @@ bool Utility.is_path_windows_drive_partition_root (string path) {
 }
 
 string Utility.sanitize_for_file_name (string name) {
-    const var invalid = QStringLiteral (R" (/?<>\:*|\")");
+    const var invalid = R" (/?<>\:*|\")";
     string result;
     result.reserve (name.size ());
     for (var c : name) {
         if (!invalid.contains (c)
-            && c.category () != QChar.Other_Control
-            && c.category () != QChar.Other_Format) {
+            && c.category () != char.Other_Control
+            && c.category () != char.Other_Format) {
             result.append (c);
         }
     }
@@ -903,9 +905,9 @@ string Utility.sanitize_for_file_name (string name) {
 
     static void setup_fav_link_private (string folder) {
         // Nautilus : add to ~/.gtk-bookmarks
-        QFile gtk_bookmarks (QDir.home_path () + QLatin1String ("/.config/gtk-3.0/bookmarks"));
+        GLib.File gtk_bookmarks (QDir.home_path () + QLatin1String ("/.config/gtk-3.0/bookmarks"));
         GLib.ByteArray folder_url = "file://" + folder.to_utf8 ();
-        if (gtk_bookmarks.open (QFile.ReadWrite)) {
+        if (gtk_bookmarks.open (GLib.File.ReadWrite)) {
             GLib.ByteArray places = gtk_bookmarks.read_all ();
             if (!places.contains (folder_url)) {
                 places += folder_url;
@@ -932,7 +934,7 @@ string Utility.sanitize_for_file_name (string name) {
         string desktop_file_location = get_user_autostart_dir_private ()
                                         + QLatin1String (LINUX_APPLICATION_ID)
                                         + QLatin1String (".desktop");
-        return QFile.exists (desktop_file_location);
+        return GLib.File.exists (desktop_file_location);
     }
 
     void set_launch_on_startup_private (string app_name, string gui_name, bool enable) {
@@ -943,36 +945,36 @@ string Utility.sanitize_for_file_name (string name) {
                                         + QLatin1String (".desktop");
         if (enable) {
             if (!QDir ().exists (user_auto_start_path) && !QDir ().mkpath (user_auto_start_path)) {
-                q_c_warning (lc_utility) << "Could not create autostart folder" << user_auto_start_path;
+                GLib.warn (lc_utility) << "Could not create autostart folder" << user_auto_start_path;
                 return;
             }
-            QFile ini_file (desktop_file_location);
+            GLib.File ini_file (desktop_file_location);
             if (!ini_file.open (QIODevice.WriteOnly)) {
-                q_c_warning (lc_utility) << "Could not write var on_start entry" << desktop_file_location;
+                GLib.warn (lc_utility) << "Could not write var on_start entry" << desktop_file_location;
                 return;
             }
             // When running inside an AppImage, we need to set the path to the
             // AppImage instead of the path to the executable
             const string app_image_path = q_environment_variable ("APPIMAGE");
-            const bool running_inside_app_image = !app_image_path.is_null () && QFile.exists (app_image_path);
+            const bool running_inside_app_image = !app_image_path.is_null () && GLib.File.exists (app_image_path);
             const string executable_path = running_inside_app_image ? app_image_path : QCoreApplication.application_file_path ();
 
             QTextStream ts (&ini_file);
             ts.set_codec ("UTF-8");
-            ts << QLatin1String ("[Desktop Entry]\n")
-               << QLatin1String ("Name=") << gui_name << QLatin1Char ('\n')
-               << QLatin1String ("GenericName=") << QLatin1String ("File Synchronizer\n")
-               << QLatin1String ("Exec=\"") << executable_path << "\" --background\n"
-               << QLatin1String ("Terminal=") << "false\n"
-               << QLatin1String ("Icon=") << APPLICATION_ICON_NAME << QLatin1Char ('\n')
-               << QLatin1String ("Categories=") << QLatin1String ("Network\n")
-               << QLatin1String ("Type=") << QLatin1String ("Application\n")
-               << QLatin1String ("StartupNotify=") << "false\n"
-               << QLatin1String ("X-GNOME-Autostart-enabled=") << "true\n"
-               << QLatin1String ("X-GNOME-Autostart-Delay=10") << Qt.endl;
+            ts << "[Desktop Entry]\n"
+               << "Name=" << gui_name << '\n'
+               << "GenericName=" << "File Synchronizer\n"
+               << "Exec=\"" << executable_path << "\" --background\n"
+               << "Terminal=" << "false\n"
+               << "Icon=" << APPLICATION_ICON_NAME << '\n'
+               << "Categories=" << "Network\n"
+               << "Type=" << "Application\n"
+               << "StartupNotify=" << "false\n"
+               << "X-GNOME-Autostart-enabled=" << "true\n"
+               << "X-GNOME-Autostart-Delay=10" << Qt.endl;
         } else {
-            if (!QFile.remove (desktop_file_location)) {
-                q_c_warning (lc_utility) << "Could not remove autostart desktop file";
+            if (!GLib.File.remove (desktop_file_location)) {
+                GLib.warn (lc_utility) << "Could not remove autostart desktop file";
             }
         }
     }

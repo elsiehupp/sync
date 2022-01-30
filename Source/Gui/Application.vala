@@ -174,7 +174,7 @@ namespace {
         string dev_tr_path = q_app.application_dir_path () + string.from_latin1 ("/../src/gui/");
         if (QDir (dev_tr_path).exists ()) {
             // might miss Qt, QtKeyChain, etc.
-            q_c_warning (lc_application) << "Running from build location! Translations may be incomplete!";
+            GLib.warn (lc_application) << "Running from build location! Translations may be incomplete!";
             return dev_tr_path;
         }
 #if defined (Q_OS_UNIX)
@@ -208,23 +208,23 @@ bool Application.config_version_migration () {
     if (warning_message) {
         string bold_message;
         if (!delete_keys.is_empty ()) {
-            bold_message = tr ("Continuing will mean <b>deleting these settings</b>.");
+            bold_message = _("Continuing will mean <b>deleting these settings</b>.");
         } else {
-            bold_message = tr ("Continuing will mean <b>ignoring these settings</b>.");
+            bold_message = _("Continuing will mean <b>ignoring these settings</b>.");
         }
 
         QMessageBox box (
             QMessageBox.Warning,
             APPLICATION_SHORTNAME,
-            tr ("Some settings were configured in newer versions of this client and "
+            _("Some settings were configured in newer versions of this client and "
                "use features that are not available in this version.<br>"
                "<br>"
                "%1<br>"
                "<br>"
                "The current configuration file was already backed up to <i>%2</i>.")
                 .arg (bold_message, backup_file));
-        box.add_button (tr ("Quit"), QMessageBox.AcceptRole);
-        var continue_btn = box.add_button (tr ("Continue"), QMessageBox.DestructiveRole);
+        box.add_button (_("Quit"), QMessageBox.AcceptRole);
+        var continue_btn = box.add_button (_("Continue"), QMessageBox.DestructiveRole);
 
         box.exec ();
         if (box.clicked_button () != continue_btn) {
@@ -299,16 +299,16 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
             if (conf_dir.ends_with ('/')) conf_dir.chop (1);  // macOS 10.11.x does not like trailing slash for rename/move.
             q_c_info (lc_application) << "Migrating old config from" << old_dir << "to" << conf_dir;
 
-            if (!QFile.rename (old_dir, conf_dir)) {
-                q_c_warning (lc_application) << "Failed to move the old config directory to its new location (" << old_dir << "to" << conf_dir << ")";
+            if (!GLib.File.rename (old_dir, conf_dir)) {
+                GLib.warn (lc_application) << "Failed to move the old config directory to its new location (" << old_dir << "to" << conf_dir << ")";
 
                 // Try to move the files one by one
                 if (QFileInfo (conf_dir).is_dir () || QDir ().mkdir (conf_dir)) {
                     const string[] files_list = QDir (old_dir).entry_list (QDir.Files);
                     q_c_info (lc_application) << "Will move the individual files" << files_list;
                     for (var &name : files_list) {
-                        if (!QFile.rename (old_dir + "/" + name,  conf_dir + "/" + name)) {
-                            q_c_warning (lc_application) << "Fallback move of " << name << "also failed";
+                        if (!GLib.File.rename (old_dir + "/" + name,  conf_dir + "/" + name)) {
+                            GLib.warn (lc_application) << "Fallback move of " << name << "also failed";
                         }
                     }
                 }
@@ -331,7 +331,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
 
 #if defined (WITH_CRASHREPORTER)
     if (ConfigFile ().crash_reporter ()) {
-        var reporter = QStringLiteral (CRASHREPORTER_EXECUTABLE);
+        var reporter = CRASHREPORTER_EXECUTABLE;
         _crash_handler.on_reset (new CrashReporter.Handler (QDir.temp_path (), true, reporter));
     }
 #endif
@@ -350,7 +350,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
 
     // Check vfs plugins
     if (Theme.instance ().show_virtual_files_option () && best_available_vfs_mode () == Vfs.Off) {
-        q_c_warning (lc_application) << "Theme wants to show vfs mode, but no vfs plugins are available";
+        GLib.warn (lc_application) << "Theme wants to show vfs mode, but no vfs plugins are available";
     }
     if (is_vfs_plugin_available (Vfs.WindowsCfApi))
         q_c_info (lc_application) << "VFS windows plugin is available";
@@ -370,11 +370,11 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
             q_c_critical (lc_application) << "Could not read the account settings, quitting";
             QMessageBox.critical (
                 nullptr,
-                tr ("Error accessing the configuration file"),
-                tr ("There was an error while accessing the configuration "
+                _("Error accessing the configuration file"),
+                _("There was an error while accessing the configuration "
                    "file at %1. Please make sure the file can be accessed by your user.")
                     .arg (ConfigFile ().config_file ()),
-                tr ("Quit %1").arg (Theme.instance ().app_name_gui ()));
+                _("Quit %1").arg (Theme.instance ().app_name_gui ()));
             QTimer.single_shot (0, q_app, SLOT (quit ()));
             return;
         }
@@ -589,9 +589,9 @@ void Application.on_use_mono_icons_changed (bool) {
 }
 
 void Application.on_parse_message (string msg, GLib.Object *) {
-    if (msg.starts_with (QLatin1String ("MSG_PARSEOPTIONS:"))) {
+    if (msg.starts_with ("MSG_PARSEOPTIONS:")) {
         const int length_of_msg_prefix = 17;
-        string[] options = msg.mid (length_of_msg_prefix).split (QLatin1Char ('|'));
+        string[] options = msg.mid (length_of_msg_prefix).split ('|');
         _show_log_window = false;
         parse_options (options);
         setup_logging ();
@@ -606,7 +606,7 @@ void Application.on_parse_message (string msg, GLib.Object *) {
         q_c_info (lc_application) << "Running for" << _started_at.elapsed () / 1000.0 << "sec";
         if (_started_at.elapsed () < 10 * 1000) {
             // This call is mirrored with the one in int main ()
-            q_c_warning (lc_application) << "Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and var on_start";
+            GLib.warn (lc_application) << "Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and var on_start";
             return;
         }
 
@@ -666,14 +666,14 @@ void Application.parse_options (string[] &options) {
             } else {
                 show_hint ("Path for confdir not specified");
             }
-        } else if (option == QLatin1String ("--debug")) {
+        } else if (option == "--debug") {
             _log_debug = true;
             _debug_mode = true;
-        } else if (option == QLatin1String ("--background")) {
+        } else if (option == "--background") {
             _background_mode = true;
-        } else if (option == QLatin1String ("--version") || option == QLatin1String ("-v")) {
+        } else if (option == "--version" || option == "-v") {
             _version_only = true;
-        } else if (option.ends_with (QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX))) {
+        } else if (option.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
             // virtual file, open it after the Folder were created (if the app is not terminated)
             QTimer.single_shot (0, this, [this, option] {
                 on_open_virtual_file (option);
@@ -760,10 +760,10 @@ void Application.setup_translations () {
     var qtkeychain_translator = new QTranslator (this);
 
     for (string lang : q_as_const (ui_languages)) {
-        lang.replace (QLatin1Char ('-'), QLatin1Char ('_')); // work around QTBUG-25973
+        lang.replace ('-', '_'); // work around QTBUG-25973
         lang = subst_lang (lang);
         const string tr_path = application_tr_path ();
-        const string tr_file = QLatin1String ("client_") + lang;
+        const string tr_file = "client_" + lang;
         if (translator.on_load (tr_file, tr_path) || lang.starts_with (QLatin1String ("en"))) {
             // Permissive approach : Qt and keychain translations
             // may be missing, but Qt translations must be there in order
@@ -816,7 +816,7 @@ void Application.on_gui_is_showing_settings () {
 }
 
 void Application.on_open_virtual_file (string filename) {
-    string virtual_file_ext = QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
+    string virtual_file_ext = APPLICATION_DOTVIRTUALFILE_SUFFIX;
     if (!filename.ends_with (virtual_file_ext)) {
         q_warning (lc_application) << "Can only handle file ending in .owncloud. Unable to open" << filename;
         return;
@@ -833,8 +833,8 @@ void Application.on_open_virtual_file (string filename) {
     var con = unowned<QMetaObject.Connection>.create ();
     *con = connect (folder, &Folder.sync_finished, folder, [folder, con, normal_name] {
         folder.disconnect (*con);
-        if (QFile.exists (normal_name)) {
-            QDesktopServices.open_url (QUrl.from_local_file (normal_name));
+        if (GLib.File.exists (normal_name)) {
+            QDesktopServices.open_url (GLib.Uri.from_local_file (normal_name));
         }
     });
 }

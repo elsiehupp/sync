@@ -4,10 +4,10 @@
 // #include <QDom_element>
 // #include <QXml_stream_writer>
 // #include <Qt_debug>
-// #include <QFile>
+// #include <GLib.File>
 // #include <QDom_document>
 // #include <QtCore/Qt_debug>
-// #include <QtCore/QFile>
+// #include <QtCore/GLib.File>
 
 namespace Occ {
 
@@ -114,7 +114,7 @@ class Update_info {
         int error_line = 0, error_col = 0;
         QDom_document doc;
         if (!doc.set_content (xml, false, &error_msg, &error_line, &error_col)) {
-            q_c_warning (lc_updater).noquote ().nospace () << error_msg << " at " << error_line << "," << error_col
+            GLib.warn (lc_updater).noquote ().nospace () << error_msg << " at " << error_line << "," << error_col
                                     << "\n" <<  xml.split_ref ("\n").value (error_line-1) << "\n"
                                     << string (" ").repeated (error_col - 1) << "^\n"
                                     << "." << xml << "<-";

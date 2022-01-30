@@ -12,14 +12,14 @@ using namespace Occ;
 
 class DesktopServiceHook : GLib.Object {
 signals:
-    void hooked (QUrl );
+    void hooked (GLib.Uri );
 
     public DesktopServiceHook () {
         QDesktopServices.setUrlHandler ("oauthtest", this, "hooked");
     }
 };
 
-static const QUrl sOAuthTestServer ("oauthtest://someserver/owncloud");
+static const GLib.Uri sOAuthTestServer ("oauthtest://someserver/owncloud");
 
 class FakePostReply : QNetworkReply {
 
@@ -114,7 +114,7 @@ class OAuthTestCase : GLib.Object {
     public string code = generateEtag ();
 
 
-    public Occ.AccountPtr account;
+    public Occ.AccountPointer account;
 
     public QScopedPointer<OAuth> oauth;
 
@@ -140,7 +140,7 @@ class OAuthTestCase : GLib.Object {
     }
 
 
-    public virtual void openBrowserHook (QUrl url) {
+    public virtual void openBrowserHook (GLib.Uri url) {
         QCOMPARE (state, StartState);
         state = BrowserOpened;
         QCOMPARE (url.path (), string (sOAuthTestServer.path () + "/index.php/apps/oauth2/authorize"));
@@ -148,7 +148,7 @@ class OAuthTestCase : GLib.Object {
         QUrlQuery query (url);
         QCOMPARE (query.queryItemValue (QLatin1String ("response_type")), QLatin1String ("code"));
         QCOMPARE (query.queryItemValue (QLatin1String ("client_id")), Theme.instance ().oauthClientId ());
-        QUrl redirectUri (query.queryItemValue (QLatin1String ("redirect_uri")));
+        GLib.Uri redirectUri (query.queryItemValue (QLatin1String ("redirect_uri")));
         QCOMPARE (redirectUri.host (), QLatin1String ("localhost"));
         redirectUri.setQuery ("code=" + code);
         createBrowserReply (QNetworkRequest (redirectUri));

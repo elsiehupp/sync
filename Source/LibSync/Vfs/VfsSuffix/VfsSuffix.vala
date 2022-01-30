@@ -4,7 +4,7 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFile>
+// #include <GLib.File>
 // #pragma once
 
 // #include <QScopedPointer>
@@ -77,9 +77,9 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
         // that are not marked as a virtual file. These could be real .owncloud
         // files that were synced before vfs was enabled.
         QByte_array_list to_wipe;
-        params.journal.get_files_below_path ("", [&to_wipe] (SyncJournalFileRecord &rec) {
-            if (!rec.is_virtual_file () && rec._path.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX))
-                to_wipe.append (rec._path);
+        params.journal.get_files_below_path ("", [&to_wipe] (SyncJournalFileRecord &record) {
+            if (!record.is_virtual_file () && record._path.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX))
+                to_wipe.append (record._path);
         });
         for (var &path : to_wipe)
             params.journal.delete_file_record (path);
@@ -97,7 +97,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
 
     Result<void, string> Vfs_suffix.update_metadata (string file_path, time_t modtime, int64, GLib.ByteArray ) {
         if (modtime <= 0) {
-            return {tr ("Error updating metadata due to invalid modified time")};
+            return {_("Error updating metadata due to invalid modified time")};
         }
 
         FileSystem.set_mod_time (file_path, modtime);
@@ -106,7 +106,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
 
     Result<void, string> Vfs_suffix.create_placeholder (SyncFileItem &item) {
         if (item._modtime <= 0) {
-            return {tr ("Error updating metadata due to invalid modified time")};
+            return {_("Error updating metadata due to invalid modified time")};
         }
 
         // The concrete shape of the placeholder is also used in is_dehydrated_placeholder () below
@@ -116,13 +116,13 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
             return string ("vfs file isn't ending with suffix");
         }
 
-        QFile file = new QFile (fn);
+        GLib.File file = new GLib.File (fn);
         if (file.exists () && file.size () > 1
             && !FileSystem.verify_file_unchanged (fn, item._size, item._modtime)) {
             return string ("Cannot create a placeholder because a file with the placeholder name already exist");
         }
 
-        if (!file.open (QFile.ReadWrite | QFile.Truncate))
+        if (!file.open (GLib.File.ReadWrite | GLib.File.Truncate))
             return file.error_string ();
 
         file.write (" ");
@@ -139,7 +139,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
             return r;
 
         if (item._file != item._rename_target) { // can be the same when renaming foo . foo.owncloud to dehydrate
-            QFile.remove (_setup_params.filesystem_path + item._file);
+            GLib.File.remove (_setup_params.filesystem_path + item._file);
         }
 
         // Move the item's pin state

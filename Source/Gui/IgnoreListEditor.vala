@@ -4,7 +4,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFile>
+// #include <GLib.File>
 // #include <QDir>
 // #include <QList_widget>
 // #include <QListWidgetTtem>
@@ -49,7 +49,7 @@ class Ignore_list_editor : Gtk.Dialog {
 
         ConfigFile cfg_file;
         //FIXME This is not true. The entries are hardcoded below in setup_table_read_only_items
-        read_only_tooltip = tr ("This entry is provided by the system at \"%1\" "
+        read_only_tooltip = _("This entry is provided by the system at \"%1\" "
                              "and cannot be modified in this view.")
                               .arg (QDir.to_native_separators (cfg_file.exclude_file (ConfigFile.SystemScope)));
 

@@ -43,7 +43,7 @@ namespace {
                 return;
             }
 
-            _image_paths = id.split (QLatin1Char (';'), Qt.Skip_empty_parts);
+            _image_paths = id.split (';', Qt.Skip_empty_parts);
             _requested_image_size = requested_size;
 
             if (_image_paths.is_empty ()) {
@@ -76,7 +76,7 @@ namespace {
 
             const var current_user = Occ.User_model.instance ().current_user ();
             if (current_user && current_user.account ()) {
-                const QUrl icon_url (_image_paths.at (_index));
+                const GLib.Uri icon_url (_image_paths.at (_index));
                 if (icon_url.is_valid () && !icon_url.scheme ().is_empty ()) {
                     // fetch the remote resource
                     const var reply = current_user.account ().send_raw_request (QByteArrayLiteral ("GET"), icon_url);

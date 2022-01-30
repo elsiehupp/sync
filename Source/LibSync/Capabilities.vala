@@ -6,7 +6,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 
 // #include <QVariantMap>
 // #include <QLoggingCategory>
-// #include <QUrl>
+// #include <GLib.Uri>
 
 // #include <QDebug>
 
@@ -101,7 +101,7 @@ class Capabilities {
     public PushNotificationTypes available_push_notifications ();
 
     /// Websocket url for files push notifications if available
-    public QUrl push_notifications_web_socket_url ();
+    public GLib.Uri push_notifications_web_socket_url ();
 
     /// disable parallel upload in chunking
     public bool chunking_parallel_upload_disabled ();
@@ -190,7 +190,7 @@ class Capabilities {
     /***********************************************************
     return the list of filename that should not be uploaded
     ***********************************************************/
-    public string[] blacklisted_files ();
+    public string[] blocklisted_files ();
 
 
     /***********************************************************
@@ -352,14 +352,14 @@ class DirectEditor : GLib.Object {
         bool ok = false;
         const var major = !splitted_version.is_empty () ? splitted_version.at (0).to_int (&ok) : 0;
         if (!ok) {
-            q_c_warning (lc_server_capabilities) << "Didn't understand version scheme (major), E2EE disabled";
+            GLib.warn (lc_server_capabilities) << "Didn't understand version scheme (major), E2EE disabled";
             return false;
         }
 
         ok = false;
         const var minor = splitted_version.size () > 1 ? splitted_version.at (1).to_int (&ok) : 0;
         if (!ok) {
-            q_c_warning (lc_server_capabilities) << "Didn't understand version scheme (minor), E2EE disabled";
+            GLib.warn (lc_server_capabilities) << "Didn't understand version scheme (minor), E2EE disabled";
             return false;
         }
 
@@ -455,9 +455,9 @@ class DirectEditor : GLib.Object {
         return push_notification_types;
     }
 
-    QUrl Capabilities.push_notifications_web_socket_url () {
+    GLib.Uri Capabilities.push_notifications_web_socket_url () {
         const var websocket = _capabilities["notify_push"].to_map ()["endpoints"].to_map ()["websocket"].to_string ();
-        return QUrl (websocket);
+        return GLib.Uri (websocket);
     }
 
     bool Capabilities.chunking_parallel_upload_disabled () {
@@ -489,8 +489,8 @@ class DirectEditor : GLib.Object {
         return _capabilities[QStringLiteral ("upload_conflict_files")].to_bool ();
     }
 
-    string[] Capabilities.blacklisted_files () {
-        return _capabilities["files"].to_map ()["blacklisted_files"].to_string_list ();
+    string[] Capabilities.blocklisted_files () {
+        return _capabilities["files"].to_map ()["blocklisted_files"].to_string_list ();
     }
 
     /*-------------------------------------------------------------------------------------*/

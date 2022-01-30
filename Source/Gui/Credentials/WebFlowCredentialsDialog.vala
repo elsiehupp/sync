@@ -1,6 +1,6 @@
 
 // #include <Gtk.Dialog>
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QVBoxLayout>
 // #include <QLabel>
 
@@ -17,7 +17,7 @@ class WebFlowCredentialsDialog : Gtk.Dialog {
 
     public WebFlowCredentialsDialog (Account account, bool use_flow2, Gtk.Widget parent = nullptr);
 
-    public void set_url (QUrl url);
+    public void set_url (GLib.Uri url);
 
 
     public void set_info (string msg);
@@ -143,7 +143,7 @@ void WebFlowCredentialsDialog.close_event (QCloseEvent* e) {
     emit close ();
 }
 
-void WebFlowCredentialsDialog.set_url (QUrl url) {
+void WebFlowCredentialsDialog.set_url (GLib.Uri url) {
 #ifdef WITH_WEBENGINE
     if (_web_view)
         _web_view.set_url (url);

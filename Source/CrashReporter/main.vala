@@ -21,7 +21,7 @@ int main (int argc, char argv[]) {
     }
 
     // TODO : install socorro ....
-    CrashReporter reporter (QUrl (CRASHREPORTER_SUBMIT_URL), app.arguments ());
+    CrashReporter reporter (GLib.Uri (CRASHREPORTER_SUBMIT_URL), app.arguments ());
 
 #ifdef CRASHREPORTER_ICON
     reporter.set_logo (QPixmap (CRASHREPORTER_ICON));
@@ -29,10 +29,10 @@ int main (int argc, char argv[]) {
     reporter.set_window_title (CRASHREPORTER_PRODUCT_NAME);
     reporter.on_set_text ("<html><head/><body><p><span style=\" font-weight:600;\">Sorry!</span> " CRASHREPORTER_PRODUCT_NAME " crashed. Please tell us about it! " CRASHREPORTER_PRODUCT_NAME " has created an error report for you that can help improve the stability in the future. You can now send this report directly to the " CRASHREPORTER_PRODUCT_NAME " developers.</p></body></html>");
 
-    const QFileInfo crash_log (QDir.temp_path () + QStringLiteral ("/" CRASHREPORTER_PRODUCT_NAME "-crash.log"));
+    const QFileInfo crash_log (QDir.temp_path () + "/" + CRASHREPORTER_PRODUCT_NAME + "-crash.log");
     if (crash_log.exists ()) {
-        QFile in_file (crash_log.file_path ());
-        if (in_file.open (QFile.ReadOnly)) {
+        GLib.File in_file (crash_log.file_path ());
+        if (in_file.open (GLib.File.ReadOnly)) {
             reporter.set_comment (in_file.read_all ());
         }
     }
@@ -73,8 +73,8 @@ int main (int argc, char argv[]) {
 
     // TODO:
     // send log
-    //    QFile log_file ( INSERT_FILE_PATH_HERE );
-    //    log_file.open ( QFile.ReadOnly );
+    //    GLib.File log_file ( INSERT_FILE_PATH_HERE );
+    //    log_file.open ( GLib.File.ReadOnly );
     //    reporter.set_report_data ( "upload_file_miralllog", q_compress ( log_file.read_all () ), "application/x-gzip", QFileInfo ( INSERT_FILE_PATH_HERE ).file_name ().to_utf8 ());
     //    log_file.close ();
 

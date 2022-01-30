@@ -10,13 +10,13 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QMessageBox>
 // #include <QtCore>
 // #include <QMutableSetIterator>
-// #include <QSet>
+// #include <GLib.Set>
 // #include <QNetworkProxy>
 
 // #include <QQueue>
 // #include <GLib.List>
 
-static const char version_c[] = "version";
+static const char VERSION_C[] = "version";
 static const int max_folders_version = 1;
 
 
@@ -91,7 +91,7 @@ class FolderMan : GLib.Object {
     incoming relative server path. The method checks with all existing sync
     folders.
     ***********************************************************/
-    public string[] find_file_in_local_folders (string rel_path, AccountPtr acc);
+    public string[] find_file_in_local_folders (string rel_path, AccountPointer acc);
 
 
     /***********************************************************
@@ -150,7 +150,7 @@ class FolderMan : GLib.Object {
 
     @returns an empty string if it is allowed, or an error if it is not allowed
     ***********************************************************/
-    public string check_path_validity_for_new_folder (string path, QUrl server_url = QUrl ());
+    public string check_path_validity_for_new_folder (string path, GLib.Uri server_url = GLib.Uri ());
 
 
     /***********************************************************
@@ -162,7 +162,7 @@ class FolderMan : GLib.Object {
     subfolder of ~ would be a good candidate. When that happens \a base_path
     is returned.
     ***********************************************************/
-    public string find_good_path_for_new_sync_folder (string base_path, QUrl server_url);
+    public string find_good_path_for_new_sync_folder (string base_path, GLib.Uri server_url);
 
 
     /***********************************************************
@@ -379,7 +379,7 @@ signals:
 
     private bool is_switch_to_vfs_needed (FolderDefinition &folder_definition);
 
-    private QSet<Folder> _disabled_folders;
+    private GLib.Set<Folder> _disabled_folders;
     private Folder.Map _folder_map;
     private string _folder_config_path;
     private Folder _current_sync_folder = nullptr;
@@ -387,7 +387,7 @@ signals:
     private bool _sync_enabled = true;
 
     /// Folder aliases from the settings that weren't read
-    private QSet<string> _additional_blocked_folder_aliases;
+    private GLib.Set<string> _additional_blocked_folder_aliases;
 
     /// Starts regular etag query jobs
     private QTimer _etag_poll_timer;
@@ -558,7 +558,7 @@ int FolderMan.setup_folders () {
             settings.begin_group (group_name);
             if (skip_settings_keys.contains (settings.group ())) {
                 // Should not happen : bad container keys should have been deleted
-                q_c_warning (lc_folder_man) << "Folder structure" << group_name << "is too new, ignoring";
+                GLib.warn (lc_folder_man) << "Folder structure" << group_name << "is too new, ignoring";
             } else {
                 setup_folders_helper (*settings, account, skip_settings_keys, backwards_compatible, folders_with_placeholders);
             }
@@ -606,10 +606,10 @@ void FolderMan.setup_folders_helper (QSettings &settings, AccountStatePtr accoun
             }
 
             // Migration #2 : journal_path might be absolute (in DataAppDir most likely) move it back to the root of local tree
-            if (folder_definition.journal_path.at (0) != QChar ('.')) {
-                QFile old_journal (folder_definition.journal_path);
-                QFile old_journal_shm (folder_definition.journal_path + QStringLiteral ("-shm"));
-                QFile old_journal_wal (folder_definition.journal_path + QStringLiteral ("-wal"));
+            if (folder_definition.journal_path.at (0) != char ('.')) {
+                GLib.File old_journal (folder_definition.journal_path);
+                GLib.File old_journal_shm (folder_definition.journal_path + QStringLiteral ("-shm"));
+                GLib.File old_journal_wal (folder_definition.journal_path + QStringLiteral ("-wal"));
 
                 folder_definition.journal_path = default_journal_path;
 
@@ -629,14 +629,14 @@ void FolderMan.setup_folders_helper (QSettings &settings, AccountStatePtr accoun
                 }
 
                 if (!journal_file_move_success) {
-                    q_c_warning (lc_folder_man) << "Wasn't able to move 3.0 syncjournal database files to new location. One-time loss off sync settings possible.";
+                    GLib.warn (lc_folder_man) << "Wasn't able to move 3.0 syncjournal database files to new location. One-time loss off sync settings possible.";
                 } else {
                     q_c_info (lc_folder_man) << "Successfully migrated syncjournal database.";
                 }
 
                 var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
                 if (!vfs && folder_definition.virtual_files_mode != Vfs.Off) {
-                    q_c_warning (lc_folder_man) << "Could not load plugin for mode" << folder_definition.virtual_files_mode;
+                    GLib.warn (lc_folder_man) << "Could not load plugin for mode" << folder_definition.virtual_files_mode;
                 }
 
                 Folder f = add_folder_internal (folder_definition, account.data (), std.move (vfs));
@@ -651,7 +651,7 @@ void FolderMan.setup_folders_helper (QSettings &settings, AccountStatePtr accoun
             // new default if no database exists yet.
             if (folder_definition.journal_path.starts_with ("._sync_")
                 && default_journal_path.starts_with (".sync_")
-                && !QFile.exists (folder_definition.absolute_journal_path ())) {
+                && !GLib.File.exists (folder_definition.absolute_journal_path ())) {
                 folder_definition.journal_path = default_journal_path;
             }
 
@@ -677,7 +677,7 @@ void FolderMan.setup_folders_helper (QSettings &settings, AccountStatePtr accoun
                     f.switch_to_virtual_files ();
                 }
                 // Migrate the old "use_placeholders" setting to the root folder pin state
-                if (settings.value (QLatin1String (version_c), 1).to_int () == 1
+                if (settings.value (QLatin1String (VERSION_C), 1).to_int () == 1
                     && settings.value (QLatin1String ("use_placeholders"), false).to_bool ()) {
                     q_c_info (lc_folder_man) << "Migrate : From use_placeholders to PinState.VfsItemAvailability.ONLINE_ONLY";
                     f.set_root_pin_state (PinState.VfsItemAvailability.ONLINE_ONLY);
@@ -730,11 +730,11 @@ void FolderMan.backward_migration_settings_keys (string[] *delete_keys, string[]
 
     var process_subgroup = [&] (string name) {
         settings.begin_group (name);
-        const int folders_version = settings.value (QLatin1String (version_c), 1).to_int ();
+        const int folders_version = settings.value (QLatin1String (VERSION_C), 1).to_int ();
         if (folders_version <= max_folders_version) {
             foreach (var &folder_alias, settings.child_groups ()) {
                 settings.begin_group (folder_alias);
-                const int folder_version = settings.value (QLatin1String (version_c), 1).to_int ();
+                const int folder_version = settings.value (QLatin1String (VERSION_C), 1).to_int ();
                 if (folder_version > FolderDefinition.max_settings_version ()) {
                     ignore_keys.append (settings.group ());
                 }
@@ -757,10 +757,10 @@ void FolderMan.backward_migration_settings_keys (string[] *delete_keys, string[]
 
 bool FolderMan.ensure_journal_gone (string journal_database_file) {
     // remove the old journal file
-    while (QFile.exists (journal_database_file) && !QFile.remove (journal_database_file)) {
-        q_c_warning (lc_folder_man) << "Could not remove old database file at" << journal_database_file;
-        int ret = QMessageBox.warning (nullptr, tr ("Could not reset folder state"),
-            tr ("An old sync journal \"%1\" was found, "
+    while (GLib.File.exists (journal_database_file) && !GLib.File.remove (journal_database_file)) {
+        GLib.warn (lc_folder_man) << "Could not remove old database file at" << journal_database_file;
+        int ret = QMessageBox.warning (nullptr, _("Could not reset folder state"),
+            _("An old sync journal \"%1\" was found, "
                "but could not be removed. Please make sure "
                "that no application is currently using it.")
                 .arg (QDir.from_native_separators (QDir.clean_path (journal_database_file))),
@@ -788,18 +788,18 @@ const int PAR_C_TAG QLatin1String ("__PAR_CLOSE__")
 string FolderMan.escape_alias (string alias) {
     string a (alias);
 
-    a.replace (QLatin1Char ('/'), SLASH_TAG);
-    a.replace (QLatin1Char ('\\'), BSLASH_TAG);
-    a.replace (QLatin1Char ('?'), QMARK_TAG);
-    a.replace (QLatin1Char ('%'), PERCENT_TAG);
-    a.replace (QLatin1Char ('*'), STAR_TAG);
-    a.replace (QLatin1Char (':'), COLON_TAG);
-    a.replace (QLatin1Char ('|'), PIPE_TAG);
-    a.replace (QLatin1Char ('"'), QUOTE_TAG);
-    a.replace (QLatin1Char ('<'), LT_TAG);
-    a.replace (QLatin1Char ('>'), GT_TAG);
-    a.replace (QLatin1Char ('['), PAR_O_TAG);
-    a.replace (QLatin1Char (']'), PAR_C_TAG);
+    a.replace ('/', SLASH_TAG);
+    a.replace ('\\', BSLASH_TAG);
+    a.replace ('?', QMARK_TAG);
+    a.replace ('%', PERCENT_TAG);
+    a.replace ('*', STAR_TAG);
+    a.replace (':', COLON_TAG);
+    a.replace ('|', PIPE_TAG);
+    a.replace ('"', QUOTE_TAG);
+    a.replace ('<', LT_TAG);
+    a.replace ('>', GT_TAG);
+    a.replace ('[', PAR_O_TAG);
+    a.replace (']', PAR_C_TAG);
     return a;
 }
 
@@ -845,11 +845,11 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
         cfg_file.set_file (_folder_config_path, escaped_alias);
     }
     if (!cfg_file.is_readable ()) {
-        q_c_warning (lc_folder_man) << "Cannot read folder definition for alias " << cfg_file.file_path ();
+        GLib.warn (lc_folder_man) << "Cannot read folder definition for alias " << cfg_file.file_path ();
         return folder;
     }
 
-    QSettings settings (_folder_config_path + QLatin1Char ('/') + escaped_alias, QSettings.IniFormat);
+    QSettings settings (_folder_config_path + '/' + escaped_alias, QSettings.IniFormat);
     q_c_info (lc_folder_man) << "    . file path : " << settings.file_name ();
 
     // Check if the filename is equal to the group setting. If not, use the group
@@ -870,12 +870,12 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
     string alias = unescape_alias (escaped_alias);
 
     if (backend.is_empty () || backend != QLatin1String ("owncloud")) {
-        q_c_warning (lc_folder_man) << "obsolete configuration of type" << backend;
+        GLib.warn (lc_folder_man) << "obsolete configuration of type" << backend;
         return nullptr;
     }
 
     // cut off the leading slash, o_c_url always has a trailing.
-    if (target_path.starts_with (QLatin1Char ('/'))) {
+    if (target_path.starts_with ('/')) {
         target_path.remove (0, 1);
     }
 
@@ -893,11 +893,11 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
 
     folder = add_folder_internal (folder_definition, account_state, std.make_unique<VfsOff> ());
     if (folder) {
-        string[] black_list = settings.value (QLatin1String ("black_list")).to_string_list ();
-        if (!black_list.empty ()) {
+        string[] block_list = settings.value (QLatin1String ("block_list")).to_string_list ();
+        if (!block_list.empty ()) {
             //migrate settings
-            folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, black_list);
-            settings.remove (QLatin1String ("black_list"));
+            folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
+            settings.remove (QLatin1String ("block_list"));
             // FIXME : If you remove this codepath, you need to provide another way to do
             // this via theme.h or the normal FolderMan.setup_folders
         }
@@ -1032,14 +1032,14 @@ void FolderMan.on_run_one_etag_job () {
             }
         }
         if (_current_etag_job.is_null ()) {
-            //q_c_debug (lc_folder_man) << "No more remote ETag check jobs to schedule.";
+            //GLib.debug (lc_folder_man) << "No more remote ETag check jobs to schedule.";
 
             // now it might be a good time to check for restarting...
             if (!is_any_sync_running () && _app_restart_required) {
                 restart_application ();
             }
         } else {
-            q_c_debug (lc_folder_man) << "Scheduling" << folder.remote_url ().to_string () << "to check remote ETag";
+            GLib.debug (lc_folder_man) << "Scheduling" << folder.remote_url ().to_string () << "to check remote ETag";
             _current_etag_job.on_start (); // on destroy/end it will continue the queue via on_etag_job_destroyed
         }
     }
@@ -1154,7 +1154,7 @@ void FolderMan.on_start_scheduled_folder_sync () {
         return;
     }
 
-    q_c_debug (lc_folder_man) << "folder_queue size : " << _scheduled_folders.count ();
+    GLib.debug (lc_folder_man) << "folder_queue size : " << _scheduled_folders.count ();
     if (_scheduled_folders.is_empty ()) {
         return;
     }
@@ -1298,7 +1298,7 @@ void FolderMan.on_forward_folder_sync_state_change () {
 void FolderMan.on_server_version_changed (Account account) {
     // Pause folders if the server version is unsupported
     if (account.server_version_unsupported ()) {
-        q_c_warning (lc_folder_man) << "The server version is unsupported:" << account.server_version ()
+        GLib.warn (lc_folder_man) << "The server version is unsupported:" << account.server_version ()
                                << "pausing all folders on the account";
 
         for (var &f : q_as_const (_folder_map)) {
@@ -1418,7 +1418,7 @@ Folder *FolderMan.add_folder (AccountState account_state, FolderDefinition &fold
 
     var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
     if (!vfs) {
-        q_c_warning (lc_folder_man) << "Could not load plugin for mode" << folder_definition.virtual_files_mode;
+        GLib.warn (lc_folder_man) << "Could not load plugin for mode" << folder_definition.virtual_files_mode;
         return nullptr;
     }
 
@@ -1487,18 +1487,18 @@ Folder *FolderMan.add_folder_internal (
 }
 
 Folder *FolderMan.folder_for_path (string path) {
-    string absolute_path = QDir.clean_path (path) + QLatin1Char ('/');
+    string absolute_path = QDir.clean_path (path) + '/';
 
     const var folders = this.map ().values ();
     const var it = std.find_if (folders.cbegin (), folders.cend (), [absolute_path] (var folder) {
-        const string folder_path = folder.clean_path () + QLatin1Char ('/');
+        const string folder_path = folder.clean_path () + '/';
         return absolute_path.starts_with (folder_path, (Utility.is_windows () || Utility.is_mac ()) ? Qt.CaseInsensitive : Qt.CaseSensitive);
     });
 
     return it != folders.cend () ? *it : nullptr;
 }
 
-string[] FolderMan.find_file_in_local_folders (string rel_path, AccountPtr acc) {
+string[] FolderMan.find_file_in_local_folders (string rel_path, AccountPointer acc) {
     string[] re;
 
     // We'll be comparing against Folder.remote_path which always starts with /
@@ -1515,7 +1515,7 @@ string[] FolderMan.find_file_in_local_folders (string rel_path, AccountPtr acc) 
 
         string path = folder.clean_path () + '/';
         path += server_path.mid_ref (folder.remote_path_trailing_slash ().length ());
-        if (QFile.exists (path)) {
+        if (GLib.File.exists (path)) {
             re.append (path);
         }
     }
@@ -1569,12 +1569,12 @@ string FolderMan.get_backup_name (string full_path_name) {
     if (full_path_name.is_empty ())
         return string ();
 
-    string new_name = full_path_name + tr (" (backup)");
+    string new_name = full_path_name + _(" (backup)");
     QFileInfo fi (new_name);
     int cnt = 2;
     do {
         if (fi.exists ()) {
-            new_name = full_path_name + tr (" (backup %1)").arg (cnt++);
+            new_name = full_path_name + _(" (backup %1)").arg (cnt++);
             fi.set_file (new_name);
         }
     } while (fi.exists ());
@@ -1600,7 +1600,7 @@ bool FolderMan.start_from_scratch (string local_folder) {
     if (fi.exists ()) {
         // It exists, but is empty . just reuse it.
         if (fi.is_dir () && fi.dir ().count () == 0) {
-            q_c_debug (lc_folder_man) << "start_from_scratch : Directory is empty!";
+            GLib.debug (lc_folder_man) << "start_from_scratch : Directory is empty!";
             return true;
         }
         // Disconnect the socket api from the database to avoid that locking of the
@@ -1618,14 +1618,14 @@ bool FolderMan.start_from_scratch (string local_folder) {
         string new_name = get_backup_name (parent_dir.absolute_file_path (folder_name));
         string rename_error;
         if (!FileSystem.rename (fi.absolute_file_path (), new_name, &rename_error)) {
-            q_c_warning (lc_folder_man) << "start_from_scratch : Could not rename" << fi.absolute_file_path ()
+            GLib.warn (lc_folder_man) << "start_from_scratch : Could not rename" << fi.absolute_file_path ()
                                    << "to" << new_name << "error:" << rename_error;
             return false;
         }
     }
 
     if (!parent_dir.mkdir (fi.absolute_file_path ())) {
-        q_c_warning (lc_folder_man) << "start_from_scratch : Could not mkdir" << fi.absolute_file_path ();
+        GLib.warn (lc_folder_man) << "start_from_scratch : Could not mkdir" << fi.absolute_file_path ();
         return false;
     }
 
@@ -1670,14 +1670,14 @@ void FolderMan.on_wipe_folder_for_account (AccountState account_state) {
         if (user_folder.exists ()) {
             on_success = user_folder.remove_recursively ();
             if (!on_success) {
-                q_c_warning (lc_folder_man) << "Failed to remove existing folder " << f.path ();
+                GLib.warn (lc_folder_man) << "Failed to remove existing folder " << f.path ();
             } else {
                 q_c_info (lc_folder_man) << "wipe : Removed  file " << f.path ();
             }
 
         } else {
             on_success = true;
-            q_c_warning (lc_folder_man) << "folder does not exist, can not remove.";
+            GLib.warn (lc_folder_man) << "folder does not exist, can not remove.";
         }
 
         f.set_sync_paused (true);
@@ -1812,48 +1812,48 @@ string FolderMan.tray_tooltip_status_string (
     string folder_message;
     switch (sync_status) {
     case SyncResult.Undefined:
-        folder_message = tr ("Undefined State.");
+        folder_message = _("Undefined State.");
         break;
     case SyncResult.NotYetStarted:
-        folder_message = tr ("Waiting to on_start syncing.");
+        folder_message = _("Waiting to on_start syncing.");
         break;
     case SyncResult.Sync_prepare:
-        folder_message = tr ("Preparing for sync.");
+        folder_message = _("Preparing for sync.");
         break;
     case SyncResult.Sync_running:
-        folder_message = tr ("Sync is running.");
+        folder_message = _("Sync is running.");
         break;
     case SyncResult.Success:
     case SyncResult.Problem:
         if (has_unresolved_conflicts) {
-            folder_message = tr ("Sync on_finished with unresolved conflicts.");
+            folder_message = _("Sync on_finished with unresolved conflicts.");
         } else {
-            folder_message = tr ("Last Sync was successful.");
+            folder_message = _("Last Sync was successful.");
         }
         break;
     case SyncResult.Error:
         break;
     case SyncResult.Setup_error:
-        folder_message = tr ("Setup Error.");
+        folder_message = _("Setup Error.");
         break;
     case SyncResult.Sync_abort_requested:
-        folder_message = tr ("User Abort.");
+        folder_message = _("User Abort.");
         break;
     case SyncResult.Paused:
-        folder_message = tr ("Sync is paused.");
+        folder_message = _("Sync is paused.");
         break;
         // no default case on purpose, check compiler warnings
     }
     if (paused) {
         // sync is disabled.
-        folder_message = tr ("%1 (Sync is paused)").arg (folder_message);
+        folder_message = _("%1 (Sync is paused)").arg (folder_message);
     }
     return folder_message;
 }
 
 static string check_path_validity_recursive (string path) {
     if (path.is_empty ()) {
-        return FolderMan.tr ("No valid folder selected!");
+        return FolderMan._("No valid folder selected!");
     }
 
     const QFileInfo sel_file (path);
@@ -1862,15 +1862,15 @@ static string check_path_validity_recursive (string path) {
         string parent_path = sel_file.dir ().path ();
         if (parent_path != path)
             return check_path_validity_recursive (parent_path);
-        return FolderMan.tr ("The selected path does not exist!");
+        return FolderMan._("The selected path does not exist!");
     }
 
     if (!sel_file.is_dir ()) {
-        return FolderMan.tr ("The selected path is not a folder!");
+        return FolderMan._("The selected path is not a folder!");
     }
 
     if (!sel_file.is_writable ()) {
-        return FolderMan.tr ("You have no permission to write to the selected folder!");
+        return FolderMan._("You have no permission to write to the selected folder!");
     }
     return string ();
 }
@@ -1895,10 +1895,10 @@ static string canonical_path (string path) {
     return sel_file.canonical_file_path ();
 }
 
-string FolderMan.check_path_validity_for_new_folder (string path, QUrl server_url) {
+string FolderMan.check_path_validity_for_new_folder (string path, GLib.Uri server_url) {
     string recursive_validity = check_path_validity_recursive (path);
     if (!recursive_validity.is_empty ()) {
-        q_c_debug (lc_folder_man) << path << recursive_validity;
+        GLib.debug (lc_folder_man) << path << recursive_validity;
         return recursive_validity;
     }
 
@@ -1915,13 +1915,13 @@ string FolderMan.check_path_validity_for_new_folder (string path, QUrl server_ur
 
         bool different_paths = string.compare (folder_dir, user_dir, cs) != 0;
         if (different_paths && folder_dir.starts_with (user_dir, cs)) {
-            return tr ("The local folder %1 already contains a folder used in a folder sync connection. "
+            return _("The local folder %1 already contains a folder used in a folder sync connection. "
                       "Please pick another one!")
                 .arg (QDir.to_native_separators (path));
         }
 
         if (different_paths && user_dir.starts_with (folder_dir, cs)) {
-            return tr ("The local folder %1 is already contained in a folder used in a folder sync connection. "
+            return _("The local folder %1 is already contained in a folder used in a folder sync connection. "
                       "Please pick another one!")
                 .arg (QDir.to_native_separators (path));
         }
@@ -1930,12 +1930,12 @@ string FolderMan.check_path_validity_for_new_folder (string path, QUrl server_ur
         // otherwise it would mean that a new connection from the same local folder
         // to the same account is added which is not wanted. The account must differ.
         if (server_url.is_valid () && !different_paths) {
-            QUrl folder_url = f.account_state ().account ().url ();
+            GLib.Uri folder_url = f.account_state ().account ().url ();
             string user = f.account_state ().account ().credentials ().user ();
             folder_url.set_user_name (user);
 
             if (server_url == folder_url) {
-                return tr ("There is already a sync from the server to this local folder. "
+                return _("There is already a sync from the server to this local folder. "
                           "Please pick another local folder!");
             }
         }
@@ -1944,7 +1944,7 @@ string FolderMan.check_path_validity_for_new_folder (string path, QUrl server_ur
     return string ();
 }
 
-string FolderMan.find_good_path_for_new_sync_folder (string base_path, QUrl server_url) {
+string FolderMan.find_good_path_for_new_sync_folder (string base_path, GLib.Uri server_url) {
     string folder = base_path;
 
     // If the parent folder is a sync folder or contained in one, we can't
@@ -2015,7 +2015,7 @@ void FolderMan.restart_application () {
 
         QProcess.start_detached (prg, args);
     } else {
-        q_c_debug (lc_folder_man) << "On this platform we do not restart.";
+        GLib.debug (lc_folder_man) << "On this platform we do not restart.";
     }
 }
 

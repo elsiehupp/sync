@@ -9,7 +9,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QVector>
 // #include <GLib.List>
 // #include <QPair>
-// #include <QUrl>
+// #include <GLib.Uri>
 
 namespace Occ {
 
@@ -23,7 +23,7 @@ All the communication logic is handled in this class.
 ***********************************************************/
 class Notification_confirm_job : AbstractNetworkJob {
 
-    public Notification_confirm_job (AccountPtr account);
+    public Notification_confirm_job (AccountPointer account);
 
 
     /***********************************************************
@@ -31,7 +31,7 @@ class Notification_confirm_job : AbstractNetworkJob {
 
     @param verb currently supported GET PUT POST DELETE
     ***********************************************************/
-    public void set_link_and_verb (QUrl link, GLib.ByteArray verb);
+    public void set_link_and_verb (GLib.Uri link, GLib.ByteArray verb);
 
 
     /***********************************************************
@@ -53,22 +53,22 @@ signals:
 
 
     private GLib.ByteArray _verb;
-    private QUrl _link;
+    private GLib.Uri _link;
 };
 
-    Notification_confirm_job.Notification_confirm_job (AccountPtr account)
+    Notification_confirm_job.Notification_confirm_job (AccountPointer account)
         : AbstractNetworkJob (account, "") {
         set_ignore_credential_failure (true);
     }
 
-    void Notification_confirm_job.set_link_and_verb (QUrl link, GLib.ByteArray verb) {
+    void Notification_confirm_job.set_link_and_verb (GLib.Uri link, GLib.ByteArray verb) {
         _link = link;
         _verb = verb;
     }
 
     void Notification_confirm_job.on_start () {
         if (!_link.is_valid ()) {
-            q_c_warning (lc_notifications_job) << "Attempt to trigger invalid URL : " << _link.to_string ();
+            GLib.warn (lc_notifications_job) << "Attempt to trigger invalid URL : " << _link.to_string ();
             return;
         }
         QNetworkRequest req;

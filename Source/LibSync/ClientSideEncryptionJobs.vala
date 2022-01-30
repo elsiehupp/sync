@@ -33,7 +33,7 @@ _job.on_start
 ***********************************************************/
 class SignPublicKeyApiJob : AbstractNetworkJob {
 
-    public SignPublicKeyApiJob (AccountPtr &account, string path, GLib.Object parent = nullptr);
+    public SignPublicKeyApiJob (AccountPointer &account, string path, GLib.Object parent = nullptr);
 
 
     /***********************************************************
@@ -74,7 +74,7 @@ _job.on_start
 ***********************************************************/
 class StorePrivateKeyApiJob : AbstractNetworkJob {
 
-    public StorePrivateKeyApiJob (AccountPtr &account, string path, GLib.Object parent = nullptr);
+    public StorePrivateKeyApiJob (AccountPointer &account, string path, GLib.Object parent = nullptr);
 
 
     /***********************************************************
@@ -119,7 +119,7 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
         Set = 1
     };
 
-    public SetEncryptionFlagApiJob (AccountPtr &account, GLib.ByteArray file_id, FlagAction flag_action = Set, GLib.Object parent = nullptr);
+    public SetEncryptionFlagApiJob (AccountPointer &account, GLib.ByteArray file_id, FlagAction flag_action = Set, GLib.Object parent = nullptr);
 
 
     public on_ void on_start () override;
@@ -137,7 +137,7 @@ signals:
 
 class LockEncryptFolderApiJob : AbstractNetworkJob {
 
-    public LockEncryptFolderApiJob (AccountPtr &account, GLib.ByteArray& file_id, GLib.Object parent = nullptr);
+    public LockEncryptFolderApiJob (AccountPointer &account, GLib.ByteArray& file_id, GLib.Object parent = nullptr);
 
 
     public on_ void on_start () override;
@@ -155,7 +155,7 @@ signals:
 class UnlockEncryptFolderApiJob : AbstractNetworkJob {
 
     public UnlockEncryptFolderApiJob (
-        const AccountPtr &account,
+        const AccountPointer &account,
         const GLib.ByteArray& file_id,
         const GLib.ByteArray& token,
         GLib.Object parent = nullptr);
@@ -178,7 +178,7 @@ signals:
 class StoreMetaDataApiJob : AbstractNetworkJob {
 
     public StoreMetaDataApiJob (
-        const AccountPtr &account,
+        const AccountPointer &account,
         const GLib.ByteArray& file_id,
         const GLib.ByteArray& b64Metadata,
         GLib.Object parent = nullptr);
@@ -200,7 +200,7 @@ signals:
 class UpdateMetadataApiJob : AbstractNetworkJob {
 
     public UpdateMetadataApiJob (
-        const AccountPtr &account,
+        const AccountPointer &account,
         const GLib.ByteArray& file_id,
         const GLib.ByteArray& b64Metadata,
         const GLib.ByteArray& locked_token,
@@ -224,7 +224,7 @@ signals:
 class GetMetadataApiJob : AbstractNetworkJob {
 
     public GetMetadataApiJob (
-        const AccountPtr &account,
+        const AccountPointer &account,
         const GLib.ByteArray& file_id,
         GLib.Object parent = nullptr);
 
@@ -244,7 +244,7 @@ signals:
 class DeleteMetadataApiJob : AbstractNetworkJob {
 
     public DeleteMetadataApiJob (
-        const AccountPtr &account,
+        const AccountPointer &account,
         const GLib.ByteArray& file_id,
         GLib.Object parent = nullptr);
 
@@ -263,7 +263,7 @@ signals:
 
 
 
-GetMetadataApiJob.GetMetadataApiJob (AccountPtr& account,
+GetMetadataApiJob.GetMetadataApiJob (AccountPointer& account,
                                     const GLib.ByteArray& file_id,
                                     GLib.Object* parent)
  : AbstractNetworkJob (account, e2ee_base_url () + QStringLiteral ("meta-data/") + file_id, parent), _file_id (file_id) {
@@ -274,7 +274,7 @@ void GetMetadataApiJob.on_start () {
     req.set_raw_header ("OCS-APIREQUEST", "true");
     QUrlQuery query;
     query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
-    QUrl url = Utility.concat_url_path (account ().url (), path ());
+    GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
     url.set_query (query);
 
     q_c_info (lc_cse_job ()) << "Requesting the metadata for the file_id" << _file_id << "as encrypted";
@@ -295,7 +295,7 @@ bool GetMetadataApiJob.on_finished () {
     return true;
 }
 
-StoreMetaDataApiJob.StoreMetaDataApiJob (AccountPtr& account,
+StoreMetaDataApiJob.StoreMetaDataApiJob (AccountPointer& account,
                                                  const GLib.ByteArray& file_id,
                                                  const GLib.ByteArray& b64Metadata,
                                                  GLib.Object* parent)
@@ -308,10 +308,10 @@ void StoreMetaDataApiJob.on_start () {
     req.set_header (QNetworkRequest.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
     QUrlQuery query;
     query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
-    QUrl url = Utility.concat_url_path (account ().url (), path ());
+    GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
     url.set_query (query);
 
-    GLib.ByteArray data = GLib.ByteArray ("meta_data=") + QUrl.to_percent_encoding (_b64Metadata);
+    GLib.ByteArray data = GLib.ByteArray ("meta_data=") + GLib.Uri.to_percent_encoding (_b64Metadata);
     var buffer = new QBuffer (this);
     buffer.set_data (data);
 
@@ -332,7 +332,7 @@ bool StoreMetaDataApiJob.on_finished () {
     return true;
 }
 
-UpdateMetadataApiJob.UpdateMetadataApiJob (AccountPtr& account,
+UpdateMetadataApiJob.UpdateMetadataApiJob (AccountPointer& account,
                                                  const GLib.ByteArray& file_id,
                                                  const GLib.ByteArray& b64Metadata,
                                                  const GLib.ByteArray& token,
@@ -352,11 +352,11 @@ void UpdateMetadataApiJob.on_start () {
     url_query.add_query_item (QStringLiteral ("format"), QStringLiteral ("json"));
     url_query.add_query_item (QStringLiteral ("e2e-token"), _token);
 
-    QUrl url = Utility.concat_url_path (account ().url (), path ());
+    GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
     url.set_query (url_query);
 
     QUrlQuery params;
-    params.add_query_item ("meta_data",QUrl.to_percent_encoding (_b64Metadata));
+    params.add_query_item ("meta_data",GLib.Uri.to_percent_encoding (_b64Metadata));
     params.add_query_item ("e2e-token", _token);
 
     GLib.ByteArray data = params.query ().to_local8Bit ();
@@ -380,7 +380,7 @@ bool UpdateMetadataApiJob.on_finished () {
     return true;
 }
 
-UnlockEncryptFolderApiJob.UnlockEncryptFolderApiJob (AccountPtr& account,
+UnlockEncryptFolderApiJob.UnlockEncryptFolderApiJob (AccountPointer& account,
                                                  const GLib.ByteArray& file_id,
                                                  const GLib.ByteArray& token,
                                                  GLib.Object* parent)
@@ -392,7 +392,7 @@ void UnlockEncryptFolderApiJob.on_start () {
     req.set_raw_header ("OCS-APIREQUEST", "true");
     req.set_raw_header ("e2e-token", _token);
 
-    QUrl url = Utility.concat_url_path (account ().url (), path ());
+    GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
     send_request ("DELETE", url, req);
 
     AbstractNetworkJob.on_start ();
@@ -411,7 +411,7 @@ bool UnlockEncryptFolderApiJob.on_finished () {
     return true;
 }
 
-DeleteMetadataApiJob.DeleteMetadataApiJob (AccountPtr& account,
+DeleteMetadataApiJob.DeleteMetadataApiJob (AccountPointer& account,
                                                   const GLib.ByteArray& file_id,
                                                  GLib.Object* parent)
  : AbstractNetworkJob (account, e2ee_base_url () + QStringLiteral ("meta-data/") + file_id, parent), _file_id (file_id) {
@@ -421,7 +421,7 @@ void DeleteMetadataApiJob.on_start () {
     QNetworkRequest req;
     req.set_raw_header ("OCS-APIREQUEST", "true");
 
-    QUrl url = Utility.concat_url_path (account ().url (), path ());
+    GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
     send_request ("DELETE", url, req);
 
     AbstractNetworkJob.on_start ();
@@ -440,7 +440,7 @@ bool DeleteMetadataApiJob.on_finished () {
     return true;
 }
 
-LockEncryptFolderApiJob.LockEncryptFolderApiJob (AccountPtr& account, GLib.ByteArray& file_id, GLib.Object* parent)
+LockEncryptFolderApiJob.LockEncryptFolderApiJob (AccountPointer& account, GLib.ByteArray& file_id, GLib.Object* parent)
  : AbstractNetworkJob (account, e2ee_base_url () + QStringLiteral ("lock/") + file_id, parent), _file_id (file_id) {
 }
 
@@ -449,7 +449,7 @@ void LockEncryptFolderApiJob.on_start () {
     req.set_raw_header ("OCS-APIREQUEST", "true");
     QUrlQuery query;
     query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
-    QUrl url = Utility.concat_url_path (account ().url (), path ());
+    GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
     url.set_query (query);
 
     q_c_info (lc_cse_job ()) << "locking the folder with id" << _file_id << "as encrypted";
@@ -476,14 +476,14 @@ bool LockEncryptFolderApiJob.on_finished () {
     return true;
 }
 
-SetEncryptionFlagApiJob.SetEncryptionFlagApiJob (AccountPtr& account, GLib.ByteArray& file_id, FlagAction flag_action, GLib.Object* parent)
+SetEncryptionFlagApiJob.SetEncryptionFlagApiJob (AccountPointer& account, GLib.ByteArray& file_id, FlagAction flag_action, GLib.Object* parent)
  : AbstractNetworkJob (account, e2ee_base_url () + QStringLiteral ("encrypted/") + file_id, parent), _file_id (file_id), _flag_action (flag_action) {
 }
 
 void SetEncryptionFlagApiJob.on_start () {
     QNetworkRequest req;
     req.set_raw_header ("OCS-APIREQUEST", "true");
-    QUrl url = Utility.concat_url_path (account ().url (), path ());
+    GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
 
     q_c_info (lc_cse_job ()) << "marking the file with id" << _file_id << "as" << (_flag_action == Set ? "encrypted" : "non-encrypted") << ".";
 
@@ -504,13 +504,13 @@ bool SetEncryptionFlagApiJob.on_finished () {
     return true;
 }
 
-StorePrivateKeyApiJob.StorePrivateKeyApiJob (AccountPtr& account, string& path, GLib.Object* parent)
+StorePrivateKeyApiJob.StorePrivateKeyApiJob (AccountPointer& account, string& path, GLib.Object* parent)
  : AbstractNetworkJob (account, path, parent) {
 }
 
 void StorePrivateKeyApiJob.set_private_key (GLib.ByteArray& priv_key) {
     GLib.ByteArray data = "private_key=";
-    data += QUrl.to_percent_encoding (priv_key);
+    data += GLib.Uri.to_percent_encoding (priv_key);
     _priv_key.set_data (data);
 }
 
@@ -519,7 +519,7 @@ void StorePrivateKeyApiJob.on_start () {
     req.set_raw_header ("OCS-APIREQUEST", "true");
     QUrlQuery query;
     query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
-    QUrl url = Utility.concat_url_path (account ().url (), path ());
+    GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
     url.set_query (query);
 
     q_c_info (lc_store_private_key_api_job) << "Sending the private key" << _priv_key.data ();
@@ -538,13 +538,13 @@ bool StorePrivateKeyApiJob.on_finished () {
     return true;
 }
 
-SignPublicKeyApiJob.SignPublicKeyApiJob (AccountPtr& account, string& path, GLib.Object* parent)
+SignPublicKeyApiJob.SignPublicKeyApiJob (AccountPointer& account, string& path, GLib.Object* parent)
  : AbstractNetworkJob (account, path, parent) {
 }
 
 void SignPublicKeyApiJob.set_csr (GLib.ByteArray& csr) {
     GLib.ByteArray data = "csr=";
-    data += QUrl.to_percent_encoding (csr);
+    data += GLib.Uri.to_percent_encoding (csr);
     _csr.set_data (data);
 }
 
@@ -554,7 +554,7 @@ void SignPublicKeyApiJob.on_start () {
     req.set_header (QNetworkRequest.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
     QUrlQuery query;
     query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
-    QUrl url = Utility.concat_url_path (account ().url (), path ());
+    GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
     url.set_query (query);
 
     q_c_info (lc_sign_public_key_api_job) << "Sending the CSR" << _csr.data ();

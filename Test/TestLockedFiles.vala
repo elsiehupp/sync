@@ -28,11 +28,11 @@ class TestLockedFiles : GLib.Object {
                                                                "olonglonglonglong/file🐷.txt"); {
             // use a long file path to ensure we handle that correctly
             QVERIFY (QFileInfo (tmpFile).dir ().mkpath ("."));
-            QFile tmp (tmpFile);
-            QVERIFY (tmp.open (QFile.WriteOnly));
+            GLib.File tmp (tmpFile);
+            QVERIFY (tmp.open (GLib.File.WriteOnly));
             QVERIFY (tmp.write ("ownCLoud"));
         }
-        QVERIFY (QFile.exists (tmpFile));
+        QVERIFY (GLib.File.exists (tmpFile));
 
         QVERIFY (!FileSystem.isFileLocked (tmpFile));
         watcher.addFile (tmpFile);

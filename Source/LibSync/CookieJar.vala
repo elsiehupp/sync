@@ -4,7 +4,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFile>
+// #include <GLib.File>
 // #include <QDateTime>
 // #include <QLoggingCategory>
 // #include <QNetworkCookie>
@@ -23,8 +23,8 @@ class CookieJar : QNetworkCookieJar {
 
     public CookieJar (GLib.Object parent = nullptr);
     ~CookieJar () override;
-    public bool set_cookies_from_url (GLib.List<QNetworkCookie> &cookie_list, QUrl url) override;
-    public GLib.List<QNetworkCookie> cookies_for_url (QUrl url) override;
+    public bool set_cookies_from_url (GLib.List<QNetworkCookie> &cookie_list, GLib.Uri url) override;
+    public GLib.List<QNetworkCookie> cookies_for_url (GLib.Uri url) override;
 
     public void clear_session_cookies ();
 
@@ -37,7 +37,7 @@ class CookieJar : QNetworkCookieJar {
     public bool restore (string file_name);
 
 signals:
-    void new_cookies_for_url (GLib.List<QNetworkCookie> &cookie_list, QUrl url);
+    void new_cookies_for_url (GLib.List<QNetworkCookie> &cookie_list, GLib.Uri url);
 
 
     private GLib.List<QNetworkCookie> remove_expired (GLib.List<QNetworkCookie> &cookies);
@@ -72,7 +72,7 @@ signals:
             stream >> value;
             GLib.List<QNetworkCookie> new_cookies = QNetworkCookie.parse_cookies (value);
             if (new_cookies.count () == 0 && value.length () != 0) {
-                q_c_warning (lc_cookie_jar) << "CookieJar : Unable to parse saved cookie:" << value;
+                GLib.warn (lc_cookie_jar) << "CookieJar : Unable to parse saved cookie:" << value;
             }
             for (int j = 0; j < new_cookies.count (); ++j)
                 list.append (new_cookies.at (j));
@@ -88,7 +88,7 @@ signals:
 
     CookieJar.~CookieJar () = default;
 
-    bool CookieJar.set_cookies_from_url (GLib.List<QNetworkCookie> &cookie_list, QUrl url) {
+    bool CookieJar.set_cookies_from_url (GLib.List<QNetworkCookie> &cookie_list, GLib.Uri url) {
         if (QNetworkCookieJar.set_cookies_from_url (cookie_list, url)) {
             Q_EMIT new_cookies_for_url (cookie_list, url);
             return true;
@@ -97,9 +97,9 @@ signals:
         return false;
     }
 
-    GLib.List<QNetworkCookie> CookieJar.cookies_for_url (QUrl url) {
+    GLib.List<QNetworkCookie> CookieJar.cookies_for_url (GLib.Uri url) {
         GLib.List<QNetworkCookie> cookies = QNetworkCookieJar.cookies_for_url (url);
-        q_c_debug (lc_cookie_jar) << url << "requests:" << cookies;
+        GLib.debug (lc_cookie_jar) << url << "requests:" << cookies;
         return cookies;
     }
 
@@ -113,8 +113,8 @@ signals:
             info.dir ().mkpath (".");
         }
 
-        q_c_debug (lc_cookie_jar) << file_name;
-        QFile file = new QFile (file_name);
+        GLib.debug (lc_cookie_jar) << file_name;
+        GLib.File file = new GLib.File (file_name);
         if (!file.open (QIODevice.WriteOnly)) {
             return false;
         }
@@ -130,7 +130,7 @@ signals:
             return false;
         }
 
-        QFile file = new QFile (file_name);
+        GLib.File file = new GLib.File (file_name);
         if (!file.open (QIODevice.ReadOnly)) {
             return false;
         }

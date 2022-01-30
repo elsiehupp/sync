@@ -16,7 +16,7 @@ Once the job has on_finished the job_finished signal will be emitted.
 ***********************************************************/
 class Thumbnail_job : AbstractNetworkJob {
 
-    public Thumbnail_job (string path, AccountPtr account, GLib.Object parent = nullptr);
+    public Thumbnail_job (string path, AccountPointer account, GLib.Object parent = nullptr);
 
     public on_ void on_start () override;
 signals:
@@ -34,7 +34,7 @@ signals:
 };
 
 
-    Thumbnail_job.Thumbnail_job (string path, AccountPtr account, GLib.Object parent)
+    Thumbnail_job.Thumbnail_job (string path, AccountPointer account, GLib.Object parent)
         : AbstractNetworkJob (account, QLatin1String ("index.php/apps/files/api/v1/thumbnail/150/150/") + path, parent) {
         set_ignore_credential_failure (true);
     }

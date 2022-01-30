@@ -7,7 +7,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 // #include <QDir>
 // #include <QFileDialog>
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QTimer>
 // #include <QPushButton>
 // #include <QMessageBox>
@@ -141,7 +141,7 @@ signals:
 
     void Owncloud_setup_page.setup_server_address_description_label () {
         const var app_name = Theme.instance ().app_name_gui ();
-        _ui.server_address_description_label.on_set_text (tr ("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
+        _ui.server_address_description_label.on_set_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
     }
 
     void Owncloud_setup_page.set_server_url (string new_url) {
@@ -196,7 +196,7 @@ signals:
             if (url.ends_with (web_dav_path)) {
                 new_url.chop (web_dav_path.length ());
             }
-            if (web_dav_path.ends_with (QLatin1Char ('/'))) {
+            if (web_dav_path.ends_with ('/')) {
                 web_dav_path.chop (1); // cut off the slash
                 if (url.ends_with (web_dav_path)) {
                     new_url.chop (web_dav_path.length ());
@@ -210,7 +210,7 @@ signals:
 
     void Owncloud_setup_page.on_url_edit_finished () {
         string url = _ui.le_url.full_text ();
-        if (QUrl (url).is_relative () && !url.is_empty ()) {
+        if (GLib.Uri (url).is_relative () && !url.is_empty ()) {
             // no scheme defined, set one
             url.prepend ("https://");
             _ui.le_url.set_full_text (url);
@@ -250,7 +250,7 @@ signals:
             // immediately.
             set_commit_page (true);
             // Hack : set_commit_page () changes caption, but after an error this page could still be visible
-            set_button_text (QWizard.Commit_button, tr ("&Next >"));
+            set_button_text (QWizard.Commit_button, _("&Next >"));
             validate_page ();
             set_visible (false);
         }
@@ -283,9 +283,9 @@ signals:
         if (!_auth_type_known) {
             on_url_edit_finished ();
             string u = url ();
-            QUrl qurl (u);
+            GLib.Uri qurl (u);
             if (!qurl.is_valid () || qurl.host ().is_empty ()) {
-                on_set_error_string (tr ("Server address does not seem to be valid"), false);
+                on_set_error_string (_("Server address does not seem to be valid"), false);
                 return false;
             }
 
@@ -316,7 +316,7 @@ signals:
             _ui.error_label.set_visible (false);
         } else {
             if (retry_http_only) {
-                QUrl url (_ui.le_url.full_text ());
+                GLib.Uri url (_ui.le_url.full_text ());
                 if (url.scheme () == "https") {
                     // Ask the user how to proceed when connecting to a https:// URL fails.
                     // It is possible that the server is secured with client-side TLS certificates,
@@ -367,13 +367,13 @@ signals:
     }
 
     string subject_info_helper (QSslCertificate &cert, GLib.ByteArray qa) {
-        return cert.subject_info (qa).join (QLatin1Char ('/'));
+        return cert.subject_info (qa).join ('/');
     }
 
     //called during the validation of the client certificate.
     void Owncloud_setup_page.on_certificate_accepted () {
-        QFile cert_file (add_cert_dial.get_certificate_path ());
-        cert_file.open (QFile.ReadOnly);
+        GLib.File cert_file (add_cert_dial.get_certificate_path ());
+        cert_file.open (GLib.File.ReadOnly);
         GLib.ByteArray cert_data = cert_file.read_all ();
         GLib.ByteArray cert_password = add_cert_dial.get_certificate_passwd ().to_local8Bit ();
 
@@ -390,7 +390,7 @@ signals:
             // The extracted SSL key and cert gets added to the QSslConfiguration in check_server ()
             validate_page ();
         } else {
-            add_cert_dial.show_error_message (tr ("Could not load certificate. Maybe wrong password?"));
+            add_cert_dial.show_error_message (_("Could not load certificate. Maybe wrong password?"));
             add_cert_dial.show ();
         }
     }

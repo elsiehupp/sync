@@ -154,7 +154,7 @@ signals:
         if (!_account_state || !_active) {
             return false;
         }
-        AccountPtr account = _account_state.account ();
+        AccountPointer account = _account_state.account ();
         return (_account_state.is_connected () || _allow_disconnected_account_state)
             && account.credentials ()
             && account.credentials ().ready ();
@@ -170,7 +170,7 @@ signals:
             _job.delete_later ();
         }
 
-        AccountPtr account = _account_state.account ();
+        AccountPointer account = _account_state.account ();
         _job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"), this);
         _job.on_set_timeout (20 * 1000);
         connect (_job.data (), &JsonApiJob.json_received, this, &UserInfo.on_update_last_info);
@@ -181,7 +181,7 @@ signals:
     void UserInfo.on_update_last_info (QJsonDocument &json) {
         var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
 
-        AccountPtr account = _account_state.account ();
+        AccountPointer account = _account_state.account ();
 
         // User Info
         string user = obj_data.value ("id").to_string ();

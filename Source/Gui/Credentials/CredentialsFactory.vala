@@ -25,7 +25,7 @@ namespace CredentialsFactory {
         } else if (type == "webflow") {
             return new WebFlowCredentials;
         } else {
-            q_c_warning (lc_gui_credentials, "Unknown credentials type : %s", q_printable (type));
+            GLib.warn (lc_gui_credentials, "Unknown credentials type : %s", q_printable (type));
             return new DummyCredentials;
         }
     }

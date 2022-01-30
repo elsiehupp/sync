@@ -67,7 +67,7 @@ class TokenCredentials : AbstractCredentials {
 
         protected QNetworkReply create_request (Operation op, QNetworkRequest &request, QIODevice outgoing_data) {
             if (_cred.user ().is_empty () || _cred.password ().is_empty ()) {
-                q_c_warning (lc_token_credentials) << "Empty user/password provided!";
+                GLib.warn (lc_token_credentials) << "Empty user/password provided!";
             }
 
             QNetworkRequest req (request);
@@ -163,7 +163,7 @@ class TokenCredentials : AbstractCredentials {
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,
         // those credentials were invalid and we terminate.
-        q_c_warning (lc_token_credentials) << "Stop request : Authentication failed for " << reply.url ().to_string ();
+        GLib.warn (lc_token_credentials) << "Stop request : Authentication failed for " << reply.url ().to_string ();
         reply.set_property (authentication_failed_c, true);
         reply.close ();
     }

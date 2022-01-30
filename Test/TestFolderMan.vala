@@ -24,14 +24,14 @@ class TestFolderMan : public GLib.Object {
         QVERIFY (dir2.mkpath ("ownCloud2"));
         QVERIFY (dir2.mkpath ("sub/free"));
         QVERIFY (dir2.mkpath ("free2/sub")); {
-            QFile f (dir.path () + "/sub/file.txt");
-            f.open (QFile.WriteOnly);
+            GLib.File f (dir.path () + "/sub/file.txt");
+            f.open (GLib.File.WriteOnly);
             f.write ("hello");
         }
         string dirPath = dir2.canonicalPath ();
 
-        AccountPtr account = Account.create ();
-        QUrl url ("http://example.de");
+        AccountPointer account = Account.create ();
+        GLib.Uri url ("http://example.de");
         var cred = new HttpCredentialsTest ("testuser", "secret");
         account.setCredentials (cred);
         account.setUrl ( url );
@@ -49,7 +49,7 @@ class TestFolderMan : public GLib.Object {
         }
 
         // those should be allowed
-        // string FolderMan.checkPathValidityForNewFolder (string& path, QUrl serverUrl, bool forNewDirectory)
+        // string FolderMan.checkPathValidityForNewFolder (string& path, GLib.Uri serverUrl, bool forNewDirectory)
 
         QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free"), string ());
         QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/free2/"), string ());
@@ -62,7 +62,7 @@ class TestFolderMan : public GLib.Object {
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/file.txt").isNull ());
 
         // There are folders configured in those folders, url needs to be taken into account : . ERROR
-        QUrl url2 (url);
+        GLib.Uri url2 (url);
         const string user = account.credentials ().user ();
         url2.setUserName (user);
 
@@ -71,7 +71,7 @@ class TestFolderMan : public GLib.Object {
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/", url2).isNull ());
 
         // Now it will work because the account is different
-        QUrl url3 ("http://anotherexample.org");
+        GLib.Uri url3 ("http://anotherexample.org");
         url3.setUserName ("dummy");
         QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1", url3), string ());
         QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/", url3), string ());
@@ -81,10 +81,10 @@ class TestFolderMan : public GLib.Object {
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1/folder/f").isNull ());
 
         // make a bunch of links
-        QVERIFY (QFile.link (dirPath + "/sub/free", dirPath + "/link1"));
-        QVERIFY (QFile.link (dirPath + "/sub", dirPath + "/link2"));
-        QVERIFY (QFile.link (dirPath + "/sub/ownCloud1", dirPath + "/link3"));
-        QVERIFY (QFile.link (dirPath + "/sub/ownCloud1/folder", dirPath + "/link4"));
+        QVERIFY (GLib.File.link (dirPath + "/sub/free", dirPath + "/link1"));
+        QVERIFY (GLib.File.link (dirPath + "/sub", dirPath + "/link2"));
+        QVERIFY (GLib.File.link (dirPath + "/sub/ownCloud1", dirPath + "/link3"));
+        QVERIFY (GLib.File.link (dirPath + "/sub/ownCloud1/folder", dirPath + "/link4"));
 
         // Ok
         QVERIFY (folderman.checkPathValidityForNewFolder (dirPath + "/link1").isNull ());
@@ -139,8 +139,8 @@ class TestFolderMan : public GLib.Object {
         QVERIFY (dir2.mkpath ("free2/sub"));
         string dirPath = dir2.canonicalPath ();
 
-        AccountPtr account = Account.create ();
-        QUrl url ("http://example.de");
+        AccountPointer account = Account.create ();
+        GLib.Uri url ("http://example.de");
         var cred = new HttpCredentialsTest ("testuser", "secret");
         account.setCredentials (cred);
         account.setUrl ( url );

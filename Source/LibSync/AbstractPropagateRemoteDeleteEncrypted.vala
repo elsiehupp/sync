@@ -88,7 +88,7 @@ void AbstractPropagateRemoteDeleteEncrypted.store_first_error_string (string err
 }
 
 void AbstractPropagateRemoteDeleteEncrypted.start_ls_col_job (string path) {
-    q_c_debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder is encrypted, let's get the Id from it.";
+    GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder is encrypted, let's get the Id from it.";
     var job = new LsColJob (_propagator.account (), _propagator.full_remote_path (path), this);
     job.set_properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
     connect (job, &LsColJob.directory_listing_subfolders, this, &AbstractPropagateRemoteDeleteEncrypted.on_folder_encrypted_id_received);
@@ -97,7 +97,7 @@ void AbstractPropagateRemoteDeleteEncrypted.start_ls_col_job (string path) {
 }
 
 void AbstractPropagateRemoteDeleteEncrypted.on_folder_encrypted_id_received (string[] &list) {
-    q_c_debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Received id of folder, trying to lock it so we can prepare the metadata";
+    GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Received id of folder, trying to lock it so we can prepare the metadata";
     var job = qobject_cast<LsColJob> (sender ());
     const ExtraFolderInfo folder_info = job._folder_infos.value (list.first ());
     on_try_lock (folder_info.file_id);
@@ -111,7 +111,7 @@ void AbstractPropagateRemoteDeleteEncrypted.on_try_lock (GLib.ByteArray folder_i
 }
 
 void AbstractPropagateRemoteDeleteEncrypted.on_folder_locked_successfully (GLib.ByteArray folder_id, GLib.ByteArray token) {
-    q_c_debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder id" << folder_id << "Locked Successfully for Upload, Fetching Metadata";
+    GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder id" << folder_id << "Locked Successfully for Upload, Fetching Metadata";
     _folder_locked = true;
     _folder_token = token;
     _folder_id = folder_id;
@@ -124,7 +124,7 @@ void AbstractPropagateRemoteDeleteEncrypted.on_folder_locked_successfully (GLib.
 
 void AbstractPropagateRemoteDeleteEncrypted.on_folder_un_locked_successfully (GLib.ByteArray folder_id) {
     Q_UNUSED (folder_id);
-    q_c_debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder id" << folder_id << "successfully unlocked";
+    GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder id" << folder_id << "successfully unlocked";
     _folder_locked = false;
     _folder_token = "";
 }
@@ -162,7 +162,7 @@ void AbstractPropagateRemoteDeleteEncrypted.on_delete_remote_item_finished () {
         // Normally we expect "204 No Content"
         // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
         // throw an error.
-        store_first_error_string (tr ("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
+        store_first_error_string (_("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                        .arg (_item._http_error_code)
                        .arg (delete_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ()));
 
@@ -193,7 +193,7 @@ void AbstractPropagateRemoteDeleteEncrypted.unlock_folder () {
         return;
     }
 
-    q_c_debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Unlocking folder" << _folder_id;
+    GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Unlocking folder" << _folder_id;
     var unlock_job = new UnlockEncryptFolderApiJob (_propagator.account (), _folder_id, _folder_token, this);
 
     connect (unlock_job, &UnlockEncryptFolderApiJob.on_success, this, &AbstractPropagateRemoteDeleteEncrypted.on_folder_un_locked_successfully);
@@ -202,7 +202,7 @@ void AbstractPropagateRemoteDeleteEncrypted.unlock_folder () {
         _folder_locked = false;
         _folder_token = "";
         _item._http_error_code = http_return_code;
-        _error_string = tr ("\"%1 Failed to unlock encrypted folder %2\".")
+        _error_string = _("\"%1 Failed to unlock encrypted folder %2\".")
                 .arg (http_return_code)
                 .arg (string.from_utf8 (file_id));
         _item._error_string =_error_string;
@@ -212,7 +212,7 @@ void AbstractPropagateRemoteDeleteEncrypted.unlock_folder () {
 }
 
 void AbstractPropagateRemoteDeleteEncrypted.task_failed () {
-    q_c_debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Task failed for job" << sender ();
+    GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Task failed for job" << sender ();
     _is_task_failed = true;
     if (_folder_locked) {
         unlock_folder ();

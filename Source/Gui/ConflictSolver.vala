@@ -102,16 +102,16 @@ signals:
             return false;
         }
 
-        const var message = info.is_dir () ? tr ("Do you want to delete the directory <i>%1</i> and all its contents permanently?").arg (info.dir ().dir_name ())
-                                          : tr ("Do you want to delete the file <i>%1</i> permanently?").arg (info.file_name ());
-        const var result = QMessageBox.question (_parent_widget, tr ("Confirm deletion"), message, QMessageBox.Yes, QMessageBox.No);
+        const var message = info.is_dir () ? _("Do you want to delete the directory <i>%1</i> and all its contents permanently?").arg (info.dir ().dir_name ())
+                                          : _("Do you want to delete the file <i>%1</i> permanently?").arg (info.file_name ());
+        const var result = QMessageBox.question (_parent_widget, _("Confirm deletion"), message, QMessageBox.Yes, QMessageBox.No);
         if (result != QMessageBox.Yes)
             return false;
 
         if (info.is_dir ()) {
             return FileSystem.remove_recursively (_local_version_filename);
         } else {
-            return QFile (_local_version_filename).remove ();
+            return GLib.File (_local_version_filename).remove ();
         }
     }
 
@@ -146,8 +146,8 @@ signals:
         if (FileSystem.unchecked_rename_replace (_local_version_filename, target_filename, &error)) {
             return true;
         } else {
-            q_c_warning (lc_conflict) << "Rename error:" << error;
-            QMessageBox.warning (_parent_widget, tr ("Error"), tr ("Moving file failed:\n\n%1").arg (error));
+            GLib.warn (lc_conflict) << "Rename error:" << error;
+            QMessageBox.warning (_parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
             return false;
         }
     }
@@ -170,8 +170,8 @@ signals:
         if (FileSystem.unchecked_rename_replace (_local_version_filename, _remote_version_filename, &error)) {
             return true;
         } else {
-            q_c_warning (lc_conflict) << "Rename error:" << error;
-            QMessageBox.warning (_parent_widget, tr ("Error"), tr ("Moving file failed:\n\n%1").arg (error));
+            GLib.warn (lc_conflict) << "Rename error:" << error;
+            QMessageBox.warning (_parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
             return false;
         }
     }

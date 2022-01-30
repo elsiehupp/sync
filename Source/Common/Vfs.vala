@@ -14,7 +14,7 @@ using csync_file_stat_t = struct csync_file_stat_s;
 
 namespace Occ {
 
-using AccountPtr = unowned<Account>;
+using AccountPointer = unowned<Account>;
 
 /***********************************************************
 Collection of parameters for initializing a Vfs instance.
@@ -42,7 +42,7 @@ struct OCSYNC_EXPORT VfsSetupParams {
     string remote_path;
 
     /// Account url, credentials etc for network calls
-    AccountPtr account;
+    AccountPointer account;
 
 
     /***********************************************************
@@ -381,7 +381,7 @@ const int OCC_DEFINE_VFS_FACTORY (name, Type)
     static_assert (std.is_base_of<Occ.Vfs, Type>.value, "Please define VFS factories only for Occ.Vfs subclasses");
     namespace {
     void init_plugin () \ {
-        Occ.Vfs.register_plugin (QStringLiteral (name), [] () . Occ.Vfs * {
+        Occ.Vfs.register_plugin (name, [] () . Occ.Vfs * {
             return new (Type);
         });
     }
@@ -417,15 +417,15 @@ string Vfs.mode_to_string (Mode mode) {
     // Note: Strings are used for config and must be stable
     switch (mode) {
     case Off:
-        return QStringLiteral ("off");
+        return "off";
     case WithSuffix:
-        return QStringLiteral ("suffix");
+        return "suffix";
     case WindowsCfApi:
-        return QStringLiteral ("wincfapi");
+        return "wincfapi";
     case XAttr:
-        return QStringLiteral ("xattr");
+        return "xattr";
     }
-    return QStringLiteral ("off");
+    return "off";
 }
 
 Optional<Vfs.Mode> Vfs.mode_from_string (string str) {
@@ -497,12 +497,12 @@ VfsOff.~VfsOff () = default;
 
 static string mode_to_plugin_name (Vfs.Mode mode) {
     if (mode == Vfs.WithSuffix)
-        return QStringLiteral ("suffix");
+        return "suffix";
     if (mode == Vfs.WindowsCfApi)
-        return QStringLiteral ("cfapi");
+        return "cfapi";
     if (mode == Vfs.XAttr)
-        return QStringLiteral ("xattr");
-    return string ();
+        return "xattr";
+    return "";
 }
 
 
@@ -517,32 +517,32 @@ bool Occ.is_vfs_plugin_available (Vfs.Mode mode) {
         return false;
     }
 
-    QPluginLoader loader (plugin_file_name (QStringLiteral ("vfs"), name));
+    QPluginLoader loader (plugin_file_name ("vfs", name));
 
     const var base_meta_data = loader.meta_data ();
-    if (base_meta_data.is_empty () || !base_meta_data.contains (QStringLiteral ("IID"))) {
-        q_c_debug (lc_plugin) << "Plugin doesn't exist" << loader.file_name ();
+    if (base_meta_data.is_empty () || !base_meta_data.contains ("IID")) {
+        GLib.debug (lc_plugin) << "Plugin doesn't exist" << loader.file_name ();
         return false;
     }
-    if (base_meta_data[QStringLiteral ("IID")].to_string () != QStringLiteral ("org.owncloud.PluginFactory")) {
-        q_c_warning (lc_plugin) << "Plugin has wrong IID" << loader.file_name () << base_meta_data[QStringLiteral ("IID")];
+    if (base_meta_data["IID"].to_string () != "org.owncloud.PluginFactory") {
+        GLib.warn (lc_plugin) << "Plugin has wrong IID" << loader.file_name () << base_meta_data["IID"];
         return false;
     }
 
-    const var metadata = base_meta_data[QStringLiteral ("MetaData")].to_object ();
-    if (metadata[QStringLiteral ("type")].to_string () != QStringLiteral ("vfs")) {
-        q_c_warning (lc_plugin) << "Plugin has wrong type" << loader.file_name () << metadata[QStringLiteral ("type")];
+    const var metadata = base_meta_data["MetaData"].to_object ();
+    if (metadata["type"].to_string () != "vfs") {
+        GLib.warn (lc_plugin) << "Plugin has wrong type" << loader.file_name () << metadata["type"];
         return false;
     }
-    if (metadata[QStringLiteral ("version")].to_string () != QStringLiteral (MIRALL_VERSION_STRING)) {
-        q_c_warning (lc_plugin) << "Plugin has wrong version" << loader.file_name () << metadata[QStringLiteral ("version")];
+    if (metadata["version"].to_string () != MIRALL_VERSION_STRING) {
+        GLib.warn (lc_plugin) << "Plugin has wrong version" << loader.file_name () << metadata["version"];
         return false;
     }
 
     // Attempting to load the plugin is essential as it could have dependencies that
     // can't be resolved and thus not be available after all.
     if (!loader.on_load ()) {
-        q_c_warning (lc_plugin) << "Plugin failed to load:" << loader.error_string ();
+        GLib.warn (lc_plugin) << "Plugin failed to load:" << loader.error_string ();
         return false;
     }
 
@@ -590,7 +590,7 @@ std.unique_ptr<Vfs> Occ.create_vfs_from_plugin (Vfs.Mode mode) {
         return nullptr;
     }
 
-    const var plugin_path = plugin_file_name (QStringLiteral ("vfs"), name);
+    const var plugin_path = plugin_file_name ("vfs", name);
 
     if (!is_vfs_plugin_available (mode)) {
         q_c_critical (lc_plugin) << "Could not load plugin : not existant or bad metadata" << plugin_path;

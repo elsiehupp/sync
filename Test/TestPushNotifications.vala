@@ -14,7 +14,7 @@ const int RETURN_FALSE_ON_FAIL (expr)
         return false;
     }
 
-bool verifyCalledOnceWithAccount (QSignalSpy &spy, Occ.AccountPtr account) {
+bool verifyCalledOnceWithAccount (QSignalSpy &spy, Occ.AccountPointer account) {
     RETURN_FALSE_ON_FAIL (spy.count () == 1);
     var accountFromSpy = spy.at (0).at (0).value<Occ.Account> ();
     RETURN_FALSE_ON_FAIL (accountFromSpy == account.data ());
@@ -22,7 +22,7 @@ bool verifyCalledOnceWithAccount (QSignalSpy &spy, Occ.AccountPtr account) {
     return true;
 }
 
-bool failThreeAuthenticationAttempts (FakeWebSocketServer &fakeServer, Occ.AccountPtr account) {
+bool failThreeAuthenticationAttempts (FakeWebSocketServer &fakeServer, Occ.AccountPointer account) {
     RETURN_FALSE_ON_FAIL (account);
     RETURN_FALSE_ON_FAIL (account.pushNotifications ());
 

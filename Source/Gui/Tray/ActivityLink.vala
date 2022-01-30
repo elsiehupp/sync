@@ -74,7 +74,7 @@ class Activity {
     public string _message;
     public string _folder;
     public string _file;
-    public QUrl _link;
+    public GLib.Uri _link;
     public QDateTime _date_time;
     public int64 _expire_at_msecs = -1;
     public string _acc_name;

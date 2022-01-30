@@ -20,15 +20,15 @@ class PluginFactory {
 template<class PluginClass>
 class DefaultPluginFactory : PluginFactory {
 
-    public GLib.Object* create (GLib.Object parent) override {
+    public override GLib.Object create (GLib.Object parent) {
         return new PluginClass (parent);
     }
 };
 
 /// Return the expected name of a plugin, for use with QPluginLoader
 string plugin_file_name (string type, string name) {
-    return QStringLiteral ("%1sync_%2_%3")
-        .arg (QStringLiteral (APPLICATION_EXECUTABLE), type, name);
+    return "%1sync_%2_%3"
+        .arg (APPLICATION_EXECUTABLE, type, name);
 }
 
 

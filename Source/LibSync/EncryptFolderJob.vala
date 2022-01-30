@@ -17,7 +17,7 @@ class EncryptFolderJob : GLib.Object {
         Error,
     };
 
-    public EncryptFolderJob (AccountPtr &account, SyncJournalDb journal, string path, GLib.ByteArray file_id, GLib.Object parent = nullptr);
+    public EncryptFolderJob (AccountPointer &account, SyncJournalDb journal, string path, GLib.ByteArray file_id, GLib.Object parent = nullptr);
 
 
     public void on_start ();
@@ -38,7 +38,7 @@ signals:
     private void on_update_metadata_error (GLib.ByteArray folder_id, int http_return_code);
 
 
-    private AccountPtr _account;
+    private AccountPointer _account;
     private SyncJournalDb _journal;
     private string _path;
     private GLib.ByteArray _file_id;
@@ -46,7 +46,7 @@ signals:
     private string _error_string;
 };
 
-    EncryptFolderJob.EncryptFolderJob (AccountPtr &account, SyncJournalDb journal, string path, GLib.ByteArray file_id, GLib.Object parent)
+    EncryptFolderJob.EncryptFolderJob (AccountPointer &account, SyncJournalDb journal, string path, GLib.ByteArray file_id, GLib.Object parent)
         : GLib.Object (parent)
         , _account (account)
         , _journal (journal)
@@ -66,11 +66,11 @@ signals:
     }
 
     void EncryptFolderJob.on_encryption_flag_success (GLib.ByteArray file_id) {
-        SyncJournalFileRecord rec;
-        _journal.get_file_record (_path, &rec);
-        if (rec.is_valid ()) {
-            rec._is_e2e_encrypted = true;
-            _journal.set_file_record (rec);
+        SyncJournalFileRecord record;
+        _journal.get_file_record (_path, &record);
+        if (record.is_valid ()) {
+            record._is_e2e_encrypted = true;
+            _journal.set_file_record (record);
         }
 
         var lock_job = new LockEncryptFolderApiJob (_account, file_id, this);
@@ -93,7 +93,7 @@ signals:
         var encrypted_metadata = empty_metadata.encrypted_metadata ();
         if (encrypted_metadata.is_empty ()) {
             //TODO : Mark the folder as unencrypted as the metadata generation failed.
-            _error_string = tr ("Could not generate the metadata for encryption, Unlocking the folder.\n"
+            _error_string = _("Could not generate the metadata for encryption, Unlocking the folder.\n"
                               "This can be an issue with your OpenSSL libraries.");
             emit finished (Error);
             return;

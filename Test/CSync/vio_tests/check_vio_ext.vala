@@ -187,7 +187,7 @@ static void traverse_dir (void **state, string dir, int cnt) {
 }
 
 static void create_file ( const char path, char name, char content) {
-    QFile file = new QFile (QStringLiteral ("%1/%2%3").arg (CSYNC_TEST_DIR, string.fromUtf8 (path), string.fromUtf8 (name)));
+    GLib.File file = new GLib.File (QStringLiteral ("%1/%2%3").arg (CSYNC_TEST_DIR, string.fromUtf8 (path), string.fromUtf8 (name)));
     assert_int_equal (1, file.open (QIODevice.WriteOnly | QIODevice.NewOnly));
     file.write (content);
 }

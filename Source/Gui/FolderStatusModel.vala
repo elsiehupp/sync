@@ -152,8 +152,8 @@ class FolderStatusModel : QAbstractItemModel {
     private void on_show_fetch_progress ();
 
 
-    private string[] create_black_list (Occ.FolderStatusModel.SubFolderInfo &root,
-        const string[] &old_black_list);
+    private string[] create_block_list (Occ.FolderStatusModel.SubFolderInfo &root,
+        const string[] &old_block_list);
     private const AccountState _account_state = nullptr;
     private bool _dirty = false; // If the selective sync checkboxes were changed
 
@@ -282,9 +282,9 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
             return QVariant (true);
         } else if (role == Qt.ToolTipRole) {
             if (!_account_state.is_connected ()) {
-                return tr ("You need to be connected to add a folder");
+                return _("You need to be connected to add a folder");
             }
-            return tr ("Click this button to add a folder to synchronize.");
+            return _("Click this button to add a folder to synchronize.");
         }
         return QVariant ();
     }
@@ -295,9 +295,9 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
         switch (role) {
         case Qt.Display_role:
             // : Example text : "File.txt (23KB)"
-            return x._size < 0 ? x._name : tr ("%1 (%2)").arg (x._name, Utility.octets_to_string (x._size));
+            return x._size < 0 ? x._name : _("%1 (%2)").arg (x._name, Utility.octets_to_string (x._size));
         case Qt.ToolTipRole:
-            return string (QLatin1String ("<qt>") + Utility.escape (x._size < 0 ? x._name : tr ("%1 (%2)").arg (x._name, Utility.octets_to_string (x._size))) + QLatin1String ("</qt>"));
+            return string (QLatin1String ("<qt>") + Utility.escape (x._size < 0 ? x._name : _("%1 (%2)").arg (x._name, Utility.octets_to_string (x._size))) + QLatin1String ("</qt>"));
         case Qt.CheckStateRole:
             if (supports_selective_sync) {
                 return x._checked;
@@ -333,10 +333,10 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
         switch (role) {
         case Qt.Display_role:
             if (x._has_error) {
-                return QVariant (tr ("Error while loading the list of folders from the server.")
+                return QVariant (_("Error while loading the list of folders from the server.")
                     + string ("\n") + x._last_error_string);
             } else {
-                return tr ("Fetching folder list from server …");
+                return _("Fetching folder list from server …");
             }
             break;
         default:
@@ -362,13 +362,13 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
         return f.remote_path ();
     case FolderStatusDelegate.Folder_conflict_msg:
         return (f.sync_result ().has_unresolved_conflicts ())
-            ? string[] (tr ("There are unresolved conflicts. Click for details."))
+            ? string[] (_("There are unresolved conflicts. Click for details."))
             : string[] ();
     case FolderStatusDelegate.Folder_error_msg:
         return f.sync_result ().error_strings ();
     case FolderStatusDelegate.Folder_info_msg:
         return f.virtual_files_enabled () && f.vfs ().mode () != Vfs.Mode.WindowsCfApi
-            ? string[] (tr ("Virtual file support is enabled."))
+            ? string[] (_("Virtual file support is enabled."))
             : string[] ();
     case FolderStatusDelegate.Sync_running:
         return f.sync_result ().status () == SyncResult.Sync_running;
@@ -390,7 +390,7 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
         if (account_connected)
             tool_tip = Theme.instance ().status_header_text (f.sync_result ().status ());
         else
-            tool_tip = tr ("Signed out");
+            tool_tip = _("Signed out");
         tool_tip += "\n";
         tool_tip += folder_info._folder.path ();
         return tool_tip;
@@ -432,9 +432,9 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
         return progress._overall_sync_string;
     case FolderStatusDelegate.Folder_sync_text:
         if (f.virtual_files_enabled ()) {
-            return tr ("Synchronizing Virtual_files with local folder");
+            return _("Synchronizing Virtual_files with local folder");
         } else {
-            return tr ("Synchronizing with local folder");
+            return _("Synchronizing with local folder");
         }
     }
     return QVariant ();
@@ -769,7 +769,7 @@ void FolderStatusModel.on_gather_permissions (string href, QMap<string, string> 
     var job = sender ();
     var permission_map = job.property (property_permission_map).to_map ();
     job.set_property (property_permission_map, QVariant ()); // avoid a detach of the map while it is modified
-    ASSERT (!href.ends_with (QLatin1Char ('/')), "LsColXMLParser.parse should remove the trailing slash before calling us.");
+    ASSERT (!href.ends_with ('/'), "LsColXMLParser.parse should remove the trailing slash before calling us.");
     permission_map[href] = *it;
     job.set_property (property_permission_map, permission_map);
 }
@@ -782,7 +782,7 @@ void FolderStatusModel.on_gather_encryption_status (string href, QMap<string, st
     var job = sender ();
     var encryption_map = job.property (property_encryption_map).to_map ();
     job.set_property (property_encryption_map, QVariant ()); // avoid a detach of the map while it is modified
-    ASSERT (!href.ends_with (QLatin1Char ('/')), "LsColXMLParser.parse should remove the trailing slash before calling us.");
+    ASSERT (!href.ends_with ('/'), "LsColXMLParser.parse should remove the trailing slash before calling us.");
     encryption_map[href] = *it;
     job.set_property (property_encryption_map, encryption_map);
 }
@@ -809,25 +809,25 @@ void FolderStatusModel.on_update_directories (string[] &list) {
     parent_info._fetching_job = nullptr;
     parent_info._fetched = true;
 
-    QUrl url = parent_info._folder.remote_url ();
+    GLib.Uri url = parent_info._folder.remote_url ();
     string path_to_remove = url.path ();
     if (!path_to_remove.ends_with ('/'))
         path_to_remove += '/';
 
-    string[] selective_sync_black_list;
+    string[] selective_sync_block_list;
     bool ok1 = true;
     bool ok2 = true;
     if (parent_info._checked == Qt.Partially_checked) {
-        selective_sync_black_list = parent_info._folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok1);
+        selective_sync_block_list = parent_info._folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, &ok1);
     }
-    var selective_sync_undecided_list = parent_info._folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncUndecidedList, &ok2);
+    var selective_sync_undecided_list = parent_info._folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, &ok2);
 
     if (! (ok1 && ok2)) {
-        q_c_warning (lc_folder_status) << "Could not retrieve selective sync info from journal";
+        GLib.warn (lc_folder_status) << "Could not retrieve selective sync info from journal";
         return;
     }
 
-    std.set<string> selective_sync_undecided_set; // not QSet because it's not sorted
+    std.set<string> selective_sync_undecided_set; // not GLib.Set because it's not sorted
     foreach (string str, selective_sync_undecided_list) {
         if (str.starts_with (parent_info._path) || parent_info._path == QLatin1String ("/")) {
             selective_sync_undecided_set.insert (str);
@@ -859,15 +859,15 @@ void FolderStatusModel.on_update_directories (string[] &list) {
         new_info._is_encrypted = encryption_map.value (remove_trailing_slash (path)).to_string () == QStringLiteral ("1");
         new_info._path = relative_path;
 
-        SyncJournalFileRecord rec;
-        parent_info._folder.journal_database ().get_file_record_by_e2e_mangled_name (remove_trailing_slash (relative_path), &rec);
-        if (rec.is_valid ()) {
-            new_info._name = remove_trailing_slash (rec._path).split ('/').last ();
-            if (rec._is_e2e_encrypted && !rec._e2e_mangled_name.is_empty ()) {
+        SyncJournalFileRecord record;
+        parent_info._folder.journal_database ().get_file_record_by_e2e_mangled_name (remove_trailing_slash (relative_path), &record);
+        if (record.is_valid ()) {
+            new_info._name = remove_trailing_slash (record._path).split ('/').last ();
+            if (record._is_e2e_encrypted && !record._e2e_mangled_name.is_empty ()) {
                 // we must use local path for Settings Dialog's filesystem tree, otherwise open and create new folder actions won't work
                 // hence, we are storing _e2e_mangled_name separately so it can be use later for LsColJob
                 new_info._e2e_mangled_name = relative_path;
-                new_info._path = rec._path;
+                new_info._path = record._path;
             }
             if (!new_info._path.ends_with ('/')) {
                 new_info._path += '/';
@@ -887,7 +887,7 @@ void FolderStatusModel.on_update_directories (string[] &list) {
         } else if (parent_info._checked == Qt.Checked) {
             new_info._checked = Qt.Checked;
         } else {
-            foreach (string str, selective_sync_black_list) {
+            foreach (string str, selective_sync_block_list) {
                 if (str == relative_path || str == QLatin1String ("/")) {
                     new_info._checked = Qt.Unchecked;
                     break;
@@ -932,7 +932,7 @@ void FolderStatusModel.on_update_directories (string[] &list) {
     if (it != selective_sync_undecided_list.end ()) {
         selective_sync_undecided_list.erase (it, selective_sync_undecided_list.end ());
         parent_info._folder.journal_database ().set_selective_sync_list (
-            SyncJournalDb.SelectiveSyncUndecidedList, selective_sync_undecided_list);
+            SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, selective_sync_undecided_list);
         emit dirty_changed ();
     }
 }
@@ -946,7 +946,7 @@ void FolderStatusModel.on_lscol_finished_with_error (QNetworkReply r) {
     }
     var parent_info = info_for_index (idx);
     if (parent_info) {
-        q_c_debug (lc_folder_status) << r.error_string ();
+        GLib.debug (lc_folder_status) << r.error_string ();
         parent_info._last_error_string = r.error_string ();
         var error = r.error ();
 
@@ -963,8 +963,8 @@ void FolderStatusModel.on_lscol_finished_with_error (QNetworkReply r) {
     }
 }
 
-string[] FolderStatusModel.create_black_list (FolderStatusModel.SubFolderInfo &root,
-    const string[] &old_black_list) {
+string[] FolderStatusModel.create_block_list (FolderStatusModel.SubFolderInfo &root,
+    const string[] &old_block_list) {
     switch (root._checked) {
     case Qt.Unchecked:
         return string[] (root._path);
@@ -977,12 +977,12 @@ string[] FolderStatusModel.create_black_list (FolderStatusModel.SubFolderInfo &r
     string[] result;
     if (root._fetched) {
         for (int i = 0; i < root._subs.count (); ++i) {
-            result += create_black_list (root._subs.at (i), old_black_list);
+            result += create_block_list (root._subs.at (i), old_block_list);
         }
     } else {
-        // We did not load from the server so we re-use the one from the old black list
+        // We did not load from the server so we re-use the one from the old block list
         const string path = root._path;
-        foreach (string it, old_black_list) {
+        foreach (string it, old_block_list) {
             if (it.starts_with (path))
                 result += it;
         }
@@ -1003,45 +1003,45 @@ void FolderStatusModel.on_update_folder_state (Folder folder) {
 void FolderStatusModel.on_apply_selective_sync () {
     for (var &folder_info : q_as_const (_folders)) {
         if (!folder_info._fetched) {
-            folder_info._folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncUndecidedList, string[] ());
+            folder_info._folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, string[] ());
             continue;
         }
         const var folder = folder_info._folder;
 
         bool ok = false;
-        var old_black_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
+        var old_block_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, &ok);
         if (!ok) {
-            q_c_warning (lc_folder_status) << "Could not read selective sync list from database.";
+            GLib.warn (lc_folder_status) << "Could not read selective sync list from database.";
             continue;
         }
-        string[] black_list = create_black_list (folder_info, old_black_list);
-        folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, black_list);
+        string[] block_list = create_block_list (folder_info, old_block_list);
+        folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
 
-        var black_list_set = black_list.to_set ();
-        var old_black_list_set = old_black_list.to_set ();
+        var block_list_set = block_list.to_set ();
+        var old_block_list_set = old_block_list.to_set ();
 
-        // The folders that were undecided or blacklisted and that are now checked should go on the white list.
+        // The folders that were undecided or blocklisted and that are now checked should go on the allow list.
         // The user confirmed them already just now.
-        string[] to_add_to_white_list = ( (old_black_list_set + folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncUndecidedList, &ok).to_set ()) - black_list_set).values ();
+        string[] to_add_to_allow_list = ( (old_block_list_set + folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, &ok).to_set ()) - block_list_set).values ();
 
-        if (!to_add_to_white_list.is_empty ()) {
-            var white_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncWhiteList, &ok);
+        if (!to_add_to_allow_list.is_empty ()) {
+            var allow_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, &ok);
             if (ok) {
-                white_list += to_add_to_white_list;
-                folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncWhiteList, white_list);
+                allow_list += to_add_to_allow_list;
+                folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, allow_list);
             }
         }
         // clear the undecided list
-        folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncUndecidedList, string[] ());
+        folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, string[] ());
 
         // do the sync if there were changes
-        var changes = (old_black_list_set - black_list_set) + (black_list_set - old_black_list_set);
+        var changes = (old_block_list_set - block_list_set) + (block_list_set - old_block_list_set);
         if (!changes.is_empty ()) {
             if (folder.is_busy ()) {
                 folder.on_terminate_sync ();
             }
             //The part that changed should not be read from the DB on next sync because there might be new folders
-            // (the ones that are no longer in the blacklist)
+            // (the ones that are no longer in the blocklist)
             foreach (var &it, changes) {
                 folder.journal_database ().schedule_path_for_remote_discovery (it);
                 folder.on_schedule_path_for_local_discovery (it);
@@ -1084,18 +1084,18 @@ void FolderStatusModel.on_set_progress (ProgressInfo &progress) {
 
     if (progress.status () == ProgressInfo.Discovery) {
         if (!progress._current_discovered_remote_folder.is_empty ()) {
-            pi._overall_sync_string = tr ("Checking for changes in remote \"%1\"").arg (progress._current_discovered_remote_folder);
+            pi._overall_sync_string = _("Checking for changes in remote \"%1\"").arg (progress._current_discovered_remote_folder);
             emit data_changed (index (folder_index), index (folder_index), roles);
             return;
         } else if (!progress._current_discovered_local_folder.is_empty ()) {
-            pi._overall_sync_string = tr ("Checking for changes in local \"%1\"").arg (progress._current_discovered_local_folder);
+            pi._overall_sync_string = _("Checking for changes in local \"%1\"").arg (progress._current_discovered_local_folder);
             emit data_changed (index (folder_index), index (folder_index), roles);
             return;
         }
     }
 
     if (progress.status () == ProgressInfo.Reconcile) {
-        pi._overall_sync_string = tr ("Reconciling changes");
+        pi._overall_sync_string = _("Reconciling changes");
         emit data_changed (index (folder_index), index (folder_index), roles);
         return;
     }
@@ -1151,31 +1151,31 @@ void FolderStatusModel.on_set_progress (ProgressInfo &progress) {
         if (estimated_up_bw || estimated_down_bw) {
             /***********************************************************
             // : Example text : "uploading foobar.png (1MB of 2MB) time left 2 minutes at a rate of 24Kb/s"
-            file_progress_string = tr ("%1 %2 (%3 of %4) %5 left at a rate of %6/s")
+            file_progress_string = _("%1 %2 (%3 of %4) %5 left at a rate of %6/s")
                 .arg (kind_string, item_file_name, s1, s2,
                     Utility.duration_to_descriptive_string (progress.file_progress (cur_item).estimated_eta),
                     Utility.octets_to_string (estimated_bw) );
             */
             // : Example text : "Syncing 'foo.txt', 'bar.txt'"
-            file_progress_string = tr ("Syncing %1").arg (all_filenames);
+            file_progress_string = _("Syncing %1").arg (all_filenames);
             if (estimated_down_bw > 0) {
-                file_progress_string.append (tr (", "));
+                file_progress_string.append (_(", "));
 // ifdefs : https://github.com/owncloud/client/issues/3095#issuecomment-128409294
-                file_progress_string.append (tr ("\u2193 %1/s")
+                file_progress_string.append (_("\u2193 %1/s")
                                               .arg (Utility.octets_to_string (estimated_down_bw)));
             }
             if (estimated_up_bw > 0) {
-                file_progress_string.append (tr (", "));
-                file_progress_string.append (tr ("\u2191 %1/s")
+                file_progress_string.append (_(", "));
+                file_progress_string.append (_("\u2191 %1/s")
                                               .arg (Utility.octets_to_string (estimated_up_bw)));
             }
         } else {
             // : Example text : "uploading foobar.png (2MB of 2MB)"
-            file_progress_string = tr ("%1 %2 (%3 of %4)").arg (kind_string, item_file_name, s1, s2);
+            file_progress_string = _("%1 %2 (%3 of %4)").arg (kind_string, item_file_name, s1, s2);
         }
     } else if (!kind_string.is_empty ()) {
         // : Example text : "uploading foobar.png"
-        file_progress_string = tr ("%1 %2").arg (kind_string, item_file_name);
+        file_progress_string = _("%1 %2").arg (kind_string, item_file_name);
     }
     pi._progress_string = file_progress_string;
 
@@ -1192,7 +1192,7 @@ void FolderStatusModel.on_set_progress (ProgressInfo &progress) {
 
         if (progress.trust_eta ()) {
             // : Example text : "5 minutes left, 12 MB of 345 MB, file 6 of 7"
-            overall_sync_string = tr ("%5 left, %1 of %2, file %3 of %4")
+            overall_sync_string = _("%5 left, %1 of %2, file %3 of %4")
                                     .arg (s1, s2)
                                     .arg (current_file)
                                     .arg (total_file_count)
@@ -1200,14 +1200,14 @@ void FolderStatusModel.on_set_progress (ProgressInfo &progress) {
 
         } else {
             // : Example text : "12 MB of 345 MB, file 6 of 7"
-            overall_sync_string = tr ("%1 of %2, file %3 of %4")
+            overall_sync_string = _("%1 of %2, file %3 of %4")
                                     .arg (s1, s2)
                                     .arg (current_file)
                                     .arg (total_file_count);
         }
     } else if (total_file_count > 0) {
         // Don't attempt to estimate the time left if there is no kb to transfer.
-        overall_sync_string = tr ("file %1 of %2").arg (current_file).arg (total_file_count);
+        overall_sync_string = _("file %1 of %2").arg (current_file).arg (total_file_count);
     }
 
     pi._overall_sync_string = overall_sync_string;
@@ -1252,15 +1252,15 @@ void FolderStatusModel.on_folder_sync_state_change (Folder f) {
         }
         string message;
         if (pos <= 0) {
-            message = tr ("Waiting …");
+            message = _("Waiting …");
         } else {
-            message = tr ("Waiting for %n other folder (s) …", "", pos);
+            message = _("Waiting for %n other folder (s) …", "", pos);
         }
         pi = SubFolderInfo.Progress ();
         pi._overall_sync_string = message;
     } else if (state == SyncResult.Sync_prepare) {
         pi = SubFolderInfo.Progress ();
-        pi._overall_sync_string = tr ("Preparing to sync …");
+        pi._overall_sync_string = _("Preparing to sync …");
     }
 
     // update the icon etc. now
@@ -1287,15 +1287,15 @@ void FolderStatusModel.on_reset_folders () {
 void FolderStatusModel.on_sync_all_pending_big_folders () {
     for (int i = 0; i < _folders.count (); ++i) {
         if (!_folders[i]._fetched) {
-            _folders[i]._folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncUndecidedList, string[] ());
+            _folders[i]._folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, string[] ());
             continue;
         }
         var folder = _folders.at (i)._folder;
 
         bool ok = false;
-        var undecided_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncUndecidedList, &ok);
+        var undecided_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, &ok);
         if (!ok) {
-            q_c_warning (lc_folder_status) << "Could not read selective sync list from database.";
+            GLib.warn (lc_folder_status) << "Could not read selective sync list from database.";
             return;
         }
 
@@ -1304,35 +1304,35 @@ void FolderStatusModel.on_sync_all_pending_big_folders () {
             continue;
         }
 
-        // Remove all undecided folders from the blacklist
-        var black_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
+        // Remove all undecided folders from the blocklist
+        var block_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, &ok);
         if (!ok) {
-            q_c_warning (lc_folder_status) << "Could not read selective sync list from database.";
+            GLib.warn (lc_folder_status) << "Could not read selective sync list from database.";
             return;
         }
         foreach (var &undecided_folder, undecided_list) {
-            black_list.remove_all (undecided_folder);
+            block_list.remove_all (undecided_folder);
         }
-        folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, black_list);
+        folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
 
-        // Add all undecided folders to the white list
-        var white_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncWhiteList, &ok);
+        // Add all undecided folders to the allow list
+        var allow_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, &ok);
         if (!ok) {
-            q_c_warning (lc_folder_status) << "Could not read selective sync list from database.";
+            GLib.warn (lc_folder_status) << "Could not read selective sync list from database.";
             return;
         }
-        white_list += undecided_list;
-        folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncWhiteList, white_list);
+        allow_list += undecided_list;
+        folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, allow_list);
 
         // Clear the undecided list
-        folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncUndecidedList, string[] ());
+        folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, string[] ());
 
         // Trigger a sync
         if (folder.is_busy ()) {
             folder.on_terminate_sync ();
         }
         // The part that changed should not be read from the DB on next sync because there might be new folders
-        // (the ones that are no longer in the blacklist)
+        // (the ones that are no longer in the blocklist)
         foreach (var &it, undecided_list) {
             folder.journal_database ().schedule_path_for_remote_discovery (it);
             folder.on_schedule_path_for_local_discovery (it);
@@ -1348,7 +1348,7 @@ void FolderStatusModel.on_sync_no_pending_big_folders () {
         var folder = _folders.at (i)._folder;
 
         // clear the undecided list
-        folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncUndecidedList, string[] ());
+        folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, string[] ());
     }
 
     on_reset_folders ();

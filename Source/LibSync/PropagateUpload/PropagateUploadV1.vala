@@ -17,7 +17,7 @@ void PropagateUploadFileV1.do_start_upload () {
     _start_chunk = 0;
     Q_ASSERT (_item._modtime > 0);
     if (_item._modtime <= 0) {
-        q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+        GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
     }
     _transfer_id = uint32 (Utility.rand ()) ^ uint32 (_item._modtime) ^ (uint32 (_file_to_upload._size) << 16);
 
@@ -25,7 +25,7 @@ void PropagateUploadFileV1.do_start_upload () {
 
     Q_ASSERT (_item._modtime > 0);
     if (_item._modtime <= 0) {
-        q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+        GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
     }
     if (progress_info._valid && progress_info.is_chunked () && progress_info._modtime == _item._modtime && progress_info._size == _item._size
         && (progress_info._content_checksum == _item._checksum_header || progress_info._content_checksum.is_empty () || _item._checksum_header.is_empty ())) {
@@ -42,7 +42,7 @@ void PropagateUploadFileV1.do_start_upload () {
         pi._transferid = 0; // We set a null transfer id because it is not chunked.
         Q_ASSERT (_item._modtime > 0);
         if (_item._modtime <= 0) {
-            q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+            GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
         }
         pi._modtime = _item._modtime;
         pi._error_count = 0;
@@ -102,7 +102,7 @@ void PropagateUploadFileV1.on_start_next_chunk () {
         // if there's only one chunk, it's the final one
         is_final_chunk = true;
     }
-    q_c_debug (lc_propagate_upload_v1) << _chunk_count << is_final_chunk << chunk_start << current_chunk_size;
+    GLib.debug (lc_propagate_upload_v1) << _chunk_count << is_final_chunk << chunk_start << current_chunk_size;
 
     if (is_final_chunk && !_transmission_checksum_header.is_empty ()) {
         q_c_info (lc_propagate_upload_v1) << propagator ().full_remote_path (path) << _transmission_checksum_header;
@@ -113,7 +113,7 @@ void PropagateUploadFileV1.on_start_next_chunk () {
     var device = std.make_unique<UploadDevice> (
             file_name, chunk_start, current_chunk_size, &propagator ()._bandwidth_manager);
     if (!device.open (QIODevice.ReadOnly)) {
-        q_c_warning (lc_propagate_upload_v1) << "Could not prepare upload device : " << device.error_string ();
+        GLib.warn (lc_propagate_upload_v1) << "Could not prepare upload device : " << device.error_string ();
 
         // If the file is currently locked, we want to retry the sync
         // when it becomes available again.
@@ -199,7 +199,7 @@ void PropagateUploadFileV1.on_put_finished () {
     if (_item._http_error_code == 202) {
         string path = string.from_utf8 (job.reply ().raw_header ("OC-Job_status-Location"));
         if (path.is_empty ()) {
-            on_done (SyncFileItem.NormalError, tr ("Poll URL missing"));
+            on_done (SyncFileItem.NormalError, _("Poll URL missing"));
             return;
         }
         _finished = true;
@@ -223,7 +223,7 @@ void PropagateUploadFileV1.on_put_finished () {
     const string full_file_path (propagator ().full_local_path (_item._file));
     if (!FileSystem.file_exists (full_file_path)) {
         if (!_finished) {
-            abort_with_error (SyncFileItem.SoftError, tr ("The local file was removed during sync."));
+            abort_with_error (SyncFileItem.SoftError, _("The local file was removed during sync."));
             return;
         } else {
             propagator ()._another_sync_needed = true;
@@ -233,12 +233,12 @@ void PropagateUploadFileV1.on_put_finished () {
     // Check whether the file changed since discovery. the file check here is the original and not the temprary.
     Q_ASSERT (_item._modtime > 0);
     if (_item._modtime <= 0) {
-        q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+        GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
     }
     if (!FileSystem.verify_file_unchanged (full_file_path, _item._size, _item._modtime)) {
         propagator ()._another_sync_needed = true;
         if (!_finished) {
-            abort_with_error (SyncFileItem.SoftError, tr ("Local file changed during sync."));
+            abort_with_error (SyncFileItem.SoftError, _("Local file changed during sync."));
             // FIXME :  the legacy code was retrying for a few seconds.
             //         and also checking that after the last chunk, and removed the file in case of INSTRUCTION_NEW
             return;
@@ -252,14 +252,14 @@ void PropagateUploadFileV1.on_put_finished () {
                 // just wait for the other job to finish.
                 return;
             }
-            on_done (SyncFileItem.NormalError, tr ("The server did not acknowledge the last chunk. (No e-tag was present)"));
+            on_done (SyncFileItem.NormalError, _("The server did not acknowledge the last chunk. (No e-tag was present)"));
             return;
         }
 
-        // Deletes an existing blacklist entry on successful chunk upload
-        if (_item._has_blacklist_entry) {
-            propagator ()._journal.wipe_error_blacklist_entry (_item._file);
-            _item._has_blacklist_entry = false;
+        // Deletes an existing blocklist entry on successful chunk upload
+        if (_item._has_blocklist_entry) {
+            propagator ()._journal.wipe_error_blocklist_entry (_item._file);
+            _item._has_blocklist_entry = false;
         }
 
         SyncJournalDb.UploadInfo pi;
@@ -275,7 +275,7 @@ void PropagateUploadFileV1.on_put_finished () {
         pi._transferid = _transfer_id;
         Q_ASSERT (_item._modtime > 0);
         if (_item._modtime <= 0) {
-            q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
+            GLib.warn (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
         }
         pi._modtime = _item._modtime;
         pi._error_count = 0; // successful chunk upload resets
@@ -292,7 +292,7 @@ void PropagateUploadFileV1.on_put_finished () {
     GLib.ByteArray fid = job.reply ().raw_header ("OC-FileID");
     if (!fid.is_empty ()) {
         if (!_item._file_id.is_empty () && _item._file_id != fid) {
-            q_c_warning (lc_propagate_upload_v1) << "File ID changed!" << _item._file_id << fid;
+            GLib.warn (lc_propagate_upload_v1) << "File ID changed!" << _item._file_id << fid;
         }
         _item._file_id = fid;
     }
@@ -302,7 +302,7 @@ void PropagateUploadFileV1.on_put_finished () {
     if (job.reply ().raw_header ("X-OC-MTime") != "accepted") {
         // X-OC-MTime is supported since owncloud 5.0.   But not when chunking.
         // Normally Owncloud 6 always puts X-OC-MTime
-        q_c_warning (lc_propagate_upload_v1) << "Server does not support X-OC-MTime" << job.reply ().raw_header ("X-OC-MTime");
+        GLib.warn (lc_propagate_upload_v1) << "Server does not support X-OC-MTime" << job.reply ().raw_header ("X-OC-MTime");
         // Well, the mtime was not set
     }
 

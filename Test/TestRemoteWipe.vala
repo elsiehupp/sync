@@ -24,7 +24,7 @@ class TestRemoteWipe : public GLib.Object {
 
 //        string dirPath = dirToRemove.canonicalPath ();
 
-//        AccountPtr account = Account.create ();
+//        AccountPointer account = Account.create ();
 //        QVERIFY (account);
 
 //        var manager = AccountManager.instance ();
@@ -34,7 +34,7 @@ class TestRemoteWipe : public GLib.Object {
 //        manager.save ();
 //        QVERIFY (newAccountState);
 
-//        QUrl url ("http://example.de");
+//        GLib.Uri url ("http://example.de");
 //        HttpCredentialsTest cred = new HttpCredentialsTest ("testuser", "secret");
 //        account.setCredentials (cred);
 //        account.setUrl ( url );

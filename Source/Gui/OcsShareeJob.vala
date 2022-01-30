@@ -17,7 +17,7 @@ Fetching sharees from the OCS Sharee API
 ***********************************************************/
 class Ocs_sharee_job : Ocs_job {
 
-    public Ocs_sharee_job (AccountPtr account);
+    public Ocs_sharee_job (AccountPointer account);
 
 
     /***********************************************************
@@ -39,7 +39,7 @@ signals:
     private void on_job_done (QJsonDocument &reply);
 };
 
-    Ocs_sharee_job.Ocs_sharee_job (AccountPtr account)
+    Ocs_sharee_job.Ocs_sharee_job (AccountPointer account)
         : Ocs_job (account) {
         set_path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
         connect (this, &Ocs_job.job_finished, this, &Ocs_sharee_job.on_job_done);

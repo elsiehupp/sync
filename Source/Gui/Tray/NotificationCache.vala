@@ -1,6 +1,6 @@
 #pragma once
 
-// #include <QSet>
+// #include <GLib.Set>
 
 namespace Occ {
 
@@ -20,7 +20,7 @@ class Notification_cache {
 
     private uint32 calculate_key (Notification &notification);
 
-    private QSet<uint32> _notifications;
+    private GLib.Set<uint32> _notifications;
 };
 
 

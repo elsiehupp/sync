@@ -43,7 +43,7 @@ class Share;
 ***********************************************************/
 class Share_link_widget : Gtk.Widget {
 
-    public Share_link_widget (AccountPtr account,
+    public Share_link_widget (AccountPointer account,
         const string share_path,
         const string local_path,
         Share_permissions max_sharing_permissions,
@@ -134,7 +134,7 @@ signals:
     void display_share_link_label ();
 
     Ui.Share_link_widget _ui;
-    AccountPtr _account;
+    AccountPointer _account;
     string _share_path;
     string _local_path;
     string _share_url;
@@ -168,7 +168,7 @@ signals:
 };
 
 
-Share_link_widget.Share_link_widget (AccountPtr account,
+Share_link_widget.Share_link_widget (AccountPointer account,
     const string share_path,
     const string local_path,
     Share_permissions max_sharing_permissions,
@@ -210,10 +210,10 @@ Share_link_widget.Share_link_widget (AccountPtr account,
 
     var sharing_possible = true;
     if (!_account.capabilities ().share_public_link ()) {
-        q_c_warning (lc_share_link) << "Link shares have been disabled";
+        GLib.warn (lc_share_link) << "Link shares have been disabled";
         sharing_possible = false;
     } else if (! (max_sharing_permissions & Share_permission_share)) {
-        q_c_warning (lc_share_link) << "The file can not be shared because it was shared without sharing permission.";
+        GLib.warn (lc_share_link) << "The file can not be shared because it was shared without sharing permission.";
         sharing_possible = false;
     }
 
@@ -237,7 +237,7 @@ Share_link_widget.Share_link_widget (AccountPtr account,
 
     // check if the file is already inside of a synced folder
     if (share_path.is_empty ()) {
-        q_c_warning (lc_share_link) << "Unable to share files not in a sync folder.";
+        GLib.warn (lc_share_link) << "Unable to share files not in a sync folder.";
         return;
     }
 }
@@ -303,24 +303,24 @@ void Share_link_widget.setup_ui_options () {
 
     if (_is_file) {
         checked = (perm & Share_permission_read) && (perm & Share_permission_update);
-        _allow_editing_link_action = _link_context_menu.add_action (tr ("Allow editing"));
+        _allow_editing_link_action = _link_context_menu.add_action (_("Allow editing"));
         _allow_editing_link_action.set_checkable (true);
         _allow_editing_link_action.set_checked (checked);
 
     } else {
         checked = (perm == Share_permission_read);
-        _read_only_link_action = permissions_group.add_action (tr ("View only"));
+        _read_only_link_action = permissions_group.add_action (_("View only"));
         _read_only_link_action.set_checkable (true);
         _read_only_link_action.set_checked (checked);
 
         checked = (perm & Share_permission_read) && (perm & Share_permission_create)
             && (perm & Share_permission_update) && (perm & Share_permission_delete);
-        _allow_upload_editing_link_action = permissions_group.add_action (tr ("Allow upload and editing"));
+        _allow_upload_editing_link_action = permissions_group.add_action (_("Allow upload and editing"));
         _allow_upload_editing_link_action.set_checkable (true);
         _allow_upload_editing_link_action.set_checked (checked);
 
         checked = (perm == Share_permission_create);
-        _allow_upload_link_action = permissions_group.add_action (tr ("File drop (upload only)"));
+        _allow_upload_link_action = permissions_group.add_action (_("File drop (upload only)"));
         _allow_upload_link_action.set_checkable (true);
         _allow_upload_link_action.set_checked (checked);
     }
@@ -338,7 +338,7 @@ void Share_link_widget.setup_ui_options () {
 
     _share_link_edit = new QLineEdit (this);
     connect (_share_link_edit, &QLineEdit.return_pressed, this, &Share_link_widget.on_create_label);
-    _share_link_edit.set_placeholder_text (tr ("Link name"));
+    _share_link_edit.set_placeholder_text (_("Link name"));
     _share_link_edit.on_set_text (_link_share.data ().get_label ());
     _share_link_layout.add_widget (_share_link_edit);
 
@@ -370,7 +370,7 @@ void Share_link_widget.setup_ui_options () {
     }
 
     // Adds action to display note widget (check box)
-    _note_link_action = _link_context_menu.add_action (tr ("Note to recipient"));
+    _note_link_action = _link_context_menu.add_action (_("Note to recipient"));
     _note_link_action.set_checkable (true);
 
     if (_link_share.get_note ().is_simple_text () && !_link_share.get_note ().is_empty ()) {
@@ -380,7 +380,7 @@ void Share_link_widget.setup_ui_options () {
     }
 
     // Adds action to display password widget (check box)
-    _password_protect_link_action = _link_context_menu.add_action (tr ("Password protect"));
+    _password_protect_link_action = _link_context_menu.add_action (_("Password protect"));
     _password_protect_link_action.set_checkable (true);
 
     if (_link_share.data ().is_password_set ()) {
@@ -399,7 +399,7 @@ void Share_link_widget.setup_ui_options () {
     }
 
     // Adds action to display expiration date widget (check box)
-    _expiration_date_link_action = _link_context_menu.add_action (tr ("Set expiration date"));
+    _expiration_date_link_action = _link_context_menu.add_action (_("Set expiration date"));
     _expiration_date_link_action.set_checkable (true);
     if (!expire_date.is_null ()) {
         _ui.calendar.set_date (expire_date);
@@ -420,12 +420,12 @@ void Share_link_widget.setup_ui_options () {
 
     // Adds action to unshare widget (check box)
     _unshare_link_action = _link_context_menu.add_action (QIcon (":/client/theme/delete.svg"),
-        tr ("Delete link"));
+        _("Delete link"));
 
     _link_context_menu.add_separator ();
 
     _add_another_link_action = _link_context_menu.add_action (QIcon (":/client/theme/add.svg"),
-        tr ("Add another link"));
+        _("Add another link"));
 
     _ui.enable_share_link.set_icon (QIcon (":/client/theme/copy.svg"));
     disconnect (_ui.enable_share_link, &QPushButton.clicked, this, &Share_link_widget.on_create_share_link);
@@ -628,15 +628,15 @@ void Share_link_widget.toggle_expire_date_options (bool enable) {
 void Share_link_widget.confirm_and_delete_share () {
     var message_box = new QMessageBox (
         QMessageBox.Question,
-        tr ("Confirm Link Share Deletion"),
-        tr ("<p>Do you really want to delete the public link share <i>%1</i>?</p>"
+        _("Confirm Link Share Deletion"),
+        _("<p>Do you really want to delete the public link share <i>%1</i>?</p>"
            "<p>Note: This action cannot be undone.</p>")
             .arg (share_name ()),
         QMessageBox.NoButton,
         this);
     QPushButton yes_button =
-        message_box.add_button (tr ("Delete"), QMessageBox.YesRole);
-    message_box.add_button (tr ("Cancel"), QMessageBox.NoRole);
+        message_box.add_button (_("Delete"), QMessageBox.YesRole);
+    message_box.add_button (_("Cancel"), QMessageBox.NoRole);
 
     connect (message_box, &QMessageBox.on_finished, this,
         [message_box, yes_button, this] () {
@@ -653,7 +653,7 @@ string Share_link_widget.share_name () {
     if (!name.is_empty ())
         return name;
     if (!_names_supported)
-        return tr ("Public link");
+        return _("Public link");
     return _link_share.get_token ();
 }
 
@@ -700,7 +700,7 @@ void Share_link_widget.on_link_context_menu_action_triggered (QAction action) {
 void Share_link_widget.on_server_error (int code, string message) {
     on_toggle_share_link_animation (false);
 
-    q_c_warning (lc_sharing) << "Error from server" << code << message;
+    GLib.warn (lc_sharing) << "Error from server" << code << message;
     on_display_error (message);
 }
 

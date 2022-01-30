@@ -41,7 +41,7 @@ class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
             return {};
 
         // If any of the url is outside of a sync folder, return an empty menu.
-        const GLib.List<QUrl> urls = fileItemInfos.urlList ();
+        const GLib.List<GLib.Uri> urls = fileItemInfos.urlList ();
         const var paths = helper.paths ();
         GLib.ByteArray files;
         for (var &url : urls) {
@@ -67,12 +67,14 @@ class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
             if (cmd.startsWith ("GET_MENU_ITEMS:END")) {
                 loop.quit ();
             } else if (cmd.startsWith ("MENU_ITEM:")) {
-                var args = string.fromUtf8 (cmd).split (QLatin1Char (':'));
-                if (args.size () < 4)
+                var args = string.fromUtf8 (cmd).split (':');
+                if (args.size () < 4) {
                     return;
-                var action = menu.addAction (args.mid (3).join (QLatin1Char (':')));
-                if (args.value (2).contains (QLatin1Char ('d')))
+                }
+                var action = menu.addAction (args.mid (3).join (':'));
+                if (args.value (2).contains ('d')) {
                     action.setDisabled (true);
+                }
                 var call = args.value (1).toLatin1 ();
                 connect (action, &QAction.triggered, [helper, call, files] {
                     helper.sendCommand (GLib.ByteArray (call + ":" + files + "\n"));
@@ -95,7 +97,7 @@ class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
 
     public GLib.List<QAction> legacyActions (KFileItemListProperties &fileItemInfos, Gtk.Widget parentWidget) {
-        GLib.List<QUrl> urls = fileItemInfos.urlList ();
+        GLib.List<GLib.Uri> urls = fileItemInfos.urlList ();
         if (urls.count () != 1)
             return {};
         QDir localPath (urls.first ().toLocalFile ());

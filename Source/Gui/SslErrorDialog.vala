@@ -26,7 +26,7 @@ namespace Ui {
 ***********************************************************/
 class SslDialogErrorHandler : AbstractSslErrorHandler {
 
-    public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration &conf, GLib.List<QSslCertificate> *certs, AccountPtr) override;
+    public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration &conf, GLib.List<QSslCertificate> *certs, AccountPointer) override;
 };
 
 /***********************************************************
@@ -35,7 +35,7 @@ class SslDialogErrorHandler : AbstractSslErrorHandler {
 ***********************************************************/
 class Ssl_error_dialog : Gtk.Dialog {
 
-    public Ssl_error_dialog (AccountPtr account, Gtk.Widget parent = nullptr);
+    public Ssl_error_dialog (AccountPointer account, Gtk.Widget parent = nullptr);
     ~Ssl_error_dialog () override;
     public bool check_failing_certs_known (GLib.List<QSslError> &errors);
 
@@ -56,7 +56,7 @@ class Ssl_error_dialog : Gtk.Dialog {
     private GLib.List<QSslCertificate> _unknown_certs;
     private string _custom_config_handle;
     private Ui.Ssl_error_dialog _ui;
-    private AccountPtr _account;
+    private AccountPointer _account;
 };
 
     namespace Utility {
@@ -66,7 +66,7 @@ class Ssl_error_dialog : Gtk.Dialog {
         }
     }
 
-    bool SslDialogErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration &conf, GLib.List<QSslCertificate> *certs, AccountPtr account) {
+    bool SslDialogErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration &conf, GLib.List<QSslCertificate> *certs, AccountPointer account) {
         (void)conf;
         if (!certs) {
             q_c_critical (lc_ssl_error_dialog) << "Certs parameter required but is NULL!";
@@ -89,14 +89,14 @@ class Ssl_error_dialog : Gtk.Dialog {
         return false;
     }
 
-    Ssl_error_dialog.Ssl_error_dialog (AccountPtr account, Gtk.Widget parent)
+    Ssl_error_dialog.Ssl_error_dialog (AccountPointer account, Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , _all_trusted (false)
         , _ui (new Ui.Ssl_error_dialog)
         , _account (account) {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         _ui.setup_ui (this);
-        set_window_title (tr ("Untrusted Certificate"));
+        set_window_title (_("Untrusted Certificate"));
         QPushButton ok_button =
             _ui._dialog_button_box.button (QDialogButtonBox.Ok);
         QPushButton cancel_button =
@@ -165,7 +165,7 @@ class Ssl_error_dialog : Gtk.Dialog {
         msg += QL ("</head><body>");
 
         var host = _account.url ().host ();
-        msg += QL ("<h3>") + tr ("Cannot connect securely to <i>%1</i>:").arg (host) + QL ("</h3>");
+        msg += QL ("<h3>") + _("Cannot connect securely to <i>%1</i>:").arg (host) + QL ("</h3>");
         // loop over the unknown certs and line up their errors.
         msg += QL ("<div id=\"ca_errors\">");
         foreach (QSslCertificate &cert, _unknown_certs) {
@@ -184,7 +184,7 @@ class Ssl_error_dialog : Gtk.Dialog {
         }
 
         if (!additional_error_strings.is_empty ()) {
-            msg += QL ("<h4>") + tr ("Additional errors:") + QL ("</h4>");
+            msg += QL ("<h4>") + _("Additional errors:") + QL ("</h4>");
 
             for (var &error_string : additional_error_strings) {
                 msg += QL ("<div id=\"ca_error\">");
@@ -197,7 +197,7 @@ class Ssl_error_dialog : Gtk.Dialog {
 
         var doc = new QText_document (nullptr);
         string style = style_sheet ();
-        doc.add_resource (QText_document.Style_sheet_resource, QUrl (QL ("format.css")), style);
+        doc.add_resource (QText_document.Style_sheet_resource, GLib.Uri (QL ("format.css")), style);
         doc.set_html (msg);
 
         _ui._tb_errors.set_document (doc);
@@ -209,7 +209,7 @@ class Ssl_error_dialog : Gtk.Dialog {
     string Ssl_error_dialog.cert_div (QSslCertificate cert) {
         string msg;
         msg += QL ("<div id=\"cert\">");
-        msg += QL ("<h3>") + tr ("with Certificate %1").arg (Utility.escape (cert.subject_info (QSslCertificate.Common_name))) + QL ("</h3>");
+        msg += QL ("<h3>") + _("with Certificate %1").arg (Utility.escape (cert.subject_info (QSslCertificate.Common_name))) + QL ("</h3>");
 
         msg += QL ("<div id=\"ccert\">");
         string[] li;
@@ -218,39 +218,39 @@ class Ssl_error_dialog : Gtk.Dialog {
         string unit = Utility.escape (cert.subject_info (QSslCertificate.Organizational_unit_name));
         string country = Utility.escape (cert.subject_info (QSslCertificate.Country_name));
         if (unit.is_empty ())
-            unit = tr ("&lt;not specified&gt;");
+            unit = _("&lt;not specified&gt;");
         if (org.is_empty ())
-            org = tr ("&lt;not specified&gt;");
+            org = _("&lt;not specified&gt;");
         if (country.is_empty ())
-            country = tr ("&lt;not specified&gt;");
-        li << tr ("Organization : %1").arg (org);
-        li << tr ("Unit : %1").arg (unit);
-        li << tr ("Country : %1").arg (country);
+            country = _("&lt;not specified&gt;");
+        li << _("Organization : %1").arg (org);
+        li << _("Unit : %1").arg (unit);
+        li << _("Country : %1").arg (country);
         msg += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
 
         msg += QL ("<p>");
 
         if (cert.effective_date () < QDateTime (QDate (2016, 1, 1), QTime (), Qt.UTC)) {
         string sha1sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha1).to_hex ());
-            msg += tr ("Fingerprint (SHA1) : <tt>%1</tt>").arg (sha1sum) + QL ("<br/>");
+            msg += _("Fingerprint (SHA1) : <tt>%1</tt>").arg (sha1sum) + QL ("<br/>");
         }
 
         string sha256sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha256).to_hex ());
         string sha512sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha512).to_hex ());
-        msg += tr ("Fingerprint (SHA-256) : <tt>%1</tt>").arg (sha256sum) + QL ("<br/>");
-        msg += tr ("Fingerprint (SHA-512) : <tt>%1</tt>").arg (sha512sum) + QL ("<br/>");
+        msg += _("Fingerprint (SHA-256) : <tt>%1</tt>").arg (sha256sum) + QL ("<br/>");
+        msg += _("Fingerprint (SHA-512) : <tt>%1</tt>").arg (sha512sum) + QL ("<br/>");
         msg += QL ("<br/>");
-        msg += tr ("Effective Date : %1").arg (cert.effective_date ().to_string ()) + QL ("<br/>");
-        msg += tr ("Expiration Date : %1").arg (cert.expiry_date ().to_string ()) + QL ("</p>");
+        msg += _("Effective Date : %1").arg (cert.effective_date ().to_string ()) + QL ("<br/>");
+        msg += _("Expiration Date : %1").arg (cert.expiry_date ().to_string ()) + QL ("</p>");
 
         msg += QL ("</div>");
 
-        msg += QL ("<h3>") + tr ("Issuer : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Common_name))) + QL ("</h3>");
+        msg += QL ("<h3>") + _("Issuer : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Common_name))) + QL ("</h3>");
         msg += QL ("<div id=\"issuer\">");
         li.clear ();
-        li << tr ("Organization : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organization)));
-        li << tr ("Unit : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organizational_unit_name)));
-        li << tr ("Country : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Country_name)));
+        li << _("Organization : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organization)));
+        li << _("Unit : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organizational_unit_name)));
+        li << _("Country : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Country_name)));
         msg += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
         msg += QL ("</div>");
         msg += QL ("</div>");

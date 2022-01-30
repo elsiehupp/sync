@@ -28,7 +28,7 @@ namespace Occ {
 
 class OcsUserStatusConnector : UserStatusConnector {
 
-    public OcsUserStatusConnector (AccountPtr account, GLib.Object parent = nullptr);
+    public OcsUserStatusConnector (AccountPointer account, GLib.Object parent = nullptr);
 
     public void fetch_user_status () override;
 
@@ -55,7 +55,7 @@ class OcsUserStatusConnector : UserStatusConnector {
     private void set_user_status_message_predefined (UserStatus &user_status);
     private void set_user_status_message_custom (UserStatus &user_status);
 
-    private AccountPtr _account;
+    private AccountPointer _account;
 
     private bool _user_status_supported = false;
     private bool _user_status_emojis_supported = false;
@@ -164,7 +164,7 @@ class OcsUserStatusConnector : UserStatusConnector {
             const var days = Qt.Sunday - QDate.current_date ().day_of_week ();
             return QDate.current_date ().add_days (days + 1).start_of_day ().to_time_t ();
         }
-        q_c_warning (lc_ocs_user_status_connector) << "Can not handle clear at endof day type" << clear_at._endof;
+        GLib.warn (lc_ocs_user_status_connector) << "Can not handle clear at endof day type" << clear_at._endof;
         return QDateTime.current_date_time ().to_time_t ();
     }
 
@@ -213,7 +213,7 @@ class OcsUserStatusConnector : UserStatusConnector {
                 clear_at_value._type = Occ.ClearAtType.EndOf;
                 clear_at_value._endof = time_value;
             } else {
-                q_c_warning (lc_ocs_user_status_connector) << "Can not handle clear type value" << type_value;
+                GLib.warn (lc_ocs_user_status_connector) << "Can not handle clear type value" << type_value;
             }
             clear_at = clear_at_value;
         }
@@ -251,7 +251,7 @@ class OcsUserStatusConnector : UserStatusConnector {
     const string base_url ("/ocs/v2.php/apps/user_status/api/v1");
     const string user_status_base_url = base_url + QStringLiteral ("/user_status");
 
-    OcsUserStatusConnector.OcsUserStatusConnector (AccountPtr account, GLib.Object parent)
+    OcsUserStatusConnector.OcsUserStatusConnector (AccountPointer account, GLib.Object parent)
         : UserStatusConnector (parent)
         , _account (account) {
         Q_ASSERT (_account);
@@ -260,10 +260,10 @@ class OcsUserStatusConnector : UserStatusConnector {
     }
 
     void OcsUserStatusConnector.fetch_user_status () {
-        q_c_debug (lc_ocs_user_status_connector) << "Try to fetch user status";
+        GLib.debug (lc_ocs_user_status_connector) << "Try to fetch user status";
 
         if (!_user_status_supported) {
-            q_c_debug (lc_ocs_user_status_connector) << "User status not supported";
+            GLib.debug (lc_ocs_user_status_connector) << "User status not supported";
             emit error (Error.UserStatusNotSupported);
             return;
         }
@@ -273,7 +273,7 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     void OcsUserStatusConnector.start_fetch_user_status_job () {
         if (_get_user_status_job) {
-            q_c_debug (lc_ocs_user_status_connector) << "Get user status job is already running.";
+            GLib.debug (lc_ocs_user_status_connector) << "Get user status job is already running.";
             return;
         }
 
@@ -297,7 +297,7 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     void OcsUserStatusConnector.start_fetch_predefined_statuses () {
         if (_get_predefined_stauses_job) {
-            q_c_debug (lc_ocs_user_status_connector) << "Get predefined statuses job is already running";
+            GLib.debug (lc_ocs_user_status_connector) << "Get predefined statuses job is already running";
             return;
         }
 
@@ -334,7 +334,7 @@ class OcsUserStatusConnector : UserStatusConnector {
     }
 
     void OcsUserStatusConnector.log_response (string message, QJsonDocument &json, int status_code) {
-        q_c_debug (lc_ocs_user_status_connector) << "Response from:" << message << "Status:" << status_code << "Json:" << json;
+        GLib.debug (lc_ocs_user_status_connector) << "Response from:" << message << "Status:" << status_code << "Json:" << json;
     }
 
     void OcsUserStatusConnector.set_user_status_online_status (UserStatus.OnlineStatus online_status) {
@@ -418,7 +418,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         }
 
         if (_set_online_status_job || _set_message_job) {
-            q_c_debug (lc_ocs_user_status_connector) << "Set online status job or set message job are already running.";
+            GLib.debug (lc_ocs_user_status_connector) << "Set online status job or set message job are already running.";
             return;
         }
 

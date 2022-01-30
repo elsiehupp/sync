@@ -11,7 +11,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <cstdio>
 
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QTemporary_file>
 // #include <QTimer>
 
@@ -90,9 +90,9 @@ class OCUpdater : Updater {
         PlainText,
         Html,
     };
-    public OCUpdater (QUrl url);
+    public OCUpdater (GLib.Uri url);
 
-    public void set_update_url (QUrl url);
+    public void set_update_url (GLib.Uri url);
 
     public bool perform_update ();
 
@@ -134,7 +134,7 @@ protected slots:
     }
 
 
-    private QUrl _update_url;
+    private GLib.Uri _update_url;
     private int _state;
     private QNetworkAccessManager _access_manager;
     private QTimer _timeout_watchdog; /** Timer to guard the timeout of an individual network request */
@@ -147,7 +147,7 @@ protected slots:
 ***********************************************************/
 class NSISUpdater : OCUpdater {
 
-    public NSISUpdater (QUrl url);
+    public NSISUpdater (GLib.Uri url);
 
 
     public bool handle_startup () override;
@@ -174,7 +174,7 @@ class NSISUpdater : OCUpdater {
 ***********************************************************/
 class Passive_update_notifier : OCUpdater {
 
-    public Passive_update_notifier (QUrl url);
+    public Passive_update_notifier (GLib.Uri url);
 
 
     public bool handle_startup () override {
@@ -238,7 +238,7 @@ class Passive_update_notifier : OCUpdater {
 
     /* ----------------------------------------------------------------- */
 
-    OCUpdater.OCUpdater (QUrl url)
+    OCUpdater.OCUpdater (GLib.Uri url)
         : Updater ()
         , _update_url (url)
         , _state (Unknown)
@@ -246,7 +246,7 @@ class Passive_update_notifier : OCUpdater {
         , _timeout_watchdog (new QTimer (this)) {
     }
 
-    void OCUpdater.set_update_url (QUrl url) {
+    void OCUpdater.set_update_url (GLib.Uri url) {
         _update_url = url;
     }
 
@@ -254,11 +254,11 @@ class Passive_update_notifier : OCUpdater {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
         string update_file = settings.value (update_available_c).to_string ();
-        if (!update_file.is_empty () && QFile (update_file).exists ()
+        if (!update_file.is_empty () && GLib.File (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
             const var message_box_start_installer = new QMessageBox (QMessageBox.Information,
-                tr ("New %1 update ready").arg (Theme.instance ().app_name_gui ()),
-                tr ("A new update for %1 is about to be installed. The updater may ask "
+                _("New %1 update ready").arg (Theme.instance ().app_name_gui ()),
+                _("A new update for %1 is about to be installed. The updater may ask "
                    "for additional privileges during the process. Your computer may reboot to complete the installation.")
                     .arg (Theme.instance ().app_name_gui ()),
                 QMessageBox.Ok,
@@ -300,31 +300,31 @@ class Passive_update_notifier : OCUpdater {
 
         switch (download_state ()) {
         case Downloading:
-            return tr ("Downloading %1. Please wait …").arg (update_version);
+            return _("Downloading %1. Please wait …").arg (update_version);
         case Download_complete:
-            return tr ("%1 available. Restart application to on_start the update.").arg (update_version);
+            return _("%1 available. Restart application to on_start the update.").arg (update_version);
         case Download_failed: {
             if (format == Update_status_string_format.Html) {
-                return tr ("Could not download update. Please open <a href='%1'>%1</a> to download the update manually.").arg (_update_info.web ());
+                return _("Could not download update. Please open <a href='%1'>%1</a> to download the update manually.").arg (_update_info.web ());
             }
-            return tr ("Could not download update. Please open %1 to download the update manually.").arg (_update_info.web ());
+            return _("Could not download update. Please open %1 to download the update manually.").arg (_update_info.web ());
         }
         case Download_timed_out:
-            return tr ("Could not check for new updates.");
+            return _("Could not check for new updates.");
         case Update_only_available_through_system: {
             if (format == Update_status_string_format.Html) {
-                return tr ("New %1 is available. Please open <a href='%2'>%2</a> to download the update.").arg (update_version, _update_info.web ());
+                return _("New %1 is available. Please open <a href='%2'>%2</a> to download the update.").arg (update_version, _update_info.web ());
             }
-            return tr ("New %1 is available. Please open %2 to download the update.").arg (update_version, _update_info.web ());
+            return _("New %1 is available. Please open %2 to download the update.").arg (update_version, _update_info.web ());
         }
         case Checking_server:
-            return tr ("Checking update server …");
+            return _("Checking update server …");
         case Unknown:
-            return tr ("Update status is unknown : Did not check for new updates.");
+            return _("Update status is unknown : Did not check for new updates.");
         case Up_to_date:
         // fall through
         default:
-            return tr ("No updates available. Your installation is at the latest version.");
+            return _("No updates available. Your installation is at the latest version.");
         }
     }
 
@@ -341,7 +341,7 @@ class Passive_update_notifier : OCUpdater {
         // or once for system based updates.
         if (_state == OCUpdater.Download_complete || (old_state != OCUpdater.Update_only_available_through_system
                                                          && _state == OCUpdater.Update_only_available_through_system)) {
-            emit new_update_available (tr ("Update Check"), status_string ());
+            emit new_update_available (_("Update Check"), status_string ());
         }
     }
 
@@ -406,7 +406,7 @@ class Passive_update_notifier : OCUpdater {
         var reply = qobject_cast<QNetworkReply> (sender ());
         reply.delete_later ();
         if (reply.error () != QNetworkReply.NoError) {
-            q_c_warning (lc_updater) << "Failed to reach version check url : " << reply.error_string ();
+            GLib.warn (lc_updater) << "Failed to reach version check url : " << reply.error_string ();
             set_download_state (Download_timed_out);
             return;
         }
@@ -418,7 +418,7 @@ class Passive_update_notifier : OCUpdater {
         if (ok) {
             version_info_arrived (_update_info);
         } else {
-            q_c_warning (lc_updater) << "Could not parse update information.";
+            GLib.warn (lc_updater) << "Could not parse update information.";
             set_download_state (Download_timed_out);
         }
     }
@@ -429,7 +429,7 @@ class Passive_update_notifier : OCUpdater {
 
     ////////////////////////////////////////////////////////////////////////
 
-    NSISUpdater.NSISUpdater (QUrl url)
+    NSISUpdater.NSISUpdater (GLib.Uri url)
         : OCUpdater (url) {
     }
 
@@ -445,7 +445,7 @@ class Passive_update_notifier : OCUpdater {
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
         string update_file_name = settings.value (update_available_c).to_string ();
         if (!update_file_name.is_empty ())
-            QFile.remove (update_file_name);
+            GLib.File.remove (update_file_name);
         settings.remove (update_available_c);
         settings.remove (update_target_version_c);
         settings.remove (update_target_version_string_c);
@@ -460,19 +460,19 @@ class Passive_update_notifier : OCUpdater {
             return;
         }
 
-        QUrl url (reply.url ());
+        GLib.Uri url (reply.url ());
         _file.close ();
 
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
 
         // remove previously downloaded but not used installer
-        QFile old_target_file (settings.value (update_available_c).to_string ());
+        GLib.File old_target_file (settings.value (update_available_c).to_string ());
         if (old_target_file.exists ()) {
             old_target_file.remove ();
         }
 
-        QFile.copy (_file.file_name (), _target_file);
+        GLib.File.copy (_file.file_name (), _target_file);
         set_download_state (Download_complete);
         q_c_info (lc_updater) << "Downloaded" << url.to_string () << "to" << _target_file;
         settings.set_value (update_target_version_c, update_info ().version ());
@@ -507,10 +507,10 @@ class Passive_update_notifier : OCUpdater {
                 show_no_url_dialog (info);
             } else {
                 _target_file = cfg.config_path () + url.mid (url.last_index_of ('/')+1);
-                if (QFile (_target_file).exists ()) {
+                if (GLib.File (_target_file).exists ()) {
                     set_download_state (Download_complete);
                 } else {
-                    var request = QNetworkRequest (QUrl (url));
+                    var request = QNetworkRequest (GLib.Uri (url));
                     request.set_attribute (QNetworkRequest.Redirect_policy_attribute, QNetworkRequest.No_less_safe_redirect_policy);
                     QNetworkReply reply = qnam ().get (request);
                     connect (reply, &QIODevice.ready_read, this, &NSISUpdater.on_write_file);
@@ -539,13 +539,13 @@ class Passive_update_notifier : OCUpdater {
         var hlayout = new QHBox_layout;
         layout.add_layout (hlayout);
 
-        msg_box.set_window_title (tr ("New Version Available"));
+        msg_box.set_window_title (_("New Version Available"));
 
         var ico = new QLabel;
         ico.set_fixed_size (icon_size, icon_size);
         ico.set_pixmap (info_icon.pixmap (icon_size));
         var lbl = new QLabel;
-        string txt = tr ("<p>A new version of the %1 Client is available.</p>"
+        string txt = _("<p>A new version of the %1 Client is available.</p>"
                          "<p><b>%2</b> is available for download. The installed version is %3.</p>")
                           .arg (Utility.escape (Theme.instance ().app_name_gui ()),
                               Utility.escape (info.version_string ()), Utility.escape (client_version ()));
@@ -558,9 +558,9 @@ class Passive_update_notifier : OCUpdater {
         hlayout.add_widget (lbl);
 
         var bb = new QDialogButtonBox;
-        QPushButton skip = bb.add_button (tr ("Skip this version"), QDialogButtonBox.Reset_role);
-        QPushButton reject = bb.add_button (tr ("Skip this time"), QDialogButtonBox.AcceptRole);
-        QPushButton getupdate = bb.add_button (tr ("Get update"), QDialogButtonBox.AcceptRole);
+        QPushButton skip = bb.add_button (_("Skip this version"), QDialogButtonBox.Reset_role);
+        QPushButton reject = bb.add_button (_("Skip this time"), QDialogButtonBox.AcceptRole);
+        QPushButton getupdate = bb.add_button (_("Get update"), QDialogButtonBox.AcceptRole);
 
         connect (skip, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
         connect (reject, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
@@ -588,13 +588,13 @@ class Passive_update_notifier : OCUpdater {
         var hlayout = new QHBox_layout;
         layout.add_layout (hlayout);
 
-        msg_box.set_window_title (tr ("Update Failed"));
+        msg_box.set_window_title (_("Update Failed"));
 
         var ico = new QLabel;
         ico.set_fixed_size (icon_size, icon_size);
         ico.set_pixmap (info_icon.pixmap (icon_size));
         var lbl = new QLabel;
-        string txt = tr ("<p>A new version of the %1 Client is available but the updating process failed.</p>"
+        string txt = _("<p>A new version of the %1 Client is available but the updating process failed.</p>"
                          "<p><b>%2</b> has been downloaded. The installed version is %3. If you confirm restart and update, your computer may reboot to complete the installation.</p>")
                           .arg (Utility.escape (Theme.instance ().app_name_gui ()),
                               Utility.escape (target_version), Utility.escape (client_version ()));
@@ -607,10 +607,10 @@ class Passive_update_notifier : OCUpdater {
         hlayout.add_widget (lbl);
 
         var bb = new QDialogButtonBox;
-        var skip = bb.add_button (tr ("Skip this version"), QDialogButtonBox.Reset_role);
-        var askagain = bb.add_button (tr ("Ask again later"), QDialogButtonBox.Reset_role);
-        var retry = bb.add_button (tr ("Restart and update"), QDialogButtonBox.AcceptRole);
-        var getupdate = bb.add_button (tr ("Update manually"), QDialogButtonBox.AcceptRole);
+        var skip = bb.add_button (_("Skip this version"), QDialogButtonBox.Reset_role);
+        var askagain = bb.add_button (_("Ask again later"), QDialogButtonBox.Reset_role);
+        var retry = bb.add_button (_("Restart and update"), QDialogButtonBox.AcceptRole);
+        var getupdate = bb.add_button (_("Update manually"), QDialogButtonBox.AcceptRole);
 
         connect (skip, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
         connect (askagain, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
@@ -639,7 +639,7 @@ class Passive_update_notifier : OCUpdater {
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
         string update_file_name = settings.value (update_available_c).to_string ();
         // has the previous run downloaded an update?
-        if (!update_file_name.is_empty () && QFile (update_file_name).exists ()) {
+        if (!update_file_name.is_empty () && GLib.File (update_file_name).exists ()) {
             q_c_info (lc_updater) << "An updater file is available";
             // did it try to execute the update?
             if (settings.value (auto_update_attempted_c, false).to_bool ()) {
@@ -672,7 +672,7 @@ class Passive_update_notifier : OCUpdater {
 
     ////////////////////////////////////////////////////////////////////////
 
-    Passive_update_notifier.Passive_update_notifier (QUrl url)
+    Passive_update_notifier.Passive_update_notifier (GLib.Uri url)
         : OCUpdater (url) {
         // remember the version of the currently running binary. On Linux it might happen that the
         // package management updates the package while the app is running. This is detected in the

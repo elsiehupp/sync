@@ -7,7 +7,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QDateTime>
 // #include <QLoggingCategory>
 // #include <string>
-// #include <QFile>
+// #include <GLib.File>
 // #include <QFileInfo>
 // #include <QDir>
 
@@ -49,7 +49,7 @@ class SqlDatabase {
     private int _err_id = 0;
 
     private friend class SqlQuery;
-    private QSet<SqlQuery> _queries;
+    private GLib.Set<SqlQuery> _queries;
 
     public SqlDatabase () = default;
 
@@ -80,7 +80,7 @@ class SqlDatabase {
                 // Typically CANTOPEN or IOERR.
                 int64 free_space = Utility.free_disk_space (QFileInfo (filename).dir ().absolute_path ());
                 if (free_space != -1 && free_space < 1000000) {
-                    q_c_warning (lc_sql) << "Can't prepare consistency check and disk space is low:" << free_space;
+                    GLib.warn (lc_sql) << "Can't prepare consistency check and disk space is low:" << free_space;
                     close ();
                     return false;
                 }
@@ -88,7 +88,7 @@ class SqlDatabase {
                 // Even when there's enough disk space, it might very well be that the
                 // file is on a read-only filesystem and can't be opened because of that.
                 if (_err_id == SQLITE_CANTOPEN) {
-                    q_c_warning (lc_sql) << "Can't open database to prepare consistency check, aborting";
+                    GLib.warn (lc_sql) << "Can't open database to prepare consistency check, aborting";
                     close ();
                     return false;
                 }
@@ -96,7 +96,7 @@ class SqlDatabase {
 
             q_c_critical (lc_sql) << "Consistency check failed, removing broken database" << filename;
             close ();
-            QFile.remove (filename);
+            GLib.File.remove (filename);
 
             return open_helper (filename, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
         }
@@ -115,7 +115,7 @@ class SqlDatabase {
         }
 
         if (check_database () != CheckDbResult.OK) {
-            q_c_warning (lc_sql) << "Consistency check failed in read_only mode, giving up" << filename;
+            GLib.warn (lc_sql) << "Consistency check failed in read_only mode, giving up" << filename;
             close ();
             return false;
         }
@@ -149,7 +149,7 @@ class SqlDatabase {
             }
             SQLITE_DO (sqlite3_close (_database));
             if (_err_id != SQLITE_OK)
-                q_c_warning (lc_sql) << "Closing database failed" << _error;
+                GLib.warn (lc_sql) << "Closing database failed" << _error;
             _database = nullptr;
         }
     }
@@ -184,11 +184,11 @@ class SqlDatabase {
         SQLITE_DO (sqlite3_open_v2 (filename.to_utf8 ().const_data (), &_database, sqlite_flags, nullptr));
 
         if (_err_id != SQLITE_OK) {
-            q_c_warning (lc_sql) << "Error:" << _error << "for" << filename;
+            GLib.warn (lc_sql) << "Error:" << _error << "for" << filename;
             if (_err_id == SQLITE_CANTOPEN) {
-                q_c_warning (lc_sql) << "CANTOPEN extended errcode : " << sqlite3_extended_errcode (_database);
+                GLib.warn (lc_sql) << "CANTOPEN extended errcode : " << sqlite3_extended_errcode (_database);
     #if SQLITE_VERSION_NUMBER >= 3012000
-                q_c_warning (lc_sql) << "CANTOPEN system errno : " << sqlite3_system_errno (_database);
+                GLib.warn (lc_sql) << "CANTOPEN system errno : " << sqlite3_system_errno (_database);
     #endif
             }
             close ();
@@ -196,7 +196,7 @@ class SqlDatabase {
         }
 
         if (!_database) {
-            q_c_warning (lc_sql) << "Error : no database for" << filename;
+            GLib.warn (lc_sql) << "Error : no database for" << filename;
             return false;
         }
 
@@ -211,13 +211,13 @@ class SqlDatabase {
         SqlQuery quick_check (*this);
 
         if (quick_check.prepare ("PRAGMA quick_check;", /*allow_failure=*/true) != SQLITE_OK) {
-            q_c_warning (lc_sql) << "Error preparing quick_check on database";
+            GLib.warn (lc_sql) << "Error preparing quick_check on database";
             _err_id = quick_check.error_id ();
             _error = quick_check.error ();
             return CheckDbResult.CANT_PREPARE;
         }
         if (!quick_check.exec ()) {
-            q_c_warning (lc_sql) << "Error running quick_check on database";
+            GLib.warn (lc_sql) << "Error running quick_check on database";
             _err_id = quick_check.error_id ();
             _error = quick_check.error ();
             return CheckDbResult.Cant_exec;
@@ -226,7 +226,7 @@ class SqlDatabase {
         quick_check.next ();
         string result = quick_check.string_value (0);
         if (result != QLatin1String ("ok")) {
-            q_c_warning (lc_sql) << "quick_check returned failure:" << result;
+            GLib.warn (lc_sql) << "quick_check returned failure:" << result;
             return CheckDbResult.Not_ok;
         }
 
@@ -320,7 +320,7 @@ class SqlQuery {
 
             if (_err_id != SQLITE_OK) {
                 _error = string.from_utf8 (sqlite3_errmsg (_database));
-                q_c_warning (lc_sql) << "Sqlite prepare statement error:" << _error << "in" << _sql;
+                GLib.warn (lc_sql) << "Sqlite prepare statement error:" << _error << "in" << _sql;
                 ENFORCE (allow_failure, "SQLITE Prepare error");
             } else {
                 ASSERT (_stmt);
@@ -388,10 +388,10 @@ class SqlQuery {
 
 
     public bool exec () {
-        q_c_debug (lc_sql) << "SQL exec" << _sql;
+        GLib.debug (lc_sql) << "SQL exec" << _sql;
 
         if (!_stmt) {
-            q_c_warning (lc_sql) << "Can't exec query, statement unprepared.";
+            GLib.warn (lc_sql) << "Can't exec query, statement unprepared.";
             return false;
         }
 
@@ -413,15 +413,15 @@ class SqlQuery {
 
             if (_err_id != SQLITE_DONE && _err_id != SQLITE_ROW) {
                 _error = string.from_utf8 (sqlite3_errmsg (_database));
-                q_c_warning (lc_sql) << "Sqlite exec statement error:" << _err_id << _error << "in" << _sql;
+                GLib.warn (lc_sql) << "Sqlite exec statement error:" << _err_id << _error << "in" << _sql;
                 if (_err_id == SQLITE_IOERR) {
-                    q_c_warning (lc_sql) << "IOERR extended errcode : " << sqlite3_extended_errcode (_database);
+                    GLib.warn (lc_sql) << "IOERR extended errcode : " << sqlite3_extended_errcode (_database);
     #if SQLITE_VERSION_NUMBER >= 3012000
-                    q_c_warning (lc_sql) << "IOERR system errno : " << sqlite3_system_errno (_database);
+                    GLib.warn (lc_sql) << "IOERR system errno : " << sqlite3_system_errno (_database);
     #endif
                 }
             } else {
-                q_c_debug (lc_sql) << "Last exec affected" << num_rows_affected () << "rows.";
+                GLib.debug (lc_sql) << "Last exec affected" << num_rows_affected () << "rows.";
             }
             return (_err_id == SQLITE_DONE); // either SQLITE_ROW or SQLITE_DONE
         }
@@ -456,7 +456,7 @@ class SqlQuery {
         result.has_data = _err_id == SQLITE_ROW;
         if (!result.ok) {
             _error = string.from_utf8 (sqlite3_errmsg (_database));
-            q_c_warning (lc_sql) << "Sqlite step statement error:" << _err_id << _error << "in" << _sql;
+            GLib.warn (lc_sql) << "Sqlite step statement error:" << _err_id << _error << "in" << _sql;
         }
 
         return result;
@@ -464,20 +464,20 @@ class SqlQuery {
 
     public template<class T, typename std.enable_if<std.is_enum<T>.value, int>.type = 0>
     public void bind_value (int pos, T &value) {
-        q_c_debug (lc_sql) << "SQL bind" << pos << value;
+        GLib.debug (lc_sql) << "SQL bind" << pos << value;
         bind_value_internal (pos, static_cast<int> (value));
     }
 
 
     public template<class T, typename std.enable_if<!std.is_enum<T>.value, int>.type = 0>
     public void bind_value (int pos, T &value) {
-        q_c_debug (lc_sql) << "SQL bind" << pos << value;
+        GLib.debug (lc_sql) << "SQL bind" << pos << value;
         bind_value_internal (pos, value);
     }
 
 
     public void bind_value (int pos, GLib.ByteArray value) {
-        q_c_debug (lc_sql) << "SQL bind" << pos << string.from_utf8 (value);
+        GLib.debug (lc_sql) << "SQL bind" << pos << string.from_utf8 (value);
         bind_value_internal (pos, value);
     }
 
@@ -522,14 +522,14 @@ class SqlQuery {
             break;
         case QVariant.Date_time: {
             const QDateTime date_time = value.to_date_time ();
-            const string str = date_time.to_string (QStringLiteral ("yyyy-MM-dd_thh:mm:ss.zzz"));
+            const string str = date_time.to_string ("yyyy-MM-dd_thh:mm:ss.zzz");
             res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
                 str.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
             break;
         }
         case QVariant.Time: {
             const QTime time = value.to_time ();
-            const string str = time.to_string (QStringLiteral ("hh:mm:ss.zzz"));
+            const string str = time.to_string ("hh:mm:ss.zzz");
             res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
                 str.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
             break;
@@ -539,7 +539,7 @@ class SqlQuery {
                 // lifetime of string == lifetime of its qvariant
                 const var str = static_cast<const string> (value.const_data ());
                 res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
-                    (str.size ()) * static_cast<int> (sizeof (QChar)), SQLITE_TRANSIENT);
+                    (str.size ()) * static_cast<int> (sizeof (char)), SQLITE_TRANSIENT);
             } else {
                 res = sqlite3_bind_null (_stmt, pos);
             }
@@ -554,12 +554,12 @@ class SqlQuery {
             string str = value.to_string ();
             // SQLITE_TRANSIENT makes sure that sqlite buffers the data
             res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
-                (str.size ()) * static_cast<int> (sizeof (QChar)), SQLITE_TRANSIENT);
+                (str.size ()) * static_cast<int> (sizeof (char)), SQLITE_TRANSIENT);
             break;
         }
         }
         if (res != SQLITE_OK) {
-            q_c_warning (lc_sql) << "ERROR binding SQL value:" << value << "error:" << res;
+            GLib.warn (lc_sql) << "ERROR binding SQL value:" << value << "error:" << res;
         }
         ASSERT (res == SQLITE_OK);
     }

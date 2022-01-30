@@ -6,8 +6,8 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 // #include <QDateTime>
 // #include <QDir>
-// #include <QUrl>
-// #include <QFile>
+// #include <GLib.Uri>
+// #include <GLib.File>
 // #include <QCoreApplication>
 
 // #include <sys/stat.h>
@@ -57,12 +57,12 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     void set_file_read_only (string filename, bool read_only) {
-        QFile file = new QFile (filename);
-        QFile.Permissions permissions = file.permissions ();
+        GLib.File file = new GLib.File (filename);
+        GLib.File.Permissions permissions = file.permissions ();
 
-        QFile.Permissions all_write_permissions =
-            QFile.Write_user | QFile.Write_group | QFile.Write_other | QFile.Write_owner;
-        static QFile.Permissions default_write_permissions = get_default_write_permissions ();
+        GLib.File.Permissions all_write_permissions =
+            GLib.File.Write_user | GLib.File.Write_group | GLib.File.Write_other | GLib.File.Write_owner;
+        static GLib.File.Permissions default_write_permissions = get_default_write_permissions ();
 
         permissions &= ~all_write_permissions;
         if (!read_only) {
@@ -84,10 +84,10 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     void set_file_read_only_weak (string filename, bool read_only) {
-        QFile file = new QFile (filename);
-        QFile.Permissions permissions = file.permissions ();
+        GLib.File file = new GLib.File (filename);
+        GLib.File.Permissions permissions = file.permissions ();
 
-        if (!read_only && (permissions & QFile.Write_owner)) {
+        if (!read_only && (permissions & GLib.File.Write_owner)) {
             return; // already writable enough
         }
 
@@ -119,7 +119,7 @@ namespace FileSystem {
     /***********************************************************
     @brief Checks whether a file exists.
 
-    Use this over QFileInfo.exists () and QFile.exists () to avoid bugs with lnk
+    Use this over QFileInfo.exists () and GLib.File.exists () to avoid bugs with lnk
     files, see above.
 
     OCSYNC_EXPORT
@@ -141,7 +141,7 @@ namespace FileSystem {
     @brief Rename the file \a origin_file_name to
     \a destination_file_name.
 
-    It behaves as QFile.rename () but handles .lnk files
+    It behaves as GLib.File.rename () but handles .lnk files
     correctly on Windows.
 
     OCSYNC_EXPORT
@@ -152,14 +152,14 @@ namespace FileSystem {
         bool on_success = false;
         string error;
 
-        QFile orig (origin_file_name);
+        GLib.File orig (origin_file_name);
         on_success = orig.rename (destination_file_name);
         if (!on_success) {
             error = orig.error_string ();
         }
 
         if (!on_success) {
-            q_c_warning (lc_file_system) << "Error renaming file" << origin_file_name
+            GLib.warn (lc_file_system) << "Error renaming file" << origin_file_name
                                     << "to" << destination_file_name
                                     << "failed : " << error;
             if (error_string) {
@@ -182,15 +182,15 @@ namespace FileSystem {
         string error_string) {
 
         bool on_success = false;
-        QFile orig (origin_file_name);
-        // We want a rename that also overwites.  QFile.rename does not overwite.
+        GLib.File orig (origin_file_name);
+        // We want a rename that also overwites.  GLib.File.rename does not overwite.
         // Qt 5.1 has QSave_file.rename_overwrite we could use.
         // ### FIXME
         on_success = true;
         bool dest_exists = file_exists (destination_file_name);
-        if (dest_exists && !QFile.remove (destination_file_name)) {
+        if (dest_exists && !GLib.File.remove (destination_file_name)) {
             *error_string = orig.error_string ();
-            q_c_warning (lc_file_system) << "Target file could not be removed.";
+            GLib.warn (lc_file_system) << "Target file could not be removed.";
             on_success = false;
         }
         if (on_success) {
@@ -198,7 +198,7 @@ namespace FileSystem {
         }
         if (!on_success) {
             *error_string = orig.error_string ();
-            q_c_warning (lc_file_system) << "Renaming temp file to final failed : " << *error_string;
+            GLib.warn (lc_file_system) << "Renaming temp file to final failed : " << *error_string;
             return false;
         }
 
@@ -209,13 +209,13 @@ namespace FileSystem {
     /***********************************************************
     Removes a file.
 
-    Equivalent to QFile.remove (), except on Windows, where it will also
+    Equivalent to GLib.File.remove (), except on Windows, where it will also
     successfully remove read-only files.
 
     OCSYNC_EXPORT
     ***********************************************************/
     bool remove (string file_name, string error_string = "") {
-        QFile f (file_name);
+        GLib.File f (file_name);
         if (!f.remove ()) {
             if (error_string) {
                 *error_string = f.error_string ();
@@ -233,17 +233,17 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     bool move_to_trash (string filename, string error_string) {
-        // TODO : Qt 5.15 bool QFile.move_to_trash ()
+        // TODO : Qt 5.15 bool GLib.File.move_to_trash ()
         string trash_path, trash_file_path, trash_info_path;
-        string xdg_data_home = QFile.decode_name (qgetenv ("XDG_DATA_HOME"));
+        string xdg_data_home = GLib.File.decode_name (qgetenv ("XDG_DATA_HOME"));
         if (xdg_data_home.is_empty ()) {
-            trash_path = QDir.home_path () + QStringLiteral ("/.local/share/Trash/"); // trash path that should exist
+            trash_path = QDir.home_path () + "/.local/share/Trash/"; // trash path that should exist
         } else {
-            trash_path = xdg_data_home + QStringLiteral ("/Trash/");
+            trash_path = xdg_data_home + "/Trash/";
         }
 
-        trash_file_path = trash_path + QStringLiteral ("files/"); // trash file path contain delete files
-        trash_info_path = trash_path + QStringLiteral ("info/"); // trash info path contain delete files information
+        trash_file_path = trash_path + "files/"; // trash file path contain delete files
+        trash_info_path = trash_path + "info/"; // trash info path contain delete files information
 
         if (! (QDir ().mkpath (trash_file_path) && QDir ().mkpath (trash_info_path))) {
             *error_string = QCoreApplication.translate ("FileSystem", "Could not make directories in trash");
@@ -255,7 +255,7 @@ namespace FileSystem {
         QDir file;
         int suffix_number = 1;
         if (file.exists (trash_file_path + f.file_name ())) { //file in trash already exists, move to "filename.1"
-            string path = trash_file_path + f.file_name () + QLatin1Char ('.');
+            string path = trash_file_path + f.file_name () + '.';
             while (file.exists (path + string.number (suffix_number))) { //or to "filename.2" if "filename.1" exists, etc
                 suffix_number++;
             }
@@ -273,12 +273,12 @@ namespace FileSystem {
         }
 
         // create file format for trash info file----- START
-        QFile info_file;
-        if (file.exists (trash_info_path + f.file_name () + QStringLiteral (".trashinfo"))) { //Trash_info file already exists, create "filename.1.trashinfo"
-            string filename = trash_info_path + f.file_name () + QLatin1Char ('.') + string.number (suffix_number) + QStringLiteral (".trashinfo");
+        GLib.File info_file;
+        if (file.exists (trash_info_path + f.file_name () + ".trashinfo")) { //Trash_info file already exists, create "filename.1.trashinfo"
+            string filename = trash_info_path + f.file_name () + '.' + string.number (suffix_number) + ".trashinfo";
             info_file.set_file_name (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
         } else {
-            string filename = trash_info_path + f.file_name () + QStringLiteral (".trashinfo");
+            string filename = trash_info_path + f.file_name () + ".trashinfo";
             info_file.set_file_name (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
         }
 
@@ -288,7 +288,7 @@ namespace FileSystem {
 
         stream << "[Trash Info]\n"
                << "Path="
-               << QUrl.to_percent_encoding (f.absolute_file_path (), "~_-./")
+               << GLib.Uri.to_percent_encoding (f.absolute_file_path (), "~_-./")
                << "\n"
                << "Deletion_date="
                << QDateTime.current_date_time ().to_string (Qt.ISODate)
@@ -302,21 +302,21 @@ namespace FileSystem {
 
 
     /***********************************************************
-    Replacement for QFile.open (ReadOnly) followed by a seek ().
+    Replacement for GLib.File.open (ReadOnly) followed by a seek ().
     This version sets a more permissive sharing mode on Windows.
 
     Warning : The resulting file may have an empty file_name and be unsuitable for use
-    with QFileInfo! Calling seek () on the QFile with >32bit signed values will fail!
+    with QFileInfo! Calling seek () on the GLib.File with >32bit signed values will fail!
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool open_and_seek_file_shared_read (QFile file, string error_or_null, int64 seek) {
+    bool open_and_seek_file_shared_read (GLib.File file, string error_or_null, int64 seek) {
         string error_dummy;
         // avoid many if (error_or_null) later.
         string error = error_or_null ? *error_or_null : error_dummy;
         error.clear ();
 
-        if (!file.open (QFile.ReadOnly)) {
+        if (!file.open (GLib.File.ReadOnly)) {
             error = file.error_string ();
             return false;
         }
@@ -355,10 +355,10 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     bool is_exclude_file (string filename) {
-        return filename.compare (QStringLiteral (".sync-exclude.lst"), Qt.CaseInsensitive) == 0
-            || filename.compare (QStringLiteral ("exclude.lst"), Qt.CaseInsensitive) == 0
-            || filename.ends_with (QStringLiteral ("/.sync-exclude.lst"), Qt.CaseInsensitive)
-            || filename.ends_with (QStringLiteral ("/exclude.lst"), Qt.CaseInsensitive);
+        return filename.compare (".sync-exclude.lst", Qt.CaseInsensitive) == 0
+            || filename.compare ("exclude.lst", Qt.CaseInsensitive) == 0
+            || filename.ends_with ("/.sync-exclude.lst", Qt.CaseInsensitive)
+            || filename.ends_with ("/exclude.lst", Qt.CaseInsensitive);
     }
 
 
@@ -373,15 +373,15 @@ namespace FileSystem {
     }
 
 
-    private static QFile.Permissions get_default_write_permissions () {
-        QFile.Permissions result = QFile.Write_user;
+    private static GLib.File.Permissions get_default_write_permissions () {
+        GLib.File.Permissions result = GLib.File.Write_user;
         mode_t mask = umask (0);
         umask (mask);
         if (! (mask & S_IWGRP)) {
-            result |= QFile.Write_group;
+            result |= GLib.File.Write_group;
         }
         if (! (mask & S_IWOTH)) {
-            result |= QFile.Write_other;
+            result |= GLib.File.Write_other;
         }
         return result;
     }

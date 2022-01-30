@@ -29,7 +29,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 using namespace QKeychain;
 
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QNetworkCookie>
 // #include <QNetworkRequest>
 // #include <QSslSocket>
@@ -60,7 +60,7 @@ namespace {
 
 namespace Occ {
 
-using AccountPtr = unowned<Account>;
+using AccountPointer = unowned<Account>;
 class UserStatusConnector;
 
 /***********************************************************
@@ -69,7 +69,7 @@ class UserStatusConnector;
 ***********************************************************/
 class AbstractSslErrorHandler {
     public virtual ~AbstractSslErrorHandler () = default;
-    public virtual bool handle_errors (GLib.List<QSslError>, QSslConfiguration &conf, GLib.List<QSslCertificate> *, AccountPtr) = 0;
+    public virtual bool handle_errors (GLib.List<QSslError>, QSslConfiguration &conf, GLib.List<QSslCertificate> *, AccountPointer) = 0;
 };
 
 /***********************************************************
@@ -84,14 +84,14 @@ class Account : GLib.Object {
     Q_PROPERTY (string id MEMBER _id)
     Q_PROPERTY (string dav_user MEMBER _dav_user)
     Q_PROPERTY (string display_name MEMBER _display_name)
-    Q_PROPERTY (QUrl url MEMBER _url)
+    Q_PROPERTY (GLib.Uri url MEMBER _url)
 
-    public static AccountPtr create ();
+    public static AccountPointer create ();
 
 
     public ~Account () override;
 
-    public AccountPtr shared_from_this ();
+    public AccountPointer shared_from_this ();
 
 
     /***********************************************************
@@ -127,10 +127,10 @@ class Account : GLib.Object {
     /***********************************************************
     Server url of the account
     ***********************************************************/
-    public void set_url (QUrl url);
+    public void set_url (GLib.Uri url);
 
 
-    public QUrl url () {
+    public GLib.Uri url () {
         return _url;
     }
 
@@ -149,7 +149,7 @@ class Account : GLib.Object {
     /***********************************************************
     Returns webdav entry URL, based on url ()
     ***********************************************************/
-    public QUrl dav_url ();
+    public GLib.Uri dav_url ();
 
 
     /***********************************************************
@@ -159,7 +159,7 @@ class Account : GLib.Object {
     code should use the "privatelink" property accessible via
     PROPFIND.
     ***********************************************************/
-    public QUrl deprecated_private_link_url (GLib.ByteArray numeric_file_id);
+    public GLib.Uri deprecated_private_link_url (GLib.ByteArray numeric_file_id);
 
 
     /***********************************************************
@@ -179,15 +179,15 @@ class Account : GLib.Object {
     send_request ().
     ***********************************************************/
     public QNetworkReply send_raw_request (GLib.ByteArray verb,
-        const QUrl url,
+        const GLib.Uri url,
         QNetworkRequest req = QNetworkRequest (),
         QIODevice data = nullptr);
 
     public QNetworkReply send_raw_request (GLib.ByteArray verb,
-        const QUrl url, QNetworkRequest req, GLib.ByteArray data);
+        const GLib.Uri url, QNetworkRequest req, GLib.ByteArray data);
 
     public QNetworkReply send_raw_request (GLib.ByteArray verb,
-        const QUrl url, QNetworkRequest req, QHttpMultiPart data);
+        const GLib.Uri url, QNetworkRequest req, QHttpMultiPart data);
 
 
     /***********************************************************
@@ -197,7 +197,7 @@ class Account : GLib.Object {
     types.
     ***********************************************************/
     public SimpleNetworkJob send_request (GLib.ByteArray verb,
-        const QUrl url,
+        const GLib.Uri url,
         QNetworkRequest req = QNetworkRequest (),
         QIODevice data = nullptr);
 
@@ -345,7 +345,7 @@ class Account : GLib.Object {
 
     /// Direct Editing
     // Check for the direct_editing capability
-    public void fetch_direct_editors (QUrl direct_editing_uRL, string direct_editing_e_tag);
+    public void fetch_direct_editors (GLib.Uri direct_editing_uRL, string direct_editing_e_tag);
 
     public void setup_user_status_connector ();
 
@@ -403,7 +403,7 @@ protected slots:
 
 
     private Account (GLib.Object parent = nullptr);
-    private void set_shared_this (AccountPtr shared_this);
+    private void set_shared_this (AccountPointer shared_this);
 
     private static string dav_path_base ();
 
@@ -416,7 +416,7 @@ protected slots:
     private QImage _avatar_img;
 #endif
     private QMap<string, QVariant> _settings_map;
-    private QUrl _url;
+    private GLib.Uri _url;
 
 
     /***********************************************************
@@ -427,7 +427,7 @@ protected slots:
     host through the ocs/v1.php/config endpoint in
     ConnectionValidator.
     ***********************************************************/
-    private QUrl _user_visible_url;
+    private GLib.Uri _user_visible_url;
 
     private GLib.List<QSslCertificate> _approved_certs;
     private QSslConfiguration _ssl_configuration;
@@ -486,15 +486,15 @@ protected slots:
 Account.Account (GLib.Object parent)
     : GLib.Object (parent)
     , _capabilities (QVariantMap ()) {
-    q_register_meta_type<AccountPtr> ("AccountPtr");
+    q_register_meta_type<AccountPointer> ("AccountPointer");
     q_register_meta_type<Account> ("Account*");
 
     _push_notifications_reconnect_timer.set_interval (push_notifications_reconnect_interval);
     connect (&_push_notifications_reconnect_timer, &QTimer.timeout, this, &Account.try_setup_push_notifications);
 }
 
-AccountPtr Account.create () {
-    AccountPtr acc = AccountPtr (new Account);
+AccountPointer Account.create () {
+    AccountPointer acc = AccountPointer (new Account);
     acc.set_shared_this (acc);
     return acc;
 }
@@ -507,10 +507,10 @@ ClientSideEncryption* Account.e2e () {
 Account.~Account () = default;
 
 string Account.dav_path () {
-    return dav_path_base () + QLatin1Char ('/') + dav_user () + QLatin1Char ('/');
+    return dav_path_base () + '/' + dav_user () + '/';
 }
 
-void Account.set_shared_this (AccountPtr shared_this) {
+void Account.set_shared_this (AccountPointer shared_this) {
     _shared_this = shared_this.to_weak_ref ();
     setup_user_status_connector ();
 }
@@ -519,7 +519,7 @@ string Account.dav_path_base () {
     return QStringLiteral ("/remote.php/dav/files");
 }
 
-AccountPtr Account.shared_from_this () {
+AccountPointer Account.shared_from_this () {
     return _shared_this.to_strong_ref ();
 }
 
@@ -548,7 +548,7 @@ string Account.display_name () {
     string dn = string ("%1@%2").arg (credentials ().user (), _url.host ());
     int port = url ().port ();
     if (port > 0 && port != 80 && port != 443) {
-        dn.append (QLatin1Char (':'));
+        dn.append (':');
         dn.append (string.number (port));
     }
     return dn;
@@ -654,13 +654,13 @@ void Account.try_setup_push_notifications () {
     }
 }
 
-QUrl Account.dav_url () {
+GLib.Uri Account.dav_url () {
     return Utility.concat_url_path (url (), dav_path ());
 }
 
-QUrl Account.deprecated_private_link_url (GLib.ByteArray numeric_file_id) {
+GLib.Uri Account.deprecated_private_link_url (GLib.ByteArray numeric_file_id) {
     return Utility.concat_url_path (_user_visible_url,
-        QLatin1String ("/index.php/f/") + QUrl.to_percent_encoding (string.from_latin1 (numeric_file_id)));
+        QLatin1String ("/index.php/f/") + GLib.Uri.to_percent_encoding (string.from_latin1 (numeric_file_id)));
 }
 
 /***********************************************************
@@ -694,7 +694,7 @@ void Account.reset_network_access_manager () {
         return;
     }
 
-    q_c_debug (lc_account) << "Resetting QNAM";
+    GLib.debug (lc_account) << "Resetting QNAM";
     QNetworkCookieJar jar = _am.cookie_jar ();
     QNetworkProxy proxy = _am.proxy ();
 
@@ -719,7 +719,7 @@ unowned<QNetworkAccessManager> Account.shared_network_access_manager () {
     return _am;
 }
 
-QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, QUrl url, QNetworkRequest req, QIODevice data) {
+QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, QNetworkRequest req, QIODevice data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "HEAD" && !data) {
@@ -736,7 +736,7 @@ QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, QUrl url, QNetwork
     return _am.send_custom_request (req, verb, data);
 }
 
-QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, QUrl url, QNetworkRequest req, GLib.ByteArray data) {
+QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, QNetworkRequest req, GLib.ByteArray data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "HEAD" && data.is_empty ()) {
@@ -753,7 +753,7 @@ QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, QUrl url, QNetwork
     return _am.send_custom_request (req, verb, data);
 }
 
-QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, QUrl url, QNetworkRequest req, QHttpMultiPart data) {
+QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, QNetworkRequest req, QHttpMultiPart data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "PUT") {
@@ -764,7 +764,7 @@ QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, QUrl url, QNetwork
     return _am.send_custom_request (req, verb, data);
 }
 
-SimpleNetworkJob *Account.send_request (GLib.ByteArray verb, QUrl url, QNetworkRequest req, QIODevice data) {
+SimpleNetworkJob *Account.send_request (GLib.ByteArray verb, GLib.Uri url, QNetworkRequest req, QIODevice data) {
     var job = new SimpleNetworkJob (shared_from_this ());
     job.start_request (verb, url, req, data);
     return job;
@@ -812,7 +812,7 @@ void Account.set_ssl_error_handler (AbstractSslErrorHandler handler) {
     _ssl_error_handler.on_reset (handler);
 }
 
-void Account.set_url (QUrl url) {
+void Account.set_url (GLib.Uri url) {
     _url = url;
     _user_visible_url = url;
 }
@@ -868,7 +868,7 @@ void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> err
 
     GLib.List<QSslCertificate> approved_certs;
     if (_ssl_error_handler.is_null ()) {
-        q_c_warning (lc_account) << out << "called without valid SSL error handler for account" << url ();
+        GLib.warn (lc_account) << out << "called without valid SSL error handler for account" << url ();
         return;
     }
 
@@ -914,12 +914,12 @@ void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> err
 
 void Account.on_credentials_fetched () {
     if (_dav_user.is_empty ()) {
-        q_c_debug (lc_account) << "User id not set. Fetch it.";
+        GLib.debug (lc_account) << "User id not set. Fetch it.";
         const var fetch_user_name_job = new JsonApiJob (shared_from_this (), QStringLiteral ("/ocs/v1.php/cloud/user"));
         connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, fetch_user_name_job] (QJsonDocument &json, int status_code) {
             fetch_user_name_job.delete_later ();
             if (status_code != 100) {
-                q_c_warning (lc_account) << "Could not fetch user id. Login will probably not work.";
+                GLib.warn (lc_account) << "Could not fetch user id. Login will probably not work.";
                 emit credentials_fetched (_credentials.data ());
                 return;
             }
@@ -931,7 +931,7 @@ void Account.on_credentials_fetched () {
         });
         fetch_user_name_job.on_start ();
     } else {
-        q_c_debug (lc_account) << "User id already fetched.";
+        GLib.debug (lc_account) << "User id already fetched.";
         emit credentials_fetched (_credentials.data ());
     }
 }
@@ -1038,7 +1038,7 @@ void Account.write_app_password_once (string app_password){
         if (write_job.error () == NoError)
             q_c_info (lc_account) << "app_password stored in keychain";
         else
-            q_c_warning (lc_account) << "Unable to store app_password in keychain" << write_job.error_string ();
+            GLib.warn (lc_account) << "Unable to store app_password in keychain" << write_job.error_string ();
 
         // We don't try this again on error, to not raise CPU consumption
         _wrote_app_password = true;
@@ -1078,7 +1078,7 @@ void Account.delete_app_password () {
     );
 
     if (kck.is_empty ()) {
-        q_c_debug (lc_account) << "app_password is empty";
+        GLib.debug (lc_account) << "app_password is empty";
         return;
     }
 
@@ -1090,7 +1090,7 @@ void Account.delete_app_password () {
         if (delete_job.error () == NoError)
             q_c_info (lc_account) << "app_password deleted from keychain";
         else
-            q_c_warning (lc_account) << "Unable to delete app_password from keychain" << delete_job.error_string ();
+            GLib.warn (lc_account) << "Unable to delete app_password from keychain" << delete_job.error_string ();
 
         // Allow storing a new app password on re-login
         _wrote_app_password = false;
@@ -1104,19 +1104,19 @@ void Account.delete_app_token () {
         if (var delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ())) {
             const var http_code = delete_job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
             if (http_code != 200) {
-                q_c_warning (lc_account) << "AppToken remove failed for user : " << display_name () << " with code : " << http_code;
+                GLib.warn (lc_account) << "AppToken remove failed for user : " << display_name () << " with code : " << http_code;
             } else {
                 q_c_info (lc_account) << "AppToken for user : " << display_name () << " has been removed.";
             }
         } else {
             Q_ASSERT (false);
-            q_c_warning (lc_account) << "The sender is not a DeleteJob instance.";
+            GLib.warn (lc_account) << "The sender is not a DeleteJob instance.";
         }
     });
     delete_app_token_job.on_start ();
 }
 
-void Account.fetch_direct_editors (QUrl direct_editing_uRL, string direct_editing_e_tag) {
+void Account.fetch_direct_editors (GLib.Uri direct_editing_uRL, string direct_editing_e_tag) {
     if (direct_editing_uRL.is_empty () || direct_editing_e_tag.is_empty ())
         return;
 

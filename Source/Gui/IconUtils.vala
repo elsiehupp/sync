@@ -6,7 +6,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 // #include <theme.h>
 
-// #include <QFile>
+// #include <GLib.File>
 // #include <QLoggingCategory>
 // #include <QPainter>
 // #include <QPixmapCache>
@@ -19,13 +19,13 @@ namespace {
     string find_svg_file_path (string file_name, string[] &possible_colors) {
         string result;
         result = string{Occ.Theme.theme_prefix} + file_name;
-        if (QFile.exists (result)) {
+        if (GLib.File.exists (result)) {
             return result;
         } else {
             for (var &color : possible_colors) {
                 result = string{Occ.Theme.theme_prefix} + color + QStringLiteral ("/") + file_name;
 
-                if (QFile.exists (result)) {
+                if (GLib.File.exists (result)) {
                     return result;
                 }
             }
@@ -139,7 +139,7 @@ QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_col
         QSvgRenderer svg_renderer;
 
         if (!svg_renderer.on_load (source_svg_path)) {
-            q_c_warning (lc_icon_utils) << "Could no load initial SVG image";
+            GLib.warn (lc_icon_utils) << "Could no load initial SVG image";
             return {};
         }
 

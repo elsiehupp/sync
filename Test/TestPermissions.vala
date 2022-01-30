@@ -101,8 +101,8 @@ class TestPermissions : GLib.Object {
         //2. remove the file that can be removed
         //  (they should properly be gone)
         var removeReadOnly = [&] (string file)  {
-            QVERIFY (!QFileInfo (fakeFolder.localPath () + file).permission (QFile.WriteOwner));
-            QFile (fakeFolder.localPath () + file).setPermissions (QFile.WriteOwner | QFile.ReadOwner);
+            QVERIFY (!QFileInfo (fakeFolder.localPath () + file).permission (GLib.File.WriteOwner));
+            GLib.File (fakeFolder.localPath () + file).setPermissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
             fakeFolder.localModifier ().remove (file);
         };
         removeReadOnly ("normalDirectory_PERM_CKDNV_/canBeRemoved_PERM_D_.data");
@@ -111,8 +111,8 @@ class TestPermissions : GLib.Object {
         //3. Edit the files that cannot be modified
         //  (they should be recovered, and a conflict shall be created)
         var editReadOnly = [&] (string file)  {
-            QVERIFY (!QFileInfo (fakeFolder.localPath () + file).permission (QFile.WriteOwner));
-            QFile (fakeFolder.localPath () + file).setPermissions (QFile.WriteOwner | QFile.ReadOwner);
+            QVERIFY (!QFileInfo (fakeFolder.localPath () + file).permission (GLib.File.WriteOwner));
+            GLib.File (fakeFolder.localPath () + file).setPermissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
             fakeFolder.localModifier ().appendByte (file);
         };
         editReadOnly ("normalDirectory_PERM_CKDNV_/cannotBeModified_PERM_DVN_.data");

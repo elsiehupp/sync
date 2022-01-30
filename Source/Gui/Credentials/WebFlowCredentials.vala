@@ -138,7 +138,7 @@ class WebFlowCredentials : AbstractCredentials {
 
 
 namespace {
-    const char user_c[] = "user";
+    const char USER_C[] = "user";
     const char client_certificate_pemC[] = "_client_certificate_pem";
     const char client_key_pemC[] = "_client_key_pem";
     const char client_ca_certificate_pemC[] = "_client_ca_certificate_pem";
@@ -261,13 +261,13 @@ void WebFlowCredentials.ask_from_user () {
         _ask_dialog = new WebFlowCredentialsDialog (_account, use_flow2);
 
         if (!use_flow2) {
-            QUrl url = _account.url ();
+            GLib.Uri url = _account.url ();
             string path = url.path () + "/index.php/login/flow";
             url.set_path (path);
             _ask_dialog.set_url (url);
         }
 
-        string msg = tr ("You have been logged out of %1 as user %2. Please login again.")
+        string msg = _("You have been logged out of %1 as user %2. Please login again.")
                           .arg (_account.display_name (), _user);
         _ask_dialog.set_info (msg);
 
@@ -278,7 +278,7 @@ void WebFlowCredentials.ask_from_user () {
     });
     job.on_start ();
 
-    q_c_debug (lc_web_flow_credentials ()) << "User needs to reauth!";
+    GLib.debug (lc_web_flow_credentials ()) << "User needs to reauth!";
 }
 
 void WebFlowCredentials.on_ask_from_user_credentials_provided (string user, string pass, string host) {
@@ -291,12 +291,12 @@ void WebFlowCredentials.on_ask_from_user_credentials_provided (string user, stri
     } else {
         q_c_info (lc_web_flow_credentials ()) << "Authed with the wrong user!";
 
-        string msg = tr ("Please login with the user : %1")
+        string msg = _("Please login with the user : %1")
                 .arg (_user);
         _ask_dialog.set_error (msg);
 
         if (!_ask_dialog.is_using_flow2 ()) {
-            QUrl url = _account.url ();
+            GLib.Uri url = _account.url ();
             string path = url.path () + "/index.php/login/flow";
             url.set_path (path);
             _ask_dialog.set_url (url);
@@ -319,7 +319,7 @@ void WebFlowCredentials.on_ask_from_user_credentials_provided (string user, stri
 }
 
 void WebFlowCredentials.on_ask_from_user_cancelled () {
-    q_c_debug (lc_web_flow_credentials ()) << "User cancelled reauth!";
+    GLib.debug (lc_web_flow_credentials ()) << "User cancelled reauth!";
 
     emit asked ();
 
@@ -329,8 +329,8 @@ void WebFlowCredentials.on_ask_from_user_cancelled () {
 
 bool WebFlowCredentials.still_valid (QNetworkReply reply) {
     if (reply.error () != QNetworkReply.NoError) {
-        q_c_warning (lc_web_flow_credentials ()) << reply.error ();
-        q_c_warning (lc_web_flow_credentials ()) << reply.error_string ();
+        GLib.warn (lc_web_flow_credentials ()) << reply.error ();
+        GLib.warn (lc_web_flow_credentials ()) << reply.error_string ();
     }
     return (reply.error () != QNetworkReply.AuthenticationRequiredError);
 }
@@ -341,7 +341,7 @@ void WebFlowCredentials.persist () {
         return;
     }
 
-    _account.set_credential_setting (user_c, _user);
+    _account.set_credential_setting (USER_C, _user);
     _account.wants_account_saved (_account);
 
     // write cert if there is one
@@ -384,7 +384,7 @@ void WebFlowCredentials.write_single_client_ca_cert_pem () {
 
         // keep the limit
         if (index > (_client_ssl_ca_certificates_max_count - 1)) {
-            q_c_warning (lc_web_flow_credentials) << "Maximum client CA cert count exceeded while writing slot" << string.number (index) << "cutting off after" << string.number (_client_ssl_ca_certificates_max_count) << "certs";
+            GLib.warn (lc_web_flow_credentials) << "Maximum client CA cert count exceeded while writing slot" << string.number (index) << "cutting off after" << string.number (_client_ssl_ca_certificates_max_count) << "certs";
 
             _client_ssl_ca_certificates_write_queue.clear ();
 
@@ -423,7 +423,7 @@ void WebFlowCredentials.on_write_client_ca_certs_pem_job_done (KeychainChunk.Wri
     // errors / next ca cert?
     if (write_job && !_client_ssl_ca_certificates.is_empty ()) {
         if (write_job.error () != NoError) {
-            q_c_warning (lc_web_flow_credentials) << "Error while writing client CA cert" << write_job.error_string ();
+            GLib.warn (lc_web_flow_credentials) << "Error while writing client CA cert" << write_job.error_string ();
         }
 
         if (!_client_ssl_ca_certificates_write_queue.is_empty ()) {
@@ -451,7 +451,7 @@ void WebFlowCredentials.on_write_job_done (QKeychain.Job job) {
     case NoError:
         break;
     default:
-        q_c_warning (lc_web_flow_credentials) << "Error while writing password" << job.error_string ();
+        GLib.warn (lc_web_flow_credentials) << "Error while writing password" << job.error_string ();
     }
 }
 
@@ -477,7 +477,7 @@ void WebFlowCredentials.forget_sensitive_data () {
 
     const string kck = keychain_key (_account.url ().to_string (), _user, _account.id ());
     if (kck.is_empty ()) {
-        q_c_debug (lc_web_flow_credentials ()) << "InvalidateToken : User is empty, bailing out!";
+        GLib.debug (lc_web_flow_credentials ()) << "InvalidateToken : User is empty, bailing out!";
         return;
     }
 
@@ -499,7 +499,7 @@ void WebFlowCredentials.set_account (Account account) {
 }
 
 string WebFlowCredentials.fetch_user () {
-    _user = _account.credential_setting (user_c).to_string ();
+    _user = _account.credential_setting (USER_C).to_string ();
     return _user;
 }
 
@@ -514,7 +514,7 @@ void WebFlowCredentials.on_authentication (QNetworkReply reply, QAuthenticator a
         return;
     }
 
-    q_c_debug (lc_web_flow_credentials ()) << "Requires authentication";
+    GLib.debug (lc_web_flow_credentials ()) << "Requires authentication";
 
     authenticator.set_user (_user);
     authenticator.set_password (_password);
@@ -574,11 +574,11 @@ void WebFlowCredentials.on_read_client_key_pem_job_done (KeychainChunk.ReadJob r
             _client_ssl_key = QSslKey (client_key_pem, QSsl.Ec);
         }
         if (_client_ssl_key.is_null ()) {
-            q_c_warning (lc_web_flow_credentials) << "Could not load SSL key into Qt!";
+            GLib.warn (lc_web_flow_credentials) << "Could not load SSL key into Qt!";
         }
         client_key_pem.clear ();
     } else {
-        q_c_warning (lc_web_flow_credentials) << "Unable to read client key" << read_job.error_string ();
+        GLib.warn (lc_web_flow_credentials) << "Unable to read client key" << read_job.error_string ();
     }
 
     // Start fetching client CA certs
@@ -597,7 +597,7 @@ void WebFlowCredentials.read_single_client_ca_cert_pem () {
         connect (job, &KeychainChunk.ReadJob.on_finished, this, &WebFlowCredentials.on_read_client_ca_certs_pem_job_done);
         job.on_start ();
     } else {
-        q_c_warning (lc_web_flow_credentials) << "Maximum client CA cert count exceeded while reading, ignoring after" << _client_ssl_ca_certificates_max_count;
+        GLib.warn (lc_web_flow_credentials) << "Maximum client CA cert count exceeded while reading, ignoring after" << _client_ssl_ca_certificates_max_count;
 
         on_read_client_ca_certs_pem_job_done (nullptr);
     }
@@ -618,7 +618,7 @@ void WebFlowCredentials.on_read_client_ca_certs_pem_job_done (KeychainChunk.Read
         } else {
             if (read_job.error () != QKeychain.Error.EntryNotFound ||
                 ( (read_job.error () == QKeychain.Error.EntryNotFound) && _client_ssl_ca_certificates.count () == 0)) {
-                q_c_warning (lc_web_flow_credentials) << "Unable to read client CA cert slot" << string.number (_client_ssl_ca_certificates.count ()) << read_job.error_string ();
+                GLib.warn (lc_web_flow_credentials) << "Unable to read client CA cert slot" << string.number (_client_ssl_ca_certificates.count ()) << read_job.error_string ();
             }
         }
     }
@@ -651,7 +651,7 @@ void WebFlowCredentials.on_read_password_job_done (Job incoming_job) {
     }
 
     if (_user.is_empty ()) {
-        q_c_warning (lc_web_flow_credentials) << "Strange : User is empty!";
+        GLib.warn (lc_web_flow_credentials) << "Strange : User is empty!";
     }
 
     if (error == QKeychain.NoError) {

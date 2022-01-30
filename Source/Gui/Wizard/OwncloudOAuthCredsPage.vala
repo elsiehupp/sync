@@ -13,7 +13,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 // #include <GLib.List>
 // #include <QMap>
 // #include <QNetworkCookie>
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QPointer>
 
 namespace Occ {
@@ -65,8 +65,8 @@ protected slots:
 
         WizardCommon.init_error_label (_ui.error_label);
 
-        set_title (WizardCommon.title_template ().arg (tr ("Connect to %1").arg (Theme.instance ().app_name_gui ())));
-        set_sub_title (WizardCommon.sub_title_template ().arg (tr ("Login in your browser")));
+        set_title (WizardCommon.title_template ().arg (_("Connect to %1").arg (Theme.instance ().app_name_gui ())));
+        set_sub_title (WizardCommon.sub_title_template ().arg (_("Login in your browser")));
 
         connect (_ui.open_link_button, &QCommand_link_button.clicked, this, &Owncloud_oauth_creds_page.on_open_browser);
         connect (_ui.copy_link_button, &QCommand_link_button.clicked, this, &Owncloud_oauth_creds_page.on_copy_link_to_clipboard);
@@ -148,7 +148,7 @@ protected slots:
 
     void Owncloud_oauth_creds_page.on_copy_link_to_clipboard () {
         if (_async_auth)
-            QApplication.clipboard ().on_set_text (_async_auth.authorisation_link ().to_string (QUrl.FullyEncoded));
+            QApplication.clipboard ().on_set_text (_async_auth.authorisation_link ().to_string (GLib.Uri.FullyEncoded));
     }
 
     } // namespace Occ

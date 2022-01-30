@@ -45,11 +45,11 @@ class TestAllFilesDeleted : GLib.Object {
         ConfigFile config;
         config.setPromptDeleteFiles (true);
 
-        //Just set a blacklist so we can check it is still there. This directory does not exists but
+        //Just set a blocklist so we can check it is still there. This directory does not exists but
         // that does not matter for our purposes.
-        string[] selectiveSyncBlackList = { "Q/" };
-        fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList,
-                                                                selectiveSyncBlackList);
+        string[] selectiveSyncBlockList = { "Q/" };
+        fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
+                                                                selectiveSyncBlockList);
 
         var initialState = fakeFolder.currentLocalState ();
         int aboutToRemoveAllFilesCalled = 0;
@@ -74,10 +74,10 @@ class TestAllFilesDeleted : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), initialState);
         QCOMPARE (fakeFolder.currentRemoteState (), initialState);
 
-        // The selective sync blacklist should be not have been deleted.
+        // The selective sync blocklist should be not have been deleted.
         bool ok = true;
-        QCOMPARE (fakeFolder.syncEngine ().journal ().getSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList, &ok),
-                 selectiveSyncBlackList);
+        QCOMPARE (fakeFolder.syncEngine ().journal ().getSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, &ok),
+                 selectiveSyncBlockList);
     }
 
     private on_ void testAllFilesDeletedDelete_data () {
@@ -304,7 +304,7 @@ class TestAllFilesDeleted : GLib.Object {
         QCOMPARE (aboutToRemoveAllFilesCalled, 0);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList,
+        fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
             string[] () << "A/" << "B/" << "C/" << "S/");
 
         QVERIFY (fakeFolder.syncOnce ());

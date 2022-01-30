@@ -16,7 +16,7 @@ namespace Occ {
 
 class RemoteWipe : GLib.Object {
 
-    public RemoteWipe (AccountPtr account, GLib.Object parent = nullptr);
+    public RemoteWipe (AccountPointer account, GLib.Object parent = nullptr);
 
 signals:
     /***********************************************************
@@ -53,7 +53,7 @@ signals:
     private void on_notify_server_success_job_slot ();
 
 
-    private AccountPtr _account;
+    private AccountPointer _account;
     private string _app_password;
     private bool _account_removed;
     private QNetworkAccessManager _network_manager;
@@ -63,7 +63,7 @@ signals:
     private friend class .Test_remote_wipe;
 };
 
-    RemoteWipe.RemoteWipe (AccountPtr account, GLib.Object parent)
+    RemoteWipe.RemoteWipe (AccountPointer account, GLib.Object parent)
         : GLib.Object (parent),
           _account (account),
           _app_password (string ()),
@@ -88,7 +88,7 @@ signals:
             return;
 
         _app_password = pwd;
-        QUrl request_url = Utility.concat_url_path (_account.url ().to_string (),
+        GLib.Uri request_url = Utility.concat_url_path (_account.url ().to_string (),
                                                  QLatin1String ("/index.php/core/wipe/check"));
         QNetworkRequest request;
         request.set_header (QNetworkRequest.ContentTypeHeader,
@@ -97,7 +97,7 @@ signals:
         request.set_ssl_configuration (_account.get_or_create_ssl_config ());
         var request_body = new QBuffer;
         QUrlQuery arguments (string ("token=%1").arg (_app_password));
-        request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
+        request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
         _network_reply_check = _network_manager.post (request, request_body);
         GLib.Object.connect (&_network_manager, SIGNAL (ssl_errors (QNetworkReply *, GLib.List<QSslError>)),
             _account.data (), SLOT (on_handle_ssl_errors (QNetworkReply *, GLib.List<QSslError>)));
@@ -117,16 +117,16 @@ signals:
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
-                q_c_warning (lc_remote_wipe) << string ("Error returned from the server : <em>%1<em>")
+                GLib.warn (lc_remote_wipe) << string ("Error returned from the server : <em>%1<em>")
                                            .arg (error_from_json.to_html_escaped ());
             } else if (_network_reply_check.error () != QNetworkReply.NoError) {
-                q_c_warning (lc_remote_wipe) << string ("There was an error accessing the 'token' endpoint : <br><em>%1</em>")
+                GLib.warn (lc_remote_wipe) << string ("There was an error accessing the 'token' endpoint : <br><em>%1</em>")
                                   .arg (_network_reply_check.error_string ().to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
-                q_c_warning (lc_remote_wipe) << string ("Could not parse the JSON returned from the server : <br><em>%1</em>")
+                GLib.warn (lc_remote_wipe) << string ("Could not parse the JSON returned from the server : <br><em>%1</em>")
                                   .arg (json_parse_error.error_string ());
             } else {
-                q_c_warning (lc_remote_wipe) <<  string ("The reply from the server did not contain all expected fields");
+                GLib.warn (lc_remote_wipe) <<  string ("The reply from the server did not contain all expected fields");
             }
 
         // check for wipe request
@@ -167,7 +167,7 @@ signals:
 
     void RemoteWipe.on_notify_server_success_job (AccountState account_state, bool data_wiped){
         if (_account_removed && data_wiped && _account == account_state.account ()){
-            QUrl request_url = Utility.concat_url_path (_account.url ().to_string (),
+            GLib.Uri request_url = Utility.concat_url_path (_account.url ().to_string (),
                                                      QLatin1String ("/index.php/core/wipe/on_success"));
             QNetworkRequest request;
             request.set_header (QNetworkRequest.ContentTypeHeader,
@@ -176,7 +176,7 @@ signals:
             request.set_ssl_configuration (_account.get_or_create_ssl_config ());
             var request_body = new QBuffer;
             QUrlQuery arguments (string ("token=%1").arg (_app_password));
-            request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
+            request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
             _network_reply_success = _network_manager.post (request, request_body);
             GLib.Object.connect (_network_reply_success, &QNetworkReply.on_finished, this,
                              &RemoteWipe.on_notify_server_success_job_slot);
@@ -192,16 +192,16 @@ signals:
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
-                q_c_warning (lc_remote_wipe) << string ("Error returned from the server : <em>%1</em>")
+                GLib.warn (lc_remote_wipe) << string ("Error returned from the server : <em>%1</em>")
                                   .arg (error_from_json.to_html_escaped ());
             } else if (_network_reply_success.error () != QNetworkReply.NoError) {
-                q_c_warning (lc_remote_wipe) << string ("There was an error accessing the 'on_success' endpoint : <br><em>%1</em>")
+                GLib.warn (lc_remote_wipe) << string ("There was an error accessing the 'on_success' endpoint : <br><em>%1</em>")
                                   .arg (_network_reply_success.error_string ().to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
-                q_c_warning (lc_remote_wipe) << string ("Could not parse the JSON returned from the server : <br><em>%1</em>")
+                GLib.warn (lc_remote_wipe) << string ("Could not parse the JSON returned from the server : <br><em>%1</em>")
                                   .arg (json_parse_error.error_string ());
             } else {
-                q_c_warning (lc_remote_wipe) << string ("The reply from the server did not contain all expected fields.");
+                GLib.warn (lc_remote_wipe) << string ("The reply from the server did not contain all expected fields.");
             }
         }
 

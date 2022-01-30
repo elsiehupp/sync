@@ -237,7 +237,7 @@ signals:
             return;
         }
 
-        q_c_warning (lc_push_notifications) << "Websocket error on with account" << _account.url () << error;
+        GLib.warn (lc_push_notifications) << "Websocket error on with account" << _account.url () << error;
         close_web_socket ();
         emit connection_lost ();
     }
@@ -264,7 +264,7 @@ signals:
     }
 
     void PushNotifications.on_web_socket_ssl_errors (GLib.List<QSslError> &errors) {
-        q_c_warning (lc_push_notifications) << "Websocket ssl errors on with account" << _account.url () << errors;
+        GLib.warn (lc_push_notifications) << "Websocket ssl errors on with account" << _account.url () << errors;
         close_web_socket ();
         emit authentication_failed ();
     }
@@ -327,7 +327,7 @@ signals:
     }
 
     void PushNotifications.on_web_socket_pong_received (uint64 /*elapsed_time*/, GLib.ByteArray  /*payload*/) {
-        q_c_debug (lc_push_notifications) << "Pong received in time";
+        GLib.debug (lc_push_notifications) << "Pong received in time";
         // We are fine with every kind of pong and don't care about the
         // payload. As long as we receive pongs the server is still alive.
         _pong_received_from_web_socket_server = true;
@@ -344,7 +344,7 @@ signals:
     }
 
     void PushNotifications.ping_web_socket_server () {
-        q_c_debug (lc_push_notifications, "Ping websocket server");
+        GLib.debug (lc_push_notifications, "Ping websocket server");
 
         _pong_received_from_web_socket_server = false;
 
@@ -354,7 +354,7 @@ signals:
 
     void PushNotifications.on_ping_timed_out () {
         if (_pong_received_from_web_socket_server) {
-            q_c_debug (lc_push_notifications) << "Websocket respond with a pong in time.";
+            GLib.debug (lc_push_notifications) << "Websocket respond with a pong in time.";
             return;
         }
 

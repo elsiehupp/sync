@@ -47,7 +47,7 @@ namespace {
         string host = account.url ().host ();
         int port = account.url ().port ();
         if (port > 0 && port != 80 && port != 443) {
-            host.append (QLatin1Char (':'));
+            host.append (':');
             host.append (string.number (port));
         }
         if (width > 0) {
@@ -150,7 +150,7 @@ signals:
         set_object_name ("Settings"); // required as group for save_geometry call
 
         // : This name refers to the application name e.g Nextcloud
-        set_window_title (tr ("%1 Settings").arg (Theme.instance ().app_name_gui ()));
+        set_window_title (_("%1 Settings").arg (Theme.instance ().app_name_gui ()));
 
         connect (AccountManager.instance (), &AccountManager.on_account_added,
             this, &SettingsDialog.on_account_added);
@@ -167,7 +167,7 @@ signals:
         spacer.set_size_policy (QSize_policy.Minimum_expanding, QSize_policy.Minimum);
         _tool_bar.add_widget (spacer);
 
-        QAction general_action = create_color_aware_action (QLatin1String (":/client/theme/settings.svg"), tr ("General"));
+        QAction general_action = create_color_aware_action (QLatin1String (":/client/theme/settings.svg"), _("General"));
         _action_group.add_action (general_action);
         _tool_bar.add_action (general_action);
         var general_settings = new General_settings;
@@ -176,7 +176,7 @@ signals:
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
         connect (this, &SettingsDialog.style_changed, general_settings, &General_settings.on_style_changed);
 
-        QAction network_action = create_color_aware_action (QLatin1String (":/client/theme/network.svg"), tr ("Network"));
+        QAction network_action = create_color_aware_action (QLatin1String (":/client/theme/network.svg"), _("Network"));
         _action_group.add_action (network_action);
         _tool_bar.add_action (network_action);
         var network_settings = new Network_settings;
@@ -275,7 +275,7 @@ signals:
 
         QAction account_action = nullptr;
         QImage avatar = s.account ().avatar ();
-        const string action_text = branding_single_account ? tr ("Account") : s.account ().display_name ();
+        const string action_text = branding_single_account ? _("Account") : s.account ().display_name ();
         if (avatar.is_null ()) {
             account_action = create_color_aware_action (QLatin1String (":/client/theme/account.svg"),
                 action_text);

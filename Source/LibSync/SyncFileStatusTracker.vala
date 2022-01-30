@@ -8,7 +8,7 @@ Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 // #include <QLoggingCategory>
 
 // // #include <map>
-// #include <QSet>
+// #include <GLib.Set>
 
 namespace Occ {
 
@@ -66,7 +66,7 @@ signals:
     private SyncEngine _sync_engine;
 
     private Problems_map _sync_problems;
-    private QSet<string> _dirty_paths;
+    private GLib.Set<string> _dirty_paths;
     // Counts the number direct children currently being synced (has unfinished propagation jobs).
     // We'll show a file/directory as SYNC as long as its sync count is > 0.
     // A directory that starts/ends propagation will in turn increase/decrease its own parent by 1.
@@ -127,8 +127,8 @@ signals:
             || status == SyncFileItem.NormalError
             || status == SyncFileItem.FatalError
             || status == SyncFileItem.DetailError
-            || status == SyncFileItem.BlacklistedError
-            || item._has_blacklist_entry;
+            || status == SyncFileItem.BlocklistedError
+            || item._has_blocklist_entry;
     }
 
     static inline bool has_excluded_status (SyncFileItem &item) {
@@ -152,7 +152,7 @@ signals:
     }
 
     SyncFileStatus SyncFileStatusTracker.file_status (string relative_path) {
-        ASSERT (!relative_path.ends_with (QLatin1Char ('/')));
+        ASSERT (!relative_path.ends_with ('/'));
 
         if (relative_path.is_empty ()) {
             // This is the root sync folder, it doesn't have an entry in the database and won't be walked by csync, so resolve manually.
@@ -177,9 +177,9 @@ signals:
             return SyncFileStatus.SyncFileStatusTag.STATUS_SYNC;
 
         // First look it up in the database to know if it's shared
-        SyncJournalFileRecord rec;
-        if (_sync_engine.journal ().get_file_record (relative_path, &rec) && rec.is_valid ()) {
-            return resolve_sync_and_error_status (relative_path, rec._remote_perm.has_permission (RemotePermissions.IsShared) ? Shared : Not_shared);
+        SyncJournalFileRecord record;
+        if (_sync_engine.journal ().get_file_record (relative_path, &record) && record.is_valid ()) {
+            return resolve_sync_and_error_status (relative_path, record._remote_perm.has_permission (RemotePermissions.IsShared) ? Shared : Not_shared);
         }
 
         // Must be a new file not yet in the database, check if it's syncing or has an error.
@@ -249,7 +249,7 @@ signals:
         std.swap (_sync_problems, old_problems);
 
         foreach (SyncFileItemPtr &item, items) {
-            q_c_debug (lc_status_tracker) << "Investigating" << item.destination () << item._status << item._instruction;
+            GLib.debug (lc_status_tracker) << "Investigating" << item.destination () << item._status << item._instruction;
             _dirty_paths.remove (item.destination ());
 
             if (has_error_status (*item)) {
@@ -274,7 +274,7 @@ signals:
         // Some metadata status won't trigger files to be synced, make sure that we
         // push the OK status for dirty files that don't need to be propagated.
         // Swap into a copy since file_status () reads _dirty_paths to determine the status
-        QSet<string> old_dirty_paths;
+        GLib.Set<string> old_dirty_paths;
         std.swap (_dirty_paths, old_dirty_paths);
         for (var &old_dirty_path : q_as_const (old_dirty_paths))
             emit file_status_changed (get_system_destination (old_dirty_path), file_status (old_dirty_path));
@@ -293,7 +293,7 @@ signals:
     }
 
     void SyncFileStatusTracker.on_item_completed (SyncFileItemPtr &item) {
-        q_c_debug (lc_status_tracker) << "Item completed" << item.destination () << item._status << item._instruction;
+        GLib.debug (lc_status_tracker) << "Item completed" << item.destination () << item._status << item._instruction;
 
         if (has_error_status (*item)) {
             _sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_ERROR;
@@ -368,7 +368,7 @@ signals:
         string system_path = _sync_engine.local_path () + relative_path;
         // SyncEngine.local_path () has a trailing slash, make sure to remove it if the
         // destination is empty.
-        if (system_path.ends_with (QLatin1Char ('/'))) {
+        if (system_path.ends_with ('/')) {
             system_path.truncate (system_path.length () - 1);
         }
         return system_path;

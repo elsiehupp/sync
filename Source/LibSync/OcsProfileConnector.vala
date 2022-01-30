@@ -1,7 +1,7 @@
 #pragma once
 
 // #include <QPixmap>
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <string>
 // #include <QJsonObject>
 // #include <QJsonDocument>
@@ -23,12 +23,12 @@ struct HovercardAction {
     public HovercardAction ();
 
 
-    public HovercardAction (string title, QUrl icon_url, QUrl link);
+    public HovercardAction (string title, GLib.Uri icon_url, GLib.Uri link);
 
     public string _title;
-    public QUrl _icon_url;
+    public GLib.Uri _icon_url;
     public QPixmap _icon;
-    public QUrl _link;
+    public GLib.Uri _link;
 };
 
 struct Hovercard {
@@ -37,7 +37,7 @@ struct Hovercard {
 
 class OcsProfileConnector : GLib.Object {
 
-    public OcsProfileConnector (AccountPtr account, GLib.Object parent = nullptr);
+    public OcsProfileConnector (AccountPointer account, GLib.Object parent = nullptr);
 
     public void fetch_hovercard (string user_id);
 
@@ -57,7 +57,7 @@ signals:
     private void set_hovercard_action_icon (std.size_t index, QPixmap &pixmap);
     private void load_hovercard_action_icon (std.size_t hovercard_action_index, GLib.ByteArray icon_data);
 
-    AccountPtr _account;
+    AccountPointer _account;
     Hovercard _current_hovercard;
 };
 
@@ -114,13 +114,13 @@ signals:
 
     HovercardAction.HovercardAction () = default;
 
-    HovercardAction.HovercardAction (string title, QUrl icon_url, QUrl link)
+    HovercardAction.HovercardAction (string title, GLib.Uri icon_url, GLib.Uri link)
         : _title (std.move (title))
         , _icon_url (std.move (icon_url))
         , _link (std.move (link)) {
     }
 
-    OcsProfileConnector.OcsProfileConnector (AccountPtr account, GLib.Object parent)
+    OcsProfileConnector.OcsProfileConnector (AccountPointer account, GLib.Object parent)
         : GLib.Object (parent)
         , _account (account) {
     }
@@ -139,7 +139,7 @@ signals:
     }
 
     void OcsProfileConnector.on_hovercard_fetched (QJsonDocument &json, int status_code) {
-        q_c_debug (lc_ocs_profile_connector) << "Hovercard fetched:" << json;
+        GLib.debug (lc_ocs_profile_connector) << "Hovercard fetched:" << json;
 
         if (status_code != 200) {
             q_c_info (lc_ocs_profile_connector) << "Fetching of hovercard on_finished with status code" << status_code;
@@ -169,7 +169,7 @@ signals:
             set_hovercard_action_icon (hovercard_action_index, icon.get ());
             return;
         }
-        q_c_warning (lc_ocs_profile_connector) << "Could not load Svg icon from data" << icon_data;
+        GLib.warn (lc_ocs_profile_connector) << "Could not load Svg icon from data" << icon_data;
     }
 
     void OcsProfileConnector.start_fetch_icon_job (std.size_t hovercard_action_index) {
@@ -180,7 +180,7 @@ signals:
                 load_hovercard_action_icon (hovercard_action_index, icon_data);
             });
         connect (icon_job, &IconJob.error, this, [] (QNetworkReply.NetworkError error_type) {
-            q_c_warning (lc_ocs_profile_connector) << "Could not fetch icon:" << error_type;
+            GLib.warn (lc_ocs_profile_connector) << "Could not fetch icon:" << error_type;
         });
     }
 

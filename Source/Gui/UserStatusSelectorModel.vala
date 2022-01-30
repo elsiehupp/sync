@@ -39,10 +39,10 @@ class User_status_selector_model : GLib.Object {
     Q_PROPERTY (string[] clear_at_values READ clear_at_values CONSTANT)
     Q_PROPERTY (string clear_at READ clear_at NOTIFY clear_at_changed)
     Q_PROPERTY (string error_message READ error_message NOTIFY error_message_changed)
-    Q_PROPERTY (QUrl online_icon READ online_icon CONSTANT)
-    Q_PROPERTY (QUrl away_icon READ away_icon CONSTANT)
-    Q_PROPERTY (QUrl dnd_icon READ dnd_icon CONSTANT)
-    Q_PROPERTY (QUrl invisible_icon READ invisible_icon CONSTANT)
+    Q_PROPERTY (GLib.Uri online_icon READ online_icon CONSTANT)
+    Q_PROPERTY (GLib.Uri away_icon READ away_icon CONSTANT)
+    Q_PROPERTY (GLib.Uri dnd_icon READ dnd_icon CONSTANT)
+    Q_PROPERTY (GLib.Uri invisible_icon READ invisible_icon CONSTANT)
 
     public User_status_selector_model (GLib.Object parent = nullptr);
 
@@ -67,16 +67,16 @@ class User_status_selector_model : GLib.Object {
 
     public Q_INVOKABLE void set_online_status (Occ.UserStatus.OnlineStatus status);
 
-    public Q_REQUIRED_RESULT QUrl online_icon ();
+    public Q_REQUIRED_RESULT GLib.Uri online_icon ();
 
 
-    public Q_REQUIRED_RESULT QUrl away_icon ();
+    public Q_REQUIRED_RESULT GLib.Uri away_icon ();
 
 
-    public Q_REQUIRED_RESULT QUrl dnd_icon ();
+    public Q_REQUIRED_RESULT GLib.Uri dnd_icon ();
 
 
-    public Q_REQUIRED_RESULT QUrl invisible_icon ();
+    public Q_REQUIRED_RESULT GLib.Uri invisible_icon ();
 
     public Q_REQUIRED_RESULT string user_status_message ();
 
@@ -260,31 +260,31 @@ signals:
     }
 
     void User_status_selector_model.on_error (UserStatusConnector.Error error) {
-        q_c_warning (lc_user_status_dialog_model) << "Error:" << error;
+        GLib.warn (lc_user_status_dialog_model) << "Error:" << error;
 
         switch (error) {
         case UserStatusConnector.Error.CouldNotFetchPredefinedUserStatuses:
-            set_error (tr ("Could not fetch predefined statuses. Make sure you are connected to the server."));
+            set_error (_("Could not fetch predefined statuses. Make sure you are connected to the server."));
             return;
 
         case UserStatusConnector.Error.CouldNotFetchUserStatus:
-            set_error (tr ("Could not fetch user status. Make sure you are connected to the server."));
+            set_error (_("Could not fetch user status. Make sure you are connected to the server."));
             return;
 
         case UserStatusConnector.Error.UserStatusNotSupported:
-            set_error (tr ("User status feature is not supported. You will not be able to set your user status."));
+            set_error (_("User status feature is not supported. You will not be able to set your user status."));
             return;
 
         case UserStatusConnector.Error.EmojisNotSupported:
-            set_error (tr ("Emojis feature is not supported. Some user status functionality may not work."));
+            set_error (_("Emojis feature is not supported. Some user status functionality may not work."));
             return;
 
         case UserStatusConnector.Error.CouldNotSetUserStatus:
-            set_error (tr ("Could not set user status. Make sure you are connected to the server."));
+            set_error (_("Could not set user status. Make sure you are connected to the server."));
             return;
 
         case UserStatusConnector.Error.CouldNotClearMessage:
-            set_error (tr ("Could not clear user status message. Make sure you are connected to the server."));
+            set_error (_("Could not clear user status message. Make sure you are connected to the server."));
             return;
         }
 
@@ -309,17 +309,17 @@ signals:
         emit online_status_changed ();
     }
 
-    QUrl User_status_selector_model.online_icon () {
+    GLib.Uri User_status_selector_model.online_icon () {
         return Theme.instance ().status_online_image_source ();
     }
 
-    QUrl User_status_selector_model.away_icon () {
+    GLib.Uri User_status_selector_model.away_icon () {
         return Theme.instance ().status_away_image_source ();
     }
-    QUrl User_status_selector_model.dnd_icon () {
+    GLib.Uri User_status_selector_model.dnd_icon () {
         return Theme.instance ().status_do_not_disturb_image_source ();
     }
-    QUrl User_status_selector_model.invisible_icon () {
+    GLib.Uri User_status_selector_model.invisible_icon () {
         return Theme.instance ().status_invisible_image_source ();
     }
 
@@ -461,22 +461,22 @@ signals:
     string User_status_selector_model.clear_at_stage_to_string (Clear_stage_type stage) {
         switch (stage) {
         case Clear_stage_type.Dont_clear:
-            return tr ("Don't clear");
+            return _("Don't clear");
 
         case Clear_stage_type.Half_hour:
-            return tr ("30 minutes");
+            return _("30 minutes");
 
         case Clear_stage_type.One_hour:
-            return tr ("1 hour");
+            return _("1 hour");
 
         case Clear_stage_type.Four_hour:
-            return tr ("4 hours");
+            return _("4 hours");
 
         case Clear_stage_type.Today:
-            return tr ("Today");
+            return _("Today");
 
         case Clear_stage_type.Week:
-            return tr ("This week");
+            return _("This week");
 
         default:
             Q_UNREACHABLE ();
@@ -506,27 +506,27 @@ signals:
 
     string User_status_selector_model.time_difference_to_string (int difference_secs) {
         if (difference_secs < 60) {
-            return tr ("Less than a minute");
+            return _("Less than a minute");
         } else if (difference_secs < 60 * 60) {
             const var minutes_left = std.ceil (difference_secs / 60.0);
             if (minutes_left == 1) {
-                return tr ("1 minute");
+                return _("1 minute");
             } else {
-                return tr ("%1 minutes").arg (minutes_left);
+                return _("%1 minutes").arg (minutes_left);
             }
         } else if (difference_secs < 60 * 60 * 24) {
             const var hours_left = std.ceil (difference_secs / 60.0 / 60.0);
             if (hours_left == 1) {
-                return tr ("1 hour");
+                return _("1 hour");
             } else {
-                return tr ("%1 hours").arg (hours_left);
+                return _("%1 hours").arg (hours_left);
             }
         } else {
             const var days_left = std.ceil (difference_secs / 60.0 / 60.0 / 24.0);
             if (days_left == 1) {
-                return tr ("1 day");
+                return _("1 day");
             } else {
-                return tr ("%1 days").arg (days_left);
+                return _("%1 days").arg (days_left);
             }
         }
     }
@@ -545,9 +545,9 @@ signals:
 
             case ClearAtType.EndOf: {
                 if (clear_at._endof == "day") {
-                    return tr ("Today");
+                    return _("Today");
                 } else if (clear_at._endof == "week") {
-                    return tr ("This week");
+                    return _("This week");
                 }
                 Q_UNREACHABLE ();
             }
@@ -556,7 +556,7 @@ signals:
                 Q_UNREACHABLE ();
             }
         }
-        return tr ("Don't clear");
+        return _("Don't clear");
     }
 
     string User_status_selector_model.predefined_status_clear_at (int index) {

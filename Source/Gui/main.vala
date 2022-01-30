@@ -153,7 +153,7 @@ int main (int argc, char **argv) {
                 while (!QSystemTrayIcon.is_system_tray_available ()) {
                     attempts++;
                     if (attempts >= 30) {
-                        q_c_warning (lc_application) << "System tray unavailable (xfce)";
+                        GLib.warn (lc_application) << "System tray unavailable (xfce)";
                         warn_systray ();
                         break;
                     }

@@ -69,7 +69,7 @@ signals:
 
     void Server_notification_handler.on_etag_response_header_received (GLib.ByteArray value, int status_code) {
         if (status_code == success_status_code) {
-            q_c_warning (lc_server_notification) << "New Notification ETag Response Header received " << value;
+            GLib.warn (lc_server_notification) << "New Notification ETag Response Header received " << value;
             var account = qvariant_cast<AccountState> (sender ().property (property_account_state_c));
             account.set_notifications_etag_response_header (value);
         }
@@ -84,13 +84,13 @@ signals:
 
     void Server_notification_handler.on_notifications_received (QJsonDocument &json, int status_code) {
         if (status_code != success_status_code && status_code != not_modified_status_code) {
-            q_c_warning (lc_server_notification) << "Notifications failed with status code " << status_code;
+            GLib.warn (lc_server_notification) << "Notifications failed with status code " << status_code;
             delete_later ();
             return;
         }
 
         if (status_code == not_modified_status_code) {
-            q_c_warning (lc_server_notification) << "Status code " << status_code << " Not Modified - No new notifications.";
+            GLib.warn (lc_server_notification) << "Status code " << status_code << " Not Modified - No new notifications.";
             delete_later ();
             return;
         }
@@ -116,7 +116,7 @@ signals:
             a._message = json.value ("message").to_string ();
             a._icon = json.value ("icon").to_string ();
 
-            QUrl link (json.value ("link").to_string ());
+            GLib.Uri link (json.value ("link").to_string ());
             if (!link.is_empty ()) {
                 if (link.host ().is_empty ()) {
                     link.set_scheme (ai.account ().url ().scheme ());
@@ -133,7 +133,7 @@ signals:
             foreach (var action, actions) {
                 var action_json = action.to_object ();
                 Activity_link al;
-                al._label = QUrl.from_percent_encoding (action_json.value ("label").to_string ().to_utf8 ());
+                al._label = GLib.Uri.from_percent_encoding (action_json.value ("label").to_string ().to_utf8 ());
                 al._link = action_json.value ("link").to_string ();
                 al._verb = action_json.value ("type").to_string ().to_utf8 ();
                 al._primary = action_json.value ("primary").to_bool ();
@@ -144,7 +144,7 @@ signals:
             // Add another action to dismiss notification on server
             // https://github.com/owncloud/notifications/blob/master/docs/ocs-endpoint-v1.md#deleting-a-notification-for-a-user
             Activity_link al;
-            al._label = tr ("Dismiss");
+            al._label = _("Dismiss");
             al._link = Utility.concat_url_path (ai.account ().url (), notifications_path + "/" + string.number (a._id)).to_string ();
             al._verb = "DELETE";
             al._primary = false;

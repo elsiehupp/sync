@@ -17,7 +17,7 @@ namespace Occ {
 class Sync_status_summary : GLib.Object {
 
     Q_PROPERTY (double sync_progress READ sync_progress NOTIFY sync_progress_changed)
-    Q_PROPERTY (QUrl sync_icon READ sync_icon NOTIFY sync_icon_changed)
+    Q_PROPERTY (GLib.Uri sync_icon READ sync_icon NOTIFY sync_icon_changed)
     Q_PROPERTY (bool syncing READ syncing NOTIFY syncing_changed)
     Q_PROPERTY (string sync_status_string READ sync_status_string NOTIFY sync_status_string_changed)
     Q_PROPERTY (string sync_status_detail_string READ sync_status_detail_string NOTIFY sync_status_detail_string_changed)
@@ -27,7 +27,7 @@ class Sync_status_summary : GLib.Object {
     public double sync_progress ();
 
 
-    public QUrl sync_icon ();
+    public GLib.Uri sync_icon ();
 
 
     public bool syncing ();
@@ -70,16 +70,16 @@ signals:
     private void set_syncing (bool value);
     private void set_sync_status_string (string value);
     private void set_sync_status_detail_string (string value);
-    private void set_sync_icon (QUrl value);
+    private void set_sync_icon (GLib.Uri value);
     private void set_account_state (AccountStatePtr account_state);
 
     private AccountStatePtr _account_state;
     private std.set<string> _folders_with_errors;
 
-    private QUrl _sync_icon = Theme.instance ().sync_status_ok ();
+    private GLib.Uri _sync_icon = Theme.instance ().sync_status_ok ();
     private double _progress = 1.0;
     private bool _is_syncing = false;
-    private string _sync_status_string = tr ("All synced!");
+    private string _sync_status_string = _("All synced!");
     private string _sync_status_detail_string;
 };
 }
@@ -138,7 +138,7 @@ namespace {
         return _progress;
     }
 
-    QUrl Sync_status_summary.sync_icon () {
+    GLib.Uri Sync_status_summary.sync_icon () {
         return _sync_icon;
     }
 
@@ -173,7 +173,7 @@ namespace {
     void Sync_status_summary.set_sync_state_for_folder (Folder folder) {
         if (_account_state && !_account_state.is_connected ()) {
             set_syncing (false);
-            set_sync_status_string (tr ("Offline"));
+            set_sync_status_string (_("Offline"));
             set_sync_status_detail_string ("");
             set_sync_icon (Theme.instance ().folder_offline ());
             return;
@@ -187,7 +187,7 @@ namespace {
             // Success should only be shown if all folders were fine
             if (!folder_errors () || folder_error (folder)) {
                 set_syncing (false);
-                set_sync_status_string (tr ("All synced!"));
+                set_sync_status_string (_("All synced!"));
                 set_sync_status_detail_string ("");
                 set_sync_icon (Theme.instance ().sync_status_ok ());
                 mark_folder_as_success (folder);
@@ -196,30 +196,30 @@ namespace {
         case SyncResult.Error:
         case SyncResult.Setup_error:
             set_syncing (false);
-            set_sync_status_string (tr ("Some files couldn't be synced!"));
-            set_sync_status_detail_string (tr ("See below for errors"));
+            set_sync_status_string (_("Some files couldn't be synced!"));
+            set_sync_status_detail_string (_("See below for errors"));
             set_sync_icon (Theme.instance ().sync_status_error ());
             mark_folder_as_error (folder);
             break;
         case SyncResult.Sync_running:
         case SyncResult.NotYetStarted:
             set_syncing (true);
-            set_sync_status_string (tr ("Syncing"));
+            set_sync_status_string (_("Syncing"));
             set_sync_status_detail_string ("");
             set_sync_icon (Theme.instance ().sync_status_running ());
             break;
         case SyncResult.Paused:
         case SyncResult.Sync_abort_requested:
             set_syncing (false);
-            set_sync_status_string (tr ("Sync paused"));
+            set_sync_status_string (_("Sync paused"));
             set_sync_status_detail_string ("");
             set_sync_icon (Theme.instance ().sync_status_pause ());
             break;
         case SyncResult.Problem:
         case SyncResult.Undefined:
             set_syncing (false);
-            set_sync_status_string (tr ("Some files could not be synced!"));
-            set_sync_status_detail_string (tr ("See below for warnings"));
+            set_sync_status_string (_("Some files could not be synced!"));
+            set_sync_status_detail_string (_("See below for warnings"));
             set_sync_icon (Theme.instance ().sync_status_warning ());
             mark_folder_as_error (folder);
             break;
@@ -264,16 +264,16 @@ namespace {
 
             if (progress.trust_eta ()) {
                 set_sync_status_detail_string (
-                    tr ("%1 of %2 · %3 left")
+                    _("%1 of %2 · %3 left")
                         .arg (completed_size_string, total_size_string)
                         .arg (Utility.duration_to_descriptive_string1 (progress.total_progress ().estimated_eta)));
             } else {
-                set_sync_status_detail_string (tr ("%1 of %2").arg (completed_size_string, total_size_string));
+                set_sync_status_detail_string (_("%1 of %2").arg (completed_size_string, total_size_string));
             }
         }
 
         if (total_file_count > 0) {
-            set_sync_status_string (tr ("Syncing file %1 of %2").arg (current_file).arg (total_file_count));
+            set_sync_status_string (_("Syncing file %1 of %2").arg (current_file).arg (total_file_count));
         }
     }
 
@@ -312,7 +312,7 @@ namespace {
         return _sync_status_detail_string;
     }
 
-    void Sync_status_summary.set_sync_icon (QUrl value) {
+    void Sync_status_summary.set_sync_icon (GLib.Uri value) {
         if (_sync_icon == value) {
             return;
         }
@@ -349,10 +349,10 @@ namespace {
         set_syncing (false);
         set_sync_status_detail_string ("");
         if (_account_state && !_account_state.is_connected ()) {
-            set_sync_status_string (tr ("Offline"));
+            set_sync_status_string (_("Offline"));
             set_sync_icon (Theme.instance ().folder_offline ());
         } else {
-            set_sync_status_string (tr ("All synced!"));
+            set_sync_status_string (_("All synced!"));
             set_sync_icon (Theme.instance ().sync_status_ok ());
         }
     }

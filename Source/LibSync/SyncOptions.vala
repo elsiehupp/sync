@@ -185,7 +185,7 @@ QRegularExpression SyncOptions.file_regex () {
 
 void SyncOptions.set_file_pattern (string pattern) {
     // full match or a path ending with this pattern
-    set_path_pattern (QStringLiteral (" (^|/|\\\\)") + pattern + QLatin1Char ('$'));
+    set_path_pattern (QStringLiteral (" (^|/|\\\\)") + pattern + '$');
 }
 
 void SyncOptions.set_path_pattern (string pattern) {

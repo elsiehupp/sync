@@ -30,7 +30,7 @@ class TestSyncJournalDB : GLib.Object {
 
     private void on_cleanup_test_case () {
         const string file = _database.databaseFilePath ();
-        QFile.remove (file);
+        GLib.File.remove (file);
     }
 
     private on_ void testFileRecord () {

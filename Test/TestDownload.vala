@@ -165,7 +165,7 @@ class TestDownload : GLib.Object {
                     // Check that the temporary file is still there
                     QCOMPARE (QDir (fakeFolder.localPath () + "A/").entryList ({"*.~*"}, QDir.Files | QDir.Hidden).count (), 1);
                     // Set the permission to read only on the folder, so the rename of the temporary file will fail
-                    QFile (fakeFolder.localPath () + "A/").setPermissions (QFile.Permissions (0x5555));
+                    GLib.File (fakeFolder.localPath () + "A/").setPermissions (GLib.File.Permissions (0x5555));
                 }
             });
         });
@@ -174,7 +174,7 @@ class TestDownload : GLib.Object {
         QVERIFY (!conflictFile.isEmpty ());
 
         // restore permissions
-        QFile (fakeFolder.localPath () + "A/").setPermissions (QFile.Permissions (0x7777));
+        GLib.File (fakeFolder.localPath () + "A/").setPermissions (GLib.File.Permissions (0x7777));
 
         GLib.Object.disconnect (transProgress);
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &, QIODevice *) . QNetworkReply * {
@@ -188,7 +188,7 @@ class TestDownload : GLib.Object {
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QCOMPARE (fakeFolder.currentRemoteState ().find ("A/a1").contentChar, 'A');
 
-        QVERIFY (QFile.remove (conflictFile)); // So the comparison succeeds;
+        QVERIFY (GLib.File.remove (conflictFile)); // So the comparison succeeds;
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 

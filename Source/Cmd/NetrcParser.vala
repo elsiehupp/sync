@@ -7,7 +7,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QHash>
 // #include <QPair>
 // #include <QDir>
-// #include <QFile>
+// #include <GLib.File>
 // #include <QTextStream>
 
 // #include <qtokenizer.h>
@@ -67,13 +67,13 @@ class NetrcParser {
     }
 
     bool NetrcParser.parse () {
-        QFile netrc (_netrc_location);
+        GLib.File netrc (_netrc_location);
         if (!netrc.open (QIODevice.ReadOnly)) {
             return false;
         }
         string content = netrc.read_all ();
 
-        QStringTokenizer tokenizer (content, " \n\t");
+        QStringTokenizer tokenizer = new QStringTokenizer (content, " \n\t");
         tokenizer.set_quote_characters ("\"'");
 
         Login_pair pair;

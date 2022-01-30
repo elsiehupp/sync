@@ -4,7 +4,7 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QJsonDocument>
 // #include <QJsonObject>
 // #include <QJsonArray>
@@ -14,7 +14,7 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 // #include <string>
 // #include <GLib.List>
 
-// #include <QUrl>
+// #include <GLib.Uri>
 
 
 
@@ -43,7 +43,7 @@ class Share : GLib.Object {
     /***********************************************************
     Constructor for shares
     ***********************************************************/
-    public Share (AccountPtr account,
+    public Share (AccountPointer account,
         const string id,
         const string owner,
         const string owner_display_name,
@@ -57,7 +57,7 @@ class Share : GLib.Object {
     /***********************************************************
     The account the share is defined on.
     ***********************************************************/
-    public AccountPtr account ();
+    public AccountPointer account ();
 
     public string path ();
 
@@ -140,7 +140,7 @@ signals:
     void password_set_error (int status_code, string message);
 
 
-    protected AccountPtr _account;
+    protected AccountPointer _account;
     protected string _id;
     protected string _uidowner;
     protected string _owner_display_name;
@@ -167,7 +167,7 @@ link shares or are only available to link shares.
 ***********************************************************/
 class Link_share : Share {
 
-    public Link_share (AccountPtr account,
+    public Link_share (AccountPointer account,
         const string id,
         const string uidowner,
         const string owner_display_name,
@@ -176,7 +176,7 @@ class Link_share : Share {
         const string token,
         const Permissions permissions,
         bool is_password_set,
-        const QUrl url,
+        const GLib.Uri url,
         const QDate &expire_date,
         const string note,
         const string label);
@@ -185,13 +185,13 @@ class Link_share : Share {
     /***********************************************************
     Get the share link
     ***********************************************************/
-    public QUrl get_link ();
+    public GLib.Uri get_link ();
 
 
     /***********************************************************
     The share's link for direct downloading.
     ***********************************************************/
-    public QUrl get_direct_download_link ();
+    public GLib.Uri get_direct_download_link ();
 
 
     /***********************************************************
@@ -288,13 +288,13 @@ signals:
     private string _token;
     private string _note;
     private QDate _expire_date;
-    private QUrl _url;
+    private GLib.Uri _url;
     private string _label;
 };
 
 class User_group_share : Share {
 
-    public User_group_share (AccountPtr account,
+    public User_group_share (AccountPointer account,
         const string id,
         const string owner,
         const string owner_display_name,
@@ -335,7 +335,7 @@ shares should talk to this manager and not use OCS Share Job directly
 ***********************************************************/
 class Share_manager : GLib.Object {
 
-    public Share_manager (AccountPtr _account, GLib.Object parent = nullptr);
+    public Share_manager (AccountPointer _account, GLib.Object parent = nullptr);
 
 
     /***********************************************************
@@ -407,14 +407,14 @@ signals:
     private unowned<User_group_share> parse_user_group_share (QJsonObject &data);
     private unowned<Share> parse_share (QJsonObject &data);
 
-    private AccountPtr _account;
+    private AccountPointer _account;
 };
 
 
 /***********************************************************
 When a share is modified, we need to tell the folders so they can adjust overlay icons
 ***********************************************************/
-static void update_folder (AccountPtr &account, string path) {
+static void update_folder (AccountPointer &account, string path) {
     foreach (Folder f, FolderMan.instance ().map ()) {
         if (f.account_state ().account () != account)
             continue;
@@ -432,7 +432,7 @@ static void update_folder (AccountPtr &account, string path) {
     }
 }
 
-Share.Share (AccountPtr account,
+Share.Share (AccountPointer account,
     const string id,
     const string uidowner,
     const string owner_display_name,
@@ -452,7 +452,7 @@ Share.Share (AccountPtr account,
     , _share_with (share_with) {
 }
 
-AccountPtr Share.account () {
+AccountPointer Share.account () {
     return _account;
 }
 
@@ -537,12 +537,12 @@ void Share.on_set_password_error (int status_code, string message) {
     emit password_set_error (status_code, message);
 }
 
-QUrl Link_share.get_link () {
+GLib.Uri Link_share.get_link () {
     return _url;
 }
 
-QUrl Link_share.get_direct_download_link () {
-    QUrl url = _url;
+GLib.Uri Link_share.get_direct_download_link () {
+    GLib.Uri url = _url;
     url.set_path (url.path () + "/download");
     return url;
 }
@@ -551,7 +551,7 @@ QDate Link_share.get_expire_date () {
     return _expire_date;
 }
 
-Link_share.Link_share (AccountPtr account,
+Link_share.Link_share (AccountPointer account,
     const string id,
     const string uidowner,
     const string owner_display_name,
@@ -560,7 +560,7 @@ Link_share.Link_share (AccountPtr account,
     const string token,
     Permissions permissions,
     bool is_password_set,
-    const QUrl url,
+    const GLib.Uri url,
     const QDate &expire_date,
     const string note,
     const string label)
@@ -654,7 +654,7 @@ void Link_share.on_label_set (QJsonDocument &, QVariant &label) {
     }
 }
 
-User_group_share.User_group_share (AccountPtr account,
+User_group_share.User_group_share (AccountPointer account,
     const string id,
     const string owner,
     const string owner_display_name,
@@ -720,7 +720,7 @@ void User_group_share.on_expire_date_set (QJsonDocument &reply, QVariant &value)
     emit expire_date_set ();
 }
 
-Share_manager.Share_manager (AccountPtr account, GLib.Object parent)
+Share_manager.Share_manager (AccountPointer account, GLib.Object parent)
     : GLib.Object (parent)
     , _account (account) {
 }
@@ -812,7 +812,7 @@ void Share_manager.fetch_shares (string path) {
 void Share_manager.on_shares_fetched (QJsonDocument &reply) {
     var tmp_shares = reply.object ().value ("ocs").to_object ().value ("data").to_array ();
     const string version_string = _account.server_version ();
-    q_c_debug (lc_sharing) << version_string << "Fetched" << tmp_shares.count () << "shares";
+    GLib.debug (lc_sharing) << version_string << "Fetched" << tmp_shares.count () << "shares";
 
     GLib.List<unowned<Share>> shares;
 
@@ -834,7 +834,7 @@ void Share_manager.on_shares_fetched (QJsonDocument &reply) {
         shares.append (unowned<Share> (new_share));
     }
 
-    q_c_debug (lc_sharing) << "Sending " << shares.count () << "shares";
+    GLib.debug (lc_sharing) << "Sending " << shares.count () << "shares";
     emit shares_fetched (shares);
 }
 
@@ -867,19 +867,19 @@ unowned<User_group_share> Share_manager.parse_user_group_share (QJsonObject &dat
 }
 
 unowned<Link_share> Share_manager.parse_link_share (QJsonObject &data) {
-    QUrl url;
+    GLib.Uri url;
 
     // From own_cloud server 8.2 the url field is always set for public shares
     if (data.contains ("url")) {
-        url = QUrl (data.value ("url").to_string ());
+        url = GLib.Uri (data.value ("url").to_string ());
     } else if (_account.server_version_int () >= Account.make_server_version (8, 0, 0)) {
         // From own_cloud server version 8 on, a different share link scheme is used.
-        url = QUrl (Utility.concat_url_path (_account.url (), QLatin1String ("index.php/s/") + data.value ("token").to_string ())).to_string ();
+        url = GLib.Uri (Utility.concat_url_path (_account.url (), QLatin1String ("index.php/s/") + data.value ("token").to_string ())).to_string ();
     } else {
         QUrlQuery query_args;
         query_args.add_query_item (QLatin1String ("service"), QLatin1String ("files"));
         query_args.add_query_item (QLatin1String ("t"), data.value ("token").to_string ());
-        url = QUrl (Utility.concat_url_path (_account.url (), QLatin1String ("public.php"), query_args).to_string ());
+        url = GLib.Uri (Utility.concat_url_path (_account.url (), QLatin1String ("public.php"), query_args).to_string ());
     }
 
     QDate expire_date;

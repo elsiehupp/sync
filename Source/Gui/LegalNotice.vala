@@ -59,10 +59,10 @@ class Legal_notice : Gtk.Dialog {
     }
 
     void Legal_notice.customize_style () {
-        string notice = tr ("<p>Copyright 2017-2021 Nextcloud Gmb_h<br />"
+        string notice = _("<p>Copyright 2017-2021 Nextcloud Gmb_h<br />"
                             "Copyright 2012-2021 own_cloud Gmb_h</p>");
 
-        notice += tr ("<p>Licensed under the GNU General Public License (GPL) Version 2.0 or any later version.</p>");
+        notice += _("<p>Licensed under the GNU General Public License (GPL) Version 2.0 or any later version.</p>");
 
         notice += "<p>&nbsp;</p>";
         notice += Theme.instance ().about_details ();

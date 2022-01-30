@@ -113,7 +113,7 @@ class PropagateRemoteDelete : PropagateItemJob {
             // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
             // throw an error.
             on_done (SyncFileItem.NormalError,
-                tr ("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
+                _("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                     .arg (_item._http_error_code)
                     .arg (_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ()));
             return;

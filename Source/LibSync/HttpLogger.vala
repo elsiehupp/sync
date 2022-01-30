@@ -10,7 +10,7 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 // #pragma once
 
 // #include <QNetworkReply>
-// #include <QUrl>
+// #include <GLib.Uri>
 
 namespace Occ {
 namespace HttpLogger {

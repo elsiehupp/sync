@@ -11,7 +11,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 // #include <set>
 // #include <QTextCodec>
 // #include <QFileInfo>
-// #include <QFile>
+// #include <GLib.File>
 // #include <QThreadPool>
 // #include <common/checksums.h>
 // #include <common/constants.h>
@@ -50,7 +50,7 @@ class ProcessDirectoryJob : GLib.Object {
         Normal_query,
         Parent_dont_exist, // Do not query this folder because it does not exist
         Parent_not_changed, // No need to query this folder because it has not changed from what is in the DB
-        In_black_list // Do not query this folder because it is in the blacklist (remote entries only)
+        In_block_list // Do not query this folder because it is in the blocklist (remote entries only)
     };
 
 
@@ -129,7 +129,7 @@ class ProcessDirectoryJob : GLib.Object {
         string _server; // Path on the server (before the sync)
         string _local; // Path locally (before the sync)
         static string path_append (string base, string name) {
-            return base.is_empty () ? name : base + QLatin1Char ('/') + name;
+            return base.is_empty () ? name : base + '/' + name;
         }
         PathTuple add_name (string name) {
             PathTuple result;
@@ -209,7 +209,7 @@ class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     private Move_permission_result check_move_permissions (RemotePermissions src_perm, string src_path, bool is_directory);
 
-    void process_blacklisted (PathTuple &, LocalInfo &, SyncJournalFileRecord &db_entry);
+    void process_blocklisted (PathTuple &, LocalInfo &, SyncJournalFileRecord &db_entry);
     private void sub_job_finished ();
 
 
@@ -335,10 +335,10 @@ signals:
             string error_message;
             const var new_file_name_entry = entries_iter.second;
             if (new_file_name_entry.server_entry.is_valid ()) {
-                error_message = tr ("File contains trailing spaces and could not be renamed, because a file with the same name already exists on the server.");
+                error_message = _("File contains trailing spaces and could not be renamed, because a file with the same name already exists on the server.");
             }
             if (new_file_name_entry.local_entry.is_valid ()) {
-                error_message = tr ("File contains trailing spaces and could not be renamed, because a file with the same name already exists locally.");
+                error_message = _("File contains trailing spaces and could not be renamed, because a file with the same name already exists locally.");
             }
 
             if (!error_message.is_empty ()) {
@@ -408,12 +408,12 @@ signals:
 
         // fetch all the name from the DB
         var path_u8 = _current_folder._original.to_utf8 ();
-        if (!_discovery_data._statedatabase.list_files_in_path (path_u8, [&] (SyncJournalFileRecord &rec) {
-                var name = path_u8.is_empty () ? rec._path : string.from_utf8 (rec._path.const_data () + (path_u8.size () + 1));
-                if (rec.is_virtual_file () && is_vfs_with_suffix ())
+        if (!_discovery_data._statedatabase.list_files_in_path (path_u8, [&] (SyncJournalFileRecord &record) {
+                var name = path_u8.is_empty () ? record._path : string.from_utf8 (record._path.const_data () + (path_u8.size () + 1));
+                if (record.is_virtual_file () && is_vfs_with_suffix ())
                     chop_virtual_file_suffix (name);
                 var &db_entry = entries[name].db_entry;
-                db_entry = rec;
+                db_entry = record;
                 setup_database_pin_state_actions (db_entry);
             })) {
             db_error ();
@@ -504,8 +504,8 @@ signals:
                     e.local_entry.is_sym_link || is_server_entry_windows_shortcut))
                 continue;
 
-            if (_query_server == In_black_list || _discovery_data.is_in_selective_sync_black_list (path._original)) {
-                process_blacklisted (path, e.local_entry, e.db_entry);
+            if (_query_server == In_block_list || _discovery_data.is_in_selective_sync_block_list (path._original)) {
+                process_blocklisted (path, e.local_entry, e.db_entry);
                 continue;
             }
             if (!check_for_invalid_file_name (path, entries, e)) {
@@ -531,8 +531,8 @@ signals:
             excluded = CSYNC_FILE_EXCLUDE_HIDDEN;
         }
         if (excluded == CSYNC_NOT_EXCLUDED && !local_name.is_empty ()
-                && _discovery_data._server_blacklisted_files.contains (local_name)) {
-            excluded = CSYNC_FILE_EXCLUDE_SERVER_BLACKLISTED;
+                && _discovery_data._server_blocklisted_files.contains (local_name)) {
+            excluded = CSYNC_FILE_EXCLUDE_SERVER_BLOCKLISTED;
             is_invalid_pattern = true;
         }
 
@@ -545,7 +545,7 @@ signals:
             // https://bugreports.qt.io/browse/QTBUG-6925.
             QText_encoder encoder (local_codec, QTextCodec.Convert_invalid_to_null);
             if (encoder.from_unicode (path).contains ('\0')) {
-                q_c_warning (lc_disco) << "Cannot encode " << path << " to local encoding " << local_codec.name ();
+                GLib.warn (lc_disco) << "Cannot encode " << path << " to local encoding " << local_codec.name ();
                 excluded = CSYNC_FILE_EXCLUDE_CANNOT_ENCODE;
             }
         }
@@ -564,7 +564,7 @@ signals:
 
         if (is_symlink) {
             // Symbolic links are ignored.
-            item._error_string = tr ("Symbolic links are not supported in syncing.");
+            item._error_string = _("Symbolic links are not supported in syncing.");
         } else {
             switch (excluded) {
             case CSYNC_NOT_EXCLUDED:
@@ -572,11 +572,11 @@ signals:
             case CSYNC_FILE_EXCLUDE_AND_REMOVE:
                 q_fatal ("These were handled earlier");
             case CSYNC_FILE_EXCLUDE_LIST:
-                item._error_string = tr ("File is listed on the ignore list.");
+                item._error_string = _("File is listed on the ignore list.");
                 break;
             case CSYNC_FILE_EXCLUDE_INVALID_CHAR:
                 if (item._file.ends_with ('.')) {
-                    item._error_string = tr ("File names ending with a period are not supported on this file system.");
+                    item._error_string = _("File names ending with a period are not supported on this file system.");
                 } else {
                     char invalid = '\0';
                     foreach (char x, GLib.ByteArray ("\\:?*\"<>|")) {
@@ -586,38 +586,38 @@ signals:
                         }
                     }
                     if (invalid) {
-                        item._error_string = tr ("File names containing the character \"%1\" are not supported on this file system.").arg (QLatin1Char (invalid));
+                        item._error_string = _("File names containing the character \"%1\" are not supported on this file system.").arg (invalid);
                     } else if (is_invalid_pattern) {
-                        item._error_string = tr ("File name contains at least one invalid character");
+                        item._error_string = _("File name contains at least one invalid character");
                     } else {
-                        item._error_string = tr ("The file name is a reserved name on this file system.");
+                        item._error_string = _("The file name is a reserved name on this file system.");
                     }
                 }
                 item._status = SyncFileItem.FileNameInvalid;
                 break;
             case CSYNC_FILE_EXCLUDE_TRAILING_SPACE:
-                item._error_string = tr ("Filename contains trailing spaces.");
+                item._error_string = _("Filename contains trailing spaces.");
                 item._status = SyncFileItem.FileNameInvalid;
                 break;
             case CSYNC_FILE_EXCLUDE_LONG_FILENAME:
-                item._error_string = tr ("Filename is too long.");
+                item._error_string = _("Filename is too long.");
                 item._status = SyncFileItem.FileNameInvalid;
                 break;
             case CSYNC_FILE_EXCLUDE_HIDDEN:
-                item._error_string = tr ("File/Folder is ignored because it's hidden.");
+                item._error_string = _("File/Folder is ignored because it's hidden.");
                 break;
             case CSYNC_FILE_EXCLUDE_STAT_FAILED:
-                item._error_string = tr ("Stat failed.");
+                item._error_string = _("Stat failed.");
                 break;
             case CSYNC_FILE_EXCLUDE_CONFLICT:
-                item._error_string = tr ("Conflict : Server version downloaded, local copy renamed and not uploaded.");
+                item._error_string = _("Conflict : Server version downloaded, local copy renamed and not uploaded.");
                 item._status = SyncFileItem.Conflict;
             break;
             case CSYNC_FILE_EXCLUDE_CANNOT_ENCODE:
-                item._error_string = tr ("The filename cannot be encoded on your file system.");
+                item._error_string = _("The filename cannot be encoded on your file system.");
                 break;
-            case CSYNC_FILE_EXCLUDE_SERVER_BLACKLISTED:
-                item._error_string = tr ("The filename is blacklisted on the server.");
+            case CSYNC_FILE_EXCLUDE_SERVER_BLOCKLISTED:
+                item._error_string = _("The filename is blocklisted on the server.");
                 break;
             }
         }
@@ -649,11 +649,11 @@ signals:
             && !server_entry.is_valid ()
             && !db_entry.is_valid ()
             && local_entry.modtime < _last_sync_timestamp) {
-            q_c_warning (lc_disco) << "File" << path._original << "was modified before the last sync run and is not in the sync journal and server";
+            GLib.warn (lc_disco) << "File" << path._original << "was modified before the last sync run and is not in the sync journal and server";
         }
 
         if (_discovery_data.is_renamed (path._original)) {
-            q_c_debug (lc_disco) << "Ignoring renamed";
+            GLib.debug (lc_disco) << "Ignoring renamed";
             return; // Ignore this.
         }
 
@@ -689,7 +689,7 @@ signals:
             if (has_virtual_file_suffix (server_entry.name)
                 || (local_entry.is_virtual_file && !db_entry.is_virtual_file () && has_virtual_file_suffix (db_entry._path))) {
                 item._instruction = CSYNC_INSTRUCTION_IGNORE;
-                item._error_string = tr ("File has extension reserved for virtual files.");
+                item._error_string = _("File has extension reserved for virtual files.");
                 _child_ignored = true;
                 emit _discovery_data.item_discovered (item);
                 return;
@@ -761,17 +761,17 @@ signals:
         // Check for missing server data {
             string[] missing_data;
             if (server_entry.size == -1)
-                missing_data.append (tr ("size"));
+                missing_data.append (_("size"));
             if (server_entry.remote_perm.is_null ())
-                missing_data.append (tr ("permission"));
+                missing_data.append (_("permission"));
             if (server_entry.etag.is_empty ())
                 missing_data.append ("ETag");
             if (server_entry.file_id.is_empty ())
-                missing_data.append (tr ("file id"));
+                missing_data.append (_("file id"));
             if (!missing_data.is_empty ()) {
                 item._instruction = CSYNC_INSTRUCTION_ERROR;
                 _child_ignored = true;
-                item._error_string = tr ("Server reported no %1").arg (missing_data.join (QLatin1String (", ")));
+                item._error_string = _("Server reported no %1").arg (missing_data.join (QLatin1String (", ")));
                 emit _discovery_data.item_discovered (item);
                 return;
             }
@@ -828,7 +828,7 @@ signals:
             } else if (db_entry._remote_perm != server_entry.remote_perm || db_entry._file_id != server_entry.file_id || meta_data_size_needs_update_for_e2Ee_file_placeholder) {
                 if (meta_data_size_needs_update_for_e2Ee_file_placeholder) {
                     // we are updating placeholder sizes after migrating from older versions with VFS + E2EE implicit hydration not supported
-                    q_c_debug (lc_disco) << "Migrating the E2EE VFS placeholder " << db_entry.path () << " from older version. The old size is " << item._size << ". The new size is " << size_on_server;
+                    GLib.debug (lc_disco) << "Migrating the E2EE VFS placeholder " << db_entry.path () << " from older version. The old size is " << item._size << ". The new size is " << size_on_server;
                     item._size = size_on_server;
                 }
                 item._instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
@@ -973,7 +973,7 @@ signals:
             // A remote rename can also mean Encryption Mangled Name.
             // if we find one of those in the database, we ignore it.
             if (!base._e2e_mangled_name.is_empty ()) {
-                q_c_warning (lc_disco, "Encrypted file can not rename");
+                GLib.warn (lc_disco, "Encrypted file can not rename");
                 done = true;
                 return;
             }
@@ -1302,7 +1302,7 @@ signals:
 
             Q_ASSERT (item._instruction == CSYNC_INSTRUCTION_NEW);
             if (item._instruction != CSYNC_INSTRUCTION_NEW) {
-                q_c_warning (lc_disco) << "Trying to wipe a virtual item" << path._local << " with item._instruction" << item._instruction;
+                GLib.warn (lc_disco) << "Trying to wipe a virtual item" << path._local << " with item._instruction" << item._instruction;
                 return;
             }
 
@@ -1330,10 +1330,10 @@ signals:
                 if (local_entry.is_directory && folder_place_holder_availability.is_valid () && !is_online_only_folder) {
                     // a VFS folder but is not online0only (has some files hydrated)
                     q_c_info (lc_disco) << "Virtual directory without database entry for" << path._local << "but it contains hydrated file (s), so let's keep it and reupload.";
-                    emit _discovery_data.add_error_to_gui (SyncFileItem.SoftError, tr ("Conflict when uploading some files to a folder. Those, conflicted, are going to get cleared!"), path._local);
+                    emit _discovery_data.add_error_to_gui (SyncFileItem.SoftError, _("Conflict when uploading some files to a folder. Those, conflicted, are going to get cleared!"), path._local);
                     return;
                 }
-                q_c_warning (lc_disco) << "Virtual file without database entry for" << path._local
+                GLib.warn (lc_disco) << "Virtual file without database entry for" << path._local
                                    << "but looks odd, keeping";
                 item._instruction = CSYNC_INSTRUCTION_IGNORE;
 
@@ -1349,10 +1349,10 @@ signals:
                 if (is_folder_pin_state_online_only && folder_pin_state.is_valid ()) {
                     q_c_info (lc_disco) << "*folder_pin_state:" << *folder_pin_state;
                 }
-                emit _discovery_data.add_error_to_gui (SyncFileItem.SoftError, tr ("Conflict when uploading a folder. It's going to get cleared!"), path._local);
+                emit _discovery_data.add_error_to_gui (SyncFileItem.SoftError, _("Conflict when uploading a folder. It's going to get cleared!"), path._local);
             } else {
                 q_c_info (lc_disco) << "Wiping virtual file without database entry for" << path._local;
-                emit _discovery_data.add_error_to_gui (SyncFileItem.SoftError, tr ("Conflict when uploading a file. It's going to get removed!"), path._local);
+                emit _discovery_data.add_error_to_gui (SyncFileItem.SoftError, _("Conflict when uploading a file. It's going to get removed!"), path._local);
             }
             item._instruction = CSYNC_INSTRUCTION_REMOVE;
             item._direction = SyncFileItem.Down;
@@ -1393,7 +1393,7 @@ signals:
             }
 
             // The old file must have been deleted.
-            if (QFile.exists (_discovery_data._local_dir + original_path)
+            if (GLib.File.exists (_discovery_data._local_dir + original_path)
                 // Exception : If the rename changes case only (like "foo" . "Foo") the
                 // old filename might still point to the same file.
                 && ! (Utility.fs_case_preserving ()
@@ -1581,17 +1581,17 @@ signals:
             // Update the etag and other server metadata in the journal already
             // (We can't use a typical CSYNC_INSTRUCTION_UPDATE_METADATA because
             // we must not store the size/modtime from the file system)
-            Occ.SyncJournalFileRecord rec;
-            if (_discovery_data._statedatabase.get_file_record (path._original, &rec)) {
-                rec._path = path._original.to_utf8 ();
-                rec._etag = server_entry.etag;
-                rec._file_id = server_entry.file_id;
-                rec._modtime = server_entry.modtime;
-                rec._type = item._type;
-                rec._file_size = server_entry.size;
-                rec._remote_perm = server_entry.remote_perm;
-                rec._checksum_header = server_entry.checksum_header;
-                _discovery_data._statedatabase.set_file_record (rec);
+            Occ.SyncJournalFileRecord record;
+            if (_discovery_data._statedatabase.get_file_record (path._original, &record)) {
+                record._path = path._original.to_utf8 ();
+                record._etag = server_entry.etag;
+                record._file_id = server_entry.file_id;
+                record._modtime = server_entry.modtime;
+                record._type = item._type;
+                record._file_size = server_entry.size;
+                record._remote_perm = server_entry.remote_perm;
+                record._checksum_header = server_entry.checksum_header;
+                _discovery_data._statedatabase.set_file_record (record);
             }
             return;
         }
@@ -1663,7 +1663,7 @@ signals:
         }
     }
 
-    void ProcessDirectoryJob.process_blacklisted (PathTuple &path, Occ.LocalInfo &local_entry,
+    void ProcessDirectoryJob.process_blocklisted (PathTuple &path, Occ.LocalInfo &local_entry,
         const SyncJournalFileRecord &db_entry) {
         if (!local_entry.is_valid ())
             return;
@@ -1679,14 +1679,14 @@ signals:
         } else {
             item._instruction = CSYNC_INSTRUCTION_IGNORE;
             item._status = SyncFileItem.FileIgnored;
-            item._error_string = tr ("Ignored because of the \"choose what to sync\" blacklist");
+            item._error_string = _("Ignored because of the \"choose what to sync\" blocklist");
             _child_ignored = true;
         }
 
-        q_c_info (lc_disco) << "Discovered (blacklisted) " << item._file << item._instruction << item._direction << item.is_directory ();
+        q_c_info (lc_disco) << "Discovered (blocklisted) " << item._file << item._instruction << item._direction << item.is_directory ();
 
         if (item.is_directory () && item._instruction != CSYNC_INSTRUCTION_IGNORE) {
-            var job = new ProcessDirectoryJob (path, item, Normal_query, In_black_list, _last_sync_timestamp, this);
+            var job = new ProcessDirectoryJob (path, item, Normal_query, In_block_list, _last_sync_timestamp, this);
             connect (job, &ProcessDirectoryJob.on_finished, this, &ProcessDirectoryJob.sub_job_finished);
             _queued_jobs.push_back (job);
         } else {
@@ -1709,14 +1709,14 @@ signals:
                 // No permissions set
                 return true;
             } else if (item.is_directory () && !perms.has_permission (RemotePermissions.Can_add_sub_directories)) {
-                q_c_warning (lc_disco) << "check_for_permission : ERROR" << item._file;
+                GLib.warn (lc_disco) << "check_for_permission : ERROR" << item._file;
                 item._instruction = CSYNC_INSTRUCTION_ERROR;
-                item._error_string = tr ("Not allowed because you don't have permission to add subfolders to that folder");
+                item._error_string = _("Not allowed because you don't have permission to add subfolders to that folder");
                 return false;
             } else if (!item.is_directory () && !perms.has_permission (RemotePermissions.Can_add_file)) {
-                q_c_warning (lc_disco) << "check_for_permission : ERROR" << item._file;
+                GLib.warn (lc_disco) << "check_for_permission : ERROR" << item._file;
                 item._instruction = CSYNC_INSTRUCTION_ERROR;
-                item._error_string = tr ("Not allowed because you don't have permission to add files in that folder");
+                item._error_string = _("Not allowed because you don't have permission to add files in that folder");
                 return false;
             }
             break;
@@ -1729,10 +1729,10 @@ signals:
             }
             if (!perms.has_permission (RemotePermissions.Can_write)) {
                 item._instruction = CSYNC_INSTRUCTION_CONFLICT;
-                item._error_string = tr ("Not allowed to upload this file because it is read-only on the server, restoring");
+                item._error_string = _("Not allowed to upload this file because it is read-only on the server, restoring");
                 item._direction = SyncFileItem.Down;
                 item._is_restoration = true;
-                q_c_warning (lc_disco) << "check_for_permission : RESTORING" << item._file << item._error_string;
+                GLib.warn (lc_disco) << "check_for_permission : RESTORING" << item._file << item._error_string;
                 // Take the things to write to the database from the "other" node (i.e : info from server).
                 // Do a lookup into the csync remote tree to get the metadata we need to restore.
                 q_swap (item._size, item._previous_size);
@@ -1751,8 +1751,8 @@ signals:
                 item._instruction = CSYNC_INSTRUCTION_NEW;
                 item._direction = SyncFileItem.Down;
                 item._is_restoration = true;
-                item._error_string = tr ("Moved to invalid target, restoring");
-                q_c_warning (lc_disco) << "check_for_permission : RESTORING" << item._file << item._error_string;
+                item._error_string = _("Moved to invalid target, restoring");
+                GLib.warn (lc_disco) << "check_for_permission : RESTORING" << item._file << item._error_string;
                 return true; // restore sub items
             }
             const var perms = item._remote_perm;
@@ -1764,8 +1764,8 @@ signals:
                 item._instruction = CSYNC_INSTRUCTION_NEW;
                 item._direction = SyncFileItem.Down;
                 item._is_restoration = true;
-                item._error_string = tr ("Not allowed to remove, restoring");
-                q_c_warning (lc_disco) << "check_for_permission : RESTORING" << item._file << item._error_string;
+                item._error_string = _("Not allowed to remove, restoring");
+                GLib.warn (lc_disco) << "check_for_permission : RESTORING" << item._file << item._error_string;
                 return true; // (we need to recurse to restore sub items)
             }
             break;
@@ -1868,7 +1868,7 @@ signals:
     }
 
     void ProcessDirectoryJob.db_error () {
-        _discovery_data.fatal_error (tr ("Error while reading the database"));
+        _discovery_data.fatal_error (_("Error while reading the database"));
     }
 
     void ProcessDirectoryJob.add_virtual_file_suffix (string ==&str) {
@@ -1910,7 +1910,7 @@ signals:
                     this.process ();
             } else {
                 var code = results.error ().code;
-                q_c_warning (lc_disco) << "Server error in directory" << _current_folder._server << code;
+                GLib.warn (lc_disco) << "Server error in directory" << _current_folder._server << code;
                 if (_dir_item && code >= 403) {
                     // In case of an HTTP error, we ignore that directory
                     // 403 Forbidden can be sent by the server if the file firewall is active.
@@ -1925,7 +1925,7 @@ signals:
                     emit this.on_finished ();
                 } else {
                     // Fatal for the root job since it has no SyncFileItem, or for the network errors
-                    emit _discovery_data.fatal_error (tr ("Server replied with an error while reading directory \"%1\" : %2")
+                    emit _discovery_data.fatal_error (_("Server replied with an error while reading directory \"%1\" : %2")
                         .arg (_current_folder._server, results.error ().message));
                 }
             }

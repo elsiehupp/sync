@@ -14,7 +14,7 @@ using namespace Occ;
 class TestAccount : public GLib.Object {
 
     private on_ void testAccountDavPath_unitialized_noCrash () {
-        AccountPtr account = Account.create ();
+        AccountPointer account = Account.create ();
         account.davPath ();
     }
 };

@@ -6,7 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 namespace Occ {
 
-using AccountPtr = unowned<Account>;
+using AccountPointer = unowned<Account>;
 using AccountStatePtr = unowned<AccountState>;
 
 } // namespace Occ

@@ -248,14 +248,14 @@ signals:
                 // If this is an E2EE file or folder, pretend we got no path, this leads to
                 // hiding the share button which is what we want
                 if (folder) {
-                    SyncJournalFileRecord rec;
-                    folder.journal_database ().get_file_record (a._file.mid (1), &rec);
-                    if (rec.is_valid () && (rec._is_e2e_encrypted || !rec._e2e_mangled_name.is_empty ())) {
+                    SyncJournalFileRecord record;
+                    folder.journal_database ().get_file_record (a._file.mid (1), &record);
+                    if (record.is_valid () && (record._is_e2e_encrypted || !record._e2e_mangled_name.is_empty ())) {
                         return string ();
                     }
                 }
 
-                return QUrl.from_local_file (local_files.const_first ());
+                return GLib.Uri.from_local_file (local_files.const_first ());
             }
             return string ();
         case Absolute_path_role: {
@@ -293,7 +293,7 @@ signals:
                 if (a._status == SyncFileItem.NormalError
                     || a._status == SyncFileItem.FatalError
                     || a._status == SyncFileItem.DetailError
-                    || a._status == SyncFileItem.BlacklistedError) {
+                    || a._status == SyncFileItem.BlocklistedError) {
                     return "qrc:///client/theme/black/state-error.svg";
                 } else if (a._status == SyncFileItem.SoftError
                     || a._status == SyncFileItem.Conflict
@@ -432,7 +432,7 @@ signals:
             a._subject = json.value ("subject").to_string ();
             a._message = json.value ("message").to_string ();
             a._file = json.value ("object_name").to_string ();
-            a._link = QUrl (json.value ("link").to_string ());
+            a._link = GLib.Uri (json.value ("link").to_string ());
             a._date_time = QDateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
             a._icon = json.value ("icon").to_string ();
 
@@ -467,7 +467,7 @@ signals:
         bool duplicate = false;
         if (_list_of_ignored_files.size () == 0) {
             _notification_ignored_files = new_activity;
-            _notification_ignored_files._subject = tr ("Files from the ignore list as well as symbolic links are not synced.");
+            _notification_ignored_files._subject = _("Files from the ignore list as well as symbolic links are not synced.");
             _list_of_ignored_files.append (new_activity);
             return;
         }
@@ -536,7 +536,7 @@ signals:
 
     void ActivityListModel.trigger_default_action (int activity_index) {
         if (activity_index < 0 || activity_index >= _final_list.size ()) {
-            q_c_warning (lc_activity) << "Couldn't trigger default action at index" << activity_index << "/ final list size:" << _final_list.size ();
+            GLib.warn (lc_activity) << "Couldn't trigger default action at index" << activity_index << "/ final list size:" << _final_list.size ();
             return;
         }
 
@@ -601,21 +601,21 @@ signals:
 
     void ActivityListModel.trigger_action (int activity_index, int action_index) {
         if (activity_index < 0 || activity_index >= _final_list.size ()) {
-            q_c_warning (lc_activity) << "Couldn't trigger action on activity at index" << activity_index << "/ final list size:" << _final_list.size ();
+            GLib.warn (lc_activity) << "Couldn't trigger action on activity at index" << activity_index << "/ final list size:" << _final_list.size ();
             return;
         }
 
         const var activity = _final_list[activity_index];
 
         if (action_index < 0 || action_index >= activity._links.size ()) {
-            q_c_warning (lc_activity) << "Couldn't trigger action at index" << action_index << "/ actions list size:" << activity._links.size ();
+            GLib.warn (lc_activity) << "Couldn't trigger action at index" << action_index << "/ actions list size:" << activity._links.size ();
             return;
         }
 
         const var action = activity._links[action_index];
 
         if (action._verb == "WEB") {
-            Utility.open_browser (QUrl (action._link));
+            Utility.open_browser (GLib.Uri (action._link));
             return;
         }
 
@@ -655,7 +655,7 @@ signals:
                 a._type = Activity.Activity_type;
                 a._acc_name = _account_state.account ().display_name ();
                 a._id = -1;
-                a._subject = tr ("For more activities please open the Activity app.");
+                a._subject = _("For more activities please open the Activity app.");
                 a._date_time = QDateTime.current_date_time ();
 
                 AccountApp app = _account_state.find_app (QLatin1String ("activity"));

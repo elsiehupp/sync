@@ -4,7 +4,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFile>
+// #include <GLib.File>
 
 // #pragma once
 
@@ -89,7 +89,7 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
 
     Result<void, string> Vfs_xAttr.update_metadata (string file_path, time_t modtime, int64, GLib.ByteArray ) {
         if (modtime <= 0) {
-            return {tr ("Error updating metadata due to invalid modified time")};
+            return {_("Error updating metadata due to invalid modified time")};
         }
 
         FileSystem.set_mod_time (file_path, modtime);
@@ -98,17 +98,17 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
 
     Result<void, string> Vfs_xAttr.create_placeholder (SyncFileItem &item) {
         if (item._modtime <= 0) {
-            return {tr ("Error updating metadata due to invalid modified time")};
+            return {_("Error updating metadata due to invalid modified time")};
         }
 
         const var path = string (_setup_params.filesystem_path + item._file);
-        QFile file = new QFile (path);
+        GLib.File file = new GLib.File (path);
         if (file.exists () && file.size () > 1
             && !FileSystem.verify_file_unchanged (path, item._size, item._modtime)) {
             return QStringLiteral ("Cannot create a placeholder because a file with the placeholder name already exist");
         }
 
-        if (!file.open (QFile.ReadWrite | QFile.Truncate)) {
+        if (!file.open (GLib.File.ReadWrite | GLib.File.Truncate)) {
             return file.error_string ();
         }
 
@@ -120,7 +120,7 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
 
     Result<void, string> Vfs_xAttr.dehydrate_placeholder (SyncFileItem &item) {
         const var path = string (_setup_params.filesystem_path + item._file);
-        QFile file = new QFile (path);
+        GLib.File file = new GLib.File (path);
         if (!file.remove ()) {
             return QStringLiteral ("Couldn't remove the original file to dehydrate");
         }

@@ -64,11 +64,11 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
-// #include <QFile>
+// #include <GLib.File>
 
 #ifdef HAVE_UTIMES
 int c_utimes (string uri, struct timeval times) {
-    int ret = utimes (QFile.encode_name (uri).const_data (), times);
+    int ret = utimes (GLib.File.encode_name (uri).const_data (), times);
     return ret;
 }
 #else // HAVE_UTIMES

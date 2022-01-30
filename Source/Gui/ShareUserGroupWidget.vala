@@ -70,7 +70,7 @@ signals:
 ***********************************************************/
 class Share_user_group_widget : Gtk.Widget {
 
-    public Share_user_group_widget (AccountPtr account,
+    public Share_user_group_widget (AccountPointer account,
         const string share_path,
         const string local_path,
         Share_permissions max_sharing_permissions,
@@ -116,7 +116,7 @@ signals:
 
     private Ui.Share_user_group_widget _ui;
     private QScroll_area _parent_scroll_area;
-    private AccountPtr _account;
+    private AccountPointer _account;
     private string _share_path;
     private string _local_path;
     private Share_permissions _max_sharing_permissions;
@@ -140,7 +140,7 @@ The widget displayed for each user/group share
 ***********************************************************/
 class Share_user_line : Gtk.Widget {
 
-    public Share_user_line (AccountPtr account,
+    public Share_user_line (AccountPointer account,
         unowned<User_group_share> Share,
         Share_permissions max_sharing_permissions,
         bool is_file,
@@ -211,7 +211,7 @@ signals:
     private bool enforce_expiration_date_for_share (Share.Share_type type);
 
     private Ui.Share_user_line _ui;
-    private AccountPtr _account;
+    private AccountPointer _account;
     private unowned<User_group_share> _share;
     private bool _is_file;
 
@@ -245,7 +245,7 @@ signals:
         return GLib.Object.event_filter (obj, event);
     }
 
-    Share_user_group_widget.Share_user_group_widget (AccountPtr account,
+    Share_user_group_widget.Share_user_group_widget (AccountPointer account,
         const string share_path,
         const string local_path,
         Share_permissions max_sharing_permissions,
@@ -281,7 +281,7 @@ signals:
 
         var search_globally_action = new QAction (_ui.sharee_line_edit);
         search_globally_action.set_icon (QIcon (":/client/theme/magnifying-glass.svg"));
-        search_globally_action.set_tool_tip (tr ("Search globally"));
+        search_globally_action.set_tool_tip (_("Search globally"));
 
         connect (search_globally_action, &QAction.triggered, this, [this] () {
             on_search_for_sharees (Sharee_model.Global_search);
@@ -373,17 +373,17 @@ signals:
         _ui.sharee_line_edit.set_enabled (false);
         _completion_timer.stop ();
         _pi_sharee.on_start_animation ();
-        Sharee_model.Sharee_set blacklist;
+        Sharee_model.Sharee_set blocklist;
 
         // Add the current user to _sharees since we can't share with ourself
         unowned<Sharee> current_user (new Sharee (_account.credentials ().user (), "", Sharee.Type.User));
-        blacklist << current_user;
+        blocklist << current_user;
 
         foreach (var sw, _parent_scroll_area.find_children<Share_user_line> ()) {
-            blacklist << sw.share ().get_share_with ();
+            blocklist << sw.share ().get_share_with ();
         }
         _ui.error_label.hide ();
-        _completer_model.fetch (_ui.sharee_line_edit.text (), blacklist, lookup_mode);
+        _completer_model.fetch (_ui.sharee_line_edit.text (), blocklist, lookup_mode);
     }
 
     void Share_user_group_widget.on_get_shares () {
@@ -500,7 +500,7 @@ signals:
 
         // this icon is not handled by on_style_changed () . customize_style but we can live with that
         menu.add_action (Theme.create_color_aware_icon (":/client/theme/copy.svg"),
-                        tr ("Copy link"),
+                        _("Copy link"),
             this, SLOT (on_private_link_copy ()));
 
         menu.exec (QCursor.pos ());
@@ -511,7 +511,7 @@ signals:
 
         _pi_sharee.on_stop_animation ();
         if (_completer_model.row_count () == 0) {
-            on_display_error (0, tr ("No results for \"%1\"").arg (_completer_model.current_search ()));
+            on_display_error (0, _("No results for \"%1\"").arg (_completer_model.current_search ()));
         }
 
         // if no rows are present in the model - complete () will hide the completer
@@ -555,8 +555,8 @@ signals:
             do {
                 password = QInputDialog.get_text (
                     this,
-                    tr ("Password for share required"),
-                    tr ("Please enter a password for your email share:"),
+                    _("Password for share required"),
+                    _("Please enter a password for your email share:"),
                     QLineEdit.Password,
                     string (),
                     &ok);
@@ -588,7 +588,7 @@ signals:
             delete pi;
         }
 
-        q_c_warning (lc_sharing) << "Sharing error from server" << code << message;
+        GLib.warn (lc_sharing) << "Sharing error from server" << code << message;
         _ui.error_label.on_set_text (message);
         _ui.error_label.show ();
         activate_sharee_line_edit ();
@@ -604,7 +604,7 @@ signals:
 
     void Share_user_group_widget.on_private_link_email () {
         Utility.open_email_composer (
-            tr ("I shared something with you"),
+            _("I shared something with you"),
             _private_link_url,
             this);
     }
@@ -631,7 +631,7 @@ signals:
         _ui.sharee_line_edit.set_focus ();
     }
 
-    Share_user_line.Share_user_line (AccountPtr account, unowned<User_group_share> share,
+    Share_user_line.Share_user_line (AccountPointer account, unowned<User_group_share> share,
         Share_permissions max_sharing_permissions, bool is_file, Gtk.Widget parent)
         : Gtk.Widget (parent)
         , _ui (new Ui.Share_user_line)
@@ -664,7 +664,7 @@ signals:
 
         // create menu with checkable permissions
         var menu = new QMenu (this);
-        _permission_reshare= new QAction (tr ("Can reshare"), this);
+        _permission_reshare= new QAction (_("Can reshare"), this);
         _permission_reshare.set_checkable (true);
         _permission_reshare.set_enabled (max_sharing_permissions & Share_permission_share);
         menu.add_action (_permission_reshare);
@@ -675,7 +675,7 @@ signals:
         const bool is_note_supported = _share.get_share_type () != Share.Share_type.Type_email && _share.get_share_type () != Share.Share_type.Type_room;
 
         if (is_note_supported) {
-            _note_link_action = new QAction (tr ("Note to recipient"));
+            _note_link_action = new QAction (_("Note to recipient"));
             _note_link_action.set_checkable (true);
             menu.add_action (_note_link_action);
             connect (_note_link_action, &QAction.triggered, this, &Share_user_line.toggle_note_options);
@@ -691,7 +691,7 @@ signals:
 
         if (is_expiration_date_supported) {
             // email shares do not support expiration dates
-            _expiration_date_link_action = new QAction (tr ("Set expiration date"));
+            _expiration_date_link_action = new QAction (_("Set expiration date"));
             _expiration_date_link_action.set_checkable (true);
             menu.add_action (_expiration_date_link_action);
             connect (_expiration_date_link_action, &QAction.triggered, this, &Share_user_line.toggle_expire_date_options);
@@ -706,7 +706,7 @@ signals:
 
           // Adds action to delete share widget
           QIcon deleteicon = QIcon.from_theme (QLatin1String ("user-trash"),QIcon (QLatin1String (":/client/theme/delete.svg")));
-          _delete_share_button= new QAction (deleteicon,tr ("Unshare"), this);
+          _delete_share_button= new QAction (deleteicon,_("Unshare"), this);
 
         menu.add_action (_delete_share_button);
         connect (_delete_share_button, &QAction.triggered, this, &Share_user_line.on_delete_share_button_clicked);
@@ -715,19 +715,19 @@ signals:
         Files can't have create or delete permissions
          */
         if (!_is_file) {
-            _permission_create = new QAction (tr ("Can create"), this);
+            _permission_create = new QAction (_("Can create"), this);
             _permission_create.set_checkable (true);
             _permission_create.set_enabled (max_sharing_permissions & Share_permission_create);
             menu.add_action (_permission_create);
             connect (_permission_create, &QAction.triggered, this, &Share_user_line.on_permissions_changed);
 
-            _permission_change = new QAction (tr ("Can change"), this);
+            _permission_change = new QAction (_("Can change"), this);
             _permission_change.set_checkable (true);
             _permission_change.set_enabled (max_sharing_permissions & Share_permission_update);
             menu.add_action (_permission_change);
             connect (_permission_change, &QAction.triggered, this, &Share_user_line.on_permissions_changed);
 
-            _permission_delete = new QAction (tr ("Can delete"), this);
+            _permission_delete = new QAction (_("Can delete"), this);
             _permission_delete.set_checkable (true);
             _permission_delete.set_enabled (max_sharing_permissions & Share_permission_delete);
             menu.add_action (_permission_delete);
@@ -736,7 +736,7 @@ signals:
 
         // Adds action to display password widget (check box)
         if (_share.get_share_type () == Share.Type_email && (_share.is_password_set () || _account.capabilities ().share_email_password_enabled ())) {
-            _password_protect_link_action = new QAction (tr ("Password protect"), this);
+            _password_protect_link_action = new QAction (_("Password protect"), this);
             _password_protect_link_action.set_checkable (true);
             _password_protect_link_action.set_checked (_share.is_password_set ());
             // checkbox can be checked/unchedkec if the password is not yet set or if it's not enforced
@@ -842,7 +842,7 @@ signals:
         if (!pixmap.is_null ()) {
             _ui.avatar.set_pixmap (pixmap);
         } else {
-            q_c_debug (lc_sharing) << "pixmap is null for share type : " << _share.get_share_with ().type ();
+            GLib.debug (lc_sharing) << "pixmap is null for share type : " << _share.get_share_with ().type ();
 
             // The avatar label is the first character of the user name.
             const var text = _share.get_share_with ().display_name ();
@@ -997,7 +997,7 @@ signals:
     }
 
     void Share_user_line.on_password_set_error (int status_code, string message) {
-        q_c_warning (lc_sharing) << "Error from server" << status_code << message;
+        GLib.warn (lc_sharing) << "Error from server" << status_code << message;
 
         toggle_password_set_progress_animation (false);
 
@@ -1117,7 +1117,7 @@ signals:
             const var hash = QCryptographicHash.hash (_ui.shared_with.text ().to_utf8 (), QCryptographicHash.Md5);
             Q_ASSERT (hash.size () > 0);
             if (hash.size () == 0) {
-                q_c_warning (lc_sharing) << "Failed to calculate hash color for share:" << _share.path ();
+                GLib.warn (lc_sharing) << "Failed to calculate hash color for share:" << _share.path ();
                 return QColor{};
             }
             const double hue = static_cast<uint8> (hash[0]) / 255.;

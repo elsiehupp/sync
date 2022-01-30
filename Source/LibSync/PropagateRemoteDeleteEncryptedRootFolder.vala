@@ -85,7 +85,7 @@ void Propagate_remote_delete_encrypted_root_folder.on_folder_un_locked_successfu
 void Propagate_remote_delete_encrypted_root_folder.on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code) {
     if (status_code == 404) {
         // we've eneded up having no metadata, but, _nested_items is not empty since we went this far, let's proceed with removing the nested items without modifying the metadata
-        q_c_debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "There is no metadata for this folder. Just remove it's nested items.";
+        GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "There is no metadata for this folder. Just remove it's nested items.";
         for (var it = _nested_items.const_begin (); it != _nested_items.const_end (); ++it) {
             delete_nested_remote_item (it.key ());
         }
@@ -94,11 +94,11 @@ void Propagate_remote_delete_encrypted_root_folder.on_folder_encrypted_metadata_
 
     FolderMetadata metadata (_propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
 
-    q_c_debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "It's a root encrypted folder. Let's remove nested items first.";
+    GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "It's a root encrypted folder. Let's remove nested items first.";
 
     metadata.remove_all_encrypted_files ();
 
-    q_c_debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Metadata updated, sending to the server.";
+    GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Metadata updated, sending to the server.";
 
     var job = new UpdateMetadataApiJob (_propagator.account (), _folder_id, metadata.encrypted_metadata (), _folder_token);
     connect (job, &UpdateMetadataApiJob.on_success, this, [this] (GLib.ByteArray& file_id) {
@@ -140,7 +140,7 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
     if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
         store_first_error (err);
         store_first_error_string (delete_job.error_string ());
-        q_c_warning (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Delete nested item on_finished with error" << err << ".";
+        GLib.warn (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Delete nested item on_finished with error" << err << ".";
     } else if (http_error_code != 204 && http_error_code != 404) {
         // A 404 reply is also considered a on_success here : We want to make sure
         // a file is gone from the server. It not being there in the first place
@@ -150,14 +150,14 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
         // Normally we expect "204 No Content"
         // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
         // throw an error.
-        store_first_error_string (tr ("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
+        store_first_error_string (_("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                         .arg (http_error_code)
                         .arg (delete_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ()));
         if (_item._http_error_code == 0) {
             _item._http_error_code = http_error_code;
         }
 
-        q_c_warning (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Delete nested item on_finished with error" << http_error_code << ".";
+        GLib.warn (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Delete nested item on_finished with error" << http_error_code << ".";
     }
 
     if (_nested_items.size () == 0) {

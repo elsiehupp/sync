@@ -23,11 +23,11 @@ TODO : In theory we should use QVERIFY instead of Q_ASSERT for testing, but this
 only works when directly called from a QTest :- (
 ***********************************************************/
 
-static const QUrl sRootUrl ("owncloud://somehost/owncloud/remote.php/dav/");
-static const QUrl sRootUrl2 ("owncloud://somehost/owncloud/remote.php/dav/files/admin/");
-static const QUrl sUploadUrl ("owncloud://somehost/owncloud/remote.php/dav/uploads/admin/");
+static const GLib.Uri sRootUrl ("owncloud://somehost/owncloud/remote.php/dav/");
+static const GLib.Uri sRootUrl2 ("owncloud://somehost/owncloud/remote.php/dav/files/admin/");
+static const GLib.Uri sUploadUrl ("owncloud://somehost/owncloud/remote.php/dav/uploads/admin/");
 
-inline string getFilePathFromUrl (QUrl url) {
+inline string getFilePathFromUrl (GLib.Uri url) {
     string path = url.path ();
     if (path.startsWith (sRootUrl2.path ()))
         return path.mid (sRootUrl2.path ().length ());
@@ -460,7 +460,7 @@ class FakeFolder {
     DiskFileModifier _localModifier;
     // FIXME : Clarify ownership, double delete
     FakeQNAM _fakeQnam;
-    Occ.AccountPtr _account;
+    Occ.AccountPointer _account;
     std.unique_ptr<Occ.SyncJournalDb> _journalDb;
     std.unique_ptr<Occ.SyncEngine> _syncEngine;
 
@@ -469,7 +469,7 @@ class FakeFolder {
 
     public void switchToVfs (unowned<Occ.Vfs> vfs);
 
-    public Occ.AccountPtr account () { return _account; }
+    public Occ.AccountPointer account () { return _account; }
     public Occ.SyncEngine &syncEngine () { return _syncEngine; }
     public Occ.SyncJournalDb &syncJournal () { return _journalDb; }
 
@@ -631,7 +631,7 @@ PathComponents.PathComponents (char path)
 }
 
 PathComponents.PathComponents (string path)
-    : string[] { path.split (QLatin1Char ('/'), Qt.SkipEmptyParts) } {
+    : string[] { path.split ('/', Qt.SkipEmptyParts) } {
 }
 
 PathComponents.PathComponents (string[] &pathComponents)
@@ -655,9 +655,9 @@ void DiskFileModifier.remove (string relativePath) {
 }
 
 void DiskFileModifier.insert (string relativePath, int64 size, char contentChar) {
-    QFile file { _rootDir.filePath (relativePath) };
+    GLib.File file { _rootDir.filePath (relativePath) };
     QVERIFY (!file.exists ());
-    file.open (QFile.WriteOnly);
+    file.open (GLib.File.WriteOnly);
     GLib.ByteArray buf (1024, contentChar);
     for (int x = 0; x < size / buf.size (); ++x) {
         file.write (buf);
@@ -670,17 +670,17 @@ void DiskFileModifier.insert (string relativePath, int64 size, char contentChar)
 }
 
 void DiskFileModifier.setContents (string relativePath, char contentChar) {
-    QFile file { _rootDir.filePath (relativePath) };
+    GLib.File file { _rootDir.filePath (relativePath) };
     QVERIFY (file.exists ());
     int64 size = file.size ();
-    file.open (QFile.WriteOnly);
+    file.open (GLib.File.WriteOnly);
     file.write (GLib.ByteArray {}.fill (contentChar, size));
 }
 
 void DiskFileModifier.appendByte (string relativePath) {
-    QFile file { _rootDir.filePath (relativePath) };
+    GLib.File file { _rootDir.filePath (relativePath) };
     QVERIFY (file.exists ());
-    file.open (QFile.ReadWrite);
+    file.open (GLib.File.ReadWrite);
     GLib.ByteArray contents = file.read (1);
     file.seek (file.size ());
     file.write (contents);
@@ -822,14 +822,14 @@ bool FileInfo.operator== (FileInfo &other) {
 }
 
 string FileInfo.path () {
-    return (parentPath.isEmpty () ? string () : (parentPath + QLatin1Char ('/'))) + name;
+    return (parentPath.isEmpty () ? string () : (parentPath + '/')) + name;
 }
 
 string FileInfo.absolutePath () {
-    if (parentPath.endsWith (QLatin1Char ('/'))) {
+    if (parentPath.endsWith ('/')) {
         return parentPath + name;
     } else {
-        return parentPath + QLatin1Char ('/') + name;
+        return parentPath + '/' + name;
     }
 }
 
@@ -875,9 +875,9 @@ FakePropfindReply.FakePropfindReply (FileInfo &remoteRootFileInfo, QNetworkAcces
     var writeFileResponse = [&] (FileInfo &fileInfo) {
         xml.writeStartElement (davUri, QStringLiteral ("response"));
 
-        var url = string.fromUtf8 (QUrl.toPercentEncoding (fileInfo.absolutePath (), "/"));
-        if (!url.endsWith (QChar ('/'))) {
-            url.append (QChar ('/'));
+        var url = string.fromUtf8 (GLib.Uri.toPercentEncoding (fileInfo.absolutePath (), "/"));
+        if (!url.endsWith (char ('/'))) {
+            url.append (char ('/'));
         }
         const var href = Occ.Utility.concatUrlPath (prefix, url).path ();
         xml.writeTextElement (davUri, QStringLiteral ("href"), href);
@@ -1051,7 +1051,7 @@ void FakePutMultiFileReply.respond () {
         fileInfoReply.insert ("OC-FileID", QLatin1String{fileInfo.fileId});
         fileInfoReply.insert ("X-OC-MTime", "accepted"); // Prevents Q_ASSERT (!_runningNow) since we'll call PropagateItemJob.done twice in that case.
         emit uploadProgress (fileInfo.size, totalSize);
-        allFileInfoReply.insert (QChar ('/') + fileInfo.path (), fileInfoReply);
+        allFileInfoReply.insert (char ('/') + fileInfo.path (), fileInfoReply);
     }
     reply.setObject (allFileInfoReply);
     _payload = reply.toJson ();
@@ -1136,7 +1136,7 @@ FakeMoveReply.FakeMoveReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager
 
     string fileName = getFilePathFromUrl (request.url ());
     Q_ASSERT (!fileName.isEmpty ());
-    string dest = getFilePathFromUrl (QUrl.fromEncoded (request.rawHeader ("Destination")));
+    string dest = getFilePathFromUrl (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
     Q_ASSERT (!dest.isEmpty ());
     remoteRootFileInfo.rename (fileName, dest);
     QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
@@ -1292,7 +1292,7 @@ FileInfo *FakeChunkMoveReply.perform (FileInfo &uploadsFileInfo, FileInfo &remot
     qlonglong size = 0;
     char payload = '\0';
 
-    string fileName = getFilePathFromUrl (QUrl.fromEncoded (request.rawHeader ("Destination")));
+    string fileName = getFilePathFromUrl (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
     Q_ASSERT (!fileName.isEmpty ());
 
     // Compute the size and content from the chunks if possible
@@ -1435,7 +1435,7 @@ FakeHangingReply.FakeHangingReply (QNetworkAccessManager.Operation op, QNetworkR
 void FakeHangingReply.on_abort () {
     // Follow more or less the implementation of QNetworkReplyImpl.on_abort
     close ();
-    setError (OperationCanceledError, tr ("Operation canceled"));
+    setError (OperationCanceledError, _("Operation canceled"));
     emit errorOccurred (OperationCanceledError);
     setFinished (true);
     emit finished ();
@@ -1551,7 +1551,7 @@ FakeFolder.FakeFolder (FileInfo &fileTemplate, Occ.Optional<FileInfo> &localFile
 
     _fakeQnam = new FakeQNAM (fileTemplate);
     _account = Occ.Account.create ();
-    _account.setUrl (QUrl (QStringLiteral ("http://admin:admin@localhost/owncloud")));
+    _account.setUrl (GLib.Uri (QStringLiteral ("http://admin:admin@localhost/owncloud")));
     _account.setCredentials (new FakeCredentials { _fakeQnam });
     _account.setDavDisplayName (QStringLiteral ("fakename"));
     _account.setServerVersion (QStringLiteral ("10.0.0"));
@@ -1588,7 +1588,7 @@ void FakeFolder.switchToVfs (unowned<Occ.Vfs> vfs) {
 
     Occ.VfsSetupParams vfsParams;
     vfsParams.filesystemPath = localPath ();
-    vfsParams.remotePath = QLatin1Char ('/');
+    vfsParams.remotePath = '/';
     vfsParams.account = _account;
     vfsParams.journal = _journalDb.get ();
     vfsParams.providerName = QStringLiteral ("OC-TEST");
@@ -1611,9 +1611,9 @@ FileInfo FakeFolder.currentLocalState () {
 
 string FakeFolder.localPath () {
     // SyncEngine wants a trailing slash
-    if (_tempDir.path ().endsWith (QLatin1Char ('/')))
+    if (_tempDir.path ().endsWith ('/'))
         return _tempDir.path ();
-    return _tempDir.path () + QLatin1Char ('/');
+    return _tempDir.path () + '/';
 }
 
 void FakeFolder.scheduleSync () {
@@ -1650,8 +1650,8 @@ void FakeFolder.toDisk (QDir &dir, FileInfo &templateFi) {
             subDir.cd (child.name);
             toDisk (subDir, child);
         } else {
-            QFile file { dir.filePath (child.name) };
-            file.open (QFile.WriteOnly);
+            GLib.File file { dir.filePath (child.name) };
+            file.open (GLib.File.WriteOnly);
             file.write (GLib.ByteArray {}.fill (child.contentChar, child.size));
             file.close ();
             Occ.FileSystem.setModTime (file.fileName (), Occ.Utility.qDateTimeToTime_t (child.lastModified));
@@ -1667,8 +1667,8 @@ void FakeFolder.fromDisk (QDir &dir, FileInfo &templateFi) {
             FileInfo &subFi = templateFi.children[diskChild.fileName ()] = FileInfo { diskChild.fileName () };
             fromDisk (subDir, subFi);
         } else {
-            QFile f { diskChild.filePath () };
-            f.open (QFile.ReadOnly);
+            GLib.File f { diskChild.filePath () };
+            f.open (GLib.File.ReadOnly);
             var content = f.read (1);
             if (content.size () == 0) {
                 qWarning () << "Empty file at:" << diskChild.filePath ();

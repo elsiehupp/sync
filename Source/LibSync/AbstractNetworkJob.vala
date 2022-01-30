@@ -42,12 +42,12 @@ int AbstractNetworkJob.http_timeout = q_environment_variable_int_value ("OWNCLOU
 ***********************************************************/
 class AbstractNetworkJob : GLib.Object {
 
-    public AbstractNetworkJob (AccountPtr account, string path, GLib.Object parent = nullptr);
+    public AbstractNetworkJob (AccountPointer account, string path, GLib.Object parent = nullptr);
     ~AbstractNetworkJob () override;
 
     public virtual void on_start ();
 
-    public AccountPtr account () {
+    public AccountPointer account () {
         return _account;
     }
 
@@ -168,7 +168,7 @@ signals:
     \a target_url Where to redirect to
     \a redirect_count Counts redirect hops, first is 0.
     ***********************************************************/
-    void redirected (QNetworkReply reply, QUrl target_url, int redirect_count);
+    void redirected (QNetworkReply reply, GLib.Uri target_url, int redirect_count);
 
 
     /***********************************************************
@@ -178,11 +178,11 @@ signals:
 
     Takes ownership of the request_body (to allow redirects).
     ***********************************************************/
-    protected QNetworkReply send_request (GLib.ByteArray verb, QUrl url,
+    protected QNetworkReply send_request (GLib.ByteArray verb, GLib.Uri url,
         QNetworkRequest req = QNetworkRequest (),
         QIODevice request_body = nullptr);
 
-    protected QNetworkReply send_request (GLib.ByteArray verb, QUrl url,
+    protected QNetworkReply send_request (GLib.ByteArray verb, GLib.Uri url,
         QNetworkRequest req, GLib.ByteArray request_body);
 
     // send_request does not take a relative path instead of an url,
@@ -192,7 +192,7 @@ signals:
         QNetworkRequest req = QNetworkRequest (),
         QIODevice request_body = nullptr);
 
-    protected QNetworkReply send_request (GLib.ByteArray verb, QUrl url,
+    protected QNetworkReply send_request (GLib.ByteArray verb, GLib.Uri url,
         QNetworkRequest req, QHttpMultiPart request_body);
 
 
@@ -217,10 +217,10 @@ signals:
     protected virtual void new_reply_hook (QNetworkReply *) {}
 
     /// Creates a url for the account from a relative path
-    protected QUrl make_account_url (string relative_path);
+    protected GLib.Uri make_account_url (string relative_path);
 
     /// Like make_account_url () but uses the account's dav base path
-    protected QUrl make_dav_url (string relative_path);
+    protected GLib.Uri make_dav_url (string relative_path);
 
     protected int max_redirects () {
         return 10;
@@ -256,7 +256,7 @@ signals:
     private void on_timeout ();
 
 
-    protected AccountPtr _account;
+    protected AccountPointer _account;
 
 
     private QNetworkReply add_timer (QNetworkReply reply);
@@ -323,7 +323,7 @@ string network_reply_error_string (QNetworkReply &reply);
 
 
 
-AbstractNetworkJob.AbstractNetworkJob (AccountPtr account, string path, GLib.Object parent)
+AbstractNetworkJob.AbstractNetworkJob (AccountPointer account, string path, GLib.Object parent)
     : GLib.Object (parent)
     , _timedout (false)
     , _follow_redirects (true)
@@ -394,7 +394,7 @@ QNetworkReply *AbstractNetworkJob.add_timer (QNetworkReply reply) {
     return reply;
 }
 
-QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, QUrl url,
+QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, GLib.Uri url,
     QNetworkRequest req, QIODevice request_body) {
     var reply = _account.send_raw_request (verb, url, req, request_body);
     _request_body = request_body;
@@ -405,7 +405,7 @@ QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, QUrl url,
     return reply;
 }
 
-QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, QUrl url,
+QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, GLib.Uri url,
     QNetworkRequest req, GLib.ByteArray request_body) {
     var reply = _account.send_raw_request (verb, url, req, request_body);
     _request_body = nullptr;
@@ -414,7 +414,7 @@ QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, QUrl url,
 }
 
 QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb,
-                                               const QUrl url,
+                                               const GLib.Uri url,
                                                QNetworkRequest req,
                                                QHttpMultiPart request_body) {
     var reply = _account.send_raw_request (verb, url, req, request_body);
@@ -430,11 +430,11 @@ void AbstractNetworkJob.adopt_request (QNetworkReply reply) {
     new_reply_hook (reply);
 }
 
-QUrl AbstractNetworkJob.make_account_url (string relative_path) {
+GLib.Uri AbstractNetworkJob.make_account_url (string relative_path) {
     return Utility.concat_url_path (_account.url (), relative_path);
 }
 
-QUrl AbstractNetworkJob.make_dav_url (string relative_path) {
+GLib.Uri AbstractNetworkJob.make_dav_url (string relative_path) {
     return Utility.concat_url_path (_account.dav_url (), relative_path);
 }
 
@@ -442,7 +442,7 @@ void AbstractNetworkJob.on_finished () {
     _timer.stop ();
 
     if (_reply.error () == QNetworkReply.SslHandshakeFailedError) {
-        q_c_warning (lc_network_job) << "SslHandshakeFailedError : " << error_string () << " : can be caused by a webserver wanting SSL client certificates";
+        GLib.warn (lc_network_job) << "SslHandshakeFailedError : " << error_string () << " : can be caused by a webserver wanting SSL client certificates";
     }
     // Qt doesn't yet transparently resend HTTP2 requests, do so here
     const var max_http2Resends = 3;
@@ -451,10 +451,10 @@ void AbstractNetworkJob.on_finished () {
         && _reply.attribute (QNetworkRequest.HTTP2WasUsedAttribute).to_bool ()) {
 
         if ( (_request_body && !_request_body.is_sequential ()) || verb.is_empty ()) {
-            q_c_warning (lc_network_job) << "Can't resend HTTP2 request, verb or body not suitable"
+            GLib.warn (lc_network_job) << "Can't resend HTTP2 request, verb or body not suitable"
                                     << _reply.request ().url () << verb << _request_body;
         } else if (_http2_resend_count >= max_http2Resends) {
-            q_c_warning (lc_network_job) << "Not resending HTTP2 request, number of resends exhausted"
+            GLib.warn (lc_network_job) << "Not resending HTTP2 request, number of resends exhausted"
                                     << _reply.request ().url () << _http2_resend_count;
         } else {
             q_c_info (lc_network_job) << "HTTP2 resending" << _reply.request ().url ();
@@ -481,10 +481,10 @@ void AbstractNetworkJob.on_finished () {
             return;
 
         if (!_ignore_credential_failure || _reply.error () != QNetworkReply.AuthenticationRequiredError) {
-            q_c_warning (lc_network_job) << _reply.error () << error_string ()
+            GLib.warn (lc_network_job) << _reply.error () << error_string ()
                                     << _reply.attribute (QNetworkRequest.HttpStatusCodeAttribute);
             if (_reply.error () == QNetworkReply.ProxyAuthenticationRequiredError) {
-                q_c_warning (lc_network_job) << _reply.raw_header ("Proxy-Authenticate");
+                GLib.warn (lc_network_job) << _reply.raw_header ("Proxy-Authenticate");
             }
         }
         emit network_error (_reply);
@@ -493,8 +493,8 @@ void AbstractNetworkJob.on_finished () {
     // get the Date timestamp from reply
     _response_timestamp = _reply.raw_header ("Date");
 
-    QUrl requested_url = reply ().request ().url ();
-    QUrl redirect_url = reply ().attribute (QNetworkRequest.RedirectionTargetAttribute).to_url ();
+    GLib.Uri requested_url = reply ().request ().url ();
+    GLib.Uri redirect_url = reply ().attribute (QNetworkRequest.RedirectionTargetAttribute).to_url ();
     if (_follow_redirects && !redirect_url.is_empty ()) {
         // Redirects may be relative
         if (redirect_url.is_relative ())
@@ -508,19 +508,19 @@ void AbstractNetworkJob.on_finished () {
             && requested_url.has_query ()
             && !redirect_url.has_query ()
             && !_request_body) {
-            q_c_warning (lc_network_job) << "Redirecting a POST request with an implicit body loses that body";
+            GLib.warn (lc_network_job) << "Redirecting a POST request with an implicit body loses that body";
         }
 
         // ### some of the q_warnings here should be exported via display_errors () so they
         // ### can be presented to the user if the job executor has a GUI
         if (requested_url.scheme () == QLatin1String ("https") && redirect_url.scheme () == QLatin1String ("http")) {
-            q_c_warning (lc_network_job) << this << "HTTPS.HTTP downgrade detected!";
+            GLib.warn (lc_network_job) << this << "HTTPS.HTTP downgrade detected!";
         } else if (requested_url == redirect_url || _redirect_count + 1 >= max_redirects ()) {
-            q_c_warning (lc_network_job) << this << "Redirect loop detected!";
+            GLib.warn (lc_network_job) << this << "Redirect loop detected!";
         } else if (_request_body && _request_body.is_sequential ()) {
-            q_c_warning (lc_network_job) << this << "cannot redirect request with sequential body";
+            GLib.warn (lc_network_job) << this << "cannot redirect request with sequential body";
         } else if (verb.is_empty ()) {
-            q_c_warning (lc_network_job) << this << "cannot redirect request : could not detect original verb";
+            GLib.warn (lc_network_job) << this << "cannot redirect request : could not detect original verb";
         } else {
             emit redirected (_reply, redirect_url, _redirect_count);
 
@@ -555,7 +555,7 @@ void AbstractNetworkJob.on_finished () {
 
     bool discard = on_finished ();
     if (discard) {
-        q_c_debug (lc_network_job) << "Network job" << meta_object ().class_name () << "on_finished for" << path ();
+        GLib.debug (lc_network_job) << "Network job" << meta_object ().class_name () << "on_finished for" << path ();
         delete_later ();
     }
 }
@@ -571,9 +571,9 @@ GLib.ByteArray AbstractNetworkJob.request_id () {
 
 string AbstractNetworkJob.error_string () {
     if (_timedout) {
-        return tr ("Connection timed out");
+        return _("Connection timed out");
     } else if (!reply ()) {
-        return tr ("Unknown error : network reply was deleted");
+        return _("Unknown error : network reply was deleted");
     } else if (reply ().has_raw_header ("OC-ErrorString")) {
         return reply ().raw_header ("OC-ErrorString");
     } else {
@@ -608,7 +608,7 @@ AbstractNetworkJob.~AbstractNetworkJob () {
 void AbstractNetworkJob.on_start () {
     _timer.on_start ();
 
-    const QUrl url = account ().url ();
+    const GLib.Uri url = account ().url ();
     const string display_url = string ("%1://%2%3").arg (url.scheme ()).arg (url.host ()).arg (url.path ());
 
     string parent_meta_object_name = parent () ? parent ().meta_object ().class_name () : "";
@@ -617,7 +617,7 @@ void AbstractNetworkJob.on_start () {
 
 void AbstractNetworkJob.on_timeout () {
     _timedout = true;
-    q_c_warning (lc_network_job) << "Network job timeout" << (reply () ? reply ().request ().url () : path ());
+    GLib.warn (lc_network_job) << "Network job timeout" << (reply () ? reply ().request ().url () : path ());
     on_timed_out ();
 }
 
@@ -694,13 +694,13 @@ string network_reply_error_string (QNetworkReply &reply) {
         return base;
     }
 
-    return AbstractNetworkJob.tr (R" (Server replied "%1 %2" to "%3 %4")").arg (string.number (http_status), http_reason, HttpLogger.request_verb (reply), reply.request ().url ().to_display_string ());
+    return AbstractNetworkJob._(R" (Server replied "%1 %2" to "%3 %4")").arg (string.number (http_status), http_reason, HttpLogger.request_verb (reply), reply.request ().url ().to_display_string ());
 }
 
 void AbstractNetworkJob.retry () {
     ENFORCE (_reply);
     var req = _reply.request ();
-    QUrl requested_url = req.url ();
+    GLib.Uri requested_url = req.url ();
     GLib.ByteArray verb = HttpLogger.request_verb (*_reply);
     q_c_info (lc_network_job) << "Restarting" << verb << requested_url;
     on_reset_timeout ();

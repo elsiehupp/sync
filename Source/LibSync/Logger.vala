@@ -23,7 +23,7 @@ constexpr int CrashLogSize = 20;
 
 // #include <GLib.List>
 // #include <QDateTime>
-// #include <QFile>
+// #include <GLib.File>
 // #include <QTextStream>
 // #include <qmutex.h>
 
@@ -92,13 +92,13 @@ class Logger : GLib.Object {
     ***********************************************************/
     public void disable_temporary_folder_log_dir ();
 
-    public void add_log_rule (QSet<string> &rules) {
+    public void add_log_rule (GLib.Set<string> &rules) {
         set_log_rules (_log_rules + rules);
     }
-    public void remove_log_rule (QSet<string> &rules) {
+    public void remove_log_rule (GLib.Set<string> &rules) {
         set_log_rules (_log_rules - rules);
     }
-    public void set_log_rules (QSet<string> &rules);
+    public void set_log_rules (GLib.Set<string> &rules);
 
 signals:
     void log_window_log (string );
@@ -117,7 +117,7 @@ signals:
     private void close ();
     private void dump_crash_log ();
 
-    private QFile _log_file;
+    private GLib.File _log_file;
     private bool _do_file_flush = false;
     private int _log_expire = 0;
     private bool _log_debug = false;
@@ -125,7 +125,7 @@ signals:
     private mutable QMutex _mutex;
     private string _log_directory;
     private bool _temporary_folder_log_dir = false;
-    private QSet<string> _log_rules;
+    private GLib.Set<string> _log_rules;
     private QVector<string> _crash_log;
     private int _crash_log_index = 0;
 };
@@ -135,8 +135,8 @@ Logger *Logger.instance () {
     return &log;
 }
 
-Logger.Logger (GLib.Object parent)
-    : GLib.Object (parent) {
+Logger.Logger (GLib.Object parent) {
+    base (parent);
     q_set_message_pattern (QStringLiteral ("%{time yyyy-MM-dd hh:mm:ss:zzz} [ %{type} %{category} %{file}:%{line} "
                                       "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}"));
     _crash_log.resize (CrashLogSize);
@@ -202,7 +202,7 @@ string Logger.log_file () {
 }
 
 void Logger.set_log_file (string name) {
-    QMutexLocker locker (&_mutex);
+    QMutexLocker locker = new QMutexLocker (&_mutex);
     if (_logstream) {
         _logstream.on_reset (nullptr);
         _log_file.close ();
@@ -222,8 +222,8 @@ void Logger.set_log_file (string name) {
 
     if (!open_succeeded) {
         locker.unlock (); // Just in case post_gui_message has a q_debug ()
-        post_gui_message (tr ("Error"),
-            string (tr ("<nobr>File \"%1\"<br/>cannot be opened for writing.<br/><br/>"
+        post_gui_message (_("Error"),
+            string (_("<nobr>File \"%1\"<br/>cannot be opened for writing.<br/><br/>"
                        "The log output <b>cannot</b> be saved!</nobr>"))
                 .arg (name));
         return;
@@ -250,7 +250,7 @@ void Logger.set_log_flush (bool flush) {
 }
 
 void Logger.set_log_debug (bool debug) {
-    const QSet<string> rules = {debug ? QStringLiteral ("nextcloud.*.debug=true") : string ()};
+    const GLib.Set<string> rules = {debug ? QStringLiteral ("nextcloud.*.debug=true") : string ()};
     if (debug) {
         add_log_rule (rules);
     } else {
@@ -284,30 +284,30 @@ void Logger.disable_temporary_folder_log_dir () {
     _temporary_folder_log_dir = false;
 }
 
-void Logger.set_log_rules (QSet<string> &rules) {
+void Logger.set_log_rules (GLib.Set<string> &rules) {
     _log_rules = rules;
     string tmp;
     QTextStream out (&tmp);
     for (var &p : rules) {
-        out << p << QLatin1Char ('\n');
+        out << p << '\n';
     }
     q_debug () << tmp;
     QLoggingCategory.set_filter_rules (tmp);
 }
 
 void Logger.dump_crash_log () {
-    QFile log_file (QDir.temp_path () + QStringLiteral ("/" APPLICATION_NAME "-crash.log"));
-    if (log_file.open (QFile.WriteOnly)) {
+    GLib.File log_file (QDir.temp_path () + QStringLiteral ("/" APPLICATION_NAME "-crash.log"));
+    if (log_file.open (GLib.File.WriteOnly)) {
         QTextStream out (&log_file);
         for (int i = 1; i <= CrashLogSize; ++i) {
-            out << _crash_log[ (_crash_log_index + i) % CrashLogSize] << QLatin1Char ('\n');
+            out << _crash_log[ (_crash_log_index + i) % CrashLogSize] << '\n';
         }
     }
 }
 
 static bool compress_log (string original_name, string target_name) {
 #ifdef ZLIB_FOUND
-    QFile original (original_name);
+    GLib.File original (original_name);
     if (!original.open (QIODevice.ReadOnly))
         return false;
     var compressed = gzopen (target_name.to_utf8 (), "wb");
@@ -372,9 +372,9 @@ void Logger.on_enter_next_log_file () {
         if (!log_to_compress.is_empty ()) {
             string compressed_name = log_to_compress + ".gz";
             if (compress_log (log_to_compress, compressed_name)) {
-                QFile.remove (log_to_compress);
+                GLib.File.remove (log_to_compress);
             } else {
-                QFile.remove (compressed_name);
+                GLib.File.remove (compressed_name);
             }
         }
     }

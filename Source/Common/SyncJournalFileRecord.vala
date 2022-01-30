@@ -71,7 +71,7 @@ bool OCSYNC_EXPORT
 operator== (SyncJournalFileRecord &lhs,
     const SyncJournalFileRecord &rhs);
 
-class SyncJournalErrorBlacklistRecord {
+class SyncJournalErrorBlocklistRecord {
 
     public enum Category {
         /// Normal errors have no special behavior
@@ -169,7 +169,7 @@ class ConflictRecord {
         return _file_id;
     }
 
-    bool SyncJournalErrorBlacklistRecord.is_valid () {
+    bool SyncJournalErrorBlocklistRecord.is_valid () {
         return !_file.is_empty ()
             && (!_last_try_etag.is_empty () || _last_try_modtime != 0)
             && _last_try_time > 0;

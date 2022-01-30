@@ -337,8 +337,8 @@ void OwncloudGui.on_account_state_changed () {
 void OwncloudGui.on_tray_message_if_server_unsupported (Account account) {
     if (account.server_version_unsupported ()) {
         on_show_tray_message (
-            tr ("Unsupported Server Version"),
-            tr ("The server on account %1 runs an unsupported version %2. "
+            _("Unsupported Server Version"),
+            _("The server on account %1 runs an unsupported version %2. "
                "Using this client with unsupported server versions is untested and "
                "potentially dangerous. Proceed at your own risk.")
                 .arg (account.display_name (), account.server_version ()));
@@ -378,14 +378,14 @@ void OwncloudGui.on_compute_overall_sync_status () {
     if (!problem_accounts.empty ()) {
         _tray.set_icon (Theme.instance ().folder_offline_icon (true));
         if (all_disconnected) {
-            set_status_text (tr ("Disconnected"));
+            set_status_text (_("Disconnected"));
         } else {
-            set_status_text (tr ("Disconnected from some accounts"));
+            set_status_text (_("Disconnected from some accounts"));
         }
         string[] messages;
-        messages.append (tr ("Disconnected from accounts:"));
+        messages.append (_("Disconnected from accounts:"));
         foreach (AccountStatePtr a, problem_accounts) {
-            string message = tr ("Account %1 : %2").arg (a.account ().display_name (), a.state_string (a.state ()));
+            string message = _("Account %1 : %2").arg (a.account ().display_name (), a.state_string (a.state ()));
             if (!a.connection_errors ().empty ()) {
                 message += QLatin1String ("\n");
                 message += a.connection_errors ().join (QLatin1String ("\n"));
@@ -399,13 +399,13 @@ void OwncloudGui.on_compute_overall_sync_status () {
 
     if (all_signed_out) {
         _tray.set_icon (Theme.instance ().folder_offline_icon (true));
-        _tray.set_tool_tip (tr ("Please sign in"));
-        set_status_text (tr ("Signed out"));
+        _tray.set_tool_tip (_("Please sign in"));
+        set_status_text (_("Signed out"));
         return;
     } else if (all_paused) {
         _tray.set_icon (Theme.instance ().sync_state_icon (SyncResult.Paused, true));
-        _tray.set_tool_tip (tr ("Account synchronization is disabled"));
-        set_status_text (tr ("Synchronization is paused"));
+        _tray.set_tool_tip (_("Account synchronization is disabled"));
+        set_status_text (_("Synchronization is paused"));
         return;
     }
 
@@ -441,7 +441,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
                 folder.sync_result ().status (),
                 folder.sync_result ().has_unresolved_conflicts (),
                 folder.sync_paused ());
-            all_status_strings += tr ("Folder %1 : %2").arg (folder.short_gui_local_path (), folder_message);
+            all_status_strings += _("Folder %1 : %2").arg (folder.short_gui_local_path (), folder_message);
         }
         tray_message = all_status_strings.join (QLatin1String ("\n"));
 #endif
@@ -449,18 +449,18 @@ void OwncloudGui.on_compute_overall_sync_status () {
 
         if (overall_status == SyncResult.Success || overall_status == SyncResult.Problem) {
             if (has_unresolved_conflicts) {
-                set_status_text (tr ("Unresolved conflicts"));
+                set_status_text (_("Unresolved conflicts"));
             } else {
-                set_status_text (tr ("Up to date"));
+                set_status_text (_("Up to date"));
             }
         } else if (overall_status == SyncResult.Paused) {
-            set_status_text (tr ("Synchronization is paused"));
+            set_status_text (_("Synchronization is paused"));
         } else {
-            set_status_text (tr ("Error during synchronization"));
+            set_status_text (_("Error during synchronization"));
         }
     } else {
-        _tray.set_tool_tip (tr ("There are no sync folders configured."));
-        set_status_text (tr ("No sync folders configured"));
+        _tray.set_tool_tip (_("There are no sync folders configured."));
+        set_status_text (_("No sync folders configured"));
     }
 }
 
@@ -473,7 +473,7 @@ void OwncloudGui.on_show_tray_message (string title, string msg) {
     if (_tray)
         _tray.show_message (title, msg);
     else
-        q_c_warning (lc_application) << "Tray not ready : " << msg;
+        GLib.warn (lc_application) << "Tray not ready : " << msg;
 }
 
 void OwncloudGui.on_show_optional_tray_message (string title, string msg) {
@@ -487,7 +487,7 @@ void OwncloudGui.on_folder_open_action (string alias) {
     Folder f = FolderMan.instance ().folder (alias);
     if (f) {
         q_c_info (lc_application) << "opening local url " << f.path ();
-        QUrl url = QUrl.from_local_file (f.path ());
+        GLib.Uri url = GLib.Uri.from_local_file (f.path ());
         QDesktopServices.open_url (url);
     }
 }
@@ -499,10 +499,10 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo &progress) {
     if (progress.status () == ProgressInfo.Discovery) {
 #if 0
         if (!progress._current_discovered_remote_folder.is_empty ()) {
-            _action_status.on_set_text (tr ("Checking for changes in remote \"%1\"")
+            _action_status.on_set_text (_("Checking for changes in remote \"%1\"")
                                        .arg (progress._current_discovered_remote_folder));
         } else if (!progress._current_discovered_local_folder.is_empty ()) {
-            _action_status.on_set_text (tr ("Checking for changes in local \"%1\"")
+            _action_status.on_set_text (_("Checking for changes in local \"%1\"")
                                        .arg (progress._current_discovered_local_folder));
         }
 #endif
@@ -518,12 +518,12 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo &progress) {
         int64 total_file_count = q_max (progress.total_files (), current_file);
         string msg;
         if (progress.trust_eta ()) {
-            msg = tr ("Syncing %1 of %2 (%3 left)")
+            msg = _("Syncing %1 of %2 (%3 left)")
                       .arg (current_file)
                       .arg (total_file_count)
                       .arg (Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
         } else {
-            msg = tr ("Syncing %1 of %2")
+            msg = _("Syncing %1 of %2")
                       .arg (current_file)
                       .arg (total_file_count);
         }
@@ -532,10 +532,10 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo &progress) {
         string total_size_str = Utility.octets_to_string (progress.total_size ());
         string msg;
         if (progress.trust_eta ()) {
-            msg = tr ("Syncing %1 (%2 left)")
+            msg = _("Syncing %1 (%2 left)")
                       .arg (total_size_str, Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
         } else {
-            msg = tr ("Syncing %1")
+            msg = _("Syncing %1")
                       .arg (total_size_str);
         }
         //_action_status.on_set_text (msg);
@@ -545,12 +545,12 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo &progress) {
 
         string kind_str = Progress.as_result_string (progress._last_completed_item);
         string time_str = QTime.current_time ().to_string ("hh:mm");
-        string action_text = tr ("%1 (%2, %3)").arg (progress._last_completed_item._file, kind_str, time_str);
+        string action_text = _("%1 (%2, %3)").arg (progress._last_completed_item._file, kind_str, time_str);
         var action = new QAction (action_text, this);
         Folder f = FolderMan.instance ().folder (folder);
         if (f) {
             string full_path = f.path () + '/' + progress._last_completed_item._file;
-            if (QFile (full_path).exists ()) {
+            if (GLib.File (full_path).exists ()) {
                 connect (action, &QAction.triggered, this, [this, full_path] {
                     this.on_open_path (full_path);
                 });
@@ -648,13 +648,13 @@ void OwncloudGui.on_toggle_log_browser () {
 }
 
 void OwncloudGui.on_open_owncloud () {
-    if (var account = qvariant_cast<AccountPtr> (sender ().property (property_account_c))) {
+    if (var account = qvariant_cast<AccountPointer> (sender ().property (property_account_c))) {
         Utility.open_browser (account.url ());
     }
 }
 
 void OwncloudGui.on_help () {
-    QDesktopServices.open_url (QUrl (Theme.instance ().help_url ()));
+    QDesktopServices.open_url (GLib.Uri (Theme.instance ().help_url ()));
 }
 
 void OwncloudGui.raise_dialog (Gtk.Widget raise_widget) {
@@ -669,7 +669,7 @@ void OwncloudGui.raise_dialog (Gtk.Widget raise_widget) {
 void OwncloudGui.on_show_share_dialog (string share_path, string local_path, Share_dialog_start_page start_page) {
     const var folder = FolderMan.instance ().folder_for_path (local_path);
     if (!folder) {
-        q_c_warning (lc_application) << "Could not open share dialog for" << local_path << "no responsible folder found";
+        GLib.warn (lc_application) << "Could not open share dialog for" << local_path << "no responsible folder found";
         return;
     }
 

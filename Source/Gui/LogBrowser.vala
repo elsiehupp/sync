@@ -22,7 +22,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QCheckBox>
 // #include <QPlain_text_edit>
 // #include <QTextStream>
-// #include <QFile>
+// #include <GLib.File>
 // #include <GLib.List>
 // #include <QDateTime>
 // #include <Gtk.Dialog>
@@ -53,13 +53,13 @@ protected slots:
         : Gtk.Dialog (parent) {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         set_object_name ("Log_browser"); // for save/restore_geometry ()
-        set_window_title (tr ("Log Output"));
+        set_window_title (_("Log Output"));
         set_minimum_width (600);
 
         var main_layout = new QVBoxLayout;
 
         var label = new QLabel (
-            tr ("The client can write debug logs to a temporary folder. "
+            _("The client can write debug logs to a temporary folder. "
                "These logs are very helpful for diagnosing problems.\n"
                "Since log files can get large, the client will on_start a new one for each sync "
                "run and compress older ones. It will also delete log files after a couple "
@@ -73,24 +73,24 @@ protected slots:
 
         // button to permanently save logs
         var enable_logging_button = new QCheckBox;
-        enable_logging_button.on_set_text (tr ("Enable logging to temporary folder"));
+        enable_logging_button.on_set_text (_("Enable logging to temporary folder"));
         enable_logging_button.set_checked (ConfigFile ().automatic_log_dir ());
         connect (enable_logging_button, &QCheckBox.toggled, this, &Log_browser.toggle_permanent_logging);
         main_layout.add_widget (enable_logging_button);
 
         label = new QLabel (
-            tr ("This setting persists across client restarts.\n"
+            _("This setting persists across client restarts.\n"
                "Note that using any logging command line options will override this setting."));
         label.set_word_wrap (true);
         label.set_size_policy (QSize_policy.Expanding, QSize_policy.Minimum_expanding);
         main_layout.add_widget (label);
 
         var open_folder_button = new QPushButton;
-        open_folder_button.on_set_text (tr ("Open folder"));
+        open_folder_button.on_set_text (_("Open folder"));
         connect (open_folder_button, &QPushButton.clicked, this, [] () {
             string path = Logger.instance ().temporary_folder_log_dir_path ();
             QDir ().mkpath (path);
-            QDesktopServices.open_url (QUrl.from_local_file (path));
+            QDesktopServices.open_url (GLib.Uri.from_local_file (path));
         });
         main_layout.add_widget (open_folder_button);
 

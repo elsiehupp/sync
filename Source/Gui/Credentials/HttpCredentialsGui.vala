@@ -50,8 +50,8 @@ class HttpCredentialsGui : HttpCredentials {
     In case of oauth, return an URL to the link to open the browser.
     An invalid URL otherwise
     ***********************************************************/
-    public QUrl authorisation_link () {
-        return _async_auth ? _async_auth.authorisation_link () : QUrl ();
+    public GLib.Uri authorisation_link () {
+        return _async_auth ? _async_auth.authorisation_link () : GLib.Uri ();
     }
 
     static string request_app_password_text (Account account);
@@ -92,7 +92,7 @@ void HttpCredentialsGui.on_ask_from_user_async () {
             on_show_dialog ();
         } else {
             // Shibboleth?
-            q_c_warning (lc_http_credentials_gui) << "Bad http auth type:" << type;
+            GLib.warn (lc_http_credentials_gui) << "Bad http auth type:" << type;
             emit asked ();
         }
     });
@@ -125,7 +125,7 @@ void HttpCredentialsGui.on_async_auth_result (OAuth.Result r, string user,
 }
 
 void HttpCredentialsGui.on_show_dialog () {
-    string msg = tr ("Please enter %1 password:<br>"
+    string msg = _("Please enter %1 password:<br>"
                      "<br>"
                      "User : %2<br>"
                      "Account : %3<br>")
@@ -139,14 +139,14 @@ void HttpCredentialsGui.on_show_dialog () {
     }
     if (!_fetch_error_string.is_empty ()) {
         msg += QLatin1String ("<br>")
-            + tr ("Reading from keychain failed with error : \"%1\"")
+            + _("Reading from keychain failed with error : \"%1\"")
                   .arg (Utility.escape (_fetch_error_string))
             + QLatin1String ("<br>");
     }
 
     var dialog = new QInputDialog ();
     dialog.set_attribute (Qt.WA_DeleteOnClose, true);
-    dialog.set_window_title (tr ("Enter Password"));
+    dialog.set_window_title (_("Enter Password"));
     dialog.set_label_text (msg);
     dialog.set_text_value (_previous_password);
     dialog.set_text_echo_mode (QLineEdit.Password);
@@ -183,7 +183,7 @@ string HttpCredentialsGui.request_app_password_text (Account account) {
         return string ();
     }
 
-    return tr ("<a href=\"%1\">Click here</a> to request an app password from the web interface.")
+    return _("<a href=\"%1\">Click here</a> to request an app password from the web interface.")
         .arg (url);
 }
 } // namespace Occ

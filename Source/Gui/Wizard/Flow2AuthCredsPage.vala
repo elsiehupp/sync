@@ -13,7 +13,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 // #include <GLib.List>
 // #include <QMap>
 // #include <QNetworkCookie>
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <QPointer>
 
 

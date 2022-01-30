@@ -7,7 +7,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 #ifndef FLOW2AUTHWIDGET_H
 const int FLOW2AUTHWIDGET_H
 
-// #include <QUrl>
+// #include <GLib.Uri>
 // #include <Gtk.Widget>
 
 

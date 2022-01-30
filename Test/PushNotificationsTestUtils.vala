@@ -19,7 +19,7 @@ class FakeWebSocketServer : GLib.Object {
     ~FakeWebSocketServer () override;
 
     public QWebSocket authenticateAccount (
-        const Occ.AccountPtr account, std.function<void (Occ.PushNotifications pushNotifications)> beforeAuthentication = [] (Occ.PushNotifications *) {}, std.function<void (void)> afterAuthentication = [] {});
+        const Occ.AccountPointer account, std.function<void (Occ.PushNotifications pushNotifications)> beforeAuthentication = [] (Occ.PushNotifications *) {}, std.function<void (void)> afterAuthentication = [] {});
 
     public void close ();
 
@@ -33,7 +33,7 @@ class FakeWebSocketServer : GLib.Object {
 
     public void clearTextMessages ();
 
-    public static Occ.AccountPtr createAccount (string username = "user", string password = "password");
+    public static Occ.AccountPointer createAccount (string username = "user", string password = "password");
 
 signals:
     void closed ();
@@ -106,7 +106,7 @@ FakeWebSocketServer.~FakeWebSocketServer () {
     close ();
 }
 
-QWebSocket *FakeWebSocketServer.authenticateAccount (Occ.AccountPtr account, std.function<void (Occ.PushNotifications pushNotifications)> beforeAuthentication, std.function<void (void)> afterAuthentication) {
+QWebSocket *FakeWebSocketServer.authenticateAccount (Occ.AccountPointer account, std.function<void (Occ.PushNotifications pushNotifications)> beforeAuthentication, std.function<void (void)> afterAuthentication) {
     const var pushNotifications = account.pushNotifications ();
     Q_ASSERT (pushNotifications);
     QSignalSpy readySpy (pushNotifications, &Occ.PushNotifications.ready);
@@ -203,7 +203,7 @@ void FakeWebSocketServer.clearTextMessages () {
     _processTextMessageSpy.clear ();
 }
 
-Occ.AccountPtr FakeWebSocketServer.createAccount (string username, string password) {
+Occ.AccountPointer FakeWebSocketServer.createAccount (string username, string password) {
     var account = Occ.Account.create ();
 
     string[] typeList;

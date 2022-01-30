@@ -11,11 +11,11 @@ rights.  These rights are described in the Digia Qt LGPL Exception
 version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
-// #include <QFile>
+// #include <GLib.File>
 
 namespace SharedTools {
 
-class QtLockedFile : QFile {
+class QtLockedFile : GLib.File {
 
     public enum LockMode {
         NO_LOCK = 0,
@@ -74,7 +74,7 @@ namespace SharedTools {
     /***********************************************************
     \class QtLockedFile
 
-    \brief The QtLockedFile class extends QFile with advisory locking functions.
+    \brief The QtLockedFile class extends GLib.File with advisory locking functions.
 
     A file may be locked in read or write mode. Multiple instances of
     \e QtLockedFile, created in multiple processes running on the same
@@ -83,7 +83,7 @@ namespace SharedTools {
     exist simultaneously on the same file.
 
     The file locks are advisory. This means that nothing prevents
-    another process from manipulating a locked file using QFile or
+    another process from manipulating a locked file using GLib.File or
     file system functions offered by the OS. Serialization is only
     guaranteed if all processes that access the file use
     QtLockedFile. Also, while holding a lock on a file, a process
@@ -106,24 +106,24 @@ namespace SharedTools {
 
     /***********************************************************
         Constructs an unlocked \e QtLockedFile object. This constructor behaves in the same way
-    as \e QFile.QFile ().
+    as \e GLib.File.GLib.File ().
 
-    \sa QFile.QFile ()
+    \sa GLib.File.GLib.File ()
     ***********************************************************/
     QtLockedFile.QtLockedFile ()
-        : QFile () {
+        : GLib.File () {
         m_lock_mode = LockMode.NO_LOCK;
     }
 
 
     /***********************************************************
     Constructs an unlocked QtLockedFile object with file \a name. This constructor behaves in
-    the same way as \e QFile.QFile (string&).
+    the same way as \e GLib.File.GLib.File (string&).
 
-    \sa QFile.QFile ()
+    \sa GLib.File.GLib.File ()
     ***********************************************************/
     QtLockedFile.QtLockedFile (string name)
-        : QFile (name) {
+        : GLib.File (name) {
         m_lock_mode = LockMode.NO_LOCK;
     }
 

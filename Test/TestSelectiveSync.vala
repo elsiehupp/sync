@@ -69,8 +69,8 @@ class TestSelectiveSync : GLib.Object {
         QCOMPARE (sizeRequests.count (), 1); // "A/newBigDir";
         sizeRequests.clear ();
 
-        // Simulate that we accept all files by seting a wildcard white list
-        fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncWhiteList,
+        // Simulate that we accept all files by seting a wildcard allow list
+        fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
             string[] () << QLatin1String ("/"));
         fakeFolder.syncEngine ().journal ().schedulePathForRemoteDiscovery (string ("A/newBigDir"));
         QVERIFY (fakeFolder.syncOnce ());

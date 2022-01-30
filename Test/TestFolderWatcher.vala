@@ -151,9 +151,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     private on_ void testRemoveAFile () {
         string file (_rootPath+"/a1/b2/todelete.bin");
-        QVERIFY (QFile.exists (file));
+        QVERIFY (GLib.File.exists (file));
         rm (file);
-        QVERIFY (!QFile.exists (file));
+        QVERIFY (!GLib.File.exists (file));
 
         QVERIFY (waitForPathChanged (file));
     }
@@ -161,9 +161,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     private on_ void testRenameAFile () {
         string file1 (_rootPath+"/a2/renamefile");
         string file2 (_rootPath+"/a2/renamefile.renamed");
-        QVERIFY (QFile.exists (file1));
+        QVERIFY (GLib.File.exists (file1));
         mv (file1, file2);
-        QVERIFY (QFile.exists (file2));
+        QVERIFY (GLib.File.exists (file2));
 
         QVERIFY (waitForPathChanged (file1));
         QVERIFY (waitForPathChanged (file2));
@@ -172,9 +172,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     private on_ void testMoveAFile () {
         string old_file (_rootPath+"/a1/movefile");
         string new_file (_rootPath+"/a2/movefile.renamed");
-        QVERIFY (QFile.exists (old_file));
+        QVERIFY (GLib.File.exists (old_file));
         mv (old_file, new_file);
-        QVERIFY (QFile.exists (new_file));
+        QVERIFY (GLib.File.exists (new_file));
 
         QVERIFY (waitForPathChanged (old_file));
         QVERIFY (waitForPathChanged (new_file));
@@ -183,9 +183,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     private on_ void testRenameDirectorySameBase () {
         string old_file (_rootPath+"/a1/b1");
         string new_file (_rootPath+"/a1/brename");
-        QVERIFY (QFile.exists (old_file));
+        QVERIFY (GLib.File.exists (old_file));
         mv (old_file, new_file);
-        QVERIFY (QFile.exists (new_file));
+        QVERIFY (GLib.File.exists (new_file));
 
         QVERIFY (waitForPathChanged (old_file));
         QVERIFY (waitForPathChanged (new_file));
@@ -204,9 +204,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     private on_ void testRenameDirectoryDifferentBase () {
         string old_file (_rootPath+"/a1/brename");
         string new_file (_rootPath+"/bren");
-        QVERIFY (QFile.exists (old_file));
+        QVERIFY (GLib.File.exists (old_file));
         mv (old_file, new_file);
-        QVERIFY (QFile.exists (new_file));
+        QVERIFY (GLib.File.exists (new_file));
 
         QVERIFY (waitForPathChanged (old_file));
         QVERIFY (waitForPathChanged (new_file));

@@ -15,7 +15,7 @@ Fetching enabled apps from the OCS Apps API
 ***********************************************************/
 class OcsNavigationAppsJob : Ocs_job {
 
-    public OcsNavigationAppsJob (AccountPtr account);
+    public OcsNavigationAppsJob (AccountPointer account);
 
 
     /***********************************************************
@@ -37,7 +37,7 @@ signals:
     private void on_job_done (QJsonDocument &reply, int status_code);
 };
 
-    OcsNavigationAppsJob.OcsNavigationAppsJob (AccountPtr account)
+    OcsNavigationAppsJob.OcsNavigationAppsJob (AccountPointer account)
         : Ocs_job (account) {
         set_path ("ocs/v2.php/core/navigation/apps");
         connect (this, &OcsNavigationAppsJob.job_finished, this, &OcsNavigationAppsJob.on_job_done);

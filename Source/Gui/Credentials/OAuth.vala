@@ -14,7 +14,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 // #pragma once
 // #include <QPointer>
 // #include <QTcpServer>
-// #include <QUrl>
+// #include <GLib.Uri>
 
 namespace Occ {
 
@@ -56,7 +56,7 @@ class OAuth : GLib.Object {
     public bool open_browser ();
 
 
-    public QUrl authorisation_link ();
+    public GLib.Uri authorisation_link ();
 
 signals:
     /***********************************************************
@@ -121,7 +121,7 @@ signals:
 
                     string code = rx_match.captured (1); // The 'code' is the first capture of the regexp
 
-                    QUrl request_token = Utility.concat_url_path (_account.url ().to_string (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
+                    GLib.Uri request_token = Utility.concat_url_path (_account.url ().to_string (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
                     QNetworkRequest req;
                     req.set_header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
 
@@ -135,7 +135,7 @@ signals:
                     QUrlQuery arguments (string (
                         "grant_type=authorization_code&code=%1&redirect_uri=http://localhost:%2")
                                             .arg (code, string.number (_server.server_port ())));
-                    request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
+                    request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
                     var job = _account.send_request ("POST", request_token, req, request_body);
                     job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
@@ -146,7 +146,7 @@ signals:
                         string access_token = json["access_token"].to_string ();
                         string refresh_token = json["refresh_token"].to_string ();
                         string user = json["user_id"].to_string ();
-                        QUrl message_url = json["message_url"].to_string ();
+                        GLib.Uri message_url = json["message_url"].to_string ();
 
                         if (reply.error () != QNetworkReply.NoError || json_parse_error.error != QJsonParseError.NoError
                             || json_data.is_empty () || json.is_empty () || refresh_token.is_empty () || access_token.is_empty ()
@@ -154,37 +154,37 @@ signals:
                             string error_reason;
                             string error_from_json = json["error"].to_string ();
                             if (!error_from_json.is_empty ()) {
-                                error_reason = tr ("Error returned from the server : <em>%1</em>")
+                                error_reason = _("Error returned from the server : <em>%1</em>")
                                                   .arg (error_from_json.to_html_escaped ());
                             } else if (reply.error () != QNetworkReply.NoError) {
-                                error_reason = tr ("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
+                                error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                                                   .arg (reply.error_string ().to_html_escaped ());
                             } else if (json_data.is_empty ()) {
                                 // Can happen if a funky load balancer strips away POST data, e.g. BigIP APM my.policy
-                                error_reason = tr ("Empty JSON from OAuth2 redirect");
+                                error_reason = _("Empty JSON from OAuth2 redirect");
                                 // We explicitly have this as error case since the json qc_warning output below is misleading,
                                 // it will show a fake json will null values that actually never was received like this as
                                 // soon as you access json["whatever"] the debug output json will claim to have "whatever":null
                             } else if (json_parse_error.error != QJsonParseError.NoError) {
-                                error_reason = tr ("Could not parse the JSON returned from the server : <br><em>%1</em>")
+                                error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
                                                   .arg (json_parse_error.error_string ());
                             } else {
-                                error_reason = tr ("The reply from the server did not contain all expected fields");
+                                error_reason = _("The reply from the server did not contain all expected fields");
                             }
-                            q_c_warning (lc_oauth) << "Error when getting the access_token" << json << error_reason;
+                            GLib.warn (lc_oauth) << "Error when getting the access_token" << json << error_reason;
                             http_reply_and_close (socket, "500 Internal Server Error",
-                                tr ("<h1>Login Error</h1><p>%1</p>").arg (error_reason).to_utf8 ().const_data ());
+                                _("<h1>Login Error</h1><p>%1</p>").arg (error_reason).to_utf8 ().const_data ());
                             emit result (Error);
                             return;
                         }
                         if (!_expected_user.is_null () && user != _expected_user) {
                             // Connected with the wrong user
-                            string message = tr ("<h1>Wrong user</h1>"
+                            string message = _("<h1>Wrong user</h1>"
                                                  "<p>You logged-in with user <em>%1</em>, but must login with user <em>%2</em>.<br>"
                                                  "Please log out of %3 in another tab, then <a href='%4'>click here</a> "
                                                  "and log in as user %2</p>")
                                                   .arg (user, _expected_user, Theme.instance ().app_name_gui (),
-                                                      authorisation_link ().to_string (QUrl.FullyEncoded));
+                                                      authorisation_link ().to_string (GLib.Uri.FullyEncoded));
                             http_reply_and_close (socket, "200 OK", message.to_utf8 ().const_data ());
                             // We are still listening on the socket so we will get the new connection
                             return;
@@ -203,7 +203,7 @@ signals:
         });
     }
 
-    QUrl OAuth.authorisation_link () {
+    GLib.Uri OAuth.authorisation_link () {
         Q_ASSERT (_server.is_listening ());
         QUrlQuery query;
         query.set_query_items ({
@@ -222,7 +222,7 @@ signals:
         });
         if (!_expected_user.is_null ())
             query.add_query_item ("user", _expected_user);
-        QUrl url = Utility.concat_url_path (_account.url (), QLatin1String ("/index.php/apps/oauth2/authorize"), query);
+        GLib.Uri url = Utility.concat_url_path (_account.url (), QLatin1String ("/index.php/apps/oauth2/authorize"), query);
         return url;
     }
 

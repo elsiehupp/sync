@@ -110,9 +110,9 @@ signals:
 protected slots:
     void on_check_server_and_auth ();
 
-    void on_status_found (QUrl url, QJsonObject &info);
+    void on_status_found (GLib.Uri url, QJsonObject &info);
     void on_no_status_found (QNetworkReply reply);
-    void on_job_timeout (QUrl url);
+    void on_job_timeout (GLib.Uri url);
 
     void on_auth_failed (QNetworkReply reply);
     void on_auth_success ();
@@ -138,7 +138,7 @@ protected slots:
 
     private string[] _errors;
     private AccountStatePtr _account_state;
-    private AccountPtr _account;
+    private AccountPointer _account;
     private bool _is_checking_server_and_auth;
 };
 
@@ -155,17 +155,17 @@ protected slots:
 
     void ConnectionValidator.on_check_server_and_auth () {
         if (!_account) {
-            _errors << tr ("No Nextcloud account configured");
+            _errors << _("No Nextcloud account configured");
             report_result (NotConfigured);
             return;
         }
-        q_c_debug (lc_connection_validator) << "Checking server and authentication";
+        GLib.debug (lc_connection_validator) << "Checking server and authentication";
 
         _is_checking_server_and_auth = true;
 
         // Lookup system proxy in a thread https://github.com/owncloud/client/issues/2993
         if (ClientProxy.is_using_system_default ()) {
-            q_c_debug (lc_connection_validator) << "Trying to look up system proxy";
+            GLib.debug (lc_connection_validator) << "Trying to look up system proxy";
             ClientProxy.lookup_system_proxy_async (_account.url (),
                 this, SLOT (on_system_proxy_lookup_done (QNetworkProxy)));
         } else {
@@ -178,7 +178,7 @@ protected slots:
 
     void ConnectionValidator.on_system_proxy_lookup_done (QNetworkProxy &proxy) {
         if (!_account) {
-            q_c_warning (lc_connection_validator) << "Bailing out, Account had been deleted";
+            GLib.warn (lc_connection_validator) << "Bailing out, Account had been deleted";
             return;
         }
 
@@ -203,7 +203,7 @@ protected slots:
         check_job.on_start ();
     }
 
-    void ConnectionValidator.on_status_found (QUrl url, QJsonObject &info) {
+    void ConnectionValidator.on_status_found (GLib.Uri url, QJsonObject &info) {
         // Newer servers don't disclose any version in status.php anymore
         // https://github.com/owncloud/core/pull/27473/files
         // so this string can be empty.
@@ -240,7 +240,7 @@ protected slots:
     // status.php could not be loaded (network or server issue!).
     void ConnectionValidator.on_no_status_found (QNetworkReply reply) {
         var job = qobject_cast<CheckServerJob> (sender ());
-        q_c_warning (lc_connection_validator) << reply.error () << job.error_string () << reply.peek (1024);
+        GLib.warn (lc_connection_validator) << reply.error () << job.error_string () << reply.peek (1024);
         if (reply.error () == QNetworkReply.SslHandshakeFailedError) {
             report_result (SslError);
             return;
@@ -248,18 +248,18 @@ protected slots:
 
         if (!_account.credentials ().still_valid (reply)) {
             // Note: Why would this happen on a status.php request?
-            _errors.append (tr ("Authentication error : Either username or password are wrong."));
+            _errors.append (_("Authentication error : Either username or password are wrong."));
         } else {
-            //_errors.append (tr ("Unable to connect to %1").arg (_account.url ().to_string ()));
+            //_errors.append (_("Unable to connect to %1").arg (_account.url ().to_string ()));
             _errors.append (job.error_string ());
         }
         report_result (StatusNotFound);
     }
 
-    void ConnectionValidator.on_job_timeout (QUrl url) {
+    void ConnectionValidator.on_job_timeout (GLib.Uri url) {
         Q_UNUSED (url);
-        //_errors.append (tr ("Unable to connect to %1").arg (url.to_string ()));
-        _errors.append (tr ("Timeout"));
+        //_errors.append (_("Unable to connect to %1").arg (url.to_string ()));
+        _errors.append (_("Timeout"));
         report_result (Timeout);
     }
 
@@ -273,7 +273,7 @@ protected slots:
 
         // simply GET the webdav root, will fail if credentials are wrong.
         // continue in on_auth_check here :-)
-        q_c_debug (lc_connection_validator) << "# Check whether authenticated propfind works.";
+        GLib.debug (lc_connection_validator) << "# Check whether authenticated propfind works.";
         var job = new PropfindJob (_account, "/", this);
         job.on_set_timeout (timeout_to_use_msec);
         job.set_properties (GLib.List<GLib.ByteArray> () << "getlastmodified");
@@ -292,8 +292,8 @@ protected slots:
 
         } else if (reply.error () == QNetworkReply.AuthenticationRequiredError
             || !_account.credentials ().still_valid (reply)) {
-            q_c_warning (lc_connection_validator) << "******** Password is wrong!" << reply.error () << job.error_string ();
-            _errors << tr ("The provided credentials are not correct");
+            GLib.warn (lc_connection_validator) << "******** Password is wrong!" << reply.error () << job.error_string ();
+            _errors << _("The provided credentials are not correct");
             stat = CredentialsWrong;
 
         } else if (reply.error () != QNetworkReply.NoError) {
@@ -339,7 +339,7 @@ protected slots:
         }
 
         // Check for the direct_editing capability
-        QUrl direct_editing_uRL = QUrl (caps["files"].to_object ()["direct_editing"].to_object ()["url"].to_string ());
+        GLib.Uri direct_editing_uRL = GLib.Uri (caps["files"].to_object ()["direct_editing"].to_object ()["url"].to_string ());
         string direct_editing_e_tag = caps["files"].to_object ()["direct_editing"].to_object ()["etag"].to_string ();
         _account.fetch_direct_editors (direct_editing_uRL, direct_editing_e_tag);
 
@@ -359,8 +359,8 @@ protected slots:
         // We cannot deal with servers < 7.0.0
         if (_account.server_version_int ()
             && _account.server_version_int () < Account.make_server_version (7, 0, 0)) {
-            _errors.append (tr ("The configured server for this client is too old"));
-            _errors.append (tr ("Please update to the latest server and restart the client."));
+            _errors.append (_("The configured server for this client is too old"));
+            _errors.append (_("Please update to the latest server and restart the client."));
             report_result (ServerVersionMismatch);
             return false;
         }
