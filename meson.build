@@ -9,7 +9,7 @@ srcs = files([
 #    'Version.vala.in'
 ])
 
-subdir('Source')
+subdir('Vala')
 
 executable(
     meson.project_name(),

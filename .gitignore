@@ -34,6 +34,8 @@ CMakeSettings.json
 
 build*
 build/*
+Build*
+Build/*
 builddir*
 builddir/*
 
