@@ -32,6 +32,11 @@ CMakeSettings.json
 *.user
 *.sln.docstates
 
+build*
+build/*
+builddir*
+builddir/*
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
