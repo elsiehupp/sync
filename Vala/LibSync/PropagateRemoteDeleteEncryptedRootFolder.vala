@@ -111,8 +111,8 @@ void Propagate_remote_delete_encrypted_root_folder.on_folder_encrypted_metadata_
     GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Metadata updated, sending to the server.";
 
     var job = new UpdateMetadataApiJob (this.propagator.account (), this.folder_id, metadata.encrypted_metadata (), this.folder_token);
-    connect (job, &UpdateMetadataApiJob.on_success, this, [this] (GLib.ByteArray& file_id) {
-        Q_UNUSED (file_id);
+    connect (job, &UpdateMetadataApiJob.on_success, this, [this] (GLib.ByteArray file_identifier) {
+        Q_UNUSED (file_identifier);
         for (var it = this.nested_items.const_begin (); it != this.nested_items.const_end (); ++it) {
             delete_nested_remote_item (it.key ());
         }
@@ -130,7 +130,7 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
         return;
     }
 
-    const string encrypted_filename = delete_job.property (encrypted_filename_property_key).to_"";
+    const string encrypted_filename = delete_job.property (encrypted_filename_property_key).to_string ();
 
     if (!encrypted_filename.is_empty ()) {
         const var nested_item = this.nested_items.take (encrypted_filename);
@@ -143,7 +143,7 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
 
     QNetworkReply.NetworkError err = delete_job.reply ().error ();
 
-    const var http_error_code = delete_job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+    const var http_error_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
     this.item._response_time_stamp = delete_job.response_timestamp ();
     this.item._request_id = delete_job.request_id ();
 
@@ -162,7 +162,7 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
         // throw an error.
         store_first_error_string (_("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                         .arg (http_error_code)
-                        .arg (delete_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_""));
+                        .arg (delete_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
         if (this.item._http_error_code == 0) {
             this.item._http_error_code = http_error_code;
         }
@@ -196,12 +196,12 @@ void Propagate_remote_delete_encrypted_root_folder.delete_nested_remote_item (st
 
 void Propagate_remote_delete_encrypted_root_folder.decrypt_and_remote_delete () {
     var job = new Occ.SetEncryptionFlagApiJob (this.propagator.account (), this.item._file_id, Occ.SetEncryptionFlagApiJob.Clear, this);
-    connect (job, &Occ.SetEncryptionFlagApiJob.on_success, this, [this] (GLib.ByteArray file_id) {
-        Q_UNUSED (file_id);
+    connect (job, &Occ.SetEncryptionFlagApiJob.on_success, this, [this] (GLib.ByteArray file_identifier) {
+        Q_UNUSED (file_identifier);
         delete_remote_item (this.item._file);
     });
-    connect (job, &Occ.SetEncryptionFlagApiJob.error, this, [this] (GLib.ByteArray file_id, int http_return_code) {
-        Q_UNUSED (file_id);
+    connect (job, &Occ.SetEncryptionFlagApiJob.error, this, [this] (GLib.ByteArray file_identifier, int http_return_code) {
+        Q_UNUSED (file_identifier);
         this.item._http_error_code = http_return_code;
         task_failed ();
     });

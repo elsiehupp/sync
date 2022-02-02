@@ -146,9 +146,9 @@ class OcsUserStatusConnector : UserStatusConnector {
     Occ.UserStatus json_extract_user_status (QJsonObject json) {
         const var clear_at = json_extract_clear_at (json);
 
-        const Occ.UserStatus user_status (json.value ("message_id").to_"",
-            json.value ("message").to_"".trimmed (),
-            json.value ("icon").to_"".trimmed (), string_to_user_online_status (json.value ("status").to_""),
+        const Occ.UserStatus user_status (json.value ("message_id").to_string (),
+            json.value ("message").to_string ().trimmed (),
+            json.value ("icon").to_string ().trimmed (), string_to_user_online_status (json.value ("status").to_string ()),
             json.value ("message_is_predefined").to_bool (false), clear_at);
 
         return user_status;

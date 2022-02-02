@@ -75,12 +75,12 @@ class TokenCredentials : AbstractCredentials {
         }
 
 
-        protected QNetworkReply create_request (Operation op, QNetworkRequest request, QIODevice outgoing_data) {
+        protected QNetworkReply create_request (Operation op, Soup.Request request, QIODevice outgoing_data) {
             if (this.cred.user ().is_empty () || this.cred.password ().is_empty ()) {
                 GLib.warn (lc_token_credentials) << "Empty user/password provided!";
             }
 
-            QNetworkRequest req (request);
+            Soup.Request req (request);
 
             GLib.ByteArray cred_hash = GLib.ByteArray (this.cred.user ().to_utf8 () + ":" + this.cred.password ().to_utf8 ()).to_base64 ();
             req.set_raw_header (GLib.ByteArray ("Authorization"), GLib.ByteArray ("Basic ") + cred_hash);
@@ -173,7 +173,7 @@ class TokenCredentials : AbstractCredentials {
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,
         // those credentials were invalid and we terminate.
-        GLib.warn (lc_token_credentials) << "Stop request : Authentication failed for " << reply.url ().to_"";
+        GLib.warn (lc_token_credentials) << "Stop request : Authentication failed for " << reply.url ().to_string ();
         reply.set_property (authentication_failed_c, true);
         reply.close ();
     }

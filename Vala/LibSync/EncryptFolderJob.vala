@@ -21,7 +21,7 @@ class EncryptFolderJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public EncryptFolderJob (AccountPointer account, SyncJournalDb journal, string path, GLib.ByteArray file_id, GLib.Object parent = new GLib.Object ());
+    public EncryptFolderJob (AccountPointer account, SyncJournalDb journal, string path, GLib.ByteArray file_identifier, GLib.Object parent = new GLib.Object ());
 
     /***********************************************************
     ***********************************************************/
@@ -53,21 +53,21 @@ signals:
     private AccountPointer this.account;
     private SyncJournalDb this.journal;
     private string this.path;
-    private GLib.ByteArray this.file_id;
+    private GLib.ByteArray file_identifier;
     private GLib.ByteArray this.folder_token;
     private string this.error_string;
 };
 
-    EncryptFolderJob.EncryptFolderJob (AccountPointer account, SyncJournalDb journal, string path, GLib.ByteArray file_id, GLib.Object parent)
+    EncryptFolderJob.EncryptFolderJob (AccountPointer account, SyncJournalDb journal, string path, GLib.ByteArray file_identifier, GLib.Object parent)
         : GLib.Object (parent)
         , this.account (account)
         , this.journal (journal)
         , this.path (path)
-        , this.file_id (file_id) {
+        , this.file_identifier (file_identifier) {
     }
 
     void EncryptFolderJob.on_start () {
-        var job = new Occ.SetEncryptionFlagApiJob (this.account, this.file_id, Occ.SetEncryptionFlagApiJob.Set, this);
+        var job = new Occ.SetEncryptionFlagApiJob (this.account, this.file_identifier, Occ.SetEncryptionFlagApiJob.Set, this);
         connect (job, &Occ.SetEncryptionFlagApiJob.on_success, this, &EncryptFolderJob.on_encryption_flag_success);
         connect (job, &Occ.SetEncryptionFlagApiJob.error, this, &EncryptFolderJob.on_encryption_flag_error);
         job.on_start ();
@@ -77,7 +77,7 @@ signals:
         return this.error_string;
     }
 
-    void EncryptFolderJob.on_encryption_flag_success (GLib.ByteArray file_id) {
+    void EncryptFolderJob.on_encryption_flag_success (GLib.ByteArray file_identifier) {
         SyncJournalFileRecord record;
         this.journal.get_file_record (this.path, record);
         if (record.is_valid ()) {
@@ -85,7 +85,7 @@ signals:
             this.journal.set_file_record (record);
         }
 
-        var lock_job = new LockEncryptFolderApiJob (this.account, file_id, this);
+        var lock_job = new LockEncryptFolderApiJob (this.account, file_identifier, this);
         connect (lock_job, &LockEncryptFolderApiJob.on_success,
                 this, &EncryptFolderJob.on_lock_for_encryption_success);
         connect (lock_job, &LockEncryptFolderApiJob.error,
@@ -93,12 +93,12 @@ signals:
         lock_job.on_start ();
     }
 
-    void EncryptFolderJob.on_encryption_flag_error (GLib.ByteArray file_id, int http_error_code) {
-        q_debug () << "Error on the encryption flag of" << file_id << "HTTP code:" << http_error_code;
+    void EncryptFolderJob.on_encryption_flag_error (GLib.ByteArray file_identifier, int http_error_code) {
+        q_debug () << "Error on the encryption flag of" << file_identifier << "HTTP code:" << http_error_code;
         /* emit */ finished (Error);
     }
 
-    void EncryptFolderJob.on_lock_for_encryption_success (GLib.ByteArray file_id, GLib.ByteArray token) {
+    void EncryptFolderJob.on_lock_for_encryption_success (GLib.ByteArray file_identifier, GLib.ByteArray token) {
         this.folder_token = token;
 
         FolderMetadata empty_metadata (this.account);
@@ -111,7 +111,7 @@ signals:
             return;
         }
 
-        var store_metadata_job = new StoreMetaDataApiJob (this.account, file_id, empty_metadata.encrypted_metadata (), this);
+        var store_metadata_job = new StoreMetaDataApiJob (this.account, file_identifier, empty_metadata.encrypted_metadata (), this);
         connect (store_metadata_job, &StoreMetaDataApiJob.on_success,
                 this, &EncryptFolderJob.on_upload_metadata_success);
         connect (store_metadata_job, &StoreMetaDataApiJob.error,
@@ -139,17 +139,17 @@ signals:
         unlock_job.on_start ();
     }
 
-    void EncryptFolderJob.on_lock_for_encryption_error (GLib.ByteArray file_id, int http_error_code) {
-        q_c_info (lc_encrypt_folder_job ()) << "Locking error for" << file_id << "HTTP code:" << http_error_code;
+    void EncryptFolderJob.on_lock_for_encryption_error (GLib.ByteArray file_identifier, int http_error_code) {
+        q_c_info (lc_encrypt_folder_job ()) << "Locking error for" << file_identifier << "HTTP code:" << http_error_code;
         /* emit */ finished (Error);
     }
 
-    void EncryptFolderJob.on_unlock_folder_error (GLib.ByteArray file_id, int http_error_code) {
-        q_c_info (lc_encrypt_folder_job ()) << "Unlocking error for" << file_id << "HTTP code:" << http_error_code;
+    void EncryptFolderJob.on_unlock_folder_error (GLib.ByteArray file_identifier, int http_error_code) {
+        q_c_info (lc_encrypt_folder_job ()) << "Unlocking error for" << file_identifier << "HTTP code:" << http_error_code;
         /* emit */ finished (Error);
     }
-    void EncryptFolderJob.on_unlock_folder_success (GLib.ByteArray file_id) {
-        q_c_info (lc_encrypt_folder_job ()) << "Unlocking on_success for" << file_id;
+    void EncryptFolderJob.on_unlock_folder_success (GLib.ByteArray file_identifier) {
+        q_c_info (lc_encrypt_folder_job ()) << "Unlocking on_success for" << file_identifier;
         /* emit */ finished (Success);
     }
 

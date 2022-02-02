@@ -67,13 +67,13 @@ class Propagate_upload_encrypted : GLib.Object {
     ***********************************************************/
     private void on_folder_encrypted_id_received (string[] list);
     private void on_folder_encrypted_id_error (QNetworkReply r);
-    private void on_folder_locked_successfully (GLib.ByteArray& file_id, GLib.ByteArray& token);
-    private void on_folder_locked_error (GLib.ByteArray& file_id, int http_error_code);
-    private void on_try_lock (GLib.ByteArray& file_id);
+    private void on_folder_locked_successfully (GLib.ByteArray file_identifier, GLib.ByteArray token);
+    private void on_folder_locked_error (GLib.ByteArray file_identifier, int http_error_code);
+    private void on_try_lock (GLib.ByteArray file_identifier);
     private void on_folder_encrypted_metadata_received (QJsonDocument json, int status_code);
-    private void on_folder_encrypted_metadata_error (GLib.ByteArray& file_id, int http_return_code);
-    private void on_update_metadata_success (GLib.ByteArray& file_id);
-    private void on_update_metadata_error (GLib.ByteArray& file_id, int http_return_code);
+    private void on_folder_encrypted_metadata_error (GLib.ByteArray file_identifier, int http_return_code);
+    private void on_update_metadata_success (GLib.ByteArray file_identifier);
+    private void on_update_metadata_error (GLib.ByteArray file_identifier, int http_return_code);
 
 signals:
     // Emmited after the file is encrypted and everythign is setup.
@@ -172,22 +172,22 @@ signals:
     var job = qobject_cast<LsColJob> (sender ());
     const var& folder_info = job._folder_infos.value (list.first ());
     this.folder_lock_first_try.on_start ();
-    on_try_lock (folder_info.file_id);
+    on_try_lock (folder_info.file_identifier);
   }
 
-  void Propagate_upload_encrypted.on_try_lock (GLib.ByteArray& file_id) {
-    var lock_job = new LockEncryptFolderApiJob (this.propagator.account (), file_id, this);
+  void Propagate_upload_encrypted.on_try_lock (GLib.ByteArray file_identifier) {
+    var lock_job = new LockEncryptFolderApiJob (this.propagator.account (), file_identifier, this);
     connect (lock_job, &LockEncryptFolderApiJob.on_success, this, &Propagate_upload_encrypted.on_folder_locked_successfully);
     connect (lock_job, &LockEncryptFolderApiJob.error, this, &Propagate_upload_encrypted.on_folder_locked_error);
     lock_job.on_start ();
   }
 
-  void Propagate_upload_encrypted.on_folder_locked_successfully (GLib.ByteArray& file_id, GLib.ByteArray& token) {
-    GLib.debug (lc_propagate_upload_encrypted) << "Folder" << file_id << "Locked Successfully for Upload, Fetching Metadata";
+  void Propagate_upload_encrypted.on_folder_locked_successfully (GLib.ByteArray file_identifier, GLib.ByteArray token) {
+    GLib.debug (lc_propagate_upload_encrypted) << "Folder" << file_identifier << "Locked Successfully for Upload, Fetching Metadata";
     // Should I use a mutex here?
     this.current_locking_in_progress = true;
     this.folder_token = token;
-    this.folder_id = file_id;
+    this.folder_id = file_identifier;
     this.is_folder_locked = true;
 
     var job = new GetMetadataApiJob (this.propagator.account (), this.folder_id);
@@ -199,8 +199,8 @@ signals:
     job.on_start ();
   }
 
-  void Propagate_upload_encrypted.on_folder_encrypted_metadata_error (GLib.ByteArray& file_id, int http_return_code) {
-      Q_UNUSED (file_id);
+  void Propagate_upload_encrypted.on_folder_encrypted_metadata_error (GLib.ByteArray file_identifier, int http_return_code) {
+      Q_UNUSED (file_identifier);
       Q_UNUSED (http_return_code);
       GLib.debug (lc_propagate_upload_encrypted ()) << "Error Getting the encrypted metadata. Pretend we got empty metadata.";
       FolderMetadata empty_metadata (this.propagator.account ());
@@ -303,8 +303,8 @@ signals:
     }
   }
 
-  void Propagate_upload_encrypted.on_update_metadata_success (GLib.ByteArray& file_id) {
-      Q_UNUSED (file_id);
+  void Propagate_upload_encrypted.on_update_metadata_success (GLib.ByteArray file_identifier) {
+      Q_UNUSED (file_identifier);
       GLib.debug (lc_propagate_upload_encrypted) << "Uploading of the metadata on_success, Encrypting the file";
       QFileInfo output_info (this.complete_filename);
 
@@ -315,18 +315,18 @@ signals:
                      output_info.size ());
   }
 
-  void Propagate_upload_encrypted.on_update_metadata_error (GLib.ByteArray& file_id, int http_error_response) {
-    GLib.debug (lc_propagate_upload_encrypted) << "Update metadata error for folder" << file_id << "with error" << http_error_response;
+  void Propagate_upload_encrypted.on_update_metadata_error (GLib.ByteArray file_identifier, int http_error_response) {
+    GLib.debug (lc_propagate_upload_encrypted) << "Update metadata error for folder" << file_identifier << "with error" << http_error_response;
     GLib.debug (lc_propagate_upload_encrypted ()) << "Unlocking the folder.";
     connect (this, &Propagate_upload_encrypted.folder_unlocked, this, &Propagate_upload_encrypted.error);
     unlock_folder ();
   }
 
-  void Propagate_upload_encrypted.on_folder_locked_error (GLib.ByteArray& file_id, int http_error_code) {
+  void Propagate_upload_encrypted.on_folder_locked_error (GLib.ByteArray file_identifier, int http_error_code) {
       Q_UNUSED (http_error_code);
       /* try to call the lock from 5 to 5 seconds
       and fail if it's more than 5 minutes. */
-      QTimer.single_shot (5000, this, [this, file_id]{
+      QTimer.single_shot (5000, this, [this, file_identifier]{
           if (!this.current_locking_in_progress) {
               GLib.debug (lc_propagate_upload_encrypted) << "Error locking the folder while no other update is locking it up.";
               GLib.debug (lc_propagate_upload_encrypted) << "Perhaps another client locked it.";
@@ -339,10 +339,10 @@ signals:
               GLib.debug (lc_propagate_upload_encrypted) << "One minute passed, ignoring more attempts to lock the folder.";
           return;
           }
-          on_try_lock (file_id);
+          on_try_lock (file_identifier);
       });
 
-      GLib.debug (lc_propagate_upload_encrypted) << "Folder" << file_id << "Coundn't be locked.";
+      GLib.debug (lc_propagate_upload_encrypted) << "Folder" << file_identifier << "Coundn't be locked.";
   }
 
   void Propagate_upload_encrypted.on_folder_encrypted_id_error (QNetworkReply r) {

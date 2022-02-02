@@ -12,7 +12,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 // #include <QSslKey>
 // #include <QJsonObject>
 // #include <QJsonDocument>
-// #include <QBuffer>
+// #include <Soup.Buffer>
 
 // #include <qt5keychain/keychain.h>
 
@@ -21,7 +21,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 // #include <QMap>
 // #include <QSslCertificate>
 // #include <QSslKey>
-// #include <QNetworkRequest>
+// #include <Soup.Request>
 
 
 namespace QKeychain {
@@ -81,8 +81,8 @@ namespace {
 class HttpCredentials : AbstractCredentials {
     friend class HttpCredentialsAccessManager;
 
-    /// Don't add credentials if this is set on a QNetworkRequest
-    public static constexpr QNetworkRequest.Attribute DontAddCredentialsAttribute = QNetworkRequest.User;
+    /// Don't add credentials if this is set on a Soup.Request
+    public static constexpr Soup.Request.Attribute DontAddCredentialsAttribute = Soup.Request.User;
 
     /***********************************************************
     ***********************************************************/
@@ -223,8 +223,8 @@ class HttpCredentials : AbstractCredentials {
         }
 
 
-        protected QNetworkReply create_request (Operation op, QNetworkRequest request, QIODevice outgoing_data) override {
-            QNetworkRequest req (request);
+        protected QNetworkReply create_request (Operation op, Soup.Request request, QIODevice outgoing_data) override {
+            Soup.Request req (request);
             if (!req.attribute (HttpCredentials.DontAddCredentialsAttribute).to_bool ()) {
                 if (this.cred && !this.cred.password ().is_empty ()) {
                     if (this.cred.is_using_oAuth ()) {
@@ -323,7 +323,7 @@ class HttpCredentials : AbstractCredentials {
     }
 
     string HttpCredentials.fetch_user () {
-        this.user = this.account.credential_setting (QLatin1String (USER_C)).to_"";
+        this.user = this.account.credential_setting (QLatin1String (USER_C)).to_string ();
         return this.user;
     }
 
@@ -356,7 +356,7 @@ class HttpCredentials : AbstractCredentials {
             var job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (this.account, job);
             job.set_insecure_fallback (false);
-            job.set_key (keychain_key (this.account.url ().to_"", this.user + client_cert_password_c, this.account.id ()));
+            job.set_key (keychain_key (this.account.url ().to_string (), this.user + client_cert_password_c, this.account.id ()));
             connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_read_client_cert_password_job_done);
             job.on_start ();
             return;
@@ -364,7 +364,7 @@ class HttpCredentials : AbstractCredentials {
 
         // Old case (pre 2.6) : Read client cert and then key from keychain
         const string kck = keychain_key (
-            this.account.url ().to_"",
+            this.account.url ().to_string (),
             this.user + client_certificate_pemC,
             this.keychain_migration ? "" : this.account.id ());
 
@@ -381,7 +381,7 @@ class HttpCredentials : AbstractCredentials {
             var job = new QKeychain.DeletePasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (this.account, job);
             job.set_insecure_fallback (true);
-            job.set_key (keychain_key (this.account.url ().to_"", user, ""));
+            job.set_key (keychain_key (this.account.url ().to_string (), user, ""));
             job.on_start ();
         };
 
@@ -441,7 +441,7 @@ class HttpCredentials : AbstractCredentials {
 
         // Load key too
         const string kck = keychain_key (
-            this.account.url ().to_"",
+            this.account.url ().to_string (),
             this.user + client_key_pemC,
             this.keychain_migration ? "" : this.account.id ());
 
@@ -478,7 +478,7 @@ class HttpCredentials : AbstractCredentials {
 
     void HttpCredentials.on_read_password_from_keychain () {
         const string kck = keychain_key (
-            this.account.url ().to_"",
+            this.account.url ().to_string (),
             this.user,
             this.keychain_migration ? "" : this.account.id ());
 
@@ -554,15 +554,15 @@ class HttpCredentials : AbstractCredentials {
             return false;
 
         GLib.Uri request_token = Utility.concat_url_path (this.account.url (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
-        QNetworkRequest req;
-        req.set_header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
+        Soup.Request req;
+        req.set_header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         string basic_auth = string ("%1:%2").arg (
             Theme.instance ().oauth_client_id (), Theme.instance ().oauth_client_secret ());
         req.set_raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
         req.set_attribute (HttpCredentials.DontAddCredentialsAttribute, true);
 
-        var request_body = new QBuffer;
+        var request_body = new Soup.Buffer;
         QUrlQuery arguments (string ("grant_type=refresh_token&refresh_token=%1").arg (this.refresh_token));
         request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
@@ -572,7 +572,7 @@ class HttpCredentials : AbstractCredentials {
             var json_data = reply.read_all ();
             QJsonParseError json_parse_error;
             QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
-            string access_token = json["access_token"].to_"";
+            string access_token = json["access_token"].to_string ();
             if (json_parse_error.error != QJsonParseError.NoError || json.is_empty ()) {
                 // Invalid or empty JSON : Network error maybe?
                 GLib.warn (lc_http_credentials) << "Error while refreshing the token" << reply.error_string () << json_data << json_parse_error.error_string ();
@@ -584,7 +584,7 @@ class HttpCredentials : AbstractCredentials {
             } else {
                 this.ready = true;
                 this.password = access_token;
-                this.refresh_token = json["refresh_token"].to_"";
+                this.refresh_token = json["refresh_token"].to_string ();
                 persist ();
             }
             this.is_renewing_oauth_token = false;
@@ -609,7 +609,7 @@ class HttpCredentials : AbstractCredentials {
         // User must be fetched from config file to generate a valid key
         fetch_user ();
 
-        const string kck = keychain_key (this.account.url ().to_"", this.user, this.account.id ());
+        const string kck = keychain_key (this.account.url ().to_string (), this.user, this.account.id ());
         if (kck.is_empty ()) {
             GLib.warn (lc_http_credentials) << "InvalidateToken : User is empty, bailing out!";
             return;
@@ -671,7 +671,7 @@ class HttpCredentials : AbstractCredentials {
             add_settings_to_job (this.account, job);
             job.set_insecure_fallback (false);
             connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_write_client_cert_password_job_done);
-            job.set_key (keychain_key (this.account.url ().to_"", this.user + client_cert_password_c, this.account.id ()));
+            job.set_key (keychain_key (this.account.url ().to_string (), this.user + client_cert_password_c, this.account.id ()));
             job.set_binary_data (this.client_cert_password);
             job.on_start ();
             this.client_cert_bundle.clear ();
@@ -684,7 +684,7 @@ class HttpCredentials : AbstractCredentials {
             add_settings_to_job (this.account, job);
             job.set_insecure_fallback (false);
             connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_write_client_cert_pem_job_done);
-            job.set_key (keychain_key (this.account.url ().to_"", this.user + client_certificate_pemC, this.account.id ()));
+            job.set_key (keychain_key (this.account.url ().to_string (), this.user + client_certificate_pemC, this.account.id ()));
             job.set_binary_data (this.client_ssl_certificate.to_pem ());
             job.on_start ();
         } else {
@@ -714,7 +714,7 @@ class HttpCredentials : AbstractCredentials {
             add_settings_to_job (this.account, job);
             job.set_insecure_fallback (false);
             connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_write_client_key_pem_job_done);
-            job.set_key (keychain_key (this.account.url ().to_"", this.user + client_key_pemC, this.account.id ()));
+            job.set_key (keychain_key (this.account.url ().to_string (), this.user + client_key_pemC, this.account.id ()));
             job.set_binary_data (this.client_ssl_key.to_pem ());
             job.on_start ();
         } else {
@@ -736,7 +736,7 @@ class HttpCredentials : AbstractCredentials {
         add_settings_to_job (this.account, job);
         job.set_insecure_fallback (false);
         connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_write_job_done);
-        job.set_key (keychain_key (this.account.url ().to_"", this.user, this.account.id ()));
+        job.set_key (keychain_key (this.account.url ().to_string (), this.user, this.account.id ()));
         job.set_text_data (is_using_oAuth () ? this.refresh_token : this.password);
         job.on_start ();
     }
@@ -754,7 +754,7 @@ class HttpCredentials : AbstractCredentials {
         Q_UNUSED (authenticator)
         // Because of issue #4326, we need to set the login and password manually at every requests
         // Thus, if we reach this signal, those credentials were invalid and we terminate.
-        GLib.warn (lc_http_credentials) << "Stop request : Authentication failed for " << reply.url ().to_"";
+        GLib.warn (lc_http_credentials) << "Stop request : Authentication failed for " << reply.url ().to_string ();
         reply.set_property (authentication_failed_c, true);
 
         if (this.is_renewing_oauth_token) {
@@ -782,7 +782,7 @@ class HttpCredentials : AbstractCredentials {
         if (this.client_cert_bundle.is_empty ())
             return true;
 
-        QBuffer cert_buffer (&this.client_cert_bundle);
+        Soup.Buffer cert_buffer (&this.client_cert_bundle);
         cert_buffer.open (QIODevice.ReadOnly);
         GLib.List<QSslCertificate> client_ca_certificates;
         return QSslCertificate.import_pkcs12 (

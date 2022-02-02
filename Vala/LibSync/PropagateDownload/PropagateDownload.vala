@@ -20,7 +20,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 // #pragma once
 
-// #include <QBuffer>
+// #include <Soup.Buffer>
 // #include <GLib.File>
 
 namespace Occ {
@@ -421,12 +421,12 @@ void GETFileJob.on_start () {
         GLib.debug (lc_get_job) << "Retry with range " << this.headers["Range"];
     }
 
-    QNetworkRequest req;
+    Soup.Request req;
     for (QMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = this.headers.begin (); it != this.headers.end (); ++it) {
         req.set_raw_header (it.key (), it.value ());
     }
 
-    req.set_priority (QNetworkRequest.Low_priority); // Long downloads must not block non-propagation jobs.
+    req.set_priority (Soup.Request.Low_priority); // Long downloads must not block non-propagation jobs.
 
     if (this.direct_download_url.is_empty ()) {
         send_request ("GET", make_dav_url (path ()), req);
@@ -459,7 +459,7 @@ void GETFileJob.on_meta_data_changed () {
     // through the HTTP layer thread (?)
     reply ().set_read_buffer_size (16 * 1024);
 
-    int http_status = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+    int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
     if (http_status == 301 || http_status == 302 || http_status == 303 || http_status == 307
         || http_status == 308 || http_status == 401) {
@@ -506,7 +506,7 @@ void GETFileJob.on_meta_data_changed () {
     }
 
     bool ok = false;
-    this.content_length = reply ().header (QNetworkRequest.ContentLengthHeader).to_long_long (&ok);
+    this.content_length = reply ().header (Soup.Request.ContentLengthHeader).to_long_long (&ok);
     if (ok && this.expected_content_length != -1 && this.content_length != this.expected_content_length) {
         GLib.warn (lc_get_job) << "We received a different content length than expected!"
                             << this.expected_content_length << "vs" << this.content_length;
@@ -545,7 +545,7 @@ void GETFileJob.on_meta_data_changed () {
         }
     }
 
-    var last_modified = reply ().header (QNetworkRequest.Last_modified_header);
+    var last_modified = reply ().header (Soup.Request.Last_modified_header);
     if (!last_modified.is_null ()) {
         this.last_modified = Utility.q_date_time_to_time_t (last_modified.to_date_time ());
     }
@@ -630,7 +630,7 @@ void GETFileJob.on_ready_read () {
             this.bandwidth_manager.on_unregister_download_job (this);
         }
         if (!this.has_emitted_finished_signal) {
-            q_c_info (lc_get_job) << "GET of" << reply ().request ().url ().to_"" << "FINISHED WITH STATUS"
+            q_c_info (lc_get_job) << "GET of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
                              << reply_status_""
                              << reply ().raw_header ("Content-Range") << reply ().raw_header ("Content-Length");
 
@@ -1026,7 +1026,7 @@ void PropagateDownloadFile.on_get_finished () {
     GETFileJob job = this.job;
     ASSERT (job);
 
-    this.item._http_error_code = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+    this.item._http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
     this.item._request_id = job.request_id ();
 
     QNetworkReply.NetworkError err = job.reply ().error ();
@@ -1072,7 +1072,7 @@ void PropagateDownloadFile.on_get_finished () {
         // the whole sync and allows for a custom error message.
         QNetworkReply reply = job.reply ();
         if (err == QNetworkReply.OperationCanceledError && reply.property (owncloud_custom_soft_error_string_c).is_valid ()) {
-            job.on_set_error_string (reply.property (owncloud_custom_soft_error_string_c).to_"");
+            job.on_set_error_string (reply.property (owncloud_custom_soft_error_string_c).to_string ());
             job.set_error_status (SyncFileItem.Status.SOFT_ERROR);
         } else if (bad_range_header) {
             // Can't do this in classify_error () because 416 without a
@@ -1134,8 +1134,8 @@ void PropagateDownloadFile.on_get_finished () {
     // of the compressed data. See QTBUG-73364.
     const var content_encoding = job.reply ().raw_header ("content-encoding").to_lower ();
     if ( (content_encoding == "gzip" || content_encoding == "deflate")
-        && (job.reply ().attribute (QNetworkRequest.HTTP2WasUsedAttribute).to_bool ()
-         || job.reply ().attribute (QNetworkRequest.Spdy_was_used_attribute).to_bool ())) {
+        && (job.reply ().attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()
+         || job.reply ().attribute (Soup.Request.Spdy_was_used_attribute).to_bool ())) {
         body_size = 0;
         has_size_header = false;
     }

@@ -169,7 +169,7 @@ signals:
 
     void OcsProfileConnector.set_hovercard_action_icon (std.size_t index, QPixmap pixmap) {
         var hovercard_action = this.current_hovercard._actions[index];
-        QPixmapCache.insert (hovercard_action._icon_url.to_"", pixmap);
+        QPixmapCache.insert (hovercard_action._icon_url.to_string (), pixmap);
         hovercard_action._icon = pixmap;
         /* emit */ icon_loaded (index);
     }

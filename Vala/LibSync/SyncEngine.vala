@@ -1035,7 +1035,7 @@ signals:
         this.progress_info._status = ProgressInfo.Reconcile;
         /* emit */ transmission_progress (*this.progress_info);
 
-        //    q_c_info (lc_engine) << "Permissions of the root folder : " << this.csync_ctx.remote.root_perms.to_"";
+        //    q_c_info (lc_engine) << "Permissions of the root folder : " << this.csync_ctx.remote.root_perms.to_string ();
         var finish = [this]{
             var database_fingerprint = this.journal.data_fingerprint ();
             // If database_fingerprint is empty, this means that there was no information in the database

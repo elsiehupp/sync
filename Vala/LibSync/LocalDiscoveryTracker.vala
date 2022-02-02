@@ -100,7 +100,7 @@ class LocalDiscoveryTracker : GLib.Object {
     again when the sync is done to make sure everything is retried.
     ***********************************************************/
     private std.set<string> this.previous_local_discovery_paths;
-};
+}
 
 } // namespace Occ
 

@@ -160,7 +160,7 @@ void PropagateUploadFileNG.on_propfind_finished_with_error () {
     var job = qobject_cast<LsColJob> (sender ());
     on_job_destroyed (job); // remove it from the this.jobs list
     QNetworkReply.NetworkError err = job.reply ().error ();
-    var http_error_code = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+    var http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
     var status = classify_error (err, http_error_code, propagator ()._another_sync_needed);
     if (status == SyncFileItem.Status.FATAL_ERROR) {
         this.item._request_id = job.request_id ();
@@ -178,7 +178,7 @@ void PropagateUploadFileNG.on_delete_job_finished () {
 
     QNetworkReply.NetworkError err = job.reply ().error ();
     if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
-        const int http_status = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+        const int http_status = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         SyncFileItem.Status status = classify_error (err, http_status);
         if (status == SyncFileItem.Status.FATAL_ERROR) {
             this.item._request_id = job.request_id ();
@@ -245,7 +245,7 @@ void PropagateUploadFileNG.on_mk_col_finished () {
     var job = qobject_cast<MkColJob> (sender ());
     on_job_destroyed (job); // remove it from the this.jobs list
     QNetworkReply.NetworkError err = job.reply ().error ();
-    this.item._http_error_code = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+    this.item._http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
     if (err != QNetworkReply.NoError || this.item._http_error_code != 201) {
         this.item._request_id = job.request_id ();
@@ -352,7 +352,7 @@ void PropagateUploadFileNG.on_put_finished () {
     QNetworkReply.NetworkError err = job.reply ().error ();
 
     if (err != QNetworkReply.NoError) {
-        this.item._http_error_code = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+        this.item._http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item._request_id = job.request_id ();
         common_error_handling (job);
         return;
@@ -436,7 +436,7 @@ void PropagateUploadFileNG.on_move_job_finished () {
     var job = qobject_cast<Move_job> (sender ());
     on_job_destroyed (job); // remove it from the this.jobs list
     QNetworkReply.NetworkError err = job.reply ().error ();
-    this.item._http_error_code = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+    this.item._http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
     this.item._response_time_stamp = job.response_timestamp ();
     this.item._request_id = job.request_id ();
 

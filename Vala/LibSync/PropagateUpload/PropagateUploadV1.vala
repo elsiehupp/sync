@@ -186,7 +186,7 @@ void PropagateUploadFileV1.on_put_finished () {
         return;
     }
 
-    this.item._http_error_code = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+    this.item._http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
     this.item._response_time_stamp = job.response_timestamp ();
     this.item._request_id = job.request_id ();
     QNetworkReply.NetworkError err = job.reply ().error ();

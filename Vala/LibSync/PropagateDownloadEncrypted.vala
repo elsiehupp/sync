@@ -45,7 +45,7 @@ class Propagate_download_encrypted : GLib.Object {
     public void on_folder_id_error ();
 
 
-    public void on_folder_encrypted_metadata_error (GLib.ByteArray file_id, int http_return_code);
+    public void on_folder_encrypted_metadata_error (GLib.ByteArray file_identifier, int http_return_code);
 
 signals:
     void file_metadata_found ();
@@ -109,7 +109,7 @@ void Propagate_download_encrypted.on_check_folder_id (string[] list) {
     const ExtraFolderInfo folder_info = job._folder_infos.value (folder_id);
 
     // Now that we have the folder-id we need it's JSON metadata
-    var metadata_job = new GetMetadataApiJob (this.propagator.account (), folder_info.file_id);
+    var metadata_job = new GetMetadataApiJob (this.propagator.account (), folder_info.file_identifier);
     connect (metadata_job, &GetMetadataApiJob.json_received,
                     this, &Propagate_download_encrypted.on_check_folder_encrypted_metadata);
     connect (metadata_job, &GetMetadataApiJob.error,
@@ -118,7 +118,7 @@ void Propagate_download_encrypted.on_check_folder_id (string[] list) {
     metadata_job.on_start ();
 }
 
-void Propagate_download_encrypted.on_folder_encrypted_metadata_error (GLib.ByteArray  /*file_id*/, int /*http_return_code*/) {
+void Propagate_download_encrypted.on_folder_encrypted_metadata_error (GLib.ByteArray  /*file_identifier*/, int /*http_return_code*/) {
         q_c_critical (lc_propagate_download_encrypted) << "Failed to find encrypted metadata information of remote file" << this.info.filename ();
         /* emit */ failed ();
 }

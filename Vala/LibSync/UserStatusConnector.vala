@@ -15,7 +15,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Occ {
 
-enum class ClearAtType {
+enum ClearAtType {
     Period,
     EndOf,
     Timestamp
@@ -153,7 +153,7 @@ class UserStatusConnector : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public enum class Error {
+    public enum Error {
         CouldNotFetchUserStatus,
         CouldNotFetchPredefinedUserStatuses,
         UserStatusNotSupported,

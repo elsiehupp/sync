@@ -59,7 +59,7 @@ signals:
     }
 
     void DeleteJob.on_start () {
-        QNetworkRequest req;
+        Soup.Request req;
         if (!this.folder_token.is_empty ()) {
             req.set_raw_header ("e2e-token", this.folder_token);
         }

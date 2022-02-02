@@ -15,7 +15,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 // #include <cstring>
 // #pragma once
 
-// #include <QBuffer>
+// #include <Soup.Buffer>
 // #include <GLib.File>
 // #include <QElapsedTimer>
 
@@ -535,12 +535,12 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     }
 
     void PUTFile_job.on_start () {
-        QNetworkRequest req;
+        Soup.Request req;
         for (QMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = this.headers.begin (); it != this.headers.end (); ++it) {
             req.set_raw_header (it.key (), it.value ());
         }
 
-        req.set_priority (QNetworkRequest.Low_priority); // Long uploads must not block non-propagation jobs.
+        req.set_priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
 
         if (this.url.is_valid ()) {
             send_request ("PUT", this.url, req, this.device);
@@ -561,10 +561,10 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     bool PUTFile_job.on_finished () {
         this.device.close ();
 
-        q_c_info (lc_put_job) << "PUT of" << reply ().request ().url ().to_"" << "FINISHED WITH STATUS"
+        q_c_info (lc_put_job) << "PUT of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
                          << reply_status_""
-                         << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute)
-                         << reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute);
+                         << reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
+                         << reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);
 
         /* emit */ finished_signal ();
         return true;
@@ -583,7 +583,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     bool PollJob.on_finished () {
         QNetworkReply.NetworkError err = reply ().error ();
         if (err != QNetworkReply.NoError) {
-            this.item._http_error_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+            this.item._http_error_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             this.item._request_id = request_id ();
             this.item._status = classify_error (err, this.item._http_error_code);
             this.item._error_string = error_string ();
@@ -607,7 +607,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         GLib.ByteArray json_data = reply ().read_all ().trimmed ();
         QJsonParseError json_parse_error;
         QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
-        q_c_info (lc_poll_job) << ">" << json_data << "<" << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int () << json << json_parse_error.error_string ();
+        q_c_info (lc_poll_job) << ">" << json_data << "<" << reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int () << json << json_parse_error.error_string ();
         if (json_parse_error.error != QJsonParseError.NoError) {
             this.item._error_string = _("Invalid JSON reply from the poll URL");
             this.item._status = SyncFileItem.Status.NORMAL_ERROR;
@@ -615,7 +615,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             return true;
         }
 
-        var status = json["status"].to_"";
+        var status = json["status"].to_string ();
         if (status == QLatin1String ("on_init") || status == QLatin1String ("started")) {
             QTimer.single_shot (5 * 1000, this, &PollJob.on_start);
             return false;
@@ -626,11 +626,11 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         if (status == QLatin1String ("on_finished")) {
             this.item._status = SyncFileItem.Status.SUCCESS;
-            this.item._file_id = json["file_id"].to_"".to_utf8 ();
-            this.item._etag = parse_etag (json["ETag"].to_"".to_utf8 ());
+            this.item._file_id = json["file_identifier"].to_string ().to_utf8 ();
+            this.item._etag = parse_etag (json["ETag"].to_string ().to_utf8 ());
         } else { // error
             this.item._status = classify_error (QNetworkReply.Unknown_content_error, this.item._http_error_code);
-            this.item._error_string = json["error_message"].to_"";
+            this.item._error_string = json["error_message"].to_string ();
         }
 
         SyncJournalDb.PollInfo info;

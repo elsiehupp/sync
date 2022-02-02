@@ -104,7 +104,7 @@ class PropagateRemoteDelete : PropagateItemJob {
         ASSERT (this.job);
 
         QNetworkReply.NetworkError err = this.job.reply ().error ();
-        const int http_status = this.job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+        const int http_status = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item._http_error_code = http_status;
         this.item._response_time_stamp = this.job.response_timestamp ();
         this.item._request_id = this.job.request_id ();
@@ -127,7 +127,7 @@ class PropagateRemoteDelete : PropagateItemJob {
             on_done (SyncFileItem.Status.NORMAL_ERROR,
                 _("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                     .arg (this.item._http_error_code)
-                    .arg (this.job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_""));
+                    .arg (this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
             return;
         }
 

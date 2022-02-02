@@ -31,7 +31,7 @@ using namespace QKeychain;
 
 // #include <GLib.Uri>
 // #include <QNetworkCookie>
-// #include <QNetworkRequest>
+// #include <Soup.Request>
 // #include <QSslSocket>
 // #include <QSslCertificate>
 // #include <QSslConfiguration>
@@ -47,11 +47,6 @@ const char app_password[] = "this.app-password";
 
 // #include <memory>
 
-class QNetworkAccessManager;
-
-namespace QKeychain {
-}
-
 
 namespace {
     constexpr int push_notifications_reconnect_interval = 1000 * 60 * 2;
@@ -61,7 +56,6 @@ namespace {
 namespace Occ {
 
 using AccountPointer = unowned<Account>;
-class UserStatusConnector;
 
 /***********************************************************
 @brief Reimplement this to handle SSL errors from libsync
@@ -198,7 +192,7 @@ class Account : GLib.Object {
     ***********************************************************/
     public QNetworkReply send_raw_request (GLib.ByteArray verb,
         const GLib.Uri url,
-        QNetworkRequest req = QNetworkRequest (),
+        Soup.Request req = Soup.Request (),
         QIODevice data = nullptr);
 
     /***********************************************************
@@ -209,7 +203,7 @@ class Account : GLib.Object {
     ***********************************************************/
     public 
     public QNetworkReply send_raw_request (GLib.ByteArray verb,
-        const GLib.Uri url, QNetworkRequest req, QHttpMultiPart data);
+        const GLib.Uri url, Soup.Request req, QHttpMultiPart data);
 
 
     /***********************************************************
@@ -220,7 +214,7 @@ class Account : GLib.Object {
     ***********************************************************/
     public SimpleNetworkJob send_request (GLib.ByteArray verb,
         const GLib.Uri url,
-        QNetworkRequest req = QNetworkRequest (),
+        Soup.Request req = Soup.Request (),
         QIODevice data = nullptr);
 
 
@@ -822,7 +816,7 @@ unowned<QNetworkAccessManager> Account.shared_network_access_manager () {
     return this.am;
 }
 
-QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, QNetworkRequest req, QIODevice data) {
+QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, Soup.Request req, QIODevice data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "HEAD" && !data) {
@@ -839,7 +833,7 @@ QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, QNet
     return this.am.send_custom_request (req, verb, data);
 }
 
-QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, QNetworkRequest req, GLib.ByteArray data) {
+QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, Soup.Request req, GLib.ByteArray data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "HEAD" && data.is_empty ()) {
@@ -856,7 +850,7 @@ QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, QNet
     return this.am.send_custom_request (req, verb, data);
 }
 
-QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, QNetworkRequest req, QHttpMultiPart data) {
+QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, Soup.Request req, QHttpMultiPart data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "PUT") {
@@ -867,7 +861,7 @@ QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, QNet
     return this.am.send_custom_request (req, verb, data);
 }
 
-SimpleNetworkJob *Account.send_request (GLib.ByteArray verb, GLib.Uri url, QNetworkRequest req, QIODevice data) {
+SimpleNetworkJob *Account.send_request (GLib.ByteArray verb, GLib.Uri url, Soup.Request req, QIODevice data) {
     var job = new SimpleNetworkJob (shared_from_this ());
     job.start_request (verb, url, req, data);
     return job;
@@ -946,7 +940,7 @@ void Account.set_credential_setting (string key, GLib.Variant value) {
 void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> errors) {
     NetworkJobTimeoutPauser pauser (reply);
     string out;
-    QDebug (&out) << "SSL-Errors happened for url " << reply.url ().to_"";
+    QDebug (&out) << "SSL-Errors happened for url " << reply.url ().to_string ();
     foreach (QSslError error, errors) {
         QDebug (&out) << "\t_error in " << error.certificate () << ":"
                      << error.error_string () << " (" << error.error () << ")"
@@ -1127,7 +1121,7 @@ void Account.write_app_password_once (string app_password){
         return;
 
     const string kck = AbstractCredentials.keychain_key (
-                url ().to_"",
+                url ().to_string (),
                 dav_user () + app_password,
                 id ()
     );
@@ -1151,7 +1145,7 @@ void Account.write_app_password_once (string app_password){
 
 void Account.retrieve_app_password (){
     const string kck = AbstractCredentials.keychain_key (
-                url ().to_"",
+                url ().to_string (),
                 credentials ().user () + app_password,
                 id ()
     );
@@ -1175,7 +1169,7 @@ void Account.retrieve_app_password (){
 
 void Account.delete_app_password () {
     const string kck = AbstractCredentials.keychain_key (
-                url ().to_"",
+                url ().to_string (),
                 credentials ().user () + app_password,
                 id ()
     );
@@ -1205,7 +1199,7 @@ void Account.delete_app_token () {
     const var delete_app_token_job = new DeleteJob (shared_from_this (), QStringLiteral ("/ocs/v2.php/core/apppassword"));
     connect (delete_app_token_job, &DeleteJob.finished_signal, this, [this] () {
         if (var delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ())) {
-            const var http_code = delete_job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+            const var http_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (http_code != 200) {
                 GLib.warn (lc_account) << "AppToken remove failed for user : " << display_name () << " with code : " << http_code;
             } else {
@@ -1240,8 +1234,8 @@ void Account.on_direct_editing_recieved (QJsonDocument json) {
     foreach (var editor_key, editors.keys ()) {
         var editor = editors.value (editor_key).to_object ();
 
-        const string id = editor.value ("id").to_"";
-        const string name = editor.value ("name").to_"";
+        const string id = editor.value ("id").to_string ();
+        const string name = editor.value ("name").to_string ();
 
         if (!id.is_empty () && !name.is_empty ()) {
             var mime_types = editor.value ("mimetypes").to_array ();
@@ -1250,11 +1244,11 @@ void Account.on_direct_editing_recieved (QJsonDocument json) {
             var direct_editor = new DirectEditor (id, name);
 
             foreach (var mime_type, mime_types) {
-                direct_editor.add_mimetype (mime_type.to_"".to_latin1 ());
+                direct_editor.add_mimetype (mime_type.to_string ().to_latin1 ());
             }
 
             foreach (var optional_mime_type, optional_mime_types) {
-                direct_editor.add_optional_mimetype (optional_mime_type.to_"".to_latin1 ());
+                direct_editor.add_optional_mimetype (optional_mime_type.to_string ().to_latin1 ());
             }
 
             this.capabilities.add_direct_editor (direct_editor);

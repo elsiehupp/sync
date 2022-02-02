@@ -27,7 +27,7 @@ using CSync;
 
 namespace Occ {
 
-enum class LocalDiscoveryStyle {
+enum LocalDiscoveryStyle {
     FilesystemOnly, //< read all local data from the filesystem
     DatabaseAndFilesystem, //< read from the database, except for listed paths
 };
@@ -42,7 +42,7 @@ struct RemoteInfo {
     ***********************************************************/
     string name;
     GLib.ByteArray etag;
-    GLib.ByteArray file_id;
+    GLib.ByteArray file_identifier;
     GLib.ByteArray checksum_header;
     Occ.RemotePermissions remote_perm;
     time_t modtime = 0;
@@ -148,7 +148,7 @@ signals:
     private void on_ls_job_finished_with_error_slot (QNetworkReply *);
     private void on_fetch_e2e_metadata ();
     private void on_metadata_received (QJsonDocument json, int status_code);
-    private void on_metadata_error (GLib.ByteArray& file_id, int http_return_code);
+    private void on_metadata_error (GLib.ByteArray file_identifier, int http_return_code);
 
 
     /***********************************************************
@@ -156,7 +156,7 @@ signals:
     private GLib.Vector<RemoteInfo> this.results;
     private string this.sub_path;
     private GLib.ByteArray this.first_etag;
-    private GLib.ByteArray this.file_id;
+    private GLib.ByteArray file_identifier;
     private GLib.ByteArray this.local_file_id;
     private AccountPointer this.account;
     // The first result is for the directory itself and need to be ignored.
@@ -689,7 +689,7 @@ string adjust_renamed_path (QMap<string, string> renamed_items, string original)
             } else if (property == "getetag") {
                 result.etag = Utility.normalize_etag (value.to_utf8 ());
             } else if (property == "id") {
-                result.file_id = value.to_utf8 ();
+                result.file_identifier = value.to_utf8 ();
             } else if (property == "download_uRL") {
                 result.direct_download_url = value;
             } else if (property == "d_dC") {
@@ -739,11 +739,11 @@ string adjust_renamed_path (QMap<string, string> renamed_items, string original)
                 this.local_file_id = map.value (QStringLiteral ("fileid")).to_utf8 ();
             }
             if (map.contains ("id")) {
-                this.file_id = map.value ("id").to_utf8 ();
+                this.file_identifier = map.value ("id").to_utf8 ();
             }
             if (map.contains ("is-encrypted") && map.value ("is-encrypted") == QStringLiteral ("1")) {
                 this.is_e2e_encrypted = true;
-                Q_ASSERT (!this.file_id.is_empty ());
+                Q_ASSERT (!this.file_identifier.is_empty ());
             }
             if (map.contains ("size")) {
                 this.size = map.value ("size").to_int ();
@@ -802,8 +802,8 @@ string adjust_renamed_path (QMap<string, string> renamed_items, string original)
     }
 
     void DiscoverySingleDirectoryJob.on_ls_job_finished_with_error_slot (QNetworkReply r) {
-        string content_type = r.header (QNetworkRequest.ContentTypeHeader).to_"";
-        int http_code = r.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+        string content_type = r.header (Soup.Request.ContentTypeHeader).to_string ();
+        int http_code = r.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         string msg = r.error_string ();
         GLib.warn (lc_discovery) << "LSCOL job error" << r.error_string () << http_code << r.error ();
         if (r.error () == QNetworkReply.NoError
@@ -858,8 +858,8 @@ string adjust_renamed_path (QMap<string, string> renamed_items, string original)
         delete_later ();
     }
 
-    void DiscoverySingleDirectoryJob.on_metadata_error (GLib.ByteArray file_id, int http_return_code) {
-        GLib.warn (lc_discovery) << "E2EE Metadata job error. Trying to proceed without it." << file_id << http_return_code;
+    void DiscoverySingleDirectoryJob.on_metadata_error (GLib.ByteArray file_identifier, int http_return_code) {
+        GLib.warn (lc_discovery) << "E2EE Metadata job error. Trying to proceed without it." << file_identifier << http_return_code;
         /* emit */ finished (this.results);
         delete_later ();
     }

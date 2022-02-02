@@ -41,7 +41,7 @@ class Vfs_suffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_id) override;
+    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_identifier) override;
 
     /***********************************************************
     ***********************************************************/

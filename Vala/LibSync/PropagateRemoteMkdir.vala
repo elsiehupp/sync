@@ -166,7 +166,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         propfind_job.set_properties ({"http://owncloud.org/ns:permissions"});
         connect (propfind_job, &PropfindJob.result, this, [this, job_path] (QVariantMap result){
             propagator ()._active_job_list.remove_one (this);
-            this.item._remote_perm = RemotePermissions.from_server_string (result.value (QStringLiteral ("permissions")).to_"");
+            this.item._remote_perm = RemotePermissions.from_server_string (result.value (QStringLiteral ("permissions")).to_string ());
 
             if (!this.upload_encrypted_helper && !this.item._is_encrypted) {
                 on_success ();
@@ -226,7 +226,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         ASSERT (this.job);
 
         QNetworkReply.NetworkError err = this.job.reply ().error ();
-        this.item._http_error_code = this.job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+        this.item._http_error_code = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item._response_time_stamp = this.job.response_timestamp ();
         this.item._request_id = this.job.request_id ();
 
@@ -234,7 +234,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
         this.item._error_string = this.job.error_string ();
 
-        const var job_http_reason_phrase_string = this.job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_"";
+        const var job_http_reason_phrase_string = this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();
 
         const var job_path = this.job.path ();
 

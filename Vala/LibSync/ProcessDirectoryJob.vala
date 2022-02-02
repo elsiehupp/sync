@@ -667,7 +667,7 @@ signals:
                                   << " | etag : " << db_entry._etag << "//" << server_entry.etag
                                   << " | checksum : " << db_entry._checksum_header << "//" << server_entry.checksum_header
                                   << " | perm : " << db_entry._remote_perm << "//" << server_entry.remote_perm
-                                  << " | fileid : " << db_entry._file_id << "//" << server_entry.file_id
+                                  << " | fileid : " << db_entry._file_id << "//" << server_entry.file_identifier
                                   << " | inode : " << db_entry._inode << "/" << local_entry.inode << "/"
                                   << " | type : " << db_entry._type << "/" << local_entry.type << "/" << (server_entry.is_directory ? ItemTypeDirectory : ItemTypeFile)
                                   << " | e2ee : " << db_entry._is_e2e_encrypted << "/" << server_entry.is_e2e_encrypted
@@ -766,7 +766,7 @@ signals:
         const SyncFileItemPtr item, PathTuple path, LocalInfo local_entry,
         const RemoteInfo server_entry, SyncJournalFileRecord db_entry) {
         item._checksum_header = server_entry.checksum_header;
-        item._file_id = server_entry.file_id;
+        item._file_id = server_entry.file_identifier;
         item._remote_perm = server_entry.remote_perm;
         item._type = server_entry.is_directory ? ItemTypeDirectory : ItemTypeFile;
         item._etag = server_entry.etag;
@@ -794,7 +794,7 @@ signals:
                 missing_data.append (_("permission"));
             if (server_entry.etag.is_empty ())
                 missing_data.append ("ETag");
-            if (server_entry.file_id.is_empty ())
+            if (server_entry.file_identifier.is_empty ())
                 missing_data.append (_("file id"));
             if (!missing_data.is_empty ()) {
                 item._instruction = CSYNC_INSTRUCTION_ERROR;
@@ -853,7 +853,7 @@ signals:
                 } else {
                     item._instruction = CSYNC_INSTRUCTION_SYNC;
                 }
-            } else if (db_entry._remote_perm != server_entry.remote_perm || db_entry._file_id != server_entry.file_id || meta_data_size_needs_update_for_e2Ee_file_placeholder) {
+            } else if (db_entry._remote_perm != server_entry.remote_perm || db_entry._file_id != server_entry.file_identifier || meta_data_size_needs_update_for_e2Ee_file_placeholder) {
                 if (meta_data_size_needs_update_for_e2Ee_file_placeholder) {
                     // we are updating placeholder sizes after migrating from older versions with VFS + E2EE implicit hydration not supported
                     GLib.debug (lc_disco) << "Migrating the E2EE VFS placeholder " << db_entry.path () << " from older version. The old size is " << item._size << ". The new size is " << size_on_server;
@@ -1080,7 +1080,7 @@ signals:
                 async = true;
             }
         };
-        if (!this.discovery_data._statedatabase.get_file_records_by_file_id (server_entry.file_id, rename_candidate_processing)) {
+        if (!this.discovery_data._statedatabase.get_file_records_by_file_id (server_entry.file_identifier, rename_candidate_processing)) {
             db_error ();
             return;
         }
@@ -1613,7 +1613,7 @@ signals:
             if (this.discovery_data._statedatabase.get_file_record (path._original, record)) {
                 record._path = path._original.to_utf8 ();
                 record._etag = server_entry.etag;
-                record._file_id = server_entry.file_id;
+                record._file_id = server_entry.file_identifier;
                 record._modtime = server_entry.modtime;
                 record._type = item._type;
                 record._file_size = server_entry.size;

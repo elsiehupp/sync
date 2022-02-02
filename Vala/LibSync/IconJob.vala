@@ -5,7 +5,7 @@ Copyright (C) by Camila Ayres <hello@camila.codes>
 ***********************************************************/
 
 // #include <QNetworkAccessManager>
-// #include <QNetworkRequest>
+// #include <Soup.Request>
 // #include <QNetworkReply>
 
 namespace Occ {
@@ -32,9 +32,9 @@ signals:
 
     IconJob.IconJob (AccountPointer account, GLib.Uri url, GLib.Object parent)
         : GLib.Object (parent) {
-        QNetworkRequest request (url);
+        Soup.Request request (url);
     #if (QT_VERSION >= 0x050600)
-        request.set_attribute (QNetworkRequest.FollowRedirectsAttribute, true);
+        request.set_attribute (Soup.Request.FollowRedirectsAttribute, true);
     #endif
         const var reply = account.send_raw_request (QByteArrayLiteral ("GET"), url, request);
         connect (reply, &QNetworkReply.on_finished, this, &IconJob.on_finished);

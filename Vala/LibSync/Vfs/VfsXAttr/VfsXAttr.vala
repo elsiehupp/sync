@@ -42,7 +42,7 @@ class Vfs_xAttr : Vfs {
     ***********************************************************/
     public bool is_hydrating () override;
 
-    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_id) override;
+    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_identifier) override;
 
     public Result<void, string> create_placeholder (SyncFileItem item) override;
     public Result<void, string> dehydrate_placeholder (SyncFileItem item) override;

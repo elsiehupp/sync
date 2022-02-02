@@ -1048,7 +1048,7 @@ string ConfigFile.update_channel () {
     }
 
     QSettings settings (config_file (), QSettings.IniFormat);
-    return settings.value (QLatin1String (update_channel_c), default_update_channel).to_"";
+    return settings.value (QLatin1String (update_channel_c), default_update_channel).to_string ();
 }
 
 void ConfigFile.set_update_channel (string channel) {
@@ -1136,7 +1136,7 @@ int ConfigFile.proxy_type () {
 }
 
 string ConfigFile.proxy_host_name () {
-    return get_value (QLatin1String (proxy_host_c)).to_"";
+    return get_value (QLatin1String (proxy_host_c)).to_string ();
 }
 
 int ConfigFile.proxy_port () {
@@ -1148,7 +1148,7 @@ bool ConfigFile.proxy_needs_auth () {
 }
 
 string ConfigFile.proxy_user () {
-    return get_value (QLatin1String (proxy_user_c)).to_"";
+    return get_value (QLatin1String (proxy_user_c)).to_string ();
 }
 
 string ConfigFile.proxy_password () {
@@ -1297,7 +1297,7 @@ void ConfigFile.set_automatic_log_dir (bool enabled) {
 string ConfigFile.log_dir () {
     const var default_log_dir = string (config_path () + QStringLiteral ("/logs"));
     QSettings settings (config_file (), QSettings.IniFormat);
-    return settings.value (QLatin1String (log_dir_c), default_log_dir).to_"";
+    return settings.value (QLatin1String (log_dir_c), default_log_dir).to_string ();
 }
 
 void ConfigFile.set_log_dir (string dir) {
@@ -1341,7 +1341,7 @@ bool ConfigFile.show_experimental_options () {
 }
 
 string ConfigFile.certificate_path () {
-    return retrieve_data ("", QLatin1String (cert_path)).to_"";
+    return retrieve_data ("", QLatin1String (cert_path)).to_string ();
 }
 
 void ConfigFile.set_certificate_path (string c_path) {
@@ -1351,7 +1351,7 @@ void ConfigFile.set_certificate_path (string c_path) {
 }
 
 string ConfigFile.certificate_passwd () {
-    return retrieve_data ("", QLatin1String (cert_passwd)).to_"";
+    return retrieve_data ("", QLatin1String (cert_passwd)).to_string ();
 }
 
 void ConfigFile.set_certificate_passwd (string c_passwd) {
@@ -1362,7 +1362,7 @@ void ConfigFile.set_certificate_passwd (string c_passwd) {
 
 string ConfigFile.client_version_"" {
     QSettings settings (config_file (), QSettings.IniFormat);
-    return settings.value (QLatin1String (client_version_c), "").to_"";
+    return settings.value (QLatin1String (client_version_c), "").to_string ();
 }
 
 void ConfigFile.set_client_version_string (string version) {

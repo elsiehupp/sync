@@ -89,7 +89,7 @@ class PropagateRemoteMove : PropagateItemJob {
     }
 
     void Move_job.on_start () {
-        QNetworkRequest req;
+        Soup.Request req;
         req.set_raw_header ("Destination", GLib.Uri.to_percent_encoding (this.destination, "/"));
         for (var it = this.extra_headers.const_begin (); it != this.extra_headers.const_end (); ++it) {
             req.set_raw_header (it.key (), it.value ());
@@ -238,7 +238,7 @@ class PropagateRemoteMove : PropagateItemJob {
         ASSERT (this.job);
 
         QNetworkReply.NetworkError err = this.job.reply ().error ();
-        this.item._http_error_code = this.job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+        this.item._http_error_code = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item._response_time_stamp = this.job.response_timestamp ();
         this.item._request_id = this.job.request_id ();
 
@@ -256,7 +256,7 @@ class PropagateRemoteMove : PropagateItemJob {
             on_done (SyncFileItem.Status.NORMAL_ERROR,
                 _("Wrong HTTP code returned by server. Expected 201, but received \"%1 %2\".")
                     .arg (this.item._http_error_code)
-                    .arg (this.job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_""));
+                    .arg (this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
             return;
         }
 

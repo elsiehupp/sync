@@ -87,7 +87,7 @@ signals:
     PutMultiFileJob.~PutMultiFileJob () = default;
 
     void PutMultiFileJob.on_start () {
-        QNetworkRequest req;
+        Soup.Request req;
 
         for (var one_device : this.devices) {
             var one_part = QHttp_part{};
@@ -98,7 +98,7 @@ signals:
                 one_part.set_raw_header (it.key (), it.value ());
             }
 
-            req.set_priority (QNetworkRequest.Low_priority); // Long uploads must not block non-propagation jobs.
+            req.set_priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
 
             this.body.append (one_part);
         }
@@ -120,10 +120,10 @@ signals:
             one_device._device.close ();
         }
 
-        q_c_info (lc_put_multi_file_job) << "POST of" << reply ().request ().url ().to_"" << path () << "FINISHED WITH STATUS"
+        q_c_info (lc_put_multi_file_job) << "POST of" << reply ().request ().url ().to_string () << path () << "FINISHED WITH STATUS"
                          << reply_status_""
-                         << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute)
-                         << reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute);
+                         << reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
+                         << reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);
 
         /* emit */ finished_signal ();
         return true;

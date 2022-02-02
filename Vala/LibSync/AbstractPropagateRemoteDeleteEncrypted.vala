@@ -107,7 +107,7 @@ void AbstractPropagateRemoteDeleteEncrypted.on_folder_encrypted_id_received (str
     GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Received id of folder, trying to lock it so we can prepare the metadata";
     var job = qobject_cast<LsColJob> (sender ());
     const ExtraFolderInfo folder_info = job._folder_infos.value (list.first ());
-    on_try_lock (folder_info.file_id);
+    on_try_lock (folder_info.file_identifier);
 }
 
 void AbstractPropagateRemoteDeleteEncrypted.on_try_lock (GLib.ByteArray folder_id) {
@@ -149,7 +149,7 @@ void AbstractPropagateRemoteDeleteEncrypted.on_delete_remote_item_finished () {
 
     const var err = delete_job.reply ().error ();
 
-    this.item._http_error_code = delete_job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+    this.item._http_error_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
     this.item._response_time_stamp = delete_job.response_timestamp ();
     this.item._request_id = delete_job.request_id ();
 
@@ -171,7 +171,7 @@ void AbstractPropagateRemoteDeleteEncrypted.on_delete_remote_item_finished () {
         // throw an error.
         store_first_error_string (_("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                        .arg (this.item._http_error_code)
-                       .arg (delete_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_""));
+                       .arg (delete_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
 
         task_failed ();
         return;
@@ -204,14 +204,14 @@ void AbstractPropagateRemoteDeleteEncrypted.unlock_folder () {
     var unlock_job = new UnlockEncryptFolderApiJob (this.propagator.account (), this.folder_id, this.folder_token, this);
 
     connect (unlock_job, &UnlockEncryptFolderApiJob.on_success, this, &AbstractPropagateRemoteDeleteEncrypted.on_folder_un_locked_successfully);
-    connect (unlock_job, &UnlockEncryptFolderApiJob.error, this, [this] (GLib.ByteArray& file_id, int http_return_code) {
-        Q_UNUSED (file_id);
+    connect (unlock_job, &UnlockEncryptFolderApiJob.error, this, [this] (GLib.ByteArray file_identifier, int http_return_code) {
+        Q_UNUSED (file_identifier);
         this.folder_locked = false;
         this.folder_token = "";
         this.item._http_error_code = http_return_code;
         this.error_string = _("\"%1 Failed to unlock encrypted folder %2\".")
                 .arg (http_return_code)
-                .arg (string.from_utf8 (file_id));
+                .arg (string.from_utf8 (file_identifier));
         this.item._error_string =this.error_string;
         task_failed ();
     });

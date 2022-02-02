@@ -464,7 +464,7 @@ class DirectEditor : GLib.Object {
     GLib.ByteArray Capabilities.preferred_upload_checksum_type () {
         return q_environment_variable ("OWNCLOUD_CONTENT_CHECKSUM_TYPE",
                                     this.capabilities.value (QStringLiteral ("checksums")).to_map ()
-                                    .value (QStringLiteral ("preferred_upload_type"), QStringLiteral ("SHA1")).to_"").to_utf8 ();
+                                    .value (QStringLiteral ("preferred_upload_type"), QStringLiteral ("SHA1")).to_string ()).to_utf8 ();
     }
 
     GLib.ByteArray Capabilities.upload_checksum_type () {
@@ -530,7 +530,7 @@ class DirectEditor : GLib.Object {
     }
 
     GLib.Uri Capabilities.push_notifications_web_socket_url () {
-        const var websocket = this.capabilities["notify_push"].to_map ()["endpoints"].to_map ()["websocket"].to_"";
+        const var websocket = this.capabilities["notify_push"].to_map ()["endpoints"].to_map ()["websocket"].to_string ();
         return GLib.Uri (websocket);
     }
 
@@ -551,7 +551,7 @@ class DirectEditor : GLib.Object {
     }
 
     string Capabilities.invalid_filename_regex () {
-        return this.capabilities[QStringLiteral ("dav")].to_map ()[QStringLiteral ("invalid_filename_regex")].to_"";
+        return this.capabilities[QStringLiteral ("dav")].to_map ()[QStringLiteral ("invalid_filename_regex")].to_string ();
     }
 
     bool Capabilities.upload_conflict_files () {

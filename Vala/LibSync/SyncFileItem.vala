@@ -283,7 +283,7 @@ class SyncFileItem {
     /***********************************************************
     Variable used by the propagator
     ***********************************************************/
-    public GLib.ByteArray file_id;
+    public GLib.ByteArray file_identifier;
 
 
     /***********************************************************
@@ -340,7 +340,7 @@ class SyncFileItem {
             record._type = ItemTypeVirtualFile;
 
         record._etag = this.etag;
-        record._file_id = this.file_id;
+        record._file_id = this.file_identifier;
         record._file_size = this.size;
         record._remote_perm = this.remote_perm;
         record._server_has_ignored_files = this.server_has_ignored_files;

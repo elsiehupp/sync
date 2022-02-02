@@ -6,12 +6,12 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 // #include <QLoggingCategory>
-// #include <QNetworkRequest>
+// #include <Soup.Request>
 // #include <QNetworkAccessManager>
 // #include <QNetworkReply>
-// #include <QNetworkRequest>
+// #include <Soup.Request>
 // #include <QSslConfiguration>
-// #include <QBuffer>
+// #include <Soup.Buffer>
 // #include <QXmlStreamReader>
 // #include <string[]>
 // #include <QStack>
@@ -23,7 +23,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QRegularExpression>
 // #pragma once
 
-// #include <QNetworkRequest>
+// #include <Soup.Request>
 // #include <QNetworkReply>
 // #include <QPointer>
 // #include <QElapsedTimer>
@@ -210,21 +210,21 @@ signals:
     Takes ownership of the request_body (to allow redirects).
     ***********************************************************/
     protected QNetworkReply send_request (GLib.ByteArray verb, GLib.Uri url,
-        QNetworkRequest req = QNetworkRequest (),
+        Soup.Request req = Soup.Request (),
         QIODevice request_body = nullptr);
 
     protected QNetworkReply send_request (GLib.ByteArray verb, GLib.Uri url,
-        QNetworkRequest req, GLib.ByteArray request_body);
+        Soup.Request req, GLib.ByteArray request_body);
 
     // send_request does not take a relative path instead of an url,
     // but the old API allowed that. We have this undefined overload
     // to help catch usage errors
     protected QNetworkReply send_request (GLib.ByteArray verb, string relative_path,
-        QNetworkRequest req = QNetworkRequest (),
+        Soup.Request req = Soup.Request (),
         QIODevice request_body = nullptr);
 
     protected QNetworkReply send_request (GLib.ByteArray verb, GLib.Uri url,
-        QNetworkRequest req, QHttpMultiPart request_body);
+        Soup.Request req, QHttpMultiPart request_body);
 
 
     /***********************************************************
@@ -434,7 +434,7 @@ QNetworkReply *AbstractNetworkJob.add_timer (QNetworkReply reply) {
 }
 
 QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, GLib.Uri url,
-    QNetworkRequest req, QIODevice request_body) {
+    Soup.Request req, QIODevice request_body) {
     var reply = this.account.send_raw_request (verb, url, req, request_body);
     this.request_body = request_body;
     if (this.request_body) {
@@ -445,7 +445,7 @@ QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, GLib.Uri ur
 }
 
 QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, GLib.Uri url,
-    QNetworkRequest req, GLib.ByteArray request_body) {
+    Soup.Request req, GLib.ByteArray request_body) {
     var reply = this.account.send_raw_request (verb, url, req, request_body);
     this.request_body = nullptr;
     adopt_request (reply);
@@ -454,7 +454,7 @@ QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, GLib.Uri ur
 
 QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb,
                                                const GLib.Uri url,
-                                               QNetworkRequest req,
+                                               Soup.Request req,
                                                QHttpMultiPart request_body) {
     var reply = this.account.send_raw_request (verb, url, req, request_body);
     this.request_body = nullptr;
@@ -487,7 +487,7 @@ void AbstractNetworkJob.on_finished () {
     const var max_http2Resends = 3;
     GLib.ByteArray verb = HttpLogger.request_verb (*reply ());
     if (this.reply.error () == QNetworkReply.ContentReSendError
-        && this.reply.attribute (QNetworkRequest.HTTP2WasUsedAttribute).to_bool ()) {
+        && this.reply.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()) {
 
         if ( (this.request_body && !this.request_body.is_sequential ()) || verb.is_empty ()) {
             GLib.warn (lc_network_job) << "Can't resend HTTP2 request, verb or body not suitable"
@@ -521,7 +521,7 @@ void AbstractNetworkJob.on_finished () {
 
         if (!this.ignore_credential_failure || this.reply.error () != QNetworkReply.AuthenticationRequiredError) {
             GLib.warn (lc_network_job) << this.reply.error () << error_string ()
-                                    << this.reply.attribute (QNetworkRequest.HttpStatusCodeAttribute);
+                                    << this.reply.attribute (Soup.Request.HttpStatusCodeAttribute);
             if (this.reply.error () == QNetworkReply.ProxyAuthenticationRequiredError) {
                 GLib.warn (lc_network_job) << this.reply.raw_header ("Proxy-Authenticate");
             }
@@ -533,7 +533,7 @@ void AbstractNetworkJob.on_finished () {
     this.response_timestamp = this.reply.raw_header ("Date");
 
     GLib.Uri requested_url = reply ().request ().url ();
-    GLib.Uri redirect_url = reply ().attribute (QNetworkRequest.RedirectionTargetAttribute).to_url ();
+    GLib.Uri redirect_url = reply ().attribute (Soup.Request.RedirectionTargetAttribute).to_url ();
     if (this.follow_redirects && !redirect_url.is_empty ()) {
         // Redirects may be relative
         if (redirect_url.is_relative ())
@@ -572,7 +572,7 @@ void AbstractNetworkJob.on_finished () {
                 on_reset_timeout ();
                 if (this.request_body) {
                     if (!this.request_body.is_open ()) {
-                        // Avoid the QIODevice.seek (QBuffer) : The device is not open warning message
+                        // Avoid the QIODevice.seek (Soup.Buffer) : The device is not open warning message
                        this.request_body.open (QIODevice.ReadOnly);
                     }
                     this.request_body.seek (0);
@@ -725,8 +725,8 @@ string error_message (string base_error, GLib.ByteArray body) {
 
 string network_reply_error_string (QNetworkReply reply) {
     string base = reply.error_string ();
-    int http_status = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
-    string http_reason = reply.attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_"";
+    int http_status = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+    string http_reason = reply.attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();
 
     // Only adjust HTTP error messages of the expected format.
     if (http_reason.is_empty () || http_status == 0 || !base.contains (http_reason)) {

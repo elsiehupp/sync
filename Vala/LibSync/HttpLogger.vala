@@ -6,7 +6,7 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 
 // #include <QRegularExpression>
 // #include <QLoggingCategory>
-// #include <QBuffer>
+// #include <Soup.Buffer>
 // #pragma once
 
 // #include <QNetworkReply>
@@ -20,7 +20,7 @@ namespace HttpLogger {
     /***********************************************************
     Helper to construct the HTTP verb used in the request
     ***********************************************************/
-    GLib.ByteArray request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest request);
+    GLib.ByteArray request_verb (QNetworkAccessManager.Operation operation, Soup.Request request);
     inline GLib.ByteArray request_verb (QNetworkReply reply) {
         return request_verb (reply.operation (), reply.request ());
     }
@@ -50,7 +50,7 @@ namespace HttpLogger {
         }
         stream << verb;
         if (reply) {
-            stream << " " << reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+            stream << " " << reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         }
         stream << " " << url << " Header: { ";
         for (var it : header) {
@@ -67,7 +67,7 @@ namespace HttpLogger {
         if (content_length > 0) {
             if (is_text_body (content_type)) {
                 if (!device.is_open ()) {
-                    Q_ASSERT (dynamic_cast<QBuffer> (device));
+                    Q_ASSERT (dynamic_cast<Soup.Buffer> (device));
                     // should we close it again?
                     device.open (QIODevice.ReadOnly);
                 }
@@ -97,23 +97,23 @@ namespace HttpLogger {
             header << q_make_pair (key, request.raw_header (key));
         }
         log_http (request_verb (operation, request),
-            request.url ().to_"",
+            request.url ().to_string (),
             request.raw_header (XRequestId ()),
-            request.header (QNetworkRequest.ContentTypeHeader).to_"",
+            request.header (Soup.Request.ContentTypeHeader).to_string (),
             header,
             device);
 
         GLib.Object.connect (reply, &QNetworkReply.on_finished, reply, [reply] {
             log_http (request_verb (*reply),
-                reply.url ().to_"",
+                reply.url ().to_string (),
                 reply.request ().raw_header (XRequestId ()),
-                reply.header (QNetworkRequest.ContentTypeHeader).to_"",
+                reply.header (Soup.Request.ContentTypeHeader).to_string (),
                 reply.raw_header_pairs (),
                 reply);
         });
     }
 
-    GLib.ByteArray HttpLogger.request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest request) {
+    GLib.ByteArray HttpLogger.request_verb (QNetworkAccessManager.Operation operation, Soup.Request request) {
         switch (operation) {
         case QNetworkAccessManager.HeadOperation:
             return QByteArrayLiteral ("HEAD");
@@ -126,7 +126,7 @@ namespace HttpLogger {
         case QNetworkAccessManager.DeleteOperation:
             return QByteArrayLiteral ("DELETE");
         case QNetworkAccessManager.CustomOperation:
-            return request.attribute (QNetworkRequest.CustomVerbAttribute).to_byte_array ();
+            return request.attribute (Soup.Request.CustomVerbAttribute).to_byte_array ();
         case QNetworkAccessManager.UnknownOperation:
             break;
         }

@@ -218,9 +218,9 @@ class BulkPropagatorJob : PropagatorJob {
 
 
     GLib.ByteArray get_etag_from_json_reply (QJsonObject reply) {
-        const var oc_etag = Occ.parse_etag (reply.value ("OC-ETag").to_"".to_latin1 ());
-        const var ETag = Occ.parse_etag (reply.value ("ETag").to_"".to_latin1 ());
-        const var  etag = Occ.parse_etag (reply.value ("etag").to_"".to_latin1 ());
+        const var oc_etag = Occ.parse_etag (reply.value ("OC-ETag").to_string ().to_latin1 ());
+        const var ETag = Occ.parse_etag (reply.value ("ETag").to_string ().to_latin1 ());
+        const var  etag = Occ.parse_etag (reply.value ("etag").to_string ().to_latin1 ());
         GLib.ByteArray ret = oc_etag;
         if (ret.is_empty ()) {
             ret = ETag;
@@ -235,7 +235,7 @@ class BulkPropagatorJob : PropagatorJob {
     }
 
     GLib.ByteArray get_header_from_json_reply (QJsonObject reply, GLib.ByteArray header_name) {
-        return reply.value (header_name).to_"".to_latin1 ();
+        return reply.value (header_name).to_string ().to_latin1 ();
     }
 
     constexpr var batch_size = 100;
@@ -518,7 +518,7 @@ class BulkPropagatorJob : PropagatorJob {
         single_file._item._response_time_stamp = job.response_timestamp ();
         single_file._item._request_id = job.request_id ();
         if (single_file._item._http_error_code != 200) {
-            common_error_handling (single_file._item, file_reply[QStringLiteral ("message")].to_"");
+            common_error_handling (single_file._item, file_reply[QStringLiteral ("message")].to_string ());
             return;
         }
 
