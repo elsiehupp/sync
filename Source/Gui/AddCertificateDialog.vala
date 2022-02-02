@@ -9,7 +9,6 @@ Copyright (C) 2015 by Daniel Molkentin <danimo@owncloud.com>
 // #include <QLineEdit>
 
 // #include <Gtk.Dialog>
-// #include <string>
 
 namespace Occ {
 
@@ -68,8 +67,8 @@ class AddCertificateDialog : Gtk.Dialog {
     }
 
     void AddCertificateDialog.on_push_button_browse_certificate_clicked () {
-        string file_name = QFileDialog.get_open_file_name (this, _("Select a certificate"), "", _("Certificate files (*.p12 *.pfx)"));
-        ui.line_edit_certificate_path.on_set_text (file_name);
+        string filename = QFileDialog.get_open_filename (this, _("Select a certificate"), "", _("Certificate files (*.p12 *.pfx)"));
+        ui.line_edit_certificate_path.on_set_text (filename);
     }
 
     string AddCertificateDialog.get_certificate_path () {

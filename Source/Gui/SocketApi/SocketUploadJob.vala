@@ -20,7 +20,7 @@ class Socket_upload_job : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Socket_upload_job (unowned<Socket_api_job_v2> &job);
+    public Socket_upload_job (unowned<Socket_api_job_v2> job);
 
     /***********************************************************
     ***********************************************************/
@@ -30,14 +30,14 @@ class Socket_upload_job : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private unowned<Socket_api_job_v2> _api_job;
-    private string _local_path;
-    private string _remote_path;
-    private string _pattern;
-    private QTemporary_file _tmp;
-    private SyncJournalDb _database;
-    private SyncEngine _engine;
-    private string[] _synced_files;
+    private unowned<Socket_api_job_v2> this.api_job;
+    private string this.local_path;
+    private string this.remote_path;
+    private string this.pattern;
+    private QTemporary_file this.tmp;
+    private SyncJournalDb this.database;
+    private SyncEngine this.engine;
+    private string[] this.synced_files;
 };
 }
 
@@ -49,74 +49,74 @@ class Socket_upload_job : GLib.Object {
 
 
 
-Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> &job)
-    : _api_job (job) {
+Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> job)
+    : this.api_job (job) {
     connect (job.data (), &Socket_api_job_v2.on_finished, this, &Socket_upload_job.delete_later);
 
-    _local_path = _api_job.arguments ()[QLatin1String ("local_path")].to_"";
-    _remote_path = _api_job.arguments ()[QLatin1String ("remote_path")].to_"";
-    if (!_remote_path.starts_with ('/')) {
-        _remote_path = '/' + _remote_path;
+    this.local_path = this.api_job.arguments ()[QLatin1String ("local_path")].to_"";
+    this.remote_path = this.api_job.arguments ()[QLatin1String ("remote_path")].to_"";
+    if (!this.remote_path.starts_with ('/')) {
+        this.remote_path = '/' + this.remote_path;
     }
 
-    _pattern = job.arguments ()[QLatin1String ("pattern")].to_"";
+    this.pattern = job.arguments ()[QLatin1String ("pattern")].to_"";
     // TODO : use uuid
     const var accname = job.arguments ()[QLatin1String ("account")][QLatin1String ("name")].to_"";
     var account = AccountManager.instance ().account (accname);
 
-    if (!QFileInfo (_local_path).is_absolute ()) {
+    if (!QFileInfo (this.local_path).is_absolute ()) {
         job.failure (QStringLiteral ("Local path must be a an absolute path"));
         return;
     }
-    if (!_tmp.open ()) {
+    if (!this.tmp.open ()) {
         job.failure (QStringLiteral ("Failed to create temporary database"));
         return;
     }
 
-    _database = new SyncJournalDb (_tmp.file_name (), this);
-    _engine = new SyncEngine (account.account (), _local_path.ends_with ('/') ? _local_path : _local_path + '/', _remote_path, _database);
-    _engine.set_parent (_database);
+    this.database = new SyncJournalDb (this.tmp.filename (), this);
+    this.engine = new SyncEngine (account.account (), this.local_path.ends_with ('/') ? this.local_path : this.local_path + '/', this.remote_path, this.database);
+    this.engine.set_parent (this.database);
 
-    connect (_engine, &Occ.SyncEngine.item_completed, this, [this] (Occ.SyncFileItemPtr item) {
-        _synced_files.append (item._file);
+    connect (this.engine, &Occ.SyncEngine.item_completed, this, [this] (Occ.SyncFileItemPtr item) {
+        this.synced_files.append (item._file);
     });
 
-    connect (_engine, &Occ.SyncEngine.on_finished, this, [this] (bool ok) {
+    connect (this.engine, &Occ.SyncEngine.on_finished, this, [this] (bool ok) {
         if (ok) {
-            _api_job.on_success ({
+            this.api_job.on_success ({
                 {
                     "local_path",
-                    _local_path
+                    this.local_path
                 },
                 {
                     "synced_files",
-                    QJsonArray.from_string_list (_synced_files)
+                    QJsonArray.from_string_list (this.synced_files)
                 }
             });
         }
     });
-    connect (_engine, &Occ.SyncEngine.sync_error, this, [this] (string error, ErrorCategory) {
-        _api_job.failure (error);
+    connect (this.engine, &Occ.SyncEngine.sync_error, this, [this] (string error, ErrorCategory) {
+        this.api_job.failure (error);
     });
 }
 
 void Socket_upload_job.on_start () {
-    var opt = _engine.sync_options ();
-    opt.set_file_pattern (_pattern);
+    var opt = this.engine.sync_options ();
+    opt.set_file_pattern (this.pattern);
     if (!opt.file_regex ().is_valid ()) {
-        _api_job.failure (opt.file_regex ().error_string ());
+        this.api_job.failure (opt.file_regex ().error_string ());
         return;
     }
-    _engine.set_sync_options (opt);
+    this.engine.set_sync_options (opt);
 
     // create the dir, fail if it already exists
-    var mkdir = new Occ.MkColJob (_engine.account (), _remote_path);
-    connect (mkdir, &Occ.MkColJob.finished_without_error, _engine, &Occ.SyncEngine.on_start_sync);
+    var mkdir = new Occ.MkColJob (this.engine.account (), this.remote_path);
+    connect (mkdir, &Occ.MkColJob.finished_without_error, this.engine, &Occ.SyncEngine.on_start_sync);
     connect (mkdir, &Occ.MkColJob.finished_with_error, this, [this] (QNetworkReply reply) {
         if (reply.error () == 202) {
-            _api_job.failure (QStringLiteral ("Destination %1 already exists").arg (_remote_path));
+            this.api_job.failure (QStringLiteral ("Destination %1 already exists").arg (this.remote_path));
         } else {
-            _api_job.failure (reply.error_string ());
+            this.api_job.failure (reply.error_string ());
         }
     });
     mkdir.on_start ();

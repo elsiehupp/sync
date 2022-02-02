@@ -150,7 +150,7 @@ class IgnoreListTableWidget : Gtk.Widget {
         bool ok_clicked = false;
         string pattern = QInputDialog.get_text (this, _("Add Ignore Pattern"),
             _("Add a new ignore pattern:"),
-            QLineEdit.Normal, "", &ok_clicked);
+            QLineEdit.Normal, "", ok_clicked);
 
         if (!ok_clicked || pattern.is_empty ())
             return;

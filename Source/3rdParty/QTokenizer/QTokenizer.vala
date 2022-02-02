@@ -37,7 +37,6 @@ met : http://www.gnu.org/copyleft/gpl.html.
 $QT_END_LICENSE$
 ****************************************************************************/
 
-// #include <string>
 
 
 QT_BEGIN_NAMESPACE
@@ -52,13 +51,13 @@ struct QTokenizerPrivate {
         char_type quote_char = '\0';
     };
 
-    QTokenizerPrivate (T& _string, T& _delims) :
-        string (_string)
+    QTokenizerPrivate (T& this.string, T& this.delims) :
+        string (this.string)
       , begin (string.begin ())
       , end (string.end ())
       , token_begin (end)
       , token_end (begin)
-      , delimiters (_delims)
+      , delimiters (this.delims)
       , is_delim (false)
       , return_delimiters (false)
       , return_quotes (false) {

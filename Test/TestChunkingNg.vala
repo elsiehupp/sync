@@ -12,7 +12,7 @@ using namespace Occ;
 
 /* Upload a 1/3 of a file of given size.
 fakeFolder needs to be synchronized */
-static void partialUpload (FakeFolder &fakeFolder, string name, int64 size) {
+static void partialUpload (FakeFolder fakeFolder, string name, int64 size) {
     QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     QCOMPARE (fakeFolder.uploadState ().children.count (), 0); // The state should be clean
 
@@ -20,7 +20,7 @@ static void partialUpload (FakeFolder &fakeFolder, string name, int64 size) {
     // Abort when the upload is at 1/3
     int64 sizeWhenAbort = -1;
     var con = GLib.Object.connect (&fakeFolder.syncEngine (),  &SyncEngine.transmissionProgress,
-                                    [&] (ProgressInfo &progress) {
+                                    [&] (ProgressInfo progress) {
                 if (progress.completedSize () > (progress.totalSize () /3 )) {
                     sizeWhenAbort = progress.completedSize ();
                     fakeFolder.syncEngine ().on_abort ();
@@ -35,11 +35,11 @@ static void partialUpload (FakeFolder &fakeFolder, string name, int64 size) {
     QCOMPARE (fakeFolder.uploadState ().children.count (), 1); // the transfer was done with chunking
     var upStateChildren = fakeFolder.uploadState ().children.first ().children;
     QCOMPARE (sizeWhenAbort, std.accumulate (upStateChildren.cbegin (), upStateChildren.cend (), 0,
-                                            [] (int s, FileInfo &i) { return s + i.size; }));
+                                            [] (int s, FileInfo i) { return s + i.size; }));
 }
 
 // Reduce max chunk size a bit so we get more chunks
-static void setChunkSize (SyncEngine &engine, int64 size) {
+static void setChunkSize (SyncEngine engine, int64 size) {
     SyncOptions options;
     options._maxChunkSize = size;
     options._initialChunkSize = size;
@@ -80,14 +80,14 @@ class TestChunkingNG : GLib.Object {
         partialUpload (fakeFolder, "A/a0", size);
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         var chunkingId = fakeFolder.uploadState ().children.first ().name;
-        const var &chunkMap = fakeFolder.uploadState ().children.first ().children;
-        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo &f) { return s + f.size; });
+        const var chunkMap = fakeFolder.uploadState ().children.first ().children;
+        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
         QVERIFY (uploadedSize > 2 * 1000 * 1000); // at least 2 MB
 
         // Add a fake chunk to make sure it gets deleted
         fakeFolder.uploadState ().children.first ().insert ("10000", size);
 
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 // Test that we properly resuming and are not sending past data again.
                 Q_ASSERT (request.rawHeader ("OC-Chunk-Offset").toLongLong () >= uploadedSize);
@@ -115,8 +115,8 @@ class TestChunkingNG : GLib.Object {
         partialUpload (fakeFolder, "A/a0", size);
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         var chunkingId = fakeFolder.uploadState ().children.first ().name;
-        const var &chunkMap = fakeFolder.uploadState ().children.first ().children;
-        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo &f) { return s + f.size; });
+        const var chunkMap = fakeFolder.uploadState ().children.first ().children;
+        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
         QVERIFY (uploadedSize > 2 * 1000 * 1000); // at least 50 MB
         QVERIFY (chunkMap.size () >= 3); // at least three chunks
 
@@ -131,7 +131,7 @@ class TestChunkingNG : GLib.Object {
         fakeFolder.uploadState ().children.first ().remove (secondChunk.name);
 
         string[] deletedPaths;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 // Test that we properly resuming, not resending the first chunk
                 Q_ASSERT (request.rawHeader ("OC-Chunk-Offset").toLongLong () >= firstChunk.size);
@@ -171,8 +171,8 @@ class TestChunkingNG : GLib.Object {
         partialUpload (fakeFolder, "A/a0", size);
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         var chunkingId = fakeFolder.uploadState ().children.first ().name;
-        const var &chunkMap = fakeFolder.uploadState ().children.first ().children;
-        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo &f) { return s + f.size; });
+        const var chunkMap = fakeFolder.uploadState ().children.first ().children;
+        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
         QVERIFY (uploadedSize > 5 * 1000 * 1000); // at least 5 MB
 
         // Add a chunk that makes the file completely uploaded
@@ -182,7 +182,7 @@ class TestChunkingNG : GLib.Object {
         bool sawPut = false;
         bool sawDelete = false;
         bool sawMove = false;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 sawPut = true;
             } else if (op == QNetworkAccessManager.DeleteOperation) {
@@ -216,8 +216,8 @@ class TestChunkingNG : GLib.Object {
         partialUpload (fakeFolder, "A/a0", size);
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         var chunkingId = fakeFolder.uploadState ().children.first ().name;
-        const var &chunkMap = fakeFolder.uploadState ().children.first ().children;
-        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo &f) { return s + f.size; });
+        const var chunkMap = fakeFolder.uploadState ().children.first ().children;
+        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
         QVERIFY (uploadedSize > 5 * 1000 * 1000); // at least 5 MB
 
         // Add a chunk that makes the file more than completely uploaded
@@ -246,11 +246,11 @@ class TestChunkingNG : GLib.Object {
         GLib.ByteArray moveChecksumHeader;
         int nGET = 0;
         int responseDelay = 100000; // bigger than on_abort-wait timeout
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
-                QTimer.singleShot (50, &parent, [&] () { fakeFolder.syncEngine ().on_abort (); });
+                QTimer.singleShot (50, parent, [&] () { fakeFolder.syncEngine ().on_abort (); });
                 moveChecksumHeader = request.rawHeader ("OC-Checksum");
-                return new DelayedReply<FakeChunkMoveReply> (responseDelay, fakeFolder.uploadState (), fakeFolder.remoteModifier (), op, request, &parent);
+                return new DelayedReply<FakeChunkMoveReply> (responseDelay, fakeFolder.uploadState (), fakeFolder.remoteModifier (), op, request, parent);
             } else if (op == QNetworkAccessManager.GetOperation) {
                 nGET++;
             }
@@ -263,11 +263,11 @@ class TestChunkingNG : GLib.Object {
 
         // Now the next sync gets a NEW/NEW conflict and since there's no checksum
         // it just becomes a UPDATE_METADATA
-        var checkEtagUpdated = [&] (SyncFileItemVector &items) {
+        var checkEtagUpdated = [&] (SyncFileItemVector items) {
             QCOMPARE (items.size (), 1);
             QCOMPARE (items[0]._file, QLatin1String ("A"));
             SyncJournalFileRecord record;
-            QVERIFY (fakeFolder.syncJournal ().getFileRecord (GLib.ByteArray ("A/a0"), &record));
+            QVERIFY (fakeFolder.syncJournal ().getFileRecord (GLib.ByteArray ("A/a0"), record));
             QCOMPARE (record._etag, fakeFolder.remoteModifier ().find ("A/a0").etag);
         };
         var connection = connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToPropagate, checkEtagUpdated);
@@ -323,10 +323,10 @@ class TestChunkingNG : GLib.Object {
         // Make the MOVE never reply, but trigger a client-on_abort and apply the change remotely
         GLib.Object parent;
         int responseDelay = 200; // smaller than on_abort-wait timeout
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
-                QTimer.singleShot (50, &parent, [&] () { fakeFolder.syncEngine ().on_abort (); });
-                return new DelayedReply<FakeChunkMoveReply> (responseDelay, fakeFolder.uploadState (), fakeFolder.remoteModifier (), op, request, &parent);
+                QTimer.singleShot (50, parent, [&] () { fakeFolder.syncEngine ().on_abort (); });
+                return new DelayedReply<FakeChunkMoveReply> (responseDelay, fakeFolder.uploadState (), fakeFolder.remoteModifier (), op, request, parent);
             }
             return nullptr;
         });
@@ -403,7 +403,7 @@ class TestChunkingNG : GLib.Object {
 
         // But in the middle of the sync, modify the file on the server
         QMetaObject.Connection con = GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.transmissionProgress,
-                                    [&] (ProgressInfo &progress) {
+                                    [&] (ProgressInfo progress) {
                 if (progress.completedSize () > (progress.totalSize () / 2 )) {
                     fakeFolder.remoteModifier ().setContents ("A/a0", 'C');
                     GLib.Object.disconnect (con);
@@ -425,8 +425,8 @@ class TestChunkingNG : GLib.Object {
         QCOMPARE (localState.find ("A/a0").contentChar, 'C');
 
         // There is a conflict file with our version
-        var &stateAChildren = localState.find ("A").children;
-        var it = std.find_if (stateAChildren.cbegin (), stateAChildren.cend (), [&] (FileInfo &fi) {
+        var stateAChildren = localState.find ("A").children;
+        var it = std.find_if (stateAChildren.cbegin (), stateAChildren.cend (), [&] (FileInfo fi) {
             return fi.name.startsWith ("a0 (conflicted copy");
         });
         QVERIFY (it != stateAChildren.cend ());
@@ -455,7 +455,7 @@ class TestChunkingNG : GLib.Object {
 
         // middle of the sync, modify the file
         QMetaObject.Connection con = GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.transmissionProgress,
-                                    [&] (ProgressInfo &progress) {
+                                    [&] (ProgressInfo progress) {
                 if (progress.completedSize () > (progress.totalSize () / 2 )) {
                     fakeFolder.localModifier ().setContents ("A/a0", 'B');
                     fakeFolder.localModifier ().appendByte ("A/a0");
@@ -531,17 +531,17 @@ class TestChunkingNG : GLib.Object {
         QScopedValueRollback<int> setHttpTimeout (AbstractNetworkJob.httpTimeout, 1);
         int responseDelay = AbstractNetworkJob.httpTimeout * 1000 * 1000; // much bigger than http timeout (so a timeout will occur)
         // This will perform the operation on the server, but the reply will not come to the client
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice outgoingData) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice outgoingData) . QNetworkReply * {
             if (!chunking) {
                 Q_ASSERT (!request.url ().path ().contains ("/uploads/")
                     && "Should not touch uploads endpoint when not chunking");
             }
             if (!chunking && op == QNetworkAccessManager.PutOperation) {
                 checksumHeader = request.rawHeader ("OC-Checksum");
-                return new DelayedReply<FakePutReply> (responseDelay, fakeFolder.remoteModifier (), op, request, outgoingData.readAll (), &fakeFolder.syncEngine ());
+                return new DelayedReply<FakePutReply> (responseDelay, fakeFolder.remoteModifier (), op, request, outgoingData.readAll (), fakeFolder.syncEngine ());
             } else if (chunking && request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
                 checksumHeader = request.rawHeader ("OC-Checksum");
-                return new DelayedReply<FakeChunkMoveReply> (responseDelay, fakeFolder.uploadState (), fakeFolder.remoteModifier (), op, request, &fakeFolder.syncEngine ());
+                return new DelayedReply<FakeChunkMoveReply> (responseDelay, fakeFolder.uploadState (), fakeFolder.remoteModifier (), op, request, fakeFolder.syncEngine ());
             } else if (op == QNetworkAccessManager.GetOperation) {
                 nGET++;
             }

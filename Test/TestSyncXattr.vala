@@ -31,21 +31,21 @@ const int CFVERIFY_GONE (folder, path)
 
 using namespace Occ;
 
-bool itemInstruction (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
+bool itemInstruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
     return item._instruction == instr;
 }
 
-SyncJournalFileRecord dbRecord (FakeFolder &folder, string path) {
+SyncJournalFileRecord dbRecord (FakeFolder folder, string path) {
     SyncJournalFileRecord record;
-    folder.syncJournal ().getFileRecord (path, &record);
+    folder.syncJournal ().getFileRecord (path, record);
     return record;
 }
 
-void triggerDownload (FakeFolder &folder, GLib.ByteArray path) {
-    var &journal = folder.syncJournal ();
+void triggerDownload (FakeFolder folder, GLib.ByteArray path) {
+    var journal = folder.syncJournal ();
     SyncJournalFileRecord record;
-    journal.getFileRecord (path, &record);
+    journal.getFileRecord (path, record);
     if (!record.isValid ())
         return;
     record._type = ItemTypeVirtualFileDownload;
@@ -53,10 +53,10 @@ void triggerDownload (FakeFolder &folder, GLib.ByteArray path) {
     journal.schedulePathForRemoteDiscovery (record._path);
 }
 
-void markForDehydration (FakeFolder &folder, GLib.ByteArray path) {
-    var &journal = folder.syncJournal ();
+void markForDehydration (FakeFolder folder, GLib.ByteArray path) {
+    var journal = folder.syncJournal ();
     SyncJournalFileRecord record;
-    journal.getFileRecord (path, &record);
+    journal.getFileRecord (path, record);
     if (!record.isValid ())
         return;
     record._type = ItemTypeVirtualFileDehydration;
@@ -64,7 +64,7 @@ void markForDehydration (FakeFolder &folder, GLib.ByteArray path) {
     journal.schedulePathForRemoteDiscovery (record._path);
 }
 
-unowned<Vfs> setupVfs (FakeFolder &folder) {
+unowned<Vfs> setupVfs (FakeFolder folder) {
     var xattrVfs = unowned<Vfs> (createVfsFromPlugin (Vfs.XAttr).release ());
     GLib.Object.connect (&folder.syncEngine ().syncFileStatusTracker (), &SyncFileStatusTracker.fileStatusChanged,
                      xattrVfs.data (), &Vfs.fileStatusChanged);
@@ -713,7 +713,7 @@ class TestSyncXAttr : GLib.Object {
         };
         var hasDehydratedDbEntries = [&] (string path) {
             SyncJournalFileRecord record;
-            fakeFolder.syncJournal ().getFileRecord (path, &record);
+            fakeFolder.syncJournal ().getFileRecord (path, record);
             return record.isValid () && record._type == ItemTypeVirtualFile;
         };
 

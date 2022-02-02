@@ -12,21 +12,21 @@ using namespace Occ;
 
 const int DVSUFFIX APPLICATION_DOTVIRTUALFILE_SUFFIX
 
-bool itemInstruction (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
+bool itemInstruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
     return item._instruction == instr;
 }
 
-SyncJournalFileRecord dbRecord (FakeFolder &folder, string path) {
+SyncJournalFileRecord dbRecord (FakeFolder folder, string path) {
     SyncJournalFileRecord record;
-    folder.syncJournal ().getFileRecord (path, &record);
+    folder.syncJournal ().getFileRecord (path, record);
     return record;
 }
 
-void triggerDownload (FakeFolder &folder, GLib.ByteArray path) {
-    var &journal = folder.syncJournal ();
+void triggerDownload (FakeFolder folder, GLib.ByteArray path) {
+    var journal = folder.syncJournal ();
     SyncJournalFileRecord record;
-    journal.getFileRecord (path + DVSUFFIX, &record);
+    journal.getFileRecord (path + DVSUFFIX, record);
     if (!record.isValid ())
         return;
     record._type = ItemTypeVirtualFileDownload;
@@ -34,10 +34,10 @@ void triggerDownload (FakeFolder &folder, GLib.ByteArray path) {
     journal.schedulePathForRemoteDiscovery (record._path);
 }
 
-void markForDehydration (FakeFolder &folder, GLib.ByteArray path) {
-    var &journal = folder.syncJournal ();
+void markForDehydration (FakeFolder folder, GLib.ByteArray path) {
+    var journal = folder.syncJournal ();
     SyncJournalFileRecord record;
-    journal.getFileRecord (path, &record);
+    journal.getFileRecord (path, record);
     if (!record.isValid ())
         return;
     record._type = ItemTypeVirtualFileDehydration;
@@ -45,7 +45,7 @@ void markForDehydration (FakeFolder &folder, GLib.ByteArray path) {
     journal.schedulePathForRemoteDiscovery (record._path);
 }
 
-unowned<Vfs> setupVfs (FakeFolder &folder) {
+unowned<Vfs> setupVfs (FakeFolder folder) {
     var suffixVfs = unowned<Vfs> (createVfsFromPlugin (Vfs.WithSuffix).release ());
     folder.switchToVfs (suffixVfs);
 
@@ -823,8 +823,8 @@ class TestSyncVirtualFiles : GLib.Object {
         };
         var hasDehydratedDbEntries = [&] (string path) {
             SyncJournalFileRecord normal, suffix;
-            fakeFolder.syncJournal ().getFileRecord (path, &normal);
-            fakeFolder.syncJournal ().getFileRecord (path + DVSUFFIX, &suffix);
+            fakeFolder.syncJournal ().getFileRecord (path, normal);
+            fakeFolder.syncJournal ().getFileRecord (path + DVSUFFIX, suffix);
             return !normal.isValid () && suffix.isValid () && suffix._type == ItemTypeVirtualFile;
         };
 

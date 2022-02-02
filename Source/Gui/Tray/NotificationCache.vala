@@ -1,6 +1,5 @@
 #pragma once
 
-// #include <GLib.Set>
 
 namespace Occ {
 
@@ -15,11 +14,11 @@ class Notification_cache {
 
     /***********************************************************
     ***********************************************************/
-    public bool contains (Notification &notification);
+    public bool contains (Notification notification);
 
     /***********************************************************
     ***********************************************************/
-    public void insert (Notification &notification);
+    public void insert (Notification notification);
 
     /***********************************************************
     ***********************************************************/
@@ -28,27 +27,27 @@ class Notification_cache {
 
     /***********************************************************
     ***********************************************************/
-    private uint32 calculate_key (Notification &notification);
+    private uint32 calculate_key (Notification notification);
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Set<uint32> _notifications;
+    private GLib.Set<uint32> this.notifications;
 };
 
 
-    bool Notification_cache.contains (Notification &notification) {
-        return _notifications.find (calculate_key (notification)) != _notifications.end ();
+    bool Notification_cache.contains (Notification notification) {
+        return this.notifications.find (calculate_key (notification)) != this.notifications.end ();
     }
 
-    void Notification_cache.insert (Notification &notification) {
-        _notifications.insert (calculate_key (notification));
+    void Notification_cache.insert (Notification notification) {
+        this.notifications.insert (calculate_key (notification));
     }
 
     void Notification_cache.clear () {
-        _notifications.clear ();
+        this.notifications.clear ();
     }
 
-    uint32 Notification_cache.calculate_key (Notification &notification) {
+    uint32 Notification_cache.calculate_key (Notification notification) {
         return q_hash (notification.title + notification.message);
     }
     }

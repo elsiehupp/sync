@@ -5,8 +5,7 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 ***********************************************************/
 
 // #include <string[]>
-// #include <QHash>
-// #include <GLib.DateTime>
+// #include <GLib.HashMap>
 
 namespace Occ {
 
@@ -15,133 +14,133 @@ namespace Occ {
 @ingroup libsync
 ***********************************************************/
 class SyncResult {
-    Q_GADGET
+    // Q_GADGET
 
     /***********************************************************
     ***********************************************************/
     public enum Status {
-        Undefined,
-        NotYetStarted,
-        Sync_prepare,
-        Sync_running,
-        Sync_abort_requested,
-        Success,
-        Problem,
-        Error,
-        Setup_error,
-        Paused
+        UNDEFINED,
+        NOT_YET_STARTED,
+        SYNC_PREPARE,
+        SYNC_RUNNING,
+        SYNC_ABORT_REQUESTED,
+        SUCCESS,
+        PROBLEM,
+        ERROR,
+        SETUP_ERROR,
+        PAUSED
     };
 
 
     /***********************************************************
     ***********************************************************/
-    private Status _status = Undefined;
+    private Status status = Undefined;
 
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileItemVector _sync_items;
+    private SyncFileItemVector sync_items;
 
 
     /***********************************************************
     ***********************************************************/
-    private GLib.DateTime _sync_time;
+    private GLib.DateTime sync_time;
 
 
     /***********************************************************
     ***********************************************************/
-    private string _folder;
+    private string folder;
 
 
     /***********************************************************
     when the sync tool support this...
     ***********************************************************/
-    private string[] _errors;
+    private string[] errors;
 
 
     /***********************************************************
     ***********************************************************/
-    private bool _found_files_not_synced = false;
+    private bool found_files_not_synced = false;
 
 
     /***********************************************************
     ***********************************************************/
-    private bool _folder_structure_was_changed = false;
+    private bool folder_structure_was_changed = false;
+
+
+    /***********************************************************
+    Count new, removed and updated items
+    ***********************************************************/
+    private int num_new_items = 0;
 
 
     /***********************************************************
     ***********************************************************/
-    // count new, removed and updated items
-    private int _num_new_items = 0;
+    private int num_removed_items = 0;
 
 
     /***********************************************************
     ***********************************************************/
-    private int _num_removed_items = 0;
+    private int num_updated_items = 0;
 
 
     /***********************************************************
     ***********************************************************/
-    private int _num_updated_items = 0;
+    private int num_renamed_items = 0;
 
 
     /***********************************************************
     ***********************************************************/
-    private int _num_renamed_items = 0;
+    private int num_new_conflict_items = 0;
 
 
     /***********************************************************
     ***********************************************************/
-    private int _num_new_conflict_items = 0;
+    private int num_old_conflict_items = 0;
 
 
     /***********************************************************
     ***********************************************************/
-    private int _num_old_conflict_items = 0;
+    private int num_error_items = 0;
 
 
     /***********************************************************
     ***********************************************************/
-    private int _num_error_items = 0;
+    private int num_locked_items = 0;
+
+    /***********************************************************
+    ***********************************************************/
+    private SyncFileItemPtr first_item_new;
 
 
     /***********************************************************
     ***********************************************************/
-    private int _num_locked_items = 0;
-
-    /***********************************************************
-    ***********************************************************/
-    private SyncFileItemPtr _first_item_new;
+    private SyncFileItemPtr first_item_deleted;
 
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileItemPtr _first_item_deleted;
+    private SyncFileItemPtr first_item_updated;
 
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileItemPtr _first_item_updated;
+    private SyncFileItemPtr first_item_renamed;
 
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileItemPtr _first_item_renamed;
+    private SyncFileItemPtr first_new_conflict_item;
 
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileItemPtr _first_new_conflict_item;
+    private SyncFileItemPtr first_item_error;
 
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileItemPtr _first_item_error;
-
-
-    /***********************************************************
-    ***********************************************************/
-    private SyncFileItemPtr _first_item_locked;
+    private SyncFileItemPtr first_item_locked;
 
 
     /***********************************************************
@@ -152,21 +151,21 @@ class SyncResult {
     /***********************************************************
     ***********************************************************/
     public string[] error_strings () {
-        return _errors;
+        return this.errors;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void append_error_string (string err) {
-        _errors.append (err);
+        this.errors.append (err);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public SyncResult.Status status () {
-        return _status;
+        return this.status;
     }
 
     /***********************************************************
@@ -179,23 +178,23 @@ class SyncResult {
     /***********************************************************
     ***********************************************************/
     public string error_string () {
-        if (_errors.is_empty ())
+        if (this.errors.is_empty ())
             return "";
-        return _errors.first ();
+        return this.errors.first ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void clear_errors () {
-        _errors.clear ();
+        this.errors.clear ();
     }
 
     /***********************************************************
     ***********************************************************/
     public void set_status (Status stat) {
-        _status = stat;
-        _sync_time = GLib.DateTime.current_date_time_utc ();
+        this.status = stat;
+        this.sync_time = GLib.DateTime.current_date_time_utc ();
     }
 
 
@@ -205,34 +204,24 @@ class SyncResult {
         switch (status ()) {
         case Undefined:
             return "Undefined";
-            break;
         case NotYetStarted:
             return "Not yet Started";
-            break;
         case Sync_running:
             return "Sync Running";
-            break;
         case Success:
             return "Success";
-            break;
         case Error:
             return "Error";
-            break;
         case Setup_error:
             return "Setup_error";
-            break;
         case Sync_prepare:
             return "Sync_prepare";
-            break;
         case Problem:
             return "Success, some files were ignored.";
-            break;
         case Sync_abort_requested:
             return "Sync Request aborted by user";
-            break;
         case Paused:
             return "Sync Paused";
-            break;
         }
         return "";
     }
@@ -240,56 +229,56 @@ class SyncResult {
     /***********************************************************
     ***********************************************************/
     public GLib.DateTime sync_time () {
-        return _sync_time;
+        return this.sync_time;
     }
     
 
     /***********************************************************
     ***********************************************************/
     public void set_folder (string folder) {
-        _folder = folder;
+        this.folder = folder;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string folder () {
-        return _folder;
+        return this.folder;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool found_files_not_synced () {
-        return _found_files_not_synced;
+        return this.found_files_not_synced;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool folder_structure_was_changed () {
-        return _folder_structure_was_changed;
+        return this.folder_structure_was_changed;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public int num_new_items () {
-        return _num_new_items;
+        return this.num_new_items;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public int num_removed_items () {
-        return _num_removed_items;
+        return this.num_removed_items;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public int num_updated_items () {
-        return _num_updated_items;
+        return this.num_updated_items;
     }
 
 
@@ -297,87 +286,70 @@ class SyncResult {
     /***********************************************************
     ***********************************************************/
     public int num_renamed_items () {
-        return _num_renamed_items;
+        return this.num_renamed_items;
     }
 
     /***********************************************************
     ***********************************************************/
     public int num_new_conflict_items () {
-        return _num_new_conflict_items;
+        return this.num_new_conflict_items;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public int num_old_conflict_items () {
-        return _num_old_conflict_items;
-    }\
+        return this.num_old_conflict_items;
+    }
 
 
 
     /***********************************************************
     ***********************************************************/
     public void set_num_old_conflict_items (int n) {
-        _num_old_conflict_items = n;
+        this.num_old_conflict_items = n;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public int num_error_items () {
-        return _num_error_items;
+        return this.num_error_items;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool has_unresolved_conflicts () {
-        return _num_new_conflict_items + _num_old_conflict_items > 0;
+        return this.num_new_conflict_items + this.num_old_conflict_items > 0;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public int num_locked_items () {
-        return _num_locked_items;
+        return this.num_locked_items;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool has_locked_files () {
-        return _num_locked_items > 0;
+        return this.num_locked_items > 0;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public const SyncFileItemPtr &first_item_new () {
-        return _first_item_new;
+    public const SyncFileItemPtr first_item_new () {
+        return this.first_item_new;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public const SyncFileItemPtr &first_item_deleted () {
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public urn _first_item_updated;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public const SyncFileItemPtr &first_item_renamed () {
+    public const SyncFileItemPtr first_item_deleted () {
+        return this.first_item_deleted;
     }
 
 
@@ -389,21 +361,40 @@ class SyncResult {
 
     /***********************************************************
     ***********************************************************/
-    public urn _first_new_conflict_item;
+    public const SyncFileItemPtr first_item_updated () {
+        return this.first_item_updated;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public const SyncFileItemPtr &first_item_error () {
-        return _first_item_error;
+    public const SyncFileItemPtr first_item_renamed () {
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public const SyncFileItemPtr &first_item_locked () {
-        return _first_item_locked;
+    public 
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public urn this.first_new_conflict_item;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public const SyncFileItemPtr first_item_error () {
+        return this.first_item_error;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public const SyncFileItemPtr first_item_locked () {
+        return this.first_item_locked;
     }
 
 
@@ -412,76 +403,76 @@ class SyncResult {
     public void process_completed_item (SyncFileItemPtr item) {
         if (Progress.is_warning_kind (item._status)) {
             // Count any error conditions, error strings will have priority anyway.
-            _found_files_not_synced = true;
+            this.found_files_not_synced = true;
         }
 
         if (item.is_directory () && (item._instruction == CSYNC_INSTRUCTION_NEW
                                       || item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE
                                       || item._instruction == CSYNC_INSTRUCTION_REMOVE
                                       || item._instruction == CSYNC_INSTRUCTION_RENAME)) {
-            _folder_structure_was_changed = true;
+            this.folder_structure_was_changed = true;
         }
 
-        if (item._status == SyncFileItem.FileLocked){
-            _num_locked_items++;
-            if (!_first_item_locked) {
-                _first_item_locked = item;
+        if (item._status == SyncFileItem.Status.FILE_LOCKED){
+            this.num_locked_items++;
+            if (!this.first_item_locked) {
+                this.first_item_locked = item;
             }
         }
 
         // Process the item to the gui
-        if (item._status == SyncFileItem.FatalError || item._status == SyncFileItem.NormalError) {
+        if (item._status == SyncFileItem.Status.FATAL_ERROR || item._status == SyncFileItem.Status.NORMAL_ERROR) {
             // : this displays an error string (%2) for a file %1
             append_error_string (GLib.Object._("%1 : %2").arg (item._file, item._error_string));
-            _num_error_items++;
-            if (!_first_item_error) {
-                _first_item_error = item;
+            this.num_error_items++;
+            if (!this.first_item_error) {
+                this.first_item_error = item;
             }
-        } else if (item._status == SyncFileItem.Conflict) {
+        } else if (item._status == SyncFileItem.Status.CONFLICT) {
             if (item._instruction == CSYNC_INSTRUCTION_CONFLICT) {
-                _num_new_conflict_items++;
-                if (!_first_new_conflict_item) {
-                    _first_new_conflict_item = item;
+                this.num_new_conflict_items++;
+                if (!this.first_new_conflict_item) {
+                    this.first_new_conflict_item = item;
                 }
             } else {
-                _num_old_conflict_items++;
+                this.num_old_conflict_items++;
             }
         } else {
-            if (!item.has_error_status () && item._status != SyncFileItem.FileIgnored && item._direction == SyncFileItem.Down) {
+            if (!item.has_error_status () && item._status != SyncFileItem.Status.FILE_IGNORED && item._direction == SyncFileItem.Direction.DOWN) {
                 switch (item._instruction) {
                 case CSYNC_INSTRUCTION_NEW:
                 case CSYNC_INSTRUCTION_TYPE_CHANGE:
-                    _num_new_items++;
-                    if (!_first_item_new)
-                        _first_item_new = item;
+                    this.num_new_items++;
+                    if (!this.first_item_new)
+                        this.first_item_new = item;
                     break;
                 case CSYNC_INSTRUCTION_REMOVE:
-                    _num_removed_items++;
-                    if (!_first_item_deleted)
-                        _first_item_deleted = item;
+                    this.num_removed_items++;
+                    if (!this.first_item_deleted)
+                        this.first_item_deleted = item;
                     break;
                 case CSYNC_INSTRUCTION_SYNC:
-                    _num_updated_items++;
-                    if (!_first_item_updated)
-                        _first_item_updated = item;
+                    this.num_updated_items++;
+                    if (!this.first_item_updated)
+                        this.first_item_updated = item;
                     break;
                 case CSYNC_INSTRUCTION_RENAME:
-                    if (!_first_item_renamed) {
-                        _first_item_renamed = item;
+                    if (!this.first_item_renamed) {
+                        this.first_item_renamed = item;
                     }
-                    _num_renamed_items++;
+                    this.num_renamed_items++;
                     break;
                 default:
                     // nothing.
                     break;
                 }
             } else if (item._instruction == CSYNC_INSTRUCTION_IGNORE) {
-                _found_files_not_synced = true;
+                this.found_files_not_synced = true;
             }
         }
     }
 
 }
 
-} // ns mirall
+} // namespace mirall
     

@@ -46,7 +46,7 @@ class Application : SharedTools.QtSingleApplication {
 
     /***********************************************************
     ***********************************************************/
-    public Application (int &argc, char **argv);
+    public Application (int argc, char **argv);
 
     /***********************************************************
     ***********************************************************/
@@ -142,46 +142,46 @@ protected slots:
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<OwncloudGui> _gui;
+    private QPointer<OwncloudGui> this.gui;
 
     /***********************************************************
     ***********************************************************/
-    private Theme _theme;
+    private Theme this.theme;
 
     /***********************************************************
     ***********************************************************/
-    private bool _help_only;
+    private bool this.help_only;
 
     /***********************************************************
     ***********************************************************/
     private 
-    private QElapsedTimer _started_at;
+    private QElapsedTimer this.started_at;
 
     // options from command line:
-    private bool _show_log_window;
-    private bool _quit_instance = false;
-    private string _log_file;
-    private string _log_dir;
-    private int _log_expire;
-    private bool _log_flush;
-    private bool _log_debug;
-    private bool _user_triggered_connect;
-    private bool _debug_mode;
-    private bool _background_mode;
+    private bool this.show_log_window;
+    private bool this.quit_instance = false;
+    private string this.log_file;
+    private string this.log_dir;
+    private int this.log_expire;
+    private bool this.log_flush;
+    private bool this.log_debug;
+    private bool this.user_triggered_connect;
+    private bool this.debug_mode;
+    private bool this.background_mode;
 
     /***********************************************************
     ***********************************************************/
-    private ClientProxy _proxy;
+    private ClientProxy this.proxy;
 
     /***********************************************************
     ***********************************************************/
-    private QNetworkConfigurationManager _network_configuration_manager;
-    private QTimer _check_connection_timer;
+    private QNetworkConfigurationManager this.network_configuration_manager;
+    private QTimer this.check_connection_timer;
 
 #if defined (WITH_CRASHREPORTER)
-    private QScopedPointer<CrashReporter.Handler> _crash_handler;
+    private QScopedPointer<CrashReporter.Handler> this.crash_handler;
 #endif
-    private QScopedPointer<FolderMan> _folder_manager;
+    private QScopedPointer<FolderMan> this.folder_manager;
 };
 
 
@@ -223,8 +223,8 @@ namespace {
 
 bool Application.config_version_migration () {
     string[] delete_keys, ignore_keys;
-    AccountManager.backward_migration_settings_keys (&delete_keys, &ignore_keys);
-    FolderMan.backward_migration_settings_keys (&delete_keys, &ignore_keys);
+    AccountManager.backward_migration_settings_keys (&delete_keys, ignore_keys);
+    FolderMan.backward_migration_settings_keys (&delete_keys, ignore_keys);
 
     ConfigFile config_file;
 
@@ -272,7 +272,7 @@ bool Application.config_version_migration () {
         settings.end_group ();
 
         // Wipe confusing keys from the future, ignore the others
-        for (var &bad_key : delete_keys)
+        for (var bad_key : delete_keys)
             settings.remove (bad_key);
     }
 
@@ -281,23 +281,23 @@ bool Application.config_version_migration () {
 }
 
 OwncloudGui *Application.gui () {
-    return _gui;
+    return this.gui;
 }
 
-Application.Application (int &argc, char **argv)
+Application.Application (int argc, char **argv)
     : SharedTools.QtSingleApplication (Theme.instance ().app_name (), argc, argv)
-    , _gui (nullptr)
-    , _theme (Theme.instance ())
-    , _help_only (false)
-    , _version_only (false)
-    , _show_log_window (false)
-    , _log_expire (0)
-    , _log_flush (false)
-    , _log_debug (true)
-    , _user_triggered_connect (false)
-    , _debug_mode (false)
-    , _background_mode (false) {
-    _started_at.on_start ();
+    , this.gui (nullptr)
+    , this.theme (Theme.instance ())
+    , this.help_only (false)
+    , this.version_only (false)
+    , this.show_log_window (false)
+    , this.log_expire (0)
+    , this.log_flush (false)
+    , this.log_debug (true)
+    , this.user_triggered_connect (false)
+    , this.debug_mode (false)
+    , this.background_mode (false) {
+    this.started_at.on_start ();
 
     qsrand (std.random_device () ());
 
@@ -308,17 +308,17 @@ Application.Application (int &argc, char **argv)
     // set_desktop_filename to provide wayland compatibility (in general : conformance with naming standards)
     // but only on Qt >= 5.7, where set_desktop_filename was introduced
 #if (QT_VERSION >= 0x050700)
-    string desktop_file_name = string (QLatin1String (LINUX_APPLICATION_ID)
+    string desktop_filename = string (QLatin1String (LINUX_APPLICATION_ID)
                                         + QLatin1String (".desktop"));
-    set_desktop_file_name (desktop_file_name);
+    set_desktop_filename (desktop_filename);
 #endif
 
-    set_application_name (_theme.app_name ());
-    set_window_icon (_theme.application_icon ());
+    set_application_name (this.theme.app_name ());
+    set_window_icon (this.theme.application_icon ());
 
     if (!ConfigFile ().exists ()) {
         // Migrate from version <= 2.4
-        set_application_name (_theme.app_name_gui ());
+        set_application_name (this.theme.app_name_gui ());
 #ifndef QT_WARNING_DISABLE_DEPRECATED // Was added in Qt 5.9
 const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-declarations")
 #endif
@@ -329,7 +329,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         string old_dir = QDesktopServices.storage_location (QDesktopServices.DataLocation);
         if (old_dir.ends_with ('/')) old_dir.chop (1); // macOS 10.11.x does not like trailing slash for rename/move.
         QT_WARNING_POP
-        set_application_name (_theme.app_name ());
+        set_application_name (this.theme.app_name ());
         if (QFileInfo (old_dir).is_dir ()) {
             var conf_dir = ConfigFile ().config_path ();
             if (conf_dir.ends_with ('/')) conf_dir.chop (1);  // macOS 10.11.x does not like trailing slash for rename/move.
@@ -342,7 +342,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
                 if (QFileInfo (conf_dir).is_dir () || QDir ().mkdir (conf_dir)) {
                     const string[] files_list = QDir (old_dir).entry_list (QDir.Files);
                     q_c_info (lc_application) << "Will move the individual files" << files_list;
-                    for (var &name : files_list) {
+                    for (var name : files_list) {
                         if (!GLib.File.rename (old_dir + "/" + name,  conf_dir + "/" + name)) {
                             GLib.warn (lc_application) << "Fallback move of " << name << "also failed";
                         }
@@ -354,10 +354,10 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
 
     parse_options (arguments ());
     //no need to waste time;
-    if (_help_only || _version_only)
+    if (this.help_only || this.version_only)
         return;
 
-    if (_quit_instance) {
+    if (this.quit_instance) {
         QTimer.single_shot (0, q_app, &QApplication.quit);
         return;
     }
@@ -368,7 +368,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
 #if defined (WITH_CRASHREPORTER)
     if (ConfigFile ().crash_reporter ()) {
         var reporter = CRASHREPORTER_EXECUTABLE;
-        _crash_handler.on_reset (new CrashReporter.Handler (QDir.temp_path (), true, reporter));
+        this.crash_handler.on_reset (new CrashReporter.Handler (QDir.temp_path (), true, reporter));
     }
 #endif
 
@@ -393,7 +393,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
     if (is_vfs_plugin_available (Vfs.WithSuffix))
         q_c_info (lc_application) << "VFS suffix plugin is available";
 
-    _folder_manager.on_reset (new FolderMan);
+    this.folder_manager.on_reset (new FolderMan);
 
     connect (this, &SharedTools.QtSingleApplication.message_received, this, &Application.on_parse_message);
 
@@ -420,70 +420,70 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
 
     set_quit_on_last_window_closed (false);
 
-    _theme.set_systray_use_mono_icons (cfg.mono_icons ());
-    connect (_theme, &Theme.systray_use_mono_icons_changed, this, &Application.on_use_mono_icons_changed);
+    this.theme.set_systray_use_mono_icons (cfg.mono_icons ());
+    connect (this.theme, &Theme.systray_use_mono_icons_changed, this, &Application.on_use_mono_icons_changed);
 
     // Setting up the gui class will allow tray notifications for the
     // setup that follows, like folder setup
-    _gui = new OwncloudGui (this);
-    if (_show_log_window) {
-        _gui.on_toggle_log_browser (); // _show_log_window is set in parse_options.
+    this.gui = new OwncloudGui (this);
+    if (this.show_log_window) {
+        this.gui.on_toggle_log_browser (); // this.show_log_window is set in parse_options.
     }
 #if WITH_LIBCLOUDPROVIDERS
-    _gui.setup_cloud_providers ();
+    this.gui.setup_cloud_providers ();
 #endif
 
     FolderMan.instance ().setup_folders ();
-    _proxy.on_setup_qt_proxy_from_config (); // folders have to be defined first, than we set up the Qt proxy.
+    this.proxy.on_setup_qt_proxy_from_config (); // folders have to be defined first, than we set up the Qt proxy.
 
     connect (AccountManager.instance (), &AccountManager.on_account_added,
         this, &Application.on_account_state_added);
     connect (AccountManager.instance (), &AccountManager.on_account_removed,
         this, &Application.on_account_state_removed);
-    for (var &ai : AccountManager.instance ().accounts ()) {
+    for (var ai : AccountManager.instance ().accounts ()) {
         on_account_state_added (ai.data ());
     }
 
     connect (FolderMan.instance ().socket_api (), &SocketApi.share_command_received,
-        _gui.data (), &OwncloudGui.on_show_share_dialog);
+        this.gui.data (), &OwncloudGui.on_show_share_dialog);
 
     connect (FolderMan.instance ().socket_api (), &SocketApi.file_activity_command_received,
         Systray.instance (), &Systray.show_file_activity_dialog);
 
     // startup procedure.
-    connect (&_check_connection_timer, &QTimer.timeout, this, &Application.on_check_connection);
-    _check_connection_timer.set_interval (ConnectionValidator.DefaultCallingIntervalMsec); // check for connection every 32 seconds.
-    _check_connection_timer.on_start ();
+    connect (&this.check_connection_timer, &QTimer.timeout, this, &Application.on_check_connection);
+    this.check_connection_timer.set_interval (ConnectionValidator.DefaultCallingIntervalMsec); // check for connection every 32 seconds.
+    this.check_connection_timer.on_start ();
     // Also check immediately
     QTimer.single_shot (0, this, &Application.on_check_connection);
 
     // Can't use online_state_changed because it is always true on modern systems because of many interfaces
-    connect (&_network_configuration_manager, &QNetworkConfigurationManager.configuration_changed,
+    connect (&this.network_configuration_manager, &QNetworkConfigurationManager.configuration_changed,
         this, &Application.on_system_online_configuration_changed);
 
 #if defined (BUILD_UPDATER)
     // Update checks
     var updater_scheduler = new UpdaterScheduler (this);
     connect (updater_scheduler, &UpdaterScheduler.updater_announcement,
-        _gui.data (), &OwncloudGui.on_show_tray_message);
+        this.gui.data (), &OwncloudGui.on_show_tray_message);
     connect (updater_scheduler, &UpdaterScheduler.request_restart,
-        _folder_manager.data (), &FolderMan.on_schedule_app_restart);
+        this.folder_manager.data (), &FolderMan.on_schedule_app_restart);
 #endif
 
     // Cleanup at Quit.
     connect (this, &QCoreApplication.about_to_quit, this, &Application.on_cleanup);
 
     // Allow other classes to hook into is_showing_settings_dialog () signals (re-auth widgets, for example)
-    connect (_gui.data (), &OwncloudGui.is_showing_settings_dialog, this, &Application.on_gui_is_showing_settings);
+    connect (this.gui.data (), &OwncloudGui.is_showing_settings_dialog, this, &Application.on_gui_is_showing_settings);
 
-    _gui.create_tray ();
+    this.gui.create_tray ();
 }
 
 Application.~Application () {
     // Make sure all folders are gone, otherwise removing the
     // accounts will remove the associated folders from the settings.
-    if (_folder_manager) {
-        _folder_manager.unload_and_delete_all_folders ();
+    if (this.folder_manager) {
+        this.folder_manager.unload_and_delete_all_folders ();
     }
 
     // Remove the account from the account manager so it can be deleted.
@@ -493,21 +493,21 @@ Application.~Application () {
 }
 
 void Application.on_account_state_removed (AccountState account_state) {
-    if (_gui) {
+    if (this.gui) {
         disconnect (account_state, &AccountState.state_changed,
-            _gui.data (), &OwncloudGui.on_account_state_changed);
+            this.gui.data (), &OwncloudGui.on_account_state_changed);
         disconnect (account_state.account ().data (), &Account.server_version_changed,
-            _gui.data (), &OwncloudGui.on_tray_message_if_server_unsupported);
+            this.gui.data (), &OwncloudGui.on_tray_message_if_server_unsupported);
     }
-    if (_folder_manager) {
+    if (this.folder_manager) {
         disconnect (account_state, &AccountState.state_changed,
-            _folder_manager.data (), &FolderMan.on_account_state_changed);
+            this.folder_manager.data (), &FolderMan.on_account_state_changed);
         disconnect (account_state.account ().data (), &Account.server_version_changed,
-            _folder_manager.data (), &FolderMan.on_server_version_changed);
+            this.folder_manager.data (), &FolderMan.on_server_version_changed);
     }
 
     // if there is no more account, show the wizard.
-    if (_gui && AccountManager.instance ().accounts ().is_empty ()) {
+    if (this.gui && AccountManager.instance ().accounts ().is_empty ()) {
         // allow to add a new account if there is non any more. Always think
         // about single account theming!
         OwncloudSetupWizard.run_wizard (this, SLOT (on_owncloud_wizard_done (int)));
@@ -516,23 +516,23 @@ void Application.on_account_state_removed (AccountState account_state) {
 
 void Application.on_account_state_added (AccountState account_state) {
     connect (account_state, &AccountState.state_changed,
-        _gui.data (), &OwncloudGui.on_account_state_changed);
+        this.gui.data (), &OwncloudGui.on_account_state_changed);
     connect (account_state.account ().data (), &Account.server_version_changed,
-        _gui.data (), &OwncloudGui.on_tray_message_if_server_unsupported);
+        this.gui.data (), &OwncloudGui.on_tray_message_if_server_unsupported);
     connect (account_state, &AccountState.state_changed,
-        _folder_manager.data (), &FolderMan.on_account_state_changed);
+        this.folder_manager.data (), &FolderMan.on_account_state_changed);
     connect (account_state.account ().data (), &Account.server_version_changed,
-        _folder_manager.data (), &FolderMan.on_server_version_changed);
+        this.folder_manager.data (), &FolderMan.on_server_version_changed);
 
-    _gui.on_tray_message_if_server_unsupported (account_state.account ().data ());
+    this.gui.on_tray_message_if_server_unsupported (account_state.account ().data ());
 }
 
 void Application.on_cleanup () {
     AccountManager.instance ().save ();
     FolderMan.instance ().unload_and_delete_all_folders ();
 
-    _gui.on_shutdown ();
-    _gui.delete_later ();
+    this.gui.on_shutdown ();
+    this.gui.delete_later ();
 }
 
 // FIXME : This is not ideal yet since a ConnectionValidator might already be running and is in
@@ -546,7 +546,7 @@ void Application.on_system_online_configuration_changed (QNetworkConfiguration c
 
 void Application.on_check_connection () {
     const var list = AccountManager.instance ().accounts ();
-    for (var &account_state : list) {
+    for (var account_state : list) {
         AccountState.State state = account_state.state ();
 
         // Don't check if we're manually signed out or
@@ -561,9 +561,9 @@ void Application.on_check_connection () {
 
     if (list.is_empty ()) {
         // let gui open the setup wizard
-        _gui.on_open_settings_dialog ();
+        this.gui.on_open_settings_dialog ();
 
-        _check_connection_timer.stop (); // don't popup the wizard on interval;
+        this.check_connection_timer.stop (); // don't popup the wizard on interval;
     }
 }
 
@@ -579,7 +579,7 @@ void Application.on_owncloud_wizard_done (int res) {
 
     if (res == Gtk.Dialog.Accepted) {
         // Check connectivity of the newly created account
-        _check_connection_timer.on_start ();
+        this.check_connection_timer.on_start ();
         on_check_connection ();
 
         // If one account is configured : enable autostart
@@ -589,7 +589,7 @@ void Application.on_owncloud_wizard_done (int res) {
         bool should_set_auto_start = false;
 #endif
         if (should_set_auto_start) {
-            Utility.set_launch_on_startup (_theme.app_name (), _theme.app_name_gui (), true);
+            Utility.set_launch_on_startup (this.theme.app_name (), this.theme.app_name_gui (), true);
         }
 
         Systray.instance ().show_window ();
@@ -599,48 +599,48 @@ void Application.on_owncloud_wizard_done (int res) {
 void Application.setup_logging () {
     // might be called from second instance
     var logger = Logger.instance ();
-    logger.set_log_file (_log_file);
-    if (_log_file.is_empty ()) {
-        logger.set_log_dir (_log_dir.is_empty () ? ConfigFile ().log_dir () : _log_dir);
+    logger.set_log_file (this.log_file);
+    if (this.log_file.is_empty ()) {
+        logger.set_log_dir (this.log_dir.is_empty () ? ConfigFile ().log_dir () : this.log_dir);
     }
-    logger.set_log_expire (_log_expire > 0 ? _log_expire : ConfigFile ().log_expire ());
-    logger.set_log_flush (_log_flush || ConfigFile ().log_flush ());
-    logger.set_log_debug (_log_debug || ConfigFile ().log_debug ());
+    logger.set_log_expire (this.log_expire > 0 ? this.log_expire : ConfigFile ().log_expire ());
+    logger.set_log_flush (this.log_flush || ConfigFile ().log_flush ());
+    logger.set_log_debug (this.log_debug || ConfigFile ().log_debug ());
     if (!logger.is_logging_to_file () && ConfigFile ().automatic_log_dir ()) {
         logger.setup_temporary_folder_log_dir ();
     }
 
     logger.on_enter_next_log_file ();
 
-    q_c_info (lc_application) << "##################" << _theme.app_name ()
+    q_c_info (lc_application) << "##################" << this.theme.app_name ()
                           << "locale:" << QLocale.system ().name ()
                           << "ui_lang:" << property ("ui_lang")
-                          << "version:" << _theme.version ()
+                          << "version:" << this.theme.version ()
                           << "os:" << Utility.platform_name ();
     q_c_info (lc_application) << "Arguments:" << q_app.arguments ();
 }
 
 void Application.on_use_mono_icons_changed (bool) {
-    _gui.on_compute_overall_sync_status ();
+    this.gui.on_compute_overall_sync_status ();
 }
 
 void Application.on_parse_message (string msg, GLib.Object *) {
     if (msg.starts_with ("MSG_PARSEOPTIONS:")) {
         const int length_of_msg_prefix = 17;
         string[] options = msg.mid (length_of_msg_prefix).split ('|');
-        _show_log_window = false;
+        this.show_log_window = false;
         parse_options (options);
         setup_logging ();
-        if (_show_log_window) {
-            _gui.on_toggle_log_browser (); // _show_log_window is set in parse_options.
+        if (this.show_log_window) {
+            this.gui.on_toggle_log_browser (); // this.show_log_window is set in parse_options.
         }
-        if (_quit_instance) {
+        if (this.quit_instance) {
             q_app.quit ();
         }
 
     } else if (msg.starts_with (QLatin1String ("MSG_SHOWMAINDIALOG"))) {
-        q_c_info (lc_application) << "Running for" << _started_at.elapsed () / 1000.0 << "sec";
-        if (_started_at.elapsed () < 10 * 1000) {
+        q_c_info (lc_application) << "Running for" << this.started_at.elapsed () / 1000.0 << "sec";
+        if (this.started_at.elapsed () < 10 * 1000) {
             // This call is mirrored with the one in int main ()
             GLib.warn (lc_application) << "Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and var on_start";
             return;
@@ -650,12 +650,12 @@ void Application.on_parse_message (string msg, GLib.Object *) {
         if (!AccountManager.instance ().accounts ().is_empty ()) {
             show_main_dialog ();
         } else {
-            _gui.on_new_account_wizard ();
+            this.gui.on_new_account_wizard ();
         }
     }
 }
 
-void Application.parse_options (string[] &options) {
+void Application.parse_options (string[] options) {
     QStringListIterator it (options);
     // skip file name;
     if (it.has_next ())
@@ -668,31 +668,31 @@ void Application.parse_options (string[] &options) {
             set_help ();
             break;
         } else if (option == QLatin1String ("--quit") || option == QLatin1String ("-q")) {
-            _quit_instance = true;
+            this.quit_instance = true;
         } else if (option == QLatin1String ("--logwindow") || option == QLatin1String ("-l")) {
-            _show_log_window = true;
+            this.show_log_window = true;
         } else if (option == QLatin1String ("--logfile")) {
             if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
-                _log_file = it.next ();
+                this.log_file = it.next ();
             } else {
                 show_hint ("Log file not specified");
             }
         } else if (option == QLatin1String ("--logdir")) {
             if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
-                _log_dir = it.next ();
+                this.log_dir = it.next ();
             } else {
                 show_hint ("Log dir not specified");
             }
         } else if (option == QLatin1String ("--logexpire")) {
             if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
-                _log_expire = it.next ().to_int ();
+                this.log_expire = it.next ().to_int ();
             } else {
                 show_hint ("Log expiration not specified");
             }
         } else if (option == QLatin1String ("--logflush")) {
-            _log_flush = true;
+            this.log_flush = true;
         } else if (option == QLatin1String ("--logdebug")) {
-            _log_debug = true;
+            this.log_debug = true;
         } else if (option == QLatin1String ("--confdir")) {
             if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
                 string conf_dir = it.next ();
@@ -703,12 +703,12 @@ void Application.parse_options (string[] &options) {
                 show_hint ("Path for confdir not specified");
             }
         } else if (option == "--debug") {
-            _log_debug = true;
-            _debug_mode = true;
+            this.log_debug = true;
+            this.debug_mode = true;
         } else if (option == "--background") {
-            _background_mode = true;
+            this.background_mode = true;
         } else if (option == "--version" || option == "-v") {
-            _version_only = true;
+            this.version_only = true;
         } else if (option.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
             // virtual file, open it after the Folder were created (if the app is not terminated)
             QTimer.single_shot (0, this, [this, option] {
@@ -730,15 +730,15 @@ void Application.show_help () {
     set_help ();
     string help_text;
     QTextStream stream (&help_text);
-    stream << _theme.app_name ()
+    stream << this.theme.app_name ()
            << QLatin1String (" version ")
-           << _theme.version () << endl;
+           << this.theme.version () << endl;
 
     stream << QLatin1String ("File synchronisation desktop utility.") << endl
            << endl
            << QLatin1String (options_c);
 
-    if (_theme.app_name () == QLatin1String ("own_cloud"))
+    if (this.theme.app_name () == QLatin1String ("own_cloud"))
         stream << endl
                << "For more information, see http://www.owncloud.org" << endl
                << endl;
@@ -751,22 +751,22 @@ void Application.show_version () {
 }
 
 void Application.show_hint (std.string error_hint) {
-    static string bin_name = QFileInfo (QCoreApplication.application_file_path ()).file_name ();
+    static string bin_name = QFileInfo (QCoreApplication.application_file_path ()).filename ();
     std.cerr << error_hint << std.endl;
     std.cerr << "Try '" << bin_name.to_std_"" << " --help' for more information" << std.endl;
     std.exit (1);
 }
 
 bool Application.debug_mode () {
-    return _debug_mode;
+    return this.debug_mode;
 }
 
 bool Application.background_mode () {
-    return _background_mode;
+    return this.background_mode;
 }
 
 void Application.set_help () {
-    _help_only = true;
+    this.help_only = true;
 }
 
 string subst_lang (string lang) {
@@ -796,7 +796,7 @@ void Application.setup_translations () {
     var qtkeychain_translator = new QTranslator (this);
 
     for (string lang : q_as_const (ui_languages)) {
-        lang.replace ('-', '_'); // work around QTBUG-25973
+        lang.replace ('-', 'this.'); // work around QTBUG-25973
         lang = subst_lang (lang);
         const string tr_path = application_tr_path ();
         const string tr_file = "client_" + lang;
@@ -836,19 +836,19 @@ void Application.setup_translations () {
 }
 
 bool Application.give_help () {
-    return _help_only;
+    return this.help_only;
 }
 
 bool Application.version_only () {
-    return _version_only;
+    return this.version_only;
 }
 
 void Application.show_main_dialog () {
-    _gui.on_open_main_dialog ();
+    this.gui.on_open_main_dialog ();
 }
 
 void Application.on_gui_is_showing_settings () {
-    emit is_showing_settings_dialog ();
+    /* emit */ is_showing_settings_dialog ();
 }
 
 void Application.on_open_virtual_file (string filename) {
@@ -877,7 +877,7 @@ void Application.on_open_virtual_file (string filename) {
 
 void Application.on_try_tray_again () {
     q_c_info (lc_application) << "Trying tray icon, tray available:" << QSystemTrayIcon.is_system_tray_available ();
-    _gui.hide_and_show_tray ();
+    this.gui.hide_and_show_tray ();
 }
 
 bool Application.event (QEvent event) {

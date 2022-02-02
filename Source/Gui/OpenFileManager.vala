@@ -20,7 +20,6 @@ const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 #endif
 // #pragma once
 
-// #include <string>
 
 namespace Occ {
 /***********************************************************
@@ -58,8 +57,8 @@ static string find_default_file_manager () {
                                       << "inode/directory",
         GLib.File.ReadOnly);
     p.wait_for_finished ();
-    string file_name = string.from_utf8 (p.read_all ().trimmed ());
-    if (file_name.is_empty ())
+    string filename = string.from_utf8 (p.read_all ().trimmed ());
+    if (filename.is_empty ())
         return "";
 
     QFileInfo fi;
@@ -69,7 +68,7 @@ static string find_default_file_manager () {
             << "/applications/kde4/";
     foreach (string dir, dirs) {
         foreach (string subdir, subdirs) {
-            fi.set_file (dir + subdir + file_name);
+            fi.set_file (dir + subdir + filename);
             if (fi.exists ()) {
                 return fi.absolute_file_path ();
             }

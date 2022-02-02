@@ -30,7 +30,7 @@ using AccountAppList = GLib.List<AccountApp>;
 @ingroup gui
 ***********************************************************/
 class AccountState : GLib.Object, public QSharedData {
-    Q_PROPERTY (AccountPointer account MEMBER _account)
+    Q_PROPERTY (AccountPointer account MEMBER this.account)
 
     /***********************************************************
     ***********************************************************/
@@ -100,7 +100,7 @@ class AccountState : GLib.Object, public QSharedData {
 
     Use from AccountManager with a prepared QSettings object only.
     ***********************************************************/
-    public static AccountState load_from_settings (AccountPointer account, QSettings &settings);
+    public static AccountState load_from_settings (AccountPointer account, QSettings settings);
 
 
     /***********************************************************
@@ -108,7 +108,7 @@ class AccountState : GLib.Object, public QSharedData {
 
     It does not write the Account data.
     ***********************************************************/
-    public void write_to_settings (QSettings &settings);
+    public void write_to_settings (QSettings settings);
 
     /***********************************************************
     ***********************************************************/
@@ -187,7 +187,7 @@ class AccountState : GLib.Object, public QSharedData {
     the server to validate the connection if the last successful etag job
     was not so long ago.
     ***********************************************************/
-    public void tag_last_successfull_e_tag_request (GLib.DateTime &tp);
+    public void tag_last_successfull_e_tag_request (GLib.DateTime tp);
 
 
     /***********************************************************
@@ -255,7 +255,7 @@ class AccountState : GLib.Object, public QSharedData {
     signal void status_changed ();
     signal void desktop_notifications_allowed_changed ();
 
-    protected void on_connection_validator_result (ConnectionValidator.Status status, string[] &errors);
+    protected void on_connection_validator_result (ConnectionValidator.Status status, string[] errors);
 
 
     /***********************************************************
@@ -267,53 +267,53 @@ class AccountState : GLib.Object, public QSharedData {
     protected void on_credentials_fetched (AbstractCredentials creds);
     protected void on_credentials_asked (AbstractCredentials creds);
 
-    protected void on_navigation_apps_fetched (QJsonDocument &reply, int status_code);
+    protected void on_navigation_apps_fetched (QJsonDocument reply, int status_code);
     protected void on_etag_response_header_received (GLib.ByteArray value, int status_code);
     protected void on_ocs_error (int status_code, string message);
 
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer _account;
-    private State _state;
-    private ConnectionStatus _connection_status;
-    private string[] _connection_errors;
-    private bool _waiting_for_new_credentials;
-    private GLib.DateTime _time_of_last_e_tag_check;
-    private QPointer<ConnectionValidator> _connection_validator;
-    private GLib.ByteArray _notifications_etag_response_header;
-    private GLib.ByteArray _navigation_apps_etag_response_header;
+    private AccountPointer this.account;
+    private State this.state;
+    private ConnectionStatus this.connection_status;
+    private string[] this.connection_errors;
+    private bool this.waiting_for_new_credentials;
+    private GLib.DateTime this.time_of_last_e_tag_check;
+    private QPointer<ConnectionValidator> this.connection_validator;
+    private GLib.ByteArray this.notifications_etag_response_header;
+    private GLib.ByteArray this.navigation_apps_etag_response_header;
 
 
     /***********************************************************
     Starts counting when the server starts being back up after 503 or
     maintenance mode. The account will only become connected once this
-    timer exceeds the _maintenance_to_connected_delay value.
+    timer exceeds the this.maintenance_to_connected_delay value.
     ***********************************************************/
-    private QElapsedTimer _time_since_maintenance_over;
+    private QElapsedTimer this.time_since_maintenance_over;
 
 
     /***********************************************************
     Milliseconds for which to delay reconnection after 503/maintenance.
     ***********************************************************/
-    private int _maintenance_to_connected_delay;
+    private int this.maintenance_to_connected_delay;
 
 
     /***********************************************************
     Connects remote wipe check with the account
     the log out triggers the check (loads app password . create request)
     ***********************************************************/
-    private RemoteWipe _remote_wipe;
+    private RemoteWipe this.remote_wipe;
 
 
     /***********************************************************
     Holds the App names and URLs available on the server
     ***********************************************************/
-    private AccountAppList _apps;
+    private AccountAppList this.apps;
 
     /***********************************************************
     ***********************************************************/
-    private bool _is_desktop_notifications_allowed;
+    private bool this.is_desktop_notifications_allowed;
 };
 
 class AccountApp : GLib.Object {
@@ -346,25 +346,25 @@ class AccountApp : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private string _name;
+    private string this.name;
 
     /***********************************************************
     ***********************************************************/
     private 
-    private string _id;
-    private GLib.Uri _icon_url;
+    private string this.id;
+    private GLib.Uri this.icon_url;
 };
 
 
     AccountState.AccountState (AccountPointer account)
         : GLib.Object ()
-        , _account (account)
-        , _state (AccountState.Disconnected)
-        , _connection_status (ConnectionValidator.Undefined)
-        , _waiting_for_new_credentials (false)
-        , _maintenance_to_connected_delay (60000 + (qrand () % (4 * 60000))) // 1-5min delay
-        , _remote_wipe (new RemoteWipe (_account))
-        , _is_desktop_notifications_allowed (true) {
+        , this.account (account)
+        , this.state (AccountState.Disconnected)
+        , this.connection_status (ConnectionValidator.Undefined)
+        , this.waiting_for_new_credentials (false)
+        , this.maintenance_to_connected_delay (60000 + (qrand () % (4 * 60000))) // 1-5min delay
+        , this.remote_wipe (new RemoteWipe (this.account))
+        , this.is_desktop_notifications_allowed (true) {
         q_register_meta_type<AccountState> ("AccountState*");
 
         connect (account.data (), &Account.invalid_credentials,
@@ -393,49 +393,49 @@ class AccountApp : GLib.Object {
     }
 
     AccountPointer AccountState.account () {
-        return _account;
+        return this.account;
     }
 
     AccountState.ConnectionStatus AccountState.connection_status () {
-        return _connection_status;
+        return this.connection_status;
     }
 
     string[] AccountState.connection_errors () {
-        return _connection_errors;
+        return this.connection_errors;
     }
 
     AccountState.State AccountState.state () {
-        return _state;
+        return this.state;
     }
 
     void AccountState.set_state (State state) {
-        if (_state != state) {
+        if (this.state != state) {
             q_c_info (lc_account_state) << "AccountState state change : "
-                                   << state_string (_state) << "." << state_string (state);
-            State old_state = _state;
-            _state = state;
+                                   << state_string (this.state) << "." << state_string (state);
+            State old_state = this.state;
+            this.state = state;
 
-            if (_state == SignedOut) {
-                _connection_status = ConnectionValidator.Undefined;
-                _connection_errors.clear ();
-            } else if (old_state == SignedOut && _state == Disconnected) {
+            if (this.state == SignedOut) {
+                this.connection_status = ConnectionValidator.Undefined;
+                this.connection_errors.clear ();
+            } else if (old_state == SignedOut && this.state == Disconnected) {
                 // If we stop being voluntarily signed-out, try to connect and
                 // auth right now!
                 on_check_connectivity ();
-            } else if (_state == ServiceUnavailable) {
+            } else if (this.state == ServiceUnavailable) {
                 // Check if we are actually down for maintenance.
                 // To do this we must clear the connection validator that just
                 // produced the 503. It's on_finished anyway and will delete itself.
-                _connection_validator.clear ();
+                this.connection_validator.clear ();
                 on_check_connectivity ();
             }
-            if (old_state == Connected || _state == Connected) {
-                emit is_connected_changed ();
+            if (old_state == Connected || this.state == Connected) {
+                /* emit */ is_connected_changed ();
             }
         }
 
-        // might not have changed but the underlying _connection_errors might have
-        emit state_changed (_state);
+        // might not have changed but the underlying this.connection_errors might have
+        /* emit */ state_changed (this.state);
     }
 
     string AccountState.state_string (State state) {
@@ -461,7 +461,7 @@ class AccountApp : GLib.Object {
     }
 
     bool AccountState.is_signed_out () {
-        return _state == SignedOut;
+        return this.state == SignedOut;
     }
 
     void AccountState.sign_out_by_ui () {
@@ -477,55 +477,55 @@ class AccountApp : GLib.Object {
     }
 
     void AccountState.sign_in () {
-        if (_state == SignedOut) {
-            _waiting_for_new_credentials = false;
+        if (this.state == SignedOut) {
+            this.waiting_for_new_credentials = false;
             set_state (Disconnected);
         }
     }
 
     bool AccountState.is_connected () {
-        return _state == Connected;
+        return this.state == Connected;
     }
 
-    void AccountState.tag_last_successfull_e_tag_request (GLib.DateTime &tp) {
-        _time_of_last_e_tag_check = tp;
+    void AccountState.tag_last_successfull_e_tag_request (GLib.DateTime tp) {
+        this.time_of_last_e_tag_check = tp;
     }
 
     GLib.ByteArray AccountState.notifications_etag_response_header () {
-        return _notifications_etag_response_header;
+        return this.notifications_etag_response_header;
     }
 
     void AccountState.set_notifications_etag_response_header (GLib.ByteArray value) {
-        _notifications_etag_response_header = value;
+        this.notifications_etag_response_header = value;
     }
 
     GLib.ByteArray AccountState.navigation_apps_etag_response_header () {
-        return _navigation_apps_etag_response_header;
+        return this.navigation_apps_etag_response_header;
     }
 
     void AccountState.set_navigation_apps_etag_response_header (GLib.ByteArray value) {
-        _navigation_apps_etag_response_header = value;
+        this.navigation_apps_etag_response_header = value;
     }
 
     bool AccountState.is_desktop_notifications_allowed () {
-        return _is_desktop_notifications_allowed;
+        return this.is_desktop_notifications_allowed;
     }
 
     void AccountState.set_desktop_notifications_allowed (bool is_allowed) {
-        if (_is_desktop_notifications_allowed == is_allowed) {
+        if (this.is_desktop_notifications_allowed == is_allowed) {
             return;
         }
 
-        _is_desktop_notifications_allowed = is_allowed;
-        emit desktop_notifications_allowed_changed ();
+        this.is_desktop_notifications_allowed = is_allowed;
+        /* emit */ desktop_notifications_allowed_changed ();
     }
 
     void AccountState.on_check_connectivity () {
-        if (is_signed_out () || _waiting_for_new_credentials) {
+        if (is_signed_out () || this.waiting_for_new_credentials) {
             return;
         }
 
-        if (_connection_validator) {
+        if (this.connection_validator) {
             GLib.warn (lc_account_state) << "ConnectionValidator already running, ignoring" << account ().display_name ();
             return;
         }
@@ -533,7 +533,7 @@ class AccountApp : GLib.Object {
         // If we never fetched credentials, do that now - otherwise connection attempts
         // make little sense, we might be missing client certs.
         if (!account ().credentials ().was_fetched ()) {
-            _waiting_for_new_credentials = true;
+            this.waiting_for_new_credentials = true;
             account ().credentials ().fetch_from_keychain ();
             return;
         }
@@ -541,15 +541,15 @@ class AccountApp : GLib.Object {
         // IF the account is connected the connection check can be skipped
         // if the last successful etag check job is not so long ago.
         const var polltime = std.chrono.duration_cast<std.chrono.seconds> (ConfigFile ().remote_poll_interval ());
-        const var elapsed = _time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
-        if (is_connected () && _time_of_last_e_tag_check.is_valid ()
+        const var elapsed = this.time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
+        if (is_connected () && this.time_of_last_e_tag_check.is_valid ()
             && elapsed <= polltime.count ()) {
             GLib.debug (lc_account_state) << account ().display_name () << "The last ETag check succeeded within the last " << polltime.count () << "s (" << elapsed << "s). No connection check needed!";
             return;
         }
 
         var con_validator = new ConnectionValidator (AccountStatePtr (this));
-        _connection_validator = con_validator;
+        this.connection_validator = con_validator;
         connect (con_validator, &ConnectionValidator.connection_result,
             this, &AccountState.on_connection_validator_result);
         if (is_connected ()) {
@@ -576,40 +576,40 @@ class AccountApp : GLib.Object {
         }
     }
 
-    void AccountState.on_connection_validator_result (ConnectionValidator.Status status, string[] &errors) {
+    void AccountState.on_connection_validator_result (ConnectionValidator.Status status, string[] errors) {
         if (is_signed_out ()) {
-            GLib.warn (lc_account_state) << "Signed out, ignoring" << status << _account.url ().to_"";
+            GLib.warn (lc_account_state) << "Signed out, ignoring" << status << this.account.url ().to_"";
             return;
         }
 
         // Come online gradually from 503 or maintenance mode
         if (status == ConnectionValidator.Connected
-            && (_connection_status == ConnectionValidator.ServiceUnavailable
-                || _connection_status == ConnectionValidator.MaintenanceMode)) {
-            if (!_time_since_maintenance_over.is_valid ()) {
+            && (this.connection_status == ConnectionValidator.ServiceUnavailable
+                || this.connection_status == ConnectionValidator.MaintenanceMode)) {
+            if (!this.time_since_maintenance_over.is_valid ()) {
                 q_c_info (lc_account_state) << "AccountState reconnection : delaying for"
-                                       << _maintenance_to_connected_delay << "ms";
-                _time_since_maintenance_over.on_start ();
-                QTimer.single_shot (_maintenance_to_connected_delay + 100, this, &AccountState.on_check_connectivity);
+                                       << this.maintenance_to_connected_delay << "ms";
+                this.time_since_maintenance_over.on_start ();
+                QTimer.single_shot (this.maintenance_to_connected_delay + 100, this, &AccountState.on_check_connectivity);
                 return;
-            } else if (_time_since_maintenance_over.elapsed () < _maintenance_to_connected_delay) {
+            } else if (this.time_since_maintenance_over.elapsed () < this.maintenance_to_connected_delay) {
                 q_c_info (lc_account_state) << "AccountState reconnection : only"
-                                       << _time_since_maintenance_over.elapsed () << "ms have passed";
+                                       << this.time_since_maintenance_over.elapsed () << "ms have passed";
                 return;
             }
         }
 
-        if (_connection_status != status) {
+        if (this.connection_status != status) {
             q_c_info (lc_account_state) << "AccountState connection status change : "
-                                   << _connection_status << "."
+                                   << this.connection_status << "."
                                    << status;
-            _connection_status = status;
+            this.connection_status = status;
         }
-        _connection_errors = errors;
+        this.connection_errors = errors;
 
         switch (status) {
         case ConnectionValidator.Connected:
-            if (_state != Connected) {
+            if (this.state != Connected) {
                 set_state (Connected);
 
                 // Get the Apps available on the server.
@@ -640,11 +640,11 @@ class AccountApp : GLib.Object {
             set_state (SignedOut);
             break;
         case ConnectionValidator.ServiceUnavailable:
-            _time_since_maintenance_over.invalidate ();
+            this.time_since_maintenance_over.invalidate ();
             set_state (ServiceUnavailable);
             break;
         case ConnectionValidator.MaintenanceMode:
-            _time_since_maintenance_over.invalidate ();
+            this.time_since_maintenance_over.invalidate ();
             set_state (MaintenanceMode);
             break;
         case ConnectionValidator.Timeout:
@@ -657,21 +657,21 @@ class AccountApp : GLib.Object {
         // make sure it changes account state and icons
         sign_out_by_ui ();
 
-        q_c_info (lc_account_state) << "Invalid credentials for" << _account.url ().to_""
+        q_c_info (lc_account_state) << "Invalid credentials for" << this.account.url ().to_""
                                << "checking for remote wipe request";
 
-        _waiting_for_new_credentials = false;
+        this.waiting_for_new_credentials = false;
         set_state (SignedOut);
     }
 
     void AccountState.handle_invalid_credentials () {
-        if (is_signed_out () || _waiting_for_new_credentials)
+        if (is_signed_out () || this.waiting_for_new_credentials)
             return;
 
-        q_c_info (lc_account_state) << "Invalid credentials for" << _account.url ().to_""
+        q_c_info (lc_account_state) << "Invalid credentials for" << this.account.url ().to_""
                                << "asking user";
 
-        _waiting_for_new_credentials = true;
+        this.waiting_for_new_credentials = true;
         set_state (AskingCredentials);
 
         if (account ().credentials ().ready ()) {
@@ -688,17 +688,17 @@ class AccountApp : GLib.Object {
         // Make a connection attempt, no matter whether the credentials are
         // ready or not - we want to check whether we can get an SSL connection
         // going before bothering the user for a password.
-        q_c_info (lc_account_state) << "Fetched credentials for" << _account.url ().to_""
+        q_c_info (lc_account_state) << "Fetched credentials for" << this.account.url ().to_""
                                << "attempting to connect";
-        _waiting_for_new_credentials = false;
+        this.waiting_for_new_credentials = false;
         on_check_connectivity ();
     }
 
     void AccountState.on_credentials_asked (AbstractCredentials credentials) {
-        q_c_info (lc_account_state) << "Credentials asked for" << _account.url ().to_""
+        q_c_info (lc_account_state) << "Credentials asked for" << this.account.url ().to_""
                                << "are they ready?" << credentials.ready ();
 
-        _waiting_for_new_credentials = false;
+        this.waiting_for_new_credentials = false;
 
         if (!credentials.ready ()) {
             // User canceled the connection or did not give a password
@@ -706,11 +706,11 @@ class AccountApp : GLib.Object {
             return;
         }
 
-        if (_connection_validator) {
+        if (this.connection_validator) {
             // When new credentials become available we always want to restart the
             // connection validation, even if it's currently running.
-            _connection_validator.delete_later ();
-            _connection_validator = nullptr;
+            this.connection_validator.delete_later ();
+            this.connection_validator = nullptr;
         }
 
         on_check_connectivity ();
@@ -718,12 +718,12 @@ class AccountApp : GLib.Object {
 
     std.unique_ptr<QSettings> AccountState.settings () {
         var s = ConfigFile.settings_with_group (QLatin1String ("Accounts"));
-        s.begin_group (_account.id ());
+        s.begin_group (this.account.id ());
         return s;
     }
 
     void AccountState.fetch_navigation_apps (){
-        var job = new OcsNavigationAppsJob (_account);
+        var job = new OcsNavigationAppsJob (this.account);
         job.add_raw_header ("If-None-Match", navigation_apps_etag_response_header ());
         connect (job, &OcsNavigationAppsJob.apps_job_finished, this, &AccountState.on_navigation_apps_fetched);
         connect (job, &OcsNavigationAppsJob.etag_response_header_received, this, &AccountState.on_etag_response_header_received);
@@ -742,42 +742,42 @@ class AccountApp : GLib.Object {
         GLib.debug (lc_account_state) << "Error " << status_code << " while fetching new navigation apps : " << message;
     }
 
-    void AccountState.on_navigation_apps_fetched (QJsonDocument &reply, int status_code) {
-        if (_account){
+    void AccountState.on_navigation_apps_fetched (QJsonDocument reply, int status_code) {
+        if (this.account){
             if (status_code == 304) {
                 GLib.warn (lc_account_state) << "Status code " << status_code << " Not Modified - No new navigation apps.";
             } else {
-                _apps.clear ();
+                this.apps.clear ();
 
                 if (!reply.is_empty ()){
                     var element = reply.object ().value ("ocs").to_object ().value ("data");
                     const var nav_links = element.to_array ();
 
                     if (nav_links.size () > 0){
-                        for (QJsonValue &value : nav_links) {
+                        for (QJsonValue value : nav_links) {
                             var nav_link = value.to_object ();
 
                             var app = new AccountApp (nav_link.value ("name").to_"", GLib.Uri (nav_link.value ("href").to_""),
                                 nav_link.value ("id").to_"", GLib.Uri (nav_link.value ("icon").to_""));
 
-                            _apps << app;
+                            this.apps << app;
                         }
                     }
                 }
 
-                emit has_fetched_navigation_apps ();
+                /* emit */ has_fetched_navigation_apps ();
             }
         }
     }
 
     AccountAppList AccountState.app_list () {
-        return _apps;
+        return this.apps;
     }
 
     AccountApp* AccountState.find_app (string app_id) {
         if (!app_id.is_empty ()) {
             const var apps = app_list ();
-            const var it = std.find_if (apps.cbegin (), apps.cend (), [app_id] (var &app) {
+            const var it = std.find_if (apps.cbegin (), apps.cend (), [app_id] (var app) {
                 return app.id () == app_id;
             });
             if (it != apps.cend ()) {
@@ -792,26 +792,26 @@ class AccountApp : GLib.Object {
         const string id, GLib.Uri icon_url,
         GLib.Object parent)
         : GLib.Object (parent)
-        , _name (name)
-        , _url (url)
-        , _id (id)
-        , _icon_url (icon_url) {
+        , this.name (name)
+        , this.url (url)
+        , this.id (id)
+        , this.icon_url (icon_url) {
     }
 
     string AccountApp.name () {
-        return _name;
+        return this.name;
     }
 
     GLib.Uri AccountApp.url () {
-        return _url;
+        return this.url;
     }
 
     string AccountApp.id () {
-        return _id;
+        return this.id;
     }
 
     GLib.Uri AccountApp.icon_url () {
-        return _icon_url;
+        return this.icon_url;
     }
 
 

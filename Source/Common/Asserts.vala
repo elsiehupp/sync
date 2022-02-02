@@ -13,7 +13,7 @@ const int OC_ASSERT_MSG q_critical
 // See also : https://stackoverflow.com/questions/9183993/msvc-variadic-macro-expansion
 const int OC_ASSERT_GLUE (x, y) x y
 
-const int OC_ASSERT_GET_COUNT (_1, _2, _3, COUNT, ...) COUNT
+const int OC_ASSERT_GET_COUNT (this.1, this.2, this.3, COUNT, ...) COUNT
 const int OC_ASSERT_EXPAND_ARGS (args) OC_ASSERT_GET_COUNT args
 const int OC_ASSERT_VA_SIZE (...) OC_ASSERT_EXPAND_ARGS ( (__VA_ARGS__, 3, 2, 1, 0))
 

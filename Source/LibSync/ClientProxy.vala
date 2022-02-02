@@ -12,7 +12,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QRunnable>
 // #include <GLib.Uri>
 
-// #include <csync.h>
+using CSync;
 
 namespace Occ {
 
@@ -62,12 +62,12 @@ class SystemProxyRunnable : GLib.Object, public QRunnable {
     public 
     public void run () override;
 signals:
-    void system_proxy_looked_up (QNetworkProxy &url);
+    void system_proxy_looked_up (QNetworkProxy url);
 
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Uri _url;
+    private GLib.Uri this.url;
 };
 
 
@@ -77,7 +77,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    static QNetworkProxy proxy_from_config (ConfigFile &cfg) {
+    static QNetworkProxy proxy_from_config (ConfigFile cfg) {
         QNetworkProxy proxy;
 
         if (cfg.proxy_host_name ().is_empty ())
@@ -122,7 +122,7 @@ signals:
         }
     }
 
-    string ClientProxy.print_q_network_proxy (QNetworkProxy &proxy) {
+    string ClientProxy.print_q_network_proxy (QNetworkProxy proxy) {
         return string ("%1://%2:%3").arg (proxy_type_to_c_str (proxy.type ())).arg (proxy.host_name ()).arg (proxy.port ());
     }
 
@@ -180,17 +180,17 @@ signals:
     SystemProxyRunnable.SystemProxyRunnable (GLib.Uri url)
         : GLib.Object ()
         , QRunnable ()
-        , _url (url) {
+        , this.url (url) {
     }
 
     void SystemProxyRunnable.run () {
         q_register_meta_type<QNetworkProxy> ("QNetworkProxy");
-        GLib.List<QNetworkProxy> proxies = QNetworkProxyFactory.system_proxy_for_query (QNetworkProxyQuery (_url));
+        GLib.List<QNetworkProxy> proxies = QNetworkProxyFactory.system_proxy_for_query (QNetworkProxyQuery (this.url));
 
         if (proxies.is_empty ()) {
-            emit system_proxy_looked_up (QNetworkProxy (QNetworkProxy.NoProxy));
+            /* emit */ system_proxy_looked_up (QNetworkProxy (QNetworkProxy.NoProxy));
         } else {
-            emit system_proxy_looked_up (proxies.first ());
+            /* emit */ system_proxy_looked_up (proxies.first ());
             // FIXME Would we really ever return more?
         }
     }

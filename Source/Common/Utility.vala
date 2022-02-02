@@ -17,7 +17,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <GLib.Uri>
 // #include <QProcess>
 // #include <QThread>
-// #include <GLib.DateTime>
 // #include <QSysInfo>
 // #include <QStandardPaths>
 // #include <QCollator>
@@ -36,8 +35,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 #include "utility_unix.cpp"
 
-// #include <string>
-// #include <GLib.DateTime>
 // #include <QElapsedTimer>
 // #include <QLoggingCategory>
 // #include <QMap>
@@ -92,9 +89,9 @@ namespace Utility {
 
     OCSYNC_EXPORT void set_launch_on_startup (string app_name, string gui_name, bool launch);
 
-    OCSYNC_EXPORT uint32 convert_size_to_uint (size_t &convert_var);
+    OCSYNC_EXPORT uint32 convert_size_to_uint (size_t convert_var);
 
-    OCSYNC_EXPORT int convert_size_to_int (size_t &convert_var);
+    OCSYNC_EXPORT int convert_size_to_int (size_t convert_var);
 
 
     /***********************************************************
@@ -125,7 +122,7 @@ namespace Utility {
 
     OCSYNC_EXPORT GLib.DateTime q_date_time_from_time_t (int64 t);
 
-    OCSYNC_EXPORT int64 q_date_time_to_time_t (GLib.DateTime &t);
+    OCSYNC_EXPORT int64 q_date_time_to_time_t (GLib.DateTime t);
 
 
     /***********************************************************
@@ -181,7 +178,7 @@ namespace Utility {
     // uses QDir.canonical_path () to judge and cares for the systems
     // case sensitivity.
 
-    OCSYNC_EXPORT bool file_names_equal (string fn1, string fn2);
+    OCSYNC_EXPORT bool filenames_equal (string fn1, string fn2);
 
     // Call the given command with the switch --version and rerun the first line
     // of the output.
@@ -193,7 +190,7 @@ namespace Utility {
 
     OCSYNC_EXPORT
 
-    OCSYNC_EXPORT string file_name_for_gui_use (string f_name);
+    OCSYNC_EXPORT string filename_for_gui_use (string f_name);
 
     OCSYNC_EXPORT GLib.ByteArray normalize_etag (GLib.ByteArray etag);
 
@@ -207,13 +204,13 @@ namespace Utility {
     If the second parameter is ommitted, the current time is used.
     ***********************************************************/
 
-    OCSYNC_EXPORT string time_ago_in_words (GLib.DateTime &dt, GLib.DateTime &from = GLib.DateTime ());
+    OCSYNC_EXPORT string time_ago_in_words (GLib.DateTime dt, GLib.DateTime from = GLib.DateTime ());
 
     class StopWatch {
 
-        private QMap<string, uint64> _lap_times;
-        private GLib.DateTime _start_time;
-        private QElapsedTimer _timer;
+        private QMap<string, uint64> this.lap_times;
+        private GLib.DateTime this.start_time;
+        private QElapsedTimer this.timer;
 
 
         public void on_start ();
@@ -232,7 +229,7 @@ namespace Utility {
     @brief Sort a string[] in a way that's appropriate for filenames
     ***********************************************************/
 
-    OCSYNC_EXPORT void sort_filenames (string[] &file_names);
+    OCSYNC_EXPORT void sort_filenames (string[] filenames);
 
 
     /***********************************************************
@@ -241,7 +238,7 @@ namespace Utility {
 
     OCSYNC_EXPORT GLib.Uri concat_url_path (
         const GLib.Uri url, string concat_path,
-        const QUrlQuery &query_items = {});
+        const QUrlQuery query_items = {});
 
 
     /***********************************************************
@@ -266,15 +263,15 @@ namespace Utility {
     will pass unchanged.
     ***********************************************************/
 
-    OCSYNC_EXPORT string sanitize_for_file_name (string name);
+    OCSYNC_EXPORT string sanitize_for_filename (string name);
 
 
     /***********************************************************
     Returns a file name based on \a fn that's suitable for a conflict.
     ***********************************************************/
 
-    OCSYNC_EXPORT string make_conflict_file_name (
-        const string fn, GLib.DateTime &dt, string user);
+    OCSYNC_EXPORT string make_conflict_filename (
+        const string fn, GLib.DateTime dt, string user);
 
 
     /***********************************************************
@@ -465,7 +462,7 @@ void Utility.set_launch_on_startup (string app_name, string gui_name, bool enabl
 int64 Utility.free_disk_space (string path) {
 #if defined (Q_OS_UNIX)
     struct statvfs64 stat;
-    if (statvfs64 (path.to_local8Bit ().data (), &stat) == 0) {
+    if (statvfs64 (path.to_local8Bit ().data (), stat) == 0) {
         return (int64)stat.f_bavail * stat.f_frsize;
     }
 #endif
@@ -516,7 +513,7 @@ bool Utility.fs_case_preserving () {
     return fs_case_preserving_override;
 }
 
-bool Utility.file_names_equal (string fn1, string fn2) {
+bool Utility.filenames_equal (string fn1, string fn2) {
     const QDir fd1 (fn1);
     const QDir fd2 (fn2);
 
@@ -532,7 +529,7 @@ GLib.DateTime Utility.q_date_time_from_time_t (int64 t) {
     return GLib.DateTime.from_m_secs_since_epoch (t * 1000);
 }
 
-int64 Utility.q_date_time_to_time_t (GLib.DateTime &t) {
+int64 Utility.q_date_time_to_time_t (GLib.DateTime t) {
     return t.to_m_secs_since_epoch () / 1000;
 }
 
@@ -550,7 +547,7 @@ namespace {
 // (it must be in the form ("context", "source", "comment", n)
 #undef QT_TRANSLATE_NOOP
 const int QT_TRANSLATE_NOOP (ctx, string_value, ...) string_value
-    Q_DECL_CONSTEXPR Period periods[] = { { QT_TRANSLATE_NOOP ("Utility", "%n year (s)", 0, _), 365 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n month (s)", 0, _), 30 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n day (s)", 0, _), 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n hour (s)", 0, _), 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n minute (s)", 0, _), 60 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n second (s)", 0, _), 1000LL }, { nullptr, 0 }
+    Q_DECL_CONSTEXPR Period periods[] = { { QT_TRANSLATE_NOOP ("Utility", "%n year (s)", 0, this.), 365 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n month (s)", 0, this.), 30 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n day (s)", 0, this.), 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n hour (s)", 0, this.), 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n minute (s)", 0, this.), 60 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n second (s)", 0, this.), 1000LL }, { nullptr, 0 }
     };
 } // anonymous namespace
 
@@ -585,7 +582,7 @@ string Utility.duration_to_descriptive_string1 (uint64 msecs) {
     return periods[p].description (amount);
 }
 
-string Utility.file_name_for_gui_use (string f_name) {
+string Utility.filename_for_gui_use (string f_name) {
     if (is_mac ()) {
         string n (f_name);
         return n.replace (':', '/');
@@ -627,7 +624,7 @@ void Utility.crash () {
 
 // Use this functions to retrieve uint32/int (often required by Qt and WIN32) from size_t
 // without compiler warnings about possible truncation
-uint32 Utility.convert_size_to_uint (size_t &convert_var) {
+uint32 Utility.convert_size_to_uint (size_t convert_var) {
     if (convert_var > UINT_MAX) {
         //throw std.bad_cast ();
         convert_var = UINT_MAX; // intentionally default to wrong value here to not crash : exception handling TBD
@@ -635,7 +632,7 @@ uint32 Utility.convert_size_to_uint (size_t &convert_var) {
     return static_cast<uint32> (convert_var);
 }
 
-int Utility.convert_size_to_int (size_t &convert_var) {
+int Utility.convert_size_to_int (size_t convert_var) {
     if (convert_var > INT_MAX) {
         //throw std.bad_cast ();
         convert_var = INT_MAX; // intentionally default to wrong value here to not crash : exception handling TBD
@@ -671,7 +668,7 @@ GLib.ByteArray Utility.version_of_installed_binary (string command) {
     return re;
 }
 
-string Utility.time_ago_in_words (GLib.DateTime &dt, GLib.DateTime &from) {
+string Utility.time_ago_in_words (GLib.DateTime dt, GLib.DateTime from) {
     GLib.DateTime now = GLib.DateTime.current_date_time_utc ();
 
     if (from.is_valid ()) {
@@ -723,43 +720,43 @@ string Utility.time_ago_in_words (GLib.DateTime &dt, GLib.DateTime &from) {
 
 
 
-static const char STOPWATCH_END_TAG[] = "_STOPWATCH_END";
+static const char STOPWATCH_END_TAG[] = "this.STOPWATCH_END";
 
 void Utility.StopWatch.on_start () {
-    _start_time = GLib.DateTime.current_date_time_utc ();
-    _timer.on_start ();
+    this.start_time = GLib.DateTime.current_date_time_utc ();
+    this.timer.on_start ();
 }
 
 uint64 Utility.StopWatch.stop () {
     add_lap_time (QLatin1String (STOPWATCH_END_TAG));
-    uint64 duration = _timer.elapsed ();
-    _timer.invalidate ();
+    uint64 duration = this.timer.elapsed ();
+    this.timer.invalidate ();
     return duration;
 }
 
 void Utility.StopWatch.on_reset () {
-    _timer.invalidate ();
-    _start_time.set_m_secs_since_epoch (0);
-    _lap_times.clear ();
+    this.timer.invalidate ();
+    this.start_time.set_m_secs_since_epoch (0);
+    this.lap_times.clear ();
 }
 
 uint64 Utility.StopWatch.add_lap_time (string lap_name) {
-    if (!_timer.is_valid ()) {
+    if (!this.timer.is_valid ()) {
         on_start ();
     }
-    uint64 re = _timer.elapsed ();
-    _lap_times[lap_name] = re;
+    uint64 re = this.timer.elapsed ();
+    this.lap_times[lap_name] = re;
     return re;
 }
 
 GLib.DateTime Utility.StopWatch.start_time () {
-    return _start_time;
+    return this.start_time;
 }
 
 GLib.DateTime Utility.StopWatch.time_of_lap (string lap_name) {
     uint64 t = duration_of_lap (lap_name);
     if (t) {
-        GLib.DateTime re (_start_time);
+        GLib.DateTime re (this.start_time);
         return re.add_m_secs (t);
     }
 
@@ -767,18 +764,18 @@ GLib.DateTime Utility.StopWatch.time_of_lap (string lap_name) {
 }
 
 uint64 Utility.StopWatch.duration_of_lap (string lap_name) {
-    return _lap_times.value (lap_name, 0);
+    return this.lap_times.value (lap_name, 0);
 }
 
-void Utility.sort_filenames (string[] &file_names) {
+void Utility.sort_filenames (string[] filenames) {
     QCollator collator;
     collator.set_numeric_mode (true);
     collator.set_case_sensitivity (Qt.CaseInsensitive);
-    std.sort (file_names.begin (), file_names.end (), collator);
+    std.sort (filenames.begin (), filenames.end (), collator);
 }
 
 GLib.Uri Utility.concat_url_path (GLib.Uri url, string concat_path,
-    const QUrlQuery &query_items) {
+    const QUrlQuery query_items) {
     string path = url.path ();
     if (!concat_path.is_empty ()) {
         // avoid '//'
@@ -797,27 +794,27 @@ GLib.Uri Utility.concat_url_path (GLib.Uri url, string concat_path,
     return tmp_url;
 }
 
-string Utility.make_conflict_file_name (
-    const string fn, GLib.DateTime &dt, string user) {
-    string conflict_file_name (fn);
+string Utility.make_conflict_filename (
+    const string fn, GLib.DateTime dt, string user) {
+    string conflict_filename (fn);
     // Add conflict tag before the extension.
-    int dot_location = conflict_file_name.last_index_of ('.');
+    int dot_location = conflict_filename.last_index_of ('.');
     // If no extension, add it at the end  (take care of cases like foo/.hidden or foo.bar/file)
-    if (dot_location <= conflict_file_name.last_index_of ('/') + 1) {
-        dot_location = conflict_file_name.size ();
+    if (dot_location <= conflict_filename.last_index_of ('/') + 1) {
+        dot_location = conflict_filename.size ();
     }
 
     string conflict_marker = " (conflicted copy ";
     if (!user.is_empty ()) {
         // Don't allow parens in the user name, to ensure
         // we can find the beginning and end of the conflict tag.
-        const var user_name = sanitize_for_file_name (user).replace ('(', '_').replace (')', '_');
+        const var user_name = sanitize_for_filename (user).replace ('(', 'this.').replace (')', 'this.');
         conflict_marker += user_name + ' ';
     }
     conflict_marker += dt.to_string ("yyyy-MM-dd hhmmss") + ')';
 
-    conflict_file_name.insert (dot_location, conflict_marker);
-    return conflict_file_name;
+    conflict_filename.insert (dot_location, conflict_marker);
+    return conflict_filename;
 }
 
 bool Utility.is_conflict_file (char name) {
@@ -829,7 +826,7 @@ bool Utility.is_conflict_file (char name) {
     }
 
     // Old pattern
-    if (std.strstr (bname, "_conflict-"))
+    if (std.strstr (bname, "this.conflict-"))
         return true;
 
     // New pattern
@@ -842,7 +839,7 @@ bool Utility.is_conflict_file (char name) {
 bool Utility.is_conflict_file (string name) {
     var bname = name.mid_ref (name.last_index_of ('/') + 1);
 
-    if (bname.contains ("_conflict-")) {
+    if (bname.contains ("this.conflict-")) {
         return true;
     }
 
@@ -857,7 +854,7 @@ GLib.ByteArray Utility.conflict_file_base_name_from_pattern (GLib.ByteArray conf
     // This function must be able to deal with conflict files for conflict files.
     // To do this, we scan backwards, for the outermost conflict marker and
     // strip only that to generate the conflict file base name.
-    var start_old = conflict_name.last_index_of ("_conflict-");
+    var start_old = conflict_name.last_index_of ("this.conflict-");
 
     // A single space before " (conflicted copy" is considered part of the tag
     var start_new = conflict_name.last_index_of (" (conflicted copy");
@@ -887,7 +884,7 @@ bool Utility.is_path_windows_drive_partition_root (string path) {
     return false;
 }
 
-string Utility.sanitize_for_file_name (string name) {
+string Utility.sanitize_for_filename (string name) {
     const var invalid = R" (/?<>\:*|\")";
     string result;
     result.reserve (name.size ());

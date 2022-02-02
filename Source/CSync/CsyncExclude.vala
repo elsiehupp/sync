@@ -18,8 +18,6 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
-// #include <GLib.Set>
-// #include <string>
 // #include <QRegularExpression>
 
 // #include <functional>
@@ -154,7 +152,7 @@ class ExcludedFiles : GLib.Object {
     /***********************************************************
     Loads the exclude patterns from file the registered base paths.
     ***********************************************************/
-    public void on_load_exclude_file_patterns (string base_path, GLib.File &file);
+    public void on_load_exclude_file_patterns (string base_path, GLib.File file);
 
 
     /***********************************************************
@@ -187,7 +185,7 @@ class ExcludedFiles : GLib.Object {
 
     // Our Base_path need to end with '/'
     private class Base_path_string : string {
-        public Base_path_string (string &other)
+        public Base_path_string (string other)
             : string (std.move (other)) {
             Q_ASSERT (ends_with ('/'));
         }
@@ -203,7 +201,7 @@ class ExcludedFiles : GLib.Object {
     Generate optimized regular expressions for the exclude patterns anchored to base_path.
 
     The optimization works in two steps : First, all supported patterns are put
-    into _full_regex_file/_full_regex_dir. These regexes
+    into this.full_regex_file/this.full_regex_dir. These regexes
     path to determine whether it is excluded or not.
 
     The second is a performance optimization. The particularly common use
@@ -220,15 +218,15 @@ class ExcludedFiles : GLib.Object {
       full ("a/b/c/d") == traversal (
 
     The traversal matcher can be extremely fast because it has a fast early-
-    case : It checks the bname part of the path against _bname_traversal_regex
-    and only runs a simplified _full_traversal_regex on the whole path if bname
+    case : It checks the bname part of the path against this.bname_traversal_regex
+    and only runs a simplified this.full_traversal_regex on the whole path if bname
     activation for it was triggered.
 
     Note: The traversal matcher will return not-excluded on some paths that
     full matcher would exclude. Example: "b" is excluded. traversal ("b/c")
     returns not-excluded because "c" isn't a bname activation pattern.
     ***********************************************************/
-    private void prepare (Base_path_string &base_path);
+    private void prepare (Base_path_string base_path);
 
     /***********************************************************
     ***********************************************************/
@@ -241,28 +239,28 @@ class ExcludedFiles : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private 
-    private string _local_path;
+    private string this.local_path;
 
     /// Files to load excludes from
-    private QMap<Base_path_string, string[]> _exclude_files;
+    private QMap<Base_path_string, string[]> this.exclude_files;
 
     /// Exclude patterns added with add_manual_exclude ()
-    private QMap<Base_path_string, string[]> _manual_excludes;
+    private QMap<Base_path_string, string[]> this.manual_excludes;
 
     /// List of all active exclude patterns
-    private QMap<Base_path_string, string[]> _all_excludes;
+    private QMap<Base_path_string, string[]> this.all_excludes;
 
     /// see prepare ()
-    private QMap<Base_path_string, QRegularExpression> _bname_traversal_regex_file;
-    private QMap<Base_path_string, QRegularExpression> _bname_traversal_regex_dir;
-    private QMap<Base_path_string, QRegularExpression> _full_traversal_regex_file;
-    private QMap<Base_path_string, QRegularExpression> _full_traversal_regex_dir;
-    private QMap<Base_path_string, QRegularExpression> _full_regex_file;
-    private QMap<Base_path_string, QRegularExpression> _full_regex_dir;
+    private QMap<Base_path_string, QRegularExpression> this.bname_traversal_regex_file;
+    private QMap<Base_path_string, QRegularExpression> this.bname_traversal_regex_dir;
+    private QMap<Base_path_string, QRegularExpression> this.full_traversal_regex_file;
+    private QMap<Base_path_string, QRegularExpression> this.full_traversal_regex_dir;
+    private QMap<Base_path_string, QRegularExpression> this.full_regex_file;
+    private QMap<Base_path_string, QRegularExpression> this.full_regex_dir;
 
     /***********************************************************
     ***********************************************************/
-    private bool _exclude_conflict_files = true;
+    private bool this.exclude_conflict_files = true;
 
 
     /***********************************************************
@@ -271,14 +269,14 @@ class ExcludedFiles : GLib.Object {
     Unfortunately this was how matching was done on Windows so
     it continues to be enabled there.
     ***********************************************************/
-    private bool _wildcards_match_slash = false;
+    private bool this.wildcards_match_slash = false;
 
 
     /***********************************************************
     The client version. Used to evaluate version-dependent excludes,
     see version_directive_keep_next_line ().
     ***********************************************************/
-    private Version _client_version;
+    private Version this.client_version;
 
     /***********************************************************
     ***********************************************************/
@@ -317,13 +315,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 // #include <qglobal.h>
 
-#ifndef _GNU_SOURCE
-const int _GNU_SOURCE
+#ifndef this.GNU_SOURCE
+const int this.GNU_SOURCE
 #endif
 
 #include "../version.h"
 
-// #include <string>
 // #include <QFileInfo>
 // #include <QDir>
 
@@ -401,10 +398,10 @@ static const char win_reserved_words_n[] = {
 
 /***********************************************************
 @brief Checks if filename is considered reserved by Windows
-@param file_name filename
+@param filename filename
 @return true if file is reserved, false otherwise
 ***********************************************************/
-OCSYNC_EXPORT bool csync_is_windows_reserved_word (QStringRef &filename) {
+OCSYNC_EXPORT bool csync_is_windows_reserved_word (QStringRef filename) {
     size_t len_filename = filename.size ();
 
     // Drive letters
@@ -442,7 +439,7 @@ OCSYNC_EXPORT bool csync_is_windows_reserved_word (QStringRef &filename) {
     return false;
 }
 
-static CSYNC_EXCLUDE_TYPE _csync_excluded_common (string path, bool exclude_conflict_files) {
+static CSYNC_EXCLUDE_TYPE this.csync_excluded_common (string path, bool exclude_conflict_files) {
     /* split up the path */
     QStringRef bname (&path);
     int last_slash = path.last_index_of ('/');
@@ -466,12 +463,12 @@ static CSYNC_EXCLUDE_TYPE _csync_excluded_common (string path, bool exclude_conf
     }
 
     // check the strlen and ignore the file if its name is longer than 254 chars.
-    // whenever changing this also check create_download_tmp_file_name
+    // whenever changing this also check create_download_tmp_filename
     if (blen > 254) {
         return CSYNC_FILE_EXCLUDE_LONG_FILENAME;
     }
 
-#ifdef _WIN32
+#ifdef this.WIN32
     // Windows cannot sync files ending in spaces (#2176). It also cannot
     // distinguish files ending in '.' from files without an ending,
     // as '.' is a separator that is not stored internally, so let's
@@ -522,7 +519,7 @@ static CSYNC_EXCLUDE_TYPE _csync_excluded_common (string path, bool exclude_conf
     return CSYNC_NOT_EXCLUDED;
 }
 
-static string left_include_last (string arr, char &c) {
+static string left_include_last (string arr, char c) {
     // left up to and including `c`
     return arr.left (arr.last_index_of (c, arr.size () - 2) + 1);
 }
@@ -530,14 +527,14 @@ static string left_include_last (string arr, char &c) {
 using namespace Occ;
 
 ExcludedFiles.ExcludedFiles (string local_path)
-    : _local_path (local_path)
-    , _client_version (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH) {
-    Q_ASSERT (_local_path.ends_with (QStringLiteral ("/")));
+    : this.local_path (local_path)
+    , this.client_version (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH) {
+    Q_ASSERT (this.local_path.ends_with (QStringLiteral ("/")));
     // Windows used to use Path_match_spec which allows foo to match abc/deffoo.
-    _wildcards_match_slash = Utility.is_windows ();
+    this.wildcards_match_slash = Utility.is_windows ();
 
     // We're in a detached exclude probably coming from a partial sync or test
-    if (_local_path.is_empty ())
+    if (this.local_path.is_empty ())
         return;
 }
 
@@ -545,48 +542,48 @@ ExcludedFiles.~ExcludedFiles () = default;
 
 void ExcludedFiles.add_exclude_file_path (string path) {
     const QFileInfo exclude_file_info (path);
-    const var file_name = exclude_file_info.file_name ();
-    const var base_path = file_name.compare (QStringLiteral ("sync-exclude.lst"), Qt.CaseInsensitive) == 0
-                                                                    ? _local_path
+    const var filename = exclude_file_info.filename ();
+    const var base_path = filename.compare (QStringLiteral ("sync-exclude.lst"), Qt.CaseInsensitive) == 0
+                                                                    ? this.local_path
                                                                     : left_include_last (path, '/');
-    var &exclude_files_local_path = _exclude_files[base_path];
+    var exclude_files_local_path = this.exclude_files[base_path];
     if (std.find (exclude_files_local_path.cbegin (), exclude_files_local_path.cend (), path) == exclude_files_local_path.cend ()) {
         exclude_files_local_path.append (path);
     }
 }
 
 void ExcludedFiles.set_exclude_conflict_files (bool onoff) {
-    _exclude_conflict_files = onoff;
+    this.exclude_conflict_files = onoff;
 }
 
 void ExcludedFiles.add_manual_exclude (string expr) {
-    add_manual_exclude (expr, _local_path);
+    add_manual_exclude (expr, this.local_path);
 }
 
 void ExcludedFiles.add_manual_exclude (string expr, string base_path) {
     Q_ASSERT (base_path.ends_with ('/'));
 
     var key = base_path;
-    _manual_excludes[key].append (expr);
-    _all_excludes[key].append (expr);
+    this.manual_excludes[key].append (expr);
+    this.all_excludes[key].append (expr);
     prepare (key);
 }
 
 void ExcludedFiles.clear_manual_excludes () {
-    _manual_excludes.clear ();
+    this.manual_excludes.clear ();
     on_reload_exclude_files ();
 }
 
 void ExcludedFiles.set_wildcards_match_slash (bool onoff) {
-    _wildcards_match_slash = onoff;
+    this.wildcards_match_slash = onoff;
     prepare ();
 }
 
 void ExcludedFiles.set_client_version (ExcludedFiles.Version version) {
-    _client_version = version;
+    this.client_version = version;
 }
 
-void ExcludedFiles.on_load_exclude_file_patterns (string base_path, GLib.File &file) {
+void ExcludedFiles.on_load_exclude_file_patterns (string base_path, GLib.File file) {
     string[] patterns;
     while (!file.at_end ()) {
         GLib.ByteArray line = file.read_line ().trimmed ();
@@ -599,28 +596,28 @@ void ExcludedFiles.on_load_exclude_file_patterns (string base_path, GLib.File &f
         csync_exclude_expand_escapes (line);
         patterns.append (string.from_utf8 (line));
     }
-    _all_excludes[base_path].append (patterns);
+    this.all_excludes[base_path].append (patterns);
 
     // nothing to prepare if the user decided to not exclude anything
-    if (!_all_excludes.value (base_path).is_empty ()){
+    if (!this.all_excludes.value (base_path).is_empty ()){
         prepare (base_path);
     }
 }
 
 bool ExcludedFiles.on_reload_exclude_files () {
-    _all_excludes.clear ();
+    this.all_excludes.clear ();
     // clear all regex
-    _bname_traversal_regex_file.clear ();
-    _bname_traversal_regex_dir.clear ();
-    _full_traversal_regex_file.clear ();
-    _full_traversal_regex_dir.clear ();
-    _full_regex_file.clear ();
-    _full_regex_dir.clear ();
+    this.bname_traversal_regex_file.clear ();
+    this.bname_traversal_regex_dir.clear ();
+    this.full_traversal_regex_file.clear ();
+    this.full_traversal_regex_dir.clear ();
+    this.full_regex_file.clear ();
+    this.full_regex_dir.clear ();
 
     bool on_success = true;
-    const var keys = _exclude_files.keys ();
+    const var keys = this.exclude_files.keys ();
     for (var& base_path : keys) {
-        for (var &exclude_file : _exclude_files.value (base_path)) {
+        for (var exclude_file : this.exclude_files.value (base_path)) {
             GLib.File file = new GLib.File (exclude_file);
             if (file.exists () && file.open (QIODevice.ReadOnly)) {
                 on_load_exclude_file_patterns (base_path, file);
@@ -631,9 +628,9 @@ bool ExcludedFiles.on_reload_exclude_files () {
         }
     }
 
-    var end_manual = _manual_excludes.cend ();
-    for (var kv = _manual_excludes.cbegin (); kv != end_manual; ++kv) {
-        _all_excludes[kv.key ()].append (kv.value ());
+    var end_manual = this.manual_excludes.cend ();
+    for (var kv = this.manual_excludes.cbegin (); kv != end_manual; ++kv) {
+        this.all_excludes[kv.key ()].append (kv.value ());
         prepare (kv.key ());
     }
 
@@ -653,15 +650,15 @@ bool ExcludedFiles.version_directive_keep_next_line (GLib.ByteArray directive) {
 
     var arg_version = std.make_tuple (arg_versions[0].to_int (), arg_versions[1].to_int (), arg_versions[2].to_int ());
     if (op == "<=")
-        return _client_version <= arg_version;
+        return this.client_version <= arg_version;
     if (op == "<")
-        return _client_version < arg_version;
+        return this.client_version < arg_version;
     if (op == ">")
-        return _client_version > arg_version;
+        return this.client_version > arg_version;
     if (op == ">=")
-        return _client_version >= arg_version;
+        return this.client_version >= arg_version;
     if (op == "==")
-        return _client_version == arg_version;
+        return this.client_version == arg_version;
     return true;
 }
 
@@ -681,8 +678,8 @@ bool ExcludedFiles.is_excluded (
         // We do want to be able to sync with a hidden folder as the target.
         while (path.size () > base_path.size ()) {
             QFileInfo fi (path);
-            if (fi.file_name () != QStringLiteral (".sync-exclude.lst")
-                && (fi.is_hidden () || fi.file_name ().starts_with ('.'))) {
+            if (fi.filename () != QStringLiteral (".sync-exclude.lst")
+                && (fi.is_hidden () || fi.filename ().starts_with ('.'))) {
                 return true;
             }
 
@@ -706,15 +703,15 @@ bool ExcludedFiles.is_excluded (
 }
 
 CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType filetype) {
-    var match = _csync_excluded_common (path, _exclude_conflict_files);
+    var match = this.csync_excluded_common (path, this.exclude_conflict_files);
     if (match != CSYNC_NOT_EXCLUDED)
         return match;
-    if (_all_excludes.is_empty ())
+    if (this.all_excludes.is_empty ())
         return CSYNC_NOT_EXCLUDED;
 
     // Directories are guaranteed to be visited before their files
     if (filetype == ItemTypeDirectory) {
-        const var base_path = string (_local_path + path + '/');
+        const var base_path = string (this.local_path + path + '/');
         const string absolute_path = base_path + QStringLiteral (".sync-exclude.lst");
         QFileInfo exclude_file_info (absolute_path);
 
@@ -734,16 +731,16 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
         bname_str = path.mid_ref (last_slash + 1);
     }
 
-    string base_path (_local_path + path);
-    while (base_path.size () > _local_path.size ()) {
+    string base_path (this.local_path + path);
+    while (base_path.size () > this.local_path.size ()) {
         base_path = left_include_last (base_path, '/');
         QRegular_expression_match m;
         if (filetype == ItemTypeDirectory
-            && _bname_traversal_regex_dir.contains (base_path)) {
-            m = _bname_traversal_regex_dir[base_path].match (bname_str);
+            && this.bname_traversal_regex_dir.contains (base_path)) {
+            m = this.bname_traversal_regex_dir[base_path].match (bname_str);
         } else if (filetype == ItemTypeFile
-            && _bname_traversal_regex_file.contains (base_path)) {
-            m = _bname_traversal_regex_file[base_path].match (bname_str);
+            && this.bname_traversal_regex_file.contains (base_path)) {
+            m = this.bname_traversal_regex_file[base_path].match (bname_str);
         } else {
             continue;
         }
@@ -758,16 +755,16 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
     }
 
     // third capture : full path matching is triggered
-    base_path = _local_path + path;
-    while (base_path.size () > _local_path.size ()) {
+    base_path = this.local_path + path;
+    while (base_path.size () > this.local_path.size ()) {
         base_path = left_include_last (base_path, '/');
         QRegular_expression_match m;
         if (filetype == ItemTypeDirectory
-            && _full_traversal_regex_dir.contains (base_path)) {
-            m = _full_traversal_regex_dir[base_path].match (path);
+            && this.full_traversal_regex_dir.contains (base_path)) {
+            m = this.full_traversal_regex_dir[base_path].match (path);
         } else if (filetype == ItemTypeFile
-            && _full_traversal_regex_file.contains (base_path)) {
-            m = _full_traversal_regex_file[base_path].match (path);
+            && this.full_traversal_regex_file.contains (base_path)) {
+            m = this.full_traversal_regex_file[base_path].match (path);
         } else {
             continue;
         }
@@ -784,28 +781,28 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
 }
 
 CSYNC_EXCLUDE_TYPE ExcludedFiles.full_pattern_match (string p, ItemType filetype) {
-    var match = _csync_excluded_common (p, _exclude_conflict_files);
+    var match = this.csync_excluded_common (p, this.exclude_conflict_files);
     if (match != CSYNC_NOT_EXCLUDED)
         return match;
-    if (_all_excludes.is_empty ())
+    if (this.all_excludes.is_empty ())
         return CSYNC_NOT_EXCLUDED;
 
-    // `path` seems to always be relative to `_local_path`, the tests however have not been
+    // `path` seems to always be relative to `this.local_path`, the tests however have not been
     // written that way... this makes the tests happy for now. TODO Fix the tests at some point
     string path = p;
-    if (path.starts_with (_local_path))
-        path = path.mid (_local_path.size ());
+    if (path.starts_with (this.local_path))
+        path = path.mid (this.local_path.size ());
 
-    string base_path (_local_path + path);
-    while (base_path.size () > _local_path.size ()) {
+    string base_path (this.local_path + path);
+    while (base_path.size () > this.local_path.size ()) {
         base_path = left_include_last (base_path, '/');
         QRegular_expression_match m;
         if (filetype == ItemTypeDirectory
-            && _full_regex_dir.contains (base_path)) {
-            m = _full_regex_dir[base_path].match (p);
+            && this.full_regex_dir.contains (base_path)) {
+            m = this.full_regex_dir[base_path].match (p);
         } else if (filetype == ItemTypeFile
-            && _full_regex_file.contains (base_path)) {
-            m = _full_regex_file[base_path].match (p);
+            && this.full_regex_file.contains (base_path)) {
+            m = this.full_regex_file[base_path].match (p);
         } else {
             continue;
         }
@@ -959,33 +956,33 @@ string ExcludedFiles.extract_bname_trigger (string exclude, bool wildcards_match
 
 void ExcludedFiles.prepare () {
     // clear all regex
-    _bname_traversal_regex_file.clear ();
-    _bname_traversal_regex_dir.clear ();
-    _full_traversal_regex_file.clear ();
-    _full_traversal_regex_dir.clear ();
-    _full_regex_file.clear ();
-    _full_regex_dir.clear ();
+    this.bname_traversal_regex_file.clear ();
+    this.bname_traversal_regex_dir.clear ();
+    this.full_traversal_regex_file.clear ();
+    this.full_traversal_regex_dir.clear ();
+    this.full_regex_file.clear ();
+    this.full_regex_dir.clear ();
 
-    const var keys = _all_excludes.keys ();
+    const var keys = this.all_excludes.keys ();
     for (var const & base_path : keys)
         prepare (base_path);
 }
 
 void ExcludedFiles.prepare (Base_path_string & base_path) {
-    Q_ASSERT (_all_excludes.contains (base_path));
+    Q_ASSERT (this.all_excludes.contains (base_path));
 
     // Build regular expressions for the different cases.
     //
-    // To compose the _bname_traversal_regex, _full_traversal_regex and _full_regex
+    // To compose the this.bname_traversal_regex, this.full_traversal_regex and this.full_regex
     // patterns we collect several subgroups of patterns here.
     //
     // * The "full" group will contain all patterns that contain a non-trailing
     //   slash. They only make sense in the full_regex and full_traversal_regex.
     // * The "bname" group contains all patterns without a non-trailing slash.
-    //   These need separate handling in the _full_regex (slash-containing
+    //   These need separate handling in the this.full_regex (slash-containing
     //   patterns must be anchored to the front, these don't need it)
     // * The "bname_trigger" group contains the bname part of all patterns in the
-    //   "full" group. These and the "bname" group become _bname_traversal_regex.
+    //   "full" group. These and the "bname" group become this.bname_traversal_regex.
     //
     // To complicate matters, the exclude patterns have two binary attributes
     // meaning we'll end up with 4 variants:
@@ -1016,7 +1013,7 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
         pattern.append (append_me);
     };
 
-    for (var exclude : _all_excludes.value (base_path)) {
+    for (var exclude : this.all_excludes.value (base_path)) {
         if (exclude[0] == '\n') {
             continue; // empty line
         }
@@ -1037,28 +1034,28 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
         bool full_path = exclude.contains ('/');
 
         /* Use QRegularExpression, append to the right pattern */
-        var &bname_file_dir = remove_excluded ? bname_file_dir_remove : bname_file_dir_keep;
-        var &bname_dir = remove_excluded ? bname_dir_remove : bname_dir_keep;
-        var &full_file_dir = remove_excluded ? full_file_dir_remove : full_file_dir_keep;
-        var &full_dir = remove_excluded ? full_dir_remove : full_dir_keep;
+        var bname_file_dir = remove_excluded ? bname_file_dir_remove : bname_file_dir_keep;
+        var bname_dir = remove_excluded ? bname_dir_remove : bname_dir_keep;
+        var full_file_dir = remove_excluded ? full_file_dir_remove : full_file_dir_keep;
+        var full_dir = remove_excluded ? full_dir_remove : full_dir_keep;
 
         if (full_path) {
-            // The full pattern is matched against a path relative to _local_path, however exclude is
+            // The full pattern is matched against a path relative to this.local_path, however exclude is
             // relative to base_path at this point.
-            // We know for sure that both _local_path and base_path are absolute and that base_path is
-            // contained in _local_path. So we can simply remove it from the begining.
-            var rel_path = base_path.mid (_local_path.size ());
-            // Make exclude relative to _local_path
+            // We know for sure that both this.local_path and base_path are absolute and that base_path is
+            // contained in this.local_path. So we can simply remove it from the begining.
+            var rel_path = base_path.mid (this.local_path.size ());
+            // Make exclude relative to this.local_path
             exclude.prepend (rel_path);
         }
-        var regex_exclude = convert_to_regexp_syntax (exclude, _wildcards_match_slash);
+        var regex_exclude = convert_to_regexp_syntax (exclude, this.wildcards_match_slash);
         if (!full_path) {
             regex_append (bname_file_dir, bname_dir, regex_exclude, match_dir_only);
         } else {
             regex_append (full_file_dir, full_dir, regex_exclude, match_dir_only);
 
             // For activation, trigger on the 'bname' part of the full pattern.
-            string bname_exclude = extract_bname_trigger (exclude, _wildcards_match_slash);
+            string bname_exclude = extract_bname_trigger (exclude, this.wildcards_match_slash);
             var regex_bname = convert_to_regexp_syntax (bname_exclude, true);
             regex_append (bname_trigger_file_dir, bname_trigger_dir, regex_bname, match_dir_only);
         }
@@ -1087,12 +1084,12 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
     // (exclude)| (excluderemove)| (bname triggers).
     // If the third group matches, the full_activated_regex needs to be applied
     // to the full path.
-    _bname_traversal_regex_file[base_path].set_pattern (
+    this.bname_traversal_regex_file[base_path].set_pattern (
         QStringLiteral ("^ (?P<exclude>%1)$|"
                        "^ (?P<excluderemove>%2)$|"
                        "^ (?P<trigger>%3)$")
             .arg (bname_file_dir_keep, bname_file_dir_remove, bname_trigger_file_dir));
-    _bname_traversal_regex_dir[base_path].set_pattern (
+    this.bname_traversal_regex_dir[base_path].set_pattern (
         QStringLiteral ("^ (?P<exclude>%1|%2)$|"
                        "^ (?P<excluderemove>%3|%4)$|"
                        "^ (?P<trigger>%5|%6)$")
@@ -1102,13 +1099,13 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
     // the bname regex matches. Its basic form is (exclude)| (excluderemove)".
     // This pattern can be much simpler than full_regex since we can assume a traversal
     // situation and doesn't need to look for bname patterns in parent paths.
-    _full_traversal_regex_file[base_path].set_pattern (
+    this.full_traversal_regex_file[base_path].set_pattern (
         // Full patterns are anchored to the beginning
         QStringLiteral ("^ (?P<exclude>%1) (?:$|/)"
                        "|"
                        "^ (?P<excluderemove>%2) (?:$|/)")
             .arg (full_file_dir_keep, full_file_dir_remove));
-    _full_traversal_regex_dir[base_path].set_pattern (
+    this.full_traversal_regex_dir[base_path].set_pattern (
         QStringLiteral ("^ (?P<exclude>%1|%2) (?:$|/)"
                        "|"
                        "^ (?P<excluderemove>%3|%4) (?:$|/)")
@@ -1116,7 +1113,7 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
 
     // The full regex is applied to the full path and incorporates both bname and
     // full-path patterns. It has the form " (exclude)| (excluderemove)".
-    _full_regex_file[base_path].set_pattern (
+    this.full_regex_file[base_path].set_pattern (
         QStringLiteral (" (?P<exclude>"
                        // Full patterns are anchored to the beginning
                        "^ (?:%1) (?:$|/)|"
@@ -1131,7 +1128,7 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
                        " (?:^|/) (?:%5) (?:$|/)|"
                        " (?:^|/) (?:%6)/)")
             .arg (full_file_dir_keep, bname_file_dir_keep, bname_dir_keep, full_file_dir_remove, bname_file_dir_remove, bname_dir_remove));
-    _full_regex_dir[base_path].set_pattern (
+    this.full_regex_dir[base_path].set_pattern (
         QStringLiteral (" (?P<exclude>"
                        "^ (?:%1|%2) (?:$|/)|"
                        " (?:^|/) (?:%3|%4) (?:$|/))"
@@ -1144,16 +1141,16 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
     QRegularExpression.Pattern_options pattern_options = QRegularExpression.No_pattern_option;
     if (Occ.Utility.fs_case_preserving ())
         pattern_options |= QRegularExpression.Case_insensitive_option;
-    _bname_traversal_regex_file[base_path].set_pattern_options (pattern_options);
-    _bname_traversal_regex_file[base_path].optimize ();
-    _bname_traversal_regex_dir[base_path].set_pattern_options (pattern_options);
-    _bname_traversal_regex_dir[base_path].optimize ();
-    _full_traversal_regex_file[base_path].set_pattern_options (pattern_options);
-    _full_traversal_regex_file[base_path].optimize ();
-    _full_traversal_regex_dir[base_path].set_pattern_options (pattern_options);
-    _full_traversal_regex_dir[base_path].optimize ();
-    _full_regex_file[base_path].set_pattern_options (pattern_options);
-    _full_regex_file[base_path].optimize ();
-    _full_regex_dir[base_path].set_pattern_options (pattern_options);
-    _full_regex_dir[base_path].optimize ();
+    this.bname_traversal_regex_file[base_path].set_pattern_options (pattern_options);
+    this.bname_traversal_regex_file[base_path].optimize ();
+    this.bname_traversal_regex_dir[base_path].set_pattern_options (pattern_options);
+    this.bname_traversal_regex_dir[base_path].optimize ();
+    this.full_traversal_regex_file[base_path].set_pattern_options (pattern_options);
+    this.full_traversal_regex_file[base_path].optimize ();
+    this.full_traversal_regex_dir[base_path].set_pattern_options (pattern_options);
+    this.full_traversal_regex_dir[base_path].optimize ();
+    this.full_regex_file[base_path].set_pattern_options (pattern_options);
+    this.full_regex_file[base_path].optimize ();
+    this.full_regex_dir[base_path].set_pattern_options (pattern_options);
+    this.full_regex_dir[base_path].optimize ();
 }

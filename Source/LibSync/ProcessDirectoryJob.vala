@@ -64,22 +64,22 @@ class ProcessDirectoryJob : GLib.Object {
     public ProcessDirectoryJob (DiscoveryPhase data, PinState base_pin_state,
         int64 last_sync_timestamp, GLib.Object parent)
         : GLib.Object (parent)
-        , _last_sync_timestamp (last_sync_timestamp)
-        , _discovery_data (data) {
+        , this.last_sync_timestamp (last_sync_timestamp)
+        , this.discovery_data (data) {
         compute_pin_state (base_pin_state);
     }
 
     /// For creating subjobs
-    public ProcessDirectoryJob (PathTuple &path, SyncFileItemPtr &dir_item,
+    public ProcessDirectoryJob (PathTuple path, SyncFileItemPtr dir_item,
         Query_mode query_local, Query_mode query_server, int64 last_sync_timestamp,
         ProcessDirectoryJob parent)
         : GLib.Object (parent)
-        , _dir_item (dir_item)
-        , _last_sync_timestamp (last_sync_timestamp)
-        , _query_server (query_server)
-        , _query_local (query_local)
-        , _discovery_data (parent._discovery_data)
-        , _current_folder (path) {
+        , this.dir_item (dir_item)
+        , this.last_sync_timestamp (last_sync_timestamp)
+        , this.query_server (query_server)
+        , this.query_local (query_local)
+        , this.discovery_data (parent._discovery_data)
+        , this.current_folder (path) {
         compute_pin_state (parent._pin_state);
     }
 
@@ -95,20 +95,20 @@ class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void set_inside_encrypted_tree (bool is_inside_encrypted_tree) {
-        _is_inside_encrypted_tree = is_inside_encrypted_tree;
+        this.is_inside_encrypted_tree = is_inside_encrypted_tree;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_inside_encrypted_tree () {
-        return _is_inside_encrypted_tree;
+        return this.is_inside_encrypted_tree;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public SyncFileItemPtr _dir_item;
+    public SyncFileItemPtr this.dir_item;
 
 
     /***********************************************************
@@ -128,7 +128,7 @@ class ProcessDirectoryJob : GLib.Object {
     These strings never on_start or ends with slashes. They are all relative to the fo
     Usually they are all the same and are even shared instance of the s
 
-    _server and _local path
+    this.server and this.local path
       remote renamed A/ to
         target :   B/Y/file
         original : A/X/file
@@ -136,36 +136,36 @@ class ProcessDirectoryJob : GLib.Object {
         server :   B/X/file
     ***********************************************************/
     private struct PathTuple {
-        string _original; // Path as in the DB (before the sync)
-        string _target; // Path that will be the result after the sync (and will be in the DB)
-        string _server; // Path on the server (before the sync)
-        string _local; // Path locally (before the sync)
+        string this.original; // Path as in the DB (before the sync)
+        string this.target; // Path that will be the result after the sync (and will be in the DB)
+        string this.server; // Path on the server (before the sync)
+        string this.local; // Path locally (before the sync)
         static string path_append (string base, string name) {
             return base.is_empty () ? name : base + '/' + name;
         }
         PathTuple add_name (string name) {
             PathTuple result;
-            result._original = path_append (_original, name);
+            result._original = path_append (this.original, name);
             var build_string = [&] (string other) {
                 // Optimize by trying to keep all string implicitly shared if they are the same (common case)
-                return other == _original ? result._original : path_append (other, name);
+                return other == this.original ? result._original : path_append (other, name);
             };
-            result._target = build_string (_target);
-            result._server = build_string (_server);
-            result._local = build_string (_local);
+            result._target = build_string (this.target);
+            result._server = build_string (this.server);
+            result._local = build_string (this.local);
             return result;
         }
     };
 
     /***********************************************************
     ***********************************************************/
-    private bool check_for_invalid_file_name (PathTuple &path, std.map<string, Entries> &entries, Entries &entry);
+    private bool check_for_invalid_filename (PathTuple path, GLib.HashMap<string, Entries> entries, Entries entry);
 
 
     /***********************************************************
     Iterate over entries inside the directory (non-recursively).
 
-    Called once _server_entries and _local_entries are filled
+    Called once this.server_entries and this.local_entries are filled
     Calls process_file () for each non-excluded one.
     Will on_start scheduling subdir jobs when done.
     ***********************************************************/
@@ -188,16 +188,16 @@ class ProcessDirectoryJob : GLib.Object {
     private void process_file (PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// process_file helper for when remote information is available, typically flows into Analyze_local_info when done
-    private void process_file_analyze_remote_info (SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
+    private void process_file_analyze_remote_info (SyncFileItemPtr item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// process_file helper for reconciling local changes
-    private void process_file_analyze_local_info (SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &, Query_mode recurse_query_server);
+    private void process_file_analyze_local_info (SyncFileItemPtr item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &, Query_mode recurse_query_server);
 
     /// process_file helper for local/remote conflicts
-    private void process_file_conflict (SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
+    private void process_file_conflict (SyncFileItemPtr item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// process_file helper for common final processing
-    private void process_file_finalize (SyncFileItemPtr &item, PathTuple, bool recurse, Query_mode recurse_query_local, Query_mode recurse_query_server);
+    private void process_file_finalize (SyncFileItemPtr item, PathTuple, bool recurse, Query_mode recurse_query_local, Query_mode recurse_query_server);
 
 
     /***********************************************************
@@ -205,7 +205,7 @@ class ProcessDirectoryJob : GLib.Object {
     @return false indicate that this is an error and if it is a directory, one should not recurse
     inside it.
     ***********************************************************/
-    private bool check_permissions (SyncFileItemPtr &item);
+    private bool check_permissions (SyncFileItemPtr item);
 
     /***********************************************************
     ***********************************************************/
@@ -225,7 +225,7 @@ class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     private Move_permission_result check_move_permissions (RemotePermissions src_perm, string src_path, bool is_directory);
 
-    void process_blocklisted (PathTuple &, LocalInfo &, SyncJournalFileRecord &db_entry);
+    void process_blocklisted (PathTuple &, LocalInfo &, SyncJournalFileRecord db_entry);
     private void sub_job_finished ();
 
 
@@ -250,7 +250,7 @@ class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     Start a remote discovery network job
 
-    It fills _server_normal_query_entries and sets _server_query_done when done.
+    It fills this.server_normal_query_entries and sets this.server_query_done when done.
     ***********************************************************/
     private DiscoverySingleDirectoryJob start_async_server_query ();
 
@@ -258,13 +258,13 @@ class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     Discover the local directory
 
-    Fills _local_normal_query_entries.
+    Fills this.local_normal_query_entries.
     ***********************************************************/
     private void start_async_local_query ();
 
 
     /***********************************************************
-    Sets _pin_state, the directory's pin state
+    Sets this.pin_state, the directory's pin state
 
     If the folder exists locally its state is retrieved, otherwise the
     parent's pin state is inherited.
@@ -281,45 +281,45 @@ class ProcessDirectoryJob : GLib.Object {
 
     This function checks whether the combination of file type and pi
     state suggests a hydration or dehydration action and changes the
-    _type field accordingly.
+    this.type field accordingly.
     ***********************************************************/
-    private void setup_database_pin_state_actions (SyncJournalFileRecord &record);
+    private void setup_database_pin_state_actions (SyncJournalFileRecord record);
 
     /***********************************************************
     ***********************************************************/
-    private int64 _last_sync_timestamp = 0;
+    private int64 this.last_sync_timestamp = 0;
 
     /***********************************************************
     ***********************************************************/
-    private Query_mode _query_server = Query_mode.Normal_query;
-    private Query_mode _query_local = Query_mode.Normal_query;
+    private Query_mode this.query_server = Query_mode.Normal_query;
+    private Query_mode this.query_local = Query_mode.Normal_query;
 
     // Holds entries that resulted from a Normal_query
-    private QVector<RemoteInfo> _server_normal_query_entries;
-    private QVector<LocalInfo> _local_normal_query_entries;
+    private GLib.Vector<RemoteInfo> this.server_normal_query_entries;
+    private GLib.Vector<LocalInfo> this.local_normal_query_entries;
 
     // Whether the local/remote directory item queries are done. Will be set
     // even even for do-nothing (!= Normal_query) queries.
-    private bool _server_query_done = false;
-    private bool _local_query_done = false;
+    private bool this.server_query_done = false;
+    private bool this.local_query_done = false;
 
     /***********************************************************
     ***********************************************************/
-    private RemotePermissions _root_permissions;
-    private QPointer<DiscoverySingleDirectoryJob> _server_job;
+    private RemotePermissions this.root_permissions;
+    private QPointer<DiscoverySingleDirectoryJob> this.server_job;
 
 
     /***********************************************************
     Number of currently running async jobs.
 
     These "async jobs" have nothing to do with the jobs for subdirectories
-    which are being tracked by _queued_jobs and _running_jobs.
+    which are being tracked by this.queued_jobs and this.running_jobs.
 
     They are jobs that need to be completed to finish processing of direct
     entries. This variable is used to ensure this job doesn't finish while
     these jobs are still in flight.
     ***********************************************************/
-    private int _pending_async_jobs = 0;
+    private int this.pending_async_jobs = 0;
 
 
     /***********************************************************
@@ -328,44 +328,44 @@ class ProcessDirectoryJob : GLib.Object {
     The jobs are enqueued while processind directory entries and
     then gradually run via calls to process_sub_jobs ().
     ***********************************************************/
-    private std.deque<ProcessDirectoryJob> _queued_jobs;
-    private QVector<ProcessDirectoryJob> _running_jobs;
+    private std.deque<ProcessDirectoryJob> this.queued_jobs;
+    private GLib.Vector<ProcessDirectoryJob> this.running_jobs;
 
     /***********************************************************
     ***********************************************************/
-    private DiscoveryPhase _discovery_data;
+    private DiscoveryPhase this.discovery_data;
 
     /***********************************************************
     ***********************************************************/
-    private PathTuple _current_folder;
-    private bool _child_modified = false; // the directory contains modified item what would prevent deletion
-    private bool _child_ignored = false; // The directory contains ignored item that would prevent deletion
-    private PinState _pin_state = PinState.PinState.UNSPECIFIED; // The directory's pin-state, see compute_pin_state ()
-    private bool _is_inside_encrypted_tree = false; // this directory is encrypted or is within the tree of directories with root directory encrypted
+    private PathTuple this.current_folder;
+    private bool this.child_modified = false; // the directory contains modified item what would prevent deletion
+    private bool this.child_ignored = false; // The directory contains ignored item that would prevent deletion
+    private PinState this.pin_state = PinState.PinState.UNSPECIFIED; // The directory's pin-state, see compute_pin_state ()
+    private bool this.is_inside_encrypted_tree = false; // this directory is encrypted or is within the tree of directories with root directory encrypted
 
 signals:
     void on_finished ();
     // The root etag of this directory was fetched
-    void etag (GLib.ByteArray , GLib.DateTime &time);
+    void etag (GLib.ByteArray , GLib.DateTime time);
 };
 
-    bool ProcessDirectoryJob.check_for_invalid_file_name (PathTuple &path,
-        const std.map<string, Entries> &entries, Entries &entry) {
-        const var original_file_name = entry.local_entry.name;
-        const var new_file_name = original_file_name.trimmed ();
+    bool ProcessDirectoryJob.check_for_invalid_filename (PathTuple path,
+        const GLib.HashMap<string, Entries> entries, Entries entry) {
+        const var original_filename = entry.local_entry.name;
+        const var new_filename = original_filename.trimmed ();
 
-        if (original_file_name == new_file_name) {
+        if (original_filename == new_filename) {
             return true;
         }
 
-        const var entries_iter = entries.find (new_file_name);
+        const var entries_iter = entries.find (new_filename);
         if (entries_iter != entries.end ()) {
             string error_message;
-            const var new_file_name_entry = entries_iter.second;
-            if (new_file_name_entry.server_entry.is_valid ()) {
+            const var new_filename_entry = entries_iter.second;
+            if (new_filename_entry.server_entry.is_valid ()) {
                 error_message = _("File contains trailing spaces and could not be renamed, because a file with the same name already exists on the server.");
             }
-            if (new_file_name_entry.local_entry.is_valid ()) {
+            if (new_filename_entry.local_entry.is_valid ()) {
                 error_message = _("File contains trailing spaces and could not be renamed, because a file with the same name already exists locally.");
             }
 
@@ -379,48 +379,48 @@ signals:
                 item._file = path._target;
                 item._original_file = path._target;
                 item._instruction = CSYNC_INSTRUCTION_ERROR;
-                item._status = SyncFileItem.NormalError;
+                item._status = SyncFileItem.Status.NORMAL_ERROR;
                 item._error_string = error_message;
-                emit _discovery_data.item_discovered (item);
+                /* emit */ this.discovery_data.item_discovered (item);
                 return false;
             }
         }
 
-        entry.local_entry.rename_name = new_file_name;
+        entry.local_entry.rename_name = new_filename;
 
         return true;
     }
 
     void ProcessDirectoryJob.on_start () {
-        q_c_info (lc_disco) << "STARTING" << _current_folder._server << _query_server << _current_folder._local << _query_local;
+        q_c_info (lc_disco) << "STARTING" << this.current_folder._server << this.query_server << this.current_folder._local << this.query_local;
 
-        if (_query_server == Normal_query) {
-            _server_job = start_async_server_query ();
+        if (this.query_server == Normal_query) {
+            this.server_job = start_async_server_query ();
         } else {
-            _server_query_done = true;
+            this.server_query_done = true;
         }
 
         // Check whether a normal local query is even necessary
-        if (_query_local == Normal_query) {
-            if (!_discovery_data._should_discover_localy (_current_folder._local)
-                && (_current_folder._local == _current_folder._original || !_discovery_data._should_discover_localy (_current_folder._original))) {
-                _query_local = Parent_not_changed;
+        if (this.query_local == Normal_query) {
+            if (!this.discovery_data._should_discover_localy (this.current_folder._local)
+                && (this.current_folder._local == this.current_folder._original || !this.discovery_data._should_discover_localy (this.current_folder._original))) {
+                this.query_local = Parent_not_changed;
             }
         }
 
-        if (_query_local == Normal_query) {
+        if (this.query_local == Normal_query) {
             start_async_local_query ();
         } else {
-            _local_query_done = true;
+            this.local_query_done = true;
         }
 
-        if (_local_query_done && _server_query_done) {
+        if (this.local_query_done && this.server_query_done) {
             process ();
         }
     }
 
     void ProcessDirectoryJob.process () {
-        ASSERT (_local_query_done && _server_query_done);
+        ASSERT (this.local_query_done && this.server_query_done);
 
         // Build lookup tables for local, remote and database entries.
         // For suffix-virtual files, the key will normally be the base file name
@@ -428,19 +428,19 @@ signals:
         // However, if foo and foo.owncloud exists locally, there'll be "foo"
         // with local, database, server entries and "foo.owncloud" with only a local
         // entry.
-        std.map<string, Entries> entries;
-        for (var &e : _server_normal_query_entries) {
+        GLib.HashMap<string, Entries> entries;
+        for (var e : this.server_normal_query_entries) {
             entries[e.name].server_entry = std.move (e);
         }
-        _server_normal_query_entries.clear ();
+        this.server_normal_query_entries.clear ();
 
         // fetch all the name from the DB
-        var path_u8 = _current_folder._original.to_utf8 ();
-        if (!_discovery_data._statedatabase.list_files_in_path (path_u8, [&] (SyncJournalFileRecord &record) {
+        var path_u8 = this.current_folder._original.to_utf8 ();
+        if (!this.discovery_data._statedatabase.list_files_in_path (path_u8, [&] (SyncJournalFileRecord record) {
                 var name = path_u8.is_empty () ? record._path : string.from_utf8 (record._path.const_data () + (path_u8.size () + 1));
                 if (record.is_virtual_file () && is_vfs_with_suffix ())
                     chop_virtual_file_suffix (name);
-                var &db_entry = entries[name].db_entry;
+                var db_entry = entries[name].db_entry;
                 db_entry = record;
                 setup_database_pin_state_actions (db_entry);
             })) {
@@ -448,7 +448,7 @@ signals:
             return;
         }
 
-        for (var &e : _local_normal_query_entries) {
+        for (var e : this.local_normal_query_entries) {
             entries[e.name].local_entry = e;
         }
         if (is_vfs_with_suffix ()) {
@@ -456,16 +456,16 @@ signals:
             // with the non-suffixed name. Unless both names exist locally or there's
             // other data about the suffixed file.
             // This is done in a second path in order to not depend on the order of
-            // _local_normal_query_entries.
-            for (var &e : _local_normal_query_entries) {
+            // this.local_normal_query_entries.
+            for (var e : this.local_normal_query_entries) {
                 if (!e.is_virtual_file)
                     continue;
-                var &suffixed_entry = entries[e.name];
+                var suffixed_entry = entries[e.name];
                 bool has_other_data = suffixed_entry.server_entry.is_valid () || suffixed_entry.db_entry.is_valid ();
 
                 var nonvirtual_name = e.name;
                 chop_virtual_file_suffix (nonvirtual_name);
-                var &nonvirtual_entry = entries[nonvirtual_name];
+                var nonvirtual_entry = entries[nonvirtual_name];
                 // If the non-suffixed entry has no data, move it
                 if (!nonvirtual_entry.local_entry.is_valid ()) {
                     std.swap (nonvirtual_entry.local_entry, suffixed_entry.local_entry);
@@ -480,30 +480,30 @@ signals:
                 }
             }
         }
-        _local_normal_query_entries.clear ();
+        this.local_normal_query_entries.clear ();
 
         //
         // Iterate over entries and process them
         //
-        for (var &f : entries) {
-            var &e = f.second;
+        for (var f : entries) {
+            var e = f.second;
 
             PathTuple path;
-            path = _current_folder.add_name (e.name_override.is_empty () ? f.first : e.name_override);
+            path = this.current_folder.add_name (e.name_override.is_empty () ? f.first : e.name_override);
 
             if (is_vfs_with_suffix ()) {
                 // Without suffix vfs the paths would be good. But since the db_entry and local_entry
                 // can have different names from f.first when suffix vfs is on, make sure the
-                // corresponding _original and _local paths are right.
+                // corresponding this.original and this.local paths are right.
 
                 if (e.db_entry.is_valid ()) {
                     path._original = e.db_entry._path;
                 } else if (e.local_entry.is_virtual_file) {
                     // We don't have a database entry - but it should be at this path
-                    path._original = PathTuple.path_append (_current_folder._original,  e.local_entry.name);
+                    path._original = PathTuple.path_append (this.current_folder._original,  e.local_entry.name);
                 }
                 if (e.local_entry.is_valid ()) {
-                    path._local = PathTuple.path_append (_current_folder._local, e.local_entry.name);
+                    path._local = PathTuple.path_append (this.current_folder._local, e.local_entry.name);
                 } else if (e.db_entry.is_virtual_file ()) {
                     // We don't have a local entry - but it should be at this path
                     add_virtual_file_suffix (path._local);
@@ -512,10 +512,10 @@ signals:
 
             // On the server the path is mangled in case of E2EE
             if (!e.server_entry.e2e_mangled_name.is_empty ()) {
-                Q_ASSERT (_discovery_data._remote_folder.starts_with ('/'));
-                Q_ASSERT (_discovery_data._remote_folder.ends_with ('/'));
+                Q_ASSERT (this.discovery_data._remote_folder.starts_with ('/'));
+                Q_ASSERT (this.discovery_data._remote_folder.ends_with ('/'));
 
-                const var root_path = _discovery_data._remote_folder.mid (1);
+                const var root_path = this.discovery_data._remote_folder.mid (1);
                 Q_ASSERT (e.server_entry.e2e_mangled_name.starts_with (root_path));
 
                 path._server = e.server_entry.e2e_mangled_name.mid (root_path.length ());
@@ -532,34 +532,34 @@ signals:
                     e.local_entry.is_sym_link || is_server_entry_windows_shortcut))
                 continue;
 
-            if (_query_server == In_block_list || _discovery_data.is_in_selective_sync_block_list (path._original)) {
+            if (this.query_server == In_block_list || this.discovery_data.is_in_selective_sync_block_list (path._original)) {
                 process_blocklisted (path, e.local_entry, e.db_entry);
                 continue;
             }
-            if (!check_for_invalid_file_name (path, entries, e)) {
+            if (!check_for_invalid_filename (path, entries, e)) {
                 continue;
             }
             process_file (std.move (path), e.local_entry, e.server_entry, e.db_entry);
         }
-        QTimer.single_shot (0, _discovery_data, &DiscoveryPhase.schedule_more_jobs);
+        QTimer.single_shot (0, this.discovery_data, &DiscoveryPhase.schedule_more_jobs);
     }
 
     bool ProcessDirectoryJob.handle_excluded (string path, string local_name, bool is_directory, bool is_hidden, bool is_symlink) {
-        var excluded = _discovery_data._excludes.traversal_pattern_match (path, is_directory ? ItemTypeDirectory : ItemTypeFile);
+        var excluded = this.discovery_data._excludes.traversal_pattern_match (path, is_directory ? ItemTypeDirectory : ItemTypeFile);
 
         // FIXME : move to ExcludedFiles 's regexp ?
         bool is_invalid_pattern = false;
-        if (excluded == CSYNC_NOT_EXCLUDED && !_discovery_data._invalid_filename_rx.pattern ().is_empty ()) {
-            if (path.contains (_discovery_data._invalid_filename_rx)) {
+        if (excluded == CSYNC_NOT_EXCLUDED && !this.discovery_data._invalid_filename_rx.pattern ().is_empty ()) {
+            if (path.contains (this.discovery_data._invalid_filename_rx)) {
                 excluded = CSYNC_FILE_EXCLUDE_INVALID_CHAR;
                 is_invalid_pattern = true;
             }
         }
-        if (excluded == CSYNC_NOT_EXCLUDED && _discovery_data._ignore_hidden_files && is_hidden) {
+        if (excluded == CSYNC_NOT_EXCLUDED && this.discovery_data._ignore_hidden_files && is_hidden) {
             excluded = CSYNC_FILE_EXCLUDE_HIDDEN;
         }
         if (excluded == CSYNC_NOT_EXCLUDED && !local_name.is_empty ()
-                && _discovery_data._server_blocklisted_files.contains (local_name)) {
+                && this.discovery_data._server_blocklisted_files.contains (local_name)) {
             excluded = CSYNC_FILE_EXCLUDE_SERVER_BLOCKLISTED;
             is_invalid_pattern = true;
         }
@@ -581,7 +581,7 @@ signals:
         if (excluded == CSYNC_NOT_EXCLUDED && !is_symlink) {
             return false;
         } else if (excluded == CSYNC_FILE_SILENTLY_EXCLUDED || excluded == CSYNC_FILE_EXCLUDE_AND_REMOVE) {
-            emit _discovery_data.silently_excluded (path);
+            /* emit */ this.discovery_data.silently_excluded (path);
             return true;
         }
 
@@ -621,15 +621,15 @@ signals:
                         item._error_string = _("The file name is a reserved name on this file system.");
                     }
                 }
-                item._status = SyncFileItem.FileNameInvalid;
+                item._status = SyncFileItem.Status.FILENAME_INVALID;
                 break;
             case CSYNC_FILE_EXCLUDE_TRAILING_SPACE:
                 item._error_string = _("Filename contains trailing spaces.");
-                item._status = SyncFileItem.FileNameInvalid;
+                item._status = SyncFileItem.Status.FILENAME_INVALID;
                 break;
             case CSYNC_FILE_EXCLUDE_LONG_FILENAME:
                 item._error_string = _("Filename is too long.");
-                item._status = SyncFileItem.FileNameInvalid;
+                item._status = SyncFileItem.Status.FILENAME_INVALID;
                 break;
             case CSYNC_FILE_EXCLUDE_HIDDEN:
                 item._error_string = _("File/Folder is ignored because it's hidden.");
@@ -639,7 +639,7 @@ signals:
                 break;
             case CSYNC_FILE_EXCLUDE_CONFLICT:
                 item._error_string = _("Conflict : Server version downloaded, local copy renamed and not uploaded.");
-                item._status = SyncFileItem.Conflict;
+                item._status = SyncFileItem.Status.CONFLICT;
             break;
             case CSYNC_FILE_EXCLUDE_CANNOT_ENCODE:
                 item._error_string = _("The filename cannot be encoded on your file system.");
@@ -650,16 +650,16 @@ signals:
             }
         }
 
-        _child_ignored = true;
-        emit _discovery_data.item_discovered (item);
+        this.child_ignored = true;
+        /* emit */ this.discovery_data.item_discovered (item);
         return true;
     }
 
     void ProcessDirectoryJob.process_file (PathTuple path,
-        const LocalInfo &local_entry, RemoteInfo &server_entry,
-        const SyncJournalFileRecord &db_entry) {
-        const char has_server = server_entry.is_valid () ? "true" : _query_server == Parent_not_changed ? "database" : "false";
-        const char has_local = local_entry.is_valid () ? "true" : _query_local == Parent_not_changed ? "database" : "false";
+        const LocalInfo local_entry, RemoteInfo server_entry,
+        const SyncJournalFileRecord db_entry) {
+        const char has_server = server_entry.is_valid () ? "true" : this.query_server == Parent_not_changed ? "database" : "false";
+        const char has_local = local_entry.is_valid () ? "true" : this.query_local == Parent_not_changed ? "database" : "false";
         q_c_info (lc_disco).nospace () << "Processing " << path._original
                                   << " | valid : " << db_entry.is_valid () << "/" << has_local << "/" << has_server
                                   << " | mtime : " << db_entry._modtime << "/" << local_entry.modtime << "/" << server_entry.modtime
@@ -676,11 +676,11 @@ signals:
         if (local_entry.is_valid ()
             && !server_entry.is_valid ()
             && !db_entry.is_valid ()
-            && local_entry.modtime < _last_sync_timestamp) {
+            && local_entry.modtime < this.last_sync_timestamp) {
             GLib.warn (lc_disco) << "File" << path._original << "was modified before the last sync run and is not in the sync journal and server";
         }
 
-        if (_discovery_data.is_renamed (path._original)) {
+        if (this.discovery_data.is_renamed (path._original)) {
             GLib.debug (lc_disco) << "Ignoring renamed";
             return; // Ignore this.
         }
@@ -691,8 +691,8 @@ signals:
         item._previous_size = db_entry._file_size;
         item._previous_modtime = db_entry._modtime;
         if (!local_entry.rename_name.is_empty ()) {
-            if (_dir_item) {
-                item._rename_target = _dir_item._file + "/" + local_entry.rename_name;
+            if (this.dir_item) {
+                item._rename_target = this.dir_item._file + "/" + local_entry.rename_name;
             } else {
                 item._rename_target = local_entry.rename_name;
             }
@@ -718,8 +718,8 @@ signals:
                 || (local_entry.is_virtual_file && !db_entry.is_virtual_file () && has_virtual_file_suffix (db_entry._path))) {
                 item._instruction = CSYNC_INSTRUCTION_IGNORE;
                 item._error_string = _("File has extension reserved for virtual files.");
-                _child_ignored = true;
-                emit _discovery_data.item_discovered (item);
+                this.child_ignored = true;
+                /* emit */ this.discovery_data.item_discovered (item);
                 return;
             }
         }
@@ -734,22 +734,22 @@ signals:
         // Note: Normally setting the Virtual_file_download flag means that local and
         // remote will be rediscovered. This is just a fallback for a similar check
         // in process_file_analyze_remote_info ().
-        if (_query_server == Parent_not_changed
+        if (this.query_server == Parent_not_changed
             && db_entry.is_valid ()
             && (db_entry._type == ItemTypeVirtualFileDownload
                 || local_entry.type == ItemTypeVirtualFileDownload)
-            && (local_entry.is_valid () || _query_local == Parent_not_changed)) {
-            item._direction = SyncFileItem.Down;
+            && (local_entry.is_valid () || this.query_local == Parent_not_changed)) {
+            item._direction = SyncFileItem.Direction.DOWN;
             item._instruction = CSYNC_INSTRUCTION_SYNC;
             item._type = ItemTypeVirtualFileDownload;
         }
 
-        process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, _query_server);
+        process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, this.query_server);
     }
 
     // Compute the checksum of the given file and assign the result in item._checksum_header
     // Returns true if the checksum was successfully computed
-    static bool compute_local_checksum (GLib.ByteArray header, string path, SyncFileItemPtr &item) {
+    static bool compute_local_checksum (GLib.ByteArray header, string path, SyncFileItemPtr item) {
         var type = parse_checksum_header_type (header);
         if (!type.is_empty ()) {
             // TODO : compute async?
@@ -763,8 +763,8 @@ signals:
     }
 
     void ProcessDirectoryJob.process_file_analyze_remote_info (
-        const SyncFileItemPtr &item, PathTuple path, LocalInfo &local_entry,
-        const RemoteInfo &server_entry, SyncJournalFileRecord &db_entry) {
+        const SyncFileItemPtr item, PathTuple path, LocalInfo local_entry,
+        const RemoteInfo server_entry, SyncJournalFileRecord db_entry) {
         item._checksum_header = server_entry.checksum_header;
         item._file_id = server_entry.file_id;
         item._remote_perm = server_entry.remote_perm;
@@ -773,15 +773,15 @@ signals:
         item._direct_download_url = server_entry.direct_download_url;
         item._direct_download_cookies = server_entry.direct_download_cookies;
         item._is_encrypted = server_entry.is_e2e_encrypted;
-        item._encrypted_file_name = [=] {
+        item._encrypted_filename = [=] {
             if (server_entry.e2e_mangled_name.is_empty ()) {
                 return "";
             }
 
-            Q_ASSERT (_discovery_data._remote_folder.starts_with ('/'));
-            Q_ASSERT (_discovery_data._remote_folder.ends_with ('/'));
+            Q_ASSERT (this.discovery_data._remote_folder.starts_with ('/'));
+            Q_ASSERT (this.discovery_data._remote_folder.ends_with ('/'));
 
-            const var root_path = _discovery_data._remote_folder.mid (1);
+            const var root_path = this.discovery_data._remote_folder.mid (1);
             Q_ASSERT (server_entry.e2e_mangled_name.starts_with (root_path));
             return server_entry.e2e_mangled_name.mid (root_path.length ());
         } ();
@@ -798,9 +798,9 @@ signals:
                 missing_data.append (_("file id"));
             if (!missing_data.is_empty ()) {
                 item._instruction = CSYNC_INSTRUCTION_ERROR;
-                _child_ignored = true;
+                this.child_ignored = true;
                 item._error_string = _("Server reported no %1").arg (missing_data.join (QLatin1String (", ")));
-                emit _discovery_data.item_discovered (item);
+                /* emit */ this.discovery_data.item_discovered (item);
                 return;
             }
         }
@@ -817,37 +817,37 @@ signals:
                 // If the type of the entity changed, it's like NEW, but
                 // needs to delete the other entity first.
                 item._instruction = CSYNC_INSTRUCTION_TYPE_CHANGE;
-                item._direction = SyncFileItem.Down;
+                item._direction = SyncFileItem.Direction.DOWN;
                 item._modtime = server_entry.modtime;
                 item._size = size_on_server;
             } else if ( (db_entry._type == ItemTypeVirtualFileDownload || local_entry.type == ItemTypeVirtualFileDownload)
-                && (local_entry.is_valid () || _query_local == Parent_not_changed)) {
+                && (local_entry.is_valid () || this.query_local == Parent_not_changed)) {
                 // The above check for the local_entry existing is important. Otherwise it breaks
                 // the case where a file is moved and simultaneously tagged for download in the database.
-                item._direction = SyncFileItem.Down;
+                item._direction = SyncFileItem.Direction.DOWN;
                 item._instruction = CSYNC_INSTRUCTION_SYNC;
                 item._type = ItemTypeVirtualFileDownload;
             } else if (db_entry._etag != server_entry.etag) {
-                item._direction = SyncFileItem.Down;
+                item._direction = SyncFileItem.Direction.DOWN;
                 item._modtime = server_entry.modtime;
                 item._size = size_on_server;
                 if (server_entry.is_directory) {
                     ENFORCE (db_entry.is_directory ());
                     item._instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
-                } else if (!local_entry.is_valid () && _query_local != Parent_not_changed) {
+                } else if (!local_entry.is_valid () && this.query_local != Parent_not_changed) {
                     // Deleted locally, changed on server
                     item._instruction = CSYNC_INSTRUCTION_NEW;
                 } else {
                     item._instruction = CSYNC_INSTRUCTION_SYNC;
                 }
             } else if (db_entry._modtime <= 0 && server_entry.modtime > 0) {
-                item._direction = SyncFileItem.Down;
+                item._direction = SyncFileItem.Direction.DOWN;
                 item._modtime = server_entry.modtime;
                 item._size = size_on_server;
                 if (server_entry.is_directory) {
                     ENFORCE (db_entry.is_directory ());
                     item._instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
-                } else if (!local_entry.is_valid () && _query_local != Parent_not_changed) {
+                } else if (!local_entry.is_valid () && this.query_local != Parent_not_changed) {
                     // Deleted locally, changed on server
                     item._instruction = CSYNC_INSTRUCTION_NEW;
                 } else {
@@ -860,16 +860,16 @@ signals:
                     item._size = size_on_server;
                 }
                 item._instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
-                item._direction = SyncFileItem.Down;
+                item._direction = SyncFileItem.Direction.DOWN;
             } else {
                 // if (is virtual mode enabled and folder is encrypted - check if the size is the same as on the server and then - trigger server query
                 // to update a placeholder with corrected size (-16 Bytes)
                 // or, maybe, add a flag to the database - vfs_e2ee_size_corrected? if it is not set - subtract it from the placeholder's size and re-create/update a placeholder?
-                const Query_mode server_query_mode = [this, &db_entry, &server_entry] () {
-                    const bool is_vfs_mode_on = _discovery_data && _discovery_data._sync_options._vfs && _discovery_data._sync_options._vfs.mode () != Vfs.Off;
+                const Query_mode server_query_mode = [this, db_entry, server_entry] () {
+                    const bool is_vfs_mode_on = this.discovery_data && this.discovery_data._sync_options._vfs && this.discovery_data._sync_options._vfs.mode () != Vfs.Off;
                     if (is_vfs_mode_on && db_entry.is_directory () && db_entry._is_e2e_encrypted) {
                         int64 local_folder_size = 0;
-                        const var list_files_callback = [&local_folder_size] (Occ.SyncJournalFileRecord &record) {
+                        const var list_files_callback = [&local_folder_size] (Occ.SyncJournalFileRecord record) {
                             if (record.is_file ()) {
                                 // add Constants.E2EE_TAG_SIZE so we will know the size of E2EE file on the server
                                 local_folder_size += record._file_size + Constants.E2EE_TAG_SIZE;
@@ -879,7 +879,7 @@ signals:
                             }
                         };
 
-                        const bool list_files_succeeded = _discovery_data._statedatabase.list_files_in_path (db_entry.path ().to_utf8 (), list_files_callback);
+                        const bool list_files_succeeded = this.discovery_data._statedatabase.list_files_in_path (db_entry.path ().to_utf8 (), list_files_callback);
 
                         if (list_files_succeeded && local_folder_size != 0 && local_folder_size == server_entry.size_of_folder) {
                             q_c_info (lc_disco) << "Migration of E2EE folder " << db_entry.path () << " from older version to the one, supporting the implicit VFS hydration.";
@@ -893,7 +893,7 @@ signals:
                 return;
             }
 
-            process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, _query_server);
+            process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, this.query_server);
             return;
         }
 
@@ -901,36 +901,36 @@ signals:
         Q_ASSERT (!db_entry.is_valid ());
 
         item._instruction = CSYNC_INSTRUCTION_NEW;
-        item._direction = SyncFileItem.Down;
+        item._direction = SyncFileItem.Direction.DOWN;
         item._modtime = server_entry.modtime;
         item._size = server_entry.size;
 
         var post_process_server_new = [=] () mutable {
             if (item.is_directory ()) {
-                _pending_async_jobs++;
-                _discovery_data.check_selective_sync_new_folder (path._server, server_entry.remote_perm,
+                this.pending_async_jobs++;
+                this.discovery_data.check_selective_sync_new_folder (path._server, server_entry.remote_perm,
                     [=] (bool result) {
-                        --_pending_async_jobs;
+                        --this.pending_async_jobs;
                         if (!result) {
-                            process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, _query_server);
+                            process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, this.query_server);
                         }
-                        QTimer.single_shot (0, _discovery_data, &DiscoveryPhase.schedule_more_jobs);
+                        QTimer.single_shot (0, this.discovery_data, &DiscoveryPhase.schedule_more_jobs);
                     });
                 return;
             }
             // Turn new remote files into virtual files if the option is enabled.
-            var &opts = _discovery_data._sync_options;
+            var opts = this.discovery_data._sync_options;
             if (!local_entry.is_valid ()
                 && item._type == ItemTypeFile
                 && opts._vfs.mode () != Vfs.Off
-                && _pin_state != PinState.PinState.ALWAYS_LOCAL
+                && this.pin_state != PinState.PinState.ALWAYS_LOCAL
                 && !FileSystem.is_exclude_file (item._file)) {
                 item._type = ItemTypeVirtualFile;
                 if (is_vfs_with_suffix ())
                     add_virtual_file_suffix (path._original);
             }
 
-            if (opts._vfs.mode () != Vfs.Off && !item._encrypted_file_name.is_empty ()) {
+            if (opts._vfs.mode () != Vfs.Off && !item._encrypted_filename.is_empty ()) {
                 // We are syncing a file for the first time (local entry is invalid) and it is encrypted file that will be virtual once synced
                 // to avoid having error of "file has changed during sync" when trying to hydrate it excplicitly - we must remove Constants.E2EE_TAG_SIZE bytes from the end
                 // as explicit hydration does not care if these bytes are present in the placeholder or not, but, the size must not change in the middle of the sync
@@ -938,7 +938,7 @@ signals:
                 // another scenario - we are syncing a file which is on disk but not in the database (database was removed or file was not written there yet)
                 item._size = server_entry.size - Constants.E2EE_TAG_SIZE;
             }
-            process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, _query_server);
+            process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, this.query_server);
         };
 
         // Potential NEW/NEW conflict is handled in Analyze_local
@@ -954,7 +954,7 @@ signals:
         bool done = false;
         bool async = false;
         // This function will be executed for every candidate
-        var rename_candidate_processing = [&] (Occ.SyncJournalFileRecord &base) {
+        var rename_candidate_processing = [&] (Occ.SyncJournalFileRecord base) {
             if (done)
                 return;
             if (!base.is_valid ())
@@ -993,7 +993,7 @@ signals:
             // Now we know there is a sane rename candidate.
             string original_path = base.path ();
 
-            if (_discovery_data.is_renamed (original_path)) {
+            if (this.discovery_data.is_renamed (original_path)) {
                 q_c_info (lc_disco, "folder already has a rename entry, skipping");
                 return;
             }
@@ -1006,11 +1006,11 @@ signals:
                 return;
             }
 
-            string original_path_adjusted = _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Up);
+            string original_path_adjusted = this.discovery_data.adjust_renamed_path (original_path, SyncFileItem.Direction.UP);
 
             if (!base.is_directory ()) {
                 csync_file_stat_t buf;
-                if (csync_vio_local_stat (_discovery_data._local_dir + original_path_adjusted, &buf)) {
+                if (csync_vio_local_stat (this.discovery_data._local_dir + original_path_adjusted, buf)) {
                     q_c_info (lc_disco) << "Local file does not exist anymore." << original_path_adjusted;
                     return;
                 }
@@ -1021,7 +1021,7 @@ signals:
                     return;
                 }
             } else {
-                if (!QFileInfo (_discovery_data._local_dir + original_path_adjusted).is_dir ()) {
+                if (!QFileInfo (this.discovery_data._local_dir + original_path_adjusted).is_dir ()) {
                     q_c_info (lc_disco) << "Local directory does not exist anymore." << original_path_adjusted;
                     return;
                 }
@@ -1032,15 +1032,15 @@ signals:
                 item._type = ItemTypeVirtualFile;
             }
 
-            bool was_deleted_on_server = _discovery_data.find_and_cancel_deleted_job (original_path).first;
+            bool was_deleted_on_server = this.discovery_data.find_and_cancel_deleted_job (original_path).first;
 
-            var post_process_rename = [this, item, base, original_path] (PathTuple &path) {
-                var adjusted_original_path = _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Up);
-                _discovery_data._renamed_items_remote.insert (original_path, path._target);
+            var post_process_rename = [this, item, base, original_path] (PathTuple path) {
+                var adjusted_original_path = this.discovery_data.adjust_renamed_path (original_path, SyncFileItem.Direction.UP);
+                this.discovery_data._renamed_items_remote.insert (original_path, path._target);
                 item._modtime = base._modtime;
                 item._inode = base._inode;
                 item._instruction = CSYNC_INSTRUCTION_RENAME;
-                item._direction = SyncFileItem.Down;
+                item._direction = SyncFileItem.Direction.DOWN;
                 item._rename_target = path._target;
                 item._file = adjusted_original_path;
                 item._original_file = original_path;
@@ -1054,14 +1054,14 @@ signals:
                 done = true;
             } else {
                 // we need to make a request to the server to know that the original file is deleted on the server
-                _pending_async_jobs++;
-                var job = new RequestEtagJob (_discovery_data._account, _discovery_data._remote_folder + original_path, this);
-                connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> &etag) mutable {
-                    _pending_async_jobs--;
-                    QTimer.single_shot (0, _discovery_data, &DiscoveryPhase.schedule_more_jobs);
+                this.pending_async_jobs++;
+                var job = new RequestEtagJob (this.discovery_data._account, this.discovery_data._remote_folder + original_path, this);
+                connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> etag) mutable {
+                    this.pending_async_jobs--;
+                    QTimer.single_shot (0, this.discovery_data, &DiscoveryPhase.schedule_more_jobs);
                     if (etag || etag.error ().code != 404 ||
                         // Somehow another item claimed this original path, consider as if it existed
-                        _discovery_data.is_renamed (original_path)) {
+                        this.discovery_data.is_renamed (original_path)) {
                         // If the file exist or if there is another error, consider it is a new file.
                         post_process_server_new ();
                         return;
@@ -1070,17 +1070,17 @@ signals:
                     // The file do not exist, it is a rename
 
                     // In case the deleted item was discovered in parallel
-                    _discovery_data.find_and_cancel_deleted_job (original_path);
+                    this.discovery_data.find_and_cancel_deleted_job (original_path);
 
                     post_process_rename (path);
-                    process_file_finalize (item, path, item.is_directory (), item._instruction == CSYNC_INSTRUCTION_RENAME ? Normal_query : Parent_dont_exist, _query_server);
+                    process_file_finalize (item, path, item.is_directory (), item._instruction == CSYNC_INSTRUCTION_RENAME ? Normal_query : Parent_dont_exist, this.query_server);
                 });
                 job.on_start ();
                 done = true; // Ideally, if the origin still exist on the server, we should continue searching...  but that'd be difficult
                 async = true;
             }
         };
-        if (!_discovery_data._statedatabase.get_file_records_by_file_id (server_entry.file_id, rename_candidate_processing)) {
+        if (!this.discovery_data._statedatabase.get_file_records_by_file_id (server_entry.file_id, rename_candidate_processing)) {
             db_error ();
             return;
         }
@@ -1092,14 +1092,14 @@ signals:
             post_process_server_new ();
             return;
         }
-        process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, _query_server);
+        process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, this.query_server);
     }
 
     void ProcessDirectoryJob.process_file_analyze_local_info (
-        const SyncFileItemPtr &item, PathTuple path, LocalInfo &local_entry,
-        const RemoteInfo &server_entry, SyncJournalFileRecord &db_entry, Query_mode recurse_query_server) {
-        bool no_server_entry = (_query_server != Parent_not_changed && !server_entry.is_valid ())
-            || (_query_server == Parent_not_changed && !db_entry.is_valid ());
+        const SyncFileItemPtr item, PathTuple path, LocalInfo local_entry,
+        const RemoteInfo server_entry, SyncJournalFileRecord db_entry, Query_mode recurse_query_server) {
+        bool no_server_entry = (this.query_server != Parent_not_changed && !server_entry.is_valid ())
+            || (this.query_server == Parent_not_changed && !db_entry.is_valid ());
 
         if (no_server_entry)
             recurse_query_server = Parent_dont_exist;
@@ -1108,7 +1108,7 @@ signals:
             || item._instruction == CSYNC_INSTRUCTION_RENAME || item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE;
 
         // Decay server modifications to UPDATE_METADATA if the local virtual exists
-        bool has_local_virtual = local_entry.is_virtual_file || (_query_local == Parent_not_changed && db_entry.is_virtual_file ());
+        bool has_local_virtual = local_entry.is_virtual_file || (this.query_local == Parent_not_changed && db_entry.is_virtual_file ());
         bool virtual_file_download = item._type == ItemTypeVirtualFileDownload;
         if (server_modified && !virtual_file_download && has_local_virtual) {
             item._instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
@@ -1120,7 +1120,7 @@ signals:
             item._type = ItemTypeVirtualFile;
         }
 
-        _child_modified |= server_modified;
+        this.child_modified |= server_modified;
 
         var on_finalize = [&] {
             bool recurse = item.is_directory () || local_entry.is_directory || server_entry.is_directory;
@@ -1128,31 +1128,31 @@ signals:
             // conflict we don't need to recurse into it. (local c1.owncloud, c1/ ; remote : c1)
             if (item._instruction == CSYNC_INSTRUCTION_CONFLICT && !item.is_directory ())
                 recurse = false;
-            if (_query_local != Normal_query && _query_server != Normal_query)
+            if (this.query_local != Normal_query && this.query_server != Normal_query)
                 recurse = false;
 
-            var recurse_query_local = _query_local == Parent_not_changed ? Parent_not_changed : local_entry.is_directory || item._instruction == CSYNC_INSTRUCTION_RENAME ? Normal_query : Parent_dont_exist;
+            var recurse_query_local = this.query_local == Parent_not_changed ? Parent_not_changed : local_entry.is_directory || item._instruction == CSYNC_INSTRUCTION_RENAME ? Normal_query : Parent_dont_exist;
             process_file_finalize (item, path, recurse, recurse_query_local, recurse_query_server);
         };
 
         if (!local_entry.is_valid ()) {
-            if (_query_local == Parent_not_changed && db_entry.is_valid ()) {
+            if (this.query_local == Parent_not_changed && db_entry.is_valid ()) {
                 // Not modified locally (Parent_not_changed)
                 if (no_server_entry) {
                     // not on the server : Removed on the server, delete locally
                     q_c_info (lc_disco) << "File" << item._file << "is not anymore on server. Going to delete it locally.";
                     item._instruction = CSYNC_INSTRUCTION_REMOVE;
-                    item._direction = SyncFileItem.Down;
+                    item._direction = SyncFileItem.Direction.DOWN;
                 } else if (db_entry._type == ItemTypeVirtualFileDehydration) {
                     // dehydration requested
-                    item._direction = SyncFileItem.Down;
+                    item._direction = SyncFileItem.Direction.DOWN;
                     item._instruction = CSYNC_INSTRUCTION_SYNC;
                     item._type = ItemTypeVirtualFileDehydration;
                 }
             } else if (no_server_entry) {
                 // Not locally, not on the server. The entry is stale!
                 q_c_info (lc_disco) << "Stale DB entry";
-                _discovery_data._statedatabase.delete_file_record (path._original, true);
+                this.discovery_data._statedatabase.delete_file_record (path._original, true);
                 return;
             } else if (db_entry._type == ItemTypeVirtualFile && is_vfs_with_suffix ()) {
                 // If the virtual file is removed, recreate it.
@@ -1160,14 +1160,14 @@ signals:
                 // and we don't want users to accidentally delete server data because they
                 // might not expect that deleting the placeholder will have a remote effect.
                 item._instruction = CSYNC_INSTRUCTION_NEW;
-                item._direction = SyncFileItem.Down;
+                item._direction = SyncFileItem.Direction.DOWN;
                 item._type = ItemTypeVirtualFile;
             } else if (!server_modified) {
                 // Removed locally : also remove on the server.
                 if (!db_entry._server_has_ignored_files) {
                     q_c_info (lc_disco) << "File" << item._file << "was deleted locally. Going to delete it on the server.";
                     item._instruction = CSYNC_INSTRUCTION_REMOVE;
-                    item._direction = SyncFileItem.Up;
+                    item._direction = SyncFileItem.Direction.UP;
                 }
             }
 
@@ -1184,14 +1184,14 @@ signals:
             if (!type_change && local_entry.is_virtual_file) {
                 if (no_server_entry) {
                     item._instruction = CSYNC_INSTRUCTION_REMOVE;
-                    item._direction = SyncFileItem.Down;
+                    item._direction = SyncFileItem.Direction.DOWN;
                 } else if (!db_entry.is_virtual_file () && is_vfs_with_suffix ()) {
                     // If we find what looks to be a spurious "abc.owncloud" the base file "abc"
                     // might have been renamed to that. Make sure that the base file is not
                     // deleted from the server.
                     if (db_entry._modtime == local_entry.modtime && db_entry._file_size == local_entry.size) {
                         q_c_info (lc_disco) << "Base file was renamed to virtual file:" << item._file;
-                        item._direction = SyncFileItem.Down;
+                        item._direction = SyncFileItem.Direction.DOWN;
                         item._instruction = CSYNC_INSTRUCTION_SYNC;
                         item._type = ItemTypeVirtualFileDehydration;
                         add_virtual_file_suffix (item._file);
@@ -1206,16 +1206,16 @@ signals:
                 if (no_server_entry) {
                     q_c_info (lc_disco) << "File" << item._file << "is not anymore on server. Going to delete it locally.";
                     item._instruction = CSYNC_INSTRUCTION_REMOVE;
-                    item._direction = SyncFileItem.Down;
+                    item._direction = SyncFileItem.Direction.DOWN;
                 } else if (db_entry._type == ItemTypeVirtualFileDehydration || local_entry.type == ItemTypeVirtualFileDehydration) {
-                    item._direction = SyncFileItem.Down;
+                    item._direction = SyncFileItem.Direction.DOWN;
                     item._instruction = CSYNC_INSTRUCTION_SYNC;
                     item._type = ItemTypeVirtualFileDehydration;
                 } else if (!server_modified
                     && (db_entry._inode != local_entry.inode
-                        || _discovery_data._sync_options._vfs.needs_metadata_update (*item))) {
+                        || this.discovery_data._sync_options._vfs.needs_metadata_update (*item))) {
                     item._instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
-                    item._direction = SyncFileItem.Down;
+                    item._direction = SyncFileItem.Direction.DOWN;
                 }
             } else if (!type_change && is_vfs_with_suffix ()
                 && db_entry.is_virtual_file () && !local_entry.is_virtual_file
@@ -1224,7 +1224,7 @@ signals:
                 && local_entry.size == 1) {
                 // A suffix vfs file can be downloaded by renaming it to remove the suffix.
                 // This check leaks some details of Vfs_suffix, particularly the size of placeholders.
-                item._direction = SyncFileItem.Down;
+                item._direction = SyncFileItem.Direction.DOWN;
                 if (no_server_entry) {
                     item._instruction = CSYNC_INSTRUCTION_REMOVE;
                     item._type = ItemTypeFile;
@@ -1243,20 +1243,20 @@ signals:
                 process_file_conflict (item, path, local_entry, server_entry, db_entry);
             } else if (type_change) {
                 item._instruction = CSYNC_INSTRUCTION_TYPE_CHANGE;
-                item._direction = SyncFileItem.Up;
+                item._direction = SyncFileItem.Direction.UP;
                 item._checksum_header.clear ();
                 item._size = local_entry.size;
                 item._modtime = local_entry.modtime;
                 item._type = local_entry.is_directory ? ItemTypeDirectory : ItemTypeFile;
-                _child_modified = true;
+                this.child_modified = true;
             } else if (db_entry._modtime > 0 && local_entry.modtime <= 0) {
                 item._instruction = CSYNC_INSTRUCTION_SYNC;
-                item._direction = SyncFileItem.Down;
+                item._direction = SyncFileItem.Direction.DOWN;
                 item._size = local_entry.size > 0 ? local_entry.size : db_entry._file_size;
                 item._modtime = db_entry._modtime;
                 item._previous_modtime = db_entry._modtime;
                 item._type = local_entry.is_directory ? ItemTypeDirectory : ItemTypeFile;
-                _child_modified = true;
+                this.child_modified = true;
             } else {
                 // Local file was changed
                 item._instruction = CSYNC_INSTRUCTION_SYNC;
@@ -1264,17 +1264,17 @@ signals:
                     // Special case! deleted on server, modified on client, the instruction is then NEW
                     item._instruction = CSYNC_INSTRUCTION_NEW;
                 }
-                item._direction = SyncFileItem.Up;
+                item._direction = SyncFileItem.Direction.UP;
                 item._checksum_header.clear ();
                 item._size = local_entry.size;
                 item._modtime = local_entry.modtime;
-                _child_modified = true;
+                this.child_modified = true;
 
                 // Checksum comparison at this stage is only enabled for .eml files,
                 // check #4754 #4755
                 bool is_eml_file = path._original.ends_with (QLatin1String (".eml"), Qt.CaseInsensitive);
                 if (is_eml_file && db_entry._file_size == local_entry.size && !db_entry._checksum_header.is_empty ()) {
-                    if (compute_local_checksum (db_entry._checksum_header, _discovery_data._local_dir + path._local, item)
+                    if (compute_local_checksum (db_entry._checksum_header, this.discovery_data._local_dir + path._local, item)
                             && item._checksum_header == db_entry._checksum_header) {
                         q_c_info (lc_disco) << "Note: Checksums are identical, file did not actually change : " << path._local;
                         item._instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
@@ -1303,18 +1303,18 @@ signals:
 
         // New local file or rename
         item._instruction = CSYNC_INSTRUCTION_NEW;
-        item._direction = SyncFileItem.Up;
+        item._direction = SyncFileItem.Direction.UP;
         item._checksum_header.clear ();
         item._size = local_entry.size;
         item._modtime = local_entry.modtime;
         item._type = local_entry.is_directory ? ItemTypeDirectory : local_entry.is_virtual_file ? ItemTypeVirtualFile : ItemTypeFile;
-        _child_modified = true;
+        this.child_modified = true;
 
         var post_process_local_new = [item, local_entry, path, this] () {
             // TODO : We may want to execute the same logic for non-VFS mode, as, moving/renaming the same folder by 2 or more clients at the same time is not possible in Web UI.
             // Keeping it like this (for VFS files and folders only) just to fix a user issue.
 
-            if (! (_discovery_data && _discovery_data._sync_options._vfs && _discovery_data._sync_options._vfs.mode () != Vfs.Off)) {
+            if (! (this.discovery_data && this.discovery_data._sync_options._vfs && this.discovery_data._sync_options._vfs.mode () != Vfs.Off)) {
                 // for VFS files and folders only
                 return;
             }
@@ -1323,7 +1323,7 @@ signals:
                 return;
             }
 
-            if (local_entry.is_directory && _discovery_data._sync_options._vfs.mode () != Vfs.WindowsCfApi) {
+            if (local_entry.is_directory && this.discovery_data._sync_options._vfs.mode () != Vfs.WindowsCfApi) {
                 // for VFS folders on Windows only
                 return;
             }
@@ -1335,12 +1335,12 @@ signals:
             }
 
             // must be a dehydrated placeholder
-            const bool is_file_place_holder = !local_entry.is_directory && _discovery_data._sync_options._vfs.is_dehydrated_placeholder (_discovery_data._local_dir + path._local);
+            const bool is_file_place_holder = !local_entry.is_directory && this.discovery_data._sync_options._vfs.is_dehydrated_placeholder (this.discovery_data._local_dir + path._local);
 
             // either correct availability, or a result with error if the folder is new or otherwise has no availability set yet
-            const var folder_place_holder_availability = local_entry.is_directory ? _discovery_data._sync_options._vfs.availability (path._local) : Vfs.AvailabilityResult (Vfs.AvailabilityError.NoSuchItem);
+            const var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data._sync_options._vfs.availability (path._local) : Vfs.AvailabilityResult (Vfs.AvailabilityError.NoSuchItem);
 
-            const var folder_pin_state = local_entry.is_directory ? _discovery_data._sync_options._vfs.pin_state (path._local) : Optional<PinStateEnums.PinState> (PinState.PinState.UNSPECIFIED);
+            const var folder_pin_state = local_entry.is_directory ? this.discovery_data._sync_options._vfs.pin_state (path._local) : Optional<PinStateEnums.PinState> (PinState.PinState.UNSPECIFIED);
 
             if (!is_file_place_holder && !folder_place_holder_availability.is_valid () && !folder_pin_state.is_valid ()) {
                 // not a file placeholder and not a synced folder placeholder (new local folder)
@@ -1358,7 +1358,7 @@ signals:
                 if (local_entry.is_directory && folder_place_holder_availability.is_valid () && !is_online_only_folder) {
                     // a VFS folder but is not online0only (has some files hydrated)
                     q_c_info (lc_disco) << "Virtual directory without database entry for" << path._local << "but it contains hydrated file (s), so let's keep it and reupload.";
-                    emit _discovery_data.add_error_to_gui (SyncFileItem.SoftError, _("Conflict when uploading some files to a folder. Those, conflicted, are going to get cleared!"), path._local);
+                    /* emit */ this.discovery_data.add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading some files to a folder. Those, conflicted, are going to get cleared!"), path._local);
                     return;
                 }
                 GLib.warn (lc_disco) << "Virtual file without database entry for" << path._local
@@ -1377,20 +1377,20 @@ signals:
                 if (is_folder_pin_state_online_only && folder_pin_state.is_valid ()) {
                     q_c_info (lc_disco) << "*folder_pin_state:" << *folder_pin_state;
                 }
-                emit _discovery_data.add_error_to_gui (SyncFileItem.SoftError, _("Conflict when uploading a folder. It's going to get cleared!"), path._local);
+                /* emit */ this.discovery_data.add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading a folder. It's going to get cleared!"), path._local);
             } else {
                 q_c_info (lc_disco) << "Wiping virtual file without database entry for" << path._local;
-                emit _discovery_data.add_error_to_gui (SyncFileItem.SoftError, _("Conflict when uploading a file. It's going to get removed!"), path._local);
+                /* emit */ this.discovery_data.add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading a file. It's going to get removed!"), path._local);
             }
             item._instruction = CSYNC_INSTRUCTION_REMOVE;
-            item._direction = SyncFileItem.Down;
+            item._direction = SyncFileItem.Direction.DOWN;
             // this flag needs to be unset, otherwise a folder would get marked as new in the process_sub_jobs
-            _child_modified = false;
+            this.child_modified = false;
         };
 
         // Check if it is a move
         Occ.SyncJournalFileRecord base;
-        if (!_discovery_data._statedatabase.get_file_record_by_inode (local_entry.inode, &base)) {
+        if (!this.discovery_data._statedatabase.get_file_record_by_inode (local_entry.inode, base)) {
             db_error ();
             return;
         }
@@ -1421,7 +1421,7 @@ signals:
             }
 
             // The old file must have been deleted.
-            if (GLib.File.exists (_discovery_data._local_dir + original_path)
+            if (GLib.File.exists (this.discovery_data._local_dir + original_path)
                 // Exception : If the rename changes case only (like "foo" . "Foo") the
                 // old filename might still point to the same file.
                 && ! (Utility.fs_case_preserving ()
@@ -1433,7 +1433,7 @@ signals:
 
             // Verify the checksum where possible
             if (!base._checksum_header.is_empty () && item._type == ItemTypeFile && base._type == ItemTypeFile) {
-                if (compute_local_checksum (base._checksum_header, _discovery_data._local_dir + path._original, item)) {
+                if (compute_local_checksum (base._checksum_header, this.discovery_data._local_dir + path._original, item)) {
                     q_c_info (lc_disco) << "checking checksum of potential rename " << path._original << item._checksum_header << base._checksum_header;
                     if (item._checksum_header != base._checksum_header) {
                         q_c_info (lc_disco) << "Not a move, checksums differ";
@@ -1442,7 +1442,7 @@ signals:
                 }
             }
 
-            if (_discovery_data.is_renamed (original_path)) {
+            if (this.discovery_data.is_renamed (original_path)) {
                 q_c_info (lc_disco) << "Not a move, base path already renamed";
                 return false;
             }
@@ -1483,26 +1483,26 @@ signals:
 
             // Here we know the new location can't be uploaded : must prevent the source delete.
             // Two cases : either the source item was already processed or not.
-            var was_deleted_on_client = _discovery_data.find_and_cancel_deleted_job (original_path);
+            var was_deleted_on_client = this.discovery_data.find_and_cancel_deleted_job (original_path);
             if (was_deleted_on_client.first) {
                 // More complicated. The REMOVE is canceled. Restore will happen next sync.
                 q_c_info (lc_disco) << "Undid remove instruction on source" << original_path;
-                _discovery_data._statedatabase.delete_file_record (original_path, true);
-                _discovery_data._statedatabase.schedule_path_for_remote_discovery (original_path);
-                _discovery_data._another_sync_needed = true;
+                this.discovery_data._statedatabase.delete_file_record (original_path, true);
+                this.discovery_data._statedatabase.schedule_path_for_remote_discovery (original_path);
+                this.discovery_data._another_sync_needed = true;
             } else {
                 // Signal to future check_permissions () to forbid the REMOVE and set to restore instead
                 q_c_info (lc_disco) << "Preventing future remove on source" << original_path;
-                _discovery_data._forbidden_deletes[original_path + '/'] = true;
+                this.discovery_data._forbidden_deletes[original_path + '/'] = true;
             }
             return;
         }
 
-        var was_deleted_on_client = _discovery_data.find_and_cancel_deleted_job (original_path);
+        var was_deleted_on_client = this.discovery_data.find_and_cancel_deleted_job (original_path);
 
-        var process_rename = [item, original_path, base, this] (PathTuple &path) {
-            var adjusted_original_path = _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Down);
-            _discovery_data._renamed_items_local.insert (original_path, path._target);
+        var process_rename = [item, original_path, base, this] (PathTuple path) {
+            var adjusted_original_path = this.discovery_data.adjust_renamed_path (original_path, SyncFileItem.Direction.DOWN);
+            this.discovery_data._renamed_items_local.insert (original_path, path._target);
             item._rename_target = path._target;
             path._server = adjusted_original_path;
             item._file = path._server;
@@ -1511,7 +1511,7 @@ signals:
             item._modtime = base._modtime;
             item._inode = base._inode;
             item._instruction = CSYNC_INSTRUCTION_RENAME;
-            item._direction = SyncFileItem.Up;
+            item._direction = SyncFileItem.Direction.UP;
             item._file_id = base._file_id;
             item._remote_perm = base._remote_perm;
             item._etag = base._etag;
@@ -1532,25 +1532,25 @@ signals:
             process_rename (path);
         } else {
             // We must query the server to know if the etag has not changed
-            _pending_async_jobs++;
-            string server_original_path = _discovery_data._remote_folder + _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Down);
+            this.pending_async_jobs++;
+            string server_original_path = this.discovery_data._remote_folder + this.discovery_data.adjust_renamed_path (original_path, SyncFileItem.Direction.DOWN);
             if (base.is_virtual_file () && is_vfs_with_suffix ())
                 chop_virtual_file_suffix (server_original_path);
-            var job = new RequestEtagJob (_discovery_data._account, server_original_path, this);
-            connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> &etag) mutable {
-                if (!etag || (etag.get () != base._etag && !item.is_directory ()) || _discovery_data.is_renamed (original_path)) {
+            var job = new RequestEtagJob (this.discovery_data._account, server_original_path, this);
+            connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> etag) mutable {
+                if (!etag || (etag.get () != base._etag && !item.is_directory ()) || this.discovery_data.is_renamed (original_path)) {
                     q_c_info (lc_disco) << "Can't rename because the etag has changed or the directory is gone" << original_path;
                     // Can't be a rename, leave it as a new.
                     post_process_local_new ();
                 } else {
                     // In case the deleted item was discovered in parallel
-                    _discovery_data.find_and_cancel_deleted_job (original_path);
+                    this.discovery_data.find_and_cancel_deleted_job (original_path);
                     process_rename (path);
                     recurse_query_server = etag.get () == base._etag ? Parent_not_changed : Normal_query;
                 }
                 process_file_finalize (item, path, item.is_directory (), Normal_query, recurse_query_server);
-                _pending_async_jobs--;
-                QTimer.single_shot (0, _discovery_data, &DiscoveryPhase.schedule_more_jobs);
+                this.pending_async_jobs--;
+                QTimer.single_shot (0, this.discovery_data, &DiscoveryPhase.schedule_more_jobs);
             });
             job.on_start ();
             return;
@@ -1559,7 +1559,7 @@ signals:
         on_finalize ();
     }
 
-    void ProcessDirectoryJob.process_file_conflict (SyncFileItemPtr &item, ProcessDirectoryJob.PathTuple path, LocalInfo &local_entry, RemoteInfo &server_entry, SyncJournalFileRecord &db_entry) {
+    void ProcessDirectoryJob.process_file_conflict (SyncFileItemPtr item, ProcessDirectoryJob.PathTuple path, LocalInfo local_entry, RemoteInfo server_entry, SyncJournalFileRecord db_entry) {
         item._previous_size = local_entry.size;
         item._previous_modtime = local_entry.modtime;
 
@@ -1592,25 +1592,25 @@ signals:
             // sizes and mtimes pops up when the local database is lost for
             // whatever reason.
             item._instruction = is_conflict ? CSYNC_INSTRUCTION_CONFLICT : CSYNC_INSTRUCTION_UPDATE_METADATA;
-            item._direction = is_conflict ? SyncFileItem.None : SyncFileItem.Down;
+            item._direction = is_conflict ? SyncFileItem.Direction.NONE : SyncFileItem.Direction.DOWN;
             return;
         }
 
         // Do we have an UploadInfo for this?
         // Maybe the Upload was completed, but the connection was broken just before
         // we recieved the etag (Issue #5106)
-        var up = _discovery_data._statedatabase.get_upload_info (path._original);
+        var up = this.discovery_data._statedatabase.get_upload_info (path._original);
         if (up._valid && up._content_checksum == server_entry.checksum_header) {
             // Solve the conflict into an upload, or nothing
             item._instruction = up._modtime == local_entry.modtime && up._size == local_entry.size
                 ? CSYNC_INSTRUCTION_NONE : CSYNC_INSTRUCTION_SYNC;
-            item._direction = SyncFileItem.Up;
+            item._direction = SyncFileItem.Direction.UP;
 
             // Update the etag and other server metadata in the journal already
             // (We can't use a typical CSYNC_INSTRUCTION_UPDATE_METADATA because
             // we must not store the size/modtime from the file system)
             Occ.SyncJournalFileRecord record;
-            if (_discovery_data._statedatabase.get_file_record (path._original, &record)) {
+            if (this.discovery_data._statedatabase.get_file_record (path._original, record)) {
                 record._path = path._original.to_utf8 ();
                 record._etag = server_entry.etag;
                 record._file_id = server_entry.file_id;
@@ -1619,18 +1619,18 @@ signals:
                 record._file_size = server_entry.size;
                 record._remote_perm = server_entry.remote_perm;
                 record._checksum_header = server_entry.checksum_header;
-                _discovery_data._statedatabase.set_file_record (record);
+                this.discovery_data._statedatabase.set_file_record (record);
             }
             return;
         }
 
         // Rely on content hash comparisons to optimize away non-conflicts inside the job
         item._instruction = CSYNC_INSTRUCTION_CONFLICT;
-        item._direction = SyncFileItem.None;
+        item._direction = SyncFileItem.Direction.NONE;
     }
 
     void ProcessDirectoryJob.process_file_finalize (
-        const SyncFileItemPtr &item, PathTuple path, bool recurse,
+        const SyncFileItemPtr item, PathTuple path, bool recurse,
         Query_mode recurse_query_local, Query_mode recurse_query_server) {
         // Adjust target path for virtual-suffix files
         if (is_vfs_with_suffix ()) {
@@ -1651,12 +1651,12 @@ signals:
         }
 
         if (path._original != path._target && (item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA || item._instruction == CSYNC_INSTRUCTION_NONE)) {
-            ASSERT (_dir_item && _dir_item._instruction == CSYNC_INSTRUCTION_RENAME);
+            ASSERT (this.dir_item && this.dir_item._instruction == CSYNC_INSTRUCTION_RENAME);
             // This is because otherwise subitems are not updated!  (ideally renaming a directory could
             // update the database for all items!  See PropagateDirectory.on_sub_jobs_finished)
             item._instruction = CSYNC_INSTRUCTION_RENAME;
             item._rename_target = path._target;
-            item._direction = _dir_item._direction;
+            item._direction = this.dir_item._direction;
         }
 
         q_c_info (lc_disco) << "Discovered" << item._file << item._instruction << item._direction << item._type;
@@ -1672,27 +1672,27 @@ signals:
         }
         if (recurse) {
             var job = new ProcessDirectoryJob (path, item, recurse_query_local, recurse_query_server,
-                _last_sync_timestamp, this);
+                this.last_sync_timestamp, this);
             job.set_inside_encrypted_tree (is_inside_encrypted_tree () || item._is_encrypted);
             if (removed) {
-                job.set_parent (_discovery_data);
-                _discovery_data._queued_deleted_directories[path._original] = job;
+                job.set_parent (this.discovery_data);
+                this.discovery_data._queued_deleted_directories[path._original] = job;
             } else {
                 connect (job, &ProcessDirectoryJob.on_finished, this, &ProcessDirectoryJob.sub_job_finished);
-                _queued_jobs.push_back (job);
+                this.queued_jobs.push_back (job);
             }
         } else {
             if (removed
                 // For the purpose of rename deletion, restored deleted placeholder is as if it was deleted
                 || (item._type == ItemTypeVirtualFile && item._instruction == CSYNC_INSTRUCTION_NEW)) {
-                _discovery_data._deleted_item[path._original] = item;
+                this.discovery_data._deleted_item[path._original] = item;
             }
-            emit _discovery_data.item_discovered (item);
+            /* emit */ this.discovery_data.item_discovered (item);
         }
     }
 
-    void ProcessDirectoryJob.process_blocklisted (PathTuple &path, Occ.LocalInfo &local_entry,
-        const SyncJournalFileRecord &db_entry) {
+    void ProcessDirectoryJob.process_blocklisted (PathTuple path, Occ.LocalInfo local_entry,
+        const SyncJournalFileRecord db_entry) {
         if (!local_entry.is_valid ())
             return;
 
@@ -1703,27 +1703,27 @@ signals:
         item._is_selective_sync = true;
         if (db_entry.is_valid () && ( (db_entry._modtime == local_entry.modtime && db_entry._file_size == local_entry.size) || (local_entry.is_directory && db_entry.is_directory ()))) {
             item._instruction = CSYNC_INSTRUCTION_REMOVE;
-            item._direction = SyncFileItem.Down;
+            item._direction = SyncFileItem.Direction.DOWN;
         } else {
             item._instruction = CSYNC_INSTRUCTION_IGNORE;
-            item._status = SyncFileItem.FileIgnored;
+            item._status = SyncFileItem.Status.FILE_IGNORED;
             item._error_string = _("Ignored because of the \"choose what to sync\" blocklist");
-            _child_ignored = true;
+            this.child_ignored = true;
         }
 
         q_c_info (lc_disco) << "Discovered (blocklisted) " << item._file << item._instruction << item._direction << item.is_directory ();
 
         if (item.is_directory () && item._instruction != CSYNC_INSTRUCTION_IGNORE) {
-            var job = new ProcessDirectoryJob (path, item, Normal_query, In_block_list, _last_sync_timestamp, this);
+            var job = new ProcessDirectoryJob (path, item, Normal_query, In_block_list, this.last_sync_timestamp, this);
             connect (job, &ProcessDirectoryJob.on_finished, this, &ProcessDirectoryJob.sub_job_finished);
-            _queued_jobs.push_back (job);
+            this.queued_jobs.push_back (job);
         } else {
-            emit _discovery_data.item_discovered (item);
+            /* emit */ this.discovery_data.item_discovered (item);
         }
     }
 
-    bool ProcessDirectoryJob.check_permissions (Occ.SyncFileItemPtr &item) {
-        if (item._direction != SyncFileItem.Up) {
+    bool ProcessDirectoryJob.check_permissions (Occ.SyncFileItemPtr item) {
+        if (item._direction != SyncFileItem.Direction.UP) {
             // Currently we only check server-side permissions
             return true;
         }
@@ -1731,8 +1731,8 @@ signals:
         switch (item._instruction) {
         case CSYNC_INSTRUCTION_TYPE_CHANGE:
         case CSYNC_INSTRUCTION_NEW: {
-            const var perms = !_root_permissions.is_null () ? _root_permissions
-                                                          : _dir_item ? _dir_item._remote_perm : _root_permissions;
+            const var perms = !this.root_permissions.is_null () ? this.root_permissions
+                                                          : this.dir_item ? this.dir_item._remote_perm : this.root_permissions;
             if (perms.is_null ()) {
                 // No permissions set
                 return true;
@@ -1758,7 +1758,7 @@ signals:
             if (!perms.has_permission (RemotePermissions.Can_write)) {
                 item._instruction = CSYNC_INSTRUCTION_CONFLICT;
                 item._error_string = _("Not allowed to upload this file because it is read-only on the server, restoring");
-                item._direction = SyncFileItem.Down;
+                item._direction = SyncFileItem.Direction.DOWN;
                 item._is_restoration = true;
                 GLib.warn (lc_disco) << "check_for_permission : RESTORING" << item._file << item._error_string;
                 // Take the things to write to the database from the "other" node (i.e : info from server).
@@ -1771,13 +1771,13 @@ signals:
         }
         case CSYNC_INSTRUCTION_REMOVE: {
             string file_slash = item._file + '/';
-            var forbidden_it = _discovery_data._forbidden_deletes.upper_bound (file_slash);
-            if (forbidden_it != _discovery_data._forbidden_deletes.begin ())
+            var forbidden_it = this.discovery_data._forbidden_deletes.upper_bound (file_slash);
+            if (forbidden_it != this.discovery_data._forbidden_deletes.begin ())
                 forbidden_it -= 1;
-            if (forbidden_it != _discovery_data._forbidden_deletes.end ()
+            if (forbidden_it != this.discovery_data._forbidden_deletes.end ()
                 && file_slash.starts_with (forbidden_it.key ())) {
                 item._instruction = CSYNC_INSTRUCTION_NEW;
-                item._direction = SyncFileItem.Down;
+                item._direction = SyncFileItem.Direction.DOWN;
                 item._is_restoration = true;
                 item._error_string = _("Moved to invalid target, restoring");
                 GLib.warn (lc_disco) << "check_for_permission : RESTORING" << item._file << item._error_string;
@@ -1790,7 +1790,7 @@ signals:
             }
             if (!perms.has_permission (RemotePermissions.Can_delete)) {
                 item._instruction = CSYNC_INSTRUCTION_NEW;
-                item._direction = SyncFileItem.Down;
+                item._direction = SyncFileItem.Direction.DOWN;
                 item._is_restoration = true;
                 item._error_string = _("Not allowed to remove, restoring");
                 GLib.warn (lc_disco) << "check_for_permission : RESTORING" << item._file << item._error_string;
@@ -1807,12 +1807,12 @@ signals:
     var ProcessDirectoryJob.check_move_permissions (RemotePermissions src_perm, string src_path,
                                                    bool is_directory)
         . Move_permission_result {
-        var dest_perms = !_root_permissions.is_null () ? _root_permissions
-                                                    : _dir_item ? _dir_item._remote_perm : _root_permissions;
+        var dest_perms = !this.root_permissions.is_null () ? this.root_permissions
+                                                    : this.dir_item ? this.dir_item._remote_perm : this.root_permissions;
         var file_perms = src_perm;
         //true when it is just a rename in the same directory. (not a move)
-        bool is_rename = src_path.starts_with (_current_folder._original)
-            && src_path.last_index_of ('/') == _current_folder._original.size ();
+        bool is_rename = src_path.starts_with (this.current_folder._original)
+            && src_path.last_index_of ('/') == this.current_folder._original.size ();
         // Check if we are allowed to move to the destination.
         bool destination_oK = true;
         bool destination_new_oK = true;
@@ -1841,54 +1841,54 @@ signals:
         var job = qobject_cast<ProcessDirectoryJob> (sender ());
         ASSERT (job);
 
-        _child_ignored |= job._child_ignored;
-        _child_modified |= job._child_modified;
+        this.child_ignored |= job._child_ignored;
+        this.child_modified |= job._child_modified;
 
         if (job._dir_item)
-            emit _discovery_data.item_discovered (job._dir_item);
+            /* emit */ this.discovery_data.item_discovered (job._dir_item);
 
-        int count = _running_jobs.remove_all (job);
+        int count = this.running_jobs.remove_all (job);
         ASSERT (count == 1);
         job.delete_later ();
-        QTimer.single_shot (0, _discovery_data, &DiscoveryPhase.schedule_more_jobs);
+        QTimer.single_shot (0, this.discovery_data, &DiscoveryPhase.schedule_more_jobs);
     }
 
     int ProcessDirectoryJob.process_sub_jobs (int nb_jobs) {
-        if (_queued_jobs.empty () && _running_jobs.empty () && _pending_async_jobs == 0) {
-            _pending_async_jobs = -1; // We're on_finished, we don't want to emit finished again
-            if (_dir_item) {
-                if (_child_modified && _dir_item._instruction == CSYNC_INSTRUCTION_REMOVE) {
+        if (this.queued_jobs.empty () && this.running_jobs.empty () && this.pending_async_jobs == 0) {
+            this.pending_async_jobs = -1; // We're on_finished, we don't want to emit finished again
+            if (this.dir_item) {
+                if (this.child_modified && this.dir_item._instruction == CSYNC_INSTRUCTION_REMOVE) {
                     // re-create directory that has modified contents
-                    _dir_item._instruction = CSYNC_INSTRUCTION_NEW;
-                    _dir_item._direction = _dir_item._direction == SyncFileItem.Up ? SyncFileItem.Down : SyncFileItem.Up;
+                    this.dir_item._instruction = CSYNC_INSTRUCTION_NEW;
+                    this.dir_item._direction = this.dir_item._direction == SyncFileItem.Direction.UP ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP;
                 }
-                if (_child_modified && _dir_item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE && !_dir_item.is_directory ()) {
+                if (this.child_modified && this.dir_item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE && !this.dir_item.is_directory ()) {
                     // Replacing a directory by a file is a conflict, if the directory had modified children
-                    _dir_item._instruction = CSYNC_INSTRUCTION_CONFLICT;
-                    if (_dir_item._direction == SyncFileItem.Up) {
-                        _dir_item._type = ItemTypeDirectory;
-                        _dir_item._direction = SyncFileItem.Down;
+                    this.dir_item._instruction = CSYNC_INSTRUCTION_CONFLICT;
+                    if (this.dir_item._direction == SyncFileItem.Direction.UP) {
+                        this.dir_item._type = ItemTypeDirectory;
+                        this.dir_item._direction = SyncFileItem.Direction.DOWN;
                     }
                 }
-                if (_child_ignored && _dir_item._instruction == CSYNC_INSTRUCTION_REMOVE) {
+                if (this.child_ignored && this.dir_item._instruction == CSYNC_INSTRUCTION_REMOVE) {
                     // Do not remove a directory that has ignored files
-                    _dir_item._instruction = CSYNC_INSTRUCTION_NONE;
+                    this.dir_item._instruction = CSYNC_INSTRUCTION_NONE;
                 }
             }
-            emit finished ();
+            /* emit */ finished ();
         }
 
         int started = 0;
-        foreach (var rj, _running_jobs) {
+        foreach (var rj, this.running_jobs) {
             started += rj.process_sub_jobs (nb_jobs - started);
             if (started >= nb_jobs)
                 return started;
         }
 
-        while (started < nb_jobs && !_queued_jobs.empty ()) {
-            var f = _queued_jobs.front ();
-            _queued_jobs.pop_front ();
-            _running_jobs.push_back (f);
+        while (started < nb_jobs && !this.queued_jobs.empty ()) {
+            var f = this.queued_jobs.front ();
+            this.queued_jobs.pop_front ();
+            this.running_jobs.push_back (f);
             f.on_start ();
             started++;
         }
@@ -1896,17 +1896,17 @@ signals:
     }
 
     void ProcessDirectoryJob.db_error () {
-        _discovery_data.fatal_error (_("Error while reading the database"));
+        this.discovery_data.fatal_error (_("Error while reading the database"));
     }
 
     void ProcessDirectoryJob.add_virtual_file_suffix (string ==&string_value) {
-        string_value.append (_discovery_data._sync_options._vfs.file_suffix ());
+        string_value.append (this.discovery_data._sync_options._vfs.file_suffix ());
     }
 
     bool ProcessDirectoryJob.has_virtual_file_suffix (string string_value) {
         if (!is_vfs_with_suffix ())
             return false;
-        return string_value.ends_with (_discovery_data._sync_options._vfs.file_suffix ());
+        return string_value.ends_with (this.discovery_data._sync_options._vfs.file_suffix ());
     }
 
     void ProcessDirectoryJob.chop_virtual_file_suffix (string string_value) {
@@ -1915,31 +1915,31 @@ signals:
         bool has_suffix = has_virtual_file_suffix (string_value);
         ASSERT (has_suffix);
         if (has_suffix)
-            string_value.chop (_discovery_data._sync_options._vfs.file_suffix ().size ());
+            string_value.chop (this.discovery_data._sync_options._vfs.file_suffix ().size ());
     }
 
     DiscoverySingleDirectoryJob *ProcessDirectoryJob.start_async_server_query () {
-        var server_job = new DiscoverySingleDirectoryJob (_discovery_data._account,
-            _discovery_data._remote_folder + _current_folder._server, this);
-        if (!_dir_item)
+        var server_job = new DiscoverySingleDirectoryJob (this.discovery_data._account,
+            this.discovery_data._remote_folder + this.current_folder._server, this);
+        if (!this.dir_item)
             server_job.set_is_root_path (); // query the fingerprint on the root
         connect (server_job, &DiscoverySingleDirectoryJob.etag, this, &ProcessDirectoryJob.etag);
-        _discovery_data._currently_active_jobs++;
-        _pending_async_jobs++;
-        connect (server_job, &DiscoverySingleDirectoryJob.on_finished, this, [this, server_job] (var &results) {
-            _discovery_data._currently_active_jobs--;
-            _pending_async_jobs--;
+        this.discovery_data._currently_active_jobs++;
+        this.pending_async_jobs++;
+        connect (server_job, &DiscoverySingleDirectoryJob.on_finished, this, [this, server_job] (var results) {
+            this.discovery_data._currently_active_jobs--;
+            this.pending_async_jobs--;
             if (results) {
-                _server_normal_query_entries = *results;
-                _server_query_done = true;
-                if (!server_job._data_fingerprint.is_empty () && _discovery_data._data_fingerprint.is_empty ())
-                    _discovery_data._data_fingerprint = server_job._data_fingerprint;
-                if (_local_query_done)
+                this.server_normal_query_entries = *results;
+                this.server_query_done = true;
+                if (!server_job._data_fingerprint.is_empty () && this.discovery_data._data_fingerprint.is_empty ())
+                    this.discovery_data._data_fingerprint = server_job._data_fingerprint;
+                if (this.local_query_done)
                     this.process ();
             } else {
                 var code = results.error ().code;
-                GLib.warn (lc_disco) << "Server error in directory" << _current_folder._server << code;
-                if (_dir_item && code >= 403) {
+                GLib.warn (lc_disco) << "Server error in directory" << this.current_folder._server << code;
+                if (this.dir_item && code >= 403) {
                     // In case of an HTTP error, we ignore that directory
                     // 403 Forbidden can be sent by the server if the file firewall is active.
                     // A file or directory should be ignored and sync must continue. See #3490
@@ -1948,68 +1948,68 @@ signals:
                     // is returned too. Thus we can't distinguish the two and will treat any
                     // 503 as request to ignore the folder. See #3113 #2884.
                     // Similarly, the server might also return 404 or 50x in case of bugs. #7199 #7586
-                    _dir_item._instruction = CSYNC_INSTRUCTION_IGNORE;
-                    _dir_item._error_string = results.error ().message;
-                    emit this.on_finished ();
+                    this.dir_item._instruction = CSYNC_INSTRUCTION_IGNORE;
+                    this.dir_item._error_string = results.error ().message;
+                    /* emit */ this.on_finished ();
                 } else {
                     // Fatal for the root job since it has no SyncFileItem, or for the network errors
-                    emit _discovery_data.fatal_error (_("Server replied with an error while reading directory \"%1\" : %2")
-                        .arg (_current_folder._server, results.error ().message));
+                    /* emit */ this.discovery_data.fatal_error (_("Server replied with an error while reading directory \"%1\" : %2")
+                        .arg (this.current_folder._server, results.error ().message));
                 }
             }
         });
         connect (server_job, &DiscoverySingleDirectoryJob.first_directory_permissions, this,
-            [this] (RemotePermissions &perms) {
-                _root_permissions = perms;
+            [this] (RemotePermissions perms) {
+                this.root_permissions = perms;
             });
         server_job.on_start ();
         return server_job;
     }
 
     void ProcessDirectoryJob.start_async_local_query () {
-        string local_path = _discovery_data._local_dir + _current_folder._local;
-        var local_job = new DiscoverySingleLocalDirectoryJob (_discovery_data._account, local_path, _discovery_data._sync_options._vfs.data ());
+        string local_path = this.discovery_data._local_dir + this.current_folder._local;
+        var local_job = new DiscoverySingleLocalDirectoryJob (this.discovery_data._account, local_path, this.discovery_data._sync_options._vfs.data ());
 
-        _discovery_data._currently_active_jobs++;
-        _pending_async_jobs++;
+        this.discovery_data._currently_active_jobs++;
+        this.pending_async_jobs++;
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.item_discovered, _discovery_data, &DiscoveryPhase.item_discovered);
+        connect (local_job, &DiscoverySingleLocalDirectoryJob.item_discovered, this.discovery_data, &DiscoveryPhase.item_discovered);
 
         connect (local_job, &DiscoverySingleLocalDirectoryJob.child_ignored, this, [this] (bool b) {
-            _child_ignored = b;
+            this.child_ignored = b;
         });
 
         connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_fatal_error, this, [this] (string msg) {
-            _discovery_data._currently_active_jobs--;
-            _pending_async_jobs--;
-            if (_server_job)
-                _server_job.on_abort ();
+            this.discovery_data._currently_active_jobs--;
+            this.pending_async_jobs--;
+            if (this.server_job)
+                this.server_job.on_abort ();
 
-            emit _discovery_data.fatal_error (msg);
+            /* emit */ this.discovery_data.fatal_error (msg);
         });
 
         connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_non_fatal_error, this, [this] (string msg) {
-            _discovery_data._currently_active_jobs--;
-            _pending_async_jobs--;
+            this.discovery_data._currently_active_jobs--;
+            this.pending_async_jobs--;
 
-            if (_dir_item) {
-                _dir_item._instruction = CSYNC_INSTRUCTION_IGNORE;
-                _dir_item._error_string = msg;
-                emit this.on_finished ();
+            if (this.dir_item) {
+                this.dir_item._instruction = CSYNC_INSTRUCTION_IGNORE;
+                this.dir_item._error_string = msg;
+                /* emit */ this.on_finished ();
             } else {
                 // Fatal for the root job since it has no SyncFileItem
-                emit _discovery_data.fatal_error (msg);
+                /* emit */ this.discovery_data.fatal_error (msg);
             }
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.on_finished, this, [this] (var &results) {
-            _discovery_data._currently_active_jobs--;
-            _pending_async_jobs--;
+        connect (local_job, &DiscoverySingleLocalDirectoryJob.on_finished, this, [this] (var results) {
+            this.discovery_data._currently_active_jobs--;
+            this.pending_async_jobs--;
 
-            _local_normal_query_entries = results;
-            _local_query_done = true;
+            this.local_normal_query_entries = results;
+            this.local_query_done = true;
 
-            if (_server_query_done)
+            if (this.server_query_done)
                 this.process ();
         });
 
@@ -2018,26 +2018,26 @@ signals:
     }
 
     bool ProcessDirectoryJob.is_vfs_with_suffix () {
-        return _discovery_data._sync_options._vfs.mode () == Vfs.WithSuffix;
+        return this.discovery_data._sync_options._vfs.mode () == Vfs.WithSuffix;
     }
 
     void ProcessDirectoryJob.compute_pin_state (PinState parent_state) {
-        _pin_state = parent_state;
-        if (_query_local != Parent_dont_exist) {
-            if (var state = _discovery_data._sync_options._vfs.pin_state (_current_folder._local)) // ouch! pin local or original?
-                _pin_state = *state;
+        this.pin_state = parent_state;
+        if (this.query_local != Parent_dont_exist) {
+            if (var state = this.discovery_data._sync_options._vfs.pin_state (this.current_folder._local)) // ouch! pin local or original?
+                this.pin_state = *state;
         }
     }
 
-    void ProcessDirectoryJob.setup_database_pin_state_actions (SyncJournalFileRecord &record) {
+    void ProcessDirectoryJob.setup_database_pin_state_actions (SyncJournalFileRecord record) {
         // Only suffix-vfs uses the database for pin states.
         // Other plugins will set local_entry._type according to the file's pin state.
         if (!is_vfs_with_suffix ())
             return;
 
-        var pin = _discovery_data._statedatabase.internal_pin_states ().raw_for_path (record._path);
+        var pin = this.discovery_data._statedatabase.internal_pin_states ().raw_for_path (record._path);
         if (!pin || *pin == PinState.PinState.INHERITED)
-            pin = _pin_state;
+            pin = this.pin_state;
 
         // VfsItemAvailability.ONLINE_ONLY hydrated files want to be dehydrated
         if (record._type == ItemTypeFile && *pin == PinState.VfsItemAvailability.ONLINE_ONLY)

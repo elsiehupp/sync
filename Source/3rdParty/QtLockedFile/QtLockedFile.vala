@@ -259,7 +259,7 @@ namespace SharedTools {
         fl.l_len = 0;
         fl.l_type = (mode == LockMode.READ_LOCK) ? F_RDLCK : F_WRLCK;
         int cmd = block ? F_SETLKW : F_SETLK;
-        int ret = fcntl (handle (), cmd, &fl);
+        int ret = fcntl (handle (), cmd, fl);
 
         if (ret == -1) {
             if (errno != EINTR && errno != EAGAIN)
@@ -285,7 +285,7 @@ namespace SharedTools {
         fl.l_start = 0;
         fl.l_len = 0;
         fl.l_type = F_UNLCK;
-        int ret = fcntl (handle (), F_SETLKW, &fl);
+        int ret = fcntl (handle (), F_SETLKW, fl);
 
         if (ret == -1) {
             q_warning ("QtLockedFile.lock () : fcntl : %s", strerror (errno));

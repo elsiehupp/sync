@@ -193,7 +193,7 @@ class Vfs : GLib.Object {
     /***********************************************************
     the parameters passed to on_start ()
     ***********************************************************/
-    protected VfsSetupParams _setup_params;
+    protected VfsSetupParams this.setup_params;
 
 
     /***********************************************************
@@ -218,7 +218,7 @@ class Vfs : GLib.Object {
     Access to the parameters the instance was on_start ()ed with.
     ***********************************************************/
     public VfsSetupParams parameters () {
-        return _setup_params;
+        return this.setup_params;
     }
 
 
@@ -276,7 +276,7 @@ class Vfs : GLib.Object {
     Create a new dehydrated placeholder. Called from PropagateDownload.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public virtual Result<void, string> create_placeholder (SyncFileItem &item);
+    public virtual Result<void, string> create_placeholder (SyncFileItem item);
 
 
     /***********************************************************
@@ -286,7 +286,7 @@ class Vfs : GLib.Object {
     (like pin states) may be essential for some vfs plugins.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public virtual Result<void, string> dehydrate_placeholder (SyncFileItem &item);
+    public virtual Result<void, string> dehydrate_placeholder (SyncFileItem item);
 
 
     /***********************************************************
@@ -296,7 +296,7 @@ class Vfs : GLib.Object {
     become hydrated placeholder files.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public virtual bool needs_metadata_update (SyncFileItem &item);
+    public virtual bool needs_metadata_update (SyncFileItem item);
 
 
     /***********************************************************
@@ -386,7 +386,7 @@ class Vfs : GLib.Object {
     via the vfs plugin. The connection to SyncFileStatusTracker allows both to be based
     on the same data.
     ***********************************************************/
-    public virtual void on_file_status_changed (string system_file_name, SyncFileStatus file_status);
+    public virtual void on_file_status_changed (string system_filename, SyncFileStatus file_status);
 
 
     /***********************************************************
@@ -419,9 +419,9 @@ class Vfs : GLib.Object {
     ***********************************************************/
     protected bool set_pin_state_in_database (string folder_path, PinState state) {
         var path = folder_path.to_utf8 ();
-        _setup_params.journal.internal_pin_states ().wipe_for_path_and_below (path);
+        this.setup_params.journal.internal_pin_states ().wipe_for_path_and_below (path);
         if (state != PinState.PinState.INHERITED)
-            _setup_params.journal.internal_pin_states ().set_for_path (path, state);
+            this.setup_params.journal.internal_pin_states ().set_for_path (path, state);
         return true;
     }
 
@@ -429,7 +429,7 @@ class Vfs : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected Optional<PinState> pin_state_in_database (string folder_path) {
-        var pin = _setup_params.journal.internal_pin_states ().effective_for_path (folder_path.to_utf8 ());
+        var pin = this.setup_params.journal.internal_pin_states ().effective_for_path (folder_path.to_utf8 ());
         return pin;
     }
 
@@ -438,9 +438,9 @@ class Vfs : GLib.Object {
     ***********************************************************/
     protected AvailabilityResult availability_in_database (string folder_path) {
         var path = folder_path.to_utf8 ();
-        var pin = _setup_params.journal.internal_pin_states ().effective_for_path_recursive (path);
+        var pin = this.setup_params.journal.internal_pin_states ().effective_for_path_recursive (path);
         // not being able to retrieve the pin state isn't too bad
-        var hydration_status = _setup_params.journal.has_hydrated_or_dehydrated_files (path);
+        var hydration_status = this.setup_params.journal.has_hydrated_or_dehydrated_files (path);
         if (!hydration_status)
             return AvailabilityError.DbError;
 
@@ -606,25 +606,25 @@ class VfsOff : Vfs {
             return false;
         }
 
-        QPluginLoader loader (plugin_file_name ("vfs", name));
+        QPluginLoader loader (plugin_filename ("vfs", name));
 
         const var base_meta_data = loader.meta_data ();
         if (base_meta_data.is_empty () || !base_meta_data.contains ("IID")) {
-            GLib.debug (lc_plugin) << "Plugin doesn't exist" << loader.file_name ();
+            GLib.debug (lc_plugin) << "Plugin doesn't exist" << loader.filename ();
             return false;
         }
         if (base_meta_data["IID"].to_"" != "org.owncloud.PluginFactory") {
-            GLib.warn (lc_plugin) << "Plugin has wrong IID" << loader.file_name () << base_meta_data["IID"];
+            GLib.warn (lc_plugin) << "Plugin has wrong IID" << loader.filename () << base_meta_data["IID"];
             return false;
         }
 
         const var metadata = base_meta_data["MetaData"].to_object ();
         if (metadata["type"].to_"" != "vfs") {
-            GLib.warn (lc_plugin) << "Plugin has wrong type" << loader.file_name () << metadata["type"];
+            GLib.warn (lc_plugin) << "Plugin has wrong type" << loader.filename () << metadata["type"];
             return false;
         }
         if (metadata["version"].to_"" != MIRALL_VERSION_STRING) {
-            GLib.warn (lc_plugin) << "Plugin has wrong version" << loader.file_name () << metadata["version"];
+            GLib.warn (lc_plugin) << "Plugin has wrong version" << loader.filename () << metadata["version"];
             return false;
         }
 
@@ -688,7 +688,7 @@ class VfsOff : Vfs {
             return nullptr;
         }
 
-        const var plugin_path = plugin_file_name ("vfs", name);
+        const var plugin_path = plugin_filename ("vfs", name);
 
         if (!is_vfs_plugin_available (mode)) {
             q_c_critical (lc_plugin) << "Could not load plugin : not existant or bad metadata" << plugin_path;
@@ -704,13 +704,13 @@ class VfsOff : Vfs {
 
         var factory = qobject_cast<PluginFactory> (plugin);
         if (!factory) {
-            q_c_critical (lc_plugin) << "Plugin" << loader.file_name () << "does not implement PluginFactory";
+            q_c_critical (lc_plugin) << "Plugin" << loader.filename () << "does not implement PluginFactory";
             return nullptr;
         }
 
         var vfs = std.unique_ptr<Vfs> (qobject_cast<Vfs> (factory.create (nullptr)));
         if (!vfs) {
-            q_c_critical (lc_plugin) << "Plugin" << loader.file_name () << "does not create a Vfs instance";
+            q_c_critical (lc_plugin) << "Plugin" << loader.filename () << "does not create a Vfs instance";
             return nullptr;
         }
 

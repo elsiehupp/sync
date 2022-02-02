@@ -72,7 +72,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private 
-    private QTimer _update_check_timer; /** Timer for the regular update check. */
+    private QTimer this.update_check_timer; /** Timer for the regular update check. */
 };
 
 /***********************************************************
@@ -148,23 +148,23 @@ protected slots:
     private void on_timed_out ();
 
 
-    protected virtual void version_info_arrived (Update_info &info);
+    protected virtual void version_info_arrived (Update_info info);
     protected bool update_succeeded ();
     protected QNetworkAccessManager qnam () {
-        return _access_manager;
+        return this.access_manager;
     }
     protected Update_info update_info () {
-        return _update_info;
+        return this.update_info;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Uri _update_url;
-    private int _state;
-    private QNetworkAccessManager _access_manager;
-    private QTimer _timeout_watchdog; /** Timer to guard the timeout of an individual network request */
-    private Update_info _update_info;
+    private GLib.Uri this.update_url;
+    private int this.state;
+    private QNetworkAccessManager this.access_manager;
+    private QTimer this.timeout_watchdog; /** Timer to guard the timeout of an individual network request */
+    private Update_info this.update_info;
 };
 
 /***********************************************************
@@ -192,11 +192,11 @@ class NSISUpdater : OCUpdater {
     /***********************************************************
     ***********************************************************/
     private void wipe_update_data ();
-    private void show_no_url_dialog (Update_info &info);
+    private void show_no_url_dialog (Update_info info);
     private void show_update_error_dialog (string target_version);
-    private void version_info_arrived (Update_info &info) override;
-    private QScopedPointer<QTemporary_file> _file;
-    private string _target_file;
+    private void version_info_arrived (Update_info info) override;
+    private QScopedPointer<QTemporary_file> this.file;
+    private string this.target_file;
 };
 
 /***********************************************************
@@ -227,8 +227,8 @@ class Passive_update_notifier : OCUpdater {
 
     /***********************************************************
     ***********************************************************/
-    private void version_info_arrived (Update_info &info) override;
-    private GLib.ByteArray _running_app_version;
+    private void version_info_arrived (Update_info info) override;
+    private GLib.ByteArray this.running_app_version;
 };
 
 
@@ -242,7 +242,7 @@ class Passive_update_notifier : OCUpdater {
 
     UpdaterScheduler.UpdaterScheduler (GLib.Object parent) {
         base (parent);
-        connect (&_update_check_timer, &QTimer.timeout,
+        connect (&this.update_check_timer, &QTimer.timeout,
             this, &UpdaterScheduler.on_timer_fired);
 
         // Note: the sparkle-updater is not an OCUpdater
@@ -257,7 +257,7 @@ class Passive_update_notifier : OCUpdater {
 
         ConfigFile cfg;
         var check_interval = cfg.update_check_interval ();
-        _update_check_timer.on_start (std.chrono.milliseconds (check_interval).count ());
+        this.update_check_timer.on_start (std.chrono.milliseconds (check_interval).count ());
     }
 
     void UpdaterScheduler.on_timer_fired () {
@@ -265,8 +265,8 @@ class Passive_update_notifier : OCUpdater {
 
         // re-set the check interval if it changed in the config file meanwhile
         var check_interval = std.chrono.milliseconds (cfg.update_check_interval ()).count ();
-        if (check_interval != _update_check_timer.interval ()) {
-            _update_check_timer.set_interval (check_interval);
+        if (check_interval != this.update_check_timer.interval ()) {
+            this.update_check_timer.set_interval (check_interval);
             q_c_info (lc_updater) << "Setting new update check interval " << check_interval;
         }
 
@@ -286,14 +286,14 @@ class Passive_update_notifier : OCUpdater {
 
     OCUpdater.OCUpdater (GLib.Uri url)
         : Updater ()
-        , _update_url (url)
-        , _state (Unknown)
-        , _access_manager (new AccessManager (this))
-        , _timeout_watchdog (new QTimer (this)) {
+        , this.update_url (url)
+        , this.state (Unknown)
+        , this.access_manager (new AccessManager (this))
+        , this.timeout_watchdog (new QTimer (this)) {
     }
 
     void OCUpdater.set_update_url (GLib.Uri url) {
-        _update_url = url;
+        this.update_url = url;
     }
 
     bool OCUpdater.perform_update () {
@@ -342,7 +342,7 @@ class Passive_update_notifier : OCUpdater {
     }
 
     string OCUpdater.status_string (Update_status_string_format format) {
-        string update_version = _update_info.version_"";
+        string update_version = this.update_info.version_"";
 
         switch (download_state ()) {
         case Downloading:
@@ -351,17 +351,17 @@ class Passive_update_notifier : OCUpdater {
             return _("%1 available. Restart application to on_start the update.").arg (update_version);
         case Download_failed: {
             if (format == Update_status_string_format.Html) {
-                return _("Could not download update. Please open <a href='%1'>%1</a> to download the update manually.").arg (_update_info.web ());
+                return _("Could not download update. Please open <a href='%1'>%1</a> to download the update manually.").arg (this.update_info.web ());
             }
-            return _("Could not download update. Please open %1 to download the update manually.").arg (_update_info.web ());
+            return _("Could not download update. Please open %1 to download the update manually.").arg (this.update_info.web ());
         }
         case Download_timed_out:
             return _("Could not check for new updates.");
         case Update_only_available_through_system: {
             if (format == Update_status_string_format.Html) {
-                return _("New %1 is available. Please open <a href='%2'>%2</a> to download the update.").arg (update_version, _update_info.web ());
+                return _("New %1 is available. Please open <a href='%2'>%2</a> to download the update.").arg (update_version, this.update_info.web ());
             }
-            return _("New %1 is available. Please open %2 to download the update.").arg (update_version, _update_info.web ());
+            return _("New %1 is available. Please open %2 to download the update.").arg (update_version, this.update_info.web ());
         }
         case Checking_server:
             return _("Checking update server …");
@@ -375,19 +375,19 @@ class Passive_update_notifier : OCUpdater {
     }
 
     int OCUpdater.download_state () {
-        return _state;
+        return this.state;
     }
 
     void OCUpdater.set_download_state (Download_state state) {
-        var old_state = _state;
-        _state = state;
-        emit download_state_changed ();
+        var old_state = this.state;
+        this.state = state;
+        /* emit */ download_state_changed ();
 
         // show the notification if the download is complete (on every check)
         // or once for system based updates.
-        if (_state == OCUpdater.Download_complete || (old_state != OCUpdater.Update_only_available_through_system
-                                                         && _state == OCUpdater.Update_only_available_through_system)) {
-            emit new_update_available (_("Update Check"), status_string ());
+        if (this.state == OCUpdater.Download_complete || (old_state != OCUpdater.Update_only_available_through_system
+                                                         && this.state == OCUpdater.Update_only_available_through_system)) {
+            /* emit */ new_update_available (_("Update Check"), status_string ());
         }
     }
 
@@ -426,16 +426,16 @@ class Passive_update_notifier : OCUpdater {
     }
 
     void OCUpdater.check_for_update () {
-        QNetworkReply reply = _access_manager.get (QNetworkRequest (_update_url));
-        connect (_timeout_watchdog, &QTimer.timeout, this, &OCUpdater.on_timed_out);
-        _timeout_watchdog.on_start (30 * 1000);
+        QNetworkReply reply = this.access_manager.get (QNetworkRequest (this.update_url));
+        connect (this.timeout_watchdog, &QTimer.timeout, this, &OCUpdater.on_timed_out);
+        this.timeout_watchdog.on_start (30 * 1000);
         connect (reply, &QNetworkReply.on_finished, this, &OCUpdater.on_version_info_arrived);
 
         set_download_state (Checking_server);
     }
 
     void OCUpdater.on_open_update_url () {
-        QDesktopServices.open_url (_update_info.web ());
+        QDesktopServices.open_url (this.update_info.web ());
     }
 
     bool OCUpdater.update_succeeded () {
@@ -448,7 +448,7 @@ class Passive_update_notifier : OCUpdater {
     }
 
     void OCUpdater.on_version_info_arrived () {
-        _timeout_watchdog.stop ();
+        this.timeout_watchdog.stop ();
         var reply = qobject_cast<QNetworkReply> (sender ());
         reply.delete_later ();
         if (reply.error () != QNetworkReply.NoError) {
@@ -460,9 +460,9 @@ class Passive_update_notifier : OCUpdater {
         string xml = string.from_utf8 (reply.read_all ());
 
         bool ok = false;
-        _update_info = Update_info.parse_string (xml, &ok);
+        this.update_info = Update_info.parse_string (xml, ok);
         if (ok) {
-            version_info_arrived (_update_info);
+            version_info_arrived (this.update_info);
         } else {
             GLib.warn (lc_updater) << "Could not parse update information.";
             set_download_state (Download_timed_out);
@@ -481,17 +481,17 @@ class Passive_update_notifier : OCUpdater {
 
     void NSISUpdater.on_write_file () {
         var reply = qobject_cast<QNetworkReply> (sender ());
-        if (_file.is_open ()) {
-            _file.write (reply.read_all ());
+        if (this.file.is_open ()) {
+            this.file.write (reply.read_all ());
         }
     }
 
     void NSISUpdater.wipe_update_data () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
-        string update_file_name = settings.value (update_available_c).to_"";
-        if (!update_file_name.is_empty ())
-            GLib.File.remove (update_file_name);
+        string update_filename = settings.value (update_available_c).to_"";
+        if (!update_filename.is_empty ())
+            GLib.File.remove (update_filename);
         settings.remove (update_available_c);
         settings.remove (update_target_version_c);
         settings.remove (update_target_version_string_c);
@@ -507,7 +507,7 @@ class Passive_update_notifier : OCUpdater {
         }
 
         GLib.Uri url (reply.url ());
-        _file.close ();
+        this.file.close ();
 
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
@@ -518,15 +518,15 @@ class Passive_update_notifier : OCUpdater {
             old_target_file.remove ();
         }
 
-        GLib.File.copy (_file.file_name (), _target_file);
+        GLib.File.copy (this.file.filename (), this.target_file);
         set_download_state (Download_complete);
-        q_c_info (lc_updater) << "Downloaded" << url.to_"" << "to" << _target_file;
+        q_c_info (lc_updater) << "Downloaded" << url.to_"" << "to" << this.target_file;
         settings.set_value (update_target_version_c, update_info ().version ());
         settings.set_value (update_target_version_string_c, update_info ().version_"");
-        settings.set_value (update_available_c, _target_file);
+        settings.set_value (update_available_c, this.target_file);
     }
 
-    void NSISUpdater.version_info_arrived (Update_info &info) {
+    void NSISUpdater.version_info_arrived (Update_info info) {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
         int64 info_version = Helper.string_version_to_int (info.version ());
@@ -552,8 +552,8 @@ class Passive_update_notifier : OCUpdater {
             if (url.is_empty ()) {
                 show_no_url_dialog (info);
             } else {
-                _target_file = cfg.config_path () + url.mid (url.last_index_of ('/')+1);
-                if (GLib.File (_target_file).exists ()) {
+                this.target_file = cfg.config_path () + url.mid (url.last_index_of ('/')+1);
+                if (GLib.File (this.target_file).exists ()) {
                     set_download_state (Download_complete);
                 } else {
                     var request = QNetworkRequest (GLib.Uri (url));
@@ -562,15 +562,15 @@ class Passive_update_notifier : OCUpdater {
                     connect (reply, &QIODevice.ready_read, this, &NSISUpdater.on_write_file);
                     connect (reply, &QNetworkReply.on_finished, this, &NSISUpdater.on_download_finished);
                     set_download_state (Downloading);
-                    _file.on_reset (new QTemporary_file);
-                    _file.set_auto_remove (true);
-                    _file.open ();
+                    this.file.on_reset (new QTemporary_file);
+                    this.file.set_auto_remove (true);
+                    this.file.open ();
                 }
             }
         }
     }
 
-    void NSISUpdater.show_no_url_dialog (Update_info &info) {
+    void NSISUpdater.show_no_url_dialog (Update_info info) {
         // if the version tag is set, there is a newer version.
         var msg_box = new Gtk.Dialog;
         msg_box.set_attribute (Qt.WA_DeleteOnClose);
@@ -683,9 +683,9 @@ class Passive_update_notifier : OCUpdater {
     bool NSISUpdater.handle_startup () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
-        string update_file_name = settings.value (update_available_c).to_"";
+        string update_filename = settings.value (update_available_c).to_"";
         // has the previous run downloaded an update?
-        if (!update_file_name.is_empty () && GLib.File (update_file_name).exists ()) {
+        if (!update_filename.is_empty () && GLib.File (update_filename).exists ()) {
             q_c_info (lc_updater) << "An updater file is available";
             // did it try to execute the update?
             if (settings.value (auto_update_attempted_c, false).to_bool ()) {
@@ -724,7 +724,7 @@ class Passive_update_notifier : OCUpdater {
         // package management updates the package while the app is running. This is detected in the
         // updater slot : If the installed binary on the hd has a different version than the one
         // running, the running app is restarted. That happens in folderman.
-        _running_app_version = Utility.version_of_installed_binary ();
+        this.running_app_version = Utility.version_of_installed_binary ();
     }
 
     void Passive_update_notifier.background_check_for_update () {
@@ -732,15 +732,15 @@ class Passive_update_notifier : OCUpdater {
             // on linux, check if the installed binary is still the same version
             // as the one that is running. If not, restart if possible.
             const GLib.ByteArray fs_version = Utility.version_of_installed_binary ();
-            if (! (fs_version.is_empty () || _running_app_version.is_empty ()) && fs_version != _running_app_version) {
-                emit request_restart ();
+            if (! (fs_version.is_empty () || this.running_app_version.is_empty ()) && fs_version != this.running_app_version) {
+                /* emit */ request_restart ();
             }
         }
 
         OCUpdater.background_check_for_update ();
     }
 
-    void Passive_update_notifier.version_info_arrived (Update_info &info) {
+    void Passive_update_notifier.version_info_arrived (Update_info info) {
         int64 current_ver = Helper.current_version_to_int ();
         int64 remote_ver = Helper.string_version_to_int (info.version ());
 
@@ -752,5 +752,5 @@ class Passive_update_notifier : OCUpdater {
         }
     }
 
-    } // ns mirall
+    } // namespace mirall
     

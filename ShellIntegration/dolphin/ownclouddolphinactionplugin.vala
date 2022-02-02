@@ -33,7 +33,7 @@ class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
     /***********************************************************
     ***********************************************************/
-    public OwncloudDolphinPluginAction (GLib.Object parent, GLib.List<QVariant>&)
+    public OwncloudDolphinPluginAction (GLib.Object parent, GLib.List<GLib.Variant>&)
         : KAbstractFileItemActionPlugin (parent) { }
 
 
@@ -48,7 +48,7 @@ class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         const GLib.List<GLib.Uri> urls = fileItemInfos.urlList ();
         const var paths = helper.paths ();
         GLib.ByteArray files;
-        for (var &url : urls) {
+        for (var url : urls) {
             QDir localPath (url.toLocalFile ());
             var localFile = localPath.canonicalPath ();
             if (!std.any_of (paths.begin (), paths.end (), [&] (string s) {
@@ -85,7 +85,7 @@ class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
                 });
             }
         });
-        QTimer.singleShot (100, &loop, SLOT (quit ())); // add a timeout to be sure we don't freeze dolphin
+        QTimer.singleShot (100, loop, SLOT (quit ())); // add a timeout to be sure we don't freeze dolphin
         helper.sendCommand (GLib.ByteArray ("GET_MENU_ITEMS:" + files + "\n"));
         loop.exec (QEventLoop.ExcludeUserInputEvents);
         disconnect (con);
@@ -102,7 +102,7 @@ class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.List<QAction> legacyActions (KFileItemListProperties &fileItemInfos, Gtk.Widget parentWidget) {
+    public GLib.List<QAction> legacyActions (KFileItemListProperties fileItemInfos, Gtk.Widget parentWidget) {
         GLib.List<GLib.Uri> urls = fileItemInfos.urlList ();
         if (urls.count () != 1)
             return {};

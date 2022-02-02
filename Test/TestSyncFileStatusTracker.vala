@@ -10,19 +10,19 @@
 using namespace Occ;
 
 class StatusPushSpy : QSignalSpy {
-    SyncEngine &_syncEngine;
+    SyncEngine this.syncEngine;
 
     /***********************************************************
     ***********************************************************/
-    public StatusPushSpy (SyncEngine &syncEngine)
+    public StatusPushSpy (SyncEngine syncEngine)
         : QSignalSpy (&syncEngine.syncFileStatusTracker (), SIGNAL (fileStatusChanged (string&, SyncFileStatus)))
-        , _syncEngine (syncEngine) { }
+        , this.syncEngine (syncEngine) { }
 
 
     /***********************************************************
     ***********************************************************/
     public SyncFileStatus statusOf (string relativePath) {
-        QFileInfo file (_syncEngine.localPath (), relativePath);
+        QFileInfo file (this.syncEngine.localPath (), relativePath);
         // Start from the end to get the latest status
         for (int i = size () - 1; i >= 0; --i) {
             if (QFileInfo (at (i)[0].toString ()) == file)
@@ -35,8 +35,8 @@ class StatusPushSpy : QSignalSpy {
     /***********************************************************
     ***********************************************************/
     public bool statusEmittedBefore (string firstPath, string secondPath) {
-        QFileInfo firstFile (_syncEngine.localPath (), firstPath);
-        QFileInfo secondFile (_syncEngine.localPath (), secondPath);
+        QFileInfo firstFile (this.syncEngine.localPath (), firstPath);
+        QFileInfo secondFile (this.syncEngine.localPath (), secondPath);
         // Start from the end to get the latest status
         int i = size () - 1;
         for (; i >= 0; --i) {
@@ -55,7 +55,7 @@ class StatusPushSpy : QSignalSpy {
 
 class TestSyncFileStatusTracker : GLib.Object {
 
-    void verifyThatPushMatchesPull (FakeFolder &fakeFolder, StatusPushSpy &statusSpy) {
+    void verifyThatPushMatchesPull (FakeFolder fakeFolder, StatusPushSpy statusSpy) {
         string root = fakeFolder.localPath ();
         QDirIterator it (root, QDir.AllEntries | QDir.NoDotAndDotDot, QDirIterator.Subdirectories);
         while (it.hasNext ()) {

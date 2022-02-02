@@ -7,7 +7,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 // #include <QBuffer>
 // #include <QJsonDocument>
 
-// #include <QVector>
+// #include <GLib.Vector>
 // #include <GLib.List>
 // #include <QPair>
 
@@ -49,7 +49,7 @@ class Ocs_share_job : Ocs_job {
     @param date The expire date, if this date is invalid the expire date
     will be removed
     ***********************************************************/
-    public void set_expire_date (string share_id, QDate &date);
+    public void set_expire_date (string share_id, QDate date);
 
 	 /***********************************************************
     Set note a share
@@ -133,13 +133,13 @@ signals:
     /***********************************************************
     Result of the OCS request
     The value parameter is only set if this was a put request.
-    e.g. if we set the password to 'foo' the QVariant will hold a string with 'foo'.
+    e.g. if we set the password to 'foo' the GLib.Variant will hold a string with 'foo'.
     This is needed so we can update the share objects properly
 
     @param reply The reply
     @param value To what did we set a variable (if we set any).
     ***********************************************************/
-    void share_job_finished (QJsonDocument reply, QVariant value);
+    void share_job_finished (QJsonDocument reply, GLib.Variant value);
 
 
     /***********************************************************
@@ -149,7 +149,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private 
-    private QVariant _value;
+    private GLib.Variant this.value;
 };
 
 
@@ -176,7 +176,7 @@ signals:
         on_start ();
     }
 
-    void Ocs_share_job.set_expire_date (string share_id, QDate &date) {
+    void Ocs_share_job.set_expire_date (string share_id, QDate date) {
         append_path (share_id);
         set_verb ("PUT");
 
@@ -185,7 +185,7 @@ signals:
         } else {
             add_param (string.from_latin1 ("expire_date"), "");
         }
-        _value = date;
+        this.value = date;
 
         on_start ();
     }
@@ -195,7 +195,7 @@ signals:
         set_verb ("PUT");
 
         add_param (string.from_latin1 ("password"), password);
-        _value = password;
+        this.value = password;
 
         on_start ();
     }
@@ -205,7 +205,7 @@ signals:
         set_verb ("PUT");
 
         add_param (string.from_latin1 ("note"), note);
-        _value = note;
+        this.value = note;
 
         on_start ();
     }
@@ -216,7 +216,7 @@ signals:
 
         const string value = string.from_latin1 (public_upload ? "true" : "false");
         add_param (string.from_latin1 ("public_upload"), value);
-        _value = public_upload;
+        this.value = public_upload;
 
         on_start ();
     }
@@ -225,7 +225,7 @@ signals:
         append_path (share_id);
         set_verb ("PUT");
         add_param (string.from_latin1 ("name"), name);
-        _value = name;
+        this.value = name;
 
         on_start ();
     }
@@ -236,7 +236,7 @@ signals:
         set_verb ("PUT");
 
         add_param (string.from_latin1 ("permissions"), string.number (permissions));
-        _value = (int)permissions;
+        this.value = (int)permissions;
 
         on_start ();
     }
@@ -246,7 +246,7 @@ signals:
         set_verb ("PUT");
 
         add_param (QStringLiteral ("label"), label);
-        _value = label;
+        this.value = label;
 
         on_start ();
     }
@@ -297,7 +297,7 @@ signals:
     }
 
     void Ocs_share_job.on_job_done (QJsonDocument reply) {
-        emit share_job_finished (reply, _value);
+        /* emit */ share_job_finished (reply, this.value);
     }
     }
     

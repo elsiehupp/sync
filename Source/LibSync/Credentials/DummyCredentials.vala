@@ -10,8 +10,8 @@ class DummyCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public string _user;
-    public string _password;
+    public string this.user;
+    public string this.password;
     public string auth_type () override;
     public string user () override;
     public string password () override;
@@ -30,7 +30,7 @@ class DummyCredentials : AbstractCredentials {
     }
 
     string DummyCredentials.user () {
-        return _user;
+        return this.user;
     }
 
     string DummyCredentials.password () {
@@ -52,7 +52,7 @@ class DummyCredentials : AbstractCredentials {
     }
 
     void DummyCredentials.fetch_from_keychain () {
-        _was_fetched = true;
+        this.was_fetched = true;
         Q_EMIT (fetched ());
     }
 

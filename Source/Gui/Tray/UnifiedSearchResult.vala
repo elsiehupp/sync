@@ -30,15 +30,15 @@ struct Unified_search_result {
     ***********************************************************/
     static string type_as_string (Unified_search_result.Type type);
 
-    string _title;
-    string _subline;
-    string _provider_id;
-    string _provider_name;
-    bool _is_rounded = false;
-    int32 _order = std.numeric_limits<int32>.max ();
-    GLib.Uri _resource_url;
-    string _icons;
-    Type _type = Type.Default;
+    string this.title;
+    string this.subline;
+    string this.provider_id;
+    string this.provider_name;
+    bool this.is_rounded = false;
+    int32 this.order = std.numeric_limits<int32>.max ();
+    GLib.Uri this.resource_url;
+    string this.icons;
+    Type this.type = Type.Default;
 };
 
 

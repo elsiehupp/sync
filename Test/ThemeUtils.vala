@@ -27,7 +27,7 @@ class FakePaintDevice : QPaintDevice {
 
     /***********************************************************
     ***********************************************************/
-    private bool _hidpi = false;
+    private bool this.hidpi = false;
 };
 
 
@@ -52,13 +52,13 @@ QPaintEngine *FakePaintDevice.paintEngine () {
 }
 
 void FakePaintDevice.setHidpi (bool value) {
-    _hidpi = value;
+    this.hidpi = value;
 }
 
 int FakePaintDevice.metric (QPaintDevice.PaintDeviceMetric metric) {
     switch (metric) {
     case QPaintDevice.PdmDevicePixelRatio:
-        if (_hidpi) {
+        if (this.hidpi) {
             return 2;
         }
         return 1;

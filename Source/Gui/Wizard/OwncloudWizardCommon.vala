@@ -7,13 +7,12 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 // #include <QLabel>
 // #include <QPixmap>
-// #include <QVariant>
+// #include <GLib.Variant>
 // #include <QRadio_button>
 // #include <QAbstractButton>
 // #include <QCheckBox>
 // #include <QSpin_box>
 
-// #include <string>
 
 class QSpin_box;
 
@@ -21,7 +20,7 @@ namespace Occ {
 
 namespace WizardCommon {
 
-    void setup_custom_media (QVariant &variant, QLabel label);
+    void setup_custom_media (GLib.Variant variant, QLabel label);
     string title_template ();
     string sub_title_template ();
     void init_error_label (QLabel error_label);
@@ -44,7 +43,7 @@ namespace WizardCommon {
         Page_Advanced_setup,
     };
 
-    void setup_custom_media (QVariant &variant, QLabel label) {
+    void setup_custom_media (GLib.Variant variant, QLabel label) {
         if (!label)
             return;
 
@@ -86,12 +85,12 @@ namespace WizardCommon {
 
     void customize_hint_label (QLabel label) {
         var palette = label.palette ();
-        QColor text_color = palette.color (QPalette.Text);
+        Gtk.Color text_color = palette.color (QPalette.Text);
         text_color.set_alpha (128);
         palette.on_set_color (QPalette.Text, text_color);
         label.set_palette (palette);
     }
 
-} // ns WizardCommon
+} // namespace WizardCommon
 
 } // namespace Occ

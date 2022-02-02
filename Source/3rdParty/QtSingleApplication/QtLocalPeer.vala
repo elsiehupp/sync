@@ -116,7 +116,7 @@ QtLocalPeer.QtLocalPeer (GLib.Object parent, string app_id)
     string lock_name = QDir (QDir.temp_path ()).absolute_path ()
                        + '/' + socket_name
                        + "-lockfile";
-    lock_file.set_file_name (lock_name);
+    lock_file.set_filename (lock_name);
     lock_file.open (QIODevice.ReadWrite);
 }
 
@@ -203,7 +203,7 @@ void QtLocalPeer.receive_connection () {
     string message = string.from_utf8 (u_msg.const_data (), u_msg.size ());
     socket.write (ack, qstrlen (ack));
     socket.wait_for_bytes_written (1000);
-    emit message_received (message, socket); // ## (might take a long time to return)
+    /* emit */ message_received (message, socket); // ## (might take a long time to return)
 }
 
 } // namespace SharedTools

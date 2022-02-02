@@ -4,7 +4,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QHash>
+// #include <GLib.HashMap>
 // #include <QPair>
 // #include <QDir>
 // #include <GLib.File>
@@ -43,10 +43,10 @@ class NetrcParser {
 
     /***********************************************************
     ***********************************************************/
-    private void try_add_entry_and_clear (string machine, Login_pair &pair, bool &is_default);
-    private QHash<string, Login_pair> _entries;
-    private Login_pair _default;
-    private string _netrc_location;
+    private void try_add_entry_and_clear (string machine, Login_pair pair, bool is_default);
+    private GLib.HashMap<string, Login_pair> this.entries;
+    private Login_pair this.default;
+    private string this.netrc_location;
 };
 
 
@@ -59,17 +59,17 @@ class NetrcParser {
     }
 
     NetrcParser.NetrcParser (string file) {
-        _netrc_location = file;
-        if (_netrc_location.is_empty ()) {
-            _netrc_location = QDir.home_path () + QLatin1String ("/.netrc");
+        this.netrc_location = file;
+        if (this.netrc_location.is_empty ()) {
+            this.netrc_location = QDir.home_path () + QLatin1String ("/.netrc");
         }
     }
 
-    void NetrcParser.try_add_entry_and_clear (string machine, Login_pair &pair, bool &is_default) {
+    void NetrcParser.try_add_entry_and_clear (string machine, Login_pair pair, bool is_default) {
         if (is_default) {
-            _default = pair;
+            this.default = pair;
         } else if (!machine.is_empty () && !pair.first.is_empty ()) {
-            _entries.insert (machine, pair);
+            this.entries.insert (machine, pair);
         }
         pair = q_make_pair ("", "");
         machine.clear ();
@@ -77,7 +77,7 @@ class NetrcParser {
     }
 
     bool NetrcParser.parse () {
-        GLib.File netrc (_netrc_location);
+        GLib.File netrc (this.netrc_location);
         if (!netrc.open (QIODevice.ReadOnly)) {
             return false;
         }
@@ -114,7 +114,7 @@ class NetrcParser {
         }
         try_add_entry_and_clear (machine, pair, is_default);
 
-        if (!_entries.is_empty () || _default != q_make_pair ("", "")) {
+        if (!this.entries.is_empty () || this.default != q_make_pair ("", "")) {
             return true;
         } else {
             return false;
@@ -122,11 +122,11 @@ class NetrcParser {
     }
 
     NetrcParser.Login_pair NetrcParser.find (string machine) {
-        QHash<string, Login_pair>.Const_iterator it = _entries.find (machine);
-        if (it != _entries.end ()) {
+        GLib.HashMap<string, Login_pair>.Const_iterator it = this.entries.find (machine);
+        if (it != this.entries.end ()) {
             return it;
         } else {
-            return _default;
+            return this.default;
         }
     }
 

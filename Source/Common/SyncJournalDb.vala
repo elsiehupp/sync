@@ -23,10 +23,9 @@ const int IS_PREFIX_PATH_OR_EQUAL (prefix, path) {
     " (" path " == " prefix " OR " IS_PREFIX_PATH_OF (prefix, path) ")"
 }
 
-// #include <GLib.DateTime>
-// #include <QHash>
+// #include <GLib.HashMap>
 // #include <QMutex>
-// #include <QVariant>
+// #include <GLib.Variant>
 // #include <functional>
 
 namespace Occ {
@@ -42,19 +41,19 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private SqlDatabase _database;
-    private string _database_file;
-    private QRecursiveMutex _mutex; // Public functions are protected with the mutex.
-    private QMap<GLib.ByteArray, int> _checksym_type_cache;
-    private int _transaction;
-    private bool _metadata_table_is_empty;
+    private SqlDatabase this.database;
+    private string this.database_file;
+    private QRecursiveMutex this.mutex; // Public functions are protected with the mutex.
+    private QMap<GLib.ByteArray, int> this.checksym_type_cache;
+    private int this.transaction;
+    private bool this.metadata_table_is_empty;
 
     /* Storing etags to these folders, or their parent folders, is filtered out.
 
-    When schedule_path_for_remote_discovery () is called some etags to _invalid_ in the
+    When schedule_path_for_remote_discovery () is called some etags to this.invalid_ in the
     database. If this is done during a sync run, a later propagation job might
     undo that by writing the correct etag to the database instead. This filter
-    will prevent this write and instead guarantee the _invalid_ etag stays in
+    will prevent this write and instead guarantee the this.invalid_ etag stays in
     place.
 
     The list is cleared on close () (end of sync ru
@@ -62,7 +61,7 @@ class SyncJournalDb : GLib.Object {
 
     The contained paths have a trailing /.
     ***********************************************************/
-    private GLib.List<GLib.ByteArray> _etag_storage_filter;
+    private GLib.List<GLib.ByteArray> this.etag_storage_filter;
 
 
     /***********************************************************
@@ -71,11 +70,11 @@ class SyncJournalDb : GLib.Object {
     Typically WAL initially, but may be set to other modes via environment
     variable, for specific filesystems, or when WAL fails in a particular way.
     ***********************************************************/
-    private GLib.ByteArray _journal_mode;
+    private GLib.ByteArray this.journal_mode;
 
     /***********************************************************
     ***********************************************************/
-    private PreparedSqlQueryManager _query_manager;
+    private PreparedSqlQueryManager this.query_manager;
 
 
     /***********************************************************
@@ -87,9 +86,9 @@ class SyncJournalDb : GLib.Object {
         this._metadata_table_is_empty = false;
         // Allow forcing the journal mode for debugging
         static GLib.ByteArray env_journal_mode = qgetenv ("OWNCLOUD_SQLITE_JOURNAL_MODE");
-        _journal_mode = env_journal_mode;
-        if (_journal_mode.is_empty ()) {
-            _journal_mode = default_journal_mode (_database_file);
+        this.journal_mode = env_journal_mode;
+        if (this.journal_mode.is_empty ()) {
+            this.journal_mode = default_journal_mode (this.database_file);
         }
     }
 
@@ -128,7 +127,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         // Error during creation, just keep the original and throw errors later
-        GLib.warn (lc_database) << "Could not find a writable database path" << file.file_name () << file.error_string ();
+        GLib.warn (lc_database) << "Could not find a writable database path" << file.filename () << file.error_string ();
         return journal_path;
     }
 
@@ -152,21 +151,21 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_file_record (GLib.ByteArray filename, SyncJournalFileRecord record) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         // Reset the output var in case the caller is reusing it.
         Q_ASSERT (record);
         record._path.clear ();
         Q_ASSERT (!record.is_valid ());
 
-        if (_metadata_table_is_empty)
+        if (this.metadata_table_is_empty)
             return true; // no error, yet nothing found (record.is_valid () == false)
 
         if (!check_connect ())
             return false;
 
         if (!filename.is_empty ()) {
-            const var query = _query_manager.get (PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY, QByteArrayLiteral (GET_FILE_RECORD_QUERY " WHERE phash=?1"), _database);
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY, QByteArrayLiteral (GET_FILE_RECORD_QUERY " WHERE phash=?1"), this.database);
             if (!query) {
                 return false;
             }
@@ -196,14 +195,14 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_file_record_by_e2e_mangled_name (string mangled_name, SyncJournalFileRecord record) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         // Reset the output var in case the caller is reusing it.
         Q_ASSERT (record);
         record._path.clear ();
         Q_ASSERT (!record.is_valid ());
 
-        if (_metadata_table_is_empty) {
+        if (this.metadata_table_is_empty) {
             return true; // no error, yet nothing found (record.is_valid () == false)
         }
 
@@ -212,7 +211,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (!mangled_name.is_empty ()) {
-            const var query = _query_manager.get (PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_MANGLED_NAME, QByteArrayLiteral (GET_FILE_RECORD_QUERY " WHERE e2e_mangled_name=?1"), _database);
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_MANGLED_NAME, QByteArrayLiteral (GET_FILE_RECORD_QUERY " WHERE e2e_mangled_name=?1"), this.database);
             if (!query) {
                 return false;
             }
@@ -242,19 +241,19 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_file_record_by_inode (uint64 inode, SyncJournalFileRecord record) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         // Reset the output var in case the caller is reusing it.
         Q_ASSERT (record);
         record._path.clear ();
         Q_ASSERT (!record.is_valid ());
 
-        if (!inode || _metadata_table_is_empty)
+        if (!inode || this.metadata_table_is_empty)
             return true; // no error, yet nothing found (record.is_valid () == false)
 
         if (!check_connect ())
             return false;
-        const var query = _query_manager.get (PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_INODE, QByteArrayLiteral (GET_FILE_RECORD_QUERY " WHERE inode=?1"), _database);
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_INODE, QByteArrayLiteral (GET_FILE_RECORD_QUERY " WHERE inode=?1"), this.database);
         if (!query)
             return false;
 
@@ -276,15 +275,15 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_file_records_by_file_id (GLib.ByteArray file_id, std.function<void (SyncJournalFileRecord &)> row_callback) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
-        if (file_id.is_empty () || _metadata_table_is_empty)
+        if (file_id.is_empty () || this.metadata_table_is_empty)
             return true; // no error, yet nothing found (record.is_valid () == false)
 
         if (!check_connect ())
             return false;
 
-        const var query = _query_manager.get (PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_FILE_ID, QByteArrayLiteral (GET_FILE_RECORD_QUERY " WHERE fileid=?1"), _database);
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_FILE_ID, QByteArrayLiteral (GET_FILE_RECORD_QUERY " WHERE fileid=?1"), this.database);
         if (!query) {
             return false;
         }
@@ -313,15 +312,15 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool get_files_below_path (GLib.ByteArray path, std.function<void (SyncJournalFileRecord&)> row_callback) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
-        if (_metadata_table_is_empty)
+        if (this.metadata_table_is_empty)
             return true; // no error, yet nothing found
 
         if (!check_connect ())
             return false;
 
-        var _exec = [&row_callback] (SqlQuery &query) {
+        var this.exec = [&row_callback] (SqlQuery query) {
             if (!query.exec ()) {
                 return false;
             }
@@ -346,15 +345,15 @@ class SyncJournalDb : GLib.Object {
             // and find nothing. So, unfortunately, we have to use a different query for
             // retrieving the whole tree.
 
-            const var query = _query_manager.get (PreparedSqlQueryManager.Key.GET_ALL_FILES_QUERY, QByteArrayLiteral (GET_FILE_RECORD_QUERY " ORDER BY path||'/' ASC"), _database);
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_ALL_FILES_QUERY, QByteArrayLiteral (GET_FILE_RECORD_QUERY " ORDER BY path||'/' ASC"), this.database);
             if (!query) {
                 return false;
             }
-            return _exec (*query);
+            return this.exec (*query);
         } else {
             // This query is used to skip discovery and fill the tree from the
             // database instead
-            const var query = _query_manager.get (
+            const var query = this.query_manager.get (
                 PreparedSqlQueryManager.Key.GET_FILES_BELOW_PATH_QUERY,
                 QByteArrayLiteral (GET_FILE_RECORD_QUERY " WHERE " IS_PREFIX_PATH_OF ("?1", "path")
                     " OR " IS_PREFIX_PATH_OF ("?1", "e2e_mangled_name")
@@ -364,12 +363,12 @@ class SyncJournalDb : GLib.Object {
                     // With the trailing /, we get foo-2, foo, foo/file. This property
                     // is used in fill_tree_from_database ().
                     " ORDER BY path||'/' ASC"),
-                _database);
+                this.database);
             if (!query) {
                 return false;
             }
             query.bind_value (1, path);
-            return _exec (*query);
+            return this.exec (*query);
         }
     }
 
@@ -377,15 +376,15 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool list_files_in_path (GLib.ByteArray path, std.function<void (SyncJournalFileRecord&)> row_callback) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
-        if (_metadata_table_is_empty)
+        if (this.metadata_table_is_empty)
             return true;
 
         if (!check_connect ())
             return false;
 
-        const var query = _query_manager.get (PreparedSqlQueryManager.Key.LIST_FILES_IN_PATH_QUERY, QByteArrayLiteral (GET_FILE_RECORD_QUERY " WHERE parent_hash (path) = ?1 ORDER BY path||'/' ASC"), _database);
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Key.LIST_FILES_IN_PATH_QUERY, QByteArrayLiteral (GET_FILE_RECORD_QUERY " WHERE parent_hash (path) = ?1 ORDER BY path||'/' ASC"), this.database);
         if (!query) {
             return false;
         }
@@ -416,17 +415,17 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Result<void, string> set_file_record (SyncJournalFileRecord &_record) {
-        SyncJournalFileRecord record = _record;
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+    public Result<void, string> set_file_record (SyncJournalFileRecord this.record) {
+        SyncJournalFileRecord record = this.record;
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
-        if (!_etag_storage_filter.is_empty ()) {
+        if (!this.etag_storage_filter.is_empty ()) {
             // If we are a directory that should not be read from database next time, don't write the etag
             GLib.ByteArray prefix = record._path + "/";
-            foreach (GLib.ByteArray it, _etag_storage_filter) {
+            foreach (GLib.ByteArray it, this.etag_storage_filter) {
                 if (it.starts_with (prefix)) {
                     q_c_info (lc_database) << "Filtered writing the etag of" << prefix << "because it is a prefix of" << it;
-                    record._etag = "_invalid_";
+                    record._etag = "this.invalid_";
                     break;
                 }
             }
@@ -450,13 +449,13 @@ class SyncJournalDb : GLib.Object {
                 file_id = "";
             GLib.ByteArray remote_perm = record._remote_perm.to_database_value ();
             GLib.ByteArray checksum_type, checksum;
-            parse_checksum_header (record._checksum_header, &checksum_type, &checksum);
+            parse_checksum_header (record._checksum_header, checksum_type, checksum);
             int content_checksum_type_id = map_checksum_type (checksum_type);
 
-            const var query = _query_manager.get (PreparedSqlQueryManager.Key.SET_FILE_RECORD_QUERY, QByteArrayLiteral ("INSERT OR REPLACE INTO metadata "
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Key.SET_FILE_RECORD_QUERY, QByteArrayLiteral ("INSERT OR REPLACE INTO metadata "
                                                                                                                 " (phash, pathlen, path, inode, uid, gid, mode, modtime, type, md5, fileid, remote_perm, filesize, ignored_children_remote, content_checksum, content_checksum_type_id, e2e_mangled_name, is_e2e_encrypted) "
                                                                                                                 "VALUES (?1 , ?2, ?3 , ?4 , ?5 , ?6 , ?7,  ?8 , ?9 , ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18);"),
-                _database);
+                this.database);
             if (!query) {
                 return query.error ();
             }
@@ -485,7 +484,7 @@ class SyncJournalDb : GLib.Object {
             }
 
             // Can't be true anymore.
-            _metadata_table_is_empty = false;
+            this.metadata_table_is_empty = false;
 
             return {};
         } else {
@@ -497,13 +496,13 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void key_value_store_set (string key, QVariant value) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+    public void key_value_store_set (string key, GLib.Variant value) {
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ()) {
             return;
         }
 
-        const var query = _query_manager.get (PreparedSqlQueryManager.SetKeyValueStoreQuery, QByteArrayLiteral ("INSERT OR REPLACE INTO key_value_store (key, value) VALUES (?1, ?2);"), _database);
+        const var query = this.query_manager.get (PreparedSqlQueryManager.SetKeyValueStoreQuery, QByteArrayLiteral ("INSERT OR REPLACE INTO key_value_store (key, value) VALUES (?1, ?2);"), this.database);
         if (!query) {
             return;
         }
@@ -517,12 +516,12 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public int64 key_value_store_get_int (string key, int64 default_value) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ()) {
             return default_value;
         }
 
-        const var query = _query_manager.get (PreparedSqlQueryManager.GetKeyValueStoreQuery, QByteArrayLiteral ("SELECT value FROM key_value_store WHERE key=?1"), _database);
+        const var query = this.query_manager.get (PreparedSqlQueryManager.GetKeyValueStoreQuery, QByteArrayLiteral ("SELECT value FROM key_value_store WHERE key=?1"), this.database);
         if (!query) {
             return default_value;
         }
@@ -542,14 +541,14 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void key_value_store_delete (string key) {
-        const var query = _query_manager.get (PreparedSqlQueryManager.DeleteKeyValueStoreQuery, QByteArrayLiteral ("DELETE FROM key_value_store WHERE key=?1;"), _database);
+        const var query = this.query_manager.get (PreparedSqlQueryManager.DeleteKeyValueStoreQuery, QByteArrayLiteral ("DELETE FROM key_value_store WHERE key=?1;"), this.database);
         if (!query) {
-            GLib.warn (lc_database) << "Failed to init_or_reset _delete_key_value_store_query";
+            GLib.warn (lc_database) << "Failed to init_or_reset this.delete_key_value_store_query";
             Q_ASSERT (false);
         }
         query.bind_value (1, key);
         if (!query.exec ()) {
-            GLib.warn (lc_database) << "Failed to exec _delete_key_value_store_query for key" << key;
+            GLib.warn (lc_database) << "Failed to exec this.delete_key_value_store_query for key" << key;
             Q_ASSERT (false);
         }
     }
@@ -557,13 +556,13 @@ class SyncJournalDb : GLib.Object {
 
     // TODO : filename . QBytearray?
     public bool delete_file_record (string filename, bool recursively = false) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         if (check_connect ()) {
             // if (!recursively) {
             // always delete the actual file.
             {
-                const var query = _query_manager.get (PreparedSqlQueryManager.Key.DELETE_FILE_RECORD_PHASH, QByteArrayLiteral ("DELETE FROM metadata WHERE phash=?1"), _database);
+                const var query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_FILE_RECORD_PHASH, QByteArrayLiteral ("DELETE FROM metadata WHERE phash=?1"), this.database);
                 if (!query) {
                     return false;
                 }
@@ -577,7 +576,7 @@ class SyncJournalDb : GLib.Object {
             }
 
             if (recursively) {
-                const var query = _query_manager.get (PreparedSqlQueryManager.Key.DELETE_FILE_RECORD_RECURSIVELY, QByteArrayLiteral ("DELETE FROM metadata WHERE " IS_PREFIX_PATH_OF ("?1", "path")), _database);
+                const var query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_FILE_RECORD_RECURSIVELY, QByteArrayLiteral ("DELETE FROM metadata WHERE " IS_PREFIX_PATH_OF ("?1", "path")), this.database);
                 if (!query)
                     return false;
                 query.bind_value (1, filename);
@@ -598,7 +597,7 @@ class SyncJournalDb : GLib.Object {
     public bool update_file_record_checksum (string filename,
         GLib.ByteArray content_checksum,
         GLib.ByteArray content_checksum_type) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         q_c_info (lc_database) << "Updating file checksum" << filename << content_checksum << content_checksum_type;
 
@@ -610,10 +609,10 @@ class SyncJournalDb : GLib.Object {
 
         int checksum_type_id = map_checksum_type (content_checksum_type);
 
-        const var query = _query_manager.get (PreparedSqlQueryManager.Key.SET_FILE_RECORD_CHECKSUM_QUERY, QByteArrayLiteral ("UPDATE metadata"
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Key.SET_FILE_RECORD_CHECKSUM_QUERY, QByteArrayLiteral ("UPDATE metadata"
                                                                                                                     " SET content_checksum = ?2, content_checksum_type_id = ?3"
                                                                                                                     " WHERE phash == ?1;"),
-            _database);
+            this.database);
         if (!query) {
             return false;
         }
@@ -628,7 +627,7 @@ class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public bool update_local_metadata (string filename,
         int64 modtime, int64 size, uint64 inode) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         q_c_info (lc_database) << "Updating local metadata for:" << filename << modtime << size << inode;
 
@@ -638,10 +637,10 @@ class SyncJournalDb : GLib.Object {
             return false;
         }
 
-        const var query = _query_manager.get (PreparedSqlQueryManager.Key.SET_FILE_LOCAL_METADATA_QUERY, QByteArrayLiteral ("UPDATE metadata"
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Key.SET_FILE_LOCAL_METADATA_QUERY, QByteArrayLiteral ("UPDATE metadata"
                                                                                                                         " SET inode=?2, modtime=?3, filesize=?4"
                                                                                                                         " WHERE phash == ?1;"),
-            _database);
+            this.database);
         if (!query) {
             return false;
         }
@@ -667,13 +666,13 @@ class SyncJournalDb : GLib.Object {
     Returns whether the item or any subitems are dehydrated
     ***********************************************************/
     public Optional<HasHydratedDehydrated> has_hydrated_or_dehydrated_files (GLib.ByteArray filename) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ())
             return {};
 
-        const var query = _query_manager.get (PreparedSqlQueryManager.Count_dehydrated_files_query, QByteArrayLiteral ("SELECT DISTINCT type FROM metadata"
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Count_dehydrated_files_query, QByteArrayLiteral ("SELECT DISTINCT type FROM metadata"
                                                                                                                 " WHERE (" IS_PREFIX_PATH_OR_EQUAL ("?1", "path") " OR ?1 == '');"),
-            _database);
+            this.database);
         if (!query) {
             return {};
         }
@@ -703,8 +702,8 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool exists () {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
-        return (!_database_file.is_empty () && GLib.File.exists (_database_file));
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
+        return (!this.database_file.is_empty () && GLib.File.exists (this.database_file));
     }
 
 
@@ -714,7 +713,7 @@ class SyncJournalDb : GLib.Object {
     public void wal_checkpoint () {
         QElapsedTimer t;
         t.on_start ();
-        SqlQuery pragma1 (_database);
+        SqlQuery pragma1 (this.database);
         pragma1.prepare ("PRAGMA wal_checkpoint (FULL);");
         if (pragma1.exec ()) {
             GLib.debug (lc_database) << "took" << t.elapsed () << "msec";
@@ -725,7 +724,7 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string database_file_path () {
-        return _database_file;
+        return this.database_file;
     }
 
 
@@ -743,7 +742,7 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void set_error_blocklist_entry (SyncJournalErrorBlocklistRecord item) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         q_c_info (lc_database) << "Setting blocklist entry for" << item._file << item._retry_count
                     << item._error_string << item._last_try_time << item._ignore_duration
@@ -754,10 +753,10 @@ class SyncJournalDb : GLib.Object {
             return;
         }
 
-        const var query = _query_manager.get (PreparedSqlQueryManager.Set_error_blocklist_query, QByteArrayLiteral ("INSERT OR REPLACE INTO blocklist "
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Set_error_blocklist_query, QByteArrayLiteral ("INSERT OR REPLACE INTO blocklist "
                                                                                                                 " (path, last_try_etag, last_try_modtime, retrycount, errorstring, last_try_time, ignore_duration, rename_target, error_category, request_id) "
                                                                                                                 "VALUES ( ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)"),
-            _database);
+            this.database);
         if (!query) {
             return;
         }
@@ -783,9 +782,9 @@ class SyncJournalDb : GLib.Object {
             return;
         }
 
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (check_connect ()) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
 
             query.prepare ("DELETE FROM blocklist WHERE path=?1");
             query.bind_value (1, file);
@@ -799,9 +798,9 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void wipe_error_blocklist_category (SyncJournalErrorBlocklistRecord.Category category) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (check_connect ()) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
 
             query.prepare ("DELETE FROM blocklist WHERE error_category=?1");
             query.bind_value (1, category);
@@ -815,9 +814,9 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public int wipe_error_blocklist () {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (check_connect ()) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
 
             query.prepare ("DELETE FROM blocklist");
 
@@ -836,9 +835,9 @@ class SyncJournalDb : GLib.Object {
     public int on_error_block_list_entry_count () {
         int re = 0;
 
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (check_connect ()) {
-            SqlQuery query = new SqlQuery ("SELECT count (*) FROM blocklist", _database);
+            SqlQuery query = new SqlQuery ("SELECT count (*) FROM blocklist", this.database);
 
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("Count number of blocklist entries failed"), query);
@@ -854,30 +853,30 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public struct DownloadInfo {
-        string _tmpfile;
-        GLib.ByteArray _etag;
-        int _error_count = 0;
-        bool _valid = false;
+        string this.tmpfile;
+        GLib.ByteArray this.etag;
+        int this.error_count = 0;
+        bool this.valid = false;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public struct UploadInfo {
-        int _chunk = 0;
-        uint32 _transferid = 0;
-        int64 _size = 0;
-        int64 _modtime = 0;
-        int _error_count = 0;
-        bool _valid = false;
-        GLib.ByteArray _content_checksum;
+        int this.chunk = 0;
+        uint32 this.transferid = 0;
+        int64 this.size = 0;
+        int64 this.modtime = 0;
+        int this.error_count = 0;
+        bool this.valid = false;
+        GLib.ByteArray this.content_checksum;
         /***********************************************************
         Returns true if this entry refers to a chunked upload that can be continued.
         (As opposed to a small file transfer which is stored in the database so we can detect the case
         when the upload succeeded, but the connection was dropped before we got the answer)
         ***********************************************************/
         bool is_chunked () {
-            return _transferid != 0;
+            return this.transferid != 0;
         }
     }
 
@@ -885,22 +884,22 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public struct PollInfo {
-        string _file; // The relative path of a file
-        string _url; // the poll url. (This pollinfo is invalid if _url is empty)
-        int64 _modtime; // The modtime of the file being uploaded
-        int64 _file_size;
+        string this.file; // The relative path of a file
+        string this.url; // the poll url. (This pollinfo is invalid if this.url is empty)
+        int64 this.modtime; // The modtime of the file being uploaded
+        int64 this.file_size;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public DownloadInfo get_download_info (string file) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         DownloadInfo res;
 
         if (check_connect ()) {
-            const var query = _query_manager.get (PreparedSqlQueryManager.Key.GET_DOWNLOAD_INFO_QUERY, QByteArrayLiteral ("SELECT tmpfile, etag, errorcount FROM downloadinfo WHERE path=?1"), _database);
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_DOWNLOAD_INFO_QUERY, QByteArrayLiteral ("SELECT tmpfile, etag, errorcount FROM downloadinfo WHERE path=?1"), this.database);
             if (!query) {
                 return res;
             }
@@ -912,7 +911,7 @@ class SyncJournalDb : GLib.Object {
             }
 
             if (query.next ().has_data) {
-                to_download_info (*query, &res);
+                to_download_info (*query, res);
             }
         }
         return res;
@@ -922,17 +921,17 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void set_download_info (string file, DownloadInfo i) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         if (!check_connect ()) {
             return;
         }
 
         if (i._valid) {
-            const var query = _query_manager.get (PreparedSqlQueryManager.Key.SET_DOWNLOAD_INFO_QUERY, QByteArrayLiteral ("INSERT OR REPLACE INTO downloadinfo "
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Key.SET_DOWNLOAD_INFO_QUERY, QByteArrayLiteral ("INSERT OR REPLACE INTO downloadinfo "
                                                                                                                 " (path, tmpfile, etag, errorcount) "
                                                                                                                 "VALUES ( ?1 , ?2, ?3, ?4 )"),
-                _database);
+                this.database);
             if (!query) {
                 return;
             }
@@ -942,7 +941,7 @@ class SyncJournalDb : GLib.Object {
             query.bind_value (4, i._error_count);
             query.exec ();
         } else {
-            const var query = _query_manager.get (PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY);
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY);
             query.bind_value (1, file);
             query.exec ();
         }
@@ -951,15 +950,15 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QVector<DownloadInfo> get_and_delete_stale_download_infos (GLib.Set<string> keep) {
-        QVector<SyncJournalDb.DownloadInfo> empty_result;
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+    public GLib.Vector<DownloadInfo> get_and_delete_stale_download_infos (GLib.Set<string> keep) {
+        GLib.Vector<SyncJournalDb.DownloadInfo> empty_result;
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         if (!check_connect ()) {
             return empty_result;
         }
 
-        SqlQuery query = new SqlQuery (_database);
+        SqlQuery query = new SqlQuery (this.database);
         // The selected values must* match the ones expected by to_download_info ().
         query.prepare ("SELECT tmpfile, etag, errorcount, path FROM downloadinfo");
 
@@ -968,19 +967,19 @@ class SyncJournalDb : GLib.Object {
         }
 
         string[] superfluous_paths;
-        QVector<SyncJournalDb.DownloadInfo> deleted_entries;
+        GLib.Vector<SyncJournalDb.DownloadInfo> deleted_entries;
 
         while (query.next ().has_data) {
             const string file = query.string_value (3); // path
             if (!keep.contains (file)) {
                 superfluous_paths.append (file);
                 DownloadInfo info;
-                to_download_info (query, &info);
+                to_download_info (query, info);
                 deleted_entries.append (info);
             }
         }
         {
-            const var query = _query_manager.get (PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY);
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY);
             if (!delete_batch (*query, superfluous_paths, QStringLiteral ("downloadinfo"))) {
                 return empty_result;
             }
@@ -995,9 +994,9 @@ class SyncJournalDb : GLib.Object {
     public int on_download_info_count () {
         int re = 0;
 
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (check_connect ()) {
-            SqlQuery query = new SqlQuery ("SELECT count (*) FROM downloadinfo", _database);
+            SqlQuery query = new SqlQuery ("SELECT count (*) FROM downloadinfo", this.database);
 
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("Count number of downloadinfo entries failed"), query);
@@ -1013,14 +1012,14 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public UploadInfo get_upload_info (string file) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         UploadInfo res;
 
         if (check_connect ()) {
-            const var query = _query_manager.get (PreparedSqlQueryManager.Key.GET_UPLOAD_INFO_QUERY, QByteArrayLiteral ("SELECT chunk, transferid, errorcount, size, modtime, content_checksum FROM "
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_UPLOAD_INFO_QUERY, QByteArrayLiteral ("SELECT chunk, transferid, errorcount, size, modtime, content_checksum FROM "
                                                                                                                 "uploadinfo WHERE path=?1"),
-                _database);
+                this.database);
             if (!query) {
                 return res;
             }
@@ -1048,17 +1047,17 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void set_upload_info (string file, UploadInfo i) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         if (!check_connect ()) {
             return;
         }
 
         if (i._valid) {
-            const var query = _query_manager.get (PreparedSqlQueryManager.Key.SET_UPLOAD_INFO_QUERY, QByteArrayLiteral ("INSERT OR REPLACE INTO uploadinfo "
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Key.SET_UPLOAD_INFO_QUERY, QByteArrayLiteral ("INSERT OR REPLACE INTO uploadinfo "
                                                                                                                 " (path, chunk, transferid, errorcount, size, modtime, content_checksum) "
                                                                                                                 "VALUES ( ?1 , ?2, ?3 , ?4 ,  ?5, ?6 , ?7 )"),
-                _database);
+                this.database);
             if (!query) {
                 return;
             }
@@ -1075,7 +1074,7 @@ class SyncJournalDb : GLib.Object {
                 return;
             }
         } else {
-            const var query = _query_manager.get (PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY);
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY);
             query.bind_value (1, file);
 
             if (!query.exec ()) {
@@ -1086,15 +1085,15 @@ class SyncJournalDb : GLib.Object {
 
 
     // Return the list of transfer ids that were removed.
-    public QVector<uint32> delete_stale_upload_infos (GLib.Set<string> keep) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
-        QVector<uint32> ids;
+    public GLib.Vector<uint32> delete_stale_upload_infos (GLib.Set<string> keep) {
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
+        GLib.Vector<uint32> ids;
 
         if (!check_connect ()) {
             return ids;
         }
 
-        SqlQuery query = new SqlQuery (_database);
+        SqlQuery query = new SqlQuery (this.database);
         query.prepare ("SELECT path,transferid FROM uploadinfo");
 
         if (!query.exec ()) {
@@ -1111,7 +1110,7 @@ class SyncJournalDb : GLib.Object {
             }
         }
 
-        const var delete_upload_info_query = _query_manager.get (PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY);
+        const var delete_upload_info_query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY);
         delete_batch (*delete_upload_info_query, superfluous_paths, QStringLiteral ("uploadinfo"));
         return ids;
     }
@@ -1120,14 +1119,14 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public SyncJournalErrorBlocklistRecord error_blocklist_entry (string file) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         SyncJournalErrorBlocklistRecord entry;
 
         if (file.is_empty ())
             return entry;
 
         if (check_connect ()) {
-            const var query = _query_manager.get (PreparedSqlQueryManager.GetErrorBlocklistQuery);
+            const var query = this.query_manager.get (PreparedSqlQueryManager.GetErrorBlocklistQuery);
             query.bind_value (1, file);
             if (query.exec ()) {
                 if (query.next ().has_data) {
@@ -1153,13 +1152,13 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool delete_stale_error_blocklist_entries (GLib.Set<string> keep) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         if (!check_connect ()) {
             return false;
         }
 
-        SqlQuery query = new SqlQuery (_database);
+        SqlQuery query = new SqlQuery (this.database);
         query.prepare ("SELECT path FROM blocklist");
 
         if (!query.exec ()) {
@@ -1175,7 +1174,7 @@ class SyncJournalDb : GLib.Object {
             }
         }
 
-        SqlQuery del_query (_database);
+        SqlQuery del_query (this.database);
         del_query.prepare ("DELETE FROM blocklist WHERE path = ?");
         return delete_batch (del_query, superfluous_paths, QStringLiteral ("blocklist"));
     }
@@ -1185,11 +1184,11 @@ class SyncJournalDb : GLib.Object {
     Delete flags table entries that have no metadata correspondent
     ***********************************************************/
     public void delete_stale_flags_entries () {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ())
             return;
 
-        SqlQuery del_query ("DELETE FROM flags WHERE path != '' AND path NOT IN (SELECT path from metadata);", _database);
+        SqlQuery del_query ("DELETE FROM flags WHERE path != '' AND path NOT IN (SELECT path from metadata);", this.database);
         del_query.exec ();
     }
 
@@ -1202,13 +1201,13 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void avoid_renames_on_next_sync (GLib.ByteArray path) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         if (!check_connect ()) {
             return;
         }
 
-        SqlQuery query = new SqlQuery (_database);
+        SqlQuery query = new SqlQuery (this.database);
         query.prepare ("UPDATE metadata SET fileid = '', inode = '0' WHERE " IS_PREFIX_PATH_OR_EQUAL ("?1", "path"));
         query.bind_value (1, path);
         query.exec ();
@@ -1222,18 +1221,18 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void set_poll_info (PollInfo info) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ()) {
             return;
         }
 
         if (info._url.is_empty ()) {
             GLib.debug (lc_database) << "Deleting Poll job" << info._file;
-            SqlQuery query = new SqlQuery ("DELETE FROM async_poll WHERE path=?", _database);
+            SqlQuery query = new SqlQuery ("DELETE FROM async_poll WHERE path=?", this.database);
             query.bind_value (1, info._file);
             query.exec ();
         } else {
-            SqlQuery query = new SqlQuery ("INSERT OR REPLACE INTO async_poll (path, modtime, filesize, pollpath) VALUES ( ? , ? , ? , ? )", _database);
+            SqlQuery query = new SqlQuery ("INSERT OR REPLACE INTO async_poll (path, modtime, filesize, pollpath) VALUES ( ? , ? , ? , ? )", this.database);
             query.bind_value (1, info._file);
             query.bind_value (2, info._modtime);
             query.bind_value (3, info._file_size);
@@ -1245,15 +1244,15 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QVector<PollInfo> get_poll_infos () {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+    public GLib.Vector<PollInfo> get_poll_infos () {
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
-        QVector<SyncJournalDb.PollInfo> res;
+        GLib.Vector<SyncJournalDb.PollInfo> res;
 
         if (!check_connect ())
             return res;
 
-        SqlQuery query = new SqlQuery ("SELECT path, modtime, filesize, pollpath FROM async_poll", _database);
+        SqlQuery query = new SqlQuery ("SELECT path, modtime, filesize, pollpath FROM async_poll", this.database);
 
         if (!query.exec ()) {
             return res;
@@ -1301,13 +1300,13 @@ class SyncJournalDb : GLib.Object {
         string[] result;
         ASSERT (ok);
 
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ()) {
             *ok = false;
             return result;
         }
 
-        const var query = _query_manager.get (PreparedSqlQueryManager.Get_selective_sync_list_query, QByteArrayLiteral ("SELECT path FROM selectivesync WHERE type=?1"), _database);
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Get_selective_sync_list_query, QByteArrayLiteral ("SELECT path FROM selectivesync WHERE type=?1"), this.database);
         if (!query) {
             *ok = false;
             return result;
@@ -1342,11 +1341,11 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     Write the selective sync list (remove all other entries of that list
     ***********************************************************/
-    public void set_selective_sync_list (SelectiveSyncListType type, string[] &list);
+    public void set_selective_sync_list (SelectiveSyncListType type, string[] list);
 
 
     /***********************************************************
-    Make sure that on the next sync file_name and its parents are discovered from the server.
+    Make sure that on the next sync filename and its parents are discovered from the server.
 
     That means its metadata and, if it's a directory, its direct contents.
 
@@ -1355,24 +1354,24 @@ class SyncJournalDb : GLib.Object {
     affected folders.
 
     Since folders in the selective sync list will not be rediscovered (csync_ftw,
-    _csync_detect_update skip them), the _invalid_ marker will stay. And any
+    this.csync_detect_update skip them), the this.invalid_ marker will stay. And any
     child items in the database will be ignored when reading a remote tree from the database.
 
     Any set_file_record () call to affected directories before the next sync run will be
-    adjusted to retain the invalid etag via _etag_storage_filter.
+    adjusted to retain the invalid etag via this.etag_storage_filter.
     ***********************************************************/
-    public void schedule_path_for_remote_discovery (string file_name) {
-        schedule_path_for_remote_discovery (file_name.to_utf8 ());
+    public void schedule_path_for_remote_discovery (string filename) {
+        schedule_path_for_remote_discovery (filename.to_utf8 ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void schedule_path_for_remote_discovery (GLib.ByteArray file_name);
+    public void schedule_path_for_remote_discovery (GLib.ByteArray filename);
 
 
     /***********************************************************
-    Wipe _etag_storage_filter. Also done implicitly on close ().
+    Wipe this.etag_storage_filter. Also done implicitly on close ().
     ***********************************************************/
     public void clear_etag_storage_filter ();
 
@@ -1567,9 +1566,9 @@ class SyncJournalDb : GLib.Object {
         Returns nothing on database error.
         Note that this will have an entry for "".
         ***********************************************************/
-        Optional<QVector<QPair<GLib.ByteArray, PinState>>> raw_list ();
+        Optional<GLib.Vector<QPair<GLib.ByteArray, PinState>>> raw_list ();
 
-        SyncJournalDb _database;
+        SyncJournalDb this.database;
     }
 
 
@@ -1662,13 +1661,13 @@ class SyncJournalDb : GLib.Object {
 
 
     //  OCSYNC_EXPORT
-    bool operator== (SyncJournalDb.DownloadInfo &lhs,
-        const SyncJournalDb.DownloadInfo &rhs);
+    bool operator== (SyncJournalDb.DownloadInfo lhs,
+        const SyncJournalDb.DownloadInfo rhs);
 
 
     //  OCSYNC_EXPORT
-    bool operator== (SyncJournalDb.UploadInfo &lhs,
-        const SyncJournalDb.UploadInfo &rhs);
+    bool operator== (SyncJournalDb.UploadInfo lhs,
+        const SyncJournalDb.UploadInfo rhs);
 
 };
 
@@ -1684,7 +1683,7 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static void fill_file_record_from_get_query (SyncJournalFileRecord &record, SqlQuery &query) {
+    static void fill_file_record_from_get_query (SyncJournalFileRecord record, SqlQuery query) {
         record._path = query.byte_array_value (0);
         record._inode = query.int64_value (1);
         record._modtime = query.int64_value (2);
@@ -1727,38 +1726,38 @@ class SyncJournalDb : GLib.Object {
         string error;
 
         if (FileSystem.file_exists (new_database_name)) {
-            if (!FileSystem.remove (new_database_name, &error)) {
+            if (!FileSystem.remove (new_database_name, error)) {
                 GLib.warn (lc_database) << "Database migration : Could not remove database file" << new_database_name
                                 << "due to" << error;
                 return false;
             }
         }
         if (FileSystem.file_exists (new_database_name_wal)) {
-            if (!FileSystem.remove (new_database_name_wal, &error)) {
+            if (!FileSystem.remove (new_database_name_wal, error)) {
                 GLib.warn (lc_database) << "Database migration : Could not remove database WAL file" << new_database_name_wal
                                 << "due to" << error;
                 return false;
             }
         }
         if (FileSystem.file_exists (new_database_name_shm)) {
-            if (!FileSystem.remove (new_database_name_shm, &error)) {
+            if (!FileSystem.remove (new_database_name_shm, error)) {
                 GLib.warn (lc_database) << "Database migration : Could not remove database SHM file" << new_database_name_shm
                                 << "due to" << error;
                 return false;
             }
         }
 
-        if (!FileSystem.rename (old_database_name, new_database_name, &error)) {
+        if (!FileSystem.rename (old_database_name, new_database_name, error)) {
             GLib.warn (lc_database) << "Database migration : could not rename" << old_database_name
                             << "to" << new_database_name << ":" << error;
             return false;
         }
-        if (!FileSystem.rename (old_database_name_wal, new_database_name_wal, &error)) {
+        if (!FileSystem.rename (old_database_name_wal, new_database_name_wal, error)) {
             GLib.warn (lc_database) << "Database migration : could not rename" << old_database_name_wal
                             << "to" << new_database_name_wal << ":" << error;
             return false;
         }
-        if (!FileSystem.rename (old_database_name_shm, new_database_name_shm, &error)) {
+        if (!FileSystem.rename (old_database_name_shm, new_database_name_shm, error)) {
             GLib.warn (lc_database) << "Database migration : could not rename" << old_database_name_shm
                             << "to" << new_database_name_shm << ":" << error;
             return false;
@@ -1772,33 +1771,33 @@ class SyncJournalDb : GLib.Object {
 
 
     void SyncJournalDb.start_transaction () {
-        if (_transaction == 0) {
-            if (!_database.transaction ()) {
-                GLib.warn (lc_database) << "ERROR starting transaction:" << _database.error ();
+        if (this.transaction == 0) {
+            if (!this.database.transaction ()) {
+                GLib.warn (lc_database) << "ERROR starting transaction:" << this.database.error ();
                 return;
             }
-            _transaction = 1;
+            this.transaction = 1;
         } else {
             GLib.debug (lc_database) << "Database Transaction is running, not starting another one!";
         }
     }
 
     void SyncJournalDb.commit_transaction () {
-        if (_transaction == 1) {
-            if (!_database.commit ()) {
-                GLib.warn (lc_database) << "ERROR committing to the database:" << _database.error ();
+        if (this.transaction == 1) {
+            if (!this.database.commit ()) {
+                GLib.warn (lc_database) << "ERROR committing to the database:" << this.database.error ();
                 return;
             }
-            _transaction = 0;
+            this.transaction = 0;
         } else {
             GLib.debug (lc_database) << "No database Transaction to commit";
         }
     }
 
-    bool SyncJournalDb.sql_fail (string log, SqlQuery &query) {
+    bool SyncJournalDb.sql_fail (string log, SqlQuery query) {
         commit_transaction ();
         GLib.warn (lc_database) << "SQL Error" << log << query.error ();
-        _database.close ();
+        this.database.close ();
         ASSERT (false);
         return false;
     }
@@ -1811,35 +1810,35 @@ class SyncJournalDb : GLib.Object {
             }
         }
 
-        if (_database.is_open ()) {
+        if (this.database.is_open ()) {
             // Unfortunately the sqlite is_open check can return true even when the underlying storage
             // has become unavailable - and then some operations may cause crashes. See #6049
-            if (!GLib.File.exists (_database_file)) {
-                GLib.warn (lc_database) << "Database open, but file" << _database_file << "does not exist";
+            if (!GLib.File.exists (this.database_file)) {
+                GLib.warn (lc_database) << "Database open, but file" << this.database_file << "does not exist";
                 close ();
                 return false;
             }
             return true;
         }
 
-        if (_database_file.is_empty ()) {
-            GLib.warn (lc_database) << "Database filename" << _database_file << "is empty";
+        if (this.database_file.is_empty ()) {
+            GLib.warn (lc_database) << "Database filename" << this.database_file << "is empty";
             return false;
         }
 
         // The database file is created by this call (SQLITE_OPEN_CREATE)
-        if (!_database.open_or_create_read_write (_database_file)) {
-            string error = _database.error ();
+        if (!this.database.open_or_create_read_write (this.database_file)) {
+            string error = this.database.error ();
             GLib.warn (lc_database) << "Error opening the database:" << error;
             return false;
         }
 
-        if (!GLib.File.exists (_database_file)) {
-            GLib.warn (lc_database) << "Database file" << _database_file << "does not exist";
+        if (!GLib.File.exists (this.database_file)) {
+            GLib.warn (lc_database) << "Database file" << this.database_file << "does not exist";
             return false;
         }
 
-        SqlQuery pragma1 (_database);
+        SqlQuery pragma1 (this.database);
         pragma1.prepare ("SELECT sqlite_version ();");
         if (!pragma1.exec ()) {
             return sql_fail ("SELECT sqlite_version ()", pragma1);
@@ -1860,7 +1859,7 @@ class SyncJournalDb : GLib.Object {
             q_c_info (lc_database) << "Sqlite3 locking_mode=" << pragma1.string_value (0);
         }
 
-        pragma1.prepare ("PRAGMA journal_mode=" + _journal_mode + ";");
+        pragma1.prepare ("PRAGMA journal_mode=" + this.journal_mode + ";");
         if (!pragma1.exec ()) {
             return sql_fail ("Set PRAGMA journal_mode", pragma1);
         } else {
@@ -1881,7 +1880,7 @@ class SyncJournalDb : GLib.Object {
         // With WAL journal the NORMAL sync mode is safe from corruption,
         // otherwise use the standard FULL mode.
         GLib.ByteArray synchronous_mode = "FULL";
-        if (string.from_utf8 (_journal_mode).compare ("wal", Qt.CaseInsensitive) == 0)
+        if (string.from_utf8 (this.journal_mode).compare ("wal", Qt.CaseInsensitive) == 0)
             synchronous_mode = "NORMAL";
         pragma1.prepare ("PRAGMA synchronous = " + synchronous_mode + ";");
         if (!pragma1.exec ()) {
@@ -1895,7 +1894,7 @@ class SyncJournalDb : GLib.Object {
             return sql_fail (QStringLiteral ("Set PRAGMA case_sensitivity"), pragma1);
         }
 
-        sqlite3_create_function (_database.sqlite_database (), "parent_hash", 1, SQLITE_UTF8 | SQLITE_DETERMINISTIC, nullptr,
+        sqlite3_create_function (this.database.sqlite_database (), "parent_hash", 1, SQLITE_UTF8 | SQLITE_DETERMINISTIC, nullptr,
                                     [] (sqlite3_context ctx,int, sqlite3_value **argv) {
                                         var text = reinterpret_cast<const char> (sqlite3_value_text (argv[0]));
                                         const char end = std.strrchr (text, '/');
@@ -1907,7 +1906,7 @@ class SyncJournalDb : GLib.Object {
         // Because insert is so slow, we do everything in a transaction, and only need one call to commit
         start_transaction ();
 
-        SqlQuery create_query (_database);
+        SqlQuery create_query (this.database);
         create_query.prepare ("CREATE TABLE IF NOT EXISTS metadata ("
                             "phash INTEGER (8),"
                             "pathlen INTEGER,"
@@ -1938,13 +1937,13 @@ class SyncJournalDb : GLib.Object {
         if (!create_query.exec ()) {
             // In certain situations the io error can be avoided by switching
             // to the DELETE journal mode, see #5723
-            if (_journal_mode != "DELETE"
+            if (this.journal_mode != "DELETE"
                 && create_query.error_id () == SQLITE_IOERR
-                && sqlite3_extended_errcode (_database.sqlite_database ()) == SQLITE_IOERR_SHMMAP) {
+                && sqlite3_extended_errcode (this.database.sqlite_database ()) == SQLITE_IOERR_SHMMAP) {
                 GLib.warn (lc_database) << "IO error SHMMAP on table creation, attempting with DELETE journal mode";
-                _journal_mode = "DELETE";
+                this.journal_mode = "DELETE";
                 commit_transaction ();
-                _database.close ();
+                this.database.close ();
                 return check_connect ();
             }
 
@@ -2066,7 +2065,7 @@ class SyncJournalDb : GLib.Object {
 
         bool force_remote_discovery = false;
 
-        SqlQuery version_query ("SELECT major, minor, patch FROM version;", _database);
+        SqlQuery version_query ("SELECT major, minor, patch FROM version;", this.database);
         if (!version_query.next ().has_data) {
             force_remote_discovery = true;
 
@@ -2133,14 +2132,14 @@ class SyncJournalDb : GLib.Object {
         if (force_remote_discovery) {
             force_remote_discovery_next_sync_locked ();
         }
-        const var delete_download_info = _query_manager.get (PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY, QByteArrayLiteral ("DELETE FROM downloadinfo WHERE path=?1"), _database);
+        const var delete_download_info = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY, QByteArrayLiteral ("DELETE FROM downloadinfo WHERE path=?1"), this.database);
         if (!delete_download_info) {
-            return sql_fail (QStringLiteral ("prepare _delete_download_info_query"), *delete_download_info);
+            return sql_fail (QStringLiteral ("prepare this.delete_download_info_query"), *delete_download_info);
         }
 
-        const var delete_upload_info_query = _query_manager.get (PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY, QByteArrayLiteral ("DELETE FROM uploadinfo WHERE path=?1"), _database);
+        const var delete_upload_info_query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY, QByteArrayLiteral ("DELETE FROM uploadinfo WHERE path=?1"), this.database);
         if (!delete_upload_info_query) {
-            return sql_fail (QStringLiteral ("prepare _delete_upload_info_query"), *delete_upload_info_query);
+            return sql_fail (QStringLiteral ("prepare this.delete_upload_info_query"), *delete_upload_info_query);
         }
 
         GLib.ByteArray sql ("SELECT last_try_etag, last_try_modtime, retrycount, errorstring, last_try_time, ignore_duration, rename_target, error_category, request_id "
@@ -2150,9 +2149,9 @@ class SyncJournalDb : GLib.Object {
             // case insensitively
             sql += " COLLATE NOCASE";
         }
-        const var get_error_blocklist_query = _query_manager.get (PreparedSqlQueryManager.GetErrorBlocklistQuery, sql, _database);
+        const var get_error_blocklist_query = this.query_manager.get (PreparedSqlQueryManager.GetErrorBlocklistQuery, sql, this.database);
         if (!get_error_blocklist_query) {
-            return sql_fail (QStringLiteral ("prepare _get_error_blocklist_query"), *get_error_blocklist_query);
+            return sql_fail (QStringLiteral ("prepare this.get_error_blocklist_query"), *get_error_blocklist_query);
         }
 
         // don't on_start a new transaction now
@@ -2160,7 +2159,7 @@ class SyncJournalDb : GLib.Object {
 
         // This avoid reading from the DB if we already know it is empty
         // thereby speeding up the initial discovery significantly.
-        _metadata_table_is_empty = (get_file_record_count () == 0);
+        this.metadata_table_is_empty = (get_file_record_count () == 0);
 
         // Hide 'em all!
         FileSystem.set_file_hidden (database_file_path (), true);
@@ -2172,14 +2171,14 @@ class SyncJournalDb : GLib.Object {
     }
 
     void SyncJournalDb.close () {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
-        q_c_info (lc_database) << "Closing DB" << _database_file;
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
+        q_c_info (lc_database) << "Closing DB" << this.database_file;
 
         commit_transaction ();
 
-        _database.close ();
+        this.database.close ();
         clear_etag_storage_filter ();
-        _metadata_table_is_empty = false;
+        this.metadata_table_is_empty = false;
     }
 
     bool SyncJournalDb.update_database_structure () {
@@ -2201,7 +2200,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (columns.index_of ("fileid") == -1) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN fileid VARCHAR (128);");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : Add column fileid"), query);
@@ -2216,7 +2215,7 @@ class SyncJournalDb : GLib.Object {
             commit_internal (QStringLiteral ("update database structure : add fileid col"));
         }
         if (columns.index_of ("remote_perm") == -1) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN remote_perm VARCHAR (128);");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : add column remote_perm"), query);
@@ -2225,7 +2224,7 @@ class SyncJournalDb : GLib.Object {
             commit_internal (QStringLiteral ("update database structure (remote_perm)"));
         }
         if (columns.index_of ("filesize") == -1) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN filesize BIGINT;");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_database_structure : add column filesize"), query);
@@ -2235,7 +2234,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (true) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("CREATE INDEX IF NOT EXISTS metadata_inode ON metadata (inode);");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : create index inode"), query);
@@ -2245,7 +2244,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (true) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("CREATE INDEX IF NOT EXISTS metadata_path ON metadata (path);");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : create index path"), query);
@@ -2255,7 +2254,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (true) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("CREATE INDEX IF NOT EXISTS metadata_parent ON metadata (parent_hash (path));");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : create index parent"), query);
@@ -2265,7 +2264,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (columns.index_of ("ignored_children_remote") == -1) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN ignored_children_remote INT;");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : add ignored_children_remote column"), query);
@@ -2275,7 +2274,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (columns.index_of ("content_checksum") == -1) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN content_checksum TEXT;");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : add content_checksum column"), query);
@@ -2284,7 +2283,7 @@ class SyncJournalDb : GLib.Object {
             commit_internal (QStringLiteral ("update database structure : add content_checksum col"));
         }
         if (columns.index_of ("content_checksum_type_id") == -1) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN content_checksum_type_id INTEGER;");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : add content_checksum_type_id column"), query);
@@ -2294,7 +2293,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (!columns.contains ("e2e_mangled_name")) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN e2e_mangled_name TEXT;");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : add e2e_mangled_name column"), query);
@@ -2304,7 +2303,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (!columns.contains ("is_e2e_encrypted")) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN is_e2e_encrypted INTEGER;");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : add is_e2e_encrypted column"), query);
@@ -2317,7 +2316,7 @@ class SyncJournalDb : GLib.Object {
         if (upload_info_columns.is_empty ())
             return false;
         if (!upload_info_columns.contains ("content_checksum")) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE uploadinfo ADD COLUMN content_checksum TEXT;");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : add content_checksum column"), query);
@@ -2330,7 +2329,7 @@ class SyncJournalDb : GLib.Object {
         if (conflicts_columns.is_empty ())
             return false;
         if (!conflicts_columns.contains ("base_path")) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE conflicts ADD COLUMN base_path TEXT;");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : add base_path column"), query);
@@ -2339,7 +2338,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (true) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("CREATE INDEX IF NOT EXISTS metadata_e2e_id ON metadata (e2e_mangled_name);");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_metadata_table_structure : create index e2e_mangled_name"), query);
@@ -2360,7 +2359,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (columns.index_of ("last_try_time") == -1) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE blocklist ADD COLUMN last_try_time INTEGER (8);");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_blocklist_table_structure : Add last_try_time fileid"), query);
@@ -2374,7 +2373,7 @@ class SyncJournalDb : GLib.Object {
             commit_internal (QStringLiteral ("update database structure : add last_try_time, ignore_duration cols"));
         }
         if (columns.index_of ("rename_target") == -1) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE blocklist ADD COLUMN rename_target VARCHAR (4096);");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_blocklist_table_structure : Add rename_target"), query);
@@ -2384,7 +2383,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (columns.index_of ("error_category") == -1) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE blocklist ADD COLUMN error_category INTEGER (8);");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_blocklist_table_structure : Add error_category"), query);
@@ -2394,7 +2393,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (columns.index_of ("request_id") == -1) {
-            SqlQuery query = new SqlQuery (_database);
+            SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE blocklist ADD COLUMN request_id VARCHAR (36);");
             if (!query.exec ()) {
                 sql_fail (QStringLiteral ("update_blocklist_table_structure : Add request_id"), query);
@@ -2403,7 +2402,7 @@ class SyncJournalDb : GLib.Object {
             commit_internal (QStringLiteral ("update database structure : add error_category col"));
         }
 
-        SqlQuery query = new SqlQuery (_database);
+        SqlQuery query = new SqlQuery (this.database);
         query.prepare ("CREATE INDEX IF NOT EXISTS blocklist_index ON blocklist (path collate nocase);");
         if (!query.exec ()) {
             sql_fail (QStringLiteral ("update_error_blocklist_table_structure : create index blocklit"), query);
@@ -2413,12 +2412,12 @@ class SyncJournalDb : GLib.Object {
         return re;
     }
 
-    QVector<GLib.ByteArray> SyncJournalDb.table_columns (GLib.ByteArray table) {
-        QVector<GLib.ByteArray> columns;
+    GLib.Vector<GLib.ByteArray> SyncJournalDb.table_columns (GLib.ByteArray table) {
+        GLib.Vector<GLib.ByteArray> columns;
         if (!check_connect ()) {
             return columns;
         }
-        SqlQuery query = new SqlQuery ("PRAGMA table_info ('" + table + "');", _database);
+        SqlQuery query = new SqlQuery ("PRAGMA table_info ('" + table + "');", this.database);
         if (!query.exec ()) {
             return columns;
         }
@@ -2442,9 +2441,9 @@ class SyncJournalDb : GLib.Object {
 
 
     int SyncJournalDb.get_file_record_count () {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
-        SqlQuery query = new SqlQuery (_database);
+        SqlQuery query = new SqlQuery (this.database);
         query.prepare ("SELECT COUNT (*) FROM metadata");
 
         if (!query.exec ()) {
@@ -2464,7 +2463,7 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static void to_download_info (SqlQuery &query, SyncJournalDb.DownloadInfo res) {
+    static void to_download_info (SqlQuery query, SyncJournalDb.DownloadInfo res) {
         bool ok = true;
         res._tmpfile = query.string_value (0);
         res._etag = query.byte_array_value (1);
@@ -2474,7 +2473,7 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static bool delete_batch (SqlQuery &query, string[] &entries, string name) {
+    static bool delete_batch (SqlQuery query, string[] entries, string name) {
         if (entries.is_empty ())
             return true;
 
@@ -2509,8 +2508,8 @@ class SyncJournalDb : GLib.Object {
 
 
 
-    void SyncJournalDb.set_selective_sync_list (SyncJournalDb.SelectiveSyncListType type, string[] &list) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+    void SyncJournalDb.set_selective_sync_list (SyncJournalDb.SelectiveSyncListType type, string[] list) {
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ()) {
             return;
         }
@@ -2518,14 +2517,14 @@ class SyncJournalDb : GLib.Object {
         start_transaction ();
 
         //first, delete all entries of this type
-        SqlQuery del_query ("DELETE FROM selectivesync WHERE type == ?1", _database);
+        SqlQuery del_query ("DELETE FROM selectivesync WHERE type == ?1", this.database);
         del_query.bind_value (1, int (type));
         if (!del_query.exec ()) {
             GLib.warn (lc_database) << "SQL error when deleting selective sync list" << list << del_query.error ();
         }
 
-        SqlQuery ins_query ("INSERT INTO selectivesync VALUES (?1, ?2)", _database);
-        foreach (var &path, list) {
+        SqlQuery ins_query ("INSERT INTO selectivesync VALUES (?1, ?2)", this.database);
+        foreach (var path, list) {
             ins_query.reset_and_clear_bindings ();
             ins_query.bind_value (1, path);
             ins_query.bind_value (2, int (type));
@@ -2538,37 +2537,37 @@ class SyncJournalDb : GLib.Object {
     }
 
 
-    void SyncJournalDb.schedule_path_for_remote_discovery (GLib.ByteArray file_name) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+    void SyncJournalDb.schedule_path_for_remote_discovery (GLib.ByteArray filename) {
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         if (!check_connect ()) {
             return;
         }
 
         // Remove trailing slash
-        var argument = file_name;
+        var argument = filename;
         if (argument.ends_with ('/'))
             argument.chop (1);
 
-        SqlQuery query = new SqlQuery (_database);
-        // This query will match entries for which the path is a prefix of file_name
+        SqlQuery query = new SqlQuery (this.database);
+        // This query will match entries for which the path is a prefix of filename
         // Note: CSYNC_FTW_TYPE_DIR == 2
-        query.prepare ("UPDATE metadata SET md5='_invalid_' WHERE " IS_PREFIX_PATH_OR_EQUAL ("path", "?1") " AND type == 2;");
+        query.prepare ("UPDATE metadata SET md5='this.invalid_' WHERE " IS_PREFIX_PATH_OR_EQUAL ("path", "?1") " AND type == 2;");
         query.bind_value (1, argument);
         query.exec ();
 
         // Prevent future overwrite of the etags of this folder and all
         // parent folders for this sync
         argument.append ('/');
-        _etag_storage_filter.append (argument);
+        this.etag_storage_filter.append (argument);
     }
 
     void SyncJournalDb.clear_etag_storage_filter () {
-        _etag_storage_filter.clear ();
+        this.etag_storage_filter.clear ();
     }
 
     void SyncJournalDb.force_remote_discovery_next_sync () {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
 
         if (!check_connect ()) {
             return;
@@ -2579,19 +2578,19 @@ class SyncJournalDb : GLib.Object {
 
     void SyncJournalDb.force_remote_discovery_next_sync_locked () {
         q_c_info (lc_database) << "Forcing remote re-discovery by deleting folder Etags";
-        SqlQuery delete_remote_folder_etags_query (_database);
-        delete_remote_folder_etags_query.prepare ("UPDATE metadata SET md5='_invalid_' WHERE type=2;");
+        SqlQuery delete_remote_folder_etags_query (this.database);
+        delete_remote_folder_etags_query.prepare ("UPDATE metadata SET md5='this.invalid_' WHERE type=2;");
         delete_remote_folder_etags_query.exec ();
     }
 
     GLib.ByteArray SyncJournalDb.get_checksum_type (int checksum_type_id) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ()) {
             return GLib.ByteArray ();
         }
 
         // Retrieve the id
-        const var query = _query_manager.get (PreparedSqlQueryManager.Get_checksum_type_query, QByteArrayLiteral ("SELECT name FROM checksumtype WHERE id=?1"), _database);
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Get_checksum_type_query, QByteArrayLiteral ("SELECT name FROM checksumtype WHERE id=?1"), this.database);
         if (!query) {
             return {};
         }
@@ -2612,12 +2611,12 @@ class SyncJournalDb : GLib.Object {
             return 0;
         }
 
-        var it =  _checksym_type_cache.find (checksum_type);
-        if (it != _checksym_type_cache.end ())
+        var it =  this.checksym_type_cache.find (checksum_type);
+        if (it != this.checksym_type_cache.end ())
             return it;
 
         // Ensure the checksum type is in the database {
-            const var query = _query_manager.get (PreparedSqlQueryManager.Insert_checksum_type_query, QByteArrayLiteral ("INSERT OR IGNORE INTO checksumtype (name) VALUES (?1)"), _database);
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Insert_checksum_type_query, QByteArrayLiteral ("INSERT OR IGNORE INTO checksumtype (name) VALUES (?1)"), this.database);
             if (!query) {
                 return 0;
             }
@@ -2628,7 +2627,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         // Retrieve the id {
-            const var query = _query_manager.get (PreparedSqlQueryManager.Get_checksum_type_id_query, QByteArrayLiteral ("SELECT id FROM checksumtype WHERE name=?1"), _database);
+            const var query = this.query_manager.get (PreparedSqlQueryManager.Get_checksum_type_id_query, QByteArrayLiteral ("SELECT id FROM checksumtype WHERE name=?1"), this.database);
             if (!query) {
                 return 0;
             }
@@ -2642,18 +2641,18 @@ class SyncJournalDb : GLib.Object {
                 return 0;
             }
             var value = query.int_value (0);
-            _checksym_type_cache[checksum_type] = value;
+            this.checksym_type_cache[checksum_type] = value;
             return value;
         }
     }
 
     GLib.ByteArray SyncJournalDb.data_fingerprint () {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ()) {
             return GLib.ByteArray ();
         }
 
-        const var query = _query_manager.get (PreparedSqlQueryManager.Get_data_fingerprint_query, QByteArrayLiteral ("SELECT fingerprint FROM datafingerprint"), _database);
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Get_data_fingerprint_query, QByteArrayLiteral ("SELECT fingerprint FROM datafingerprint"), this.database);
         if (!query) {
             return GLib.ByteArray ();
         }
@@ -2669,13 +2668,13 @@ class SyncJournalDb : GLib.Object {
     }
 
     void SyncJournalDb.set_data_fingerprint (GLib.ByteArray data_fingerprint) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ()) {
             return;
         }
 
-        const var set_data_fingerprint_query1 = _query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query1, QByteArrayLiteral ("DELETE FROM datafingerprint;"), _database);
-        const var set_data_fingerprint_query2 = _query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query2, QByteArrayLiteral ("INSERT INTO datafingerprint (fingerprint) VALUES (?1);"), _database);
+        const var set_data_fingerprint_query1 = this.query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query1, QByteArrayLiteral ("DELETE FROM datafingerprint;"), this.database);
+        const var set_data_fingerprint_query2 = this.query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query2, QByteArrayLiteral ("INSERT INTO datafingerprint (fingerprint) VALUES (?1);"), this.database);
         if (!set_data_fingerprint_query1 || !set_data_fingerprint_query2) {
             return;
         }
@@ -2686,15 +2685,15 @@ class SyncJournalDb : GLib.Object {
         set_data_fingerprint_query2.exec ();
     }
 
-    void SyncJournalDb.set_conflict_record (ConflictRecord &record) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+    void SyncJournalDb.set_conflict_record (ConflictRecord record) {
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ())
             return;
 
-        const var query = _query_manager.get (PreparedSqlQueryManager.Set_conflict_record_query, QByteArrayLiteral ("INSERT OR REPLACE INTO conflicts "
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Set_conflict_record_query, QByteArrayLiteral ("INSERT OR REPLACE INTO conflicts "
                                                                                                                 " (path, base_file_id, base_modtime, base_etag, base_path) "
                                                                                                                 "VALUES (?1, ?2, ?3, ?4, ?5);"),
-            _database);
+            this.database);
         ASSERT (query)
         query.bind_value (1, record.path);
         query.bind_value (2, record.base_file_id);
@@ -2707,11 +2706,11 @@ class SyncJournalDb : GLib.Object {
     ConflictRecord SyncJournalDb.conflict_record (GLib.ByteArray path) {
         ConflictRecord entry;
 
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ()) {
             return entry;
         }
-        const var query = _query_manager.get (PreparedSqlQueryManager.Get_conflict_record_query, QByteArrayLiteral ("SELECT base_file_id, base_modtime, base_etag, base_path FROM conflicts WHERE path=?1;"), _database);
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Get_conflict_record_query, QByteArrayLiteral ("SELECT base_file_id, base_modtime, base_etag, base_path FROM conflicts WHERE path=?1;"), this.database);
         ASSERT (query)
         query.bind_value (1, path);
         ASSERT (query.exec ())
@@ -2727,22 +2726,22 @@ class SyncJournalDb : GLib.Object {
     }
 
     void SyncJournalDb.delete_conflict_record (GLib.ByteArray path) {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ())
             return;
 
-        const var query = _query_manager.get (PreparedSqlQueryManager.Delete_conflict_record_query, QByteArrayLiteral ("DELETE FROM conflicts WHERE path=?1;"), _database);
+        const var query = this.query_manager.get (PreparedSqlQueryManager.Delete_conflict_record_query, QByteArrayLiteral ("DELETE FROM conflicts WHERE path=?1;"), this.database);
         ASSERT (query)
         query.bind_value (1, path);
         ASSERT (query.exec ())
     }
 
     QByte_array_list SyncJournalDb.conflict_record_paths () {
-        QMutexLocker locker = new QMutexLocker (&_mutex);
+        QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (!check_connect ())
             return {};
 
-        SqlQuery query = new SqlQuery (_database);
+        SqlQuery query = new SqlQuery (this.database);
         query.prepare ("SELECT path FROM conflicts");
         ASSERT (query.exec ());
 
@@ -2757,7 +2756,7 @@ class SyncJournalDb : GLib.Object {
         var conflict = conflict_record (conflict_name);
         GLib.ByteArray result;
         if (conflict.is_valid ()) {
-            get_file_records_by_file_id (conflict.base_file_id, [&result] (SyncJournalFileRecord &record) {
+            get_file_records_by_file_id (conflict.base_file_id, [&result] (SyncJournalFileRecord record) {
                 if (!record._path.is_empty ())
                     result = record._path;
             });
@@ -2770,39 +2769,39 @@ class SyncJournalDb : GLib.Object {
     }
 
     void SyncJournalDb.clear_file_table () {
-        QMutexLocker lock (&_mutex);
-        SqlQuery query = new SqlQuery (_database);
+        QMutexLocker lock (&this.mutex);
+        SqlQuery query = new SqlQuery (this.database);
         query.prepare ("DELETE FROM metadata;");
         query.exec ();
     }
 
     void SyncJournalDb.mark_virtual_file_for_download_recursively (GLib.ByteArray path) {
-        QMutexLocker lock (&_mutex);
+        QMutexLocker lock (&this.mutex);
         if (!check_connect ())
             return;
 
         static_assert (ItemTypeVirtualFile == 4 && ItemTypeVirtualFileDownload == 5, "");
         SqlQuery query = new SqlQuery ("UPDATE metadata SET type=5 WHERE "
                     " (" IS_PREFIX_PATH_OF ("?1", "path") " OR ?1 == '') "
-                    "AND type=4;", _database);
+                    "AND type=4;", this.database);
         query.bind_value (1, path);
         query.exec ();
 
         // We also must make sure we do not read the files from the database (same logic as in schedule_path_for_remote_discovery)
         // This includes all the parents up to the root, but also all the directory within the selected dir.
         static_assert (ItemTypeDirectory == 2, "");
-        query.prepare ("UPDATE metadata SET md5='_invalid_' WHERE "
+        query.prepare ("UPDATE metadata SET md5='this.invalid_' WHERE "
                     " (" IS_PREFIX_PATH_OF ("?1", "path") " OR ?1 == '' OR " IS_PREFIX_PATH_OR_EQUAL ("path", "?1") ") AND type == 2;");
         query.bind_value (1, path);
         query.exec ();
     }
 
     Optional<PinState> SyncJournalDb.PinStateInterface.raw_for_path (GLib.ByteArray path) {
-        QMutexLocker lock (&_database._mutex);
-        if (!_database.check_connect ())
+        QMutexLocker lock (&this.database._mutex);
+        if (!this.database.check_connect ())
             return {};
 
-        const var query = _database._query_manager.get (PreparedSqlQueryManager.Get_raw_pin_state_query, QByteArrayLiteral ("SELECT pin_state FROM flags WHERE path == ?1;"), _database._database);
+        const var query = this.database._query_manager.get (PreparedSqlQueryManager.Get_raw_pin_state_query, QByteArrayLiteral ("SELECT pin_state FROM flags WHERE path == ?1;"), this.database._database);
         ASSERT (query)
         query.bind_value (1, path);
         query.exec ();
@@ -2818,17 +2817,17 @@ class SyncJournalDb : GLib.Object {
     }
 
     Optional<PinState> SyncJournalDb.PinStateInterface.effective_for_path (GLib.ByteArray path) {
-        QMutexLocker lock (&_database._mutex);
-        if (!_database.check_connect ())
+        QMutexLocker lock (&this.database._mutex);
+        if (!this.database.check_connect ())
             return {};
 
-        const var query = _database._query_manager.get (PreparedSqlQueryManager.Get_effective_pin_state_query, QByteArrayLiteral ("SELECT pin_state FROM flags WHERE"
+        const var query = this.database._query_manager.get (PreparedSqlQueryManager.Get_effective_pin_state_query, QByteArrayLiteral ("SELECT pin_state FROM flags WHERE"
                                                                                                                         // explicitly allow "" to represent the root path
                                                                                                                         // (it'd be great if paths started with a / and "/" could be the root)
                                                                                                                         " (" IS_PREFIX_PATH_OR_EQUAL ("path", "?1") " OR path == '')"
                                                                                                                                                                 " AND pin_state is not null AND pin_state != 0"
                                                                                                                                                                 " ORDER BY length (path) DESC LIMIT 1;"),
-            _database._database);
+            this.database._database);
         ASSERT (query)
         query.bind_value (1, path);
         query.exec ();
@@ -2850,15 +2849,15 @@ class SyncJournalDb : GLib.Object {
         if (!base_pin)
             return {};
 
-        QMutexLocker lock (&_database._mutex);
-        if (!_database.check_connect ())
+        QMutexLocker lock (&this.database._mutex);
+        if (!this.database.check_connect ())
             return {};
 
         // Find all the non-inherited pin states below the item
-        const var query = _database._query_manager.get (PreparedSqlQueryManager.Get_sub_pins_query, QByteArrayLiteral ("SELECT DISTINCT pin_state FROM flags WHERE"
+        const var query = this.database._query_manager.get (PreparedSqlQueryManager.Get_sub_pins_query, QByteArrayLiteral ("SELECT DISTINCT pin_state FROM flags WHERE"
                                                                                                             " (" IS_PREFIX_PATH_OF ("?1", "path") " OR ?1 == '')"
                                                                                                                                                 " AND pin_state is not null and pin_state != 0;"),
-            _database._database);
+            this.database._database);
         ASSERT (query)
         query.bind_value (1, path);
         query.exec ();
@@ -2879,18 +2878,18 @@ class SyncJournalDb : GLib.Object {
     }
 
     void SyncJournalDb.PinStateInterface.set_for_path (GLib.ByteArray path, PinState state) {
-        QMutexLocker lock (&_database._mutex);
-        if (!_database.check_connect ())
+        QMutexLocker lock (&this.database._mutex);
+        if (!this.database.check_connect ())
             return;
 
-        const var query = _database._query_manager.get (PreparedSqlQueryManager.Set_pin_state_query, QByteArrayLiteral (
+        const var query = this.database._query_manager.get (PreparedSqlQueryManager.Set_pin_state_query, QByteArrayLiteral (
                                                                                                 // If we had sqlite >=3.24.0 everywhere this could be an upsert,
                                                                                                 // making further flags columns easy
                                                                                                 //"INSERT INTO flags (path, pin_state) VALUES (?1, ?2)"
                                                                                                 //" ON CONFLICT (path) DO UPDATE SET pin_state=?2;"),
                                                                                                 // Simple version that doesn't work nicely with multiple columns:
                                                                                                 "INSERT OR REPLACE INTO flags (path, pin_state) VALUES (?1, ?2);"),
-            _database._database);
+            this.database._database);
         ASSERT (query)
         query.bind_value (1, path);
         query.bind_value (2, state);
@@ -2898,29 +2897,29 @@ class SyncJournalDb : GLib.Object {
     }
 
     void SyncJournalDb.PinStateInterface.wipe_for_path_and_below (GLib.ByteArray path) {
-        QMutexLocker lock (&_database._mutex);
-        if (!_database.check_connect ())
+        QMutexLocker lock (&this.database._mutex);
+        if (!this.database.check_connect ())
             return;
 
-        const var query = _database._query_manager.get (PreparedSqlQueryManager.Wipe_pin_state_query, QByteArrayLiteral ("DELETE FROM flags WHERE "
+        const var query = this.database._query_manager.get (PreparedSqlQueryManager.Wipe_pin_state_query, QByteArrayLiteral ("DELETE FROM flags WHERE "
                                                                                                                 // Allow "" to delete everything
                                                                                                                 " (" IS_PREFIX_PATH_OR_EQUAL ("?1", "path") " OR ?1 == '');"),
-            _database._database);
+            this.database._database);
         ASSERT (query)
         query.bind_value (1, path);
         query.exec ();
     }
 
-    Optional<QVector<QPair<GLib.ByteArray, PinState>>>
+    Optional<GLib.Vector<QPair<GLib.ByteArray, PinState>>>
     SyncJournalDb.PinStateInterface.raw_list () {
-        QMutexLocker lock (&_database._mutex);
-        if (!_database.check_connect ())
+        QMutexLocker lock (&this.database._mutex);
+        if (!this.database.check_connect ())
             return {};
 
-        SqlQuery query = new SqlQuery ("SELECT path, pin_state FROM flags;", _database._database);
+        SqlQuery query = new SqlQuery ("SELECT path, pin_state FROM flags;", this.database._database);
         query.exec ();
 
-        QVector<QPair<GLib.ByteArray, PinState>> result;
+        GLib.Vector<QPair<GLib.ByteArray, PinState>> result;
         forever {
             var next = query.next ();
             if (!next.ok)
@@ -2939,13 +2938,13 @@ class SyncJournalDb : GLib.Object {
     }
 
     void SyncJournalDb.commit (string context, bool start_trans) {
-        QMutexLocker lock (&_mutex);
+        QMutexLocker lock (&this.mutex);
         commit_internal (context, start_trans);
     }
 
     void SyncJournalDb.commit_if_needed_and_start_new_transaction (string context) {
-        QMutexLocker lock (&_mutex);
-        if (_transaction == 1) {
+        QMutexLocker lock (&this.mutex);
+        if (this.transaction == 1) {
             commit_internal (context, true);
         } else {
             start_transaction ();
@@ -2953,13 +2952,13 @@ class SyncJournalDb : GLib.Object {
     }
 
     bool SyncJournalDb.open () {
-        QMutexLocker lock (&_mutex);
+        QMutexLocker lock (&this.mutex);
         return check_connect ();
     }
 
     bool SyncJournalDb.is_open () {
-        QMutexLocker lock (&_mutex);
-        return _database.is_open ();
+        QMutexLocker lock (&this.mutex);
+        return this.database.is_open ();
     }
 
     void SyncJournalDb.commit_internal (string context, bool start_trans) {
@@ -2972,16 +2971,16 @@ class SyncJournalDb : GLib.Object {
     }
 
 
-    bool operator== (SyncJournalDb.DownloadInfo &lhs,
-        const SyncJournalDb.DownloadInfo &rhs) {
+    bool operator== (SyncJournalDb.DownloadInfo lhs,
+        const SyncJournalDb.DownloadInfo rhs) {
         return lhs._error_count == rhs._error_count
             && lhs._etag == rhs._etag
             && lhs._tmpfile == rhs._tmpfile
             && lhs._valid == rhs._valid;
     }
 
-    bool operator== (SyncJournalDb.UploadInfo &lhs,
-        const SyncJournalDb.UploadInfo &rhs) {
+    bool operator== (SyncJournalDb.UploadInfo lhs,
+        const SyncJournalDb.UploadInfo rhs) {
         return lhs._error_count == rhs._error_count
             && lhs._chunk == rhs._chunk
             && lhs._modtime == rhs._modtime

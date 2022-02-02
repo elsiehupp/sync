@@ -177,7 +177,7 @@ private on_ void check_csync_excluded () {
 
     QCOMPARE (check_file_full ("latex/songbook/my_manuscript.tex.tmp"), CSYNC_FILE_EXCLUDE_LIST);
 
-#ifdef _WIN32
+#ifdef this.WIN32
     QCOMPARE (check_file_full ("file_trailing_space "), CSYNC_FILE_EXCLUDE_TRAILING_SPACE);
     QCOMPARE (check_file_full ("file_trailing_dot."), CSYNC_FILE_EXCLUDE_INVALID_CHAR);
     QCOMPARE (check_file_full ("AUX"), CSYNC_FILE_EXCLUDE_INVALID_CHAR);
@@ -327,7 +327,7 @@ private on_ void check_csync_excluded_traversal () {
     QCOMPARE (check_file_traversal ("latex/my_manuscript.tex.tmp"), CSYNC_NOT_EXCLUDED);
     QCOMPARE (check_file_traversal ("latex/songbook/my_manuscript.tex.tmp"), CSYNC_FILE_EXCLUDE_LIST);
 
-#ifdef _WIN32
+#ifdef this.WIN32
     QCOMPARE (check_file_traversal ("file_trailing_space "), CSYNC_FILE_EXCLUDE_TRAILING_SPACE);
     QCOMPARE (check_file_traversal ("file_trailing_dot."), CSYNC_FILE_EXCLUDE_INVALID_CHAR);
     QCOMPARE (check_file_traversal ("AUX"), CSYNC_FILE_EXCLUDE_INVALID_CHAR);
@@ -533,7 +533,7 @@ private on_ void check_csync_bname_trigger () {
     setup ();
     bool wildcardsMatchSlash = false;
     GLib.ByteArray storage;
-    var translate = [&storage, &wildcardsMatchSlash] (char pattern) {
+    var translate = [&storage, wildcardsMatchSlash] (char pattern) {
         storage = ExcludedFiles.extractBnameTrigger (pattern, wildcardsMatchSlash).toUtf8 ();
         return storage.constData ();
     };
@@ -563,7 +563,7 @@ private on_ void check_csync_bname_trigger () {
 private on_ void check_csync_is_windows_reserved_word () {
     var csync_is_windows_reserved_word = [] (char fn) {
         string s = string.fromLatin1 (fn);
-        extern bool csync_is_windows_reserved_word (QStringRef &filename);
+        extern bool csync_is_windows_reserved_word (QStringRef filename);
         return csync_is_windows_reserved_word (&s);
     };
 

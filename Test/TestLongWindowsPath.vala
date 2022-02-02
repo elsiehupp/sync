@@ -68,7 +68,7 @@ class TestLongWindowsPath : GLib.Object {
         file.close ();
 
         csync_file_stat_t buf;
-        QVERIFY (csync_vio_local_stat (longPath.filePath (), &buf) != -1);
+        QVERIFY (csync_vio_local_stat (longPath.filePath (), buf) != -1);
         QVERIFY (buf.size == data.size ());
         QVERIFY (buf.size == longPath.size ());
 

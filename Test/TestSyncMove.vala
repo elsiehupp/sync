@@ -19,7 +19,7 @@ struct OperationCounter {
     void on_reset () { *this = {}; }
 
     var functor () {
-        return [&] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice *) {
+        return [&] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice *) {
             if (op == QNetworkAccessManager.GetOperation)
                 ++nGET;
             if (op == QNetworkAccessManager.PutOperation)
@@ -33,23 +33,23 @@ struct OperationCounter {
     }
 };
 
-bool itemSuccessful (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
+bool itemSuccessful (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
-    return item._status == SyncFileItem.Success && item._instruction == instr;
+    return item._status == SyncFileItem.Status.SUCCESS && item._instruction == instr;
 }
 
-bool itemConflict (ItemCompletedSpy &spy, string path) {
+bool itemConflict (ItemCompletedSpy spy, string path) {
     var item = spy.findItem (path);
-    return item._status == SyncFileItem.Conflict && item._instruction == CSYNC_INSTRUCTION_CONFLICT;
+    return item._status == SyncFileItem.Status.CONFLICT && item._instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
-bool itemSuccessfulMove (ItemCompletedSpy &spy, string path) {
+bool itemSuccessfulMove (ItemCompletedSpy spy, string path) {
     return itemSuccessful (spy, path, CSYNC_INSTRUCTION_RENAME);
 }
 
-string[] findConflicts (FileInfo &dir) {
+string[] findConflicts (FileInfo dir) {
     string[] conflicts;
-    for (var &item : dir.children) {
+    for (var item : dir.children) {
         if (item.name.contains (" (conflicted copy")) {
             conflicts.append (item.path ());
         }
@@ -57,12 +57,12 @@ string[] findConflicts (FileInfo &dir) {
     return conflicts;
 }
 
-bool expectAndWipeConflict (FileModifier &local, FileInfo state, string path) {
+bool expectAndWipeConflict (FileModifier local, FileInfo state, string path) {
     PathComponents pathComponents (path);
     var base = state.find (pathComponents.parentDirComponents ());
     if (!base)
         return false;
-    for (var &item : base.children) {
+    for (var item : base.children) {
         if (item.name.startsWith (pathComponents.fileName ()) && item.name.contains (" (conflicted copy")) {
             local.remove (item.path ());
             return true;
@@ -81,7 +81,7 @@ class TestSyncMove : GLib.Object {
         FileInfo fileInfo ({}, { folder });
 
         FakeFolder fakeFolder (fileInfo, folder, QStringLiteral ("/A"));
-        var &localModifier = fakeFolder.localModifier ();
+        var localModifier = fakeFolder.localModifier ();
 
         OperationCounter counter;
         fakeFolder.setServerOverride (counter.functor ());
@@ -204,7 +204,7 @@ class TestSyncMove : GLib.Object {
         });
 
         // For directly editing the remote checksum
-        FileInfo &remoteInfo = fakeFolder.remoteModifier ();
+        FileInfo remoteInfo = fakeFolder.remoteModifier ();
 
         // Simple move causing a remote rename
         fakeFolder.localModifier ().rename ("A/a1", "A/a1m");
@@ -295,7 +295,7 @@ class TestSyncMove : GLib.Object {
         QFETCH (string, prefix);
 
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        var &remote = fakeFolder.remoteModifier ();
+        var remote = fakeFolder.remoteModifier ();
 
         remote.mkdir ("A/W");
         remote.insert ("A/W/w1");
@@ -358,8 +358,8 @@ class TestSyncMove : GLib.Object {
     ***********************************************************/
     private on_ void testMovePropagation () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        var &local = fakeFolder.localModifier ();
-        var &remote = fakeFolder.remoteModifier ();
+        var local = fakeFolder.localModifier ();
+        var remote = fakeFolder.remoteModifier ();
 
         OperationCounter counter;
         fakeFolder.setServerOverride (counter.functor ());
@@ -613,8 +613,8 @@ class TestSyncMove : GLib.Object {
     // These renames can be troublesome on windows
     private on_ void testRenameCaseOnly () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        var &local = fakeFolder.localModifier ();
-        var &remote = fakeFolder.remoteModifier ();
+        var local = fakeFolder.localModifier ();
+        var remote = fakeFolder.remoteModifier ();
 
         OperationCounter counter;
         fakeFolder.setServerOverride (counter.functor ());
@@ -634,8 +634,8 @@ class TestSyncMove : GLib.Object {
     // Check interaction of moves with file type changes
     private on_ void testMoveAndTypeChange () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        var &local = fakeFolder.localModifier ();
-        var &remote = fakeFolder.remoteModifier ();
+        var local = fakeFolder.localModifier ();
+        var remote = fakeFolder.remoteModifier ();
 
         // Touch on one side, rename and mkdir on the other {
             local.appendByte ("A/a1");
@@ -756,7 +756,7 @@ class TestSyncMove : GLib.Object {
     private on_ void testDeepHierarchy () {
         QFETCH (bool, local);
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
-        var &modifier = local ? fakeFolder.localModifier () : fakeFolder.remoteModifier ();
+        var modifier = local ? fakeFolder.localModifier () : fakeFolder.remoteModifier ();
 
         modifier.mkdir ("FolA");
         modifier.mkdir ("FolA/FolB");
@@ -806,14 +806,14 @@ class TestSyncMove : GLib.Object {
 
         // 1) move the folder alphabeticaly before
         fakeFolder.remoteModifier ().rename ("A/a1", "A/a1m");
-        fakeFolder.localModifier ().rename ("A", "_A");
+        fakeFolder.localModifier ().rename ("A", "this.A");
         fakeFolder.localModifier ().rename ("B/b1", "B/b1m");
-        fakeFolder.remoteModifier ().rename ("B", "_B");
+        fakeFolder.remoteModifier ().rename ("B", "this.B");
 
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentRemoteState (), fakeFolder.currentRemoteState ());
-        QVERIFY (fakeFolder.currentRemoteState ().find ("_A/a1m"));
-        QVERIFY (fakeFolder.currentRemoteState ().find ("_B/b1m"));
+        QVERIFY (fakeFolder.currentRemoteState ().find ("this.A/a1m"));
+        QVERIFY (fakeFolder.currentRemoteState ().find ("this.B/b1m"));
         QCOMPARE (counter.nDELETE, 0);
         QCOMPARE (counter.nGET, 0);
         QCOMPARE (counter.nPUT, 0);
@@ -821,10 +821,10 @@ class TestSyncMove : GLib.Object {
         counter.on_reset ();
 
         // 2) move alphabetically after
-        fakeFolder.remoteModifier ().rename ("_A/a2", "_A/a2m");
-        fakeFolder.localModifier ().rename ("_B/b2", "_B/b2m");
-        fakeFolder.localModifier ().rename ("_A", "S/A");
-        fakeFolder.remoteModifier ().rename ("_B", "S/B");
+        fakeFolder.remoteModifier ().rename ("this.A/a2", "this.A/a2m");
+        fakeFolder.localModifier ().rename ("this.B/b2", "this.B/b2m");
+        fakeFolder.localModifier ().rename ("this.A", "S/A");
+        fakeFolder.remoteModifier ().rename ("this.B", "S/B");
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentRemoteState (), fakeFolder.currentRemoteState ());
         QVERIFY (fakeFolder.currentRemoteState ().find ("S/A/a2m"));

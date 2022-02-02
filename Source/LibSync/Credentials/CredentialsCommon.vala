@@ -6,7 +6,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 ***********************************************************/
 
 // #include <GLib.List>
-// #include <string>
 // #include <QSslCertificate>
 // #include <QSslConfiguration>
 

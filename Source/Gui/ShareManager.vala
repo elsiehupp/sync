@@ -11,7 +11,6 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 
 
 // #include <QDate>
-// #include <string>
 // #include <GLib.List>
 
 // #include <GLib.Uri>
@@ -146,26 +145,26 @@ signals:
     void password_set_error (int status_code, string message);
 
 
-    protected AccountPointer _account;
-    protected string _id;
-    protected string _uidowner;
-    protected string _owner_display_name;
-    protected string _path;
-    protected Share_type _share_type;
-    protected bool _is_password_set;
-    protected Permissions _permissions;
-    protected unowned<Sharee> _share_with;
+    protected AccountPointer this.account;
+    protected string this.id;
+    protected string this.uidowner;
+    protected string this.owner_display_name;
+    protected string this.path;
+    protected Share_type this.share_type;
+    protected bool this.is_password_set;
+    protected Permissions this.permissions;
+    protected unowned<Sharee> this.share_with;
 
 protected slots:
     void on_ocs_error (int status_code, string message);
-    void on_password_set (QJsonDocument &, QVariant &value);
+    void on_password_set (QJsonDocument &, GLib.Variant value);
     void on_set_password_error (int status_code, string message);
 
 
     /***********************************************************
     ***********************************************************/
     private void on_deleted ();
-    private void on_permissions_set (QJsonDocument &, QVariant &value);
+    private void on_permissions_set (QJsonDocument &, GLib.Variant value);
 };
 
 /***********************************************************
@@ -187,7 +186,7 @@ class Link_share : Share {
         const Permissions permissions,
         bool is_password_set,
         const GLib.Uri url,
-        const QDate &expire_date,
+        const QDate expire_date,
         const string note,
         const string label);
 
@@ -266,7 +265,7 @@ class Link_share : Share {
     On on_success the expire_date_set signal is emitted
     In case of a server error the on_server_error signal is emitted.
     ***********************************************************/
-    public void set_expire_date (QDate &expire_date);
+    public void set_expire_date (QDate expire_date);
 
 
     /***********************************************************
@@ -290,20 +289,20 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void on_note_set (QJsonDocument &, QVariant &value);
-    private void on_expire_date_set (QJsonDocument &reply, QVariant &value);
-    private void on_name_set (QJsonDocument &, QVariant &value);
-    private void on_label_set (QJsonDocument &, QVariant &value);
+    private void on_note_set (QJsonDocument &, GLib.Variant value);
+    private void on_expire_date_set (QJsonDocument reply, GLib.Variant value);
+    private void on_name_set (QJsonDocument &, GLib.Variant value);
+    private void on_label_set (QJsonDocument &, GLib.Variant value);
 
 
     /***********************************************************
     ***********************************************************/
-    private string _name;
-    private string _token;
-    private string _note;
-    private QDate _expire_date;
-    private GLib.Uri _url;
-    private string _label;
+    private string this.name;
+    private string this.token;
+    private string this.note;
+    private QDate this.expire_date;
+    private GLib.Uri this.url;
+    private string this.label;
 };
 
 class User_group_share : Share {
@@ -319,7 +318,7 @@ class User_group_share : Share {
         bool is_password_set,
         const Permissions permissions,
         const unowned<Sharee> share_with,
-        const QDate &expire_date,
+        const QDate expire_date,
         const string note);
 
     /***********************************************************
@@ -332,11 +331,11 @@ class User_group_share : Share {
 
     /***********************************************************
     ***********************************************************/
-    public void on_note_set (QJsonDocument &, QVariant &note);
+    public void on_note_set (QJsonDocument &, GLib.Variant note);
 
     /***********************************************************
     ***********************************************************/
-    public void set_expire_date (QDate &date);
+    public void set_expire_date (QDate date);
 
     /***********************************************************
     ***********************************************************/
@@ -344,7 +343,7 @@ class User_group_share : Share {
 
     /***********************************************************
     ***********************************************************/
-    public void on_expire_date_set (QJsonDocument &reply, QVariant &value);
+    public void on_expire_date_set (QJsonDocument reply, GLib.Variant value);
 
 signals:
     void note_set ();
@@ -354,8 +353,8 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private string _note;
-    private QDate _expire_date;
+    private string this.note;
+    private QDate this.expire_date;
 };
 
 /***********************************************************
@@ -367,7 +366,7 @@ class Share_manager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Share_manager (AccountPointer _account, GLib.Object parent = new GLib.Object ());
+    public Share_manager (AccountPointer this.account, GLib.Object parent = new GLib.Object ());
 
 
     /***********************************************************
@@ -414,9 +413,9 @@ class Share_manager : GLib.Object {
     public void fetch_shares (string path);
 
 signals:
-    void share_created (unowned<Share> &share);
-    void on_link_share_created (unowned<Link_share> &share);
-    void on_shares_fetched (GLib.List<unowned<Share>> &shares);
+    void share_created (unowned<Share> share);
+    void on_link_share_created (unowned<Link_share> share);
+    void on_shares_fetched (GLib.List<unowned<Share>> shares);
     void on_server_error (int code, string message);
 
 
@@ -432,27 +431,27 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void on_shares_fetched (QJsonDocument &reply);
-    private void on_link_share_created (QJsonDocument &reply);
-    private void on_share_created (QJsonDocument &reply);
+    private void on_shares_fetched (QJsonDocument reply);
+    private void on_link_share_created (QJsonDocument reply);
+    private void on_share_created (QJsonDocument reply);
     private void on_ocs_error (int status_code, string message);
 
     /***********************************************************
     ***********************************************************/
-    private unowned<Link_share> parse_link_share (QJsonObject &data);
-    private unowned<User_group_share> parse_user_group_share (QJsonObject &data);
-    private unowned<Share> parse_share (QJsonObject &data);
+    private unowned<Link_share> parse_link_share (QJsonObject data);
+    private unowned<User_group_share> parse_user_group_share (QJsonObject data);
+    private unowned<Share> parse_share (QJsonObject data);
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer _account;
+    private AccountPointer this.account;
 };
 
 
 /***********************************************************
 When a share is modified, we need to tell the folders so they can adjust overlay icons
 ***********************************************************/
-static void update_folder (AccountPointer &account, string path) {
+static void update_folder (AccountPointer account, string path) {
     foreach (Folder f, FolderMan.instance ().map ()) {
         if (f.account_state ().account () != account)
             continue;
@@ -479,74 +478,74 @@ Share.Share (AccountPointer account,
     bool is_password_set,
     const Permissions permissions,
     const unowned<Sharee> share_with)
-    : _account (account)
-    , _id (id)
-    , _uidowner (uidowner)
-    , _owner_display_name (owner_display_name)
-    , _path (path)
-    , _share_type (share_type)
-    , _is_password_set (is_password_set)
-    , _permissions (permissions)
-    , _share_with (share_with) {
+    : this.account (account)
+    , this.id (id)
+    , this.uidowner (uidowner)
+    , this.owner_display_name (owner_display_name)
+    , this.path (path)
+    , this.share_type (share_type)
+    , this.is_password_set (is_password_set)
+    , this.permissions (permissions)
+    , this.share_with (share_with) {
 }
 
 AccountPointer Share.account () {
-    return _account;
+    return this.account;
 }
 
 string Share.path () {
-    return _path;
+    return this.path;
 }
 
 string Share.get_id () {
-    return _id;
+    return this.id;
 }
 
 string Share.get_uid_owner () {
-    return _uidowner;
+    return this.uidowner;
 }
 
 string Share.get_owner_display_name () {
-    return _owner_display_name;
+    return this.owner_display_name;
 }
 
 Share.Share_type Share.get_share_type () {
-    return _share_type;
+    return this.share_type;
 }
 
 unowned<Sharee> Share.get_share_with () {
-    return _share_with;
+    return this.share_with;
 }
 
 void Share.set_password (string password) {
-    var * const job = new Ocs_share_job (_account);
+    var * const job = new Ocs_share_job (this.account);
     connect (job, &Ocs_share_job.share_job_finished, this, &Share.on_password_set);
     connect (job, &Ocs_job.ocs_error, this, &Share.on_set_password_error);
     job.set_password (get_id (), password);
 }
 
 bool Share.is_password_set () {
-    return _is_password_set;
+    return this.is_password_set;
 }
 
 void Share.set_permissions (Permissions permissions) {
-    var job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (this.account);
     connect (job, &Ocs_share_job.share_job_finished, this, &Share.on_permissions_set);
     connect (job, &Ocs_job.ocs_error, this, &Share.on_ocs_error);
     job.set_permissions (get_id (), permissions);
 }
 
-void Share.on_permissions_set (QJsonDocument &, QVariant &value) {
-    _permissions = (Permissions)value.to_int ();
-    emit permissions_set ();
+void Share.on_permissions_set (QJsonDocument &, GLib.Variant value) {
+    this.permissions = (Permissions)value.to_int ();
+    /* emit */ permissions_set ();
 }
 
 Share.Permissions Share.get_permissions () {
-    return _permissions;
+    return this.permissions;
 }
 
 void Share.delete_share () {
-    var job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (this.account);
     connect (job, &Ocs_share_job.share_job_finished, this, &Share.on_deleted);
     connect (job, &Ocs_job.ocs_error, this, &Share.on_ocs_error);
     job.delete_share (get_id ());
@@ -558,35 +557,35 @@ bool Share.is_share_type_user_group_email_room_or_remote (Share_type type) {
 }
 
 void Share.on_deleted () {
-    update_folder (_account, _path);
-    emit share_deleted ();
+    update_folder (this.account, this.path);
+    /* emit */ share_deleted ();
 }
 
 void Share.on_ocs_error (int status_code, string message) {
-    emit server_error (status_code, message);
+    /* emit */ server_error (status_code, message);
 }
 
-void Share.on_password_set (QJsonDocument &, QVariant &value) {
-    _is_password_set = !value.to_"".is_empty ();
-    emit password_set ();
+void Share.on_password_set (QJsonDocument &, GLib.Variant value) {
+    this.is_password_set = !value.to_"".is_empty ();
+    /* emit */ password_set ();
 }
 
 void Share.on_set_password_error (int status_code, string message) {
-    emit password_set_error (status_code, message);
+    /* emit */ password_set_error (status_code, message);
 }
 
 GLib.Uri Link_share.get_link () {
-    return _url;
+    return this.url;
 }
 
 GLib.Uri Link_share.get_direct_download_link () {
-    GLib.Uri url = _url;
+    GLib.Uri url = this.url;
     url.set_path (url.path () + "/download");
     return url;
 }
 
 QDate Link_share.get_expire_date () {
-    return _expire_date;
+    return this.expire_date;
 }
 
 Link_share.Link_share (AccountPointer account,
@@ -599,36 +598,36 @@ Link_share.Link_share (AccountPointer account,
     Permissions permissions,
     bool is_password_set,
     const GLib.Uri url,
-    const QDate &expire_date,
+    const QDate expire_date,
     const string note,
     const string label)
     : Share (account, id, uidowner, owner_display_name, path, Share.Type_link, is_password_set, permissions)
-    , _name (name)
-    , _token (token)
-    , _note (note)
-    , _expire_date (expire_date)
-    , _url (url)
-    , _label (label) {
+    , this.name (name)
+    , this.token (token)
+    , this.note (note)
+    , this.expire_date (expire_date)
+    , this.url (url)
+    , this.label (label) {
 }
 
 bool Link_share.get_public_upload () {
-    return _permissions & Share_permission_create;
+    return this.permissions & Share_permission_create;
 }
 
 bool Link_share.get_show_file_listing () {
-    return _permissions & Share_permission_read;
+    return this.permissions & Share_permission_read;
 }
 
 string Link_share.get_name () {
-    return _name;
+    return this.name;
 }
 
 string Link_share.get_note () {
-    return _note;
+    return this.note;
 }
 
 string Link_share.get_label () {
-    return _label;
+    return this.label;
 }
 
 void Link_share.set_name (string name) {
@@ -639,16 +638,16 @@ void Link_share.set_note (string note) {
     create_share_job (&Link_share.on_note_set).set_note (get_id (), note);
 }
 
-void Link_share.on_note_set (QJsonDocument &, QVariant &note) {
-    _note = note.to_"";
-    emit note_set ();
+void Link_share.on_note_set (QJsonDocument &, GLib.Variant note) {
+    this.note = note.to_"";
+    /* emit */ note_set ();
 }
 
 string Link_share.get_token () {
-    return _token;
+    return this.token;
 }
 
-void Link_share.set_expire_date (QDate &date) {
+void Link_share.set_expire_date (QDate date) {
     create_share_job (&Link_share.on_expire_date_set).set_expire_date (get_id (), date);
 }
 
@@ -658,13 +657,13 @@ void Link_share.set_label (string label) {
 
 template <typename Link_share_slot>
 Ocs_share_job *Link_share.create_share_job (Link_share_slot on_function) {
-    var job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (this.account);
     connect (job, &Ocs_share_job.share_job_finished, this, on_function);
     connect (job, &Ocs_job.ocs_error, this, &Link_share.on_ocs_error);
     return job;
 }
 
-void Link_share.on_expire_date_set (QJsonDocument &reply, QVariant &value) {
+void Link_share.on_expire_date_set (QJsonDocument reply, GLib.Variant value) {
     var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
 
 
@@ -673,22 +672,22 @@ void Link_share.on_expire_date_set (QJsonDocument &reply, QVariant &value) {
     they use this date.
     ***********************************************************/
     if (data.value ("expiration").is_"") {
-        _expire_date = QDate.from_string (data.value ("expiration").to_"", "yyyy-MM-dd 00:00:00");
+        this.expire_date = QDate.from_string (data.value ("expiration").to_"", "yyyy-MM-dd 00:00:00");
     } else {
-        _expire_date = value.to_date ();
+        this.expire_date = value.to_date ();
     }
-    emit expire_date_set ();
+    /* emit */ expire_date_set ();
 }
 
-void Link_share.on_name_set (QJsonDocument &, QVariant &value) {
-    _name = value.to_"";
-    emit name_set ();
+void Link_share.on_name_set (QJsonDocument &, GLib.Variant value) {
+    this.name = value.to_"";
+    /* emit */ name_set ();
 }
 
-void Link_share.on_label_set (QJsonDocument &, QVariant &label) {
-    if (_label != label.to_"") {
-        _label = label.to_"";
-        emit label_set ();
+void Link_share.on_label_set (QJsonDocument &, GLib.Variant label) {
+    if (this.label != label.to_"") {
+        this.label = label.to_"";
+        /* emit */ label_set ();
     }
 }
 
@@ -701,48 +700,48 @@ User_group_share.User_group_share (AccountPointer account,
     bool is_password_set,
     const Permissions permissions,
     const unowned<Sharee> share_with,
-    const QDate &expire_date,
+    const QDate expire_date,
     const string note)
     : Share (account, id, owner, owner_display_name, path, share_type, is_password_set, permissions, share_with)
-    , _note (note)
-    , _expire_date (expire_date) {
+    , this.note (note)
+    , this.expire_date (expire_date) {
     Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share_type));
     Q_ASSERT (share_with);
 }
 
 void User_group_share.set_note (string note) {
-    var job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (this.account);
     connect (job, &Ocs_share_job.share_job_finished, this, &User_group_share.on_note_set);
     connect (job, &Ocs_job.ocs_error, this, &User_group_share.note_set_error);
     job.set_note (get_id (), note);
 }
 
 string User_group_share.get_note () {
-    return _note;
+    return this.note;
 }
 
-void User_group_share.on_note_set (QJsonDocument &, QVariant &note) {
-    _note = note.to_"";
-    emit note_set ();
+void User_group_share.on_note_set (QJsonDocument &, GLib.Variant note) {
+    this.note = note.to_"";
+    /* emit */ note_set ();
 }
 
 QDate User_group_share.get_expire_date () {
-    return _expire_date;
+    return this.expire_date;
 }
 
-void User_group_share.set_expire_date (QDate &date) {
-    if (_expire_date == date) {
-        emit expire_date_set ();
+void User_group_share.set_expire_date (QDate date) {
+    if (this.expire_date == date) {
+        /* emit */ expire_date_set ();
         return;
     }
 
-    var job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (this.account);
     connect (job, &Ocs_share_job.share_job_finished, this, &User_group_share.on_expire_date_set);
     connect (job, &Ocs_job.ocs_error, this, &User_group_share.on_ocs_error);
     job.set_expire_date (get_id (), date);
 }
 
-void User_group_share.on_expire_date_set (QJsonDocument &reply, QVariant &value) {
+void User_group_share.on_expire_date_set (QJsonDocument reply, GLib.Variant value) {
     var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
 
 
@@ -751,28 +750,28 @@ void User_group_share.on_expire_date_set (QJsonDocument &reply, QVariant &value)
     they use this date.
     ***********************************************************/
     if (data.value ("expiration").is_"") {
-        _expire_date = QDate.from_string (data.value ("expiration").to_"", "yyyy-MM-dd 00:00:00");
+        this.expire_date = QDate.from_string (data.value ("expiration").to_"", "yyyy-MM-dd 00:00:00");
     } else {
-        _expire_date = value.to_date ();
+        this.expire_date = value.to_date ();
     }
-    emit expire_date_set ();
+    /* emit */ expire_date_set ();
 }
 
 Share_manager.Share_manager (AccountPointer account, GLib.Object parent)
     : GLib.Object (parent)
-    , _account (account) {
+    , this.account (account) {
 }
 
 void Share_manager.create_link_share (string path,
     const string name,
     const string password) {
-    var job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (this.account);
     connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_link_share_created);
     connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_ocs_error);
     job.create_link_share (path, name, password);
 }
 
-void Share_manager.on_link_share_created (QJsonDocument &reply) {
+void Share_manager.on_link_share_created (QJsonDocument reply) {
     string message;
     int code = Ocs_share_job.get_json_return_code (reply, message);
 
@@ -782,7 +781,7 @@ void Share_manager.on_link_share_created (QJsonDocument &reply) {
     meant that a share was password protected
     ***********************************************************/
     if (code == 403) {
-        emit link_share_requires_password (message);
+        /* emit */ link_share_requires_password (message);
         return;
     }
 
@@ -790,9 +789,9 @@ void Share_manager.on_link_share_created (QJsonDocument &reply) {
     var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
     unowned<Link_share> share (parse_link_share (data));
 
-    emit link_share_created (share);
+    /* emit */ link_share_created (share);
 
-    update_folder (_account, share.path ());
+    update_folder (this.account, share.path ());
 }
 
 void Share_manager.create_share (string path,
@@ -800,13 +799,13 @@ void Share_manager.create_share (string path,
     const string share_with,
     const Share.Permissions desired_permissions,
     const string password) {
-    var job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (this.account);
     connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_ocs_error);
     connect (job, &Ocs_share_job.share_job_finished, this,
-        [=] (QJsonDocument &reply) {
+        [=] (QJsonDocument reply) {
             // Find existing share permissions (if this was shared with us)
             Share.Permissions existing_permissions = Share_permission_default;
-            foreach (QJsonValue &element, reply.object ()["ocs"].to_object ()["data"].to_array ()) {
+            foreach (QJsonValue element, reply.object ()["ocs"].to_object ()["data"].to_array ()) {
                 var map = element.to_object ();
                 if (map["file_target"] == path)
                     existing_permissions = Share.Permissions (map["permissions"].to_int ());
@@ -822,7 +821,7 @@ void Share_manager.create_share (string path,
                 valid_permissions &= existing_permissions;
             }
 
-            var job = new Ocs_share_job (_account);
+            var job = new Ocs_share_job (this.account);
             connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_share_created);
             connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_ocs_error);
             job.create_share (path, share_type, share_with, valid_permissions, password);
@@ -830,31 +829,31 @@ void Share_manager.create_share (string path,
     job.get_shared_with_me ();
 }
 
-void Share_manager.on_share_created (QJsonDocument &reply) {
+void Share_manager.on_share_created (QJsonDocument reply) {
     //Parse share
     var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
     unowned<Share> share (parse_share (data));
 
-    emit share_created (share);
+    /* emit */ share_created (share);
 
-    update_folder (_account, share.path ());
+    update_folder (this.account, share.path ());
 }
 
 void Share_manager.fetch_shares (string path) {
-    var job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (this.account);
     connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_shares_fetched);
     connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_ocs_error);
     job.on_get_shares (path);
 }
 
-void Share_manager.on_shares_fetched (QJsonDocument &reply) {
+void Share_manager.on_shares_fetched (QJsonDocument reply) {
     var tmp_shares = reply.object ().value ("ocs").to_object ().value ("data").to_array ();
-    const string version_string = _account.server_version ();
+    const string version_string = this.account.server_version ();
     GLib.debug (lc_sharing) << version_string << "Fetched" << tmp_shares.count () << "shares";
 
     GLib.List<unowned<Share>> shares;
 
-    foreach (var &share, tmp_shares) {
+    foreach (var share, tmp_shares) {
         var data = share.to_object ();
 
         var share_type = data.value ("share_type").to_int ();
@@ -873,10 +872,10 @@ void Share_manager.on_shares_fetched (QJsonDocument &reply) {
     }
 
     GLib.debug (lc_sharing) << "Sending " << shares.count () << "shares";
-    emit shares_fetched (shares);
+    /* emit */ shares_fetched (shares);
 }
 
-unowned<User_group_share> Share_manager.parse_user_group_share (QJsonObject &data) {
+unowned<User_group_share> Share_manager.parse_user_group_share (QJsonObject data) {
     unowned<Sharee> sharee (new Sharee (data.value ("share_with").to_"",
         data.value ("share_with_displayname").to_"",
         static_cast<Sharee.Type> (data.value ("share_type").to_int ())));
@@ -891,7 +890,7 @@ unowned<User_group_share> Share_manager.parse_user_group_share (QJsonObject &dat
         note = data.value ("note").to_"";
     }
 
-    return unowned<User_group_share> (new User_group_share (_account,
+    return unowned<User_group_share> (new User_group_share (this.account,
         data.value ("id").to_variant ().to_"", // "id" used to be an integer, support both
         data.value ("uid_owner").to_variant ().to_"",
         data.value ("displayname_owner").to_variant ().to_"",
@@ -904,20 +903,20 @@ unowned<User_group_share> Share_manager.parse_user_group_share (QJsonObject &dat
         note));
 }
 
-unowned<Link_share> Share_manager.parse_link_share (QJsonObject &data) {
+unowned<Link_share> Share_manager.parse_link_share (QJsonObject data) {
     GLib.Uri url;
 
     // From own_cloud server 8.2 the url field is always set for public shares
     if (data.contains ("url")) {
         url = GLib.Uri (data.value ("url").to_"");
-    } else if (_account.server_version_int () >= Account.make_server_version (8, 0, 0)) {
+    } else if (this.account.server_version_int () >= Account.make_server_version (8, 0, 0)) {
         // From own_cloud server version 8 on, a different share link scheme is used.
-        url = GLib.Uri (Utility.concat_url_path (_account.url (), QLatin1String ("index.php/s/") + data.value ("token").to_"")).to_"";
+        url = GLib.Uri (Utility.concat_url_path (this.account.url (), QLatin1String ("index.php/s/") + data.value ("token").to_"")).to_"";
     } else {
         QUrlQuery query_args;
         query_args.add_query_item (QLatin1String ("service"), QLatin1String ("files"));
         query_args.add_query_item (QLatin1String ("t"), data.value ("token").to_"");
-        url = GLib.Uri (Utility.concat_url_path (_account.url (), QLatin1String ("public.php"), query_args).to_"");
+        url = GLib.Uri (Utility.concat_url_path (this.account.url (), QLatin1String ("public.php"), query_args).to_"");
     }
 
     QDate expire_date;
@@ -930,7 +929,7 @@ unowned<Link_share> Share_manager.parse_link_share (QJsonObject &data) {
         note = data.value ("note").to_"";
     }
 
-    return unowned<Link_share> (new Link_share (_account,
+    return unowned<Link_share> (new Link_share (this.account,
         data.value ("id").to_variant ().to_"", // "id" used to be an integer, support both
         data.value ("uid_owner").to_"",
         data.value ("displayname_owner").to_"",
@@ -945,12 +944,12 @@ unowned<Link_share> Share_manager.parse_link_share (QJsonObject &data) {
         data.value ("label").to_""));
 }
 
-unowned<Share> Share_manager.parse_share (QJsonObject &data) {
+unowned<Share> Share_manager.parse_share (QJsonObject data) {
     unowned<Sharee> sharee (new Sharee (data.value ("share_with").to_"",
         data.value ("share_with_displayname").to_"",
         (Sharee.Type)data.value ("share_type").to_int ()));
 
-    return unowned<Share> (new Share (_account,
+    return unowned<Share> (new Share (this.account,
         data.value ("id").to_variant ().to_"", // "id" used to be an integer, support both
         data.value ("uid_owner").to_variant ().to_"",
         data.value ("displayname_owner").to_variant ().to_"",
@@ -962,6 +961,6 @@ unowned<Share> Share_manager.parse_share (QJsonObject &data) {
 }
 
 void Share_manager.on_ocs_error (int status_code, string message) {
-    emit server_error (status_code, message);
+    /* emit */ server_error (status_code, message);
 }
 }

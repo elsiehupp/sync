@@ -47,7 +47,7 @@ int torture_run_tests (void);
 }
 #endif
 
-#endif /* _TORTURE_H */
+#endif /* this.TORTURE_H */
 
 
 
@@ -88,7 +88,7 @@ int main (int argc, char **argv) {
   struct argument_s arguments;
 
   arguments.verbose = 0;
-  torture_cmdline_parse (argc, argv, &arguments);
+  torture_cmdline_parse (argc, argv, arguments);
   verbosity = arguments.verbose;
 
   return torture_run_tests ();

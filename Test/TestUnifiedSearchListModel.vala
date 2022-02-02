@@ -33,18 +33,18 @@ class FakeProvider {
 
     /***********************************************************
     ***********************************************************/
-    public string _id;
-    public string _name;
-    public int32 _order = std.numeric_limits<int32>.max ();
+    public string this.id;
+    public string this.name;
+    public int32 this.order = std.numeric_limits<int32>.max ();
 
 
     /***********************************************************
     ***********************************************************/
-    public uint32 _numItemsToInsert = 5; // how many fake resuls to insert
+    public uint32 this.numItemsToInsert = 5; // how many fake resuls to insert
 };
 
 // this will be used when initializing fake search results data for each provider
-static const QVector<FakeProvider> fakeProvidersInitInfo = { {QStringLiteral ("settings_apps"), QStringLiteral ("Apps"), -50, 10}, {QStringLiteral ("talk-message"), QStringLiteral ("Messages"), -2, 17}, {QStringLiteral ("files"), QStringLiteral ("Files"), 5, 3}, {QStringLiteral ("deck"), QStringLiteral ("Deck"), 10, 5}, {QStringLiteral ("comments"), QStringLiteral ("Comments"), 10, 2}, {QStringLiteral ("mail"), QStringLiteral ("Mails"), 10, 15}, {QStringLiteral ("calendar"), QStringLiteral ("Events"), 30, 11}
+static const GLib.Vector<FakeProvider> fakeProvidersInitInfo = { {QStringLiteral ("settings_apps"), QStringLiteral ("Apps"), -50, 10}, {QStringLiteral ("talk-message"), QStringLiteral ("Messages"), -2, 17}, {QStringLiteral ("files"), QStringLiteral ("Files"), 5, 3}, {QStringLiteral ("deck"), QStringLiteral ("Deck"), 10, 5}, {QStringLiteral ("comments"), QStringLiteral ("Comments"), 10, 2}, {QStringLiteral ("mail"), QStringLiteral ("Mails"), 10, 15}, {QStringLiteral ("calendar"), QStringLiteral ("Events"), 30, 11}
 };
 
 static GLib.ByteArray fake404Response = R" ( {"ocs":{"meta":{"status":"failure","statuscode":404,"message":"Invalid query, please check the syntax. API specifications are here : http:\/\/www.freedesktop.org\/wiki\/Specifications\/open-collaboration-services.\n"},"data":[]}}
@@ -63,20 +63,20 @@ emulates the real server storage that contains all the results that UnifiedSearc
 class FakeSearchResultsStorage { {lass Provider {
         public class SearchResult {
 
-            public string _thumbnailUrl;
-            public string _title;
-            public string _subline;
-            public string _resourceUrl;
-            public string _icon;
-            public bool _rounded;
+            public string this.thumbnailUrl;
+            public string this.title;
+            public string this.subline;
+            public string this.resourceUrl;
+            public string this.icon;
+            public bool this.rounded;
         };
 
-        string _id;
-        string _name;
-        int32 _order = std.numeric_limits<int32>.max ();
-        int32 _cursor = 0;
-        bool _isPaginated = false;
-        QVector<SearchResult> _results;
+        string this.id;
+        string this.name;
+        int32 this.order = std.numeric_limits<int32>.max ();
+        int32 this.cursor = 0;
+        bool this.isPaginated = false;
+        GLib.Vector<SearchResult> this.results;
     };
 
     FakeSearchResultsStorage () = default;
@@ -85,33 +85,33 @@ class FakeSearchResultsStorage { {lass Provider {
     /***********************************************************
     ***********************************************************/
     public static FakeSearchResultsStorage instance () {
-        if (!_instance) {
-            _instance = new FakeSearchResultsStorage ();
-            _instance.on_init ();
+        if (!this.instance) {
+            this.instance = new FakeSearchResultsStorage ();
+            this.instance.on_init ();
         }
 
-        return _instance;
+        return this.instance;
     };
 
     /***********************************************************
     ***********************************************************/
     public static void destroy () {
-        if (_instance) {
-            delete _instance;
+        if (this.instance) {
+            delete this.instance;
         }
 
-        _instance = nullptr;
+        this.instance = nullptr;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void on_init () {
-        if (!_searchResultsData.isEmpty ()) {
+        if (!this.searchResultsData.isEmpty ()) {
             return;
         }
 
-        _metaSuccess = {{QStringLiteral ("status"), QStringLiteral ("ok")}, {QStringLiteral ("statuscode"), 200}, {QStringLiteral ("message"), QStringLiteral ("OK")}};
+        this.metaSuccess = {{QStringLiteral ("status"), QStringLiteral ("ok")}, {QStringLiteral ("statuscode"), 200}, {QStringLiteral ("message"), QStringLiteral ("OK")}};
 
         initProvidersResponse ();
 
@@ -120,24 +120,24 @@ class FakeSearchResultsStorage { {lass Provider {
 
     // initialize the JSON response containing the fake list of providers and their properties
     public void initProvidersResponse () {
-        GLib.List<QVariant> providersList;
+        GLib.List<GLib.Variant> providersList;
 
-        for (var &fakeProviderInitInfo : fakeProvidersInitInfo) {
+        for (var fakeProviderInitInfo : fakeProvidersInitInfo) {
             providersList.push_back (QVariantMap{ {QStringLiteral ("id"), fakeProviderInitInfo._id}, {QStringLiteral ("name"), fakeProviderInitInfo._name}, {QStringLiteral ("order"), fakeProviderInitInfo._order},
             });
         }
 
-        const QVariantMap ocsMap = { {QStringLiteral ("meta"), _metaSuccess}, {QStringLiteral ("data"), providersList}
+        const QVariantMap ocsMap = { {QStringLiteral ("meta"), this.metaSuccess}, {QStringLiteral ("data"), providersList}
         };
 
-        _providersResponse =
+        this.providersResponse =
             QJsonDocument.fromVariant (QVariantMap{{QStringLiteral ("ocs"), ocsMap}}).toJson (QJsonDocument.Compact);
     }
 
     // on_init the map of fake search results for each provider
     public void initSearchResultsData () {
-        for (var &fakeProvider : fakeProvidersInitInfo) {
-            var &providerData = _searchResultsData[fakeProvider._id];
+        for (var fakeProvider : fakeProvidersInitInfo) {
+            var providerData = this.searchResultsData[fakeProvider._id];
             providerData._id = fakeProvider._id;
             providerData._name = fakeProvider._name;
             providerData._order = fakeProvider._order;
@@ -156,8 +156,8 @@ class FakeSearchResultsStorage { {lass Provider {
 
     /***********************************************************
     ***********************************************************/
-    public const GLib.List<QVariant> resultsForProvider (string providerId, int cursor) {
-        GLib.List<QVariant> list;
+    public const GLib.List<GLib.Variant> resultsForProvider (string providerId, int cursor) {
+        GLib.List<GLib.Variant> list;
 
         const var results = resultsForProviderAsVector (providerId, cursor);
 
@@ -165,7 +165,7 @@ class FakeSearchResultsStorage { {lass Provider {
             return list;
         }
 
-        for (var &result : results) {
+        for (var result : results) {
             list.push_back (QVariantMap{ {"thumbnailUrl", result._thumbnailUrl}, {"title", result._title}, {"subline", result._subline}, {"resourceUrl", result._resourceUrl}, {"icon", result._icon}, {"rounded", result._rounded}
             });
         }
@@ -176,10 +176,10 @@ class FakeSearchResultsStorage { {lass Provider {
 
     /***********************************************************
     ***********************************************************/
-    public const QVector<Provider.SearchResult> resultsForProviderAsVector (string providerId, int cursor) {
-        QVector<Provider.SearchResult> results;
+    public const GLib.Vector<Provider.SearchResult> resultsForProviderAsVector (string providerId, int cursor) {
+        GLib.Vector<Provider.SearchResult> results;
 
-        const var provider = _searchResultsData.value (providerId, Provider ());
+        const var provider = this.searchResultsData.value (providerId, Provider ());
 
         if (provider._id.isEmpty () || cursor > provider._results.size ()) {
             return results;
@@ -200,7 +200,7 @@ class FakeSearchResultsStorage { {lass Provider {
     /***********************************************************
     ***********************************************************/
     public const GLib.ByteArray queryProvider (string providerId, string searchTerm, int cursor) {
-        if (!_searchResultsData.contains (providerId)) {
+        if (!this.searchResultsData.contains (providerId)) {
             return fake404Response;
         }
 
@@ -209,21 +209,21 @@ class FakeSearchResultsStorage { {lass Provider {
         }
 
         if (searchTerm == QStringLiteral ("[empty]")) {
-            const QVariantMap dataMap = {{QStringLiteral ("name"), _searchResultsData[providerId]._name}, {QStringLiteral ("isPaginated"), false}, {QStringLiteral ("cursor"), 0}, {QStringLiteral ("entries"), QVariantList{}}};
+            const QVariantMap dataMap = {{QStringLiteral ("name"), this.searchResultsData[providerId]._name}, {QStringLiteral ("isPaginated"), false}, {QStringLiteral ("cursor"), 0}, {QStringLiteral ("entries"), QVariantList{}}};
 
-            const QVariantMap ocsMap = {{QStringLiteral ("meta"), _metaSuccess}, {QStringLiteral ("data"), dataMap}};
+            const QVariantMap ocsMap = {{QStringLiteral ("meta"), this.metaSuccess}, {QStringLiteral ("data"), dataMap}};
 
             return QJsonDocument.fromVariant (QVariantMap{{QStringLiteral ("ocs"), ocsMap}})
                 .toJson (QJsonDocument.Compact);
         }
 
-        const var provider = _searchResultsData.value (providerId, Provider ());
+        const var provider = this.searchResultsData.value (providerId, Provider ());
 
         const var nextCursor = cursor + pageSize;
 
-        const QVariantMap dataMap = {{QStringLiteral ("name"), _searchResultsData[providerId]._name}, {QStringLiteral ("isPaginated"), _searchResultsData[providerId]._isPaginated}, {QStringLiteral ("cursor"), nextCursor}, {QStringLiteral ("entries"), resultsForProvider (providerId, cursor)}};
+        const QVariantMap dataMap = {{QStringLiteral ("name"), this.searchResultsData[providerId]._name}, {QStringLiteral ("isPaginated"), this.searchResultsData[providerId]._isPaginated}, {QStringLiteral ("cursor"), nextCursor}, {QStringLiteral ("entries"), resultsForProvider (providerId, cursor)}};
 
-        const QVariantMap ocsMap = {{QStringLiteral ("meta"), _metaSuccess}, {QStringLiteral ("data"), dataMap}};
+        const QVariantMap ocsMap = {{QStringLiteral ("meta"), this.metaSuccess}, {QStringLiteral ("data"), dataMap}};
 
         return QJsonDocument.fromVariant (QVariantMap{{QStringLiteral ("ocs"), ocsMap}}).toJson (QJsonDocument.Compact);
     }
@@ -231,12 +231,12 @@ class FakeSearchResultsStorage { {lass Provider {
 
     /***********************************************************
     ***********************************************************/
-    public const GLib.ByteArray fakeProvidersResponseJson () { return _providersResponse; }
+    public const GLib.ByteArray fakeProvidersResponseJson () { return this.providersResponse; }
 
 
     /***********************************************************
     ***********************************************************/
-    private static FakeSearchResultsStorage _instance;
+    private static FakeSearchResultsStorage this.instance;
 
     /***********************************************************
     ***********************************************************/
@@ -244,15 +244,15 @@ class FakeSearchResultsStorage { {lass Provider {
 
     /***********************************************************
     ***********************************************************/
-    private QMap<string, Provider> _searchResultsData;
+    private QMap<string, Provider> this.searchResultsData;
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray _providersResponse = fake404Response;
+    private GLib.ByteArray this.providersResponse = fake404Response;
 
     /***********************************************************
     ***********************************************************/
-    private QVariantMap _metaSuccess;
+    private QVariantMap this.metaSuccess;
 };
 
 FakeSearchResultsStorage *FakeSearchResultsStorage._instance = nullptr;
@@ -291,7 +291,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
         accountState.on_reset (new Occ.AccountState (account));
 
-        fakeQnam.setOverride ([this] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice device) {
+        fakeQnam.setOverride ([this] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice device) {
             Q_UNUSED (device);
             QNetworkReply reply = nullptr;
 

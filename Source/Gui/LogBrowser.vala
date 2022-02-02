@@ -24,7 +24,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QTextStream>
 // #include <GLib.File>
 // #include <GLib.List>
-// #include <GLib.DateTime>
 // #include <Gtk.Dialog>
 // #include <QLineEdit>
 // #include <QPushButton>

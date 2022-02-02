@@ -14,8 +14,6 @@ static const int check_frequency = 20 * 1000; // ms
 // #pragma once
 
 // #include <GLib.List>
-// #include <string>
-// #include <GLib.Set>
 // #include <QTimer>
 
 // #include <chrono>
@@ -78,8 +76,8 @@ signals:
     /***********************************************************
     ***********************************************************/
     private 
-    private GLib.Set<string> _watched_paths;
-    private QTimer _timer;
+    private GLib.Set<string> this.watched_paths;
+    private QTimer this.timer;
 };
 }
 
@@ -92,31 +90,31 @@ signals:
 
 LockWatcher.LockWatcher (GLib.Object parent) {
     base (parent);
-    connect (&_timer, &QTimer.timeout,
+    connect (&this.timer, &QTimer.timeout,
         this, &LockWatcher.on_check_files);
-    _timer.on_start (check_frequency);
+    this.timer.on_start (check_frequency);
 }
 
 void LockWatcher.add_file (string path) {
     q_c_info (lc_lock_watcher) << "Watching for lock of" << path << "being released";
-    _watched_paths.insert (path);
+    this.watched_paths.insert (path);
 }
 
 void LockWatcher.set_check_interval (std.chrono.milliseconds interval) {
-    _timer.on_start (interval.count ());
+    this.timer.on_start (interval.count ());
 }
 
 bool LockWatcher.contains (string path) {
-    return _watched_paths.contains (path);
+    return this.watched_paths.contains (path);
 }
 
 void LockWatcher.on_check_files () {
     GLib.Set<string> unlocked;
 
-    foreach (string path, _watched_paths) {
+    foreach (string path, this.watched_paths) {
         if (!FileSystem.is_file_locked (path)) {
             q_c_info (lc_lock_watcher) << "Lock of" << path << "was released";
-            emit file_unlocked (path);
+            /* emit */ file_unlocked (path);
             unlocked.insert (path);
         }
     }
@@ -124,5 +122,5 @@ void LockWatcher.on_check_files () {
     // Doing it this way instead of with a QMutableSetIterator
     // ensures that calling back into add_file from connected
     // slots isn't a problem.
-    _watched_paths.subtract (unlocked);
+    this.watched_paths.subtract (unlocked);
 }

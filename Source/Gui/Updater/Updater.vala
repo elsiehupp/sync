@@ -54,17 +54,17 @@ class Updater : GLib.Object {
     private static string get_system_info ();
     private static QUrlQuery get_query_params ();
     private static Updater create ();
-    private static Updater _instance;
+    private static Updater this.instance;
 };
 
 
     Updater *Updater._instance = nullptr;
 
     Updater *Updater.instance () {
-        if (!_instance) {
-            _instance = create ();
+        if (!this.instance) {
+            this.instance = create ();
         }
-        return _instance;
+        return this.instance;
     }
 
     GLib.Uri Updater.update_url () {
@@ -170,7 +170,7 @@ class Updater : GLib.Object {
             return 0;
         GLib.ByteArray ba_version = version.to_latin1 ();
         int major = 0, minor = 0, patch = 0, build = 0;
-        sscanf (ba_version, "%d.%d.%d.%d", &major, &minor, &patch, &build);
+        sscanf (ba_version, "%d.%d.%d.%d", major, minor, patch, build);
         return version_to_int (major, minor, patch, build);
     }
 

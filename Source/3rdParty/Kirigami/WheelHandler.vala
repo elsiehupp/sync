@@ -293,7 +293,7 @@ class GlobalWheelFilter_singleton {
     GlobalWheelFilter.~GlobalWheelFilter () = default;
 
     GlobalWheelFilter *GlobalWheelFilter.self () {
-        return &private_global_wheel_filter_self ().self;
+        return private_global_wheel_filter_self ().self;
     }
 
     void GlobalWheelFilter.set_item_handler_association (QQuick_item item, WheelHandler handler) {
@@ -342,7 +342,7 @@ class GlobalWheelFilter_singleton {
                 if (handler.m_scroll_flickable_target) {
                     should_scroll_flickable = true;
                 }
-                emit handler.wheel (&m_wheel_event);
+                /* emit */ handler.wheel (&m_wheel_event);
             }
 
             if (should_scroll_flickable && !m_wheel_event.is_accepted ()) {
@@ -520,7 +520,7 @@ class GlobalWheelFilter_singleton {
 
         GlobalWheelFilter.self ().set_item_handler_association (target, this);
 
-        emit target_changed ();
+        /* emit */ target_changed ();
     }
 
     #include "moc_wheelhandler.cpp"

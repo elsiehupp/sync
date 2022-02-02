@@ -8,7 +8,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 // #include <QJsonDocument>
 // #include <QJsonObject>
 
-// #include <QVector>
+// #include <GLib.Vector>
 // #include <GLib.List>
 // #include <QPair>
 // #include <GLib.Uri>
@@ -61,7 +61,7 @@ class Ocs_job : AbstractNetworkJob {
     @param post_params list of pairs to add (url_encoded) to the body of the
     request
     ***********************************************************/
-    protected void set_post_params (GLib.List<QPair<string, string>> &post_params);
+    protected void set_post_params (GLib.List<QPair<string, string>> post_params);
 
 
     /***********************************************************
@@ -91,7 +91,7 @@ class Ocs_job : AbstractNetworkJob {
     @param message The message that is set in the metadata
     @return The statuscode of the OCS response
     ***********************************************************/
-    public static int get_json_return_code (QJsonDocument &json, string message);
+    public static int get_json_return_code (QJsonDocument json, string message);
 
 
     /***********************************************************
@@ -144,30 +144,30 @@ signals:
     /***********************************************************
     ***********************************************************/
     private 
-    private GLib.ByteArray _verb;
-    private GLib.List<QPair<string, string>> _params;
-    private QVector<int> _pass_status_codes;
-    private QNetworkRequest _request;
+    private GLib.ByteArray this.verb;
+    private GLib.List<QPair<string, string>> this.params;
+    private GLib.Vector<int> this.pass_status_codes;
+    private QNetworkRequest this.request;
 };
 
     Ocs_job.Ocs_job (AccountPointer account)
         : AbstractNetworkJob (account, "") {
-        _pass_status_codes.append (OCS_SUCCESS_STATUS_CODE);
-        _pass_status_codes.append (OCS_SUCCESS_STATUS_CODE_V2);
-        _pass_status_codes.append (OCS_NOT_MODIFIED_STATUS_CODE_V2);
+        this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE);
+        this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE_V2);
+        this.pass_status_codes.append (OCS_NOT_MODIFIED_STATUS_CODE_V2);
         set_ignore_credential_failure (true);
     }
 
     void Ocs_job.set_verb (GLib.ByteArray verb) {
-        _verb = verb;
+        this.verb = verb;
     }
 
     void Ocs_job.add_param (string name, string value) {
-        _params.append (q_make_pair (name, value));
+        this.params.append (q_make_pair (name, value));
     }
 
     void Ocs_job.add_pass_status_code (int code) {
-        _pass_status_codes.append (code);
+        this.pass_status_codes.append (code);
     }
 
     void Ocs_job.append_path (string id) {
@@ -175,17 +175,17 @@ signals:
     }
 
     void Ocs_job.add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
-        _request.set_raw_header (header_name, value);
+        this.request.set_raw_header (header_name, value);
     }
 
     /***********************************************************
     ***********************************************************/
     static QUrlQuery percent_encode_query_items (
-        const GLib.List<QPair<string, string>> &items) {
+        const GLib.List<QPair<string, string>> items) {
         QUrlQuery result;
         // Note: QUrlQuery.set_query_items () does not fully percent encode
         // the query items, see #5042
-        foreach (var &item, items) {
+        foreach (var item, items) {
             result.add_query_item (
                 GLib.Uri.to_percent_encoding (item.first),
                 GLib.Uri.to_percent_encoding (item.second));
@@ -200,12 +200,12 @@ signals:
         var buffer = new QBuffer;
 
         QUrlQuery query_items;
-        if (_verb == "GET") {
-            query_items = percent_encode_query_items (_params);
-        } else if (_verb == "POST" || _verb == "PUT") {
-            // Url encode the _post_params and put them in a buffer.
+        if (this.verb == "GET") {
+            query_items = percent_encode_query_items (this.params);
+        } else if (this.verb == "POST" || this.verb == "PUT") {
+            // Url encode the this.post_params and put them in a buffer.
             GLib.ByteArray post_data;
-            Q_FOREACH (var tmp, _params) {
+            Q_FOREACH (var tmp, this.params) {
                 if (!post_data.is_empty ()) {
                     post_data.append ("&");
                 }
@@ -217,7 +217,7 @@ signals:
         }
         query_items.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path (), query_items);
-        send_request (_verb, url, _request, buffer);
+        send_request (this.verb, url, this.request, buffer);
         AbstractNetworkJob.on_start ();
     }
 
@@ -227,15 +227,15 @@ signals:
         QJsonParseError error;
         string message;
         int status_code = 0;
-        var json = QJsonDocument.from_json (reply_data, &error);
+        var json = QJsonDocument.from_json (reply_data, error);
 
         // when it is null we might have a 304 so get status code from reply () and gives a warning...
         if (error.error != QJsonParseError.NoError) {
             status_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
             GLib.warn (lc_ocs) << "Could not parse reply to"
-                             << _verb
+                             << this.verb
                              << Utility.concat_url_path (account ().url (), path ())
-                             << _params
+                             << this.params
                              << error.error_string ()
                              << ":" << reply_data;
         } else {
@@ -243,25 +243,25 @@ signals:
         }
 
         //... then it checks for the status_code
-        if (!_pass_status_codes.contains (status_code)) {
+        if (!this.pass_status_codes.contains (status_code)) {
             GLib.warn (lc_ocs) << "Reply to"
-                             << _verb
+                             << this.verb
                              << Utility.concat_url_path (account ().url (), path ())
-                             << _params
+                             << this.params
                              << "has unexpected status code:" << status_code << reply_data;
-            emit ocs_error (status_code, message);
+            /* emit */ ocs_error (status_code, message);
 
         } else {
             // save new ETag value
             if (reply ().raw_header_list ().contains ("ETag"))
-                emit etag_response_header_received (reply ().raw_header ("ETag"), status_code);
+                /* emit */ etag_response_header_received (reply ().raw_header ("ETag"), status_code);
 
-            emit job_finished (json, status_code);
+            /* emit */ job_finished (json, status_code);
         }
         return true;
     }
 
-    int Ocs_job.get_json_return_code (QJsonDocument &json, string message) {
+    int Ocs_job.get_json_return_code (QJsonDocument json, string message) {
         //TODO proper checking
         var meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
         int code = meta.value ("statuscode").to_int ();

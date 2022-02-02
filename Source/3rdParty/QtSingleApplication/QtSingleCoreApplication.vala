@@ -20,7 +20,7 @@ class Qt_singleCoreApplication : QCoreApplication {
 
     /***********************************************************
     ***********************************************************/
-    public Qt_singleCoreApplication (int &argc, char **argv);
+    public Qt_singleCoreApplication (int argc, char **argv);
 
     /***********************************************************
     ***********************************************************/
@@ -84,14 +84,14 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 
 namespace SharedTools {
 
-    Qt_singleCoreApplication.Qt_singleCoreApplication (int &argc, char **argv)
+    Qt_singleCoreApplication.Qt_singleCoreApplication (int argc, char **argv)
         : QCoreApplication (argc, argv) {
         peer = new QtLocalPeer (this);
         block = false;
         connect (peer, &QtLocalPeer.message_received, this, &Qt_singleCoreApplication.message_received);
     }
 
-    Qt_singleCoreApplication.Qt_singleCoreApplication (string app_id, int &argc, char **argv)
+    Qt_singleCoreApplication.Qt_singleCoreApplication (string app_id, int argc, char **argv)
         : QCoreApplication (argc, argv) {
         peer = new QtLocalPeer (this, app_id);
         connect (peer, &QtLocalPeer.message_received, this, &Qt_singleCoreApplication.message_received);

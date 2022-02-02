@@ -45,9 +45,9 @@ class Vfs_suffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public Result<void, string> create_placeholder (SyncFileItem &item) override;
-    public Result<void, string> dehydrate_placeholder (SyncFileItem &item) override;
-    public Result<Vfs.ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem &item, string ) override;
+    public Result<void, string> create_placeholder (SyncFileItem item) override;
+    public Result<void, string> dehydrate_placeholder (SyncFileItem item) override;
+    public Result<Vfs.ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem item, string ) override;
 
     /***********************************************************
     ***********************************************************/
@@ -84,7 +84,7 @@ class Vfs_suffix : Vfs {
     ***********************************************************/
     public void on_file_status_changed (string , SyncFileStatus) override {}
 
-    protected void start_impl (VfsSetupParams &parameters) override;
+    protected void start_impl (VfsSetupParams parameters) override;
 };
 
 class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_suffix> {
@@ -106,16 +106,16 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
         return QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
     }
 
-    void Vfs_suffix.start_impl (VfsSetupParams &parameters) {
+    void Vfs_suffix.start_impl (VfsSetupParams parameters) {
         // It is unsafe for the database to contain any ".owncloud" file entries
         // that are not marked as a virtual file. These could be real .owncloud
         // files that were synced before vfs was enabled.
         QByte_array_list to_wipe;
-        parameters.journal.get_files_below_path ("", [&to_wipe] (SyncJournalFileRecord &record) {
+        parameters.journal.get_files_below_path ("", [&to_wipe] (SyncJournalFileRecord record) {
             if (!record.is_virtual_file () && record._path.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX))
                 to_wipe.append (record._path);
         });
-        for (var &path : to_wipe)
+        for (var path : to_wipe)
             parameters.journal.delete_file_record (path);
     }
 
@@ -138,13 +138,13 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
         return {};
     }
 
-    Result<void, string> Vfs_suffix.create_placeholder (SyncFileItem &item) {
+    Result<void, string> Vfs_suffix.create_placeholder (SyncFileItem item) {
         if (item._modtime <= 0) {
             return {_("Error updating metadata due to invalid modified time")};
         }
 
         // The concrete shape of the placeholder is also used in is_dehydrated_placeholder () below
-        string fn = _setup_params.filesystem_path + item._file;
+        string fn = this.setup_params.filesystem_path + item._file;
         if (!fn.ends_with (file_suffix ())) {
             ASSERT (false, "vfs file isn't ending with suffix");
             return string ("vfs file isn't ending with suffix");
@@ -165,7 +165,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
         return {};
     }
 
-    Result<void, string> Vfs_suffix.dehydrate_placeholder (SyncFileItem &item) {
+    Result<void, string> Vfs_suffix.dehydrate_placeholder (SyncFileItem item) {
         SyncFileItem virtual_item (item);
         virtual_item._file = item._rename_target;
         var r = create_placeholder (virtual_item);
@@ -173,11 +173,11 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
             return r;
 
         if (item._file != item._rename_target) { // can be the same when renaming foo . foo.owncloud to dehydrate
-            GLib.File.remove (_setup_params.filesystem_path + item._file);
+            GLib.File.remove (this.setup_params.filesystem_path + item._file);
         }
 
         // Move the item's pin state
-        var pin = _setup_params.journal.internal_pin_states ().raw_for_path (item._file.to_utf8 ());
+        var pin = this.setup_params.journal.internal_pin_states ().raw_for_path (item._file.to_utf8 ());
         if (pin && *pin != PinState.PinState.INHERITED) {
             set_pin_state (item._rename_target, *pin);
             set_pin_state (item._file, PinState.PinState.INHERITED);

@@ -6,12 +6,10 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 // #include <networkjobs.h>
 
-// #include <GLib.DateTime>
 // #include <QtGlobal>
 // #include <QJsonDocument>
 // #include <QJsonValue>
 // #include <QLoggingCategory>
-// #include <string>
 // #include <QJsonObject>
 // #include <QJsonArray>
 // #include <qdatetime.h>
@@ -42,7 +40,7 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    public void set_user_status (UserStatus &user_status) override;
+    public void set_user_status (UserStatus user_status) override;
 
     /***********************************************************
     ***********************************************************/
@@ -55,47 +53,47 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    private void on_user_status_fetched (QJsonDocument &json, int status_code);
-    private void on_predefined_statuses_fetched (QJsonDocument &json, int status_code);
-    private void on_user_status_online_status_set (QJsonDocument &json, int status_code);
-    private void on_user_status_message_set (QJsonDocument &json, int status_code);
-    private void on_message_cleared (QJsonDocument &json, int status_code);
+    private void on_user_status_fetched (QJsonDocument json, int status_code);
+    private void on_predefined_statuses_fetched (QJsonDocument json, int status_code);
+    private void on_user_status_online_status_set (QJsonDocument json, int status_code);
+    private void on_user_status_message_set (QJsonDocument json, int status_code);
+    private void on_message_cleared (QJsonDocument json, int status_code);
 
     /***********************************************************
     ***********************************************************/
-    private void log_response (string message, QJsonDocument &json, int status_code);
+    private void log_response (string message, QJsonDocument json, int status_code);
     private void start_fetch_user_status_job ();
     private void start_fetch_predefined_statuses ();
     private void set_user_status_online_status (UserStatus.OnlineStatus online_status);
-    private void set_user_status_message (UserStatus &user_status);
-    private void set_user_status_message_predefined (UserStatus &user_status);
-    private void set_user_status_message_custom (UserStatus &user_status);
+    private void set_user_status_message (UserStatus user_status);
+    private void set_user_status_message_predefined (UserStatus user_status);
+    private void set_user_status_message_custom (UserStatus user_status);
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer _account;
+    private AccountPointer this.account;
 
     /***********************************************************
     ***********************************************************/
-    private bool _user_status_supported = false;
+    private bool this.user_status_supported = false;
 
     /***********************************************************
     ***********************************************************/
     private 
-    private QPointer<JsonApiJob> _clear_message_job {};
-    private QPointer<JsonApiJob> _set_message_job {};
-    private QPointer<JsonApiJob> _set_online_status_job {};
-    private QPointer<JsonApiJob> _get_predefined_stauses_job {};
-    private QPointer<JsonApiJob> _get_user_status_job {};
+    private QPointer<JsonApiJob> this.clear_message_job {};
+    private QPointer<JsonApiJob> this.set_message_job {};
+    private QPointer<JsonApiJob> this.set_online_status_job {};
+    private QPointer<JsonApiJob> this.get_predefined_stauses_job {};
+    private QPointer<JsonApiJob> this.get_user_status_job {};
 
     /***********************************************************
     ***********************************************************/
-    private UserStatus _user_status;
+    private UserStatus this.user_status;
 };
 
     Occ.UserStatus.OnlineStatus string_to_user_online_status (string status) {
         // it needs to match the Status enum
-        const QHash<string, Occ.UserStatus.OnlineStatus> pre_defined_status {
+        const GLib.HashMap<string, Occ.UserStatus.OnlineStatus> pre_defined_status {
             {
                 "online", Occ.UserStatus.OnlineStatus.Online
             },
@@ -114,7 +112,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         };
 
         // api should return invisible, dnd,... to_lower () it is to make sure
-        // it matches _pre_defined_status, otherwise the default is online (0)
+        // it matches this.pre_defined_status, otherwise the default is online (0)
         return pre_defined_status.value (status.to_lower (), Occ.UserStatus.OnlineStatus.Online);
     }
 
@@ -156,7 +154,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         return user_status;
     }
 
-    Occ.UserStatus json_to_user_status (QJsonDocument &json) {
+    Occ.UserStatus json_to_user_status (QJsonDocument json) {
         {
             QJsonObject d
             {
@@ -179,7 +177,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         return json_extract_user_status (retrieved_data);
     }
 
-    uint64 clear_at_end_of_to_timestamp (Occ.ClearAt &clear_at) {
+    uint64 clear_at_end_of_to_timestamp (Occ.ClearAt clear_at) {
         Q_ASSERT (clear_at._type == Occ.ClearAtType.EndOf);
 
         if (clear_at._endof == "day") {
@@ -192,11 +190,11 @@ class OcsUserStatusConnector : UserStatusConnector {
         return GLib.DateTime.current_date_time ().to_time_t ();
     }
 
-    uint64 clear_at_period_to_timestamp (Occ.ClearAt &clear_at) {
+    uint64 clear_at_period_to_timestamp (Occ.ClearAt clear_at) {
         return GLib.DateTime.current_date_time ().add_secs (clear_at._period).to_time_t ();
     }
 
-    uint64 clear_at_to_timestamp (Occ.ClearAt &clear_at) {
+    uint64 clear_at_to_timestamp (Occ.ClearAt clear_at) {
         switch (clear_at._type) {
         case Occ.ClearAtType.Period: {
             return clear_at_period_to_timestamp (clear_at);
@@ -214,7 +212,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         return 0;
     }
 
-    uint64 clear_at_to_timestamp (Occ.Optional<Occ.ClearAt> &clear_at) {
+    uint64 clear_at_to_timestamp (Occ.Optional<Occ.ClearAt> clear_at) {
         if (clear_at) {
             return clear_at_to_timestamp (*clear_at);
         }
@@ -261,7 +259,7 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     std.vector<Occ.UserStatus> json_to_predefined_statuses (QJsonArray json_data_array) {
         std.vector<Occ.UserStatus> statuses;
-        for (var &json_entry : json_data_array) {
+        for (var json_entry : json_data_array) {
             Q_ASSERT (json_entry.is_object ());
             if (!json_entry.is_object ()) {
                 continue;
@@ -277,18 +275,18 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     OcsUserStatusConnector.OcsUserStatusConnector (AccountPointer account, GLib.Object parent)
         : UserStatusConnector (parent)
-        , _account (account) {
-        Q_ASSERT (_account);
-        _user_status_supported = _account.capabilities ().user_status ();
-        _user_status_emojis_supported = _account.capabilities ().user_status_supports_emoji ();
+        , this.account (account) {
+        Q_ASSERT (this.account);
+        this.user_status_supported = this.account.capabilities ().user_status ();
+        this.user_status_emojis_supported = this.account.capabilities ().user_status_supports_emoji ();
     }
 
     void OcsUserStatusConnector.fetch_user_status () {
         GLib.debug (lc_ocs_user_status_connector) << "Try to fetch user status";
 
-        if (!_user_status_supported) {
+        if (!this.user_status_supported) {
             GLib.debug (lc_ocs_user_status_connector) << "User status not supported";
-            emit error (Error.UserStatusNotSupported);
+            /* emit */ error (Error.UserStatusNotSupported);
             return;
         }
 
@@ -296,56 +294,56 @@ class OcsUserStatusConnector : UserStatusConnector {
     }
 
     void OcsUserStatusConnector.start_fetch_user_status_job () {
-        if (_get_user_status_job) {
+        if (this.get_user_status_job) {
             GLib.debug (lc_ocs_user_status_connector) << "Get user status job is already running.";
             return;
         }
 
-        _get_user_status_job = new JsonApiJob (_account, user_status_base_url, this);
-        connect (_get_user_status_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_fetched);
-        _get_user_status_job.on_start ();
+        this.get_user_status_job = new JsonApiJob (this.account, user_status_base_url, this);
+        connect (this.get_user_status_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_fetched);
+        this.get_user_status_job.on_start ();
     }
 
-    void OcsUserStatusConnector.on_user_status_fetched (QJsonDocument &json, int status_code) {
+    void OcsUserStatusConnector.on_user_status_fetched (QJsonDocument json, int status_code) {
         log_response ("user status fetched", json, status_code);
 
         if (status_code != 200) {
             q_c_info (lc_ocs_user_status_connector) << "Slot fetch UserStatus on_finished with status code" << status_code;
-            emit error (Error.CouldNotFetchUserStatus);
+            /* emit */ error (Error.CouldNotFetchUserStatus);
             return;
         }
 
-        _user_status = json_to_user_status (json);
-        emit user_status_fetched (_user_status);
+        this.user_status = json_to_user_status (json);
+        /* emit */ user_status_fetched (this.user_status);
     }
 
     void OcsUserStatusConnector.start_fetch_predefined_statuses () {
-        if (_get_predefined_stauses_job) {
+        if (this.get_predefined_stauses_job) {
             GLib.debug (lc_ocs_user_status_connector) << "Get predefined statuses job is already running";
             return;
         }
 
-        _get_predefined_stauses_job = new JsonApiJob (_account,
+        this.get_predefined_stauses_job = new JsonApiJob (this.account,
             base_url + QStringLiteral ("/predefined_statuses"), this);
-        connect (_get_predefined_stauses_job, &JsonApiJob.json_received, this,
+        connect (this.get_predefined_stauses_job, &JsonApiJob.json_received, this,
             &OcsUserStatusConnector.on_predefined_statuses_fetched);
-        _get_predefined_stauses_job.on_start ();
+        this.get_predefined_stauses_job.on_start ();
     }
 
     void OcsUserStatusConnector.fetch_predefined_statuses () {
-        if (!_user_status_supported) {
-            emit error (Error.UserStatusNotSupported);
+        if (!this.user_status_supported) {
+            /* emit */ error (Error.UserStatusNotSupported);
             return;
         }
         start_fetch_predefined_statuses ();
     }
 
-    void OcsUserStatusConnector.on_predefined_statuses_fetched (QJsonDocument &json, int status_code) {
+    void OcsUserStatusConnector.on_predefined_statuses_fetched (QJsonDocument json, int status_code) {
         log_response ("predefined statuses", json, status_code);
 
         if (status_code != 200) {
             q_c_info (lc_ocs_user_status_connector) << "Slot predefined user statuses on_finished with status code" << status_code;
-            emit error (Error.CouldNotFetchPredefinedUserStatuses);
+            /* emit */ error (Error.CouldNotFetchPredefinedUserStatuses);
             return;
         }
         const var json_data = json.object ().value ("ocs").to_object ().value ("data");
@@ -354,35 +352,35 @@ class OcsUserStatusConnector : UserStatusConnector {
             return;
         }
         const var statuses = json_to_predefined_statuses (json_data.to_array ());
-        emit predefined_statuses_fetched (statuses);
+        /* emit */ predefined_statuses_fetched (statuses);
     }
 
-    void OcsUserStatusConnector.log_response (string message, QJsonDocument &json, int status_code) {
+    void OcsUserStatusConnector.log_response (string message, QJsonDocument json, int status_code) {
         GLib.debug (lc_ocs_user_status_connector) << "Response from:" << message << "Status:" << status_code << "Json:" << json;
     }
 
     void OcsUserStatusConnector.set_user_status_online_status (UserStatus.OnlineStatus online_status) {
-        _set_online_status_job = new JsonApiJob (_account,
+        this.set_online_status_job = new JsonApiJob (this.account,
             user_status_base_url + QStringLiteral ("/status"), this);
-        _set_online_status_job.set_verb (JsonApiJob.Verb.Put);
+        this.set_online_status_job.set_verb (JsonApiJob.Verb.Put);
         // Set body
         QJsonObject data_object;
         data_object.insert ("status_type", online_status_to_string (online_status));
         QJsonDocument body;
         body.set_object (data_object);
-        _set_online_status_job.set_body (body);
-        connect (_set_online_status_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_online_status_set);
-        _set_online_status_job.on_start ();
+        this.set_online_status_job.set_body (body);
+        connect (this.set_online_status_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_online_status_set);
+        this.set_online_status_job.on_start ();
     }
 
-    void OcsUserStatusConnector.set_user_status_message_predefined (UserStatus &user_status) {
+    void OcsUserStatusConnector.set_user_status_message_predefined (UserStatus user_status) {
         Q_ASSERT (user_status.message_predefined ());
         if (!user_status.message_predefined ()) {
             return;
         }
 
-        _set_message_job = new JsonApiJob (_account, user_status_base_url + QStringLiteral ("/message/predefined"), this);
-        _set_message_job.set_verb (JsonApiJob.Verb.Put);
+        this.set_message_job = new JsonApiJob (this.account, user_status_base_url + QStringLiteral ("/message/predefined"), this);
+        this.set_message_job.set_verb (JsonApiJob.Verb.Put);
         // Set body
         QJsonObject data_object;
         data_object.insert ("message_id", user_status.id ());
@@ -393,23 +391,23 @@ class OcsUserStatusConnector : UserStatusConnector {
         }
         QJsonDocument body;
         body.set_object (data_object);
-        _set_message_job.set_body (body);
-        connect (_set_message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_message_set);
-        _set_message_job.on_start ();
+        this.set_message_job.set_body (body);
+        connect (this.set_message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_message_set);
+        this.set_message_job.on_start ();
     }
 
-    void OcsUserStatusConnector.set_user_status_message_custom (UserStatus &user_status) {
+    void OcsUserStatusConnector.set_user_status_message_custom (UserStatus user_status) {
         Q_ASSERT (!user_status.message_predefined ());
         if (user_status.message_predefined ()) {
             return;
         }
 
-        if (!_user_status_emojis_supported) {
-            emit error (Error.EmojisNotSupported);
+        if (!this.user_status_emojis_supported) {
+            /* emit */ error (Error.EmojisNotSupported);
             return;
         }
-        _set_message_job = new JsonApiJob (_account, user_status_base_url + QStringLiteral ("/message/custom"), this);
-        _set_message_job.set_verb (JsonApiJob.Verb.Put);
+        this.set_message_job = new JsonApiJob (this.account, user_status_base_url + QStringLiteral ("/message/custom"), this);
+        this.set_message_job.set_verb (JsonApiJob.Verb.Put);
         // Set body
         QJsonObject data_object;
         data_object.insert ("status_icon", user_status.icon ());
@@ -422,12 +420,12 @@ class OcsUserStatusConnector : UserStatusConnector {
         }
         QJsonDocument body;
         body.set_object (data_object);
-        _set_message_job.set_body (body);
-        connect (_set_message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_message_set);
-        _set_message_job.on_start ();
+        this.set_message_job.set_body (body);
+        connect (this.set_message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_message_set);
+        this.set_message_job.on_start ();
     }
 
-    void OcsUserStatusConnector.set_user_status_message (UserStatus &user_status) {
+    void OcsUserStatusConnector.set_user_status_message (UserStatus user_status) {
         if (user_status.message_predefined ()) {
             set_user_status_message_predefined (user_status);
             return;
@@ -435,13 +433,13 @@ class OcsUserStatusConnector : UserStatusConnector {
         set_user_status_message_custom (user_status);
     }
 
-    void OcsUserStatusConnector.set_user_status (UserStatus &user_status) {
-        if (!_user_status_supported) {
-            emit error (Error.UserStatusNotSupported);
+    void OcsUserStatusConnector.set_user_status (UserStatus user_status) {
+        if (!this.user_status_supported) {
+            /* emit */ error (Error.UserStatusNotSupported);
             return;
         }
 
-        if (_set_online_status_job || _set_message_job) {
+        if (this.set_online_status_job || this.set_message_job) {
             GLib.debug (lc_ocs_user_status_connector) << "Set online status job or set message job are already running.";
             return;
         }
@@ -450,20 +448,20 @@ class OcsUserStatusConnector : UserStatusConnector {
         set_user_status_message (user_status);
     }
 
-    void OcsUserStatusConnector.on_user_status_online_status_set (QJsonDocument &json, int status_code) {
+    void OcsUserStatusConnector.on_user_status_online_status_set (QJsonDocument json, int status_code) {
         log_response ("Online status set", json, status_code);
 
         if (status_code != 200) {
-            emit error (Error.CouldNotSetUserStatus);
+            /* emit */ error (Error.CouldNotSetUserStatus);
             return;
         }
     }
 
-    void OcsUserStatusConnector.on_user_status_message_set (QJsonDocument &json, int status_code) {
+    void OcsUserStatusConnector.on_user_status_message_set (QJsonDocument json, int status_code) {
         log_response ("Message set", json, status_code);
 
         if (status_code != 200) {
-            emit error (Error.CouldNotSetUserStatus);
+            /* emit */ error (Error.CouldNotSetUserStatus);
             return;
         }
 
@@ -472,30 +470,30 @@ class OcsUserStatusConnector : UserStatusConnector {
         // message
         fetch_user_status ();
 
-        emit user_status_set ();
+        /* emit */ user_status_set ();
     }
 
     void OcsUserStatusConnector.clear_message () {
-        _clear_message_job = new JsonApiJob (_account, user_status_base_url + QStringLiteral ("/message"));
-        _clear_message_job.set_verb (JsonApiJob.Verb.Delete);
-        connect (_clear_message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_message_cleared);
-        _clear_message_job.on_start ();
+        this.clear_message_job = new JsonApiJob (this.account, user_status_base_url + QStringLiteral ("/message"));
+        this.clear_message_job.set_verb (JsonApiJob.Verb.Delete);
+        connect (this.clear_message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_message_cleared);
+        this.clear_message_job.on_start ();
     }
 
     UserStatus OcsUserStatusConnector.user_status () {
-        return _user_status;
+        return this.user_status;
     }
 
-    void OcsUserStatusConnector.on_message_cleared (QJsonDocument &json, int status_code) {
+    void OcsUserStatusConnector.on_message_cleared (QJsonDocument json, int status_code) {
         log_response ("Message cleared", json, status_code);
 
         if (status_code != 200) {
-            emit error (Error.CouldNotClearMessage);
+            /* emit */ error (Error.CouldNotClearMessage);
             return;
         }
 
-        _user_status = {};
-        emit message_cleared ();
+        this.user_status = {};
+        /* emit */ message_cleared ();
     }
     }
     

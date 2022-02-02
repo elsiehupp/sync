@@ -165,7 +165,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private static Systray _instance;
+    private static Systray this.instance;
 
     /***********************************************************
     ***********************************************************/
@@ -180,34 +180,34 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private bool _is_open = false;
-    private bool _sync_is_paused = true;
-    private QPointer<QQml_application_engine> _tray_engine;
+    private bool this.is_open = false;
+    private bool this.sync_is_paused = true;
+    private QPointer<QQml_application_engine> this.tray_engine;
 
     /***********************************************************
     ***********************************************************/
-    private Access_manager_factory _access_manager_factory;
+    private Access_manager_factory this.access_manager_factory;
 };
 
 
 Systray *Systray._instance = nullptr;
 
 Systray *Systray.instance () {
-    if (!_instance) {
-        _instance = new Systray ();
+    if (!this.instance) {
+        this.instance = new Systray ();
     }
-    return _instance;
+    return this.instance;
 }
 
 void Systray.set_tray_engine (QQml_application_engine tray_engine) {
-    _tray_engine = tray_engine;
+    this.tray_engine = tray_engine;
 
-    _tray_engine.set_network_access_manager_factory (&_access_manager_factory);
+    this.tray_engine.set_network_access_manager_factory (&this.access_manager_factory);
 
-    _tray_engine.add_import_path ("qrc:/qml/theme");
-    _tray_engine.add_image_provider ("avatars", new Image_provider);
-    _tray_engine.add_image_provider (QLatin1String ("svgimage-custom-color"), new Occ.Ui.Svg_image_provider);
-    _tray_engine.add_image_provider (QLatin1String ("unified-search-result-icon"), new Unified_search_result_image_provider);
+    this.tray_engine.add_import_path ("qrc:/qml/theme");
+    this.tray_engine.add_image_provider ("avatars", new Image_provider);
+    this.tray_engine.add_image_provider (QLatin1String ("svgimage-custom-color"), new Occ.Ui.Svg_image_provider);
+    this.tray_engine.add_image_provider (QLatin1String ("unified-search-result-icon"), new Unified_search_result_image_provider);
 }
 
 Systray.Systray ()
@@ -281,28 +281,28 @@ Systray.Systray ()
 }
 
 void Systray.create () {
-    if (_tray_engine) {
+    if (this.tray_engine) {
         if (!AccountManager.instance ().accounts ().is_empty ()) {
-            _tray_engine.root_context ().set_context_property ("activity_model", User_model.instance ().current_activity_model ());
+            this.tray_engine.root_context ().set_context_property ("activity_model", User_model.instance ().current_activity_model ());
         }
-        _tray_engine.on_load ("qrc:/qml/src/gui/tray/Window.qml");
+        this.tray_engine.on_load ("qrc:/qml/src/gui/tray/Window.qml");
     }
     hide_window ();
-    emit activated (QSystemTrayIcon.Activation_reason.Unknown);
+    /* emit */ activated (QSystemTrayIcon.Activation_reason.Unknown);
 
     const var folder_map = FolderMan.instance ().map ();
     for (var folder : folder_map) {
         if (!folder.sync_paused ()) {
-            _sync_is_paused = false;
+            this.sync_is_paused = false;
             break;
         }
     }
 }
 
 void Systray.on_new_user_selected () {
-    if (_tray_engine) {
+    if (this.tray_engine) {
         // Change Activity_model
-        _tray_engine.root_context ().set_context_property ("activity_model", User_model.instance ().current_activity_model ());
+        this.tray_engine.root_context ().set_context_property ("activity_model", User_model.instance ().current_activity_model ());
     }
 
     // Rebuild App list
@@ -325,7 +325,7 @@ void Systray.set_pause_on_all_folders_helper (bool pause) {
         const var ptr_list = AccountManager.instance ().accounts ();
         var result = GLib.List<AccountState> ();
         result.reserve (ptr_list.size ());
-        std.transform (std.cbegin (ptr_list), std.cend (ptr_list), std.back_inserter (result), [] (AccountStatePtr &account) {
+        std.transform (std.cbegin (ptr_list), std.cend (ptr_list), std.back_inserter (result), [] (AccountStatePtr account) {
             return account.data ();
         });
         return result;
@@ -342,7 +342,7 @@ void Systray.set_pause_on_all_folders_helper (bool pause) {
 }
 
 bool Systray.is_open () {
-    return _is_open;
+    return this.is_open;
 }
 
 string Systray.window_title () {
@@ -359,18 +359,18 @@ bool Systray.use_normal_window () {
 }
 
 Q_INVOKABLE void Systray.set_opened () {
-    _is_open = true;
+    this.is_open = true;
 }
 
 Q_INVOKABLE void Systray.set_closed () {
-    _is_open = false;
+    this.is_open = false;
 }
 
 void Systray.show_message (string title, string message, Message_icon icon) {
 #ifdef USE_FDO_NOTIFICATIONS
     if (QDBus_interface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid ()) {
         const QVariantMap hints = {{QStringLiteral ("desktop-entry"), LINUX_APPLICATION_ID}};
-        GLib.List<QVariant> args = GLib.List<QVariant> () << APPLICATION_NAME << uint32 (0) << APPLICATION_ICON_NAME
+        GLib.List<GLib.Variant> args = GLib.List<GLib.Variant> () << APPLICATION_NAME << uint32 (0) << APPLICATION_ICON_NAME
                                                  << title << message << string[] () << hints << int32 (-1);
         QDBus_message method = QDBus_message.create_method_call (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE, "Notify");
         method.set_arguments (args);
@@ -391,15 +391,15 @@ void Systray.set_tool_tip (string tip) {
 }
 
 bool Systray.sync_is_paused () {
-    return _sync_is_paused;
+    return this.sync_is_paused;
 }
 
 void Systray.pause_resume_sync () {
-    if (_sync_is_paused) {
-        _sync_is_paused = false;
+    if (this.sync_is_paused) {
+        this.sync_is_paused = false;
         on_unpause_all_folders ();
     } else {
-        _sync_is_paused = true;
+        this.sync_is_paused = true;
         on_pause_all_folders ();
     }
 }

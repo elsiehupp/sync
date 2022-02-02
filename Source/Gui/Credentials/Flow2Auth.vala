@@ -99,27 +99,27 @@ signals:
     /***********************************************************
     ***********************************************************/
     private 
-    private Account _account;
-    private GLib.Uri _login_url;
-    private string _poll_token;
-    private string _poll_endpoint;
-    private QTimer _poll_timer;
-    private int64 _seconds_left;
-    private int64 _seconds_interval;
-    private bool _is_busy;
-    private bool _has_token;
-    private bool _enforce_https = false;
+    private Account this.account;
+    private GLib.Uri this.login_url;
+    private string this.poll_token;
+    private string this.poll_endpoint;
+    private QTimer this.poll_timer;
+    private int64 this.seconds_left;
+    private int64 this.seconds_interval;
+    private bool this.is_busy;
+    private bool this.has_token;
+    private bool this.enforce_https = false;
 };
 
 
 
     Flow2Auth.Flow2Auth (Account account, GLib.Object parent)
         : GLib.Object (parent)
-        , _account (account)
-        , _is_busy (false)
-        , _has_token (false) {
-        _poll_timer.set_interval (1000);
-        GLib.Object.connect (&_poll_timer, &QTimer.timeout, this, &Flow2Auth.on_poll_timer_timeout);
+        , this.account (account)
+        , this.is_busy (false)
+        , this.has_token (false) {
+        this.poll_timer.set_interval (1000);
+        GLib.Object.connect (&this.poll_timer, &QTimer.timeout, this, &Flow2Auth.on_poll_timer_timeout);
     }
 
     Flow2Auth.~Flow2Auth () = default;
@@ -132,7 +132,7 @@ signals:
     }
 
     GLib.Uri Flow2Auth.authorisation_link () {
-        return _login_url;
+        return this.login_url;
     }
 
     void Flow2Auth.open_browser () {
@@ -144,39 +144,39 @@ signals:
     }
 
     void Flow2Auth.fetch_new_token (TokenAction action) {
-        if (_is_busy)
+        if (this.is_busy)
             return;
 
-        _is_busy = true;
-        _has_token = false;
+        this.is_busy = true;
+        this.has_token = false;
 
-        emit status_changed (PollStatus.status_fetch_token, 0);
+        /* emit */ status_changed (PollStatus.status_fetch_token, 0);
 
         // Step 1 : Initiate a login, do an anonymous POST request
-        GLib.Uri url = Utility.concat_url_path (_account.url ().to_"", QLatin1String ("/index.php/login/v2"));
-        _enforce_https = url.scheme () == QStringLiteral ("https");
+        GLib.Uri url = Utility.concat_url_path (this.account.url ().to_"", QLatin1String ("/index.php/login/v2"));
+        this.enforce_https = url.scheme () == QStringLiteral ("https");
 
         // add 'Content-Length : 0' header (see https://github.com/nextcloud/desktop/issues/1473)
         QNetworkRequest req;
         req.set_header (QNetworkRequest.ContentLengthHeader, "0");
         req.set_header (QNetworkRequest.UserAgentHeader, Utility.friendly_user_agent_"");
 
-        var job = _account.send_request ("POST", url, req);
+        var job = this.account.send_request ("POST", url, req);
         job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
 
         GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, action] (QNetworkReply reply) {
             var json_data = reply.read_all ();
             QJsonParseError json_parse_error;
-            QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
+            QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
             string poll_token, poll_endpoint, login_url;
 
             if (reply.error () == QNetworkReply.NoError && json_parse_error.error == QJsonParseError.NoError
                 && !json.is_empty ()) {
                 poll_token = json.value ("poll").to_object ().value ("token").to_"";
                 poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_"";
-                if (_enforce_https && GLib.Uri (poll_endpoint).scheme () != QStringLiteral ("https")) {
+                if (this.enforce_https && GLib.Uri (poll_endpoint).scheme () != QStringLiteral ("https")) {
                     GLib.warn (lc_flow2auth) << "Can not poll endpoint because the returned url" << poll_endpoint << "does not on_start with https";
-                    emit result (Error, _("The polling URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
+                    /* emit */ result (Error, _("The polling URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
                 }
                 login_url = json["login"].to_"";
@@ -199,36 +199,36 @@ signals:
                     error_reason = _("The reply from the server did not contain all expected fields");
                 }
                 GLib.warn (lc_flow2auth) << "Error when getting the login_url" << json << error_reason;
-                emit result (Error, error_reason);
-                _poll_timer.stop ();
-                _is_busy = false;
+                /* emit */ result (Error, error_reason);
+                this.poll_timer.stop ();
+                this.is_busy = false;
                 return;
             }
 
-            _login_url = login_url;
+            this.login_url = login_url;
 
-            if (_account.is_username_prefill_supported ()) {
+            if (this.account.is_username_prefill_supported ()) {
                 const var user_name = Utility.get_current_user_name ();
                 if (!user_name.is_empty ()) {
-                    var query = QUrlQuery (_login_url);
+                    var query = QUrlQuery (this.login_url);
                     query.add_query_item (QStringLiteral ("user"), user_name);
-                    _login_url.set_query (query);
+                    this.login_url.set_query (query);
                 }
             }
 
-            _poll_token = poll_token;
-            _poll_endpoint = poll_endpoint;
+            this.poll_token = poll_token;
+            this.poll_endpoint = poll_endpoint;
 
             // Start polling
             ConfigFile cfg;
             std.chrono.milliseconds polltime = cfg.remote_poll_interval ();
             q_c_info (lc_flow2auth) << "setting remote poll timer interval to" << polltime.count () << "msec";
-            _seconds_interval = (polltime.count () / 1000);
-            _seconds_left = _seconds_interval;
-            emit status_changed (PollStatus.status_poll_countdown, _seconds_left);
+            this.seconds_interval = (polltime.count () / 1000);
+            this.seconds_left = this.seconds_interval;
+            /* emit */ status_changed (PollStatus.status_poll_countdown, this.seconds_left);
 
-            if (!_poll_timer.is_active ()) {
-                _poll_timer.on_start ();
+            if (!this.poll_timer.is_active ()) {
+                this.poll_timer.on_start ();
             }
 
             switch (action) {
@@ -237,58 +237,58 @@ signals:
                 if (!Utility.open_browser (authorisation_link ())) {
                     // We cannot open the browser, then we claim we don't support Flow2Auth.
                     // Our UI callee will ask the user to copy and open the link.
-                    emit result (NotSupported);
+                    /* emit */ result (NotSupported);
                 }
                 break;
             case action_copy_link_to_clipboard:
                 QApplication.clipboard ().on_set_text (authorisation_link ().to_string (GLib.Uri.FullyEncoded));
-                emit status_changed (PollStatus.status_copy_link_to_clipboard, 0);
+                /* emit */ status_changed (PollStatus.status_copy_link_to_clipboard, 0);
                 break;
             }
 
-            _is_busy = false;
-            _has_token = true;
+            this.is_busy = false;
+            this.has_token = true;
         });
     }
 
     void Flow2Auth.on_poll_timer_timeout () {
-        if (_is_busy || !_has_token)
+        if (this.is_busy || !this.has_token)
             return;
 
-        _is_busy = true;
+        this.is_busy = true;
 
-        _seconds_left--;
-        if (_seconds_left > 0) {
-            emit status_changed (PollStatus.status_poll_countdown, _seconds_left);
-            _is_busy = false;
+        this.seconds_left--;
+        if (this.seconds_left > 0) {
+            /* emit */ status_changed (PollStatus.status_poll_countdown, this.seconds_left);
+            this.is_busy = false;
             return;
         }
-        emit status_changed (PollStatus.status_poll_now, 0);
+        /* emit */ status_changed (PollStatus.status_poll_now, 0);
 
         // Step 2 : Poll
         QNetworkRequest req;
         req.set_header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         var request_body = new QBuffer;
-        QUrlQuery arguments (string ("token=%1").arg (_poll_token));
+        QUrlQuery arguments (string ("token=%1").arg (this.poll_token));
         request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
-        var job = _account.send_request ("POST", _poll_endpoint, req, request_body);
+        var job = this.account.send_request ("POST", this.poll_endpoint, req, request_body);
         job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
 
         GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (QNetworkReply reply) {
             var json_data = reply.read_all ();
             QJsonParseError json_parse_error;
-            QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
+            QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
             GLib.Uri server_url;
             string login_name, app_password;
 
             if (reply.error () == QNetworkReply.NoError && json_parse_error.error == QJsonParseError.NoError
                 && !json.is_empty ()) {
                 server_url = json["server"].to_"";
-                if (_enforce_https && server_url.scheme () != QStringLiteral ("https")) {
+                if (this.enforce_https && server_url.scheme () != QStringLiteral ("https")) {
                     GLib.warn (lc_flow2auth) << "Returned server url" << server_url << "does not on_start with https";
-                    emit result (Error, _("The returned server URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
+                    /* emit */ result (Error, _("The returned server URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
                 }
                 login_name = json["login_name"].to_"";
@@ -315,46 +315,46 @@ signals:
 
                 // We get a 404 until authentication is done, so don't show this error in the GUI.
                 if (reply.error () != QNetworkReply.ContentNotFoundError)
-                    emit result (Error, error_reason);
+                    /* emit */ result (Error, error_reason);
 
                 // Forget sensitive data
                 app_password.clear ();
                 login_name.clear ();
 
                 // Failed : poll again
-                _seconds_left = _seconds_interval;
-                _is_busy = false;
+                this.seconds_left = this.seconds_interval;
+                this.is_busy = false;
                 return;
             }
 
-            _poll_timer.stop ();
+            this.poll_timer.stop ();
 
             // Success
             q_c_info (lc_flow2auth) << "Success getting the app_password for user : " << login_name << ", server : " << server_url.to_"";
 
-            _account.set_url (server_url);
+            this.account.set_url (server_url);
 
-            emit result (LoggedIn, "", login_name, app_password);
+            /* emit */ result (LoggedIn, "", login_name, app_password);
 
             // Forget sensitive data
             app_password.clear ();
             login_name.clear ();
 
-            _login_url.clear ();
-            _poll_token.clear ();
-            _poll_endpoint.clear ();
+            this.login_url.clear ();
+            this.poll_token.clear ();
+            this.poll_endpoint.clear ();
 
-            _is_busy = false;
-            _has_token = false;
+            this.is_busy = false;
+            this.has_token = false;
         });
     }
 
     void Flow2Auth.on_poll_now () {
         // poll now if we're not already doing so
-        if (_is_busy || !_has_token)
+        if (this.is_busy || !this.has_token)
             return;
 
-        _seconds_left = 1;
+        this.seconds_left = 1;
         on_poll_timer_timeout ();
     }
 

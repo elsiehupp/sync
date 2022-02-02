@@ -4,7 +4,7 @@ c_jhash.c Jenkins Hash
 Copyright (c) 1997 Bob Jenkins <bob_jenkins@burtleburtle.
 
 lookup8.c, by Bob Jenkins, January 4 1997, Public Domain.
-hash (), hash2 (), hash3, and _c_mix () are externally useful
+hash (), hash2 (), hash3, and this.c_mix () are externally useful
 Routines to test the hash are included if SELF_TEST is defined.
 You can use this free for any purpose.  It has no warranty.
 
@@ -32,16 +32,16 @@ const int c_hashsize (n) ( (uint8_t) 1 << (n))
 const int c_hashmask (n) (xhashsize (n) - 1)
 
 /***********************************************************
-_c_mix -- Mix 3 32-bit values reversibly.
+this.c_mix -- Mix 3 32-bit values reversibly.
 
 For every delta with one or two bit set, and the deltas of all three
 high bits or all three low bits, whether the or
 is almost all zero or is uniformly distributed,
-If _c_mix () is run forward or backward, a
+If this.c_mix () is run forward or backward, a
 have at least 1/4 probability of changing.
-If _c_mix () is run forward, every bit of c will change between 1/
+If this.c_mix () is run forward, every bit of c will change between 1/
 2/3 of the time.  (Well, 22/100 and 78/100 for some 2-bit deltas.)
-_c_mix () was built out of 36 single-cycle latency inst
+this.c_mix () was built out of 36 single-cycle latency inst
 structure t
     a -= b;
     a -= c; x = (c>
@@ -57,7 +57,7 @@ latency instructions into multi-cycle latency instructions.  Still,
 this is the fastest good hash I could find.  There were about 2^^68
 to choose from.  I only looked at a billion or so.
 ***********************************************************/
-const int _c_mix (a,b,c) \ {
+const int this.c_mix (a,b,c) \ {
   (a) -= (b); (a) -= (c); (a) ^= ( (c)>>13);
   (b) -= (c); (b) -= (a); (b) ^= ( (a)<<8);
   (c) -= (a); (c) -= (b); (c) ^= ( (b)>>13);
@@ -70,9 +70,9 @@ const int _c_mix (a,b,c) \ {
 }
 
 /***********************************************************
-_c_mix64 -- Mix 3 64-bit values reversibly.
+this.c_mix64 -- Mix 3 64-bit values reversibly.
 
-_c_mix64 () takes 48 machine instructions, but only 24 cycles on a
+this.c_mix64 () takes 48 machine instructions, but only 24 cycles on a
 machine (like Intel's new MMX
 registers for 4.2 parallelism.
 All 1-bit deltas, all 2-bit deltas, all deltas composed of top bits
@@ -83,11 +83,11 @@ of the time (well, only 113/400 to 287/400 of the time for some
 2-bit delta).  These deltas all cause at least 80 bits to change
 among (a,b,c) w
 is reversible).
-This implies that a hash using _c_mix64 has no funnels.  There
+This implies that a hash using this.c_mix64 has no funnels.  There
 characteristics with 3-bit deltas or bigger, I didn't test for
 those.
 ***********************************************************/
-const int _c_mix64 (a,b,c) \ {
+const int this.c_mix64 (a,b,c) \ {
   (a) -= (b); (a) -= (c); (a) ^= ( (c)>>43);
   (b) -= (c); (b) -= (a); (b) ^= ( (a)<<9);
   (c) -= (a); (c) -= (b); (c) ^= ( (b)>>8);
@@ -139,7 +139,7 @@ static inline uint32_t c_jhash (uint8_t k, uint32_t length, uint32_t initval) {
       a += (k[0] + ( (uint32_t)k[1]<<8) + ( (uint32_t)k[2]<<16) + ( (uint32_t)k[3]<<24));
       b += (k[4] + ( (uint32_t)k[5]<<8) + ( (uint32_t)k[6]<<16) + ( (uint32_t)k[7]<<24));
       c += (k[8] + ( (uint32_t)k[9]<<8) + ( (uint32_t)k[10]<<16)+ ( (uint32_t)k[11]<<24));
-      _c_mix (a,b,c);
+      this.c_mix (a,b,c);
       k += 12; len -= 12;
    }
 
@@ -161,7 +161,7 @@ static inline uint32_t c_jhash (uint8_t k, uint32_t length, uint32_t initval) {
      case 1 : a+=k[0];
      /* case 0 : nothing left to add */
    }
-   _c_mix (a,b,c);
+   this.c_mix (a,b,c);
 
    return c;
 }
@@ -205,7 +205,7 @@ static inline uint64_t c_jhash64 (uint8_t k, uint64_t length, uint64_t intval) {
      + ( (uint64_t)k[12]<<32)+ ( (uint64_t)k[13]<<40)+ ( (uint64_t)k[14]<<48)+ ( (uint64_t)k[15]<<56));
     c += (k[16]       + ( (uint64_t)k[17]<< 8)+ ( (uint64_t)k[18]<<16)+ ( (uint64_t)k[19]<<24)
      + ( (uint64_t)k[20]<<32)+ ( (uint64_t)k[21]<<40)+ ( (uint64_t)k[22]<<48)+ ( (uint64_t)k[23]<<56));
-    _c_mix64 (a,b,c);
+    this.c_mix64 (a,b,c);
     k += 24; len -= 24;
   }
 
@@ -238,7 +238,7 @@ static inline uint64_t c_jhash64 (uint8_t k, uint64_t length, uint64_t intval) {
     case  1 : a+= ( (uint64_t)k[ 0]);
     /* case 0 : nothing left to add */
   }
-  _c_mix64 (a,b,c);
+  this.c_mix64 (a,b,c);
 
   return c;
 }

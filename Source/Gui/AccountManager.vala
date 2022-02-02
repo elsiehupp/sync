@@ -47,10 +47,10 @@ class AccountManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<AccountStatePtr> _accounts;
+    private GLib.List<AccountStatePtr> this.accounts;
 
     /// Account ids from settings that weren't read
-    private GLib.Set<string> _additional_blocked_account_ids;
+    private GLib.Set<string> this.additional_blocked_account_ids;
 
 
     signal void on_account_added (AccountState account);
@@ -68,7 +68,7 @@ class AccountManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static AccountManager instance () {
-        return &instance;
+        return instance;
     }
 
 
@@ -78,7 +78,7 @@ class AccountManager : GLib.Object {
     public void save (bool save_credentials = true) {
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
         settings.set_value (QLatin1String (VERSION_C), max_accounts_version);
-        for (var &acc : q_as_const (_accounts)) {
+        for (var acc : q_as_const (this.accounts)) {
             settings.begin_group (acc.account ().id ());
             save_account_helper (acc.account ().data (), *settings, save_credentials);
             acc.write_to_settings (*settings);
@@ -98,11 +98,11 @@ class AccountManager : GLib.Object {
     ***********************************************************/
     public bool restore () {
         string[] skip_settings_keys;
-        backward_migration_settings_keys (&skip_settings_keys, &skip_settings_keys);
+        backward_migration_settings_keys (&skip_settings_keys, skip_settings_keys);
 
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
         if (settings.status () != QSettings.NoError || !settings.is_writable ()) {
-            GLib.warn (lc_account_manager) << "Could not read settings from" << settings.file_name ()
+            GLib.warn (lc_account_manager) << "Could not read settings from" << settings.filename ()
                                         << settings.status ();
             return false;
         }
@@ -135,7 +135,7 @@ class AccountManager : GLib.Object {
                 }
             } else {
                 q_c_info (lc_account_manager) << "Account" << account_id << "is too new, ignoring";
-                _additional_blocked_account_ids.insert (account_id);
+                this.additional_blocked_account_ids.insert (account_id);
             }
             settings.end_group ();
         }
@@ -180,10 +180,10 @@ class AccountManager : GLib.Object {
     by its display name
     ***********************************************************/
     public AccountStatePtr account (string name) {
-        const var it = std.find_if (_accounts.cbegin (), _accounts.cend (), [name] (var &acc) {
+        const var it = std.find_if (this.accounts.cbegin (), this.accounts.cend (), [name] (var acc) {
             return acc.account ().display_name () == name;
         });
-        return it != _accounts.cend () ? *it : AccountStatePtr ();
+        return it != this.accounts.cend () ? *it : AccountStatePtr ();
     }
 
 
@@ -191,12 +191,12 @@ class AccountManager : GLib.Object {
     Delete the AccountState
     ***********************************************************/
     public void delete_account (AccountState account) {
-        var it = std.find (_accounts.begin (), _accounts.end (), account);
-        if (it == _accounts.end ()) {
+        var it = std.find (this.accounts.begin (), this.accounts.end (), account);
+        if (it == this.accounts.end ()) {
             return;
         }
         var copy = *it; // keep a reference to the shared pointer so it does not delete it just yet
-        _accounts.erase (it);
+        this.accounts.erase (it);
 
         // Forget account credentials, cookies
         account.account ().credentials ().forget_sensitive_data ();
@@ -210,8 +210,8 @@ class AccountManager : GLib.Object {
 
         account.account ().delete_app_token ();
 
-        emit account_sync_connection_removed (account);
-        emit account_removed (account);
+        /* emit */ account_sync_connection_removed (account);
+        /* emit */ account_removed (account);
     }
 
 
@@ -265,7 +265,7 @@ class AccountManager : GLib.Object {
                 // re-persisting them)
                 acc._credentials.persist ();
             }
-            for (var &key : acc._settings_map.keys ()) {
+            for (var key : acc._settings_map.keys ()) {
                 settings.set_value (key, acc._settings_map.value (key));
             }
             settings.set_value (QLatin1String (AUTH_TYPE_C), acc._credentials.auth_type ());
@@ -356,7 +356,7 @@ class AccountManager : GLib.Object {
 
         // We want to only restore settings for that auth type and the user value
         acc._settings_map.insert (QLatin1String (USER_C), settings.value (USER_C));
-        string auth_type_prefix = auth_type + "_";
+        string auth_type_prefix = auth_type + "this.";
         foreach (var key in settings.child_keys ()) {
             if (!key.starts_with (auth_type_prefix))
                 continue;
@@ -389,7 +389,7 @@ class AccountManager : GLib.Object {
         // then try to load settings from a very old place
         if (settings.child_keys ().is_empty ()) {
             // Now try to open the original own_cloud settings to see if they exist.
-            string o_c_cfg_file = QDir.from_native_separators (settings.file_name ());
+            string o_c_cfg_file = QDir.from_native_separators (settings.filename ());
             // replace the last two segments with own_cloud/owncloud.cfg
             o_c_cfg_file = o_c_cfg_file.left (o_c_cfg_file.last_index_of ('/'));
             o_c_cfg_file = o_c_cfg_file.left (o_c_cfg_file.last_index_of ('/'));
@@ -512,23 +512,23 @@ class AccountManager : GLib.Object {
     }
 
     void AccountManager.shutdown () {
-        const var accounts_copy = _accounts;
-        _accounts.clear ();
-        for (var &acc : accounts_copy) {
-            emit account_removed (acc.data ());
-            emit remove_account_folders (acc.data ());
+        const var accounts_copy = this.accounts;
+        this.accounts.clear ();
+        for (var acc : accounts_copy) {
+            /* emit */ account_removed (acc.data ());
+            /* emit */ remove_account_folders (acc.data ());
         }
     }
 
     GLib.List<AccountStatePtr> AccountManager.accounts () {
-         return _accounts;
+         return this.accounts;
     }
 
     bool AccountManager.is_account_id_available (string id) {
-        if (_additional_blocked_account_ids.contains (id))
+        if (this.additional_blocked_account_ids.contains (id))
             return false;
 
-        return std.none_of (_accounts.cbegin (), _accounts.cend (), [id] (var &acc) {
+        return std.none_of (this.accounts.cbegin (), this.accounts.cend (), [id] (var acc) {
             return acc.account ().id () == id;
         });
     }
@@ -550,8 +550,8 @@ class AccountManager : GLib.Object {
             this, &AccountManager.on_save_account);
 
         AccountStatePtr ptr (account_state);
-        _accounts << ptr;
-        emit account_added (account_state);
+        this.accounts << ptr;
+        /* emit */ account_added (account_state);
     }
     }
     

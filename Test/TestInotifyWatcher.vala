@@ -12,44 +12,44 @@ class TestInotifyWatcher : public FolderWatcherPrivate {
 
     /***********************************************************
     ***********************************************************/
-    private string _root;
+    private string this.root;
 
     /***********************************************************
     ***********************************************************/
     private void on_init_test_case () {
-        _root = QDir.tempPath () + "/" + "test_" + string.number (Occ.Utility.rand ());
-        qDebug () << "creating test directory tree in " << _root;
-        QDir rootDir (_root);
+        this.root = QDir.tempPath () + "/" + "test_" + string.number (Occ.Utility.rand ());
+        qDebug () << "creating test directory tree in " << this.root;
+        QDir rootDir (this.root);
 
-        rootDir.mkpath (_root + "/a1/b1/c1");
-        rootDir.mkpath (_root + "/a1/b1/c2");
-        rootDir.mkpath (_root + "/a1/b2/c1");
-        rootDir.mkpath (_root + "/a1/b3/c3");
-        rootDir.mkpath (_root + "/a2/b3/c3");
+        rootDir.mkpath (this.root + "/a1/b1/c1");
+        rootDir.mkpath (this.root + "/a1/b1/c2");
+        rootDir.mkpath (this.root + "/a1/b2/c1");
+        rootDir.mkpath (this.root + "/a1/b3/c3");
+        rootDir.mkpath (this.root + "/a2/b3/c3");
     }
 
     // Test the recursive path listing function findFoldersBelow
     private on_ void testDirsBelowPath () {
         string[] dirs;
 
-        bool ok = findFoldersBelow (QDir (_root), dirs);
-        QVERIFY ( dirs.indexOf (_root + "/a1")>-1);
-        QVERIFY ( dirs.indexOf (_root + "/a1/b1")>-1);
-        QVERIFY ( dirs.indexOf (_root + "/a1/b1/c1")>-1);
-        QVERIFY ( dirs.indexOf (_root + "/a1/b1/c2")>-1);
+        bool ok = findFoldersBelow (QDir (this.root), dirs);
+        QVERIFY ( dirs.indexOf (this.root + "/a1")>-1);
+        QVERIFY ( dirs.indexOf (this.root + "/a1/b1")>-1);
+        QVERIFY ( dirs.indexOf (this.root + "/a1/b1/c1")>-1);
+        QVERIFY ( dirs.indexOf (this.root + "/a1/b1/c2")>-1);
 
-        QVERIFY (Utility.writeRandomFile (_root+"/a1/rand1.dat"));
-        QVERIFY (Utility.writeRandomFile (_root+"/a1/b1/rand2.dat"));
-        QVERIFY (Utility.writeRandomFile (_root+"/a1/b1/c1/rand3.dat"));
+        QVERIFY (Utility.writeRandomFile (this.root+"/a1/rand1.dat"));
+        QVERIFY (Utility.writeRandomFile (this.root+"/a1/b1/rand2.dat"));
+        QVERIFY (Utility.writeRandomFile (this.root+"/a1/b1/c1/rand3.dat"));
 
-        QVERIFY ( dirs.indexOf (_root + "/a1/b2")>-1);
-        QVERIFY ( dirs.indexOf (_root + "/a1/b2/c1")>-1);
-        QVERIFY ( dirs.indexOf (_root + "/a1/b3")>-1);
-        QVERIFY ( dirs.indexOf (_root + "/a1/b3/c3")>-1);
+        QVERIFY ( dirs.indexOf (this.root + "/a1/b2")>-1);
+        QVERIFY ( dirs.indexOf (this.root + "/a1/b2/c1")>-1);
+        QVERIFY ( dirs.indexOf (this.root + "/a1/b3")>-1);
+        QVERIFY ( dirs.indexOf (this.root + "/a1/b3/c3")>-1);
 
-        QVERIFY ( dirs.indexOf (_root + "/a2"));
-        QVERIFY ( dirs.indexOf (_root + "/a2/b3"));
-        QVERIFY ( dirs.indexOf (_root + "/a2/b3/c3"));
+        QVERIFY ( dirs.indexOf (this.root + "/a2"));
+        QVERIFY ( dirs.indexOf (this.root + "/a2/b3"));
+        QVERIFY ( dirs.indexOf (this.root + "/a2/b3/c3"));
 
         QVERIFY2 (dirs.count () == 11, "Directory count wrong.");
 
@@ -60,8 +60,8 @@ class TestInotifyWatcher : public FolderWatcherPrivate {
     /***********************************************************
     ***********************************************************/
     private void on_cleanup_test_case () {
-        if ( _root.startsWith (QDir.tempPath () )) {
-           system ( string ("rm -rf %1").arg (_root).toLocal8Bit () );
+        if ( this.root.startsWith (QDir.tempPath () )) {
+           system ( string ("rm -rf %1").arg (this.root).toLocal8Bit () );
         }
     }
 };

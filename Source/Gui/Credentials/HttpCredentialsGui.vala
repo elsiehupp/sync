@@ -47,12 +47,12 @@ class HttpCredentialsGui : HttpCredentials {
     public HttpCredentialsGui (string user, string password, string refresh_token,
             const GLib.ByteArray client_cert_bundle, GLib.ByteArray client_cert_password)
         : HttpCredentials (user, password, client_cert_bundle, client_cert_password) {
-        _refresh_token = refresh_token;
+        this.refresh_token = refresh_token;
     }
 
 
     /***********************************************************
-    This will query the server and either uses OAuth via _async_auth.on_start ()
+    This will query the server and either uses OAuth via this.async_auth.on_start ()
     or call on_show_dialog to ask the password
     ***********************************************************/
     public void ask_from_user () override;
@@ -61,7 +61,7 @@ class HttpCredentialsGui : HttpCredentials {
     An invalid URL otherwise
     ***********************************************************/
     public GLib.Uri authorisation_link () {
-        return _async_auth ? _async_auth.authorisation_link () : GLib.Uri ();
+        return this.async_auth ? this.async_auth.authorisation_link () : GLib.Uri ();
     }
 
     /***********************************************************
@@ -79,7 +79,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<OAuth, QScopedPointerObjectDeleteLater<OAuth>> _async_auth;
+    private QScopedPointer<OAuth, QScopedPointerObjectDeleteLater<OAuth>> this.async_auth;
 };
 
 
@@ -93,23 +93,23 @@ void HttpCredentialsGui.ask_from_user () {
 
 void HttpCredentialsGui.on_ask_from_user_async () {
     // First, we will check what kind of auth we need.
-    var job = new DetermineAuthTypeJob (_account.shared_from_this (), this);
+    var job = new DetermineAuthTypeJob (this.account.shared_from_this (), this);
     GLib.Object.connect (job, &DetermineAuthTypeJob.auth_type, this, [this] (DetermineAuthTypeJob.AuthType type) {
         if (type == DetermineAuthTypeJob.OAuth) {
-            _async_auth.on_reset (new OAuth (_account, this));
-            _async_auth._expected_user = _account.dav_user ();
-            connect (_async_auth.data (), &OAuth.result,
+            this.async_auth.on_reset (new OAuth (this.account, this));
+            this.async_auth._expected_user = this.account.dav_user ();
+            connect (this.async_auth.data (), &OAuth.result,
                 this, &HttpCredentialsGui.on_async_auth_result);
-            connect (_async_auth.data (), &OAuth.destroyed,
+            connect (this.async_auth.data (), &OAuth.destroyed,
                 this, &HttpCredentialsGui.authorisation_link_changed);
-            _async_auth.on_start ();
-            emit authorisation_link_changed ();
+            this.async_auth.on_start ();
+            /* emit */ authorisation_link_changed ();
         } else if (type == DetermineAuthTypeJob.Basic) {
             on_show_dialog ();
         } else {
             // Shibboleth?
             GLib.warn (lc_http_credentials_gui) << "Bad http auth type:" << type;
-            emit asked ();
+            /* emit */ asked ();
         }
     });
     job.on_start ();
@@ -120,24 +120,24 @@ void HttpCredentialsGui.on_async_auth_result (OAuth.Result r, string user,
     switch (r) {
     case OAuth.NotSupported:
         on_show_dialog ();
-        _async_auth.on_reset (nullptr);
+        this.async_auth.on_reset (nullptr);
         return;
     case OAuth.Error:
-        _async_auth.on_reset (nullptr);
-        emit asked ();
+        this.async_auth.on_reset (nullptr);
+        /* emit */ asked ();
         return;
     case OAuth.LoggedIn:
         break;
     }
 
-    ASSERT (_user == user); // ensured by _async_auth
+    ASSERT (this.user == user); // ensured by this.async_auth
 
-    _password = token;
-    _refresh_token = refresh_token;
-    _ready = true;
+    this.password = token;
+    this.refresh_token = refresh_token;
+    this.ready = true;
     persist ();
-    _async_auth.on_reset (nullptr);
-    emit asked ();
+    this.async_auth.on_reset (nullptr);
+    /* emit */ asked ();
 }
 
 void HttpCredentialsGui.on_show_dialog () {
@@ -146,17 +146,17 @@ void HttpCredentialsGui.on_show_dialog () {
                      "User : %2<br>"
                      "Account : %3<br>")
                       .arg (Utility.escape (Theme.instance ().app_name_gui ()),
-                          Utility.escape (_user),
-                          Utility.escape (_account.display_name ()));
+                          Utility.escape (this.user),
+                          Utility.escape (this.account.display_name ()));
 
-    string req_txt = request_app_password_text (_account);
+    string req_txt = request_app_password_text (this.account);
     if (!req_txt.is_empty ()) {
         msg += QLatin1String ("<br>") + req_txt + QLatin1String ("<br>");
     }
-    if (!_fetch_error_string.is_empty ()) {
+    if (!this.fetch_error_string.is_empty ()) {
         msg += QLatin1String ("<br>")
             + _("Reading from keychain failed with error : \"%1\"")
-                  .arg (Utility.escape (_fetch_error_string))
+                  .arg (Utility.escape (this.fetch_error_string))
             + QLatin1String ("<br>");
     }
 
@@ -164,7 +164,7 @@ void HttpCredentialsGui.on_show_dialog () {
     dialog.set_attribute (Qt.WA_DeleteOnClose, true);
     dialog.set_window_title (_("Enter Password"));
     dialog.set_label_text (msg);
-    dialog.set_text_value (_previous_password);
+    dialog.set_text_value (this.previous_password);
     dialog.set_text_echo_mode (QLineEdit.Password);
     if (var dialog_label = dialog.find_child<QLabel> ()) {
         dialog_label.set_open_external_links (true);
@@ -174,12 +174,12 @@ void HttpCredentialsGui.on_show_dialog () {
     dialog.open ();
     connect (dialog, &Gtk.Dialog.on_finished, this, [this, dialog] (int result) {
         if (result == Gtk.Dialog.Accepted) {
-            _password = dialog.text_value ();
-            _refresh_token.clear ();
-            _ready = true;
+            this.password = dialog.text_value ();
+            this.refresh_token.clear ();
+            this.ready = true;
             persist ();
         }
-        emit asked ();
+        /* emit */ asked ();
     });
 }
 

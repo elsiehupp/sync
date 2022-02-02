@@ -22,7 +22,7 @@ class Svg_image_provider : QQuick_image_provider {
     /***********************************************************
     ***********************************************************/
     public 
-    public QImage request_image (string id, QSize size, QSize &requested_size) override;
+    public QImage request_image (string id, QSize size, QSize requested_size) override;
 };
 
 
@@ -30,7 +30,7 @@ class Svg_image_provider : QQuick_image_provider {
         : QQuick_image_provider (QQuick_image_provider.Image) {
     }
 
-    QImage Svg_image_provider.request_image (string id, QSize size, QSize &requested_size) {
+    QImage Svg_image_provider.request_image (string id, QSize size, QSize requested_size) {
         Q_ASSERT (!id.is_empty ());
 
         const var id_split = id.split (QStringLiteral ("/"), Qt.Skip_empty_parts);
@@ -41,7 +41,7 @@ class Svg_image_provider : QQuick_image_provider {
         }
 
         const var pixmap_name = id_split.at (0);
-        const var pixmap_color = id_split.size () > 1 ? QColor (id_split.at (1)) : QColor_constants.Svg.black;
+        const var pixmap_color = id_split.size () > 1 ? Gtk.Color (id_split.at (1)) : QColor_constants.Svg.black;
 
         if (pixmap_name.is_empty () || !pixmap_color.is_valid ()) {
             GLib.warn (lc_svg_image_provider) << "Image id is incorrect!";

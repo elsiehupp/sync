@@ -21,7 +21,7 @@ class TestSelectiveSync : GLib.Object {
         fakeFolder.syncEngine ().setSyncOptions (options);
 
         string[] sizeRequests;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest &req, QIODevice device)
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest req, QIODevice device)
                                          . QNetworkReply * {
             // Record what path we are querying for the size
             if (req.attribute (QNetworkRequest.CustomVerbAttribute) == "PROPFIND") {

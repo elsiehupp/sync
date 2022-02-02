@@ -25,7 +25,7 @@ class FileActivityListModel : ActivityListModel {
 
     /***********************************************************
     ***********************************************************/
-    private string _file_id;
+    private string this.file_id;
 };
     FileActivityListModel.FileActivityListModel (GLib.Object parent)
         : ActivityListModel (nullptr, parent) {
@@ -46,11 +46,11 @@ class FileActivityListModel : ActivityListModel {
 
         const var file = folder.file_from_local_path (local_path);
         SyncJournalFileRecord file_record;
-        if (!folder.journal_database ().get_file_record (file, &file_record) || !file_record.is_valid ()) {
+        if (!folder.journal_database ().get_file_record (file, file_record) || !file_record.is_valid ()) {
             return;
         }
 
-        _file_id = file_record._file_id;
+        this.file_id = file_record._file_id;
         on_refresh_activity ();
     }
 
@@ -68,7 +68,7 @@ class FileActivityListModel : ActivityListModel {
         QUrlQuery parameters;
         parameters.add_query_item (QStringLiteral ("sort"), QStringLiteral ("asc"));
         parameters.add_query_item (QStringLiteral ("object_type"), "files");
-        parameters.add_query_item (QStringLiteral ("object_id"), _file_id);
+        parameters.add_query_item (QStringLiteral ("object_id"), this.file_id);
         job.add_query_params (parameters);
         set_done_fetching (true);
         set_hide_old_activities (true);

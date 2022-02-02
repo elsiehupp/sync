@@ -38,16 +38,16 @@ class AuthenticationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private QLineEdit _user;
-    private QLineEdit _password;
+    private QLineEdit this.user;
+    private QLineEdit this.password;
 };
 
 
 
     AuthenticationDialog.AuthenticationDialog (string realm, string domain, Gtk.Widget parent)
         : Gtk.Dialog (parent)
-        , _user (new QLineEdit)
-        , _password (new QLineEdit) {
+        , this.user (new QLineEdit)
+        , this.password (new QLineEdit) {
         set_window_title (_("Authentication Required"));
         var lay = new QVBoxLayout (this);
         var label = new QLabel (_("Enter username and password for \"%1\" at %2.").arg (realm, domain));
@@ -55,10 +55,10 @@ class AuthenticationDialog : Gtk.Dialog {
         lay.add_widget (label);
 
         var form = new QFormLayout;
-        form.add_row (_("&User:"), _user);
-        form.add_row (_("&Password:"), _password);
+        form.add_row (_("&User:"), this.user);
+        form.add_row (_("&Password:"), this.password);
         lay.add_layout (form);
-        _password.set_echo_mode (QLineEdit.Password);
+        this.password.set_echo_mode (QLineEdit.Password);
 
         var box = new QDialogButtonBox (QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal);
         connect (box, &QDialogButtonBox.accepted, this, &Gtk.Dialog.accept);
@@ -67,11 +67,11 @@ class AuthenticationDialog : Gtk.Dialog {
     }
 
     string AuthenticationDialog.user () {
-        return _user.text ();
+        return this.user.text ();
     }
 
     string AuthenticationDialog.password () {
-        return _password.text ();
+        return this.password.text ();
     }
 
     } // namespace Occ

@@ -6,11 +6,10 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 // #include <QLoggingCategory>
-// #include <string>
 // #include <QCoreApplication>
 
 
-// #include <csync.h>
+using CSync;
 
 namespace Occ {
 
@@ -49,14 +48,14 @@ class AbstractCredentials : GLib.Object {
     Whether fetch_from_keychain () was called before.
     ***********************************************************/
     public bool was_fetched () {
-        return _was_fetched;
+        return this.was_fetched;
     }
 
 
     /***********************************************************
     Trigger (async) fetching of credential information
 
-    Should set _was_fetched = true, and later emit fetched () when done.
+    Should set this.was_fetched = true, and later emit fetched () when done.
     ***********************************************************/
     public virtual void fetch_from_keychain ();
 
@@ -127,16 +126,16 @@ signals:
     void asked ();
 
 
-    protected Account _account = nullptr;
-    protected bool _was_fetched = false;
+    protected Account this.account = nullptr;
+    protected bool this.was_fetched = false;
 };
 
 
     AbstractCredentials.AbstractCredentials () = default;
 
     void AbstractCredentials.set_account (Account account) {
-        ENFORCE (!_account, "should only set_account once");
-        _account = account;
+        ENFORCE (!this.account, "should only set_account once");
+        this.account = account;
     }
 
     string AbstractCredentials.keychain_key (string url, string user, string account_id) {

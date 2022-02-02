@@ -10,20 +10,20 @@
 
 using namespace Occ;
 
-static void applyPermissionsFromName (FileInfo &info) {
-    static QRegularExpression rx ("_PERM_ ([^_]*)_[^/]*$");
+static void applyPermissionsFromName (FileInfo info) {
+    static QRegularExpression rx ("this.PERM_ ([^this.]*)this.[^/]*$");
     var m = rx.match (info.name);
     if (m.hasMatch ()) {
         info.permissions = RemotePermissions.fromServerString (m.captured (1));
     }
 
-    for (FileInfo &sub : info.children)
+    for (FileInfo sub : info.children)
         applyPermissionsFromName (sub);
 }
 
 // Check if the expected rows in the DB are non-empty. Note that in some cases they might be, then we cannot use this function
 // https://github.com/owncloud/client/issues/2038
-static void assertCsyncJournalOk (SyncJournalDb &journal) {
+static void assertCsyncJournalOk (SyncJournalDb journal) {
     // The DB is openend in locked mode : close to allow us to access.
     journal.close ();
 
@@ -35,20 +35,20 @@ static void assertCsyncJournalOk (SyncJournalDb &journal) {
     QCOMPARE (q.intValue (0), 0);
 }
 
-SyncFileItemPtr findDiscoveryItem (SyncFileItemVector &spy, string path) {
-    for (var &item : spy) {
+SyncFileItemPtr findDiscoveryItem (SyncFileItemVector spy, string path) {
+    for (var item : spy) {
         if (item.destination () == path)
             return item;
     }
     return SyncFileItemPtr (new SyncFileItem);
 }
 
-bool itemInstruction (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
+bool itemInstruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
     return item._instruction == instr;
 }
 
-bool discoveryInstruction (SyncFileItemVector &spy, string path, SyncInstructions instr) {
+bool discoveryInstruction (SyncFileItemVector spy, string path, SyncInstructions instr) {
     var item = findDiscoveryItem (spy, path);
     return item._instruction == instr;
 }
@@ -328,7 +328,7 @@ class TestPermissions : GLib.Object {
     ***********************************************************/
     private on_ static void setAllPerm (FileInfo fi, RemotePermissions perm) {
         fi.permissions = perm;
-        for (var &subFi : fi.children)
+        for (var subFi : fi.children)
             setAllPerm (&subFi, perm);
     }
 
@@ -343,8 +343,8 @@ class TestPermissions : GLib.Object {
         syncOpts._parallelNetworkJobs = 1;
         fakeFolder.syncEngine ().setSyncOptions (syncOpts);
 
-        var &lm = fakeFolder.localModifier ();
-        var &rm = fakeFolder.remoteModifier ();
+        var lm = fakeFolder.localModifier ();
+        var rm = fakeFolder.remoteModifier ();
         rm.mkdir ("allowed");
         rm.mkdir ("norename");
         rm.mkdir ("nomove");
@@ -402,7 +402,7 @@ class TestPermissions : GLib.Object {
         QVERIFY (discoveryInstruction (discovery, "norename/sub", CSYNC_INSTRUCTION_REMOVE));
         QVERIFY (itemInstruction (completeSpy, "norename/file_renamed", CSYNC_INSTRUCTION_NEW));
         QVERIFY (itemInstruction (completeSpy, "norename/sub_renamed", CSYNC_INSTRUCTION_NEW));
-        // the contents can _move_
+        // the contents can this.move_
         QVERIFY (itemInstruction (completeSpy, "norename/sub_renamed/file", CSYNC_INSTRUCTION_RENAME));
 
         // simiilarly forbidding moves becomes delete+create
@@ -462,8 +462,8 @@ class TestPermissions : GLib.Object {
         syncOpts._parallelNetworkJobs = 1;
         fakeFolder.syncEngine ().setSyncOptions (syncOpts);
 
-        var &lm = fakeFolder.localModifier ();
-        var &rm = fakeFolder.remoteModifier ();
+        var lm = fakeFolder.localModifier ();
+        var rm = fakeFolder.remoteModifier ();
         rm.mkdir ("changeonly");
         rm.mkdir ("changeonly/sub1");
         rm.insert ("changeonly/sub1/file1");

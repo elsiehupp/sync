@@ -32,7 +32,7 @@ class DefaultPluginFactory : PluginFactory {
 /***********************************************************
 Return the expected name of a plugin, for use with QPluginLoader
 ***********************************************************/
-string plugin_file_name (string type, string name) {
+string plugin_filename (string type, string name) {
     return "%1sync_%2_%3"
         .arg (APPLICATION_EXECUTABLE, type, name);
 }

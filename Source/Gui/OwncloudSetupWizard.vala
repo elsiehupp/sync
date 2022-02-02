@@ -87,33 +87,33 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private OwncloudWizard _oc_wizard;
-    private string _init_local_folder;
-    private string _remote_folder;
+    private OwncloudWizard this.oc_wizard;
+    private string this.init_local_folder;
+    private string this.remote_folder;
 };
 
 
     OwncloudSetupWizard.OwncloudSetupWizard (GLib.Object parent)
         : GLib.Object (parent)
-        , _oc_wizard (new OwncloudWizard)
-        , _remote_folder () {
-        connect (_oc_wizard, &OwncloudWizard.determine_auth_type,
+        , this.oc_wizard (new OwncloudWizard)
+        , this.remote_folder () {
+        connect (this.oc_wizard, &OwncloudWizard.determine_auth_type,
             this, &OwncloudSetupWizard.on_check_server);
-        connect (_oc_wizard, &OwncloudWizard.connect_to_oc_url,
+        connect (this.oc_wizard, &OwncloudWizard.connect_to_oc_url,
             this, &OwncloudSetupWizard.on_connect_to_oCUrl);
-        connect (_oc_wizard, &OwncloudWizard.create_local_and_remote_folders,
+        connect (this.oc_wizard, &OwncloudWizard.create_local_and_remote_folders,
             this, &OwncloudSetupWizard.on_create_local_and_remote_folders);
         /* basic_setup_finished might be called from a reply from the network.
            on_assistant_finished might destroy the temporary QNetworkAccessManager.
            Therefore Qt.QueuedConnection is required */
-        connect (_oc_wizard, &OwncloudWizard.basic_setup_finished,
+        connect (this.oc_wizard, &OwncloudWizard.basic_setup_finished,
             this, &OwncloudSetupWizard.on_assistant_finished, Qt.QueuedConnection);
-        connect (_oc_wizard, &Gtk.Dialog.on_finished, this, &GLib.Object.delete_later);
-        connect (_oc_wizard, &OwncloudWizard.skip_folder_configuration, this, &OwncloudSetupWizard.on_skip_folder_configuration);
+        connect (this.oc_wizard, &Gtk.Dialog.on_finished, this, &GLib.Object.delete_later);
+        connect (this.oc_wizard, &OwncloudWizard.skip_folder_configuration, this, &OwncloudSetupWizard.on_skip_folder_configuration);
     }
 
     OwncloudSetupWizard.~OwncloudSetupWizard () {
-        _oc_wizard.delete_later ();
+        this.oc_wizard.delete_later ();
     }
 
     /***********************************************************
@@ -145,10 +145,10 @@ signals:
         AccountPointer account = AccountManager.create_account ();
         account.set_credentials (CredentialsFactory.create ("dummy"));
         account.set_url (Theme.instance ().override_server_url ());
-        _oc_wizard.set_account (account);
-        _oc_wizard.set_oCUrl (account.url ().to_"");
+        this.oc_wizard.set_account (account);
+        this.oc_wizard.set_oCUrl (account.url ().to_"");
 
-        _remote_folder = Theme.instance ().default_server_folder ();
+        this.remote_folder = Theme.instance ().default_server_folder ();
         // remote_folder may be empty, which means /
         string local_folder = Theme.instance ().default_client_folder ();
 
@@ -158,7 +158,7 @@ signals:
             local_folder = QDir.home_path () + '/' + local_folder;
         }
 
-        _oc_wizard.set_property ("local_folder", local_folder);
+        this.oc_wizard.set_property ("local_folder", local_folder);
 
         // remember the local folder to compare later if it changed, but clean first
         string lf = QDir.from_native_separators (local_folder);
@@ -166,21 +166,21 @@ signals:
             lf.append ('/');
         }
 
-        _init_local_folder = lf;
+        this.init_local_folder = lf;
 
-        _oc_wizard.on_set_remote_folder (_remote_folder);
+        this.oc_wizard.on_set_remote_folder (this.remote_folder);
 
     #ifdef WITH_PROVIDERS
         const var start_page = WizardCommon.Page_Welcome;
     #else // WITH_PROVIDERS
         const var start_page = WizardCommon.Page_Server_setup;
     #endif // WITH_PROVIDERS
-        _oc_wizard.set_start_id (start_page);
+        this.oc_wizard.set_start_id (start_page);
 
-        _oc_wizard.restart ();
+        this.oc_wizard.restart ();
 
-        _oc_wizard.open ();
-        _oc_wizard.raise ();
+        this.oc_wizard.open ();
+        this.oc_wizard.raise ();
     }
 
     // also checks if an installation is valid and determines auth type in a second step
@@ -191,7 +191,7 @@ signals:
         if (!fixed_url.starts_with ("http://") && !fixed_url.starts_with ("https://")) {
             url.set_scheme ("https");
         }
-        AccountPointer account = _oc_wizard.account ();
+        AccountPointer account = this.oc_wizard.account ();
         account.set_url (url);
 
         // Reset the proxy which might had been determined previously in ConnectionValidator.on_check_server_and_auth ()
@@ -202,13 +202,13 @@ signals:
         // Here the client certificate is added, if any. Later it'll be in HttpCredentials
         account.set_ssl_configuration (QSslConfiguration ());
         var ssl_configuration = account.get_or_create_ssl_config (); // let Account set defaults
-        if (!_oc_wizard._client_ssl_certificate.is_null ()) {
-            ssl_configuration.set_local_certificate (_oc_wizard._client_ssl_certificate);
-            ssl_configuration.set_private_key (_oc_wizard._client_ssl_key);
+        if (!this.oc_wizard._client_ssl_certificate.is_null ()) {
+            ssl_configuration.set_local_certificate (this.oc_wizard._client_ssl_certificate);
+            ssl_configuration.set_private_key (this.oc_wizard._client_ssl_key);
         }
         // Be sure to merge the CAs
         var ca = ssl_configuration.system_ca_certificates ();
-        ca.append (_oc_wizard._client_ssl_ca_certificates);
+        ca.append (this.oc_wizard._client_ssl_ca_certificates);
         ssl_configuration.set_ca_certificates (ca);
         account.set_ssl_configuration (ssl_configuration);
 
@@ -228,20 +228,20 @@ signals:
         }
     }
 
-    void OwncloudSetupWizard.on_system_proxy_lookup_done (QNetworkProxy &proxy) {
+    void OwncloudSetupWizard.on_system_proxy_lookup_done (QNetworkProxy proxy) {
         if (proxy.type () != QNetworkProxy.NoProxy) {
             q_c_info (lc_wizard) << "Setting QNAM proxy to be system proxy" << ClientProxy.print_q_network_proxy (proxy);
         } else {
             q_c_info (lc_wizard) << "No system proxy set by OS";
         }
-        AccountPointer account = _oc_wizard.account ();
+        AccountPointer account = this.oc_wizard.account ();
         account.network_access_manager ().set_proxy (proxy);
 
         on_find_server ();
     }
 
     void OwncloudSetupWizard.on_find_server () {
-        AccountPointer account = _oc_wizard.account ();
+        AccountPointer account = this.oc_wizard.account ();
 
         // Set fake credentials before we check what credential it actually is.
         account.set_credentials (CredentialsFactory.create ("dummy"));
@@ -266,7 +266,7 @@ signals:
     }
 
     void OwncloudSetupWizard.on_find_server_behind_redirect () {
-        AccountPointer account = _oc_wizard.account ();
+        AccountPointer account = this.oc_wizard.account ();
 
         // Step 2 : Resolve any permanent redirect chains on the base url
         var redirect_check_job = account.send_request ("GET", account.url ());
@@ -301,10 +301,10 @@ signals:
         });
     }
 
-    void OwncloudSetupWizard.on_found_server (GLib.Uri url, QJsonObject &info) {
+    void OwncloudSetupWizard.on_found_server (GLib.Uri url, QJsonObject info) {
         var server_version = CheckServerJob.version (info);
 
-        _oc_wizard.on_append_to_configuration_log (_("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
+        this.oc_wizard.on_append_to_configuration_log (_("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
                                                 .arg (Utility.escape (url.to_""),
                                                     Utility.escape (Theme.instance ().app_name_gui ()),
                                                     Utility.escape (CheckServerJob.version_string (info)),
@@ -312,11 +312,11 @@ signals:
 
         // Note with newer servers we get the version actually only later in capabilities
         // https://github.com/owncloud/core/pull/27473/files
-        _oc_wizard.account ().set_server_version (server_version);
+        this.oc_wizard.account ().set_server_version (server_version);
 
-        if (url != _oc_wizard.account ().url ()) {
+        if (url != this.oc_wizard.account ().url ()) {
             // We might be redirected, update the account
-            _oc_wizard.account ().set_url (url);
+            this.oc_wizard.account ().set_url (url);
             q_c_info (lc_wizard) << " was redirected to" << url.to_"";
         }
 
@@ -328,45 +328,45 @@ signals:
 
         // Do this early because reply might be deleted in message box event loop
         string msg;
-        if (!_oc_wizard.account ().url ().is_valid ()) {
+        if (!this.oc_wizard.account ().url ().is_valid ()) {
             msg = _("Invalid URL");
         } else {
             msg = _("Failed to connect to %1 at %2:<br/>%3")
                       .arg (Utility.escape (Theme.instance ().app_name_gui ()),
-                          Utility.escape (_oc_wizard.account ().url ().to_""),
+                          Utility.escape (this.oc_wizard.account ().url ().to_""),
                           Utility.escape (job.error_string ()));
         }
         bool is_downgrade_advised = check_downgrade_advised (reply);
 
         // Displays message inside wizard and possibly also another message box
-        _oc_wizard.on_display_error (msg, is_downgrade_advised);
+        this.oc_wizard.on_display_error (msg, is_downgrade_advised);
 
         // Allow the credentials dialog to pop up again for the same URL.
         // Maybe the user just clicked 'Cancel' by accident or changed his mind.
-        _oc_wizard.account ().reset_rejected_certificates ();
+        this.oc_wizard.account ().reset_rejected_certificates ();
     }
 
     void OwncloudSetupWizard.on_no_server_found_timeout (GLib.Uri url) {
-        _oc_wizard.on_display_error (
+        this.oc_wizard.on_display_error (
             _("Timeout while trying to connect to %1 at %2.")
                 .arg (Utility.escape (Theme.instance ().app_name_gui ()), Utility.escape (url.to_"")),
                     false);
     }
 
     void OwncloudSetupWizard.on_determine_auth_type () {
-        var job = new DetermineAuthTypeJob (_oc_wizard.account (), this);
+        var job = new DetermineAuthTypeJob (this.oc_wizard.account (), this);
         connect (job, &DetermineAuthTypeJob.auth_type,
-            _oc_wizard, &OwncloudWizard.on_set_auth_type);
+            this.oc_wizard, &OwncloudWizard.on_set_auth_type);
         job.on_start ();
     }
 
     void OwncloudSetupWizard.on_connect_to_oCUrl (string url) {
         q_c_info (lc_wizard) << "Connect to url : " << url;
-        AbstractCredentials creds = _oc_wizard.get_credentials ();
-        _oc_wizard.account ().set_credentials (creds);
+        AbstractCredentials creds = this.oc_wizard.get_credentials ();
+        this.oc_wizard.account ().set_credentials (creds);
 
-        const var fetch_user_name_job = new JsonApiJob (_oc_wizard.account ().shared_from_this (), "/ocs/v1.php/cloud/user");
-        connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, url] (QJsonDocument &json, int status_code) {
+        const var fetch_user_name_job = new JsonApiJob (this.oc_wizard.account ().shared_from_this (), "/ocs/v1.php/cloud/user");
+        connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, url] (QJsonDocument json, int status_code) {
             if (status_code != 100) {
                 GLib.warn (lc_wizard) << "Could not fetch username.";
             }
@@ -376,11 +376,11 @@ signals:
             const var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
             const var user_id = obj_data.value ("id").to_string ("");
             const var display_name = obj_data.value ("display-name").to_string ("");
-            _oc_wizard.account ().set_dav_user (user_id);
-            _oc_wizard.account ().set_dav_display_name (display_name);
+            this.oc_wizard.account ().set_dav_user (user_id);
+            this.oc_wizard.account ().set_dav_display_name (display_name);
 
-            _oc_wizard.set_field (QLatin1String ("OCUrl"), url);
-            _oc_wizard.on_append_to_configuration_log (_("Trying to connect to %1 at %2 …")
+            this.oc_wizard.set_field (QLatin1String ("OCUrl"), url);
+            this.oc_wizard.on_append_to_configuration_log (_("Trying to connect to %1 at %2 …")
                                                     .arg (Theme.instance ().app_name_gui ())
                                                     .arg (url));
 
@@ -390,7 +390,7 @@ signals:
     }
 
     void OwncloudSetupWizard.test_owncloud_connect () {
-        AccountPointer account = _oc_wizard.account ();
+        AccountPointer account = this.oc_wizard.account ();
 
         var job = new PropfindJob (account, "/", this);
         job.set_ignore_credential_failure (true);
@@ -398,7 +398,7 @@ signals:
         // so don't automatically follow redirects.
         job.set_follow_redirects (false);
         job.set_properties (GLib.List<GLib.ByteArray> () << "getlastmodified");
-        connect (job, &PropfindJob.result, _oc_wizard, &OwncloudWizard.on_successful_step);
+        connect (job, &PropfindJob.result, this.oc_wizard, &OwncloudWizard.on_successful_step);
         connect (job, &PropfindJob.finished_with_error, this, &OwncloudSetupWizard.on_auth_error);
         job.on_start ();
     }
@@ -421,13 +421,13 @@ signals:
 
             // strip the expected path
             string path = redirect_url.path ();
-            static string expected_path = "/" + _oc_wizard.account ().dav_path ();
+            static string expected_path = "/" + this.oc_wizard.account ().dav_path ();
             if (path.ends_with (expected_path)) {
                 path.chop (expected_path.size ());
                 redirect_url.set_path (path);
 
                 q_c_info (lc_wizard) << "Setting account url to" << redirect_url.to_"";
-                _oc_wizard.account ().set_url (redirect_url);
+                this.oc_wizard.account ().set_url (redirect_url);
                 test_owncloud_connect ();
                 return;
             }
@@ -438,15 +438,15 @@ signals:
             // A 404 is actually a on_success : we were authorized to know that the folder does
             // not exist. It will be created later...
         } else if (reply.error () == QNetworkReply.ContentNotFoundError) {
-            _oc_wizard.on_successful_step ();
+            this.oc_wizard.on_successful_step ();
             return;
 
             // Provide messages for other errors, such as invalid credentials.
         } else if (reply.error () != QNetworkReply.NoError) {
-            if (!_oc_wizard.account ().credentials ().still_valid (reply)) {
+            if (!this.oc_wizard.account ().credentials ().still_valid (reply)) {
                 error_msg = _("Access forbidden by server. To verify that you have proper access, "
                               "<a href=\"%1\">click here</a> to access the service with your browser.")
-                               .arg (Utility.escape (_oc_wizard.account ().url ().to_""));
+                               .arg (Utility.escape (this.oc_wizard.account ().url ().to_""));
             } else {
                 error_msg = job.error_string_parsing_body ();
             }
@@ -457,11 +457,11 @@ signals:
         }
 
         // bring wizard to top
-        _oc_wizard.bring_to_top ();
-        if (_oc_wizard.current_id () == WizardCommon.Page_OAuth_creds || _oc_wizard.current_id () == WizardCommon.Page_Flow2Auth_creds) {
-            _oc_wizard.back ();
+        this.oc_wizard.bring_to_top ();
+        if (this.oc_wizard.current_id () == WizardCommon.Page_OAuth_creds || this.oc_wizard.current_id () == WizardCommon.Page_Flow2Auth_creds) {
+            this.oc_wizard.back ();
         }
-        _oc_wizard.on_display_error (error_msg, _oc_wizard.current_id () == WizardCommon.Page_Server_setup && check_downgrade_advised (reply));
+        this.oc_wizard.on_display_error (error_msg, this.oc_wizard.current_id () == WizardCommon.Page_Server_setup && check_downgrade_advised (reply));
     }
 
     bool OwncloudSetupWizard.check_downgrade_advised (QNetworkReply reply) {
@@ -496,7 +496,7 @@ signals:
             Utility.setup_fav_link (local_folder);
             // there is an existing local folder. If its non empty, it can only be synced if the
             // own_cloud is newly created.
-            _oc_wizard.on_append_to_configuration_log (
+            this.oc_wizard.on_append_to_configuration_log (
                 _("Local sync folder %1 already exists, setting it up for sync.<br/><br/>")
                     .arg (Utility.escape (local_folder)));
         } else {
@@ -508,10 +508,10 @@ signals:
             } else {
                 res += _("failed.");
                 GLib.warn (lc_wizard) << "Failed to create " << fi.path ();
-                _oc_wizard.on_display_error (_("Could not create local folder %1").arg (Utility.escape (local_folder)), false);
+                this.oc_wizard.on_display_error (_("Could not create local folder %1").arg (Utility.escape (local_folder)), false);
                 next_step = false;
             }
-            _oc_wizard.on_append_to_configuration_log (res);
+            this.oc_wizard.on_append_to_configuration_log (res);
         }
         if (next_step) {
             /***********************************************************
@@ -522,9 +522,9 @@ signals:
                     Example: https://cloud.example.com/remote.php/dav//
 
             ***********************************************************/
-            q_c_info (lc_wizard) << "Sanitize got URL path:" << string (_oc_wizard.account ().url ().to_"" + '/' + _oc_wizard.account ().dav_path () + remote_folder);
+            q_c_info (lc_wizard) << "Sanitize got URL path:" << string (this.oc_wizard.account ().url ().to_"" + '/' + this.oc_wizard.account ().dav_path () + remote_folder);
 
-            string new_dav_path = _oc_wizard.account ().dav_path (),
+            string new_dav_path = this.oc_wizard.account ().dav_path (),
                     new_remote_folder = remote_folder;
 
             while (new_dav_path.starts_with ('/')) {
@@ -543,12 +543,12 @@ signals:
 
             string new_url_path = new_dav_path + '/' + new_remote_folder;
 
-            q_c_info (lc_wizard) << "Sanitized to URL path:" << _oc_wizard.account ().url ().to_"" + '/' + new_url_path;
+            q_c_info (lc_wizard) << "Sanitized to URL path:" << this.oc_wizard.account ().url ().to_"" + '/' + new_url_path;
             /***********************************************************
             END - Sanitize URL paths to eliminate double-slashes
             ***********************************************************/
 
-            var job = new EntityExistsJob (_oc_wizard.account (), new_url_path, this);
+            var job = new EntityExistsJob (this.oc_wizard.account (), new_url_path, this);
             connect (job, &EntityExistsJob.exists, this, &OwncloudSetupWizard.on_remote_folder_exists);
             job.on_start ();
         } else {
@@ -566,7 +566,7 @@ signals:
         if (err_id == QNetworkReply.NoError) {
             q_c_info (lc_wizard) << "Remote folder found, all cool!";
         } else if (err_id == QNetworkReply.ContentNotFoundError) {
-            if (_remote_folder.is_empty ()) {
+            if (this.remote_folder.is_empty ()) {
                 error = _("No remote folder specified!");
                 ok = false;
             } else {
@@ -578,19 +578,19 @@ signals:
         }
 
         if (!ok) {
-            _oc_wizard.on_display_error (Utility.escape (error), false);
+            this.oc_wizard.on_display_error (Utility.escape (error), false);
         }
 
         finalize_setup (ok);
     }
 
     void OwncloudSetupWizard.create_remote_folder () {
-        _oc_wizard.on_append_to_configuration_log (_("creating folder on Nextcloud : %1").arg (_remote_folder));
+        this.oc_wizard.on_append_to_configuration_log (_("creating folder on Nextcloud : %1").arg (this.remote_folder));
 
-        var job = new MkColJob (_oc_wizard.account (), _remote_folder, this);
+        var job = new MkColJob (this.oc_wizard.account (), this.remote_folder, this);
         connect (job, &MkColJob.finished_with_error, this, &OwncloudSetupWizard.on_create_remote_folder_finished);
         connect (job, &MkColJob.finished_without_error, this, [this] {
-            _oc_wizard.on_append_to_configuration_log (_("Remote folder %1 created successfully.").arg (_remote_folder));
+            this.oc_wizard.on_append_to_configuration_log (_("Remote folder %1 created successfully.").arg (this.remote_folder));
             finalize_setup (true);
         });
         job.on_start ();
@@ -604,24 +604,24 @@ signals:
 
         bool on_success = true;
         if (error == 202) {
-            _oc_wizard.on_append_to_configuration_log (_("The remote folder %1 already exists. Connecting it for syncing.").arg (_remote_folder));
+            this.oc_wizard.on_append_to_configuration_log (_("The remote folder %1 already exists. Connecting it for syncing.").arg (this.remote_folder));
         } else if (error > 202 && error < 300) {
-            _oc_wizard.on_display_error (_("The folder creation resulted in HTTP error code %1").arg (static_cast<int> (error)), false);
+            this.oc_wizard.on_display_error (_("The folder creation resulted in HTTP error code %1").arg (static_cast<int> (error)), false);
 
-            _oc_wizard.on_append_to_configuration_log (_("The folder creation resulted in HTTP error code %1").arg (static_cast<int> (error)));
+            this.oc_wizard.on_append_to_configuration_log (_("The folder creation resulted in HTTP error code %1").arg (static_cast<int> (error)));
         } else if (error == QNetworkReply.OperationCanceledError) {
-            _oc_wizard.on_display_error (_("The remote folder creation failed because the provided credentials "
+            this.oc_wizard.on_display_error (_("The remote folder creation failed because the provided credentials "
                                        "are wrong!"
                                        "<br/>Please go back and check your credentials.</p>"),
                 false);
-            _oc_wizard.on_append_to_configuration_log (_("<p><font color=\"red\">Remote folder creation failed probably because the provided credentials are wrong.</font>"
+            this.oc_wizard.on_append_to_configuration_log (_("<p><font color=\"red\">Remote folder creation failed probably because the provided credentials are wrong.</font>"
                                                    "<br/>Please go back and check your credentials.</p>"));
-            _remote_folder.clear ();
+            this.remote_folder.clear ();
             on_success = false;
         } else {
-            _oc_wizard.on_append_to_configuration_log (_("Remote folder %1 creation failed with error <tt>%2</tt>.").arg (Utility.escape (_remote_folder)).arg (error));
-            _oc_wizard.on_display_error (_("Remote folder %1 creation failed with error <tt>%2</tt>.").arg (Utility.escape (_remote_folder)).arg (error), false);
-            _remote_folder.clear ();
+            this.oc_wizard.on_append_to_configuration_log (_("Remote folder %1 creation failed with error <tt>%2</tt>.").arg (Utility.escape (this.remote_folder)).arg (error));
+            this.oc_wizard.on_display_error (_("Remote folder %1 creation failed with error <tt>%2</tt>.").arg (Utility.escape (this.remote_folder)).arg (error), false);
+            this.remote_folder.clear ();
             on_success = false;
         }
 
@@ -629,22 +629,22 @@ signals:
     }
 
     void OwncloudSetupWizard.finalize_setup (bool on_success) {
-        const string local_folder = _oc_wizard.property ("local_folder").to_"";
+        const string local_folder = this.oc_wizard.property ("local_folder").to_"";
         if (on_success) {
-            if (! (local_folder.is_empty () || _remote_folder.is_empty ())) {
-                _oc_wizard.on_append_to_configuration_log (
+            if (! (local_folder.is_empty () || this.remote_folder.is_empty ())) {
+                this.oc_wizard.on_append_to_configuration_log (
                     _("A sync connection from %1 to remote directory %2 was set up.")
-                        .arg (local_folder, _remote_folder));
+                        .arg (local_folder, this.remote_folder));
             }
-            _oc_wizard.on_append_to_configuration_log (QLatin1String (" "));
-            _oc_wizard.on_append_to_configuration_log (QLatin1String ("<p><font color=\"green\"><b>")
+            this.oc_wizard.on_append_to_configuration_log (QLatin1String (" "));
+            this.oc_wizard.on_append_to_configuration_log (QLatin1String ("<p><font color=\"green\"><b>")
                 + _("Successfully connected to %1!")
                       .arg (Theme.instance ().app_name_gui ())
                 + QLatin1String ("</b></font></p>"));
-            _oc_wizard.on_successful_step ();
+            this.oc_wizard.on_successful_step ();
         } else {
             // ### this is not quite true, pass in the real problem as optional parameter
-            _oc_wizard.on_append_to_configuration_log (QLatin1String ("<p><font color=\"red\">")
+            this.oc_wizard.on_append_to_configuration_log (QLatin1String ("<p><font color=\"red\">")
                 + _("Connection to %1 could not be established. Please check again.")
                       .arg (Theme.instance ().app_name_gui ())
                 + QLatin1String ("</font></p>"));
@@ -682,16 +682,16 @@ signals:
             // is changed.
             var account = apply_account_changes ();
 
-            string local_folder = FolderDefinition.prepare_local_path (_oc_wizard.local_folder ());
+            string local_folder = FolderDefinition.prepare_local_path (this.oc_wizard.local_folder ());
 
-            bool start_from_scratch = _oc_wizard.field ("OCSync_from_scratch").to_bool ();
+            bool start_from_scratch = this.oc_wizard.field ("OCSync_from_scratch").to_bool ();
             if (!start_from_scratch || ensure_start_from_scratch (local_folder)) {
-                q_c_info (lc_wizard) << "Adding folder definition for" << local_folder << _remote_folder;
+                q_c_info (lc_wizard) << "Adding folder definition for" << local_folder << this.remote_folder;
                 FolderDefinition folder_definition;
                 folder_definition.local_path = local_folder;
-                folder_definition.target_path = FolderDefinition.prepare_target_path (_remote_folder);
+                folder_definition.target_path = FolderDefinition.prepare_target_path (this.remote_folder);
                 folder_definition.ignore_hidden_files = folder_man.ignore_hidden_files ();
-                if (_oc_wizard.use_virtual_file_sync ()) {
+                if (this.oc_wizard.use_virtual_file_sync ()) {
                     folder_definition.virtual_files_mode = best_available_vfs_mode ();
                 }
                 if (folder_man.navigation_pane_helper ().show_in_explorer_navigation_pane ())
@@ -699,43 +699,43 @@ signals:
 
                 var f = folder_man.add_folder (account, folder_definition);
                 if (f) {
-                    if (folder_definition.virtual_files_mode != Vfs.Off && _oc_wizard.use_virtual_file_sync ())
+                    if (folder_definition.virtual_files_mode != Vfs.Off && this.oc_wizard.use_virtual_file_sync ())
                         f.set_root_pin_state (PinState.VfsItemAvailability.ONLINE_ONLY);
 
                     f.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
-                        _oc_wizard.selective_sync_blocklist ());
-                    if (!_oc_wizard.is_confirm_big_folder_checked ()) {
+                        this.oc_wizard.selective_sync_blocklist ());
+                    if (!this.oc_wizard.is_confirm_big_folder_checked ()) {
                         // The user already accepted the selective sync dialog. everything is in the allow list
                         f.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
                             string[] () << QLatin1String ("/"));
                     }
                 }
-                _oc_wizard.on_append_to_configuration_log (_("<font color=\"green\"><b>Local sync folder %1 successfully created!</b></font>").arg (local_folder));
+                this.oc_wizard.on_append_to_configuration_log (_("<font color=\"green\"><b>Local sync folder %1 successfully created!</b></font>").arg (local_folder));
             }
         }
 
         // notify others.
-        _oc_wizard.on_done (QWizard.Accepted);
-        emit own_cloud_wizard_done (result);
+        this.oc_wizard.on_done (QWizard.Accepted);
+        /* emit */ own_cloud_wizard_done (result);
     }
 
     void OwncloudSetupWizard.on_skip_folder_configuration () {
         apply_account_changes ();
 
-        disconnect (_oc_wizard, &OwncloudWizard.basic_setup_finished,
+        disconnect (this.oc_wizard, &OwncloudWizard.basic_setup_finished,
             this, &OwncloudSetupWizard.on_assistant_finished);
-        _oc_wizard.close ();
-        emit own_cloud_wizard_done (Gtk.Dialog.Accepted);
+        this.oc_wizard.close ();
+        /* emit */ own_cloud_wizard_done (Gtk.Dialog.Accepted);
     }
 
     AccountState *OwncloudSetupWizard.apply_account_changes () {
-        AccountPointer new_account = _oc_wizard.account ();
+        AccountPointer new_account = this.oc_wizard.account ();
 
         // Detach the account that is going to be saved from the
         // wizard to ensure it doesn't accidentally get modified
         // later (such as from running on_cleanup such as
         // Abstract_credentials_wizard_page.cleanup_page ())
-        _oc_wizard.set_account (AccountManager.create_account ());
+        this.oc_wizard.set_account (AccountManager.create_account ());
 
         var manager = AccountManager.instance ();
 

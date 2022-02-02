@@ -27,13 +27,13 @@ Normal workfl
       |
       +---. open_browser () open the browser to the login page, redirects to http://localhost
       |
-      +---. _ser
+      +---. this.ser
                |
                v
             requ
                |
                v
-             emit result (...)
+             /* emit */ result (...)
 
 ***********************************************************/
 class OAuth : GLib.Object {
@@ -42,7 +42,7 @@ class OAuth : GLib.Object {
     ***********************************************************/
     public OAuth (Account account, GLib.Object parent)
         : GLib.Object (parent)
-        , _account (account) {
+        , this.account (account) {
     }
     ~OAuth () override;
 
@@ -78,12 +78,12 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private Account _account;
+    private Account this.account;
 
     /***********************************************************
     ***********************************************************/
     private 
-    private public string _expected_user;
+    private public string this.expected_user;
 };
 
 
@@ -113,16 +113,16 @@ signals:
 
     void OAuth.on_start () {
         // Listen on the socket to get a port which will be used in the redirect_uri
-        if (!_server.listen (QHostAddress.LocalLost)) {
-            emit result (NotSupported, "");
+        if (!this.server.listen (QHostAddress.LocalLost)) {
+            /* emit */ result (NotSupported, "");
             return;
         }
 
         if (!open_browser ())
             return;
 
-        GLib.Object.connect (&_server, &QTcpServer.new_connection, this, [this] {
-            while (QPointer<QTcpSocket> socket = _server.next_pending_connection ()) {
+        GLib.Object.connect (&this.server, &QTcpServer.new_connection, this, [this] {
+            while (QPointer<QTcpSocket> socket = this.server.next_pending_connection ()) {
                 GLib.Object.connect (socket.data (), &QTcpSocket.disconnected, socket.data (), &QTcpSocket.delete_later);
                 GLib.Object.connect (socket.data (), &QIODevice.ready_read, this, [this, socket] {
                     GLib.ByteArray peek = socket.peek (q_min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
@@ -137,7 +137,7 @@ signals:
 
                     string code = rx_match.captured (1); // The 'code' is the first capture of the regexp
 
-                    GLib.Uri request_token = Utility.concat_url_path (_account.url ().to_"", QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
+                    GLib.Uri request_token = Utility.concat_url_path (this.account.url ().to_"", QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
                     QNetworkRequest req;
                     req.set_header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
 
@@ -150,15 +150,15 @@ signals:
                     var request_body = new QBuffer;
                     QUrlQuery arguments (string (
                         "grant_type=authorization_code&code=%1&redirect_uri=http://localhost:%2")
-                                            .arg (code, string.number (_server.server_port ())));
+                                            .arg (code, string.number (this.server.server_port ())));
                     request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
-                    var job = _account.send_request ("POST", request_token, req, request_body);
+                    var job = this.account.send_request ("POST", request_token, req, request_body);
                     job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
                     GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, socket] (QNetworkReply reply) {
                         var json_data = reply.read_all ();
                         QJsonParseError json_parse_error;
-                        QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
+                        QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
                         string access_token = json["access_token"].to_"";
                         string refresh_token = json["refresh_token"].to_"";
                         string user = json["user_id"].to_"";
@@ -190,16 +190,16 @@ signals:
                             GLib.warn (lc_oauth) << "Error when getting the access_token" << json << error_reason;
                             http_reply_and_close (socket, "500 Internal Server Error",
                                 _("<h1>Login Error</h1><p>%1</p>").arg (error_reason).to_utf8 ().const_data ());
-                            emit result (Error);
+                            /* emit */ result (Error);
                             return;
                         }
-                        if (!_expected_user.is_null () && user != _expected_user) {
+                        if (!this.expected_user.is_null () && user != this.expected_user) {
                             // Connected with the wrong user
                             string message = _("<h1>Wrong user</h1>"
                                                  "<p>You logged-in with user <em>%1</em>, but must login with user <em>%2</em>.<br>"
                                                  "Please log out of %3 in another tab, then <a href='%4'>click here</a> "
                                                  "and log in as user %2</p>")
-                                                  .arg (user, _expected_user, Theme.instance ().app_name_gui (),
+                                                  .arg (user, this.expected_user, Theme.instance ().app_name_gui (),
                                                       authorisation_link ().to_string (GLib.Uri.FullyEncoded));
                             http_reply_and_close (socket, "200 OK", message.to_utf8 ().const_data ());
                             // We are still listening on the socket so we will get the new connection
@@ -212,7 +212,7 @@ signals:
                         } else {
                             http_reply_and_close (socket, "200 OK", login_successfull_html);
                         }
-                        emit result (LoggedIn, user, access_token, refresh_token);
+                        /* emit */ result (LoggedIn, user, access_token, refresh_token);
                     });
                 });
             }
@@ -220,7 +220,7 @@ signals:
     }
 
     GLib.Uri OAuth.authorisation_link () {
-        Q_ASSERT (_server.is_listening ());
+        Q_ASSERT (this.server.is_listening ());
         QUrlQuery query;
         query.set_query_items ({
             {
@@ -233,19 +233,19 @@ signals:
             },
             {
                 QLatin1String ("redirect_uri"),
-                QLatin1String ("http://localhost:") + string.number (_server.server_port ())
+                QLatin1String ("http://localhost:") + string.number (this.server.server_port ())
             }
         });
-        if (!_expected_user.is_null ())
-            query.add_query_item ("user", _expected_user);
-        GLib.Uri url = Utility.concat_url_path (_account.url (), QLatin1String ("/index.php/apps/oauth2/authorize"), query);
+        if (!this.expected_user.is_null ())
+            query.add_query_item ("user", this.expected_user);
+        GLib.Uri url = Utility.concat_url_path (this.account.url (), QLatin1String ("/index.php/apps/oauth2/authorize"), query);
         return url;
     }
 
     bool OAuth.open_browser () {
         if (!Utility.open_browser (authorisation_link ())) {
             // We cannot open the browser, then we claim we don't support OAuth.
-            emit result (NotSupported, "");
+            /* emit */ result (NotSupported, "");
             return false;
         }
         return true;

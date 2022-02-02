@@ -75,7 +75,7 @@ int main (int argc, char argv[]) {
     // send log
     //    GLib.File log_file ( INSERT_FILE_PATH_HERE );
     //    log_file.open ( GLib.File.ReadOnly );
-    //    reporter.set_report_data ( "upload_file_miralllog", q_compress ( log_file.read_all () ), "application/x-gzip", QFileInfo ( INSERT_FILE_PATH_HERE ).file_name ().to_utf8 ());
+    //    reporter.set_report_data ( "upload_file_miralllog", q_compress ( log_file.read_all () ), "application/x-gzip", QFileInfo ( INSERT_FILE_PATH_HERE ).filename ().to_utf8 ());
     //    log_file.close ();
 
     reporter.show ();

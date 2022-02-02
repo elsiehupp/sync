@@ -12,16 +12,16 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private bool _success;
-    private string[] _subdirs;
-    private string[] _items;
+    private bool this.success;
+    private string[] this.subdirs;
+    private string[] this.items;
 
 
     /***********************************************************
     ***********************************************************/
     public void on_directory_listing_sub_folders (string[]& list) {
         qDebug () << "subfolders : " << list;
-        _subdirs.append (list);
+        this.subdirs.append (list);
     }
 
 
@@ -29,14 +29,14 @@ class TestXmlParse : GLib.Object {
     ***********************************************************/
     public void on_directory_listing_iterated (string& item, QMap<string,string>& ) {
         qDebug () << "     item : " << item;
-        _items.append (item);
+        this.items.append (item);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void on_finished_successfully () {
-        _success = true;
+        this.success = true;
     }
 
 
@@ -44,9 +44,9 @@ class TestXmlParse : GLib.Object {
     ***********************************************************/
     private void on_init () {
         qDebug () << Q_FUNC_INFO;
-        _success = false;
-        _subdirs.clear ();
-        _items.clear ();
+        this.success = false;
+        this.subdirs.clear ();
+        this.items.clear ();
     }
 
 
@@ -108,25 +108,25 @@ class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect ( &parser, SIGNAL (directoryListingSubfolders (string[]&)),
+        connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
                  this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
-        connect ( &parser, SIGNAL (finishedWithoutError ()),
+        connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
-        QHash <string, ExtraFolderInfo> sizes;
-        QVERIFY (parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
+        GLib.HashMap <string, ExtraFolderInfo> sizes;
+        QVERIFY (parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" ));
 
-        QVERIFY (_success);
+        QVERIFY (this.success);
         QCOMPARE (sizes.size (), 1 ); // Quota info in the XML
 
-        QVERIFY (_items.contains ("/oc/remote.php/dav/sharefolder/quitte.pdf"));
-        QVERIFY (_items.contains ("/oc/remote.php/dav/sharefolder"));
-        QVERIFY (_items.size () == 2 );
+        QVERIFY (this.items.contains ("/oc/remote.php/dav/sharefolder/quitte.pdf"));
+        QVERIFY (this.items.contains ("/oc/remote.php/dav/sharefolder"));
+        QVERIFY (this.items.size () == 2 );
 
-        QVERIFY (_subdirs.contains ("/oc/remote.php/dav/sharefolder/"));
-        QVERIFY (_subdirs.size () == 1);
+        QVERIFY (this.subdirs.contains ("/oc/remote.php/dav/sharefolder/"));
+        QVERIFY (this.subdirs.size () == 1);
     }
 
 
@@ -184,22 +184,22 @@ class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect ( &parser, SIGNAL (directoryListingSubfolders (string[]&)),
+        connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
                  this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
-        connect ( &parser, SIGNAL (finishedWithoutError ()),
+        connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
-        QHash <string, ExtraFolderInfo> sizes;
-        QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
+        GLib.HashMap <string, ExtraFolderInfo> sizes;
+        QVERIFY (false == parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
 
-        QVERIFY (!_success);
+        QVERIFY (!this.success);
         QVERIFY (sizes.size () == 0 ); // No quota info in the XML
 
-        QVERIFY (_items.size () == 0 ); // FIXME : We should change the parser to not emit during parsing but at the end
+        QVERIFY (this.items.size () == 0 ); // FIXME : We should change the parser to not emit during parsing but at the end
 
-        QVERIFY (_subdirs.size () == 0);
+        QVERIFY (this.subdirs.size () == 0);
     }
 
 
@@ -210,21 +210,21 @@ class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect ( &parser, SIGNAL (directoryListingSubfolders (string[]&)),
+        connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
                  this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
-        connect ( &parser, SIGNAL (finishedWithoutError ()),
+        connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
-        QHash <string, ExtraFolderInfo> sizes;
-        QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
+        GLib.HashMap <string, ExtraFolderInfo> sizes;
+        QVERIFY (false == parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
 
-        QVERIFY (!_success);
+        QVERIFY (!this.success);
         QVERIFY (sizes.size () == 0 ); // No quota info in the XML
 
-        QVERIFY (_items.size () == 0 ); // FIXME : We should change the parser to not emit during parsing but at the end
-        QVERIFY (_subdirs.size () == 0);
+        QVERIFY (this.items.size () == 0 ); // FIXME : We should change the parser to not emit during parsing but at the end
+        QVERIFY (this.subdirs.size () == 0);
     }
 
 
@@ -235,21 +235,21 @@ class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect ( &parser, SIGNAL (directoryListingSubfolders (string[]&)),
+        connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
                  this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
-        connect ( &parser, SIGNAL (finishedWithoutError ()),
+        connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
-        QHash <string, ExtraFolderInfo> sizes;
-        QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
+        GLib.HashMap <string, ExtraFolderInfo> sizes;
+        QVERIFY (false == parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
 
-        QVERIFY (!_success);
+        QVERIFY (!this.success);
         QVERIFY (sizes.size () == 0 ); // No quota info in the XML
 
-        QVERIFY (_items.size () == 0 ); // FIXME : We should change the parser to not emit during parsing but at the end
-        QVERIFY (_subdirs.size () == 0);
+        QVERIFY (this.items.size () == 0 ); // FIXME : We should change the parser to not emit during parsing but at the end
+        QVERIFY (this.subdirs.size () == 0);
     }
 
 
@@ -276,16 +276,16 @@ class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect ( &parser, SIGNAL (directoryListingSubfolders (string[]&)),
+        connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
                  this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
-        connect ( &parser, SIGNAL (finishedWithoutError ()),
+        connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
-        QHash <string, ExtraFolderInfo> sizes;
-        QVERIFY (!parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
-        QVERIFY (!_success);
+        GLib.HashMap <string, ExtraFolderInfo> sizes;
+        QVERIFY (!parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" ));
+        QVERIFY (!this.success);
     }
 
 
@@ -343,16 +343,16 @@ class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect ( &parser, SIGNAL (directoryListingSubfolders (string[]&)),
+        connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
                  this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
-        connect ( &parser, SIGNAL (finishedWithoutError ()),
+        connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
-        QHash <string, ExtraFolderInfo> sizes;
-        QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
-        QVERIFY (!_success);
+        GLib.HashMap <string, ExtraFolderInfo> sizes;
+        QVERIFY (false == parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" ));
+        QVERIFY (!this.success);
     }
 
 
@@ -410,16 +410,16 @@ class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect ( &parser, SIGNAL (directoryListingSubfolders (string[]&)),
+        connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
                  this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
-        connect ( &parser, SIGNAL (finishedWithoutError ()),
+        connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
-        QHash <string, ExtraFolderInfo> sizes;
-        QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
-        QVERIFY (!_success);
+        GLib.HashMap <string, ExtraFolderInfo> sizes;
+        QVERIFY (false == parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" ));
+        QVERIFY (!this.success);
     }
 
 
@@ -477,25 +477,25 @@ class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect ( &parser, SIGNAL (directoryListingSubfolders (string[]&)),
+        connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
                  this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
-        connect ( &parser, SIGNAL (finishedWithoutError ()),
+        connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
-        QHash <string, ExtraFolderInfo> sizes;
-        QVERIFY (parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
+        GLib.HashMap <string, ExtraFolderInfo> sizes;
+        QVERIFY (parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" ));
 
-        QVERIFY (_success);
+        QVERIFY (this.success);
         QCOMPARE (sizes.size (), 1 ); // Quota info in the XML
 
-        QVERIFY (_items.contains ("/oc/remote.php/dav/sharefolder/quitte.pdf"));
-        QVERIFY (_items.contains ("/oc/remote.php/dav/sharefolder"));
-        QVERIFY (_items.size () == 2 );
+        QVERIFY (this.items.contains ("/oc/remote.php/dav/sharefolder/quitte.pdf"));
+        QVERIFY (this.items.contains ("/oc/remote.php/dav/sharefolder"));
+        QVERIFY (this.items.size () == 2 );
 
-        QVERIFY (_subdirs.contains ("/oc/remote.php/dav/sharefolder/"));
-        QVERIFY (_subdirs.size () == 1);
+        QVERIFY (this.subdirs.contains ("/oc/remote.php/dav/sharefolder/"));
+        QVERIFY (this.subdirs.size () == 1);
     }
 
 
@@ -553,17 +553,17 @@ class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect ( &parser, SIGNAL (directoryListingSubfolders (string[]&)),
+        connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
                  this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
-        connect ( &parser, SIGNAL (finishedWithoutError ()),
+        connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
-        QHash <string, ExtraFolderInfo> sizes;
-        QVERIFY (!parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
+        GLib.HashMap <string, ExtraFolderInfo> sizes;
+        QVERIFY (!parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" ));
 
-        QVERIFY (!_success);
+        QVERIFY (!this.success);
     }
 
 
@@ -621,23 +621,23 @@ class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect ( &parser, SIGNAL (directoryListingSubfolders (string[]&)),
+        connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
                  this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
-        connect ( &parser, SIGNAL (finishedWithoutError ()),
+        connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
-        QHash <string, ExtraFolderInfo> sizes;
-        QVERIFY (parser.parse ( testXml, &sizes, string.fromUtf8 ("/ä") ));
-        QVERIFY (_success);
+        GLib.HashMap <string, ExtraFolderInfo> sizes;
+        QVERIFY (parser.parse ( testXml, sizes, string.fromUtf8 ("/ä") ));
+        QVERIFY (this.success);
 
-        QVERIFY (_items.contains (string.fromUtf8 ("/ä/ä.pdf")));
-        QVERIFY (_items.contains (string.fromUtf8 ("/ä")));
-        QVERIFY (_items.size () == 2 );
+        QVERIFY (this.items.contains (string.fromUtf8 ("/ä/ä.pdf")));
+        QVERIFY (this.items.contains (string.fromUtf8 ("/ä")));
+        QVERIFY (this.items.size () == 2 );
 
-        QVERIFY (_subdirs.contains (string.fromUtf8 ("/ä")));
-        QVERIFY (_subdirs.size () == 1);
+        QVERIFY (this.subdirs.contains (string.fromUtf8 ("/ä")));
+        QVERIFY (this.subdirs.size () == 1);
     }
 
 };

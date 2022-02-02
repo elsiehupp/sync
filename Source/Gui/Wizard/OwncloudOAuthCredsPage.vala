@@ -4,7 +4,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QVariant>
+// #include <GLib.Variant>
 // #include <QMenu>
 // #include <QClipboard>
 
@@ -52,11 +52,11 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public string _user;
-    public string _token;
-    public string _refresh_token;
-    public QScopedPointer<OAuth> _async_auth;
-    public Ui_Owncloud_oauth_creds_page _ui;
+    public string this.user;
+    public string this.token;
+    public string this.refresh_token;
+    public QScopedPointer<OAuth> this.async_auth;
+    public Ui_Owncloud_oauth_creds_page this.ui;
 
 protected slots:
     void on_open_browser ();
@@ -65,32 +65,32 @@ protected slots:
 
     Owncloud_oauth_creds_page.Owncloud_oauth_creds_page ()
         : Abstract_credentials_wizard_page () {
-        _ui.setup_ui (this);
+        this.ui.setup_ui (this);
 
         Theme theme = Theme.instance ();
-        _ui.top_label.hide ();
-        _ui.bottom_label.hide ();
-        QVariant variant = theme.custom_media (Theme.o_c_setup_top);
-        WizardCommon.setup_custom_media (variant, _ui.top_label);
-        variant = theme.custom_media (Theme.o_c_setup_bottom);
-        WizardCommon.setup_custom_media (variant, _ui.bottom_label);
+        this.ui.top_label.hide ();
+        this.ui.bottom_label.hide ();
+        GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
+        WizardCommon.setup_custom_media (variant, this.ui.top_label);
+        variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_BOTTOM);
+        WizardCommon.setup_custom_media (variant, this.ui.bottom_label);
 
-        WizardCommon.init_error_label (_ui.error_label);
+        WizardCommon.init_error_label (this.ui.error_label);
 
         set_title (WizardCommon.title_template ().arg (_("Connect to %1").arg (Theme.instance ().app_name_gui ())));
         set_sub_title (WizardCommon.sub_title_template ().arg (_("Login in your browser")));
 
-        connect (_ui.open_link_button, &QCommand_link_button.clicked, this, &Owncloud_oauth_creds_page.on_open_browser);
-        connect (_ui.copy_link_button, &QCommand_link_button.clicked, this, &Owncloud_oauth_creds_page.on_copy_link_to_clipboard);
+        connect (this.ui.open_link_button, &QCommand_link_button.clicked, this, &Owncloud_oauth_creds_page.on_open_browser);
+        connect (this.ui.copy_link_button, &QCommand_link_button.clicked, this, &Owncloud_oauth_creds_page.on_copy_link_to_clipboard);
     }
 
     void Owncloud_oauth_creds_page.initialize_page () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         Q_ASSERT (oc_wizard);
         oc_wizard.account ().set_credentials (CredentialsFactory.create ("http"));
-        _async_auth.on_reset (new OAuth (oc_wizard.account ().data (), this));
-        connect (_async_auth.data (), &OAuth.result, this, &Owncloud_oauth_creds_page.on_async_auth_result, Qt.QueuedConnection);
-        _async_auth.on_start ();
+        this.async_auth.on_reset (new OAuth (oc_wizard.account ().data (), this));
+        connect (this.async_auth.data (), &OAuth.result, this, &Owncloud_oauth_creds_page.on_async_auth_result, Qt.QueuedConnection);
+        this.async_auth.on_start ();
 
         // Don't hide the wizard (avoid user confusion)!
         //wizard ().hide ();
@@ -99,7 +99,7 @@ protected slots:
     void Occ.Owncloud_oauth_creds_page.cleanup_page () {
         // The next or back button was activated, show the wizard again
         wizard ().show ();
-        _async_auth.on_reset ();
+        this.async_auth.on_reset ();
     }
 
     void Owncloud_oauth_creds_page.on_async_auth_result (OAuth.Result r, string user,
@@ -114,16 +114,16 @@ protected slots:
         }
         case OAuth.Error:
             /* Error while getting the access token.  (Timeout, or the server did not accept our client credentials */
-            _ui.error_label.show ();
+            this.ui.error_label.show ();
             wizard ().show ();
             break;
         case OAuth.LoggedIn: {
-            _token = token;
-            _user = user;
-            _refresh_token = refresh_token;
+            this.token = token;
+            this.user = user;
+            this.refresh_token = refresh_token;
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             Q_ASSERT (oc_wizard);
-            emit connect_to_oc_url (oc_wizard.account ().url ().to_"");
+            /* emit */ connect_to_oc_url (oc_wizard.account ().url ().to_"");
             break;
         }
         }
@@ -140,7 +140,7 @@ protected slots:
     AbstractCredentials *Owncloud_oauth_creds_page.get_credentials () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         Q_ASSERT (oc_wizard);
-        return new HttpCredentialsGui (_user, _token, _refresh_token,
+        return new HttpCredentialsGui (this.user, this.token, this.refresh_token,
             oc_wizard._client_cert_bundle, oc_wizard._client_cert_password);
     }
 
@@ -149,18 +149,18 @@ protected slots:
     }
 
     void Owncloud_oauth_creds_page.on_open_browser () {
-        if (_ui.error_label)
-            _ui.error_label.hide ();
+        if (this.ui.error_label)
+            this.ui.error_label.hide ();
 
         qobject_cast<OwncloudWizard> (wizard ()).account ().clear_cookie_jar (); // #6574
 
-        if (_async_auth)
-            _async_auth.open_browser ();
+        if (this.async_auth)
+            this.async_auth.open_browser ();
     }
 
     void Owncloud_oauth_creds_page.on_copy_link_to_clipboard () {
-        if (_async_auth)
-            QApplication.clipboard ().on_set_text (_async_auth.authorisation_link ().to_string (GLib.Uri.FullyEncoded));
+        if (this.async_auth)
+            QApplication.clipboard ().on_set_text (this.async_auth.authorisation_link ().to_string (GLib.Uri.FullyEncoded));
     }
 
     } // namespace Occ

@@ -51,7 +51,7 @@ signals:
     }
 
     bool Thumbnail_job.on_finished () {
-        emit job_finished (reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int (), reply ().read_all ());
+        /* emit */ job_finished (reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int (), reply ().read_all ());
         return true;
     }
     }

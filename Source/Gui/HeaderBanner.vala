@@ -112,7 +112,7 @@ class HeaderBanner : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void setup (string title, QPixmap &logo, QPixmap &banner,
+    public void setup (string title, QPixmap logo, QPixmap banner,
                const Qt.Text_format title_format, string style_sheet);
 
 
@@ -155,7 +155,7 @@ class HeaderBanner : Gtk.Widget {
         layout.add_widget (logo_label, 1, 5, 5, 1);
     }
 
-    void HeaderBanner.setup (string title, QPixmap &logo, QPixmap &banner,
+    void HeaderBanner.setup (string title, QPixmap logo, QPixmap banner,
                              const Qt.Text_format title_format, string style_sheet) {
         QStyle style = parent_widget ().style ();
         //const int layout_horizontal_spacing = style.pixel_metric (QStyle.PM_Layout_horizontal_spacing);
@@ -192,7 +192,7 @@ class HeaderBanner : Gtk.Widget {
         painter.draw_pixmap (0, 0, width (), banner_pixmap.height (), banner_pixmap);
         int x = width () - 2;
         int y = height () - 2;
-        const QPalette &pal = QGuiApplication.palette ();
+        const QPalette pal = QGuiApplication.palette ();
         painter.set_pen (pal.mid ().color ());
         painter.draw_line (0, y, x, y);
         painter.set_pen (pal.base ().color ());

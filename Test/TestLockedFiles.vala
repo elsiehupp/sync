@@ -22,7 +22,7 @@ class TestLockedFiles : GLib.Object {
 
         LockWatcher watcher;
         watcher.setCheckInterval (std.chrono.milliseconds (50));
-        connect (&watcher, &LockWatcher.fileUnlocked, &watcher, [&] (string f) { ++count; file = f; });
+        connect (&watcher, &LockWatcher.fileUnlocked, watcher, [&] (string f) { ++count; file = f; });
 
         const string tmpFile = tmp.path () + string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                                "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
@@ -41,7 +41,7 @@ class TestLockedFiles : GLib.Object {
         QVERIFY (watcher.contains (tmpFile));
 
         QEventLoop loop;
-        QTimer.singleShot (120, &loop, [&] { loop.exit (); });
+        QTimer.singleShot (120, loop, [&] { loop.exit (); });
         loop.exec ();
 
         QCOMPARE (count, 1);

@@ -17,12 +17,10 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <GLib.List>
 // #include <QLoggingCategory>
-// #include <string>
 // #include <string[]>
 // #include <QElapsedTimer>
-// #include <QHash>
+// #include <GLib.HashMap>
 // #include <QScopedPointer>
-// #include <GLib.Set>
 // #include <QDir>
 
 
@@ -109,7 +107,7 @@ signals:
 protected slots:
     // called from the implementations to indicate a change in path
     void change_detected (string path);
-    void change_detected (string[] &paths);
+    void change_detected (string[] paths);
 
 
     /***********************************************************
@@ -117,16 +115,16 @@ protected slots:
     private void on_start_notification_test_when_ready ();
 
 
-    protected QHash<string, int> _pending_pathes;
+    protected GLib.HashMap<string, int> this.pending_pathes;
 
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<Folder_watcher_private> _d;
-    private QElapsedTimer _timer;
-    private GLib.Set<string> _last_paths;
-    private Folder _folder;
-    private bool _is_reliable = true;
+    private QScopedPointer<Folder_watcher_private> this.d;
+    private QElapsedTimer this.timer;
+    private GLib.Set<string> this.last_paths;
+    private Folder this.folder;
+    private bool this.is_reliable = true;
 
     /***********************************************************
     ***********************************************************/
@@ -136,7 +134,7 @@ protected slots:
     /***********************************************************
     Path of the expected test notification
     ***********************************************************/
-    private string _test_notification_path;
+    private string this.test_notification_path;
 
     /***********************************************************
     ***********************************************************/
@@ -145,24 +143,24 @@ protected slots:
 
     Folder_watcher.Folder_watcher (Folder folder)
         : GLib.Object (folder)
-        , _folder (folder) {
+        , this.folder (folder) {
     }
 
     Folder_watcher.~Folder_watcher () = default;
 
     void Folder_watcher.on_init (string root) {
-        _d.on_reset (new Folder_watcher_private (this, root));
-        _timer.on_start ();
+        this.d.on_reset (new Folder_watcher_private (this, root));
+        this.timer.on_start ();
     }
 
     bool Folder_watcher.path_is_ignored (string path) {
         if (path.is_empty ())
             return true;
-        if (!_folder)
+        if (!this.folder)
             return false;
 
     #ifndef OWNCLOUD_TEST
-        if (_folder.is_file_excluded_absolute (path) && !Utility.is_conflict_file (path)) {
+        if (this.folder.is_file_excluded_absolute (path) && !Utility.is_conflict_file (path)) {
             GLib.debug (lc_folder_watcher) << "* Ignoring file" << path;
             return true;
         }
@@ -171,7 +169,7 @@ protected slots:
     }
 
     bool Folder_watcher.is_reliable () {
-        return _is_reliable;
+        return this.is_reliable;
     }
 
     void Folder_watcher.append_sub_paths (QDir dir, string[]& sub_paths) {
@@ -188,8 +186,8 @@ protected slots:
     }
 
     void Folder_watcher.start_notificaton_test (string path) {
-        Q_ASSERT (_test_notification_path.is_empty ());
-        _test_notification_path = path;
+        Q_ASSERT (this.test_notification_path.is_empty ());
+        this.test_notification_path = path;
 
         // Don't do the local file modification immediately:
         // wait for Folder_watch_private._ready
@@ -197,12 +195,12 @@ protected slots:
     }
 
     void Folder_watcher.on_start_notification_test_when_ready () {
-        if (!_d._ready) {
+        if (!this.d._ready) {
             QTimer.single_shot (1000, this, &Folder_watcher.on_start_notification_test_when_ready);
             return;
         }
 
-        var path = _test_notification_path;
+        var path = this.test_notification_path;
         if (GLib.File.exists (path)) {
             var mtime = FileSystem.get_mod_time (path);
             FileSystem.set_mod_time (path, mtime + 1);
@@ -212,15 +210,15 @@ protected slots:
         }
 
         QTimer.single_shot (5000, this, [this] () {
-            if (!_test_notification_path.is_empty ())
-                emit became_unreliable (_("The watcher did not receive a test notification."));
-            _test_notification_path.clear ();
+            if (!this.test_notification_path.is_empty ())
+                /* emit */ became_unreliable (_("The watcher did not receive a test notification."));
+            this.test_notification_path.clear ();
         });
     }
 
     int Folder_watcher.test_linux_watch_count () {
     #ifdef Q_OS_LINUX
-        return _d.test_watch_count ();
+        return this.d.test_watch_count ();
     #else
         return -1;
     #endif
@@ -236,7 +234,7 @@ protected slots:
         change_detected (paths);
     }
 
-    void Folder_watcher.change_detected (string[] &paths) {
+    void Folder_watcher.change_detected (string[] paths) {
         // TODO : this shortcut doesn't look very reliable:
         //   - why is the timeout only 1 second?
         //   - what if there is more than one file being updated frequently?
@@ -244,21 +242,21 @@ protected slots:
 
         // Check if the same path was reported within the last second.
         GLib.Set<string> paths_set = paths.to_set ();
-        if (paths_set == _last_paths && _timer.elapsed () < 1000) {
+        if (paths_set == this.last_paths && this.timer.elapsed () < 1000) {
             // the same path was reported within the last second. Skip.
             return;
         }
-        _last_paths = paths_set;
-        _timer.restart ();
+        this.last_paths = paths_set;
+        this.timer.restart ();
 
         GLib.Set<string> changed_paths;
 
         // ------- handle ignores:
         for (int i = 0; i < paths.size (); ++i) {
             string path = paths[i];
-            if (!_test_notification_path.is_empty ()
-                && Utility.file_names_equal (path, _test_notification_path)) {
-                _test_notification_path.clear ();
+            if (!this.test_notification_path.is_empty ()
+                && Utility.filenames_equal (path, this.test_notification_path)) {
+                this.test_notification_path.clear ();
             }
             if (path_is_ignored (path)) {
                 continue;
@@ -272,7 +270,7 @@ protected slots:
 
         q_c_info (lc_folder_watcher) << "Detected changes in paths:" << changed_paths;
         foreach (string path, changed_paths) {
-            emit path_changed (path);
+            /* emit */ path_changed (path);
         }
     }
 

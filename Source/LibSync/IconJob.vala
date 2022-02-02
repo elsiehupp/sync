@@ -49,11 +49,11 @@ signals:
 
         const var network_error = reply.error ();
         if (network_error != QNetworkReply.NoError) {
-            emit error (network_error);
+            /* emit */ error (network_error);
             return;
         }
 
-        emit job_finished (reply.read_all ());
+        /* emit */ job_finished (reply.read_all ());
     }
     }
     

@@ -4,7 +4,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.DateTime>
 // #include <QDir>
 // #include <GLib.Uri>
 // #include <GLib.File>
@@ -15,7 +14,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 // #pragma once
 
-// #include <string>
 // #include <ctime>
 // #include <QFileInfo>
 // #include <QLoggingCategory>
@@ -138,29 +136,29 @@ namespace FileSystem {
 
 
     /***********************************************************
-    @brief Rename the file \a origin_file_name to
-    \a destination_file_name.
+    @brief Rename the file \a origin_filename to
+    \a destination_filename.
 
     It behaves as GLib.File.rename () but handles .lnk files
     correctly on Windows.
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool rename (string origin_file_name,
-        const string destination_file_name,
+    bool rename (string origin_filename,
+        const string destination_filename,
         string error_string = "") {
         bool on_success = false;
         string error;
 
-        GLib.File orig (origin_file_name);
-        on_success = orig.rename (destination_file_name);
+        GLib.File orig (origin_filename);
+        on_success = orig.rename (destination_filename);
         if (!on_success) {
             error = orig.error_string ();
         }
 
         if (!on_success) {
-            GLib.warn (lc_file_system) << "Error renaming file" << origin_file_name
-                                    << "to" << destination_file_name
+            GLib.warn (lc_file_system) << "Error renaming file" << origin_filename
+                                    << "to" << destination_filename
                                     << "failed : " << error;
             if (error_string) {
                 *error_string = error;
@@ -171,30 +169,30 @@ namespace FileSystem {
 
 
     /***********************************************************
-    Rename the file \a origin_file_name to
-    \a destination_file_name, and overwrite the destination if
+    Rename the file \a origin_filename to
+    \a destination_filename, and overwrite the destination if
     it already exists, without extra checks.
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool unchecked_rename_replace (string origin_file_name,
-        const string destination_file_name,
+    bool unchecked_rename_replace (string origin_filename,
+        const string destination_filename,
         string error_string) {
 
         bool on_success = false;
-        GLib.File orig (origin_file_name);
+        GLib.File orig (origin_filename);
         // We want a rename that also overwites.  GLib.File.rename does not overwite.
         // Qt 5.1 has QSave_file.rename_overwrite we could use.
         // ### FIXME
         on_success = true;
-        bool dest_exists = file_exists (destination_file_name);
-        if (dest_exists && !GLib.File.remove (destination_file_name)) {
+        bool dest_exists = file_exists (destination_filename);
+        if (dest_exists && !GLib.File.remove (destination_filename)) {
             *error_string = orig.error_string ();
             GLib.warn (lc_file_system) << "Target file could not be removed.";
             on_success = false;
         }
         if (on_success) {
-            on_success = orig.rename (destination_file_name);
+            on_success = orig.rename (destination_filename);
         }
         if (!on_success) {
             *error_string = orig.error_string ();
@@ -214,8 +212,8 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool remove (string file_name, string error_string = "") {
-        GLib.File f (file_name);
+    bool remove (string filename, string error_string = "") {
+        GLib.File f (filename);
         if (!f.remove ()) {
             if (error_string) {
                 *error_string = f.error_string ();
@@ -250,12 +248,12 @@ namespace FileSystem {
             return false; //mkpath will return true if path exists
         }
 
-        QFileInfo f (file_name);
+        QFileInfo f (filename);
 
         QDir file;
         int suffix_number = 1;
-        if (file.exists (trash_file_path + f.file_name ())) { //file in trash already exists, move to "filename.1"
-            string path = trash_file_path + f.file_name () + '.';
+        if (file.exists (trash_file_path + f.filename ())) { //file in trash already exists, move to "filename.1"
+            string path = trash_file_path + f.filename () + '.';
             while (file.exists (path + string.number (suffix_number))) { //or to "filename.2" if "filename.1" exists, etc
                 suffix_number++;
             }
@@ -265,21 +263,21 @@ namespace FileSystem {
                 return false;
             }
         } else {
-            if (!file.rename (f.absolute_file_path (), trash_file_path + f.file_name ())) { // rename (file old path, file trash path)
+            if (!file.rename (f.absolute_file_path (), trash_file_path + f.filename ())) { // rename (file old path, file trash path)
                 *error_string = QCoreApplication.translate ("FileSystem", R" (Could not move "%1" to "%2")")
-                                   .arg (f.absolute_file_path (), trash_file_path + f.file_name ());
+                                   .arg (f.absolute_file_path (), trash_file_path + f.filename ());
                 return false;
             }
         }
 
         // create file format for trash info file----- START
         GLib.File info_file;
-        if (file.exists (trash_info_path + f.file_name () + ".trashinfo")) { //Trash_info file already exists, create "filename.1.trashinfo"
-            string filename = trash_info_path + f.file_name () + '.' + string.number (suffix_number) + ".trashinfo";
-            info_file.set_file_name (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
+        if (file.exists (trash_info_path + f.filename () + ".trashinfo")) { //Trash_info file already exists, create "filename.1.trashinfo"
+            string filename = trash_info_path + f.filename () + '.' + string.number (suffix_number) + ".trashinfo";
+            info_file.set_filename (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
         } else {
-            string filename = trash_info_path + f.file_name () + ".trashinfo";
-            info_file.set_file_name (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
+            string filename = trash_info_path + f.filename () + ".trashinfo";
+            info_file.set_filename (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
         }
 
         info_file.open (QIODevice.ReadWrite);
@@ -288,7 +286,7 @@ namespace FileSystem {
 
         stream << "[Trash Info]\n"
                << "Path="
-               << GLib.Uri.to_percent_encoding (f.absolute_file_path (), "~_-./")
+               << GLib.Uri.to_percent_encoding (f.absolute_file_path (), "~this.-./")
                << "\n"
                << "Deletion_date="
                << GLib.DateTime.current_date_time ().to_string (Qt.ISODate)
@@ -305,7 +303,7 @@ namespace FileSystem {
     Replacement for GLib.File.open (ReadOnly) followed by a seek ().
     This version sets a more permissive sharing mode on Windows.
 
-    Warning : The resulting file may have an empty file_name and be unsuitable for use
+    Warning : The resulting file may have an empty filename and be unsuitable for use
     with QFileInfo! Calling seek () on the GLib.File with >32bit signed values will fail!
 
     OCSYNC_EXPORT
@@ -333,8 +331,8 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool is_file_locked (string file_name) {
-        Q_UNUSED (file_name);
+    bool is_file_locked (string filename) {
+        Q_UNUSED (filename);
         return false;
     }
 

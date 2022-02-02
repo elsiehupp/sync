@@ -6,12 +6,10 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 // #pragma once
 
-// #include <string>
 // #include <QMetaType>
 // #include <GLib.Uri>
-// #include <GLib.DateTime>
 // #include <QtGlobal>
-// #include <QVariant>
+// #include <GLib.Variant>
 
 // #include <vector>
 
@@ -25,20 +23,20 @@ enum class ClearAtType {
 
 // TODO: If we can use C++17 make it a std.variant
 struct ClearAt {
-    ClearAtType _type = ClearAtType.Period;
+    ClearAtType this.type = ClearAtType.Period;
 
-    uint64 _timestamp;
-    int _period;
-    string _endof;
+    uint64 this.timestamp;
+    int this.period;
+    string this.endof;
 };
 
 class UserStatus {
-    Q_GADGET
+    // Q_GADGET
 
-    Q_PROPERTY (string id MEMBER _id)
-    Q_PROPERTY (string message MEMBER _message)
-    Q_PROPERTY (string icon MEMBER _icon)
-    Q_PROPERTY (OnlineStatus state MEMBER _state)
+    Q_PROPERTY (string id MEMBER this.id)
+    Q_PROPERTY (string message MEMBER this.message)
+    Q_PROPERTY (string icon MEMBER this.icon)
+    Q_PROPERTY (OnlineStatus state MEMBER this.state)
 
 
     /***********************************************************
@@ -58,7 +56,7 @@ class UserStatus {
     /***********************************************************
     ***********************************************************/
     public UserStatus (string id, string message, string icon,
-        OnlineStatus state, bool message_predefined, Optional<ClearAt> &clear_at = {});
+        OnlineStatus state, bool message_predefined, Optional<ClearAt> clear_at = {});
 
 
     /***********************************************************
@@ -89,27 +87,27 @@ class UserStatus {
     Q_REQUIRED_RESULT
     ***********************************************************/
     public Optional<ClearAt> clear_at () {
-        return _clear_at;
+        return this.clear_at;
     }
 
     /***********************************************************
     ***********************************************************/
     public void set_id (string id) {
-        _id = id;
+        this.id = id;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void UserStatus.set_message (string message) {
-        _message = message;
+        this.message = message;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void set_state (OnlineStatus state) {
-        _state = state;
+        this.state = state;
     }
 
 
@@ -117,21 +115,21 @@ class UserStatus {
     /***********************************************************
     ***********************************************************/
     public void set_icon (string icon) {
-        _icon = icon;
+        this.icon = icon;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void set_message_predefined (bool value) {
-        _message_predefined = value;
+        this.message_predefined = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void set_clear_at (Optional<ClearAt> date_time) {
-        _clear_at = date_time;
+        this.clear_at = date_time;
     }
 
     //  Q_REQUIRED_RESULT
@@ -143,12 +141,12 @@ class UserStatus {
 
     /***********************************************************
     ***********************************************************/
-    private string _id;
-    private string _message;
-    private string _icon;
-    private OnlineStatus _state = OnlineStatus.Online;
-    private bool _message_predefined;
-    private Optional<ClearAt> _clear_at;
+    private string this.id;
+    private string this.message;
+    private string this.icon;
+    private OnlineStatus this.state = OnlineStatus.Online;
+    private bool this.message_predefined;
+    private Optional<ClearAt> this.clear_at;
 };
 
 class UserStatusConnector : GLib.Object {
@@ -180,7 +178,7 @@ class UserStatusConnector : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual void set_user_status (UserStatus &user_status);
+    public virtual void set_user_status (UserStatus user_status);
 
     /***********************************************************
     ***********************************************************/
@@ -191,8 +189,8 @@ class UserStatusConnector : GLib.Object {
     public virtual UserStatus user_status ();
 
 signals:
-    void user_status_fetched (UserStatus &user_status);
-    void predefined_statuses_fetched (std.vector<UserStatus> &statuses);
+    void user_status_fetched (UserStatus user_status);
+    void predefined_statuses_fetched (std.vector<UserStatus> statuses);
     void user_status_set ();
     void message_cleared ();
     void error (Error error);
@@ -203,37 +201,37 @@ signals:
 
     UserStatus.UserStatus (
         const string id, string message, string icon,
-        OnlineStatus state, bool message_predefined, Optional<ClearAt> &clear_at)
-        : _id (id)
-        , _message (message)
-        , _icon (icon)
-        , _state (state)
-        , _message_predefined (message_predefined)
-        , _clear_at (clear_at) {
+        OnlineStatus state, bool message_predefined, Optional<ClearAt> clear_at)
+        : this.id (id)
+        , this.message (message)
+        , this.icon (icon)
+        , this.state (state)
+        , this.message_predefined (message_predefined)
+        , this.clear_at (clear_at) {
     }
 
     string UserStatus.id () {
-        return _id;
+        return this.id;
     }
 
     string UserStatus.message () {
-        return _message;
+        return this.message;
     }
 
     string UserStatus.icon () {
-        return _icon;
+        return this.icon;
     }
 
     var UserStatus.state () . OnlineStatus {
-        return _state;
+        return this.state;
     }
 
     bool UserStatus.message_predefined () {
-        return _message_predefined;
+        return this.message_predefined;
     }
 
     GLib.Uri UserStatus.state_icon () {
-        switch (_state) {
+        switch (this.state) {
         case UserStatus.OnlineStatus.Away:
             return Theme.instance ().status_away_image_source ();
 

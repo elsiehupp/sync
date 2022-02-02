@@ -5,7 +5,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 // #include <QMetaType>
-// #include <string>
 
 namespace Occ {
 
@@ -29,8 +28,8 @@ class SyncFileStatus {
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileStatusTag _tag;
-    private bool _shared = false;
+    private SyncFileStatusTag this.tag;
+    private bool this.shared = false;
 
 
     /***********************************************************
@@ -73,7 +72,7 @@ class SyncFileStatus {
         string status_string = "";
         bool can_be_shared = true;
 
-        switch (_tag) {
+        switch (this.tag) {
         case SyncFileStatusTag.STATUS_NONE:
             status_string = "NOP";
             can_be_shared = false;
@@ -96,7 +95,7 @@ class SyncFileStatus {
             status_string = "IGNORE";
             break;
         }
-        if (can_be_shared && _shared) {
+        if (can_be_shared && this.shared) {
             status_string += "+SWM";
         }
 
@@ -105,12 +104,12 @@ class SyncFileStatus {
 
 
 
-    //  inline bool operator== (SyncFileStatus &a, SyncFileStatus &b) {
+    //  inline bool operator== (SyncFileStatus a, SyncFileStatus b) {
     //      return a.tag () == b.tag () && a.shared () == b.shared ();
     //  }
 
 
-    //  inline bool operator!= (SyncFileStatus &a, SyncFileStatus &b) {
+    //  inline bool operator!= (SyncFileStatus a, SyncFileStatus b) {
     //      return ! (a == b);
     //  }
 }

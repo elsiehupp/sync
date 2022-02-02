@@ -40,14 +40,14 @@ class FolderCreationDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private 
-    private string _destination;
+    private string this.destination;
 };
 
 
     FolderCreationDialog.FolderCreationDialog (string destination, Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.FolderCreationDialog)
-        , _destination (destination) {
+        , this.destination (destination) {
         ui.setup_ui (this);
 
         ui.label_error_message.set_visible (false);
@@ -58,7 +58,7 @@ class FolderCreationDialog : Gtk.Dialog {
 
         const string suggested_folder_name_prefix = GLib.Object._("New folder");
 
-        const string new_folder_full_path = _destination + '/' + suggested_folder_name_prefix;
+        const string new_folder_full_path = this.destination + '/' + suggested_folder_name_prefix;
         if (!QDir (new_folder_full_path).exists ()) {
             ui.new_folder_name_edit.on_set_text (suggested_folder_name_prefix);
         } else {
@@ -81,14 +81,14 @@ class FolderCreationDialog : Gtk.Dialog {
     }
 
     void FolderCreationDialog.on_accept () {
-        Q_ASSERT (!_destination.ends_with ('/'));
+        Q_ASSERT (!this.destination.ends_with ('/'));
 
-        if (QDir (_destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
+        if (QDir (this.destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
             ui.label_error_message.set_visible (true);
             return;
         }
 
-        if (!QDir (_destination).mkdir (ui.new_folder_name_edit.text ())) {
+        if (!QDir (this.destination).mkdir (ui.new_folder_name_edit.text ())) {
             QMessageBox.critical (this, _("Error"), _("Could not create a folder! Check your write permissions."));
         }
 
@@ -96,7 +96,7 @@ class FolderCreationDialog : Gtk.Dialog {
     }
 
     void FolderCreationDialog.on_new_folder_name_edit_text_edited () {
-        if (!ui.new_folder_name_edit.text ().is_empty () && QDir (_destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
+        if (!ui.new_folder_name_edit.text ().is_empty () && QDir (this.destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
             ui.label_error_message.set_visible (true);
         } else {
             ui.label_error_message.set_visible (false);

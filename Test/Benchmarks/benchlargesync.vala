@@ -13,7 +13,7 @@ int numDirs = 0;
 int numFiles = 0;
 
 template<int filesPerDir, int dirPerDir, int maxDepth>
-void addBunchOfFiles (int depth, string path, FileModifier &fi) {
+void addBunchOfFiles (int depth, string path, FileModifier fi) {
     for (int fileNum = 1; fileNum <= filesPerDir; ++fileNum) {
         string name = QStringLiteral ("file") + string.number (fileNum);
         fi.insert (path.isEmpty () ? name : path + "/" + name);

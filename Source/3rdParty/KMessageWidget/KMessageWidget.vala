@@ -294,7 +294,7 @@ class KMessageWidget : QFrame {
     Define an icon to be shown on the left of the text
     @since 4.11
     ***********************************************************/
-    public on_ void set_icon (QIcon &icon);
+    public on_ void set_icon (QIcon icon);
 
 signals:
     /***********************************************************
@@ -554,7 +554,7 @@ class KMessageWidgetPrivate {
     }
 
     void KMessageWidgetPrivate.apply_style_sheet () {
-        QColor bg_base_color;
+        Gtk.Color bg_base_color;
 
         // We have to hardcode colors here because KWidgets_addons is a tier 1 framework
         // and therefore can't depend on any other KDE Frameworks
@@ -577,16 +577,16 @@ class KMessageWidgetPrivate {
         bg_base_color.set_alpha_f (bg_base_color_alpha);
 
         const QPalette palette = QGuiApplication.palette ();
-        const QColor window_color = palette.window ().color ();
-        const QColor text_color = palette.text ().color ();
-        const QColor border = bg_base_color;
+        const Gtk.Color window_color = palette.window ().color ();
+        const Gtk.Color text_color = palette.text ().color ();
+        const Gtk.Color border = bg_base_color;
 
         // Generate a final background color from overlaying bg_base_color over window_color
         const int new_red = q_round (bg_base_color.red () * bg_base_color_alpha) + q_round (window_color.red () * (1 - bg_base_color_alpha));
         const int new_green = q_round (bg_base_color.green () * bg_base_color_alpha) + q_round (window_color.green () * (1 - bg_base_color_alpha));
         const int new_blue = q_round (bg_base_color.blue () * bg_base_color_alpha) + q_round (window_color.blue () * (1 - bg_base_color_alpha));
 
-        const QColor bg_final_color = QColor (new_red, new_green, new_blue);
+        const Gtk.Color bg_final_color = Gtk.Color (new_red, new_green, new_blue);
 
         content.set_style_sheet (
             string.from_latin1 (".QFrame {"
@@ -635,11 +635,11 @@ class KMessageWidgetPrivate {
             content.set_geometry (0, 0, q.width (), best_content_height ());
 
             // notify about on_finished animation
-            emit q.show_animation_finished ();
+            /* emit */ q.show_animation_finished ();
         } else {
             // hide and notify about on_finished animation
             q.hide ();
-            emit q.hide_animation_finished ();
+            /* emit */ q.hide_animation_finished ();
         }
     }
 
@@ -777,18 +777,18 @@ class KMessageWidgetPrivate {
         // Test before style_hint, as there might have been a style change while animation was running
         if (is_hide_animation_running ()) {
             d.time_line.stop ();
-            emit hide_animation_finished ();
+            /* emit */ hide_animation_finished ();
         }
 
         if (!style ().style_hint (QStyle.SH_Widget_Animate, nullptr, this)
          || (parent_widget () && !parent_widget ().is_visible ())) {
             show ();
-            emit show_animation_finished ();
+            /* emit */ show_animation_finished ();
             return;
         }
 
         if (is_visible () && (d.time_line.state () == QTime_line.Not_running) && (height () == d.best_content_height ()) && (d.content.pos ().y () == 0)) {
-            emit show_animation_finished ();
+            /* emit */ show_animation_finished ();
             return;
         }
 
@@ -813,19 +813,19 @@ class KMessageWidgetPrivate {
         // And before style_hint, as there might have been a style change while animation was running
         if (is_show_animation_running ()) {
             d.time_line.stop ();
-            emit show_animation_finished ();
+            /* emit */ show_animation_finished ();
         }
 
         if (!style ().style_hint (QStyle.SH_Widget_Animate, nullptr, this)) {
             hide ();
-            emit hide_animation_finished ();
+            /* emit */ hide_animation_finished ();
             return;
         }
 
         if (!is_visible ()) {
             // explicitly hide it, so it stays hidden in case it is only not visible due to the parents
             hide ();
-            emit hide_animation_finished ();
+            /* emit */ hide_animation_finished ();
             return;
         }
 
@@ -852,7 +852,7 @@ class KMessageWidgetPrivate {
         return d.icon;
     }
 
-    void KMessageWidget.set_icon (QIcon &icon) {
+    void KMessageWidget.set_icon (QIcon icon) {
         d.icon = icon;
         if (d.icon.is_null ()) {
             d.icon_label.hide ();

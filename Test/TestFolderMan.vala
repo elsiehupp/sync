@@ -13,7 +13,7 @@ using namespace Occ;
 
 class TestFolderMan : public GLib.Object {
 
-    FolderMan _fm;
+    FolderMan this.fm;
 
     /***********************************************************
     ***********************************************************/
@@ -40,13 +40,13 @@ class TestFolderMan : public GLib.Object {
 
         AccountStatePtr newAccountState (new AccountState (account));
         FolderMan folderman = FolderMan.instance ();
-        QCOMPARE (folderman, &_fm);
+        QCOMPARE (folderman, this.fm);
         QVERIFY (folderman.addFolder (newAccountState.data (), folderDefinition (dirPath + "/sub/ownCloud1")));
         QVERIFY (folderman.addFolder (newAccountState.data (), folderDefinition (dirPath + "/ownCloud2")));
 
         const var folderList = folderman.map ();
 
-        for (var &folder : folderList) {
+        for (var folder : folderList) {
             QVERIFY (!folder.isSyncRunning ());
         }
 
@@ -153,7 +153,7 @@ class TestFolderMan : public GLib.Object {
 
         AccountStatePtr newAccountState (new AccountState (account));
         FolderMan folderman = FolderMan.instance ();
-        QCOMPARE (folderman, &_fm);
+        QCOMPARE (folderman, this.fm);
         QVERIFY (folderman.addFolder (newAccountState.data (), folderDefinition (dirPath + "/sub/ownCloud/")));
         QVERIFY (folderman.addFolder (newAccountState.data (), folderDefinition (dirPath + "/ownCloud2/")));
 

@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 // #include <sys/types.h>
 // #include <sys/stat.h>
 
-#ifdef _WIN32
+#ifdef this.WIN32
 // #include <windows.h>
 // #include <windef.h>
 // #include <winbase.h>
@@ -60,15 +60,15 @@ const int gid_t int
 const int nlink_t int
 const int getuid () 0
 const int geteuid () 0
-#elif defined (_WIN32)
+#elif defined (this.WIN32)
 const int mode_t int
 #else
 // #include <fcntl.h>
 #endif
 
-#ifdef _WIN32
+#ifdef this.WIN32
 using csync_stat_t = struct stat64;
-const int _FILE_OFFSET_BITS 64
+const int this.FILE_OFFSET_BITS 64
 #else
 using csync_stat_t = struct stat;
 #endif
@@ -78,67 +78,67 @@ const int O_NOATIME 0
 #endif
 
 #ifndef HAVE_LSTAT
-const int lstat _stat
+const int lstat this.stat
 #endif
 
 /* tchar definitions for clean win32 filenames */
-#ifndef _UNICODE
-const int _UNICODE
+#ifndef this.UNICODE
+const int this.UNICODE
 #endif
 
-#if defined _WIN32 && defined _UNICODE
+#if defined this.WIN32 && defined this.UNICODE
 using mbchar_t = wchar_t;
-const int _topen           _wopen
-const int _tdirent         _wdirent
-const int _topendir        _wopendir
-const int _tclosedir       _wclosedir
-const int _treaddir        _wreaddir
-const int _trewinddir      _wrewinddir
-const int _ttelldir        _wtelldir
-const int _tseekdir        _wseekdir
-const int _tcreat          _wcreat
-const int _tstat           _wstat64
-const int _tfstat          _fstat64
-const int _tunlink         _wunlink
-const int _tmkdir (X,Y)     _wmkdir (X)
-const int _trmdir	         _wrmdir
-const int _tchmod          _wchmod
-const int _trewinddir      _wrewinddir
-const int _tchown (X, Y, Z)  0 /* no chown on Win32 */
-const int _tchdir          _wchdir
-const int _tgetcwd         _wgetcwd
+const int this.topen           this.wopen
+const int this.tdirent         this.wdirent
+const int this.topendir        this.wopendir
+const int this.tclosedir       this.wclosedir
+const int this.treaddir        this.wreaddir
+const int this.trewinddir      this.wrewinddir
+const int this.ttelldir        this.wtelldir
+const int this.tseekdir        this.wseekdir
+const int this.tcreat          this.wcreat
+const int this.tstat           this.wstat64
+const int this.tfstat          this.fstat64
+const int this.tunlink         this.wunlink
+const int this.tmkdir (X,Y)     this.wmkdir (X)
+const int this.trmdir	         this.wrmdir
+const int this.tchmod          this.wchmod
+const int this.trewinddir      this.wrewinddir
+const int this.tchown (X, Y, Z)  0 /* no chown on Win32 */
+const int this.tchdir          this.wchdir
+const int this.tgetcwd         this.wgetcwd
 #else
 using mbchar_t = char;
-const int _tdirent       dirent
-const int _topen         open
-const int _topendir      opendir
-const int _tclosedir     closedir
-const int _treaddir      readdir
-const int _trewinddir    rewinddir
-const int _ttelldir      telldir
-const int _tseekdir      seekdir
-const int _tcreat        creat
-const int _tstat         lstat
-const int _tfstat        fstat
-const int _tunlink       unlink
-const int _tmkdir (X,Y)   mkdir (X,Y)
-const int _trmdir	       rmdir
-const int _tchmod        chmod
-const int _trewinddir    rewinddir
-const int _tchown (X,Y,Z) chown (X,Y,Z)
-const int _tchdir        chdir
-const int _tgetcwd       getcwd
+const int this.tdirent       dirent
+const int this.topen         open
+const int this.topendir      opendir
+const int this.tclosedir     closedir
+const int this.treaddir      readdir
+const int this.trewinddir    rewinddir
+const int this.ttelldir      telldir
+const int this.tseekdir      seekdir
+const int this.tcreat        creat
+const int this.tstat         lstat
+const int this.tfstat        fstat
+const int this.tunlink       unlink
+const int this.tmkdir (X,Y)   mkdir (X,Y)
+const int this.trmdir	       rmdir
+const int this.tchmod        chmod
+const int this.trewinddir    rewinddir
+const int this.tchown (X,Y,Z) chown (X,Y,Z)
+const int this.tchdir        chdir
+const int this.tgetcwd       getcwd
 #endif
 
 /* FIXME : Implement TLS for OS X */
 #if defined (__GNUC__) && !defined (__APPLE__)
 # define CSYNC_THREAD __thread
-#elif defined (_MSC_VER)
+#elif defined (this.MSC_VER)
 # define CSYNC_THREAD __declspec (thread)
 #else
 # define CSYNC_THREAD
 #endif
 
-#endif //_C_PRIVATE_H
+#endif //this.C_PRIVATE_H
 
 /* vim : set ft=c.doxygen ts=8 sw=2 et cindent : */

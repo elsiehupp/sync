@@ -178,7 +178,7 @@ class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_file_names_equal () {
+    private void on_test_filenames_equal () {
         QTemporaryDir dir;
         QVERIFY (dir.isValid ());
         QDir dir2 (dir.path ());
@@ -208,7 +208,7 @@ class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_sanitize_for_file_name_data () {
+    private void on_test_sanitize_for_filename_data () {
         QTest.addColumn<string> ("input");
         QTest.addColumn<string> ("output");
 

@@ -26,7 +26,7 @@ namespace Occ {
 
 
 namespace {
-    const char* encrypted_file_name_property_key = "encrypted_file_name";
+    const char* encrypted_filename_property_key = "encrypted_filename";
 }
 
 class Propagate_remote_delete_encrypted_root_folder : AbstractPropagateRemoteDeleteEncrypted {
@@ -43,7 +43,7 @@ class Propagate_remote_delete_encrypted_root_folder : AbstractPropagateRemoteDel
     /***********************************************************
     ***********************************************************/
     private void on_folder_un_locked_successfully (GLib.ByteArray folder_id) override;
-    private void on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code) override;
+    private void on_folder_encrypted_metadata_received (QJsonDocument json, int status_code) override;
     private void on_delete_nested_remote_item_finished ();
 
     /***********************************************************
@@ -53,7 +53,7 @@ class Propagate_remote_delete_encrypted_root_folder : AbstractPropagateRemoteDel
     /***********************************************************
     ***********************************************************/
     private 
-    private QMap<string, Occ.SyncJournalFileRecord> _nested_items; // Nested files and folders
+    private QMap<string, Occ.SyncJournalFileRecord> this.nested_items; // Nested files and folders
 };
 
 
@@ -72,19 +72,19 @@ Propagate_remote_delete_encrypted_root_folder.Propagate_remote_delete_encrypted_
 }
 
 void Propagate_remote_delete_encrypted_root_folder.on_start () {
-    Q_ASSERT (_item._is_encrypted);
+    Q_ASSERT (this.item._is_encrypted);
 
-    const bool list_files_result = _propagator._journal.list_files_in_path (_item._file.to_utf8 (), [this] (Occ.SyncJournalFileRecord &record) {
-        _nested_items[record._e2e_mangled_name] = record;
+    const bool list_files_result = this.propagator._journal.list_files_in_path (this.item._file.to_utf8 (), [this] (Occ.SyncJournalFileRecord record) {
+        this.nested_items[record._e2e_mangled_name] = record;
     });
 
-    if (!list_files_result || _nested_items.is_empty ()) {
+    if (!list_files_result || this.nested_items.is_empty ()) {
         // if the folder is empty, just decrypt and delete it
         decrypt_and_remote_delete ();
         return;
     }
 
-    start_ls_col_job (_item._file);
+    start_ls_col_job (this.item._file);
 }
 
 void Propagate_remote_delete_encrypted_root_folder.on_folder_un_locked_successfully (GLib.ByteArray folder_id) {
@@ -92,17 +92,17 @@ void Propagate_remote_delete_encrypted_root_folder.on_folder_un_locked_successfu
     decrypt_and_remote_delete ();
 }
 
-void Propagate_remote_delete_encrypted_root_folder.on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code) {
+void Propagate_remote_delete_encrypted_root_folder.on_folder_encrypted_metadata_received (QJsonDocument json, int status_code) {
     if (status_code == 404) {
-        // we've eneded up having no metadata, but, _nested_items is not empty since we went this far, let's proceed with removing the nested items without modifying the metadata
+        // we've eneded up having no metadata, but, this.nested_items is not empty since we went this far, let's proceed with removing the nested items without modifying the metadata
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "There is no metadata for this folder. Just remove it's nested items.";
-        for (var it = _nested_items.const_begin (); it != _nested_items.const_end (); ++it) {
+        for (var it = this.nested_items.const_begin (); it != this.nested_items.const_end (); ++it) {
             delete_nested_remote_item (it.key ());
         }
         return;
     }
 
-    FolderMetadata metadata (_propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
+    FolderMetadata metadata (this.propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
 
     GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "It's a root encrypted folder. Let's remove nested items first.";
 
@@ -110,10 +110,10 @@ void Propagate_remote_delete_encrypted_root_folder.on_folder_encrypted_metadata_
 
     GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Metadata updated, sending to the server.";
 
-    var job = new UpdateMetadataApiJob (_propagator.account (), _folder_id, metadata.encrypted_metadata (), _folder_token);
+    var job = new UpdateMetadataApiJob (this.propagator.account (), this.folder_id, metadata.encrypted_metadata (), this.folder_token);
     connect (job, &UpdateMetadataApiJob.on_success, this, [this] (GLib.ByteArray& file_id) {
         Q_UNUSED (file_id);
-        for (var it = _nested_items.const_begin (); it != _nested_items.const_end (); ++it) {
+        for (var it = this.nested_items.const_begin (); it != this.nested_items.const_end (); ++it) {
             delete_nested_remote_item (it.key ());
         }
     });
@@ -130,22 +130,22 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
         return;
     }
 
-    const string encrypted_file_name = delete_job.property (encrypted_file_name_property_key).to_"";
+    const string encrypted_filename = delete_job.property (encrypted_filename_property_key).to_"";
 
-    if (!encrypted_file_name.is_empty ()) {
-        const var nested_item = _nested_items.take (encrypted_file_name);
+    if (!encrypted_filename.is_empty ()) {
+        const var nested_item = this.nested_items.take (encrypted_filename);
 
         if (nested_item.is_valid ()) {
-            _propagator._journal.delete_file_record (nested_item._path, nested_item._type == ItemTypeDirectory);
-            _propagator._journal.commit ("Remote Remove");
+            this.propagator._journal.delete_file_record (nested_item._path, nested_item._type == ItemTypeDirectory);
+            this.propagator._journal.commit ("Remote Remove");
         }
     }
 
     QNetworkReply.NetworkError err = delete_job.reply ().error ();
 
     const var http_error_code = delete_job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
-    _item._response_time_stamp = delete_job.response_timestamp ();
-    _item._request_id = delete_job.request_id ();
+    this.item._response_time_stamp = delete_job.response_timestamp ();
+    this.item._request_id = delete_job.request_id ();
 
     if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
         store_first_error (err);
@@ -163,17 +163,17 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
         store_first_error_string (_("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                         .arg (http_error_code)
                         .arg (delete_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_""));
-        if (_item._http_error_code == 0) {
-            _item._http_error_code = http_error_code;
+        if (this.item._http_error_code == 0) {
+            this.item._http_error_code = http_error_code;
         }
 
         GLib.warn (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Delete nested item on_finished with error" << http_error_code << ".";
     }
 
-    if (_nested_items.size () == 0) {
-        // we wait for all _nested_items' Delete_jobs to finish, and then - fail if any of those jobs has failed
-        if (network_error () != QNetworkReply.NetworkError.NoError || _item._http_error_code != 0) {
-            const int error_code = network_error () != QNetworkReply.NetworkError.NoError ? network_error () : _item._http_error_code;
+    if (this.nested_items.size () == 0) {
+        // we wait for all this.nested_items' Delete_jobs to finish, and then - fail if any of those jobs has failed
+        if (network_error () != QNetworkReply.NetworkError.NoError || this.item._http_error_code != 0) {
+            const int error_code = network_error () != QNetworkReply.NetworkError.NoError ? network_error () : this.item._http_error_code;
             q_c_critical (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Delete of nested items on_finished with error" << error_code << ". Failing the entire sequence.";
             task_failed ();
             return;
@@ -185,9 +185,9 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
 void Propagate_remote_delete_encrypted_root_folder.delete_nested_remote_item (string filename) {
     q_c_info (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Deleting nested encrypted remote item" << filename;
 
-    var delete_job = new DeleteJob (_propagator.account (), _propagator.full_remote_path (filename), this);
-    delete_job.set_folder_token (_folder_token);
-    delete_job.set_property (encrypted_file_name_property_key, filename);
+    var delete_job = new DeleteJob (this.propagator.account (), this.propagator.full_remote_path (filename), this);
+    delete_job.set_folder_token (this.folder_token);
+    delete_job.set_property (encrypted_filename_property_key, filename);
 
     connect (delete_job, &DeleteJob.finished_signal, this, &Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_finished);
 
@@ -195,14 +195,14 @@ void Propagate_remote_delete_encrypted_root_folder.delete_nested_remote_item (st
 }
 
 void Propagate_remote_delete_encrypted_root_folder.decrypt_and_remote_delete () {
-    var job = new Occ.SetEncryptionFlagApiJob (_propagator.account (), _item._file_id, Occ.SetEncryptionFlagApiJob.Clear, this);
+    var job = new Occ.SetEncryptionFlagApiJob (this.propagator.account (), this.item._file_id, Occ.SetEncryptionFlagApiJob.Clear, this);
     connect (job, &Occ.SetEncryptionFlagApiJob.on_success, this, [this] (GLib.ByteArray file_id) {
         Q_UNUSED (file_id);
-        delete_remote_item (_item._file);
+        delete_remote_item (this.item._file);
     });
     connect (job, &Occ.SetEncryptionFlagApiJob.error, this, [this] (GLib.ByteArray file_id, int http_return_code) {
         Q_UNUSED (file_id);
-        _item._http_error_code = http_return_code;
+        this.item._http_error_code = http_return_code;
         task_failed ();
     });
     job.on_start ();

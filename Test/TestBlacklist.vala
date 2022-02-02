@@ -10,9 +10,9 @@
 
 using namespace Occ;
 
-SyncJournalFileRecord journalRecord (FakeFolder &folder, GLib.ByteArray path) {
+SyncJournalFileRecord journalRecord (FakeFolder folder, GLib.ByteArray path) {
     SyncJournalFileRecord record;
-    folder.syncJournal ().getFileRecord (path, &record);
+    folder.syncJournal ().getFileRecord (path, record);
     return record;
 }
 
@@ -36,12 +36,12 @@ class TestBlocklist : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        var &modifier = remote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
+        var modifier = remote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
 
         int counter = 0;
         const GLib.ByteArray testFileName = QByteArrayLiteral ("A/new");
         GLib.ByteArray reqId;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice *) . QNetworkReply * {
             if (req.url ().path ().endsWith (testFileName)) {
                 reqId = req.rawHeader ("X-Request-ID");
             }
@@ -65,7 +65,7 @@ class TestBlocklist : GLib.Object {
         QVERIFY (!fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.NormalError); // initial error visible
+            QCOMPARE (it._status, SyncFileItem.Status.NORMAL_ERROR); // initial error visible
             QCOMPARE (it._instruction, CSYNC_INSTRUCTION_NEW);
 
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
@@ -85,7 +85,7 @@ class TestBlocklist : GLib.Object {
         QVERIFY (!fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.BlocklistedError);
+            QCOMPARE (it._status, SyncFileItem.Status.BLOCKLISTED_ERROR);
             QCOMPARE (it._instruction, CSYNC_INSTRUCTION_IGNORE); // no retry happened!
 
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
@@ -110,7 +110,7 @@ class TestBlocklist : GLib.Object {
         QVERIFY (!fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.BlocklistedError); // blocklisted as it's just a retry
+            QCOMPARE (it._status, SyncFileItem.Status.BLOCKLISTED_ERROR); // blocklisted as it's just a retry
             QCOMPARE (it._instruction, CSYNC_INSTRUCTION_NEW); // retry!
 
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
@@ -131,7 +131,7 @@ class TestBlocklist : GLib.Object {
         QVERIFY (!fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.BlocklistedError);
+            QCOMPARE (it._status, SyncFileItem.Status.BLOCKLISTED_ERROR);
             QCOMPARE (it._instruction, CSYNC_INSTRUCTION_NEW); // retry!
 
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
@@ -157,7 +157,7 @@ class TestBlocklist : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.Success);
+            QCOMPARE (it._status, SyncFileItem.Status.SUCCESS);
             QCOMPARE (it._instruction, CSYNC_INSTRUCTION_NEW);
 
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);

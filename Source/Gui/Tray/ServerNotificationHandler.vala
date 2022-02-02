@@ -29,50 +29,50 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void on_notifications_received (QJsonDocument &json, int status_code);
+    private void on_notifications_received (QJsonDocument json, int status_code);
     private void on_etag_response_header_received (GLib.ByteArray value, int status_code);
     private void on_allow_desktop_notifications_changed (bool is_allowed);
 
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<JsonApiJob> _notification_job;
-    private AccountState _account_state;
+    private QPointer<JsonApiJob> this.notification_job;
+    private AccountState this.account_state;
 };
 
 
     Server_notification_handler.Server_notification_handler (AccountState account_state, GLib.Object parent)
         : GLib.Object (parent)
-        , _account_state (account_state) {
+        , this.account_state (account_state) {
     }
 
     void Server_notification_handler.on_fetch_notifications () {
         // check connectivity and credentials
-        if (! (_account_state && _account_state.is_connected () && _account_state.account () && _account_state.account ().credentials () && _account_state.account ().credentials ().ready ())) {
+        if (! (this.account_state && this.account_state.is_connected () && this.account_state.account () && this.account_state.account ().credentials () && this.account_state.account ().credentials ().ready ())) {
             delete_later ();
             return;
         }
         // check if the account has notifications enabled. If the capabilities are
         // not yet valid, its assumed that notifications are available.
-        if (_account_state.account ().capabilities ().is_valid ()) {
-            if (!_account_state.account ().capabilities ().notifications_available ()) {
-                q_c_info (lc_server_notification) << "Account" << _account_state.account ().display_name () << "does not have notifications enabled.";
+        if (this.account_state.account ().capabilities ().is_valid ()) {
+            if (!this.account_state.account ().capabilities ().notifications_available ()) {
+                q_c_info (lc_server_notification) << "Account" << this.account_state.account ().display_name () << "does not have notifications enabled.";
                 delete_later ();
                 return;
             }
         }
 
         // if the previous notification job has on_finished, on_start next.
-        _notification_job = new JsonApiJob (_account_state.account (), notifications_path, this);
-        GLib.Object.connect (_notification_job.data (), &JsonApiJob.json_received,
+        this.notification_job = new JsonApiJob (this.account_state.account (), notifications_path, this);
+        GLib.Object.connect (this.notification_job.data (), &JsonApiJob.json_received,
             this, &Server_notification_handler.on_notifications_received);
-        GLib.Object.connect (_notification_job.data (), &JsonApiJob.etag_response_header_received,
+        GLib.Object.connect (this.notification_job.data (), &JsonApiJob.etag_response_header_received,
             this, &Server_notification_handler.on_etag_response_header_received);
-        GLib.Object.connect (_notification_job.data (), &JsonApiJob.allow_desktop_notifications_changed,
+        GLib.Object.connect (this.notification_job.data (), &JsonApiJob.allow_desktop_notifications_changed,
                 this, &Server_notification_handler.on_allow_desktop_notifications_changed);
-        _notification_job.set_property (property_account_state_c, QVariant.from_value<AccountState> (_account_state));
-        _notification_job.add_raw_header ("If-None-Match", _account_state.notifications_etag_response_header ());
-        _notification_job.on_start ();
+        this.notification_job.set_property (property_account_state_c, GLib.Variant.from_value<AccountState> (this.account_state));
+        this.notification_job.add_raw_header ("If-None-Match", this.account_state.notifications_etag_response_header ());
+        this.notification_job.on_start ();
     }
 
     void Server_notification_handler.on_etag_response_header_received (GLib.ByteArray value, int status_code) {
@@ -90,7 +90,7 @@ signals:
         }
     }
 
-    void Server_notification_handler.on_notifications_received (QJsonDocument &json, int status_code) {
+    void Server_notification_handler.on_notifications_received (QJsonDocument json, int status_code) {
         if (status_code != success_status_code && status_code != not_modified_status_code) {
             GLib.warn (lc_server_notification) << "Notifications failed with status code " << status_code;
             delete_later ();
@@ -160,7 +160,7 @@ signals:
 
             list.append (a);
         }
-        emit new_notification_list (list);
+        /* emit */ new_notification_list (list);
 
         delete_later ();
     }

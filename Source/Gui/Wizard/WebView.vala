@@ -36,18 +36,18 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private Ui_Web_view _ui;
+    private Ui_Web_view this.ui;
 
     /***********************************************************
     ***********************************************************/
-    private QWeb_engine_view _webview;
-    private QWeb_engine_profile _profile;
-    private Web_engine_page _page;
+    private QWeb_engine_view this.webview;
+    private QWeb_engine_profile this.profile;
+    private Web_engine_page this.page;
 
     /***********************************************************
     ***********************************************************/
-    private Web_view_page_url_request_interceptor _interceptor;
-    private Web_view_page_url_scheme_handler _scheme_handler;
+    private Web_view_page_url_request_interceptor this.interceptor;
+    private Web_view_page_url_scheme_handler this.scheme_handler;
 };
 
 
@@ -60,7 +60,7 @@ class Web_view_page_url_request_interceptor : QWeb_engine_url_request_intercepto
     /***********************************************************
     ***********************************************************/
     public 
-    public void intercept_request (QWeb_engine_url_request_info &info) override;
+    public void intercept_request (QWeb_engine_url_request_info info) override;
 };
 
 class Web_view_page_url_scheme_handler : QWeb_engine_url_scheme_handler {
@@ -91,14 +91,14 @@ class Web_engine_page : QWeb_engine_page {
     public void set_url (GLib.Uri url);
 
 
-    protected bool certificate_error (QWeb_engine_certificate_error &certificate_error) override;
+    protected bool certificate_error (QWeb_engine_certificate_error certificate_error) override;
 
     protected bool accept_navigation_request (GLib.Uri url, QWeb_engine_page.Navigation_type type, bool is_main_frame) override;
 
 
     /***********************************************************
     ***********************************************************/
-    private bool _enforce_https = false;
+    private bool this.enforce_https = false;
 };
 
 // We need a separate class here, since we cannot simply return the same Web_engine_page object
@@ -117,30 +117,30 @@ class External_web_engine_page : QWeb_engine_page {
 
 WebView.WebView (Gtk.Widget parent)
     : Gtk.Widget (parent),
-      _ui () {
-    _ui.setup_ui (this);
+      this.ui () {
+    this.ui.setup_ui (this);
 #if QT_VERSION >= 0x051200
-    QWeb_engine_url_scheme _ncsheme ("nc");
-    QWeb_engine_url_scheme.register_scheme (_ncsheme);
+    QWeb_engine_url_scheme this.ncsheme ("nc");
+    QWeb_engine_url_scheme.register_scheme (this.ncsheme);
 #endif
-    _webview = new QWeb_engine_view (this);
-    _profile = new QWeb_engine_profile (this);
-    _page = new Web_engine_page (_profile);
-    _interceptor = new Web_view_page_url_request_interceptor (this);
-    _scheme_handler = new Web_view_page_url_scheme_handler (this);
+    this.webview = new QWeb_engine_view (this);
+    this.profile = new QWeb_engine_profile (this);
+    this.page = new Web_engine_page (this.profile);
+    this.interceptor = new Web_view_page_url_request_interceptor (this);
+    this.scheme_handler = new Web_view_page_url_scheme_handler (this);
 
     const string user_agent (Utility.user_agent_"");
-    _profile.set_http_user_agent (user_agent);
+    this.profile.set_http_user_agent (user_agent);
     QWeb_engine_profile.default_profile ().set_http_user_agent (user_agent);
-    _profile.set_request_interceptor (_interceptor);
-    _profile.install_url_scheme_handler ("nc", _scheme_handler);
+    this.profile.set_request_interceptor (this.interceptor);
+    this.profile.install_url_scheme_handler ("nc", this.scheme_handler);
 
 
     /***********************************************************
     Set a proper accept langauge to the language of the client
     code from : http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection
     ***********************************************************/ {
-        string system_locale = QLocale.system ().name ().replace (char.from_latin1 ('_'),char.from_latin1 ('-'));
+        string system_locale = QLocale.system ().name ().replace (char.from_latin1 ('this.'),char.from_latin1 ('-'));
         string accept_language;
         if (system_locale == QLatin1String ("C")) {
             accept_language = string.from_latin1 ("en,*");
@@ -149,31 +149,31 @@ WebView.WebView (Gtk.Widget parent)
         } else {
             accept_language = system_locale + QLatin1String (",en,*");
         }
-        _profile.set_http_accept_language (accept_language);
+        this.profile.set_http_accept_language (accept_language);
     }
 
-    _webview.set_page (_page);
-    _ui.vertical_layout.add_widget (_webview);
+    this.webview.set_page (this.page);
+    this.ui.vertical_layout.add_widget (this.webview);
 
-    connect (_webview, &QWeb_engine_view.load_progress, _ui.progress_bar, &QProgressBar.set_value);
-    connect (_scheme_handler, &Web_view_page_url_scheme_handler.on_url_catched, this, &WebView.on_url_catched);
+    connect (this.webview, &QWeb_engine_view.load_progress, this.ui.progress_bar, &QProgressBar.set_value);
+    connect (this.scheme_handler, &Web_view_page_url_scheme_handler.on_url_catched, this, &WebView.on_url_catched);
 }
 
 void WebView.set_url (GLib.Uri url) {
-    _page.set_url (url);
+    this.page.set_url (url);
 }
 
 WebView.~WebView () {
     /***********************************************************
     The Qt implmentation deletes children in the order they are added to the
-    object tree, so in this case _page is deleted after _profile, which
-    violates the assumption that _profile should exist longer than
-    _page [1]. Here I delete _page manually so that _profile can be safely
+    object tree, so in this case this.page is deleted after this.profile, which
+    violates the assumption that this.profile should exist longer than
+    this.page [1]. Here I delete this.page manually so that this.profile can be safely
     deleted later.
 
     [1] https://doc.qt.io/qt-5/qwebenginepage.html#QWeb_engine_page-1
     ***********************************************************/
-    delete _page;
+    delete this.page;
 }
 
 Web_view_page_url_request_interceptor.Web_view_page_url_request_interceptor (GLib.Object parent)
@@ -181,7 +181,7 @@ Web_view_page_url_request_interceptor.Web_view_page_url_request_interceptor (GLi
 
 }
 
-void Web_view_page_url_request_interceptor.intercept_request (QWeb_engine_url_request_info &info) {
+void Web_view_page_url_request_interceptor.intercept_request (QWeb_engine_url_request_info info) {
     info.set_http_header ("OCS-APIREQUEST", "true");
 }
 
@@ -223,7 +223,7 @@ void Web_view_page_url_scheme_handler.request_started (QWeb_engine_url_request_j
     }
     q_c_info (lc_wizard_webiew ()) << "Got user : " << user << ", server : " << server;
 
-    emit url_catched (user, password, server);
+    /* emit */ url_catched (user, password, server);
 }
 
 Web_engine_page.Web_engine_page (QWeb_engine_profile profile, GLib.Object parent) : QWeb_engine_page (profile, parent) {
@@ -238,10 +238,10 @@ QWeb_engine_page * Web_engine_page.create_window (QWeb_engine_page.Web_window_ty
 
 void Web_engine_page.set_url (GLib.Uri url) {
     QWeb_engine_page.set_url (url);
-    _enforce_https = url.scheme () == QStringLiteral ("https");
+    this.enforce_https = url.scheme () == QStringLiteral ("https");
 }
 
-bool Web_engine_page.certificate_error (QWeb_engine_certificate_error &certificate_error) {
+bool Web_engine_page.certificate_error (QWeb_engine_certificate_error certificate_error) {
     /***********************************************************
     TODO properly improve this.
     The certificate should be displayed.
@@ -265,7 +265,7 @@ bool Web_engine_page.accept_navigation_request (GLib.Uri url, QWeb_engine_page.N
     Q_UNUSED (type);
     Q_UNUSED (is_main_frame);
 
-    if (_enforce_https && url.scheme () != QStringLiteral ("https") && url.scheme () != QStringLiteral ("nc")) {
+    if (this.enforce_https && url.scheme () != QStringLiteral ("https") && url.scheme () != QStringLiteral ("nc")) {
         QMessageBox.warning (nullptr, "Security warning", "Can not follow non https link on a https website. This might be a security issue. Please contact your administrator");
         return false;
     }

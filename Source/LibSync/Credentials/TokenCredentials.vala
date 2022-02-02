@@ -53,10 +53,10 @@ class TokenCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private 
-    private string _user;
-    private string _password;
-    private string _token; // the cookies
-    private bool _ready;
+    private string this.user;
+    private string this.password;
+    private string this.token; // the cookies
+    private bool this.ready;
 };
 
 
@@ -71,22 +71,22 @@ class TokenCredentials : AbstractCredentials {
         public friend class TokenCredentials;
         public TokenCredentialsAccessManager (TokenCredentials cred, GLib.Object parent = new GLib.Object ())
             : AccessManager (parent)
-            , _cred (cred) {
+            , this.cred (cred) {
         }
 
 
-        protected QNetworkReply create_request (Operation op, QNetworkRequest &request, QIODevice outgoing_data) {
-            if (_cred.user ().is_empty () || _cred.password ().is_empty ()) {
+        protected QNetworkReply create_request (Operation op, QNetworkRequest request, QIODevice outgoing_data) {
+            if (this.cred.user ().is_empty () || this.cred.password ().is_empty ()) {
                 GLib.warn (lc_token_credentials) << "Empty user/password provided!";
             }
 
             QNetworkRequest req (request);
 
-            GLib.ByteArray cred_hash = GLib.ByteArray (_cred.user ().to_utf8 () + ":" + _cred.password ().to_utf8 ()).to_base64 ();
+            GLib.ByteArray cred_hash = GLib.ByteArray (this.cred.user ().to_utf8 () + ":" + this.cred.password ().to_utf8 ()).to_base64 ();
             req.set_raw_header (GLib.ByteArray ("Authorization"), GLib.ByteArray ("Basic ") + cred_hash);
 
             // A pre-authenticated cookie
-            GLib.ByteArray token = _cred._token.to_utf8 ();
+            GLib.ByteArray token = this.cred._token.to_utf8 ();
             if (token.length () > 0) {
                 set_raw_cookie (token, request.url ());
             }
@@ -95,20 +95,20 @@ class TokenCredentials : AbstractCredentials {
         }
 
 
-        private const TokenCredentials _cred;
+        private const TokenCredentials this.cred;
     };
 
     TokenCredentials.TokenCredentials ()
-        : _user ()
-        , _password ()
-        , _ready (false) {
+        : this.user ()
+        , this.password ()
+        , this.ready (false) {
     }
 
     TokenCredentials.TokenCredentials (string user, string password, string token)
-        : _user (user)
-        , _password (password)
-        , _token (token)
-        , _ready (true) {
+        : this.user (user)
+        , this.password (password)
+        , this.token (token)
+        , this.ready (true) {
     }
 
     string TokenCredentials.auth_type () {
@@ -116,11 +116,11 @@ class TokenCredentials : AbstractCredentials {
     }
 
     string TokenCredentials.user () {
-        return _user;
+        return this.user;
     }
 
     string TokenCredentials.password () {
-        return _password;
+        return this.password;
     }
 
     QNetworkAccessManager *TokenCredentials.create_qNAM () {
@@ -133,16 +133,16 @@ class TokenCredentials : AbstractCredentials {
     }
 
     bool TokenCredentials.ready () {
-        return _ready;
+        return this.ready;
     }
 
     void TokenCredentials.fetch_from_keychain () {
-        _was_fetched = true;
+        this.was_fetched = true;
         Q_EMIT fetched ();
     }
 
     void TokenCredentials.ask_from_user () {
-        emit asked ();
+        /* emit */ asked ();
     }
 
     bool TokenCredentials.still_valid (QNetworkReply reply) {
@@ -154,11 +154,11 @@ class TokenCredentials : AbstractCredentials {
 
     void TokenCredentials.invalidate_token () {
         q_c_info (lc_token_credentials) << "Invalidating token";
-        _ready = false;
-        _account.clear_cookie_jar ();
-        _token = "";
-        _user = "";
-        _password = "";
+        this.ready = false;
+        this.account.clear_cookie_jar ();
+        this.token = "";
+        this.user = "";
+        this.password = "";
     }
 
     void TokenCredentials.forget_sensitive_data () {

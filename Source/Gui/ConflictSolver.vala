@@ -61,22 +61,22 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private Gtk.Widget _parent_widget;
-    private string _local_version_filename;
-    private string _remote_version_filename;
+    private Gtk.Widget this.parent_widget;
+    private string this.local_version_filename;
+    private string this.remote_version_filename;
 };
 
     ConflictSolver.ConflictSolver (Gtk.Widget parent)
         : GLib.Object (parent)
-        , _parent_widget (parent) {
+        , this.parent_widget (parent) {
     }
 
     string ConflictSolver.local_version_filename () {
-        return _local_version_filename;
+        return this.local_version_filename;
     }
 
     string ConflictSolver.remote_version_filename () {
-        return _remote_version_filename;
+        return this.remote_version_filename;
     }
 
     bool ConflictSolver.exec (ConflictSolver.Solution solution) {
@@ -93,60 +93,60 @@ signals:
     }
 
     void ConflictSolver.on_set_local_version_filename (string local_version_filename) {
-        if (_local_version_filename == local_version_filename) {
+        if (this.local_version_filename == local_version_filename) {
             return;
         }
 
-        _local_version_filename = local_version_filename;
-        emit local_version_filename_changed ();
+        this.local_version_filename = local_version_filename;
+        /* emit */ local_version_filename_changed ();
     }
 
     void ConflictSolver.on_set_remote_version_filename (string remote_version_filename) {
-        if (_remote_version_filename == remote_version_filename) {
+        if (this.remote_version_filename == remote_version_filename) {
             return;
         }
 
-        _remote_version_filename = remote_version_filename;
-        emit remote_version_filename_changed ();
+        this.remote_version_filename = remote_version_filename;
+        /* emit */ remote_version_filename_changed ();
     }
 
     bool ConflictSolver.delete_local_version () {
-        if (_local_version_filename.is_empty ()) {
+        if (this.local_version_filename.is_empty ()) {
             return false;
         }
 
-        QFileInfo info (_local_version_filename);
+        QFileInfo info (this.local_version_filename);
         if (!info.exists ()) {
             return false;
         }
 
         const var message = info.is_dir () ? _("Do you want to delete the directory <i>%1</i> and all its contents permanently?").arg (info.dir ().dir_name ())
-                                          : _("Do you want to delete the file <i>%1</i> permanently?").arg (info.file_name ());
-        const var result = QMessageBox.question (_parent_widget, _("Confirm deletion"), message, QMessageBox.Yes, QMessageBox.No);
+                                          : _("Do you want to delete the file <i>%1</i> permanently?").arg (info.filename ());
+        const var result = QMessageBox.question (this.parent_widget, _("Confirm deletion"), message, QMessageBox.Yes, QMessageBox.No);
         if (result != QMessageBox.Yes)
             return false;
 
         if (info.is_dir ()) {
-            return FileSystem.remove_recursively (_local_version_filename);
+            return FileSystem.remove_recursively (this.local_version_filename);
         } else {
-            return GLib.File (_local_version_filename).remove ();
+            return GLib.File (this.local_version_filename).remove ();
         }
     }
 
     bool ConflictSolver.rename_local_version () {
-        if (_local_version_filename.is_empty ()) {
+        if (this.local_version_filename.is_empty ()) {
             return false;
         }
 
-        QFileInfo info (_local_version_filename);
+        QFileInfo info (this.local_version_filename);
         if (!info.exists ()) {
             return false;
         }
 
         const var rename_pattern = [=] {
-            var result = string.from_utf8 (Occ.Utility.conflict_file_base_name_from_pattern (_local_version_filename.to_utf8 ()));
+            var result = string.from_utf8 (Occ.Utility.conflict_file_base_name_from_pattern (this.local_version_filename.to_utf8 ()));
             const var dot_index = result.last_index_of ('.');
-            return string (result.left (dot_index) + "_%1" + result.mid (dot_index));
+            return string (result.left (dot_index) + "this.%1" + result.mid (dot_index));
         } ();
 
         const var target_filename = [=] {
@@ -161,35 +161,35 @@ signals:
         } ();
 
         string error;
-        if (FileSystem.unchecked_rename_replace (_local_version_filename, target_filename, &error)) {
+        if (FileSystem.unchecked_rename_replace (this.local_version_filename, target_filename, error)) {
             return true;
         } else {
             GLib.warn (lc_conflict) << "Rename error:" << error;
-            QMessageBox.warning (_parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
+            QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
             return false;
         }
     }
 
     bool ConflictSolver.overwrite_remote_version () {
-        if (_local_version_filename.is_empty ()) {
+        if (this.local_version_filename.is_empty ()) {
             return false;
         }
 
-        if (_remote_version_filename.is_empty ()) {
+        if (this.remote_version_filename.is_empty ()) {
             return false;
         }
 
-        QFileInfo info (_local_version_filename);
+        QFileInfo info (this.local_version_filename);
         if (!info.exists ()) {
             return false;
         }
 
         string error;
-        if (FileSystem.unchecked_rename_replace (_local_version_filename, _remote_version_filename, &error)) {
+        if (FileSystem.unchecked_rename_replace (this.local_version_filename, this.remote_version_filename, error)) {
             return true;
         } else {
             GLib.warn (lc_conflict) << "Rename error:" << error;
-            QMessageBox.warning (_parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
+            QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
             return false;
         }
     }

@@ -18,9 +18,8 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
-// #include <string>
 
-#ifdef _WIN32
+#ifdef this.WIN32
 // #include <time.h>
 #else
 // #include <sys/time.h>
@@ -73,7 +72,7 @@ int c_utimes (string uri, struct timeval times) {
 }
 #else // HAVE_UTIMES
 
-#ifdef _WIN32
+#ifdef this.WIN32
 // implementation for utimes taken from KDE mingw headers
 
 // #include <errno.h>
@@ -140,5 +139,5 @@ int c_utimes (string uri, struct timeval times) {
     return 0;
 }
 
-#endif // _WIN32
+#endif // this.WIN32
 #endif // HAVE_UTIMES

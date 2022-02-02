@@ -4,8 +4,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <string>
-// #include <GLib.DateTime>
 
 namespace Occ {
 
@@ -19,12 +17,12 @@ class SyncJournalFileRecord {
     /***********************************************************
     ***********************************************************/
     public bool is_valid () {
-        return !_path.is_empty ();
+        return !this.path.is_empty ();
     }
 
 
     /***********************************************************
-    Returns the numeric part of the full id in _file_id.
+    Returns the numeric part of the full id in this.file_id.
 
     On the server this is sometimes known as the internal file id.
 
@@ -36,64 +34,64 @@ class SyncJournalFileRecord {
     /***********************************************************
     ***********************************************************/
     public GLib.DateTime mod_date_time () {
-        return Utility.q_date_time_from_time_t (_modtime);
+        return Utility.q_date_time_from_time_t (this.modtime);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_directory () {
-        return _type == ItemTypeDirectory;
+        return this.type == ItemTypeDirectory;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_file () {
-        return _type == ItemTypeFile || _type == ItemTypeVirtualFileDehydration;
+        return this.type == ItemTypeFile || this.type == ItemTypeVirtualFileDehydration;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_virtual_file () {
-        return _type == ItemTypeVirtualFile || _type == ItemTypeVirtualFileDownload;
+        return this.type == ItemTypeVirtualFile || this.type == ItemTypeVirtualFileDownload;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string path () {
-        return string.from_utf8 (_path);
+        return string.from_utf8 (this.path);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string e2e_mangled_name () {
-        return string.from_utf8 (_e2e_mangled_name);
+        return string.from_utf8 (this.e2e_mangled_name);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray _path;
-    public uint64 _inode = 0;
-    public int64 _modtime = 0;
-    public ItemType _type = ItemTypeSkip;
-    public GLib.ByteArray _etag;
-    public GLib.ByteArray _file_id;
-    public int64 _file_size = 0;
-    public RemotePermissions _remote_perm;
-    public bool _server_has_ignored_files = false;
-    public GLib.ByteArray _checksum_header;
-    public GLib.ByteArray _e2e_mangled_name;
-    public bool _is_e2e_encrypted = false;
+    public GLib.ByteArray this.path;
+    public uint64 this.inode = 0;
+    public int64 this.modtime = 0;
+    public ItemType this.type = ItemTypeSkip;
+    public GLib.ByteArray this.etag;
+    public GLib.ByteArray this.file_id;
+    public int64 this.file_size = 0;
+    public RemotePermissions this.remote_perm;
+    public bool this.server_has_ignored_files = false;
+    public GLib.ByteArray this.checksum_header;
+    public GLib.ByteArray this.e2e_mangled_name;
+    public bool this.is_e2e_encrypted = false;
 };
 
 bool OCSYNC_EXPORT
-operator== (SyncJournalFileRecord &lhs,
-    const SyncJournalFileRecord &rhs);
+operator== (SyncJournalFileRecord lhs,
+    const SyncJournalFileRecord rhs);
 
 class SyncJournalErrorBlocklistRecord {
 
@@ -115,55 +113,55 @@ class SyncJournalErrorBlocklistRecord {
     /***********************************************************
     The number of times the operation was unsuccessful so far.
     ***********************************************************/
-    public int _retry_count = 0;
+    public int this.retry_count = 0;
 
 
     /***********************************************************
     The last error string.
     ***********************************************************/
-    public string _error_string;
+    public string this.error_string;
 
 
     /***********************************************************
     The error category. Sometimes used for special actions.
     ***********************************************************/
-    public Category _error_category = Category.Normal;
+    public Category this.error_category = Category.Normal;
 
     /***********************************************************
     ***********************************************************/
-    public int64 _last_try_modtime = 0;
+    public int64 this.last_try_modtime = 0;
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray _last_try_etag;
+    public GLib.ByteArray this.last_try_etag;
 
 
     /***********************************************************
     The last time the operation was attempted (in s since epoch).
     ***********************************************************/
-    public int64 _last_try_time = 0;
+    public int64 this.last_try_time = 0;
 
 
     /***********************************************************
     The number of seconds the file shall be ignored.
     ***********************************************************/
-    public int64 _ignore_duration = 0;
+    public int64 this.ignore_duration = 0;
 
     /***********************************************************
     ***********************************************************/
-    public string _file;
+    public string this.file;
 
 
     /***********************************************************
     ***********************************************************/
-    public string _rename_target;
+    public string this.rename_target;
 
 
     /***********************************************************
     The last X-Request-ID of the request that failled
     ***********************************************************/
-    public GLib.ByteArray _request_id;
+    public GLib.ByteArray this.request_id;
 
     /***********************************************************
     ***********************************************************/
@@ -230,22 +228,22 @@ class ConflictRecord {
 
     GLib.ByteArray SyncJournalFileRecord.numeric_file_id () {
         // Use the id up until the first non-numeric character
-        for (int i = 0; i < _file_id.size (); ++i) {
-            if (_file_id[i] < '0' || _file_id[i] > '9') {
-                return _file_id.left (i);
+        for (int i = 0; i < this.file_id.size (); ++i) {
+            if (this.file_id[i] < '0' || this.file_id[i] > '9') {
+                return this.file_id.left (i);
             }
         }
-        return _file_id;
+        return this.file_id;
     }
 
     bool SyncJournalErrorBlocklistRecord.is_valid () {
-        return !_file.is_empty ()
-            && (!_last_try_etag.is_empty () || _last_try_modtime != 0)
-            && _last_try_time > 0;
+        return !this.file.is_empty ()
+            && (!this.last_try_etag.is_empty () || this.last_try_modtime != 0)
+            && this.last_try_time > 0;
     }
 
-    bool operator== (SyncJournalFileRecord &lhs,
-        const SyncJournalFileRecord &rhs) {
+    bool operator== (SyncJournalFileRecord lhs,
+        const SyncJournalFileRecord rhs) {
         return lhs._path == rhs._path
             && lhs._inode == rhs._inode
             && lhs._modtime == rhs._modtime

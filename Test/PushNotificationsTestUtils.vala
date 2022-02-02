@@ -67,12 +67,12 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private QWebSocketServer _webSocketServer;
+    private QWebSocketServer this.webSocketServer;
 
     /***********************************************************
     ***********************************************************/
     private 
-    private std.unique_ptr<QSignalSpy> _processTextMessageSpy;
+    private std.unique_ptr<QSignalSpy> this.processTextMessageSpy;
 };
 
 class CredentialsStub : Occ.AbstractCredentials {
@@ -102,8 +102,8 @@ class CredentialsStub : Occ.AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private string _user;
-    private string _password;
+    private string this.user;
+    private string this.password;
 };
 
 
@@ -124,14 +124,14 @@ Q_LOGGING_CATEGORY (lcFakeWebSocketServer, "nextcloud.test.fakewebserver", QtInf
 
 FakeWebSocketServer.FakeWebSocketServer (uint16 port, GLib.Object parent)
     : GLib.Object (parent)
-    , _webSocketServer (new QWebSocketServer (QStringLiteral ("Fake Server"), QWebSocketServer.NonSecureMode, this)) {
-    if (!_webSocketServer.listen (QHostAddress.Any, port)) {
+    , this.webSocketServer (new QWebSocketServer (QStringLiteral ("Fake Server"), QWebSocketServer.NonSecureMode, this)) {
+    if (!this.webSocketServer.listen (QHostAddress.Any, port)) {
         Q_UNREACHABLE ();
     }
-    connect (_webSocketServer, &QWebSocketServer.newConnection, this, &FakeWebSocketServer.on_new_connection);
-    connect (_webSocketServer, &QWebSocketServer.closed, this, &FakeWebSocketServer.closed);
+    connect (this.webSocketServer, &QWebSocketServer.newConnection, this, &FakeWebSocketServer.on_new_connection);
+    connect (this.webSocketServer, &QWebSocketServer.closed, this, &FakeWebSocketServer.closed);
     qCInfo (lcFakeWebSocketServer) << "Open fake websocket server on port:" << port;
-    _processTextMessageSpy = std.make_unique<QSignalSpy> (this, &FakeWebSocketServer.processTextMessage);
+    this.processTextMessageSpy = std.make_unique<QSignalSpy> (this, &FakeWebSocketServer.processTextMessage);
 }
 
 FakeWebSocketServer.~FakeWebSocketServer () {
@@ -178,28 +178,28 @@ QWebSocket *FakeWebSocketServer.authenticateAccount (Occ.AccountPointer account,
 }
 
 void FakeWebSocketServer.close () {
-    if (_webSocketServer.isListening ()) {
+    if (this.webSocketServer.isListening ()) {
         qCInfo (lcFakeWebSocketServer) << "Close fake websocket server";
 
-        _webSocketServer.close ();
-        qDeleteAll (_clients.begin (), _clients.end ());
+        this.webSocketServer.close ();
+        qDeleteAll (this.clients.begin (), this.clients.end ());
     }
 }
 
 void FakeWebSocketServer.on_process_next_message_internal (string message) {
     var client = qobject_cast<QWebSocket> (sender ());
-    emit processTextMessage (client, message);
+    /* emit */ processTextMessage (client, message);
 }
 
 void FakeWebSocketServer.on_new_connection () {
     qCInfo (lcFakeWebSocketServer) << "New connection on fake websocket server";
 
-    var socket = _webSocketServer.nextPendingConnection ();
+    var socket = this.webSocketServer.nextPendingConnection ();
 
     connect (socket, &QWebSocket.textMessageReceived, this, &FakeWebSocketServer.on_process_next_message_internal);
     connect (socket, &QWebSocket.disconnected, this, &FakeWebSocketServer.on_socket_disconnected);
 
-    _clients << socket;
+    this.clients << socket;
 }
 
 void FakeWebSocketServer.on_socket_disconnected () {
@@ -208,31 +208,31 @@ void FakeWebSocketServer.on_socket_disconnected () {
     var client = qobject_cast<QWebSocket> (sender ());
 
     if (client) {
-        _clients.removeAll (client);
+        this.clients.removeAll (client);
         client.deleteLater ();
     }
 }
 
 bool FakeWebSocketServer.waitForTextMessages () {
-    return _processTextMessageSpy.wait ();
+    return this.processTextMessageSpy.wait ();
 }
 
 uint32_t FakeWebSocketServer.textMessagesCount () {
-    return _processTextMessageSpy.count ();
+    return this.processTextMessageSpy.count ();
 }
 
 string FakeWebSocketServer.textMessage (int messageNumber) {
-    Q_ASSERT (0 <= messageNumber && messageNumber < _processTextMessageSpy.count ());
-    return _processTextMessageSpy.at (messageNumber).at (1).toString ();
+    Q_ASSERT (0 <= messageNumber && messageNumber < this.processTextMessageSpy.count ());
+    return this.processTextMessageSpy.at (messageNumber).at (1).toString ();
 }
 
 QWebSocket *FakeWebSocketServer.socketForTextMessage (int messageNumber) {
-    Q_ASSERT (0 <= messageNumber && messageNumber < _processTextMessageSpy.count ());
-    return _processTextMessageSpy.at (messageNumber).at (0).value<QWebSocket> ();
+    Q_ASSERT (0 <= messageNumber && messageNumber < this.processTextMessageSpy.count ());
+    return this.processTextMessageSpy.at (messageNumber).at (0).value<QWebSocket> ();
 }
 
 void FakeWebSocketServer.clearTextMessages () {
-    _processTextMessageSpy.clear ();
+    this.processTextMessageSpy.clear ();
 }
 
 Occ.AccountPointer FakeWebSocketServer.createAccount (string username, string password) {
@@ -264,8 +264,8 @@ Occ.AccountPointer FakeWebSocketServer.createAccount (string username, string pa
 }
 
 CredentialsStub.CredentialsStub (string user, string password)
-    : _user (user)
-    , _password (password) {
+    : this.user (user)
+    , this.password (password) {
 }
 
 string CredentialsStub.authType () {
@@ -273,11 +273,11 @@ string CredentialsStub.authType () {
 }
 
 string CredentialsStub.user () {
-    return _user;
+    return this.user;
 }
 
 string CredentialsStub.password () {
-    return _password;
+    return this.password;
 }
 
 QNetworkAccessManager *CredentialsStub.createQNAM () {

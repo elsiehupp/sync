@@ -42,10 +42,10 @@ class Ssl_button : QToolButton {
 
     /***********************************************************
     ***********************************************************/
-    private QMenu build_cert_menu (QMenu parent, QSslCertificate &cert,
-        const GLib.List<QSslCertificate> &user_approved, int pos, GLib.List<QSslCertificate> &system_ca_certificates);
-    private QPointer<AccountState> _account_state;
-    private QMenu _menu;
+    private QMenu build_cert_menu (QMenu parent, QSslCertificate cert,
+        const GLib.List<QSslCertificate> user_approved, int pos, GLib.List<QSslCertificate> system_ca_certificates);
+    private QPointer<AccountState> this.account_state;
+    private QMenu this.menu;
 };
 
 
@@ -54,10 +54,10 @@ class Ssl_button : QToolButton {
         set_popup_mode (QToolButton.Instant_popup);
         set_auto_raise (true);
 
-        _menu = new QMenu (this);
-        GLib.Object.connect (_menu, &QMenu.about_to_show,
+        this.menu = new QMenu (this);
+        GLib.Object.connect (this.menu, &QMenu.about_to_show,
             this, &Ssl_button.on_update_menu);
-        set_menu (_menu);
+        set_menu (this.menu);
     }
 
     /***********************************************************
@@ -72,13 +72,13 @@ class Ssl_button : QToolButton {
     }
 
     // necessary indication only, not sufficient for primary validation!
-    static bool is_self_signed (QSslCertificate &certificate) {
+    static bool is_self_signed (QSslCertificate certificate) {
         return certificate.issuer_info (QSslCertificate.Common_name) == certificate.subject_info (QSslCertificate.Common_name)
             && certificate.issuer_info (QSslCertificate.Organizational_unit_name) == certificate.subject_info (QSslCertificate.Organizational_unit_name);
     }
 
-    QMenu *Ssl_button.build_cert_menu (QMenu parent, QSslCertificate &cert,
-        const GLib.List<QSslCertificate> &user_approved, int pos, GLib.List<QSslCertificate> &system_ca_certificates) {
+    QMenu *Ssl_button.build_cert_menu (QMenu parent, QSslCertificate cert,
+        const GLib.List<QSslCertificate> user_approved, int pos, GLib.List<QSslCertificate> system_ca_certificates) {
         string cn = string[] (cert.subject_info (QSslCertificate.Common_name)).join (char (';'));
         string ou = string[] (cert.subject_info (QSslCertificate.Organizational_unit_name)).join (char (';'));
         string org = string[] (cert.subject_info (QSslCertificate.Organization)).join (char (';'));
@@ -182,9 +182,9 @@ class Ssl_button : QToolButton {
         } else {
             set_visible (true);
         }
-        _account_state = account_state;
+        this.account_state = account_state;
 
-        AccountPointer account = _account_state.account ();
+        AccountPointer account = this.account_state.account ();
         if (account.url ().scheme () == QLatin1String ("https")) {
             set_icon (QIcon (QLatin1String (":/client/theme/lock-https.svg")));
             QSslCipher cipher = account._session_cipher;
@@ -196,18 +196,18 @@ class Ssl_button : QToolButton {
     }
 
     void Ssl_button.on_update_menu () {
-        _menu.clear ();
+        this.menu.clear ();
 
-        if (!_account_state) {
+        if (!this.account_state) {
             return;
         }
 
-        AccountPointer account = _account_state.account ();
+        AccountPointer account = this.account_state.account ();
 
-        _menu.add_action (_("Server version : %1").arg (account.server_version ())).set_enabled (false);
+        this.menu.add_action (_("Server version : %1").arg (account.server_version ())).set_enabled (false);
 
         if (account.is_http2Supported ()) {
-            _menu.add_action ("HTTP/2").set_enabled (false);
+            this.menu.add_action ("HTTP/2").set_enabled (false);
         }
 
         if (account.url ().scheme () == QLatin1String ("https")) {
@@ -215,10 +215,10 @@ class Ssl_button : QToolButton {
                 + ", " + account._session_cipher.authentication_method ()
                 + ", " + account._session_cipher.key_exchange_method ()
                 + ", " + account._session_cipher.encryption_method ();
-            _menu.add_action (ssl_version).set_enabled (false);
+            this.menu.add_action (ssl_version).set_enabled (false);
 
             if (account._session_ticket.is_empty ()) {
-                _menu.add_action (_("No support for SSL session tickets/identifiers")).set_enabled (false);
+                this.menu.add_action (_("No support for SSL session tickets/identifiers")).set_enabled (false);
             }
 
             GLib.List<QSslCertificate> chain = account._peer_certificate_chain;
@@ -228,7 +228,7 @@ class Ssl_button : QToolButton {
                 return;
             }
 
-            _menu.add_action (_("Certificate information:")).set_enabled (false);
+            this.menu.add_action (_("Certificate information:")).set_enabled (false);
 
             const var system_certs = QSslConfiguration.system_ca_certificates ();
 
@@ -241,7 +241,7 @@ class Ssl_button : QToolButton {
             chain = tmp_chain;
 
             // find trust anchor (informational only, verification is done by QSslSocket!)
-            for (QSslCertificate &root_cA : system_certs) {
+            for (QSslCertificate root_cA : system_certs) {
                 if (root_cA.issuer_info (QSslCertificate.Common_name) == chain.last ().issuer_info (QSslCertificate.Common_name)
                     && root_cA.issuer_info (QSslCertificate.Organization) == chain.last ().issuer_info (QSslCertificate.Organization)) {
                     chain.append (root_cA);
@@ -253,11 +253,11 @@ class Ssl_button : QToolButton {
             it.to_back ();
             int i = 0;
             while (it.has_previous ()) {
-                _menu.add_menu (build_cert_menu (_menu, it.previous (), account.approved_certs (), i, system_certs));
+                this.menu.add_menu (build_cert_menu (this.menu, it.previous (), account.approved_certs (), i, system_certs));
                 i++;
             }
         } else {
-            _menu.add_action (_("The connection is not secure")).set_enabled (false);
+            this.menu.add_action (_("The connection is not secure")).set_enabled (false);
         }
     }
 

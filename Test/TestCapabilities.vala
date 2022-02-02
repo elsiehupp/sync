@@ -14,7 +14,7 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var capabilities = Occ.Capabilities (capabilitiesMap);
         const var activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
 
         QCOMPARE (activitiesPushNotificationsAvailable, true);
@@ -33,7 +33,7 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var capabilities = Occ.Capabilities (capabilitiesMap);
         const var activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
 
         QCOMPARE (activitiesPushNotificationsAvailable, false);
@@ -52,7 +52,7 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var capabilities = Occ.Capabilities (capabilitiesMap);
         const var filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Files);
 
         QCOMPARE (filesPushNotificationsAvailable, true);
@@ -71,7 +71,7 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var capabilities = Occ.Capabilities (capabilitiesMap);
         const var filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Files);
 
         QCOMPARE (filesPushNotificationsAvailable, false);
@@ -90,7 +90,7 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var capabilities = Occ.Capabilities (capabilitiesMap);
         const var notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Notifications);
 
         QCOMPARE (notificationsPushNotificationsAvailable, true);
@@ -109,7 +109,7 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var capabilities = Occ.Capabilities (capabilitiesMap);
         const var notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Notifications);
 
         QCOMPARE (notificationsPushNotificationsAvailable, false);
@@ -119,7 +119,7 @@ class TestCapabilities : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testPushNotificationsAvailable_pushNotificationsNotAvailable_returnFalse () {
-        const var &capabilities = Occ.Capabilities (QVariantMap ());
+        const var capabilities = Occ.Capabilities (QVariantMap ());
         const var activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
         const var filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Files);
         const var notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Notifications);
@@ -144,7 +144,7 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var capabilities = Occ.Capabilities (capabilitiesMap);
 
         QCOMPARE (capabilities.pushNotificationsWebSocketUrl (), websocketUrl);
     }
@@ -280,7 +280,7 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["dav"] = bulkuploadMap;
 
-        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var capabilities = Occ.Capabilities (capabilitiesMap);
         const var bulkuploadAvailable = capabilities.bulkUpload ();
 
         QCOMPARE (bulkuploadAvailable, true);

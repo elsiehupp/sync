@@ -44,13 +44,13 @@ class Vfs_xAttr : Vfs {
 
     public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_id) override;
 
-    public Result<void, string> create_placeholder (SyncFileItem &item) override;
-    public Result<void, string> dehydrate_placeholder (SyncFileItem &item) override;
-    public Result<ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem &item, string replaces_file) override;
+    public Result<void, string> create_placeholder (SyncFileItem item) override;
+    public Result<void, string> dehydrate_placeholder (SyncFileItem item) override;
+    public Result<ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem item, string replaces_file) override;
 
     /***********************************************************
     ***********************************************************/
-    public bool needs_metadata_update (SyncFileItem &item) override;
+    public bool needs_metadata_update (SyncFileItem item) override;
     public bool is_dehydrated_placeholder (string file_path) override;
     public bool stat_type_virtual_file (csync_file_stat_t stat, void stat_data) override;
 
@@ -63,10 +63,10 @@ class Vfs_xAttr : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public void on_file_status_changed (string system_file_name, SyncFileStatus file_status) override;
+    public void on_file_status_changed (string system_filename, SyncFileStatus file_status) override;
 
 
-    protected void start_impl (VfsSetupParams &parameters) override;
+    protected void start_impl (VfsSetupParams parameters) override;
 };
 
 class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xAttr> {
@@ -114,12 +114,12 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
         return {};
     }
 
-    Result<void, string> Vfs_xAttr.create_placeholder (SyncFileItem &item) {
+    Result<void, string> Vfs_xAttr.create_placeholder (SyncFileItem item) {
         if (item._modtime <= 0) {
             return {_("Error updating metadata due to invalid modified time")};
         }
 
-        const var path = string (_setup_params.filesystem_path + item._file);
+        const var path = string (this.setup_params.filesystem_path + item._file);
         GLib.File file = new GLib.File (path);
         if (file.exists () && file.size () > 1
             && !FileSystem.verify_file_unchanged (path, item._size, item._modtime)) {
@@ -136,8 +136,8 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
         return xattr.add_nextcloud_placeholder_attributes (path);
     }
 
-    Result<void, string> Vfs_xAttr.dehydrate_placeholder (SyncFileItem &item) {
-        const var path = string (_setup_params.filesystem_path + item._file);
+    Result<void, string> Vfs_xAttr.dehydrate_placeholder (SyncFileItem item) {
+        const var path = string (this.setup_params.filesystem_path + item._file);
         GLib.File file = new GLib.File (path);
         if (!file.remove ()) {
             return QStringLiteral ("Couldn't remove the original file to dehydrate");

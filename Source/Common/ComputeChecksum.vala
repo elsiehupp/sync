@@ -98,11 +98,11 @@ abstract class ComputeChecksumBase : GLib.Object {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    GLib.ByteArray find_best_checksum (GLib.ByteArray _checksums) {
-        if (_checksums.is_empty ()) {
+    GLib.ByteArray find_best_checksum (GLib.ByteArray this.checksums) {
+        if (this.checksums.is_empty ()) {
             return {};
         }
-        const var checksums = string.from_utf8 (_checksums);
+        const var checksums = string.from_utf8 (this.checksums);
         int i = 0;
         // The order of the searches here defines the preference ordering.
         if (-1 != (i = checksums.index_of (QLatin1String ("SHA3-256:"), 0, Qt.CaseInsensitive))
@@ -112,14 +112,14 @@ abstract class ComputeChecksumBase : GLib.Object {
             || -1 != (i = checksums.index_of (QLatin1String ("ADLER32:"), 0, Qt.CaseInsensitive))) {
             // Now i is the on_start of the best checksum
             // Grab it until the next space or end of xml or end of string.
-            int end = _checksums.index_of (' ', i);
+            int end = this.checksums.index_of (' ', i);
             // workaround for https://github.com/owncloud/core/pull/38304
             if (end == -1) {
-                end = _checksums.index_of ('<', i);
+                end = this.checksums.index_of ('<', i);
             }
-            return _checksums.mid (i, end - i);
+            return this.checksums.mid (i, end - i);
         }
-        GLib.warn (lc_checksums) << "Failed to parse" << _checksums;
+        GLib.warn (lc_checksums) << "Failed to parse" << this.checksums;
         return {};
     }
 
@@ -256,10 +256,10 @@ class ComputeChecksum : ComputeChecksumBase {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray _checksum_type;
+    private GLib.ByteArray this.checksum_type;
 
     // watcher for the checksum calculation thread
-    private QFuture_watcher<GLib.ByteArray> _watcher;
+    private QFuture_watcher<GLib.ByteArray> this.watcher;
 
     /***********************************************************
     ***********************************************************/
@@ -275,14 +275,14 @@ class ComputeChecksum : ComputeChecksumBase {
     Sets the checksum type to be used. The default is empty.
     ***********************************************************/
     public void set_checksum_type (GLib.ByteArray type) {
-        _checksum_type = type;
+        this.checksum_type = type;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public GLib.ByteArray checksum_type () {
-        return _checksum_type;
+        return this.checksum_type;
     }
 
 
@@ -368,11 +368,11 @@ class ComputeChecksum : ComputeChecksumBase {
     /***********************************************************
     ***********************************************************/
     private void on_calculation_done () {
-        GLib.ByteArray checksum = _watcher.future ().result ();
+        GLib.ByteArray checksum = this.watcher.future ().result ();
         if (!checksum.is_null ()) {
-            emit done (_checksum_type, checksum);
+            /* emit */ done (this.checksum_type, checksum);
         } else {
-            emit done (GLib.ByteArray (), GLib.ByteArray ());
+            /* emit */ done (GLib.ByteArray (), GLib.ByteArray ());
         }
     }
 
@@ -380,7 +380,7 @@ class ComputeChecksum : ComputeChecksumBase {
     /***********************************************************
     ***********************************************************/
     private void start_impl (std.unique_ptr<QIODevice> device) {
-        connect (&_watcher, &QFuture_watcher_base.on_finished,
+        connect (&this.watcher, &QFuture_watcher_base.on_finished,
             this, &ComputeChecksum.on_calculation_done,
             Qt.UniqueConnection);
 
@@ -390,10 +390,10 @@ class ComputeChecksum : ComputeChecksumBase {
 
         // Bug : The thread will keep running even if ComputeChecksum is deleted.
         var type = checksum_type ();
-        _watcher.set_future (Qt_concurrent.run ([shared_device, type] () {
+        this.watcher.set_future (Qt_concurrent.run ([shared_device, type] () {
             if (!shared_device.open (QIODevice.ReadOnly)) {
                 if (var file = qobject_cast<GLib.File> (shared_device.data ())) {
-                    GLib.warn (lc_checksums) << "Could not open file" << file.file_name ()
+                    GLib.warn (lc_checksums) << "Could not open file" << file.filename ()
                             << "for reading to compute a checksum" << file.error_string ();
                 } else {
                     GLib.warn (lc_checksums) << "Could not open device" << shared_device.data ()
@@ -416,8 +416,8 @@ class ValidateChecksumHeader : ComputeChecksumBase {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray _expected_checksum_type;
-    private GLib.ByteArray _expected_checksum;
+    private GLib.ByteArray this.expected_checksum_type;
+    private GLib.ByteArray this.expected_checksum;
 
     /***********************************************************
     ***********************************************************/
@@ -461,15 +461,15 @@ class ValidateChecksumHeader : ComputeChecksumBase {
     /***********************************************************
     ***********************************************************/
     private void on_checksum_calculated (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
-        if (checksum_type != _expected_checksum_type) {
-            emit validation_failed (_("The checksum header contained an unknown checksum type \"%1\"").arg (string.from_latin1 (_expected_checksum_type)));
+        if (checksum_type != this.expected_checksum_type) {
+            /* emit */ validation_failed (_("The checksum header contained an unknown checksum type \"%1\"").arg (string.from_latin1 (this.expected_checksum_type)));
             return;
         }
-        if (checksum != _expected_checksum) {
-            emit validation_failed (_(R" (The downloaded file does not match the checksum, it will be resumed. "%1" != "%2")").arg (string.from_utf8 (_expected_checksum), string.from_utf8 (checksum)));
+        if (checksum != this.expected_checksum) {
+            /* emit */ validation_failed (_(R" (The downloaded file does not match the checksum, it will be resumed. "%1" != "%2")").arg (string.from_utf8 (this.expected_checksum), string.from_utf8 (checksum)));
             return;
         }
-        emit validated (checksum_type, checksum);
+        /* emit */ validated (checksum_type, checksum);
     }
 
 
@@ -478,18 +478,18 @@ class ValidateChecksumHeader : ComputeChecksumBase {
     private ComputeChecksum prepare_start (GLib.ByteArray checksum_header) {
         // If the incoming header is empty no validation can happen. Just continue.
         if (checksum_header.is_empty ()) {
-            emit validated (GLib.ByteArray (), GLib.ByteArray ());
+            /* emit */ validated (GLib.ByteArray (), GLib.ByteArray ());
             return nullptr;
         }
 
-        if (!parse_checksum_header (checksum_header, &_expected_checksum_type, &_expected_checksum)) {
+        if (!parse_checksum_header (checksum_header, this.expected_checksum_type, this.expected_checksum)) {
             GLib.warn (lc_checksums) << "Checksum header malformed:" << checksum_header;
-            emit validation_failed (_("The checksum header is malformed."));
+            /* emit */ validation_failed (_("The checksum header is malformed."));
             return nullptr;
         }
 
         var calculator = new ComputeChecksum (this);
-        calculator.set_checksum_type (_expected_checksum_type);
+        calculator.set_checksum_type (this.expected_checksum_type);
         connect (calculator, &ComputeChecksum.done,
             this, &ValidateChecksumHeader.on_checksum_calculated);
         return calculator;

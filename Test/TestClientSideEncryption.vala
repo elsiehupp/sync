@@ -192,7 +192,7 @@ class TestClientSideEncryption : GLib.Object {
 
         GLib.ByteArray tag;
 
-        QVERIFY (EncryptionHelper.fileEncryption (encryptionKey, initializationVector, &dummyInputFile, &dummyEncryptionOutputFile, tag));
+        QVERIFY (EncryptionHelper.fileEncryption (encryptionKey, initializationVector, dummyInputFile, dummyEncryptionOutputFile, tag));
         dummyInputFile.close ();
         QVERIFY (!dummyInputFile.isOpen ());
 
@@ -201,7 +201,7 @@ class TestClientSideEncryption : GLib.Object {
 
         QTemporaryFile dummyDecryptionOutputFile;
 
-        QVERIFY (EncryptionHelper.fileDecryption (encryptionKey, initializationVector, &dummyEncryptionOutputFile, &dummyDecryptionOutputFile));
+        QVERIFY (EncryptionHelper.fileDecryption (encryptionKey, initializationVector, dummyEncryptionOutputFile, dummyDecryptionOutputFile));
         QVERIFY (dummyDecryptionOutputFile.open ());
         const var dummyDecryptionOutputFileHash = generateHash (dummyDecryptionOutputFile.readAll ());
         QCOMPARE (dummyDecryptionOutputFileHash, originalFileHash);

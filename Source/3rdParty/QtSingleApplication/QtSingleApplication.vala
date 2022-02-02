@@ -22,7 +22,7 @@ class QtSingleApplication : QApplication {
 
     /***********************************************************
     ***********************************************************/
-    public QtSingleApplication (string id, int &argc, char **argv);
+    public QtSingleApplication (string id, int argc, char **argv);
 
     /***********************************************************
     ***********************************************************/
@@ -69,7 +69,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private string instances_file_name (string app_id);
+    private string instances_filename (string app_id);
 
     int64 first_peer;
     QShared_memory instances;
@@ -126,7 +126,7 @@ namespace SharedTools {
         return res + app_session_id + QLatin1String ("-instances");
     }
 
-    QtSingleApplication.QtSingleApplication (string app_id, int &argc, char **argv)
+    QtSingleApplication.QtSingleApplication (string app_id, int argc, char **argv)
         : QApplication (argc, argv),
           first_peer (-1),
           pid_peer (nullptr) {
@@ -196,7 +196,7 @@ namespace SharedTools {
     bool QtSingleApplication.event (QEvent event) {
         if (event.type () == QEvent.File_open) {
             var foe = static_cast<QFile_open_event> (event);
-            emit file_open_request (foe.file ());
+            /* emit */ file_open_request (foe.file ());
             return true;
         }
         return QApplication.event (event);

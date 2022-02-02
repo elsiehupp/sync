@@ -89,7 +89,7 @@ signals:
     private void on_sync_everything_clicked ();
     private void on_selective_sync_clicked ();
     private void on_virtual_file_sync_clicked ();
-    private void on_quota_retrieved (QVariantMap &result);
+    private void on_quota_retrieved (QVariantMap result);
 
 
     /***********************************************************
@@ -121,112 +121,112 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private Ui_Owncloud_advanced_setup_page _ui;
-    private bool _checking = false;
-    private bool _created = false;
-    private bool _local_folder_valid = false;
-    private QProgress_indicator _progress_indi;
-    private string _remote_folder;
-    private string[] _selective_sync_blocklist;
-    private int64 _r_size = -1;
-    private int64 _r_selected_size = -1;
-    private OwncloudWizard _oc_wizard;
+    private Ui_Owncloud_advanced_setup_page this.ui;
+    private bool this.checking = false;
+    private bool this.created = false;
+    private bool this.local_folder_valid = false;
+    private QProgress_indicator this.progress_indi;
+    private string this.remote_folder;
+    private string[] this.selective_sync_blocklist;
+    private int64 this.r_size = -1;
+    private int64 this.r_selected_size = -1;
+    private OwncloudWizard this.oc_wizard;
 };
 
     Owncloud_advanced_setup_page.Owncloud_advanced_setup_page (OwncloudWizard wizard)
         : QWizard_page ()
-        , _progress_indi (new QProgress_indicator (this))
-        , _oc_wizard (wizard) {
-        _ui.setup_ui (this);
+        , this.progress_indi (new QProgress_indicator (this))
+        , this.oc_wizard (wizard) {
+        this.ui.setup_ui (this);
 
         setup_resoultion_widget ();
 
-        register_field (QLatin1String ("OCSync_from_scratch"), _ui.cb_sync_from_scratch);
+        register_field (QLatin1String ("OCSync_from_scratch"), this.ui.cb_sync_from_scratch);
 
-        var size_policy = _progress_indi.size_policy ();
+        var size_policy = this.progress_indi.size_policy ();
         size_policy.set_retain_size_when_hidden (true);
-        _progress_indi.set_size_policy (size_policy);
+        this.progress_indi.set_size_policy (size_policy);
 
-        _ui.result_layout.add_widget (_progress_indi);
+        this.ui.result_layout.add_widget (this.progress_indi);
         on_stop_spinner ();
         setup_customization ();
 
-        connect (_ui.pb_select_local_folder, &QAbstractButton.clicked, this, &Owncloud_advanced_setup_page.on_select_folder);
+        connect (this.ui.pb_select_local_folder, &QAbstractButton.clicked, this, &Owncloud_advanced_setup_page.on_select_folder);
         set_button_text (QWizard.Finish_button, _("Connect"));
 
         if (Theme.instance ().enforce_virtual_files_sync_folder ()) {
-            _ui.r_sync_everything.set_disabled (true);
-            _ui.r_selective_sync.set_disabled (true);
-            _ui.b_selective_sync.set_disabled (true);
+            this.ui.r_sync_everything.set_disabled (true);
+            this.ui.r_selective_sync.set_disabled (true);
+            this.ui.b_selective_sync.set_disabled (true);
         }
 
-        connect (_ui.r_sync_everything, &QAbstractButton.clicked, this, &Owncloud_advanced_setup_page.on_sync_everything_clicked);
-        connect (_ui.r_selective_sync, &QAbstractButton.clicked, this, &Owncloud_advanced_setup_page.on_selective_sync_clicked);
-        connect (_ui.r_virtual_file_sync, &QAbstractButton.clicked, this, &Owncloud_advanced_setup_page.on_virtual_file_sync_clicked);
-        connect (_ui.r_virtual_file_sync, &QRadio_button.toggled, this, [this] (bool checked) {
+        connect (this.ui.r_sync_everything, &QAbstractButton.clicked, this, &Owncloud_advanced_setup_page.on_sync_everything_clicked);
+        connect (this.ui.r_selective_sync, &QAbstractButton.clicked, this, &Owncloud_advanced_setup_page.on_selective_sync_clicked);
+        connect (this.ui.r_virtual_file_sync, &QAbstractButton.clicked, this, &Owncloud_advanced_setup_page.on_virtual_file_sync_clicked);
+        connect (this.ui.r_virtual_file_sync, &QRadio_button.toggled, this, [this] (bool checked) {
             if (checked) {
-                _ui.l_selective_sync_size_label.clear ();
-                _selective_sync_blocklist.clear ();
+                this.ui.l_selective_sync_size_label.clear ();
+                this.selective_sync_blocklist.clear ();
             }
         });
-        connect (_ui.b_selective_sync, &QAbstractButton.clicked, this, &Owncloud_advanced_setup_page.on_selective_sync_clicked);
+        connect (this.ui.b_selective_sync, &QAbstractButton.clicked, this, &Owncloud_advanced_setup_page.on_selective_sync_clicked);
 
         const var theme = Theme.instance ();
         const var app_icon = theme.application_icon ();
         const var app_icon_size = Theme.is_hidpi () ? 128 : 64;
 
-        _ui.l_server_icon.set_pixmap (app_icon.pixmap (app_icon_size));
+        this.ui.l_server_icon.set_pixmap (app_icon.pixmap (app_icon_size));
 
         if (theme.wizard_hide_external_storage_confirmation_checkbox ()) {
-            _ui.conf_check_box_external.hide ();
+            this.ui.conf_check_box_external.hide ();
         }
         if (theme.wizard_hide_folder_size_limit_checkbox ()) {
-            _ui.conf_check_box_size.hide ();
-            _ui.conf_spin_box.hide ();
-            _ui.conf_trailling_size_label.hide ();
+            this.ui.conf_check_box_size.hide ();
+            this.ui.conf_spin_box.hide ();
+            this.ui.conf_trailling_size_label.hide ();
         }
 
-        _ui.r_virtual_file_sync.on_set_text (_("Use &virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+        this.ui.r_virtual_file_sync.on_set_text (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
     }
 
     void Owncloud_advanced_setup_page.setup_customization () {
         // set defaults for the customize labels.
-        _ui.top_label.hide ();
-        _ui.bottom_label.hide ();
+        this.ui.top_label.hide ();
+        this.ui.bottom_label.hide ();
 
         Theme theme = Theme.instance ();
-        QVariant variant = theme.custom_media (Theme.o_c_setup_top);
+        GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
         if (!variant.is_null ()) {
-            WizardCommon.setup_custom_media (variant, _ui.top_label);
+            WizardCommon.setup_custom_media (variant, this.ui.top_label);
         }
 
-        variant = theme.custom_media (Theme.o_c_setup_bottom);
-        WizardCommon.setup_custom_media (variant, _ui.bottom_label);
+        variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_BOTTOM);
+        WizardCommon.setup_custom_media (variant, this.ui.bottom_label);
 
-        WizardCommon.customize_hint_label (_ui.l_free_space);
-        WizardCommon.customize_hint_label (_ui.l_sync_everything_size_label);
-        WizardCommon.customize_hint_label (_ui.l_selective_sync_size_label);
-        WizardCommon.customize_hint_label (_ui.server_address_label);
+        WizardCommon.customize_hint_label (this.ui.l_free_space);
+        WizardCommon.customize_hint_label (this.ui.l_sync_everything_size_label);
+        WizardCommon.customize_hint_label (this.ui.l_selective_sync_size_label);
+        WizardCommon.customize_hint_label (this.ui.server_address_label);
     }
 
     bool Owncloud_advanced_setup_page.is_complete () {
-        return !_checking && _local_folder_valid;
+        return !this.checking && this.local_folder_valid;
     }
 
     void Owncloud_advanced_setup_page.initialize_page () {
-        WizardCommon.init_error_label (_ui.error_label);
+        WizardCommon.init_error_label (this.ui.error_label);
 
         if (!Theme.instance ().show_virtual_files_option () || best_available_vfs_mode () == Vfs.Off) {
             // If the layout were wrapped in a widget, the var-grouping of the
             // radio buttons no longer works and there are surprising margins.
             // Just manually hide the button and remove the layout.
-            _ui.r_virtual_file_sync.hide ();
-            _ui.w_sync_strategy.layout ().remove_item (_ui.l_virtual_file_sync);
+            this.ui.r_virtual_file_sync.hide ();
+            this.ui.w_sync_strategy.layout ().remove_item (this.ui.l_virtual_file_sync);
         }
 
-        _checking = false;
-        _ui.l_selective_sync_size_label.clear ();
-        _ui.l_sync_everything_size_label.clear ();
+        this.checking = false;
+        this.ui.l_selective_sync_size_label.clear ();
+        this.ui.l_sync_everything_size_label.clear ();
 
         // Update the local folder - this is not guaranteed to find a good one
         string good_local_folder = FolderMan.instance ().find_good_path_for_new_sync_folder (local_folder (), server_url ());
@@ -239,30 +239,30 @@ signals:
         QTimer.single_shot (0, wizard ().button (QWizard.Finish_button), q_overload<> (&Gtk.Widget.set_focus));
 
         var acc = static_cast<OwncloudWizard> (wizard ()).account ();
-        var quota_job = new PropfindJob (acc, _remote_folder, this);
+        var quota_job = new PropfindJob (acc, this.remote_folder, this);
         quota_job.set_properties (GLib.List<GLib.ByteArray> () << "http://owncloud.org/ns:size");
 
         connect (quota_job, &PropfindJob.result, this, &Owncloud_advanced_setup_page.on_quota_retrieved);
         quota_job.on_start ();
 
         if (Theme.instance ().wizard_selective_sync_default_nothing ()) {
-            _selective_sync_blocklist = string[] ("/");
-            set_radio_checked (_ui.r_selective_sync);
+            this.selective_sync_blocklist = string[] ("/");
+            set_radio_checked (this.ui.r_selective_sync);
             QTimer.single_shot (0, this, &Owncloud_advanced_setup_page.on_selective_sync_clicked);
         }
 
         ConfigFile cfg_file;
         var new_folder_limit = cfg_file.new_big_folder_size_limit ();
-        _ui.conf_check_box_size.set_checked (new_folder_limit.first);
-        _ui.conf_spin_box.set_value (new_folder_limit.second);
-        _ui.conf_check_box_external.set_checked (cfg_file.confirm_external_storage ());
+        this.ui.conf_check_box_size.set_checked (new_folder_limit.first);
+        this.ui.conf_spin_box.set_value (new_folder_limit.second);
+        this.ui.conf_check_box_external.set_checked (cfg_file.confirm_external_storage ());
 
         fetch_user_avatar ();
         set_user_information ();
 
         customize_style ();
 
-        var next_button = qobject_cast<QPushButton> (_oc_wizard.button (QWizard.Next_button));
+        var next_button = qobject_cast<QPushButton> (this.oc_wizard.button (QWizard.Next_button));
         if (next_button) {
             next_button.set_default (true);
         }
@@ -271,46 +271,46 @@ signals:
     void Owncloud_advanced_setup_page.fetch_user_avatar () {
         // Reset user avatar
         const var app_icon = Theme.instance ().application_icon ();
-        _ui.l_server_icon.set_pixmap (app_icon.pixmap (48));
+        this.ui.l_server_icon.set_pixmap (app_icon.pixmap (48));
         // Fetch user avatar
-        const var account = _oc_wizard.account ();
+        const var account = this.oc_wizard.account ();
         var avatar_size = 64;
         if (Theme.is_hidpi ()) {
             avatar_size *= 2;
         }
         const var avatar_job = new AvatarJob (account, account.dav_user (), avatar_size, this);
         avatar_job.on_set_timeout (20 * 1000);
-        GLib.Object.connect (avatar_job, &AvatarJob.avatar_pixmap, this, [this] (QImage &avatar_image) {
+        GLib.Object.connect (avatar_job, &AvatarJob.avatar_pixmap, this, [this] (QImage avatar_image) {
             if (avatar_image.is_null ()) {
                 return;
             }
             const var avatar_pixmap = QPixmap.from_image (AvatarJob.make_circular_avatar (avatar_image));
-            _ui.l_server_icon.set_pixmap (avatar_pixmap);
+            this.ui.l_server_icon.set_pixmap (avatar_pixmap);
         });
         avatar_job.on_start ();
     }
 
     void Owncloud_advanced_setup_page.set_user_information () {
-        const var account = _oc_wizard.account ();
+        const var account = this.oc_wizard.account ();
         const var server_url = account.url ().to_"";
         set_server_address_label_url (server_url);
         const var user_name = account.dav_display_name ();
-        _ui.user_name_label.on_set_text (user_name);
+        this.ui.user_name_label.on_set_text (user_name);
     }
 
     void Owncloud_advanced_setup_page.refresh_virtual_files_availibility (string path) {
         // TODO : remove when UX decision is made
-        if (!_ui.r_virtual_file_sync.is_visible ()) {
+        if (!this.ui.r_virtual_file_sync.is_visible ()) {
             return;
         }
 
         if (Utility.is_path_windows_drive_partition_root (path)) {
-            _ui.r_virtual_file_sync.on_set_text (_("Virtual files are not supported for Windows partition roots as local folder. Please choose a valid subfolder under drive letter."));
-            set_radio_checked (_ui.r_sync_everything);
-            _ui.r_virtual_file_sync.set_enabled (false);
+            this.ui.r_virtual_file_sync.on_set_text (_("Virtual files are not supported for Windows partition roots as local folder. Please choose a valid subfolder under drive letter."));
+            set_radio_checked (this.ui.r_sync_everything);
+            this.ui.r_virtual_file_sync.set_enabled (false);
         } else {
-            _ui.r_virtual_file_sync.on_set_text (_("Use &virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
-            _ui.r_virtual_file_sync.set_enabled (true);
+            this.ui.r_virtual_file_sync.on_set_text (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+            this.ui.r_virtual_file_sync.set_enabled (true);
         }
         //
     }
@@ -321,7 +321,7 @@ signals:
         }
 
         const var pretty_url = url.to_"".mid (url.scheme ().size () + 3); // + 3 because we need to remove ://
-        _ui.server_address_label.on_set_text (pretty_url);
+        this.ui.server_address_label.on_set_text (pretty_url);
     }
 
     // Called if the user changes the user- or url field. Adjust the texts and
@@ -331,20 +331,20 @@ signals:
 
         // check if the local folder exists. If so, and if its not empty, show a warning.
         string error_str = FolderMan.instance ().check_path_validity_for_new_folder (loc_folder, server_url ());
-        _local_folder_valid = error_str.is_empty ();
+        this.local_folder_valid = error_str.is_empty ();
 
         string t;
 
         set_local_folder_push_button_path (loc_folder);
 
         if (on_data_changed ()) {
-            if (_remote_folder.is_empty () || _remote_folder == QLatin1String ("/")) {
+            if (this.remote_folder.is_empty () || this.remote_folder == QLatin1String ("/")) {
                 t = "";
             } else {
                 t = Utility.escape (_(R" (%1 folder "%2" is synced to local folder "%3")")
-                                        .arg (Theme.instance ().app_name (), _remote_folder,
+                                        .arg (Theme.instance ().app_name (), this.remote_folder,
                                             QDir.to_native_separators (loc_folder)));
-                _ui.r_sync_everything.on_set_text (_("Sync the folder \"%1\"").arg (_remote_folder));
+                this.ui.r_sync_everything.on_set_text (_("Sync the folder \"%1\"").arg (this.remote_folder));
             }
 
             const bool dir_not_empty (QDir (loc_folder).entry_list (QDir.AllEntries | QDir.NoDotAndDotDot).count () > 0);
@@ -357,12 +357,12 @@ signals:
         }
 
         string lfree_space_str = Utility.octets_to_string (available_local_space ());
-        _ui.l_free_space.on_set_text (string (_("%1 free space", "%1 gets replaced with the size and a matching unit. Example: 3 MB or 5 GB")).arg (lfree_space_str));
+        this.ui.l_free_space.on_set_text (string (_("%1 free space", "%1 gets replaced with the size and a matching unit. Example: 3 MB or 5 GB")).arg (lfree_space_str));
 
-        _ui.sync_mode_label.on_set_text (t);
-        _ui.sync_mode_label.set_fixed_height (_ui.sync_mode_label.size_hint ().height ());
+        this.ui.sync_mode_label.on_set_text (t);
+        this.ui.sync_mode_label.set_fixed_height (this.ui.sync_mode_label.size_hint ().height ());
 
-        int64 r_space = _ui.r_sync_everything.is_checked () ? _r_size : _r_selected_size;
+        int64 r_space = this.ui.r_sync_everything.is_checked () ? this.r_size : this.r_selected_size;
 
         string space_error = check_local_space (r_space);
         if (!space_error.is_empty ()) {
@@ -370,13 +370,13 @@ signals:
         }
         on_set_error_string (error_str);
 
-        emit complete_changed ();
+        /* emit */ complete_changed ();
     }
 
     void Owncloud_advanced_setup_page.set_resolution_gui_visible (bool value) {
-        _ui.sync_mode_label.set_visible (value);
-        _ui.r_keep_local.set_visible (value);
-        _ui.cb_sync_from_scratch.set_visible (value);
+        this.ui.sync_mode_label.set_visible (value);
+        this.ui.r_keep_local.set_visible (value);
+        this.ui.cb_sync_from_scratch.set_visible (value);
     }
 
     /* obsolete */
@@ -385,15 +385,15 @@ signals:
     }
 
     void Owncloud_advanced_setup_page.on_start_spinner () {
-        _ui.result_layout.set_enabled (true);
-        _progress_indi.set_visible (true);
-        _progress_indi.on_start_animation ();
+        this.ui.result_layout.set_enabled (true);
+        this.progress_indi.set_visible (true);
+        this.progress_indi.on_start_animation ();
     }
 
     void Owncloud_advanced_setup_page.on_stop_spinner () {
-        _ui.result_layout.set_enabled (false);
-        _progress_indi.set_visible (false);
-        _progress_indi.on_stop_animation ();
+        this.ui.result_layout.set_enabled (false);
+        this.progress_indi.set_visible (false);
+        this.progress_indi.on_stop_animation ();
     }
 
     GLib.Uri Owncloud_advanced_setup_page.server_url () {
@@ -416,15 +416,15 @@ signals:
     }
 
     string[] Owncloud_advanced_setup_page.selective_sync_blocklist () {
-        return _selective_sync_blocklist;
+        return this.selective_sync_blocklist;
     }
 
     bool Owncloud_advanced_setup_page.use_virtual_file_sync () {
-        return _ui.r_virtual_file_sync.is_checked ();
+        return this.ui.r_virtual_file_sync.is_checked ();
     }
 
     bool Owncloud_advanced_setup_page.is_confirm_big_folder_checked () {
-        return _ui.r_sync_everything.is_checked () && _ui.conf_check_box_size.is_checked ();
+        return this.ui.r_sync_everything.is_checked () && this.ui.conf_check_box_size.is_checked ();
     }
 
     bool Owncloud_advanced_setup_page.validate_page () {
@@ -438,25 +438,25 @@ signals:
             }
         }
 
-        if (!_created) {
+        if (!this.created) {
             on_set_error_string ("");
-            _checking = true;
+            this.checking = true;
             on_start_spinner ();
-            emit complete_changed ();
+            /* emit */ complete_changed ();
 
-            if (_ui.r_sync_everything.is_checked ()) {
+            if (this.ui.r_sync_everything.is_checked ()) {
                 ConfigFile cfg_file;
-                cfg_file.set_new_big_folder_size_limit (_ui.conf_check_box_size.is_checked (),
-                    _ui.conf_spin_box.value ());
-                cfg_file.set_confirm_external_storage (_ui.conf_check_box_external.is_checked ());
+                cfg_file.set_new_big_folder_size_limit (this.ui.conf_check_box_size.is_checked (),
+                    this.ui.conf_spin_box.value ());
+                cfg_file.set_confirm_external_storage (this.ui.conf_check_box_external.is_checked ());
             }
 
-            emit create_local_and_remote_folders (local_folder (), _remote_folder);
+            /* emit */ create_local_and_remote_folders (local_folder (), this.remote_folder);
             return false;
         } else {
             // connecting is running
-            _checking = false;
-            emit complete_changed ();
+            this.checking = false;
+            /* emit */ complete_changed ();
             on_stop_spinner ();
             return true;
         }
@@ -464,25 +464,25 @@ signals:
 
     void Owncloud_advanced_setup_page.on_set_error_string (string err) {
         if (err.is_empty ()) {
-            _ui.error_label.set_visible (false);
+            this.ui.error_label.set_visible (false);
         } else {
-            _ui.error_label.set_visible (true);
-            _ui.error_label.on_set_text (err);
+            this.ui.error_label.set_visible (true);
+            this.ui.error_label.on_set_text (err);
         }
-        _checking = false;
-        emit complete_changed ();
+        this.checking = false;
+        /* emit */ complete_changed ();
     }
 
     void Owncloud_advanced_setup_page.directories_created () {
-        _checking = false;
-        _created = true;
+        this.checking = false;
+        this.created = true;
         on_stop_spinner ();
-        emit complete_changed ();
+        /* emit */ complete_changed ();
     }
 
     void Owncloud_advanced_setup_page.on_set_remote_folder (string remote_folder) {
         if (!remote_folder.is_empty ()) {
-            _remote_folder = remote_folder;
+            this.remote_folder = remote_folder;
         }
     }
 
@@ -497,7 +497,7 @@ signals:
             update_status ();
         }
 
-        int64 r_space = _ui.r_sync_everything.is_checked () ? _r_size : _r_selected_size;
+        int64 r_space = this.ui.r_sync_everything.is_checked () ? this.r_size : this.r_selected_size;
         string error_str = check_local_space (r_space);
         on_set_error_string (error_str);
     }
@@ -506,19 +506,19 @@ signals:
         const var home_dir = QDir.home_path ().ends_with ('/') ? QDir.home_path () : QDir.home_path () + '/';
 
         if (!path.starts_with (home_dir)) {
-            _ui.pb_select_local_folder.on_set_text (QDir.to_native_separators (path));
+            this.ui.pb_select_local_folder.on_set_text (QDir.to_native_separators (path));
             return;
         }
 
         var pretty_path = path;
         pretty_path.remove (0, home_dir.size ());
 
-        _ui.pb_select_local_folder.on_set_text (QDir.to_native_separators (pretty_path));
+        this.ui.pb_select_local_folder.on_set_text (QDir.to_native_separators (pretty_path));
     }
 
     void Owncloud_advanced_setup_page.on_selective_sync_clicked () {
         AccountPointer acc = static_cast<OwncloudWizard> (wizard ()).account ();
-        var dlg = new Selective_sync_dialog (acc, _remote_folder, _selective_sync_blocklist, this);
+        var dlg = new Selective_sync_dialog (acc, this.remote_folder, this.selective_sync_blocklist, this);
         dlg.set_attribute (Qt.WA_DeleteOnClose);
 
         connect (dlg, &Selective_sync_dialog.on_finished, this, [this, dlg]{
@@ -530,29 +530,29 @@ signals:
             // case the stub blocklist of / was expanded to the actual list of top
             // level folders by the selective sync dialog.
             if (result == Gtk.Dialog.Accepted) {
-                _selective_sync_blocklist = dlg.create_block_list ();
+                this.selective_sync_blocklist = dlg.create_block_list ();
                 update_blocklist = true;
-            } else if (result == Gtk.Dialog.Rejected && _selective_sync_blocklist == string[] ("/")) {
-                _selective_sync_blocklist = dlg.old_block_list ();
+            } else if (result == Gtk.Dialog.Rejected && this.selective_sync_blocklist == string[] ("/")) {
+                this.selective_sync_blocklist = dlg.old_block_list ();
                 update_blocklist = true;
             }
 
             if (update_blocklist) {
-                if (!_selective_sync_blocklist.is_empty ()) {
-                    _ui.r_selective_sync.block_signals (true);
-                    set_radio_checked (_ui.r_selective_sync);
-                    _ui.r_selective_sync.block_signals (false);
+                if (!this.selective_sync_blocklist.is_empty ()) {
+                    this.ui.r_selective_sync.block_signals (true);
+                    set_radio_checked (this.ui.r_selective_sync);
+                    this.ui.r_selective_sync.block_signals (false);
                     var s = dlg.estimated_size ();
                     if (s > 0) {
-                        _ui.l_selective_sync_size_label.on_set_text (_(" (%1)").arg (Utility.octets_to_string (s)));
+                        this.ui.l_selective_sync_size_label.on_set_text (_(" (%1)").arg (Utility.octets_to_string (s)));
                     } else {
-                        _ui.l_selective_sync_size_label.on_set_text ("");
+                        this.ui.l_selective_sync_size_label.on_set_text ("");
                     }
                 } else {
-                    set_radio_checked (_ui.r_sync_everything);
-                    _ui.l_selective_sync_size_label.on_set_text ("");
+                    set_radio_checked (this.ui.r_sync_everything);
+                    this.ui.l_selective_sync_size_label.on_set_text ("");
                 }
-                wizard ().set_property ("blocklist", _selective_sync_blocklist);
+                wizard ().set_property ("blocklist", this.selective_sync_blocklist);
             }
 
             update_status ();
@@ -562,27 +562,27 @@ signals:
     }
 
     void Owncloud_advanced_setup_page.on_virtual_file_sync_clicked () {
-        if (!_ui.r_virtual_file_sync.is_checked ()) {
+        if (!this.ui.r_virtual_file_sync.is_checked ()) {
             OwncloudWizard.ask_experimental_virtual_files_feature (this, [this] (bool enable) {
                 if (!enable)
                     return;
-                set_radio_checked (_ui.r_virtual_file_sync);
+                set_radio_checked (this.ui.r_virtual_file_sync);
             });
         }
     }
 
     void Owncloud_advanced_setup_page.on_sync_everything_clicked () {
-        _ui.l_selective_sync_size_label.on_set_text ("");
-        set_radio_checked (_ui.r_sync_everything);
-        _selective_sync_blocklist.clear ();
+        this.ui.l_selective_sync_size_label.on_set_text ("");
+        set_radio_checked (this.ui.r_sync_everything);
+        this.selective_sync_blocklist.clear ();
 
-        string error_str = check_local_space (_r_size);
+        string error_str = check_local_space (this.r_size);
         on_set_error_string (error_str);
     }
 
-    void Owncloud_advanced_setup_page.on_quota_retrieved (QVariantMap &result) {
-        _r_size = result["size"].to_double ();
-        _ui.l_sync_everything_size_label.on_set_text (_(" (%1)").arg (Utility.octets_to_string (_r_size)));
+    void Owncloud_advanced_setup_page.on_quota_retrieved (QVariantMap result) {
+        this.r_size = result["size"].to_double ();
+        this.ui.l_sync_everything_size_label.on_set_text (_(" (%1)").arg (Utility.octets_to_string (this.r_size)));
 
         update_status ();
     }
@@ -605,12 +605,12 @@ signals:
     }
 
     void Owncloud_advanced_setup_page.customize_style () {
-        if (_progress_indi) {
+        if (this.progress_indi) {
             const var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
-                _progress_indi.on_set_color (Qt.white);
+                this.progress_indi.on_set_color (Qt.white);
             } else {
-                _progress_indi.on_set_color (Qt.block);
+                this.progress_indi.on_set_color (Qt.block);
             }
         }
 
@@ -620,9 +620,9 @@ signals:
 
     void Owncloud_advanced_setup_page.style_local_folder_label () {
         const var background_color = palette ().window ().color ();
-        const var folder_icon_file_name = Theme.instance ().is_branded () ? Theme.hidpi_file_name ("folder.png", background_color)
-                                                                       : Theme.hidpi_file_name (":/client/theme/colored/folder.png");
-        _ui.l_local.set_pixmap (folder_icon_file_name);
+        const var folder_icon_filename = Theme.instance ().is_branded () ? Theme.hidpi_filename ("folder.png", background_color)
+                                                                       : Theme.hidpi_filename (":/client/theme/colored/folder.png");
+        this.ui.l_local.set_pixmap (folder_icon_filename);
     }
 
     void Owncloud_advanced_setup_page.set_radio_checked (QRadio_button radio) {
@@ -632,20 +632,20 @@ signals:
         radio.set_checkable (true);
         radio.set_checked (true);
 
-        if (radio != _ui.r_selective_sync)
-            _ui.r_selective_sync.set_checkable (false);
-        if (radio != _ui.r_virtual_file_sync)
-            _ui.r_virtual_file_sync.set_checkable (false);
+        if (radio != this.ui.r_selective_sync)
+            this.ui.r_selective_sync.set_checkable (false);
+        if (radio != this.ui.r_virtual_file_sync)
+            this.ui.r_virtual_file_sync.set_checkable (false);
     }
 
     void Owncloud_advanced_setup_page.style_sync_logo () {
         const var sync_arrow_icon = Theme.create_color_aware_icon (QLatin1String (":/client/theme/sync-arrow.svg"), palette ());
-        _ui.sync_logo_label.set_pixmap (sync_arrow_icon.pixmap (QSize (50, 50)));
+        this.ui.sync_logo_label.set_pixmap (sync_arrow_icon.pixmap (QSize (50, 50)));
     }
 
     void Owncloud_advanced_setup_page.setup_resoultion_widget () {
-        for (int i = 0; i < _ui.resolution_widget_layout.count (); ++i) {
-            var widget = _ui.resolution_widget_layout.item_at (i).widget ();
+        for (int i = 0; i < this.ui.resolution_widget_layout.count (); ++i) {
+            var widget = this.ui.resolution_widget_layout.item_at (i).widget ();
             if (!widget) {
                 continue;
             }

@@ -33,21 +33,21 @@ class Legal_notice : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private Ui.Legal_notice _ui;
+    private Ui.Legal_notice this.ui;
 };
 
     Legal_notice.Legal_notice (Gtk.Dialog parent)
         : Gtk.Dialog (parent)
-        , _ui (new Ui.Legal_notice) {
-        _ui.setup_ui (this);
+        , this.ui (new Ui.Legal_notice) {
+        this.ui.setup_ui (this);
 
-        connect (_ui.close_button, &QPushButton.clicked, this, &Legal_notice.accept);
+        connect (this.ui.close_button, &QPushButton.clicked, this, &Legal_notice.accept);
 
         customize_style ();
     }
 
     Legal_notice.~Legal_notice () {
-        delete _ui;
+        delete this.ui;
     }
 
     void Legal_notice.change_event (QEvent e) {
@@ -75,10 +75,10 @@ class Legal_notice : Gtk.Dialog {
 
         Theme.replace_link_color_string_background_aware (notice);
 
-        _ui.notice.set_text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
-        _ui.notice.on_set_text (notice);
-        _ui.notice.set_word_wrap (true);
-        _ui.notice.set_open_external_links (true);
+        this.ui.notice.set_text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
+        this.ui.notice.on_set_text (notice);
+        this.ui.notice.set_word_wrap (true);
+        this.ui.notice.set_open_external_links (true);
     }
 
     } // namespace Occ

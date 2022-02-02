@@ -11,12 +11,12 @@
 
 using namespace Occ;
 
-static void changeAllFileId (FileInfo &info) {
+static void changeAllFileId (FileInfo info) {
     info.fileId = generateFileId ();
     if (!info.isDir)
         return;
     info.etag = generateEtag ();
-    for (var &child : info.children) {
+    for (var child : info.children) {
         changeAllFileId (child);
     }
 }
@@ -59,13 +59,13 @@ class TestAllFilesDeleted : GLib.Object {
             [&] (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
                 QCOMPARE (aboutToRemoveAllFilesCalled, 0);
                 aboutToRemoveAllFilesCalled++;
-                QCOMPARE (dir, deleteOnRemote ? SyncFileItem.Down : SyncFileItem.Up);
+                QCOMPARE (dir, deleteOnRemote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP);
                 callback (true);
                 fakeFolder.syncEngine ().journal ().clearFileTable (); // That's what Folder is doing
             });
 
-        var &modifier = deleteOnRemote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
-        for (var &s : fakeFolder.currentRemoteState ().children.keys ())
+        var modifier = deleteOnRemote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
+        for (var s : fakeFolder.currentRemoteState ().children.keys ())
             modifier.remove (s);
 
         QVERIFY (!fakeFolder.syncOnce ()); // Should fail because we cancel the sync
@@ -78,7 +78,7 @@ class TestAllFilesDeleted : GLib.Object {
 
         // The selective sync blocklist should be not have been deleted.
         bool ok = true;
-        QCOMPARE (fakeFolder.syncEngine ().journal ().getSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, &ok),
+        QCOMPARE (fakeFolder.syncEngine ().journal ().getSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok),
                  selectiveSyncBlockList);
     }
 
@@ -102,12 +102,12 @@ class TestAllFilesDeleted : GLib.Object {
             [&] (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
                 QCOMPARE (aboutToRemoveAllFilesCalled, 0);
                 aboutToRemoveAllFilesCalled++;
-                QCOMPARE (dir, deleteOnRemote ? SyncFileItem.Down : SyncFileItem.Up);
+                QCOMPARE (dir, deleteOnRemote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP);
                 callback (false);
             });
 
-        var &modifier = deleteOnRemote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
-        for (var &s : fakeFolder.currentRemoteState ().children.keys ())
+        var modifier = deleteOnRemote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
+        for (var s : fakeFolder.currentRemoteState ().children.keys ())
             modifier.remove (s);
 
         QVERIFY (fakeFolder.syncOnce ()); // Should succeed, and all files must then be deleted
@@ -139,7 +139,7 @@ class TestAllFilesDeleted : GLib.Object {
             [&] { QVERIFY (false); });
         QVERIFY (fakeFolder.syncOnce ());
 
-        for (var &s : fakeFolder.currentRemoteState ().children.keys ())
+        for (var s : fakeFolder.currentRemoteState ().children.keys ())
             fakeFolder.syncJournal ().avoidRenamesOnNextSync (s); // clears all the fileid and inodes.
         fakeFolder.localModifier ().remove ("A/a1");
         var expectedState = fakeFolder.currentLocalState ();
@@ -166,7 +166,7 @@ class TestAllFilesDeleted : GLib.Object {
             [&] (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
                 QCOMPARE (aboutToRemoveAllFilesCalled, 0);
                 aboutToRemoveAllFilesCalled++;
-                QCOMPARE (dir, SyncFileItem.Down);
+                QCOMPARE (dir, SyncFileItem.Direction.DOWN);
                 callback (false);
             });
 
@@ -215,7 +215,7 @@ class TestAllFilesDeleted : GLib.Object {
         }
 
         int fingerprintRequests = 0;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest &request, QIODevice stream) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest request, QIODevice stream) . QNetworkReply * {
             var verb = request.attribute (QNetworkRequest.CustomVerbAttribute);
             if (verb == "PROPFIND") {
                 var data = stream.readAll ();

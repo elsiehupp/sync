@@ -42,29 +42,29 @@ using namespace Occ;
 
 class TestFolderWatcher : GLib.Object {
 
-    QTemporaryDir _root;
-    string _rootPath;
-    QScopedPointer<FolderWatcher> _watcher;
-    QScopedPointer<QSignalSpy> _pathChangedSpy;
+    QTemporaryDir this.root;
+    string this.rootPath;
+    QScopedPointer<FolderWatcher> this.watcher;
+    QScopedPointer<QSignalSpy> this.pathChangedSpy;
 
     bool waitForPathChanged (string path) {
         QElapsedTimer t;
         t.on_start ();
         while (t.elapsed () < 5000) {
             // Check if it was already reported as changed by the watcher
-            for (int i = 0; i < _pathChangedSpy.size (); ++i) {
-                const var &args = _pathChangedSpy.at (i);
+            for (int i = 0; i < this.pathChangedSpy.size (); ++i) {
+                const var args = this.pathChangedSpy.at (i);
                 if (args.first ().toString () == path)
                     return true;
             }
             // Wait a bit and test again (don't bother checking if we timed out or not)
-            _pathChangedSpy.wait (200);
+            this.pathChangedSpy.wait (200);
         }
         return false;
     }
 
 #ifdef Q_OS_LINUX
-const int CHECK_WATCH_COUNT (n) QCOMPARE (_watcher.testLinuxWatchCount (), (n))
+const int CHECK_WATCH_COUNT (n) QCOMPARE (this.watcher.testLinuxWatchCount (), (n))
 #else
 const int CHECK_WATCH_COUNT (n) do {} while (false)
 #endif
@@ -72,23 +72,23 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     /***********************************************************
     ***********************************************************/
     public TestFolderWatcher () {
-        QDir rootDir (_root.path ());
-        _rootPath = rootDir.canonicalPath ();
-        qDebug () << "creating test directory tree in " << _rootPath;
+        QDir rootDir (this.root.path ());
+        this.rootPath = rootDir.canonicalPath ();
+        qDebug () << "creating test directory tree in " << this.rootPath;
 
         rootDir.mkpath ("a1/b1/c1");
         rootDir.mkpath ("a1/b1/c2");
         rootDir.mkpath ("a1/b2/c1");
         rootDir.mkpath ("a1/b3/c3");
         rootDir.mkpath ("a2/b3/c3");
-        Utility.writeRandomFile ( _rootPath+"/a1/random.bin");
-        Utility.writeRandomFile ( _rootPath+"/a1/b2/todelete.bin");
-        Utility.writeRandomFile ( _rootPath+"/a2/renamefile");
-        Utility.writeRandomFile ( _rootPath+"/a1/movefile");
+        Utility.writeRandomFile ( this.rootPath+"/a1/random.bin");
+        Utility.writeRandomFile ( this.rootPath+"/a1/b2/todelete.bin");
+        Utility.writeRandomFile ( this.rootPath+"/a2/renamefile");
+        Utility.writeRandomFile ( this.rootPath+"/a1/movefile");
 
-        _watcher.on_reset (new FolderWatcher);
-        _watcher.on_init (_rootPath);
-        _pathChangedSpy.on_reset (new QSignalSpy (_watcher.data (), SIGNAL (pathChanged (string))));
+        this.watcher.on_reset (new FolderWatcher);
+        this.watcher.on_init (this.rootPath);
+        this.pathChangedSpy.on_reset (new QSignalSpy (this.watcher.data (), SIGNAL (pathChanged (string))));
     }
 
 
@@ -96,7 +96,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     ***********************************************************/
     public int countFolders (string path) {
         int n = 0;
-        for (var &sub : QDir (path).entryList (QDir.Dirs | QDir.NoDotAndDotDot))
+        for (var sub : QDir (path).entryList (QDir.Dirs | QDir.NoDotAndDotDot))
             n += 1 + countFolders (path + '/' + sub);
         return n;
     }
@@ -105,22 +105,22 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     /***********************************************************
     ***********************************************************/
     private void on_init () {
-        _pathChangedSpy.clear ();
-        CHECK_WATCH_COUNT (countFolders (_rootPath) + 1);
+        this.pathChangedSpy.clear ();
+        CHECK_WATCH_COUNT (countFolders (this.rootPath) + 1);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_cleanup () {
-        CHECK_WATCH_COUNT (countFolders (_rootPath) + 1);
+        CHECK_WATCH_COUNT (countFolders (this.rootPath) + 1);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private on_ void testACreate () { // create a new file
-        string file (_rootPath + "/foo.txt");
+        string file (this.rootPath + "/foo.txt");
         string cmd;
         cmd = string ("echo \"xyz\" > %1").arg (file);
         qDebug () << "Command : " << cmd;
@@ -133,7 +133,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     /***********************************************************
     ***********************************************************/
     private on_ void testATouch () { // touch an existing file.
-        string file (_rootPath + "/a1/random.bin");
+        string file (this.rootPath + "/a1/random.bin");
         touch (file);
         QVERIFY (waitForPathChanged (file));
     }
@@ -142,25 +142,25 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     /***********************************************************
     ***********************************************************/
     private on_ void testMove3LevelDirWithFile () {
-        string file (_rootPath + "/a0/b/c/empty.txt");
-        mkdir (_rootPath + "/a0");
-        mkdir (_rootPath + "/a0/b");
-        mkdir (_rootPath + "/a0/b/c");
+        string file (this.rootPath + "/a0/b/c/empty.txt");
+        mkdir (this.rootPath + "/a0");
+        mkdir (this.rootPath + "/a0/b");
+        mkdir (this.rootPath + "/a0/b/c");
         touch (file);
-        mv (_rootPath + "/a0", _rootPath + "/a");
-        QVERIFY (waitForPathChanged (_rootPath + "/a/b/c/empty.txt"));
+        mv (this.rootPath + "/a0", this.rootPath + "/a");
+        QVERIFY (waitForPathChanged (this.rootPath + "/a/b/c/empty.txt"));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private on_ void testCreateADir () {
-        string file (_rootPath+"/a1/b1/new_dir");
+        string file (this.rootPath+"/a1/b1/new_dir");
         mkdir (file);
         QVERIFY (waitForPathChanged (file));
 
         // Notifications from that new folder arrive too
-        string file2 (_rootPath + "/a1/b1/new_dir/contained");
+        string file2 (this.rootPath + "/a1/b1/new_dir/contained");
         touch (file2);
         QVERIFY (waitForPathChanged (file2));
     }
@@ -169,7 +169,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     /***********************************************************
     ***********************************************************/
     private on_ void testRemoveADir () {
-        string file (_rootPath+"/a1/b3/c3");
+        string file (this.rootPath+"/a1/b3/c3");
         rmdir (file);
         QVERIFY (waitForPathChanged (file));
     }
@@ -178,7 +178,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     /***********************************************************
     ***********************************************************/
     private on_ void testRemoveAFile () {
-        string file (_rootPath+"/a1/b2/todelete.bin");
+        string file (this.rootPath+"/a1/b2/todelete.bin");
         QVERIFY (GLib.File.exists (file));
         rm (file);
         QVERIFY (!GLib.File.exists (file));
@@ -190,8 +190,8 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     /***********************************************************
     ***********************************************************/
     private on_ void testRenameAFile () {
-        string file1 (_rootPath+"/a2/renamefile");
-        string file2 (_rootPath+"/a2/renamefile.renamed");
+        string file1 (this.rootPath+"/a2/renamefile");
+        string file2 (this.rootPath+"/a2/renamefile.renamed");
         QVERIFY (GLib.File.exists (file1));
         mv (file1, file2);
         QVERIFY (GLib.File.exists (file2));
@@ -204,8 +204,8 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     /***********************************************************
     ***********************************************************/
     private on_ void testMoveAFile () {
-        string old_file (_rootPath+"/a1/movefile");
-        string new_file (_rootPath+"/a2/movefile.renamed");
+        string old_file (this.rootPath+"/a1/movefile");
+        string new_file (this.rootPath+"/a2/movefile.renamed");
         QVERIFY (GLib.File.exists (old_file));
         mv (old_file, new_file);
         QVERIFY (GLib.File.exists (new_file));
@@ -218,8 +218,8 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     /***********************************************************
     ***********************************************************/
     private on_ void testRenameDirectorySameBase () {
-        string old_file (_rootPath+"/a1/b1");
-        string new_file (_rootPath+"/a1/brename");
+        string old_file (this.rootPath+"/a1/b1");
+        string new_file (this.rootPath+"/a1/brename");
         QVERIFY (GLib.File.exists (old_file));
         mv (old_file, new_file);
         QVERIFY (GLib.File.exists (new_file));
@@ -229,11 +229,11 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
         // Verify that further notifications end up with the correct paths
 
-        string file (_rootPath+"/a1/brename/c1/random.bin");
+        string file (this.rootPath+"/a1/brename/c1/random.bin");
         touch (file);
         QVERIFY (waitForPathChanged (file));
 
-        string dir (_rootPath+"/a1/brename/newfolder");
+        string dir (this.rootPath+"/a1/brename/newfolder");
         mkdir (dir);
         QVERIFY (waitForPathChanged (dir));
     }
@@ -242,8 +242,8 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     /***********************************************************
     ***********************************************************/
     private on_ void testRenameDirectoryDifferentBase () {
-        string old_file (_rootPath+"/a1/brename");
-        string new_file (_rootPath+"/bren");
+        string old_file (this.rootPath+"/a1/brename");
+        string new_file (this.rootPath+"/bren");
         QVERIFY (GLib.File.exists (old_file));
         mv (old_file, new_file);
         QVERIFY (GLib.File.exists (new_file));
@@ -253,11 +253,11 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
         // Verify that further notifications end up with the correct paths
 
-        string file (_rootPath+"/bren/c1/random.bin");
+        string file (this.rootPath+"/bren/c1/random.bin");
         touch (file);
         QVERIFY (waitForPathChanged (file));
 
-        string dir (_rootPath+"/bren/newfolder2");
+        string dir (this.rootPath+"/bren/newfolder2");
         mkdir (dir);
         QVERIFY (waitForPathChanged (dir));
     }

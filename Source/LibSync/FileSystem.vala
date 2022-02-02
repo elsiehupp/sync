@@ -12,7 +12,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 // #pragma once
 
-// #include <string>
 // #include <ctime>
 // #include <functional>
 
@@ -66,13 +65,13 @@ namespace FileSystem {
 
 
     /***********************************************************
-    @brief Check if \a file_name has changed given previous size and mtime
+    @brief Check if \a filename has changed given previous size and mtime
 
     Nonexisting files are covered through mtime : they have an mtime of -1.
 
     @return true if the file's mtime or size are not what is expected.
     ***********************************************************/
-    bool file_changed (string file_name,
+    bool file_changed (string filename,
         int64 previous_size,
         time_t previous_mtime);
 
@@ -80,7 +79,7 @@ namespace FileSystem {
     /***********************************************************
     @brief Like !file_changed () but with verbose logging if the file did* change.
     ***********************************************************/
-    bool verify_file_unchanged (string file_name,
+    bool verify_file_unchanged (string filename,
         int64 previous_size,
         time_t previous_mtime);
 
@@ -93,7 +92,7 @@ namespace FileSystem {
     errors are collected in errors.
     ***********************************************************/
     bool remove_recursively (string path,
-        const std.function<void (string path, bool is_dir)> &on_deleted = nullptr,
+        const std.function<void (string path, bool is_dir)> on_deleted = nullptr,
         string[] *errors = nullptr);
 }
 
@@ -129,7 +128,7 @@ namespace FileSystem {
     time_t FileSystem.get_mod_time (string filename) {
         csync_file_stat_t stat;
         int64 result = -1;
-        if (csync_vio_local_stat (filename, &stat) != -1
+        if (csync_vio_local_stat (filename, stat) != -1
             && (stat.modtime != 0)) {
             result = stat.modtime;
         } else {
@@ -153,20 +152,20 @@ namespace FileSystem {
         return true;
     }
 
-    bool FileSystem.file_changed (string file_name,
+    bool FileSystem.file_changed (string filename,
         int64 previous_size,
         time_t previous_mtime) {
-        return get_size (file_name) != previous_size
-            || get_mod_time (file_name) != previous_mtime;
+        return get_size (filename) != previous_size
+            || get_mod_time (filename) != previous_mtime;
     }
 
-    bool FileSystem.verify_file_unchanged (string file_name,
+    bool FileSystem.verify_file_unchanged (string filename,
         int64 previous_size,
         time_t previous_mtime) {
-        const int64 actual_size = get_size (file_name);
-        const time_t actual_mtime = get_mod_time (file_name);
+        const int64 actual_size = get_size (filename);
+        const time_t actual_mtime = get_mod_time (filename);
         if ( (actual_size != previous_size && actual_mtime > 0) || (actual_mtime != previous_mtime && previous_mtime > 0 && actual_mtime > 0)) {
-            q_c_info (lc_file_system) << "File" << file_name << "has changed:"
+            q_c_info (lc_file_system) << "File" << filename << "has changed:"
                                  << "size : " << previous_size << "<." << actual_size
                                  << ", mtime : " << previous_mtime << "<." << actual_mtime;
             return false;
@@ -179,22 +178,22 @@ namespace FileSystem {
     }
 
     // Code inspired from Qt5's QDir.remove_recursively
-    bool FileSystem.remove_recursively (string path, std.function<void (string path, bool is_dir)> &on_deleted, string[] *errors) {
+    bool FileSystem.remove_recursively (string path, std.function<void (string path, bool is_dir)> on_deleted, string[] *errors) {
         bool all_removed = true;
         QDirIterator di (path, QDir.AllEntries | QDir.Hidden | QDir.System | QDir.NoDotAndDotDot);
 
         while (di.has_next ()) {
             di.next ();
-            const QFileInfo &fi = di.file_info ();
+            const QFileInfo fi = di.file_info ();
             bool remove_ok = false;
             // The use of is_sym_link here is okay:
             // we never want to go into this branch for .lnk files
             bool is_dir = fi.is_dir () && !fi.is_sym_link () && !FileSystem.is_junction (fi.absolute_file_path ());
             if (is_dir) {
-                remove_ok = remove_recursively (path + '/' + di.file_name (), on_deleted, errors); // recursive
+                remove_ok = remove_recursively (path + '/' + di.filename (), on_deleted, errors); // recursive
             } else {
                 string remove_error;
-                remove_ok = FileSystem.remove (di.file_path (), &remove_error);
+                remove_ok = FileSystem.remove (di.file_path (), remove_error);
                 if (remove_ok) {
                     if (on_deleted)
                         on_deleted (di.file_path (), false);
@@ -227,7 +226,7 @@ namespace FileSystem {
 
     bool FileSystem.get_inode (string filename, uint64 inode) {
         csync_file_stat_t fs;
-        if (csync_vio_local_stat (filename, &fs) == 0) {
+        if (csync_vio_local_stat (filename, fs) == 0) {
             *inode = fs.inode;
             return true;
         }

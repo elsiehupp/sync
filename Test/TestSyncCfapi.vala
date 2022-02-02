@@ -52,21 +52,21 @@ void setPinState (string path, PinState state, cfapi.SetPinRecurseMode mode) {
     }
 }
 
-bool itemInstruction (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
+bool itemInstruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
     return item._instruction == instr;
 }
 
-SyncJournalFileRecord dbRecord (FakeFolder &folder, string path) {
+SyncJournalFileRecord dbRecord (FakeFolder folder, string path) {
     SyncJournalFileRecord record;
-    folder.syncJournal ().getFileRecord (path, &record);
+    folder.syncJournal ().getFileRecord (path, record);
     return record;
 }
 
-void triggerDownload (FakeFolder &folder, GLib.ByteArray path) {
-    var &journal = folder.syncJournal ();
+void triggerDownload (FakeFolder folder, GLib.ByteArray path) {
+    var journal = folder.syncJournal ();
     SyncJournalFileRecord record;
-    journal.getFileRecord (path, &record);
+    journal.getFileRecord (path, record);
     if (!record.isValid ())
         return;
     record._type = ItemTypeVirtualFileDownload;
@@ -74,10 +74,10 @@ void triggerDownload (FakeFolder &folder, GLib.ByteArray path) {
     journal.schedulePathForRemoteDiscovery (record._path);
 }
 
-void markForDehydration (FakeFolder &folder, GLib.ByteArray path) {
-    var &journal = folder.syncJournal ();
+void markForDehydration (FakeFolder folder, GLib.ByteArray path) {
+    var journal = folder.syncJournal ();
     SyncJournalFileRecord record;
-    journal.getFileRecord (path, &record);
+    journal.getFileRecord (path, record);
     if (!record.isValid ())
         return;
     record._type = ItemTypeVirtualFileDehydration;
@@ -85,7 +85,7 @@ void markForDehydration (FakeFolder &folder, GLib.ByteArray path) {
     journal.schedulePathForRemoteDiscovery (record._path);
 }
 
-unowned<Vfs> setupVfs (FakeFolder &folder) {
+unowned<Vfs> setupVfs (FakeFolder folder) {
     var cfapiVfs = unowned<Vfs> (createVfsFromPlugin (Vfs.WindowsCfApi).release ());
     GLib.Object.connect (&folder.syncEngine ().syncFileStatusTracker (), &SyncFileStatusTracker.fileStatusChanged,
                      cfapiVfs.data (), &Vfs.fileStatusChanged);
@@ -732,7 +732,7 @@ class TestSyncCfApi : GLib.Object {
         };
         var hasDehydratedDbEntries = [&] (string path) {
             SyncJournalFileRecord record;
-            fakeFolder.syncJournal ().getFileRecord (path, &record);
+            fakeFolder.syncJournal ().getFileRecord (path, record);
             return record.isValid () && record._type == ItemTypeVirtualFile;
         };
 
@@ -1186,7 +1186,7 @@ class TestSyncCfApi : GLib.Object {
 
         // Setup error case if needed
         if (errorKind == Timeout) {
-            fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice *) . QNetworkReply * {
+            fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice *) . QNetworkReply * {
                 if (req.url ().path ().endsWith ("online/sub/file1")) {
                     return new FakeHangingReply (op, req, this);
                 }

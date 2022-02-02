@@ -71,11 +71,11 @@ class TestIconUtils : GLib.Object {
 
         QVERIFY (!blackImages.isEmpty ());
 
-        QVERIFY (!Occ.Ui.IconUtils.pixmapForBackground (whiteImages.at (0), QColor ("blue")).isNull ());
+        QVERIFY (!Occ.Ui.IconUtils.pixmapForBackground (whiteImages.at (0), Gtk.Color ("blue")).isNull ());
 
         QVERIFY (!whiteImages.isEmpty ());
 
-        QVERIFY (!Occ.Ui.IconUtils.pixmapForBackground (blackImages.at (0), QColor ("yellow")).isNull ());
+        QVERIFY (!Occ.Ui.IconUtils.pixmapForBackground (blackImages.at (0), Gtk.Color ("yellow")).isNull ());
     }
 };
 

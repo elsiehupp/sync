@@ -49,20 +49,20 @@ class SyncRunFileLog {
 
     /***********************************************************
     ***********************************************************/
-    private string date_time_str (GLib.DateTime &dt);
+    private string date_time_str (GLib.DateTime dt);
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<GLib.File> _file;
-    private QTextStream _out;
-    private QElapsedTimer _total_duration;
-    private QElapsedTimer _lap_duration;
+    private QScopedPointer<GLib.File> this.file;
+    private QTextStream this.out;
+    private QElapsedTimer this.total_duration;
+    private QElapsedTimer this.lap_duration;
 };
 
 
     SyncRunFileLog.SyncRunFileLog () = default;
 
-    string SyncRunFileLog.date_time_str (GLib.DateTime &dt) {
+    string SyncRunFileLog.date_time_str (GLib.DateTime dt) {
         return dt.to_string (Qt.ISODate);
     }
 
@@ -76,7 +76,7 @@ class SyncRunFileLog {
 
         int length = folder_path.split (QLatin1String ("/")).length ();
         string filename_single = folder_path.split (QLatin1String ("/")).at (length - 2);
-        string filename = logpath + QLatin1String ("/") + filename_single + QLatin1String ("_sync.log");
+        string filename = logpath + QLatin1String ("/") + filename_single + QLatin1String ("this.sync.log");
 
         int depth_index = 2;
         while (GLib.File.exists (filename)) {
@@ -89,13 +89,13 @@ class SyncRunFileLog {
             if (string.compare (folder_path,line,Qt.CaseSensitive)!=0) {
                 depth_index++;
                 if (depth_index <= length) {
-                    filename_single = folder_path.split (QLatin1String ("/")).at (length - depth_index) + string ("_") ///
+                    filename_single = folder_path.split (QLatin1String ("/")).at (length - depth_index) + string ("this.") ///
                             + filename_single;
-                    filename = logpath+ QLatin1String ("/") + filename_single + QLatin1String ("_sync.log");
+                    filename = logpath+ QLatin1String ("/") + filename_single + QLatin1String ("this.sync.log");
                 }
                 else {
-                    filename_single = filename_single + QLatin1String ("_1");
-                    filename = logpath + QLatin1String ("/") + filename_single + QLatin1String ("_sync.log");
+                    filename_single = filename_single + QLatin1String ("this.1");
+                    filename = logpath + QLatin1String ("/") + filename_single + QLatin1String ("this.sync.log");
                 }
             }
             else break;
@@ -110,15 +110,15 @@ class SyncRunFileLog {
             GLib.File.remove (new_filename);
             GLib.File.rename (filename, new_filename);
         }
-        _file.on_reset (new GLib.File (filename));
+        this.file.on_reset (new GLib.File (filename));
 
-        _file.open (QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text);
-        _out.set_device (_file.data ());
+        this.file.open (QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text);
+        this.out.set_device (this.file.data ());
 
         if (!exists) {
-            _out << folder_path << endl;
+            this.out << folder_path << endl;
             // We are creating a new file, add the note.
-            _out << "# timestamp | duration | file | instruction | dir | modtime | etag | "
+            this.out << "# timestamp | duration | file | instruction | dir | modtime | etag | "
                     "size | file_id | status | error_string | http result code | "
                     "other size | other modtime | X-Request-ID"
                  << endl;
@@ -126,13 +126,13 @@ class SyncRunFileLog {
             FileSystem.set_file_hidden (filename, true);
         }
 
-        _total_duration.on_start ();
-        _lap_duration.on_start ();
-        _out << "#=#=#=# Syncrun started " << date_time_str (GLib.DateTime.current_date_time_utc ()) << endl;
+        this.total_duration.on_start ();
+        this.lap_duration.on_start ();
+        this.out << "#=#=#=# Syncrun started " << date_time_str (GLib.DateTime.current_date_time_utc ()) << endl;
     }
-    void SyncRunFileLog.log_item (SyncFileItem &item) {
+    void SyncRunFileLog.log_item (SyncFileItem item) {
         // don't log the directory items that are in the list
-        if (item._direction == SyncFileItem.None
+        if (item._direction == SyncFileItem.Direction.NONE
             || item._instruction == CSYNC_INSTRUCTION_IGNORE) {
             return;
         }
@@ -146,40 +146,40 @@ class SyncRunFileLog {
         }
 
         const char L = '|';
-        _out << ts << L;
-        _out << L;
+        this.out << ts << L;
+        this.out << L;
         if (item._instruction != CSYNC_INSTRUCTION_RENAME) {
-            _out << item.destination () << L;
+            this.out << item.destination () << L;
         } else {
-            _out << item._file << QLatin1String (" . ") << item._rename_target << L;
+            this.out << item._file << QLatin1String (" . ") << item._rename_target << L;
         }
-        _out << item._instruction << L;
-        _out << item._direction << L;
-        _out << string.number (item._modtime) << L;
-        _out << item._etag << L;
-        _out << string.number (item._size) << L;
-        _out << item._file_id << L;
-        _out << item._status << L;
-        _out << item._error_string << L;
-        _out << string.number (item._http_error_code) << L;
-        _out << string.number (item._previous_size) << L;
-        _out << string.number (item._previous_modtime) << L;
-        _out << item._request_id << L;
+        this.out << item._instruction << L;
+        this.out << item._direction << L;
+        this.out << string.number (item._modtime) << L;
+        this.out << item._etag << L;
+        this.out << string.number (item._size) << L;
+        this.out << item._file_id << L;
+        this.out << item._status << L;
+        this.out << item._error_string << L;
+        this.out << string.number (item._http_error_code) << L;
+        this.out << string.number (item._previous_size) << L;
+        this.out << string.number (item._previous_modtime) << L;
+        this.out << item._request_id << L;
 
-        _out << endl;
+        this.out << endl;
     }
 
     void SyncRunFileLog.log_lap (string name) {
-        _out << "#=#=#=#=# " << name << " " << date_time_str (GLib.DateTime.current_date_time_utc ())
-             << " (last step : " << _lap_duration.restart () << " msec"
-             << ", total : " << _total_duration.elapsed () << " msec)" << endl;
+        this.out << "#=#=#=#=# " << name << " " << date_time_str (GLib.DateTime.current_date_time_utc ())
+             << " (last step : " << this.lap_duration.restart () << " msec"
+             << ", total : " << this.total_duration.elapsed () << " msec)" << endl;
     }
 
     void SyncRunFileLog.finish () {
-        _out << "#=#=#=# Syncrun on_finished " << date_time_str (GLib.DateTime.current_date_time_utc ())
-             << " (last step : " << _lap_duration.elapsed () << " msec"
-             << ", total : " << _total_duration.elapsed () << " msec)" << endl;
-        _file.close ();
+        this.out << "#=#=#=# Syncrun on_finished " << date_time_str (GLib.DateTime.current_date_time_utc ())
+             << " (last step : " << this.lap_duration.elapsed () << " msec"
+             << ", total : " << this.total_duration.elapsed () << " msec)" << endl;
+        this.file.close ();
     }
     }
     

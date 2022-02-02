@@ -96,7 +96,7 @@ int main (int argc, char **argv) {
         core_limit.rlim_cur = RLIM_INFINITY;
         core_limit.rlim_max = RLIM_INFINITY;
 
-        if (setrlimit (RLIMIT_CORE, &core_limit) < 0) {
+        if (setrlimit (RLIMIT_CORE, core_limit) < 0) {
             fprintf (stderr, "Unable to set core dump limit\n");
         } else {
             q_c_info (lc_application) << "Core dumps enabled";
@@ -167,7 +167,7 @@ int main (int argc, char **argv) {
                 if (desktop_session != "ubuntu") {
                     q_c_info (lc_application) << "System tray still not available, showing window and trying again later";
                     app.show_main_dialog ();
-                    QTimer.single_shot (10000, &app, &Application.on_try_tray_again);
+                    QTimer.single_shot (10000, app, &Application.on_try_tray_again);
                 } else {
                     q_c_info (lc_application) << "System tray still not available, but assuming it's fine on 'ubuntu' desktop";
                 }

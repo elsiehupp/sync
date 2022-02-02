@@ -89,8 +89,7 @@ static constexpr char show_main_dialog_as_normal_window_c[] = "show_main_dialog_
 // #include <memory>
 
 // #include <QSettings>
-// #include <string>
-// #include <QVariant>
+// #include <GLib.Variant>
 // #include <chrono>
 
 
@@ -524,21 +523,21 @@ class ConfigFile {
     public static std.unique_ptr<QSettings> settings_with_group (string group, GLib.Object parent = new GLib.Object ());
 
     /// Add the system and user exclude file path to the ExcludedFiles instance.
-    public static void setup_default_exclude_file_paths (ExcludedFiles &excluded_files);
+    public static void setup_default_exclude_file_paths (ExcludedFiles excluded_files);
 
 
-    protected QVariant get_policy_setting (string policy, QVariant &default_value = QVariant ());
-    protected void store_data (string group, string key, QVariant &value);
-    protected QVariant retrieve_data (string group, string key);
+    protected GLib.Variant get_policy_setting (string policy, GLib.Variant default_value = GLib.Variant ());
+    protected void store_data (string group, string key, GLib.Variant value);
+    protected GLib.Variant retrieve_data (string group, string key);
     protected void remove_data (string group, string key);
     protected bool data_exists (string group, string key);
 
 
     /***********************************************************
     ***********************************************************/
-    private QVariant get_value (string param, string group = "",
-        const QVariant &default_value = QVariant ());
-    private void set_value (string key, QVariant &value);
+    private GLib.Variant get_value (string param, string group = "",
+        const GLib.Variant default_value = GLib.Variant ());
+    private void set_value (string key, GLib.Variant value);
 
     /***********************************************************
     ***********************************************************/
@@ -551,12 +550,12 @@ class ConfigFile {
     /***********************************************************
     ***********************************************************/
     private 
-    private static bool _asked_user;
-    private static string _o_c_version;
-    private static string _conf_dir;
+    private static bool this.asked_user;
+    private static string this.o_c_version;
+    private static string this.conf_dir;
 };
 
-static chrono.milliseconds milliseconds_value (QSettings &setting, char key,
+static chrono.milliseconds milliseconds_value (QSettings setting, char key,
     chrono.milliseconds default_value) {
     return chrono.milliseconds (setting.value (QLatin1String (key), qlonglong (default_value.count ())).to_long_long ());
 }
@@ -618,7 +617,7 @@ bool ConfigFile.set_conf_dir (string value) {
     if (fi.exists () && fi.is_dir ()) {
         dir_path = fi.absolute_file_path ();
         q_c_info (lc_config_file) << "Using custom config dir " << dir_path;
-        _conf_dir = dir_path;
+        this.conf_dir = dir_path;
         return true;
     }
     return false;
@@ -713,7 +712,7 @@ void ConfigFile.restore_geometry_header (QHeaderView header) {
 #endif
 }
 
-QVariant ConfigFile.get_policy_setting (string setting, QVariant &default_value) {
+GLib.Variant ConfigFile.get_policy_setting (string setting, GLib.Variant default_value) {
     if (Utility.is_windows ()) {
         // check for policies first and return immediately if a value is found.
         QSettings user_policy (string.from_latin1 (R" (HKEY_CURRENT_USER\Software\Policies\%1\%2)")
@@ -734,10 +733,10 @@ QVariant ConfigFile.get_policy_setting (string setting, QVariant &default_value)
 }
 
 string ConfigFile.config_path () {
-    if (_conf_dir.is_empty ()) {
+    if (this.conf_dir.is_empty ()) {
         if (!Utility.is_windows ()) {
             // On Unix, use the AppConfigLocation for the settings, that's configurable with the XDG_CONFIG_HOME env variable.
-            _conf_dir = QStandardPaths.writable_location (QStandardPaths.AppConfigLocation);
+            this.conf_dir = QStandardPaths.writable_location (QStandardPaths.AppConfigLocation);
         } else {
             // On Windows, use AppDataLocation, that's where the roaming data is and where we should store the config file
              var new_location = QStandardPaths.writable_location (QStandardPaths.AppDataLocation);
@@ -753,10 +752,10 @@ string ConfigFile.config_path () {
                      copy_dir_recursive (old_location, new_location);
                  }
              }
-            _conf_dir = new_location;
+            this.conf_dir = new_location;
         }
     }
-    string dir = _conf_dir;
+    string dir = this.conf_dir;
 
     if (!dir.ends_with ('/'))
         dir.append ('/');
@@ -822,7 +821,7 @@ string ConfigFile.backup () {
     string base_file = config_file ();
     var version_string = client_version_"";
     if (!version_string.is_empty ())
-        version_string.prepend ('_');
+        version_string.prepend ('this.');
     string backup_file =
         string ("%1.backup_%2%3")
             .arg (base_file)
@@ -840,7 +839,7 @@ string ConfigFile.backup () {
 }
 
 string ConfigFile.config_file () {
-    return config_path () + Theme.instance ().config_file_name ();
+    return config_path () + Theme.instance ().config_filename ();
 }
 
 bool ConfigFile.exists () {
@@ -852,7 +851,7 @@ string ConfigFile.default_connection () {
     return Theme.instance ().app_name ();
 }
 
-void ConfigFile.store_data (string group, string key, QVariant &value) {
+void ConfigFile.store_data (string group, string key, GLib.Variant value) {
     const string con (group.is_empty () ? default_connection () : group);
     QSettings settings (config_file (), QSettings.IniFormat);
 
@@ -861,7 +860,7 @@ void ConfigFile.store_data (string group, string key, QVariant &value) {
     settings.sync ();
 }
 
-QVariant ConfigFile.retrieve_data (string group, string key) {
+GLib.Variant ConfigFile.retrieve_data (string group, string key) {
     const string con (group.is_empty () ? default_connection () : group);
     QSettings settings (config_file (), QSettings.IniFormat);
 
@@ -980,10 +979,10 @@ bool ConfigFile.skip_update_check (string connection) {
     if (connection.is_empty ())
         con = default_connection ();
 
-    QVariant fallback = get_value (QLatin1String (skip_update_check_c), con, false);
+    GLib.Variant fallback = get_value (QLatin1String (skip_update_check_c), con, false);
     fallback = get_value (QLatin1String (skip_update_check_c), "", fallback);
 
-    QVariant value = get_policy_setting (QLatin1String (skip_update_check_c), fallback);
+    GLib.Variant value = get_policy_setting (QLatin1String (skip_update_check_c), fallback);
     return value.to_bool ();
 }
 
@@ -995,7 +994,7 @@ void ConfigFile.set_skip_update_check (bool skip, string connection) {
     QSettings settings (config_file (), QSettings.IniFormat);
     settings.begin_group (con);
 
-    settings.set_value (QLatin1String (skip_update_check_c), QVariant (skip));
+    settings.set_value (QLatin1String (skip_update_check_c), GLib.Variant (skip));
     settings.sync ();
 }
 
@@ -1004,10 +1003,10 @@ bool ConfigFile.auto_update_check (string connection) {
     if (connection.is_empty ())
         con = default_connection ();
 
-    QVariant fallback = get_value (QLatin1String (auto_update_check_c), con, true);
+    GLib.Variant fallback = get_value (QLatin1String (auto_update_check_c), con, true);
     fallback = get_value (QLatin1String (auto_update_check_c), "", fallback);
 
-    QVariant value = get_policy_setting (QLatin1String (auto_update_check_c), fallback);
+    GLib.Variant value = get_policy_setting (QLatin1String (auto_update_check_c), fallback);
     return value.to_bool ();
 }
 
@@ -1019,7 +1018,7 @@ void ConfigFile.set_auto_update_check (bool auto_check, string connection) {
     QSettings settings (config_file (), QSettings.IniFormat);
     settings.begin_group (con);
 
-    settings.set_value (QLatin1String (auto_update_check_c), QVariant (auto_check));
+    settings.set_value (QLatin1String (auto_update_check_c), GLib.Variant (auto_check));
     settings.sync ();
 }
 
@@ -1091,9 +1090,9 @@ void ConfigFile.set_proxy_type (int proxy_type,
     settings.sync ();
 }
 
-QVariant ConfigFile.get_value (string param, string group,
-    const QVariant &default_value) {
-    QVariant system_setting;
+GLib.Variant ConfigFile.get_value (string param, string group,
+    const GLib.Variant default_value) {
+    GLib.Variant system_setting;
     if (Utility.is_mac ()) {
         QSettings system_settings (QLatin1String ("/Library/Preferences/" APPLICATION_REV_DOMAIN ".plist"), QSettings.NativeFormat);
         if (!group.is_empty ()) {
@@ -1123,7 +1122,7 @@ QVariant ConfigFile.get_value (string param, string group,
     return settings.value (param, system_setting);
 }
 
-void ConfigFile.set_value (string key, QVariant &value) {
+void ConfigFile.set_value (string key, GLib.Variant value) {
     QSettings settings (config_file (), QSettings.IniFormat);
 
     settings.set_value (key, value);
@@ -1371,20 +1370,20 @@ void ConfigFile.set_client_version_string (string version) {
     settings.set_value (QLatin1String (client_version_c), version);
 }
 
-Q_GLOBAL_STATIC (string, g_config_file_name)
+Q_GLOBAL_STATIC (string, g_config_filename)
 
 std.unique_ptr<QSettings> ConfigFile.settings_with_group (string group, GLib.Object parent) {
-    if (g_config_file_name ().is_empty ()) {
+    if (g_config_filename ().is_empty ()) {
         // cache file name
         ConfigFile cfg;
-        *g_config_file_name () = cfg.config_file ();
+        *g_config_filename () = cfg.config_file ();
     }
-    std.unique_ptr<QSettings> settings (new QSettings (*g_config_file_name (), QSettings.IniFormat, parent));
+    std.unique_ptr<QSettings> settings (new QSettings (*g_config_filename (), QSettings.IniFormat, parent));
     settings.begin_group (group);
     return settings;
 }
 
-void ConfigFile.setup_default_exclude_file_paths (ExcludedFiles &excluded_files) {
+void ConfigFile.setup_default_exclude_file_paths (ExcludedFiles excluded_files) {
     ConfigFile cfg;
     string system_list = cfg.exclude_file (ConfigFile.SystemScope);
     string user_list = cfg.exclude_file (ConfigFile.UserScope);

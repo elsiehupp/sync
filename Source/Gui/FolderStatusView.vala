@@ -20,14 +20,14 @@ class Folder_status_view : QTreeView {
 
     /***********************************************************
     ***********************************************************/
-    public QModelIndex index_at (QPoint &point) override;
-    public QRect visual_rect (QModelIndex &index) override;
+    public QModelIndex index_at (QPoint point) override;
+    public QRect visual_rect (QModelIndex index) override;
 };
 
     Folder_status_view.Folder_status_view (Gtk.Widget parent) : QTreeView (parent) {
     }
 
-    QModelIndex Folder_status_view.index_at (QPoint &point) {
+    QModelIndex Folder_status_view.index_at (QPoint point) {
         QModelIndex index = QTreeView.index_at (point);
         if (index.data (FolderStatusDelegate.AddButton).to_bool () && !visual_rect (index).contains (point)) {
             return {};
@@ -35,7 +35,7 @@ class Folder_status_view : QTreeView {
         return index;
     }
 
-    QRect Folder_status_view.visual_rect (QModelIndex &index) {
+    QRect Folder_status_view.visual_rect (QModelIndex index) {
         QRect rect = QTreeView.visual_rect (index);
         if (index.data (FolderStatusDelegate.AddButton).to_bool ()) {
             return FolderStatusDelegate.add_button_rect (rect, layout_direction ());

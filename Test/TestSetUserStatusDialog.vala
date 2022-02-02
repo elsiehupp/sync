@@ -6,7 +6,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 // #include <QTest>
 // #include <QSignalSpy>
-// #include <GLib.DateTime>
 
 // #include <memory>
 
@@ -15,52 +14,52 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
     /***********************************************************
     ***********************************************************/
     public void fetchUserStatus () override {
-        if (_couldNotFetchUserStatus) {
-            emit error (Error.CouldNotFetchUserStatus);
+        if (this.couldNotFetchUserStatus) {
+            /* emit */ error (Error.CouldNotFetchUserStatus);
             return;
-        } else if (_userStatusNotSupported) {
-            emit error (Error.UserStatusNotSupported);
+        } else if (this.userStatusNotSupported) {
+            /* emit */ error (Error.UserStatusNotSupported);
             return;
-        } else if (_emojisNotSupported) {
-            emit error (Error.EmojisNotSupported);
+        } else if (this.emojisNotSupported) {
+            /* emit */ error (Error.EmojisNotSupported);
             return;
         }
 
-        emit userStatusFetched (_userStatus);
+        /* emit */ userStatusFetched (this.userStatus);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void fetchPredefinedStatuses () override {
-        if (_couldNotFetchPredefinedUserStatuses) {
-            emit error (Error.CouldNotFetchPredefinedUserStatuses);
+        if (this.couldNotFetchPredefinedUserStatuses) {
+            /* emit */ error (Error.CouldNotFetchPredefinedUserStatuses);
             return;
         }
-        emit predefinedStatusesFetched (_predefinedStatuses);
+        /* emit */ predefinedStatusesFetched (this.predefinedStatuses);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void setUserStatus (Occ.UserStatus &userStatus) override {
-        if (_couldNotSetUserStatusMessage) {
-            emit error (Error.CouldNotSetUserStatus);
+    public void setUserStatus (Occ.UserStatus userStatus) override {
+        if (this.couldNotSetUserStatusMessage) {
+            /* emit */ error (Error.CouldNotSetUserStatus);
             return;
         }
 
-        _userStatusSetByCallerOfSetUserStatus = userStatus;
-        emit UserStatusConnector.userStatusSet ();
+        this.userStatusSetByCallerOfSetUserStatus = userStatus;
+        /* emit */ UserStatusConnector.userStatusSet ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void clearMessage () override {
-        if (_couldNotClearUserStatusMessage) {
-            emit error (Error.CouldNotClearMessage);
+        if (this.couldNotClearUserStatusMessage) {
+            /* emit */ error (Error.CouldNotClearMessage);
         } else {
-            _isMessageCleared = true;
+            this.isMessageCleared = true;
         }
     }
 
@@ -74,22 +73,22 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    public void setFakeUserStatus (Occ.UserStatus &userStatus) {
-        _userStatus = userStatus;
+    public void setFakeUserStatus (Occ.UserStatus userStatus) {
+        this.userStatus = userStatus;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void setFakePredefinedStatuses (
-        const std.vector<Occ.UserStatus> &statuses) {
-        _predefinedStatuses = statuses;
+        const std.vector<Occ.UserStatus> statuses) {
+        this.predefinedStatuses = statuses;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Occ.UserStatus userStatusSetByCallerOfSetUserStatus () { return _userStatusSetByCallerOfSetUserStatus; }
+    public Occ.UserStatus userStatusSetByCallerOfSetUserStatus () { return this.userStatusSetByCallerOfSetUserStatus; }
 
     /***********************************************************
     ***********************************************************/
@@ -100,64 +99,64 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
     public 
 
     public void setErrorCouldNotFetchPredefinedUserStatuses (bool value) {
-        _couldNotFetchPredefinedUserStatuses = value;
+        this.couldNotFetchPredefinedUserStatuses = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void setErrorCouldNotFetchUserStatus (bool value) {
-        _couldNotFetchUserStatus = value;
+        this.couldNotFetchUserStatus = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void setErrorCouldNotSetUserStatusMessage (bool value) {
-        _couldNotSetUserStatusMessage = value;
+        this.couldNotSetUserStatusMessage = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void setErrorUserStatusNotSupported (bool value) {
-        _userStatusNotSupported = value;
+        this.userStatusNotSupported = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void setErrorEmojisNotSupported (bool value) {
-        _emojisNotSupported = value;
+        this.emojisNotSupported = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void setErrorCouldNotClearUserStatusMessage (bool value) {
-        _couldNotClearUserStatusMessage = value;
+        this.couldNotClearUserStatusMessage = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private Occ.UserStatus _userStatusSetByCallerOfSetUserStatus;
-    private Occ.UserStatus _userStatus;
-    private std.vector<Occ.UserStatus> _predefinedStatuses;
-    private bool _isMessageCleared = false;
-    private bool _couldNotFetchPredefinedUserStatuses = false;
-    private bool _couldNotFetchUserStatus = false;
-    private bool _couldNotSetUserStatusMessage = false;
-    private bool _userStatusNotSupported = false;
-    private bool _emojisNotSupported = false;
-    private bool _couldNotClearUserStatusMessage = false;
+    private Occ.UserStatus this.userStatusSetByCallerOfSetUserStatus;
+    private Occ.UserStatus this.userStatus;
+    private std.vector<Occ.UserStatus> this.predefinedStatuses;
+    private bool this.isMessageCleared = false;
+    private bool this.couldNotFetchPredefinedUserStatuses = false;
+    private bool this.couldNotFetchUserStatus = false;
+    private bool this.couldNotSetUserStatusMessage = false;
+    private bool this.userStatusNotSupported = false;
+    private bool this.emojisNotSupported = false;
+    private bool this.couldNotClearUserStatusMessage = false;
 };
 
 class FakeDateTimeProvider : Occ.DateTimeProvider {
 
     /***********************************************************
     ***********************************************************/
-    public void setCurrentDateTime (GLib.DateTime &dateTime) { _dateTime = dateTime; }
+    public void setCurrentDateTime (GLib.DateTime dateTime) { this.dateTime = dateTime; }
 
     /***********************************************************
     ***********************************************************/
@@ -167,16 +166,16 @@ class FakeDateTimeProvider : Occ.DateTimeProvider {
     ***********************************************************/
     public 
 
-    public QDate currentDate () override { return _dateTime.date (); }
+    public QDate currentDate () override { return this.dateTime.date (); }
 
 
     /***********************************************************
     ***********************************************************/
-    private GLib.DateTime _dateTime;
+    private GLib.DateTime this.dateTime;
 };
 
 static std.vector<Occ.UserStatus>
-createFakePredefinedStatuses (GLib.DateTime &currentTime) {
+createFakePredefinedStatuses (GLib.DateTime currentTime) {
     std.vector<Occ.UserStatus> statuses;
 
     const string userStatusId ("fake-id");

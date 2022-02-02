@@ -81,14 +81,14 @@ class EchoDisabler {
     /***********************************************************
     ***********************************************************/
     public EchoDisabler () {
-        tcgetattr (STDIN_FILENO, &tios);
+        tcgetattr (STDIN_FILENO, tios);
         termios tios_new = tios;
         tios_new.c_lflag &= ~ECHO;
-        tcsetattr (STDIN_FILENO, TCSANOW, &tios_new);
+        tcsetattr (STDIN_FILENO, TCSANOW, tios_new);
     }
 
     ~EchoDisabler () {
-        tcsetattr (STDIN_FILENO, TCSANOW, &tios);
+        tcsetattr (STDIN_FILENO, TCSANOW, tios);
     }
 
 
@@ -113,37 +113,37 @@ class HttpCredentialsText : HttpCredentials {
     public HttpCredentialsText (string user, string password)
         : HttpCredentials (user, password)
         , // FIXME : not working with client certs yet (qknight)
-        _ssl_trusted (false) {
+        this.ssl_trusted (false) {
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void ask_from_user () override {
-        _password = .query_password (user ());
-        _ready = true;
+        this.password = .query_password (user ());
+        this.ready = true;
         persist ();
-        emit asked ();
+        /* emit */ asked ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void set_s_sLTrusted (bool is_trusted) {
-        _ssl_trusted = is_trusted;
+        this.ssl_trusted = is_trusted;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool ssl_is_trusted () override {
-        return _ssl_trusted;
+        return this.ssl_trusted;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private bool _ssl_trusted;
+    private bool this.ssl_trusted;
 };
 #endif /* TOKEN_AUTH_ONLY */
 
@@ -184,7 +184,7 @@ void show_version () {
     exit (0);
 }
 
-void parse_options (string[] &app_args, CmdOptions options) {
+void parse_options (string[] app_args, CmdOptions options) {
     string[] args (app_args);
 
     int arg_count = args.count ();
@@ -265,7 +265,7 @@ void parse_options (string[] &app_args, CmdOptions options) {
 /* If the selective sync list is different from before, we need to disable the read from database
   (The normal client does it in Selective_sync_dialog.accept*)
 ***********************************************************/
-void selective_sync_fixup (Occ.SyncJournalDb journal, string[] &new_list) {
+void selective_sync_fixup (Occ.SyncJournalDb journal, string[] new_list) {
     SqlDatabase database;
     if (!database.open_or_create_read_write (journal.database_file_path ())) {
         return;
@@ -273,12 +273,12 @@ void selective_sync_fixup (Occ.SyncJournalDb journal, string[] &new_list) {
 
     bool ok = false;
 
-    const var selective_sync_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, &ok);
+    const var selective_sync_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
     const GLib.Set<string> old_block_list_set (selective_sync_list.begin (), selective_sync_list.end ());
     if (ok) {
         const GLib.Set<string> block_list_set (new_list.begin (), new_list.end ());
         const var changes = (old_block_list_set - block_list_set) + (block_list_set - old_block_list_set);
-        for (var &it : changes) {
+        for (var it : changes) {
             journal.schedule_path_for_remote_discovery (it);
         }
 
@@ -299,7 +299,7 @@ int main (int argc, char **argv) {
     options.uplimit = 0;
     options.downlimit = 0;
 
-    parse_options (app.arguments (), &options);
+    parse_options (app.arguments (), options);
 
     if (options.silent) {
         q_install_message_handler (null_message_handler);
@@ -411,7 +411,7 @@ int main (int argc, char **argv) {
 
     QEventLoop loop;
     var job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/capabilities"));
-    GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument &json) {
+    GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument json) {
         var caps = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
         q_debug () << "Server capabilities" << caps;
         account.set_capabilities (caps.to_variant_map ());
@@ -427,7 +427,7 @@ int main (int argc, char **argv) {
     }
 
     job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"));
-    GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument &json) {
+    GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument json) {
         const QJsonObject data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         account.set_dav_user (data.value ("id").to_"");
         account.set_dav_display_name (data.value ("display-name").to_"");
@@ -442,7 +442,7 @@ int main (int argc, char **argv) {
     int restart_count = 0;
 restart_sync:
 
-    opts = &options;
+    opts = options;
 
     string[] selective_sync_list;
     if (!options.unsyncedfolders.is_empty ()) {
@@ -472,14 +472,14 @@ restart_sync:
     SyncOptions opt;
     opt.fill_from_environment_variables ();
     opt.verify_chunk_sizes ();
-    SyncEngine engine (account, options.source_dir, folder, &database);
+    SyncEngine engine (account, options.source_dir, folder, database);
     engine.set_ignore_hidden_files (options.ignore_hidden_files);
     engine.set_network_limits (options.uplimit, options.downlimit);
     GLib.Object.connect (&engine, &SyncEngine.on_finished,
         [&app] (bool result) {
             app.exit (result ? EXIT_SUCCESS : EXIT_FAILURE);
         });
-    GLib.Object.connect (&engine, &SyncEngine.transmission_progress, &cmd, &Cmd.on_transmission_progress_slot);
+    GLib.Object.connect (&engine, &SyncEngine.transmission_progress, cmd, &Cmd.on_transmission_progress_slot);
     GLib.Object.connect (&engine, &SyncEngine.sync_error,
         [] (string error) {
             q_warning () << "Sync error:" << error;

@@ -13,7 +13,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 // #pragma once
 
-// #include <string>
 // #include <QMetaType>
 // #include <QDebug>
 
@@ -26,7 +25,7 @@ class RemotePermissions {
 
     // The first bit tells if the value is set or not
     // The remaining bits correspond to know if the value is set
-    private uint16 _value = 0;
+    private uint16 this.value = 0;
     private static constexpr int not_null_mask = 0x1;
 
     /***********************************************************
@@ -37,12 +36,12 @@ class RemotePermissions {
     ***********************************************************/
     private template <typename Char> // can be 'char' or 'ushort' if conversion from string
     private void from_array (Char remote_permissions) {
-        _value = not_null_mask;
+        this.value = not_null_mask;
         if (!remote_permissions)
             return;
         while (*remote_permissions) {
             if (var res = std.strchr (letters, static_cast<char> (*remote_permissions)))
-                _value |= (1 << (res - letters));
+                this.value |= (1 << (res - letters));
             ++remote_permissions;
         }
     }
@@ -85,7 +84,7 @@ class RemotePermissions {
             return result;
         result.reserve (PermissionsCount);
         for (uint32 i = 1; i <= PermissionsCount; ++i) {
-            if (_value & (1 << i))
+            if (this.value & (1 << i))
                 result.append (letters[i]);
         }
         if (result.is_empty ()) {
@@ -129,28 +128,28 @@ class RemotePermissions {
     /***********************************************************
     ***********************************************************/
     public bool has_permission (Permissions permissions) {
-        return _value & (1 << static_cast<int> (permissions));
+        return this.value & (1 << static_cast<int> (permissions));
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void set_permission (Permissions permissions) {
-        _value |= (1 << static_cast<int> (permissions)) | not_null_mask;
+        this.value |= (1 << static_cast<int> (permissions)) | not_null_mask;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void unset_permission (Permissions permissions) {
-        _value &= ~ (1 << static_cast<int> (permissions));
+        this.value &= ~ (1 << static_cast<int> (permissions));
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_null () {
-        return ! (_value & not_null_mask);
+        return ! (this.value & not_null_mask);
     }
 
 
@@ -170,7 +169,7 @@ class RemotePermissions {
 
     /***********************************************************
     ***********************************************************/
-    public friend QDebug operator<< (QDebug &dbg, RemotePermissions remote_permissions) {
+    public friend QDebug operator<< (QDebug dbg, RemotePermissions remote_permissions) {
         return dbg << remote_permissions.to_"";
     }
 }

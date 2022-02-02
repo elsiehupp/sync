@@ -68,14 +68,14 @@ class LocalDiscoveryTracker : GLib.Object {
     /***********************************************************
     Access list of files that shall be locally rediscovered.
     ***********************************************************/
-    public const std.set<string> &local_discovery_paths ();
+    public const std.set<string> local_discovery_paths ();
 
 
     /***********************************************************
     Success and failure of sync items adjust what the next sync is
     supposed to do.
     ***********************************************************/
-    public void on_item_completed (SyncFileItemPtr &item);
+    public void on_item_completed (SyncFileItemPtr item);
 
 
     /***********************************************************
@@ -90,16 +90,16 @@ class LocalDiscoveryTracker : GLib.Object {
     Mostly a collection of files the filewatchers have reported as touched.
     Also includes files that have had errors in the last sync run.
     ***********************************************************/
-    private std.set<string> _local_discovery_paths;
+    private std.set<string> this.local_discovery_paths;
 
 
     /***********************************************************
     The paths that the current sync run used for local discovery.
 
-    For failing syncs, this list will be merged into _local_discovery_paths
+    For failing syncs, this list will be merged into this.local_discovery_paths
     again when the sync is done to make sure everything is retried.
     ***********************************************************/
-    private std.set<string> _previous_local_discovery_paths;
+    private std.set<string> this.previous_local_discovery_paths;
 };
 
 } // namespace Occ
@@ -118,50 +118,50 @@ LocalDiscoveryTracker.LocalDiscoveryTracker () = default;
 
 void LocalDiscoveryTracker.add_touched_path (string relative_path) {
     GLib.debug (lc_local_discovery_tracker) << "inserted touched" << relative_path;
-    _local_discovery_paths.insert (relative_path);
+    this.local_discovery_paths.insert (relative_path);
 }
 
 void LocalDiscoveryTracker.start_sync_full_discovery () {
-    _local_discovery_paths.clear ();
-    _previous_local_discovery_paths.clear ();
+    this.local_discovery_paths.clear ();
+    this.previous_local_discovery_paths.clear ();
     GLib.debug (lc_local_discovery_tracker) << "full discovery";
 }
 
 void LocalDiscoveryTracker.start_sync_partial_discovery () {
     if (lc_local_discovery_tracker ().is_debug_enabled ()) {
         string[] paths;
-        for (var &path : _local_discovery_paths)
+        for (var path : this.local_discovery_paths)
             paths.append (path);
         GLib.debug (lc_local_discovery_tracker) << "partial discovery with paths : " << paths;
     }
 
-    _previous_local_discovery_paths = std.move (_local_discovery_paths);
-    _local_discovery_paths.clear ();
+    this.previous_local_discovery_paths = std.move (this.local_discovery_paths);
+    this.local_discovery_paths.clear ();
 }
 
 const std.set<string> &LocalDiscoveryTracker.local_discovery_paths () {
-    return _local_discovery_paths;
+    return this.local_discovery_paths;
 }
 
-void LocalDiscoveryTracker.on_item_completed (SyncFileItemPtr &item) {
+void LocalDiscoveryTracker.on_item_completed (SyncFileItemPtr item) {
     // For successes, we want to wipe the file from the list to ensure we don't
     // rediscover it even if this overall sync fails.
     //
     // For failures, we want to add the file to the list so the next sync
     // will be able to retry it.
-    if (item._status == SyncFileItem.Success
-        || item._status == SyncFileItem.FileIgnored
-        || item._status == SyncFileItem.Restoration
-        || item._status == SyncFileItem.Conflict
-        || (item._status == SyncFileItem.NoStatus
+    if (item._status == SyncFileItem.Status.SUCCESS
+        || item._status == SyncFileItem.Status.FILE_IGNORED
+        || item._status == SyncFileItem.Status.RESTORATION
+        || item._status == SyncFileItem.Status.CONFLICT
+        || (item._status == SyncFileItem.Status.NO_STATUS
                && (item._instruction == CSYNC_INSTRUCTION_NONE
                       || item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA))) {
-        if (_previous_local_discovery_paths.erase (item._file.to_utf8 ()))
+        if (this.previous_local_discovery_paths.erase (item._file.to_utf8 ()))
             GLib.debug (lc_local_discovery_tracker) << "wiped successful item" << item._file;
-        if (!item._rename_target.is_empty () && _previous_local_discovery_paths.erase (item._rename_target.to_utf8 ()))
+        if (!item._rename_target.is_empty () && this.previous_local_discovery_paths.erase (item._rename_target.to_utf8 ()))
             GLib.debug (lc_local_discovery_tracker) << "wiped successful item" << item._rename_target;
     } else {
-        _local_discovery_paths.insert (item._file.to_utf8 ());
+        this.local_discovery_paths.insert (item._file.to_utf8 ());
         GLib.debug (lc_local_discovery_tracker) << "inserted error item" << item._file;
     }
 }
@@ -173,9 +173,9 @@ void LocalDiscoveryTracker.on_sync_finished (bool on_success) {
         // On overall-failure we can't forget about last sync's local discovery
         // paths yet, reuse them for the next sync again.
         // C++17 : Could use std.set.merge ().
-        _local_discovery_paths.insert (
-            _previous_local_discovery_paths.begin (), _previous_local_discovery_paths.end ());
+        this.local_discovery_paths.insert (
+            this.previous_local_discovery_paths.begin (), this.previous_local_discovery_paths.end ());
         GLib.debug (lc_local_discovery_tracker) << "sync failed, keeping last sync's local discovery path list";
     }
-    _previous_local_discovery_paths.clear ();
+    this.previous_local_discovery_paths.clear ();
 }

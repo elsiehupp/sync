@@ -61,9 +61,9 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private Account _account = nullptr;
-    private QScopedPointer<Flow2Auth> _async_auth;
-    private Ui_Flow2Auth_widget _ui;
+    private Account this.account = nullptr;
+    private QScopedPointer<Flow2Auth> this.async_auth;
+    private Ui_Flow2Auth_widget this.ui;
 
 protected slots:
     void on_open_browser ();
@@ -79,8 +79,8 @@ protected slots:
 
     /***********************************************************
     ***********************************************************/
-    private QProgress_indicator _progress_indi;
-    private int _status_update_skip_count = 0;
+    private QProgress_indicator this.progress_indi;
+    private int this.status_update_skip_count = 0;
 };
 
 } // namespace Occ

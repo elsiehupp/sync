@@ -35,7 +35,7 @@ class Capabilities {
 
     /***********************************************************
     ***********************************************************/
-    public Capabilities (QVariantMap &capabilities);
+    public Capabilities (QVariantMap capabilities);
 
     /***********************************************************
     ***********************************************************/
@@ -248,21 +248,21 @@ class Capabilities {
 
     /***********************************************************
     ***********************************************************/
-    public DirectEditor* get_direct_editor_for_mimetype (QMimeType &mime_type);
+    public DirectEditor* get_direct_editor_for_mimetype (QMimeType mime_type);
 
     /***********************************************************
     ***********************************************************/
     public 
-    public DirectEditor* get_direct_editor_for_optional_mimetype (QMimeType &mime_type);
+    public DirectEditor* get_direct_editor_for_optional_mimetype (QMimeType mime_type);
 
 
     /***********************************************************
     ***********************************************************/
-    private QVariantMap _capabilities;
+    private QVariantMap this.capabilities;
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<DirectEditor> _direct_editors;
+    private GLib.List<DirectEditor> this.direct_editors;
 };
 
 /*-------------------------------------------------------------------------------------*/
@@ -312,22 +312,22 @@ class DirectEditor : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private string _id;
+    private string this.id;
 
     /***********************************************************
     ***********************************************************/
     private 
-    private GLib.List<GLib.ByteArray> _mime_types;
-    private GLib.List<GLib.ByteArray> _optional_mime_types;
+    private GLib.List<GLib.ByteArray> this.mime_types;
+    private GLib.List<GLib.ByteArray> this.optional_mime_types;
 };
 
-    Capabilities.Capabilities (QVariantMap &capabilities)
-        : _capabilities (capabilities) {
+    Capabilities.Capabilities (QVariantMap capabilities)
+        : this.capabilities (capabilities) {
     }
 
     bool Capabilities.share_a_p_i () {
-        if (_capabilities["files_sharing"].to_map ().contains ("api_enabled")) {
-            return _capabilities["files_sharing"].to_map ()["api_enabled"].to_bool ();
+        if (this.capabilities["files_sharing"].to_map ().contains ("api_enabled")) {
+            return this.capabilities["files_sharing"].to_map ()["api_enabled"].to_bool ();
         } else {
             // This was later added so if it is not present just assume the API is enabled.
             return true;
@@ -335,16 +335,16 @@ class DirectEditor : GLib.Object {
     }
 
     bool Capabilities.share_email_password_enabled () {
-        return _capabilities["files_sharing"].to_map ()["sharebymail"].to_map ()["password"].to_map ()["enabled"].to_bool ();
+        return this.capabilities["files_sharing"].to_map ()["sharebymail"].to_map ()["password"].to_map ()["enabled"].to_bool ();
     }
 
     bool Capabilities.share_email_password_enforced () {
-        return _capabilities["files_sharing"].to_map ()["sharebymail"].to_map ()["password"].to_map ()["enforced"].to_bool ();
+        return this.capabilities["files_sharing"].to_map ()["sharebymail"].to_map ()["password"].to_map ()["enforced"].to_bool ();
     }
 
     bool Capabilities.share_public_link () {
-        if (_capabilities["files_sharing"].to_map ().contains ("public")) {
-            return share_a_p_i () && _capabilities["files_sharing"].to_map ()["public"].to_map ()["enabled"].to_bool ();
+        if (this.capabilities["files_sharing"].to_map ().contains ("public")) {
+            return share_a_p_i () && this.capabilities["files_sharing"].to_map ()["public"].to_map ()["enabled"].to_bool ();
         } else {
             // This was later added so if it is not present just assume that link sharing is enabled.
             return true;
@@ -352,64 +352,64 @@ class DirectEditor : GLib.Object {
     }
 
     bool Capabilities.share_public_link_allow_upload () {
-        return _capabilities["files_sharing"].to_map ()["public"].to_map ()["upload"].to_bool ();
+        return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["upload"].to_bool ();
     }
 
     bool Capabilities.share_public_link_supports_upload_only () {
-        return _capabilities["files_sharing"].to_map ()["public"].to_map ()["supports_upload_only"].to_bool ();
+        return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["supports_upload_only"].to_bool ();
     }
 
     bool Capabilities.share_public_link_ask_optional_password () {
-        return _capabilities["files_sharing"].to_map ()["public"].to_map ()["password"].to_map ()["ask_for_optional_password"].to_bool ();
+        return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["password"].to_map ()["ask_for_optional_password"].to_bool ();
     }
 
     bool Capabilities.share_public_link_enforce_password () {
-        return _capabilities["files_sharing"].to_map ()["public"].to_map ()["password"].to_map ()["enforced"].to_bool ();
+        return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["password"].to_map ()["enforced"].to_bool ();
     }
 
     bool Capabilities.share_public_link_enforce_expire_date () {
-        return _capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date"].to_map ()["enforced"].to_bool ();
+        return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date"].to_map ()["enforced"].to_bool ();
     }
 
     int Capabilities.share_public_link_expire_date_days () {
-        return _capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date"].to_map ()["days"].to_int ();
+        return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date"].to_map ()["days"].to_int ();
     }
 
     bool Capabilities.share_internal_enforce_expire_date () {
-        return _capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date_internal"].to_map ()["enforced"].to_bool ();
+        return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date_internal"].to_map ()["enforced"].to_bool ();
     }
 
     int Capabilities.share_internal_expire_date_days () {
-        return _capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date_internal"].to_map ()["days"].to_int ();
+        return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date_internal"].to_map ()["days"].to_int ();
     }
 
     bool Capabilities.share_remote_enforce_expire_date () {
-        return _capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date_remote"].to_map ()["enforced"].to_bool ();
+        return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date_remote"].to_map ()["enforced"].to_bool ();
     }
 
     int Capabilities.share_remote_expire_date_days () {
-        return _capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date_remote"].to_map ()["days"].to_int ();
+        return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date_remote"].to_map ()["days"].to_int ();
     }
 
     bool Capabilities.share_public_link_multiple () {
-        return _capabilities["files_sharing"].to_map ()["public"].to_map ()["multiple"].to_bool ();
+        return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["multiple"].to_bool ();
     }
 
     bool Capabilities.share_resharing () {
-        return _capabilities["files_sharing"].to_map ()["resharing"].to_bool ();
+        return this.capabilities["files_sharing"].to_map ()["resharing"].to_bool ();
     }
 
     int Capabilities.share_default_permissions () {
-        if (_capabilities["files_sharing"].to_map ().contains ("default_permissions")) {
-            return _capabilities["files_sharing"].to_map ()["default_permissions"].to_int ();
+        if (this.capabilities["files_sharing"].to_map ().contains ("default_permissions")) {
+            return this.capabilities["files_sharing"].to_map ()["default_permissions"].to_int ();
         }
 
         return {};
     }
 
     bool Capabilities.client_side_encryption_available () {
-        var it = _capabilities.const_find (QStringLiteral ("end-to-end-encryption"));
-        if (it == _capabilities.const_end ()) {
+        var it = this.capabilities.const_find (QStringLiteral ("end-to-end-encryption"));
+        if (it == this.capabilities.const_end ()) {
             return false;
         }
 
@@ -442,20 +442,20 @@ class DirectEditor : GLib.Object {
 
     bool Capabilities.notifications_available () {
         // We require the OCS style API in 9.x, can't deal with the REST one only found in 8.2
-        return _capabilities.contains ("notifications") && _capabilities["notifications"].to_map ().contains ("ocs-endpoints");
+        return this.capabilities.contains ("notifications") && this.capabilities["notifications"].to_map ().contains ("ocs-endpoints");
     }
 
     bool Capabilities.is_valid () {
-        return !_capabilities.is_empty ();
+        return !this.capabilities.is_empty ();
     }
 
     bool Capabilities.has_activities () {
-        return _capabilities.contains ("activity");
+        return this.capabilities.contains ("activity");
     }
 
     GLib.List<GLib.ByteArray> Capabilities.supported_checksum_types () {
         GLib.List<GLib.ByteArray> list;
-        foreach (var &t, _capabilities["checksums"].to_map ()["supported_types"].to_list ()) {
+        foreach (var t, this.capabilities["checksums"].to_map ()["supported_types"].to_list ()) {
             list.push_back (t.to_byte_array ());
         }
         return list;
@@ -463,7 +463,7 @@ class DirectEditor : GLib.Object {
 
     GLib.ByteArray Capabilities.preferred_upload_checksum_type () {
         return q_environment_variable ("OWNCLOUD_CONTENT_CHECKSUM_TYPE",
-                                    _capabilities.value (QStringLiteral ("checksums")).to_map ()
+                                    this.capabilities.value (QStringLiteral ("checksums")).to_map ()
                                     .value (QStringLiteral ("preferred_upload_type"), QStringLiteral ("SHA1")).to_"").to_utf8 ();
     }
 
@@ -483,18 +483,18 @@ class DirectEditor : GLib.Object {
             return false;
         if (chunkng == "1")
             return true;
-        return _capabilities["dav"].to_map ()["chunking"].to_byte_array () >= "1.0";
+        return this.capabilities["dav"].to_map ()["chunking"].to_byte_array () >= "1.0";
     }
 
     bool Capabilities.bulk_upload () {
-        return _capabilities["dav"].to_map ()["bulkupload"].to_byte_array () >= "1.0";
+        return this.capabilities["dav"].to_map ()["bulkupload"].to_byte_array () >= "1.0";
     }
 
     bool Capabilities.user_status () {
-        if (!_capabilities.contains ("user_status")) {
+        if (!this.capabilities.contains ("user_status")) {
             return false;
         }
-        const var user_status_map = _capabilities["user_status"].to_map ();
+        const var user_status_map = this.capabilities["user_status"].to_map ();
         return user_status_map.value ("enabled", false).to_bool ();
     }
 
@@ -502,16 +502,16 @@ class DirectEditor : GLib.Object {
         if (!user_status ()) {
             return false;
         }
-        const var user_status_map = _capabilities["user_status"].to_map ();
+        const var user_status_map = this.capabilities["user_status"].to_map ();
         return user_status_map.value ("supports_emoji", false).to_bool ();
     }
 
     PushNotificationTypes Capabilities.available_push_notifications () {
-        if (!_capabilities.contains ("notify_push")) {
+        if (!this.capabilities.contains ("notify_push")) {
             return PushNotificationType.None;
         }
 
-        const var types = _capabilities["notify_push"].to_map ()["type"].to_string_list ();
+        const var types = this.capabilities["notify_push"].to_map ()["type"].to_string_list ();
         PushNotificationTypes push_notification_types;
 
         if (types.contains ("files")) {
@@ -530,28 +530,28 @@ class DirectEditor : GLib.Object {
     }
 
     GLib.Uri Capabilities.push_notifications_web_socket_url () {
-        const var websocket = _capabilities["notify_push"].to_map ()["endpoints"].to_map ()["websocket"].to_"";
+        const var websocket = this.capabilities["notify_push"].to_map ()["endpoints"].to_map ()["websocket"].to_"";
         return GLib.Uri (websocket);
     }
 
     bool Capabilities.chunking_parallel_upload_disabled () {
-        return _capabilities["dav"].to_map ()["chunking_parallel_upload_disabled"].to_bool ();
+        return this.capabilities["dav"].to_map ()["chunking_parallel_upload_disabled"].to_bool ();
     }
 
     bool Capabilities.private_link_property_available () {
-        return _capabilities["files"].to_map ()["private_links"].to_bool ();
+        return this.capabilities["files"].to_map ()["private_links"].to_bool ();
     }
 
     GLib.List<int> Capabilities.http_error_codes_that_reset_failing_chunked_uploads () {
         GLib.List<int> list;
-        foreach (var &t, _capabilities["dav"].to_map ()["http_error_codes_that_reset_failing_chunked_uploads"].to_list ()) {
+        foreach (var t, this.capabilities["dav"].to_map ()["http_error_codes_that_reset_failing_chunked_uploads"].to_list ()) {
             list.push_back (t.to_int ());
         }
         return list;
     }
 
     string Capabilities.invalid_filename_regex () {
-        return _capabilities[QStringLiteral ("dav")].to_map ()[QStringLiteral ("invalid_filename_regex")].to_"";
+        return this.capabilities[QStringLiteral ("dav")].to_map ()[QStringLiteral ("invalid_filename_regex")].to_"";
     }
 
     bool Capabilities.upload_conflict_files () {
@@ -560,11 +560,11 @@ class DirectEditor : GLib.Object {
         if (env_is_set)
             return env_value != 0;
 
-        return _capabilities[QStringLiteral ("upload_conflict_files")].to_bool ();
+        return this.capabilities[QStringLiteral ("upload_conflict_files")].to_bool ();
     }
 
     string[] Capabilities.blocklisted_files () {
-        return _capabilities["files"].to_map ()["blocklisted_files"].to_string_list ();
+        return this.capabilities["files"].to_map ()["blocklisted_files"].to_string_list ();
     }
 
     /*-------------------------------------------------------------------------------------*/
@@ -572,11 +572,11 @@ class DirectEditor : GLib.Object {
     // Direct Editing
     void Capabilities.add_direct_editor (DirectEditor* direct_editor) {
         if (direct_editor)
-            _direct_editors.append (direct_editor);
+            this.direct_editors.append (direct_editor);
     }
 
-    DirectEditor* Capabilities.get_direct_editor_for_mimetype (QMimeType &mime_type) {
-        foreach (DirectEditor* editor, _direct_editors) {
+    DirectEditor* Capabilities.get_direct_editor_for_mimetype (QMimeType mime_type) {
+        foreach (DirectEditor* editor, this.direct_editors) {
             if (editor.has_mimetype (mime_type))
                 return editor;
         }
@@ -584,8 +584,8 @@ class DirectEditor : GLib.Object {
         return nullptr;
     }
 
-    DirectEditor* Capabilities.get_direct_editor_for_optional_mimetype (QMimeType &mime_type) {
-        foreach (DirectEditor* editor, _direct_editors) {
+    DirectEditor* Capabilities.get_direct_editor_for_optional_mimetype (QMimeType mime_type) {
+        foreach (DirectEditor* editor, this.direct_editors) {
             if (editor.has_optional_mimetype (mime_type))
                 return editor;
         }
@@ -597,40 +597,40 @@ class DirectEditor : GLib.Object {
 
     DirectEditor.DirectEditor (string id, string name, GLib.Object parent)
         : GLib.Object (parent)
-        , _id (id)
-        , _name (name) {
+        , this.id (id)
+        , this.name (name) {
     }
 
     string DirectEditor.id () {
-        return _id;
+        return this.id;
     }
 
     string DirectEditor.name () {
-        return _name;
+        return this.name;
     }
 
     void DirectEditor.add_mimetype (GLib.ByteArray mime_type) {
-        _mime_types.append (mime_type);
+        this.mime_types.append (mime_type);
     }
 
     void DirectEditor.add_optional_mimetype (GLib.ByteArray mime_type) {
-        _optional_mime_types.append (mime_type);
+        this.optional_mime_types.append (mime_type);
     }
 
     GLib.List<GLib.ByteArray> DirectEditor.mime_types () {
-        return _mime_types;
+        return this.mime_types;
     }
 
     GLib.List<GLib.ByteArray> DirectEditor.optional_mime_types () {
-        return _optional_mime_types;
+        return this.optional_mime_types;
     }
 
-    bool DirectEditor.has_mimetype (QMimeType &mime_type) {
-        return _mime_types.contains (mime_type.name ().to_latin1 ());
+    bool DirectEditor.has_mimetype (QMimeType mime_type) {
+        return this.mime_types.contains (mime_type.name ().to_latin1 ());
     }
 
-    bool DirectEditor.has_optional_mimetype (QMimeType &mime_type) {
-        return _optional_mime_types.contains (mime_type.name ().to_latin1 ());
+    bool DirectEditor.has_optional_mimetype (QMimeType mime_type) {
+        return this.optional_mime_types.contains (mime_type.name ().to_latin1 ());
     }
 
     /*-------------------------------------------------------------------------------------*/

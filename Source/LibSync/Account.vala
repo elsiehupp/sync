@@ -43,7 +43,7 @@ using namespace QKeychain;
 // #include <QPixmap>
 #endif
 
-const char app_password[] = "_app-password";
+const char app_password[] = "this.app-password";
 
 // #include <memory>
 
@@ -69,7 +69,7 @@ class UserStatusConnector;
 ***********************************************************/
 class AbstractSslErrorHandler {
     public virtual ~AbstractSslErrorHandler () = default;
-    public virtual bool handle_errors (GLib.List<QSslError>, QSslConfiguration &conf, GLib.List<QSslCertificate> *, AccountPointer);
+    public virtual bool handle_errors (GLib.List<QSslError>, QSslConfiguration conf, GLib.List<QSslCertificate> *, AccountPointer);
 };
 
 /***********************************************************
@@ -81,10 +81,10 @@ The Account has a name and url. It also has information
 about credentials, SSL errors and certificates.
 ***********************************************************/
 class Account : GLib.Object {
-    Q_PROPERTY (string id MEMBER _id)
-    Q_PROPERTY (string dav_user MEMBER _dav_user)
-    Q_PROPERTY (string display_name MEMBER _display_name)
-    Q_PROPERTY (GLib.Uri url MEMBER _url)
+    Q_PROPERTY (string id MEMBER this.id)
+    Q_PROPERTY (string dav_user MEMBER this.dav_user)
+    Q_PROPERTY (string display_name MEMBER this.display_name)
+    Q_PROPERTY (GLib.Uri url MEMBER this.url)
 
     /***********************************************************
     ***********************************************************/
@@ -128,7 +128,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_avatar (QImage &img);
+    public void set_avatar (QImage img);
 #endif
 
     /// The name of the account as shown in the toolbar
@@ -147,10 +147,10 @@ class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public GLib.Uri url () {
-        return _url;
+        return this.url;
     }
 
-    /// Adjusts _user_visible_url once the host to use is discovered.
+    /// Adjusts this.user_visible_url once the host to use is discovered.
     public void set_user_visible_host (string host);
 
 
@@ -233,24 +233,24 @@ class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public QSslConfiguration ssl_configuration () {
-        return _ssl_configuration;
+        return this.ssl_configuration;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_ssl_configuration (QSslConfiguration &config);
+    public void set_ssl_configuration (QSslConfiguration config);
     // Because of bugs in Qt, we use this to store info needed for the SSL Button
-    public QSslCipher _session_cipher;
-    public GLib.ByteArray _session_ticket;
-    public GLib.List<QSslCertificate> _peer_certificate_chain;
+    public QSslCipher this.session_cipher;
+    public GLib.ByteArray this.session_ticket;
+    public GLib.List<QSslCertificate> this.peer_certificate_chain;
 
 
     /***********************************************************
     The certificates of the account
     ***********************************************************/
     public GLib.List<QSslCertificate> approved_certs () {
-        return _approved_certs;
+        return this.approved_certs;
     }
 
 
@@ -272,12 +272,12 @@ class Account : GLib.Object {
     public void set_ssl_error_handler (AbstractSslErrorHandler handler);
 
     // To be called by credentials only, for storing username and the like
-    public QVariant credential_setting (string key);
+    public GLib.Variant credential_setting (string key);
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_credential_setting (string key, QVariant &value);
+    public void set_credential_setting (string key, GLib.Variant value);
 
 
     /***********************************************************
@@ -289,12 +289,12 @@ class Account : GLib.Object {
     /***********************************************************
     Access the server capabilities
     ***********************************************************/
-    public const Capabilities &capabilities ();
+    public const Capabilities capabilities ();
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_capabilities (QVariantMap &caps);
+    public void set_capabilities (QVariantMap caps);
 
 
     /***********************************************************
@@ -348,14 +348,14 @@ class Account : GLib.Object {
     True when the server connection is using HTTP2
     ***********************************************************/
     public bool is_http2Supported () {
-        return _http2Supported;
+        return this.http2Supported;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void set_http2Supported (bool value) {
-        _http2Supported = value;
+        this.http2Supported = value;
     }
 
 
@@ -477,7 +477,7 @@ signals:
 protected slots:
     void on_credentials_fetched ();
     void on_credentials_asked ();
-    void on_direct_editing_recieved (QJsonDocument &json);
+    void on_direct_editing_recieved (QJsonDocument json);
 
 
     /***********************************************************
@@ -491,67 +491,67 @@ protected slots:
     /***********************************************************
     ***********************************************************/
     private 
-    private QWeakPointer<Account> _shared_this;
-    private string _id;
-    private string _dav_user;
-    private string _display_name;
-    private QTimer _push_notifications_reconnect_timer;
+    private QWeakPointer<Account> this.shared_this;
+    private string this.id;
+    private string this.dav_user;
+    private string this.display_name;
+    private QTimer this.push_notifications_reconnect_timer;
 #ifndef TOKEN_AUTH_ONLY
-    private QImage _avatar_img;
+    private QImage this.avatar_img;
 #endif
-    private QMap<string, QVariant> _settings_map;
-    private GLib.Uri _url;
+    private QMap<string, GLib.Variant> this.settings_map;
+    private GLib.Uri this.url;
 
 
     /***********************************************************
     If url to use for any user-visible urls.
 
     If the server configures overwritehost this can be different
-    from the connection url in _url. We retrieve the visible
+    from the connection url in this.url. We retrieve the visible
     host through the ocs/v1.php/config endpoint in
     ConnectionValidator.
     ***********************************************************/
-    private GLib.Uri _user_visible_url;
+    private GLib.Uri this.user_visible_url;
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<QSslCertificate> _approved_certs;
-    private QSslConfiguration _ssl_configuration;
-    private Capabilities _capabilities;
-    private string _server_version;
-    private QScopedPointer<AbstractSslErrorHandler> _ssl_error_handler;
-    private unowned<QNetworkAccessManager> _am;
-    private QScopedPointer<AbstractCredentials> _credentials;
-    private bool _http2Supported = false;
+    private GLib.List<QSslCertificate> this.approved_certs;
+    private QSslConfiguration this.ssl_configuration;
+    private Capabilities this.capabilities;
+    private string this.server_version;
+    private QScopedPointer<AbstractSslErrorHandler> this.ssl_error_handler;
+    private unowned<QNetworkAccessManager> this.am;
+    private QScopedPointer<AbstractCredentials> this.credentials;
+    private bool this.http2Supported = false;
 
     /// Certificates that were explicitly rejected by the user
-    private GLib.List<QSslCertificate> _rejected_certificates;
+    private GLib.List<QSslCertificate> this.rejected_certificates;
 
     /***********************************************************
     ***********************************************************/
-    private static string _config_file_name;
+    private static string this.config_filename;
 
     /***********************************************************
     ***********************************************************/
-    private ClientSideEncryption _e2e;
+    private ClientSideEncryption this.e2e;
 
     /// Used in RemoteWipe
-    private bool _wrote_app_password = false;
+    private bool this.wrote_app_password = false;
 
     /***********************************************************
     ***********************************************************/
     private friend class AccountManager;
 
     // Direct Editing
-    private string _last_direct_editing_e_tag;
+    private string this.last_direct_editing_e_tag;
 
     /***********************************************************
     ***********************************************************/
-    private PushNotifications _push_notifications = nullptr;
+    private PushNotifications this.push_notifications = nullptr;
 
     /***********************************************************
     ***********************************************************/
-    private std.shared_ptr<UserStatusConnector> _user_status_connector;
+    private std.shared_ptr<UserStatusConnector> this.user_status_connector;
 
 
     /***********************************************************
@@ -569,31 +569,31 @@ protected slots:
     upon Remote Wipe.
     ***********************************************************/
     public void set_remote_wipe_requested_HACK () {
-        _is_remote_wipe_requested_HACK = true;
+        this.is_remote_wipe_requested_HACK = true;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_remote_wipe_requested_HACK () {
-        return _is_remote_wipe_requested_HACK;
+        return this.is_remote_wipe_requested_HACK;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private bool _is_remote_wipe_requested_HACK = false;
+    private bool this.is_remote_wipe_requested_HACK = false;
     // <-- FIXME MS@2019-12-07
 };
 
 Account.Account (GLib.Object parent)
     : GLib.Object (parent)
-    , _capabilities (QVariantMap ()) {
+    , this.capabilities (QVariantMap ()) {
     q_register_meta_type<AccountPointer> ("AccountPointer");
     q_register_meta_type<Account> ("Account*");
 
-    _push_notifications_reconnect_timer.set_interval (push_notifications_reconnect_interval);
-    connect (&_push_notifications_reconnect_timer, &QTimer.timeout, this, &Account.try_setup_push_notifications);
+    this.push_notifications_reconnect_timer.set_interval (push_notifications_reconnect_interval);
+    connect (&this.push_notifications_reconnect_timer, &QTimer.timeout, this, &Account.try_setup_push_notifications);
 }
 
 AccountPointer Account.create () {
@@ -604,7 +604,7 @@ AccountPointer Account.create () {
 
 ClientSideEncryption* Account.e2e () {
     // Qt expects everything in the connect to be a pointer, so return a pointer.
-    return &_e2e;
+    return this.e2e;
 }
 
 Account.~Account () = default;
@@ -614,7 +614,7 @@ string Account.dav_path () {
 }
 
 void Account.set_shared_this (AccountPointer shared_this) {
-    _shared_this = shared_this.to_weak_ref ();
+    this.shared_this = shared_this.to_weak_ref ();
     setup_user_status_connector ();
 }
 
@@ -623,32 +623,32 @@ string Account.dav_path_base () {
 }
 
 AccountPointer Account.shared_from_this () {
-    return _shared_this.to_strong_ref ();
+    return this.shared_this.to_strong_ref ();
 }
 
 string Account.dav_user () {
-    return _dav_user.is_empty () && _credentials ? _credentials.user () : _dav_user;
+    return this.dav_user.is_empty () && this.credentials ? this.credentials.user () : this.dav_user;
 }
 
 void Account.set_dav_user (string new_dav_user) {
-    if (_dav_user == new_dav_user)
+    if (this.dav_user == new_dav_user)
         return;
-    _dav_user = new_dav_user;
-    emit wants_account_saved (this);
+    this.dav_user = new_dav_user;
+    /* emit */ wants_account_saved (this);
 }
 
 #ifndef TOKEN_AUTH_ONLY
 QImage Account.avatar () {
-    return _avatar_img;
+    return this.avatar_img;
 }
-void Account.set_avatar (QImage &img) {
-    _avatar_img = img;
-    emit account_changed_avatar ();
+void Account.set_avatar (QImage img) {
+    this.avatar_img = img;
+    /* emit */ account_changed_avatar ();
 }
 #endif
 
 string Account.display_name () {
-    string dn = string ("%1@%2").arg (credentials ().user (), _url.host ());
+    string dn = string ("%1@%2").arg (credentials ().user (), this.url.host ());
     int port = url ().port ();
     if (port > 0 && port != 80 && port != 443) {
         dn.append (':');
@@ -658,20 +658,20 @@ string Account.display_name () {
 }
 
 string Account.dav_display_name () {
-    return _display_name;
+    return this.display_name;
 }
 
 void Account.set_dav_display_name (string new_display_name) {
-    _display_name = new_display_name;
-    emit account_changed_display_name ();
+    this.display_name = new_display_name;
+    /* emit */ account_changed_display_name ();
 }
 
 string Account.id () {
-    return _id;
+    return this.id;
 }
 
 AbstractCredentials *Account.credentials () {
-    return _credentials.data ();
+    return this.credentials.data ();
 }
 
 void Account.set_credentials (AbstractCredentials cred) {
@@ -679,81 +679,81 @@ void Account.set_credentials (AbstractCredentials cred) {
     QNetworkCookieJar jar = nullptr;
     QNetworkProxy proxy;
 
-    if (_am) {
-        jar = _am.cookie_jar ();
+    if (this.am) {
+        jar = this.am.cookie_jar ();
         jar.set_parent (nullptr);
 
         // Remember proxy (issue #2108)
-        proxy = _am.proxy ();
+        proxy = this.am.proxy ();
 
-        _am = unowned<QNetworkAccessManager> ();
+        this.am = unowned<QNetworkAccessManager> ();
     }
 
     // The order for these two is important! Reading the credential's
     // settings accesses the account as well as account._credentials,
-    _credentials.on_reset (cred);
+    this.credentials.on_reset (cred);
     cred.set_account (this);
 
     // Note: This way the QNAM can outlive the Account and Credentials.
     // This is necessary to avoid issues with the QNAM being deleted while
     // processing on_handle_ssl_errors ().
-    _am = unowned<QNetworkAccessManager> (_credentials.create_qNAM (), &GLib.Object.delete_later);
+    this.am = unowned<QNetworkAccessManager> (this.credentials.create_qNAM (), &GLib.Object.delete_later);
 
     if (jar) {
-        _am.set_cookie_jar (jar);
+        this.am.set_cookie_jar (jar);
     }
     if (proxy.type () != QNetworkProxy.DefaultProxy) {
-        _am.set_proxy (proxy);
+        this.am.set_proxy (proxy);
     }
-    connect (_am.data (), SIGNAL (ssl_errors (QNetworkReply *, GLib.List<QSslError>)),
+    connect (this.am.data (), SIGNAL (ssl_errors (QNetworkReply *, GLib.List<QSslError>)),
         SLOT (on_handle_ssl_errors (QNetworkReply *, GLib.List<QSslError>)));
-    connect (_am.data (), &QNetworkAccessManager.proxy_authentication_required,
+    connect (this.am.data (), &QNetworkAccessManager.proxy_authentication_required,
         this, &Account.proxy_authentication_required);
-    connect (_credentials.data (), &AbstractCredentials.fetched,
+    connect (this.credentials.data (), &AbstractCredentials.fetched,
         this, &Account.on_credentials_fetched);
-    connect (_credentials.data (), &AbstractCredentials.asked,
+    connect (this.credentials.data (), &AbstractCredentials.asked,
         this, &Account.on_credentials_asked);
 
     try_setup_push_notifications ();
 }
 
 void Account.set_push_notifications_reconnect_interval (int interval) {
-    _push_notifications_reconnect_timer.set_interval (interval);
+    this.push_notifications_reconnect_timer.set_interval (interval);
 }
 
 void Account.try_setup_push_notifications () {
     // Stop the timer to prevent parallel setup attempts
-    _push_notifications_reconnect_timer.stop ();
+    this.push_notifications_reconnect_timer.stop ();
 
-    if (_capabilities.available_push_notifications () != PushNotificationType.None) {
+    if (this.capabilities.available_push_notifications () != PushNotificationType.None) {
         q_c_info (lc_account) << "Try to setup push notifications";
 
-        if (!_push_notifications) {
-            _push_notifications = new PushNotifications (this, this);
+        if (!this.push_notifications) {
+            this.push_notifications = new PushNotifications (this, this);
 
-            connect (_push_notifications, &PushNotifications.ready, this, [this] () {
-                _push_notifications_reconnect_timer.stop ();
-                emit push_notifications_ready (this);
+            connect (this.push_notifications, &PushNotifications.ready, this, [this] () {
+                this.push_notifications_reconnect_timer.stop ();
+                /* emit */ push_notifications_ready (this);
             });
 
             const var disable_push_notifications = [this] () {
                 q_c_info (lc_account) << "Disable push notifications object because authentication failed or connection lost";
-                if (!_push_notifications) {
+                if (!this.push_notifications) {
                     return;
                 }
-                if (!_push_notifications.is_ready ()) {
-                    emit push_notifications_disabled (this);
+                if (!this.push_notifications.is_ready ()) {
+                    /* emit */ push_notifications_disabled (this);
                 }
-                if (!_push_notifications_reconnect_timer.is_active ()) {
-                    _push_notifications_reconnect_timer.on_start ();
+                if (!this.push_notifications_reconnect_timer.is_active ()) {
+                    this.push_notifications_reconnect_timer.on_start ();
                 }
             };
 
-            connect (_push_notifications, &PushNotifications.connection_lost, this, disable_push_notifications);
-            connect (_push_notifications, &PushNotifications.authentication_failed, this, disable_push_notifications);
+            connect (this.push_notifications, &PushNotifications.connection_lost, this, disable_push_notifications);
+            connect (this.push_notifications, &PushNotifications.authentication_failed, this, disable_push_notifications);
         }
         // If push notifications already running it is no problem to call setup again
-        _push_notifications.setup ();
+        this.push_notifications.setup ();
     }
 }
 
@@ -762,7 +762,7 @@ GLib.Uri Account.dav_url () {
 }
 
 GLib.Uri Account.deprecated_private_link_url (GLib.ByteArray numeric_file_id) {
-    return Utility.concat_url_path (_user_visible_url,
+    return Utility.concat_url_path (this.user_visible_url,
         QLatin1String ("/index.php/f/") + GLib.Uri.to_percent_encoding (string.from_latin1 (numeric_file_id)));
 }
 
@@ -770,10 +770,10 @@ GLib.Uri Account.deprecated_private_link_url (GLib.ByteArray numeric_file_id) {
 clear all cookies. (Session cookies or not)
 ***********************************************************/
 void Account.clear_cookie_jar () {
-    var jar = qobject_cast<CookieJar> (_am.cookie_jar ());
+    var jar = qobject_cast<CookieJar> (this.am.cookie_jar ());
     ASSERT (jar);
     jar.set_all_cookies (GLib.List<QNetworkCookie> ());
-    emit wants_account_saved (this);
+    /* emit */ wants_account_saved (this);
 }
 
 /***********************************************************
@@ -782,7 +782,7 @@ authentication cookies) with another QNAM while making sure
 of not losing its ownership.
 ***********************************************************/
 void Account.lend_cookie_jar_to (QNetworkAccessManager guest) {
-    var jar = _am.cookie_jar ();
+    var jar = this.am.cookie_jar ();
     var old_parent = jar.parent ();
     guest.set_cookie_jar (jar); // takes ownership of our precious cookie jar
     jar.set_parent (old_parent); // takes it back
@@ -793,78 +793,78 @@ string Account.cookie_jar_path () {
 }
 
 void Account.reset_network_access_manager () {
-    if (!_credentials || !_am) {
+    if (!this.credentials || !this.am) {
         return;
     }
 
     GLib.debug (lc_account) << "Resetting QNAM";
-    QNetworkCookieJar jar = _am.cookie_jar ();
-    QNetworkProxy proxy = _am.proxy ();
+    QNetworkCookieJar jar = this.am.cookie_jar ();
+    QNetworkProxy proxy = this.am.proxy ();
 
     // Use a unowned to allow locking the life of the QNAM on the stack.
     // Make it call delete_later to make sure that we can return to any QNAM stack frames safely.
-    _am = unowned<QNetworkAccessManager> (_credentials.create_qNAM (), &GLib.Object.delete_later);
+    this.am = unowned<QNetworkAccessManager> (this.credentials.create_qNAM (), &GLib.Object.delete_later);
 
-    _am.set_cookie_jar (jar); // takes ownership of the old cookie jar
-    _am.set_proxy (proxy);   // Remember proxy (issue #2108)
+    this.am.set_cookie_jar (jar); // takes ownership of the old cookie jar
+    this.am.set_proxy (proxy);   // Remember proxy (issue #2108)
 
-    connect (_am.data (), SIGNAL (ssl_errors (QNetworkReply *, GLib.List<QSslError>)),
+    connect (this.am.data (), SIGNAL (ssl_errors (QNetworkReply *, GLib.List<QSslError>)),
         SLOT (on_handle_ssl_errors (QNetworkReply *, GLib.List<QSslError>)));
-    connect (_am.data (), &QNetworkAccessManager.proxy_authentication_required,
+    connect (this.am.data (), &QNetworkAccessManager.proxy_authentication_required,
         this, &Account.proxy_authentication_required);
 }
 
 QNetworkAccessManager *Account.network_access_manager () {
-    return _am.data ();
+    return this.am.data ();
 }
 
 unowned<QNetworkAccessManager> Account.shared_network_access_manager () {
-    return _am;
+    return this.am;
 }
 
 QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, QNetworkRequest req, QIODevice data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "HEAD" && !data) {
-        return _am.head (req);
+        return this.am.head (req);
     } else if (verb == "GET" && !data) {
-        return _am.get (req);
+        return this.am.get (req);
     } else if (verb == "POST") {
-        return _am.post (req, data);
+        return this.am.post (req, data);
     } else if (verb == "PUT") {
-        return _am.put (req, data);
+        return this.am.put (req, data);
     } else if (verb == "DELETE" && !data) {
-        return _am.delete_resource (req);
+        return this.am.delete_resource (req);
     }
-    return _am.send_custom_request (req, verb, data);
+    return this.am.send_custom_request (req, verb, data);
 }
 
 QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, QNetworkRequest req, GLib.ByteArray data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "HEAD" && data.is_empty ()) {
-        return _am.head (req);
+        return this.am.head (req);
     } else if (verb == "GET" && data.is_empty ()) {
-        return _am.get (req);
+        return this.am.get (req);
     } else if (verb == "POST") {
-        return _am.post (req, data);
+        return this.am.post (req, data);
     } else if (verb == "PUT") {
-        return _am.put (req, data);
+        return this.am.put (req, data);
     } else if (verb == "DELETE" && data.is_empty ()) {
-        return _am.delete_resource (req);
+        return this.am.delete_resource (req);
     }
-    return _am.send_custom_request (req, verb, data);
+    return this.am.send_custom_request (req, verb, data);
 }
 
 QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, QNetworkRequest req, QHttpMultiPart data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "PUT") {
-        return _am.put (req, data);
+        return this.am.put (req, data);
     } else if (verb == "POST") {
-        return _am.post (req, data);
+        return this.am.post (req, data);
     }
-    return _am.send_custom_request (req, verb, data);
+    return this.am.send_custom_request (req, verb, data);
 }
 
 SimpleNetworkJob *Account.send_request (GLib.ByteArray verb, GLib.Uri url, QNetworkRequest req, QIODevice data) {
@@ -873,15 +873,15 @@ SimpleNetworkJob *Account.send_request (GLib.ByteArray verb, GLib.Uri url, QNetw
     return job;
 }
 
-void Account.set_ssl_configuration (QSslConfiguration &config) {
-    _ssl_configuration = config;
+void Account.set_ssl_configuration (QSslConfiguration config) {
+    this.ssl_configuration = config;
 }
 
 QSslConfiguration Account.get_or_create_ssl_config () {
-    if (!_ssl_configuration.is_null ()) {
+    if (!this.ssl_configuration.is_null ()) {
         // Will be set by CheckServerJob.on_finished ()
         // We need to use a central shared config to get SSL session tickets
-        return _ssl_configuration;
+        return this.ssl_configuration;
     }
 
     // if setting the client certificate fails, you will probably get an error similar to this:
@@ -893,53 +893,53 @@ QSslConfiguration Account.get_or_create_ssl_config () {
     ssl_config.set_ssl_option (QSsl.SslOptionDisableSessionSharing, false);
     ssl_config.set_ssl_option (QSsl.SslOptionDisableSessionPersistence, false);
 
-    ssl_config.set_ocsp_stapling_enabled (Theme.instance ().enable_stapling_oCSP ());
+    ssl_config.set_ocsp_stapling_enabled (Theme.instance ().enable_stapling_ocsp ());
 
     return ssl_config;
 }
 
 void Account.set_approved_certs (GLib.List<QSslCertificate> certs) {
-    _approved_certs = certs;
+    this.approved_certs = certs;
     QSslConfiguration.default_configuration ().add_ca_certificates (certs);
 }
 
 void Account.add_approved_certs (GLib.List<QSslCertificate> certs) {
-    _approved_certs += certs;
+    this.approved_certs += certs;
 }
 
 void Account.reset_rejected_certificates () {
-    _rejected_certificates.clear ();
+    this.rejected_certificates.clear ();
 }
 
 void Account.set_ssl_error_handler (AbstractSslErrorHandler handler) {
-    _ssl_error_handler.on_reset (handler);
+    this.ssl_error_handler.on_reset (handler);
 }
 
 void Account.set_url (GLib.Uri url) {
-    _url = url;
-    _user_visible_url = url;
+    this.url = url;
+    this.user_visible_url = url;
 }
 
 void Account.set_user_visible_host (string host) {
-    _user_visible_url.set_host (host);
+    this.user_visible_url.set_host (host);
 }
 
-QVariant Account.credential_setting (string key) {
-    if (_credentials) {
-        string prefix = _credentials.auth_type ();
-        QVariant value = _settings_map.value (prefix + "_" + key);
+GLib.Variant Account.credential_setting (string key) {
+    if (this.credentials) {
+        string prefix = this.credentials.auth_type ();
+        GLib.Variant value = this.settings_map.value (prefix + "this." + key);
         if (value.is_null ()) {
-            value = _settings_map.value (key);
+            value = this.settings_map.value (key);
         }
         return value;
     }
-    return QVariant ();
+    return GLib.Variant ();
 }
 
-void Account.set_credential_setting (string key, QVariant &value) {
-    if (_credentials) {
-        string prefix = _credentials.auth_type ();
-        _settings_map.insert (prefix + "_" + key, value);
+void Account.set_credential_setting (string key, GLib.Variant value) {
+    if (this.credentials) {
+        string prefix = this.credentials.auth_type ();
+        this.settings_map.insert (prefix + "this." + key, value);
     }
 }
 
@@ -947,7 +947,7 @@ void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> err
     NetworkJobTimeoutPauser pauser (reply);
     string out;
     QDebug (&out) << "SSL-Errors happened for url " << reply.url ().to_"";
-    foreach (QSslError &error, errors) {
+    foreach (QSslError error, errors) {
         QDebug (&out) << "\t_error in " << error.certificate () << ":"
                      << error.error_string () << " (" << error.error () << ")"
                      << "\n";
@@ -957,8 +957,8 @@ void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> err
     q_c_info (lc_account ()) << reply.ssl_configuration ().peer_certificate_chain ();
 
     bool all_previously_rejected = true;
-    foreach (QSslError &error, errors) {
-        if (!_rejected_certificates.contains (error.certificate ())) {
+    foreach (QSslError error, errors) {
+        if (!this.rejected_certificates.contains (error.certificate ())) {
             all_previously_rejected = false;
         }
     }
@@ -970,7 +970,7 @@ void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> err
     }
 
     GLib.List<QSslCertificate> approved_certs;
-    if (_ssl_error_handler.is_null ()) {
+    if (this.ssl_error_handler.is_null ()) {
         GLib.warn (lc_account) << out << "called without valid SSL error handler for account" << url ();
         return;
     }
@@ -979,17 +979,17 @@ void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> err
     // the delete_later () of the QNAM before we have the chance of unwinding our stack.
     // Keep a ref here on our stackframe to make sure that it doesn't get deleted before
     // handle_errors returns.
-    unowned<QNetworkAccessManager> qnam_lock = _am;
+    unowned<QNetworkAccessManager> qnam_lock = this.am;
     QPointer<GLib.Object> guard = reply;
 
-    if (_ssl_error_handler.handle_errors (errors, reply.ssl_configuration (), &approved_certs, shared_from_this ())) {
+    if (this.ssl_error_handler.handle_errors (errors, reply.ssl_configuration (), approved_certs, shared_from_this ())) {
         if (!guard)
             return;
 
         if (!approved_certs.is_empty ()) {
             QSslConfiguration.default_configuration ().add_ca_certificates (approved_certs);
             add_approved_certs (approved_certs);
-            emit wants_account_saved (this);
+            /* emit */ wants_account_saved (this);
 
             // all ssl certs are known and accepted. We can ignore the problems right away.
             q_c_info (lc_account) << out << "Certs are known and trusted! This is not an actual error.";
@@ -1004,9 +1004,9 @@ void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> err
             return;
 
         // Mark all involved certificates as rejected, so we don't ask the user again.
-        foreach (QSslError &error, errors) {
-            if (!_rejected_certificates.contains (error.certificate ())) {
-                _rejected_certificates.append (error.certificate ());
+        foreach (QSslError error, errors) {
+            if (!this.rejected_certificates.contains (error.certificate ())) {
+                this.rejected_certificates.append (error.certificate ());
             }
         }
 
@@ -1016,67 +1016,67 @@ void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> err
 }
 
 void Account.on_credentials_fetched () {
-    if (_dav_user.is_empty ()) {
+    if (this.dav_user.is_empty ()) {
         GLib.debug (lc_account) << "User id not set. Fetch it.";
         const var fetch_user_name_job = new JsonApiJob (shared_from_this (), QStringLiteral ("/ocs/v1.php/cloud/user"));
-        connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, fetch_user_name_job] (QJsonDocument &json, int status_code) {
+        connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, fetch_user_name_job] (QJsonDocument json, int status_code) {
             fetch_user_name_job.delete_later ();
             if (status_code != 100) {
                 GLib.warn (lc_account) << "Could not fetch user id. Login will probably not work.";
-                emit credentials_fetched (_credentials.data ());
+                /* emit */ credentials_fetched (this.credentials.data ());
                 return;
             }
 
             const var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
             const var user_id = obj_data.value ("id").to_string ("");
             set_dav_user (user_id);
-            emit credentials_fetched (_credentials.data ());
+            /* emit */ credentials_fetched (this.credentials.data ());
         });
         fetch_user_name_job.on_start ();
     } else {
         GLib.debug (lc_account) << "User id already fetched.";
-        emit credentials_fetched (_credentials.data ());
+        /* emit */ credentials_fetched (this.credentials.data ());
     }
 }
 
 void Account.on_credentials_asked () {
-    emit credentials_asked (_credentials.data ());
+    /* emit */ credentials_asked (this.credentials.data ());
 }
 
 void Account.handle_invalid_credentials () {
     // Retrieving password will trigger remote wipe check job
     retrieve_app_password ();
 
-    emit invalid_credentials ();
+    /* emit */ invalid_credentials ();
 }
 
 void Account.on_clear_qnam_cache () {
-    _am.clear_access_cache ();
+    this.am.clear_access_cache ();
 }
 
 const Capabilities &Account.capabilities () {
-    return _capabilities;
+    return this.capabilities;
 }
 
-void Account.set_capabilities (QVariantMap &caps) {
-    _capabilities = Capabilities (caps);
+void Account.set_capabilities (QVariantMap caps) {
+    this.capabilities = Capabilities (caps);
 
     setup_user_status_connector ();
     try_setup_push_notifications ();
 }
 
 void Account.setup_user_status_connector () {
-    _user_status_connector = std.make_shared<OcsUserStatusConnector> (shared_from_this ());
-    connect (_user_status_connector.get (), &UserStatusConnector.user_status_fetched, this, [this] (UserStatus &) {
-        emit user_status_changed ();
+    this.user_status_connector = std.make_shared<OcsUserStatusConnector> (shared_from_this ());
+    connect (this.user_status_connector.get (), &UserStatusConnector.user_status_fetched, this, [this] (UserStatus &) {
+        /* emit */ user_status_changed ();
     });
-    connect (_user_status_connector.get (), &UserStatusConnector.message_cleared, this, [this] {
-        emit user_status_changed ();
+    connect (this.user_status_connector.get (), &UserStatusConnector.message_cleared, this, [this] {
+        /* emit */ user_status_changed ();
     });
 }
 
 string Account.server_version () {
-    return _server_version;
+    return this.server_version;
 }
 
 int Account.server_version_int () {
@@ -1105,17 +1105,17 @@ bool Account.is_username_prefill_supported () {
 }
 
 void Account.set_server_version (string version) {
-    if (version == _server_version) {
+    if (version == this.server_version) {
         return;
     }
 
-    var old_server_version = _server_version;
-    _server_version = version;
-    emit server_version_changed (this, old_server_version, version);
+    var old_server_version = this.server_version;
+    this.server_version = version;
+    /* emit */ server_version_changed (this, old_server_version, version);
 }
 
 void Account.write_app_password_once (string app_password){
-    if (_wrote_app_password)
+    if (this.wrote_app_password)
         return;
 
     // Fix : Password got written from Account Wizard, before finish.
@@ -1144,7 +1144,7 @@ void Account.write_app_password_once (string app_password){
             GLib.warn (lc_account) << "Unable to store app_password in keychain" << write_job.error_string ();
 
         // We don't try this again on error, to not raise CPU consumption
-        _wrote_app_password = true;
+        this.wrote_app_password = true;
     });
     job.on_start ();
 }
@@ -1168,7 +1168,7 @@ void Account.retrieve_app_password (){
             pwd = read_job.binary_data ();
         }
 
-        emit app_password_retrieved (pwd);
+        /* emit */ app_password_retrieved (pwd);
     });
     job.on_start ();
 }
@@ -1196,7 +1196,7 @@ void Account.delete_app_password () {
             GLib.warn (lc_account) << "Unable to delete app_password from keychain" << delete_job.error_string ();
 
         // Allow storing a new app password on re-login
-        _wrote_app_password = false;
+        this.wrote_app_password = false;
     });
     job.on_start ();
 }
@@ -1225,7 +1225,7 @@ void Account.fetch_direct_editors (GLib.Uri direct_editing_uRL, string direct_ed
 
     // Check for the direct_editing capability
     if (!direct_editing_uRL.is_empty () &&
-        (direct_editing_e_tag.is_empty () || direct_editing_e_tag != _last_direct_editing_e_tag)) {
+        (direct_editing_e_tag.is_empty () || direct_editing_e_tag != this.last_direct_editing_e_tag)) {
             // Fetch the available editors and their mime types
             var job = new JsonApiJob (shared_from_this (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing"));
             GLib.Object.connect (job, &JsonApiJob.json_received, this, &Account.on_direct_editing_recieved);
@@ -1233,7 +1233,7 @@ void Account.fetch_direct_editors (GLib.Uri direct_editing_uRL, string direct_ed
     }
 }
 
-void Account.on_direct_editing_recieved (QJsonDocument &json) {
+void Account.on_direct_editing_recieved (QJsonDocument json) {
     var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
     var editors = data.value ("editors").to_object ();
 
@@ -1257,17 +1257,17 @@ void Account.on_direct_editing_recieved (QJsonDocument &json) {
                 direct_editor.add_optional_mimetype (optional_mime_type.to_"".to_latin1 ());
             }
 
-            _capabilities.add_direct_editor (direct_editor);
+            this.capabilities.add_direct_editor (direct_editor);
         }
     }
 }
 
 PushNotifications *Account.push_notifications () {
-    return _push_notifications;
+    return this.push_notifications;
 }
 
 std.shared_ptr<UserStatusConnector> Account.user_status_connector () {
-    return _user_status_connector;
+    return this.user_status_connector;
 }
 
 } // namespace Occ

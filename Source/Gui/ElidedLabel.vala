@@ -30,7 +30,7 @@ class ElidedLabel : QLabel {
     public 
 
     public const string text () {
-        return _text;
+        return this.text;
     }
 
 
@@ -42,7 +42,7 @@ class ElidedLabel : QLabel {
     ***********************************************************/
     public 
     public Qt.TextElideMode elide_mode () {
-        return _elide_mode;
+        return this.elide_mode;
     }
 
 
@@ -51,8 +51,8 @@ class ElidedLabel : QLabel {
 
     /***********************************************************
     ***********************************************************/
-    private string _text;
-    private Qt.TextElideMode _elide_mode = Qt.ElideNone;
+    private string this.text;
+    private Qt.TextElideMode this.elide_mode = Qt.ElideNone;
 };
 
 
@@ -62,17 +62,17 @@ class ElidedLabel : QLabel {
 
     ElidedLabel.ElidedLabel (string text, Gtk.Widget parent)
         : QLabel (text, parent)
-        , _text (text) {
+        , this.text (text) {
     }
 
     void ElidedLabel.on_set_text (string text) {
-        _text = text;
+        this.text = text;
         QLabel.on_set_text (text);
         update ();
     }
 
     void ElidedLabel.set_elide_mode (Qt.TextElideMode elide_mode) {
-        _elide_mode = elide_mode;
+        this.elide_mode = elide_mode;
         update ();
     }
 
@@ -80,7 +80,7 @@ class ElidedLabel : QLabel {
         QLabel.resize_event (event);
 
         QFontMetrics fm = font_metrics ();
-        string elided = fm.elided_text (_text, _elide_mode, event.size ().width ());
+        string elided = fm.elided_text (this.text, this.elide_mode, event.size ().width ());
         QLabel.on_set_text (elided);
     }
     }

@@ -64,7 +64,7 @@ signals:
             Utility.open_browser (url);
         }
 
-        emit clicked ();
+        /* emit */ clicked ();
     }
 
     void Link_label.set_font_underline (bool value) {

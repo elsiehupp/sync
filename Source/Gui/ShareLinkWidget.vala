@@ -165,7 +165,7 @@ signals:
 
 
     /***********************************************************
-    Retrieve a share's name, accounting for _names_supported
+    Retrieve a share's name, accounting for this.names_supported
     ***********************************************************/
     string share_name ();
 
@@ -175,38 +175,38 @@ signals:
 
     void display_share_link_label ();
 
-    Ui.Share_link_widget _ui;
-    AccountPointer _account;
-    string _share_path;
-    string _local_path;
-    string _share_url;
+    Ui.Share_link_widget this.ui;
+    AccountPointer this.account;
+    string this.share_path;
+    string this.local_path;
+    string this.share_url;
 
-    unowned<Link_share> _link_share;
+    unowned<Link_share> this.link_share;
 
-    bool _is_file;
-    bool _password_required;
-    bool _expiry_required;
-    bool _names_supported;
-    bool _note_required;
+    bool this.is_file;
+    bool this.password_required;
+    bool this.expiry_required;
+    bool this.names_supported;
+    bool this.note_required;
 
-    QMenu _link_context_menu;
-    QAction _read_only_link_action;
-    QAction _allow_editing_link_action;
-    QAction _allow_upload_editing_link_action;
-    QAction _allow_upload_link_action;
-    QAction _password_protect_link_action;
-    QAction _expiration_date_link_action;
-    QAction _unshare_link_action;
-    QAction _add_another_link_action;
-    QAction _note_link_action;
-    QHBox_layout _share_link_layout{};
-    QLabel _share_link_label{};
-    ElidedLabel _share_link_elided_label{};
-    QLineEdit _share_link_edit{};
-    QToolButton _share_link_button{};
-    QProgress_indicator _share_link_progress_indicator{};
-    Gtk.Widget _share_link_default_widget{};
-    QWidget_action _share_link_widget_action{};
+    QMenu this.link_context_menu;
+    QAction this.read_only_link_action;
+    QAction this.allow_editing_link_action;
+    QAction this.allow_upload_editing_link_action;
+    QAction this.allow_upload_link_action;
+    QAction this.password_protect_link_action;
+    QAction this.expiration_date_link_action;
+    QAction this.unshare_link_action;
+    QAction this.add_another_link_action;
+    QAction this.note_link_action;
+    QHBox_layout this.share_link_layout{};
+    QLabel this.share_link_label{};
+    ElidedLabel this.share_link_elided_label{};
+    QLineEdit this.share_link_edit{};
+    QToolButton this.share_link_button{};
+    QProgress_indicator this.share_link_progress_indicator{};
+    Gtk.Widget this.share_link_default_widget{};
+    QWidget_action this.share_link_widget_action{};
 };
 
 
@@ -216,42 +216,42 @@ Share_link_widget.Share_link_widget (AccountPointer account,
     Share_permissions max_sharing_permissions,
     Gtk.Widget parent)
     : Gtk.Widget (parent)
-    , _ui (new Ui.Share_link_widget)
-    , _account (account)
-    , _share_path (share_path)
-    , _local_path (local_path)
-    , _link_share (nullptr)
-    , _password_required (false)
-    , _expiry_required (false)
-    , _names_supported (true)
-    , _note_required (false)
-    , _link_context_menu (nullptr)
-    , _read_only_link_action (nullptr)
-    , _allow_editing_link_action (nullptr)
-    , _allow_upload_editing_link_action (nullptr)
-    , _allow_upload_link_action (nullptr)
-    , _password_protect_link_action (nullptr)
-    , _expiration_date_link_action (nullptr)
-    , _unshare_link_action (nullptr)
-    , _note_link_action (nullptr) {
-    _ui.setup_ui (this);
+    , this.ui (new Ui.Share_link_widget)
+    , this.account (account)
+    , this.share_path (share_path)
+    , this.local_path (local_path)
+    , this.link_share (nullptr)
+    , this.password_required (false)
+    , this.expiry_required (false)
+    , this.names_supported (true)
+    , this.note_required (false)
+    , this.link_context_menu (nullptr)
+    , this.read_only_link_action (nullptr)
+    , this.allow_editing_link_action (nullptr)
+    , this.allow_upload_editing_link_action (nullptr)
+    , this.allow_upload_link_action (nullptr)
+    , this.password_protect_link_action (nullptr)
+    , this.expiration_date_link_action (nullptr)
+    , this.unshare_link_action (nullptr)
+    , this.note_link_action (nullptr) {
+    this.ui.setup_ui (this);
 
-    _ui.share_link_tool_button.hide ();
+    this.ui.share_link_tool_button.hide ();
 
     //Is this a file or folder?
     QFileInfo fi (local_path);
-    _is_file = fi.is_file ();
+    this.is_file = fi.is_file ();
 
-    connect (_ui.enable_share_link, &QPushButton.clicked, this, &Share_link_widget.on_create_share_link);
-    connect (_ui.line_edit_password, &QLineEdit.return_pressed, this, &Share_link_widget.on_create_password);
-    connect (_ui.confirm_password, &QAbstractButton.clicked, this, &Share_link_widget.on_create_password);
-    connect (_ui.confirm_note, &QAbstractButton.clicked, this, &Share_link_widget.on_create_note);
-    connect (_ui.confirm_expiration_date, &QAbstractButton.clicked, this, &Share_link_widget.on_set_expire_date);
+    connect (this.ui.enable_share_link, &QPushButton.clicked, this, &Share_link_widget.on_create_share_link);
+    connect (this.ui.line_edit_password, &QLineEdit.return_pressed, this, &Share_link_widget.on_create_password);
+    connect (this.ui.confirm_password, &QAbstractButton.clicked, this, &Share_link_widget.on_create_password);
+    connect (this.ui.confirm_note, &QAbstractButton.clicked, this, &Share_link_widget.on_create_note);
+    connect (this.ui.confirm_expiration_date, &QAbstractButton.clicked, this, &Share_link_widget.on_set_expire_date);
 
-    _ui.error_label.hide ();
+    this.ui.error_label.hide ();
 
     var sharing_possible = true;
-    if (!_account.capabilities ().share_public_link ()) {
+    if (!this.account.capabilities ().share_public_link ()) {
         GLib.warn (lc_share_link) << "Link shares have been disabled";
         sharing_possible = false;
     } else if (! (max_sharing_permissions & Share_permission_share)) {
@@ -259,23 +259,23 @@ Share_link_widget.Share_link_widget (AccountPointer account,
         sharing_possible = false;
     }
 
-    _ui.enable_share_link.set_checked (false);
-    _ui.share_link_tool_button.set_enabled (false);
-    _ui.share_link_tool_button.hide ();
+    this.ui.enable_share_link.set_checked (false);
+    this.ui.share_link_tool_button.set_enabled (false);
+    this.ui.share_link_tool_button.hide ();
 
     // Older servers don't support multiple public link shares
-    if (!_account.capabilities ().share_public_link_multiple ()) {
-        _names_supported = false;
+    if (!this.account.capabilities ().share_public_link_multiple ()) {
+        this.names_supported = false;
     }
 
     toggle_password_options (false);
     toggle_expire_date_options (false);
     toggle_note_options (false);
 
-    _ui.note_progress_indicator.set_visible (false);
-    _ui.password_progress_indicator.set_visible (false);
-    _ui.expiration_date_progress_indicator.set_visible (false);
-    _ui.sharelink_progress_indicator.set_visible (false);
+    this.ui.note_progress_indicator.set_visible (false);
+    this.ui.password_progress_indicator.set_visible (false);
+    this.ui.expiration_date_progress_indicator.set_visible (false);
+    this.ui.sharelink_progress_indicator.set_visible (false);
 
     // check if the file is already inside of a synced folder
     if (share_path.is_empty ()) {
@@ -285,17 +285,17 @@ Share_link_widget.Share_link_widget (AccountPointer account,
 }
 
 Share_link_widget.~Share_link_widget () {
-    delete _ui;
+    delete this.ui;
 }
 
 void Share_link_widget.on_toggle_share_link_animation (bool on_start) {
-    _ui.sharelink_progress_indicator.set_visible (on_start);
+    this.ui.sharelink_progress_indicator.set_visible (on_start);
     if (on_start) {
-        if (!_ui.sharelink_progress_indicator.is_animated ()) {
-            _ui.sharelink_progress_indicator.on_start_animation ();
+        if (!this.ui.sharelink_progress_indicator.is_animated ()) {
+            this.ui.sharelink_progress_indicator.on_start_animation ();
         }
     } else {
-        _ui.sharelink_progress_indicator.on_stop_animation ();
+        this.ui.sharelink_progress_indicator.on_stop_animation ();
     }
 }
 
@@ -314,252 +314,252 @@ void Share_link_widget.toggle_button_animation (QToolButton button, QProgress_in
 }
 
 void Share_link_widget.set_link_share (unowned<Link_share> link_share) {
-    _link_share = link_share;
+    this.link_share = link_share;
 }
 
 unowned<Link_share> Share_link_widget.get_link_share () {
-    return _link_share;
+    return this.link_share;
 }
 
 void Share_link_widget.on_focus_password_line_edit () {
-    _ui.line_edit_password.set_focus ();
+    this.ui.line_edit_password.set_focus ();
 }
 
 void Share_link_widget.setup_ui_options () {
-    connect (_link_share.data (), &Link_share.note_set, this, &Share_link_widget.on_note_set);
-    connect (_link_share.data (), &Link_share.password_set, this, &Share_link_widget.on_password_set);
-    connect (_link_share.data (), &Link_share.password_set_error, this, &Share_link_widget.on_password_set_error);
-    connect (_link_share.data (), &Link_share.label_set, this, &Share_link_widget.on_label_set);
+    connect (this.link_share.data (), &Link_share.note_set, this, &Share_link_widget.on_note_set);
+    connect (this.link_share.data (), &Link_share.password_set, this, &Share_link_widget.on_password_set);
+    connect (this.link_share.data (), &Link_share.password_set_error, this, &Share_link_widget.on_password_set_error);
+    connect (this.link_share.data (), &Link_share.label_set, this, &Share_link_widget.on_label_set);
 
     // Prepare permissions check and create group action
-    const QDate expire_date = _link_share.data ().get_expire_date ().is_valid () ? _link_share.data ().get_expire_date () : QDate ();
-    const Share_permissions perm = _link_share.data ().get_permissions ();
+    const QDate expire_date = this.link_share.data ().get_expire_date ().is_valid () ? this.link_share.data ().get_expire_date () : QDate ();
+    const Share_permissions perm = this.link_share.data ().get_permissions ();
     var checked = false;
     var permissions_group = new QAction_group (this);
 
     // Prepare sharing menu
-    _link_context_menu = new QMenu (this);
+    this.link_context_menu = new QMenu (this);
 
     // radio button style
     permissions_group.set_exclusive (true);
 
-    if (_is_file) {
+    if (this.is_file) {
         checked = (perm & Share_permission_read) && (perm & Share_permission_update);
-        _allow_editing_link_action = _link_context_menu.add_action (_("Allow editing"));
-        _allow_editing_link_action.set_checkable (true);
-        _allow_editing_link_action.set_checked (checked);
+        this.allow_editing_link_action = this.link_context_menu.add_action (_("Allow editing"));
+        this.allow_editing_link_action.set_checkable (true);
+        this.allow_editing_link_action.set_checked (checked);
 
     } else {
         checked = (perm == Share_permission_read);
-        _read_only_link_action = permissions_group.add_action (_("View only"));
-        _read_only_link_action.set_checkable (true);
-        _read_only_link_action.set_checked (checked);
+        this.read_only_link_action = permissions_group.add_action (_("View only"));
+        this.read_only_link_action.set_checkable (true);
+        this.read_only_link_action.set_checked (checked);
 
         checked = (perm & Share_permission_read) && (perm & Share_permission_create)
             && (perm & Share_permission_update) && (perm & Share_permission_delete);
-        _allow_upload_editing_link_action = permissions_group.add_action (_("Allow upload and editing"));
-        _allow_upload_editing_link_action.set_checkable (true);
-        _allow_upload_editing_link_action.set_checked (checked);
+        this.allow_upload_editing_link_action = permissions_group.add_action (_("Allow upload and editing"));
+        this.allow_upload_editing_link_action.set_checkable (true);
+        this.allow_upload_editing_link_action.set_checked (checked);
 
         checked = (perm == Share_permission_create);
-        _allow_upload_link_action = permissions_group.add_action (_("File drop (upload only)"));
-        _allow_upload_link_action.set_checkable (true);
-        _allow_upload_link_action.set_checked (checked);
+        this.allow_upload_link_action = permissions_group.add_action (_("File drop (upload only)"));
+        this.allow_upload_link_action.set_checkable (true);
+        this.allow_upload_link_action.set_checked (checked);
     }
 
-    _share_link_elided_label = new Occ.ElidedLabel (this);
-    _share_link_elided_label.set_elide_mode (Qt.Elide_right);
+    this.share_link_elided_label = new Occ.ElidedLabel (this);
+    this.share_link_elided_label.set_elide_mode (Qt.Elide_right);
     display_share_link_label ();
-    _ui.horizontal_layout.insert_widget (2, _share_link_elided_label);
+    this.ui.horizontal_layout.insert_widget (2, this.share_link_elided_label);
 
-    _share_link_layout = new QHBox_layout (this);
+    this.share_link_layout = new QHBox_layout (this);
 
-    _share_link_label = new QLabel (this);
-    _share_link_label.set_pixmap (string (":/client/theme/black/edit.svg"));
-    _share_link_layout.add_widget (_share_link_label);
+    this.share_link_label = new QLabel (this);
+    this.share_link_label.set_pixmap (string (":/client/theme/black/edit.svg"));
+    this.share_link_layout.add_widget (this.share_link_label);
 
-    _share_link_edit = new QLineEdit (this);
-    connect (_share_link_edit, &QLineEdit.return_pressed, this, &Share_link_widget.on_create_label);
-    _share_link_edit.set_placeholder_text (_("Link name"));
-    _share_link_edit.on_set_text (_link_share.data ().get_label ());
-    _share_link_layout.add_widget (_share_link_edit);
+    this.share_link_edit = new QLineEdit (this);
+    connect (this.share_link_edit, &QLineEdit.return_pressed, this, &Share_link_widget.on_create_label);
+    this.share_link_edit.set_placeholder_text (_("Link name"));
+    this.share_link_edit.on_set_text (this.link_share.data ().get_label ());
+    this.share_link_layout.add_widget (this.share_link_edit);
 
-    _share_link_button = new QToolButton (this);
-    connect (_share_link_button, &QToolButton.clicked, this, &Share_link_widget.on_create_label);
-    _share_link_button.set_icon (QIcon (":/client/theme/confirm.svg"));
-    _share_link_button.set_tool_button_style (Qt.Tool_button_icon_only);
-    _share_link_layout.add_widget (_share_link_button);
+    this.share_link_button = new QToolButton (this);
+    connect (this.share_link_button, &QToolButton.clicked, this, &Share_link_widget.on_create_label);
+    this.share_link_button.set_icon (QIcon (":/client/theme/confirm.svg"));
+    this.share_link_button.set_tool_button_style (Qt.Tool_button_icon_only);
+    this.share_link_layout.add_widget (this.share_link_button);
 
-    _share_link_progress_indicator = new QProgress_indicator (this);
-    _share_link_progress_indicator.set_visible (false);
-    _share_link_layout.add_widget (_share_link_progress_indicator);
+    this.share_link_progress_indicator = new QProgress_indicator (this);
+    this.share_link_progress_indicator.set_visible (false);
+    this.share_link_layout.add_widget (this.share_link_progress_indicator);
 
-    _share_link_default_widget = new Gtk.Widget (this);
-    _share_link_default_widget.set_layout (_share_link_layout);
+    this.share_link_default_widget = new Gtk.Widget (this);
+    this.share_link_default_widget.set_layout (this.share_link_layout);
 
-    _share_link_widget_action = new QWidget_action (this);
-    _share_link_widget_action.set_default_widget (_share_link_default_widget);
-    _share_link_widget_action.set_checkable (true);
-    _link_context_menu.add_action (_share_link_widget_action);
+    this.share_link_widget_action = new QWidget_action (this);
+    this.share_link_widget_action.set_default_widget (this.share_link_default_widget);
+    this.share_link_widget_action.set_checkable (true);
+    this.link_context_menu.add_action (this.share_link_widget_action);
 
     // Adds permissions actions (radio button style)
-    if (_is_file) {
-        _link_context_menu.add_action (_allow_editing_link_action);
+    if (this.is_file) {
+        this.link_context_menu.add_action (this.allow_editing_link_action);
     } else {
-        _link_context_menu.add_action (_read_only_link_action);
-        _link_context_menu.add_action (_allow_upload_editing_link_action);
-        _link_context_menu.add_action (_allow_upload_link_action);
+        this.link_context_menu.add_action (this.read_only_link_action);
+        this.link_context_menu.add_action (this.allow_upload_editing_link_action);
+        this.link_context_menu.add_action (this.allow_upload_link_action);
     }
 
     // Adds action to display note widget (check box)
-    _note_link_action = _link_context_menu.add_action (_("Note to recipient"));
-    _note_link_action.set_checkable (true);
+    this.note_link_action = this.link_context_menu.add_action (_("Note to recipient"));
+    this.note_link_action.set_checkable (true);
 
-    if (_link_share.get_note ().is_simple_text () && !_link_share.get_note ().is_empty ()) {
-        _ui.text_edit_note.on_set_text (_link_share.get_note ());
-        _note_link_action.set_checked (true);
+    if (this.link_share.get_note ().is_simple_text () && !this.link_share.get_note ().is_empty ()) {
+        this.ui.text_edit_note.on_set_text (this.link_share.get_note ());
+        this.note_link_action.set_checked (true);
         toggle_note_options ();
     }
 
     // Adds action to display password widget (check box)
-    _password_protect_link_action = _link_context_menu.add_action (_("Password protect"));
-    _password_protect_link_action.set_checkable (true);
+    this.password_protect_link_action = this.link_context_menu.add_action (_("Password protect"));
+    this.password_protect_link_action.set_checkable (true);
 
-    if (_link_share.data ().is_password_set ()) {
-        _password_protect_link_action.set_checked (true);
-        _ui.line_edit_password.set_placeholder_text (string.from_utf8 (password_is_set_placeholder));
+    if (this.link_share.data ().is_password_set ()) {
+        this.password_protect_link_action.set_checked (true);
+        this.ui.line_edit_password.set_placeholder_text (string.from_utf8 (password_is_set_placeholder));
         toggle_password_options ();
     }
 
     // If password is enforced then don't allow users to disable it
-    if (_account.capabilities ().share_public_link_enforce_password ()) {
-        if (_link_share.data ().is_password_set ()) {
-            _password_protect_link_action.set_checked (true);
-            _password_protect_link_action.set_enabled (false);
+    if (this.account.capabilities ().share_public_link_enforce_password ()) {
+        if (this.link_share.data ().is_password_set ()) {
+            this.password_protect_link_action.set_checked (true);
+            this.password_protect_link_action.set_enabled (false);
         }
-        _password_required = true;
+        this.password_required = true;
     }
 
     // Adds action to display expiration date widget (check box)
-    _expiration_date_link_action = _link_context_menu.add_action (_("Set expiration date"));
-    _expiration_date_link_action.set_checkable (true);
+    this.expiration_date_link_action = this.link_context_menu.add_action (_("Set expiration date"));
+    this.expiration_date_link_action.set_checkable (true);
     if (!expire_date.is_null ()) {
-        _ui.calendar.set_date (expire_date);
-        _expiration_date_link_action.set_checked (true);
+        this.ui.calendar.set_date (expire_date);
+        this.expiration_date_link_action.set_checked (true);
         toggle_expire_date_options ();
     }
-    connect (_ui.calendar, &QDate_time_edit.date_changed, this, &Share_link_widget.on_set_expire_date);
-    connect (_link_share.data (), &Link_share.expire_date_set, this, &Share_link_widget.on_expire_date_set);
+    connect (this.ui.calendar, &QDate_time_edit.date_changed, this, &Share_link_widget.on_set_expire_date);
+    connect (this.link_share.data (), &Link_share.expire_date_set, this, &Share_link_widget.on_expire_date_set);
 
     // If expiredate is enforced do not allow disable and set max days
-    if (_account.capabilities ().share_public_link_enforce_expire_date ()) {
-        _ui.calendar.set_maximum_date (QDate.current_date ().add_days (
-            _account.capabilities ().share_public_link_expire_date_days ()));
-        _expiration_date_link_action.set_checked (true);
-        _expiration_date_link_action.set_enabled (false);
-        _expiry_required = true;
+    if (this.account.capabilities ().share_public_link_enforce_expire_date ()) {
+        this.ui.calendar.set_maximum_date (QDate.current_date ().add_days (
+            this.account.capabilities ().share_public_link_expire_date_days ()));
+        this.expiration_date_link_action.set_checked (true);
+        this.expiration_date_link_action.set_enabled (false);
+        this.expiry_required = true;
     }
 
     // Adds action to unshare widget (check box)
-    _unshare_link_action = _link_context_menu.add_action (QIcon (":/client/theme/delete.svg"),
+    this.unshare_link_action = this.link_context_menu.add_action (QIcon (":/client/theme/delete.svg"),
         _("Delete link"));
 
-    _link_context_menu.add_separator ();
+    this.link_context_menu.add_separator ();
 
-    _add_another_link_action = _link_context_menu.add_action (QIcon (":/client/theme/add.svg"),
+    this.add_another_link_action = this.link_context_menu.add_action (QIcon (":/client/theme/add.svg"),
         _("Add another link"));
 
-    _ui.enable_share_link.set_icon (QIcon (":/client/theme/copy.svg"));
-    disconnect (_ui.enable_share_link, &QPushButton.clicked, this, &Share_link_widget.on_create_share_link);
-    connect (_ui.enable_share_link, &QPushButton.clicked, this, &Share_link_widget.on_copy_link_share);
+    this.ui.enable_share_link.set_icon (QIcon (":/client/theme/copy.svg"));
+    disconnect (this.ui.enable_share_link, &QPushButton.clicked, this, &Share_link_widget.on_create_share_link);
+    connect (this.ui.enable_share_link, &QPushButton.clicked, this, &Share_link_widget.on_copy_link_share);
 
-    connect (_link_context_menu, &QMenu.triggered,
+    connect (this.link_context_menu, &QMenu.triggered,
         this, &Share_link_widget.on_link_context_menu_action_triggered);
 
-    _ui.share_link_tool_button.set_menu (_link_context_menu);
-    _ui.share_link_tool_button.set_enabled (true);
-    _ui.enable_share_link.set_enabled (true);
-    _ui.enable_share_link.set_checked (true);
+    this.ui.share_link_tool_button.set_menu (this.link_context_menu);
+    this.ui.share_link_tool_button.set_enabled (true);
+    this.ui.enable_share_link.set_enabled (true);
+    this.ui.enable_share_link.set_checked (true);
 
     // show sharing options
-    _ui.share_link_tool_button.show ();
+    this.ui.share_link_tool_button.show ();
 
     customize_style ();
 }
 
 void Share_link_widget.on_create_note () {
-    const var note = _ui.text_edit_note.to_plain_text ();
-    if (!_link_share || _link_share.get_note () == note || note.is_empty ()) {
+    const var note = this.ui.text_edit_note.to_plain_text ();
+    if (!this.link_share || this.link_share.get_note () == note || note.is_empty ()) {
         return;
     }
 
-    toggle_button_animation (_ui.confirm_note, _ui.note_progress_indicator, _note_link_action);
-    _ui.error_label.hide ();
-    _link_share.set_note (note);
+    toggle_button_animation (this.ui.confirm_note, this.ui.note_progress_indicator, this.note_link_action);
+    this.ui.error_label.hide ();
+    this.link_share.set_note (note);
 }
 
 void Share_link_widget.on_note_set () {
-    toggle_button_animation (_ui.confirm_note, _ui.note_progress_indicator, _note_link_action);
+    toggle_button_animation (this.ui.confirm_note, this.ui.note_progress_indicator, this.note_link_action);
 }
 
 void Share_link_widget.on_copy_link_share (bool clicked) {
     Q_UNUSED (clicked);
 
-    QApplication.clipboard ().on_set_text (_link_share.get_link ().to_"");
+    QApplication.clipboard ().on_set_text (this.link_share.get_link ().to_"");
 }
 
 void Share_link_widget.on_expire_date_set () {
-    toggle_button_animation (_ui.confirm_expiration_date, _ui.expiration_date_progress_indicator, _expiration_date_link_action);
+    toggle_button_animation (this.ui.confirm_expiration_date, this.ui.expiration_date_progress_indicator, this.expiration_date_link_action);
 }
 
 void Share_link_widget.on_set_expire_date () {
-    if (!_link_share) {
+    if (!this.link_share) {
         return;
     }
 
-    toggle_button_animation (_ui.confirm_expiration_date, _ui.expiration_date_progress_indicator, _expiration_date_link_action);
-    _ui.error_label.hide ();
-    _link_share.set_expire_date (_ui.calendar.date ());
+    toggle_button_animation (this.ui.confirm_expiration_date, this.ui.expiration_date_progress_indicator, this.expiration_date_link_action);
+    this.ui.error_label.hide ();
+    this.link_share.set_expire_date (this.ui.calendar.date ());
 }
 
 void Share_link_widget.on_create_password () {
-    if (!_link_share || _ui.line_edit_password.text ().is_empty ()) {
+    if (!this.link_share || this.ui.line_edit_password.text ().is_empty ()) {
         return;
     }
 
-    toggle_button_animation (_ui.confirm_password, _ui.password_progress_indicator, _password_protect_link_action);
-    _ui.error_label.hide ();
-    emit create_password (_ui.line_edit_password.text ());
+    toggle_button_animation (this.ui.confirm_password, this.ui.password_progress_indicator, this.password_protect_link_action);
+    this.ui.error_label.hide ();
+    /* emit */ create_password (this.ui.line_edit_password.text ());
 }
 
 void Share_link_widget.on_create_share_link (bool clicked) {
     Q_UNUSED (clicked);
     on_toggle_share_link_animation (true);
-    emit create_link_share ();
+    /* emit */ create_link_share ();
 }
 
 void Share_link_widget.on_password_set () {
-    toggle_button_animation (_ui.confirm_password, _ui.password_progress_indicator, _password_protect_link_action);
+    toggle_button_animation (this.ui.confirm_password, this.ui.password_progress_indicator, this.password_protect_link_action);
 
-    _ui.line_edit_password.on_set_text ({});
+    this.ui.line_edit_password.on_set_text ({});
 
-    if (_link_share.is_password_set ()) {
-        _ui.line_edit_password.set_enabled (true);
-        _ui.line_edit_password.set_placeholder_text (string.from_utf8 (password_is_set_placeholder));
+    if (this.link_share.is_password_set ()) {
+        this.ui.line_edit_password.set_enabled (true);
+        this.ui.line_edit_password.set_placeholder_text (string.from_utf8 (password_is_set_placeholder));
     } else {
-        _ui.line_edit_password.set_placeholder_text ({});
+        this.ui.line_edit_password.set_placeholder_text ({});
     }
 
-    emit create_password_processed ();
+    /* emit */ create_password_processed ();
 }
 
 void Share_link_widget.on_password_set_error (int code, string message) {
-    toggle_button_animation (_ui.confirm_password, _ui.password_progress_indicator, _password_protect_link_action);
+    toggle_button_animation (this.ui.confirm_password, this.ui.password_progress_indicator, this.password_protect_link_action);
 
     on_server_error (code, message);
     toggle_password_options ();
-    _ui.line_edit_password.set_focus ();
-    emit create_password_processed ();
+    this.ui.line_edit_password.set_focus ();
+    /* emit */ create_password_processed ();
 }
 
 void Share_link_widget.on_start_animation (int on_start, int end) {
@@ -580,42 +580,42 @@ void Share_link_widget.on_start_animation (int on_start, int end) {
 void Share_link_widget.on_delete_share_fetched () {
     on_toggle_share_link_animation (false);
 
-    _link_share.clear ();
+    this.link_share.clear ();
     toggle_password_options (false);
     toggle_note_options (false);
     toggle_expire_date_options (false);
-    emit delete_link_share ();
+    /* emit */ delete_link_share ();
 }
 
 void Share_link_widget.toggle_note_options (bool enable) {
-    _ui.note_label.set_visible (enable);
-    _ui.text_edit_note.set_visible (enable);
-    _ui.confirm_note.set_visible (enable);
-    _ui.text_edit_note.on_set_text (enable && _link_share ? _link_share.get_note () : "");
+    this.ui.note_label.set_visible (enable);
+    this.ui.text_edit_note.set_visible (enable);
+    this.ui.confirm_note.set_visible (enable);
+    this.ui.text_edit_note.on_set_text (enable && this.link_share ? this.link_share.get_note () : "");
 
-    if (!enable && _link_share && !_link_share.get_note ().is_empty ()) {
-        _link_share.set_note ({});
+    if (!enable && this.link_share && !this.link_share.get_note ().is_empty ()) {
+        this.link_share.set_note ({});
     }
 }
 
 void Share_link_widget.on_animation_finished () {
-    emit resize_requested ();
+    /* emit */ resize_requested ();
     delete_later ();
 }
 
 void Share_link_widget.on_create_label () {
-    const var label_text = _share_link_edit.text ();
-    if (!_link_share || _link_share.get_label () == label_text || label_text.is_empty ()) {
+    const var label_text = this.share_link_edit.text ();
+    if (!this.link_share || this.link_share.get_label () == label_text || label_text.is_empty ()) {
         return;
     }
-    _share_link_widget_action.set_checked (true);
-    toggle_button_animation (_share_link_button, _share_link_progress_indicator, _share_link_widget_action);
-    _ui.error_label.hide ();
-    _link_share.set_label (_share_link_edit.text ());
+    this.share_link_widget_action.set_checked (true);
+    toggle_button_animation (this.share_link_button, this.share_link_progress_indicator, this.share_link_widget_action);
+    this.ui.error_label.hide ();
+    this.link_share.set_label (this.share_link_edit.text ());
 }
 
 void Share_link_widget.on_label_set () {
-    toggle_button_animation (_share_link_button, _share_link_progress_indicator, _share_link_widget_action);
+    toggle_button_animation (this.share_link_button, this.share_link_progress_indicator, this.share_link_widget_action);
     display_share_link_label ();
 }
 
@@ -630,40 +630,40 @@ void Share_link_widget.on_create_share_requires_password (string message) {
     on_toggle_share_link_animation (message.is_empty ());
 
     if (!message.is_empty ()) {
-        _ui.error_label.on_set_text (message);
-        _ui.error_label.show ();
+        this.ui.error_label.on_set_text (message);
+        this.ui.error_label.show ();
     }
 
-    _password_required = true;
+    this.password_required = true;
 
     toggle_password_options ();
 }
 
 void Share_link_widget.toggle_password_options (bool enable) {
-    _ui.password_label.set_visible (enable);
-    _ui.line_edit_password.set_visible (enable);
-    _ui.confirm_password.set_visible (enable);
-    _ui.line_edit_password.set_focus ();
+    this.ui.password_label.set_visible (enable);
+    this.ui.line_edit_password.set_visible (enable);
+    this.ui.confirm_password.set_visible (enable);
+    this.ui.line_edit_password.set_focus ();
 
-    if (!enable && _link_share && _link_share.is_password_set ()) {
-        _link_share.set_password ({});
+    if (!enable && this.link_share && this.link_share.is_password_set ()) {
+        this.link_share.set_password ({});
     }
 }
 
 void Share_link_widget.toggle_expire_date_options (bool enable) {
-    _ui.expiration_label.set_visible (enable);
-    _ui.calendar.set_visible (enable);
-    _ui.confirm_expiration_date.set_visible (enable);
+    this.ui.expiration_label.set_visible (enable);
+    this.ui.calendar.set_visible (enable);
+    this.ui.confirm_expiration_date.set_visible (enable);
 
-    const var date = enable ? _link_share.get_expire_date () : QDate.current_date ().add_days (1);
-    _ui.calendar.set_date (date);
-    _ui.calendar.set_minimum_date (QDate.current_date ().add_days (1));
-    _ui.calendar.set_maximum_date (
-        QDate.current_date ().add_days (_account.capabilities ().share_public_link_expire_date_days ()));
-    _ui.calendar.set_focus ();
+    const var date = enable ? this.link_share.get_expire_date () : QDate.current_date ().add_days (1);
+    this.ui.calendar.set_date (date);
+    this.ui.calendar.set_minimum_date (QDate.current_date ().add_days (1));
+    this.ui.calendar.set_maximum_date (
+        QDate.current_date ().add_days (this.account.capabilities ().share_public_link_expire_date_days ()));
+    this.ui.calendar.set_focus ();
 
-    if (!enable && _link_share && _link_share.get_expire_date ().is_valid ()) {
-        _link_share.set_expire_date ({});
+    if (!enable && this.link_share && this.link_share.get_expire_date ().is_valid ()) {
+        this.link_share.set_expire_date ({});
     }
 }
 
@@ -691,50 +691,50 @@ void Share_link_widget.confirm_and_delete_share () {
 }
 
 string Share_link_widget.share_name () {
-    string name = _link_share.get_name ();
+    string name = this.link_share.get_name ();
     if (!name.is_empty ())
         return name;
-    if (!_names_supported)
+    if (!this.names_supported)
         return _("Public link");
-    return _link_share.get_token ();
+    return this.link_share.get_token ();
 }
 
 void Share_link_widget.on_context_menu_button_clicked () {
-    _link_context_menu.exec (QCursor.pos ());
+    this.link_context_menu.exec (QCursor.pos ());
 }
 
 void Share_link_widget.on_link_context_menu_action_triggered (QAction action) {
     const var state = action.is_checked ();
     Share_permissions perm = Share_permission_read;
 
-    if (action == _add_another_link_action) {
-        emit create_link_share ();
+    if (action == this.add_another_link_action) {
+        /* emit */ create_link_share ();
 
-    } else if (action == _read_only_link_action && state) {
-        _link_share.set_permissions (perm);
+    } else if (action == this.read_only_link_action && state) {
+        this.link_share.set_permissions (perm);
 
-    } else if (action == _allow_editing_link_action && state) {
+    } else if (action == this.allow_editing_link_action && state) {
         perm |= Share_permission_update;
-        _link_share.set_permissions (perm);
+        this.link_share.set_permissions (perm);
 
-    } else if (action == _allow_upload_editing_link_action && state) {
+    } else if (action == this.allow_upload_editing_link_action && state) {
         perm |= Share_permission_create | Share_permission_update | Share_permission_delete;
-        _link_share.set_permissions (perm);
+        this.link_share.set_permissions (perm);
 
-    } else if (action == _allow_upload_link_action && state) {
+    } else if (action == this.allow_upload_link_action && state) {
         perm = Share_permission_create;
-        _link_share.set_permissions (perm);
+        this.link_share.set_permissions (perm);
 
-    } else if (action == _password_protect_link_action) {
+    } else if (action == this.password_protect_link_action) {
         toggle_password_options (state);
 
-    } else if (action == _expiration_date_link_action) {
+    } else if (action == this.expiration_date_link_action) {
         toggle_expire_date_options (state);
 
-    } else if (action == _note_link_action) {
+    } else if (action == this.note_link_action) {
         toggle_note_options (state);
 
-    } else if (action == _unshare_link_action) {
+    } else if (action == this.unshare_link_action) {
         confirm_and_delete_share ();
     }
 }
@@ -747,8 +747,8 @@ void Share_link_widget.on_server_error (int code, string message) {
 }
 
 void Share_link_widget.on_display_error (string error_message) {
-    _ui.error_label.on_set_text (error_message);
-    _ui.error_label.show ();
+    this.ui.error_label.on_set_text (error_message);
+    this.ui.error_label.show ();
 }
 
 void Share_link_widget.on_style_changed () {
@@ -756,27 +756,27 @@ void Share_link_widget.on_style_changed () {
 }
 
 void Share_link_widget.customize_style () {
-    _unshare_link_action.set_icon (Theme.create_color_aware_icon (":/client/theme/delete.svg"));
+    this.unshare_link_action.set_icon (Theme.create_color_aware_icon (":/client/theme/delete.svg"));
 
-    _add_another_link_action.set_icon (Theme.create_color_aware_icon (":/client/theme/add.svg"));
+    this.add_another_link_action.set_icon (Theme.create_color_aware_icon (":/client/theme/add.svg"));
 
-    _ui.enable_share_link.set_icon (Theme.create_color_aware_icon (":/client/theme/copy.svg"));
+    this.ui.enable_share_link.set_icon (Theme.create_color_aware_icon (":/client/theme/copy.svg"));
 
-    _ui.share_link_icon_label.set_pixmap (Theme.create_color_aware_pixmap (":/client/theme/public.svg"));
+    this.ui.share_link_icon_label.set_pixmap (Theme.create_color_aware_pixmap (":/client/theme/public.svg"));
 
-    _ui.share_link_tool_button.set_icon (Theme.create_color_aware_icon (":/client/theme/more.svg"));
+    this.ui.share_link_tool_button.set_icon (Theme.create_color_aware_icon (":/client/theme/more.svg"));
 
-    _ui.confirm_note.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
-    _ui.confirm_password.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
-    _ui.confirm_expiration_date.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+    this.ui.confirm_note.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+    this.ui.confirm_password.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+    this.ui.confirm_expiration_date.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
 
-    _ui.password_progress_indicator.on_set_color (QGuiApplication.palette ().color (QPalette.Text));
+    this.ui.password_progress_indicator.on_set_color (QGuiApplication.palette ().color (QPalette.Text));
 }
 
 void Share_link_widget.display_share_link_label () {
-    _share_link_elided_label.clear ();
-    if (!_link_share.get_label ().is_empty ()) {
-        _share_link_elided_label.on_set_text (string (" (%1)").arg (_link_share.get_label ()));
+    this.share_link_elided_label.clear ();
+    if (!this.link_share.get_label ().is_empty ()) {
+        this.share_link_elided_label.on_set_text (string (" (%1)").arg (this.link_share.get_label ()));
     }
 }
 

@@ -12,14 +12,14 @@ using namespace Occ;
 
 class TestSyncJournalDB : GLib.Object {
 
-    QTemporaryDir _tempDir;
+    QTemporaryDir this.tempDir;
 
 
     /***********************************************************
     ***********************************************************/
     public TestSyncJournalDB ()
-        : _database ( (_tempDir.path () + "/sync.db")) {
-        QVERIFY (_tempDir.isValid ());
+        : this.database ( (this.tempDir.path () + "/sync.db")) {
+        QVERIFY (this.tempDir.isValid ());
     }
 
 
@@ -37,7 +37,7 @@ class TestSyncJournalDB : GLib.Object {
 
     private
     private void on_cleanup_test_case () {
-        const string file = _database.databaseFilePath ();
+        const string file = this.database.databaseFilePath ();
         GLib.File.remove (file);
     }
 
@@ -46,7 +46,7 @@ class TestSyncJournalDB : GLib.Object {
     ***********************************************************/
     private on_ void testFileRecord () {
         SyncJournalFileRecord record;
-        QVERIFY (_database.getFileRecord (QByteArrayLiteral ("nonexistant"), &record));
+        QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("nonexistant"), record));
         QVERIFY (!record.isValid ());
 
         record._path = "foo";
@@ -60,16 +60,16 @@ class TestSyncJournalDB : GLib.Object {
         record._remotePerm = RemotePermissions.fromDbValue ("RW");
         record._fileSize = 213089055;
         record._checksumHeader = "MD5:mychecksum";
-        QVERIFY (_database.setFileRecord (record));
+        QVERIFY (this.database.setFileRecord (record));
 
         SyncJournalFileRecord storedRecord;
-        QVERIFY (_database.getFileRecord (QByteArrayLiteral ("foo"), &storedRecord));
+        QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo"), storedRecord));
         QVERIFY (storedRecord == record);
 
         // Update checksum
         record._checksumHeader = "Adler32:newchecksum";
-        _database.updateFileRecordChecksum ("foo", "newchecksum", "Adler32");
-        QVERIFY (_database.getFileRecord (QByteArrayLiteral ("foo"), &storedRecord));
+        this.database.updateFileRecordChecksum ("foo", "newchecksum", "Adler32");
+        QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo"), storedRecord));
         QVERIFY (storedRecord == record);
 
         // Update metadata
@@ -81,12 +81,12 @@ class TestSyncJournalDB : GLib.Object {
         record._fileId = "efg";
         record._remotePerm = RemotePermissions.fromDbValue ("NV");
         record._fileSize = 289055;
-        _database.setFileRecord (record);
-        QVERIFY (_database.getFileRecord (QByteArrayLiteral ("foo"), &storedRecord));
+        this.database.setFileRecord (record);
+        QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo"), storedRecord));
         QVERIFY (storedRecord == record);
 
-        QVERIFY (_database.deleteFileRecord ("foo"));
-        QVERIFY (_database.getFileRecord (QByteArrayLiteral ("foo"), &record));
+        QVERIFY (this.database.deleteFileRecord ("foo"));
+        QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo"), record));
         QVERIFY (!record.isValid ());
     }
 
@@ -100,10 +100,10 @@ class TestSyncJournalDB : GLib.Object {
             record._remotePerm = RemotePermissions.fromDbValue (" ");
             record._checksumHeader = "MD5:mychecksum";
             record._modtime = Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ());
-            QVERIFY (_database.setFileRecord (record));
+            QVERIFY (this.database.setFileRecord (record));
 
             SyncJournalFileRecord storedRecord;
-            QVERIFY (_database.getFileRecord (QByteArrayLiteral ("foo-checksum"), &storedRecord));
+            QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo-checksum"), storedRecord));
             QVERIFY (storedRecord._path == record._path);
             QVERIFY (storedRecord._remotePerm == record._remotePerm);
             QVERIFY (storedRecord._checksumHeader == record._checksumHeader);
@@ -120,10 +120,10 @@ class TestSyncJournalDB : GLib.Object {
             record._remotePerm = RemotePermissions.fromDbValue ("RW");
             record._modtime = Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ());
 
-            QVERIFY (_database.setFileRecord (record));
+            QVERIFY (this.database.setFileRecord (record));
 
             SyncJournalFileRecord storedRecord;
-            QVERIFY (_database.getFileRecord (QByteArrayLiteral ("foo-nochecksum"), &storedRecord));
+            QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo-nochecksum"), storedRecord));
             QVERIFY (storedRecord == record);
         }
     }
@@ -133,20 +133,20 @@ class TestSyncJournalDB : GLib.Object {
     ***********************************************************/
     private on_ void testDownloadInfo () {
         using Info = SyncJournalDb.DownloadInfo;
-        Info record = _database.getDownloadInfo ("nonexistant");
+        Info record = this.database.getDownloadInfo ("nonexistant");
         QVERIFY (!record._valid);
 
         record._errorCount = 5;
         record._etag = "ABCDEF";
         record._valid = true;
         record._tmpfile = "/tmp/foo";
-        _database.setDownloadInfo ("foo", record);
+        this.database.setDownloadInfo ("foo", record);
 
-        Info storedRecord = _database.getDownloadInfo ("foo");
+        Info storedRecord = this.database.getDownloadInfo ("foo");
         QVERIFY (storedRecord == record);
 
-        _database.setDownloadInfo ("foo", Info ());
-        Info wipedRecord = _database.getDownloadInfo ("foo");
+        this.database.setDownloadInfo ("foo", Info ());
+        Info wipedRecord = this.database.getDownloadInfo ("foo");
         QVERIFY (!wipedRecord._valid);
     }
 
@@ -155,7 +155,7 @@ class TestSyncJournalDB : GLib.Object {
     ***********************************************************/
     private on_ void testUploadInfo () {
         using Info = SyncJournalDb.UploadInfo;
-        Info record = _database.getUploadInfo ("nonexistant");
+        Info record = this.database.getUploadInfo ("nonexistant");
         QVERIFY (!record._valid);
 
         record._errorCount = 5;
@@ -164,13 +164,13 @@ class TestSyncJournalDB : GLib.Object {
         record._size = 12894789147;
         record._modtime = dropMsecs (GLib.DateTime.currentDateTime ());
         record._valid = true;
-        _database.setUploadInfo ("foo", record);
+        this.database.setUploadInfo ("foo", record);
 
-        Info storedRecord = _database.getUploadInfo ("foo");
+        Info storedRecord = this.database.getUploadInfo ("foo");
         QVERIFY (storedRecord == record);
 
-        _database.setUploadInfo ("foo", Info ());
-        Info wipedRecord = _database.getUploadInfo ("foo");
+        this.database.setUploadInfo ("foo", Info ());
+        Info wipedRecord = this.database.getUploadInfo ("foo");
         QVERIFY (!wipedRecord._valid);
     }
 
@@ -199,25 +199,25 @@ class TestSyncJournalDB : GLib.Object {
         record.baseModtime = 1234;
         record.baseEtag = "ghi";
 
-        QVERIFY (!_database.conflictRecord (record.path).isValid ());
+        QVERIFY (!this.database.conflictRecord (record.path).isValid ());
 
-        _database.setConflictRecord (record);
-        var newRecord = _database.conflictRecord (record.path);
+        this.database.setConflictRecord (record);
+        var newRecord = this.database.conflictRecord (record.path);
         QVERIFY (newRecord.isValid ());
         QCOMPARE (newRecord.path, record.path);
         QCOMPARE (newRecord.baseFileId, record.baseFileId);
         QCOMPARE (newRecord.baseModtime, record.baseModtime);
         QCOMPARE (newRecord.baseEtag, record.baseEtag);
 
-        _database.deleteConflictRecord (record.path);
-        QVERIFY (!_database.conflictRecord (record.path).isValid ());
+        this.database.deleteConflictRecord (record.path);
+        QVERIFY (!this.database.conflictRecord (record.path).isValid ());
     }
 
 
     /***********************************************************
     ***********************************************************/
     private on_ void testAvoidReadFromDbOnNextSync () {
-        var invalidEtag = GLib.ByteArray ("_invalid_");
+        var invalidEtag = GLib.ByteArray ("this.invalid_");
         var initialEtag = GLib.ByteArray ("etag");
         var makeEntry = [&] (GLib.ByteArray path, ItemType type) {
             SyncJournalFileRecord record;
@@ -225,11 +225,11 @@ class TestSyncJournalDB : GLib.Object {
             record._type = type;
             record._etag = initialEtag;
             record._remotePerm = RemotePermissions.fromDbValue ("RW");
-            _database.setFileRecord (record);
+            this.database.setFileRecord (record);
         };
         var getEtag = [&] (GLib.ByteArray path) {
             SyncJournalFileRecord record;
-            _database.getFileRecord (path, &record);
+            this.database.getFileRecord (path, record);
             return record._etag;
         };
 
@@ -247,9 +247,9 @@ class TestSyncJournalDB : GLib.Object {
         makeEntry ("foodir/subdir/subsubdir/file", ItemTypeFile);
         makeEntry ("foodir/subdir/otherdir", ItemTypeDirectory);
 
-        _database.schedulePathForRemoteDiscovery (GLib.ByteArray ("foodir/subdir"));
+        this.database.schedulePathForRemoteDiscovery (GLib.ByteArray ("foodir/subdir"));
 
-        // Direct effects of parent directories being set to _invalid_
+        // Direct effects of parent directories being set to this.invalid_
         QCOMPARE (getEtag ("foodir"), invalidEtag);
         QCOMPARE (getEtag ("foodir/subdir"), invalidEtag);
         QCOMPARE (getEtag ("foodir/subdir/subsubdir"), initialEtag);
@@ -289,7 +289,7 @@ class TestSyncJournalDB : GLib.Object {
             SyncJournalFileRecord record;
             record._path = path;
             record._remotePerm = RemotePermissions.fromDbValue ("RW");
-            _database.setFileRecord (record);
+            this.database.setFileRecord (record);
         };
 
         QByteArrayList elements;
@@ -310,7 +310,7 @@ class TestSyncJournalDB : GLib.Object {
             bool ok = true;
             for (var& elem : elements) {
                 SyncJournalFileRecord record;
-                _database.getFileRecord (elem, &record);
+                this.database.getFileRecord (elem, record);
                 if (!record.isValid ()) {
                     qWarning () << "Missing record : " << elem;
                     ok = false;
@@ -319,17 +319,17 @@ class TestSyncJournalDB : GLib.Object {
             return ok;
         };
 
-        _database.deleteFileRecord ("moo", true);
+        this.database.deleteFileRecord ("moo", true);
         elements.removeAll ("moo");
         elements.removeAll ("moo/file");
         QVERIFY (checkElements ());
 
-        _database.deleteFileRecord ("fo_", true);
+        this.database.deleteFileRecord ("fo_", true);
         elements.removeAll ("fo_");
         elements.removeAll ("fo_/file");
         QVERIFY (checkElements ());
 
-        _database.deleteFileRecord ("foo%bar", true);
+        this.database.deleteFileRecord ("foo%bar", true);
         elements.removeAll ("foo%bar");
         QVERIFY (checkElements ());
     }
@@ -339,13 +339,13 @@ class TestSyncJournalDB : GLib.Object {
     ***********************************************************/
     private on_ void testPinState () {
         var make = [&] (GLib.ByteArray path, PinState state) {
-            _database.internalPinStates ().setForPath (path, state);
-            var pinState = _database.internalPinStates ().rawForPath (path);
+            this.database.internalPinStates ().setForPath (path, state);
+            var pinState = this.database.internalPinStates ().rawForPath (path);
             QVERIFY (pinState);
             QCOMPARE (*pinState, state);
         };
         var get = [&] (GLib.ByteArray path) . PinState {
-            var state = _database.internalPinStates ().effectiveForPath (path);
+            var state = this.database.internalPinStates ().effectiveForPath (path);
             if (!state) {
                 QTest.qFail ("couldn't read pin state", __FILE__, __LINE__);
                 return PinState.PinState.INHERITED;
@@ -353,7 +353,7 @@ class TestSyncJournalDB : GLib.Object {
             return state;
         };
         var getRecursive = [&] (GLib.ByteArray path) . PinState {
-            var state = _database.internalPinStates ().effectiveForPathRecursive (path);
+            var state = this.database.internalPinStates ().effectiveForPathRecursive (path);
             if (!state) {
                 QTest.qFail ("couldn't read pin state", __FILE__, __LINE__);
                 return PinState.PinState.INHERITED;
@@ -361,7 +361,7 @@ class TestSyncJournalDB : GLib.Object {
             return state;
         };
         var getRaw = [&] (GLib.ByteArray path) . PinState {
-            var state = _database.internalPinStates ().rawForPath (path);
+            var state = this.database.internalPinStates ().rawForPath (path);
             if (!state) {
                 QTest.qFail ("couldn't read pin state", __FILE__, __LINE__);
                 return PinState.PinState.INHERITED;
@@ -369,8 +369,8 @@ class TestSyncJournalDB : GLib.Object {
             return state;
         };
 
-        _database.internalPinStates ().wipeForPathAndBelow ("");
-        var list = _database.internalPinStates ().rawList ();
+        this.database.internalPinStates ().wipeForPathAndBelow ("");
+        var list = this.database.internalPinStates ().rawList ();
         QCOMPARE (list.size (), 0);
 
         // Make a thrice-nested setup
@@ -390,7 +390,7 @@ class TestSyncJournalDB : GLib.Object {
             }
         }
 
-        list = _database.internalPinStates ().rawList ();
+        list = this.database.internalPinStates ().rawList ();
         QCOMPARE (list.size (), 4 + 9 + 27);
 
         // Baseline direct checks (the fallback for unset root pinstate is PinState.ALWAYS_LOCAL)
@@ -452,27 +452,27 @@ class TestSyncJournalDB : GLib.Object {
 
         // Wiping
         QCOMPARE (getRaw ("local/local"), PinState.PinState.ALWAYS_LOCAL);
-        _database.internalPinStates ().wipeForPathAndBelow ("local/local");
+        this.database.internalPinStates ().wipeForPathAndBelow ("local/local");
         QCOMPARE (getRaw ("local"), PinState.PinState.ALWAYS_LOCAL);
         QCOMPARE (getRaw ("local/local"), PinState.PinState.INHERITED);
         QCOMPARE (getRaw ("local/local/local"), PinState.PinState.INHERITED);
         QCOMPARE (getRaw ("local/local/online"), PinState.PinState.INHERITED);
-        list = _database.internalPinStates ().rawList ();
+        list = this.database.internalPinStates ().rawList ();
         QCOMPARE (list.size (), 4 + 9 + 27 - 4);
 
         // Wiping everything
-        _database.internalPinStates ().wipeForPathAndBelow ("");
+        this.database.internalPinStates ().wipeForPathAndBelow ("");
         QCOMPARE (getRaw (""), PinState.PinState.INHERITED);
         QCOMPARE (getRaw ("local"), PinState.PinState.INHERITED);
         QCOMPARE (getRaw ("online"), PinState.PinState.INHERITED);
-        list = _database.internalPinStates ().rawList ();
+        list = this.database.internalPinStates ().rawList ();
         QCOMPARE (list.size (), 0);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private SyncJournalDb _database;
+    private SyncJournalDb this.database;
 };
 
 QTEST_APPLESS_MAIN (TestSyncJournalDB)

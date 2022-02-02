@@ -34,7 +34,7 @@ class FakePostReply : QNetworkReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePostReply (QNetworkAccessManager.Operation op, QNetworkRequest &request,
+    public FakePostReply (QNetworkAccessManager.Operation op, QNetworkRequest request,
                   std.unique_ptr<QIODevice> payload_, GLib.Object parent)
         : QNetworkReply{parent}, payload{std.move (payload_)} {
         setRequest (request);
@@ -49,34 +49,34 @@ class FakePostReply : QNetworkReply {
     public virtual void respond () {
         if (aborted) {
             setError (OperationCanceledError, "Operation Canceled");
-            emit metaDataChanged ();
-            emit finished ();
+            /* emit */ metaDataChanged ();
+            /* emit */ finished ();
             return;
         } else if (redirectToPolicy) {
             setHeader (QNetworkRequest.LocationHeader, "/my.policy");
             setAttribute (QNetworkRequest.RedirectionTargetAttribute, "/my.policy");
             setAttribute (QNetworkRequest.HttpStatusCodeAttribute, 302); // 302 might or might not lose POST data in rfc
             setHeader (QNetworkRequest.ContentLengthHeader, 0);
-            emit metaDataChanged ();
-            emit finished ();
+            /* emit */ metaDataChanged ();
+            /* emit */ finished ();
             return;
         } else if (redirectToToken) {
             // Redirect to self
-            QVariant destination = QVariant (sOAuthTestServer.toString ()+QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
+            GLib.Variant destination = GLib.Variant (sOAuthTestServer.toString ()+QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
             setHeader (QNetworkRequest.LocationHeader, destination);
             setAttribute (QNetworkRequest.RedirectionTargetAttribute, destination);
             setAttribute (QNetworkRequest.HttpStatusCodeAttribute, 307); // 307 explicitly in rfc says to not lose POST data
             setHeader (QNetworkRequest.ContentLengthHeader, 0);
-            emit metaDataChanged ();
-            emit finished ();
+            /* emit */ metaDataChanged ();
+            /* emit */ finished ();
             return;
         }
         setHeader (QNetworkRequest.ContentLengthHeader, payload.size ());
         setAttribute (QNetworkRequest.HttpStatusCodeAttribute, 200);
-        emit metaDataChanged ();
+        /* emit */ metaDataChanged ();
         if (bytesAvailable ())
-            emit readyRead ();
-        emit finished ();
+            /* emit */ readyRead ();
+        /* emit */ finished ();
     }
 
 
@@ -150,7 +150,7 @@ class OAuthTestCase : GLib.Object {
         account.setUrl (sOAuthTestServer);
         account.setCredentials (new FakeCredentials{fakeQnam});
         fakeQnam.setParent (this);
-        fakeQnam.setOverride ([this] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice device) {
+        fakeQnam.setOverride ([this] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice device) {
             ASSERT (device);
             ASSERT (device.bytesAvailable ()>0); // OAuth2 always sends around POST data.
             return this.tokenReply (op, req);
@@ -185,7 +185,7 @@ class OAuthTestCase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual QNetworkReply createBrowserReply (QNetworkRequest &request) {
+    public virtual QNetworkReply createBrowserReply (QNetworkRequest request) {
         browserReply = realQNAM.get (request);
         GLib.Object.connect (browserReply, &QNetworkReply.on_finished, this, &OAuthTestCase.browserReplyFinished);
         return browserReply;
@@ -204,7 +204,7 @@ class OAuthTestCase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual QNetworkReply tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest &req) {
+    public virtual QNetworkReply tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest req) {
         ASSERT (state == BrowserOpened);
         state = TokenAsked;
         ASSERT (op == QNetworkAccessManager.PostOperation);
@@ -278,11 +278,11 @@ class TestOAuth : public GLib.Object {
     private on_ void testRandomConnections () {
         // Test that we can send random garbage to the litening socket and it does not prevent the connection
         struct Test : OAuthTestCase {
-            QNetworkReply createBrowserReply (QNetworkRequest &request) override {
+            QNetworkReply createBrowserReply (QNetworkRequest request) override {
                 QTimer.singleShot (0, this, [this, request] {
                     var port = request.url ().port ();
                     state = CustomState;
-                    QVector<GLib.ByteArray> payloads = {
+                    GLib.Vector<GLib.ByteArray> payloads = {
                         "GET FOFOFO HTTP 1/1\n\n",
                         "GET /?code=invalie HTTP 1/1\n\n",
                         "GET /?code=xxxxx&bar=fff",
@@ -291,7 +291,7 @@ class TestOAuth : public GLib.Object {
                         GLib.ByteArray ("GET /?code=éléphant\xa5 HTTP\n"),
                         GLib.ByteArray ("\n\n\n\n"),
                     };
-                    foreach (var &x, payloads) {
+                    foreach (var x, payloads) {
                         var socket = new QTcpSocket (this);
                         socket.connectToHost ("localhost", port);
                         QVERIFY (socket.waitForConnected ());
@@ -308,7 +308,7 @@ class TestOAuth : public GLib.Object {
                return nullptr;
             }
 
-            QNetworkReply tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest &req) override {
+            QNetworkReply tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest req) override {
                 if (state == CustomState)
                     return new FakeErrorReply{op, req, this, 500};
                 return OAuthTestCase.tokenReply (op, req);

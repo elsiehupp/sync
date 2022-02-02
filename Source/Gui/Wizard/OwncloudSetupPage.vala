@@ -121,96 +121,96 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private Ui_Owncloud_setup_page _ui;
+    private Ui_Owncloud_setup_page this.ui;
 
     /***********************************************************
     ***********************************************************/
-    private string _o_c_url;
-    private string _oc_user;
-    private bool _auth_type_known = false;
-    private bool _checking = false;
-    private DetermineAuthTypeJob.AuthType _auth_type = DetermineAuthTypeJob.Basic;
+    private string this.o_c_url;
+    private string this.oc_user;
+    private bool this.auth_type_known = false;
+    private bool this.checking = false;
+    private DetermineAuthTypeJob.AuthType this.auth_type = DetermineAuthTypeJob.Basic;
 
     /***********************************************************
     ***********************************************************/
-    private QProgress_indicator _progress_indi;
-    private OwncloudWizard _oc_wizard;
+    private QProgress_indicator this.progress_indi;
+    private OwncloudWizard this.oc_wizard;
     private AddCertificateDialog add_cert_dial = nullptr;
 };
 
     Owncloud_setup_page.Owncloud_setup_page (Gtk.Widget parent)
         : QWizard_page ()
-        , _progress_indi (new QProgress_indicator (this))
-        , _oc_wizard (qobject_cast<OwncloudWizard> (parent)) {
-        _ui.setup_ui (this);
+        , this.progress_indi (new QProgress_indicator (this))
+        , this.oc_wizard (qobject_cast<OwncloudWizard> (parent)) {
+        this.ui.setup_ui (this);
 
         setup_server_address_description_label ();
 
         Theme theme = Theme.instance ();
         if (theme.override_server_url ().is_empty ()) {
-            _ui.le_url.set_postfix (theme.wizard_url_postfix ());
-            _ui.le_url.set_placeholder_text (theme.wizard_url_hint ());
+            this.ui.le_url.set_postfix (theme.wizard_url_postfix ());
+            this.ui.le_url.set_placeholder_text (theme.wizard_url_hint ());
         } else if (Theme.instance ().force_override_server_url ()) {
-            _ui.le_url.set_enabled (false);
+            this.ui.le_url.set_enabled (false);
         }
 
-        register_field (QLatin1String ("OCUrl*"), _ui.le_url);
+        register_field (QLatin1String ("OCUrl*"), this.ui.le_url);
 
-        var size_policy = _progress_indi.size_policy ();
+        var size_policy = this.progress_indi.size_policy ();
         size_policy.set_retain_size_when_hidden (true);
-        _progress_indi.set_size_policy (size_policy);
+        this.progress_indi.set_size_policy (size_policy);
 
-        _ui.progress_layout.add_widget (_progress_indi);
+        this.ui.progress_layout.add_widget (this.progress_indi);
         on_stop_spinner ();
 
         setup_customization ();
 
         on_url_changed (QLatin1String ("")); // don't jitter UI
-        connect (_ui.le_url, &QLineEdit.text_changed, this, &Owncloud_setup_page.on_url_changed);
-        connect (_ui.le_url, &QLineEdit.editing_finished, this, &Owncloud_setup_page.on_url_edit_finished);
+        connect (this.ui.le_url, &QLineEdit.text_changed, this, &Owncloud_setup_page.on_url_changed);
+        connect (this.ui.le_url, &QLineEdit.editing_finished, this, &Owncloud_setup_page.on_url_edit_finished);
 
         add_cert_dial = new AddCertificateDialog (this);
         connect (add_cert_dial, &Gtk.Dialog.accepted, this, &Owncloud_setup_page.on_certificate_accepted);
     }
 
     void Owncloud_setup_page.set_logo () {
-        _ui.logo_label.set_pixmap (Theme.instance ().wizard_application_logo ());
+        this.ui.logo_label.set_pixmap (Theme.instance ().wizard_application_logo ());
     }
 
     void Owncloud_setup_page.setup_server_address_description_label () {
         const var app_name = Theme.instance ().app_name_gui ();
-        _ui.server_address_description_label.on_set_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
+        this.ui.server_address_description_label.on_set_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
     }
 
     void Owncloud_setup_page.set_server_url (string new_url) {
-        _oc_wizard.set_registration (false);
-        _o_c_url = new_url;
-        if (_o_c_url.is_empty ()) {
-            _ui.le_url.clear ();
+        this.oc_wizard.set_registration (false);
+        this.o_c_url = new_url;
+        if (this.o_c_url.is_empty ()) {
+            this.ui.le_url.clear ();
             return;
         }
 
-        _ui.le_url.on_set_text (_o_c_url);
+        this.ui.le_url.on_set_text (this.o_c_url);
     }
 
     void Owncloud_setup_page.setup_customization () {
         // set defaults for the customize labels.
-        _ui.top_label.hide ();
-        _ui.bottom_label.hide ();
+        this.ui.top_label.hide ();
+        this.ui.bottom_label.hide ();
 
         Theme theme = Theme.instance ();
-        QVariant variant = theme.custom_media (Theme.o_c_setup_top);
+        GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
         if (!variant.is_null ()) {
-            WizardCommon.setup_custom_media (variant, _ui.top_label);
+            WizardCommon.setup_custom_media (variant, this.ui.top_label);
         }
 
-        variant = theme.custom_media (Theme.o_c_setup_bottom);
-        WizardCommon.setup_custom_media (variant, _ui.bottom_label);
+        variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_BOTTOM);
+        WizardCommon.setup_custom_media (variant, this.ui.bottom_label);
 
-        var le_url_palette = _ui.le_url.palette ();
+        var le_url_palette = this.ui.le_url.palette ();
         le_url_palette.on_set_color (QPalette.Text, Qt.black);
         le_url_palette.on_set_color (QPalette.Base, Qt.white);
-        _ui.le_url.set_palette (le_url_palette);
+        this.ui.le_url.set_palette (le_url_palette);
     }
 
     // slot hit from text_changed of the url entry field.
@@ -218,19 +218,19 @@ signals:
         // Need to set next button as default button here because
         // otherwise the on OSX the next button does not stay the default
         // button
-        var next_button = qobject_cast<QPushButton> (_oc_wizard.button (QWizard.Next_button));
+        var next_button = qobject_cast<QPushButton> (this.oc_wizard.button (QWizard.Next_button));
         if (next_button) {
             next_button.set_default (true);
         }
 
-        _auth_type_known = false;
+        this.auth_type_known = false;
 
         string new_url = url;
         if (url.ends_with ("index.php")) {
             new_url.chop (9);
         }
-        if (_oc_wizard && _oc_wizard.account ()) {
-            string web_dav_path = _oc_wizard.account ().dav_path ();
+        if (this.oc_wizard && this.oc_wizard.account ()) {
+            string web_dav_path = this.oc_wizard.account ().dav_path ();
             if (url.ends_with (web_dav_path)) {
                 new_url.chop (web_dav_path.length ());
             }
@@ -242,30 +242,30 @@ signals:
             }
         }
         if (new_url != url) {
-            _ui.le_url.on_set_text (new_url);
+            this.ui.le_url.on_set_text (new_url);
         }
     }
 
     void Owncloud_setup_page.on_url_edit_finished () {
-        string url = _ui.le_url.full_text ();
+        string url = this.ui.le_url.full_text ();
         if (GLib.Uri (url).is_relative () && !url.is_empty ()) {
             // no scheme defined, set one
             url.prepend ("https://");
-            _ui.le_url.set_full_text (url);
+            this.ui.le_url.set_full_text (url);
         }
     }
 
     bool Owncloud_setup_page.is_complete () {
-        return !_ui.le_url.text ().is_empty () && !_checking;
+        return !this.ui.le_url.text ().is_empty () && !this.checking;
     }
 
     void Owncloud_setup_page.initialize_page () {
         customize_style ();
 
-        WizardCommon.init_error_label (_ui.error_label);
+        WizardCommon.init_error_label (this.ui.error_label);
 
-        _auth_type_known = false;
-        _checking = false;
+        this.auth_type_known = false;
+        this.checking = false;
 
         QAbstractButton next_button = wizard ().button (QWizard.Next_button);
         var push_button = qobject_cast<QPushButton> (next_button);
@@ -273,7 +273,7 @@ signals:
             push_button.set_default (true);
         }
 
-        _ui.le_url.set_focus ();
+        this.ui.le_url.set_focus ();
 
         const var is_server_url_overridden = !Theme.instance ().override_server_url ().is_empty ();
         if (is_server_url_overridden && !Theme.instance ().force_override_server_url ()) {
@@ -295,7 +295,7 @@ signals:
     }
 
     int Owncloud_setup_page.next_id () {
-        switch (_auth_type) {
+        switch (this.auth_type) {
         case DetermineAuthTypeJob.Basic:
             return WizardCommon.Page_Http_creds;
         case DetermineAuthTypeJob.OAuth:
@@ -313,12 +313,12 @@ signals:
     }
 
     string Owncloud_setup_page.url () {
-        string url = _ui.le_url.full_text ().simplified ();
+        string url = this.ui.le_url.full_text ().simplified ();
         return url;
     }
 
     bool Owncloud_setup_page.validate_page () {
-        if (!_auth_type_known) {
+        if (!this.auth_type_known) {
             on_url_edit_finished ();
             string u = url ();
             GLib.Uri qurl (u);
@@ -328,33 +328,33 @@ signals:
             }
 
             on_set_error_string ("", false);
-            _checking = true;
+            this.checking = true;
             on_start_spinner ();
-            emit complete_changed ();
+            /* emit */ complete_changed ();
 
-            emit determine_auth_type (u);
+            /* emit */ determine_auth_type (u);
             return false;
         } else {
             // connecting is running
             on_stop_spinner ();
-            _checking = false;
-            emit complete_changed ();
+            this.checking = false;
+            /* emit */ complete_changed ();
             return true;
         }
     }
 
     void Owncloud_setup_page.on_set_auth_type (DetermineAuthTypeJob.AuthType type) {
-        _auth_type_known = true;
-        _auth_type = type;
+        this.auth_type_known = true;
+        this.auth_type = type;
         on_stop_spinner ();
     }
 
     void Owncloud_setup_page.on_set_error_string (string err, bool retry_http_only) {
         if (err.is_empty ()) {
-            _ui.error_label.set_visible (false);
+            this.ui.error_label.set_visible (false);
         } else {
             if (retry_http_only) {
-                GLib.Uri url (_ui.le_url.full_text ());
+                GLib.Uri url (this.ui.le_url.full_text ());
                 if (url.scheme () == "https") {
                     // Ask the user how to proceed when connecting to a https:// URL fails.
                     // It is possible that the server is secured with client-side TLS certificates,
@@ -368,7 +368,7 @@ signals:
                     switch (ret_val) {
                     case Owncloud_connection_method_dialog.No_TLS: {
                         url.set_scheme ("http");
-                        _ui.le_url.set_full_text (url.to_"");
+                        this.ui.le_url.set_full_text (url.to_"");
                         // skip ahead to next page, since the user would expect us to retry automatically
                         wizard ().next ();
                     } break;
@@ -384,27 +384,27 @@ signals:
                 }
             }
 
-            _ui.error_label.set_visible (true);
-            _ui.error_label.on_set_text (err);
+            this.ui.error_label.set_visible (true);
+            this.ui.error_label.on_set_text (err);
         }
-        _checking = false;
-        emit complete_changed ();
+        this.checking = false;
+        /* emit */ complete_changed ();
         on_stop_spinner ();
     }
 
     void Owncloud_setup_page.on_start_spinner () {
-        _ui.progress_layout.set_enabled (true);
-        _progress_indi.set_visible (true);
-        _progress_indi.on_start_animation ();
+        this.ui.progress_layout.set_enabled (true);
+        this.progress_indi.set_visible (true);
+        this.progress_indi.on_start_animation ();
     }
 
     void Owncloud_setup_page.on_stop_spinner () {
-        _ui.progress_layout.set_enabled (false);
-        _progress_indi.set_visible (false);
-        _progress_indi.on_stop_animation ();
+        this.ui.progress_layout.set_enabled (false);
+        this.progress_indi.set_visible (false);
+        this.progress_indi.on_stop_animation ();
     }
 
-    string subject_info_helper (QSslCertificate &cert, GLib.ByteArray qa) {
+    string subject_info_helper (QSslCertificate cert, GLib.ByteArray qa) {
         return cert.subject_info (qa).join ('/');
     }
 
@@ -418,10 +418,10 @@ signals:
         QBuffer cert_data_buffer (&cert_data);
         cert_data_buffer.open (QIODevice.ReadOnly);
         if (QSslCertificate.import_pkcs12 (&cert_data_buffer,
-                &_oc_wizard._client_ssl_key, &_oc_wizard._client_ssl_certificate,
-                &_oc_wizard._client_ssl_ca_certificates, cert_password)) {
-            _oc_wizard._client_cert_bundle = cert_data;
-            _oc_wizard._client_cert_password = cert_password;
+                this.oc_wizard._client_ssl_key, this.oc_wizard._client_ssl_certificate,
+                this.oc_wizard._client_ssl_ca_certificates, cert_password)) {
+            this.oc_wizard._client_cert_bundle = cert_data;
+            this.oc_wizard._client_cert_password = cert_password;
 
             add_cert_dial.reinit (); // FIXME : Why not just have this only created on use?
 
@@ -442,16 +442,16 @@ signals:
     void Owncloud_setup_page.customize_style () {
         set_logo ();
 
-        if (_progress_indi) {
+        if (this.progress_indi) {
             const var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
-                _progress_indi.on_set_color (Qt.white);
+                this.progress_indi.on_set_color (Qt.white);
             } else {
-                _progress_indi.on_set_color (Qt.black);
+                this.progress_indi.on_set_color (Qt.black);
             }
         }
 
-        WizardCommon.customize_hint_label (_ui.server_address_description_label);
+        WizardCommon.customize_hint_label (this.ui.server_address_description_label);
     }
 
     } // namespace Occ

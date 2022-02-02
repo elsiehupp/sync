@@ -35,12 +35,12 @@ signals:
 
     @param reply The reply
     ***********************************************************/
-    void sharee_job_finished (QJsonDocument &reply);
+    void sharee_job_finished (QJsonDocument reply);
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_job_done (QJsonDocument &reply);
+    private void on_job_done (QJsonDocument reply);
 };
 
     Ocs_sharee_job.Ocs_sharee_job (AccountPointer account)
@@ -60,13 +60,13 @@ signals:
         add_param (string.from_latin1 ("item_type"), item_type);
         add_param (string.from_latin1 ("page"), string.number (page));
         add_param (string.from_latin1 ("per_page"), string.number (per_page));
-        add_param (string.from_latin1 ("lookup"), QVariant (lookup).to_"");
+        add_param (string.from_latin1 ("lookup"), GLib.Variant (lookup).to_"");
 
         on_start ();
     }
 
-    void Ocs_sharee_job.on_job_done (QJsonDocument &reply) {
-        emit sharee_job_finished (reply);
+    void Ocs_sharee_job.on_job_done (QJsonDocument reply) {
+        /* emit */ sharee_job_finished (reply);
     }
     }
     

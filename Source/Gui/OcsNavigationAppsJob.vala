@@ -33,12 +33,12 @@ signals:
     @param reply The reply
     @param status_code the status code of the response
     ***********************************************************/
-    void apps_job_finished (QJsonDocument &reply, int status_code);
+    void apps_job_finished (QJsonDocument reply, int status_code);
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_job_done (QJsonDocument &reply, int status_code);
+    private void on_job_done (QJsonDocument reply, int status_code);
 };
 
     OcsNavigationAppsJob.OcsNavigationAppsJob (AccountPointer account)
@@ -53,8 +53,8 @@ signals:
         on_start ();
     }
 
-    void OcsNavigationAppsJob.on_job_done (QJsonDocument &reply, int status_code) {
-        emit apps_job_finished (reply, status_code);
+    void OcsNavigationAppsJob.on_job_done (QJsonDocument reply, int status_code) {
+        /* emit */ apps_job_finished (reply, status_code);
     }
     }
     

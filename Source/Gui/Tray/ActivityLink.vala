@@ -26,19 +26,19 @@ namespace Occ {
 These are part of notifications which are mapped into activities.
 ***********************************************************/
 class Activity_link {
-    Q_GADGET
+    // Q_GADGET
 
-    Q_PROPERTY (string label MEMBER _label)
-    Q_PROPERTY (string link MEMBER _link)
-    Q_PROPERTY (GLib.ByteArray verb MEMBER _verb)
-    Q_PROPERTY (bool primary MEMBER _primary)
+    Q_PROPERTY (string label MEMBER this.label)
+    Q_PROPERTY (string link MEMBER this.link)
+    Q_PROPERTY (GLib.ByteArray verb MEMBER this.verb)
+    Q_PROPERTY (bool primary MEMBER this.primary)
 
     /***********************************************************
     ***********************************************************/
-    public string _label;
-    public string _link;
-    public GLib.ByteArray _verb;
-    public bool _primary;
+    public string this.label;
+    public string this.link;
+    public GLib.ByteArray this.verb;
+    public bool this.primary;
 };
 
 
@@ -74,24 +74,24 @@ class Activity {
 
     /***********************************************************
     ***********************************************************/
-    public Type _type;
-    public qlonglong _id;
-    public string _file_action;
-    public string _object_type;
-    public string _subject;
-    public string _message;
-    public string _folder;
-    public string _file;
-    public GLib.Uri _link;
-    public GLib.DateTime _date_time;
-    public int64 _expire_at_msecs = -1;
-    public string _acc_name;
-    public string _icon;
+    public Type this.type;
+    public qlonglong this.id;
+    public string this.file_action;
+    public string this.object_type;
+    public string this.subject;
+    public string this.message;
+    public string this.folder;
+    public string this.file;
+    public GLib.Uri this.link;
+    public GLib.DateTime this.date_time;
+    public int64 this.expire_at_msecs = -1;
+    public string this.acc_name;
+    public string this.icon;
 
     // Stores information about the error
-    int _status;
+    int this.status;
 
-    QVector<Activity_link> _links;
+    GLib.Vector<Activity_link> this.links;
     /***********************************************************
     @brief Sort operator to sort the list youngest first.
     @param val
@@ -101,8 +101,8 @@ class Activity {
     Identifier ident ();
 };
 
-bool operator== (Activity &rhs, Activity &lhs);
-bool operator< (Activity &rhs, Activity &lhs);
+bool operator== (Activity rhs, Activity lhs);
+bool operator< (Activity rhs, Activity lhs);
 
 
 
@@ -122,15 +122,15 @@ A GLib.List based list of Activities
 using Activity_list = GLib.List<Activity>;
 
 
-bool operator< (Activity &rhs, Activity &lhs) {
+bool operator< (Activity rhs, Activity lhs) {
     return rhs._date_time > lhs._date_time;
 }
 
-bool operator== (Activity &rhs, Activity &lhs) {
+bool operator== (Activity rhs, Activity lhs) {
     return (rhs._type == lhs._type && rhs._id == lhs._id && rhs._acc_name == lhs._acc_name);
 }
 
 Activity.Identifier Activity.ident () {
-    return Identifier (_id, _acc_name);
+    return Identifier (this.id, this.acc_name);
 }
 }

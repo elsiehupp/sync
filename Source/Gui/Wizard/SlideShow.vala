@@ -33,7 +33,7 @@ class Slide_show : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void add_slide (QPixmap &pixmap, string label);
+    public void add_slide (QPixmap pixmap, string label);
 
     /***********************************************************
     ***********************************************************/
@@ -104,14 +104,14 @@ signals:
     /***********************************************************
     ***********************************************************/
     private 
-    private bool _reverse = false;
-    private int _interval = 3500;
-    private int _current_index = 0;
-    private QPoint _press_point;
-    private QBasic_timer _timer;
-    private string[] _labels;
-    private QVector<QPixmap> _pixmaps;
-    private QPointer<QVariant_animation> _animation = nullptr;
+    private bool this.reverse = false;
+    private int this.interval = 3500;
+    private int this.current_index = 0;
+    private QPoint this.press_point;
+    private QBasic_timer this.timer;
+    private string[] this.labels;
+    private GLib.Vector<QPixmap> this.pixmaps;
+    private QPointer<QVariant_animation> this.animation = nullptr;
 };
 
 static const int Spacing = 6;
@@ -122,57 +122,57 @@ Slide_show.Slide_show (Gtk.Widget parent) : Gtk.Widget (parent) {
     set_size_policy (QSize_policy.Minimum, QSize_policy.Minimum);
 }
 
-void Slide_show.add_slide (QPixmap &pixmap, string label) {
-    _labels += label;
-    _pixmaps += pixmap;
+void Slide_show.add_slide (QPixmap pixmap, string label) {
+    this.labels += label;
+    this.pixmaps += pixmap;
     update_geometry ();
 }
 
 bool Slide_show.is_active () {
-    return _timer.is_active ();
+    return this.timer.is_active ();
 }
 
 int Slide_show.interval () {
-    return _interval;
+    return this.interval;
 }
 
 void Slide_show.set_interval (int interval) {
-    if (_interval == interval)
+    if (this.interval == interval)
         return;
 
-    _interval = interval;
+    this.interval = interval;
     maybe_restart_timer ();
 }
 
 int Slide_show.current_slide () {
-    return _current_index;
+    return this.current_index;
 }
 
 void Slide_show.set_current_slide (int index) {
-    if (_current_index == index)
+    if (this.current_index == index)
         return;
 
-    if (!_animation) {
-        _animation = new QVariant_animation (this);
-        _animation.set_duration (Slide_duration);
-        _animation.set_easing_curve (QEasing_curve.Out_cubic);
-        _animation.set_start_value (static_cast<qreal> (_current_index));
-        connect (_animation.data (), SIGNAL (value_changed (QVariant)), this, SLOT (update ()));
+    if (!this.animation) {
+        this.animation = new QVariant_animation (this);
+        this.animation.set_duration (Slide_duration);
+        this.animation.set_easing_curve (QEasing_curve.Out_cubic);
+        this.animation.set_start_value (static_cast<qreal> (this.current_index));
+        connect (this.animation.data (), SIGNAL (value_changed (GLib.Variant)), this, SLOT (update ()));
     }
-    _animation.set_end_value (static_cast<qreal> (index));
-    _animation.on_start (QAbstractAnimation.DeleteWhenStopped);
+    this.animation.set_end_value (static_cast<qreal> (index));
+    this.animation.on_start (QAbstractAnimation.DeleteWhenStopped);
 
-    _reverse = index < _current_index;
-    _current_index = index;
+    this.reverse = index < this.current_index;
+    this.current_index = index;
     maybe_restart_timer ();
     update ();
-    emit current_slide_changed (index);
+    /* emit */ current_slide_changed (index);
 }
 
 QSize Slide_show.size_hint () {
     QFontMetrics fm = font_metrics ();
     QSize label_size (0, fm.height ());
-    for (string label : _labels) {
+    for (string label : this.labels) {
 #if (HASQT5_11)
         label_size.set_width (std.max (fm.horizontal_advance (label), label_size.width ()));
 #else
@@ -180,7 +180,7 @@ QSize Slide_show.size_hint () {
 #endif
     }
     QSize pixmap_size;
-    for (QPixmap &pixmap : _pixmaps) {
+    for (QPixmap pixmap : this.pixmaps) {
         pixmap_size.set_width (std.max (pixmap.width (), pixmap_size.width ()));
         pixmap_size.set_height (std.max (pixmap.height (), pixmap_size.height ()));
     }
@@ -192,65 +192,65 @@ QSize Slide_show.size_hint () {
 
 void Slide_show.on_start_show (int interval) {
     if (interval > 0)
-        _interval = interval;
-    _timer.on_start (_interval, this);
+        this.interval = interval;
+    this.timer.on_start (this.interval, this);
 }
 
 void Slide_show.on_stop_show () {
-    _timer.stop ();
+    this.timer.stop ();
 }
 
 void Slide_show.on_next_slide () {
-    set_current_slide ( (_current_index + 1) % _labels.count ());
-    _reverse = false;
+    set_current_slide ( (this.current_index + 1) % this.labels.count ());
+    this.reverse = false;
 }
 
 void Slide_show.on_prev_slide () {
-    set_current_slide ( (_current_index > 0 ? _current_index : _labels.count ()) - 1);
-    _reverse = true;
+    set_current_slide ( (this.current_index > 0 ? this.current_index : this.labels.count ()) - 1);
+    this.reverse = true;
 }
 
 void Slide_show.on_reset () {
     on_stop_show ();
-    _pixmaps.clear ();
-    _labels.clear ();
+    this.pixmaps.clear ();
+    this.labels.clear ();
     update_geometry ();
     update ();
 }
 
 void Slide_show.mouse_press_event (QMouse_event event) {
-    _press_point = event.pos ();
+    this.press_point = event.pos ();
 }
 
 void Slide_show.mouse_release_event (QMouse_event event) {
-    if (!_animation && QLine_f (_press_point, event.pos ()).length () < QGuiApplication.style_hints ().start_drag_distance ())
-        emit clicked ();
+    if (!this.animation && QLine_f (this.press_point, event.pos ()).length () < QGuiApplication.style_hints ().start_drag_distance ())
+        /* emit */ clicked ();
 }
 
 void Slide_show.paint_event (QPaint_event *) {
     QPainter painter (this);
 
-    if (_animation) {
-        int from = _animation.start_value ().to_int ();
-        int to = _animation.end_value ().to_int ();
-        qreal progress = _animation.easing_curve ().value_for_progress (_animation.current_time () / static_cast<qreal> (_animation.duration ()));
+    if (this.animation) {
+        int from = this.animation.start_value ().to_int ();
+        int to = this.animation.end_value ().to_int ();
+        qreal progress = this.animation.easing_curve ().value_for_progress (this.animation.current_time () / static_cast<qreal> (this.animation.duration ()));
 
         painter.save ();
         painter.set_opacity (1.0 - progress);
-        painter.translate (progress * (_reverse ? Slide_distance : -Slide_distance), 0);
+        painter.translate (progress * (this.reverse ? Slide_distance : -Slide_distance), 0);
         draw_slide (&painter, from);
 
         painter.restore ();
         painter.set_opacity (progress);
-        painter.translate ( (1.0 - progress) * (_reverse ? -Slide_distance : Slide_distance), 0);
+        painter.translate ( (1.0 - progress) * (this.reverse ? -Slide_distance : Slide_distance), 0);
         draw_slide (&painter, to);
     } else {
-        draw_slide (&painter, _current_index);
+        draw_slide (&painter, this.current_index);
     }
 }
 
 void Slide_show.timer_event (QTimerEvent event) {
-    if (event.timer_id () == _timer.timer_id ())
+    if (event.timer_id () == this.timer.timer_id ())
         on_next_slide ();
 }
 
@@ -262,11 +262,11 @@ void Slide_show.maybe_restart_timer () {
 }
 
 void Slide_show.draw_slide (QPainter painter, int index) {
-    string label = _labels.value (index);
+    string label = this.labels.value (index);
     QRect label_rect = style ().item_text_rect (font_metrics (), rect (), Qt.Align_bottom | Qt.Align_hCenter, is_enabled (), label);
     style ().draw_item_text (painter, label_rect, Qt.AlignCenter, palette (), is_enabled (), label, QPalette.Window_text);
 
-    QPixmap pixmap = _pixmaps.value (index);
+    QPixmap pixmap = this.pixmaps.value (index);
     QRect pixmap_rect = style ().item_pixmap_rect (QRect (0, 0, width (), label_rect.top () - Spacing), Qt.AlignCenter, pixmap);
     style ().draw_item_pixmap (painter, pixmap_rect, Qt.AlignCenter, pixmap);
 }

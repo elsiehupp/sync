@@ -11,7 +11,7 @@ const int MAXPAIR   = 80
 const int MAXLEN    = 70
 
 static void check_c_jhash_trials (void **state) {
-    uint8_t qa[MAXLEN+1], qb[MAXLEN+2], *a = &qa[0], *b = &qb[1];
+    uint8_t qa[MAXLEN+1], qb[MAXLEN+2], *a = qa[0], *b = qb[1];
     uint32_t c[HASHSTATE];
     uint32_t d[HASHSTATE];
     uint32_t i = 0;
@@ -154,8 +154,8 @@ static void check_c_jhash64_trials (void **state) {
 
     (void) state; /* unused */
 
-    a = &qa[0];
-    b = &qb[1];
+    a = qa[0];
+    b = qb[1];
 
     for (hlen=0; hlen < MAXLEN; ++hlen) {
         z=0;

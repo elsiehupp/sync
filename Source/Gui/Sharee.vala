@@ -12,9 +12,9 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 // #include <QAbstractListModel>
 // #include <QLoggingCategory>
 // #include <QModelIndex>
-// #include <QVariant>
+// #include <GLib.Variant>
 
-// #include <QVector>
+// #include <GLib.Vector>
 
 namespace Occ {
 
@@ -60,9 +60,9 @@ class Sharee {
 
     /***********************************************************
     ***********************************************************/
-    private string _share_with;
-    private string _display_name;
-    private Type _type;
+    private string this.share_with;
+    private string this.display_name;
+    private Type this.type;
 };
 
 class Sharee_model : QAbstractListModel {
@@ -76,17 +76,17 @@ class Sharee_model : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public Sharee_model (AccountPointer &account, string type, GLib.Object parent = new GLib.Object ());
+    public Sharee_model (AccountPointer account, string type, GLib.Object parent = new GLib.Object ());
 
     /***********************************************************
     ***********************************************************/
-    public using Sharee_set = QVector<unowned<Sharee>>; // FIXME : make it a GLib.Set<Sharee> when Sharee can be compared
-    public void fetch (string search, Sharee_set &blocklist, Lookup_mode lookup_mode);
+    public using Sharee_set = GLib.Vector<unowned<Sharee>>; // FIXME : make it a GLib.Set<Sharee> when Sharee can be compared
+    public void fetch (string search, Sharee_set blocklist, Lookup_mode lookup_mode);
 
 
     /***********************************************************
     ***********************************************************/
-    public int row_count (QModelIndex &parent = QModelIndex ()) override;
+    public int row_count (QModelIndex parent = QModelIndex ()) override;
 
     /***********************************************************
     ***********************************************************/
@@ -96,7 +96,7 @@ class Sharee_model : QAbstractListModel {
     ***********************************************************/
     public 
     public string current_search () {
-        return _search;
+        return this.search;
     }
 
 signals:
@@ -106,7 +106,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void on_sharees_fetched (QJsonDocument &reply);
+    private void on_sharees_fetched (QJsonDocument reply);
 
     /***********************************************************
     ***********************************************************/
@@ -114,40 +114,40 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void set_new_sharees (QVector<unowned<Sharee>> &new_sharees);
+    private void set_new_sharees (GLib.Vector<unowned<Sharee>> new_sharees);
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer _account;
-    private string _search;
-    private string _type;
+    private AccountPointer this.account;
+    private string this.search;
+    private string this.type;
 
     /***********************************************************
     ***********************************************************/
-    private QVector<unowned<Sharee>> _sharees;
-    private QVector<unowned<Sharee>> _sharee_blocklist;
+    private GLib.Vector<unowned<Sharee>> this.sharees;
+    private GLib.Vector<unowned<Sharee>> this.sharee_blocklist;
 };
 
     Sharee.Sharee (string share_with,
         const string display_name,
         const Type type)
-        : _share_with (share_with)
-        , _display_name (display_name)
-        , _type (type) {
+        : this.share_with (share_with)
+        , this.display_name (display_name)
+        , this.type (type) {
     }
 
     string Sharee.format () {
-        string formatted = _display_name;
+        string formatted = this.display_name;
 
-        if (_type == Type.Group) {
+        if (this.type == Type.Group) {
             formatted += QLatin1String (" (group)");
-        } else if (_type == Type.Email) {
+        } else if (this.type == Type.Email) {
             formatted += QLatin1String (" (email)");
-        } else if (_type == Type.Federated) {
+        } else if (this.type == Type.Federated) {
             formatted += QLatin1String (" (remote)");
-        } else if (_type == Type.Circle) {
+        } else if (this.type == Type.Circle) {
             formatted += QLatin1String (" (circle)");
-        } else if (_type == Type.Room) {
+        } else if (this.type == Type.Room) {
             formatted += QLatin1String (" (conversation)");
         }
 
@@ -155,41 +155,41 @@ signals:
     }
 
     string Sharee.share_with () {
-        return _share_with;
+        return this.share_with;
     }
 
     string Sharee.display_name () {
-        return _display_name;
+        return this.display_name;
     }
 
     Sharee.Type Sharee.type () {
-        return _type;
+        return this.type;
     }
 
-    Sharee_model.Sharee_model (AccountPointer &account, string type, GLib.Object parent)
+    Sharee_model.Sharee_model (AccountPointer account, string type, GLib.Object parent)
         : QAbstractListModel (parent)
-        , _account (account)
-        , _type (type) {
+        , this.account (account)
+        , this.type (type) {
     }
 
-    void Sharee_model.fetch (string search, Sharee_set &blocklist, Lookup_mode lookup_mode) {
-        _search = search;
-        _sharee_blocklist = blocklist;
-        var job = new Ocs_sharee_job (_account);
+    void Sharee_model.fetch (string search, Sharee_set blocklist, Lookup_mode lookup_mode) {
+        this.search = search;
+        this.sharee_blocklist = blocklist;
+        var job = new Ocs_sharee_job (this.account);
         connect (job, &Ocs_sharee_job.sharee_job_finished, this, &Sharee_model.on_sharees_fetched);
         connect (job, &Ocs_job.ocs_error, this, &Sharee_model.display_error_message);
-        job.get_sharees (_search, _type, 1, 50, lookup_mode == Global_search ? true : false);
+        job.get_sharees (this.search, this.type, 1, 50, lookup_mode == Global_search ? true : false);
     }
 
-    void Sharee_model.on_sharees_fetched (QJsonDocument &reply) {
-        QVector<unowned<Sharee>> new_sharees;
+    void Sharee_model.on_sharees_fetched (QJsonDocument reply) {
+        GLib.Vector<unowned<Sharee>> new_sharees;
      {
             const string[] sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
 
-            const var append_sharees = [this, &sharee_types] (QJsonObject &data, QVector<unowned<Sharee>>& out) {
-                for (var &sharee_type : sharee_types) {
+            const var append_sharees = [this, sharee_types] (QJsonObject data, GLib.Vector<unowned<Sharee>>& out) {
+                for (var sharee_type : sharee_types) {
                     const var category = data.value (sharee_type).to_array ();
-                    for (var &sharee : category) {
+                    for (var sharee : category) {
                         out.append (parse_sharee (sharee.to_object ()));
                     }
                 }
@@ -200,10 +200,10 @@ signals:
         }
 
         // Filter sharees that we have already shared with
-        QVector<unowned<Sharee>> filtered_sharees;
-        foreach (var &sharee, new_sharees) {
+        GLib.Vector<unowned<Sharee>> filtered_sharees;
+        foreach (var sharee, new_sharees) {
             bool found = false;
-            foreach (var &blocklist_sharee, _sharee_blocklist) {
+            foreach (var blocklist_sharee, this.sharee_blocklist) {
                 if (sharee.type () == blocklist_sharee.type () && sharee.share_with () == blocklist_sharee.share_with ()) {
                     found = true;
                     break;
@@ -219,7 +219,7 @@ signals:
         sharees_ready ();
     }
 
-    unowned<Sharee> Sharee_model.parse_sharee (QJsonObject &data) {
+    unowned<Sharee> Sharee_model.parse_sharee (QJsonObject data) {
         string display_name = data.value ("label").to_"";
         const string share_with = data.value ("value").to_object ().value ("share_with").to_"";
         Sharee.Type type = (Sharee.Type)data.value ("value").to_object ().value ("share_type").to_int ();
@@ -232,13 +232,13 @@ signals:
     }
 
     // Helper function for set_new_sharees   (could be a lambda when we can use them)
-    static unowned<Sharee> sharee_from_model_index (QModelIndex &idx) {
+    static unowned<Sharee> sharee_from_model_index (QModelIndex idx) {
         return idx.data (Qt.User_role).value<unowned<Sharee>> ();
     }
 
     struct Find_sharee_helper {
-        const unowned<Sharee> &sharee;
-        bool operator () (unowned<Sharee> &s2) {
+        const unowned<Sharee> sharee;
+        bool operator () (unowned<Sharee> s2) {
             return s2.format () == sharee.format () && s2.display_name () == sharee.format ();
         }
     };
@@ -247,28 +247,28 @@ signals:
 
         Do that while preserving the model index so the selection stays
     ***********************************************************/
-    void Sharee_model.set_new_sharees (QVector<unowned<Sharee>> &new_sharees) {
+    void Sharee_model.set_new_sharees (GLib.Vector<unowned<Sharee>> new_sharees) {
         layout_about_to_be_changed ();
         const var persistent = persistent_index_list ();
-        QVector<unowned<Sharee>> old_persistant_sharee;
+        GLib.Vector<unowned<Sharee>> old_persistant_sharee;
         old_persistant_sharee.reserve (persistent.size ());
 
         std.transform (persistent.begin (), persistent.end (), std.back_inserter (old_persistant_sharee),
             sharee_from_model_index);
 
-        _sharees = new_sharees;
+        this.sharees = new_sharees;
 
         QModel_index_list new_persistant;
         new_persistant.reserve (persistent.size ());
-        foreach (unowned<Sharee> &sharee, old_persistant_sharee) {
+        foreach (unowned<Sharee> sharee, old_persistant_sharee) {
             Find_sharee_helper helper = {
                 sharee
             };
-            var it = std.find_if (_sharees.const_begin (), _sharees.const_end (), helper);
-            if (it == _sharees.const_end ()) {
+            var it = std.find_if (this.sharees.const_begin (), this.sharees.const_end (), helper);
+            if (it == this.sharees.const_end ()) {
                 new_persistant << QModelIndex ();
             } else {
-                new_persistant << index (std.distance (_sharees.const_begin (), it));
+                new_persistant << index (std.distance (this.sharees.const_begin (), it));
             }
         }
 
@@ -277,15 +277,15 @@ signals:
     }
 
     int Sharee_model.row_count (QModelIndex &) {
-        return _sharees.size ();
+        return this.sharees.size ();
     }
 
-    QVariant Sharee_model.data (QModelIndex &index, int role) {
-        if (index.row () < 0 || index.row () > _sharees.size ()) {
-            return QVariant ();
+    GLib.Variant Sharee_model.data (QModelIndex index, int role) {
+        if (index.row () < 0 || index.row () > this.sharees.size ()) {
+            return GLib.Variant ();
         }
 
-        const var &sharee = _sharees.at (index.row ());
+        const var sharee = this.sharees.at (index.row ());
         if (role == Qt.Display_role) {
             return sharee.format ();
 
@@ -297,18 +297,18 @@ signals:
             return string (sharee.display_name () + " (" + sharee.share_with () + ")");
 
         } else if (role == Qt.User_role) {
-            return QVariant.from_value (sharee);
+            return GLib.Variant.from_value (sharee);
         }
 
-        return QVariant ();
+        return GLib.Variant ();
     }
 
     unowned<Sharee> Sharee_model.get_sharee (int at) {
-        if (at < 0 || at > _sharees.size ()) {
+        if (at < 0 || at > this.sharees.size ()) {
             return unowned<Sharee> (nullptr);
         }
 
-        return _sharees.at (at);
+        return this.sharees.at (at);
     }
     }
     

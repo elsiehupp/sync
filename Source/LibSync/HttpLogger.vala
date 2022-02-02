@@ -20,8 +20,8 @@ namespace HttpLogger {
     /***********************************************************
     Helper to construct the HTTP verb used in the request
     ***********************************************************/
-    GLib.ByteArray request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest &request);
-    inline GLib.ByteArray request_verb (QNetworkReply &reply) {
+    GLib.ByteArray request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest request);
+    inline GLib.ByteArray request_verb (QNetworkReply reply) {
         return request_verb (reply.operation (), reply.request ());
     }
 }
@@ -37,7 +37,7 @@ namespace HttpLogger {
         return regexp.match (s).has_match ();
     }
 
-    void log_http (GLib.ByteArray verb, string url, GLib.ByteArray id, string content_type, GLib.List<QNetworkReply.RawHeaderPair> &header, QIODevice device) {
+    void log_http (GLib.ByteArray verb, string url, GLib.ByteArray id, string content_type, GLib.List<QNetworkReply.RawHeaderPair> header, QIODevice device) {
         const var reply = qobject_cast<QNetworkReply> (device);
         const var content_length = device ? device.size () : 0;
         string msg;
@@ -53,7 +53,7 @@ namespace HttpLogger {
             stream << " " << reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
         }
         stream << " " << url << " Header: { ";
-        for (var &it : header) {
+        for (var it : header) {
             stream << it.first << " : ";
             if (it.first == "Authorization") {
                 stream << (it.second.starts_with ("Bearer ") ? "Bearer" : "Basic");
@@ -93,7 +93,7 @@ namespace HttpLogger {
         const var keys = request.raw_header_list ();
         GLib.List<QNetworkReply.RawHeaderPair> header;
         header.reserve (keys.size ());
-        for (var &key : keys) {
+        for (var key : keys) {
             header << q_make_pair (key, request.raw_header (key));
         }
         log_http (request_verb (operation, request),
@@ -113,7 +113,7 @@ namespace HttpLogger {
         });
     }
 
-    GLib.ByteArray HttpLogger.request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest &request) {
+    GLib.ByteArray HttpLogger.request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest request) {
         switch (operation) {
         case QNetworkAccessManager.HeadOperation:
             return QByteArrayLiteral ("HEAD");

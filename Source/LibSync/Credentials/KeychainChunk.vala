@@ -80,18 +80,18 @@ class Job : GLib.Object {
     public void set_auto_delete (bool auto_delete);
 
 
-    protected string _service_name;
-    protected Account _account;
-    protected string _key;
-    protected bool _insecure_fallback = false;
-    protected bool _auto_delete = true;
-    protected bool _keychain_migration = false;
+    protected string this.service_name;
+    protected Account this.account;
+    protected string this.key;
+    protected bool this.insecure_fallback = false;
+    protected bool this.auto_delete = true;
+    protected bool this.keychain_migration = false;
 
-    protected QKeychain.Error _error = QKeychain.NoError;
-    protected string _error_string;
+    protected QKeychain.Error this.error = QKeychain.NoError;
+    protected string this.error_string;
 
-    protected int _chunk_count = 0;
-    protected GLib.ByteArray _chunk_buffer;
+    protected int this.chunk_count = 0;
+    protected GLib.ByteArray this.chunk_buffer;
 }; // class Job
 
 /***********************************************************
@@ -178,7 +178,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private 
-    private bool _retry_on_key_chain_error = true; // true if we haven't done yet any reading from keychain
+    private bool this.retry_on_key_chain_error = true; // true if we haven't done yet any reading from keychain
 }; // class ReadJob
 
 /***********************************************************
@@ -238,46 +238,46 @@ Job
 ***********************************************************/
 Job.Job (GLib.Object parent) {
     base (parent);
-    _service_name = Theme.instance ().app_name ();
+    this.service_name = Theme.instance ().app_name ();
 }
 
 Job.~Job () {
-    _chunk_count = 0;
-    _chunk_buffer.clear ();
+    this.chunk_count = 0;
+    this.chunk_buffer.clear ();
 }
 
 QKeychain.Error Job.error () {
-    return _error;
+    return this.error;
 }
 
 string Job.error_string () {
-    return _error_string;
+    return this.error_string;
 }
 
 GLib.ByteArray Job.binary_data () {
-    return _chunk_buffer;
+    return this.chunk_buffer;
 }
 
 string Job.text_data () {
-    return _chunk_buffer;
+    return this.chunk_buffer;
 }
 
 bool Job.insecure_fallback () {
-    return _insecure_fallback;
+    return this.insecure_fallback;
 }
 
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
 void Job.set_insecure_fallback (bool insecure_fallback) {
-    _insecure_fallback = insecure_fallback;
+    this.insecure_fallback = insecure_fallback;
 }
 #endif
 
 bool Job.auto_delete () {
-    return _auto_delete;
+    return this.auto_delete;
 }
 
 void Job.set_auto_delete (bool auto_delete) {
-    _auto_delete = auto_delete;
+    this.auto_delete = auto_delete;
 }
 
 /***********************************************************
@@ -285,13 +285,13 @@ void Job.set_auto_delete (bool auto_delete) {
 ***********************************************************/
 WriteJob.WriteJob (Account account, string key, GLib.ByteArray data, GLib.Object parent)
     : Job (parent) {
-    _account = account;
-    _key = key;
+    this.account = account;
+    this.key = key;
 
     // Windows workaround : Split the private key into chunks of 2048 bytes,
     // to allow 4k (4096 bit) keys to be saved (obey Windows's limits)
-    _chunk_buffer = data;
-    _chunk_count = 0;
+    this.chunk_buffer = data;
+    this.chunk_count = 0;
 }
 
 WriteJob.WriteJob (string key, GLib.ByteArray data, GLib.Object parent)
@@ -299,7 +299,7 @@ WriteJob.WriteJob (string key, GLib.ByteArray data, GLib.Object parent)
 }
 
 void WriteJob.on_start () {
-    _error = QKeychain.NoError;
+    this.error = QKeychain.NoError;
 
     on_write_job_done (nullptr);
 }
@@ -308,7 +308,7 @@ bool WriteJob.exec () {
     on_start ();
 
     QEventLoop wait_loop;
-    connect (this, &WriteJob.on_finished, &wait_loop, &QEventLoop.quit);
+    connect (this, &WriteJob.on_finished, wait_loop, &QEventLoop.quit);
     wait_loop.exec ();
 
     if (error () != NoError) {
@@ -324,52 +324,52 @@ void WriteJob.on_write_job_done (QKeychain.Job incoming_job) {
 
     // Errors? (write_job can be nullptr here, see : WriteJob.on_start)
     if (write_job) {
-        _error = write_job.error ();
-        _error_string = write_job.error_string ();
+        this.error = write_job.error ();
+        this.error_string = write_job.error_string ();
 
         if (write_job.error () != NoError) {
             GLib.warn (lc_keychain_chunk) << "Error while writing" << write_job.key () << "chunk" << write_job.error_string ();
-            _chunk_buffer.clear ();
+            this.chunk_buffer.clear ();
         }
     }
 
     // write a chunk if there is any in the buffer
-    if (!_chunk_buffer.is_empty ()) {
+    if (!this.chunk_buffer.is_empty ()) {
         // write full data in one chunk on non-Windows, as usual
-        var chunk = _chunk_buffer;
+        var chunk = this.chunk_buffer;
 
-        _chunk_buffer.clear ();
+        this.chunk_buffer.clear ();
 
-        var index = (_chunk_count++);
+        var index = (this.chunk_count++);
 
         // keep the limit
-        if (_chunk_count > KeychainChunk.MaxChunks) {
+        if (this.chunk_count > KeychainChunk.MaxChunks) {
             GLib.warn (lc_keychain_chunk) << "Maximum chunk count exceeded while writing" << write_job.key () << "chunk" << string.number (index) << "cutting off after" << string.number (KeychainChunk.MaxChunks) << "chunks";
 
             write_job.delete_later ();
 
-            _chunk_buffer.clear ();
+            this.chunk_buffer.clear ();
 
-            emit finished (this);
+            /* emit */ finished (this);
 
-            if (_auto_delete) {
+            if (this.auto_delete) {
                 delete_later ();
             }
             return;
         }
 
-        const string key_with_index = _key + (index > 0 ? (string (".") + string.number (index)) : "");
-        const string kck = _account ? AbstractCredentials.keychain_key (
-                _account.url ().to_"",
+        const string key_with_index = this.key + (index > 0 ? (string (".") + string.number (index)) : "");
+        const string kck = this.account ? AbstractCredentials.keychain_key (
+                this.account.url ().to_"",
                 key_with_index,
-                _account.id ()
+                this.account.id ()
             ) : key_with_index;
 
-        var job = new QKeychain.WritePasswordJob (_service_name, this);
+        var job = new QKeychain.WritePasswordJob (this.service_name, this);
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-        add_settings_to_job (_account, job);
+        add_settings_to_job (this.account, job);
 #endif
-        job.set_insecure_fallback (_insecure_fallback);
+        job.set_insecure_fallback (this.insecure_fallback);
         connect (job, &QKeychain.Job.on_finished, this, &KeychainChunk.WriteJob.on_write_job_done);
         // only add the key's (sub)"index" after the first element, to stay compatible with older versions and non-Windows
         job.set_key (kck);
@@ -378,9 +378,9 @@ void WriteJob.on_write_job_done (QKeychain.Job incoming_job) {
 
         chunk.clear ();
     } else {
-        emit finished (this);
+        /* emit */ finished (this);
 
-        if (_auto_delete) {
+        if (this.auto_delete) {
             delete_later ();
         }
     }
@@ -393,13 +393,13 @@ void WriteJob.on_write_job_done (QKeychain.Job incoming_job) {
 ***********************************************************/
 ReadJob.ReadJob (Account account, string key, bool keychain_migration, GLib.Object parent)
     : Job (parent) {
-    _account = account;
-    _key = key;
+    this.account = account;
+    this.key = key;
 
-    _keychain_migration = keychain_migration;
+    this.keychain_migration = keychain_migration;
 
-    _chunk_count = 0;
-    _chunk_buffer.clear ();
+    this.chunk_count = 0;
+    this.chunk_buffer.clear ();
 }
 
 ReadJob.ReadJob (string key, GLib.Object parent)
@@ -407,21 +407,21 @@ ReadJob.ReadJob (string key, GLib.Object parent)
 }
 
 void ReadJob.on_start () {
-    _chunk_count = 0;
-    _chunk_buffer.clear ();
-    _error = QKeychain.NoError;
+    this.chunk_count = 0;
+    this.chunk_buffer.clear ();
+    this.error = QKeychain.NoError;
 
-    const string kck = _account ? AbstractCredentials.keychain_key (
-            _account.url ().to_"",
-            _key,
-            _keychain_migration ? "" : _account.id ()
-        ) : _key;
+    const string kck = this.account ? AbstractCredentials.keychain_key (
+            this.account.url ().to_"",
+            this.key,
+            this.keychain_migration ? "" : this.account.id ()
+        ) : this.key;
 
-    var job = new QKeychain.ReadPasswordJob (_service_name, this);
+    var job = new QKeychain.ReadPasswordJob (this.service_name, this);
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-    add_settings_to_job (_account, job);
+    add_settings_to_job (this.account, job);
 #endif
-    job.set_insecure_fallback (_insecure_fallback);
+    job.set_insecure_fallback (this.insecure_fallback);
     job.set_key (kck);
     connect (job, &QKeychain.Job.on_finished, this, &KeychainChunk.ReadJob.on_read_job_done);
     job.on_start ();
@@ -431,15 +431,15 @@ bool ReadJob.exec () {
     on_start ();
 
     QEventLoop wait_loop;
-    connect (this, &ReadJob.on_finished, &wait_loop, &QEventLoop.quit);
+    connect (this, &ReadJob.on_finished, wait_loop, &QEventLoop.quit);
     wait_loop.exec ();
 
     if (error () == NoError) {
         return true;
     }
 
-    _chunk_count = 0;
-    _chunk_buffer.clear ();
+    this.chunk_count = 0;
+    this.chunk_buffer.clear ();
     if (error () != EntryNotFound) {
         GLib.warn (lc_keychain_chunk) << "ReadPasswordJob failed with" << error_string ();
     }
@@ -452,36 +452,36 @@ void ReadJob.on_read_job_done (QKeychain.Job incoming_job) {
     Q_ASSERT (read_job);
 
     if (read_job.error () == NoError && !read_job.binary_data ().is_empty ()) {
-        _chunk_buffer.append (read_job.binary_data ());
-        _chunk_count++;
+        this.chunk_buffer.append (read_job.binary_data ());
+        this.chunk_count++;
     } else {
         if (!read_job.insecure_fallback ()) { // If insecure_fallback is set, the next test would be pointless
-            if (_retry_on_key_chain_error && (read_job.error () == QKeychain.NoBackendAvailable
+            if (this.retry_on_key_chain_error && (read_job.error () == QKeychain.NoBackendAvailable
                     || read_job.error () == QKeychain.OtherError)) {
                 // Could be that the backend was not yet available. Wait some extra seconds.
                 // (Issues #4274 and #6522)
                 // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
                 q_c_info (lc_keychain_chunk) << "Backend unavailable (yet?) Retrying in a few seconds." << read_job.error_string ();
                 QTimer.single_shot (10000, this, &ReadJob.on_start);
-                _retry_on_key_chain_error = false;
+                this.retry_on_key_chain_error = false;
                 read_job.delete_later ();
                 return;
             }
-            _retry_on_key_chain_error = false;
+            this.retry_on_key_chain_error = false;
         }
         if (read_job.error () != QKeychain.EntryNotFound ||
-            ( (read_job.error () == QKeychain.EntryNotFound) && _chunk_count == 0)) {
-            _error = read_job.error ();
-            _error_string = read_job.error_string ();
-            GLib.warn (lc_keychain_chunk) << "Unable to read" << read_job.key () << "chunk" << string.number (_chunk_count) << read_job.error_string ();
+            ( (read_job.error () == QKeychain.EntryNotFound) && this.chunk_count == 0)) {
+            this.error = read_job.error ();
+            this.error_string = read_job.error_string ();
+            GLib.warn (lc_keychain_chunk) << "Unable to read" << read_job.key () << "chunk" << string.number (this.chunk_count) << read_job.error_string ();
         }
     }
 
     read_job.delete_later ();
 
-    emit finished (this);
+    /* emit */ finished (this);
 
-    if (_auto_delete) {
+    if (this.auto_delete) {
         delete_later ();
     }
 }
@@ -491,10 +491,10 @@ void ReadJob.on_read_job_done (QKeychain.Job incoming_job) {
 ***********************************************************/
 DeleteJob.DeleteJob (Account account, string key, bool keychain_migration, GLib.Object parent)
     : Job (parent) {
-    _account = account;
-    _key = key;
+    this.account = account;
+    this.key = key;
 
-    _keychain_migration = keychain_migration;
+    this.keychain_migration = keychain_migration;
 }
 
 DeleteJob.DeleteJob (string key, GLib.Object parent)
@@ -502,20 +502,20 @@ DeleteJob.DeleteJob (string key, GLib.Object parent)
 }
 
 void DeleteJob.on_start () {
-    _chunk_count = 0;
-    _error = QKeychain.NoError;
+    this.chunk_count = 0;
+    this.error = QKeychain.NoError;
 
-    const string kck = _account ? AbstractCredentials.keychain_key (
-            _account.url ().to_"",
-            _key,
-            _keychain_migration ? "" : _account.id ()
-        ) : _key;
+    const string kck = this.account ? AbstractCredentials.keychain_key (
+            this.account.url ().to_"",
+            this.key,
+            this.keychain_migration ? "" : this.account.id ()
+        ) : this.key;
 
-    var job = new QKeychain.DeletePasswordJob (_service_name, this);
+    var job = new QKeychain.DeletePasswordJob (this.service_name, this);
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-    add_settings_to_job (_account, job);
+    add_settings_to_job (this.account, job);
 #endif
-    job.set_insecure_fallback (_insecure_fallback);
+    job.set_insecure_fallback (this.insecure_fallback);
     job.set_key (kck);
     connect (job, &QKeychain.Job.on_finished, this, &KeychainChunk.DeleteJob.on_delete_job_done);
     job.on_start ();
@@ -525,14 +525,14 @@ bool DeleteJob.exec () {
     on_start ();
 
     QEventLoop wait_loop;
-    connect (this, &DeleteJob.on_finished, &wait_loop, &QEventLoop.quit);
+    connect (this, &DeleteJob.on_finished, wait_loop, &QEventLoop.quit);
     wait_loop.exec ();
 
     if (error () == NoError) {
         return true;
     }
 
-    _chunk_count = 0;
+    this.chunk_count = 0;
     if (error () != EntryNotFound) {
         GLib.warn (lc_keychain_chunk) << "DeletePasswordJob failed with" << error_string ();
     }
@@ -545,21 +545,21 @@ void DeleteJob.on_delete_job_done (QKeychain.Job incoming_job) {
     Q_ASSERT (delete_job);
 
     if (delete_job.error () == NoError) {
-        _chunk_count++;
+        this.chunk_count++;
     } else {
         if (delete_job.error () != QKeychain.EntryNotFound ||
-            ( (delete_job.error () == QKeychain.EntryNotFound) && _chunk_count == 0)) {
-            _error = delete_job.error ();
-            _error_string = delete_job.error_string ();
-            GLib.warn (lc_keychain_chunk) << "Unable to delete" << delete_job.key () << "chunk" << string.number (_chunk_count) << delete_job.error_string ();
+            ( (delete_job.error () == QKeychain.EntryNotFound) && this.chunk_count == 0)) {
+            this.error = delete_job.error ();
+            this.error_string = delete_job.error_string ();
+            GLib.warn (lc_keychain_chunk) << "Unable to delete" << delete_job.key () << "chunk" << string.number (this.chunk_count) << delete_job.error_string ();
         }
     }
 
     delete_job.delete_later ();
 
-    emit finished (this);
+    /* emit */ finished (this);
 
-    if (_auto_delete) {
+    if (this.auto_delete) {
         delete_later ();
     }
 }

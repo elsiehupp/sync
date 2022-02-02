@@ -18,7 +18,6 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
-// #include <string>
 
 struct csync_vio_handle_t;
 namespace Occ {
@@ -88,14 +87,14 @@ struct csync_vio_handle_t {
   GLib.ByteArray path;
 };
 
-static int _csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf);
+static int this.csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf);
 
 csync_vio_handle_t csync_vio_local_opendir (string name) {
     QScopedPointer<csync_vio_handle_t> handle (new csync_vio_handle_t{});
 
     var dirname = GLib.File.encode_name (name);
 
-    handle.dh = _topendir (dirname.const_data ());
+    handle.dh = this.topendir (dirname.const_data ());
     if (!handle.dh) {
         return nullptr;
     }
@@ -106,18 +105,18 @@ csync_vio_handle_t csync_vio_local_opendir (string name) {
 
 int csync_vio_local_closedir (csync_vio_handle_t dhandle) {
     Q_ASSERT (dhandle);
-    var rc = _tclosedir (dhandle.dh);
+    var rc = this.tclosedir (dhandle.dh);
     delete dhandle;
     return rc;
 }
 
 std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t handle, Occ.Vfs vfs) {
 
-  struct _tdirent dirent = nullptr;
+  struct this.tdirent dirent = nullptr;
   std.unique_ptr<csync_file_stat_t> file_stat;
 
   do {
-      dirent = _treaddir (handle.dh);
+      dirent = this.treaddir (handle.dh);
       if (!dirent)
           return {};
   } while (qstrcmp (dirent.d_name, ".") == 0 || qstrcmp (dirent.d_name, "..") == 0);
@@ -131,7 +130,7 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t ha
   }
 
   /* Check for availability of d_type, see manpage. */
-#if defined (_DIRENT_HAVE_D_TYPE) || defined (__APPLE__)
+#if defined (this.DIRENT_HAVE_D_TYPE) || defined (__APPLE__)
   switch (dirent.d_type) {
     case DT_FIFO:
     case DT_SOCK:
@@ -154,8 +153,8 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t ha
   if (file_stat.path.is_null ())
       return file_stat;
 
-  if (_csync_vio_local_stat_mb (full_path.const_data (), file_stat.get ()) < 0) {
-      // Will get excluded by _csync_detect_update.
+  if (this.csync_vio_local_stat_mb (full_path.const_data (), file_stat.get ()) < 0) {
+      // Will get excluded by this.csync_detect_update.
       file_stat.type = ItemTypeSkip;
   }
 
@@ -163,7 +162,7 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t ha
   if (vfs) {
       // Directly modifies file_stat.type.
       // We can ignore the return value since we're done here anyway.
-      const var result = vfs.stat_type_virtual_file (file_stat.get (), &handle.path);
+      const var result = vfs.stat_type_virtual_file (file_stat.get (), handle.path);
       Q_UNUSED (result)
   }
 
@@ -171,13 +170,13 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t ha
 }
 
 int csync_vio_local_stat (string uri, csync_file_stat_t buf) {
-    return _csync_vio_local_stat_mb (GLib.File.encode_name (uri).const_data (), buf);
+    return this.csync_vio_local_stat_mb (GLib.File.encode_name (uri).const_data (), buf);
 }
 
-static int _csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf) {
+static int this.csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf) {
     csync_stat_t sb;
 
-    if (_tstat (wuri, &sb) < 0) {
+    if (this.tstat (wuri, sb) < 0) {
         return -1;
     }
 

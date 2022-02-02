@@ -39,8 +39,8 @@ class BrokenFakeGetReply : FakeGetReply {
     }
 };
 
-SyncFileItemPtr getItem (QSignalSpy &spy, string path) {
-    for (GLib.List<QVariant> &args : spy) {
+SyncFileItemPtr getItem (QSignalSpy spy, string path) {
+    for (GLib.List<GLib.Variant> args : spy) {
         var item = args[0].value<SyncFileItemPtr> ();
         if (item.destination () == path)
             return item;
@@ -60,7 +60,7 @@ class TestDownload : GLib.Object {
         fakeFolder.remoteModifier ().insert ("A/a0", size);
 
         // First, download only the first 3 MB of the file
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.GetOperation && request.url ().path ().endsWith ("A/a0")) {
                 return new BrokenFakeGetReply (fakeFolder.remoteModifier (), op, request, this);
             }
@@ -68,13 +68,13 @@ class TestDownload : GLib.Object {
         });
 
         QVERIFY (!fakeFolder.syncOnce ()); // The sync must fail because not all the file was downloaded
-        QCOMPARE (getItem (completeSpy, "A/a0")._status, SyncFileItem.SoftError);
+        QCOMPARE (getItem (completeSpy, "A/a0")._status, SyncFileItem.Status.SOFT_ERROR);
         QCOMPARE (getItem (completeSpy, "A/a0")._errorString, string ("The file could not be downloaded completely."));
         QVERIFY (fakeFolder.syncEngine ().isAnotherSyncNeeded ());
 
         // Now, we need to restart, this time, it should resume.
         GLib.ByteArray ranges;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.GetOperation && request.url ().path ().endsWith ("A/a0")) {
                 ranges = request.rawHeader ("Range");
             }
@@ -100,7 +100,7 @@ class TestDownload : GLib.Object {
         GLib.ByteArray serverMessage = "The file was not downloaded because the tests wants so!";
 
         // First, download only the first 3 MB of the file
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.GetOperation && request.url ().path ().endsWith ("A/broken")) {
                 return new FakeErrorReply (op, request, this, 400,
                     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -113,10 +113,10 @@ class TestDownload : GLib.Object {
         });
 
         bool timedOut = false;
-        QTimer.singleShot (10000, &fakeFolder.syncEngine (), [&] () { timedOut = true; fakeFolder.syncEngine ().on_abort (); });
+        QTimer.singleShot (10000, fakeFolder.syncEngine (), [&] () { timedOut = true; fakeFolder.syncEngine ().on_abort (); });
         QVERIFY (!fakeFolder.syncOnce ());  // Fail because A/broken
         QVERIFY (!timedOut);
-        QCOMPARE (getItem (completeSpy, "A/broken")._status, SyncFileItem.NormalError);
+        QCOMPARE (getItem (completeSpy, "A/broken")._status, SyncFileItem.Status.NORMAL_ERROR);
         QVERIFY (getItem (completeSpy, "A/broken")._errorString.contains (serverMessage));
     }
 
@@ -128,7 +128,7 @@ class TestDownload : GLib.Object {
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.remoteModifier ().insert ("A/broken");
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.GetOperation) {
                 return new FakeErrorReply (op, request, this, 503,
                     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -143,7 +143,7 @@ class TestDownload : GLib.Object {
         QSignalSpy completeSpy (&fakeFolder.syncEngine (), &SyncEngine.itemCompleted);
         QVERIFY (!fakeFolder.syncOnce ()); // Fail because A/broken
         // FatalError means the sync was aborted, which is what we want
-        QCOMPARE (getItem (completeSpy, "A/broken")._status, SyncFileItem.FatalError);
+        QCOMPARE (getItem (completeSpy, "A/broken")._status, SyncFileItem.Status.FATAL_ERROR);
         QVERIFY (getItem (completeSpy, "A/broken")._errorString.contains ("System in maintenance mode"));
     }
 
@@ -165,7 +165,7 @@ class TestDownload : GLib.Object {
         bool propConnected = false;
         string conflictFile;
         var transProgress = connect (&fakeFolder.syncEngine (), &SyncEngine.transmissionProgress,
-                                     [&] (ProgressInfo &pi) {
+                                     [&] (ProgressInfo pi) {
             var propagator = fakeFolder.syncEngine ().getPropagator ();
             if (pi.status () != ProgressInfo.Propagation || propConnected || !propagator)
                 return;
@@ -219,12 +219,12 @@ class TestDownload : GLib.Object {
         int resendExpected = 2;
 
         // First, download only the first 3 MB of the file
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.GetOperation && request.url ().path ().endsWith ("A/resendme") && resendActual < resendExpected) {
                 var errorReply = new FakeErrorReply (op, request, this, 400, "ignore this body");
                 errorReply.setError (QNetworkReply.ContentReSendError, serverMessage);
                 errorReply.setAttribute (QNetworkRequest.HTTP2WasUsedAttribute, true);
-                errorReply.setAttribute (QNetworkRequest.HttpStatusCodeAttribute, QVariant ());
+                errorReply.setAttribute (QNetworkRequest.HttpStatusCodeAttribute, GLib.Variant ());
                 resendActual += 1;
                 return errorReply;
             }
@@ -242,7 +242,7 @@ class TestDownload : GLib.Object {
         QSignalSpy completeSpy (&fakeFolder.syncEngine (), SIGNAL (itemCompleted (SyncFileItemPtr &)));
         QVERIFY (!fakeFolder.syncOnce ());
         QCOMPARE (resendActual, 4); // the 4th fails because it only resends 3 times
-        QCOMPARE (getItem (completeSpy, "A/resendme")._status, SyncFileItem.NormalError);
+        QCOMPARE (getItem (completeSpy, "A/resendme")._status, SyncFileItem.Status.NORMAL_ERROR);
         QVERIFY (getItem (completeSpy, "A/resendme")._errorString.contains (serverMessage));
     }
 };

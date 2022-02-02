@@ -12,8 +12,8 @@
 using namespace Occ;
 
 struct FakeBrokenXmlPropfindReply : FakePropfindReply {
-    FakeBrokenXmlPropfindReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op,
-                               const QNetworkRequest &request, GLib.Object parent)
+    FakeBrokenXmlPropfindReply (FileInfo remoteRootFileInfo, QNetworkAccessManager.Operation op,
+                               const QNetworkRequest request, GLib.Object parent)
         : FakePropfindReply (remoteRootFileInfo, op, request, parent) {
         QVERIFY (payload.size () > 50);
         // turncate the XML
@@ -22,8 +22,8 @@ struct FakeBrokenXmlPropfindReply : FakePropfindReply {
 };
 
 struct MissingPermissionsPropfindReply : FakePropfindReply {
-    MissingPermissionsPropfindReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op,
-                               const QNetworkRequest &request, GLib.Object parent)
+    MissingPermissionsPropfindReply (FileInfo remoteRootFileInfo, QNetworkAccessManager.Operation op,
+                               const QNetworkRequest request, GLib.Object parent)
         : FakePropfindReply (remoteRootFileInfo, op, request, parent) {
         // If the propfind contains a single file without permissions, this is a server error
         const char toRemove[] = "<oc:permissions>RDNVCKW</oc:permissions>";
@@ -86,7 +86,7 @@ class TestRemoteDiscovery : GLib.Object {
 
         string errorFolder = "dav/files/admin/B";
         string fatalErrorPrefix = "Server replied with an error while reading directory \"B\" : ";
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice *)
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice *)
                 . QNetworkReply *{
             if (req.attribute (QNetworkRequest.CustomVerbAttribute) == "PROPFIND" && req.url ().path ().endsWith (errorFolder)) {
                 if (errorKind == InvalidXML) {
@@ -147,7 +147,7 @@ class TestRemoteDiscovery : GLib.Object {
         fakeFolder.remoteModifier ().mkdir ("nopermissions");
         fakeFolder.remoteModifier ().insert ("nopermissions/A");
 
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice *)
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice *)
                 . QNetworkReply *{
             if (req.attribute (QNetworkRequest.CustomVerbAttribute) == "PROPFIND" && req.url ().path ().endsWith ("nopermissions"))
                 return new MissingPermissionsPropfindReply (fakeFolder.remoteModifier (), op, req, this);

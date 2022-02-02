@@ -5,7 +5,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QVariant>
+// #include <GLib.Variant>
 // #include <QVBoxLayout>
 
 // #pragma once
@@ -65,30 +65,30 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public string _user;
-    public string _app_password;
+    public string this.user;
+    public string this.app_password;
 
 
     /***********************************************************
     ***********************************************************/
-    private Flow2AuthWidget _flow_2_auth_widget = nullptr;
-    private QVBoxLayout _layout = nullptr;
+    private Flow2AuthWidget this.flow_2_auth_widget = nullptr;
+    private QVBoxLayout this.layout = nullptr;
 };
 
     Flow2Auth_creds_page.Flow2Auth_creds_page ()
         : Abstract_credentials_wizard_page () {
-        _layout = new QVBoxLayout (this);
+        this.layout = new QVBoxLayout (this);
 
-        _flow_2_auth_widget = new Flow2AuthWidget ();
-        _layout.add_widget (_flow_2_auth_widget);
+        this.flow_2_auth_widget = new Flow2AuthWidget ();
+        this.layout.add_widget (this.flow_2_auth_widget);
 
-        connect (_flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &Flow2Auth_creds_page.on_flow_2_auth_result);
+        connect (this.flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &Flow2Auth_creds_page.on_flow_2_auth_result);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &Flow2Auth_creds_page.style_changed, _flow_2_auth_widget, &Flow2AuthWidget.on_style_changed);
+        connect (this, &Flow2Auth_creds_page.style_changed, this.flow_2_auth_widget, &Flow2AuthWidget.on_style_changed);
 
         // allow Flow2 page to poll on window activation
-        connect (this, &Flow2Auth_creds_page.poll_now, _flow_2_auth_widget, &Flow2AuthWidget.on_poll_now);
+        connect (this, &Flow2Auth_creds_page.poll_now, this.flow_2_auth_widget, &Flow2AuthWidget.on_poll_now);
     }
 
     void Flow2Auth_creds_page.initialize_page () {
@@ -96,24 +96,24 @@ signals:
         Q_ASSERT (oc_wizard);
         oc_wizard.account ().set_credentials (CredentialsFactory.create ("http"));
 
-        if (_flow_2_auth_widget)
-            _flow_2_auth_widget.start_auth (oc_wizard.account ().data ());
+        if (this.flow_2_auth_widget)
+            this.flow_2_auth_widget.start_auth (oc_wizard.account ().data ());
 
         // Don't hide the wizard (avoid user confusion)!
         //wizard ().hide ();
 
-        _flow_2_auth_widget.on_style_changed ();
+        this.flow_2_auth_widget.on_style_changed ();
     }
 
     void Occ.Flow2Auth_creds_page.cleanup_page () {
         // The next or back button was activated, show the wizard again
         wizard ().show ();
-        if (_flow_2_auth_widget)
-            _flow_2_auth_widget.reset_auth ();
+        if (this.flow_2_auth_widget)
+            this.flow_2_auth_widget.reset_auth ();
 
         // Forget sensitive data
-        _app_password.clear ();
-        _user.clear ();
+        this.app_password.clear ();
+        this.user.clear ();
     }
 
     void Flow2Auth_creds_page.on_flow_2_auth_result (Flow2Auth.Result r, string error_string, string user, string app_password) {
@@ -134,12 +134,12 @@ signals:
             wizard ().show ();
             break;
         case Flow2Auth.LoggedIn: {
-            _user = user;
-            _app_password = app_password;
+            this.user = user;
+            this.app_password = app_password;
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             Q_ASSERT (oc_wizard);
 
-            emit connect_to_oc_url (oc_wizard.account ().url ().to_"");
+            /* emit */ connect_to_oc_url (oc_wizard.account ().url ().to_"");
             break;
         }
         }
@@ -161,8 +161,8 @@ signals:
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         Q_ASSERT (oc_wizard);
         return new WebFlowCredentials (
-                    _user,
-                    _app_password,
+                    this.user,
+                    this.app_password,
                     oc_wizard._client_ssl_certificate,
                     oc_wizard._client_ssl_key,
                     oc_wizard._client_ssl_ca_certificates
@@ -174,11 +174,11 @@ signals:
     }
 
     void Flow2Auth_creds_page.on_poll_now () {
-        emit poll_now ();
+        /* emit */ poll_now ();
     }
 
     void Flow2Auth_creds_page.on_style_changed () {
-        emit style_changed ();
+        /* emit */ style_changed ();
     }
 
     } // namespace Occ

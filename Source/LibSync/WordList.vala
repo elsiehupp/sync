@@ -1,6 +1,5 @@
 
 // #include <GLib.List>
-// #include <string>
 // #include <openssl/rand.h>
 
 namespace Occ {

@@ -13,7 +13,7 @@ class PreparedSqlQuery {
 
     /***********************************************************
     ***********************************************************/
-    private SqlQuery _query;
+    private SqlQuery this.query;
 
     /***********************************************************
     ***********************************************************/
@@ -26,29 +26,29 @@ class PreparedSqlQuery {
     /***********************************************************
     ***********************************************************/
     private PreparedSqlQuery (SqlQuery query, bool ok = true) {
-        _query = query;
-        _ok = ok;
+        this.query = query;
+        this.ok = ok;
     }
 
     ~PreparedSqlQuery () {
-        _query.reset_and_clear_bindings ();
+        this.query.reset_and_clear_bindings ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public to_bool () {
-        return _ok;
+        return this.ok;
     }
 
     //  public SqlQuery operator. () {
-    //      Q_ASSERT (_ok);
-    //      return _query;
+    //      Q_ASSERT (this.ok);
+    //      return this.query;
     //  }
 
-    //  public SqlQuery &operator* () & {
-    //      Q_ASSERT (_ok);
-    //      return _query;
+    //  public SqlQuery operator* () & {
+    //      Q_ASSERT (this.ok);
+    //      return this.query;
     //  }
 };
 
@@ -113,11 +113,11 @@ class PreparedSqlQueryManager {
     The queries are reset in the destructor to prevent wal locks
     ***********************************************************/
     public const PreparedSqlQuery get (Key key) {
-        var &query = _queries[key];
+        var query = this.queries[key];
         ENFORCE (query._stmt)
         Q_ASSERT (!Sqlite3Stmt_busy (query._stmt));
         return {
-            &query
+            query
         };
     }
 
@@ -126,25 +126,25 @@ class PreparedSqlQueryManager {
     Prepare the SqlQuery if it was not prepared yet.
     ***********************************************************/
     public const PreparedSqlQuery get (Key key, GLib.ByteArray sql, SqlDatabase database) {
-        var &query = _queries[key];
+        var query = this.queries[key];
         Q_ASSERT (!Sqlite3Stmt_busy (query._stmt));
-        ENFORCE (!query._sqldb || &database == query._sqldb)
+        ENFORCE (!query._sqldb || database == query._sqldb)
         if (!query._stmt) {
-            query._sqldb = &database;
+            query._sqldb = database;
             query._db = database.sqlite_db ();
             return {
-                &query, query.prepare (sql) == 0
+                query, query.prepare (sql) == 0
             };
         }
         return {
-            &query
+            query
         };
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private SqlQuery _queries[Prepared_query_count];
+    private SqlQuery this.queries[Prepared_query_count];
     private Q_DISABLE_COPY (PreparedSqlQueryManager)
 };
 

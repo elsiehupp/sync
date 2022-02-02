@@ -28,7 +28,7 @@ class SslDialogErrorHandler : AbstractSslErrorHandler {
 
     /***********************************************************
     ***********************************************************/
-    public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration &conf, GLib.List<QSslCertificate> *certs, AccountPointer) override;
+    public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certs, AccountPointer) override;
 };
 
 /***********************************************************
@@ -41,7 +41,7 @@ class Ssl_error_dialog : Gtk.Dialog {
     ***********************************************************/
     public Ssl_error_dialog (AccountPointer account, Gtk.Widget parent = nullptr);
     ~Ssl_error_dialog () override;
-    public bool check_failing_certs_known (GLib.List<QSslError> &errors);
+    public bool check_failing_certs_known (GLib.List<QSslError> errors);
 
 
     /***********************************************************
@@ -52,7 +52,7 @@ class Ssl_error_dialog : Gtk.Dialog {
     ***********************************************************/
     public 
     public GLib.List<QSslCertificate> unknown_certs () {
-        return _unknown_certs;
+        return this.unknown_certs;
     }
 
 
@@ -67,20 +67,20 @@ class Ssl_error_dialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private 
-    private GLib.List<QSslCertificate> _unknown_certs;
-    private string _custom_config_handle;
-    private Ui.Ssl_error_dialog _ui;
-    private AccountPointer _account;
+    private GLib.List<QSslCertificate> this.unknown_certs;
+    private string this.custom_config_handle;
+    private Ui.Ssl_error_dialog this.ui;
+    private AccountPointer this.account;
 };
 
     namespace Utility {
         //  Used for QSSLCertificate.subject_info which returns a string[] in Qt5, but a string in Qt4
-        string escape (string[] &l) {
+        string escape (string[] l) {
             return escape (l.join (';'));
         }
     }
 
-    bool SslDialogErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration &conf, GLib.List<QSslCertificate> *certs, AccountPointer account) {
+    bool SslDialogErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certs, AccountPointer account) {
         (void)conf;
         if (!certs) {
             q_c_critical (lc_ssl_error_dialog) << "Certs parameter required but is NULL!";
@@ -105,20 +105,20 @@ class Ssl_error_dialog : Gtk.Dialog {
 
     Ssl_error_dialog.Ssl_error_dialog (AccountPointer account, Gtk.Widget parent)
         : Gtk.Dialog (parent)
-        , _all_trusted (false)
-        , _ui (new Ui.Ssl_error_dialog)
-        , _account (account) {
+        , this.all_trusted (false)
+        , this.ui (new Ui.Ssl_error_dialog)
+        , this.account (account) {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
-        _ui.setup_ui (this);
+        this.ui.setup_ui (this);
         set_window_title (_("Untrusted Certificate"));
         QPushButton ok_button =
-            _ui._dialog_button_box.button (QDialogButtonBox.Ok);
+            this.ui._dialog_button_box.button (QDialogButtonBox.Ok);
         QPushButton cancel_button =
-            _ui._dialog_button_box.button (QDialogButtonBox.Cancel);
+            this.ui._dialog_button_box.button (QDialogButtonBox.Cancel);
         ok_button.set_enabled (false);
 
-        _ui._cb_trust_connect.set_enabled (!Theme.instance ().forbid_bad_s_sL ());
-        connect (_ui._cb_trust_connect, &QAbstractButton.clicked,
+        this.ui._cb_trust_connect.set_enabled (!Theme.instance ().forbid_bad_ssl ());
+        connect (this.ui._cb_trust_connect, &QAbstractButton.clicked,
             ok_button, &Gtk.Widget.set_enabled);
 
         if (ok_button) {
@@ -129,7 +129,7 @@ class Ssl_error_dialog : Gtk.Dialog {
     }
 
     Ssl_error_dialog.~Ssl_error_dialog () {
-        delete _ui;
+        delete this.ui;
     }
 
     string Ssl_error_dialog.style_sheet () {
@@ -145,24 +145,24 @@ class Ssl_error_dialog : Gtk.Dialog {
     }
     const int QL (x) QLatin1String (x)
 
-    bool Ssl_error_dialog.check_failing_certs_known (GLib.List<QSslError> &errors) {
+    bool Ssl_error_dialog.check_failing_certs_known (GLib.List<QSslError> errors) {
         // check if unknown certs caused errors.
-        _unknown_certs.clear ();
+        this.unknown_certs.clear ();
 
         string[] error_strings;
 
         string[] additional_error_strings;
 
-        GLib.List<QSslCertificate> trusted_certs = _account.approved_certs ();
+        GLib.List<QSslCertificate> trusted_certs = this.account.approved_certs ();
 
         for (int i = 0; i < errors.count (); ++i) {
             QSslError error = errors.at (i);
-            if (trusted_certs.contains (error.certificate ()) || _unknown_certs.contains (error.certificate ())) {
+            if (trusted_certs.contains (error.certificate ()) || this.unknown_certs.contains (error.certificate ())) {
                 continue;
             }
             error_strings += error.error_string ();
             if (!error.certificate ().is_null ()) {
-                _unknown_certs.append (error.certificate ());
+                this.unknown_certs.append (error.certificate ());
             } else {
                 additional_error_strings.append (error.error_string ());
             }
@@ -170,7 +170,7 @@ class Ssl_error_dialog : Gtk.Dialog {
 
         // if there are no errors left, all Certs were known.
         if (error_strings.is_empty ()) {
-            _all_trusted = true;
+            this.all_trusted = true;
             return true;
         }
 
@@ -178,11 +178,11 @@ class Ssl_error_dialog : Gtk.Dialog {
         msg += QL ("<link rel='stylesheet' type='text/css' href='format.css'>");
         msg += QL ("</head><body>");
 
-        var host = _account.url ().host ();
+        var host = this.account.url ().host ();
         msg += QL ("<h3>") + _("Cannot connect securely to <i>%1</i>:").arg (host) + QL ("</h3>");
         // loop over the unknown certs and line up their errors.
         msg += QL ("<div id=\"ca_errors\">");
-        foreach (QSslCertificate &cert, _unknown_certs) {
+        foreach (QSslCertificate cert, this.unknown_certs) {
             msg += QL ("<div id=\"ca_error\">");
             // add the errors for this cert
             foreach (QSslError err, errors) {
@@ -192,7 +192,7 @@ class Ssl_error_dialog : Gtk.Dialog {
             }
             msg += QL ("</div>");
             msg += cert_div (cert);
-            if (_unknown_certs.count () > 1) {
+            if (this.unknown_certs.count () > 1) {
                 msg += QL ("<hr/>");
             }
         }
@@ -200,7 +200,7 @@ class Ssl_error_dialog : Gtk.Dialog {
         if (!additional_error_strings.is_empty ()) {
             msg += QL ("<h4>") + _("Additional errors:") + QL ("</h4>");
 
-            for (var &error_string : additional_error_strings) {
+            for (var error_string : additional_error_strings) {
                 msg += QL ("<div id=\"ca_error\">");
                 msg += QL ("<p>") + error_string + QL ("</p>");
                 msg += QL ("</div>");
@@ -214,8 +214,8 @@ class Ssl_error_dialog : Gtk.Dialog {
         doc.add_resource (QText_document.Style_sheet_resource, GLib.Uri (QL ("format.css")), style);
         doc.set_html (msg);
 
-        _ui._tb_errors.set_document (doc);
-        _ui._tb_errors.show ();
+        this.ui._tb_errors.set_document (doc);
+        this.ui._tb_errors.show ();
 
         return false;
     }
@@ -273,10 +273,10 @@ class Ssl_error_dialog : Gtk.Dialog {
     }
 
     bool Ssl_error_dialog.trust_connection () {
-        if (_all_trusted)
+        if (this.all_trusted)
             return true;
 
-        bool stat = (_ui._cb_trust_connect.check_state () == Qt.Checked);
+        bool stat = (this.ui._cb_trust_connect.check_state () == Qt.Checked);
         q_c_info (lc_ssl_error_dialog) << "SSL-Connection is trusted : " << stat;
 
         return stat;

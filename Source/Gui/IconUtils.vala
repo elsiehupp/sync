@@ -12,18 +12,18 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 // #include <QPixmapCache>
 // #include <QSvgRenderer>
 
-// #include <QColor>
+// #include <Gtk.Color>
 // #include <QPixmap>
 
 namespace {
-    string find_svg_file_path (string file_name, string[] &possible_colors) {
+    string find_svg_file_path (string filename, string[] possible_colors) {
         string result;
-        result = string{Occ.Theme.theme_prefix} + file_name;
+        result = string{Occ.Theme.theme_prefix} + filename;
         if (GLib.File.exists (result)) {
             return result;
         } else {
-            for (var &color : possible_colors) {
-                result = string{Occ.Theme.theme_prefix} + color + QStringLiteral ("/") + file_name;
+            for (var color : possible_colors) {
+                result = string{Occ.Theme.theme_prefix} + color + QStringLiteral ("/") + filename;
 
                 if (GLib.File.exists (result)) {
                     return result;
@@ -40,29 +40,29 @@ namespace Occ {
 namespace Ui {
 namespace Icon_utils {
 
-QPixmap pixmap_for_background (string file_name, QColor &background_color);
-QImage create_svg_image_with_custom_color (string file_name, QColor &custom_color, QSize original_size = nullptr, QSize &requested_size = {});
-QPixmap create_svg_pixmap_with_custom_color_cached (string file_name, QColor &custom_color, QSize original_size = nullptr, QSize &requested_size = {});
-QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_color, QSize original_size = nullptr, QSize &requested_size = {});
+QPixmap pixmap_for_background (string filename, Gtk.Color background_color);
+QImage create_svg_image_with_custom_color (string filename, Gtk.Color custom_color, QSize original_size = nullptr, QSize requested_size = {});
+QPixmap create_svg_pixmap_with_custom_color_cached (string filename, Gtk.Color custom_color, QSize original_size = nullptr, QSize requested_size = {});
+QImage draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fill_color, QSize original_size = nullptr, QSize requested_size = {});
 
-    QPixmap pixmap_for_background (string file_name, QColor &background_color) {
-        Q_ASSERT (!file_name.is_empty ());
+    QPixmap pixmap_for_background (string filename, Gtk.Color background_color) {
+        Q_ASSERT (!filename.is_empty ());
 
         const var pixmap_color = background_color.is_valid () && !Theme.is_dark_color (background_color)
             ? QColor_constants.Svg.black
             : QColor_constants.Svg.white;
         ;
-        return create_svg_pixmap_with_custom_color_cached (file_name, pixmap_color);
+        return create_svg_pixmap_with_custom_color_cached (filename, pixmap_color);
     }
 
-    QImage create_svg_image_with_custom_color (string file_name, QColor &custom_color, QSize original_size, QSize &requested_size) {
-        Q_ASSERT (!file_name.is_empty ());
+    QImage create_svg_image_with_custom_color (string filename, Gtk.Color custom_color, QSize original_size, QSize requested_size) {
+        Q_ASSERT (!filename.is_empty ());
         Q_ASSERT (custom_color.is_valid ());
 
         QImage result{};
 
-        if (file_name.is_empty () || !custom_color.is_valid ()) {
-            q_warning (lc_icon_utils) << "invalid file_name or custom_color";
+        if (filename.is_empty () || !custom_color.is_valid ()) {
+            q_warning (lc_icon_utils) << "invalid filename or custom_color";
             return result;
         }
 
@@ -84,7 +84,7 @@ QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_col
             } ();
 
             if (icon_base_colors.contains (custom_color_name)) {
-                result = QImage{string{Occ.Theme.theme_prefix} + custom_color_name + QStringLiteral ("/") + file_name};
+                result = QImage{string{Occ.Theme.theme_prefix} + custom_color_name + QStringLiteral ("/") + filename};
                 if (!result.is_null ()) {
                     return result;
                 }
@@ -92,11 +92,11 @@ QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_col
         }
 
         // find the first matching svg file
-        const var source_svg = find_svg_file_path (file_name, icon_base_colors);
+        const var source_svg = find_svg_file_path (filename, icon_base_colors);
 
         Q_ASSERT (!source_svg.is_empty ());
         if (source_svg.is_empty ()) {
-            q_warning (lc_icon_utils) << "Failed to find base SVG file for" << file_name;
+            q_warning (lc_icon_utils) << "Failed to find base SVG file for" << filename;
             return result;
         }
 
@@ -104,28 +104,28 @@ QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_col
 
         Q_ASSERT (!result.is_null ());
         if (result.is_null ()) {
-            q_warning (lc_icon_utils) << "Failed to load pixmap for" << file_name;
+            q_warning (lc_icon_utils) << "Failed to load pixmap for" << filename;
         }
 
         return result;
     }
 
-    QPixmap create_svg_pixmap_with_custom_color_cached (string file_name, QColor &custom_color, QSize original_size, QSize &requested_size) {
+    QPixmap create_svg_pixmap_with_custom_color_cached (string filename, Gtk.Color custom_color, QSize original_size, QSize requested_size) {
         QPixmap cached_pixmap;
 
         const var custom_color_name = custom_color.name ();
 
-        const string cache_key = file_name + QStringLiteral (",") + custom_color_name;
+        const string cache_key = filename + QStringLiteral (",") + custom_color_name;
 
         // check for existing QPixmap in cache
-        if (QPixmapCache.find (cache_key, &cached_pixmap)) {
+        if (QPixmapCache.find (cache_key, cached_pixmap)) {
             if (original_size) {
                 *original_size = {};
             }
             return cached_pixmap;
         }
 
-        cached_pixmap = QPixmap.from_image (create_svg_image_with_custom_color (file_name, custom_color, original_size, requested_size));
+        cached_pixmap = QPixmap.from_image (create_svg_image_with_custom_color (filename, custom_color, original_size, requested_size));
 
         if (!cached_pixmap.is_null ()) {
             QPixmapCache.insert (cache_key, cached_pixmap);
@@ -135,7 +135,7 @@ QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_col
     }
 
     QImage draw_svg_with_custom_fill_color (
-        const string source_svg_path, QColor &fill_color, QSize original_size, QSize &requested_size) {
+        const string source_svg_path, Gtk.Color fill_color, QSize original_size, QSize requested_size) {
         QSvgRenderer svg_renderer;
 
         if (!svg_renderer.on_load (source_svg_path)) {
@@ -158,7 +158,7 @@ QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_col
 
         // draw target image with custom fill_color
         QImage image (req_size, QImage.Format_ARGB32);
-        image.fill (QColor (fill_color)); {
+        image.fill (Gtk.Color (fill_color)); {
             QPainter image_painter (&image);
             image_painter.set_composition_mode (QPainter.Composition_mode_Destination_in);
             image_painter.draw_image (0, 0, svg_image);

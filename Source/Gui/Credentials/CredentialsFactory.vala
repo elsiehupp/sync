@@ -5,7 +5,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 ***********************************************************/
 
 // #include <QLoggingCategory>
-// #include <string>
 
 
 namespace Occ {
@@ -30,6 +29,6 @@ namespace CredentialsFactory {
         }
     }
 
-} // ns CredentialsFactory
+} // namespace CredentialsFactory
 
 } // namespace Occ

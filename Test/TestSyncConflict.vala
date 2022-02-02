@@ -10,23 +10,23 @@
 
 using namespace Occ;
 
-bool itemSuccessful (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
+bool itemSuccessful (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
-    return item._status == SyncFileItem.Success && item._instruction == instr;
+    return item._status == SyncFileItem.Status.SUCCESS && item._instruction == instr;
 }
 
-bool itemConflict (ItemCompletedSpy &spy, string path) {
+bool itemConflict (ItemCompletedSpy spy, string path) {
     var item = spy.findItem (path);
-    return item._status == SyncFileItem.Conflict && item._instruction == CSYNC_INSTRUCTION_CONFLICT;
+    return item._status == SyncFileItem.Status.CONFLICT && item._instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
-bool itemSuccessfulMove (ItemCompletedSpy &spy, string path) {
+bool itemSuccessfulMove (ItemCompletedSpy spy, string path) {
     return itemSuccessful (spy, path, CSYNC_INSTRUCTION_RENAME);
 }
 
-string[] findConflicts (FileInfo &dir) {
+string[] findConflicts (FileInfo dir) {
     string[] conflicts;
-    for (var &item : dir.children) {
+    for (var item : dir.children) {
         if (item.name.contains (" (conflicted copy")) {
             conflicts.append (item.path ());
         }
@@ -34,12 +34,12 @@ string[] findConflicts (FileInfo &dir) {
     return conflicts;
 }
 
-bool expectAndWipeConflict (FileModifier &local, FileInfo state, string path) {
+bool expectAndWipeConflict (FileModifier local, FileInfo state, string path) {
     PathComponents pathComponents (path);
     var base = state.find (pathComponents.parentDirComponents ());
     if (!base)
         return false;
-    for (var &item : base.children) {
+    for (var item : base.children) {
         if (item.name.startsWith (pathComponents.fileName ()) && item.name.contains (" (conflicted copy")) {
             local.remove (item.path ());
             return true;
@@ -48,9 +48,9 @@ bool expectAndWipeConflict (FileModifier &local, FileInfo state, string path) {
     return false;
 }
 
-SyncJournalFileRecord dbRecord (FakeFolder &folder, string path) {
+SyncJournalFileRecord dbRecord (FakeFolder folder, string path) {
     SyncJournalFileRecord record;
-    folder.syncJournal ().getFileRecord (path, &record);
+    folder.syncJournal ().getFileRecord (path, record);
     return record;
 }
 
@@ -70,7 +70,7 @@ class TestSyncConflict : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
 
         // Verify that the conflict names don't have the user name
-        for (var &name : findConflicts (fakeFolder.currentLocalState ().children["A"])) {
+        for (var name : findConflicts (fakeFolder.currentLocalState ().children["A"])) {
             QVERIFY (!name.contains (fakeFolder.syncEngine ().account ().davDisplayName ()));
         }
 
@@ -88,7 +88,7 @@ class TestSyncConflict : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
         QMap<GLib.ByteArray, string> conflictMap;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 if (request.rawHeader ("OC-Conflict") == "1") {
                     var baseFileId = request.rawHeader ("OC-ConflictBaseFileId");
@@ -140,7 +140,7 @@ class TestSyncConflict : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
         QMap<GLib.ByteArray, string> conflictMap;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 if (request.rawHeader ("OC-Conflict") == "1") {
                     var baseFileId = request.rawHeader ("OC-ConflictBaseFileId");
@@ -221,9 +221,9 @@ class TestSyncConflict : GLib.Object {
         // Now with server headers
         GLib.Object parent;
         var a2FileId = fakeFolder.remoteModifier ().find ("A/a2").fileId;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.GetOperation) {
-                var reply = new FakeGetReply (fakeFolder.remoteModifier (), op, request, &parent);
+                var reply = new FakeGetReply (fakeFolder.remoteModifier (), op, request, parent);
                 reply.setRawHeader ("OC-Conflict", "1");
                 reply.setRawHeader ("OC-ConflictBaseFileId", a2FileId);
                 reply.setRawHeader ("OC-ConflictBaseMtime", "1234");
@@ -376,7 +376,7 @@ class TestSyncConflict : GLib.Object {
             << "a/b/foo (conflicted copy 123) (conflicted copy 456).txt"
             << "a/b/foo (conflicted copy 123).txt";
         QTest.newRow ("double4")
-            << "a/b/foo (conflicted copy 123)_conflict-456.txt"
+            << "a/b/foo (conflicted copy 123)this.conflict-456.txt"
             << "a/b/foo (conflicted copy 123).txt";
         QTest.newRow ("double5")
             << "a/b/foo_conflict-123 (conflicted copy 456).txt"

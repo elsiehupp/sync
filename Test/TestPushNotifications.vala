@@ -5,7 +5,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 ***********************************************************/
 
 // #include <QTest>
-// #include <QVector>
+// #include <GLib.Vector>
 // #include <QWebSocketServer>
 // #include <QSignalSpy>
 
@@ -14,7 +14,7 @@ const int RETURN_FALSE_ON_FAIL (expr)
         return false;
     }
 
-bool verifyCalledOnceWithAccount (QSignalSpy &spy, Occ.AccountPointer account) {
+bool verifyCalledOnceWithAccount (QSignalSpy spy, Occ.AccountPointer account) {
     RETURN_FALSE_ON_FAIL (spy.count () == 1);
     var accountFromSpy = spy.at (0).at (0).value<Occ.Account> ();
     RETURN_FALSE_ON_FAIL (accountFromSpy == account.data ());
@@ -22,7 +22,7 @@ bool verifyCalledOnceWithAccount (QSignalSpy &spy, Occ.AccountPointer account) {
     return true;
 }
 
-bool failThreeAuthenticationAttempts (FakeWebSocketServer &fakeServer, Occ.AccountPointer account) {
+bool failThreeAuthenticationAttempts (FakeWebSocketServer fakeServer, Occ.AccountPointer account) {
     RETURN_FALSE_ON_FAIL (account);
     RETURN_FALSE_ON_FAIL (account.pushNotifications ());
 
@@ -213,7 +213,7 @@ class TestPushNotifications : GLib.Object {
         // The websocket that is retrived through the server is not connected to the ssl error signal.
         var pushNotificationsWebSocketChildren = account.pushNotifications ().findChildren<QWebSocket> ();
         QVERIFY (pushNotificationsWebSocketChildren.size () == 1);
-        emit pushNotificationsWebSocketChildren[0].sslErrors (GLib.List<QSslError> ());
+        /* emit */ pushNotificationsWebSocketChildren[0].sslErrors (GLib.List<QSslError> ());
 
         // Account handled connectionLost signal and the authenticationFailed Signal should be emitted
         QCOMPARE (pushNotificationsDisabledSpy.count (), 1);

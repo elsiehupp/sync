@@ -64,9 +64,9 @@ static int setup_testenv (void **state) {
     rc = oc_mkdir (dir);
     assert_int_equal (rc, 0);
 
-    assert_non_null (_tgetcwd (wd_buffer, WD_BUFFER_SIZE));
+    assert_non_null (this.tgetcwd (wd_buffer, WD_BUFFER_SIZE));
 
-    rc = _tchdir (dir.toLocal8Bit ().constData ());
+    rc = this.tchdir (dir.toLocal8Bit ().constData ());
 
     assert_int_equal (rc, 0);
 
@@ -85,7 +85,7 @@ static int teardown (void **state) {
 
     output ("================== Tearing down!\n");
 
-    rc = _tchdir (wd_buffer);
+    rc = this.tchdir (wd_buffer);
     assert_int_equal (rc, 0);
 
     rc = wipe_testdir ();
@@ -100,8 +100,8 @@ and creates each sub directory.
 ***********************************************************/
 static void create_dirs ( const char path ) {
   int rc = -1;
-  var _mypath = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, string.fromUtf8 (path)).toUtf8 ();
-  char mypath = _mypath.data ();
+  var this.mypath = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, string.fromUtf8 (path)).toUtf8 ();
+  char mypath = this.mypath.data ();
 
   char p = mypath + CSYNC_TEST_DIR.size () + 1; /* on_start behind the offset */
   int i = 0;
@@ -199,7 +199,7 @@ static void check_readdir_shorttree (void **state) {
     create_dirs ( t1 );
     int files_cnt = 0;
 
-    traverse_dir (state, CSYNC_TEST_DIR, &files_cnt);
+    traverse_dir (state, CSYNC_TEST_DIR, files_cnt);
 
     assert_string_equal (sv.result.constData (),
         string.fromUtf8 ("<DIR> %1/alibaba"
@@ -223,7 +223,7 @@ static void check_readdir_with_content (void **state) {
     create_file ( t1, "Räuber Max.txt", "Der Max ist ein schlimmer finger");
     create_file ( t1, "пя́тница.txt", "Am Freitag tanzt der Ürk");
 
-    traverse_dir (state, CSYNC_TEST_DIR, &files_cnt);
+    traverse_dir (state, CSYNC_TEST_DIR, files_cnt);
 
     assert_string_equal (sv.result.constData (),
         string.fromUtf8 ("<DIR> %1/warum"
@@ -298,7 +298,7 @@ static void check_readdir_longtree (void **state) {
     /* assemble the result string ... */
     const var result = (r1 + r2 + r3).toUtf8 ();
     int files_cnt = 0;
-    traverse_dir (state, CSYNC_TEST_DIR, &files_cnt);
+    traverse_dir (state, CSYNC_TEST_DIR, files_cnt);
     assert_int_equal (files_cnt, 0);
     /* and compare. */
     assert_string_equal (sv.result.constData (), result.constData ());
@@ -323,7 +323,7 @@ static void check_readdir_bigunicode (void **state) {
     assert_int_equal (rc, 0);
 
     int files_cnt = 0;
-    traverse_dir (state, CSYNC_TEST_DIR, &files_cnt);
+    traverse_dir (state, CSYNC_TEST_DIR, files_cnt);
     const var expected_result = QStringLiteral ("<DIR> %1/goodone"
                                                 "<DIR> %1/goodone/ugly\xEF\xBB\xBF\x32.txt")
                                      .arg (CSYNC_TEST_DIR);

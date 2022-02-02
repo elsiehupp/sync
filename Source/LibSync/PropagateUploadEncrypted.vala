@@ -1,6 +1,5 @@
 
 
-// #include <string>
 // #include <QMap>
 // #include <QJsonDocument>
 // #include <QNetworkReply>
@@ -46,7 +45,7 @@ class Propagate_upload_encrypted : GLib.Object {
     ***********************************************************/
     public 
     public bool is_unlock_running () {
-        return _is_unlock_running;
+        return this.is_unlock_running;
     }
 
 
@@ -60,18 +59,18 @@ class Propagate_upload_encrypted : GLib.Object {
     ***********************************************************/
     public 
     public const GLib.ByteArray folder_token () {
-        return _folder_token;
+        return this.folder_token;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_folder_encrypted_id_received (string[] &list);
+    private void on_folder_encrypted_id_received (string[] list);
     private void on_folder_encrypted_id_error (QNetworkReply r);
     private void on_folder_locked_successfully (GLib.ByteArray& file_id, GLib.ByteArray& token);
     private void on_folder_locked_error (GLib.ByteArray& file_id, int http_error_code);
     private void on_try_lock (GLib.ByteArray& file_id);
-    private void on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code);
+    private void on_folder_encrypted_metadata_received (QJsonDocument json, int status_code);
     private void on_folder_encrypted_metadata_error (GLib.ByteArray& file_id, int http_return_code);
     private void on_update_metadata_success (GLib.ByteArray& file_id);
     private void on_update_metadata_error (GLib.ByteArray& file_id, int http_return_code);
@@ -85,13 +84,13 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private OwncloudPropagator _propagator;
-    private string _remote_parent_path;
-    private SyncFileItemPtr _item;
+    private OwncloudPropagator this.propagator;
+    private string this.remote_parent_path;
+    private SyncFileItemPtr this.item;
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray _folder_token;
+    private GLib.ByteArray this.folder_token;
 
     /***********************************************************
     ***********************************************************/
@@ -99,34 +98,34 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private bool _current_locking_in_progress = false;
+    private bool this.current_locking_in_progress = false;
 
     /***********************************************************
     ***********************************************************/
-    private bool _is_unlock_running = false;
-    private bool _is_folder_locked = false;
+    private bool this.is_unlock_running = false;
+    private bool this.is_folder_locked = false;
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray _generated_key;
-    private GLib.ByteArray _generated_iv;
-    private FolderMetadata _metadata;
-    private EncryptedFile _encrypted_file;
-    private string _complete_file_name;
+    private GLib.ByteArray this.generated_key;
+    private GLib.ByteArray this.generated_iv;
+    private FolderMetadata this.metadata;
+    private EncryptedFile this.encrypted_file;
+    private string this.complete_filename;
 };
 
 
   Propagate_upload_encrypted.Propagate_upload_encrypted (OwncloudPropagator propagator, string remote_parent_path, SyncFileItemPtr item, GLib.Object parent)
       : GLib.Object (parent)
-      , _propagator (propagator)
-      , _remote_parent_path (remote_parent_path)
-      , _item (item)
-      , _metadata (nullptr) {
+      , this.propagator (propagator)
+      , this.remote_parent_path (remote_parent_path)
+      , this.item (item)
+      , this.metadata (nullptr) {
   }
 
   void Propagate_upload_encrypted.on_start () {
       const var root_path = [=] () {
-          const var result = _propagator.remote_path ();
+          const var result = this.propagator.remote_path ();
           if (result.starts_with ('/')) {
               return result.mid (1);
           } else {
@@ -134,7 +133,7 @@ signals:
           }
       } ();
       const var absolute_remote_parent_path = [=]{
-          var path = string (root_path + _remote_parent_path);
+          var path = string (root_path + this.remote_parent_path);
           if (path.ends_with ('/')) {
               path.chop (1);
           }
@@ -152,7 +151,7 @@ signals:
       unlock the folder.
        */
       GLib.debug (lc_propagate_upload_encrypted) << "Folder is encrypted, let's get the Id from it.";
-      var job = new LsColJob (_propagator.account (), absolute_remote_parent_path, this);
+      var job = new LsColJob (this.propagator.account (), absolute_remote_parent_path, this);
       job.set_properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
       connect (job, &LsColJob.directory_listing_subfolders, this, &Propagate_upload_encrypted.on_folder_encrypted_id_received);
       connect (job, &LsColJob.finished_with_error, this, &Propagate_upload_encrypted.on_folder_encrypted_id_error);
@@ -168,16 +167,16 @@ signals:
                                           . on_success.
   ***********************************************************/
 
-  void Propagate_upload_encrypted.on_folder_encrypted_id_received (string[] &list) {
+  void Propagate_upload_encrypted.on_folder_encrypted_id_received (string[] list) {
     GLib.debug (lc_propagate_upload_encrypted) << "Received id of folder, trying to lock it so we can prepare the metadata";
     var job = qobject_cast<LsColJob> (sender ());
     const var& folder_info = job._folder_infos.value (list.first ());
-    _folder_lock_first_try.on_start ();
+    this.folder_lock_first_try.on_start ();
     on_try_lock (folder_info.file_id);
   }
 
   void Propagate_upload_encrypted.on_try_lock (GLib.ByteArray& file_id) {
-    var lock_job = new LockEncryptFolderApiJob (_propagator.account (), file_id, this);
+    var lock_job = new LockEncryptFolderApiJob (this.propagator.account (), file_id, this);
     connect (lock_job, &LockEncryptFolderApiJob.on_success, this, &Propagate_upload_encrypted.on_folder_locked_successfully);
     connect (lock_job, &LockEncryptFolderApiJob.error, this, &Propagate_upload_encrypted.on_folder_locked_error);
     lock_job.on_start ();
@@ -186,12 +185,12 @@ signals:
   void Propagate_upload_encrypted.on_folder_locked_successfully (GLib.ByteArray& file_id, GLib.ByteArray& token) {
     GLib.debug (lc_propagate_upload_encrypted) << "Folder" << file_id << "Locked Successfully for Upload, Fetching Metadata";
     // Should I use a mutex here?
-    _current_locking_in_progress = true;
-    _folder_token = token;
-    _folder_id = file_id;
-    _is_folder_locked = true;
+    this.current_locking_in_progress = true;
+    this.folder_token = token;
+    this.folder_id = file_id;
+    this.is_folder_locked = true;
 
-    var job = new GetMetadataApiJob (_propagator.account (), _folder_id);
+    var job = new GetMetadataApiJob (this.propagator.account (), this.folder_id);
     connect (job, &GetMetadataApiJob.json_received,
             this, &Propagate_upload_encrypted.on_folder_encrypted_metadata_received);
     connect (job, &GetMetadataApiJob.error,
@@ -204,28 +203,28 @@ signals:
       Q_UNUSED (file_id);
       Q_UNUSED (http_return_code);
       GLib.debug (lc_propagate_upload_encrypted ()) << "Error Getting the encrypted metadata. Pretend we got empty metadata.";
-      FolderMetadata empty_metadata (_propagator.account ());
+      FolderMetadata empty_metadata (this.propagator.account ());
       empty_metadata.encrypted_metadata ();
       var json = QJsonDocument.from_json (empty_metadata.encrypted_metadata ());
       on_folder_encrypted_metadata_received (json, http_return_code);
   }
 
-  void Propagate_upload_encrypted.on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code) {
+  void Propagate_upload_encrypted.on_folder_encrypted_metadata_received (QJsonDocument json, int status_code) {
     GLib.debug (lc_propagate_upload_encrypted) << "Metadata Received, Preparing it for the new file." << json.to_variant ();
 
     // Encrypt File!
-    _metadata = new FolderMetadata (_propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
+    this.metadata = new FolderMetadata (this.propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
 
-    QFileInfo info (_propagator.full_local_path (_item._file));
-    const string file_name = info.file_name ();
+    QFileInfo info (this.propagator.full_local_path (this.item._file));
+    const string filename = info.filename ();
 
     // Find existing metadata for this file
     bool found = false;
     EncryptedFile encrypted_file;
-    const QVector<EncryptedFile> files = _metadata.files ();
+    const GLib.Vector<EncryptedFile> files = this.metadata.files ();
 
-    for (EncryptedFile &file : files) {
-      if (file.original_filename == file_name) {
+    for (EncryptedFile file : files) {
+      if (file.original_filename == filename) {
         encrypted_file = file;
         found = true;
       }
@@ -238,7 +237,7 @@ signals:
         encrypted_file.initialization_vector = EncryptionHelper.generate_random (16);
         encrypted_file.file_version = 1;
         encrypted_file.metadata_key = 1;
-        encrypted_file.original_filename = file_name;
+        encrypted_file.original_filename = filename;
 
         QMimeDatabase mdatabase;
         encrypted_file.mimetype = mdatabase.mime_type_for_file (info).name ().to_local8Bit ();
@@ -250,13 +249,13 @@ signals:
         }
     }
 
-    _item._encrypted_file_name = _remote_parent_path + '/' + encrypted_file.encrypted_filename;
-    _item._is_encrypted = true;
+    this.item._encrypted_filename = this.remote_parent_path + '/' + encrypted_file.encrypted_filename;
+    this.item._is_encrypted = true;
 
     GLib.debug (lc_propagate_upload_encrypted) << "Creating the encrypted file.";
 
     if (info.is_dir ()) {
-        _complete_file_name = encrypted_file.encrypted_filename;
+        this.complete_filename = encrypted_file.encrypted_filename;
     } else {
         GLib.File input (info.absolute_file_path ());
         GLib.File output (QDir.temp_path () + QDir.separator () + encrypted_file.encrypted_filename);
@@ -265,7 +264,7 @@ signals:
         bool encryption_result = EncryptionHelper.file_encryption (
           encrypted_file.encryption_key,
           encrypted_file.initialization_vector,
-          &input, &output, tag);
+          input, output, tag);
 
         if (!encryption_result) {
           GLib.debug (lc_propagate_upload_encrypted ()) << "There was an error encrypting the file, aborting upload.";
@@ -275,28 +274,28 @@ signals:
         }
 
         encrypted_file.authentication_tag = tag;
-        _complete_file_name = output.file_name ();
+        this.complete_filename = output.filename ();
     }
 
     GLib.debug (lc_propagate_upload_encrypted) << "Creating the metadata for the encrypted file.";
 
-    _metadata.add_encrypted_file (encrypted_file);
-    _encrypted_file = encrypted_file;
+    this.metadata.add_encrypted_file (encrypted_file);
+    this.encrypted_file = encrypted_file;
 
     GLib.debug (lc_propagate_upload_encrypted) << "Metadata created, sending to the server.";
 
     if (status_code == 404) {
-      var job = new StoreMetaDataApiJob (_propagator.account (),
-                                         _folder_id,
-                                         _metadata.encrypted_metadata ());
+      var job = new StoreMetaDataApiJob (this.propagator.account (),
+                                         this.folder_id,
+                                         this.metadata.encrypted_metadata ());
       connect (job, &StoreMetaDataApiJob.on_success, this, &Propagate_upload_encrypted.on_update_metadata_success);
       connect (job, &StoreMetaDataApiJob.error, this, &Propagate_upload_encrypted.on_update_metadata_error);
       job.on_start ();
     } else {
-      var job = new UpdateMetadataApiJob (_propagator.account (),
-                                        _folder_id,
-                                        _metadata.encrypted_metadata (),
-                                        _folder_token);
+      var job = new UpdateMetadataApiJob (this.propagator.account (),
+                                        this.folder_id,
+                                        this.metadata.encrypted_metadata (),
+                                        this.folder_token);
 
       connect (job, &UpdateMetadataApiJob.on_success, this, &Propagate_upload_encrypted.on_update_metadata_success);
       connect (job, &UpdateMetadataApiJob.error, this, &Propagate_upload_encrypted.on_update_metadata_error);
@@ -307,12 +306,12 @@ signals:
   void Propagate_upload_encrypted.on_update_metadata_success (GLib.ByteArray& file_id) {
       Q_UNUSED (file_id);
       GLib.debug (lc_propagate_upload_encrypted) << "Uploading of the metadata on_success, Encrypting the file";
-      QFileInfo output_info (_complete_file_name);
+      QFileInfo output_info (this.complete_filename);
 
-      GLib.debug (lc_propagate_upload_encrypted) << "Encrypted Info:" << output_info.path () << output_info.file_name () << output_info.size ();
+      GLib.debug (lc_propagate_upload_encrypted) << "Encrypted Info:" << output_info.path () << output_info.filename () << output_info.size ();
       GLib.debug (lc_propagate_upload_encrypted) << "Finalizing the upload part, now the actuall uploader will take over";
-      emit finalized (output_info.path () + '/' + output_info.file_name (),
-                     _remote_parent_path + '/' + output_info.file_name (),
+      /* emit */ finalized (output_info.path () + '/' + output_info.filename (),
+                     this.remote_parent_path + '/' + output_info.filename (),
                      output_info.size ());
   }
 
@@ -328,7 +327,7 @@ signals:
       /* try to call the lock from 5 to 5 seconds
       and fail if it's more than 5 minutes. */
       QTimer.single_shot (5000, this, [this, file_id]{
-          if (!_current_locking_in_progress) {
+          if (!this.current_locking_in_progress) {
               GLib.debug (lc_propagate_upload_encrypted) << "Error locking the folder while no other update is locking it up.";
               GLib.debug (lc_propagate_upload_encrypted) << "Perhaps another client locked it.";
               GLib.debug (lc_propagate_upload_encrypted) << "Abort";
@@ -336,7 +335,7 @@ signals:
           }
 
           // Perhaps I should remove the elapsed timer if the lock is from this client?
-          if (_folder_lock_first_try.elapsed () > /* five minutes */ 1000 * 60 * 5 ) {
+          if (this.folder_lock_first_try.elapsed () > /* five minutes */ 1000 * 60 * 5 ) {
               GLib.debug (lc_propagate_upload_encrypted) << "One minute passed, ignoring more attempts to lock the folder.";
           return;
           }
@@ -352,33 +351,33 @@ signals:
   }
 
   void Propagate_upload_encrypted.unlock_folder () {
-      ASSERT (!_is_unlock_running);
+      ASSERT (!this.is_unlock_running);
 
-      if (_is_unlock_running) {
+      if (this.is_unlock_running) {
           q_warning () << "Double-call to unlock_folder.";
           return;
       }
 
-      _is_unlock_running = true;
+      this.is_unlock_running = true;
 
       q_debug () << "Calling Unlock";
-      var unlock_job = new UnlockEncryptFolderApiJob (_propagator.account (),
-          _folder_id, _folder_token, this);
+      var unlock_job = new UnlockEncryptFolderApiJob (this.propagator.account (),
+          this.folder_id, this.folder_token, this);
 
       connect (unlock_job, &UnlockEncryptFolderApiJob.on_success, [this] (GLib.ByteArray folder_id) {
           q_debug () << "Successfully Unlocked";
-          _folder_token = "";
-          _folder_id = "";
-          _is_folder_locked = false;
+          this.folder_token = "";
+          this.folder_id = "";
+          this.is_folder_locked = false;
 
-          emit folder_unlocked (folder_id, 200);
-          _is_unlock_running = false;
+          /* emit */ folder_unlocked (folder_id, 200);
+          this.is_unlock_running = false;
       });
       connect (unlock_job, &UnlockEncryptFolderApiJob.error, [this] (GLib.ByteArray folder_id, int http_status) {
           q_debug () << "Unlock Error";
 
-          emit folder_unlocked (folder_id, http_status);
-          _is_unlock_running = false;
+          /* emit */ folder_unlocked (folder_id, http_status);
+          this.is_unlock_running = false;
       });
       unlock_job.on_start ();
   }

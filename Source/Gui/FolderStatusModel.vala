@@ -15,7 +15,7 @@ Copyright (C) by Klaas Freitag <freitag@kde.org>
 // #include <accountfwd.h>
 // #include <QAbstractItemModel>
 // #include <QLoggingCategory>
-// #include <QVector>
+// #include <GLib.Vector>
 // #include <QElapsedTimer>
 // #include <QPointer>
 
@@ -42,44 +42,44 @@ class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public Qt.Item_flags flags (QModelIndex &) override;
-    public QVariant data (QModelIndex &index, int role) override;
-    public bool set_data (QModelIndex &index, QVariant &value, int role = Qt.Edit_role) override;
-    public int column_count (QModelIndex &parent = QModelIndex ()) override;
-    public int row_count (QModelIndex &parent = QModelIndex ()) override;
-    public QModelIndex index (int row, int column = 0, QModelIndex &parent = QModelIndex ()) override;
-    public QModelIndex parent (QModelIndex &child) override;
-    public bool can_fetch_more (QModelIndex &parent) override;
-    public void fetch_more (QModelIndex &parent) override;
-    public void reset_and_fetch (QModelIndex &parent);
+    public GLib.Variant data (QModelIndex index, int role) override;
+    public bool set_data (QModelIndex index, GLib.Variant value, int role = Qt.Edit_role) override;
+    public int column_count (QModelIndex parent = QModelIndex ()) override;
+    public int row_count (QModelIndex parent = QModelIndex ()) override;
+    public QModelIndex index (int row, int column = 0, QModelIndex parent = QModelIndex ()) override;
+    public QModelIndex parent (QModelIndex child) override;
+    public bool can_fetch_more (QModelIndex parent) override;
+    public void fetch_more (QModelIndex parent) override;
+    public void reset_and_fetch (QModelIndex parent);
 
 
     /***********************************************************
     ***********************************************************/
-    public bool has_children (QModelIndex &parent = QModelIndex ()) override;
+    public bool has_children (QModelIndex parent = QModelIndex ()) override;
 
     /***********************************************************
     ***********************************************************/
     public struct SubFolderInfo {
-        Folder _folder = nullptr;
-        string _name; // Folder name to be displayed in the UI
-        string _path; // Sub-folder path that should always point to a local filesystem's folder
-        string _e2e_mangled_name; // Mangled name that needs to be used when making fetch requests and should not be used for displaying in the UI
-        QVector<int> _path_idx;
-        QVector<SubFolderInfo> _subs;
-        int64 _size = 0;
-        bool _is_external = false;
-        bool _is_encrypted = false;
+        Folder this.folder = nullptr;
+        string this.name; // Folder name to be displayed in the UI
+        string this.path; // Sub-folder path that should always point to a local filesystem's folder
+        string this.e2e_mangled_name; // Mangled name that needs to be used when making fetch requests and should not be used for displaying in the UI
+        GLib.Vector<int> this.path_idx;
+        GLib.Vector<SubFolderInfo> this.subs;
+        int64 this.size = 0;
+        bool this.is_external = false;
+        bool this.is_encrypted = false;
 
-        bool _fetched = false; // If we did the LSCOL for this folder already
-        QPointer<LsColJob> _fetching_job; // Currently running LsColJob
-        bool _has_error = false; // If the last fetching job ended in an error
-        string _last_error_string;
-        bool _fetching_label = false; // Whether a 'fetching in progress' label is shown.
+        bool this.fetched = false; // If we did the LSCOL for this folder already
+        QPointer<LsColJob> this.fetching_job; // Currently running LsColJob
+        bool this.has_error = false; // If the last fetching job ended in an error
+        string this.last_error_string;
+        bool this.fetching_label = false; // Whether a 'fetching in progress' label is shown.
         // undecided folders are the big folders that the user has not accepted yet
-        bool _is_undecided = false;
-        GLib.ByteArray _file_id; // the file id for this folder on the server.
+        bool this.is_undecided = false;
+        GLib.ByteArray this.file_id; // the file id for this folder on the server.
 
-        Qt.Check_state _checked = Qt.Checked;
+        Qt.Check_state this.checked = Qt.Checked;
 
         // Whether this has a Fetch_label subrow
         bool has_label ();
@@ -90,19 +90,19 @@ class FolderStatusModel : QAbstractItemModel {
         struct Progress {
             bool is_null ()
             {
-                return _progress_string.is_empty () && _warning_count == 0 && _overall_sync_string.is_empty ();
+                return this.progress_string.is_empty () && this.warning_count == 0 && this.overall_sync_string.is_empty ();
             }
-            string _progress_string;
-            string _overall_sync_string;
-            int _warning_count = 0;
-            int _overall_percent = 0;
+            string this.progress_string;
+            string this.overall_sync_string;
+            int this.warning_count = 0;
+            int this.overall_percent = 0;
         };
-        Progress _progress;
+        Progress this.progress;
     };
 
     /***********************************************************
     ***********************************************************/
-    public QVector<SubFolderInfo> _folders;
+    public GLib.Vector<SubFolderInfo> this.folders;
 
     /***********************************************************
     ***********************************************************/
@@ -112,20 +112,20 @@ class FolderStatusModel : QAbstractItemModel {
         AddButton,
         Fetch_label
     };
-    public ItemType classify (QModelIndex &index);
+    public ItemType classify (QModelIndex index);
 
 
     /***********************************************************
     ***********************************************************/
-    public SubFolderInfo info_for_index (QModelIndex &index);
+    public SubFolderInfo info_for_index (QModelIndex index);
 
     /***********************************************************
     ***********************************************************/
     public 
-    public bool is_any_ancestor_encrypted (QModelIndex &index);
+    public bool is_any_ancestor_encrypted (QModelIndex index);
     // If the selective sync check boxes were changed
     public bool is_dirty () {
-        return _dirty;
+        return this.dirty;
     }
 
 
@@ -163,14 +163,14 @@ class FolderStatusModel : QAbstractItemModel {
     public void on_sync_no_pending_big_folders ();
 
 
-    public void on_set_progress (ProgressInfo &progress);
+    public void on_set_progress (ProgressInfo progress);
 
 
     /***********************************************************
     ***********************************************************/
     private void on_update_directories (string[] &);
-    private void on_gather_permissions (string name, QMap<string, string> &properties);
-    private void on_gather_encryption_status (string href, QMap<string, string> &properties);
+    private void on_gather_permissions (string name, QMap<string, string> properties);
+    private void on_gather_encryption_status (string href, QMap<string, string> properties);
     private void on_lscol_finished_with_error (QNetworkReply r);
     private void on_folder_sync_state_change (Folder f);
     private void on_folder_schedule_queue_changed ();
@@ -186,17 +186,17 @@ class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    private string[] create_block_list (Occ.FolderStatusModel.SubFolderInfo &root,
-        const string[] &old_block_list);
-    private const AccountState _account_state = nullptr;
-    private bool _dirty = false; // If the selective sync checkboxes were changed
+    private string[] create_block_list (Occ.FolderStatusModel.SubFolderInfo root,
+        const string[] old_block_list);
+    private const AccountState this.account_state = nullptr;
+    private bool this.dirty = false; // If the selective sync checkboxes were changed
 
     /***********************************************************
     Keeps track of items that are fetching data from the server.
 
     See on_show_pending_fetch_progress ()
     ***********************************************************/
-    private QMap<QPersistent_model_index, QElapsedTimer> _fetching_items;
+    private QMap<QPersistent_model_index, QElapsedTimer> this.fetching_items;
 
 signals:
     void dirty_changed ();
@@ -225,7 +225,7 @@ FolderStatusModel.FolderStatusModel (GLib.Object parent)
 
 FolderStatusModel.~FolderStatusModel () = default;
 
-static bool sort_by_folder_header (FolderStatusModel.SubFolderInfo &lhs, FolderStatusModel.SubFolderInfo &rhs) {
+static bool sort_by_folder_header (FolderStatusModel.SubFolderInfo lhs, FolderStatusModel.SubFolderInfo rhs) {
     return string.compare (lhs._folder.short_gui_remote_path_or_app_name (),
                rhs._folder.short_gui_remote_path_or_app_name (),
                Qt.CaseInsensitive)
@@ -234,9 +234,9 @@ static bool sort_by_folder_header (FolderStatusModel.SubFolderInfo &lhs, FolderS
 
 void FolderStatusModel.set_account_state (AccountState account_state) {
     begin_reset_model ();
-    _dirty = false;
-    _folders.clear ();
-    _account_state = account_state;
+    this.dirty = false;
+    this.folders.clear ();
+    this.account_state = account_state;
 
     connect (FolderMan.instance (), &FolderMan.folder_sync_state_change,
         this, &FolderStatusModel.on_folder_sync_state_change, Qt.UniqueConnection);
@@ -254,26 +254,26 @@ void FolderStatusModel.set_account_state (AccountState account_state) {
         info._path = "/";
         info._folder = f;
         info._checked = Qt.Partially_checked;
-        _folders << info;
+        this.folders << info;
 
         connect (f, &Folder.progress_info, this, &FolderStatusModel.on_set_progress, Qt.UniqueConnection);
         connect (f, &Folder.new_big_folder_discovered, this, &FolderStatusModel.on_new_big_folder, Qt.UniqueConnection);
     }
 
     // Sort by header text
-    std.sort (_folders.begin (), _folders.end (), sort_by_folder_header);
+    std.sort (this.folders.begin (), this.folders.end (), sort_by_folder_header);
 
-    // Set the root _path_idx after the sorting
-    for (int i = 0; i < _folders.size (); ++i) {
-        _folders[i]._path_idx << i;
+    // Set the root this.path_idx after the sorting
+    for (int i = 0; i < this.folders.size (); ++i) {
+        this.folders[i]._path_idx << i;
     }
 
     end_reset_model ();
-    emit dirty_changed ();
+    /* emit */ dirty_changed ();
 }
 
-Qt.Item_flags FolderStatusModel.flags (QModelIndex &index) {
-    if (!_account_state) {
+Qt.Item_flags FolderStatusModel.flags (QModelIndex index) {
+    if (!this.account_state) {
         return {};
     }
 
@@ -284,7 +284,7 @@ Qt.Item_flags FolderStatusModel.flags (QModelIndex &index) {
     case AddButton: {
         Qt.Item_flags ret;
         ret = Qt.Item_never_has_children;
-        if (!_account_state.is_connected ()) {
+        if (!this.account_state.is_connected ()) {
             return ret;
         }
         return Qt.ItemIsEnabled | ret;
@@ -303,27 +303,27 @@ Qt.Item_flags FolderStatusModel.flags (QModelIndex &index) {
     return {};
 }
 
-QVariant FolderStatusModel.data (QModelIndex &index, int role) {
+GLib.Variant FolderStatusModel.data (QModelIndex index, int role) {
     if (!index.is_valid ())
-        return QVariant ();
+        return GLib.Variant ();
 
     if (role == Qt.Edit_role)
-        return QVariant ();
+        return GLib.Variant ();
 
     switch (classify (index)) {
     case AddButton: {
         if (role == FolderStatusDelegate.AddButton) {
-            return QVariant (true);
+            return GLib.Variant (true);
         } else if (role == Qt.ToolTipRole) {
-            if (!_account_state.is_connected ()) {
+            if (!this.account_state.is_connected ()) {
                 return _("You need to be connected to add a folder");
             }
             return _("Click this button to add a folder to synchronize.");
         }
-        return QVariant ();
+        return GLib.Variant ();
     }
     case SubFolder: {
-        const var &x = static_cast<SubFolderInfo> (index.internal_pointer ())._subs.at (index.row ());
+        const var x = static_cast<SubFolderInfo> (index.internal_pointer ())._subs.at (index.row ());
         const var supports_selective_sync = x._folder && x._folder.supports_selective_sync ();
 
         switch (role) {
@@ -336,7 +336,7 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
             if (supports_selective_sync) {
                 return x._checked;
             } else {
-                return QVariant ();
+                return GLib.Variant ();
             }
         case Qt.Decoration_role: {
             if (x._is_encrypted) {
@@ -348,7 +348,7 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
         }
         case Qt.Foreground_role:
             if (x._is_undecided) {
-                return QColor (Qt.red);
+                return Gtk.Color (Qt.red);
             }
             break;
         case File_id_role:
@@ -356,38 +356,38 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
         case FolderStatusDelegate.FolderPathRole: {
             var f = x._folder;
             if (!f)
-                return QVariant ();
-            return QVariant (f.path () + x._path);
+                return GLib.Variant ();
+            return GLib.Variant (f.path () + x._path);
         }
         }
     }
-        return QVariant ();
+        return GLib.Variant ();
     case Fetch_label: {
         const var x = static_cast<SubFolderInfo> (index.internal_pointer ());
         switch (role) {
         case Qt.Display_role:
             if (x._has_error) {
-                return QVariant (_("Error while loading the list of folders from the server.")
+                return GLib.Variant (_("Error while loading the list of folders from the server.")
                     + string ("\n") + x._last_error_string);
             } else {
                 return _("Fetching folder list from server …");
             }
             break;
         default:
-            return QVariant ();
+            return GLib.Variant ();
         }
     }
     case RootFolder:
         break;
     }
 
-    const SubFolderInfo &folder_info = _folders.at (index.row ());
+    const SubFolderInfo folder_info = this.folders.at (index.row ());
     var f = folder_info._folder;
     if (!f)
-        return QVariant ();
+        return GLib.Variant ();
 
-    const SubFolderInfo.Progress &progress = folder_info._progress;
-    const bool account_connected = _account_state.is_connected ();
+    const SubFolderInfo.Progress progress = folder_info._progress;
+    const bool account_connected = this.account_state.is_connected ();
 
     switch (role) {
     case FolderStatusDelegate.FolderPathRole:
@@ -405,7 +405,7 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
             ? string[] (_("Virtual file support is enabled."))
             : string[] ();
     case FolderStatusDelegate.Sync_running:
-        return f.sync_result ().status () == SyncResult.Sync_running;
+        return f.sync_result ().status () == SyncResult.Status.SYNC_RUNNING;
     case FolderStatusDelegate.Sync_date:
         return f.sync_result ().sync_time ();
     case FolderStatusDelegate.Header_role:
@@ -436,17 +436,17 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
             if (f.sync_paused ()) {
                 return theme.folder_disabled_icon ();
             } else {
-                if (status == SyncResult.Sync_prepare || status == SyncResult.Undefined) {
-                    return theme.sync_state_icon (SyncResult.Sync_running);
+                if (status == SyncResult.Status.SYNC_PREPARE || status == SyncResult.Status.UNDEFINED) {
+                    return theme.sync_state_icon (SyncResult.Status.SYNC_RUNNING);
                 } else {
                     // The "Problem" *result* just means some files weren't
                     // synced, so we show "Success" in these cases. But we
                     // do use the "Problem" *icon* for unresolved conflicts.
-                    if (status == SyncResult.Success || status == SyncResult.Problem) {
+                    if (status == SyncResult.Status.SUCCESS || status == SyncResult.Status.PROBLEM) {
                         if (f.sync_result ().has_unresolved_conflicts ()) {
-                            return theme.sync_state_icon (SyncResult.Problem);
+                            return theme.sync_state_icon (SyncResult.Status.PROBLEM);
                         } else {
-                            return theme.sync_state_icon (SyncResult.Success);
+                            return theme.sync_state_icon (SyncResult.Status.SUCCESS);
                         }
                     } else {
                         return theme.sync_state_icon (status);
@@ -471,10 +471,10 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
             return _("Synchronizing with local folder");
         }
     }
-    return QVariant ();
+    return GLib.Variant ();
 }
 
-bool FolderStatusModel.set_data (QModelIndex &index, QVariant &value, int role) {
+bool FolderStatusModel.set_data (QModelIndex index, GLib.Variant value, int role) {
     if (role == Qt.CheckStateRole) {
         var info = info_for_index (index);
         Q_ASSERT (info._folder && info._folder.supports_selective_sync ());
@@ -489,7 +489,7 @@ bool FolderStatusModel.set_data (QModelIndex &index, QVariant &value, int role) 
                 var parent_info = info_for_index (parent);
                 if (parent_info && parent_info._checked != Qt.Checked) {
                     bool has_unchecked = false;
-                    foreach (var &sub, parent_info._subs) {
+                    foreach (var sub, parent_info._subs) {
                         if (sub._checked != Qt.Checked) {
                             has_unchecked = true;
                             break;
@@ -532,9 +532,9 @@ bool FolderStatusModel.set_data (QModelIndex &index, QVariant &value, int role) 
                 }
             }
         }
-        _dirty = true;
-        emit dirty_changed ();
-        emit data_changed (index, index, QVector<int> () << role);
+        this.dirty = true;
+        /* emit */ dirty_changed ();
+        /* emit */ data_changed (index, index, GLib.Vector<int> () << role);
         return true;
     }
     return QAbstractItemModel.set_data (index, value, role);
@@ -544,13 +544,13 @@ int FolderStatusModel.column_count (QModelIndex &) {
     return 1;
 }
 
-int FolderStatusModel.row_count (QModelIndex &parent) {
+int FolderStatusModel.row_count (QModelIndex parent) {
     if (!parent.is_valid ()) {
-        if (Theme.instance ().single_sync_folder () && _folders.count () != 0) {
+        if (Theme.instance ().single_sync_folder () && this.folders.count () != 0) {
             // "Add folder" button not visible in the single_sync_folder configuration.
-            return _folders.count ();
+            return this.folders.count ();
         }
-        return _folders.count () + 1; // +1 for the "add folder" button
+        return this.folders.count () + 1; // +1 for the "add folder" button
     }
     var info = info_for_index (parent);
     if (!info)
@@ -560,7 +560,7 @@ int FolderStatusModel.row_count (QModelIndex &parent) {
     return info._subs.count ();
 }
 
-FolderStatusModel.ItemType FolderStatusModel.classify (QModelIndex &index) {
+FolderStatusModel.ItemType FolderStatusModel.classify (QModelIndex index) {
     if (var sub = static_cast<SubFolderInfo> (index.internal_pointer ())) {
         if (sub.has_label ()) {
             return Fetch_label;
@@ -568,13 +568,13 @@ FolderStatusModel.ItemType FolderStatusModel.classify (QModelIndex &index) {
             return SubFolder;
         }
     }
-    if (index.row () < _folders.count ()) {
+    if (index.row () < this.folders.count ()) {
         return RootFolder;
     }
     return AddButton;
 }
 
-FolderStatusModel.SubFolderInfo *FolderStatusModel.info_for_index (QModelIndex &index) {
+FolderStatusModel.SubFolderInfo *FolderStatusModel.info_for_index (QModelIndex index) {
     if (!index.is_valid ())
         return nullptr;
     if (var parent_info = static_cast<SubFolderInfo> (index.internal_pointer ())) {
@@ -584,17 +584,17 @@ FolderStatusModel.SubFolderInfo *FolderStatusModel.info_for_index (QModelIndex &
         if (index.row () >= parent_info._subs.size ()) {
             return nullptr;
         }
-        return &parent_info._subs[index.row ()];
+        return parent_info._subs[index.row ()];
     } else {
-        if (index.row () >= _folders.count ()) {
+        if (index.row () >= this.folders.count ()) {
             // AddButton
             return nullptr;
         }
-        return const_cast<SubFolderInfo> (&_folders[index.row ()]);
+        return const_cast<SubFolderInfo> (&this.folders[index.row ()]);
     }
 }
 
-bool FolderStatusModel.is_any_ancestor_encrypted (QModelIndex &index) {
+bool FolderStatusModel.is_any_ancestor_encrypted (QModelIndex index) {
     var parent_index = parent (index);
     while (parent_index.is_valid ()) {
         const var info = info_for_index (parent_index);
@@ -615,8 +615,8 @@ QModelIndex FolderStatusModel.index_for_path (Folder f, string path) {
     int slash_pos = path.last_index_of ('/');
     if (slash_pos == -1) {
         // first level folder
-        for (int i = 0; i < _folders.size (); ++i) {
-            var &info = _folders.at (i);
+        for (int i = 0; i < this.folders.size (); ++i) {
+            var info = this.folders.at (i);
             if (info._folder == f) {
                 if (path.is_empty ()) { // the folder object
                     return index (i, 0);
@@ -655,7 +655,7 @@ QModelIndex FolderStatusModel.index_for_path (Folder f, string path) {
     return {};
 }
 
-QModelIndex FolderStatusModel.index (int row, int column, QModelIndex &parent) {
+QModelIndex FolderStatusModel.index (int row, int column, QModelIndex parent) {
     if (!parent.is_valid ()) {
         return create_index (row, column /*, nullptr*/);
     }
@@ -664,24 +664,24 @@ QModelIndex FolderStatusModel.index (int row, int column, QModelIndex &parent) {
     case Fetch_label:
         return {};
     case RootFolder:
-        if (_folders.count () <= parent.row ())
+        if (this.folders.count () <= parent.row ())
             return {}; // should not happen
-        return create_index (row, column, const_cast<SubFolderInfo> (&_folders[parent.row ()]));
+        return create_index (row, column, const_cast<SubFolderInfo> (&this.folders[parent.row ()]));
     case SubFolder: {
         var pinfo = static_cast<SubFolderInfo> (parent.internal_pointer ());
         if (pinfo._subs.count () <= parent.row ())
             return {}; // should not happen
-        var &info = pinfo._subs[parent.row ()];
+        var info = pinfo._subs[parent.row ()];
         if (!info.has_label ()
             && info._subs.count () <= row)
             return {}; // should not happen
-        return create_index (row, column, &info);
+        return create_index (row, column, info);
     }
     }
     return {};
 }
 
-QModelIndex FolderStatusModel.parent (QModelIndex &child) {
+QModelIndex FolderStatusModel.parent (QModelIndex child) {
     if (!child.is_valid ()) {
         return {};
     }
@@ -695,21 +695,21 @@ QModelIndex FolderStatusModel.parent (QModelIndex &child) {
     }
     var path_idx = static_cast<SubFolderInfo> (child.internal_pointer ())._path_idx;
     int i = 1;
-    ASSERT (path_idx.at (0) < _folders.count ());
+    ASSERT (path_idx.at (0) < this.folders.count ());
     if (path_idx.count () == 1) {
         return create_index (path_idx.at (0), 0 /*, nullptr*/);
     }
 
-    const SubFolderInfo info = &_folders[path_idx.at (0)];
+    const SubFolderInfo info = this.folders[path_idx.at (0)];
     while (i < path_idx.count () - 1) {
         ASSERT (path_idx.at (i) < info._subs.count ());
-        info = &info._subs.at (path_idx.at (i));
+        info = info._subs.at (path_idx.at (i));
         ++i;
     }
     return create_index (path_idx.at (i), 0, const_cast<SubFolderInfo> (info));
 }
 
-bool FolderStatusModel.has_children (QModelIndex &parent) {
+bool FolderStatusModel.has_children (QModelIndex parent) {
     if (!parent.is_valid ())
         return true;
 
@@ -726,11 +726,11 @@ bool FolderStatusModel.has_children (QModelIndex &parent) {
     return true;
 }
 
-bool FolderStatusModel.can_fetch_more (QModelIndex &parent) {
-    if (!_account_state) {
+bool FolderStatusModel.can_fetch_more (QModelIndex parent) {
+    if (!this.account_state) {
         return false;
     }
-    if (_account_state.state () != AccountState.Connected) {
+    if (this.account_state.state () != AccountState.Connected) {
         return false;
     }
     var info = info_for_index (parent);
@@ -743,7 +743,7 @@ bool FolderStatusModel.can_fetch_more (QModelIndex &parent) {
     return true;
 }
 
-void FolderStatusModel.fetch_more (QModelIndex &parent) {
+void FolderStatusModel.fetch_more (QModelIndex parent) {
     var info = info_for_index (parent);
 
     if (!info || info._fetched || info._fetching_job)
@@ -758,13 +758,13 @@ void FolderStatusModel.fetch_more (QModelIndex &parent) {
         path += info_path;
     }
 
-    var job = new LsColJob (_account_state.account (), path, this);
+    var job = new LsColJob (this.account_state.account (), path, this);
     info._fetching_job = job;
     var props = GLib.List<GLib.ByteArray> () << "resourcetype"
                                      << "http://owncloud.org/ns:size"
                                      << "http://owncloud.org/ns:permissions"
                                      << "http://owncloud.org/ns:fileid";
-    if (_account_state.account ().capabilities ().client_side_encryption_available ()) {
+    if (this.account_state.account ().capabilities ().client_side_encryption_available ()) {
         props << "http://nextcloud.org/ns:is-encrypted";
     }
     job.set_properties (props);
@@ -782,46 +782,46 @@ void FolderStatusModel.fetch_more (QModelIndex &parent) {
     job.on_start ();
 
     QPersistent_model_index persistent_index (parent);
-    job.set_property (property_parent_index_c, QVariant.from_value (persistent_index));
+    job.set_property (property_parent_index_c, GLib.Variant.from_value (persistent_index));
 
     // Show 'fetching data...' hint after a while.
-    _fetching_items[persistent_index].on_start ();
+    this.fetching_items[persistent_index].on_start ();
     QTimer.single_shot (1000, this, &FolderStatusModel.on_show_fetch_progress);
 }
 
-void FolderStatusModel.reset_and_fetch (QModelIndex &parent) {
+void FolderStatusModel.reset_and_fetch (QModelIndex parent) {
     var info = info_for_index (parent);
     info.reset_subs (this, parent);
     fetch_more (parent);
 }
 
-void FolderStatusModel.on_gather_permissions (string href, QMap<string, string> &map) {
+void FolderStatusModel.on_gather_permissions (string href, QMap<string, string> map) {
     var it = map.find ("permissions");
     if (it == map.end ())
         return;
 
     var job = sender ();
     var permission_map = job.property (property_permission_map).to_map ();
-    job.set_property (property_permission_map, QVariant ()); // avoid a detach of the map while it is modified
+    job.set_property (property_permission_map, GLib.Variant ()); // avoid a detach of the map while it is modified
     ASSERT (!href.ends_with ('/'), "LsColXMLParser.parse should remove the trailing slash before calling us.");
     permission_map[href] = *it;
     job.set_property (property_permission_map, permission_map);
 }
 
-void FolderStatusModel.on_gather_encryption_status (string href, QMap<string, string> &properties) {
+void FolderStatusModel.on_gather_encryption_status (string href, QMap<string, string> properties) {
     var it = properties.find ("is-encrypted");
     if (it == properties.end ())
         return;
 
     var job = sender ();
     var encryption_map = job.property (property_encryption_map).to_map ();
-    job.set_property (property_encryption_map, QVariant ()); // avoid a detach of the map while it is modified
+    job.set_property (property_encryption_map, GLib.Variant ()); // avoid a detach of the map while it is modified
     ASSERT (!href.ends_with ('/'), "LsColXMLParser.parse should remove the trailing slash before calling us.");
     encryption_map[href] = *it;
     job.set_property (property_encryption_map, encryption_map);
 }
 
-void FolderStatusModel.on_update_directories (string[] &list) {
+void FolderStatusModel.on_update_directories (string[] list) {
     var job = qobject_cast<LsColJob> (sender ());
     ASSERT (job);
     QModelIndex idx = qvariant_cast<QPersistent_model_index> (job.property (property_parent_index_c));
@@ -852,9 +852,9 @@ void FolderStatusModel.on_update_directories (string[] &list) {
     bool ok1 = true;
     bool ok2 = true;
     if (parent_info._checked == Qt.Partially_checked) {
-        selective_sync_block_list = parent_info._folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, &ok1);
+        selective_sync_block_list = parent_info._folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
     }
-    var selective_sync_undecided_list = parent_info._folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, &ok2);
+    var selective_sync_undecided_list = parent_info._folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok2);
 
     if (! (ok1 && ok2)) {
         GLib.warn (lc_folder_status) << "Could not retrieve selective sync info from journal";
@@ -877,7 +877,7 @@ void FolderStatusModel.on_update_directories (string[] &list) {
 
     QVarLengthArray<int, 10> undecided_indexes;
 
-    QVector<SubFolderInfo> new_subs;
+    GLib.Vector<SubFolderInfo> new_subs;
     new_subs.reserve (sorted_subfolders.size ());
     foreach (string path, sorted_subfolders) {
         var relative_path = path.mid (path_to_remove.size ());
@@ -894,12 +894,12 @@ void FolderStatusModel.on_update_directories (string[] &list) {
         new_info._path = relative_path;
 
         SyncJournalFileRecord record;
-        parent_info._folder.journal_database ().get_file_record_by_e2e_mangled_name (remove_trailing_slash (relative_path), &record);
+        parent_info._folder.journal_database ().get_file_record_by_e2e_mangled_name (remove_trailing_slash (relative_path), record);
         if (record.is_valid ()) {
             new_info._name = remove_trailing_slash (record._path).split ('/').last ();
             if (record._is_e2e_encrypted && !record._e2e_mangled_name.is_empty ()) {
                 // we must use local path for Settings Dialog's filesystem tree, otherwise open and create new folder actions won't work
-                // hence, we are storing _e2e_mangled_name separately so it can be use later for LsColJob
+                // hence, we are storing this.e2e_mangled_name separately so it can be use later for LsColJob
                 new_info._e2e_mangled_name = relative_path;
                 new_info._path = record._path;
             }
@@ -967,7 +967,7 @@ void FolderStatusModel.on_update_directories (string[] &list) {
         selective_sync_undecided_list.erase (it, selective_sync_undecided_list.end ());
         parent_info._folder.journal_database ().set_selective_sync_list (
             SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, selective_sync_undecided_list);
-        emit dirty_changed ();
+        /* emit */ dirty_changed ();
     }
 }
 
@@ -997,8 +997,8 @@ void FolderStatusModel.on_lscol_finished_with_error (QNetworkReply r) {
     }
 }
 
-string[] FolderStatusModel.create_block_list (FolderStatusModel.SubFolderInfo &root,
-    const string[] &old_block_list) {
+string[] FolderStatusModel.create_block_list (FolderStatusModel.SubFolderInfo root,
+    const string[] old_block_list) {
     switch (root._checked) {
     case Qt.Unchecked:
         return string[] (root._path);
@@ -1027,15 +1027,15 @@ string[] FolderStatusModel.create_block_list (FolderStatusModel.SubFolderInfo &r
 void FolderStatusModel.on_update_folder_state (Folder folder) {
     if (!folder)
         return;
-    for (int i = 0; i < _folders.count (); ++i) {
-        if (_folders.at (i)._folder == folder) {
-            emit data_changed (index (i), index (i));
+    for (int i = 0; i < this.folders.count (); ++i) {
+        if (this.folders.at (i)._folder == folder) {
+            /* emit */ data_changed (index (i), index (i));
         }
     }
 }
 
 void FolderStatusModel.on_apply_selective_sync () {
-    for (var &folder_info : q_as_const (_folders)) {
+    for (var folder_info : q_as_const (this.folders)) {
         if (!folder_info._fetched) {
             folder_info._folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, string[] ());
             continue;
@@ -1043,7 +1043,7 @@ void FolderStatusModel.on_apply_selective_sync () {
         const var folder = folder_info._folder;
 
         bool ok = false;
-        var old_block_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, &ok);
+        var old_block_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (!ok) {
             GLib.warn (lc_folder_status) << "Could not read selective sync list from database.";
             continue;
@@ -1056,10 +1056,10 @@ void FolderStatusModel.on_apply_selective_sync () {
 
         // The folders that were undecided or blocklisted and that are now checked should go on the allow list.
         // The user confirmed them already just now.
-        string[] to_add_to_allow_list = ( (old_block_list_set + folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, &ok).to_set ()) - block_list_set).values ();
+        string[] to_add_to_allow_list = ( (old_block_list_set + folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok).to_set ()) - block_list_set).values ();
 
         if (!to_add_to_allow_list.is_empty ()) {
-            var allow_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, &ok);
+            var allow_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok);
             if (ok) {
                 allow_list += to_add_to_allow_list;
                 folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, allow_list);
@@ -1076,7 +1076,7 @@ void FolderStatusModel.on_apply_selective_sync () {
             }
             //The part that changed should not be read from the DB on next sync because there might be new folders
             // (the ones that are no longer in the blocklist)
-            foreach (var &it, changes) {
+            foreach (var it, changes) {
                 folder.journal_database ().schedule_path_for_remote_discovery (it);
                 folder.on_schedule_path_for_local_discovery (it);
             }
@@ -1087,7 +1087,7 @@ void FolderStatusModel.on_apply_selective_sync () {
     on_reset_folders ();
 }
 
-void FolderStatusModel.on_set_progress (ProgressInfo &progress) {
+void FolderStatusModel.on_set_progress (ProgressInfo progress) {
     var par = qobject_cast<Gtk.Widget> (GLib.Object.parent ());
     if (!par.is_visible ()) {
         return; // for https://github.com/owncloud/client/issues/2648#issuecomment-71377909
@@ -1099,8 +1099,8 @@ void FolderStatusModel.on_set_progress (ProgressInfo &progress) {
     }
 
     int folder_index = -1;
-    for (int i = 0; i < _folders.count (); ++i) {
-        if (_folders.at (i)._folder == f) {
+    for (int i = 0; i < this.folders.count (); ++i) {
+        if (this.folders.at (i)._folder == f) {
             folder_index = i;
             break;
         }
@@ -1109,9 +1109,9 @@ void FolderStatusModel.on_set_progress (ProgressInfo &progress) {
         return;
     }
 
-    var pi = &_folders[folder_index]._progress;
+    var pi = this.folders[folder_index]._progress;
 
-    QVector<int> roles;
+    GLib.Vector<int> roles;
     roles << FolderStatusDelegate.Sync_progress_item_string
           << FolderStatusDelegate.Warning_count
           << Qt.ToolTipRole;
@@ -1119,18 +1119,18 @@ void FolderStatusModel.on_set_progress (ProgressInfo &progress) {
     if (progress.status () == ProgressInfo.Discovery) {
         if (!progress._current_discovered_remote_folder.is_empty ()) {
             pi._overall_sync_string = _("Checking for changes in remote \"%1\"").arg (progress._current_discovered_remote_folder);
-            emit data_changed (index (folder_index), index (folder_index), roles);
+            /* emit */ data_changed (index (folder_index), index (folder_index), roles);
             return;
         } else if (!progress._current_discovered_local_folder.is_empty ()) {
             pi._overall_sync_string = _("Checking for changes in local \"%1\"").arg (progress._current_discovered_local_folder);
-            emit data_changed (index (folder_index), index (folder_index), roles);
+            /* emit */ data_changed (index (folder_index), index (folder_index), roles);
             return;
         }
     }
 
     if (progress.status () == ProgressInfo.Reconcile) {
         pi._overall_sync_string = _("Reconciling changes");
-        emit data_changed (index (folder_index), index (folder_index), roles);
+        /* emit */ data_changed (index (folder_index), index (folder_index), roles);
         return;
     }
 
@@ -1149,32 +1149,32 @@ void FolderStatusModel.on_set_progress (ProgressInfo &progress) {
     uint64 estimated_up_bw = 0;
     uint64 estimated_down_bw = 0;
     string all_filenames;
-    foreach (ProgressInfo.Progress_item &citm, progress._current_items) {
+    foreach (ProgressInfo.Progress_item citm, progress._current_items) {
         if (cur_item_progress == -1 || (ProgressInfo.is_size_dependent (citm._item)
                                          && bigger_item_size < citm._item._size)) {
             cur_item_progress = citm._progress.completed ();
             cur_item = citm._item;
             bigger_item_size = citm._item._size;
         }
-        if (citm._item._direction != SyncFileItem.Up) {
+        if (citm._item._direction != SyncFileItem.Direction.UP) {
             estimated_down_bw += progress.file_progress (citm._item).estimated_bandwidth;
         } else {
             estimated_up_bw += progress.file_progress (citm._item).estimated_bandwidth;
         }
-        var file_name = QFileInfo (citm._item._file).file_name ();
+        var filename = QFileInfo (citm._item._file).filename ();
         if (all_filenames.length () > 0) {
             // : Build a list of file names
-            all_filenames.append (QStringLiteral (", \"%1\"").arg (file_name));
+            all_filenames.append (QStringLiteral (", \"%1\"").arg (filename));
         } else {
             // : Argument is a file name
-            all_filenames.append (QStringLiteral ("\"%1\"").arg (file_name));
+            all_filenames.append (QStringLiteral ("\"%1\"").arg (filename));
         }
     }
     if (cur_item_progress == -1) {
         cur_item_progress = cur_item._size;
     }
 
-    string item_file_name = cur_item._file;
+    string item_filename = cur_item._file;
     string kind_string = Progress.as_action_string (cur_item);
 
     string file_progress_string;
@@ -1186,7 +1186,7 @@ void FolderStatusModel.on_set_progress (ProgressInfo &progress) {
             /***********************************************************
             // : Example text : "uploading foobar.png (1MB of 2MB) time left 2 minutes at a rate of 24Kb/s"
             file_progress_string = _("%1 %2 (%3 of %4) %5 left at a rate of %6/s")
-                .arg (kind_string, item_file_name, s1, s2,
+                .arg (kind_string, item_filename, s1, s2,
                     Utility.duration_to_descriptive_string (progress.file_progress (cur_item).estimated_eta),
                     Utility.octets_to_string (estimated_bw) );
             */
@@ -1205,11 +1205,11 @@ void FolderStatusModel.on_set_progress (ProgressInfo &progress) {
             }
         } else {
             // : Example text : "uploading foobar.png (2MB of 2MB)"
-            file_progress_string = _("%1 %2 (%3 of %4)").arg (kind_string, item_file_name, s1, s2);
+            file_progress_string = _("%1 %2 (%3 of %4)").arg (kind_string, item_filename, s1, s2);
         }
     } else if (!kind_string.is_empty ()) {
         // : Example text : "uploading foobar.png"
-        file_progress_string = _("%1 %2").arg (kind_string, item_file_name);
+        file_progress_string = _("%1 %2").arg (kind_string, item_filename);
     }
     pi._progress_string = file_progress_string;
 
@@ -1252,7 +1252,7 @@ void FolderStatusModel.on_set_progress (ProgressInfo &progress) {
         overall_percent = q_round (double (completed_size + completed_file) / double (total_size + total_file_count) * 100.0);
     }
     pi._overall_percent = q_bound (0, overall_percent, 100);
-    emit data_changed (index (folder_index), index (folder_index), roles);
+    /* emit */ data_changed (index (folder_index), index (folder_index), roles);
 }
 
 void FolderStatusModel.on_folder_sync_state_change (Folder f) {
@@ -1261,8 +1261,8 @@ void FolderStatusModel.on_folder_sync_state_change (Folder f) {
     }
 
     int folder_index = -1;
-    for (int i = 0; i < _folders.count (); ++i) {
-        if (_folders.at (i)._folder == f) {
+    for (int i = 0; i < this.folders.count (); ++i) {
+        if (this.folders.at (i)._folder == f) {
             folder_index = i;
             break;
         }
@@ -1271,13 +1271,13 @@ void FolderStatusModel.on_folder_sync_state_change (Folder f) {
         return;
     }
 
-    var &pi = _folders[folder_index]._progress;
+    var pi = this.folders[folder_index]._progress;
 
     SyncResult.Status state = f.sync_result ().status ();
-    if (!f.can_sync () || state == SyncResult.Problem || state == SyncResult.Success || state == SyncResult.Error) {
+    if (!f.can_sync () || state == SyncResult.Status.PROBLEM || state == SyncResult.Status.SUCCESS || state == SyncResult.Status.ERROR) {
         // Reset progress info.
         pi = SubFolderInfo.Progress ();
-    } else if (state == SyncResult.NotYetStarted) {
+    } else if (state == SyncResult.Status.NOT_YET_STARTED) {
         FolderMan folder_man = FolderMan.instance ();
         int pos = folder_man.schedule_queue ().index_of (f);
         for (var other : folder_man.map ()) {
@@ -1292,7 +1292,7 @@ void FolderStatusModel.on_folder_sync_state_change (Folder f) {
         }
         pi = SubFolderInfo.Progress ();
         pi._overall_sync_string = message;
-    } else if (state == SyncResult.Sync_prepare) {
+    } else if (state == SyncResult.Status.SYNC_PREPARE) {
         pi = SubFolderInfo.Progress ();
         pi._overall_sync_string = _("Preparing to sync …");
     }
@@ -1301,7 +1301,7 @@ void FolderStatusModel.on_folder_sync_state_change (Folder f) {
     on_update_folder_state (f);
 
     if (f.sync_result ().folder_structure_was_changed ()
-        && (state == SyncResult.Success || state == SyncResult.Problem)) {
+        && (state == SyncResult.Status.SUCCESS || state == SyncResult.Status.PROBLEM)) {
         // There is a new or a removed folder. reset all data
         reset_and_fetch (index (folder_index));
     }
@@ -1315,19 +1315,19 @@ void FolderStatusModel.on_folder_schedule_queue_changed () {
 }
 
 void FolderStatusModel.on_reset_folders () {
-    set_account_state (_account_state);
+    set_account_state (this.account_state);
 }
 
 void FolderStatusModel.on_sync_all_pending_big_folders () {
-    for (int i = 0; i < _folders.count (); ++i) {
-        if (!_folders[i]._fetched) {
-            _folders[i]._folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, string[] ());
+    for (int i = 0; i < this.folders.count (); ++i) {
+        if (!this.folders[i]._fetched) {
+            this.folders[i]._folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, string[] ());
             continue;
         }
-        var folder = _folders.at (i)._folder;
+        var folder = this.folders.at (i)._folder;
 
         bool ok = false;
-        var undecided_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, &ok);
+        var undecided_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok);
         if (!ok) {
             GLib.warn (lc_folder_status) << "Could not read selective sync list from database.";
             return;
@@ -1339,18 +1339,18 @@ void FolderStatusModel.on_sync_all_pending_big_folders () {
         }
 
         // Remove all undecided folders from the blocklist
-        var block_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, &ok);
+        var block_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (!ok) {
             GLib.warn (lc_folder_status) << "Could not read selective sync list from database.";
             return;
         }
-        foreach (var &undecided_folder, undecided_list) {
+        foreach (var undecided_folder, undecided_list) {
             block_list.remove_all (undecided_folder);
         }
         folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
 
         // Add all undecided folders to the allow list
-        var allow_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, &ok);
+        var allow_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok);
         if (!ok) {
             GLib.warn (lc_folder_status) << "Could not read selective sync list from database.";
             return;
@@ -1367,7 +1367,7 @@ void FolderStatusModel.on_sync_all_pending_big_folders () {
         }
         // The part that changed should not be read from the DB on next sync because there might be new folders
         // (the ones that are no longer in the blocklist)
-        foreach (var &it, undecided_list) {
+        foreach (var it, undecided_list) {
             folder.journal_database ().schedule_path_for_remote_discovery (it);
             folder.on_schedule_path_for_local_discovery (it);
         }
@@ -1378,8 +1378,8 @@ void FolderStatusModel.on_sync_all_pending_big_folders () {
 }
 
 void FolderStatusModel.on_sync_no_pending_big_folders () {
-    for (int i = 0; i < _folders.count (); ++i) {
-        var folder = _folders.at (i)._folder;
+    for (int i = 0; i < this.folders.count (); ++i) {
+        var folder = this.folders.at (i)._folder;
 
         // clear the undecided list
         folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, string[] ());
@@ -1393,8 +1393,8 @@ void FolderStatusModel.on_new_big_folder () {
     ASSERT (f);
 
     int folder_index = -1;
-    for (int i = 0; i < _folders.count (); ++i) {
-        if (_folders.at (i)._folder == f) {
+    for (int i = 0; i < this.folders.count (); ++i) {
+        if (this.folders.at (i)._folder == f) {
             folder_index = i;
             break;
         }
@@ -1405,12 +1405,12 @@ void FolderStatusModel.on_new_big_folder () {
 
     reset_and_fetch (index (folder_index));
 
-    emit suggest_expand (index (folder_index));
-    emit dirty_changed ();
+    /* emit */ suggest_expand (index (folder_index));
+    /* emit */ dirty_changed ();
 }
 
 void FolderStatusModel.on_show_fetch_progress () {
-    QMutable_map_iterator<QPersistent_model_index, QElapsedTimer> it (_fetching_items);
+    QMutable_map_iterator<QPersistent_model_index, QElapsedTimer> it (this.fetching_items);
     while (it.has_next ()) {
         it.next ();
         if (it.value ().elapsed () > 800) {
@@ -1432,24 +1432,24 @@ void FolderStatusModel.on_show_fetch_progress () {
 }
 
 bool FolderStatusModel.SubFolderInfo.has_label () {
-    return _has_error || _fetching_label;
+    return this.has_error || this.fetching_label;
 }
 
 void FolderStatusModel.SubFolderInfo.reset_subs (FolderStatusModel model, QModelIndex index) {
-    _fetched = false;
-    if (_fetching_job) {
-        disconnect (_fetching_job, nullptr, model, nullptr);
-        _fetching_job.delete_later ();
-        _fetching_job.clear ();
+    this.fetched = false;
+    if (this.fetching_job) {
+        disconnect (this.fetching_job, nullptr, model, nullptr);
+        this.fetching_job.delete_later ();
+        this.fetching_job.clear ();
     }
     if (has_label ()) {
         model.begin_remove_rows (index, 0, 0);
-        _fetching_label = false;
-        _has_error = false;
+        this.fetching_label = false;
+        this.has_error = false;
         model.end_remove_rows ();
-    } else if (!_subs.is_empty ()) {
-        model.begin_remove_rows (index, 0, _subs.count () - 1);
-        _subs.clear ();
+    } else if (!this.subs.is_empty ()) {
+        model.begin_remove_rows (index, 0, this.subs.count () - 1);
+        this.subs.clear ();
         model.end_remove_rows ();
     }
 }

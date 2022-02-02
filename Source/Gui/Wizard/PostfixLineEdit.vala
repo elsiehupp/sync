@@ -55,7 +55,7 @@ class Postfix_line_edit : QLineEdit {
 
     /***********************************************************
     ***********************************************************/
-    private string _postfix;
+    private string this.postfix;
 };
 
     const int horizontal_margin (4);
@@ -66,19 +66,19 @@ class Postfix_line_edit : QLineEdit {
     }
 
     void Postfix_line_edit.set_postfix (string postfix) {
-        _postfix = postfix;
+        this.postfix = postfix;
         QFont_metrics_f fm (font ());
         QMargins tm = text_margins ();
-        tm.set_right (tm.right () + q_round (fm.width (_postfix)) + vertical_margin);
+        tm.set_right (tm.right () + q_round (fm.width (this.postfix)) + vertical_margin);
         set_text_margins (tm);
     }
 
     string Postfix_line_edit.postfix () {
-        return _postfix;
+        return this.postfix;
     }
 
     string Postfix_line_edit.full_text () {
-        return text () + _postfix;
+        return text () + this.postfix;
     }
 
     void Postfix_line_edit.set_full_text (string text) {
@@ -96,15 +96,15 @@ class Postfix_line_edit : QLineEdit {
         //
         p.set_pen (palette ().color (QPalette.Disabled, QPalette.Text));
         QFont_metrics_f fm (font ());
-        int on_start = rect ().right () - q_round (fm.width (_postfix));
+        int on_start = rect ().right () - q_round (fm.width (this.postfix));
         QStyle_option_frame panel;
         init_style_option (&panel);
-        QRect r = style ().sub_element_rect (QStyle.SE_Line_edit_contents, &panel, this);
+        QRect r = style ().sub_element_rect (QStyle.SE_Line_edit_contents, panel, this);
         r.set_top (r.top () + horizontal_margin - 1);
         QRect postfix_rect (r);
 
         postfix_rect.set_left (on_start - vertical_margin);
-        p.draw_text (postfix_rect, _postfix);
+        p.draw_text (postfix_rect, this.postfix);
     }
 
     } // namespace Occ

@@ -18,12 +18,12 @@ class TestTheme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_hidpi_file_name_dark_background_return_path_to_white_icon () {
+    private void on_test_hidpi_filename_dark_background_return_path_to_white_icon () {
         FakePaintDevice paintDevice;
-        const QColor backgroundColor ("#000000");
+        const Gtk.Color backgroundColor ("#000000");
         const string iconName ("icon-name");
 
-        const var iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, &paintDevice);
+        const var iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, paintDevice);
 
         QCOMPARE (iconPath, ":/client/theme/white/" + iconName + ".png");
     }
@@ -31,12 +31,12 @@ class TestTheme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_hidpi_file_name_light_background_return_path_to_black_icon () {
+    private void on_test_hidpi_filename_light_background_return_path_to_black_icon () {
         FakePaintDevice paintDevice;
-        const QColor backgroundColor ("#ffffff");
+        const Gtk.Color backgroundColor ("#ffffff");
         const string iconName ("icon-name");
 
-        const var iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, &paintDevice);
+        const var iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, paintDevice);
 
         QCOMPARE (iconPath, ":/client/theme/black/" + iconName + ".png");
     }
@@ -44,13 +44,13 @@ class TestTheme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_hidpi_file_name_hidpi_device_return_hidpi_icon_path () {
+    private void on_test_hidpi_filename_hidpi_device_return_hidpi_icon_path () {
         FakePaintDevice paintDevice;
         paintDevice.setHidpi (true);
-        const QColor backgroundColor ("#000000");
+        const Gtk.Color backgroundColor ("#000000");
         const string iconName ("wizard-files");
 
-        const var iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, &paintDevice);
+        const var iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, paintDevice);
 
         QCOMPARE (iconPath, ":/client/theme/white/" + iconName + "@2x.png");
     }
@@ -59,7 +59,7 @@ class TestTheme : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_test_is_dark_color_nextcloud_blue_return_true () {
-        const QColor color (0, 130, 201);
+        const Gtk.Color color (0, 130, 201);
 
         const var result = Occ.Theme.isDarkColor (color);
 
@@ -70,7 +70,7 @@ class TestTheme : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_test_is_dark_color_light_color_return_false () {
-        const QColor color (255, 255, 255);
+        const Gtk.Color color (255, 255, 255);
 
         const var result = Occ.Theme.isDarkColor (color);
 
@@ -81,7 +81,7 @@ class TestTheme : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_test_is_dark_color_dark_color_return_true () {
-        const QColor color (0, 0, 0);
+        const Gtk.Color color (0, 0, 0);
 
         const var result = Occ.Theme.isDarkColor (color);
 

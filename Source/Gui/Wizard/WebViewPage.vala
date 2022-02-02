@@ -45,7 +45,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private OwncloudWizard _oc_wizard;
+    private OwncloudWizard this.oc_wizard;
 
     /***********************************************************
     ***********************************************************/
@@ -53,81 +53,81 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private string _pass;
+    private string this.pass;
 
     /***********************************************************
     ***********************************************************/
-    private bool _use_system_proxy;
+    private bool this.use_system_proxy;
 
     /***********************************************************
     ***********************************************************/
-    private QSize _original_wizard_size;
+    private QSize this.original_wizard_size;
 };
 
 
     Web_view_page.Web_view_page (Gtk.Widget parent)
         : Abstract_credentials_wizard_page () {
-        _oc_wizard = qobject_cast<OwncloudWizard> (parent);
+        this.oc_wizard = qobject_cast<OwncloudWizard> (parent);
 
         q_c_info (lc_wizard_webiew_page ()) << "Time for a webview!";
-        _web_view = new WebView (this);
+        this.web_view = new WebView (this);
 
         var layout = new QVBoxLayout (this);
         layout.set_margin (0);
-        layout.add_widget (_web_view);
+        layout.add_widget (this.web_view);
         set_layout (layout);
 
-        connect (_web_view, &WebView.on_url_catched, this, &Web_view_page.on_url_catched);
+        connect (this.web_view, &WebView.on_url_catched, this, &Web_view_page.on_url_catched);
 
-        //_use_system_proxy = QNetworkProxyFactory.uses_system_configuration ();
+        //this.use_system_proxy = QNetworkProxyFactory.uses_system_configuration ();
     }
 
     Web_view_page.~Web_view_page () = default;
     //{
-    //    QNetworkProxyFactory.set_use_system_configuration (_use_system_proxy);
+    //    QNetworkProxyFactory.set_use_system_configuration (this.use_system_proxy);
     //}
 
     void Web_view_page.initialize_page () {
         //QNetworkProxy.set_application_proxy (QNetworkProxy.application_proxy ());
 
         string url;
-        if (_oc_wizard.registration ()) {
+        if (this.oc_wizard.registration ()) {
             url = "https://nextcloud.com/register";
         } else {
-            url = _oc_wizard.oc_url ();
+            url = this.oc_wizard.oc_url ();
             if (!url.ends_with ('/')) {
                 url += "/";
             }
             url += "index.php/login/flow";
         }
         q_c_info (lc_wizard_webiew_page ()) << "Url to auth at : " << url;
-        _web_view.set_url (GLib.Uri (url));
+        this.web_view.set_url (GLib.Uri (url));
 
-        _original_wizard_size = _oc_wizard.size ();
+        this.original_wizard_size = this.oc_wizard.size ();
         resize_wizard ();
     }
 
     void Web_view_page.resize_wizard () {
         // The webview needs a little bit more space
-        var wizard_size_changed = try_to_set_wizard_size (_original_wizard_size.width () * 2, _original_wizard_size.height () * 2);
+        var wizard_size_changed = try_to_set_wizard_size (this.original_wizard_size.width () * 2, this.original_wizard_size.height () * 2);
 
         if (!wizard_size_changed) {
-            wizard_size_changed = try_to_set_wizard_size (static_cast<int> (_original_wizard_size.width () * 1.5), static_cast<int> (_original_wizard_size.height () * 1.5));
+            wizard_size_changed = try_to_set_wizard_size (static_cast<int> (this.original_wizard_size.width () * 1.5), static_cast<int> (this.original_wizard_size.height () * 1.5));
         }
 
         if (wizard_size_changed) {
-            _oc_wizard.center_window ();
+            this.oc_wizard.center_window ();
         }
     }
 
     bool Web_view_page.try_to_set_wizard_size (int width, int height) {
-        const var window = _oc_wizard.window ();
+        const var window = this.oc_wizard.window ();
         const var screen_geometry = QGuiApplication.screen_at (window.pos ()).geometry ();
         const var window_width = screen_geometry.width ();
         const var window_height = screen_geometry.height ();
 
         if (width < window_width && height < window_height) {
-            _oc_wizard.resize (width, height);
+            this.oc_wizard.resize (width, height);
             return true;
         }
 
@@ -135,8 +135,8 @@ signals:
     }
 
     void Web_view_page.cleanup_page () {
-        _oc_wizard.resize (_original_wizard_size);
-        _oc_wizard.center_window ();
+        this.oc_wizard.resize (this.original_wizard_size);
+        this.oc_wizard.center_window ();
     }
 
     int Web_view_page.next_id () {
@@ -148,7 +148,7 @@ signals:
     }
 
     AbstractCredentials* Web_view_page.get_credentials () {
-        return new WebFlowCredentials (_user, _pass, _oc_wizard._client_ssl_certificate, _oc_wizard._client_ssl_key);
+        return new WebFlowCredentials (this.user, this.pass, this.oc_wizard._client_ssl_certificate, this.oc_wizard._client_ssl_key);
     }
 
     void Web_view_page.set_connected () {
@@ -158,14 +158,14 @@ signals:
     void Web_view_page.on_url_catched (string user, string pass, string host) {
         q_c_info (lc_wizard_webiew_page ()) << "Got user : " << user << ", server : " << host;
 
-        _user = user;
-        _pass = pass;
+        this.user = user;
+        this.pass = pass;
 
-        AccountPointer account = _oc_wizard.account ();
+        AccountPointer account = this.oc_wizard.account ();
         account.set_url (host);
 
         q_c_info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_"";
-        emit connect_to_oc_url (host);
+        /* emit */ connect_to_oc_url (host);
     }
 
     }

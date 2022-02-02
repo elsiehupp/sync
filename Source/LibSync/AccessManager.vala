@@ -34,7 +34,7 @@ class AccessManager : QNetworkAccessManager {
     ***********************************************************/
     public AccessManager (GLib.Object parent = new GLib.Object ());
 
-    protected QNetworkReply create_request (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice outgoing_data = nullptr) override;
+    protected QNetworkReply create_request (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice outgoing_data = nullptr) override;
 };
 
     AccessManager.AccessManager (GLib.Object parent)
@@ -51,7 +51,7 @@ class AccessManager : QNetworkAccessManager {
         return QUuid.create_uuid ().to_byte_array (QUuid.WithoutBraces);
     }
 
-    QNetworkReply *AccessManager.create_request (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice outgoing_data) {
+    QNetworkReply *AccessManager.create_request (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice outgoing_data) {
         QNetworkRequest new_request (request);
 
         // Respect request specific user agent if any
