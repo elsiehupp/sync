@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -87,8 +86,8 @@ class TestSyncConflict : GLib.Object {
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        QMap<GLib.ByteArray, string> conflictMap;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
+        GLib.HashMap<GLib.ByteArray, string> conflictMap;
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 if (request.rawHeader ("OC-Conflict") == "1") {
                     var baseFileId = request.rawHeader ("OC-ConflictBaseFileId");
@@ -139,8 +138,8 @@ class TestSyncConflict : GLib.Object {
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        QMap<GLib.ByteArray, string> conflictMap;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
+        GLib.HashMap<GLib.ByteArray, string> conflictMap;
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 if (request.rawHeader ("OC-Conflict") == "1") {
                     var baseFileId = request.rawHeader ("OC-ConflictBaseFileId");
@@ -221,7 +220,7 @@ class TestSyncConflict : GLib.Object {
         // Now with server headers
         GLib.Object parent;
         var a2FileId = fakeFolder.remoteModifier ().find ("A/a2").fileId;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (op == QNetworkAccessManager.GetOperation) {
                 var reply = new FakeGetReply (fakeFolder.remoteModifier (), op, request, parent);
                 reply.setRawHeader ("OC-Conflict", "1");
@@ -624,6 +623,6 @@ class TestSyncConflict : GLib.Object {
         QVERIFY (!dbRecord (fakeFolder, "A/a1").isValid ());
         QVERIFY (!dbRecord (fakeFolder, "A").isValid ());
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestSyncConflict)

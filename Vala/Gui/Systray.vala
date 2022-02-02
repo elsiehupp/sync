@@ -26,8 +26,6 @@ const int NOTIFICATIONS_IFACE "org.freedesktop.Notifications"
 
 // #include <QQml_network_access_manager_factory>
 
-class QWindow;
-
 namespace Occ {
 
 class Access_manager_factory : QQml_network_access_manager_factory {
@@ -39,7 +37,7 @@ class Access_manager_factory : QQml_network_access_manager_factory {
     /***********************************************************
     ***********************************************************/
     public QNetworkAccessManager* create (GLib.Object parent) override;
-};
+}
 
 #ifdef Q_OS_OSX
 bool can_os_x_send_user_notification ();
@@ -64,7 +62,7 @@ class Systray
     /***********************************************************
     ***********************************************************/
     public 
-    public enum class Task_bar_position {
+    public enum Task_bar_position {
         Bottom,
         Left,
         Top,
@@ -187,7 +185,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private Access_manager_factory this.access_manager_factory;
-};
+}
 
 
 Systray *Systray._instance = nullptr;
@@ -358,11 +356,13 @@ bool Systray.use_normal_window () {
     return cfg.show_main_dialog_as_normal_window ();
 }
 
-Q_INVOKABLE void Systray.set_opened () {
+// Q_INVOKABLE
+void Systray.set_opened () {
     this.is_open = true;
 }
 
-Q_INVOKABLE void Systray.set_closed () {
+// Q_INVOKABLE
+void Systray.set_closed () {
     this.is_open = false;
 }
 
@@ -405,7 +405,8 @@ void Systray.pause_resume_sync () {
 }
 
 /***************************************************************************/
-/* Helper functions for cross-platform tray icon position and taskbar orientation detection */
+/***********************************************************
+Helper functions for cross-platform tray icon position and taskbar orientation detection */
 /***************************************************************************/
 
 void Systray.position_window (QQuick_window window) {

@@ -8,7 +8,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 // #include <QInputDialog>
 // #include <QLabel>
 // #include <QDesktopServices>
-// #include <QNetworkReply>
+using Soup;
 // #include <QTimer>
 // #include <QBuffer>
 // #include <QMessageBox>
@@ -80,7 +80,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private QScopedPointer<OAuth, QScopedPointerObjectDeleteLater<OAuth>> this.async_auth;
-};
+}
 
 
 void HttpCredentialsGui.ask_from_user () {

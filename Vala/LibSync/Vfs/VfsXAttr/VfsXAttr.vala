@@ -4,10 +4,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.File>
-
 // #pragma once
-
 // #include <QScopedPointer>
 
 namespace xattr {
@@ -67,12 +64,8 @@ class Vfs_xAttr : Vfs {
 
 
     protected void start_impl (VfsSetupParams parameters) override;
-};
+}
 
-class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xAttr> {
-    Q_PLUGIN_METADATA (IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
-    Q_INTERFACES (Occ.PluginFactory)
-};
 
     Vfs_xAttr.Vfs_xAttr (GLib.Object parent)
         : Vfs (parent) {

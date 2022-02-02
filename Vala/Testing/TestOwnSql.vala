@@ -170,6 +170,6 @@ class TestOwnSql : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private SqlDatabase this.database;
-};
+}
 
 QTEST_APPLESS_MAIN (TestOwnSql)

@@ -82,6 +82,6 @@ class TestNetrcParser : GLib.Object {
         NetrcParser parser ("/invalid");
         QVERIFY (!parser.parse ());
     }
-};
+}
 
 QTEST_APPLESS_MAIN (TestNetrcParser)

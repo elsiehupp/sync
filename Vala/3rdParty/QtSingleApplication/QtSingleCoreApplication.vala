@@ -54,7 +54,7 @@ signals:
     ***********************************************************/
     private QtLocalPeer* peer;
     private bool block;
-};
+}
 
 } // namespace SharedTools
 

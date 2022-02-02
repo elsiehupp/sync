@@ -4,7 +4,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.File>
 // #include <QFileInfo>
 // #include <QDir>
 // #include <QDirIterator>

@@ -1,8 +1,8 @@
-project(
-	'com.elsiehupp.NextcloudVala',
-	'c',
-	'vala',
-	version: '1.0.0')
+# project(
+#	'com.elsiehupp.NextcloudVala',
+#	'c',
+#	'vala',
+#	version: '1.0.0')
 
 srcs = files([
 #    'ConfigCSync.vala.cmake',

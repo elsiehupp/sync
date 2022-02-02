@@ -9,19 +9,18 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 // #include <Soup.Buffer>
 // #pragma once
 
-// #include <QNetworkReply>
-// #include <GLib.Uri>
+using Soup;
 
 namespace Occ {
 namespace HttpLogger {
-    void log_request (QNetworkReply reply, QNetworkAccessManager.Operation operation, QIODevice device);
+    void log_request (Soup.Reply reply, QNetworkAccessManager.Operation operation, QIODevice device);
 
 
     /***********************************************************
     Helper to construct the HTTP verb used in the request
     ***********************************************************/
     GLib.ByteArray request_verb (QNetworkAccessManager.Operation operation, Soup.Request request);
-    inline GLib.ByteArray request_verb (QNetworkReply reply) {
+    inline GLib.ByteArray request_verb (Soup.Reply reply) {
         return request_verb (reply.operation (), reply.request ());
     }
 }
@@ -37,8 +36,8 @@ namespace HttpLogger {
         return regexp.match (s).has_match ();
     }
 
-    void log_http (GLib.ByteArray verb, string url, GLib.ByteArray id, string content_type, GLib.List<QNetworkReply.RawHeaderPair> header, QIODevice device) {
-        const var reply = qobject_cast<QNetworkReply> (device);
+    void log_http (GLib.ByteArray verb, string url, GLib.ByteArray id, string content_type, GLib.List<Soup.Reply.RawHeaderPair> header, QIODevice device) {
+        const var reply = qobject_cast<Soup.Reply> (device);
         const var content_length = device ? device.size () : 0;
         string msg;
         QTextStream stream (&msg);
@@ -85,13 +84,13 @@ namespace HttpLogger {
     }
 
 
-    void HttpLogger.log_request (QNetworkReply reply, QNetworkAccessManager.Operation operation, QIODevice device) {
+    void HttpLogger.log_request (Soup.Reply reply, QNetworkAccessManager.Operation operation, QIODevice device) {
         const var request = reply.request ();
         if (!lc_network_http ().is_info_enabled ()) {
             return;
         }
         const var keys = request.raw_header_list ();
-        GLib.List<QNetworkReply.RawHeaderPair> header;
+        GLib.List<Soup.Reply.RawHeaderPair> header;
         header.reserve (keys.size ());
         for (var key : keys) {
             header << q_make_pair (key, request.raw_header (key));
@@ -103,7 +102,7 @@ namespace HttpLogger {
             header,
             device);
 
-        GLib.Object.connect (reply, &QNetworkReply.on_finished, reply, [reply] {
+        GLib.Object.connect (reply, &Soup.Reply.on_finished, reply, [reply] {
             log_http (request_verb (*reply),
                 reply.url ().to_string (),
                 reply.request ().raw_header (XRequestId ()),

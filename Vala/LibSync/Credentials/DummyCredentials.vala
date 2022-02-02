@@ -17,13 +17,13 @@ class DummyCredentials : AbstractCredentials {
     public string password () override;
     public QNetworkAccessManager create_qNAM () override;
     public bool ready () override;
-    public bool still_valid (QNetworkReply reply) override;
+    public bool still_valid (Soup.Reply reply) override;
     public void fetch_from_keychain () override;
     public void ask_from_user () override;
     public void persist () override;
     public void invalidate_token () override {}
     public void forget_sensitive_data () override{};
-};
+}
 
     string DummyCredentials.auth_type () {
         return string.from_latin1 ("dummy");
@@ -46,7 +46,7 @@ class DummyCredentials : AbstractCredentials {
         return true;
     }
 
-    bool DummyCredentials.still_valid (QNetworkReply reply) {
+    bool DummyCredentials.still_valid (Soup.Reply reply) {
         Q_UNUSED (reply)
         return true;
     }

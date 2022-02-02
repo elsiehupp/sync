@@ -45,7 +45,8 @@ typedef struct {
     GLib.ByteArray ignored_dir;
 } statevar;
 
-/* remove the complete test dir */
+/***********************************************************
+remove the complete test dir */
 static int wipe_testdir () {
     QDir tmp (CSYNC_TEST_DIR);
     if (tmp.exists ()) {
@@ -95,7 +96,8 @@ static int teardown (void **state) {
     return 0;
 }
 
-/* This function takes a relative path, prepends it with the CSYNC_TEST_DIR
+/***********************************************************
+This function takes a relative path, prepends it with the CSYNC_TEST_DIR
 and creates each sub directory.
 ***********************************************************/
 static void create_dirs ( const char path ) {

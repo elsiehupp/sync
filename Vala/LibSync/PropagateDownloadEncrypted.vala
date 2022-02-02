@@ -62,7 +62,7 @@ signals:
     private QFileInfo this.info;
     private EncryptedFile this.encrypted_info;
     private string this.error_string;
-};
+}
 
 
 

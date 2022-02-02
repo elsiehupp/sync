@@ -7,7 +7,6 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 #ifndef FLOW2AUTHWIDGET_H
 const int FLOW2AUTHWIDGET_H
 
-// #include <GLib.Uri>
 // #include <Gtk.Widget>
 
 
@@ -81,6 +80,6 @@ protected slots:
     ***********************************************************/
     private QProgress_indicator this.progress_indi;
     private int this.status_update_skip_count = 0;
-};
+}
 
 } // namespace Occ

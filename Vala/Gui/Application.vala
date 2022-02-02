@@ -182,7 +182,7 @@ protected slots:
     private QScopedPointer<CrashReporter.Handler> this.crash_handler;
 #endif
     private QScopedPointer<FolderMan> this.folder_manager;
-};
+}
 
 
 

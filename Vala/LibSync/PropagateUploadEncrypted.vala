@@ -1,14 +1,10 @@
 
 
-// #include <QMap>
 // #include <QJsonDocument>
-// #include <QNetworkReply>
-// #include <GLib.File>
+using Soup;
 // #include <QTemporary_file>
 // #include <QFileInfo>
 // #include <QDir>
-// #include <GLib.Uri>
-// #include <GLib.File>
 // #include <QTemporary_file>
 // #include <QLoggingCategory>
 // #include <QMimeDatabase>
@@ -66,7 +62,7 @@ class Propagate_upload_encrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_folder_encrypted_id_received (string[] list);
-    private void on_folder_encrypted_id_error (QNetworkReply r);
+    private void on_folder_encrypted_id_error (Soup.Reply r);
     private void on_folder_locked_successfully (GLib.ByteArray file_identifier, GLib.ByteArray token);
     private void on_folder_locked_error (GLib.ByteArray file_identifier, int http_error_code);
     private void on_try_lock (GLib.ByteArray file_identifier);
@@ -112,7 +108,7 @@ signals:
     private FolderMetadata this.metadata;
     private EncryptedFile this.encrypted_file;
     private string this.complete_filename;
-};
+}
 
 
   Propagate_upload_encrypted.Propagate_upload_encrypted (OwncloudPropagator propagator, string remote_parent_path, SyncFileItemPtr item, GLib.Object parent)
@@ -345,7 +341,7 @@ signals:
       GLib.debug (lc_propagate_upload_encrypted) << "Folder" << file_identifier << "Coundn't be locked.";
   }
 
-  void Propagate_upload_encrypted.on_folder_encrypted_id_error (QNetworkReply r) {
+  void Propagate_upload_encrypted.on_folder_encrypted_id_error (Soup.Reply r) {
       Q_UNUSED (r);
       GLib.debug (lc_propagate_upload_encrypted) << "Error retrieving the Id of the encrypted folder.";
   }

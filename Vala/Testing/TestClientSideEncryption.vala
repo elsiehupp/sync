@@ -257,7 +257,7 @@ class TestClientSideEncryption : GLib.Object {
         QCOMPARE (generateHash (chunkedOutputDecrypted.readAll ()), originalFileHash);
         chunkedOutputDecrypted.close ();
     }
-};
+}
 
 QTEST_APPLESS_MAIN (TestClientSideEncryption)
 #include "testclientsideencryption.moc"

@@ -39,7 +39,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private void on_job_done (QJsonDocument reply, int status_code);
-};
+}
 
     OcsNavigationAppsJob.OcsNavigationAppsJob (AccountPointer account)
         : Ocs_job (account) {

@@ -7,14 +7,11 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 // #include <QLabel>
 // #include <QPixmap>
-// #include <GLib.Variant>
 // #include <QRadio_button>
 // #include <QAbstractButton>
 // #include <QCheckBox>
 // #include <QSpin_box>
 
-
-class QSpin_box;
 
 namespace Occ {
 

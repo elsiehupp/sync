@@ -40,7 +40,7 @@ class AuthenticationDialog : Gtk.Dialog {
     ***********************************************************/
     private QLineEdit this.user;
     private QLineEdit this.password;
-};
+}
 
 
 

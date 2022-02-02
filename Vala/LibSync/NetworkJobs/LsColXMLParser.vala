@@ -23,8 +23,8 @@ class LsColXMLParser : GLib.Object {
 
 signals:
     void directory_listing_subfolders (string[] items);
-    void directory_listing_iterated (string name, QMap<string, string> properties);
-    void finished_with_error (QNetworkReply reply);
+    void directory_listing_iterated (string name, GLib.HashMap<string, string> properties);
+    void finished_with_error (Soup.Reply reply);
     void finished_without_error ();
 
 
@@ -39,8 +39,8 @@ signals:
 
         string[] folders;
         string current_href;
-        QMap<string, string> current_tmp_properties;
-        QMap<string, string> current_http200Properties;
+        GLib.HashMap<string, string> current_tmp_properties;
+        GLib.HashMap<string, string> current_http200Properties;
         bool current_props_have_http200 = false;
         bool inside_propstat = false;
         bool inside_prop = false;
@@ -111,7 +111,7 @@ signals:
                     } else if (reader.name () == "propstat") {
                         inside_propstat = false;
                         if (current_props_have_http200) {
-                            current_http200Properties = QMap<string, string> (current_tmp_properties);
+                            current_http200Properties = GLib.HashMap<string, string> (current_tmp_properties);
                         }
                         current_tmp_properties.clear ();
                         current_props_have_http200 = false;

@@ -21,8 +21,6 @@ static const int max_folders_version = 1;
 
 namespace Occ {
 
-class LockWatcher;
-
 /***********************************************************
 @brief The FolderMan class
 @ingroup gui
@@ -458,7 +456,7 @@ signals:
     private FolderMan (GLib.Object parent = new GLib.Object ());
     private friend class Occ.Application;
     private friend class .TestFolderMan;
-};
+}
 
 FolderMan *FolderMan._instance = nullptr;
 

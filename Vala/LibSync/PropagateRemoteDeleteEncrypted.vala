@@ -29,7 +29,7 @@ class Propagate_remote_delete_encrypted : AbstractPropagateRemoteDeleteEncrypted
     ***********************************************************/
     private void on_folder_un_locked_successfully (GLib.ByteArray folder_id) override;
     private void on_folder_encrypted_metadata_received (QJsonDocument json, int status_code) override;
-};
+}
 
 }
 

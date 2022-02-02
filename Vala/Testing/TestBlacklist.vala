@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -41,7 +40,7 @@ class TestBlocklist : GLib.Object {
         int counter = 0;
         const GLib.ByteArray testFileName = QByteArrayLiteral ("A/new");
         GLib.ByteArray reqId;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice *) . Soup.Reply * {
             if (req.url ().path ().endsWith (testFileName)) {
                 reqId = req.rawHeader ("X-Request-ID");
             }
@@ -171,7 +170,7 @@ class TestBlocklist : GLib.Object {
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestBlocklist)
 #include "testblocklist.moc"

@@ -19,7 +19,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QLoggingCategory>
 // #include <string[]>
 // #include <QElapsedTimer>
-// #include <GLib.HashMap>
 // #include <QScopedPointer>
 // #include <QDir>
 
@@ -139,7 +138,7 @@ protected slots:
     /***********************************************************
     ***********************************************************/
     private friend class Folder_watcher_private;
-};
+}
 
     Folder_watcher.Folder_watcher (Folder folder)
         : GLib.Object (folder)

@@ -1,7 +1,6 @@
 //  #pragma once
 
 // #include <Gtk.Widget>
-// #include <GLib.File>
 // #include <QInputDialog>
 // #include <QLineEdit>
 // #include <QMessageBox>
@@ -51,7 +50,7 @@ class IgnoreListTableWidget : Gtk.Widget {
     private void setup_table_read_only_items ();
     private string read_only_tooltip;
     private Ui.IgnoreListTableWidget ui;
-};
+}
 
 
     /***********************************************************

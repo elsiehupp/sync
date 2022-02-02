@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -34,7 +33,7 @@ enum ErrorKind : int {
     NoError = 0,
     // Lower code are corresponding to HTTP error code
     Timeout = 1000,
-};
+}
 
 void setPinState (string path, PinState state, cfapi.SetPinRecurseMode mode) {
     Q_ASSERT (mode == cfapi.Recurse || mode == cfapi.NoRecurse);
@@ -1186,7 +1185,7 @@ class TestSyncCfApi : GLib.Object {
 
         // Setup error case if needed
         if (errorKind == Timeout) {
-            fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice *) . QNetworkReply * {
+            fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice *) . Soup.Reply * {
                 if (req.url ().path ().endsWith ("online/sub/file1")) {
                     return new FakeHangingReply (op, req, this);
                 }
@@ -1230,6 +1229,6 @@ class TestSyncCfApi : GLib.Object {
             CFVERIFY_VIRTUAL (fakeFolder, "online/sub/file1");
         }
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestSyncCfApi)

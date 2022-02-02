@@ -78,7 +78,7 @@ signals:
     private 
     private GLib.Set<string> this.watched_paths;
     private QTimer this.timer;
-};
+}
 }
 
 

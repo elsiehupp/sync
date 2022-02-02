@@ -52,7 +52,7 @@ class Network_settings : Gtk.Widget {
     ***********************************************************/
     private 
     private Ui.Network_settings this.ui;
-};
+}
 
     Network_settings.Network_settings (Gtk.Widget parent)
         : Gtk.Widget (parent)

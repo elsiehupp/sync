@@ -5,8 +5,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 // #include <QDir>
-// #include <GLib.Uri>
-// #include <GLib.File>
 // #include <QCoreApplication>
 
 // #include <sys/stat.h>

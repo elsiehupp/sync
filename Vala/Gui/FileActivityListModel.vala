@@ -26,7 +26,7 @@ class FileActivityListModel : ActivityListModel {
     /***********************************************************
     ***********************************************************/
     private string this.file_id;
-};
+}
     FileActivityListModel.FileActivityListModel (GLib.Object parent)
         : ActivityListModel (nullptr, parent) {
         set_display_actions (false);

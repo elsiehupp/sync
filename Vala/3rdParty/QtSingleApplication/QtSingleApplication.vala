@@ -77,7 +77,7 @@ signals:
     Gtk.Widget act_win;
     string app_id;
     bool block;
-};
+}
 
 } // namespace SharedTools
 

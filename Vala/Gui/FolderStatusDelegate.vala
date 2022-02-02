@@ -105,7 +105,7 @@ class FolderStatusDelegate : QStyled_item_delegate {
     ***********************************************************/
     private 
     private QIcon this.icon_more;
-};
+}
 
 FolderStatusDelegate.FolderStatusDelegate ()
     : QStyled_item_delegate () {

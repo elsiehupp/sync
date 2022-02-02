@@ -8,7 +8,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QJsonObject>
 // #include <QJsonArray>
 // #include <QLoggingCategory>
-// #include <QNetworkReply>
+using Soup;
 // #include <QNetworkProxyFactory>
 // #include <QXmlStreamReader>
 
@@ -16,7 +16,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <string[]>
 // #include <QVariantMap>
-// #include <QNetworkReply>
 
 namespace Occ {
 
@@ -117,10 +116,10 @@ protected slots:
     void on_check_server_and_auth ();
 
     void on_status_found (GLib.Uri url, QJsonObject info);
-    void on_no_status_found (QNetworkReply reply);
+    void on_no_status_found (Soup.Reply reply);
     void on_job_timeout (GLib.Uri url);
 
-    void on_auth_failed (QNetworkReply reply);
+    void on_auth_failed (Soup.Reply reply);
     void on_auth_success ();
 
     void on_capabilities_recieved (QJsonDocument &);
@@ -148,7 +147,7 @@ protected slots:
     private AccountStatePtr this.account_state;
     private AccountPointer this.account;
     private bool this.is_checking_server_and_auth;
-};
+}
 
     // Make sure the timeout for this job is less than how often we get called
     // This makes sure we get tried often enough without "ConnectionValidator already running"
@@ -246,10 +245,10 @@ protected slots:
     }
 
     // status.php could not be loaded (network or server issue!).
-    void ConnectionValidator.on_no_status_found (QNetworkReply reply) {
+    void ConnectionValidator.on_no_status_found (Soup.Reply reply) {
         var job = qobject_cast<CheckServerJob> (sender ());
         GLib.warn (lc_connection_validator) << reply.error () << job.error_string () << reply.peek (1024);
-        if (reply.error () == QNetworkReply.SslHandshakeFailedError) {
+        if (reply.error () == Soup.Reply.SslHandshakeFailedError) {
             report_result (SslError);
             return;
         }
@@ -290,21 +289,21 @@ protected slots:
         job.on_start ();
     }
 
-    void ConnectionValidator.on_auth_failed (QNetworkReply reply) {
+    void ConnectionValidator.on_auth_failed (Soup.Reply reply) {
         var job = qobject_cast<PropfindJob> (sender ());
         Status stat = Timeout;
 
-        if (reply.error () == QNetworkReply.SslHandshakeFailedError) {
+        if (reply.error () == Soup.Reply.SslHandshakeFailedError) {
             this.errors << job.error_string_parsing_body ();
             stat = SslError;
 
-        } else if (reply.error () == QNetworkReply.AuthenticationRequiredError
+        } else if (reply.error () == Soup.Reply.AuthenticationRequiredError
             || !this.account.credentials ().still_valid (reply)) {
             GLib.warn (lc_connection_validator) << "******** Password is wrong!" << reply.error () << job.error_string ();
             this.errors << _("The provided credentials are not correct");
             stat = CredentialsWrong;
 
-        } else if (reply.error () != QNetworkReply.NoError) {
+        } else if (reply.error () != Soup.Reply.NoError) {
             this.errors << job.error_string_parsing_body ();
 
             const int http_status =

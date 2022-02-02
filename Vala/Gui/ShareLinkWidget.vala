@@ -35,7 +35,7 @@ namespace Ui {
     class Share_link_widget;
 }
 
-class Share;
+
 
 /***********************************************************
 @brief The Share_dialog class
@@ -207,7 +207,7 @@ signals:
     QProgress_indicator this.share_link_progress_indicator{};
     Gtk.Widget this.share_link_default_widget{};
     QWidget_action this.share_link_widget_action{};
-};
+}
 
 
 Share_link_widget.Share_link_widget (AccountPointer account,

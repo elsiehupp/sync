@@ -8,10 +8,8 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 // #include <QJsonDocument>
 // #include <QJsonObject>
 
-// #include <GLib.Vector>
 // #include <GLib.List>
 // #include <QPair>
-// #include <GLib.Uri>
 
 const int OCS_SUCCESS_STATUS_CODE 100
 // Apparantly the v2.php URLs can return that
@@ -148,7 +146,7 @@ signals:
     private GLib.List<QPair<string, string>> this.params;
     private GLib.Vector<int> this.pass_status_codes;
     private QNetworkRequest this.request;
-};
+}
 
     Ocs_job.Ocs_job (AccountPointer account)
         : AbstractNetworkJob (account, "") {

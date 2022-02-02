@@ -64,6 +64,6 @@ class TestInotifyWatcher : public FolderWatcherPrivate {
            system ( string ("rm -rf %1").arg (this.root).toLocal8Bit () );
         }
     }
-};
+}
 
 QTEST_APPLESS_MAIN (TestInotifyWatcher)

@@ -5,7 +5,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 ***********************************************************/
 
 // #include <QTest>
-// #include <GLib.Vector>
 // #include <QWebSocketServer>
 // #include <QSignalSpy>
 
@@ -292,6 +291,6 @@ class TestPushNotifications : GLib.Object {
                 QVERIFY (verifyCalledOnceWithAccount (*activitiesChangedSpy, account));
             }));
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestPushNotifications)

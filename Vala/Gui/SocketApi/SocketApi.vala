@@ -21,12 +21,10 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 
 // #include <array>
 // #include <QBit_array>
-// #include <GLib.Uri>
 // #include <QMeta_method>
 // #include <QMetaObject>
 // #include <string[]>
 // #include <QScopedPointer>
-// #include <GLib.File>
 // #include <QDir>
 // #include <QApplication>
 // #include <QLocal_socket>
@@ -59,8 +57,6 @@ using Socket_api_server = QLocal_server;
 
 
 namespace Occ {
-
-class DirectEditor;
 
 Q_DECLARE_LOGGING_CATEGORY (lc_socket_api)
 
@@ -239,9 +235,9 @@ signals:
     /***********************************************************
     ***********************************************************/
     private GLib.Set<string> this.registered_aliases;
-    private QMap<QIODevice *, unowned<Socket_listener>> this.listeners;
+    private GLib.HashMap<QIODevice *, unowned<Socket_listener>> this.listeners;
     private Socket_api_server this.local_server;
-};
+}
 }
 
 
@@ -762,151 +758,6 @@ void SocketApi.command_EDIT (string local_file, Socket_listener listener) {
     job.on_start ();
 }
 
-// don't pull the share manager into socketapi unittests
-#ifndef OWNCLOUD_TEST
-
-class Get_or_create_public_link_share : GLib.Object {
-
-    /***********************************************************
-    ***********************************************************/
-    public Get_or_create_public_link_share (AccountPointer account, string local_file,
-        GLib.Object parent)
-        : GLib.Object (parent)
-        , this.account (account)
-        , this.share_manager (account)
-        , this.local_file (local_file) {
-        connect (&this.share_manager, &Share_manager.on_shares_fetched,
-            this, &Get_or_create_public_link_share.on_shares_fetched);
-        connect (&this.share_manager, &Share_manager.on_link_share_created,
-            this, &Get_or_create_public_link_share.on_link_share_created);
-        connect (&this.share_manager, &Share_manager.on_link_share_requires_password,
-            this, &Get_or_create_public_link_share.on_link_share_requires_password);
-        connect (&this.share_manager, &Share_manager.on_server_error,
-            this, &Get_or_create_public_link_share.on_server_error);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void run () {
-        GLib.debug (lc_public_link) << "Fetching shares";
-        this.share_manager.fetch_shares (this.local_file);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_shares_fetched (GLib.List<unowned<Share>> shares) {
-        var share_name = SocketApi._("Context menu share");
-
-        // If there already is a context menu share, reuse it
-        for (var share : shares) {
-            const var link_share = q_shared_pointer_dynamic_cast<Link_share> (share);
-            if (!link_share)
-                continue;
-
-            if (link_share.get_name () == share_name) {
-                GLib.debug (lc_public_link) << "Found existing share, reusing";
-                return on_success (link_share.get_link ().to_string ());
-            }
-        }
-
-        // otherwise create a new one
-        GLib.debug (lc_public_link) << "Creating new share";
-        this.share_manager.create_link_share (this.local_file, share_name, "");
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_link_share_created (unowned<Link_share> share) {
-        GLib.debug (lc_public_link) << "New share created";
-        on_success (share.get_link ().to_string ());
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_password_required () {
-        bool ok = false;
-        string password = QInputDialog.get_text (nullptr,
-                                                 _("Password for share required"),
-                                                 _("Please enter a password for your link share:"),
-                                                 QLineEdit.Normal,
-                                                 "",
-                                                 ok);
-
-        if (!ok) {
-            // The dialog was canceled so no need to do anything
-            return;
-        }
-
-        // Try to create the link share again with the newly entered password
-        this.share_manager.create_link_share (this.local_file, "", password);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_link_share_requires_password (string message) {
-        q_c_info (lc_public_link) << "Could not create link share:" << message;
-        /* emit */ error (message);
-        delete_later ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_server_error (int code, string message) {
-        GLib.warn (lc_public_link) << "Share fetch/create error" << code << message;
-        QMessageBox.warning (
-            nullptr,
-            _("Sharing error"),
-            _("Could not retrieve or create the public link share. Error:\n\n%1").arg (message),
-            QMessageBox.Ok,
-            QMessageBox.NoButton);
-        /* emit */ error (message);
-        delete_later ();
-    }
-
-signals:
-    void on_done (string link);
-    void error (string message);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_success (string link) {
-        /* emit */ done (link);
-        delete_later ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private AccountPointer this.account;
-    private Share_manager this.share_manager;
-    private string this.local_file;
-};
-
-#else
-
-class Get_or_create_public_link_share : GLib.Object {
-
-    /***********************************************************
-    ***********************************************************/
-    public Get_or_create_public_link_share (AccountPointer &, string ,
-        std.function<void (string link)>, GLib.Object *) {
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void run () {
-    }
-};
-
-#endif
 
 void SocketApi.command_COPY_PUBLIC_LINK (string local_file, Socket_listener *) {
     var file_data = File_data.get (local_file);
@@ -1577,170 +1428,10 @@ string SocketApi.build_register_path_message (string path) {
     return message;
 }
 
-void Socket_api_job.resolve (string response) {
-    this.socket_listener.on_send_message ("RESOLVE|" + this.job_id + '|' + response);
-}
-
-void Socket_api_job.resolve (QJsonObject response) {
-    resolve (QJsonDocument {
-        response
-    }.to_json ());
-}
-
-void Socket_api_job.reject (string response) {
-    this.socket_listener.on_send_message ("REJECT|" + this.job_id + '|' + response);
-}
-
-Socket_api_job_v2.Socket_api_job_v2 (unowned<Socket_listener> socket_listener, GLib.ByteArray command, QJsonObject arguments)
-    : this.socket_listener (socket_listener)
-    , this.command (command)
-    , this.job_id (arguments[QStringLiteral ("id")].to_string ())
-    , this.arguments (arguments[QStringLiteral ("arguments")].to_object ()) {
-    ASSERT (!this.job_id.is_empty ())
-}
-
-void Socket_api_job_v2.on_success (QJsonObject response) {
-    do_finish (response);
-}
-
-void Socket_api_job_v2.failure (string error) {
-    do_finish ({
-        {
-            QStringLiteral ("error"), error
-        }
-    });
-}
-
-void Socket_api_job_v2.do_finish (QJsonObject obj) {
-    this.socket_listener.on_send_message (this.command + QStringLiteral ("this.RESULT:") + QJsonDocument ({
-        {
-            QStringLiteral ("id"), this.job_id
-        },
-        {
-            QStringLiteral ("arguments"), obj
-        }
-    }).to_json (QJsonDocument.Compact));
-    Q_EMIT on_finished ();
-}
 
 
-    class Bloom_filter {
-        // Initialize with m=1024 bits and k=2 (high and low 16 bits of a q_hash).
-        // For a client navigating in less than 100 directories, this gives us a probability less than
-        // (1-e^ (-2*100/1024))^2 = 0.03147872136 false positives.
-        const static int Num_bits = 1024;
-
-        public Bloom_filter ()
-            : hash_bits (Num_bits) {
-        }
-
-        public void store_hash (uint32 hash) {
-            hash_bits.set_bit ( (hash & 0x_f_f_f_f) % Num_bits); // NOLINT it's uint32 all the way and the modulo puts us back in the 0..1023 range
-            hash_bits.set_bit ( (hash >> 16) % Num_bits); // NOLINT
-        }
-        public bool is_hash_maybe_stored (uint32 hash) {
-            return hash_bits.test_bit ( (hash & 0x_f_f_f_f) % Num_bits) // NOLINT
-                && hash_bits.test_bit ( (hash >> 16) % Num_bits); // NOLINT
-        }
 
 
-        private QBit_array hash_bits;
-    };
-
-    class Socket_listener {
-
-        public QPointer<QIODevice> socket;
-
-        public Socket_listener (QIODevice this.socket)
-            : socket (this.socket) {
-        }
-
-        public void on_send_message (string message, bool do_wait = false);
-        public void send_warning (string message, bool do_wait = false) {
-            on_send_message (QStringLiteral ("WARNING:") + message, do_wait);
-        }
-        public void send_error (string message, bool do_wait = false) {
-            on_send_message (QStringLiteral ("ERROR:") + message, do_wait);
-        }
-
-        public void send_message_if_directory_monitored (string message, uint32 system_directory_hash) {
-            if (this.monitored_directories_bloom_filter.is_hash_maybe_stored (system_directory_hash))
-                on_send_message (message, false);
-        }
-
-        public void register_monitored_directory (uint32 system_directory_hash) {
-            this.monitored_directories_bloom_filter.store_hash (system_directory_hash);
-        }
-
-        private Bloom_filter this.monitored_directories_bloom_filter;
-    };
-
-    class Listener_closure : GLib.Object {
-
-        public using Callback_function = std.function<void ()>;
-        public Listener_closure (Callback_function callback)
-            : callback_ (callback) {
-        }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public slots:
-        void closure_slot () {
-            callback_ ();
-            delete_later ();
-        }
-
-
-        private Callback_function callback_;
-    };
-
-    class Socket_api_job : GLib.Object {
-
-        public Socket_api_job (string job_id, unowned<Socket_listener> socket_listener, QJsonObject arguments)
-            : this.job_id (job_id)
-            , this.socket_listener (socket_listener)
-            , this.arguments (arguments) {
-        }
-
-        public void resolve (string response = "");
-
-        public void resolve (QJsonObject response);
-
-        public const QJsonObject arguments () {
-            return this.arguments;
-        }
-
-        public void reject (string response);
-
-        protected string this.job_id;
-        protected unowned<Socket_listener> this.socket_listener;
-        protected QJsonObject this.arguments;
-    };
-
-    class Socket_api_job_v2 : GLib.Object {
-
-        public Socket_api_job_v2 (unowned<Socket_listener> socket_listener, GLib.ByteArray command, QJsonObject arguments);
-
-        public void on_success (QJsonObject response);
-        public void failure (string error);
-
-        public const QJsonObject arguments () {
-            return this.arguments;
-        }
-        public GLib.ByteArray command () {
-            return this.command;
-        }
-
-    signals:
-        void on_finished ();
-
-
-        private void do_finish (QJsonObject obj);
-
-        private unowned<Socket_listener> this.socket_listener;
-        private const GLib.ByteArray this.command;
-        private string this.job_id;
-        private QJsonObject this.arguments;
-    };
 }

@@ -26,10 +26,12 @@ const char argp_program_bug_address = "<csync-devel@csync.org>";
 
 static char **cmdline;
 
-/* Program documentation. */
+/***********************************************************
+Program documentation. */
 static char doc[] = "csync test";
 
-/* The options we understand. */
+/***********************************************************
+The options we understand. */
 static struct argp_option options[] = { {
     .name  = "verbose",
     .key   = 'v',
@@ -38,9 +40,10 @@ static struct argp_option options[] = { {
     .doc   = "Make csync test more verbose",
     .group = 0
   }, {NULL, 0, NULL, 0, NULL, 0}
-};
+}
 
-/* Parse a single option. */
+/***********************************************************
+Parse a single option. */
 static error_t parse_opt (int key, char arg, struct argp_state state) {
   /* Get the input argument from argp_parse, which we
    * know is a pointer to our arguments structure.
@@ -66,8 +69,10 @@ static error_t parse_opt (int key, char arg, struct argp_state state) {
   return 0;
 }
 
-/* Our argp parser. */
-/* static struct argp argp = {options, parse_opt, args_doc, doc, NULL, NULL, NULL}; */
+/***********************************************************
+Our argp parser. */
+/***********************************************************
+static struct argp argp = {options, parse_opt, args_doc, doc, NULL, NULL, NULL}; */
 static struct argp argp = {options, parse_opt, NULL, doc, NULL, NULL, NULL};
 #endif /* HAVE_ARGP_H */
 

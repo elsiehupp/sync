@@ -1,21 +1,11 @@
-srcs = files([
-    'Kirigami/WheelHandler.vala',
 
-    'KMessageWidget/KMessageWidget.vala',
-
-    'QProgressIndicator/QProgressIndicator.vala',
-
-    'QtLockedFile/QtLockedFile.vala',
-
-    'QTokenizer/QTokenizer.vala',
-    'QTokenizer/Test/TestQTokenizer.vala',
-
-    'QtSingleApplication/QtLocalPeer.vala',
-    'QtSingleApplication/QtSingleApplication.vala',
-    'QtSingleApplication/QtSingleCoreApplication.vala',
-
-    'Sqlite3/sqlite3.vala'
-])
+subdir('Kirigami')
+subdir('KMessageWidget')
+subdir('QProgressIndicator')
+subdir('QtLockedFile')
+subdir('QTokenizer')
+subdir('QtSingleApplication')
+subdir('Sqlite3')
 
 executable(
     meson.project_name(),

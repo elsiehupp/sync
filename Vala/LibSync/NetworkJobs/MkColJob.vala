@@ -11,7 +11,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 class MkColJob : AbstractNetworkJob {
     GLib.Uri this.url; // Only used if the constructor taking a url is taken.
-    QMap<GLib.ByteArray, GLib.ByteArray> this.extra_headers;
+    GLib.HashMap<GLib.ByteArray, GLib.ByteArray> this.extra_headers;
 
 
     /***********************************************************
@@ -33,13 +33,13 @@ class MkColJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public 
-    public st QMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent = new GLib.Object ());
+    public st GLib.HashMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent = new GLib.Object ());
 
 
     public void on_start () override;
 
 signals:
-    void finished_with_error (QNetworkReply reply);
+    void finished_with_error (Soup.Reply reply);
     void finished_without_error ();
 
 
@@ -57,13 +57,13 @@ signals:
         : AbstractNetworkJob (account, path, parent) {
     }
 
-    MkColJob.MkColJob (AccountPointer account, string path, QMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent)
+    MkColJob.MkColJob (AccountPointer account, string path, GLib.HashMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent)
         : AbstractNetworkJob (account, path, parent)
         , this.extra_headers (extra_headers) {
     }
 
     MkColJob.MkColJob (AccountPointer account, GLib.Uri url,
-        const QMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent)
+        const GLib.HashMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent)
         : AbstractNetworkJob (account, "", parent)
         , this.url (url)
         , this.extra_headers (extra_headers) {
@@ -90,7 +90,7 @@ signals:
         q_c_info (lc_mk_col_job) << "MKCOL of" << reply ().request ().url () << "FINISHED WITH STATUS"
                         << reply_status_"";
 
-        if (reply ().error () != QNetworkReply.NoError) {
+        if (reply ().error () != Soup.Reply.NoError) {
             Q_EMIT finished_with_error (reply ());
         } else {
             Q_EMIT finished_without_error ();

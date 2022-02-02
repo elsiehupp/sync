@@ -62,7 +62,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private QSize this.original_wizard_size;
-};
+}
 
 
     Web_view_page.Web_view_page (Gtk.Widget parent)

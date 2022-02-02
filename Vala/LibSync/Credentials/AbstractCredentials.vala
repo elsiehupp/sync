@@ -69,7 +69,7 @@ class AbstractCredentials : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual bool still_valid (QNetworkReply reply);
+    public virtual bool still_valid (Soup.Reply reply);
     public virtual void persist ();
 
 
@@ -128,7 +128,7 @@ signals:
 
     protected Account this.account = nullptr;
     protected bool this.was_fetched = false;
-};
+}
 
 
     AbstractCredentials.AbstractCredentials () = default;

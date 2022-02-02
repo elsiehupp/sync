@@ -4,16 +4,13 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.Variant>
 // #include <QMenu>
 // #include <QClipboard>
 
 // #pragma once
 
 // #include <GLib.List>
-// #include <QMap>
 // #include <QNetworkCookie>
-// #include <GLib.Uri>
 // #include <QPointer>
 
 namespace Occ {
@@ -61,7 +58,7 @@ signals:
 protected slots:
     void on_open_browser ();
     void on_copy_link_to_clipboard ();
-};
+}
 
     Owncloud_oauth_creds_page.Owncloud_oauth_creds_page ()
         : Abstract_credentials_wizard_page () {

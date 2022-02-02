@@ -5,7 +5,6 @@ Copyright (C) 2015 by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.Uri>
 // #include <Gtk.Dialog>
 
 namespace Occ {
@@ -53,7 +52,7 @@ class Owncloud_connection_method_dialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private Ui.Owncloud_connection_method_dialog ui;
-};
+}
 
     Owncloud_connection_method_dialog.Owncloud_connection_method_dialog (Gtk.Widget parent)
         : Gtk.Dialog (parent, Qt.Customize_window_hint | Qt.Window_title_hint | Qt.Window_close_button_hint | Qt.MSWindows_fixed_size_dialog_hint)

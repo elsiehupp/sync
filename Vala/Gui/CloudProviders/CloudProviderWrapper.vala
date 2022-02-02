@@ -18,7 +18,8 @@ using namespace Occ;
 GSimple_action_group action_group = nullptr;
 
 
-/* Forward declaration required since gio header files interfere with GLib.Object headers */
+/***********************************************************
+Forward declaration required since gio header files interfere with GLib.Object headers */
 struct this.Cloud_providers_provider_exporter;
 using CloudProvidersProviderExporter = this.Cloud_providers_provider_exporter;
 struct this.Cloud_providers_account_exporter;
@@ -97,7 +98,7 @@ class CloudProviderWrapper : GLib.Object {
     private bool this.paused;
     private GMenu* this.main_menu = nullptr;
     private GMenu* this.recent_menu = nullptr;
-};
+}
 
 
 
@@ -453,7 +454,7 @@ static GAction_entry actions[] = {
         nullptr,
         {0,0,0}
     }
-};
+}
 
 GAction_group* CloudProviderWrapper.get_action_group () {
     g_clear_object (&action_group);

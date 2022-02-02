@@ -46,7 +46,7 @@ class PropagateRemoteDelete : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void on_delete_job_finished ();
-};
+}
 
     void PropagateRemoteDelete.on_start () {
         q_c_info (lc_propagate_remote_delete) << "Start propagate remote delete job for" << this.item._file;
@@ -63,7 +63,7 @@ class PropagateRemoteDelete : PropagateItemJob {
             connect (this.delete_encrypted_helper, &AbstractPropagateRemoteDeleteEncrypted.on_finished, this, [this] (bool on_success) {
                 if (!on_success) {
                     SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR;
-                    if (this.delete_encrypted_helper.network_error () != QNetworkReply.NoError && this.delete_encrypted_helper.network_error () != QNetworkReply.ContentNotFoundError) {
+                    if (this.delete_encrypted_helper.network_error () != Soup.Reply.NoError && this.delete_encrypted_helper.network_error () != Soup.Reply.ContentNotFoundError) {
                         status = classify_error (this.delete_encrypted_helper.network_error (), this.item._http_error_code, propagator ()._another_sync_needed);
                     }
                     on_done (status, this.delete_encrypted_helper.error_string ());
@@ -103,13 +103,13 @@ class PropagateRemoteDelete : PropagateItemJob {
 
         ASSERT (this.job);
 
-        QNetworkReply.NetworkError err = this.job.reply ().error ();
+        Soup.Reply.NetworkError err = this.job.reply ().error ();
         const int http_status = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item._http_error_code = http_status;
         this.item._response_time_stamp = this.job.response_timestamp ();
         this.item._request_id = this.job.request_id ();
 
-        if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
+        if (err != Soup.Reply.NoError && err != Soup.Reply.ContentNotFoundError) {
             SyncFileItem.Status status = classify_error (err, this.item._http_error_code,
                 propagator ()._another_sync_needed);
             on_done (status, this.job.error_string ());

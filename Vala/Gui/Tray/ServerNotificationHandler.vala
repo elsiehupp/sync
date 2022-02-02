@@ -38,7 +38,7 @@ signals:
     ***********************************************************/
     private QPointer<JsonApiJob> this.notification_job;
     private AccountState this.account_state;
-};
+}
 
 
     Server_notification_handler.Server_notification_handler (AccountState account_state, GLib.Object parent)

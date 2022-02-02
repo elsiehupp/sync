@@ -49,7 +49,7 @@ class CheckServerJob : AbstractNetworkJob {
 
     \a reply is never null
     ***********************************************************/
-    signal void instance_not_found (QNetworkReply reply);
+    signal void instance_not_found (Soup.Reply reply);
 
 
     /***********************************************************
@@ -78,8 +78,8 @@ class CheckServerJob : AbstractNetworkJob {
     public void on_start () {
         this.server_url = account ().url ();
         send_request ("GET", Utility.concat_url_path (this.server_url, path ()));
-        connect (reply (), &QNetworkReply.meta_data_changed, this, &CheckServerJob.meta_data_changed_slot);
-        connect (reply (), &QNetworkReply.encrypted, this, &CheckServerJob.encrypted_slot);
+        connect (reply (), &Soup.Reply.meta_data_changed, this, &CheckServerJob.meta_data_changed_slot);
+        connect (reply (), &Soup.Reply.encrypted, this, &CheckServerJob.encrypted_slot);
         AbstractNetworkJob.on_start ();
     }
 
@@ -123,7 +123,7 @@ class CheckServerJob : AbstractNetworkJob {
     private bool on_finished () override {
         if (reply ().request ().url ().scheme () == QLatin1String ("https")
             && reply ().ssl_configuration ().session_ticket ().is_empty ()
-            && reply ().error () == QNetworkReply.NoError) {
+            && reply ().error () == Soup.Reply.NoError) {
             GLib.warn (lc_check_server_job) << "No SSL session identifier / session ticket is used, this might impact sync performance negatively.";
         }
 
@@ -131,7 +131,7 @@ class CheckServerJob : AbstractNetworkJob {
 
         // The server installs to /owncloud. Let's try that if the file wasn't found
         // at the original location
-        if ( (reply ().error () == QNetworkReply.ContentNotFoundError) && (!this.subdir_fallback)) {
+        if ( (reply ().error () == Soup.Reply.ContentNotFoundError) && (!this.subdir_fallback)) {
             this.subdir_fallback = true;
             set_path (QLatin1String (nextcloud_dir_c) + QLatin1String (statusphp_c));
             on_start ();
@@ -181,7 +181,7 @@ class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_redirected (QNetworkReply reply, GLib.Uri target_url, int redirect_count) {
+    private void on_redirected (Soup.Reply reply, GLib.Uri target_url, int redirect_count) {
         GLib.ByteArray slash_status_php ("/");
         slash_status_php.append (statusphp_c);
 

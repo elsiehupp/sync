@@ -21,9 +21,6 @@ namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lc_wizard)
 
-class Owncloud_oauth_creds_page;
-class Abstract_credentials_wizard_page;
-
 /***********************************************************
 @brief The OwncloudWizard class
 @ingroup gui
@@ -194,7 +191,7 @@ signals:
     bool this.registration = false;
 
     friend class OwncloudSetupWizard;
-};
+}
 
 
     OwncloudWizard.OwncloudWizard (Gtk.Widget parent)

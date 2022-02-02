@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -31,7 +30,7 @@ struct OperationCounter {
             return nullptr;
         };
     }
-};
+}
 
 bool itemSuccessful (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
@@ -949,6 +948,6 @@ class TestSyncMove : GLib.Object {
         QVERIFY (!fakeFolder.currentRemoteState ().find (dest));
     }
 
-};
+}
 
 QTEST_GUILESS_MAIN (TestSyncMove)

@@ -41,7 +41,7 @@ class FolderCreationDialog : Gtk.Dialog {
     ***********************************************************/
     private 
     private string this.destination;
-};
+}
 
 
     FolderCreationDialog.FolderCreationDialog (string destination, Gtk.Widget parent)

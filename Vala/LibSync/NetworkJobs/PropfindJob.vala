@@ -44,7 +44,7 @@ class PropfindJob : AbstractNetworkJob {
 
 signals:
     void result (QVariantMap values);
-    void finished_with_error (QNetworkReply reply = nullptr);
+    void finished_with_error (Soup.Reply reply = nullptr);
 
 
     /***********************************************************

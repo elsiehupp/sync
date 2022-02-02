@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -19,7 +18,7 @@ struct FakeBrokenXmlPropfindReply : FakePropfindReply {
         // turncate the XML
         payload.chop (20);
     }
-};
+}
 
 struct MissingPermissionsPropfindReply : FakePropfindReply {
     MissingPermissionsPropfindReply (FileInfo remoteRootFileInfo, QNetworkAccessManager.Operation op,
@@ -31,13 +30,13 @@ struct MissingPermissionsPropfindReply : FakePropfindReply {
         QVERIFY (pos > 0);
         payload.remove (pos, sizeof (toRemove) - 1);
     }
-};
+}
 
 enum ErrorKind : int {
     // Lower code are corresponding to HTML error code
     InvalidXML = 1000,
     Timeout,
-};
+}
 
 Q_DECLARE_METATYPE (ErrorCategory)
 
@@ -87,7 +86,7 @@ class TestRemoteDiscovery : GLib.Object {
         string errorFolder = "dav/files/admin/B";
         string fatalErrorPrefix = "Server replied with an error while reading directory \"B\" : ";
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice *)
-                . QNetworkReply *{
+                . Soup.Reply *{
             if (req.attribute (QNetworkRequest.CustomVerbAttribute) == "PROPFIND" && req.url ().path ().endsWith (errorFolder)) {
                 if (errorKind == InvalidXML) {
                     return new FakeBrokenXmlPropfindReply (fakeFolder.remoteModifier (), op, req, this);
@@ -148,7 +147,7 @@ class TestRemoteDiscovery : GLib.Object {
         fakeFolder.remoteModifier ().insert ("nopermissions/A");
 
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice *)
-                . QNetworkReply *{
+                . Soup.Reply *{
             if (req.attribute (QNetworkRequest.CustomVerbAttribute) == "PROPFIND" && req.url ().path ().endsWith ("nopermissions"))
                 return new MissingPermissionsPropfindReply (fakeFolder.remoteModifier (), op, req, this);
             return nullptr;
@@ -166,6 +165,6 @@ class TestRemoteDiscovery : GLib.Object {
         QVERIFY (completeSpy.findItem ("nofileid")._errorString.contains ("file id"));
         QVERIFY (completeSpy.findItem ("nopermissions/A")._errorString.contains ("permission"));
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestRemoteDiscovery)

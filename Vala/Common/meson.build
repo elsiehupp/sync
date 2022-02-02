@@ -1,24 +1,39 @@
-project(
-	'com.elsiehupp.NextcloudVala',
-	'c',
-	'vala',
-	version: '1.0.0')
+# project(
+#	'com.elsiehupp.NextcloudVala',
+#	'c',
+#	'vala',
+#	version: '1.0.0')
 
 srcs = files([
     'Asserts.vala',
-    'ComputeChecksum.vala',
+
+    'ComputeChecksum/ComputeChecksum.vala',
+    'ComputeChecksum/ComputeChecksumBase.vala',
+    'ComputeChecksum/CSyncChecksumHook.vala',
+    'ComputeChecksum/ValidateChecksumHeader.vala',
+
     'Constants.vala',
     'FileSystem.vala',
     'JenkinsHash.vala',
     'PinState.vala',
-    'PluginFactory.vala',
+
+    'PluginFactory/PluginFactory.vala',
+    'PluginFactory/DefaultPluginFactory.vala',
+
     'PreparedSqlQueryManager.vala',
     'RemotePermissions.vala',
-    'Result.vala',
+
+    'Result/Optional.vala',
+    'Result/Result.vala',
+
     'SqlDatabase.vala',
     'SyncFileStatus.vala',
     'SyncJournalDb.vala',
-    'SyncJournalFileRecord.vala',
+
+    'SyncJournalFileRecord/ConflictRecord.vala',
+    'SyncJournalFileRecord/SyncJournalErrorBlocklistRecord.vala',
+    'SyncJournalFileRecord/SyncJournalFileRecord.vala',
+
     'Utility.vala',
     'Vfs.vala'
 ])

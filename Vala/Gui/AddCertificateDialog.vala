@@ -52,7 +52,7 @@ class AddCertificateDialog : Gtk.Dialog {
     ***********************************************************/
     private 
     private Ui.AddCertificateDialog ui;
-};
+}
 
 
     AddCertificateDialog.AddCertificateDialog (Gtk.Widget parent)

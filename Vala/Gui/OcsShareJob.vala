@@ -7,7 +7,6 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 // #include <QBuffer>
 // #include <QJsonDocument>
 
-// #include <GLib.Vector>
 // #include <GLib.List>
 // #include <QPair>
 
@@ -150,7 +149,7 @@ signals:
     ***********************************************************/
     private 
     private GLib.Variant this.value;
-};
+}
 
 
     Ocs_share_job.Ocs_share_job (AccountPointer account)

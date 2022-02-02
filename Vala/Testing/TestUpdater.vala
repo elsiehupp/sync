@@ -23,6 +23,6 @@ class TestUpdater : GLib.Object {
         QVERIFY (currVersion < highVersion);
     }
 
-};
+}
 
 QTEST_APPLESS_MAIN (TestUpdater)

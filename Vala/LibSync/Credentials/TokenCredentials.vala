@@ -7,11 +7,10 @@ Copyright (c) by Markus Goetz <guruz@owncloud.com>
 
 // #include <QLoggingCategory>
 // #include <QMutex>
-// #include <QNetworkReply>
+using Soup;
 // #include <QSettings>
 // #include <QNetworkCookieJar>
 
-// #include <QMap>
 
 
 namespace QKeychain {
@@ -38,7 +37,7 @@ class TokenCredentials : AbstractCredentials {
     public bool ready () override;
     public void ask_from_user () override;
     public void fetch_from_keychain () override;
-    public bool still_valid (QNetworkReply reply) override;
+    public bool still_valid (Soup.Reply reply) override;
     public void persist () override;
     public string user () override;
     public void invalidate_token () override;
@@ -48,7 +47,7 @@ class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_authentication (QNetworkReply *, QAuthenticator *);
+    private void on_authentication (Soup.Reply *, QAuthenticator *);
 
     /***********************************************************
     ***********************************************************/
@@ -57,7 +56,7 @@ class TokenCredentials : AbstractCredentials {
     private string this.password;
     private string this.token; // the cookies
     private bool this.ready;
-};
+}
 
 
     namespace {
@@ -75,7 +74,7 @@ class TokenCredentials : AbstractCredentials {
         }
 
 
-        protected QNetworkReply create_request (Operation op, Soup.Request request, QIODevice outgoing_data) {
+        protected Soup.Reply create_request (Operation op, Soup.Request request, QIODevice outgoing_data) {
             if (this.cred.user ().is_empty () || this.cred.password ().is_empty ()) {
                 GLib.warn (lc_token_credentials) << "Empty user/password provided!";
             }
@@ -126,8 +125,8 @@ class TokenCredentials : AbstractCredentials {
     QNetworkAccessManager *TokenCredentials.create_qNAM () {
         AccessManager qnam = new TokenCredentialsAccessManager (this);
 
-        connect (qnam, SIGNAL (authentication_required (QNetworkReply *, QAuthenticator *)),
-            this, SLOT (on_authentication (QNetworkReply *, QAuthenticator *)));
+        connect (qnam, SIGNAL (authentication_required (Soup.Reply *, QAuthenticator *)),
+            this, SLOT (on_authentication (Soup.Reply *, QAuthenticator *)));
 
         return qnam;
     }
@@ -145,10 +144,10 @@ class TokenCredentials : AbstractCredentials {
         /* emit */ asked ();
     }
 
-    bool TokenCredentials.still_valid (QNetworkReply reply) {
-        return ( (reply.error () != QNetworkReply.AuthenticationRequiredError)
+    bool TokenCredentials.still_valid (Soup.Reply reply) {
+        return ( (reply.error () != Soup.Reply.AuthenticationRequiredError)
             // returned if user/password or token are incorrect
-            && (reply.error () != QNetworkReply.OperationCanceledError
+            && (reply.error () != Soup.Reply.OperationCanceledError
                    || !reply.property (authentication_failed_c).to_bool ()));
     }
 
@@ -168,7 +167,7 @@ class TokenCredentials : AbstractCredentials {
     void TokenCredentials.persist () {
     }
 
-    void TokenCredentials.on_authentication (QNetworkReply reply, QAuthenticator authenticator) {
+    void TokenCredentials.on_authentication (Soup.Reply reply, QAuthenticator authenticator) {
         Q_UNUSED (authenticator)
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,

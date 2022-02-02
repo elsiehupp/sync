@@ -4,7 +4,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.File>
 // #include <QLoggingCategory>
 // #pragma once
 
@@ -57,8 +56,8 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    private void finalize_mk_col_job (QNetworkReply.NetworkError err, string job_http_reason_phrase_string, string job_path);
-};
+    private void finalize_mk_col_job (Soup.Reply.NetworkError err, string job_http_reason_phrase_string, string job_path);
+}
 
     PropagateRemoteMkdir.PropagateRemoteMkdir (OwncloudPropagator propagator, SyncFileItemPtr item)
         : PropagateItemJob (propagator, item)
@@ -141,11 +140,11 @@ class PropagateRemoteMkdir : PropagateItemJob {
         this.delete_existing = enabled;
     }
 
-    void PropagateRemoteMkdir.finalize_mk_col_job (QNetworkReply.NetworkError err, string job_http_reason_phrase_string, string job_path) {
+    void PropagateRemoteMkdir.finalize_mk_col_job (Soup.Reply.NetworkError err, string job_http_reason_phrase_string, string job_path) {
         if (this.item._http_error_code == 405) {
             // This happens when the directory already exists. Nothing to do.
             q_debug (lc_propagate_remote_mkdir) << "Folder" << job_path << "already exists.";
-        } else if (err != QNetworkReply.NoError) {
+        } else if (err != Soup.Reply.NoError) {
             SyncFileItem.Status status = classify_error (err, this.item._http_error_code,
                 propagator ()._another_sync_needed);
             on_done (status, this.item._error_string);
@@ -225,7 +224,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
         ASSERT (this.job);
 
-        QNetworkReply.NetworkError err = this.job.reply ().error ();
+        Soup.Reply.NetworkError err = this.job.reply ().error ();
         this.item._http_error_code = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item._response_time_stamp = this.job.response_timestamp ();
         this.item._request_id = this.job.request_id ();

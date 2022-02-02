@@ -35,7 +35,7 @@ enum CSYNC_EXCLUDE_TYPE {
     CSYNC_FILE_EXCLUDE_CONFLICT,
     CSYNC_FILE_EXCLUDE_CANNOT_ENCODE,
     CSYNC_FILE_EXCLUDE_SERVER_BLOCKLISTED,
-};
+}
 
 
 /***********************************************************
@@ -242,21 +242,21 @@ class ExcludedFiles : GLib.Object {
     private string this.local_path;
 
     /// Files to load excludes from
-    private QMap<Base_path_string, string[]> this.exclude_files;
+    private GLib.HashMap<Base_path_string, string[]> this.exclude_files;
 
     /// Exclude patterns added with add_manual_exclude ()
-    private QMap<Base_path_string, string[]> this.manual_excludes;
+    private GLib.HashMap<Base_path_string, string[]> this.manual_excludes;
 
     /// List of all active exclude patterns
-    private QMap<Base_path_string, string[]> this.all_excludes;
+    private GLib.HashMap<Base_path_string, string[]> this.all_excludes;
 
     /// see prepare ()
-    private QMap<Base_path_string, QRegularExpression> this.bname_traversal_regex_file;
-    private QMap<Base_path_string, QRegularExpression> this.bname_traversal_regex_dir;
-    private QMap<Base_path_string, QRegularExpression> this.full_traversal_regex_file;
-    private QMap<Base_path_string, QRegularExpression> this.full_traversal_regex_dir;
-    private QMap<Base_path_string, QRegularExpression> this.full_regex_file;
-    private QMap<Base_path_string, QRegularExpression> this.full_regex_dir;
+    private GLib.HashMap<Base_path_string, QRegularExpression> this.bname_traversal_regex_file;
+    private GLib.HashMap<Base_path_string, QRegularExpression> this.bname_traversal_regex_dir;
+    private GLib.HashMap<Base_path_string, QRegularExpression> this.full_traversal_regex_file;
+    private GLib.HashMap<Base_path_string, QRegularExpression> this.full_traversal_regex_dir;
+    private GLib.HashMap<Base_path_string, QRegularExpression> this.full_regex_file;
+    private GLib.HashMap<Base_path_string, QRegularExpression> this.full_regex_dir;
 
     /***********************************************************
     ***********************************************************/
@@ -281,7 +281,7 @@ class ExcludedFiles : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private friend class Test_excluded_files;
-};
+}
 
 
 
@@ -370,7 +370,7 @@ static const char win_reserved_words_3[] = {
     "PRN",
     "AUX",
     "NUL"
-};
+}
 static const char win_reserved_words_4[] = {
     "COM1",
     "COM2",
@@ -390,11 +390,11 @@ static const char win_reserved_words_4[] = {
     "LPT7",
     "LPT8",
     "LPT9"
-};
+}
 static const char win_reserved_words_n[] = {
     "CLOCK$",
     "$Recycle.Bin"
-};
+}
 
 /***********************************************************
 @brief Checks if filename is considered reserved by Windows

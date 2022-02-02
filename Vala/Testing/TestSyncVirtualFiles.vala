@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -1419,6 +1418,6 @@ class TestSyncVirtualFiles : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState ().find ("A/hello" DVSUFFIX).size, 222);
         QCOMPARE (fakeFolder.currentLocalState ().find ("A/igno" DVSUFFIX).size, 123);
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestSyncVirtualFiles)

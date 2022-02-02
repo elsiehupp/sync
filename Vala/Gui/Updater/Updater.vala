@@ -4,7 +4,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.Uri>
 // #include <QUrlQuery>
 // #include <QProcess>
 
@@ -55,7 +54,7 @@ class Updater : GLib.Object {
     private static QUrlQuery get_query_params ();
     private static Updater create ();
     private static Updater this.instance;
-};
+}
 
 
     Updater *Updater._instance = nullptr;

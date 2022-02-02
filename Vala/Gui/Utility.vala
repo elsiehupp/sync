@@ -13,7 +13,6 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 
 using namespace Occ;
 
-// #include <GLib.Uri>
 // #include <Gtk.Widget>
 
 namespace Occ {

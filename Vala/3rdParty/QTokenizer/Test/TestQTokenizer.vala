@@ -143,7 +143,7 @@ class TestTokenizer : GLib.Object {
     }
 
     // ### GLib.ByteArray, other types
-};
+}
 
 QTEST_APPLESS_MAIN (TestTokenizer)
 

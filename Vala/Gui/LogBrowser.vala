@@ -22,7 +22,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QCheckBox>
 // #include <QPlain_text_edit>
 // #include <QTextStream>
-// #include <GLib.File>
 // #include <GLib.List>
 // #include <Gtk.Dialog>
 // #include <QLineEdit>
@@ -47,7 +46,7 @@ class Log_browser : Gtk.Dialog {
 
 protected slots:
     void toggle_permanent_logging (bool enabled);
-};
+}
 
 
     Log_browser.Log_browser (Gtk.Widget parent)

@@ -1,7 +1,6 @@
 #pragma once
 
 // #include <QPixmap>
-// #include <GLib.Uri>
 // #include <QJsonObject>
 // #include <QJsonDocument>
 // #include <QJsonArray>
@@ -10,7 +9,7 @@
 // #include <QPainter>
 // #include <QImage>
 // #include <QSvgRenderer>
-// #include <QNetworkReply>
+using Soup;
 // #include <QPixmap>
 // #include <QPixmapCache>
 
@@ -34,11 +33,11 @@ struct HovercardAction {
     public GLib.Uri this.icon_url;
     public QPixmap this.icon;
     public GLib.Uri this.link;
-};
+}
 
 struct Hovercard {
     std.vector<HovercardAction> this.actions;
-};
+}
 
 class OcsProfileConnector : GLib.Object {
 
@@ -74,7 +73,7 @@ signals:
 
     AccountPointer this.account;
     Hovercard this.current_hovercard;
-};
+}
 
 
 
@@ -194,7 +193,7 @@ signals:
             [this, hovercard_action_index] (GLib.ByteArray icon_data) {
                 load_hovercard_action_icon (hovercard_action_index, icon_data);
             });
-        connect (icon_job, &IconJob.error, this, [] (QNetworkReply.NetworkError error_type) {
+        connect (icon_job, &IconJob.error, this, [] (Soup.Reply.NetworkError error_type) {
             GLib.warn (lc_ocs_profile_connector) << "Could not fetch icon:" << error_type;
         });
     }

@@ -14,7 +14,7 @@ class DateTimeProvider {
     /***********************************************************
     ***********************************************************/
     public virtual QDate current_date ();
-};
+}
 
 
     DateTimeProvider.~DateTimeProvider () = default;

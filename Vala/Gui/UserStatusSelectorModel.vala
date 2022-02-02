@@ -177,7 +177,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private enum class Clear_stage_type {
+    private enum Clear_stage_type {
         Dont_clear,
         Half_hour,
         One_hour,
@@ -228,7 +228,7 @@ signals:
         Clear_stage_type.Today,
         Clear_stage_type.Week
     };
-};
+}
 
     User_status_selector_model.User_status_selector_model (GLib.Object parent)
         : GLib.Object (parent)

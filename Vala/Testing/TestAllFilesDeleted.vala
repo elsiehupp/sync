@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -215,7 +214,7 @@ class TestAllFilesDeleted : GLib.Object {
         }
 
         int fingerprintRequests = 0;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest request, QIODevice stream) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest request, QIODevice stream) . Soup.Reply * {
             var verb = request.attribute (QNetworkRequest.CustomVerbAttribute);
             if (verb == "PROPFIND") {
                 var data = stream.readAll ();
@@ -336,7 +335,7 @@ class TestAllFilesDeleted : GLib.Object {
         QCOMPARE (aboutToRemoveAllFilesCalled, 0); // But we did not show the popup
     }
 
-};
+}
 
 QTEST_GUILESS_MAIN (TestAllFilesDeleted)
 #include "testallfilesdeleted.moc"

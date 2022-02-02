@@ -7,7 +7,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 // #include <QDir>
 // #include <QFileDialog>
-// #include <GLib.Uri>
 // #include <QTimer>
 // #include <QPushButton>
 // #include <QMessageBox>
@@ -136,7 +135,7 @@ signals:
     private QProgress_indicator this.progress_indi;
     private OwncloudWizard this.oc_wizard;
     private AddCertificateDialog add_cert_dial = nullptr;
-};
+}
 
     Owncloud_setup_page.Owncloud_setup_page (Gtk.Widget parent)
         : QWizard_page ()

@@ -199,7 +199,7 @@ signals:
     private bool this.currently_fetching = false;
     private bool this.done_fetching = false;
     private bool this.hide_old_activities = true;
-};
+}
 
     ActivityListModel.ActivityListModel (GLib.Object parent)
         : QAbstractListModel (parent) {

@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -527,7 +526,7 @@ class TestSyncEngine : GLib.Object {
         int remoteQuota = 1000;
         int n507 = 0, nPUT = 0;
         GLib.Object parent;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice outgoingData) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice outgoingData) . Soup.Reply * {
             Q_UNUSED (outgoingData)
 
             if (op == QNetworkAccessManager.PutOperation) {
@@ -569,7 +568,7 @@ class TestSyncEngine : GLib.Object {
         GLib.ByteArray checksumValue;
         GLib.ByteArray contentMd5Value;
 
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (op == QNetworkAccessManager.GetOperation) {
                 var reply = new FakeGetReply (fakeFolder.remoteModifier (), op, request, parent);
                 if (!checksumValue.isNull ())
@@ -748,7 +747,7 @@ class TestSyncEngine : GLib.Object {
 
         GLib.Object parent;
         int nPUT = 0;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 ++nPUT;
                 return new FakeHangingReply (op, request, parent);
@@ -829,12 +828,12 @@ class TestSyncEngine : GLib.Object {
 
         int nPUT = 0;
         int nPOST = 0;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice outgoingData) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice outgoingData) . Soup.Reply * {
             var contentType = request.header (QNetworkRequest.ContentTypeHeader).toString ();
             if (op == QNetworkAccessManager.PostOperation) {
                 ++nPOST;
                 if (contentType.startsWith (QStringLiteral ("multipart/related; boundary="))) {
-                    var jsonReplyObject = fakeFolder.forEachReplyPart (outgoingData, contentType, [] (QMap<string, GLib.ByteArray> allHeaders) . QJsonObject {
+                    var jsonReplyObject = fakeFolder.forEachReplyPart (outgoingData, contentType, [] (GLib.HashMap<string, GLib.ByteArray> allHeaders) . QJsonObject {
                         var reply = QJsonObject{};
                         const var fileName = allHeaders[QStringLiteral ("X-File-Path")];
                         if (fileName.endsWith ("A/big2") ||
@@ -902,6 +901,6 @@ class TestSyncEngine : GLib.Object {
         QCOMPARE (nPUT, 6);
         QCOMPARE (nPOST, 0);
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestSyncEngine)

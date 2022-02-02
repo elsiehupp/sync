@@ -22,7 +22,7 @@ class Abstract_credentials_wizard_page : QWizard_page {
     ***********************************************************/
     public void cleanup_page () override;
     public virtual AbstractCredentials get_credentials ();
-};
+}
 
     void Abstract_credentials_wizard_page.cleanup_page () {
         // Reset the credentials when the 'Back' button is used.

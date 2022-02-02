@@ -11,7 +11,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <QCoreApplication>
 // #include <QDir>
-// #include <GLib.File>
 // #include <QFileInfo>
 // #include <QLoggingCategory>
 // #include <QSettings>
@@ -89,7 +88,6 @@ static constexpr char show_main_dialog_as_normal_window_c[] = "show_main_dialog_
 // #include <memory>
 
 // #include <QSettings>
-// #include <GLib.Variant>
 // #include <chrono>
 
 
@@ -553,7 +551,7 @@ class ConfigFile {
     private static bool this.asked_user;
     private static string this.o_c_version;
     private static string this.conf_dir;
-};
+}
 
 static chrono.milliseconds milliseconds_value (QSettings setting, char key,
     chrono.milliseconds default_value) {

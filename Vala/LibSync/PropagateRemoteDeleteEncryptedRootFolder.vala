@@ -20,7 +20,6 @@ Removing the root encrypted folder is consisted of multiple steps:
 
 // #pragma once
 
-// #include <QMap>
 
 namespace Occ {
 
@@ -53,8 +52,8 @@ class Propagate_remote_delete_encrypted_root_folder : AbstractPropagateRemoteDel
     /***********************************************************
     ***********************************************************/
     private 
-    private QMap<string, Occ.SyncJournalFileRecord> this.nested_items; // Nested files and folders
-};
+    private GLib.HashMap<string, Occ.SyncJournalFileRecord> this.nested_items; // Nested files and folders
+}
 
 
 
@@ -141,13 +140,13 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
         }
     }
 
-    QNetworkReply.NetworkError err = delete_job.reply ().error ();
+    Soup.Reply.NetworkError err = delete_job.reply ().error ();
 
     const var http_error_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
     this.item._response_time_stamp = delete_job.response_timestamp ();
     this.item._request_id = delete_job.request_id ();
 
-    if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
+    if (err != Soup.Reply.NoError && err != Soup.Reply.ContentNotFoundError) {
         store_first_error (err);
         store_first_error_string (delete_job.error_string ());
         GLib.warn (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Delete nested item on_finished with error" << err << ".";
@@ -172,8 +171,8 @@ void Propagate_remote_delete_encrypted_root_folder.on_delete_nested_remote_item_
 
     if (this.nested_items.size () == 0) {
         // we wait for all this.nested_items' Delete_jobs to finish, and then - fail if any of those jobs has failed
-        if (network_error () != QNetworkReply.NetworkError.NoError || this.item._http_error_code != 0) {
-            const int error_code = network_error () != QNetworkReply.NetworkError.NoError ? network_error () : this.item._http_error_code;
+        if (network_error () != Soup.Reply.NetworkError.NoError || this.item._http_error_code != 0) {
+            const int error_code = network_error () != Soup.Reply.NetworkError.NoError ? network_error () : this.item._http_error_code;
             q_c_critical (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Delete of nested items on_finished with error" << error_code << ". Failing the entire sequence.";
             task_failed ();
             return;

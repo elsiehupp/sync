@@ -3,7 +3,6 @@
 // #include <QDom_element>
 // #include <QXml_stream_writer>
 // #include <Qt_debug>
-// #include <GLib.File>
 // #include <QDom_document>
 // #include <QtCore/Qt_debug>
 // #include <QtCore/GLib.File>
@@ -63,7 +62,7 @@ class Update_info {
     private string m_version_string;
     private string m_web;
     private string m_download_url;
-};
+}
 
     void Update_info.set_version (string v) {
         m_version = v;

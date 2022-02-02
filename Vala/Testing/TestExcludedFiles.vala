@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -746,7 +745,7 @@ private on_ void check_csync_is_windows_reserved_word () {
         QCOMPARE (excludedFiles.reloadExcludeFiles (), true);
         QCOMPARE (excludedFiles._allExcludes.size (), 1);
     }
-};
+}
 
 QTEST_APPLESS_MAIN (TestExcludedFiles)
 #include "testexcludedfiles.moc"

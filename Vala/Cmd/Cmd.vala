@@ -10,8 +10,6 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 // #include <random>
 // #include <qcoreapplication.h>
 // #include <string[]>
-// #include <GLib.Uri>
-// #include <GLib.File>
 // #include <QFileInfo>
 // #include <QJsonDocument>
 // #include <QJsonObject>
@@ -46,7 +44,7 @@ class Cmd : GLib.Object {
     ***********************************************************/
     public void on_transmission_progress_slot () {
     }
-};
+}
 
 
 static void null_message_handler (QtMsgType, QMessageLogContext &, string ) {
@@ -70,32 +68,12 @@ struct CmdOptions {
     int restart_times;
     int downlimit;
     int uplimit;
-};
+}
 
 // we can't use csync_set_userdata because the SyncEngine sets it already.
 // So we have to use a global variable
 CmdOptions opts = nullptr;
 
-class EchoDisabler {
-
-    /***********************************************************
-    ***********************************************************/
-    public EchoDisabler () {
-        tcgetattr (STDIN_FILENO, tios);
-        termios tios_new = tios;
-        tios_new.c_lflag &= ~ECHO;
-        tcsetattr (STDIN_FILENO, TCSANOW, tios_new);
-    }
-
-    ~EchoDisabler () {
-        tcsetattr (STDIN_FILENO, TCSANOW, tios);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private termios tios;
-};
 
 string query_password (string user) {
     EchoDisabler disabler;
@@ -105,47 +83,6 @@ string query_password (string user) {
     return string.from_std_string (s);
 }
 
-#ifndef TOKEN_AUTH_ONLY
-class HttpCredentialsText : HttpCredentials {
-
-    /***********************************************************
-    ***********************************************************/
-    public HttpCredentialsText (string user, string password)
-        : HttpCredentials (user, password)
-        , // FIXME : not working with client certs yet (qknight)
-        this.ssl_trusted (false) {
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void ask_from_user () override {
-        this.password = .query_password (user ());
-        this.ready = true;
-        persist ();
-        /* emit */ asked ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void set_s_sLTrusted (bool is_trusted) {
-        this.ssl_trusted = is_trusted;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool ssl_is_trusted () override {
-        return this.ssl_trusted;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private bool this.ssl_trusted;
-};
-#endif /* TOKEN_AUTH_ONLY */
 
 void help () {
     const char binary_name = APPLICATION_EXECUTABLE "cmd";
@@ -262,7 +199,8 @@ void parse_options (string[] app_args, CmdOptions options) {
     }
 }
 
-/* If the selective sync list is different from before, we need to disable the read from database
+/***********************************************************
+If the selective sync list is different from before, we need to disable the read from database
   (The normal client does it in Selective_sync_dialog.accept*)
 ***********************************************************/
 void selective_sync_fixup (Occ.SyncJournalDb journal, string[] new_list) {
@@ -421,7 +359,7 @@ int main (int argc, char **argv) {
     job.on_start ();
     loop.exec ();
 
-    if (job.reply ().error () != QNetworkReply.NoError){
+    if (job.reply ().error () != Soup.Reply.NoError){
         std.cout<<"Error connecting to server\n";
         return EXIT_FAILURE;
     }

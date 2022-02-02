@@ -27,7 +27,7 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_directory_listing_iterated (string& item, QMap<string,string>& ) {
+    public void on_directory_listing_iterated (string& item, GLib.HashMap<string,string>& ) {
         qDebug () << "     item : " << item;
         this.items.append (item);
     }
@@ -110,8 +110,8 @@ class TestXmlParse : GLib.Object {
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
+        connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
+                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
@@ -186,8 +186,8 @@ class TestXmlParse : GLib.Object {
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
+        connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
+                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
@@ -212,8 +212,8 @@ class TestXmlParse : GLib.Object {
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
+        connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
+                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
@@ -237,8 +237,8 @@ class TestXmlParse : GLib.Object {
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
+        connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
+                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
@@ -278,8 +278,8 @@ class TestXmlParse : GLib.Object {
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
+        connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
+                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
@@ -345,8 +345,8 @@ class TestXmlParse : GLib.Object {
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
+        connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
+                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
@@ -412,8 +412,8 @@ class TestXmlParse : GLib.Object {
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
+        connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
+                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
@@ -479,8 +479,8 @@ class TestXmlParse : GLib.Object {
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
+        connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
+                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
@@ -555,8 +555,8 @@ class TestXmlParse : GLib.Object {
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
+        connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
+                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
@@ -623,8 +623,8 @@ class TestXmlParse : GLib.Object {
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
                  this, SLOT (on_directory_listing_sub_folders (string[]&)) );
-        connect ( parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, QMap<string,string>&)) );
+        connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
+                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (on_finished_successfully ()) );
 
@@ -640,6 +640,6 @@ class TestXmlParse : GLib.Object {
         QVERIFY (this.subdirs.size () == 1);
     }
 
-};
+}
 
 QTEST_GUILESS_MAIN (TestXmlParse)

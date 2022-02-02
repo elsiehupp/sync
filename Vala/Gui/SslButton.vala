@@ -5,7 +5,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 // #include <QMenu>
-// #include <GLib.Uri>
 // #include <Qt_network>
 // #include <QSslConfiguration>
 // #include <QWidget_action>
@@ -46,7 +45,7 @@ class Ssl_button : QToolButton {
         const GLib.List<QSslCertificate> user_approved, int pos, GLib.List<QSslCertificate> system_ca_certificates);
     private QPointer<AccountState> this.account_state;
     private QMenu this.menu;
-};
+}
 
 
     Ssl_button.Ssl_button (Gtk.Widget parent)

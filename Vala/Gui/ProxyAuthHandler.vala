@@ -113,7 +113,7 @@ class ProxyAuthHandler : GLib.Object {
     /// failing for an existing QNAM, we keep track of the senders of the
     /// proxy_auth_required signal here.
     private GLib.Set<GLib.Object> this.gave_credentials_to;
-};
+}
 
 } // namespace Occ
 

@@ -4,7 +4,6 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.File>
 // #pragma once
 
 // #include <QScopedPointer>
@@ -85,12 +84,8 @@ class Vfs_suffix : Vfs {
     public void on_file_status_changed (string , SyncFileStatus) override {}
 
     protected void start_impl (VfsSetupParams parameters) override;
-};
+}
 
-class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_suffix> {
-    Q_PLUGIN_METADATA (IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
-    Q_INTERFACES (Occ.PluginFactory)
-};
 
     Vfs_suffix.Vfs_suffix (GLib.Object parent)
         : Vfs (parent) {

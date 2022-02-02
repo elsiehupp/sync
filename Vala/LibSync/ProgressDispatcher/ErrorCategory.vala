@@ -16,7 +16,7 @@ in IssuesWidget.
 enum ErrorCategory {
     Normal,
     InsufficientRemoteStorage,
-};
+}
 
 } // namespace Progress
 } // namespace Occ

@@ -52,11 +52,11 @@ signals:
     bool DeleteApiJob.on_finished () {
         q_c_info (lc_json_api_job) << "JsonApiJob of" << reply ().request ().url () << "FINISHED WITH STATUS"
                             << reply ().error ()
-                            << (reply ().error () == QNetworkReply.NoError ? QLatin1String ("") : error_string ());
+                            << (reply ().error () == Soup.Reply.NoError ? QLatin1String ("") : error_string ());
 
         int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
-        if (reply ().error () != QNetworkReply.NoError) {
+        if (reply ().error () != Soup.Reply.NoError) {
             GLib.warn (lc_json_api_job) << "Network error : " << path () << error_string () << http_status;
             /* emit */ result (http_status);
             return true;

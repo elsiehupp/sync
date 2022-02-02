@@ -19,12 +19,12 @@ class SimpleNetworkJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public QNetworkReply start_request (GLib.ByteArray verb, GLib.Uri url,
+    public Soup.Reply start_request (GLib.ByteArray verb, GLib.Uri url,
         Soup.Request req = Soup.Request (),
         QIODevice request_body = nullptr);
 
 signals:
-    void finished_signal (QNetworkReply reply);
+    void finished_signal (Soup.Reply reply);
 
     /***********************************************************
     ***********************************************************/
@@ -38,7 +38,7 @@ signals:
         : AbstractNetworkJob (account, "", parent) {
     }
 
-    QNetworkReply *SimpleNetworkJob.start_request (GLib.ByteArray verb, GLib.Uri url,
+    Soup.Reply *SimpleNetworkJob.start_request (GLib.ByteArray verb, GLib.Uri url,
         Soup.Request req, QIODevice request_body) {
         var reply = send_request (verb, url, req, request_body);
         on_start ();

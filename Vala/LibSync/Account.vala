@@ -7,7 +7,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <deletejob.h>
 
 // #include <QLoggingCategory>
-// #include <QNetworkReply>
+using Soup;
 // #include <QNetworkAccessManager>
 // #include <QSslSocket>
 // #include <QNetworkCookieJar>
@@ -29,7 +29,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 using namespace QKeychain;
 
-// #include <GLib.Uri>
 // #include <QNetworkCookie>
 // #include <Soup.Request>
 // #include <QSslSocket>
@@ -57,14 +56,6 @@ namespace Occ {
 
 using AccountPointer = unowned<Account>;
 
-/***********************************************************
-@brief Reimplement this to handle SSL errors from libsync
-@ingroup libsync
-***********************************************************/
-class AbstractSslErrorHandler {
-    public virtual ~AbstractSslErrorHandler () = default;
-    public virtual bool handle_errors (GLib.List<QSslError>, QSslConfiguration conf, GLib.List<QSslCertificate> *, AccountPointer);
-};
 
 /***********************************************************
 @brief The Account class represents an account on an
@@ -75,6 +66,18 @@ The Account has a name and url. It also has information
 about credentials, SSL errors and certificates.
 ***********************************************************/
 class Account : GLib.Object {
+
+
+    /***********************************************************
+    @brief Reimplement this to handle SSL errors from libsync
+    @ingroup libsync
+    ***********************************************************/
+    class AbstractSslErrorHandler {
+        public virtual ~AbstractSslErrorHandler () = default;
+        public virtual bool handle_errors (GLib.List<QSslError>, QSslConfiguration conf, GLib.List<QSslCertificate> *, AccountPointer);
+    };
+
+
     Q_PROPERTY (string id MEMBER this.id)
     Q_PROPERTY (string dav_user MEMBER this.dav_user)
     Q_PROPERTY (string display_name MEMBER this.display_name)
@@ -190,19 +193,19 @@ class Account : GLib.Object {
     this function. Other places should prefer to use jobs or
     send_request ().
     ***********************************************************/
-    public QNetworkReply send_raw_request (GLib.ByteArray verb,
+    public Soup.Reply send_raw_request (GLib.ByteArray verb,
         const GLib.Uri url,
         Soup.Request req = Soup.Request (),
         QIODevice data = nullptr);
 
     /***********************************************************
     ***********************************************************/
-    public QNetworkReply send_raw_request (GLib.ByteArray verb,
+    public Soup.Reply send_raw_request (GLib.ByteArray verb,
 
     /***********************************************************
     ***********************************************************/
     public 
-    public QNetworkReply send_raw_request (GLib.ByteArray verb,
+    public Soup.Reply send_raw_request (GLib.ByteArray verb,
         const GLib.Uri url, Soup.Request req, QHttpMultiPart data);
 
 
@@ -437,7 +440,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_handle_ssl_errors (QNetworkReply *, GLib.List<QSslError>);
+    public void on_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>);
 
 signals:
     /// Emitted whenever there's network activity
@@ -493,7 +496,7 @@ protected slots:
 #ifndef TOKEN_AUTH_ONLY
     private QImage this.avatar_img;
 #endif
-    private QMap<string, GLib.Variant> this.settings_map;
+    private GLib.HashMap<string, GLib.Variant> this.settings_map;
     private GLib.Uri this.url;
 
 
@@ -578,7 +581,7 @@ protected slots:
     ***********************************************************/
     private bool this.is_remote_wipe_requested_HACK = false;
     // <-- FIXME MS@2019-12-07
-};
+}
 
 Account.Account (GLib.Object parent)
     : GLib.Object (parent)
@@ -699,8 +702,8 @@ void Account.set_credentials (AbstractCredentials cred) {
     if (proxy.type () != QNetworkProxy.DefaultProxy) {
         this.am.set_proxy (proxy);
     }
-    connect (this.am.data (), SIGNAL (ssl_errors (QNetworkReply *, GLib.List<QSslError>)),
-        SLOT (on_handle_ssl_errors (QNetworkReply *, GLib.List<QSslError>)));
+    connect (this.am.data (), SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
+        SLOT (on_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
     connect (this.am.data (), &QNetworkAccessManager.proxy_authentication_required,
         this, &Account.proxy_authentication_required);
     connect (this.credentials.data (), &AbstractCredentials.fetched,
@@ -802,8 +805,8 @@ void Account.reset_network_access_manager () {
     this.am.set_cookie_jar (jar); // takes ownership of the old cookie jar
     this.am.set_proxy (proxy);   // Remember proxy (issue #2108)
 
-    connect (this.am.data (), SIGNAL (ssl_errors (QNetworkReply *, GLib.List<QSslError>)),
-        SLOT (on_handle_ssl_errors (QNetworkReply *, GLib.List<QSslError>)));
+    connect (this.am.data (), SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
+        SLOT (on_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
     connect (this.am.data (), &QNetworkAccessManager.proxy_authentication_required,
         this, &Account.proxy_authentication_required);
 }
@@ -816,7 +819,7 @@ unowned<QNetworkAccessManager> Account.shared_network_access_manager () {
     return this.am;
 }
 
-QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, Soup.Request req, QIODevice data) {
+Soup.Reply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, Soup.Request req, QIODevice data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "HEAD" && !data) {
@@ -833,7 +836,7 @@ QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, Soup
     return this.am.send_custom_request (req, verb, data);
 }
 
-QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, Soup.Request req, GLib.ByteArray data) {
+Soup.Reply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, Soup.Request req, GLib.ByteArray data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "HEAD" && data.is_empty ()) {
@@ -850,7 +853,7 @@ QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, Soup
     return this.am.send_custom_request (req, verb, data);
 }
 
-QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, Soup.Request req, QHttpMultiPart data) {
+Soup.Reply *Account.send_raw_request (GLib.ByteArray verb, GLib.Uri url, Soup.Request req, QHttpMultiPart data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "PUT") {
@@ -937,7 +940,7 @@ void Account.set_credential_setting (string key, GLib.Variant value) {
     }
 }
 
-void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> errors) {
+void Account.on_handle_ssl_errors (Soup.Reply reply, GLib.List<QSslError> errors) {
     NetworkJobTimeoutPauser pauser (reply);
     string out;
     QDebug (&out) << "SSL-Errors happened for url " << reply.url ().to_string ();

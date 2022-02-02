@@ -87,7 +87,7 @@ enum csync_status_codes_e {
     CSYNC_STATUS_INDIVIDUAL_TOO_DEEP,
     CSYNC_STATUS_INDIVIDUAL_IS_CONFLICT_FILE,
     CSYNC_STATUS_INDIVIDUAL_CANNOT_ENCODE
-};
+}
 Q_ENUM_NS (csync_status_codes_e)
 
 /***********************************************************
@@ -111,7 +111,7 @@ enum SyncInstructions {
                                                     or back. */
     CSYNC_INSTRUCTION_UPDATE_METADATA = 1 << 10, /* If the etag has been updated and need to be writen to the database,
                                                     but without any propagation (UPDATE|RECONCILE) */
-};
+}
 
 Q_ENUM_NS (SyncInstructions)
 
@@ -156,7 +156,7 @@ enum ItemType {
     file dehydration without changing the pin state.
     ***********************************************************/
     ItemTypeVirtualFileDehydration = 6,
-};
+}
 Q_ENUM_NS (ItemType)
 }
 
@@ -201,7 +201,7 @@ struct OCSYNC_EXPORT csync_file_stat_s {
     , has_ignored_files (false)
     , is_hidden (false)
     , is_e2e_encrypted (false) {}
-};
+}
 
 
 

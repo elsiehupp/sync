@@ -61,13 +61,13 @@ signals:
     private string this.app_password;
     private bool this.account_removed;
     private QNetworkAccessManager this.network_manager;
-    private QNetworkReply this.network_reply_check;
-    private QNetworkReply this.network_reply_success;
+    private Soup.Reply this.network_reply_check;
+    private Soup.Reply this.network_reply_success;
 
     /***********************************************************
     ***********************************************************/
     private friend class .Test_remote_wipe;
-};
+}
 
     RemoteWipe.RemoteWipe (AccountPointer account, GLib.Object parent)
         : GLib.Object (parent),
@@ -105,9 +105,9 @@ signals:
         QUrlQuery arguments (string ("token=%1").arg (this.app_password));
         request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
         this.network_reply_check = this.network_manager.post (request, request_body);
-        GLib.Object.connect (&this.network_manager, SIGNAL (ssl_errors (QNetworkReply *, GLib.List<QSslError>)),
-            this.account.data (), SLOT (on_handle_ssl_errors (QNetworkReply *, GLib.List<QSslError>)));
-        GLib.Object.connect (this.network_reply_check, &QNetworkReply.on_finished, this,
+        GLib.Object.connect (&this.network_manager, SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
+            this.account.data (), SLOT (on_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
+        GLib.Object.connect (this.network_reply_check, &Soup.Reply.on_finished, this,
                          &RemoteWipe.on_check_job_slot);
     }
 
@@ -118,14 +118,14 @@ signals:
         bool wipe = false;
 
         //check for errors
-        if (this.network_reply_check.error () != QNetworkReply.NoError ||
+        if (this.network_reply_check.error () != Soup.Reply.NoError ||
                 json_parse_error.error != QJsonParseError.NoError) {
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
                 GLib.warn (lc_remote_wipe) << string ("Error returned from the server : <em>%1<em>")
                                            .arg (error_from_json.to_html_escaped ());
-            } else if (this.network_reply_check.error () != QNetworkReply.NoError) {
+            } else if (this.network_reply_check.error () != Soup.Reply.NoError) {
                 GLib.warn (lc_remote_wipe) << string ("There was an error accessing the 'token' endpoint : <br><em>%1</em>")
                                   .arg (this.network_reply_check.error_string ().to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
@@ -184,7 +184,7 @@ signals:
             QUrlQuery arguments (string ("token=%1").arg (this.app_password));
             request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
             this.network_reply_success = this.network_manager.post (request, request_body);
-            GLib.Object.connect (this.network_reply_success, &QNetworkReply.on_finished, this,
+            GLib.Object.connect (this.network_reply_success, &Soup.Reply.on_finished, this,
                              &RemoteWipe.on_notify_server_success_job_slot);
         }
     }
@@ -193,14 +193,14 @@ signals:
         var json_data = this.network_reply_success.read_all ();
         QJsonParseError json_parse_error;
         QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
-        if (this.network_reply_success.error () != QNetworkReply.NoError ||
+        if (this.network_reply_success.error () != Soup.Reply.NoError ||
                 json_parse_error.error != QJsonParseError.NoError) {
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
                 GLib.warn (lc_remote_wipe) << string ("Error returned from the server : <em>%1</em>")
                                   .arg (error_from_json.to_html_escaped ());
-            } else if (this.network_reply_success.error () != QNetworkReply.NoError) {
+            } else if (this.network_reply_success.error () != Soup.Reply.NoError) {
                 GLib.warn (lc_remote_wipe) << string ("There was an error accessing the 'on_success' endpoint : <br><em>%1</em>")
                                   .arg (this.network_reply_success.error_string ().to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {

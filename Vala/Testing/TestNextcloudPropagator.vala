@@ -75,6 +75,6 @@ class TestNextcloudPropagator : GLib.Object {
             QCOMPARE (parseEtag (test.first), GLib.ByteArray (test.second));
         }
     }
-};
+}
 
 QTEST_APPLESS_MAIN (TestNextcloudPropagator)

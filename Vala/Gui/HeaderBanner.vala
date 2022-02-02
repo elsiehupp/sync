@@ -125,7 +125,7 @@ class HeaderBanner : Gtk.Widget {
     private QLabel logo_label;
     private QGrid_layout layout;
     private QPixmap banner_pixmap;
-};
+}
 
 
 

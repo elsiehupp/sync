@@ -5,13 +5,11 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 // #include <QCryptographicHash>
-// #include <GLib.File>
 // #include <QLoggingCategory>
 // #include <string[]>
 // #include <QElapsedTimer>
-// #include <GLib.Uri>
 // #include <QDir>
-// #include <Sqlite3.h>
+using Sqlite3;
 // #include <cstring>
 
 // SQL expression to check whether path.startswith (prefix + '/')
@@ -23,9 +21,7 @@ const int IS_PREFIX_PATH_OR_EQUAL (prefix, path) {
     " (" path " == " prefix " OR " IS_PREFIX_PATH_OF (prefix, path) ")"
 }
 
-// #include <GLib.HashMap>
 // #include <QMutex>
-// #include <GLib.Variant>
 // #include <functional>
 
 namespace Occ {
@@ -44,7 +40,7 @@ class SyncJournalDb : GLib.Object {
     private SqlDatabase this.database;
     private string this.database_file;
     private QRecursiveMutex this.mutex; // Public functions are protected with the mutex.
-    private QMap<GLib.ByteArray, int> this.checksym_type_cache;
+    private GLib.HashMap<GLib.ByteArray, int> this.checksym_type_cache;
     private int this.transaction;
     private bool this.metadata_table_is_empty;
 
@@ -1669,7 +1665,7 @@ class SyncJournalDb : GLib.Object {
     bool operator== (SyncJournalDb.UploadInfo lhs,
         const SyncJournalDb.UploadInfo rhs);
 
-};
+}
 
 
 

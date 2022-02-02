@@ -6,7 +6,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 // #include <QLoggingCategory>
 // #include <Soup.Request>
-// #include <QNetworkReply>
+using Soup;
 // #include <QNetworkProxy>
 // #include <QAuthenticator>
 // #include <QSslConfiguration>
@@ -34,8 +34,8 @@ class AccessManager : QNetworkAccessManager {
     ***********************************************************/
     public AccessManager (GLib.Object parent = new GLib.Object ());
 
-    protected QNetworkReply create_request (QNetworkAccessManager.Operation op, Soup.Request request, QIODevice outgoing_data = nullptr) override;
-};
+    protected Soup.Reply create_request (QNetworkAccessManager.Operation op, Soup.Request request, QIODevice outgoing_data = nullptr) override;
+}
 
     AccessManager.AccessManager (GLib.Object parent)
         : QNetworkAccessManager (parent) {
@@ -51,7 +51,7 @@ class AccessManager : QNetworkAccessManager {
         return QUuid.create_uuid ().to_byte_array (QUuid.WithoutBraces);
     }
 
-    QNetworkReply *AccessManager.create_request (QNetworkAccessManager.Operation op, Soup.Request request, QIODevice outgoing_data) {
+    Soup.Reply *AccessManager.create_request (QNetworkAccessManager.Operation op, Soup.Request request, QIODevice outgoing_data) {
         Soup.Request new_request (request);
 
         // Respect request specific user agent if any

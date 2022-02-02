@@ -9,7 +9,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QProcess>
 // #include <QSettings>
 // #include <QDir>
-// #include <GLib.Uri>
 // #include <QDesktopServices>
 // #include <QApplication>
 

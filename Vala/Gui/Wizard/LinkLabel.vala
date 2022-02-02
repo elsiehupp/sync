@@ -7,7 +7,6 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 // #pragma once
 
 // #include <QLabel>
-// #include <GLib.Uri>
 
 namespace Occ {
 
@@ -39,7 +38,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private GLib.Uri url;
-};
+}
 
     Link_label.Link_label (Gtk.Widget parent) : QLabel (parent) {
 

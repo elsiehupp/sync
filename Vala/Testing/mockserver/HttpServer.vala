@@ -21,7 +21,7 @@ class HttpServer : QTcpServer {
     ***********************************************************/
     private void on_read_client ();
     private void on_discard_client ();
-};
+}
 
 
 

@@ -8,7 +8,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QLoggingCategory>
 // #include <Soup.Request>
 // #include <QNetworkAccessManager>
-// #include <QNetworkReply>
+using Soup;
 // #include <Soup.Request>
 // #include <QSslConfiguration>
 // #include <Soup.Buffer>
@@ -24,7 +24,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #pragma once
 
 // #include <Soup.Request>
-// #include <QNetworkReply>
+using Soup;
 // #include <QPointer>
 // #include <QElapsedTimer>
 // #include <QTimer>
@@ -40,6 +40,22 @@ int AbstractNetworkJob.http_timeout = q_environment_variable_int_value ("OWNCLOU
 @ingroup libsync
 ***********************************************************/
 class AbstractNetworkJob : GLib.Object {
+
+    /***********************************************************
+    @brief Internal Helper class
+    ***********************************************************/
+    class NetworkJobTimeoutPauser {
+
+        /***********************************************************
+        ***********************************************************/
+        public NetworkJobTimeoutPauser (Soup.Reply reply);
+        ~NetworkJobTimeoutPauser ();
+
+
+        /***********************************************************
+        ***********************************************************/
+        private QPointer<QTimer> this.timer;
+    };
 
     /***********************************************************
     ***********************************************************/
@@ -71,12 +87,12 @@ class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_reply (QNetworkReply reply);
+    public void set_reply (Soup.Reply reply);
 
     /***********************************************************
     ***********************************************************/
     public 
-    public QNetworkReply reply () {
+    public Soup.Reply reply () {
         return this.reply;
     }
 
@@ -188,7 +204,7 @@ signals:
 
     \a reply is never null
     ***********************************************************/
-    void network_error (QNetworkReply reply);
+    void network_error (Soup.Reply reply);
     void network_activity ();
 
 
@@ -199,43 +215,43 @@ signals:
     \a target_url Where to redirect to
     \a redirect_count Counts redirect hops, first is 0.
     ***********************************************************/
-    void redirected (QNetworkReply reply, GLib.Uri target_url, int redirect_count);
+    void redirected (Soup.Reply reply, GLib.Uri target_url, int redirect_count);
 
 
     /***********************************************************
-    Initiate a network request, returning a QNetworkReply.
+    Initiate a network request, returning a Soup.Reply.
 
     Calls set_reply () and setup_connections () on it.
 
     Takes ownership of the request_body (to allow redirects).
     ***********************************************************/
-    protected QNetworkReply send_request (GLib.ByteArray verb, GLib.Uri url,
+    protected Soup.Reply send_request (GLib.ByteArray verb, GLib.Uri url,
         Soup.Request req = Soup.Request (),
         QIODevice request_body = nullptr);
 
-    protected QNetworkReply send_request (GLib.ByteArray verb, GLib.Uri url,
+    protected Soup.Reply send_request (GLib.ByteArray verb, GLib.Uri url,
         Soup.Request req, GLib.ByteArray request_body);
 
     // send_request does not take a relative path instead of an url,
     // but the old API allowed that. We have this undefined overload
     // to help catch usage errors
-    protected QNetworkReply send_request (GLib.ByteArray verb, string relative_path,
+    protected Soup.Reply send_request (GLib.ByteArray verb, string relative_path,
         Soup.Request req = Soup.Request (),
         QIODevice request_body = nullptr);
 
-    protected QNetworkReply send_request (GLib.ByteArray verb, GLib.Uri url,
+    protected Soup.Reply send_request (GLib.ByteArray verb, GLib.Uri url,
         Soup.Request req, QHttpMultiPart request_body);
 
 
     /***********************************************************
-    Makes this job drive a pre-made QNetworkReply
+    Makes this job drive a pre-made Soup.Reply
 
     This reply cannot have a QIODevice request body because we can't get
     at it and thus not resend it in case of redirects.
     ***********************************************************/
-    protected void adopt_request (QNetworkReply reply);
+    protected void adopt_request (Soup.Reply reply);
 
-    protected void setup_connections (QNetworkReply reply);
+    protected void setup_connections (Soup.Reply reply);
 
 
     /***********************************************************
@@ -245,7 +261,7 @@ signals:
     changes. For things like setting up additional signal connections
     on the new reply.
     ***********************************************************/
-    protected virtual void new_reply_hook (QNetworkReply *) {}
+    protected virtual void new_reply_hook (Soup.Reply *) {}
 
     /// Creates a url for the account from a relative path
     protected GLib.Uri make_account_url (string relative_path);
@@ -259,7 +275,7 @@ signals:
 
 
     /***********************************************************
-    Called at the end of QNetworkReply.on_finished processing.
+    Called at the end of Soup.Reply.on_finished processing.
 
     Returning true triggers a delete_later () of this job.
     ***********************************************************/
@@ -294,9 +310,9 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private QNetworkReply add_timer (QNetworkReply reply);
+    private Soup.Reply add_timer (Soup.Reply reply);
     private bool this.ignore_credential_failure;
-    private QPointer<QNetworkReply> this.reply; // (QPointer because the NetworkManager may be destroyed before the jobs at exit)
+    private QPointer<Soup.Reply> this.reply; // (QPointer because the NetworkManager may be destroyed before the jobs at exit)
     private string this.path;
     private QTimer this.timer;
     private int this.redirect_count = 0;
@@ -305,25 +321,10 @@ signals:
     // Set by the xyz_request () functions and needed to be able to redirect
     // requests, should it be required.
     //
-    // Reparented to the currently running QNetworkReply.
+    // Reparented to the currently running Soup.Reply.
     private QPointer<QIODevice> this.request_body;
-};
+}
 
-/***********************************************************
-@brief Internal Helper class
-***********************************************************/
-class NetworkJobTimeoutPauser {
-
-    /***********************************************************
-    ***********************************************************/
-    public NetworkJobTimeoutPauser (QNetworkReply reply);
-    ~NetworkJobTimeoutPauser ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private QPointer<QTimer> this.timer;
-};
 
 /***********************************************************
 Gets the SabreDAV-style error message from an error response.
@@ -341,16 +342,16 @@ Builds a error message based on the error and the reply body.
 string error_message (string base_error, GLib.ByteArray body);
 
 /***********************************************************
-Nicer error_string () for QNetworkReply
+Nicer error_string () for Soup.Reply
 
-By default QNetworkReply.error_string () often produces messages like
+By default Soup.Reply.error_string () often produces messages like
   "Error downloading <url> - server replied : <reason>"
 but the "downloading" part invariably confuses people since the
 error might very well have been produced by a PUT request.
 
 This function produces clearer error messages for HTTP errors.
 ***********************************************************/
-string network_reply_error_string (QNetworkReply reply);
+string network_reply_error_string (Soup.Reply reply);
 
 } // namespace Occ
 
@@ -387,11 +388,11 @@ AbstractNetworkJob.AbstractNetworkJob (AccountPointer account, string path, GLib
     }
 }
 
-void AbstractNetworkJob.set_reply (QNetworkReply reply) {
+void AbstractNetworkJob.set_reply (Soup.Reply reply) {
     if (reply)
         reply.set_property ("do_not_handle_auth", true);
 
-    QNetworkReply old = this.reply;
+    Soup.Reply old = this.reply;
     this.reply = reply;
     delete old;
 }
@@ -418,22 +419,22 @@ void AbstractNetworkJob.set_path (string path) {
     this.path = path;
 }
 
-void AbstractNetworkJob.setup_connections (QNetworkReply reply) {
-    connect (reply, &QNetworkReply.on_finished, this, &AbstractNetworkJob.on_finished);
-    connect (reply, &QNetworkReply.encrypted, this, &AbstractNetworkJob.network_activity);
+void AbstractNetworkJob.setup_connections (Soup.Reply reply) {
+    connect (reply, &Soup.Reply.on_finished, this, &AbstractNetworkJob.on_finished);
+    connect (reply, &Soup.Reply.encrypted, this, &AbstractNetworkJob.network_activity);
     connect (reply.manager (), &QNetworkAccessManager.proxy_authentication_required, this, &AbstractNetworkJob.network_activity);
-    connect (reply, &QNetworkReply.ssl_errors, this, &AbstractNetworkJob.network_activity);
-    connect (reply, &QNetworkReply.meta_data_changed, this, &AbstractNetworkJob.network_activity);
-    connect (reply, &QNetworkReply.download_progress, this, &AbstractNetworkJob.network_activity);
-    connect (reply, &QNetworkReply.upload_progress, this, &AbstractNetworkJob.network_activity);
+    connect (reply, &Soup.Reply.ssl_errors, this, &AbstractNetworkJob.network_activity);
+    connect (reply, &Soup.Reply.meta_data_changed, this, &AbstractNetworkJob.network_activity);
+    connect (reply, &Soup.Reply.download_progress, this, &AbstractNetworkJob.network_activity);
+    connect (reply, &Soup.Reply.upload_progress, this, &AbstractNetworkJob.network_activity);
 }
 
-QNetworkReply *AbstractNetworkJob.add_timer (QNetworkReply reply) {
+Soup.Reply *AbstractNetworkJob.add_timer (Soup.Reply reply) {
     reply.set_property ("timer", GLib.Variant.from_value (&this.timer));
     return reply;
 }
 
-QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, GLib.Uri url,
+Soup.Reply *AbstractNetworkJob.send_request (GLib.ByteArray verb, GLib.Uri url,
     Soup.Request req, QIODevice request_body) {
     var reply = this.account.send_raw_request (verb, url, req, request_body);
     this.request_body = request_body;
@@ -444,7 +445,7 @@ QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, GLib.Uri ur
     return reply;
 }
 
-QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, GLib.Uri url,
+Soup.Reply *AbstractNetworkJob.send_request (GLib.ByteArray verb, GLib.Uri url,
     Soup.Request req, GLib.ByteArray request_body) {
     var reply = this.account.send_raw_request (verb, url, req, request_body);
     this.request_body = nullptr;
@@ -452,7 +453,7 @@ QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb, GLib.Uri ur
     return reply;
 }
 
-QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb,
+Soup.Reply *AbstractNetworkJob.send_request (GLib.ByteArray verb,
                                                const GLib.Uri url,
                                                Soup.Request req,
                                                QHttpMultiPart request_body) {
@@ -462,7 +463,7 @@ QNetworkReply *AbstractNetworkJob.send_request (GLib.ByteArray verb,
     return reply;
 }
 
-void AbstractNetworkJob.adopt_request (QNetworkReply reply) {
+void AbstractNetworkJob.adopt_request (Soup.Reply reply) {
     add_timer (reply);
     set_reply (reply);
     setup_connections (reply);
@@ -480,13 +481,13 @@ GLib.Uri AbstractNetworkJob.make_dav_url (string relative_path) {
 void AbstractNetworkJob.on_finished () {
     this.timer.stop ();
 
-    if (this.reply.error () == QNetworkReply.SslHandshakeFailedError) {
+    if (this.reply.error () == Soup.Reply.SslHandshakeFailedError) {
         GLib.warn (lc_network_job) << "SslHandshakeFailedError : " << error_string () << " : can be caused by a webserver wanting SSL client certificates";
     }
     // Qt doesn't yet transparently resend HTTP2 requests, do so here
     const var max_http2Resends = 3;
     GLib.ByteArray verb = HttpLogger.request_verb (*reply ());
-    if (this.reply.error () == QNetworkReply.ContentReSendError
+    if (this.reply.error () == Soup.Reply.ContentReSendError
         && this.reply.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()) {
 
         if ( (this.request_body && !this.request_body.is_sequential ()) || verb.is_empty ()) {
@@ -514,15 +515,15 @@ void AbstractNetworkJob.on_finished () {
         }
     }
 
-    if (this.reply.error () != QNetworkReply.NoError) {
+    if (this.reply.error () != Soup.Reply.NoError) {
 
         if (this.account.credentials ().retry_if_needed (this))
             return;
 
-        if (!this.ignore_credential_failure || this.reply.error () != QNetworkReply.AuthenticationRequiredError) {
+        if (!this.ignore_credential_failure || this.reply.error () != Soup.Reply.AuthenticationRequiredError) {
             GLib.warn (lc_network_job) << this.reply.error () << error_string ()
                                     << this.reply.attribute (Soup.Request.HttpStatusCodeAttribute);
-            if (this.reply.error () == QNetworkReply.ProxyAuthenticationRequiredError) {
+            if (this.reply.error () == Soup.Reply.ProxyAuthenticationRequiredError) {
                 GLib.warn (lc_network_job) << this.reply.raw_header ("Proxy-Authenticate");
             }
         }
@@ -670,15 +671,15 @@ void AbstractNetworkJob.on_timed_out () {
 
 string AbstractNetworkJob.reply_status_"" {
     Q_ASSERT (reply ());
-    if (reply ().error () == QNetworkReply.NoError) {
+    if (reply ().error () == Soup.Reply.NoError) {
         return QLatin1String ("OK");
     } else {
-        string enum_str = QMetaEnum.from_type<QNetworkReply.NetworkError> ().value_to_key (static_cast<int> (reply ().error ()));
+        string enum_str = QMetaEnum.from_type<Soup.Reply.NetworkError> ().value_to_key (static_cast<int> (reply ().error ()));
         return QStringLiteral ("%1 %2").arg (enum_str, error_string ());
     }
 }
 
-NetworkJobTimeoutPauser.NetworkJobTimeoutPauser (QNetworkReply reply) {
+NetworkJobTimeoutPauser.NetworkJobTimeoutPauser (Soup.Reply reply) {
     this.timer = reply.property ("timer").value<QTimer> ();
     if (!this.timer.is_null ()) {
         this.timer.stop ();
@@ -723,7 +724,7 @@ string error_message (string base_error, GLib.ByteArray body) {
     return msg;
 }
 
-string network_reply_error_string (QNetworkReply reply) {
+string network_reply_error_string (Soup.Reply reply) {
     string base = reply.error_string ();
     int http_status = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
     string http_reason = reply.attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();

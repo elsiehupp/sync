@@ -104,6 +104,6 @@ class TestTheme : GLib.Object {
 
         QCOMPARE (Occ.Theme.isHidpi (&paintDevice), false);
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestTheme)

@@ -77,7 +77,7 @@ class TestIconUtils : GLib.Object {
 
         QVERIFY (!Occ.Ui.IconUtils.pixmapForBackground (blackImages.at (0), Gtk.Color ("yellow")).isNull ());
     }
-};
+}
 
 QTEST_MAIN (TestIconUtils)
 #include "testiconutils.moc"

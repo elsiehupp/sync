@@ -34,7 +34,7 @@ namespace Ui {
     class Share_dialog;
 }
 
-class Link_share;
+
 
 class Share_dialog : Gtk.Dialog {
 
@@ -104,7 +104,7 @@ signals:
     private Share_link_widget* this.empty_share_link_widget = nullptr;
     private Share_user_group_widget this.user_group_widget = nullptr;
     private QProgress_indicator this.progress_indicator = nullptr;
-};
+}
 
     /***********************************************************
     ***********************************************************/

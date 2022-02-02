@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -22,7 +21,7 @@ class TestSelectiveSync : GLib.Object {
 
         string[] sizeRequests;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest req, QIODevice device)
-                                         . QNetworkReply * {
+                                         . Soup.Reply * {
             // Record what path we are querying for the size
             if (req.attribute (QNetworkRequest.CustomVerbAttribute) == "PROPFIND") {
                 if (device.readAll ().contains ("<size "))
@@ -80,6 +79,6 @@ class TestSelectiveSync : GLib.Object {
         QCOMPARE (sizeRequests.count (), 0);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestSelectiveSync)

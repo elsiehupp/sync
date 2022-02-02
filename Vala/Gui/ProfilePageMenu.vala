@@ -30,7 +30,7 @@ class Profile_page_menu : Gtk.Widget {
     private 
     private OcsProfileConnector this.profile_connector;
     private QMenu this.menu;
-};
+}
 
 
     Profile_page_menu.Profile_page_menu (AccountPointer account, string share_with_user_id, Gtk.Widget parent)

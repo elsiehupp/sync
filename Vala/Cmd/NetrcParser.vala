@@ -4,10 +4,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.HashMap>
 // #include <QPair>
 // #include <QDir>
-// #include <GLib.File>
 // #include <QTextStream>
 
 // #include <qtokenizer.h>
@@ -47,7 +45,7 @@ class NetrcParser {
     private GLib.HashMap<string, Login_pair> this.entries;
     private Login_pair this.default;
     private string this.netrc_location;
-};
+}
 
 
 

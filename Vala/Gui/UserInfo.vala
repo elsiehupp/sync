@@ -12,7 +12,6 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 // #include <QJsonObject>
 
 // #include <QPointer>
-// #include <GLib.Variant>
 // #include <QTimer>
 
 namespace Occ {
@@ -118,7 +117,7 @@ signals:
     private GLib.DateTime this.last_info_received; // the time at which the user info and quota was received last
     private bool this.active; // if we should check at regular interval (when the UI is visible)
     private QPointer<JsonApiJob> this.job; // the currently running job
-};
+}
 
 
 

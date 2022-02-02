@@ -20,7 +20,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <string[]>
 // #include <QTextStream>
 // #include <QTime>
-// #include <GLib.Uri>
 // #include <QSslCertificate>
 // #include <QProcess>
 // #include <QElapsedTimer>
@@ -33,7 +32,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <QMutex>
 // #include <QThread>
-// #include <QMap>
 // #include <string[]>
 
 // #include <set>
@@ -41,13 +39,11 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 namespace Occ {
 
-class ProcessDirectoryJob;
-
 enum Another_sync_needed {
     No_follow_up_sync,
     Immediate_follow_up, // schedule this again immediately (limited amount of times)
     DelayedFollowUp // regularly schedule this folder again (around 1/minute, unlimited)
-};
+}
 
 /***********************************************************
 @brief The SyncEngine class
@@ -440,7 +436,7 @@ signals:
     private LocalDiscoveryStyle this.last_local_discovery_style = LocalDiscoveryStyle.FilesystemOnly;
     private LocalDiscoveryStyle this.local_discovery_style = LocalDiscoveryStyle.FilesystemOnly;
     private std.set<string> this.local_discovery_paths;
-};
+}
 
     bool SyncEngine.s_any_sync_running = false;
 

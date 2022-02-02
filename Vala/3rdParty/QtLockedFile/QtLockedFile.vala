@@ -11,7 +11,6 @@ rights.  These rights are described in the Digia Qt LGPL Exception
 version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
-// #include <GLib.File>
 
 namespace SharedTools {
 
@@ -58,7 +57,7 @@ class QtLockedFile : GLib.File {
     /***********************************************************
     ***********************************************************/
     private LockMode m_lock_mode;
-};
+}
 
 } // namespace SharedTools
 

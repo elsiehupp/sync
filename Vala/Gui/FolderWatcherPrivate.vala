@@ -11,7 +11,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QVarLengthArray>
 
 // #include <QSocket_notifier>
-// #include <GLib.HashMap>
 // #include <QDir>
 
 
@@ -56,10 +55,10 @@ protected slots:
     ***********************************************************/
     private string this.folder;
     private GLib.HashMap<int, string> this.watch_to_path;
-    private QMap<string, int> this.path_to_watch;
+    private GLib.HashMap<string, int> this.path_to_watch;
     private QScopedPointer<QSocket_notifier> this.socket;
     private int this.fd;
-};
+}
 
 
     Folder_watcher_private.Folder_watcher_private (Folder_watcher p, string path)

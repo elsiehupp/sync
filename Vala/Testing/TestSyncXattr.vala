@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -1104,6 +1103,6 @@ class TestSyncXAttr : GLib.Object {
         XAVERIFY_NONVIRTUAL (fakeFolder, "online/file1");
         XAVERIFY_VIRTUAL (fakeFolder, "local/file1");
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestSyncXAttr)

@@ -6,7 +6,6 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 // #include <theme.h>
 
-// #include <GLib.File>
 // #include <QLoggingCategory>
 // #include <QPainter>
 // #include <QPixmapCache>

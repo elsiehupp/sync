@@ -4,7 +4,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.File>
 // #include <QDir>
 // #include <QList_widget>
 // #include <QListWidgetTtem>
@@ -46,7 +45,7 @@ class Ignore_list_editor : Gtk.Dialog {
     private void setup_table_read_only_items ();
     private string read_only_tooltip;
     private Ui.Ignore_list_editor ui;
-};
+}
 
 
     Ignore_list_editor.Ignore_list_editor (Gtk.Widget parent)

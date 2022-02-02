@@ -5,15 +5,12 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.Variant>
 // #include <QVBoxLayout>
 
 // #pragma once
 
 // #include <GLib.List>
-// #include <QMap>
 // #include <QNetworkCookie>
-// #include <GLib.Uri>
 // #include <QPointer>
 
 
@@ -73,7 +70,7 @@ signals:
     ***********************************************************/
     private Flow2AuthWidget this.flow_2_auth_widget = nullptr;
     private QVBoxLayout this.layout = nullptr;
-};
+}
 
     Flow2Auth_creds_page.Flow2Auth_creds_page ()
         : Abstract_credentials_wizard_page () {

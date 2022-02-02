@@ -15,7 +15,6 @@ Copyright (C) by Klaas Freitag <freitag@kde.org>
 // #include <accountfwd.h>
 // #include <QAbstractItemModel>
 // #include <QLoggingCategory>
-// #include <GLib.Vector>
 // #include <QElapsedTimer>
 // #include <QPointer>
 
@@ -169,9 +168,9 @@ class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     private void on_update_directories (string[] &);
-    private void on_gather_permissions (string name, QMap<string, string> properties);
-    private void on_gather_encryption_status (string href, QMap<string, string> properties);
-    private void on_lscol_finished_with_error (QNetworkReply r);
+    private void on_gather_permissions (string name, GLib.HashMap<string, string> properties);
+    private void on_gather_encryption_status (string href, GLib.HashMap<string, string> properties);
+    private void on_lscol_finished_with_error (Soup.Reply r);
     private void on_folder_sync_state_change (Folder f);
     private void on_folder_schedule_queue_changed ();
     private void on_new_big_folder ();
@@ -196,7 +195,7 @@ class FolderStatusModel : QAbstractItemModel {
 
     See on_show_pending_fetch_progress ()
     ***********************************************************/
-    private QMap<QPersistent_model_index, QElapsedTimer> this.fetching_items;
+    private GLib.HashMap<QPersistent_model_index, QElapsedTimer> this.fetching_items;
 
 signals:
     void dirty_changed ();
@@ -204,7 +203,7 @@ signals:
     // Tell the view that this item should be expanded because it has an undecided item
     void suggest_expand (QModelIndex &);
     friend struct SubFolderInfo;
-};
+}
 
 
 static const char property_parent_index_c[] = "oc_parent_index";
@@ -795,7 +794,7 @@ void FolderStatusModel.reset_and_fetch (QModelIndex parent) {
     fetch_more (parent);
 }
 
-void FolderStatusModel.on_gather_permissions (string href, QMap<string, string> map) {
+void FolderStatusModel.on_gather_permissions (string href, GLib.HashMap<string, string> map) {
     var it = map.find ("permissions");
     if (it == map.end ())
         return;
@@ -808,7 +807,7 @@ void FolderStatusModel.on_gather_permissions (string href, QMap<string, string> 
     job.set_property (property_permission_map, permission_map);
 }
 
-void FolderStatusModel.on_gather_encryption_status (string href, QMap<string, string> properties) {
+void FolderStatusModel.on_gather_encryption_status (string href, GLib.HashMap<string, string> properties) {
     var it = properties.find ("is-encrypted");
     if (it == properties.end ())
         return;
@@ -971,7 +970,7 @@ void FolderStatusModel.on_update_directories (string[] list) {
     }
 }
 
-void FolderStatusModel.on_lscol_finished_with_error (QNetworkReply r) {
+void FolderStatusModel.on_lscol_finished_with_error (Soup.Reply r) {
     var job = qobject_cast<LsColJob> (sender ());
     ASSERT (job);
     QModelIndex idx = qvariant_cast<QPersistent_model_index> (job.property (property_parent_index_c));
@@ -986,7 +985,7 @@ void FolderStatusModel.on_lscol_finished_with_error (QNetworkReply r) {
 
         parent_info.reset_subs (this, idx);
 
-        if (error == QNetworkReply.ContentNotFoundError) {
+        if (error == Soup.Reply.ContentNotFoundError) {
             parent_info._fetched = true;
         } else {
             ASSERT (!parent_info.has_label ());

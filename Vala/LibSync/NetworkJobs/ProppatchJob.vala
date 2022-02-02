@@ -34,12 +34,12 @@ class ProppatchJob : AbstractNetworkJob {
      - contain a colon : and thus specify an explicit namespace,
        e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
     ***********************************************************/
-    public void set_properties (QMap<GLib.ByteArray, GLib.ByteArray> properties);
+    public void set_properties (GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties);
 
 
     /***********************************************************
     ***********************************************************/
-    public QMap<GLib.ByteArray, GLib.ByteArray> properties ();
+    public GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties ();
 
 signals:
     void on_success ();
@@ -53,7 +53,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private 
-    private QMap<GLib.ByteArray, GLib.ByteArray> this.properties;
+    private GLib.HashMap<GLib.ByteArray, GLib.ByteArray> this.properties;
 
 
 
@@ -103,11 +103,11 @@ signals:
         AbstractNetworkJob.on_start ();
     }
 
-    void ProppatchJob.set_properties (QMap<GLib.ByteArray, GLib.ByteArray> properties) {
+    void ProppatchJob.set_properties (GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties) {
         this.properties = properties;
     }
 
-    QMap<GLib.ByteArray, GLib.ByteArray> ProppatchJob.properties () {
+    GLib.HashMap<GLib.ByteArray, GLib.ByteArray> ProppatchJob.properties () {
         return this.properties;
     }
 

@@ -13,8 +13,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QSettings>
 // #include <QTextStream>
 // #include <QDir>
-// #include <GLib.File>
-// #include <GLib.Uri>
 // #include <QProcess>
 // #include <QThread>
 // #include <QSysInfo>
@@ -37,8 +35,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 // #include <QElapsedTimer>
 // #include <QLoggingCategory>
-// #include <QMap>
-// #include <GLib.Uri>
 // #include <QUrlQuery>
 // #include <functional>
 // #include <memory>
@@ -208,7 +204,7 @@ namespace Utility {
 
     class StopWatch {
 
-        private QMap<string, uint64> this.lap_times;
+        private GLib.HashMap<string, uint64> this.lap_times;
         private GLib.DateTime this.start_time;
         private QElapsedTimer this.timer;
 

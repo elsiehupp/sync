@@ -7,7 +7,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 // #include <QDir>
 // #include <QFileDialog>
-// #include <GLib.Uri>
 // #include <QTimer>
 // #include <QStorage_info>
 // #include <QMessageBox>
@@ -131,7 +130,7 @@ signals:
     private int64 this.r_size = -1;
     private int64 this.r_selected_size = -1;
     private OwncloudWizard this.oc_wizard;
-};
+}
 
     Owncloud_advanced_setup_page.Owncloud_advanced_setup_page (OwncloudWizard wizard)
         : QWizard_page ()

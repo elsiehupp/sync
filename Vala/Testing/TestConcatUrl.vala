@@ -1,13 +1,11 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
 
-// #include <GLib.Uri>
 
 using namespace Occ;
 
@@ -95,7 +93,7 @@ class TestConcatUrl : public GLib.Object {
                 << "?foo=bar";
     }
 
-};
+}
 
 QTEST_APPLESS_MAIN (TestConcatUrl)
 #include "testconcaturl.moc"

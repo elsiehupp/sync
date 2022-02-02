@@ -34,13 +34,10 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 namespace Occ {
 
-
-class Log_browser;
-
-enum class Share_dialog_start_page {
+enum Share_dialog_start_page {
     Users_and_groups,
     Public_links,
-};
+}
 
 /***********************************************************
 @brief The OwncloudGui class
@@ -228,7 +225,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private QMap<string, QPointer<Share_dialog>> this.share_dialogs;
+    private GLib.HashMap<string, QPointer<Share_dialog>> this.share_dialogs;
 
     /***********************************************************
     ***********************************************************/
@@ -240,7 +237,7 @@ signals:
     ***********************************************************/
     private GLib.List<QAction> this.recent_items_actions;
     private Application this.app;
-};
+}
 
 
 

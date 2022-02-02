@@ -6,7 +6,7 @@ Copyright (C) by Camila Ayres <hello@camila.codes>
 
 // #include <QNetworkAccessManager>
 // #include <Soup.Request>
-// #include <QNetworkReply>
+using Soup;
 
 namespace Occ {
 
@@ -22,13 +22,13 @@ class IconJob : GLib.Object {
 
 signals:
     void job_finished (GLib.ByteArray icon_data);
-    void error (QNetworkReply.NetworkError error_type);
+    void error (Soup.Reply.NetworkError error_type);
 
 
     /***********************************************************
     ***********************************************************/
     private void on_finished ();
-};
+}
 
     IconJob.IconJob (AccountPointer account, GLib.Uri url, GLib.Object parent)
         : GLib.Object (parent) {
@@ -37,18 +37,18 @@ signals:
         request.set_attribute (Soup.Request.FollowRedirectsAttribute, true);
     #endif
         const var reply = account.send_raw_request (QByteArrayLiteral ("GET"), url, request);
-        connect (reply, &QNetworkReply.on_finished, this, &IconJob.on_finished);
+        connect (reply, &Soup.Reply.on_finished, this, &IconJob.on_finished);
     }
 
     void IconJob.on_finished () {
-        const var reply = qobject_cast<QNetworkReply> (sender ());
+        const var reply = qobject_cast<Soup.Reply> (sender ());
         if (!reply) {
             return;
         }
         delete_later ();
 
         const var network_error = reply.error ();
-        if (network_error != QNetworkReply.NoError) {
+        if (network_error != Soup.Reply.NoError) {
             /* emit */ error (network_error);
             return;
         }

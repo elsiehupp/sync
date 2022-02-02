@@ -5,7 +5,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 // #include <QLoggingCategory>
-// #include <GLib.Vector>
 // #include <QMetaType>
 // #include <owncloudlib.h>
 

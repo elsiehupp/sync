@@ -32,7 +32,7 @@ class Notification_cache {
     /***********************************************************
     ***********************************************************/
     private GLib.Set<uint32> this.notifications;
-};
+}
 
 
     bool Notification_cache.contains (Notification notification) {

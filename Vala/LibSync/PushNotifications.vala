@@ -151,7 +151,7 @@ signals:
     private QTimer this.ping_timer;
     private QTimer this.ping_timed_out_timer;
     private bool this.pong_received_from_web_socket_server = false;
-};
+}
 
     PushNotifications.PushNotifications (Account account, GLib.Object parent)
         : GLib.Object (parent)

@@ -70,6 +70,6 @@ class TestSyncFileItem : GLib.Object {
         QVERIFY (! (b < b));
         QVERIFY (! (c < c));
     }
-};
+}
 
 QTEST_APPLESS_MAIN (TestSyncFileItem)

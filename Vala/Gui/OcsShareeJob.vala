@@ -41,7 +41,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private void on_job_done (QJsonDocument reply);
-};
+}
 
     Ocs_sharee_job.Ocs_sharee_job (AccountPointer account)
         : Ocs_job (account) {

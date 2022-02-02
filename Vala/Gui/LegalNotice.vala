@@ -34,7 +34,7 @@ class Legal_notice : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private Ui.Legal_notice this.ui;
-};
+}
 
     Legal_notice.Legal_notice (Gtk.Dialog parent)
         : Gtk.Dialog (parent)

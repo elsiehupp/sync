@@ -260,6 +260,6 @@ const int CHECK_NORMALIZE_ETAG (TEST, EXPECT)
         QVERIFY (!isPathWindowsDrivePartitionRoot ("c:/"));
         QVERIFY (!isPathWindowsDrivePartitionRoot ("c:\\"));
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestUtility)

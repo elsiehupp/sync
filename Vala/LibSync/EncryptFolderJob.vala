@@ -56,7 +56,7 @@ signals:
     private GLib.ByteArray file_identifier;
     private GLib.ByteArray this.folder_token;
     private string this.error_string;
-};
+}
 
     EncryptFolderJob.EncryptFolderJob (AccountPointer account, SyncJournalDb journal, string path, GLib.ByteArray file_identifier, GLib.Object parent)
         : GLib.Object (parent)

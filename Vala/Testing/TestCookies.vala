@@ -33,7 +33,7 @@ class TestCookies : GLib.Object {
 
     }
 
-};
+}
 
 QTEST_APPLESS_MAIN (TestCookies)
 #include "testcookies.moc"

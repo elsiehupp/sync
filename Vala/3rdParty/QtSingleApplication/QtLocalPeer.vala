@@ -58,7 +58,7 @@ protected slots:
     protected string socket_name;
     protected QLocal_server* server;
     protected QtLockedFile lock_file;
-};
+}
 
 } // namespace SharedTools
 

@@ -22,7 +22,6 @@ constexpr int CrashLogSize = 20;
 }
 
 // #include <GLib.List>
-// #include <GLib.File>
 // #include <QTextStream>
 // #include <qmutex.h>
 
@@ -177,7 +176,7 @@ signals:
     private GLib.Set<string> this.log_rules;
     private GLib.Vector<string> this.crash_log;
     private int this.crash_log_index = 0;
-};
+}
 
 Logger *Logger.instance () {
     static Logger log;

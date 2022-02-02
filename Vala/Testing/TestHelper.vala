@@ -12,7 +12,7 @@ class HttpCredentialsTest : Occ.HttpCredentials {
     public void askFromUser () override {
 
     }
-};
+}
 
 Occ.FolderDefinition folderDefinition (string path);
 

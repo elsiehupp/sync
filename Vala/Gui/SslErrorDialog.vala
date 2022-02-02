@@ -20,16 +20,6 @@ namespace Ui {
     class Ssl_error_dialog;
 }
 
-/***********************************************************
-@brief The SslDialogErrorHandler class
-@ingroup gui
-***********************************************************/
-class SslDialogErrorHandler : AbstractSslErrorHandler {
-
-    /***********************************************************
-    ***********************************************************/
-    public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certs, AccountPointer) override;
-};
 
 /***********************************************************
 @brief The Ssl_error_dialog class
@@ -71,7 +61,7 @@ class Ssl_error_dialog : Gtk.Dialog {
     private string this.custom_config_handle;
     private Ui.Ssl_error_dialog this.ui;
     private AccountPointer this.account;
-};
+}
 
     namespace Utility {
         //  Used for QSSLCertificate.subject_info which returns a string[] in Qt5, but a string in Qt4

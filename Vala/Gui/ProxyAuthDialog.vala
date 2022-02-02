@@ -44,7 +44,7 @@ class Proxy_auth_dialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private Ui.Proxy_auth_dialog ui;
-};
+}
 
     Proxy_auth_dialog.Proxy_auth_dialog (Gtk.Widget parent)
         : Gtk.Dialog (parent)

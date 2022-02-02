@@ -37,7 +37,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private bool on_finished () override;
-};
+}
 
 
     Thumbnail_job.Thumbnail_job (string path, AccountPointer account, GLib.Object parent)

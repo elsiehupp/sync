@@ -9,8 +9,6 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 // #pragma once
 
 // #include <QLoggingCategory>
-// #include <QMap>
-// #include <GLib.Uri>
 // #include <QElapsedTimer>
 // #include <QHttpMultiPart>
 // #include <memory>
@@ -22,8 +20,8 @@ Q_DECLARE_LOGGING_CATEGORY (lc_put_multi_file_job)
 
 struct SingleUploadFileData {
     std.unique_ptr<UploadDevice> this.device;
-    QMap<GLib.ByteArray, GLib.ByteArray> this.headers;
-};
+    GLib.HashMap<GLib.ByteArray, GLib.ByteArray> this.headers;
+}
 
 /***********************************************************
 @brief The PutMultiFileJob class
@@ -81,7 +79,7 @@ signals:
     private string this.error_string;
     private GLib.Uri this.url;
     private QElapsedTimer this.request_timer;
-};
+}
 
 
     PutMultiFileJob.~PutMultiFileJob () = default;
@@ -94,7 +92,7 @@ signals:
 
             one_part.set_body_device (one_device._device.get ());
 
-            for (QMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = one_device._headers.begin (); it != one_device._headers.end (); ++it) {
+            for (GLib.HashMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = one_device._headers.begin (); it != one_device._headers.end (); ++it) {
                 one_part.set_raw_header (it.key (), it.value ());
             }
 
@@ -105,11 +103,11 @@ signals:
 
         send_request ("POST", this.url, req, this.body);
 
-        if (reply ().error () != QNetworkReply.NoError) {
+        if (reply ().error () != Soup.Reply.NoError) {
             GLib.warn (lc_put_multi_file_job) << " Network error : " << reply ().error_string ();
         }
 
-        connect (reply (), &QNetworkReply.upload_progress, this, &PutMultiFileJob.upload_progress);
+        connect (reply (), &Soup.Reply.upload_progress, this, &PutMultiFileJob.upload_progress);
         connect (this, &AbstractNetworkJob.network_activity, account ().data (), &Account.propagator_network_activity);
         this.request_timer.on_start ();
         AbstractNetworkJob.on_start ();

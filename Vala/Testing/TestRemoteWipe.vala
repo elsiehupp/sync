@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <qglobal.h>
@@ -64,6 +63,6 @@ class TestRemoteWipe : public GLib.Object {
 //        // check if folders dont exist anymore
 //        QCOMPARE (dirToRemove.exists (), false);
     }
-};
+}
 
 QTEST_APPLESS_MAIN (TestRemoteWipe)

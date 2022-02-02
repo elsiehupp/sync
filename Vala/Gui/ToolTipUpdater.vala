@@ -45,7 +45,7 @@ class ToolTipUpdater : GLib.Object {
     private 
     private QTreeView this.tree_view;
     private QPoint this.tool_tip_pos;
-};
+}
 
 } // namespace Occ
 

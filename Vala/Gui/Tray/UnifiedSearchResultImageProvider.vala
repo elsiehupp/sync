@@ -26,7 +26,7 @@ class Unified_search_result_image_provider : QQuick_async_image_provider {
     /***********************************************************
     ***********************************************************/
     public QQuick_image_response request_image_response (string id, QSize requested_size) override;
-};
+}
 }
 
 
@@ -82,7 +82,7 @@ namespace {
                 if (icon_url.is_valid () && !icon_url.scheme ().is_empty ()) {
                     // fetch the remote resource
                     const var reply = current_user.account ().send_raw_request (QByteArrayLiteral ("GET"), icon_url);
-                    connect (reply, &QNetworkReply.on_finished, this, &Async_image_response.on_process_network_reply);
+                    connect (reply, &Soup.Reply.on_finished, this, &Async_image_response.on_process_network_reply);
                     ++this.index;
                     return;
                 }
@@ -96,7 +96,7 @@ namespace {
     ***********************************************************/
     private slots:
         void on_process_network_reply () {
-            const var reply = qobject_cast<QNetworkReply> (sender ());
+            const var reply = qobject_cast<Soup.Reply> (sender ());
             if (!reply) {
                 set_image_and_emit_finished ();
                 return;

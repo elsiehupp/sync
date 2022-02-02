@@ -56,7 +56,7 @@ signals:
     private bool this.connected;
     private QProgress_indicator this.progress_indi;
     private OwncloudWizard this.oc_wizard;
-};
+}
 
     Owncloud_http_creds_page.Owncloud_http_creds_page (Gtk.Widget parent)
         : Abstract_credentials_wizard_page ()

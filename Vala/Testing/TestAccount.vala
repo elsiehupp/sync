@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <qglobal.h>
@@ -19,7 +18,7 @@ class TestAccount : public GLib.Object {
         AccountPointer account = Account.create ();
         account.davPath ();
     }
-};
+}
 
 QTEST_APPLESS_MAIN (TestAccount)
 #include "testaccount.moc"

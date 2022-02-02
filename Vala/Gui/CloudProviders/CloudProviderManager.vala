@@ -29,9 +29,9 @@ class CloudProviderManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QMap<string, CloudProviderWrapper> this.map;
+    private GLib.HashMap<string, CloudProviderWrapper> this.map;
     private uint32 this.folder_index;
-};
+}
 
 
 

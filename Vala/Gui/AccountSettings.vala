@@ -16,17 +16,12 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QTreeView>
 // #include <QKeySequence>
 // #include <QIcon>
-// #include <GLib.Variant>
 // #include <QJsonDocument>
 // #include <QToolTip>
 
 // #include <Gtk.Widget>
-// #include <GLib.Uri>
 // #include <QPointer>
-// #include <GLib.HashMap>
 // #include <QTimer>
-
-class QLabel;
 
 namespace Occ {
 
@@ -167,7 +162,7 @@ protected slots:
     /***********************************************************
     ***********************************************************/
     private bool this.menu_shown;
-};
+}
 
 
 

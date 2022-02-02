@@ -40,8 +40,8 @@ class LsColJob : AbstractNetworkJob {
 
 signals:
     void directory_listing_subfolders (string[] items);
-    void directory_listing_iterated (string name, QMap<string, string> properties);
-    void finished_with_error (QNetworkReply reply);
+    void directory_listing_iterated (string name, GLib.HashMap<string, string> properties);
+    void finished_with_error (Soup.Reply reply);
     void finished_without_error ();
 
 

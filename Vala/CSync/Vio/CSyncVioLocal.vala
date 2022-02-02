@@ -85,7 +85,7 @@ directory functions
 struct csync_vio_handle_t {
   DIR *dh;
   GLib.ByteArray path;
-};
+}
 
 static int this.csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf);
 

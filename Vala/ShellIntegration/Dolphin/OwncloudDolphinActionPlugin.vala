@@ -135,7 +135,7 @@ class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         return { menuaction };
     }
 
-};
+}
 
 K_PLUGIN_FACTORY (OwncloudDolphinPluginActionFactory, registerPlugin<OwncloudDolphinPluginAction> ();)
 

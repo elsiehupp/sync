@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -493,6 +492,6 @@ class TestPermissions : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), expectedState);
         QCOMPARE (fakeFolder.currentRemoteState (), expectedState);
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestPermissions)

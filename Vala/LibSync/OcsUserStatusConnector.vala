@@ -89,7 +89,7 @@ class OcsUserStatusConnector : UserStatusConnector {
     /***********************************************************
     ***********************************************************/
     private UserStatus this.user_status;
-};
+}
 
     Occ.UserStatus.OnlineStatus string_to_user_online_status (string status) {
         // it needs to match the Status enum

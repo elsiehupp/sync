@@ -4,7 +4,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.Variant>
 #ifndef TOKEN_AUTH_ONLY
 // #include <QPixmap>
 // #include <QIcon>
@@ -26,7 +25,7 @@ class NextcloudTheme : Theme {
     /***********************************************************
     ***********************************************************/
     public string wizard_url_hint () override;
-};
+}
 
 NextcloudTheme.NextcloudTheme ()
     : Theme () {

@@ -53,7 +53,7 @@ class ElidedLabel : QLabel {
     ***********************************************************/
     private string this.text;
     private Qt.TextElideMode this.elide_mode = Qt.ElideNone;
-};
+}
 
 
     ElidedLabel.ElidedLabel (Gtk.Widget parent)

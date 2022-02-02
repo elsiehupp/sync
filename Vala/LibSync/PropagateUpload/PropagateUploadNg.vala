@@ -88,7 +88,7 @@ void PropagateUploadFileNG.do_start_upload () {
     start_new_upload ();
 }
 
-void PropagateUploadFileNG.on_propfind_iterate (string name, QMap<string, string> properties) {
+void PropagateUploadFileNG.on_propfind_iterate (string name, GLib.HashMap<string, string> properties) {
     if (name == chunk_url ().path ()) {
         return; // skip the info about the path itself
     }
@@ -159,7 +159,7 @@ void PropagateUploadFileNG.on_propfind_finished () {
 void PropagateUploadFileNG.on_propfind_finished_with_error () {
     var job = qobject_cast<LsColJob> (sender ());
     on_job_destroyed (job); // remove it from the this.jobs list
-    QNetworkReply.NetworkError err = job.reply ().error ();
+    Soup.Reply.NetworkError err = job.reply ().error ();
     var http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
     var status = classify_error (err, http_error_code, propagator ()._another_sync_needed);
     if (status == SyncFileItem.Status.FATAL_ERROR) {
@@ -176,8 +176,8 @@ void PropagateUploadFileNG.on_delete_job_finished () {
     ASSERT (job);
     this.jobs.remove (this.jobs.index_of (job));
 
-    QNetworkReply.NetworkError err = job.reply ().error ();
-    if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
+    Soup.Reply.NetworkError err = job.reply ().error ();
+    if (err != Soup.Reply.NoError && err != Soup.Reply.ContentNotFoundError) {
         const int http_status = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         SyncFileItem.Status status = classify_error (err, http_status);
         if (status == SyncFileItem.Status.FATAL_ERROR) {
@@ -226,7 +226,7 @@ void PropagateUploadFileNG.start_new_upload () {
     pi._size = this.item._size;
     propagator ()._journal.set_upload_info (this.item._file, pi);
     propagator ()._journal.commit ("Upload info");
-    QMap<GLib.ByteArray, GLib.ByteArray> headers;
+    GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
 
     // But we should send the temporary (or something) one.
     headers["OC-Total-Length"] = GLib.ByteArray.number (this.file_to_upload._size);
@@ -244,10 +244,10 @@ void PropagateUploadFileNG.on_mk_col_finished () {
     propagator ()._active_job_list.remove_one (this);
     var job = qobject_cast<MkColJob> (sender ());
     on_job_destroyed (job); // remove it from the this.jobs list
-    QNetworkReply.NetworkError err = job.reply ().error ();
+    Soup.Reply.NetworkError err = job.reply ().error ();
     this.item._http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
-    if (err != QNetworkReply.NoError || this.item._http_error_code != 201) {
+    if (err != Soup.Reply.NoError || this.item._http_error_code != 201) {
         this.item._request_id = job.request_id ();
         SyncFileItem.Status status = classify_error (err, this.item._http_error_code,
             propagator ()._another_sync_needed);
@@ -315,7 +315,7 @@ void PropagateUploadFileNG.on_start_next_chunk () {
         return;
     }
 
-    QMap<GLib.ByteArray, GLib.ByteArray> headers;
+    GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
     headers["OC-Chunk-Offset"] = GLib.ByteArray.number (this.sent);
 
     this.sent += this.current_chunk_size;
@@ -349,9 +349,9 @@ void PropagateUploadFileNG.on_put_finished () {
         return;
     }
 
-    QNetworkReply.NetworkError err = job.reply ().error ();
+    Soup.Reply.NetworkError err = job.reply ().error ();
 
-    if (err != QNetworkReply.NoError) {
+    if (err != Soup.Reply.NoError) {
         this.item._http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item._request_id = job.request_id ();
         common_error_handling (job);
@@ -435,12 +435,12 @@ void PropagateUploadFileNG.on_move_job_finished () {
     propagator ()._active_job_list.remove_one (this);
     var job = qobject_cast<Move_job> (sender ());
     on_job_destroyed (job); // remove it from the this.jobs list
-    QNetworkReply.NetworkError err = job.reply ().error ();
+    Soup.Reply.NetworkError err = job.reply ().error ();
     this.item._http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
     this.item._response_time_stamp = job.response_timestamp ();
     this.item._request_id = job.request_id ();
 
-    if (err != QNetworkReply.NoError) {
+    if (err != Soup.Reply.NoError) {
         common_error_handling (job);
         return;
     }

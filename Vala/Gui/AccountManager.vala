@@ -478,7 +478,7 @@ class AccountManager : GLib.Object {
     public static void on_display_mnemonic (string& mnemonic);
 
 
-};
+}
 
 
 

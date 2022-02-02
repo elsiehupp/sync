@@ -112,7 +112,7 @@ signals:
     private string[] this.labels;
     private GLib.Vector<QPixmap> this.pixmaps;
     private QPointer<QVariant_animation> this.animation = nullptr;
-};
+}
 
 static const int Spacing = 6;
 static const int Slide_duration = 1000;

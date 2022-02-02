@@ -6,10 +6,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <QBuffer>
 
-// #include <GLib.Vector>
 // #include <GLib.List>
 // #include <QPair>
-// #include <GLib.Uri>
 
 namespace Occ {
 
@@ -60,7 +58,7 @@ signals:
     private 
     private GLib.ByteArray this.verb;
     private GLib.Uri this.link;
-};
+}
 
     Notification_confirm_job.Notification_confirm_job (AccountPointer account)
         : AbstractNetworkJob (account, "") {

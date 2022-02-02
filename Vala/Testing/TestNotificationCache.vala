@@ -34,6 +34,6 @@ class TestNotificationCache : GLib.Object {
 
         QVERIFY (!notificationCache.contains (notification));
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestNotificationCache)

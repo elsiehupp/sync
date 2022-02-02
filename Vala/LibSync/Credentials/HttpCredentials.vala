@@ -7,7 +7,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 // #include <QLoggingCategory>
 // #include <QMutex>
-// #include <QNetworkReply>
+using Soup;
 // #include <QSettings>
 // #include <QSslKey>
 // #include <QJsonObject>
@@ -18,7 +18,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 // #include <QAuthenticator>
 
-// #include <QMap>
 // #include <QSslCertificate>
 // #include <QSslKey>
 // #include <Soup.Request>
@@ -100,7 +99,7 @@ class HttpCredentials : AbstractCredentials {
     public QNetworkAccessManager create_qNAM () override;
     public bool ready () override;
     public void fetch_from_keychain () override;
-    public bool still_valid (QNetworkReply reply) override;
+    public bool still_valid (Soup.Reply reply) override;
     public void persist () override;
     public string user () override;
     // the password or token
@@ -137,7 +136,7 @@ class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_authentication (QNetworkReply *, QAuthenticator *);
+    private void on_authentication (Soup.Reply *, QAuthenticator *);
 
     /***********************************************************
     ***********************************************************/
@@ -211,7 +210,7 @@ class HttpCredentials : AbstractCredentials {
     protected bool this.retry_on_key_chain_error = true; // true if we haven't done yet any reading from keychain
 
     protected GLib.Vector<QPointer<AbstractNetworkJob>> this.retry_queue; // Jobs we need to retry once the auth token is fetched
-};
+}
 
 
 
@@ -223,7 +222,7 @@ class HttpCredentials : AbstractCredentials {
         }
 
 
-        protected QNetworkReply create_request (Operation op, Soup.Request request, QIODevice outgoing_data) override {
+        protected Soup.Reply create_request (Operation op, Soup.Request request, QIODevice outgoing_data) override {
             Soup.Request req (request);
             if (!req.attribute (HttpCredentials.DontAddCredentialsAttribute).to_bool ()) {
                 if (this.cred && !this.cred.password ().is_empty ()) {
@@ -490,10 +489,10 @@ class HttpCredentials : AbstractCredentials {
         job.on_start ();
     }
 
-    bool HttpCredentials.still_valid (QNetworkReply reply) {
-        return ( (reply.error () != QNetworkReply.AuthenticationRequiredError)
+    bool HttpCredentials.still_valid (Soup.Reply reply) {
+        return ( (reply.error () != Soup.Reply.AuthenticationRequiredError)
             // returned if user or password is incorrect
-            && (reply.error () != QNetworkReply.OperationCanceledError
+            && (reply.error () != Soup.Reply.OperationCanceledError
                    || !reply.property (authentication_failed_c).to_bool ()));
     }
 
@@ -568,7 +567,7 @@ class HttpCredentials : AbstractCredentials {
 
         var job = this.account.send_request ("POST", request_token, req, request_body);
         job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
-        GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (QNetworkReply reply) {
+        GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (Soup.Reply reply) {
             var json_data = reply.read_all ();
             QJsonParseError json_parse_error;
             QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
@@ -748,7 +747,7 @@ class HttpCredentials : AbstractCredentials {
         }
     }
 
-    void HttpCredentials.on_authentication (QNetworkReply reply, QAuthenticator authenticator) {
+    void HttpCredentials.on_authentication (Soup.Reply reply, QAuthenticator authenticator) {
         if (!this.ready)
             return;
         Q_UNUSED (authenticator)

@@ -90,7 +90,7 @@ signals:
         connect (get, &SimpleNetworkJob.finished_signal, this, [this, get] () {
             const var reply = get.reply ();
             const var www_authenticate_header = reply.raw_header ("WWW-Authenticate");
-            if (reply.error () == QNetworkReply.AuthenticationRequiredError
+            if (reply.error () == Soup.Reply.AuthenticationRequiredError
                 && (www_authenticate_header.starts_with ("Basic") || www_authenticate_header.starts_with ("Bearer"))) {
                 this.result_get = Basic;
             } else {
@@ -99,7 +99,7 @@ signals:
             this.get_done = true;
             check_all_done ();
         });
-        connect (propfind, &SimpleNetworkJob.finished_signal, this, [this] (QNetworkReply reply) {
+        connect (propfind, &SimpleNetworkJob.finished_signal, this, [this] (Soup.Reply reply) {
             var auth_challenge = reply.raw_header ("WWW-Authenticate").to_lower ();
             if (auth_challenge.contains ("bearer ")) {
                 this.result_propfind = OAuth;

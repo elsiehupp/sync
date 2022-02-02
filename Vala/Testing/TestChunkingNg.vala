@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -10,7 +9,8 @@
 
 using namespace Occ;
 
-/* Upload a 1/3 of a file of given size.
+/***********************************************************
+Upload a 1/3 of a file of given size.
 fakeFolder needs to be synchronized */
 static void partialUpload (FakeFolder fakeFolder, string name, int64 size) {
     QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -87,7 +87,7 @@ class TestChunkingNG : GLib.Object {
         // Add a fake chunk to make sure it gets deleted
         fakeFolder.uploadState ().children.first ().insert ("10000", size);
 
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 // Test that we properly resuming and are not sending past data again.
                 Q_ASSERT (request.rawHeader ("OC-Chunk-Offset").toLongLong () >= uploadedSize);
@@ -131,7 +131,7 @@ class TestChunkingNG : GLib.Object {
         fakeFolder.uploadState ().children.first ().remove (secondChunk.name);
 
         string[] deletedPaths;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 // Test that we properly resuming, not resending the first chunk
                 Q_ASSERT (request.rawHeader ("OC-Chunk-Offset").toLongLong () >= firstChunk.size);
@@ -182,7 +182,7 @@ class TestChunkingNG : GLib.Object {
         bool sawPut = false;
         bool sawDelete = false;
         bool sawMove = false;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 sawPut = true;
             } else if (op == QNetworkAccessManager.DeleteOperation) {
@@ -246,7 +246,7 @@ class TestChunkingNG : GLib.Object {
         GLib.ByteArray moveChecksumHeader;
         int nGET = 0;
         int responseDelay = 100000; // bigger than on_abort-wait timeout
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
                 QTimer.singleShot (50, parent, [&] () { fakeFolder.syncEngine ().on_abort (); });
                 moveChecksumHeader = request.rawHeader ("OC-Checksum");
@@ -323,7 +323,7 @@ class TestChunkingNG : GLib.Object {
         // Make the MOVE never reply, but trigger a client-on_abort and apply the change remotely
         GLib.Object parent;
         int responseDelay = 200; // smaller than on_abort-wait timeout
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
                 QTimer.singleShot (50, parent, [&] () { fakeFolder.syncEngine ().on_abort (); });
                 return new DelayedReply<FakeChunkMoveReply> (responseDelay, fakeFolder.uploadState (), fakeFolder.remoteModifier (), op, request, parent);
@@ -531,7 +531,7 @@ class TestChunkingNG : GLib.Object {
         QScopedValueRollback<int> setHttpTimeout (AbstractNetworkJob.httpTimeout, 1);
         int responseDelay = AbstractNetworkJob.httpTimeout * 1000 * 1000; // much bigger than http timeout (so a timeout will occur)
         // This will perform the operation on the server, but the reply will not come to the client
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice outgoingData) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice outgoingData) . Soup.Reply * {
             if (!chunking) {
                 Q_ASSERT (!request.url ().path ().contains ("/uploads/")
                     && "Should not touch uploads endpoint when not chunking");
@@ -619,7 +619,7 @@ class TestChunkingNG : GLib.Object {
         QCOMPARE (fakeFolder.currentRemoteState ().find ("A/a0").size, size + 1);
     }
 
-};
+}
 
 QTEST_GUILESS_MAIN (TestChunkingNG)
 #include "testchunkingng.moc"

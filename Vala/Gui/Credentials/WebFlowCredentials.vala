@@ -1,20 +1,15 @@
-#ifndef WEBFLOWCREDENTIALS_H
-const int WEBFLOWCREDENTIALS_H
-
 // #include <QSslCertificate>
 // #include <QSslKey>
 // #include <QNetworkRequest>
 // #include <QQueue>
 // #include <QAuthenticator>
 // #include <QNetworkAccessManager>
-// #include <QNetworkReply>
+using Soup;
 // #include <QPointer>
 // #include <QTimer>
 // #include <Gtk.Dialog>
 // #include <QVBoxLayout>
 // #include <QLabel>
-
-class QAuthenticator;
 
 #ifdef WITH_WEBENGINE
 #endif // WITH_WEBENGINE
@@ -71,7 +66,7 @@ class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public 
-    public bool still_valid (QNetworkReply reply) override;
+    public bool still_valid (Soup.Reply reply) override;
     public void persist () override;
     public void invalidate_token () override;
     public void forget_sensitive_data () override;
@@ -82,7 +77,7 @@ class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_authentication (QNetworkReply reply, QAuthenticator authenticator);
+    private void on_authentication (Soup.Reply reply, QAuthenticator authenticator);
 
     /***********************************************************
     ***********************************************************/
@@ -154,68 +149,11 @@ class WebFlowCredentials : AbstractCredentials {
     protected bool this.keychain_migration = false;
 
     protected WebFlowCredentialsDialog this.ask_dialog = nullptr;
-};
-
-
-
-
-namespace {
-    const char USER_C[] = "user";
-    const char client_certificate_pemC[] = "this.client_certificate_pem";
-    const char client_key_pemC[] = "this.client_key_pem";
-    const char client_ca_certificate_pemC[] = "this.client_ca_certificate_pem";
-} // ns
-
-class WebFlowCredentialsAccessManager : AccessManager {
-
-    /***********************************************************
-    ***********************************************************/
-    public WebFlowCredentialsAccessManager (WebFlowCredentials cred, GLib.Object parent = new GLib.Object ())
-        : AccessManager (parent)
-        , this.cred (cred) {
-    }
-
-
-    protected QNetworkReply create_request (Operation op, QNetworkRequest request, QIODevice outgoing_data) override {
-        QNetworkRequest req (request);
-        if (!req.attribute (WebFlowCredentials.DontAddCredentialsAttribute).to_bool ()) {
-            if (this.cred && !this.cred.password ().is_empty ()) {
-                GLib.ByteArray cred_hash = GLib.ByteArray (this.cred.user ().to_utf8 () + ":" + this.cred.password ().to_utf8 ()).to_base64 ();
-                req.set_raw_header ("Authorization", "Basic " + cred_hash);
-            }
-        }
-
-        if (this.cred && !this.cred._client_ssl_key.is_null () && !this.cred._client_ssl_certificate.is_null ()) {
-            // SSL configuration
-            QSslConfiguration ssl_configuration = req.ssl_configuration ();
-            ssl_configuration.set_local_certificate (this.cred._client_ssl_certificate);
-            ssl_configuration.set_private_key (this.cred._client_ssl_key);
-
-            // Merge client side CA with system CA
-            var ca = ssl_configuration.system_ca_certificates ();
-            ca.append (this.cred._client_ssl_ca_certificates);
-            ssl_configuration.set_ca_certificates (ca);
-
-            req.set_ssl_configuration (ssl_configuration);
-        }
-
-        return AccessManager.create_request (op, req, outgoing_data);
-    }
-
-
-    // The credentials object dies along with the account, while the QNAM might
-    // outlive both.
-    private QPointer<const WebFlowCredentials> this.cred;
-};
-
-#if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-static void add_settings_to_job (Account account, QKeychain.Job job) {
-    Q_UNUSED (account)
-    var settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
-    settings.set_parent (job); // make the job parent to make setting deleted properly
-    job.set_settings (settings.release ());
 }
-#endif
+
+
+
+
 
 WebFlowCredentials.WebFlowCredentials () = default;
 
@@ -351,12 +289,12 @@ void WebFlowCredentials.on_ask_from_user_cancelled () {
     this.ask_dialog = nullptr;
 }
 
-bool WebFlowCredentials.still_valid (QNetworkReply reply) {
-    if (reply.error () != QNetworkReply.NoError) {
+bool WebFlowCredentials.still_valid (Soup.Reply reply) {
+    if (reply.error () != Soup.Reply.NoError) {
         GLib.warn (lc_web_flow_credentials ()) << reply.error ();
         GLib.warn (lc_web_flow_credentials ()) << reply.error_string ();
     }
-    return (reply.error () != QNetworkReply.AuthenticationRequiredError);
+    return (reply.error () != Soup.Reply.AuthenticationRequiredError);
 }
 
 void WebFlowCredentials.persist () {
@@ -527,7 +465,7 @@ string WebFlowCredentials.fetch_user () {
     return this.user;
 }
 
-void WebFlowCredentials.on_authentication (QNetworkReply reply, QAuthenticator authenticator) {
+void WebFlowCredentials.on_authentication (Soup.Reply reply, QAuthenticator authenticator) {
     Q_UNUSED (reply)
 
     if (!this.ready) {
@@ -545,10 +483,10 @@ void WebFlowCredentials.on_authentication (QNetworkReply reply, QAuthenticator a
     this.credentials_valid = false;
 }
 
-void WebFlowCredentials.on_finished (QNetworkReply reply) {
+void WebFlowCredentials.on_finished (Soup.Reply reply) {
     q_c_info (lc_web_flow_credentials ()) << "request on_finished";
 
-    if (reply.error () == QNetworkReply.NoError) {
+    if (reply.error () == Soup.Reply.NoError) {
         this.credentials_valid = true;
 
         /***********************************************************

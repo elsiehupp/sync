@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <qglobal.h>
@@ -180,7 +179,7 @@ class TestFolderMan : public GLib.Object {
         QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud2", url),
             string (dirPath + "/ownCloud22"));
     }
-};
+}
 
 QTEST_APPLESS_MAIN (TestFolderMan)
 #include "testfolderman.moc"

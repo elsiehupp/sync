@@ -39,7 +39,7 @@ struct Unified_search_result {
     GLib.Uri this.resource_url;
     string this.icons;
     Type this.type = Type.Default;
-};
+}
 
 
     string Unified_search_result.type_as_string (Unified_search_result.Type type) {

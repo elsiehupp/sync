@@ -130,7 +130,7 @@ class QProgress_indicator : Gtk.Widget {
     private int m_delay = 40;
     private bool m_displayed_when_stopped = false;
     private Gtk.Color m_color = Qt.black;
-};
+}
 
 
 

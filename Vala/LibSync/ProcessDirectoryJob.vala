@@ -11,7 +11,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 // #include <set>
 // #include <QTextCodec>
 // #include <QFileInfo>
-// #include <GLib.File>
 // #include <QThreadPool>
 // #include <common/checksums.h>
 // #include <common/constants.h>
@@ -347,7 +346,7 @@ signals:
     void on_finished ();
     // The root etag of this directory was fetched
     void etag (GLib.ByteArray , GLib.DateTime time);
-};
+}
 
     bool ProcessDirectoryJob.check_for_invalid_filename (PathTuple path,
         const GLib.HashMap<string, Entries> entries, Entries entry) {

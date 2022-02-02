@@ -9,7 +9,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QLoggingCategory>
 // #include <Soup.Request>
 // #include <QNetworkAccessManager>
-// #include <QNetworkReply>
+using Soup;
 // #include <Soup.Request>
 // #include <QSslConfiguration>
 // #include <QSslCipher>
@@ -114,7 +114,7 @@ namespace Occ {
                 target_function (old_url);
             }
         });
-        GLib.Object.connect (job, &PropfindJob.finished_with_error, target, [=] (QNetworkReply *) {
+        GLib.Object.connect (job, &PropfindJob.finished_with_error, target, [=] (Soup.Reply *) {
             target_function (old_url);
         });
         job.on_start ();

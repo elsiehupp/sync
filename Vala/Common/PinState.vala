@@ -27,7 +27,7 @@ pinned and then each contained item to unpinned)
 
 Note: This enum intentionally mimics CF_PIN_STATE of Windows cfapi.
 ***********************************************************/
-enum class PinState {
+enum PinState {
     /***********************************************************
     The pin state is derived from the state of the parent folder.
 
@@ -83,7 +83,7 @@ or not have been synced for other reasons, like errors.
 
 Note: The numerical values and ordering of this enum are relevant.
 ***********************************************************/
-enum class VfsItemAvailability {
+enum VfsItemAvailability {
     /***********************************************************
     The item and all its subitems are hydrated and pinned PinState.ALWAYS_LOCAL.
 

@@ -22,7 +22,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <Gtk.Dialog>
 // #include <QStyled_item_delegate>
 
-class QStandard_item_model;
+
 
 
 namespace {
@@ -66,7 +66,7 @@ namespace Occ {
 namespace Ui {
     class SettingsDialog;
 }
-class OwncloudGui;
+
 
 /***********************************************************
 @brief The SettingsDialog class
@@ -154,7 +154,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private OwncloudGui this.gui;
-};
+}
 
 
     SettingsDialog.SettingsDialog (OwncloudGui gui, Gtk.Widget parent)
@@ -414,37 +414,38 @@ signals:
         }
     }
 
-class Tool_button_action : QWidget_action {
+    class Tool_button_action : QWidget_action {
 
-    /***********************************************************
-    ***********************************************************/
-    public Tool_button_action (QIcon icon, string text, GLib.Object parent)
-        : QWidget_action (parent) {
-        on_set_text (text);
-        set_icon (icon);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public Gtk.Widget create_widget (Gtk.Widget parent) override {
-        var toolbar = qobject_cast<QTool_bar> (parent);
-        if (!toolbar) {
-            // this means we are in the extention menu, no special action here
-            return nullptr;
+        /***********************************************************
+        ***********************************************************/
+        public Tool_button_action (QIcon icon, string text, GLib.Object parent)
+            : QWidget_action (parent) {
+            on_set_text (text);
+            set_icon (icon);
         }
 
-        var btn = new QToolButton (parent);
-        string object_name = QLatin1String ("settingsdialog_toolbutton_");
-        object_name += text ();
-        btn.set_object_name (object_name);
 
-        btn.set_default_action (this);
-        btn.set_tool_button_style (Qt.Tool_button_text_under_icon);
-        btn.set_size_policy (QSize_policy.Fixed, QSize_policy.Expanding);
-        return btn;
+        /***********************************************************
+        ***********************************************************/
+        public Gtk.Widget create_widget (Gtk.Widget parent) override {
+            var toolbar = qobject_cast<QTool_bar> (parent);
+            if (!toolbar) {
+                // this means we are in the extention menu, no special action here
+                return nullptr;
+            }
+
+            var btn = new QToolButton (parent);
+            string object_name = QLatin1String ("settingsdialog_toolbutton_");
+            object_name += text ();
+            btn.set_object_name (object_name);
+
+            btn.set_default_action (this);
+            btn.set_tool_button_style (Qt.Tool_button_text_under_icon);
+            btn.set_size_policy (QSize_policy.Fixed, QSize_policy.Expanding);
+            return btn;
+        }
     }
-};
+}
 
     QAction *SettingsDialog.create_action_with_icon (QIcon icon, string text, string icon_path) {
         QAction action = new Tool_button_action (icon, text, this);

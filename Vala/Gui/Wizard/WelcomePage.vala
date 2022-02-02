@@ -44,7 +44,7 @@ class Welcome_page : QWizard_page {
     ***********************************************************/
     private OwncloudWizard this.oc_wizard;
     private WizardCommon.Pages this.next_page = WizardCommon.Page_Server_setup;
-};
+}
 
 
     Welcome_page.Welcome_page (OwncloudWizard oc_wizard)

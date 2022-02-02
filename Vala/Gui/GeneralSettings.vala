@@ -71,7 +71,7 @@ class General_settings : Gtk.Widget {
     private Ui.General_settings this.ui;
     private QPointer<Ignore_list_editor> this.ignore_editor;
     private bool this.currently_loading = false;
-};
+}
 
 } // namespace Occ
 
@@ -85,7 +85,7 @@ namespace {
 struct Zip_entry {
     string local_filename;
     string zip_filename;
-};
+}
 
 Zip_entry file_info_to_zip_entry (QFileInfo info) {
     return {

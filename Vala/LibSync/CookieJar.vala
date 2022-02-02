@@ -4,7 +4,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.File>
 // #include <QLoggingCategory>
 // #include <QNetworkCookie>
 // #include <QDataStream>
@@ -50,7 +49,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private GLib.List<QNetworkCookie> remove_expired (GLib.List<QNetworkCookie> cookies);
-};
+}
 
 
     namespace {

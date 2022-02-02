@@ -7,8 +7,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 // #include <csync_exclude.h>
 
 // #include <QLoggingCategory>
-// #include <GLib.Uri>
-// #include <GLib.File>
 // #include <QFileInfo>
 // #include <QTextCodec>
 // #include <cstring>
@@ -17,167 +15,19 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 // #include <QElapsedTimer>
 // #include <string[]>
-using CSync;
-// #include <QMap>
 // #include <QMutex>
 // #include <QWaitCondition>
 // #include <QRunnable>
 // #include <deque>
 
 
+using CSync;
 namespace Occ {
 
 enum LocalDiscoveryStyle {
     FilesystemOnly, //< read all local data from the filesystem
     DatabaseAndFilesystem, //< read from the database, except for listed paths
-};
-
-
-/***********************************************************
-Represent all the meta-data about a file in the server
-***********************************************************/
-struct RemoteInfo {
-    /***********************************************************
-    FileName of the entry (this does not contains any directory or path, just the plain name
-    ***********************************************************/
-    string name;
-    GLib.ByteArray etag;
-    GLib.ByteArray file_identifier;
-    GLib.ByteArray checksum_header;
-    Occ.RemotePermissions remote_perm;
-    time_t modtime = 0;
-    int64_t size = 0;
-    int64_t size_of_folder = 0;
-    bool is_directory = false;
-    bool is_e2e_encrypted = false;
-    string e2e_mangled_name;
-
-    bool is_valid () {
-        return !name.is_null ();
-    }
-
-    string direct_download_url;
-    string direct_download_cookies;
-};
-
-struct LocalInfo {
-    /***********************************************************
-    FileName of the entry (this does not contains any directory or path, just the plain name
-    ***********************************************************/
-    string name;
-    string rename_name;
-    time_t modtime = 0;
-    int64_t size = 0;
-    uint64_t inode = 0;
-    ItemType type = ItemTypeSkip;
-    bool is_directory = false;
-    bool is_hidden = false;
-    bool is_virtual_file = false;
-    bool is_sym_link = false;
-    bool is_valid () {
-        return !name.is_null ();
-    }
-};
-
-/***********************************************************
-@brief Run list on a local directory and process the results for Discovery
-
-@ingroup libsync
-***********************************************************/
-class DiscoverySingleLocalDirectoryJob : GLib.Object, public QRunnable {
-
-    /***********************************************************
-    ***********************************************************/
-    public DiscoverySingleLocalDirectoryJob (AccountPointer account, string local_path, Occ.Vfs vfs, GLib.Object parent = new GLib.Object ());
-
-    /***********************************************************
-    ***********************************************************/
-    public void run () override;
-signals:
-    void on_finished (GLib.Vector<LocalInfo> result);
-    void finished_fatal_error (string error_string);
-    void finished_non_fatal_error (string error_string);
-
-    void item_discovered (SyncFileItemPtr item);
-    void child_ignored (bool b);
-
-    /***********************************************************
-    ***********************************************************/
-    private string this.local_path;
-    private AccountPointer this.account;
-    private Occ.Vfs* this.vfs;
-
-};
-
-/***********************************************************
-@brief Run a PROPFIND on a directory and process the results for Discovery
-
-@ingroup libsync
-***********************************************************/
-class DiscoverySingleDirectoryJob : GLib.Object {
-
-    /***********************************************************
-    ***********************************************************/
-    public DiscoverySingleDirectoryJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
-    // Specify that this is the root and we need to check the data-fingerprint
-    public void set_is_root_path () {
-        this.is_root_path = true;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_start ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-    public void on_abort ();
-
-    // This is not actually a network job, it is just a job
-signals:
-    void first_directory_permissions (RemotePermissions);
-    void etag (GLib.ByteArray , GLib.DateTime time);
-    void finished (HttpResult<GLib.Vector<RemoteInfo>> result);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_directory_listing_iterated_slot (string , QMap<string, string> &);
-    private void on_ls_job_finished_without_error_slot ();
-    private void on_ls_job_finished_with_error_slot (QNetworkReply *);
-    private void on_fetch_e2e_metadata ();
-    private void on_metadata_received (QJsonDocument json, int status_code);
-    private void on_metadata_error (GLib.ByteArray file_identifier, int http_return_code);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private GLib.Vector<RemoteInfo> this.results;
-    private string this.sub_path;
-    private GLib.ByteArray this.first_etag;
-    private GLib.ByteArray file_identifier;
-    private GLib.ByteArray this.local_file_id;
-    private AccountPointer this.account;
-    // The first result is for the directory itself and need to be ignored.
-    // This flag is true if it was already ignored.
-    private bool this.ignored_first;
-    // Set to true if this is the root path and we need to check the data-fingerprint
-    private bool this.is_root_path;
-    // If this directory is an external storage (The first item has 'M' in its permission)
-    private bool this.is_external_storage;
-    // If this directory is e2ee
-    private bool this.is_e2e_encrypted;
-    // If set, the discovery will finish with an error
-    private int64_t this.size = 0;
-    private string this.error;
-    private QPointer<LsColJob> this.ls_col_job;
-
-
-    /***********************************************************
-    ***********************************************************/
-    private public GLib.ByteArray this.data_fingerprint;
-};
+}
 
 class DiscoveryPhase : GLib.Object {
 
@@ -193,7 +43,7 @@ class DiscoveryPhase : GLib.Object {
     can be changed. See find_and_cancel_deleted_job (). Note that
     item_discovered () will already have been emitted for the item.
     ***********************************************************/
-    QMap<string, SyncFileItemPtr> this.deleted_item;
+    GLib.HashMap<string, SyncFileItemPtr> this.deleted_item;
 
 
     /***********************************************************
@@ -207,11 +57,11 @@ class DiscoveryPhase : GLib.Object {
 
     See find_and_cancel_deleted_job ().
     ***********************************************************/
-    QMap<string, ProcessDirectoryJob> this.queued_deleted_directories;
+    GLib.HashMap<string, ProcessDirectoryJob> this.queued_deleted_directories;
 
     // map source (original path) . destinations (current server or local path)
-    QMap<string, string> this.renamed_items_remote;
-    QMap<string, string> this.renamed_items_local;
+    GLib.HashMap<string, string> this.renamed_items_remote;
+    GLib.HashMap<string, string> this.renamed_items_local;
 
     // set of paths that should not be removed even though they are removed locally:
     // there was a move to an invalid destination and now the source should be restored
@@ -221,7 +71,7 @@ class DiscoveryPhase : GLib.Object {
     // lower_bound () is reliable.
     //
     // The value of this map doesn't matter.
-    QMap<string, bool> this.forbidden_deletes;
+    GLib.HashMap<string, bool> this.forbidden_deletes;
 
 
     /***********************************************************
@@ -319,10 +169,10 @@ signals:
     void silently_excluded (string folder_path);
 
     void add_error_to_gui (SyncFileItem.Status status, string error_message, string subject);
-};
+}
 
-/// Implementation of DiscoveryPhase.adjust_renamed_path
-string adjust_renamed_path (QMap<string, string> renamed_items, string original);
+    /// Implementation of DiscoveryPhase.adjust_renamed_path
+    string adjust_renamed_path (GLib.HashMap<string, string> renamed_items, string original);
 
     /* Given a sorted list of paths ending with '/', return whether or not the given path is within one of the paths of the list*/
     static bool find_path_in_list (string[] list, string path) {
@@ -432,7 +282,7 @@ string adjust_renamed_path (QMap<string, string> renamed_items, string original)
         return Occ.adjust_renamed_path (d == SyncFileItem.Direction.DOWN ? this.renamed_items_remote : this.renamed_items_local, original);
     }
 
-    string adjust_renamed_path (QMap<string, string> renamed_items, string original) {
+    string adjust_renamed_path (GLib.HashMap<string, string> renamed_items, string original) {
         int slash_pos = original.size ();
         while ( (slash_pos = original.last_index_of ('/', slash_pos - 1)) > 0) {
             var it = renamed_items.const_find (original.left (slash_pos));
@@ -612,62 +462,10 @@ string adjust_renamed_path (QMap<string, string> renamed_items, string original)
         /* emit */ finished (results);
     }
 
-    DiscoverySingleDirectoryJob.DiscoverySingleDirectoryJob (AccountPointer account, string path, GLib.Object parent)
-        : GLib.Object (parent)
-        , this.sub_path (path)
-        , this.account (account)
-        , this.ignored_first (false)
-        , this.is_root_path (false)
-        , this.is_external_storage (false)
-        , this.is_e2e_encrypted (false) {
-    }
-
-    void DiscoverySingleDirectoryJob.on_start () {
-        // Start the actual HTTP job
-        var ls_col_job = new LsColJob (this.account, this.sub_path, this);
-
-        GLib.List<GLib.ByteArray> props;
-        props << "resourcetype"
-              << "getlastmodified"
-              << "getcontentlength"
-              << "getetag"
-              << "http://owncloud.org/ns:size"
-              << "http://owncloud.org/ns:id"
-              << "http://owncloud.org/ns:fileid"
-              << "http://owncloud.org/ns:download_uRL"
-              << "http://owncloud.org/ns:d_dC"
-              << "http://owncloud.org/ns:permissions"
-              << "http://owncloud.org/ns:checksums";
-        if (this.is_root_path)
-            props << "http://owncloud.org/ns:data-fingerprint";
-        if (this.account.server_version_int () >= Account.make_server_version (10, 0, 0)) {
-            // Server older than 10.0 have performances issue if we ask for the share-types on every PROPFIND
-            props << "http://owncloud.org/ns:share-types";
-        }
-        if (this.account.capabilities ().client_side_encryption_available ()) {
-            props << "http://nextcloud.org/ns:is-encrypted";
-        }
-
-        ls_col_job.set_properties (props);
-
-        GLib.Object.connect (ls_col_job, &LsColJob.directory_listing_iterated,
-            this, &DiscoverySingleDirectoryJob.on_directory_listing_iterated_slot);
-        GLib.Object.connect (ls_col_job, &LsColJob.finished_with_error, this, &DiscoverySingleDirectoryJob.on_ls_job_finished_with_error_slot);
-        GLib.Object.connect (ls_col_job, &LsColJob.finished_without_error, this, &DiscoverySingleDirectoryJob.on_ls_job_finished_without_error_slot);
-        ls_col_job.on_start ();
-
-        this.ls_col_job = ls_col_job;
-    }
-
-    void DiscoverySingleDirectoryJob.on_abort () {
-        if (this.ls_col_job && this.ls_col_job.reply ()) {
-            this.ls_col_job.reply ().on_abort ();
-        }
-    }
 
     /***********************************************************
     ***********************************************************/
-    static void property_map_to_remote_info (QMap<string, string> map, RemoteInfo result) {
+    static void property_map_to_remote_info (GLib.HashMap<string, string> map, RemoteInfo result) {
         for (var it = map.const_begin (); it != map.const_end (); ++it) {
             string property = it.key ();
             string value = it.value ();
@@ -699,7 +497,7 @@ string adjust_renamed_path (QMap<string, string> renamed_items, string original)
             } else if (property == "checksums") {
                 result.checksum_header = find_best_checksum (value.to_utf8 ());
             } else if (property == "share-types" && !value.is_empty ()) {
-                // Since QMap is sorted, "share-types" is always after "permissions".
+                // Since GLib.HashMap is sorted, "share-types" is always after "permissions".
                 if (result.remote_perm.is_null ()) {
                     q_warning () << "Server returned a share type, but no permissions?";
                 } else {
@@ -719,149 +517,5 @@ string adjust_renamed_path (QMap<string, string> renamed_items, string original)
         }
     }
 
-    void DiscoverySingleDirectoryJob.on_directory_listing_iterated_slot (string file, QMap<string, string> map) {
-        if (!this.ignored_first) {
-            // The first entry is for the folder itself, we should process it differently.
-            this.ignored_first = true;
-            if (map.contains ("permissions")) {
-                var perm = RemotePermissions.from_server_string (map.value ("permissions"));
-                /* emit */ first_directory_permissions (perm);
-                this.is_external_storage = perm.has_permission (RemotePermissions.IsMounted);
-            }
-            if (map.contains ("data-fingerprint")) {
-                this.data_fingerprint = map.value ("data-fingerprint").to_utf8 ();
-                if (this.data_fingerprint.is_empty ()) {
-                    // Placeholder that means that the server supports the feature even if it did not set one.
-                    this.data_fingerprint = "[empty]";
-                }
-            }
-            if (map.contains (QStringLiteral ("fileid"))) {
-                this.local_file_id = map.value (QStringLiteral ("fileid")).to_utf8 ();
-            }
-            if (map.contains ("id")) {
-                this.file_identifier = map.value ("id").to_utf8 ();
-            }
-            if (map.contains ("is-encrypted") && map.value ("is-encrypted") == QStringLiteral ("1")) {
-                this.is_e2e_encrypted = true;
-                Q_ASSERT (!this.file_identifier.is_empty ());
-            }
-            if (map.contains ("size")) {
-                this.size = map.value ("size").to_int ();
-            }
-        } else {
-
-            RemoteInfo result;
-            int slash = file.last_index_of ('/');
-            result.name = file.mid (slash + 1);
-            result.size = -1;
-            property_map_to_remote_info (map, result);
-            if (result.is_directory)
-                result.size = 0;
-
-            if (this.is_external_storage && result.remote_perm.has_permission (RemotePermissions.IsMounted)) {
-                // All the entries in a external storage have 'M' in their permission. However, for all
-                // purposes in the desktop client, we only need to know about the mount points.
-                // So replace the 'M' by a 'm' for every sub entries in an external storage
-                result.remote_perm.unset_permission (RemotePermissions.IsMounted);
-                result.remote_perm.set_permission (RemotePermissions.IsMountedSub);
-            }
-            this.results.push_back (std.move (result));
-        }
-
-        //This works in concerto with the RequestEtagJob and the Folder object to check if the remote folder changed.
-        if (map.contains ("getetag")) {
-            if (this.first_etag.is_empty ()) {
-                this.first_etag = parse_etag (map.value (QStringLiteral ("getetag")).to_utf8 ()); // for directory itself
-            }
-        }
-    }
-
-    void DiscoverySingleDirectoryJob.on_ls_job_finished_without_error_slot () {
-        if (!this.ignored_first) {
-            // This is a sanity check, if we haven't this.ignored_first then it means we never received any on_directory_listing_iterated_slot
-            // which means somehow the server XML was bogus
-            /* emit */ finished (HttpError {
-                0, _("Server error : PROPFIND reply is not XML formatted!")
-            });
-            delete_later ();
-            return;
-        } else if (!this.error.is_empty ()) {
-            /* emit */ finished (HttpError {
-                0, this.error
-            });
-            delete_later ();
-            return;
-        } else if (this.is_e2e_encrypted) {
-            /* emit */ etag (this.first_etag, GLib.DateTime.from_string (string.from_utf8 (this.ls_col_job.response_timestamp ()), Qt.RFC2822Date));
-            on_fetch_e2e_metadata ();
-            return;
-        }
-        /* emit */ etag (this.first_etag, GLib.DateTime.from_string (string.from_utf8 (this.ls_col_job.response_timestamp ()), Qt.RFC2822Date));
-        /* emit */ finished (this.results);
-        delete_later ();
-    }
-
-    void DiscoverySingleDirectoryJob.on_ls_job_finished_with_error_slot (QNetworkReply r) {
-        string content_type = r.header (Soup.Request.ContentTypeHeader).to_string ();
-        int http_code = r.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        string msg = r.error_string ();
-        GLib.warn (lc_discovery) << "LSCOL job error" << r.error_string () << http_code << r.error ();
-        if (r.error () == QNetworkReply.NoError
-            && !content_type.contains ("application/xml; charset=utf-8")) {
-            msg = _("Server error : PROPFIND reply is not XML formatted!");
-        }
-        /* emit */ finished (HttpError {
-            http_code, msg
-        });
-        delete_later ();
-    }
-
-    void DiscoverySingleDirectoryJob.on_fetch_e2e_metadata () {
-        const var job = new GetMetadataApiJob (this.account, this.local_file_id);
-        connect (job, &GetMetadataApiJob.json_received,
-                this, &DiscoverySingleDirectoryJob.on_metadata_received);
-        connect (job, &GetMetadataApiJob.error,
-                this, &DiscoverySingleDirectoryJob.on_metadata_error);
-        job.on_start ();
-    }
-
-    void DiscoverySingleDirectoryJob.on_metadata_received (QJsonDocument json, int status_code) {
-        GLib.debug (lc_discovery) << "Metadata received, applying it to the result list";
-        Q_ASSERT (this.sub_path.starts_with ('/'));
-
-        const var metadata = FolderMetadata (this.account, json.to_json (QJsonDocument.Compact), status_code);
-        const var encrypted_files = metadata.files ();
-
-        const var find_encrypted_file = [=] (string name) {
-            const var it = std.find_if (std.cbegin (encrypted_files), std.cend (encrypted_files), [=] (EncryptedFile file) {
-                return file.encrypted_filename == name;
-            });
-            if (it == std.cend (encrypted_files)) {
-                return Optional<EncryptedFile> ();
-            } else {
-                return Optional<EncryptedFile> (*it);
-            }
-        };
-
-        std.transform (std.cbegin (this.results), std.cend (this.results), std.begin (this.results), [=] (RemoteInfo info) {
-            var result = info;
-            const var encrypted_file_info = find_encrypted_file (result.name);
-            if (encrypted_file_info) {
-                result.is_e2e_encrypted = true;
-                result.e2e_mangled_name = this.sub_path.mid (1) + '/' + result.name;
-                result.name = encrypted_file_info.original_filename;
-            }
-            return result;
-        });
-
-        /* emit */ finished (this.results);
-        delete_later ();
-    }
-
-    void DiscoverySingleDirectoryJob.on_metadata_error (GLib.ByteArray file_identifier, int http_return_code) {
-        GLib.warn (lc_discovery) << "E2EE Metadata job error. Trying to proceed without it." << file_identifier << http_return_code;
-        /* emit */ finished (this.results);
-        delete_later ();
-    }
     }
     

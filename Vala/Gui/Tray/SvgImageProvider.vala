@@ -23,7 +23,7 @@ class Svg_image_provider : QQuick_image_provider {
     ***********************************************************/
     public 
     public QImage request_image (string id, QSize size, QSize requested_size) override;
-};
+}
 
 
     Svg_image_provider.Svg_image_provider ()

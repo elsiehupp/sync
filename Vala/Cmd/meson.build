@@ -1,5 +1,7 @@
 srcs = files([
     'Cmd.vala',
+    'EchoDisabler.vala',
+    'HttpCredentialsText.vala',
     'NetrcParser.vala',
     'SimpleSslErrorHandler.vala'
 ])

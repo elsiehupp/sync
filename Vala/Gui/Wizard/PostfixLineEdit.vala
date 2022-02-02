@@ -56,7 +56,7 @@ class Postfix_line_edit : QLineEdit {
     /***********************************************************
     ***********************************************************/
     private string this.postfix;
-};
+}
 
     const int horizontal_margin (4);
     const int vertical_margin (4);

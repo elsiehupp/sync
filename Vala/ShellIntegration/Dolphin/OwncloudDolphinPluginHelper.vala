@@ -86,9 +86,9 @@ signals:
     protected private GLib.Vector<string> this.paths;
     protected private QBasicTimer this.connectTimer;
 
-    protected private QMap<string, string> this.strings;
+    protected private GLib.HashMap<string, string> this.strings;
     protected private GLib.ByteArray this.version;
-};
+}
 
 
 
@@ -123,7 +123,6 @@ signals:
 // #include <QtNetwork/QLocalSocket>
 // #include <qcoreevent.h>
 // #include <QStandardPaths>
-// #include <GLib.File>
 
 OwncloudDolphinPluginHelper* OwncloudDolphinPluginHelper.instance () {
     static OwncloudDolphinPluginHelper self;

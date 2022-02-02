@@ -8,7 +8,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <qfileinfo.h>
 
-// #include <GLib.File>
 // #include <QTextStream>
 // #include <QScopedPointer>
 // #include <QElapsedTimer>
@@ -57,7 +56,7 @@ class SyncRunFileLog {
     private QTextStream this.out;
     private QElapsedTimer this.total_duration;
     private QElapsedTimer this.lap_duration;
-};
+}
 
 
     SyncRunFileLog.SyncRunFileLog () = default;

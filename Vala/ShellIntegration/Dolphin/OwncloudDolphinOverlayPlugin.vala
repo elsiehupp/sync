@@ -105,4 +105,4 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
 
         /* emit */ overlaysChanged (GLib.Uri.fromLocalFile (string.fromUtf8 (name)), overlaysForString (status));
     }
-};
+}

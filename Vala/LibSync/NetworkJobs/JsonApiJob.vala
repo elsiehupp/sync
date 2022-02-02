@@ -173,7 +173,7 @@ signals:
 
         int status_code = 0;
         int http_status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        if (reply ().error () != QNetworkReply.NoError) {
+        if (reply ().error () != Soup.Reply.NoError) {
             GLib.warn (lc_json_api_job) << "Network error : " << path () << error_string () << reply ().attribute (Soup.Request.HttpStatusCodeAttribute);
             status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             /* emit */ json_received (QJsonDocument (), status_code);

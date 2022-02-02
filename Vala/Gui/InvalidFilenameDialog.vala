@@ -94,10 +94,10 @@ class Invalid_filename_dialog : Gtk.Dialog {
     private void on_filename_line_edit_text_changed (string text);
     private void on_move_job_finished ();
     private void on_remote_file_already_exists (QVariantMap values);
-    private void on_remote_file_does_not_exist (QNetworkReply reply);
+    private void on_remote_file_does_not_exist (Soup.Reply reply);
     private void check_if_allowed_to_rename ();
     private void on_propfind_permission_success (QVariantMap values);
-};
+}
 
 
     Invalid_filename_dialog.Invalid_filename_dialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent)
@@ -187,7 +187,7 @@ class Invalid_filename_dialog : Gtk.Dialog {
         const var job = qobject_cast<Move_job> (sender ());
         const var error = job.reply ().error ();
 
-        if (error != QNetworkReply.NoError) {
+        if (error != Soup.Reply.NoError) {
             this.ui.error_label.on_set_text (_("Could not rename file. Please make sure you are connected to the server."));
             return;
         }
@@ -202,7 +202,7 @@ class Invalid_filename_dialog : Gtk.Dialog {
         this.ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
     }
 
-    void Invalid_filename_dialog.on_remote_file_does_not_exist (QNetworkReply reply) {
+    void Invalid_filename_dialog.on_remote_file_does_not_exist (Soup.Reply reply) {
         Q_UNUSED (reply);
 
         // File does not exist. We can rename it.

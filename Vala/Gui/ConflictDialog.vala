@@ -9,7 +9,6 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 // #include <QFileInfo>
 // #include <QMimeDatabase>
 // #include <QPushButton>
-// #include <GLib.Uri>
 
 // #include <Gtk.Dialog>
 
@@ -69,7 +68,7 @@ class ConflictDialog : Gtk.Dialog {
     private string this.base_filename;
     private QScopedPointer<Ui.ConflictDialog> this.ui;
     private ConflictSolver this.solver;
-};
+}
 
 } // namespace Occ
 

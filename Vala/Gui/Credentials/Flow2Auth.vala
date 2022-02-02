@@ -15,7 +15,6 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 
 // #pragma once
 // #include <QPointer>
-// #include <GLib.Uri>
 // #include <QTimer>
 
 namespace Occ {
@@ -109,7 +108,7 @@ signals:
     private bool this.is_busy;
     private bool this.has_token;
     private bool this.enforce_https = false;
-};
+}
 
 
 
@@ -164,13 +163,13 @@ signals:
         var job = this.account.send_request ("POST", url, req);
         job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
 
-        GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, action] (QNetworkReply reply) {
+        GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, action] (Soup.Reply reply) {
             var json_data = reply.read_all ();
             QJsonParseError json_parse_error;
             QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
             string poll_token, poll_endpoint, login_url;
 
-            if (reply.error () == QNetworkReply.NoError && json_parse_error.error == QJsonParseError.NoError
+            if (reply.error () == Soup.Reply.NoError && json_parse_error.error == QJsonParseError.NoError
                 && !json.is_empty ()) {
                 poll_token = json.value ("poll").to_object ().value ("token").to_string ();
                 poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_string ();
@@ -182,14 +181,14 @@ signals:
                 login_url = json["login"].to_string ();
             }
 
-            if (reply.error () != QNetworkReply.NoError || json_parse_error.error != QJsonParseError.NoError
+            if (reply.error () != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
                 || json.is_empty () || poll_token.is_empty () || poll_endpoint.is_empty () || login_url.is_empty ()) {
                 string error_reason;
                 string error_from_json = json["error"].to_string ();
                 if (!error_from_json.is_empty ()) {
                     error_reason = _("Error returned from the server : <em>%1</em>")
                                       .arg (error_from_json.to_html_escaped ());
-                } else if (reply.error () != QNetworkReply.NoError) {
+                } else if (reply.error () != Soup.Reply.NoError) {
                     error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                                       .arg (reply.error_string ().to_html_escaped ());
                 } else if (json_parse_error.error != QJsonParseError.NoError) {
@@ -276,14 +275,14 @@ signals:
         var job = this.account.send_request ("POST", this.poll_endpoint, req, request_body);
         job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
 
-        GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (QNetworkReply reply) {
+        GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (Soup.Reply reply) {
             var json_data = reply.read_all ();
             QJsonParseError json_parse_error;
             QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
             GLib.Uri server_url;
             string login_name, app_password;
 
-            if (reply.error () == QNetworkReply.NoError && json_parse_error.error == QJsonParseError.NoError
+            if (reply.error () == Soup.Reply.NoError && json_parse_error.error == QJsonParseError.NoError
                 && !json.is_empty ()) {
                 server_url = json["server"].to_string ();
                 if (this.enforce_https && server_url.scheme () != QStringLiteral ("https")) {
@@ -295,14 +294,14 @@ signals:
                 app_password = json["app_password"].to_string ();
             }
 
-            if (reply.error () != QNetworkReply.NoError || json_parse_error.error != QJsonParseError.NoError
+            if (reply.error () != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
                 || json.is_empty () || server_url.is_empty () || login_name.is_empty () || app_password.is_empty ()) {
                 string error_reason;
                 string error_from_json = json["error"].to_string ();
                 if (!error_from_json.is_empty ()) {
                     error_reason = _("Error returned from the server : <em>%1</em>")
                                       .arg (error_from_json.to_html_escaped ());
-                } else if (reply.error () != QNetworkReply.NoError) {
+                } else if (reply.error () != Soup.Reply.NoError) {
                     error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                                       .arg (reply.error_string ().to_html_escaped ());
                 } else if (json_parse_error.error != QJsonParseError.NoError) {
@@ -314,7 +313,7 @@ signals:
                 GLib.debug (lc_flow2auth) << "Error when polling for the app_password" << json << error_reason;
 
                 // We get a 404 until authentication is done, so don't show this error in the GUI.
-                if (reply.error () != QNetworkReply.ContentNotFoundError)
+                if (reply.error () != Soup.Reply.ContentNotFoundError)
                     /* emit */ result (Error, error_reason);
 
                 // Forget sensitive data

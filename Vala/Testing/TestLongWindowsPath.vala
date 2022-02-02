@@ -74,6 +74,6 @@ class TestLongWindowsPath : GLib.Object {
 
         QVERIFY (tmp.remove ());
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestLongWindowsPath)

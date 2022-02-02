@@ -47,7 +47,7 @@ signals:
     ***********************************************************/
     private GLib.Uri this.url; // Only used if the constructor taking a url is taken.
     private GLib.ByteArray this.folder_token;
-};
+}
 
     DeleteJob.DeleteJob (AccountPointer account, string path, GLib.Object parent)
         : AbstractNetworkJob (account, path, parent) {
@@ -70,7 +70,7 @@ signals:
             send_request ("DELETE", make_dav_url (path ()), req);
         }
 
-        if (reply ().error () != QNetworkReply.NoError) {
+        if (reply ().error () != Soup.Reply.NoError) {
             GLib.warn (lc_delete_job) << " Network error : " << reply ().error_string ();
         }
         AbstractNetworkJob.on_start ();

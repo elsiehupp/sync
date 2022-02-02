@@ -38,7 +38,7 @@ class Socket_upload_job : GLib.Object {
     private SyncJournalDb this.database;
     private SyncEngine this.engine;
     private string[] this.synced_files;
-};
+}
 }
 
 
@@ -112,7 +112,7 @@ void Socket_upload_job.on_start () {
     // create the dir, fail if it already exists
     var mkdir = new Occ.MkColJob (this.engine.account (), this.remote_path);
     connect (mkdir, &Occ.MkColJob.finished_without_error, this.engine, &Occ.SyncEngine.on_start_sync);
-    connect (mkdir, &Occ.MkColJob.finished_with_error, this, [this] (QNetworkReply reply) {
+    connect (mkdir, &Occ.MkColJob.finished_with_error, this, [this] (Soup.Reply reply) {
         if (reply.error () == 202) {
             this.api_job.failure (QStringLiteral ("Destination %1 already exists").arg (this.remote_path));
         } else {

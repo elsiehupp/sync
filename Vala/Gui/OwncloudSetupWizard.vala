@@ -15,7 +15,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 // #include <Gtk.Widget>
 // #include <QProcess>
-// #include <QNetworkReply>
+using Soup;
 // #include <QPointer>
 
 namespace Occ {
@@ -52,7 +52,7 @@ signals:
     private void on_find_server ();
     private void on_find_server_behind_redirect ();
     private void on_found_server (GLib.Uri , QJsonObject &);
-    private void on_no_server_found (QNetworkReply reply);
+    private void on_no_server_found (Soup.Reply reply);
     private void on_no_server_found_timeout (GLib.Uri url);
 
     /***********************************************************
@@ -67,8 +67,8 @@ signals:
     ***********************************************************/
     private 
     private void on_create_local_and_remote_folders (string , string );
-    private void on_remote_folder_exists (QNetworkReply *);
-    private void on_create_remote_folder_finished (QNetworkReply reply);
+    private void on_remote_folder_exists (Soup.Reply *);
+    private void on_create_remote_folder_finished (Soup.Reply reply);
     private void on_assistant_finished (int);
     private void on_skip_folder_configuration ();
 
@@ -83,14 +83,14 @@ signals:
     private void finalize_setup (bool);
     private bool ensure_start_from_scratch (string local_folder);
     private AccountState apply_account_changes ();
-    private bool check_downgrade_advised (QNetworkReply reply);
+    private bool check_downgrade_advised (Soup.Reply reply);
 
     /***********************************************************
     ***********************************************************/
     private OwncloudWizard this.oc_wizard;
     private string this.init_local_folder;
     private string this.remote_folder;
-};
+}
 
 
     OwncloudSetupWizard.OwncloudSetupWizard (GLib.Object parent)
@@ -279,7 +279,7 @@ signals:
         // accordingly
         var permanent_redirects = std.make_shared<int> (0);
         connect (redirect_check_job, &AbstractNetworkJob.redirected, this,
-            [permanent_redirects, account] (QNetworkReply reply, GLib.Uri target_url, int count) {
+            [permanent_redirects, account] (Soup.Reply reply, GLib.Uri target_url, int count) {
                 int http_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
                 if (count == *permanent_redirects && (http_code == 301 || http_code == 308)) {
                     q_c_info (lc_wizard) << account.url () << " was redirected to" << target_url;
@@ -323,7 +323,7 @@ signals:
         on_determine_auth_type ();
     }
 
-    void OwncloudSetupWizard.on_no_server_found (QNetworkReply reply) {
+    void OwncloudSetupWizard.on_no_server_found (Soup.Reply reply) {
         var job = qobject_cast<CheckServerJob> (sender ());
 
         // Do this early because reply might be deleted in message box event loop
@@ -411,7 +411,7 @@ signals:
             GLib.warn (lc_wizard) << "Cannot check for authed redirects. This slot should be invoked from PropfindJob!";
             return;
         }
-        QNetworkReply reply = job.reply ();
+        Soup.Reply reply = job.reply ();
 
         // If there were redirects on the authed* requests, also store
         // the updated server URL, similar to redirects on status.php.
@@ -437,12 +437,12 @@ signals:
 
             // A 404 is actually a on_success : we were authorized to know that the folder does
             // not exist. It will be created later...
-        } else if (reply.error () == QNetworkReply.ContentNotFoundError) {
+        } else if (reply.error () == Soup.Reply.ContentNotFoundError) {
             this.oc_wizard.on_successful_step ();
             return;
 
             // Provide messages for other errors, such as invalid credentials.
-        } else if (reply.error () != QNetworkReply.NoError) {
+        } else if (reply.error () != Soup.Reply.NoError) {
             if (!this.oc_wizard.account ().credentials ().still_valid (reply)) {
                 error_msg = _("Access forbidden by server. To verify that you have proper access, "
                               "<a href=\"%1\">click here</a> to access the service with your browser.")
@@ -464,16 +464,16 @@ signals:
         this.oc_wizard.on_display_error (error_msg, this.oc_wizard.current_id () == WizardCommon.Page_Server_setup && check_downgrade_advised (reply));
     }
 
-    bool OwncloudSetupWizard.check_downgrade_advised (QNetworkReply reply) {
+    bool OwncloudSetupWizard.check_downgrade_advised (Soup.Reply reply) {
         if (reply.url ().scheme () != QLatin1String ("https")) {
             return false;
         }
 
         switch (reply.error ()) {
-        case QNetworkReply.NoError:
-        case QNetworkReply.ContentNotFoundError:
-        case QNetworkReply.AuthenticationRequiredError:
-        case QNetworkReply.Host_not_found_error:
+        case Soup.Reply.NoError:
+        case Soup.Reply.ContentNotFoundError:
+        case Soup.Reply.AuthenticationRequiredError:
+        case Soup.Reply.Host_not_found_error:
             return false;
         default:
             break;
@@ -557,15 +557,15 @@ signals:
     }
 
     // ### TODO move into EntityExistsJob once we decide if/how to return gui strings from jobs
-    void OwncloudSetupWizard.on_remote_folder_exists (QNetworkReply reply) {
+    void OwncloudSetupWizard.on_remote_folder_exists (Soup.Reply reply) {
         var job = qobject_cast<EntityExistsJob> (sender ());
         bool ok = true;
         string error;
-        QNetworkReply.NetworkError err_id = reply.error ();
+        Soup.Reply.NetworkError err_id = reply.error ();
 
-        if (err_id == QNetworkReply.NoError) {
+        if (err_id == Soup.Reply.NoError) {
             q_c_info (lc_wizard) << "Remote folder found, all cool!";
-        } else if (err_id == QNetworkReply.ContentNotFoundError) {
+        } else if (err_id == Soup.Reply.ContentNotFoundError) {
             if (this.remote_folder.is_empty ()) {
                 error = _("No remote folder specified!");
                 ok = false;
@@ -596,11 +596,11 @@ signals:
         job.on_start ();
     }
 
-    void OwncloudSetupWizard.on_create_remote_folder_finished (QNetworkReply reply) {
+    void OwncloudSetupWizard.on_create_remote_folder_finished (Soup.Reply reply) {
         var error = reply.error ();
         GLib.debug (lc_wizard) << "** webdav mkdir request on_finished " << error;
-        //    disconnect (own_cloud_info.instance (), SIGNAL (webdav_col_created (QNetworkReply.NetworkError)),
-        //               this, SLOT (on_create_remote_folder_finished (QNetworkReply.NetworkError)));
+        //    disconnect (own_cloud_info.instance (), SIGNAL (webdav_col_created (Soup.Reply.NetworkError)),
+        //               this, SLOT (on_create_remote_folder_finished (Soup.Reply.NetworkError)));
 
         bool on_success = true;
         if (error == 202) {
@@ -609,7 +609,7 @@ signals:
             this.oc_wizard.on_display_error (_("The folder creation resulted in HTTP error code %1").arg (static_cast<int> (error)), false);
 
             this.oc_wizard.on_append_to_configuration_log (_("The folder creation resulted in HTTP error code %1").arg (static_cast<int> (error)));
-        } else if (error == QNetworkReply.OperationCanceledError) {
+        } else if (error == Soup.Reply.OperationCanceledError) {
             this.oc_wizard.on_display_error (_("The remote folder creation failed because the provided credentials "
                                        "are wrong!"
                                        "<br/>Please go back and check your credentials.</p>"),

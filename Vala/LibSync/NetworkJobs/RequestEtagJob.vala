@@ -52,7 +52,7 @@ signals:
         // assumes ownership
         send_request ("PROPFIND", make_dav_url (path ()), req, buf);
 
-        if (reply ().error () != QNetworkReply.NoError) {
+        if (reply ().error () != Soup.Reply.NoError) {
             GLib.warn (lc_etag_job) << "request network error : " << reply ().error_string ();
         }
         AbstractNetworkJob.on_start ();

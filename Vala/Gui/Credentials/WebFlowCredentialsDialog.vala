@@ -1,6 +1,5 @@
 
 // #include <Gtk.Dialog>
-// #include <GLib.Uri>
 // #include <QVBoxLayout>
 // #include <QLabel>
 
@@ -80,7 +79,7 @@ signals:
     private QVBoxLayout this.layout;
     private QVBoxLayout this.container_layout;
     private HeaderBanner this.header_banner;
-};
+}
 
 WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flow2, Gtk.Widget parent)
     : Gtk.Dialog (parent)

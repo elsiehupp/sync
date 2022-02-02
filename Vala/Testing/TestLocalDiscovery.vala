@@ -1,8 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
-
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 // #include <QtTest>
@@ -290,6 +289,6 @@ class TestLocalDiscovery : GLib.Object {
         QVERIFY (fakeFolder.currentLocalState ().find (fileWithSpaces));
         QVERIFY (fakeFolder.currentLocalState ().find (fileTrimmed));
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestLocalDiscovery)

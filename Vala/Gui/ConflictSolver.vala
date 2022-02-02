@@ -64,7 +64,7 @@ signals:
     private Gtk.Widget this.parent_widget;
     private string this.local_version_filename;
     private string this.remote_version_filename;
-};
+}
 
     ConflictSolver.ConflictSolver (Gtk.Widget parent)
         : GLib.Object (parent)

@@ -5,7 +5,6 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 ***********************************************************/
 
 // #include <string[]>
-// #include <GLib.HashMap>
 
 namespace Occ {
 

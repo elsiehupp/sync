@@ -1,8 +1,8 @@
-project(
-	'com.elsiehupp.NextcloudVala',
-	'c',
-	'vala',
-	version: '1.0.0')
+# project(
+#	'com.elsiehupp.NextcloudVala',
+#	'c',
+#	'vala',
+#	version: '1.0.0')
 
 srcs = files([
     'AccountManager.vala',
@@ -37,7 +37,13 @@ srcs = files([
     'Folder.vala',
     'FolderWatcherPrivate.vala',
     'FolderWatcher.vala',
-    'FolderWizard.vala',
+
+    'FolderWizard/FolderWizard.vala',
+    'FolderWizard/FolderWizardLocalPath.vala',
+    'FolderWizard/FolderWizardRemotePath.vala',
+    'FolderWizard/FolderWizardSelectiveSync.vala',
+    'FolderWizard/FormatWarningsWizardPage.vala',
+
     'GeneralSettings.vala',
     'HeaderBanner.vala',
     'IconUtils.vala',
@@ -67,9 +73,18 @@ srcs = files([
     'ShareDialog.vala',
     'Sharee.vala',
     'ShareLinkWidget.vala',
-    'ShareManager.vala',
+
+    'ShareManager/LinkShare.vala',
+    'ShareManager/Share.vala',
+    'ShareManager/ShareManager.vala',
+    'ShareManager/UserGroupShare.vala',
+
     'SharePermission.vala',
-    'ShareUserGroupWidget.vala',
+
+    'ShareUserGroupWidget/AvatarEventFilter.vala',
+    'ShareUserGroupWidget/ShareUserGroupWidget.vala',
+    'ShareUserGroupWidget/ShareUserLine.vala',
+
     'SocketApi/SocketApi.vala',
     'SocketApi/SocketUploadJob.vala',
     'SslButton.vala',
@@ -88,9 +103,17 @@ srcs = files([
     'Tray/UnifiedSearchResultImageProvider.vala',
     'Tray/UnifiedSearchResultsListModel.vala',
     'Tray/UnifiedSearchResult.vala',
-    'Tray/UserModel.vala',
 
-    'Updater/OCUpdater.vala',
+    'Tray/UserModel/ImageProvider.vala',
+    'Tray/UserModel/User.vala',
+    'Tray/UserModel/UserAppsModel.vala',
+    'Tray/UserModel/UserModel.vala',
+
+    'Updater/OCUpdater/NSISUpdater.vala',
+    'Updater/OCUpdater/OCUpdater.vala',
+    'Updater/OCUpdater/PassiveUpdateNotifier.vala',
+    'Updater/OCUpdater/UpdaterScheduler.vala',
+
     'Updater/UpdateInfo.vala',
     'Updater/Updater.vala',
 
@@ -112,7 +135,13 @@ srcs = files([
     'Wizard/PostfixLineEdit.vala',
     'Wizard/SlideShow.vala',
     'Wizard/WebViewPage.vala',
-    'Wizard/WebView.vala',
+
+    'Wizard/WebView/ExternalWebEnginePage.vala',
+    'Wizard/WebView/WebEnginePage.vala',
+    'Wizard/WebView/WebView.vala',
+    'Wizard/WebView/WebViewPageUrlRequestInterceptor.vala',
+    'Wizard/WebView/WebViewPageUrlSchemeHandler.vala',
+
     'Wizard/WelcomePage.vala'
 ])
 

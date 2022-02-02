@@ -6,7 +6,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 // #pragma once
 
-// #include <QNetworkReply>
+using Soup;
 // #include <QFileInfo>
 // #include <QLoggingCategory>
 
@@ -41,7 +41,7 @@ signals:
     void on_finished (bool on_success);
 
 
-    protected void store_first_error (QNetworkReply.NetworkError err);
+    protected void store_first_error (Soup.Reply.NetworkError err);
     protected void store_first_error_string (string err_string);
 
     protected void start_ls_col_job (string path);
@@ -63,9 +63,9 @@ signals:
     protected GLib.ByteArray this.folder_id;
     protected bool this.folder_locked = false;
     protected bool this.is_task_failed = false;
-    protected QNetworkReply.NetworkError this.network_error = QNetworkReply.NoError;
+    protected Soup.Reply.NetworkError this.network_error = Soup.Reply.NoError;
     protected string this.error_string;
-};
+}
 
 }
 
@@ -74,7 +74,7 @@ AbstractPropagateRemoteDeleteEncrypted.AbstractPropagateRemoteDeleteEncrypted (O
     , this.propagator (propagator)
     , this.item (item) {}
 
-QNetworkReply.NetworkError AbstractPropagateRemoteDeleteEncrypted.network_error () {
+Soup.Reply.NetworkError AbstractPropagateRemoteDeleteEncrypted.network_error () {
     return this.network_error;
 }
 
@@ -82,8 +82,8 @@ string AbstractPropagateRemoteDeleteEncrypted.error_string () {
     return this.error_string;
 }
 
-void AbstractPropagateRemoteDeleteEncrypted.store_first_error (QNetworkReply.NetworkError err) {
-    if (this.network_error == QNetworkReply.NetworkError.NoError) {
+void AbstractPropagateRemoteDeleteEncrypted.store_first_error (Soup.Reply.NetworkError err) {
+    if (this.network_error == Soup.Reply.NetworkError.NoError) {
         this.network_error = err;
     }
 }
@@ -153,7 +153,7 @@ void AbstractPropagateRemoteDeleteEncrypted.on_delete_remote_item_finished () {
     this.item._response_time_stamp = delete_job.response_timestamp ();
     this.item._request_id = delete_job.request_id ();
 
-    if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
+    if (err != Soup.Reply.NoError && err != Soup.Reply.ContentNotFoundError) {
         store_first_error_string (delete_job.error_string ());
         store_first_error (err);
 

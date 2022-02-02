@@ -473,6 +473,6 @@ class TestSyncJournalDB : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private SyncJournalDb this.database;
-};
+}
 
 QTEST_APPLESS_MAIN (TestSyncJournalDB)

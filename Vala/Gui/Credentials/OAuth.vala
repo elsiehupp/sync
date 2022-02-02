@@ -5,7 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 ***********************************************************/
 
 // #include <QDesktopServices>
-// #include <QNetworkReply>
+using Soup;
 // #include <QTimer>
 // #include <QBuffer>
 // #include <QJsonObject>
@@ -14,7 +14,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 // #pragma once
 // #include <QPointer>
 // #include <QTcpServer>
-// #include <GLib.Uri>
 
 namespace Occ {
 
@@ -84,7 +83,7 @@ signals:
     ***********************************************************/
     private 
     private public string this.expected_user;
-};
+}
 
 
     OAuth.~OAuth () = default;
@@ -155,7 +154,7 @@ signals:
 
                     var job = this.account.send_request ("POST", request_token, req, request_body);
                     job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
-                    GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, socket] (QNetworkReply reply) {
+                    GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, socket] (Soup.Reply reply) {
                         var json_data = reply.read_all ();
                         QJsonParseError json_parse_error;
                         QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
@@ -164,7 +163,7 @@ signals:
                         string user = json["user_id"].to_string ();
                         GLib.Uri message_url = json["message_url"].to_string ();
 
-                        if (reply.error () != QNetworkReply.NoError || json_parse_error.error != QJsonParseError.NoError
+                        if (reply.error () != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
                             || json_data.is_empty () || json.is_empty () || refresh_token.is_empty () || access_token.is_empty ()
                             || json["token_type"].to_string () != QLatin1String ("Bearer")) {
                             string error_reason;
@@ -172,7 +171,7 @@ signals:
                             if (!error_from_json.is_empty ()) {
                                 error_reason = _("Error returned from the server : <em>%1</em>")
                                                   .arg (error_from_json.to_html_escaped ());
-                            } else if (reply.error () != QNetworkReply.NoError) {
+                            } else if (reply.error () != Soup.Reply.NoError) {
                                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                                                   .arg (reply.error_string ().to_html_escaped ());
                             } else if (json_data.is_empty ()) {

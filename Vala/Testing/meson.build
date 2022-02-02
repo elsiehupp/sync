@@ -1,26 +1,61 @@
-project(
-	'com.elsiehupp.NextcloudVala',
-	'c',
-	'vala',
-	version: '1.0.0')
+# project(
+#	'com.elsiehupp.NextcloudVala',
+#	'c',
+#	'vala',
+#	version: '1.0.0')
 
 srcs = files([
     'Benchmarks/benchlargesync.vala',
+
     'CSync/cmdline.vala',
     'CSync/std_tests/check_std_c_jhash.vala',
     'CSync/torture.vala',
     'CSync/vio_tests/check_vio_ext.vala',
+
     'Manual/FavLink/main.vala',
     'Manual/FavLink/owncloudlib.vala',
+
     'mockserver/HttpServer.vala',
     'mockserver/main.vala',
-    'PushNotificationsTestUtils.vala',
+
+    'PushNotificationsTestUtils/CredentialsStub.vala',
+    'PushNotificationsTestUtils/FakeWebSocketServer.vala',
+
     'StubFolderMan.vala',
     'StubRemoteWipe.vala',
-    'SyncEngineTestUtils.vala',
+
+    'SyncEngineTestUtils/DelayedReply.vala',
+    'SyncEngineTestUtils/DiskFileModifier.vala',
+    'SyncEngineTestUtils/FakeChunkMoveReply.vala',
+    'SyncEngineTestUtils/FakeCredentials.vala',
+    'SyncEngineTestUtils/FakeDeleteReply.vala',
+    'SyncEngineTestUtils/FakeErrorReply.vala',
+    'SyncEngineTestUtils/FakeFolder.vala',
+    'SyncEngineTestUtils/FakeGetReply.vala',
+    'SyncEngineTestUtils/FakeGetWithDataReply.vala',
+    'SyncEngineTestUtils/FakeHangingReply.vala',
+    'SyncEngineTestUtils/FakeJsonErrorReply.vala',
+    'SyncEngineTestUtils/FakeMkcolReply.vala',
+    'SyncEngineTestUtils/FakeMoveReply.vala',
+    'SyncEngineTestUtils/FakeMoveReply.vala',
+    'SyncEngineTestUtils/FakePayloadReply.vala',
+    'SyncEngineTestUtils/FakePropfindReply.vala',
+    'SyncEngineTestUtils/FakePutMultiFileReply.vala',
+    'SyncEngineTestUtils/FakePutReply.vala',
+    'SyncEngineTestUtils/FakeQNAM.vala',
+    'SyncEngineTestUtils/FakeReply.vala',
+    'SyncEngineTestUtils/FileInfo.vala',
+    'SyncEngineTestUtils/FileModifier.vala',
+    'SyncEngineTestUtils/ItemCompletedSpy.vala',
+    'SyncEngineTestUtils/PathComponents.vala',
+    'SyncEngineTestUtils/SyncEngineTestUtils.vala',
+
     'TestAccount.vala',
     'TestAllFilesDeleted.vala',
-    'TestAsyncOp.vala',
+
+    'TestAsyncOp/FakeAsyncReply.vala',
+    'TestAsyncOp/TestAsyncOp.vala',
+
     'TestBlacklist.vala',
     'TestCapabilities.vala',
     'TestChecksumValidator.vala',
@@ -29,7 +64,10 @@ srcs = files([
     'TestConcatUrl.vala',
     'TestCookies.vala',
     'TestDatabaseError.vala',
-    'TestDownload.vala',
+
+    'TestDownload/BrokenFakeGetReply.vala',
+    'TestDownload/TestDownload.vala',
+
     'TestExcludedFiles.vala',
     'TestFolderMan.vala',
     'TestFolder.vala',
@@ -43,26 +81,44 @@ srcs = files([
     'TestNetrcParser.vala',
     'TestNextcloudPropagator.vala',
     'TestNotificationCache.vala',
-    'TestOAuth.vala',
+
+    'TestOAuth/DesktopServiceHook.vala',
+    'TestOAuth/FakePostReply.vala',
+    'TestOAuth/OAuthTestCase.vala',
+    'TestOAuth/SlowFakePostReply.vala',
+    'TestOAuth/TestOAuth.vala',
+
     'TestOwnSql.vala',
     'TestPermissions.vala',
     'TestPushNotifications.vala',
     'TestRemoteDiscovery.vala',
     'TestRemoteWipe.vala',
     'TestSelectiveSync.vala',
-    'TestSetUserStatusDialog.vala',
+
+    'TestSetUserStatusDialog/FakeDateTimeProvider.vala',
+    'TestSetUserStatusDialog/FakeUserStatusConnector.vala',
+    'TestSetUserStatusDialog/TestSetUserStatusDialog.vala',
+
     'TestSyncCfapi.vala',
     'TestSyncConflict.vala',
     'TestSyncDelete.vala',
     'TestSyncEngine.vala',
     'TestSyncFileItem.vala',
-    'TestSyncFileStatusTracker.vala',
+
+    'TestSyncFileStatusTracker/StatusPushSpy.vala',
+    'TestSyncFileStatusTracker/TestSyncFileStatusTracker.vala',
+
     'TestSyncJournalDB.vala',
     'TestSyncMove.vala',
     'TestSyncVirtualFiles.vala',
     'TestSyncXattr.vala',
     'TestTheme.vala',
-    'TestUnifiedSearchListModel.vala',
+
+    'TestUnifiedSearchListModel/FakeDesktopServicesUrlHandler.vala',
+    'TestUnifiedSearchListModel/FakeProvider.vala',
+    'TestUnifiedSearchListModel/FakeSearchResultsStorage.vala',
+    'TestUnifiedSearchListModel/TestUnifiedSearchListModel.vala',
+
     'TestUpdater.vala',
     'TestUploadReset.vala',
     'TestUtility.vala',

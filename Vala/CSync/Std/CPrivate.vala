@@ -20,7 +20,8 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
-/* cross platform defines */
+/***********************************************************
+cross platform defines */
 // #include <sys/types.h>
 // #include <sys/stat.h>
 
@@ -81,7 +82,8 @@ const int O_NOATIME 0
 const int lstat this.stat
 #endif
 
-/* tchar definitions for clean win32 filenames */
+/***********************************************************
+tchar definitions for clean win32 filenames */
 #ifndef this.UNICODE
 const int this.UNICODE
 #endif
@@ -130,7 +132,8 @@ const int this.tchdir        chdir
 const int this.tgetcwd       getcwd
 #endif
 
-/* FIXME : Implement TLS for OS X */
+/***********************************************************
+FIXME : Implement TLS for OS X */
 #if defined (__GNUC__) && !defined (__APPLE__)
 # define CSYNC_THREAD __thread
 #elif defined (this.MSC_VER)
@@ -141,4 +144,5 @@ const int this.tgetcwd       getcwd
 
 #endif //this.C_PRIVATE_H
 
-/* vim : set ft=c.doxygen ts=8 sw=2 et cindent : */
+/***********************************************************
+vim : set ft=c.doxygen ts=8 sw=2 et cindent : */

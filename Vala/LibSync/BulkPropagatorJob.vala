@@ -14,8 +14,6 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 // #pragma once
 
 // #include <QLoggingCategory>
-// #include <GLib.Vector>
-// #include <QMap>
 // #include <deque>
 
 namespace Occ {
@@ -45,7 +43,7 @@ class BulkPropagatorJob : PropagatorJob {
         string this.remote_path;
         string this.local_path;
         int64 this.file_size;
-        QMap<GLib.ByteArray, GLib.ByteArray> this.headers;
+        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> this.headers;
     };
 
 
@@ -130,7 +128,7 @@ class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng
     ***********************************************************/
-    private QMap<GLib.ByteArray, GLib.ByteArray> headers (SyncFileItemPtr item);
+    private GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers (SyncFileItemPtr item);
 
     /***********************************************************
     ***********************************************************/
@@ -213,7 +211,7 @@ class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private SyncFileItem.Status this.final_status = SyncFileItem.Status.NoStatus;
-};
+}
 
 
 
@@ -682,8 +680,8 @@ class BulkPropagatorJob : PropagatorJob {
         /* emit */ propagator ().item_completed (item);
     }
 
-    QMap<GLib.ByteArray, GLib.ByteArray> BulkPropagatorJob.headers (SyncFileItemPtr item) {
-        QMap<GLib.ByteArray, GLib.ByteArray> headers;
+    GLib.HashMap<GLib.ByteArray, GLib.ByteArray> BulkPropagatorJob.headers (SyncFileItemPtr item) {
+        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
         headers[QByteArrayLiteral ("Content-Type")] = QByteArrayLiteral ("application/octet-stream");
         headers[QByteArrayLiteral ("X-File-Mtime")] = GLib.ByteArray.number (int64 (item._modtime));
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS")) {

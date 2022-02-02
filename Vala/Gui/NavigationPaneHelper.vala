@@ -43,7 +43,7 @@ class NavigationPaneHelper : GLib.Object {
     private FolderMan this.folder_man;
     private bool this.show_in_explorer_navigation_pane;
     private QTimer this.update_cloud_storage_registry_timer;
-};
+}
 
     NavigationPaneHelper.NavigationPaneHelper (FolderMan folder_man)
         : this.folder_man (folder_man) {

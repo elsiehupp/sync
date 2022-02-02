@@ -581,7 +581,7 @@ class ProgressInfo : GLib.Object {
     bool is_warning_kind (SyncFileItem.Status);
     bool is_ignored_kind (SyncFileItem.Status);
 }
-};
+}
 
 } // namespace Progress
 } // namespace Occ

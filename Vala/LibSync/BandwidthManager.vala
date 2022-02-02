@@ -6,7 +6,6 @@ Copyright (C) by Markus Goetz <markus@woboq.com>
 
 // #include <QLoggingCategory>
 // #include <QTimer>
-// #include <GLib.Object>
 // #include <QTimer>
 // #include <QIODevice>
 // #include <list>
@@ -144,7 +143,7 @@ class BandwidthManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private int64 this.current_download_limit;
-};
+}
 
     // Because of the many layers of buffering inside Qt (and probably the OS and the network)
     // we cannot lower this value much more. If we do, the estimated bw will be very high

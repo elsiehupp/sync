@@ -21,7 +21,7 @@ class EntityExistsJob : AbstractNetworkJob {
     public void on_start () override;
 
 signals:
-    void exists (QNetworkReply *);
+    void exists (Soup.Reply *);
 
 
     /***********************************************************

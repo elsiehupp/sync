@@ -285,7 +285,7 @@ class TestCapabilities : GLib.Object {
 
         QCOMPARE (bulkuploadAvailable, true);
     }
-};
+}
 
 QTEST_GUILESS_MAIN (TestCapabilities)
 #include "testcapabilities.moc"

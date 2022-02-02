@@ -107,7 +107,7 @@ signals:
     private bool this.is_syncing = false;
     private string this.sync_status_string = _("All synced!");
     private string this.sync_status_detail_string;
-};
+}
 }
 
 
