@@ -845,7 +845,7 @@ signals:
                                       << free_bytes << "bytes and require at least" << min_free << "bytes";
                 this.another_sync_needed = DelayedFollowUp;
                 Q_EMIT sync_error (_("Only %1 are available, need at least %2 to on_start",
-                    "Placeholders are postfixed with file sizes using Utility.octets_to_""")
+                    "Placeholders are postfixed with file sizes using Utility.octets_to_string ()")
                                      .arg (
                                          Utility.octets_to_string (free_bytes),
                                          Utility.octets_to_string (min_free)));

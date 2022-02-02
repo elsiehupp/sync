@@ -375,7 +375,7 @@ protected slots:
         QModelIndex selected = this.ui._folder_list.selection_model ().current_index ();
         if (!selected.is_valid ())
             return "";
-        return this.model.data (selected, FolderStatusDelegate.FolderAliasRole).to_"";
+        return this.model.data (selected, FolderStatusDelegate.FolderAliasRole).to_string ();
     }
 
     void AccountSettings.on_toggle_sign_in_state () {
@@ -484,12 +484,12 @@ protected slots:
         const string filename = [this, selected, classification] {
             string result;
             if (classification == FolderStatusModel.RootFolder) {
-                const var alias = this.model.data (selected, FolderStatusDelegate.FolderAliasRole).to_"";
+                const var alias = this.model.data (selected, FolderStatusDelegate.FolderAliasRole).to_string ();
                 if (var folder = FolderMan.instance ().folder (alias)) {
                     result = folder.path ();
                 }
             } else {
-                result = this.model.data (selected, FolderStatusDelegate.FolderPathRole).to_"";
+                result = this.model.data (selected, FolderStatusDelegate.FolderPathRole).to_string ();
             }
 
             if (result.ends_with ('/')) {
@@ -510,7 +510,7 @@ protected slots:
         QModelIndex selected = this.ui._folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || this.model.classify (selected) != FolderStatusModel.SubFolder)
             return;
-        string filename = this.model.data (selected, FolderStatusDelegate.FolderPathRole).to_"";
+        string filename = this.model.data (selected, FolderStatusDelegate.FolderPathRole).to_string ();
         open_ignored_files_dialog (filename);
     }
 
@@ -547,7 +547,7 @@ protected slots:
         var ac = menu.add_action (_("Open folder"));
         connect (ac, &QAction.triggered, this, &AccountSettings.on_open_current_local_sub_folder);
 
-        var filename = this.model.data (index, FolderStatusDelegate.FolderPathRole).to_"";
+        var filename = this.model.data (index, FolderStatusDelegate.FolderPathRole).to_string ();
         if (!GLib.File.exists (filename)) {
             ac.set_enabled (false);
         }
@@ -627,7 +627,7 @@ protected slots:
         }
 
         tv.set_current_index (index);
-        string alias = this.model.data (index, FolderStatusDelegate.FolderAliasRole).to_"";
+        string alias = this.model.data (index, FolderStatusDelegate.FolderAliasRole).to_string ();
         bool folder_paused = this.model.data (index, FolderStatusDelegate.FolderSyncPaused).to_bool ();
         bool folder_connected = this.model.data (index, FolderStatusDelegate.FolderAccountConnected).to_bool ();
         var folder_man = FolderMan.instance ();
@@ -722,7 +722,7 @@ protected slots:
             } else {
                 QToolTip.show_text (
                     QCursor.pos (),
-                    this.model.data (indx, Qt.ToolTipRole).to_"",
+                    this.model.data (indx, Qt.ToolTipRole).to_string (),
                     this);
             }
             return;
@@ -768,9 +768,9 @@ protected slots:
 
         FolderDefinition definition;
         definition.local_path = FolderDefinition.prepare_local_path (
-            folder_wizard.field (QLatin1String ("source_folder")).to_"");
+            folder_wizard.field (QLatin1String ("source_folder")).to_string ());
         definition.target_path = FolderDefinition.prepare_target_path (
-            folder_wizard.property ("target_path").to_"");
+            folder_wizard.property ("target_path").to_string ());
 
         if (folder_wizard.property ("use_virtual_files").to_bool ()) {
             definition.virtual_files_mode = best_available_vfs_mode ();
@@ -870,7 +870,7 @@ protected slots:
         QModelIndex selected = this.ui._folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || this.model.classify (selected) != FolderStatusModel.SubFolder)
             return;
-        string filename = this.model.data (selected, FolderStatusDelegate.FolderPathRole).to_"";
+        string filename = this.model.data (selected, FolderStatusDelegate.FolderPathRole).to_string ();
         GLib.Uri url = GLib.Uri.from_local_file (filename);
         QDesktopServices.open_url (url);
     }
@@ -1175,8 +1175,8 @@ protected slots:
             }
 
             const string server = string.from_latin1 ("<a href=\"%1\">%2</a>")
-                                       .arg (Utility.escape (account.url ().to_""),
-                                           Utility.escape (safe_url.to_""));
+                                       .arg (Utility.escape (account.url ().to_string ()),
+                                           Utility.escape (safe_url.to_string ()));
             string server_with_user = server;
             if (AbstractCredentials cred = account.credentials ()) {
                 string user = account.dav_display_name ();

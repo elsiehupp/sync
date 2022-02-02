@@ -889,8 +889,8 @@ void FolderStatusModel.on_update_directories (string[] list) {
         new_info._folder = parent_info._folder;
         new_info._path_idx = parent_info._path_idx;
         new_info._path_idx << new_subs.size ();
-        new_info._is_external = permission_map.value (remove_trailing_slash (path)).to_"".contains ("M");
-        new_info._is_encrypted = encryption_map.value (remove_trailing_slash (path)).to_"" == QStringLiteral ("1");
+        new_info._is_external = permission_map.value (remove_trailing_slash (path)).to_string ().contains ("M");
+        new_info._is_encrypted = encryption_map.value (remove_trailing_slash (path)).to_string () == QStringLiteral ("1");
         new_info._path = relative_path;
 
         SyncJournalFileRecord record;

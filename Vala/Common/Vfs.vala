@@ -613,17 +613,17 @@ class VfsOff : Vfs {
             GLib.debug (lc_plugin) << "Plugin doesn't exist" << loader.filename ();
             return false;
         }
-        if (base_meta_data["IID"].to_"" != "org.owncloud.PluginFactory") {
+        if (base_meta_data["IID"].to_string () != "org.owncloud.PluginFactory") {
             GLib.warn (lc_plugin) << "Plugin has wrong IID" << loader.filename () << base_meta_data["IID"];
             return false;
         }
 
         const var metadata = base_meta_data["MetaData"].to_object ();
-        if (metadata["type"].to_"" != "vfs") {
+        if (metadata["type"].to_string () != "vfs") {
             GLib.warn (lc_plugin) << "Plugin has wrong type" << loader.filename () << metadata["type"];
             return false;
         }
-        if (metadata["version"].to_"" != MIRALL_VERSION_STRING) {
+        if (metadata["version"].to_string () != MIRALL_VERSION_STRING) {
             GLib.warn (lc_plugin) << "Plugin has wrong version" << loader.filename () << metadata["version"];
             return false;
         }

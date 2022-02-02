@@ -94,8 +94,8 @@ class Ssl_button : QToolButton {
             + QLatin1String ("<br/>")
             + Utility.escape (Utility.format_fingerprint (sha265hash.mid (sha265hash.length () / 2), false));
         string serial = string.from_utf8 (cert.serial_number ());
-        string effective_date = cert.effective_date ().date ().to_"";
-        string expiry_date = cert.expiry_date ().date ().to_"";
+        string effective_date = cert.effective_date ().date ().to_string ();
+        string expiry_date = cert.expiry_date ().date ().to_string ();
         string sna = string[] (cert.subject_alternative_names ().values ()).join (" ");
 
         string details;

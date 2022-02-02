@@ -164,7 +164,7 @@ signals:
         AccountPointer account = this.oc_wizard.account ();
         account.set_url (host);
 
-        q_c_info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_"";
+        q_c_info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_string ();
         /* emit */ connect_to_oc_url (host);
     }
 

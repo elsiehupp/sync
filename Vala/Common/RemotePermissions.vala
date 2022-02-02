@@ -98,7 +98,7 @@ class RemotePermissions {
     /***********************************************************
     output for display purposes, no defined format (same as to_database_value in practice)
     ***********************************************************/
-    public string to_"" {
+    public string to_string () {
         return string.from_utf8 (to_database_value ());
     }
 
@@ -170,7 +170,7 @@ class RemotePermissions {
     /***********************************************************
     ***********************************************************/
     public friend QDebug operator<< (QDebug dbg, RemotePermissions remote_permissions) {
-        return dbg << remote_permissions.to_"";
+        return dbg << remote_permissions.to_string ();
     }
 }
 

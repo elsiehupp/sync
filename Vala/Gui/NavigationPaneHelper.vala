@@ -93,7 +93,7 @@ class NavigationPaneHelper : GLib.Object {
                     // If it already exists, unmark it for removal, this is a valid sync root.
                     entries_to_remove.remove_one (folder.navigation_pane_clsid ());
 
-                    string clsid_str = folder.navigation_pane_clsid ().to_"";
+                    string clsid_str = folder.navigation_pane_clsid ().to_string ();
                     string clsid_path = "" % R" (Software\Classes\CLSID\)" % clsid_str;
                     string clsid_path_wow64 = "" % R" (Software\Classes\Wow6432Node\CLSID\)" % clsid_str;
                     string namespace_path = "" % R" (Software\Microsoft\Windows\Current_version\Explorer\Desktop\Name_space\)" % clsid_str;
@@ -118,7 +118,7 @@ class NavigationPaneHelper : GLib.Object {
 
         // Then remove anything that isn't in our folder list anymore.
         foreach (var clsid, entries_to_remove) {
-            string clsid_str = clsid.to_"";
+            string clsid_str = clsid.to_string ();
             string clsid_path = "" % R" (Software\Classes\CLSID\)" % clsid_str;
             string clsid_path_wow64 = "" % R" (Software\Classes\Wow6432Node\CLSID\)" % clsid_str;
             string namespace_path = "" % R" (Software\Microsoft\Windows\Current_version\Explorer\Desktop\Name_space\)" % clsid_str;

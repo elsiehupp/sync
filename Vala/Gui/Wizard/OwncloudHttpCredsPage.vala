@@ -166,7 +166,7 @@ signals:
             oc_wizard.account ().clear_cookie_jar ();
 
             /* emit */ complete_changed ();
-            /* emit */ connect_to_oc_url (field ("OCUrl").to_"".simplified ());
+            /* emit */ connect_to_oc_url (field ("OCUrl").to_string ().simplified ());
 
             return false;
         } else {

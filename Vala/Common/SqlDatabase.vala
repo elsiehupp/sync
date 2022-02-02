@@ -609,7 +609,7 @@ class SqlQuery {
             break;
         }
         case GLib.Variant.String: {
-            if (!value.to_"".is_null ()) {
+            if (!value.to_string ().is_null ()) {
                 // lifetime of string == lifetime of its qvariant
                 const var string_value = static_cast<const string> (value.const_data ());
                 res = sqlite3_bind_text16 (this.stmt, pos, string_value.utf16 (),
@@ -625,7 +625,7 @@ class SqlQuery {
             break;
         }
         default: {
-            string string_value = value.to_"";
+            string string_value = value.to_string ();
             // SQLITE_TRANSIENT makes sure that sqlite buffers the data
             res = sqlite3_bind_text16 (this.stmt, pos, string_value.utf16 (),
                 (string_value.size ()) * static_cast<int> (sizeof (char)), SQLITE_TRANSIENT);

@@ -422,7 +422,7 @@ class Selective_sync_tree_view_item : QTree_widget_item {
     }
 
     void Selective_sync_widget.on_item_expanded (QTree_widget_item item) {
-        string dir = item.data (0, Qt.User_role).to_"";
+        string dir = item.data (0, Qt.User_role).to_string ();
         if (dir.is_empty ())
             return;
         string prefix;
@@ -503,7 +503,7 @@ class Selective_sync_tree_view_item : QTree_widget_item {
 
         switch (root.check_state (0)) {
         case Qt.Unchecked:
-            return string[] (root.data (0, Qt.User_role).to_"" + "/");
+            return string[] (root.data (0, Qt.User_role).to_string () + "/");
         case Qt.Checked:
             return string[] ();
         case Qt.Partially_checked:
@@ -517,7 +517,7 @@ class Selective_sync_tree_view_item : QTree_widget_item {
             }
         } else {
             // We did not load from the server so we re-use the one from the old block list
-            string path = root.data (0, Qt.User_role).to_"";
+            string path = root.data (0, Qt.User_role).to_string ();
             foreach (string it, this.old_block_list) {
                 if (it.starts_with (path))
                     result += it;

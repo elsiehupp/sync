@@ -254,8 +254,8 @@ class Ssl_error_dialog : Gtk.Dialog {
         msg += _("Fingerprint (SHA-256) : <tt>%1</tt>").arg (sha256sum) + QL ("<br/>");
         msg += _("Fingerprint (SHA-512) : <tt>%1</tt>").arg (sha512sum) + QL ("<br/>");
         msg += QL ("<br/>");
-        msg += _("Effective Date : %1").arg (cert.effective_date ().to_"") + QL ("<br/>");
-        msg += _("Expiration Date : %1").arg (cert.expiry_date ().to_"") + QL ("</p>");
+        msg += _("Effective Date : %1").arg (cert.effective_date ().to_string ()) + QL ("<br/>");
+        msg += _("Expiration Date : %1").arg (cert.expiry_date ().to_string ()) + QL ("</p>");
 
         msg += QL ("</div>");
 

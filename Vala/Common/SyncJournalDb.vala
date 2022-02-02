@@ -107,7 +107,7 @@ class SyncJournalDb : GLib.Object {
         string user) {
         string journal_path = ".sync_";
 
-        string key = "%1@%2:%3".arg (user, remote_url.to_"", remote_path);
+        string key = "%1@%2:%3".arg (user, remote_url.to_string (), remote_path);
 
         GLib.ByteArray ba = QCryptographicHash.hash (key.to_utf8 (), QCryptographicHash.Md5);
         journal_path += string.from_latin1 (ba.left (6).to_hex ()) + ".db";
@@ -433,7 +433,7 @@ class SyncJournalDb : GLib.Object {
 
         q_c_info (lc_database) << "Updating file record for path:" << record.path () << "inode:" << record._inode
                     << "modtime:" << record._modtime << "type:" << record._type
-                    << "etag:" << record._etag << "file_id:" << record._file_id << "remote_perm:" << record._remote_perm.to_""
+                    << "etag:" << record._etag << "file_id:" << record._file_id << "remote_perm:" << record._remote_perm.to_string ()
                     << "file_size:" << record._file_size << "checksum:" << record._checksum_header
                     << "e2e_mangled_name:" << record.e2e_mangled_name () << "is_e2e_encrypted:" << record._is_e2e_encrypted;
 

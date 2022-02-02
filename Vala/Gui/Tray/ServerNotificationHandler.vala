@@ -117,14 +117,14 @@ signals:
             a._id = json.value ("notification_id").to_int ();
 
             //need to know, specially for remote_share
-            a._object_type = json.value ("object_type").to_"";
+            a._object_type = json.value ("object_type").to_string ();
             a._status = 0;
 
-            a._subject = json.value ("subject").to_"";
-            a._message = json.value ("message").to_"";
-            a._icon = json.value ("icon").to_"";
+            a._subject = json.value ("subject").to_string ();
+            a._message = json.value ("message").to_string ();
+            a._icon = json.value ("icon").to_string ();
 
-            GLib.Uri link (json.value ("link").to_"");
+            GLib.Uri link (json.value ("link").to_string ());
             if (!link.is_empty ()) {
                 if (link.host ().is_empty ()) {
                     link.set_scheme (ai.account ().url ().scheme ());
@@ -135,15 +135,15 @@ signals:
                 }
             }
             a._link = link;
-            a._date_time = GLib.DateTime.from_string (json.value ("datetime").to_"", Qt.ISODate);
+            a._date_time = GLib.DateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
 
             var actions = json.value ("actions").to_array ();
             foreach (var action, actions) {
                 var action_json = action.to_object ();
                 Activity_link al;
-                al._label = GLib.Uri.from_percent_encoding (action_json.value ("label").to_"".to_utf8 ());
-                al._link = action_json.value ("link").to_"";
-                al._verb = action_json.value ("type").to_"".to_utf8 ();
+                al._label = GLib.Uri.from_percent_encoding (action_json.value ("label").to_string ().to_utf8 ());
+                al._link = action_json.value ("link").to_string ();
+                al._verb = action_json.value ("type").to_string ().to_utf8 ();
                 al._primary = action_json.value ("primary").to_bool ();
 
                 a._links.append (al);
@@ -153,7 +153,7 @@ signals:
             // https://github.com/owncloud/notifications/blob/master/docs/ocs-endpoint-v1.md#deleting-a-notification-for-a-user
             Activity_link al;
             al._label = _("Dismiss");
-            al._link = Utility.concat_url_path (ai.account ().url (), notifications_path + "/" + string.number (a._id)).to_"";
+            al._link = Utility.concat_url_path (ai.account ().url (), notifications_path + "/" + string.number (a._id)).to_string ();
             al._verb = "DELETE";
             al._primary = false;
             a._links.append (al);

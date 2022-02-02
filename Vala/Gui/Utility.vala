@@ -74,7 +74,7 @@ bool Utility.open_browser (GLib.Uri url, Gtk.Widget error_widget_parent) {
     };
 
     if (!allowed_url_schemes.contains (url.scheme ())) {
-        GLib.warn (lc_utility) << "URL format is not supported, or it has been compromised for:" << url.to_"";
+        GLib.warn (lc_utility) << "URL format is not supported, or it has been compromised for:" << url.to_string ();
         return false;
     }
 
@@ -86,7 +86,7 @@ bool Utility.open_browser (GLib.Uri url, Gtk.Widget error_widget_parent) {
                 QCoreApplication.translate ("utility",
                     "There was an error when launching the browser to go to "
                     "URL %1. Maybe no default browser is configured?")
-                    .arg (url.to_""));
+                    .arg (url.to_string ()));
         }
         GLib.warn (lc_utility) << "QDesktopServices.open_url failed for" << url;
         return false;

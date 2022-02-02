@@ -334,7 +334,7 @@ signals:
     }
 
     string OwncloudWizard.oc_url () {
-        string url = field ("OCUrl").to_"".simplified ();
+        string url = field ("OCUrl").to_string ().simplified ();
         return url;
     }
 

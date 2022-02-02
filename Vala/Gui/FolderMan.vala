@@ -905,11 +905,11 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
 
     settings.begin_group (escaped_alias); // read the group with the same name as the file which is the folder alias
 
-    string path = settings.value (QLatin1String ("local_path")).to_"";
-    string backend = settings.value (QLatin1String ("backend")).to_"";
-    string target_path = settings.value (QLatin1String ("target_path")).to_"";
+    string path = settings.value (QLatin1String ("local_path")).to_string ();
+    string backend = settings.value (QLatin1String ("backend")).to_string ();
+    string target_path = settings.value (QLatin1String ("target_path")).to_string ();
     bool paused = settings.value (QLatin1String ("paused"), false).to_bool ();
-    // string connection = settings.value ( QLatin1String ("connection") ).to_"";
+    // string connection = settings.value ( QLatin1String ("connection") ).to_string ();
     string alias = unescape_alias (escaped_alias);
 
     if (backend.is_empty () || backend != QLatin1String ("owncloud")) {
@@ -1082,7 +1082,7 @@ void FolderMan.on_run_one_etag_job () {
                 restart_application ();
             }
         } else {
-            GLib.debug (lc_folder_man) << "Scheduling" << folder.remote_url ().to_"" << "to check remote ETag";
+            GLib.debug (lc_folder_man) << "Scheduling" << folder.remote_url ().to_string () << "to check remote ETag";
             this.current_etag_job.on_start (); // on destroy/end it will continue the queue via on_etag_job_destroyed
         }
     }
@@ -1187,7 +1187,7 @@ void FolderMan.on_start_scheduled_folder_sync () {
     if (is_any_sync_running ()) {
         for (var f : this.folder_map) {
             if (f.is_sync_running ())
-                q_c_info (lc_folder_man) << "Currently folder " << f.remote_url ().to_"" << " is running, wait for finish!";
+                q_c_info (lc_folder_man) << "Currently folder " << f.remote_url ().to_string () << " is running, wait for finish!";
         }
         return;
     }
@@ -1422,7 +1422,7 @@ void FolderMan.on_folder_sync_started () {
     q_c_info (lc_folder_man, ">========== Sync started for folder [%s] of account [%s] with remote [%s]",
         q_printable (f.short_gui_local_path ()),
         q_printable (f.account_state ().account ().display_name ()),
-        q_printable (f.remote_url ().to_""));
+        q_printable (f.remote_url ().to_string ()));
 }
 
 /***********************************************************
@@ -1440,7 +1440,7 @@ void FolderMan.on_folder_sync_finished (SyncResult &) {
     q_c_info (lc_folder_man, "<========== Sync on_finished for folder [%s] of account [%s] with remote [%s]",
         q_printable (f.short_gui_local_path ()),
         q_printable (f.account_state ().account ().display_name ()),
-        q_printable (f.remote_url ().to_""));
+        q_printable (f.remote_url ().to_string ()));
 
     if (f == this.current_sync_folder) {
         this.last_sync_folder = this.current_sync_folder;

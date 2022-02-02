@@ -153,7 +153,7 @@ signals:
         /* emit */ status_changed (PollStatus.status_fetch_token, 0);
 
         // Step 1 : Initiate a login, do an anonymous POST request
-        GLib.Uri url = Utility.concat_url_path (this.account.url ().to_"", QLatin1String ("/index.php/login/v2"));
+        GLib.Uri url = Utility.concat_url_path (this.account.url ().to_string (), QLatin1String ("/index.php/login/v2"));
         this.enforce_https = url.scheme () == QStringLiteral ("https");
 
         // add 'Content-Length : 0' header (see https://github.com/nextcloud/desktop/issues/1473)
@@ -172,20 +172,20 @@ signals:
 
             if (reply.error () == QNetworkReply.NoError && json_parse_error.error == QJsonParseError.NoError
                 && !json.is_empty ()) {
-                poll_token = json.value ("poll").to_object ().value ("token").to_"";
-                poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_"";
+                poll_token = json.value ("poll").to_object ().value ("token").to_string ();
+                poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_string ();
                 if (this.enforce_https && GLib.Uri (poll_endpoint).scheme () != QStringLiteral ("https")) {
                     GLib.warn (lc_flow2auth) << "Can not poll endpoint because the returned url" << poll_endpoint << "does not on_start with https";
                     /* emit */ result (Error, _("The polling URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
                 }
-                login_url = json["login"].to_"";
+                login_url = json["login"].to_string ();
             }
 
             if (reply.error () != QNetworkReply.NoError || json_parse_error.error != QJsonParseError.NoError
                 || json.is_empty () || poll_token.is_empty () || poll_endpoint.is_empty () || login_url.is_empty ()) {
                 string error_reason;
-                string error_from_json = json["error"].to_"";
+                string error_from_json = json["error"].to_string ();
                 if (!error_from_json.is_empty ()) {
                     error_reason = _("Error returned from the server : <em>%1</em>")
                                       .arg (error_from_json.to_html_escaped ());
@@ -285,20 +285,20 @@ signals:
 
             if (reply.error () == QNetworkReply.NoError && json_parse_error.error == QJsonParseError.NoError
                 && !json.is_empty ()) {
-                server_url = json["server"].to_"";
+                server_url = json["server"].to_string ();
                 if (this.enforce_https && server_url.scheme () != QStringLiteral ("https")) {
                     GLib.warn (lc_flow2auth) << "Returned server url" << server_url << "does not on_start with https";
                     /* emit */ result (Error, _("The returned server URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
                 }
-                login_name = json["login_name"].to_"";
-                app_password = json["app_password"].to_"";
+                login_name = json["login_name"].to_string ();
+                app_password = json["app_password"].to_string ();
             }
 
             if (reply.error () != QNetworkReply.NoError || json_parse_error.error != QJsonParseError.NoError
                 || json.is_empty () || server_url.is_empty () || login_name.is_empty () || app_password.is_empty ()) {
                 string error_reason;
-                string error_from_json = json["error"].to_"";
+                string error_from_json = json["error"].to_string ();
                 if (!error_from_json.is_empty ()) {
                     error_reason = _("Error returned from the server : <em>%1</em>")
                                       .arg (error_from_json.to_html_escaped ());
@@ -330,7 +330,7 @@ signals:
             this.poll_timer.stop ();
 
             // Success
-            q_c_info (lc_flow2auth) << "Success getting the app_password for user : " << login_name << ", server : " << server_url.to_"";
+            q_c_info (lc_flow2auth) << "Success getting the app_password for user : " << login_name << ", server : " << server_url.to_string ();
 
             this.account.set_url (server_url);
 

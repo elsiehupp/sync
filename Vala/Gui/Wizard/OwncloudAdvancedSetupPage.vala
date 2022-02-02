@@ -292,7 +292,7 @@ signals:
 
     void Owncloud_advanced_setup_page.set_user_information () {
         const var account = this.oc_wizard.account ();
-        const var server_url = account.url ().to_"";
+        const var server_url = account.url ().to_string ();
         set_server_address_label_url (server_url);
         const var user_name = account.dav_display_name ();
         this.ui.user_name_label.on_set_text (user_name);
@@ -320,7 +320,7 @@ signals:
             return;
         }
 
-        const var pretty_url = url.to_"".mid (url.scheme ().size () + 3); // + 3 because we need to remove ://
+        const var pretty_url = url.to_string ().mid (url.scheme ().size () + 3); // + 3 because we need to remove ://
         this.ui.server_address_label.on_set_text (pretty_url);
     }
 
@@ -411,7 +411,7 @@ signals:
     }
 
     string Owncloud_advanced_setup_page.local_folder () {
-        string folder = wizard ().property ("local_folder").to_"";
+        string folder = wizard ().property ("local_folder").to_string ();
         return folder;
     }
 

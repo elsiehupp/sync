@@ -146,7 +146,7 @@ signals:
         account.set_credentials (CredentialsFactory.create ("dummy"));
         account.set_url (Theme.instance ().override_server_url ());
         this.oc_wizard.set_account (account);
-        this.oc_wizard.set_oCUrl (account.url ().to_"");
+        this.oc_wizard.set_oCUrl (account.url ().to_string ());
 
         this.remote_folder = Theme.instance ().default_server_folder ();
         // remote_folder may be empty, which means /
@@ -305,7 +305,7 @@ signals:
         var server_version = CheckServerJob.version (info);
 
         this.oc_wizard.on_append_to_configuration_log (_("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
-                                                .arg (Utility.escape (url.to_""),
+                                                .arg (Utility.escape (url.to_string ()),
                                                     Utility.escape (Theme.instance ().app_name_gui ()),
                                                     Utility.escape (CheckServerJob.version_string (info)),
                                                     Utility.escape (server_version)));
@@ -317,7 +317,7 @@ signals:
         if (url != this.oc_wizard.account ().url ()) {
             // We might be redirected, update the account
             this.oc_wizard.account ().set_url (url);
-            q_c_info (lc_wizard) << " was redirected to" << url.to_"";
+            q_c_info (lc_wizard) << " was redirected to" << url.to_string ();
         }
 
         on_determine_auth_type ();
@@ -333,7 +333,7 @@ signals:
         } else {
             msg = _("Failed to connect to %1 at %2:<br/>%3")
                       .arg (Utility.escape (Theme.instance ().app_name_gui ()),
-                          Utility.escape (this.oc_wizard.account ().url ().to_""),
+                          Utility.escape (this.oc_wizard.account ().url ().to_string ()),
                           Utility.escape (job.error_string ()));
         }
         bool is_downgrade_advised = check_downgrade_advised (reply);
@@ -349,7 +349,7 @@ signals:
     void OwncloudSetupWizard.on_no_server_found_timeout (GLib.Uri url) {
         this.oc_wizard.on_display_error (
             _("Timeout while trying to connect to %1 at %2.")
-                .arg (Utility.escape (Theme.instance ().app_name_gui ()), Utility.escape (url.to_"")),
+                .arg (Utility.escape (Theme.instance ().app_name_gui ()), Utility.escape (url.to_string ())),
                     false);
     }
 
@@ -417,7 +417,7 @@ signals:
         // the updated server URL, similar to redirects on status.php.
         GLib.Uri redirect_url = reply.attribute (QNetworkRequest.RedirectionTargetAttribute).to_url ();
         if (!redirect_url.is_empty ()) {
-            q_c_info (lc_wizard) << "Authed request was redirected to" << redirect_url.to_"";
+            q_c_info (lc_wizard) << "Authed request was redirected to" << redirect_url.to_string ();
 
             // strip the expected path
             string path = redirect_url.path ();
@@ -426,14 +426,14 @@ signals:
                 path.chop (expected_path.size ());
                 redirect_url.set_path (path);
 
-                q_c_info (lc_wizard) << "Setting account url to" << redirect_url.to_"";
+                q_c_info (lc_wizard) << "Setting account url to" << redirect_url.to_string ();
                 this.oc_wizard.account ().set_url (redirect_url);
                 test_owncloud_connect ();
                 return;
             }
             error_msg = _("The authenticated request to the server was redirected to "
                           "\"%1\". The URL is bad, the server is misconfigured.")
-                           .arg (Utility.escape (redirect_url.to_""));
+                           .arg (Utility.escape (redirect_url.to_string ()));
 
             // A 404 is actually a on_success : we were authorized to know that the folder does
             // not exist. It will be created later...
@@ -446,7 +446,7 @@ signals:
             if (!this.oc_wizard.account ().credentials ().still_valid (reply)) {
                 error_msg = _("Access forbidden by server. To verify that you have proper access, "
                               "<a href=\"%1\">click here</a> to access the service with your browser.")
-                               .arg (Utility.escape (this.oc_wizard.account ().url ().to_""));
+                               .arg (Utility.escape (this.oc_wizard.account ().url ().to_string ()));
             } else {
                 error_msg = job.error_string_parsing_body ();
             }
@@ -522,7 +522,7 @@ signals:
                     Example: https://cloud.example.com/remote.php/dav//
 
             ***********************************************************/
-            q_c_info (lc_wizard) << "Sanitize got URL path:" << string (this.oc_wizard.account ().url ().to_"" + '/' + this.oc_wizard.account ().dav_path () + remote_folder);
+            q_c_info (lc_wizard) << "Sanitize got URL path:" << string (this.oc_wizard.account ().url ().to_string () + '/' + this.oc_wizard.account ().dav_path () + remote_folder);
 
             string new_dav_path = this.oc_wizard.account ().dav_path (),
                     new_remote_folder = remote_folder;
@@ -543,7 +543,7 @@ signals:
 
             string new_url_path = new_dav_path + '/' + new_remote_folder;
 
-            q_c_info (lc_wizard) << "Sanitized to URL path:" << this.oc_wizard.account ().url ().to_"" + '/' + new_url_path;
+            q_c_info (lc_wizard) << "Sanitized to URL path:" << this.oc_wizard.account ().url ().to_string () + '/' + new_url_path;
             /***********************************************************
             END - Sanitize URL paths to eliminate double-slashes
             ***********************************************************/
@@ -629,7 +629,7 @@ signals:
     }
 
     void OwncloudSetupWizard.finalize_setup (bool on_success) {
-        const string local_folder = this.oc_wizard.property ("local_folder").to_"";
+        const string local_folder = this.oc_wizard.property ("local_folder").to_string ();
         if (on_success) {
             if (! (local_folder.is_empty () || this.remote_folder.is_empty ())) {
                 this.oc_wizard.on_append_to_configuration_log (

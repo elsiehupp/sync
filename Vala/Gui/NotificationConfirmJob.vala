@@ -74,7 +74,7 @@ signals:
 
     void Notification_confirm_job.on_start () {
         if (!this.link.is_valid ()) {
-            GLib.warn (lc_notifications_job) << "Attempt to trigger invalid URL : " << this.link.to_"";
+            GLib.warn (lc_notifications_job) << "Attempt to trigger invalid URL : " << this.link.to_string ();
             return;
         }
         QNetworkRequest req;

@@ -460,7 +460,7 @@ static void update_folder (AccountPointer account, string path) {
             // Workaround the fact that the server does not invalidate the etags of parent directories
             // when something is shared.
             var relative = path.mid_ref (f.remote_path_trailing_slash ().length ());
-            f.journal_database ().schedule_path_for_remote_discovery (relative.to_"");
+            f.journal_database ().schedule_path_for_remote_discovery (relative.to_string ());
 
             // Schedule a sync so it can update the remote permission flag and let the socket API
             // know about the shared icon.
@@ -566,7 +566,7 @@ void Share.on_ocs_error (int status_code, string message) {
 }
 
 void Share.on_password_set (QJsonDocument &, GLib.Variant value) {
-    this.is_password_set = !value.to_"".is_empty ();
+    this.is_password_set = !value.to_string ().is_empty ();
     /* emit */ password_set ();
 }
 
@@ -639,7 +639,7 @@ void Link_share.set_note (string note) {
 }
 
 void Link_share.on_note_set (QJsonDocument &, GLib.Variant note) {
-    this.note = note.to_"";
+    this.note = note.to_string ();
     /* emit */ note_set ();
 }
 
@@ -672,7 +672,7 @@ void Link_share.on_expire_date_set (QJsonDocument reply, GLib.Variant value) {
     they use this date.
     ***********************************************************/
     if (data.value ("expiration").is_"") {
-        this.expire_date = QDate.from_string (data.value ("expiration").to_"", "yyyy-MM-dd 00:00:00");
+        this.expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
     } else {
         this.expire_date = value.to_date ();
     }
@@ -680,13 +680,13 @@ void Link_share.on_expire_date_set (QJsonDocument reply, GLib.Variant value) {
 }
 
 void Link_share.on_name_set (QJsonDocument &, GLib.Variant value) {
-    this.name = value.to_"";
+    this.name = value.to_string ();
     /* emit */ name_set ();
 }
 
 void Link_share.on_label_set (QJsonDocument &, GLib.Variant label) {
-    if (this.label != label.to_"") {
-        this.label = label.to_"";
+    if (this.label != label.to_string ()) {
+        this.label = label.to_string ();
         /* emit */ label_set ();
     }
 }
@@ -721,7 +721,7 @@ string User_group_share.get_note () {
 }
 
 void User_group_share.on_note_set (QJsonDocument &, GLib.Variant note) {
-    this.note = note.to_"";
+    this.note = note.to_string ();
     /* emit */ note_set ();
 }
 
@@ -750,7 +750,7 @@ void User_group_share.on_expire_date_set (QJsonDocument reply, GLib.Variant valu
     they use this date.
     ***********************************************************/
     if (data.value ("expiration").is_"") {
-        this.expire_date = QDate.from_string (data.value ("expiration").to_"", "yyyy-MM-dd 00:00:00");
+        this.expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
     } else {
         this.expire_date = value.to_date ();
     }
@@ -876,27 +876,27 @@ void Share_manager.on_shares_fetched (QJsonDocument reply) {
 }
 
 unowned<User_group_share> Share_manager.parse_user_group_share (QJsonObject data) {
-    unowned<Sharee> sharee (new Sharee (data.value ("share_with").to_"",
-        data.value ("share_with_displayname").to_"",
+    unowned<Sharee> sharee (new Sharee (data.value ("share_with").to_string (),
+        data.value ("share_with_displayname").to_string (),
         static_cast<Sharee.Type> (data.value ("share_type").to_int ())));
 
     QDate expire_date;
     if (data.value ("expiration").is_"") {
-        expire_date = QDate.from_string (data.value ("expiration").to_"", "yyyy-MM-dd 00:00:00");
+        expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
     }
 
     string note;
     if (data.value ("note").is_"") {
-        note = data.value ("note").to_"";
+        note = data.value ("note").to_string ();
     }
 
     return unowned<User_group_share> (new User_group_share (this.account,
-        data.value ("id").to_variant ().to_"", // "id" used to be an integer, support both
-        data.value ("uid_owner").to_variant ().to_"",
-        data.value ("displayname_owner").to_variant ().to_"",
-        data.value ("path").to_"",
+        data.value ("id").to_variant ().to_string (), // "id" used to be an integer, support both
+        data.value ("uid_owner").to_variant ().to_string (),
+        data.value ("displayname_owner").to_variant ().to_string (),
+        data.value ("path").to_string (),
         static_cast<Share.Share_type> (data.value ("share_type").to_int ()),
-        !data.value ("password").to_"".is_empty (),
+        !data.value ("password").to_string ().is_empty (),
         static_cast<Share.Permissions> (data.value ("permissions").to_int ()),
         sharee,
         expire_date,
@@ -908,54 +908,54 @@ unowned<Link_share> Share_manager.parse_link_share (QJsonObject data) {
 
     // From own_cloud server 8.2 the url field is always set for public shares
     if (data.contains ("url")) {
-        url = GLib.Uri (data.value ("url").to_"");
+        url = GLib.Uri (data.value ("url").to_string ());
     } else if (this.account.server_version_int () >= Account.make_server_version (8, 0, 0)) {
         // From own_cloud server version 8 on, a different share link scheme is used.
-        url = GLib.Uri (Utility.concat_url_path (this.account.url (), QLatin1String ("index.php/s/") + data.value ("token").to_"")).to_"";
+        url = GLib.Uri (Utility.concat_url_path (this.account.url (), QLatin1String ("index.php/s/") + data.value ("token").to_string ())).to_string ();
     } else {
         QUrlQuery query_args;
         query_args.add_query_item (QLatin1String ("service"), QLatin1String ("files"));
-        query_args.add_query_item (QLatin1String ("t"), data.value ("token").to_"");
-        url = GLib.Uri (Utility.concat_url_path (this.account.url (), QLatin1String ("public.php"), query_args).to_"");
+        query_args.add_query_item (QLatin1String ("t"), data.value ("token").to_string ());
+        url = GLib.Uri (Utility.concat_url_path (this.account.url (), QLatin1String ("public.php"), query_args).to_string ());
     }
 
     QDate expire_date;
     if (data.value ("expiration").is_"") {
-        expire_date = QDate.from_string (data.value ("expiration").to_"", "yyyy-MM-dd 00:00:00");
+        expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
     }
 
     string note;
     if (data.value ("note").is_"") {
-        note = data.value ("note").to_"";
+        note = data.value ("note").to_string ();
     }
 
     return unowned<Link_share> (new Link_share (this.account,
-        data.value ("id").to_variant ().to_"", // "id" used to be an integer, support both
-        data.value ("uid_owner").to_"",
-        data.value ("displayname_owner").to_"",
-        data.value ("path").to_"",
-        data.value ("name").to_"",
-        data.value ("token").to_"",
+        data.value ("id").to_variant ().to_string (), // "id" used to be an integer, support both
+        data.value ("uid_owner").to_string (),
+        data.value ("displayname_owner").to_string (),
+        data.value ("path").to_string (),
+        data.value ("name").to_string (),
+        data.value ("token").to_string (),
         (Share.Permissions)data.value ("permissions").to_int (),
         data.value ("share_with").is_"", // has password?
         url,
         expire_date,
         note,
-        data.value ("label").to_""));
+        data.value ("label").to_string ()));
 }
 
 unowned<Share> Share_manager.parse_share (QJsonObject data) {
-    unowned<Sharee> sharee (new Sharee (data.value ("share_with").to_"",
-        data.value ("share_with_displayname").to_"",
+    unowned<Sharee> sharee (new Sharee (data.value ("share_with").to_string (),
+        data.value ("share_with_displayname").to_string (),
         (Sharee.Type)data.value ("share_type").to_int ()));
 
     return unowned<Share> (new Share (this.account,
-        data.value ("id").to_variant ().to_"", // "id" used to be an integer, support both
-        data.value ("uid_owner").to_variant ().to_"",
-        data.value ("displayname_owner").to_variant ().to_"",
-        data.value ("path").to_"",
+        data.value ("id").to_variant ().to_string (), // "id" used to be an integer, support both
+        data.value ("uid_owner").to_variant ().to_string (),
+        data.value ("displayname_owner").to_variant ().to_string (),
+        data.value ("path").to_string (),
         (Share.Share_type)data.value ("share_type").to_int (),
-        !data.value ("password").to_"".is_empty (),
+        !data.value ("password").to_string ().is_empty (),
         (Share.Permissions)data.value ("permissions").to_int (),
         sharee));
 }

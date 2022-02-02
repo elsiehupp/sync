@@ -108,7 +108,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray verb_to_"";
+    private GLib.ByteArray verb_to_string ();
 
 
 
@@ -139,7 +139,7 @@ signals:
         this.verb = value;
     }
 
-    GLib.ByteArray JsonApiJob.verb_to_"" {
+    GLib.ByteArray JsonApiJob.verb_to_string () {
         switch (this.verb) {
         case Verb.Get:
             return "GET";
@@ -158,7 +158,7 @@ signals:
         var query = this.additional_params;
         query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path (), query);
-        const var http_verb = verb_to_"";
+        const var http_verb = verb_to_string ();
         if (!this.body.is_empty ()) {
             send_request (http_verb, url, this.request, this.body);
         } else {

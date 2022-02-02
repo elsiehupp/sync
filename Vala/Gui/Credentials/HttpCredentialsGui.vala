@@ -185,7 +185,7 @@ void HttpCredentialsGui.on_show_dialog () {
 
 string HttpCredentialsGui.request_app_password_text (Account account) {
     int version = account.server_version_int ();
-    var url = account.url ().to_"";
+    var url = account.url ().to_string ();
     if (url.ends_with ('/'))
         url.chop (1);
 

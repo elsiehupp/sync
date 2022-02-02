@@ -907,7 +907,7 @@ void User.on_add_error (string folder_alias, string message, ErrorCategory categ
         Activity activity;
         activity._type = Activity.Sync_result_type;
         activity._status = SyncResult.Status.ERROR;
-        activity._date_time = GLib.DateTime.from_string (GLib.DateTime.current_date_time ().to_"", Qt.ISODate);
+        activity._date_time = GLib.DateTime.from_string (GLib.DateTime.current_date_time ().to_string (), Qt.ISODate);
         activity._subject = message;
         activity._message = folder_instance.short_gui_local_path ();
         activity._link = folder_instance.short_gui_local_path ();
@@ -941,7 +941,7 @@ void User.on_add_error_to_gui (string folder_alias, SyncFileItem.Status status, 
         activity._type = Activity.Sync_file_item_type;
         activity._status = status;
         const var current_date_time = GLib.DateTime.current_date_time ();
-        activity._date_time = GLib.DateTime.from_string (current_date_time.to_"", Qt.ISODate);
+        activity._date_time = GLib.DateTime.from_string (current_date_time.to_string (), Qt.ISODate);
         activity._expire_at_msecs = current_date_time.add_m_secs (activity_default_expiration_time_msecs).to_m_secs_since_epoch ();
         activity._subject = !subject.is_empty () ? subject : folder_instance.short_gui_local_path ();
         activity._message = error_message;
@@ -1091,7 +1091,7 @@ string User.name () {
 }
 
 string User.server (bool shortened) {
-    string server_url = this.account.account ().url ().to_"";
+    string server_url = this.account.account ().url ().to_string ();
     if (shortened) {
         server_url.replace (QLatin1String ("https://"), QLatin1String (""));
         server_url.replace (QLatin1String ("http://"), QLatin1String (""));
@@ -1556,7 +1556,7 @@ GLib.Variant User_apps_model.data (QModelIndex index, int role) {
     } else if (role == Url_role) {
         return this.apps[index.row ()].url ();
     } else if (role == Icon_url_role) {
-        return this.apps[index.row ()].icon_url ().to_"";
+        return this.apps[index.row ()].icon_url ().to_string ();
     }
     return GLib.Variant ();
 }

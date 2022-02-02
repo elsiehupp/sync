@@ -164,11 +164,11 @@ namespace {
         QMimeDatabase mime_database;
 
         const var update_group = [this, mime_database] (string filename, QLabel link_label, string link_text, QLabel mtime_label, QLabel size_label, QToolButton button) {
-            const var file_url = GLib.Uri.from_local_file (filename).to_"";
+            const var file_url = GLib.Uri.from_local_file (filename).to_string ();
             link_label.on_set_text ("<a href='%1'>%2</a>".arg (file_url).arg (link_text));
 
             const var info = QFileInfo (filename);
-            mtime_label.on_set_text (info.last_modified ().to_"");
+            mtime_label.on_set_text (info.last_modified ().to_string ());
             size_label.on_set_text (locale ().formatted_data_size (info.size ()));
 
             const var mime = mime_database.mime_type_for_file (filename);

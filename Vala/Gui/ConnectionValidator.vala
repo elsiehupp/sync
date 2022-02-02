@@ -225,7 +225,7 @@ protected slots:
 
         // Update server url in case of redirection
         if (this.account.url () != url) {
-            q_c_info (lc_connection_validator ()) << "status.php was redirected to" << url.to_"";
+            q_c_info (lc_connection_validator ()) << "status.php was redirected to" << url.to_string ();
             this.account.set_url (url);
             this.account.wants_account_saved (this.account.data ());
         }
@@ -258,7 +258,7 @@ protected slots:
             // Note: Why would this happen on a status.php request?
             this.errors.append (_("Authentication error : Either username or password are wrong."));
         } else {
-            //this.errors.append (_("Unable to connect to %1").arg (this.account.url ().to_""));
+            //this.errors.append (_("Unable to connect to %1").arg (this.account.url ().to_string ()));
             this.errors.append (job.error_string ());
         }
         report_result (StatusNotFound);
@@ -266,7 +266,7 @@ protected slots:
 
     void ConnectionValidator.on_job_timeout (GLib.Uri url) {
         Q_UNUSED (url);
-        //this.errors.append (_("Unable to connect to %1").arg (url.to_""));
+        //this.errors.append (_("Unable to connect to %1").arg (url.to_string ()));
         this.errors.append (_("Timeout"));
         report_result (Timeout);
     }
@@ -341,14 +341,14 @@ protected slots:
         this.account.set_capabilities (caps.to_variant_map ());
 
         // New servers also report the version in the capabilities
-        string server_version = caps["core"].to_object ()["status"].to_object ()["version"].to_"";
+        string server_version = caps["core"].to_object ()["status"].to_object ()["version"].to_string ();
         if (!server_version.is_empty () && !set_and_check_server_version (server_version)) {
             return;
         }
 
         // Check for the direct_editing capability
-        GLib.Uri direct_editing_uRL = GLib.Uri (caps["files"].to_object ()["direct_editing"].to_object ()["url"].to_"");
-        string direct_editing_e_tag = caps["files"].to_object ()["direct_editing"].to_object ()["etag"].to_"";
+        GLib.Uri direct_editing_uRL = GLib.Uri (caps["files"].to_object ()["direct_editing"].to_object ()["url"].to_string ());
+        string direct_editing_e_tag = caps["files"].to_object ()["direct_editing"].to_object ()["etag"].to_string ();
         this.account.fetch_direct_editors (direct_editing_uRL, direct_editing_e_tag);
 
         fetch_user ();

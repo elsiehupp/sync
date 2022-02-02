@@ -92,5 +92,5 @@ void ToolTipUpdater.on_data_changed (QModelIndex top_left,
     }
 
     // Update the currently active tooltip
-    QToolTip.show_text (this.tool_tip_pos, this.tree_view.model ().data (index, Qt.ToolTipRole).to_"");
+    QToolTip.show_text (this.tool_tip_pos, this.tree_view.model ().data (index, Qt.ToolTipRole).to_string ());
 }

@@ -53,7 +53,7 @@ namespace WizardCommon {
             label.set_alignment (Qt.Align_top | Qt.Align_right);
             label.set_visible (true);
         } else {
-            string string_value = variant.to_"";
+            string string_value = variant.to_string ();
             if (!string_value.is_empty ()) {
                 label.on_set_text (string_value);
                 label.set_text_format (Qt.RichText);

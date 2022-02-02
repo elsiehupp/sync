@@ -368,7 +368,7 @@ signals:
                     switch (ret_val) {
                     case Owncloud_connection_method_dialog.No_TLS: {
                         url.set_scheme ("http");
-                        this.ui.le_url.set_full_text (url.to_"");
+                        this.ui.le_url.set_full_text (url.to_string ());
                         // skip ahead to next page, since the user would expect us to retry automatically
                         wizard ().next ();
                     } break;

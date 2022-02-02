@@ -415,7 +415,7 @@ int main (int argc, char **argv) {
         var caps = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
         q_debug () << "Server capabilities" << caps;
         account.set_capabilities (caps.to_variant_map ());
-        account.set_server_version (caps["core"].to_object ()["status"].to_object ()["version"].to_"");
+        account.set_server_version (caps["core"].to_object ()["status"].to_object ()["version"].to_string ());
         loop.quit ();
     });
     job.on_start ();
@@ -429,8 +429,8 @@ int main (int argc, char **argv) {
     job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"));
     GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument json) {
         const QJsonObject data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-        account.set_dav_user (data.value ("id").to_"");
-        account.set_dav_display_name (data.value ("display-name").to_"");
+        account.set_dav_user (data.value ("id").to_string ());
+        account.set_dav_display_name (data.value ("display-name").to_string ());
         loop.quit ();
     });
     job.on_start ();

@@ -659,7 +659,7 @@ signals:
     void Share_user_group_widget.on_completer_highlighted (QModelIndex index) {
         // By default the completer would set the text to Edit_role,
         // override that here.
-        this.ui.sharee_line_edit.on_set_text (index.data (Qt.Display_role).to_"");
+        this.ui.sharee_line_edit.on_set_text (index.data (Qt.Display_role).to_string ());
     }
 
     void Share_user_group_widget.on_display_error (int code, string message) {

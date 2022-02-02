@@ -201,11 +201,11 @@ signals:
         AccountPointer account = this.account_state.account ();
 
         // User Info
-        string user = obj_data.value ("id").to_"";
+        string user = obj_data.value ("id").to_string ();
         if (!user.is_empty ()) {
             account.set_dav_user (user);
         }
-        string display_name = obj_data.value ("display-name").to_"";
+        string display_name = obj_data.value ("display-name").to_string ();
         if (!display_name.is_empty ()) {
             account.set_dav_display_name (display_name);
         }

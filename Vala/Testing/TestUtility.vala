@@ -33,7 +33,7 @@ class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_octets_to_"" {
+    private void on_test_octets_to_string () {
         QLocale.setDefault (QLocale ("en"));
         QCOMPARE (octetsToString (999) , string ("999 B"));
         QCOMPARE (octetsToString (1024) , string ("1 KB"));

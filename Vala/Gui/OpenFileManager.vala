@@ -94,7 +94,7 @@ void show_in_file_manager (string local_path) {
     ***********************************************************/
     static string default_manager = find_default_file_manager ();
     QSettings desktop_file (default_manager, QSettings.IniFormat);
-    string exec = desktop_file.value ("Desktop Entry/Exec").to_"";
+    string exec = desktop_file.value ("Desktop Entry/Exec").to_string ();
 
     string file_to_open = QFileInfo (local_path).absolute_file_path ();
     string path_to_open = QFileInfo (local_path).absolute_path ();
@@ -129,9 +129,9 @@ void show_in_file_manager (string local_path) {
     ***********************************************************/
     static string name;
     if (name.is_empty ()) {
-        name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name[%1]").arg (q_app.property ("ui_lang").to_"")).to_"";
+        name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name[%1]").arg (q_app.property ("ui_lang").to_string ())).to_string ();
         if (name.is_empty ()) {
-            name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name")).to_"";
+            name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name")).to_string ();
         }
     }
 
@@ -144,7 +144,7 @@ void show_in_file_manager (string local_path) {
     // fixme : needs to append --icon, according to http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#exec-variables
     string[].iterator it = std.find (args.begin (), args.end (), string.from_latin1 ("%i"));
     if (it != args.end ()) {
-        (*it) = desktop_file.value ("Desktop Entry/Icon").to_"";
+        (*it) = desktop_file.value ("Desktop Entry/Icon").to_string ();
         args.insert (it, string.from_latin1 ("--icon")); // before
     }
 

@@ -464,7 +464,7 @@ void WebFlowCredentials.on_write_client_ca_certs_pem_job_done (KeychainChunk.Wri
 #endif
     job.set_insecure_fallback (false);
     connect (job, &Job.on_finished, this, &WebFlowCredentials.on_write_job_done);
-    job.set_key (keychain_key (this.account.url ().to_"", this.user, this.account.id ()));
+    job.set_key (keychain_key (this.account.url ().to_string (), this.user, this.account.id ()));
     job.set_text_data (this.password);
     job.on_start ();
 }
@@ -499,7 +499,7 @@ void WebFlowCredentials.forget_sensitive_data () {
 
     this.account.delete_app_password ();
 
-    const string kck = keychain_key (this.account.url ().to_"", this.user, this.account.id ());
+    const string kck = keychain_key (this.account.url ().to_string (), this.user, this.account.id ());
     if (kck.is_empty ()) {
         GLib.debug (lc_web_flow_credentials ()) << "InvalidateToken : User is empty, bailing out!";
         return;
@@ -523,7 +523,7 @@ void WebFlowCredentials.set_account (Account account) {
 }
 
 string WebFlowCredentials.fetch_user () {
-    this.user = this.account.credential_setting (USER_C).to_"";
+    this.user = this.account.credential_setting (USER_C).to_string ();
     return this.user;
 }
 
@@ -651,7 +651,7 @@ void WebFlowCredentials.on_read_client_ca_certs_pem_job_done (KeychainChunk.Read
 
     // Now fetch the actual server password
     const string kck = keychain_key (
-        this.account.url ().to_"",
+        this.account.url ().to_string (),
         this.user,
         this.keychain_migration ? "" : this.account.id ());
 

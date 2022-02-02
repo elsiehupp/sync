@@ -406,7 +406,7 @@ signals:
         this.tool_bar.set_style_sheet (TOOLBAR_CSS ().arg (background, dark, highlight_color, highlight_text_color));
 
         Q_FOREACH (QAction a, this.action_group.actions ()) {
-            QIcon icon = Theme.create_color_aware_icon (a.property ("icon_path").to_"", palette ());
+            QIcon icon = Theme.create_color_aware_icon (a.property ("icon_path").to_string (), palette ());
             a.set_icon (icon);
             var btn = qobject_cast<QToolButton> (this.tool_bar.widget_for_action (a));
             if (btn)

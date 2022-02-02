@@ -299,7 +299,7 @@ class Passive_update_notifier : OCUpdater {
     bool OCUpdater.perform_update () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
-        string update_file = settings.value (update_available_c).to_"";
+        string update_file = settings.value (update_available_c).to_string ();
         if (!update_file.is_empty () && GLib.File (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
             const var message_box_start_installer = new QMessageBox (QMessageBox.Information,
@@ -394,7 +394,7 @@ class Passive_update_notifier : OCUpdater {
     void OCUpdater.on_start_installer () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
-        string update_file = settings.value (update_available_c).to_"";
+        string update_file = settings.value (update_available_c).to_string ();
         settings.set_value (auto_update_attempted_c, true);
         settings.sync ();
         q_c_info (lc_updater) << "Running updater" << update_file;
@@ -442,7 +442,7 @@ class Passive_update_notifier : OCUpdater {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
 
-        int64 target_version_int = Helper.string_version_to_int (settings.value (update_target_version_c).to_"");
+        int64 target_version_int = Helper.string_version_to_int (settings.value (update_target_version_c).to_string ());
         int64 current_version = Helper.current_version_to_int ();
         return current_version >= target_version_int;
     }
@@ -489,7 +489,7 @@ class Passive_update_notifier : OCUpdater {
     void NSISUpdater.wipe_update_data () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
-        string update_filename = settings.value (update_available_c).to_"";
+        string update_filename = settings.value (update_available_c).to_string ();
         if (!update_filename.is_empty ())
             GLib.File.remove (update_filename);
         settings.remove (update_available_c);
@@ -513,14 +513,14 @@ class Passive_update_notifier : OCUpdater {
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
 
         // remove previously downloaded but not used installer
-        GLib.File old_target_file (settings.value (update_available_c).to_"");
+        GLib.File old_target_file (settings.value (update_available_c).to_string ());
         if (old_target_file.exists ()) {
             old_target_file.remove ();
         }
 
         GLib.File.copy (this.file.filename (), this.target_file);
         set_download_state (Download_complete);
-        q_c_info (lc_updater) << "Downloaded" << url.to_"" << "to" << this.target_file;
+        q_c_info (lc_updater) << "Downloaded" << url.to_string () << "to" << this.target_file;
         settings.set_value (update_target_version_c, update_info ().version ());
         settings.set_value (update_target_version_string_c, update_info ().version_"");
         settings.set_value (update_available_c, this.target_file);
@@ -530,7 +530,7 @@ class Passive_update_notifier : OCUpdater {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
         int64 info_version = Helper.string_version_to_int (info.version ());
-        var seen_string = settings.value (seen_version_c).to_"";
+        var seen_string = settings.value (seen_version_c).to_string ();
         int64 seen_version = Helper.string_version_to_int (seen_string);
         int64 curr_version = Helper.current_version_to_int ();
         q_c_info (lc_updater) << "Version info arrived:"
@@ -683,7 +683,7 @@ class Passive_update_notifier : OCUpdater {
     bool NSISUpdater.handle_startup () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
-        string update_filename = settings.value (update_available_c).to_"";
+        string update_filename = settings.value (update_available_c).to_string ();
         // has the previous run downloaded an update?
         if (!update_filename.is_empty () && GLib.File (update_filename).exists ()) {
             q_c_info (lc_updater) << "An updater file is available";
@@ -698,8 +698,8 @@ class Passive_update_notifier : OCUpdater {
                 } else {
                     // var update failed. Ask user what to do
                     q_c_info (lc_updater) << "The requested update attempt has failed"
-                            << settings.value (update_target_version_c).to_"";
-                    show_update_error_dialog (settings.value (update_target_version_string_c).to_"");
+                            << settings.value (update_target_version_c).to_string ();
+                    show_update_error_dialog (settings.value (update_target_version_string_c).to_string ());
                     return false;
                 }
             } else {

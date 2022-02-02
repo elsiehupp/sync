@@ -220,10 +220,10 @@ signals:
     }
 
     unowned<Sharee> Sharee_model.parse_sharee (QJsonObject data) {
-        string display_name = data.value ("label").to_"";
-        const string share_with = data.value ("value").to_object ().value ("share_with").to_"";
+        string display_name = data.value ("label").to_string ();
+        const string share_with = data.value ("value").to_object ().value ("share_with").to_string ();
         Sharee.Type type = (Sharee.Type)data.value ("value").to_object ().value ("share_type").to_int ();
-        const string additional_info = data.value ("value").to_object ().value ("share_with_additional_info").to_"";
+        const string additional_info = data.value ("value").to_object ().value ("share_with_additional_info").to_string ();
         if (!additional_info.is_empty ()) {
             display_name = _("%1 (%2)", "sharee (share_with_additional_info)").arg (display_name, additional_info);
         }

@@ -94,7 +94,7 @@ signals:
             return;
 
         this.app_password = pwd;
-        GLib.Uri request_url = Utility.concat_url_path (this.account.url ().to_"",
+        GLib.Uri request_url = Utility.concat_url_path (this.account.url ().to_string (),
                                                  QLatin1String ("/index.php/core/wipe/check"));
         QNetworkRequest request;
         request.set_header (QNetworkRequest.ContentTypeHeader,
@@ -121,7 +121,7 @@ signals:
         if (this.network_reply_check.error () != QNetworkReply.NoError ||
                 json_parse_error.error != QJsonParseError.NoError) {
             string error_reason;
-            string error_from_json = json["error"].to_"";
+            string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
                 GLib.warn (lc_remote_wipe) << string ("Error returned from the server : <em>%1<em>")
                                            .arg (error_from_json.to_html_escaped ());
@@ -173,7 +173,7 @@ signals:
 
     void RemoteWipe.on_notify_server_success_job (AccountState account_state, bool data_wiped){
         if (this.account_removed && data_wiped && this.account == account_state.account ()){
-            GLib.Uri request_url = Utility.concat_url_path (this.account.url ().to_"",
+            GLib.Uri request_url = Utility.concat_url_path (this.account.url ().to_string (),
                                                      QLatin1String ("/index.php/core/wipe/on_success"));
             QNetworkRequest request;
             request.set_header (QNetworkRequest.ContentTypeHeader,
@@ -196,7 +196,7 @@ signals:
         if (this.network_reply_success.error () != QNetworkReply.NoError ||
                 json_parse_error.error != QJsonParseError.NoError) {
             string error_reason;
-            string error_from_json = json["error"].to_"";
+            string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
                 GLib.warn (lc_remote_wipe) << string ("Error returned from the server : <em>%1</em>")
                                   .arg (error_from_json.to_html_escaped ());

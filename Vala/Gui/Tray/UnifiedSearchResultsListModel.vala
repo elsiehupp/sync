@@ -265,7 +265,7 @@ namespace {
                 : string[]{thumbnail_url_copy};
             Q_ASSERT (!thumbnail_url_copy_splitted.is_empty ());
             server_url_copy.set_path (thumbnail_url_copy_splitted[0]);
-            thumbnail_url_copy = server_url_copy.to_"";
+            thumbnail_url_copy = server_url_copy.to_string ();
             if (thumbnail_url_copy_splitted.size () > 1) {
                 thumbnail_url_copy += '?' + thumbnail_url_copy_splitted[1];
             }
@@ -286,7 +286,7 @@ namespace {
                 fallack_icon_copy.contains ('?') ? fallack_icon_copy.split ('?') : string[]{fallack_icon_copy};
             Q_ASSERT (!fallack_icon_path_splitted.is_empty ());
             server_url_copy.set_path (fallack_icon_path_splitted[0]);
-            fallack_icon_copy = server_url_copy.to_"";
+            fallack_icon_copy = server_url_copy.to_string ();
             if (fallack_icon_path_splitted.size () > 1) {
                 fallack_icon_copy += '?' + fallack_icon_path_splitted[1];
             }
@@ -525,8 +525,8 @@ namespace {
 
         for (var provider : provider_list) {
             const var provider_map = provider.to_map ();
-            const var id = provider_map[QStringLiteral ("id")].to_"";
-            const var name = provider_map[QStringLiteral ("name")].to_"";
+            const var id = provider_map[QStringLiteral ("id")].to_string ();
+            const var name = provider_map[QStringLiteral ("name")].to_string ();
             if (!name.is_empty () && id != QStringLiteral ("talk-message-current")) {
                 Unified_search_provider new_provider;
                 new_provider._name = name;
@@ -553,7 +553,7 @@ namespace {
             return;
         }
 
-        const var provider_id = job.property ("provider_id").to_"";
+        const var provider_id = job.property ("provider_id").to_string ();
 
         if (provider_id.is_empty ()) {
             return;
@@ -695,15 +695,15 @@ namespace {
             result._order = provider._order;
             result._provider_name = provider._name;
             result._is_rounded = entry_map.value (QStringLiteral ("rounded")).to_bool ();
-            result._title = entry_map.value (QStringLiteral ("title")).to_"";
-            result._subline = entry_map.value (QStringLiteral ("subline")).to_"";
+            result._title = entry_map.value (QStringLiteral ("title")).to_string ();
+            result._subline = entry_map.value (QStringLiteral ("subline")).to_string ();
 
-            const var resource_url = entry_map.value (QStringLiteral ("resource_url")).to_"";
+            const var resource_url = entry_map.value (QStringLiteral ("resource_url")).to_string ();
             const var account_url = (this.account_state && this.account_state.account ()) ? this.account_state.account ().url () : GLib.Uri ();
 
             result._resource_url = make_resource_url (resource_url, account_url);
-            result._icons = icons_from_thumbnail_and_fallback_icon (entry_map.value (QStringLiteral ("thumbnail_url")).to_"",
-                entry_map.value (QStringLiteral ("icon")).to_"", account_url);
+            result._icons = icons_from_thumbnail_and_fallback_icon (entry_map.value (QStringLiteral ("thumbnail_url")).to_string (),
+                entry_map.value (QStringLiteral ("icon")).to_string (), account_url);
 
             new_entries.push_back (result);
         }

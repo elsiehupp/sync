@@ -254,7 +254,7 @@ class AccountManager : GLib.Object {
     // saving and loading Account to settings
     private void save_account_helper (Account account, QSettings settings, bool save_credentials = true) {
         settings.set_value (QLatin1String (VERSION_C), max_account_version);
-        settings.set_value (QLatin1String (URL_C), acc._url.to_"");
+        settings.set_value (QLatin1String (URL_C), acc._url.to_string ());
         settings.set_value (QLatin1String (DAV_USER_C), acc._dav_user);
         settings.set_value (QLatin1String (SERVER_VERSION_C), acc._server_version);
         if (acc._credentials) {
@@ -312,7 +312,7 @@ class AccountManager : GLib.Object {
 
         var acc = create_account ();
 
-        string auth_type = settings.value (QLatin1String (AUTH_TYPE_C)).to_"";
+        string auth_type = settings.value (QLatin1String (AUTH_TYPE_C)).to_string ();
 
         // There was an account-type saving bug when 'skip folder config' was used
         // See #5408. This attempts to fix up the "dummy" auth_type
@@ -351,8 +351,8 @@ class AccountManager : GLib.Object {
 
         q_c_info (lc_account_manager) << "Account for" << acc.url () << "using auth type" << auth_type;
 
-        acc._server_version = settings.value (QLatin1String (SERVER_VERSION_C)).to_"";
-        acc._dav_user = settings.value (QLatin1String (DAV_USER_C), "").to_"";
+        acc._server_version = settings.value (QLatin1String (SERVER_VERSION_C)).to_string ();
+        acc._dav_user = settings.value (QLatin1String (DAV_USER_C), "").to_string ();
 
         // We want to only restore settings for that auth type and the user value
         acc._settings_map.insert (QLatin1String (USER_C), settings.value (USER_C));
@@ -408,7 +408,7 @@ class AccountManager : GLib.Object {
                     if (override_url.ends_with ('/')) {
                         override_url.chop (1);
                     }
-                    string o_c_url = o_c_settings.value (QLatin1String (URL_C)).to_"";
+                    string o_c_url = o_c_settings.value (QLatin1String (URL_C)).to_string ();
                     if (o_c_url.ends_with ('/')) {
                         o_c_url.chop (1);
                     }
@@ -451,7 +451,7 @@ class AccountManager : GLib.Object {
 
     /// Saves account data, not including the credentials
     public void on_save_account (Account a) {
-        GLib.debug (lc_account_manager) << "Saving account" << a.url ().to_"";
+        GLib.debug (lc_account_manager) << "Saving account" << a.url ().to_string ();
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
         settings.begin_group (a.id ());
         save_account_helper (a, *settings, false); // don't save credentials they might not have been loaded yet
@@ -464,7 +464,7 @@ class AccountManager : GLib.Object {
 
     /// Saves account state data, not including the account
     public void on_save_account_state (AccountState a) {
-        GLib.debug (lc_account_manager) << "Saving account state" << a.account ().url ().to_"";
+        GLib.debug (lc_account_manager) << "Saving account state" << a.account ().url ().to_string ();
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
         settings.begin_group (a.account ().id ());
         a.write_to_settings (*settings);

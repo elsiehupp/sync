@@ -74,7 +74,7 @@ class TestTokenizer : GLib.Object {
 
         QCOMPARE (tokenizer.has_next (), true);
         QCOMPARE (tokenizer.next (), "'Billy - the Kid' is dead!");
-        QCOMPARE (tokenizer.string_ref ().to_"", "'Billy - the Kid' is dead!");
+        QCOMPARE (tokenizer.string_ref ().to_string (), "'Billy - the Kid' is dead!");
 
         QCOMPARE (tokenizer.has_next (), false);
     }

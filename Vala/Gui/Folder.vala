@@ -983,17 +983,17 @@ void Folder.prepare_to_sync () {
 }
 
 void Folder.on_run_etag_job () {
-    q_c_info (lc_folder) << "Trying to check" << remote_url ().to_"" << "for changes via ETag check. (time since last sync:" << (this.time_since_last_sync_done.elapsed () / 1000) << "s)";
+    q_c_info (lc_folder) << "Trying to check" << remote_url ().to_string () << "for changes via ETag check. (time since last sync:" << (this.time_since_last_sync_done.elapsed () / 1000) << "s)";
 
     AccountPointer account = this.account_state.account ();
 
     if (this.request_etag_job) {
-        q_c_info (lc_folder) << remote_url ().to_"" << "has ETag job queued, not trying to sync";
+        q_c_info (lc_folder) << remote_url ().to_string () << "has ETag job queued, not trying to sync";
         return;
     }
 
     if (!can_sync ()) {
-        q_c_info (lc_folder) << "Not syncing.  :" << remote_url ().to_"" << this.definition.paused << AccountState.state_string (this.account_state.state ());
+        q_c_info (lc_folder) << "Not syncing.  :" << remote_url ().to_string () << this.definition.paused << AccountState.state_string (this.account_state.state ());
         return;
     }
 
@@ -1233,7 +1233,7 @@ void Folder.on_watched_path_changed (string path, ChangeReason reason) {
             && !FileSystem.file_changed (path, record._file_size, record._modtime)) {
             spurious = true;
 
-            if (var pin_state = this.vfs.pin_state (relative_path.to_"")) {
+            if (var pin_state = this.vfs.pin_state (relative_path.to_string ())) {
                 if (*pin_state == PinState.PinState.ALWAYS_LOCAL && record.is_virtual_file ())
                     spurious = false;
                 if (*pin_state == PinState.VfsItemAvailability.ONLINE_ONLY && record.is_file ())
@@ -1459,7 +1459,7 @@ void Folder.on_start_sync (string[] path_list) {
     this.sync_result.set_status (SyncResult.Status.SYNC_PREPARE);
     /* emit */ sync_state_change ();
 
-    q_c_info (lc_folder) << "*** Start syncing " << remote_url ().to_"" << " -" << APPLICATION_NAME << "client version"
+    q_c_info (lc_folder) << "*** Start syncing " << remote_url ().to_string () << " -" << APPLICATION_NAME << "client version"
                      << q_printable (Theme.instance ().version ());
 
     this.file_log.on_start (path ());
@@ -1927,15 +1927,15 @@ void FolderDefinition.save (QSettings settings, FolderDefinition folder) {
 bool FolderDefinition.on_load (QSettings settings, string alias,
     FolderDefinition folder) {
     folder.alias = FolderMan.unescape_alias (alias);
-    folder.local_path = settings.value (QLatin1String ("local_path")).to_"";
-    folder.journal_path = settings.value (QLatin1String ("journal_path")).to_"";
-    folder.target_path = settings.value (QLatin1String ("target_path")).to_"";
+    folder.local_path = settings.value (QLatin1String ("local_path")).to_string ();
+    folder.journal_path = settings.value (QLatin1String ("journal_path")).to_string ();
+    folder.target_path = settings.value (QLatin1String ("target_path")).to_string ();
     folder.paused = settings.value (QLatin1String ("paused")).to_bool ();
     folder.ignore_hidden_files = settings.value (QLatin1String ("ignore_hidden_files"), GLib.Variant (true)).to_bool ();
     folder.navigation_pane_clsid = settings.value (QLatin1String ("navigation_pane_clsid")).to_uuid ();
 
     folder.virtual_files_mode = Vfs.Off;
-    string vfs_mode_string = settings.value (QStringLiteral ("virtual_files_mode")).to_"";
+    string vfs_mode_string = settings.value (QStringLiteral ("virtual_files_mode")).to_string ();
     if (!vfs_mode_string.is_empty ()) {
         if (var mode = Vfs.mode_from_string (vfs_mode_string)) {
             folder.virtual_files_mode = *mode;

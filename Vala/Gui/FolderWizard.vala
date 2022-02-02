@@ -312,7 +312,7 @@ class FolderWizard : QWizard {
 
         string parent ('/');
         if (current) {
-            parent = current.data (0, Qt.User_role).to_"";
+            parent = current.data (0, Qt.User_role).to_string ();
         }
 
         var dlg = new QInputDialog (this);
@@ -331,7 +331,7 @@ class FolderWizard : QWizard {
         QTree_widget_item current = this.ui.folder_tree_widget.current_item ();
         string full_path;
         if (current) {
-            full_path = current.data (0, Qt.User_role).to_"";
+            full_path = current.data (0, Qt.User_role).to_string ();
         }
         full_path += "/" + folder;
 
@@ -393,7 +393,7 @@ class FolderWizard : QWizard {
         if (path_trail.is_empty ())
             return;
 
-        const string parent_path = parent.data (0, Qt.User_role).to_"";
+        const string parent_path = parent.data (0, Qt.User_role).to_string ();
         const string folder_name = path_trail.first ();
         string folder_path;
         if (parent_path == QLatin1String ("/")) {
@@ -495,13 +495,13 @@ class FolderWizard : QWizard {
     }
 
     void Folder_wizard_remote_path.on_item_expanded (QTree_widget_item item) {
-        string dir = item.data (0, Qt.User_role).to_"";
+        string dir = item.data (0, Qt.User_role).to_string ();
         run_ls_col_job (dir);
     }
 
     void Folder_wizard_remote_path.on_current_item_changed (QTree_widget_item item) {
         if (item) {
-            string dir = item.data (0, Qt.User_role).to_"";
+            string dir = item.data (0, Qt.User_role).to_string ();
 
             // We don't want to allow creating subfolders in encrypted folders outside of the sync logic
             const var encrypted = this.encrypted_paths.contains (dir);
@@ -571,7 +571,7 @@ class FolderWizard : QWizard {
             return false;
 
         string[] warn_strings;
-        string dir = this.ui.folder_tree_widget.current_item ().data (0, Qt.User_role).to_"";
+        string dir = this.ui.folder_tree_widget.current_item ().data (0, Qt.User_role).to_string ();
         if (!dir.starts_with ('/')) {
             dir.prepend ('/');
         }
@@ -638,7 +638,7 @@ class FolderWizard : QWizard {
     Folder_wizard_selective_sync.~Folder_wizard_selective_sync () = default;
 
     void Folder_wizard_selective_sync.initialize_page () {
-        string target_path = wizard ().property ("target_path").to_"";
+        string target_path = wizard ().property ("target_path").to_string ();
         if (target_path.starts_with ('/')) {
             target_path = target_path.mid (1);
         }
@@ -653,7 +653,7 @@ class FolderWizard : QWizard {
 
         if (this.virtual_files_check_box) {
             // TODO : remove when UX decision is made
-            if (Utility.is_path_windows_drive_partition_root (wizard ().field (QStringLiteral ("source_folder")).to_"")) {
+            if (Utility.is_path_windows_drive_partition_root (wizard ().field (QStringLiteral ("source_folder")).to_string ())) {
                 this.virtual_files_check_box.set_checked (false);
                 this.virtual_files_check_box.set_enabled (false);
                 this.virtual_files_check_box.on_set_text (_("Virtual files are not supported for Windows partition roots as local folder. Please choose a valid subfolder under drive letter."));
@@ -676,7 +676,7 @@ class FolderWizard : QWizard {
     bool Folder_wizard_selective_sync.validate_page () {
         const bool use_virtual_files = this.virtual_files_check_box && this.virtual_files_check_box.is_checked ();
         if (use_virtual_files) {
-            const var availability = Vfs.check_availability (wizard ().field (QStringLiteral ("source_folder")).to_"");
+            const var availability = Vfs.check_availability (wizard ().field (QStringLiteral ("source_folder")).to_string ());
             if (!availability) {
                 var msg = new QMessageBox (QMessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error (), QMessageBox.Ok, this);
                 msg.set_attribute (Qt.WA_DeleteOnClose);
@@ -690,7 +690,7 @@ class FolderWizard : QWizard {
     }
 
     void Folder_wizard_selective_sync.cleanup_page () {
-        string target_path = wizard ().property ("target_path").to_"";
+        string target_path = wizard ().property ("target_path").to_string ();
         string alias = QFileInfo (target_path).filename ();
         if (alias.is_empty ())
             alias = Theme.instance ().app_name ();

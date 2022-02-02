@@ -265,7 +265,7 @@ signals:
         //TODO proper checking
         var meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
         int code = meta.value ("statuscode").to_int ();
-        message = meta.value ("message").to_"";
+        message = meta.value ("message").to_string ();
 
         return code;
     }

@@ -60,7 +60,7 @@ signals:
         add_param (string.from_latin1 ("item_type"), item_type);
         add_param (string.from_latin1 ("page"), string.number (page));
         add_param (string.from_latin1 ("per_page"), string.number (per_page));
-        add_param (string.from_latin1 ("lookup"), GLib.Variant (lookup).to_"");
+        add_param (string.from_latin1 ("lookup"), GLib.Variant (lookup).to_string ());
 
         on_start ();
     }

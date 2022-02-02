@@ -310,11 +310,11 @@ signals:
 
     void Share_dialog.on_propfind_received (QVariantMap result) {
         const GLib.Variant received_permissions = result["share-permissions"];
-        if (!received_permissions.to_"".is_empty ()) {
+        if (!received_permissions.to_string ().is_empty ()) {
             this.max_sharing_permissions = static_cast<Share_permissions> (received_permissions.to_int ());
             q_c_info (lc_sharing) << "Received sharing permissions for" << this.share_path << this.max_sharing_permissions;
         }
-        var private_link_url = result["privatelink"].to_"";
+        var private_link_url = result["privatelink"].to_string ();
         var numeric_file_id = result["fileid"].to_byte_array ();
         if (!private_link_url.is_empty ()) {
             q_c_info (lc_sharing) << "Received private link url for" << this.share_path << private_link_url;

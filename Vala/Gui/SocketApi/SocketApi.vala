@@ -528,7 +528,7 @@ void SocketApi.on_read_socket () {
             var job_id = arguments[0];
 
             var socket_api_job = unowned<Socket_api_job> (
-                new Socket_api_job (job_id.to_"", listener, json), &GLib.Object.delete_later);
+                new Socket_api_job (job_id.to_string (), listener, json), &GLib.Object.delete_later);
             if (index_of_method != -1) {
                 static_meta_object.method (index_of_method)
                     .invoke (this, Qt.QueuedConnection,
@@ -542,7 +542,7 @@ void SocketApi.on_read_socket () {
             QJsonParseError error;
             const var json = QJsonDocument.from_json (argument.to_utf8 (), error).object ();
             if (error.error != QJsonParseError.NoError) {
-                GLib.warn (lc_socket_api ()) << "Invalid json" << argument.to_"" << error.error_string ();
+                GLib.warn (lc_socket_api ()) << "Invalid json" << argument.to_string () << error.error_string ();
                 listener.send_error (error.error_string ());
                 return;
             }
@@ -561,7 +561,7 @@ void SocketApi.on_read_socket () {
                 // to ensure that listener is still valid we need to call it with Qt.Direct_connection
                 ASSERT (thread () == QThread.current_thread ())
                 static_meta_object.method (index_of_method)
-                    .invoke (this, Qt.Direct_connection, Q_ARG (string, argument.to_""),
+                    .invoke (this, Qt.Direct_connection, Q_ARG (string, argument.to_string ()),
                         Q_ARG (Socket_listener *, listener.data ()));
             }
         }
@@ -754,7 +754,7 @@ void SocketApi.command_EDIT (string local_file, Socket_listener listener) {
 
     GLib.Object.connect (job, &JsonApiJob.json_received, [] (QJsonDocument json){
         var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-        var url = GLib.Uri (data.value ("url").to_"");
+        var url = GLib.Uri (data.value ("url").to_string ());
 
         if (!url.is_empty ())
             Utility.open_browser (url);
@@ -807,7 +807,7 @@ class Get_or_create_public_link_share : GLib.Object {
 
             if (link_share.get_name () == share_name) {
                 GLib.debug (lc_public_link) << "Found existing share, reusing";
-                return on_success (link_share.get_link ().to_"");
+                return on_success (link_share.get_link ().to_string ());
             }
         }
 
@@ -821,7 +821,7 @@ class Get_or_create_public_link_share : GLib.Object {
     ***********************************************************/
     private void on_link_share_created (unowned<Link_share> share) {
         GLib.debug (lc_public_link) << "New share created";
-        on_success (share.get_link ().to_"");
+        on_success (share.get_link ().to_string ());
     }
 
 
@@ -1407,7 +1407,7 @@ void SocketApi.command_ASYNC_LIST_WIDGETS (unowned<Socket_api_job> job) {
     for (var widget : all_objects (QApplication.all_widgets ())) {
         var object_name = widget.object_name ();
         if (!object_name.is_empty ()) {
-            response += object_name + ":" + widget.property ("text").to_"" + ", ";
+            response += object_name + ":" + widget.property ("text").to_string () + ", ";
         }
     }
     job.resolve (response);
@@ -1416,18 +1416,18 @@ void SocketApi.command_ASYNC_LIST_WIDGETS (unowned<Socket_api_job> job) {
 void SocketApi.command_ASYNC_INVOKE_WIDGET_METHOD (unowned<Socket_api_job> job) {
     var arguments = job.arguments ();
 
-    var widget = find_widget (arguments["object_name"].to_"");
+    var widget = find_widget (arguments["object_name"].to_string ());
     if (!widget) {
         job.reject (QLatin1String ("widget not found"));
         return;
     }
 
-    QMetaObject.invoke_method (widget, arguments["method"].to_"".to_utf8 ().const_data ());
+    QMetaObject.invoke_method (widget, arguments["method"].to_string ().to_utf8 ().const_data ());
     job.resolve ();
 }
 
 void SocketApi.command_ASYNC_GET_WIDGET_PROPERTY (unowned<Socket_api_job> job) {
-    string widget_name = job.arguments ()[QLatin1String ("object_name")].to_"";
+    string widget_name = job.arguments ()[QLatin1String ("object_name")].to_string ();
     var widget = find_widget (widget_name);
     if (!widget) {
         string message = string (QLatin1String ("Widget not found : 2 : %1")).arg (widget_name);
@@ -1435,7 +1435,7 @@ void SocketApi.command_ASYNC_GET_WIDGET_PROPERTY (unowned<Socket_api_job> job) {
         return;
     }
 
-    var property_name = job.arguments ()[QLatin1String ("property")].to_"";
+    var property_name = job.arguments ()[QLatin1String ("property")].to_string ();
 
     var segments = property_name.split ('.');
 
@@ -1466,14 +1466,14 @@ void SocketApi.command_ASYNC_GET_WIDGET_PROPERTY (unowned<Socket_api_job> job) {
 
 void SocketApi.command_ASYNC_SET_WIDGET_PROPERTY (unowned<Socket_api_job> job) {
     var arguments = job.arguments ();
-    string widget_name = arguments["object_name"].to_"";
+    string widget_name = arguments["object_name"].to_string ();
     var widget = find_widget (widget_name);
     if (!widget) {
         string message = string (QLatin1String ("Widget not found : 4 : %1")).arg (widget_name);
         job.reject (message);
         return;
     }
-    widget.set_property (arguments["property"].to_"".to_utf8 ().const_data (),
+    widget.set_property (arguments["property"].to_string ().to_utf8 ().const_data (),
         arguments["value"]);
 
     job.resolve ();
@@ -1481,8 +1481,8 @@ void SocketApi.command_ASYNC_SET_WIDGET_PROPERTY (unowned<Socket_api_job> job) {
 
 void SocketApi.command_ASYNC_WAIT_FOR_WIDGET_SIGNAL (unowned<Socket_api_job> job) {
     var arguments = job.arguments ();
-    string widget_name = arguments["object_name"].to_"";
-    var widget = find_widget (arguments["object_name"].to_"");
+    string widget_name = arguments["object_name"].to_string ();
+    var widget = find_widget (arguments["object_name"].to_string ());
     if (!widget) {
         string message = string (QLatin1String ("Widget not found : 5 : %1")).arg (widget_name);
         job.reject (message);
@@ -1493,7 +1493,7 @@ void SocketApi.command_ASYNC_WAIT_FOR_WIDGET_SIGNAL (unowned<Socket_api_job> job
         job.resolve ("signal emitted");
     });
 
-    var signal_signature = arguments["signal_signature"].to_"";
+    var signal_signature = arguments["signal_signature"].to_string ();
     signal_signature.prepend ("2");
     var utf8 = signal_signature.to_utf8 ();
     var signal_signature_final = utf8.const_data ();
@@ -1503,7 +1503,7 @@ void SocketApi.command_ASYNC_WAIT_FOR_WIDGET_SIGNAL (unowned<Socket_api_job> job
 void SocketApi.command_ASYNC_TRIGGER_MENU_ACTION (unowned<Socket_api_job> job) {
     var arguments = job.arguments ();
 
-    var object_name = arguments["object_name"].to_"";
+    var object_name = arguments["object_name"].to_string ();
     var widget = find_widget (object_name);
     if (!widget) {
         string message = string (QLatin1String ("Object not found : 1 : %1")).arg (object_name);
@@ -1516,7 +1516,7 @@ void SocketApi.command_ASYNC_TRIGGER_MENU_ACTION (unowned<Socket_api_job> job) {
         // foo is the popupwidget!
         var actions = child_widget.actions ();
         for (var action : actions) {
-            if (action.object_name () == arguments["action_name"].to_"") {
+            if (action.object_name () == arguments["action_name"].to_string ()) {
                 action.trigger ();
 
                 job.resolve ("action found");
@@ -1525,19 +1525,19 @@ void SocketApi.command_ASYNC_TRIGGER_MENU_ACTION (unowned<Socket_api_job> job) {
         }
     }
 
-    string message = string (QLatin1String ("Action not found : 1 : %1")).arg (arguments["action_name"].to_"");
+    string message = string (QLatin1String ("Action not found : 1 : %1")).arg (arguments["action_name"].to_string ());
     job.reject (message);
 }
 
 void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned<Socket_api_job> job) {
-    var widget = find_widget (job.arguments ()[QLatin1String ("query_string")].to_"");
+    var widget = find_widget (job.arguments ()[QLatin1String ("query_string")].to_string ());
     if (!widget) {
-        string message = string (QLatin1String ("Object not found : 6 : %1")).arg (job.arguments ()["query_string"].to_"");
+        string message = string (QLatin1String ("Object not found : 6 : %1")).arg (job.arguments ()["query_string"].to_string ());
         job.reject (message);
         return;
     }
 
-    var property_name = job.arguments ()[QLatin1String ("property_path")].to_"";
+    var property_name = job.arguments ()[QLatin1String ("property_path")].to_string ();
 
     var segments = property_name.split ('.');
 
@@ -1561,7 +1561,7 @@ void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned<Socket_api_job> job) 
         }
     }
 
-    var icon_name = job.arguments ()[QLatin1String ("icon_name")].to_"";
+    var icon_name = job.arguments ()[QLatin1String ("icon_name")].to_string ();
     if (value.name () == icon_name) {
         job.resolve ();
     } else {
@@ -1594,7 +1594,7 @@ void Socket_api_job.reject (string response) {
 Socket_api_job_v2.Socket_api_job_v2 (unowned<Socket_listener> socket_listener, GLib.ByteArray command, QJsonObject arguments)
     : this.socket_listener (socket_listener)
     , this.command (command)
-    , this.job_id (arguments[QStringLiteral ("id")].to_"")
+    , this.job_id (arguments[QStringLiteral ("id")].to_string ())
     , this.arguments (arguments[QStringLiteral ("arguments")].to_object ()) {
     ASSERT (!this.job_id.is_empty ())
 }

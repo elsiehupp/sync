@@ -148,7 +148,7 @@ class Invalid_filename_dialog : Gtk.Dialog {
         if (!values.contains ("permissions")) {
             return;
         }
-        const var remote_permissions = RemotePermissions.from_server_string (values["permissions"].to_"");
+        const var remote_permissions = RemotePermissions.from_server_string (values["permissions"].to_string ());
         if (!remote_permissions.has_permission (remote_permissions.Can_rename)
             || !remote_permissions.has_permission (remote_permissions.Can_move)) {
             this.ui.error_label.on_set_text (

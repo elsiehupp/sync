@@ -415,7 +415,7 @@ signals:
         case Display_actions:
             return this.display_actions;
         case Shareable_role:
-            return !data (index, Path_role).to_"".is_empty () && this.display_actions && a._file_action != "file_deleted" && a._status != SyncFileItem.Status.FILE_IGNORED;
+            return !data (index, Path_role).to_string ().is_empty () && this.display_actions && a._file_action != "file_deleted" && a._status != SyncFileItem.Status.FILE_IGNORED;
         default:
             return GLib.Variant ();
         }
@@ -479,16 +479,16 @@ signals:
 
             Activity a;
             a._type = Activity.Activity_type;
-            a._object_type = json.value ("object_type").to_"";
+            a._object_type = json.value ("object_type").to_string ();
             a._acc_name = ast.account ().display_name ();
             a._id = json.value ("activity_id").to_int ();
-            a._file_action = json.value ("type").to_"";
-            a._subject = json.value ("subject").to_"";
-            a._message = json.value ("message").to_"";
-            a._file = json.value ("object_name").to_"";
-            a._link = GLib.Uri (json.value ("link").to_"");
-            a._date_time = GLib.DateTime.from_string (json.value ("datetime").to_"", Qt.ISODate);
-            a._icon = json.value ("icon").to_"";
+            a._file_action = json.value ("type").to_string ();
+            a._subject = json.value ("subject").to_string ();
+            a._message = json.value ("message").to_string ();
+            a._file = json.value ("object_name").to_string ();
+            a._link = GLib.Uri (json.value ("link").to_string ());
+            a._date_time = GLib.DateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
+            a._icon = json.value ("icon").to_string ();
 
             list.append (a);
             this.current_item = list.last ()._id;

@@ -53,15 +53,15 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> job)
     : this.api_job (job) {
     connect (job.data (), &Socket_api_job_v2.on_finished, this, &Socket_upload_job.delete_later);
 
-    this.local_path = this.api_job.arguments ()[QLatin1String ("local_path")].to_"";
-    this.remote_path = this.api_job.arguments ()[QLatin1String ("remote_path")].to_"";
+    this.local_path = this.api_job.arguments ()[QLatin1String ("local_path")].to_string ();
+    this.remote_path = this.api_job.arguments ()[QLatin1String ("remote_path")].to_string ();
     if (!this.remote_path.starts_with ('/')) {
         this.remote_path = '/' + this.remote_path;
     }
 
-    this.pattern = job.arguments ()[QLatin1String ("pattern")].to_"";
+    this.pattern = job.arguments ()[QLatin1String ("pattern")].to_string ();
     // TODO : use uuid
-    const var accname = job.arguments ()[QLatin1String ("account")][QLatin1String ("name")].to_"";
+    const var accname = job.arguments ()[QLatin1String ("account")][QLatin1String ("name")].to_string ();
     var account = AccountManager.instance ().account (accname);
 
     if (!QFileInfo (this.local_path).is_absolute ()) {

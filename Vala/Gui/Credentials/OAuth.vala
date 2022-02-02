@@ -137,7 +137,7 @@ signals:
 
                     string code = rx_match.captured (1); // The 'code' is the first capture of the regexp
 
-                    GLib.Uri request_token = Utility.concat_url_path (this.account.url ().to_"", QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
+                    GLib.Uri request_token = Utility.concat_url_path (this.account.url ().to_string (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
                     QNetworkRequest req;
                     req.set_header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
 
@@ -159,16 +159,16 @@ signals:
                         var json_data = reply.read_all ();
                         QJsonParseError json_parse_error;
                         QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
-                        string access_token = json["access_token"].to_"";
-                        string refresh_token = json["refresh_token"].to_"";
-                        string user = json["user_id"].to_"";
-                        GLib.Uri message_url = json["message_url"].to_"";
+                        string access_token = json["access_token"].to_string ();
+                        string refresh_token = json["refresh_token"].to_string ();
+                        string user = json["user_id"].to_string ();
+                        GLib.Uri message_url = json["message_url"].to_string ();
 
                         if (reply.error () != QNetworkReply.NoError || json_parse_error.error != QJsonParseError.NoError
                             || json_data.is_empty () || json.is_empty () || refresh_token.is_empty () || access_token.is_empty ()
-                            || json["token_type"].to_"" != QLatin1String ("Bearer")) {
+                            || json["token_type"].to_string () != QLatin1String ("Bearer")) {
                             string error_reason;
-                            string error_from_json = json["error"].to_"";
+                            string error_from_json = json["error"].to_string ();
                             if (!error_from_json.is_empty ()) {
                                 error_reason = _("Error returned from the server : <em>%1</em>")
                                                   .arg (error_from_json.to_html_escaped ());

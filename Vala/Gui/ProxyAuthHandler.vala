@@ -276,7 +276,7 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
     GLib.debug (lc_proxy) << "trying to load" << this.proxy;
 
     if (!this.waiting_for_keychain) {
-        this.username = this.settings.value (keychain_username_key ()).to_"";
+        this.username = this.settings.value (keychain_username_key ()).to_string ();
         if (this.username.is_empty ()) {
             return false;
         }

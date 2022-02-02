@@ -139,7 +139,7 @@ signals:
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             Q_ASSERT (oc_wizard);
 
-            /* emit */ connect_to_oc_url (oc_wizard.account ().url ().to_"");
+            /* emit */ connect_to_oc_url (oc_wizard.account ().url ().to_string ());
             break;
         }
         }

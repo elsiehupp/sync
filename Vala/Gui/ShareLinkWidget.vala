@@ -505,7 +505,7 @@ void Share_link_widget.on_note_set () {
 void Share_link_widget.on_copy_link_share (bool clicked) {
     Q_UNUSED (clicked);
 
-    QApplication.clipboard ().on_set_text (this.link_share.get_link ().to_"");
+    QApplication.clipboard ().on_set_text (this.link_share.get_link ().to_string ());
 }
 
 void Share_link_widget.on_expire_date_set () {
