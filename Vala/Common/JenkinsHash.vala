@@ -22,8 +22,8 @@ See http://burtleburtle.net/bob/hash/evahash.html
 @{
 ***********************************************************/
 
-// #include <stdint.h> // NOLINT
-// #include <QtCore/qglobal.h>
+//  #include <stdint.h> // NOLINT
+//  #include <QtCore/qglobal.h>
 #ifndef Q_FALLTHROUGH
 const int Q_FALLTHROUGH () // Was added in Qt 5.8
 #endif
@@ -186,11 +186,11 @@ is acceptable.  Do NOT use for cryptographic purposes.
            the return value.  No funnels.  Every 1-bit and 2-bit delta
            achieves avalanche. About 41+5len instructions.
 ***********************************************************/
-static inline uint64_t c_jhash64 (uint8_t k, uint64_t length, uint64_t intval) {
-  uint64_t a = 0;
-  uint64_t b = 0;
-  uint64_t c = 0;
-  uint64_t len = 0;
+static inline uint64 c_jhash64 (uint8_t k, uint64 length, uint64 intval) {
+  uint64 a = 0;
+  uint64 b = 0;
+  uint64 c = 0;
+  uint64 len = 0;
 
   /* Set up the internal state */
   len = length;
@@ -199,12 +199,12 @@ static inline uint64_t c_jhash64 (uint8_t k, uint64_t length, uint64_t intval) {
 
   /* handle most of the key */
   while (len >= 24) {
-    a += (k[0]        + ( (uint64_t)k[ 1]<< 8)+ ( (uint64_t)k[ 2]<<16)+ ( (uint64_t)k[ 3]<<24)
-     + ( (uint64_t)k[4 ]<<32)+ ( (uint64_t)k[ 5]<<40)+ ( (uint64_t)k[ 6]<<48)+ ( (uint64_t)k[ 7]<<56));
-    b += (k[8]        + ( (uint64_t)k[ 9]<< 8)+ ( (uint64_t)k[10]<<16)+ ( (uint64_t)k[11]<<24)
-     + ( (uint64_t)k[12]<<32)+ ( (uint64_t)k[13]<<40)+ ( (uint64_t)k[14]<<48)+ ( (uint64_t)k[15]<<56));
-    c += (k[16]       + ( (uint64_t)k[17]<< 8)+ ( (uint64_t)k[18]<<16)+ ( (uint64_t)k[19]<<24)
-     + ( (uint64_t)k[20]<<32)+ ( (uint64_t)k[21]<<40)+ ( (uint64_t)k[22]<<48)+ ( (uint64_t)k[23]<<56));
+    a += (k[0]        + ( (uint64)k[ 1]<< 8)+ ( (uint64)k[ 2]<<16)+ ( (uint64)k[ 3]<<24)
+     + ( (uint64)k[4 ]<<32)+ ( (uint64)k[ 5]<<40)+ ( (uint64)k[ 6]<<48)+ ( (uint64)k[ 7]<<56));
+    b += (k[8]        + ( (uint64)k[ 9]<< 8)+ ( (uint64)k[10]<<16)+ ( (uint64)k[11]<<24)
+     + ( (uint64)k[12]<<32)+ ( (uint64)k[13]<<40)+ ( (uint64)k[14]<<48)+ ( (uint64)k[15]<<56));
+    c += (k[16]       + ( (uint64)k[17]<< 8)+ ( (uint64)k[18]<<16)+ ( (uint64)k[19]<<24)
+     + ( (uint64)k[20]<<32)+ ( (uint64)k[21]<<40)+ ( (uint64)k[22]<<48)+ ( (uint64)k[23]<<56));
     this.c_mix64 (a,b,c);
     k += 24; len -= 24;
   }
@@ -212,30 +212,30 @@ static inline uint64_t c_jhash64 (uint8_t k, uint64_t length, uint64_t intval) {
   /* handle the last 23 bytes */
   c += length;
   switch (len) {
-    case 23 : c+= ( (uint64_t)k[22]<<56); Q_FALLTHROUGH ();
-    case 22 : c+= ( (uint64_t)k[21]<<48); Q_FALLTHROUGH ();
-    case 21 : c+= ( (uint64_t)k[20]<<40); Q_FALLTHROUGH ();
-    case 20 : c+= ( (uint64_t)k[19]<<32); Q_FALLTHROUGH ();
-    case 19 : c+= ( (uint64_t)k[18]<<24); Q_FALLTHROUGH ();
-    case 18 : c+= ( (uint64_t)k[17]<<16); Q_FALLTHROUGH ();
-    case 17 : c+= ( (uint64_t)k[16]<<8);  Q_FALLTHROUGH ();
+    case 23 : c+= ( (uint64)k[22]<<56); Q_FALLTHROUGH ();
+    case 22 : c+= ( (uint64)k[21]<<48); Q_FALLTHROUGH ();
+    case 21 : c+= ( (uint64)k[20]<<40); Q_FALLTHROUGH ();
+    case 20 : c+= ( (uint64)k[19]<<32); Q_FALLTHROUGH ();
+    case 19 : c+= ( (uint64)k[18]<<24); Q_FALLTHROUGH ();
+    case 18 : c+= ( (uint64)k[17]<<16); Q_FALLTHROUGH ();
+    case 17 : c+= ( (uint64)k[16]<<8);  Q_FALLTHROUGH ();
     /* the first byte of c is reserved for the length */
-    case 16 : b+= ( (uint64_t)k[15]<<56); Q_FALLTHROUGH ();
-    case 15 : b+= ( (uint64_t)k[14]<<48); Q_FALLTHROUGH ();
-    case 14 : b+= ( (uint64_t)k[13]<<40); Q_FALLTHROUGH ();
-    case 13 : b+= ( (uint64_t)k[12]<<32); Q_FALLTHROUGH ();
-    case 12 : b+= ( (uint64_t)k[11]<<24); Q_FALLTHROUGH ();
-    case 11 : b+= ( (uint64_t)k[10]<<16); Q_FALLTHROUGH ();
-    case 10 : b+= ( (uint64_t)k[ 9]<<8);  Q_FALLTHROUGH ();
-    case  9 : b+= ( (uint64_t)k[ 8]);     Q_FALLTHROUGH ();
-    case  8 : a+= ( (uint64_t)k[ 7]<<56); Q_FALLTHROUGH ();
-    case  7 : a+= ( (uint64_t)k[ 6]<<48); Q_FALLTHROUGH ();
-    case  6 : a+= ( (uint64_t)k[ 5]<<40); Q_FALLTHROUGH ();
-    case  5 : a+= ( (uint64_t)k[ 4]<<32); Q_FALLTHROUGH ();
-    case  4 : a+= ( (uint64_t)k[ 3]<<24); Q_FALLTHROUGH ();
-    case  3 : a+= ( (uint64_t)k[ 2]<<16); Q_FALLTHROUGH ();
-    case  2 : a+= ( (uint64_t)k[ 1]<<8);  Q_FALLTHROUGH ();
-    case  1 : a+= ( (uint64_t)k[ 0]);
+    case 16 : b+= ( (uint64)k[15]<<56); Q_FALLTHROUGH ();
+    case 15 : b+= ( (uint64)k[14]<<48); Q_FALLTHROUGH ();
+    case 14 : b+= ( (uint64)k[13]<<40); Q_FALLTHROUGH ();
+    case 13 : b+= ( (uint64)k[12]<<32); Q_FALLTHROUGH ();
+    case 12 : b+= ( (uint64)k[11]<<24); Q_FALLTHROUGH ();
+    case 11 : b+= ( (uint64)k[10]<<16); Q_FALLTHROUGH ();
+    case 10 : b+= ( (uint64)k[ 9]<<8);  Q_FALLTHROUGH ();
+    case  9 : b+= ( (uint64)k[ 8]);     Q_FALLTHROUGH ();
+    case  8 : a+= ( (uint64)k[ 7]<<56); Q_FALLTHROUGH ();
+    case  7 : a+= ( (uint64)k[ 6]<<48); Q_FALLTHROUGH ();
+    case  6 : a+= ( (uint64)k[ 5]<<40); Q_FALLTHROUGH ();
+    case  5 : a+= ( (uint64)k[ 4]<<32); Q_FALLTHROUGH ();
+    case  4 : a+= ( (uint64)k[ 3]<<24); Q_FALLTHROUGH ();
+    case  3 : a+= ( (uint64)k[ 2]<<16); Q_FALLTHROUGH ();
+    case  2 : a+= ( (uint64)k[ 1]<<8);  Q_FALLTHROUGH ();
+    case  1 : a+= ( (uint64)k[ 0]);
     /* case 0 : nothing left to add */
   }
   this.c_mix64 (a,b,c);

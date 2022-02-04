@@ -5,17 +5,17 @@ Copyright (C) by Julius Härtl <jus@bitgrid.net>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <cloudprovidersaccountexporter.h>
-// #include <cloudprovidersproviderexporter.h>
-
-// #include <account.h>
-// #include <folder.h>
-// #include <accountstate.h>
-// #include <QDesktopServices>
+//  #include <cloudprovidersaccountexporter.h>
+//  #include <cloudprovidersproviderexporter.h>
+//  #include
+//  #include <account.h
+//  #include <folder.h>
+//  #include <accountstate.h>
+//  #include <QDesktopServices>
 
 using namespace Occ;
 
-GSimple_action_group action_group = nullptr;
+GSimple_action_group action_group = null;
 
 
 /***********************************************************
@@ -39,7 +39,7 @@ class CloudProviderWrapper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public CloudProviderWrapper (GLib.Object parent = new GLib.Object (), Folder folder = nullptr, int folder_id = 0, CloudProvidersProviderExporter* cloudprovider = nullptr);
+    public CloudProviderWrapper (GLib.Object parent = new GLib.Object (), Folder folder = null, int folder_identifier = 0, CloudProvidersProviderExporter* cloudprovider = null);
     ~CloudProviderWrapper () override;
     public Cloud_providers_account_exporter* account_exporter ();
 
@@ -96,8 +96,8 @@ class CloudProviderWrapper : GLib.Object {
     private Cloud_providers_account_exporter this.cloud_provider_account;
     private GLib.List<QPair<string, string>> this.recently_changed;
     private bool this.paused;
-    private GMenu* this.main_menu = nullptr;
-    private GMenu* this.recent_menu = nullptr;
+    private GMenu* this.main_menu = null;
+    private GMenu* this.recent_menu = null;
 }
 
 
@@ -105,17 +105,17 @@ class CloudProviderWrapper : GLib.Object {
 
 
 
-CloudProviderWrapper.CloudProviderWrapper (GLib.Object parent, Folder folder, int folder_id, CloudProvidersProviderExporter* cloudprovider) : GLib.Object (parent)
+CloudProviderWrapper.CloudProviderWrapper (GLib.Object parent, Folder folder, int folder_identifier, CloudProvidersProviderExporter* cloudprovider) : GLib.Object (parent)
   , this.folder (folder) {
     GMenu_model model;
     GAction_group action_group;
-    string account_name = string ("Folder/%1").arg (folder_id);
+    string account_name = string ("Folder/%1").arg (folder_identifier);
 
     this.cloud_provider = CLOUD_PROVIDERS_PROVIDER_EXPORTER (cloudprovider);
     this.cloud_provider_account = cloud_providers_account_exporter_new (this.cloud_provider, account_name.to_utf8 ().data ());
 
     cloud_providers_account_exporter_set_name (this.cloud_provider_account, folder.short_gui_local_path ().to_utf8 ().data ());
-    cloud_providers_account_exporter_set_icon (this.cloud_provider_account, g_icon_new_for_string (APPLICATION_ICON_NAME, nullptr));
+    cloud_providers_account_exporter_set_icon (this.cloud_provider_account, g_icon_new_for_string (APPLICATION_ICON_NAME, null));
     cloud_providers_account_exporter_set_path (this.cloud_provider_account, folder.clean_path ().to_utf8 ().data ());
     cloud_providers_account_exporter_set_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
     model = get_menu_model ();
@@ -146,9 +146,9 @@ Cloud_providers_account_exporter* CloudProviderWrapper.account_exporter () {
 }
 
 static bool should_show_in_recents_menu (SyncFileItem item) {
-    return !Progress.is_ignored_kind (item._status)
-            && item._instruction != CSYNC_INSTRUCTION_EVAL
-            && item._instruction != CSYNC_INSTRUCTION_NONE;
+    return !Progress.is_ignored_kind (item.status)
+            && item.instruction != CSYNC_INSTRUCTION_EVAL
+            && item.instruction != CSYNC_INSTRUCTION_NONE;
 }
 
 static GMenu_item menu_item_new (string label, gchar detailed_action) {
@@ -166,12 +166,12 @@ void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo progre
         return;
 
     // Build recently changed files list
-    if (!progress._last_completed_item.is_empty () && should_show_in_recents_menu (progress._last_completed_item)) {
-        string kind_str = Progress.as_result_string (progress._last_completed_item);
+    if (!progress.last_completed_item.is_empty () && should_show_in_recents_menu (progress.last_completed_item)) {
+        string kind_str = Progress.as_result_string (progress.last_completed_item);
         string time_str = QTime.current_time ().to_string ("hh:mm");
-        string action_text = _("%1 (%2, %3)").arg (progress._last_completed_item._file, kind_str, time_str);
+        string action_text = _("%1 (%2, %3)").arg (progress.last_completed_item.file, kind_str, time_str);
         if (f) {
-            string full_path = f.path () + '/' + progress._last_completed_item._file;
+            string full_path = f.path () + '/' + progress.last_completed_item.file;
             if (GLib.File (full_path).exists ()) {
                 if (this.recently_changed.length () > 5)
                     this.recently_changed.remove_first ();
@@ -185,8 +185,8 @@ void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo progre
 
     // Build status details text
     string msg;
-    if (!progress._current_discovered_remote_folder.is_empty ()) {
-        msg =  _("Checking for changes in \"%1\"").arg (progress._current_discovered_remote_folder);
+    if (!progress.current_discovered_remote_folder.is_empty ()) {
+        msg =  _("Checking for changes in \"%1\"").arg (progress.current_discovered_remote_folder);
     } else if (progress.total_size () == 0) {
         int64 current_file = progress.current_file ();
         int64 total_file_count = q_max (progress.total_files (), current_file);
@@ -212,8 +212,8 @@ void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo progre
     }
     update_status_text (msg);
 
-    if (!progress._last_completed_item.is_empty ()
-            && should_show_in_recents_menu (progress._last_completed_item)) {
+    if (!progress.last_completed_item.is_empty ()
+            && should_show_in_recents_menu (progress.last_completed_item)) {
         GMenu_item* item;
         g_menu_remove_all (G_MENU (this.recent_menu));
         if (!this.recently_changed.is_empty ()) {
@@ -227,7 +227,7 @@ void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo progre
                 g_clear_object (&item);
             }
         } else {
-            item = menu_item_new (_("No recently changed files"), nullptr);
+            item = menu_item_new (_("No recently changed files"), null);
             g_menu_append_item (this.recent_menu, item);
             g_clear_object (&item);
         }
@@ -279,11 +279,11 @@ GMenu_model* CloudProviderWrapper.get_menu_model () {
     item = menu_item_new (_("Open website"), "cloudprovider.openwebsite");
     g_menu_append_item (section, item);
     g_clear_object (&item);
-    g_menu_append_section (this.main_menu, nullptr, G_MENU_MODEL (section));
+    g_menu_append_section (this.main_menu, null, G_MENU_MODEL (section));
     g_clear_object (&section);
 
     this.recent_menu = g_menu_new ();
-    item = menu_item_new (_("No recently changed files"), nullptr);
+    item = menu_item_new (_("No recently changed files"), null);
     g_menu_append_item (this.recent_menu, item);
     g_clear_object (&item);
 
@@ -291,14 +291,14 @@ GMenu_model* CloudProviderWrapper.get_menu_model () {
     item = menu_item_new_submenu (_("Recently changed"), G_MENU_MODEL (this.recent_menu));
     g_menu_append_item (section, item);
     g_clear_object (&item);
-    g_menu_append_section (this.main_menu, nullptr, G_MENU_MODEL (section));
+    g_menu_append_section (this.main_menu, null, G_MENU_MODEL (section));
     g_clear_object (&section);
 
     section = g_menu_new ();
     item = menu_item_new (_("Pause synchronization"), "cloudprovider.pause");
     g_menu_append_item (section, item);
     g_clear_object (&item);
-    g_menu_append_section (this.main_menu, nullptr, G_MENU_MODEL (section));
+    g_menu_append_section (this.main_menu, null, G_MENU_MODEL (section));
     g_clear_object (&section);
 
     section = g_menu_new ();
@@ -314,7 +314,7 @@ GMenu_model* CloudProviderWrapper.get_menu_model () {
     item = menu_item_new (_("Quit sync client"), "cloudprovider.quit");
     g_menu_append_item (section, item);
     g_clear_object (&item);
-    g_menu_append_section (this.main_menu, nullptr, G_MENU_MODEL (section));
+    g_menu_append_section (this.main_menu, null, G_MENU_MODEL (section));
     g_clear_object (&section);
 
     return G_MENU_MODEL (this.main_menu);
@@ -344,7 +344,7 @@ activate_action_open (GSimple_action action, GVariant parameter, gpointer user_d
     }
 
     if (g_str_equal (name, "showfile")) {
-        const gchar path = g_variant_get_string (parameter, nullptr);
+        const gchar path = g_variant_get_string (parameter, null);
         g_print ("showfile => %s\n", path);
         show_in_file_manager (string (path));
     }
@@ -354,7 +354,7 @@ activate_action_open (GSimple_action action, GVariant parameter, gpointer user_d
     }
 
     if (g_str_equal (name, "quit")) {
-        q_app.quit ();
+        Gtk.Application.quit ();
     }
 }
 
@@ -385,73 +385,73 @@ static GAction_entry actions[] = {
     {
         "openwebsite",
         activate_action_open,
-        nullptr,
-        nullptr,
-        nullptr,
+        null,
+        null,
+        null,
         {0,0,0}
     },
     {
         "quit",
         activate_action_open,
-        nullptr,
-        nullptr,
-        nullptr,
+        null,
+        null,
+        null,
         {0,0,0}
     },
     {
         "logout",
         activate_action_open,
-        nullptr,
-        nullptr,
-        nullptr,
+        null,
+        null,
+        null,
         {0,0,0}
     },
     {
         "openfolder",
         activate_action_open,
-        nullptr,
-        nullptr,
-        nullptr,
+        null,
+        null,
+        null,
         {0,0,0}
     },
     {
         "showfile",
         activate_action_open,
         "s",
-        nullptr,
-        nullptr,
+        null,
+        null,
         {0,0,0}
     },
     {
         "openhelp",
         activate_action_open,
-        nullptr,
-        nullptr,
-        nullptr,
+        null,
+        null,
+        null,
         {0,0,0}
     },
     {
         "opensettings",
         activate_action_open,
-        nullptr,
-        nullptr,
-        nullptr,
+        null,
+        null,
+        null,
         {0,0,0}
     },
     {
         "openrecentfile",
         activate_action_openrecentfile,
         "s",
-        nullptr,
-        nullptr,
+        null,
+        null,
         {0,0,0}
     },
     {
         "pause",
         activate_action_pause,
-        nullptr,
+        null,
         "false",
-        nullptr,
+        null,
         {0,0,0}
     }
 }

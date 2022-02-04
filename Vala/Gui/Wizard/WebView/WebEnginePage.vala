@@ -10,7 +10,6 @@ class Web_engine_page : QWeb_engine_page {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public QWeb_engine_page * create_window (QWeb_engine_page.Web_window_type type) override;
     public void set_url (GLib.Uri url);
 
@@ -68,7 +67,7 @@ bool Web_engine_page.accept_navigation_request (GLib.Uri url, QWeb_engine_page.N
     Q_UNUSED (is_main_frame);
 
     if (this.enforce_https && url.scheme () != QStringLiteral ("https") && url.scheme () != QStringLiteral ("nc")) {
-        QMessageBox.warning (nullptr, "Security warning", "Can not follow non https link on a https website. This might be a security issue. Please contact your administrator");
+        QMessageBox.warning (null, "Security warning", "Can not follow non https link on a https website. This might be a security issue. Please contact your administrator");
         return false;
     }
     return true;

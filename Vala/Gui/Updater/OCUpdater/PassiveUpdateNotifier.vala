@@ -19,7 +19,6 @@ class Passive_update_notifier : OCUpdater {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public bool handle_startup () override {
         return false;
     }
@@ -68,7 +67,7 @@ class Passive_update_notifier : OCUpdater {
         int64 remote_ver = Helper.string_version_to_int (info.version ());
 
         if (info.version ().is_empty () || current_ver >= remote_ver) {
-            q_c_info (lc_updater) << "Client is on latest version!";
+            GLib.Info (lc_updater) << "Client is on latest version!";
             set_download_state (Up_to_date);
         } else {
             set_download_state (Update_only_available_through_system);

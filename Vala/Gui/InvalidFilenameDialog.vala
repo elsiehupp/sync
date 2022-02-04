@@ -4,25 +4,25 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <folder.h>
+//  #include <folder.h>
+//  #include
+//  #include <QPush
+//  #include <QDir>
+//  #include <qabstractbutton.h
+//  #include <QDialogBut
+//  #include <QFileInfo>
+//  #include <QPushButton>
 
-// #include <QPushButton>
-// #include <QDir>
-// #include <qabstractbutton.h>
-// #include <QDialogButtonBox>
-// #include <QFileInfo>
-// #include <QPushButton>
+//  #include <array>
 
-// #include <array>
+//  #pragma once
 
-// #pragma once
+//  #include <accountfwd.h>
+//  #include <account.h>
+//  #include
+//  #include <memory>
 
-// #include <accountfwd.h>
-// #include <account.h>
-
-// #include <memory>
-
-// #include <Gtk.Dialog>
+//  #include <Gtk.Dialog>
 
 namespace {
     constexpr std.array<char, 9> illegal_characters ({
@@ -67,7 +67,7 @@ class Invalid_filename_dialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public Invalid_filename_dialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent = nullptr);
+    public Invalid_filename_dialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent = null);
 
     ~Invalid_filename_dialog () override;
 
@@ -102,12 +102,12 @@ class Invalid_filename_dialog : Gtk.Dialog {
 
     Invalid_filename_dialog.Invalid_filename_dialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent)
         : Gtk.Dialog (parent)
-        , this.ui (new Ui.Invalid_filename_dialog)
-        , this.account (account)
-        , this.folder (folder)
-        , this.file_path (std.move (file_path)) {
-        Q_ASSERT (this.account);
-        Q_ASSERT (this.folder);
+        this.ui (new Ui.Invalid_filename_dialog)
+        this.account (account)
+        this.folder (folder)
+        this.file_path (std.move (file_path)) {
+        //  Q_ASSERT (this.account);
+        //  Q_ASSERT (this.folder);
 
         const var file_path_file_info = QFileInfo (this.file_path);
         this.relative_file_path = file_path_file_info.path () + QStringLiteral ("/");

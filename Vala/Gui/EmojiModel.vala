@@ -9,17 +9,17 @@ namespace Occ {
 
 class EmojiModel : GLib.Object {
 
-    Q_PROPERTY (QVariantList model READ model NOTIFY model_changed)
-    Q_PROPERTY (QAbstractListModel emoji_categories_model READ emoji_categories_model CONSTANT)
-
-    Q_PROPERTY (QVariantList history READ history NOTIFY history_changed)
-
-    Q_PROPERTY (QVariantList people MEMBER people CONSTANT)
-    Q_PROPERTY (QVariantList nature MEMBER nature CONSTANT)
-    Q_PROPERTY (QVariantList food MEMBER food CONSTANT)
-    Q_PROPERTY (QVariantList activity MEMBER activity CONSTANT)
-    Q_PROPERTY (QVariantList travel MEMBER travel CONSTANT)
-    Q_PROPERTY (QVariantList objects MEMBER objects CONSTANT)
+    //  Q_PROPERTY (QVariantList model READ model NOTIFY model_changed)
+    //  Q_PROPERTY (QAbstractListModel emoji_categories_model READ emoji_categories_model CONSTANT)
+    //  Q_PROPERTY (
+    //  Q_PROPERTY (QVariantList history READ history NOTIFY hi
+    //  Q_PROPERTY (
+    //  Q_PROPERTY (QVariantList people MEMBER people CONST
+    //  Q_PROPERTY (QVariantList nature MEMBER nature CONSTANT)
+    //  Q_PROPERTY (QVariantList food MEMBER food CONSTANT)
+    //  Q_PROPERTY (QVariantList activity MEMBER activity CONSTAN
+    //  Q_PROPERTY (QVariantList travel MEMBER travel CONSTANT)
+    //  Q_PROPERTY (QVariantList objects MEMBER objects CONSTANT)
     Q_PROPERTY (QVariantList symbols MEMBER symbols CONSTANT)
     Q_PROPERTY (QVariantList flags MEMBER flags CONSTANT)
 
@@ -3497,7 +3497,7 @@ signals:
             string.from_utf8 ("\xe2\x84\xb9"), ":information_source:"
         }),
         GLib.Variant.from_value (Emoji {
-            string.from_utf8 ("\xf0\x9f\x86\x94"), ":id:"
+            string.from_utf8 ("\xf0\x9f\x86\x94"), ":identifier:"
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xe2\x93\x82"), ":m:"

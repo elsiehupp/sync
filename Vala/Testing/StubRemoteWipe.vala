@@ -11,7 +11,7 @@ const QMetaObject Occ.AccountManager.staticMetaObject = GLib.Object.staticMetaOb
 
 Occ.FolderMan *Occ.FolderMan.instance () { return static_cast<FolderMan> (new GLib.Object); }
 void Occ.FolderMan.wipeDone (Occ.AccountState*, bool) { }
-Occ.Folder* Occ.FolderMan.addFolder (Occ.AccountState*, Occ.FolderDefinition const &) { return nullptr; }
+Occ.Folder* Occ.FolderMan.addFolder (Occ.AccountState*, Occ.FolderDefinition const &) { return null; }
 void Occ.FolderMan.slotWipeFolderForAccount (Occ.AccountState*) { }
 string Occ.FolderMan.unescapeAlias (string const&){ return ""; }
 string Occ.FolderMan.escapeAlias (string const&){ return ""; }
@@ -21,7 +21,7 @@ const Occ.Folder.Map &Occ.FolderMan.map () { return Occ.Folder.Map (); }
 void Occ.FolderMan.setSyncEnabled (bool) { }
 void Occ.FolderMan.slotSyncOnceFileUnlocks (string const&) { }
 void Occ.FolderMan.slotScheduleETagJob (string const&, Occ.RequestEtagJob*){ }
-Occ.Folder *Occ.FolderMan.folderForPath (string const&) { return nullptr; }
-Occ.Folder* Occ.FolderMan.folder (string const&) { return nullptr; }
+Occ.Folder *Occ.FolderMan.folderForPath (string const&) { return null; }
+Occ.Folder* Occ.FolderMan.folder (string const&) { return null; }
 void Occ.FolderMan.folderSyncStateChange (Occ.Folder*) { }
 const QMetaObject Occ.FolderMan.staticMetaObject = GLib.Object.staticMetaObject;

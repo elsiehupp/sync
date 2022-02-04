@@ -5,19 +5,19 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QInputDialog>
-// #include <QLabel>
-// #include <QDesktopServices>
-using Soup;
-// #include <QTimer>
-// #include <QBuffer>
-// #include <QMessageBox>
+//  #include <QInputDialog>
+//  #include <QLabel>
+//  #include <QDesktopServices>
+//  #include
+//  #include <QTimer>
+//  #include <QBuffer>
+//  #include <QMessageBox>
 
 using namespace QKeychain;
 
-// #pragma once
-// #include <QPointer>
-// #include <QTcpServer>
+//  #pragma once
+//  #include <QPointer>
+//  #include <QTcpServer>
 
 namespace Occ {
 
@@ -64,6 +64,7 @@ class HttpCredentialsGui : HttpCredentials {
         return this.async_auth ? this.async_auth.authorisation_link () : GLib.Uri ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     static string request_app_password_text (Account account);
@@ -95,16 +96,16 @@ void HttpCredentialsGui.on_ask_from_user_async () {
     // First, we will check what kind of auth we need.
     var job = new DetermineAuthTypeJob (this.account.shared_from_this (), this);
     GLib.Object.connect (job, &DetermineAuthTypeJob.auth_type, this, [this] (DetermineAuthTypeJob.AuthType type) {
-        if (type == DetermineAuthTypeJob.OAuth) {
+        if (type == DetermineAuthTypeJob.AuthType.OAUTH) {
             this.async_auth.on_reset (new OAuth (this.account, this));
-            this.async_auth._expected_user = this.account.dav_user ();
+            this.async_auth.expected_user = this.account.dav_user ();
             connect (this.async_auth.data (), &OAuth.result,
                 this, &HttpCredentialsGui.on_async_auth_result);
             connect (this.async_auth.data (), &OAuth.destroyed,
                 this, &HttpCredentialsGui.authorisation_link_changed);
             this.async_auth.on_start ();
             /* emit */ authorisation_link_changed ();
-        } else if (type == DetermineAuthTypeJob.Basic) {
+        } else if (type == DetermineAuthTypeJob.AuthType.BASIC) {
             on_show_dialog ();
         } else {
             // Shibboleth?
@@ -120,10 +121,10 @@ void HttpCredentialsGui.on_async_auth_result (OAuth.Result r, string user,
     switch (r) {
     case OAuth.NotSupported:
         on_show_dialog ();
-        this.async_auth.on_reset (nullptr);
+        this.async_auth.on_reset (null);
         return;
     case OAuth.Error:
-        this.async_auth.on_reset (nullptr);
+        this.async_auth.on_reset (null);
         /* emit */ asked ();
         return;
     case OAuth.LoggedIn:
@@ -136,7 +137,7 @@ void HttpCredentialsGui.on_async_auth_result (OAuth.Result r, string user,
     this.refresh_token = refresh_token;
     this.ready = true;
     persist ();
-    this.async_auth.on_reset (nullptr);
+    this.async_auth.on_reset (null);
     /* emit */ asked ();
 }
 

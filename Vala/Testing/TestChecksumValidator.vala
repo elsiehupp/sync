@@ -4,8 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <QDir>
+//  #include <QtTest>
+//  #include <QDir>
 
 using namespace Occ;
 using namespace Occ.Utility;
@@ -39,9 +39,10 @@ using namespace Occ.Utility;
          this.errorSeen = true;
     }
 
+
     /***********************************************************
     ***********************************************************/
-    static GLib.ByteArray shellSum ( const GLib.ByteArray& cmd, string& file ) {
+    static GLib.ByteArray shellSum ( const GLib.ByteArray& cmd, string file ) {
         QProcess md5;
         string[] args;
         args.append (file);

@@ -115,12 +115,12 @@ class ProgressInfo : GLib.Object {
     ***********************************************************/
     public static inline bool is_size_dependent (SyncFileItem item) {
         return !item.is_directory ()
-            && (item._instruction == CSYNC_INSTRUCTION_CONFLICT
-                || item._instruction == CSYNC_INSTRUCTION_SYNC
-                || item._instruction == CSYNC_INSTRUCTION_NEW
-                || item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE)
-            && ! (item._type == ItemTypeVirtualFile
-                 || item._type == ItemTypeVirtualFileDehydration);
+            && (item.instruction == CSYNC_INSTRUCTION_CONFLICT
+                || item.instruction == CSYNC_INSTRUCTION_SYNC
+                || item.instruction == CSYNC_INSTRUCTION_NEW
+                || item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE)
+            && ! (item.type == ItemTypeVirtualFile
+                 || item.type == ItemTypeVirtualFileDehydration);
     }
 
 
@@ -179,14 +179,14 @@ class ProgressInfo : GLib.Object {
 
         private friend class ProgressInfo;
         string Progress.as_result_string (SyncFileItem item) {
-            switch (item._instruction) {
+            switch (item.instruction) {
             case CSYNC_INSTRUCTION_SYNC:
             case CSYNC_INSTRUCTION_NEW:
             case CSYNC_INSTRUCTION_TYPE_CHANGE:
-                if (item._direction != SyncFileItem.Direction.UP) {
-                    if (item._type == ItemTypeVirtualFile) {
+                if (item.direction != SyncFileItem.Direction.UP) {
+                    if (item.type == ItemTypeVirtualFile) {
                         return QCoreApplication.translate ("progress", "Virtual file created");
-                    } else if (item._type == ItemTypeVirtualFileDehydration) {
+                    } else if (item.type == ItemTypeVirtualFileDehydration) {
                         return QCoreApplication.translate ("progress", "Replaced by virtual file");
                     } else {
                         return QCoreApplication.translate ("progress", "Downloaded");
@@ -200,7 +200,7 @@ class ProgressInfo : GLib.Object {
                 return QCoreApplication.translate ("progress", "Deleted");
             case CSYNC_INSTRUCTION_EVAL_RENAME:
             case CSYNC_INSTRUCTION_RENAME:
-                return QCoreApplication.translate ("progress", "Moved to %1").arg (item._rename_target);
+                return QCoreApplication.translate ("progress", "Moved to %1").arg (item.rename_target);
             case CSYNC_INSTRUCTION_IGNORE:
                 return QCoreApplication.translate ("progress", "Ignored");
             case CSYNC_INSTRUCTION_STAT_ERROR:
@@ -217,12 +217,12 @@ class ProgressInfo : GLib.Object {
         }
 
         string Progress.as_action_string (SyncFileItem item) {
-            switch (item._instruction) {
+            switch (item.instruction) {
             case CSYNC_INSTRUCTION_CONFLICT:
             case CSYNC_INSTRUCTION_SYNC:
             case CSYNC_INSTRUCTION_NEW:
             case CSYNC_INSTRUCTION_TYPE_CHANGE:
-                if (item._direction != SyncFileItem.Direction.UP)
+                if (item.direction != SyncFileItem.Direction.UP)
                     return QCoreApplication.translate ("progress", "downloading");
                 else
                     return QCoreApplication.translate ("progress", "uploading");
@@ -418,18 +418,18 @@ class ProgressInfo : GLib.Object {
             return;
         }
 
-        this.file_progress._total += item._affected_items;
+        this.file_progress.total += item.affected_items;
         if (is_size_dependent (item)) {
-            this.size_progress._total += item._size;
+            this.size_progress.total += item.size;
         }
     }
 
     int64 ProgressInfo.total_files () {
-        return this.file_progress._total;
+        return this.file_progress.total;
     }
 
     int64 ProgressInfo.completed_files () {
-        return this.file_progress._completed;
+        return this.file_progress.completed;
     }
 
     int64 ProgressInfo.current_file () {
@@ -437,11 +437,11 @@ class ProgressInfo : GLib.Object {
     }
 
     int64 ProgressInfo.total_size () {
-        return this.size_progress._total;
+        return this.size_progress.total;
     }
 
     int64 ProgressInfo.completed_size () {
-        return this.size_progress._completed;
+        return this.size_progress.completed;
     }
 
     void ProgressInfo.set_progress_complete (SyncFileItem item) {
@@ -449,10 +449,10 @@ class ProgressInfo : GLib.Object {
             return;
         }
 
-        this.current_items.remove (item._file);
-        this.file_progress.set_completed (this.file_progress._completed + item._affected_items);
+        this.current_items.remove (item.file);
+        this.file_progress.set_completed (this.file_progress.completed + item.affected_items);
         if (ProgressInfo.is_size_dependent (item)) {
-            this.total_size_of_completed_jobs += item._size;
+            this.total_size_of_completed_jobs += item.size;
         }
         recompute_completed_size ();
         this.last_completed_item = item;
@@ -463,9 +463,9 @@ class ProgressInfo : GLib.Object {
             return;
         }
 
-        this.current_items[item._file]._item = item;
-        this.current_items[item._file]._progress._total = item._size;
-        this.current_items[item._file]._progress.set_completed (completed);
+        this.current_items[item.file].item = item;
+        this.current_items[item.file].progress.total = item.size;
+        this.current_items[item.file].progress.set_completed (completed);
         recompute_completed_size ();
 
         // This seems dubious!
@@ -474,7 +474,7 @@ class ProgressInfo : GLib.Object {
 
     ProgressInfo.Estimates ProgressInfo.total_progress () {
         Estimates file = this.file_progress.estimates ();
-        if (this.size_progress._total == 0) {
+        if (this.size_progress.total == 0) {
             return file;
         }
 
@@ -507,7 +507,7 @@ class ProgressInfo : GLib.Object {
         // we've seen.
 
         // Compute a value that is 0 when fps is <=L*max and 1 when fps is >=U*max
-        double fps = this.file_progress._progress_per_sec;
+        double fps = this.file_progress.progress_per_sec;
         double fps_l = 0.5;
         double fps_u = 0.8;
         double near_max_fps =
@@ -517,7 +517,7 @@ class ProgressInfo : GLib.Object {
 
         // Compute a value that is 0 when transfer is >= U*max and
         // 1 when transfer is <= L*max
-        double trans = this.size_progress._progress_per_sec;
+        double trans = this.size_progress.progress_per_sec;
         double trans_u = 0.1;
         double trans_l = 0.01;
         double slow_transfer = 1.0 - q_bound (0.0,
@@ -545,7 +545,7 @@ class ProgressInfo : GLib.Object {
     }
 
     ProgressInfo.Estimates ProgressInfo.file_progress (SyncFileItem item) {
-        return this.current_items[item._file]._progress.estimates ();
+        return this.current_items[item.file].progress.estimates ();
     }
 
     void ProgressInfo.on_update_estimates () {
@@ -556,20 +556,20 @@ class ProgressInfo : GLib.Object {
         QMutable_hash_iterator<string, Progress_item> it (this.current_items);
         while (it.has_next ()) {
             it.next ();
-            it.value ()._progress.update ();
+            it.value ().progress.update ();
         }
 
-        this.max_files_per_second = q_max (this.file_progress._progress_per_sec,
+        this.max_files_per_second = q_max (this.file_progress.progress_per_sec,
             this.max_files_per_second);
-        this.max_bytes_per_second = q_max (this.size_progress._progress_per_sec,
+        this.max_bytes_per_second = q_max (this.size_progress.progress_per_sec,
             this.max_bytes_per_second);
     }
 
     void ProgressInfo.recompute_completed_size () {
         int64 r = this.total_size_of_completed_jobs;
         foreach (Progress_item i, this.current_items) {
-            if (is_size_dependent (i._item))
-                r += i._progress._completed;
+            if (is_size_dependent (i.item))
+                r += i.progress.completed;
         }
         this.size_progress.set_completed (r);
     }

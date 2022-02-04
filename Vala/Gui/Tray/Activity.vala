@@ -28,7 +28,7 @@ class Activity {
     /***********************************************************
     ***********************************************************/
     public Type this.type;
-    public qlonglong this.id;
+    public qlonglong this.identifier;
     public string this.file_action;
     public string this.object_type;
     public string this.subject;
@@ -67,13 +67,13 @@ using Activity_list = GLib.List<Activity>;
 
 
 bool operator< (Activity rhs, Activity lhs) {
-    return rhs._date_time > lhs._date_time;
+    return rhs.date_time > lhs.date_time;
 }
 
 bool operator== (Activity rhs, Activity lhs) {
-    return (rhs._type == lhs._type && rhs._id == lhs._id && rhs._acc_name == lhs._acc_name);
+    return (rhs.type == lhs.type && rhs.id == lhs.id && rhs.acc_name == lhs.acc_name);
 }
 
 Activity.Identifier Activity.ident () {
-    return Identifier (this.id, this.acc_name);
+    return Identifier (this.identifier, this.acc_name);
 }

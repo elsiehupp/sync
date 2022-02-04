@@ -6,15 +6,14 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <iostream>
-// #include <random>
-// #include <qcoreapplication.h>
-// #include <string[]>
-// #include <QFileInfo>
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <QNetworkProxy>
-// #include <qdebug.h>
+//  #include <iostream>
+//  #include <random>
+//  #include <qcoreapplication.h>
+//  #include <QFileInfo>
+//  #include <QJsonDocument>
+//  #include <QJsonObject>
+//  #include <QNetworkProxy>
+//  #include <qdebug.h>
 
 #include "configfile.h" // ONLY ACCESS THE STATIC FUNCTIONS!
 #ifdef TOKEN_AUTH_ONLY
@@ -23,8 +22,8 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 # include "creds/httpcredentials.h"
 #endif
 
-// #include <termios.h>
-// #include <unistd.h>
+//  #include <termios.h>
+//  #include <unistd.h>
 
 using namespace Occ;
 
@@ -72,7 +71,7 @@ struct CmdOptions {
 
 // we can't use csync_set_userdata because the SyncEngine sets it already.
 // So we have to use a global variable
-CmdOptions opts = nullptr;
+CmdOptions opts = null;
 
 
 string query_password (string user) {
@@ -334,13 +333,13 @@ int main (int argc, char **argv) {
     var ssl_error_handler = new Simple_sslErrorHandler;
 
 #ifdef TOKEN_AUTH_ONLY
-    var cred = new TokenCredentials (user, password, "");
-    account.set_credentials (cred);
+    var credentials = new TokenCredentials (user, password, "");
+    account.set_credentials (credentials);
 #else
-    var cred = new HttpCredentialsText (user, password);
-    account.set_credentials (cred);
+    var credentials = new HttpCredentialsText (user, password);
+    account.set_credentials (credentials);
     if (options.trust_s_sL) {
-        cred.set_s_sLTrusted (true);
+        credentials.set_s_sLTrusted (true);
     }
 #endif
 
@@ -350,10 +349,10 @@ int main (int argc, char **argv) {
     QEventLoop loop;
     var job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/capabilities"));
     GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument json) {
-        var caps = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
-        q_debug () << "Server capabilities" << caps;
-        account.set_capabilities (caps.to_variant_map ());
-        account.set_server_version (caps["core"].to_object ()["status"].to_object ()["version"].to_string ());
+        var capabilities = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
+        q_debug () << "Server capabilities" << capabilities;
+        account.set_capabilities (capabilities.to_variant_map ());
+        account.set_server_version (capabilities["core"].to_object ()["status"].to_object ()["version"].to_string ());
         loop.quit ();
     });
     job.on_start ();
@@ -367,7 +366,7 @@ int main (int argc, char **argv) {
     job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"));
     GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument json) {
         const QJsonObject data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-        account.set_dav_user (data.value ("id").to_string ());
+        account.set_dav_user (data.value ("identifier").to_string ());
         account.set_dav_display_name (data.value ("display-name").to_string ());
         loop.quit ();
     });

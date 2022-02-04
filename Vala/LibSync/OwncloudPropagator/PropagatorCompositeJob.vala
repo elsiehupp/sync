@@ -1,3 +1,11 @@
+/***********************************************************
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+<GPLv3-or-later-Boilerplate>
+***********************************************************/
+
+namespace Occ {
 
 /***********************************************************
 @brief Job that runs subjobs. It becomes on_finished only when all subjobs are on_finished.
@@ -5,33 +13,43 @@
 ***********************************************************/
 class PropagatorCompositeJob : PropagatorJob {
 
+    public GLib.Vector<PropagatorJob> jobs_to_do;
+    public SyncFileItemVector tasks_to_do;
+    public GLib.Vector<PropagatorJob> running_jobs;
+
     /***********************************************************
+    NoStatus, or NormalError / SoftError if there was an error
     ***********************************************************/
-    public GLib.Vector<PropagatorJob> this.jobs_to_do;
-    public SyncFileItemVector this.tasks_to_do;
-    public GLib.Vector<PropagatorJob> this.running_jobs;
-    public SyncFileItem.Status this.has_error; // NoStatus,  or NormalError / SoftError if there was an error
-    public uint64 this.aborts_count;
+    public SyncFileItem.Status has_error;
+
+    public uint64 aborts_count;
 
     /***********************************************************
     ***********************************************************/
-    public PropagatorCompositeJob (OwncloudPropagator propagator)
-        : PropagatorJob (propagator)
-        , this.has_error (SyncFileItem.Status.NO_STATUS), this.aborts_count (0) {
+    public PropagatorCompositeJob (OwncloudPropagator propagator) {
+        base (propagator);
+        this.has_error = SyncFileItem.Status.NO_STATUS;
+        this.aborts_count = 0;
     }
 
-    // Don't delete jobs in this.jobs_to_do and this.running_jobs : they have parents
-    // that will be responsible for on_cleanup. Deleting them here would risk
-    // deleting something that has already been deleted by a shared parent.
+
+    /***********************************************************
+    Don't delete jobs in this.jobs_to_do and this.running_jobs:
+    they have parents that will be responsible for cleanup.
+    Deleting them here would risk deleting something that has
+    already been deleted by a shared parent.
+    ***********************************************************/
     ~PropagatorCompositeJob () override = default;
 
     /***********************************************************
     ***********************************************************/
-    public void append_job (PropagatorJob job);
+    public void append_job (PropagatorJob job) {
+        job.set_associated_composite (this);
+        this.jobs_to_do.append (job);
+    }
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void append_task (SyncFileItemPtr item) {
         this.tasks_to_do.append (item);
     }
@@ -39,82 +57,7 @@ class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public bool on_schedule_self_or_child () override;
-    public JobParallelism parallelism () override;
-
-
-    /***********************************************************
-    Abort synchronously or asynchronously - some jobs
-    require to be on_finished without immediete on_abort (on_abort on job might
-    cause conflicts/duplicated files - owncloud/client/issues/5949)
-    ***********************************************************/
-    public void on_abort (PropagatorJob.AbortType abort_type) override {
-        if (!this.running_jobs.empty ()) {
-            this.aborts_count = this.running_jobs.size ();
-            foreach (PropagatorJob j, this.running_jobs) {
-                if (abort_type == AbortType.Asynchronous) {
-                    connect (j, &PropagatorJob.abort_finished,
-                            this, &PropagatorCompositeJob.on_sub_job_abort_finished);
-                }
-                j.on_abort (abort_type);
-            }
-        } else if (abort_type == AbortType.Asynchronous){
-            /* emit */ abort_finished ();
-        }
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int64 committed_disk_space () override;
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_sub_job_abort_finished ();
-    private on_ bool possibly_run_next_job (PropagatorJob next) {
-        if (next._state == NotYetStarted) {
-            connect (next, &PropagatorJob.on_finished, this, &PropagatorCompositeJob.on_sub_job_finished);
-        }
-        return next.on_schedule_self_or_child ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_sub_job_finished (SyncFileItem.Status status);
-    private on_ void on_finalize ();
-}
-
-
-
-
-    PropagatorJob.JobParallelism PropagatorCompositeJob.parallelism () {
-        // If any of the running sub jobs is not parallel, we have to wait
-        for (int i = 0; i < this.running_jobs.count (); ++i) {
-            if (this.running_jobs.at (i).parallelism () != FullParallelism) {
-                return this.running_jobs.at (i).parallelism ();
-            }
-        }
-        return FullParallelism;
-    }
-
-    void PropagatorCompositeJob.on_sub_job_abort_finished () {
-        // Count that job has been on_finished
-        this.aborts_count--;
-
-        // Emit on_abort if last job has been aborted
-        if (this.aborts_count == 0) {
-            /* emit */ abort_finished ();
-        }
-    }
-
-    void PropagatorCompositeJob.append_job (PropagatorJob job) {
-        job.set_associated_composite (this);
-        this.jobs_to_do.append (job);
-    }
-
-    bool PropagatorCompositeJob.on_schedule_self_or_child () {
+    public bool on_schedule_self_or_child () {
         if (this.state == Finished) {
             return false;
         }
@@ -126,16 +69,16 @@ class PropagatorCompositeJob : PropagatorJob {
 
         // Ask all the running composite jobs if they have something new to schedule.
         for (var running_job : q_as_const (this.running_jobs)) {
-            ASSERT (running_job._state == Running);
+            ASSERT (running_job.state == Running);
 
-            if (possibly_run_next_job (running_job)) {
+            if (on_possibly_run_next_job (running_job)) {
                 return true;
             }
 
             // If any of the running sub jobs is not parallel, we have to cancel the scheduling
             // of the rest of the list and wait for the blocking job to finish and schedule the next one.
             var paral = running_job.parallelism ();
-            if (paral == WaitForFinished) {
+            if (paral == JobParallelism.WAIT_FOR_FINISHED) {
                 return false;
             }
         }
@@ -147,7 +90,7 @@ class PropagatorCompositeJob : PropagatorJob {
             this.tasks_to_do.remove (0);
             PropagatorJob job = propagator ().create_job (next_task);
             if (!job) {
-                GLib.warn (lc_directory) << "Useless task found for file" << next_task.destination () << "instruction" << next_task._instruction;
+                GLib.warn (lc_directory) << "Useless task found for file" << next_task.destination () << "instruction" << next_task.instruction;
                 continue;
             }
             append_job (job);
@@ -158,7 +101,7 @@ class PropagatorCompositeJob : PropagatorJob {
             PropagatorJob next_job = this.jobs_to_do.first ();
             this.jobs_to_do.remove (0);
             this.running_jobs.append (next_job);
-            return possibly_run_next_job (next_job);
+            return on_possibly_run_next_job (next_job);
         }
 
         // If neither us or our children had stuff left to do we could hang. Make sure
@@ -171,7 +114,78 @@ class PropagatorCompositeJob : PropagatorJob {
         return false;
     }
 
-    void PropagatorCompositeJob.on_sub_job_finished (SyncFileItem.Status status) {
+
+    /***********************************************************
+    ***********************************************************/
+    public JobParallelism parallelism () {
+        // If any of the running sub jobs is not parallel, we have to wait
+        for (int i = 0; i < this.running_jobs.count (); ++i) {
+            if (this.running_jobs.at (i).parallelism () != JobParallelism.FULL_PARALLELISM) {
+                return this.running_jobs.at (i).parallelism ();
+            }
+        }
+        return JobParallelism.FULL_PARALLELISM;
+    }
+
+
+    /***********************************************************
+    Abort synchronously or asynchronously - some jobs
+    require to be on_finished without immediete on_abort (on_abort on job might
+    cause conflicts/duplicated files - owncloud/client/issues/5949)
+    ***********************************************************/
+    public void on_abort (PropagatorJob.AbortType abort_type) override {
+        if (!this.running_jobs.empty ()) {
+            this.aborts_count = this.running_jobs.size ();
+            foreach (PropagatorJob j, this.running_jobs) {
+                if (abort_type == AbortType.ASYNCHRONOUS) {
+                    connect (j, &PropagatorJob.abort_finished,
+                            this, &PropagatorCompositeJob.on_sub_job_abort_finished);
+                }
+                j.on_abort (abort_type);
+            }
+        } else if (abort_type == AbortType.ASYNCHRONOUS){
+            /* emit */ abort_finished ();
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public int64 committed_disk_space () {
+        int64 needed = 0;
+        foreach (PropagatorJob job, this.running_jobs) {
+            needed += job.committed_disk_space ();
+        }
+        return needed;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_sub_job_abort_finished () {
+        // Count that job has been on_finished
+        this.aborts_count--;
+
+        // Emit on_abort if last job has been aborted
+        if (this.aborts_count == 0) {
+            /* emit */ abort_finished ();
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private bool on_possibly_run_next_job (PropagatorJob next) {
+        if (next.state == NotYetStarted) {
+            connect (next, &PropagatorJob.on_finished, this, &PropagatorCompositeJob.on_sub_job_finished);
+        }
+        return next.on_schedule_self_or_child ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_sub_job_finished (SyncFileItem.Status status) {
         var sub_job = static_cast<PropagatorJob> (sender ());
         ASSERT (sub_job);
 
@@ -198,7 +212,10 @@ class PropagatorCompositeJob : PropagatorJob {
         }
     }
 
-    void PropagatorCompositeJob.on_finalize () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_finalize () {
         // The propagator will do parallel scheduling and this could be posted
         // multiple times on the event loop, ignore the duplicate calls.
         if (this.state == Finished)
@@ -208,10 +225,6 @@ class PropagatorCompositeJob : PropagatorJob {
         /* emit */ finished (this.has_error == SyncFileItem.Status.NO_STATUS ? SyncFileItem.Status.SUCCESS : this.has_error);
     }
 
-    int64 PropagatorCompositeJob.committed_disk_space () {
-        int64 needed = 0;
-        foreach (PropagatorJob job, this.running_jobs) {
-            needed += job.committed_disk_space ();
-        }
-        return needed;
-    }
+} // class PropagatorCompositeJob
+
+} // namespace Occ

@@ -5,16 +5,16 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QDir>
-// #include <QFileDialog>
-// #include <QTimer>
-// #include <QStorage_info>
-// #include <QMessageBox>
-// #include <QJsonObject>
+//  #include <QDir>
+//  #include <QFileDialog>
+//  #include <QTimer>
+//  #include <QStorage_info>
+//  #include <QMessageBox>
+//  #include <QJsonObject>
+//  #include
+//  #include <folderman.h>
 
-// #include <folderman.h>
-
-// #include <QWizard>
+//  #include <QWizard>
 
 
 namespace Occ {
@@ -78,7 +78,6 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void on_style_changed ();
 
 
@@ -134,8 +133,8 @@ signals:
 
     Owncloud_advanced_setup_page.Owncloud_advanced_setup_page (OwncloudWizard wizard)
         : QWizard_page ()
-        , this.progress_indi (new QProgress_indicator (this))
-        , this.oc_wizard (wizard) {
+        this.progress_indi (new QProgress_indicator (this))
+        this.oc_wizard (wizard) {
         this.ui.setup_ui (this);
 
         setup_resoultion_widget ();
@@ -486,7 +485,7 @@ signals:
     }
 
     void Owncloud_advanced_setup_page.on_select_folder () {
-        string dir = QFileDialog.get_existing_directory (nullptr, _("Local Sync Folder"), QDir.home_path ());
+        string dir = QFileDialog.get_existing_directory (null, _("Local Sync Folder"), QDir.home_path ());
         if (!dir.is_empty ()) {
             // TODO : remove when UX decision is made
             refresh_virtual_files_availibility (dir);

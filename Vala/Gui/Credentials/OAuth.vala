@@ -4,16 +4,16 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QDesktopServices>
-using Soup;
-// #include <QTimer>
-// #include <QBuffer>
-// #include <QJsonObject>
-// #include <QJsonDocument>
+//  #include <QDesktopServices>
+//  #include
+//  #include <QTimer>
+//  #include <QBuffer>
+//  #include <QJsonObject>
+//  #include <QJsonDocument>
 
-// #pragma once
-// #include <QPointer>
-// #include <QTcpServer>
+//  #pragma once
+//  #include <QPointer>
+//  #include <QTcpServer>
 
 namespace Occ {
 
@@ -41,7 +41,7 @@ class OAuth : GLib.Object {
     ***********************************************************/
     public OAuth (Account account, GLib.Object parent)
         : GLib.Object (parent)
-        , this.account (account) {
+        this.account (account) {
     }
     ~OAuth () override;
 
@@ -91,7 +91,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     static void http_reply_and_close (QTcpSocket socket, char code, char html,
-        const char more_headers = nullptr) {
+        const char more_headers = null) {
         if (!socket)
             return; // socket can have been deleted if the browser was closed
         socket.write ("HTTP/1.1 ");
@@ -107,7 +107,7 @@ signals:
         socket.disconnect_from_host ();
         // We don't want that deleting the server too early prevent queued data to be sent on this socket.
         // The socket will be deleted after disconnection because disconnected is connected to delete_later
-        socket.set_parent (nullptr);
+        socket.set_parent (null);
     }
 
     void OAuth.on_start () {
@@ -219,7 +219,7 @@ signals:
     }
 
     GLib.Uri OAuth.authorisation_link () {
-        Q_ASSERT (this.server.is_listening ());
+        //  Q_ASSERT (this.server.is_listening ());
         QUrlQuery query;
         query.set_query_items ({
             {

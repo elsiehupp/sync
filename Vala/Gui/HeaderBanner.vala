@@ -93,13 +93,13 @@ https://www.gnu.org/licenses/gpl-3.0.html.
 ** $QT_END_LICENSE$
 ****************************************************************************/
 
-// #include <Gtk.Widget>
-// #include <QVBoxLayout>
-// #include <QLabel>
-
-// #include <QPainter>
-// #include <QStyle>
-// #include <QGuiApplication>
+//  #include <Gtk.Widget>
+//  #include <QVBoxLayout>
+//  #include <QLabel>
+//  #include
+//  #include <QPainte
+//  #include <QStyle>
+//  #include <QGuiApplication>
 
 
 namespace Occ {
@@ -108,7 +108,7 @@ class HeaderBanner : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public HeaderBanner (Gtk.Widget parent = nullptr);
+    public HeaderBanner (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
@@ -159,9 +159,9 @@ class HeaderBanner : Gtk.Widget {
                              const Qt.Text_format title_format, string style_sheet) {
         QStyle style = parent_widget ().style ();
         //const int layout_horizontal_spacing = style.pixel_metric (QStyle.PM_Layout_horizontal_spacing);
-        int top_level_margin_left = style.pixel_metric (QStyle.PM_Layout_left_margin, nullptr, parent_widget ());
-        int top_level_margin_right = style.pixel_metric (QStyle.PM_Layout_right_margin, nullptr, parent_widget ());
-        int top_level_margin_top = style.pixel_metric (QStyle.PM_Layout_top_margin, nullptr, parent_widget ());
+        int top_level_margin_left = style.pixel_metric (QStyle.PM_Layout_left_margin, null, parent_widget ());
+        int top_level_margin_right = style.pixel_metric (QStyle.PM_Layout_right_margin, null, parent_widget ());
+        int top_level_margin_top = style.pixel_metric (QStyle.PM_Layout_top_margin, null, parent_widget ());
         //int top_level_margin_bottom = style.pixel_metric (QStyle.PM_Layout_bottom_margin, 0, parent_widget ());
 
         layout.set_row_minimum_height (0, Modern_header_top_margin);

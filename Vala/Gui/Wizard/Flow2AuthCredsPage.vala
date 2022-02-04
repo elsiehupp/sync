@@ -5,13 +5,13 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QVBoxLayout>
+//  #include <QVBoxLayout>
 
-// #pragma once
+//  #pragma once
 
-// #include <GLib.List>
-// #include <QNetworkCookie>
-// #include <QPointer>
+//  #include <GLib.List>
+//  #include <QNetworkCookie>
+//  #include <QPointer>
 
 
 namespace Occ {
@@ -68,8 +68,8 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private Flow2AuthWidget this.flow_2_auth_widget = nullptr;
-    private QVBoxLayout this.layout = nullptr;
+    private Flow2AuthWidget this.flow_2_auth_widget = null;
+    private QVBoxLayout this.layout = null;
 }
 
     Flow2Auth_creds_page.Flow2Auth_creds_page ()
@@ -90,7 +90,7 @@ signals:
 
     void Flow2Auth_creds_page.initialize_page () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-        Q_ASSERT (oc_wizard);
+        //  Q_ASSERT (oc_wizard);
         oc_wizard.account ().set_credentials (CredentialsFactory.create ("http"));
 
         if (this.flow_2_auth_widget)
@@ -123,7 +123,7 @@ signals:
             /* Don't fallback to HTTP credentials */
             /*OwncloudWizard oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             oc_wizard.back ();
-            oc_wizard.on_set_auth_type (DetermineAuthTypeJob.Basic);*/
+            oc_wizard.on_set_auth_type (DetermineAuthTypeJob.AuthType.BASIC);*/
             break;
         }
         case Flow2Auth.Error:
@@ -134,7 +134,7 @@ signals:
             this.user = user;
             this.app_password = app_password;
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-            Q_ASSERT (oc_wizard);
+            //  Q_ASSERT (oc_wizard);
 
             /* emit */ connect_to_oc_url (oc_wizard.account ().url ().to_string ());
             break;
@@ -148,7 +148,7 @@ signals:
 
     void Flow2Auth_creds_page.set_connected () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-        Q_ASSERT (oc_wizard);
+        //  Q_ASSERT (oc_wizard);
 
         // bring wizard to top
         oc_wizard.bring_to_top ();
@@ -156,13 +156,13 @@ signals:
 
     AbstractCredentials *Flow2Auth_creds_page.get_credentials () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-        Q_ASSERT (oc_wizard);
+        //  Q_ASSERT (oc_wizard);
         return new WebFlowCredentials (
                     this.user,
                     this.app_password,
-                    oc_wizard._client_ssl_certificate,
-                    oc_wizard._client_ssl_key,
-                    oc_wizard._client_ssl_ca_certificates
+                    oc_wizard.client_ssl_certificate,
+                    oc_wizard.client_ssl_key,
+                    oc_wizard.client_ssl_ca_certificates
         );
     }
 

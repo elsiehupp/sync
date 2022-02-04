@@ -5,7 +5,7 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 ***********************************************************/
 
 using Sqlite3;
-// #pragma once
+//  #pragma once
 
 namespace Occ {
 
@@ -71,8 +71,8 @@ class PreparedSqlQueryManager {
     ***********************************************************/
     public const PreparedSqlQuery get (Key key) {
         var query = this.queries[key];
-        ENFORCE (query._stmt)
-        Q_ASSERT (!Sqlite3Stmt_busy (query._stmt));
+        ENFORCE (query.stmt)
+        //  Q_ASSERT (!Sqlite3Stmt_busy (query.stmt));
         return {
             query
         };
@@ -84,11 +84,11 @@ class PreparedSqlQueryManager {
     ***********************************************************/
     public const PreparedSqlQuery get (Key key, GLib.ByteArray sql, SqlDatabase database) {
         var query = this.queries[key];
-        Q_ASSERT (!Sqlite3Stmt_busy (query._stmt));
-        ENFORCE (!query._sqldb || database == query._sqldb)
-        if (!query._stmt) {
-            query._sqldb = database;
-            query._db = database.sqlite_db ();
+        //  Q_ASSERT (!Sqlite3Stmt_busy (query.stmt));
+        ENFORCE (!query.sqldb || database == query.sqldb)
+        if (!query.stmt) {
+            query.sqldb = database;
+            query.db = database.sqlite_db ();
             return {
                 query, query.prepare (sql) == 0
             };

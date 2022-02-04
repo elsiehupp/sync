@@ -4,19 +4,19 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
-// #include <QTimer>
+//  #include <QLoggingCategory>
+//  #include <QTimer>
 
 using namespace Occ;
 
 static const int check_frequency = 20 * 1000; // ms
 
-// #pragma once
+//  #pragma once
 
-// #include <GLib.List>
-// #include <QTimer>
-
-// #include <chrono>
+//  #include <GLib.List>
+//  #include <QTimer>
+//  #include
+//  #include <chrono>
 
 namespace Occ {
 
@@ -96,7 +96,7 @@ LockWatcher.LockWatcher (GLib.Object parent) {
 }
 
 void LockWatcher.add_file (string path) {
-    q_c_info (lc_lock_watcher) << "Watching for lock of" << path << "being released";
+    GLib.Info (lc_lock_watcher) << "Watching for lock of" << path << "being released";
     this.watched_paths.insert (path);
 }
 
@@ -113,7 +113,7 @@ void LockWatcher.on_check_files () {
 
     foreach (string path, this.watched_paths) {
         if (!FileSystem.is_file_locked (path)) {
-            q_c_info (lc_lock_watcher) << "Lock of" << path << "was released";
+            GLib.Info (lc_lock_watcher) << "Lock of" << path << "was released";
             /* emit */ file_unlocked (path);
             unlocked.insert (path);
         }

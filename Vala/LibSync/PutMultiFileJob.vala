@@ -4,19 +4,19 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QHttp_part>
+//  #include <QHttp_part>
 
-// #pragma once
+//  #pragma once
 
-// #include <QLoggingCategory>
-// #include <QElapsedTimer>
-// #include <QHttpMultiPart>
-// #include <memory>
+//  #include <QLoggingCategory>
+//  #include <QElapsedTimer>
+//  #include <QHttpMultiPart>
+//  #include <memory>
 
 
 namespace Occ {
 
-Q_DECLARE_LOGGING_CATEGORY (lc_put_multi_file_job)
+//  Q_DECLARE_LOGGING_CATEGORY (lc_put_multi_file_job)
 
 struct SingleUploadFileData {
     std.unique_ptr<UploadDevice> this.device;
@@ -32,15 +32,15 @@ class PutMultiFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public PutMultiFileJob (AccountPointer account, GLib.Uri url,
-                             std.vector<SingleUploadFileData> devices, GLib.Object parent = new GLib.Object ())
-        : AbstractNetworkJob (account, {}, parent)
-        , this.devices (std.move (devices))
-        , this.url (url) {
+                             GLib.Vector<SingleUploadFileData> devices, GLib.Object parent = new GLib.Object ())
+        : base (account, {}, parent)
+        this.devices (std.move (devices))
+        this.url (url) {
         this.body.set_content_type (QHttpMultiPart.Related_type);
         for (var single_device : this.devices) {
-            single_device._device.set_parent (this);
+            single_device.device.set_parent (this);
             connect (this, &PutMultiFileJob.upload_progress,
-                    single_device._device.get (), &UploadDevice.on_job_upload_progress);
+                    single_device.device.get (), &UploadDevice.on_job_upload_progress);
         }
     }
 
@@ -75,7 +75,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private QHttpMultiPart this.body;
-    private std.vector<SingleUploadFileData> this.devices;
+    private GLib.Vector<SingleUploadFileData> this.devices;
     private string this.error_string;
     private GLib.Uri this.url;
     private QElapsedTimer this.request_timer;
@@ -90,9 +90,9 @@ signals:
         for (var one_device : this.devices) {
             var one_part = QHttp_part{};
 
-            one_part.set_body_device (one_device._device.get ());
+            one_part.set_body_device (one_device.device.get ());
 
-            for (GLib.HashMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = one_device._headers.begin (); it != one_device._headers.end (); ++it) {
+            for (GLib.HashMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = one_device.headers.begin (); it != one_device.headers.end (); ++it) {
                 one_part.set_raw_header (it.key (), it.value ());
             }
 
@@ -115,11 +115,11 @@ signals:
 
     bool PutMultiFileJob.on_finished () {
         for (var one_device : this.devices) {
-            one_device._device.close ();
+            one_device.device.close ();
         }
 
-        q_c_info (lc_put_multi_file_job) << "POST of" << reply ().request ().url ().to_string () << path () << "FINISHED WITH STATUS"
-                         << reply_status_""
+        GLib.Info (lc_put_multi_file_job) << "POST of" << reply ().request ().url ().to_string () << path () << "FINISHED WITH STATUS"
+                         << reply_status_string ()
                          << reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
                          << reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);
 

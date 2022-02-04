@@ -5,36 +5,35 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <unistd.h>
+//  #include <unistd.h>
+//  #include
+//  #include <climits>
+//  #include <cassert>
+//  #include <chrono>
+//  #include
+//  #include <QCore
+//  #include <QSslSocket>
+//  #include <QDir>
+//  #include <QLogging
+//  #include <QMutexLoc
+//  #include <QThread>
+//  #include <string
+//  #include <QTextStream>
+//  #include <QTime>
+//  #include <QSslCertificat
+//  #include <QProcess>
+//  #include <QElapsedTimer>
+//  #include <QFileInfo>
+//  #include <qtextcodec.h>
 
-// #include <climits>
-// #include <cassert>
-// #include <chrono>
+//  #pragma once
 
-// #include <QCoreApplication>
-// #include <QSslSocket>
-// #include <QDir>
-// #include <QLoggingCategory>
-// #include <QMutexLocker>
-// #include <QThread>
-// #include <string[]>
-// #include <QTextStream>
-// #include <QTime>
-// #include <QSslCertificate>
-// #include <QProcess>
-// #include <QElapsedTimer>
-// #include <QFileInfo>
-// #include <qtextcodec.h>
+//  #include <cstdint>
+//  #include
+//  #include <QMutex>
+//  #include <QThread>
 
-// #pragma once
-
-// #include <cstdint>
-
-// #include <QMutex>
-// #include <QThread>
-// #include <string[]>
-
-// #include <set>
+//  #include <set>
 
 
 namespace Occ {
@@ -63,7 +62,6 @@ class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void set_network_limits (int upload, int download);
 
 
@@ -122,7 +120,6 @@ class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public SyncFileStatusTracker sync_file_status_tracker () {
         return this.sync_file_status_tracker;
     }
@@ -146,7 +143,6 @@ class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public SyncJournalDb journal () {
         return this.journal;
     }
@@ -176,7 +172,7 @@ class SyncEngine : GLib.Object {
     /***********************************************************
     Control whether local discovery should read from filesystem or database.
 
-    If style is DatabaseAndFilesystem, paths a set of file paths relative
+    If style is DATABASE_AND_FILESYSTEM, paths a set of file paths relative
     the synced folder. All the parent directories of th
     be read from the database and scanned on the filesystem.
 
@@ -184,14 +180,14 @@ class SyncEngine : GLib.Object {
     revert afterwards. Use this.last_local_discovery_style to discover the last
     sync's style.
     ***********************************************************/
-    public void set_local_discovery_options (LocalDiscoveryStyle style, std.set<string> paths = {});
+    public void set_local_discovery_options (LocalDiscoveryStyle style, GLib.Set<string> paths = {});
 
 
     /***********************************************************
     Returns whether the given folder-relative path should be locally discovered
     given the local discovery options.
 
-    Example: If path is 'foo/bar' and style is DatabaseAndFilesystem and dirs contains
+    Example: If path is 'foo/bar' and style is DATABASE_AND_FILESYSTEM and dirs contains
         'foo/bar/touched_file', then the result will be true.
     ***********************************************************/
     public bool should_discover_locally (string path);
@@ -433,9 +429,9 @@ signals:
     /***********************************************************
     The kind of local discovery the last sync run used
     ***********************************************************/
-    private LocalDiscoveryStyle this.last_local_discovery_style = LocalDiscoveryStyle.FilesystemOnly;
-    private LocalDiscoveryStyle this.local_discovery_style = LocalDiscoveryStyle.FilesystemOnly;
-    private std.set<string> this.local_discovery_paths;
+    private LocalDiscoveryStyle this.last_local_discovery_style = LocalDiscoveryStyle.FILESYSTEM_ONLY;
+    private LocalDiscoveryStyle this.local_discovery_style = LocalDiscoveryStyle.FILESYSTEM_ONLY;
+    private GLib.Set<string> this.local_discovery_paths;
 }
 
     bool SyncEngine.s_any_sync_running = false;
@@ -463,17 +459,17 @@ signals:
     SyncEngine.SyncEngine (AccountPointer account, string local_path,
         const string remote_path, Occ.SyncJournalDb journal)
         : this.account (account)
-        , this.needs_update (false)
-        , this.sync_running (false)
-        , this.local_path (local_path)
-        , this.remote_path (remote_path)
-        , this.journal (journal)
-        , this.progress_info (new ProgressInfo)
-        , this.has_none_files (false)
-        , this.has_remove_file (false)
-        , this.upload_limit (0)
-        , this.download_limit (0)
-        , this.another_sync_needed (No_follow_up_sync) {
+        this.needs_update (false)
+        this.sync_running (false)
+        this.local_path (local_path)
+        this.remote_path (remote_path)
+        this.journal (journal)
+        this.progress_info (new ProgressInfo)
+        this.has_none_files (false)
+        this.has_remove_file (false)
+        this.upload_limit (0)
+        this.download_limit (0)
+        this.another_sync_needed (No_follow_up_sync) {
         q_register_meta_type<SyncFileItem> ("SyncFileItem");
         q_register_meta_type<SyncFileItemPtr> ("SyncFileItemPtr");
         q_register_meta_type<SyncFileItem.Status> ("SyncFileItem.Status");
@@ -514,66 +510,67 @@ signals:
             return false;
         }
 
-        SyncJournalErrorBlocklistRecord entry = this.journal.error_blocklist_entry (item._file);
-        item._has_blocklist_entry = false;
+        SyncJournalErrorBlocklistRecord entry = this.journal.error_blocklist_entry (item.file);
+        item.has_blocklist_entry = false;
 
         if (!entry.is_valid ()) {
             return false;
         }
 
-        item._has_blocklist_entry = true;
+        item.has_blocklist_entry = true;
 
         // If duration has expired, it's not blocklisted anymore
         time_t now = Utility.q_date_time_to_time_t (GLib.DateTime.current_date_time_utc ());
-        if (now >= entry._last_try_time + entry._ignore_duration) {
-            q_c_info (lc_engine) << "blocklist entry for " << item._file << " has expired!";
+        if (now >= entry.last_try_time + entry.ignore_duration) {
+            GLib.Info (lc_engine) << "blocklist entry for " << item.file << " has expired!";
             return false;
         }
 
         // If the file has changed locally or on the server, the blocklist
         // entry no longer applies
-        if (item._direction == SyncFileItem.Direction.UP) { // check the modtime
-            if (item._modtime == 0 || entry._last_try_modtime == 0) {
+        if (item.direction == SyncFileItem.Direction.UP) { // check the modtime
+            if (item.modtime == 0 || entry.last_try_modtime == 0) {
                 return false;
-            } else if (item._modtime != entry._last_try_modtime) {
-                q_c_info (lc_engine) << item._file << " is blocklisted, but has changed mtime!";
+            } else if (item.modtime != entry.last_try_modtime) {
+                GLib.Info (lc_engine) << item.file << " is blocklisted, but has changed mtime!";
                 return false;
-            } else if (item._rename_target != entry._rename_target) {
-                q_c_info (lc_engine) << item._file << " is blocklisted, but rename target changed from" << entry._rename_target;
+            } else if (item.rename_target != entry.rename_target) {
+                GLib.Info (lc_engine) << item.file << " is blocklisted, but rename target changed from" << entry.rename_target;
                 return false;
             }
-        } else if (item._direction == SyncFileItem.Direction.DOWN) {
+        } else if (item.direction == SyncFileItem.Direction.DOWN) {
             // download, check the etag.
-            if (item._etag.is_empty () || entry._last_try_etag.is_empty ()) {
-                q_c_info (lc_engine) << item._file << "one ETag is empty, no blocklisting";
+            if (item.etag.is_empty () || entry.last_try_etag.is_empty ()) {
+                GLib.Info (lc_engine) << item.file << "one ETag is empty, no blocklisting";
                 return false;
-            } else if (item._etag != entry._last_try_etag) {
-                q_c_info (lc_engine) << item._file << " is blocklisted, but has changed etag!";
+            } else if (item.etag != entry.last_try_etag) {
+                GLib.Info (lc_engine) << item.file << " is blocklisted, but has changed etag!";
                 return false;
             }
         }
 
-        int64 wait_seconds = entry._last_try_time + entry._ignore_duration - now;
-        q_c_info (lc_engine) << "Item is on blocklist : " << entry._file
-                         << "retries:" << entry._retry_count
+        int64 wait_seconds = entry.last_try_time + entry.ignore_duration - now;
+        GLib.Info (lc_engine) << "Item is on blocklist : " << entry.file
+                         << "retries:" << entry.retry_count
                          << "for another" << wait_seconds << "s";
 
         // We need to indicate that we skip this file due to blocklisting
         // for reporting and for making sure we don't update the blocklist
         // entry yet.
         // Classification is this this.instruction and this.status
-        item._instruction = CSYNC_INSTRUCTION_IGNORE;
-        item._status = SyncFileItem.Status.BLOCKLISTED_ERROR;
+        item.instruction = CSYNC_INSTRUCTION_IGNORE;
+        item.status = SyncFileItem.Status.BLOCKLISTED_ERROR;
 
         var wait_seconds_str = Utility.duration_to_descriptive_string1 (1000 * wait_seconds);
-        item._error_string = _("%1 (skipped due to earlier error, trying again in %2)").arg (entry._error_string, wait_seconds_str);
+        item.error_string = _("%1 (skipped due to earlier error, trying again in %2)").arg (entry.error_string, wait_seconds_str);
 
-        if (entry._error_category == SyncJournalErrorBlocklistRecord.InsufficientRemoteStorage) {
+        if (entry.error_category == SyncJournalErrorBlocklistRecord.InsufficientRemoteStorage) {
             on_insufficient_remote_storage ();
         }
 
         return true;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -588,10 +585,10 @@ signals:
         // Find all downloadinfo paths that we want to preserve.
         GLib.Set<string> download_file_paths;
         foreach (SyncFileItemPtr it, sync_items) {
-            if (it._direction == SyncFileItem.Direction.DOWN
-                && it._type == ItemTypeFile
-                && is_file_transfer_instruction (it._instruction)) {
-                download_file_paths.insert (it._file);
+            if (it.direction == SyncFileItem.Direction.DOWN
+                && it.type == ItemTypeFile
+                && is_file_transfer_instruction (it.instruction)) {
+                download_file_paths.insert (it.file);
             }
         }
 
@@ -599,8 +596,8 @@ signals:
         const GLib.Vector<SyncJournalDb.DownloadInfo> deleted_infos =
             this.journal.get_and_delete_stale_download_infos (download_file_paths);
         foreach (SyncJournalDb.DownloadInfo deleted_info, deleted_infos) {
-            const string tmppath = this.propagator.full_local_path (deleted_info._tmpfile);
-            q_c_info (lc_engine) << "Deleting stale temporary file : " << tmppath;
+            const string tmppath = this.propagator.full_local_path (deleted_info.tmpfile);
+            GLib.Info (lc_engine) << "Deleting stale temporary file : " << tmppath;
             FileSystem.remove (tmppath);
         }
     }
@@ -609,10 +606,10 @@ signals:
         // Find all blocklisted paths that we want to preserve.
         GLib.Set<string> upload_file_paths;
         foreach (SyncFileItemPtr it, sync_items) {
-            if (it._direction == SyncFileItem.Direction.UP
-                && it._type == ItemTypeFile
-                && is_file_transfer_instruction (it._instruction)) {
-                upload_file_paths.insert (it._file);
+            if (it.direction == SyncFileItem.Direction.UP
+                && it.type == ItemTypeFile
+                && is_file_transfer_instruction (it.instruction)) {
+                upload_file_paths.insert (it.file);
             }
         }
 
@@ -634,8 +631,8 @@ signals:
         // Find all blocklisted paths that we want to preserve.
         GLib.Set<string> blocklist_file_paths;
         foreach (SyncFileItemPtr it, sync_items) {
-            if (it._has_blocklist_entry)
-                blocklist_file_paths.insert (it._file);
+            if (it.has_blocklist_entry)
+                blocklist_file_paths.insert (it.file);
         }
 
         // Delete from journal.
@@ -679,7 +676,7 @@ signals:
                 // Determine fileid of target file
                 SyncJournalFileRecord base_record;
                 if (this.journal.get_file_record (base_path, base_record) && base_record.is_valid ()) {
-                    record.base_file_id = base_record._file_id;
+                    record.base_file_id = base_record.file_id;
                 }
 
                 this.journal.set_conflict_record (record);
@@ -688,9 +685,9 @@ signals:
     }
 
     void Occ.SyncEngine.on_item_discovered (Occ.SyncFileItemPtr item) {
-        if (Utility.is_conflict_file (item._file))
-            this.seen_conflict_files.insert (item._file);
-        if (item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA && !item.is_directory ()) {
+        if (Utility.is_conflict_file (item.file))
+            this.seen_conflict_files.insert (item.file);
+        if (item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA && !item.is_directory ()) {
             // For directories, metadata-only updates will be done after all their files are propagated.
 
             // Update the database now already :  New remote fileid or Etag or Remote_perm
@@ -707,38 +704,38 @@ signals:
             // quick to do and we don't want to create a potentially large number of
             // mini-jobs later on, we just update metadata right now.
 
-            if (item._direction == SyncFileItem.Direction.DOWN) {
-                string file_path = this.local_path + item._file;
+            if (item.direction == SyncFileItem.Direction.DOWN) {
+                string file_path = this.local_path + item.file;
 
                 // If the 'W' remote permission changed, update the local filesystem
                 SyncJournalFileRecord prev;
-                if (this.journal.get_file_record (item._file, prev)
+                if (this.journal.get_file_record (item.file, prev)
                     && prev.is_valid ()
-                    && prev._remote_perm.has_permission (RemotePermissions.Can_write) != item._remote_perm.has_permission (RemotePermissions.Can_write)) {
-                    const bool is_read_only = !item._remote_perm.is_null () && !item._remote_perm.has_permission (RemotePermissions.Can_write);
+                    && prev.remote_perm.has_permission (RemotePermissions.Can_write) != item.remote_perm.has_permission (RemotePermissions.Can_write)) {
+                    const bool is_read_only = !item.remote_perm.is_null () && !item.remote_perm.has_permission (RemotePermissions.Can_write);
                     FileSystem.set_file_read_only_weak (file_path, is_read_only);
                 }
                 var record = item.to_sync_journal_file_record_with_inode (file_path);
-                if (record._checksum_header.is_empty ())
-                    record._checksum_header = prev._checksum_header;
-                record._server_has_ignored_files |= prev._server_has_ignored_files;
+                if (record.checksum_header.is_empty ())
+                    record.checksum_header = prev.checksum_header;
+                record.server_has_ignored_files |= prev.server_has_ignored_files;
 
                 // Ensure it's a placeholder file on disk
-                if (item._type == ItemTypeFile) {
-                    const var result = this.sync_options._vfs.convert_to_placeholder (file_path, *item);
+                if (item.type == ItemTypeFile) {
+                    const var result = this.sync_options.vfs.convert_to_placeholder (file_path, *item);
                     if (!result) {
-                        item._instruction = CSYNC_INSTRUCTION_ERROR;
-                        item._error_string = _("Could not update file : %1").arg (result.error ());
+                        item.instruction = CSYNC_INSTRUCTION_ERROR;
+                        item.error_string = _("Could not update file : %1").arg (result.error ());
                         return;
                     }
                 }
 
                 // Update on-disk virtual file metadata
-                if (item._type == ItemTypeVirtualFile) {
-                    var r = this.sync_options._vfs.update_metadata (file_path, item._modtime, item._size, item._file_id);
+                if (item.type == ItemTypeVirtualFile) {
+                    var r = this.sync_options.vfs.update_metadata (file_path, item.modtime, item.size, item.file_id);
                     if (!r) {
-                        item._instruction = CSYNC_INSTRUCTION_ERROR;
-                        item._error_string = _("Could not update virtual file metadata : %1").arg (r.error ());
+                        item.instruction = CSYNC_INSTRUCTION_ERROR;
+                        item.error_string = _("Could not update virtual file metadata : %1").arg (r.error ());
                         return;
                     }
                 }
@@ -750,28 +747,28 @@ signals:
                 /* emit */ item_completed (item);
             } else {
                 // Update only outdated data from the disk.
-                this.journal.update_local_metadata (item._file, item._modtime, item._size, item._inode);
+                this.journal.update_local_metadata (item.file, item.modtime, item.size, item.inode);
             }
             this.has_none_files = true;
             return;
-        } else if (item._instruction == CSYNC_INSTRUCTION_NONE) {
+        } else if (item.instruction == CSYNC_INSTRUCTION_NONE) {
             this.has_none_files = true;
-            if (this.account.capabilities ().upload_conflict_files () && Utility.is_conflict_file (item._file)) {
+            if (this.account.capabilities ().upload_conflict_files () && Utility.is_conflict_file (item.file)) {
                 // For uploaded conflict files, files with no action performed on them should
                 // be displayed : but we mustn't overwrite the instruction if something happens
                 // to the file!
-                item._error_string = _("Unresolved conflict.");
-                item._instruction = CSYNC_INSTRUCTION_IGNORE;
-                item._status = SyncFileItem.Status.CONFLICT;
+                item.error_string = _("Unresolved conflict.");
+                item.instruction = CSYNC_INSTRUCTION_IGNORE;
+                item.status = SyncFileItem.Status.CONFLICT;
             }
             return;
-        } else if (item._instruction == CSYNC_INSTRUCTION_REMOVE && !item._is_selective_sync) {
+        } else if (item.instruction == CSYNC_INSTRUCTION_REMOVE && !item.is_selective_sync) {
             this.has_remove_file = true;
-        } else if (item._instruction == CSYNC_INSTRUCTION_RENAME) {
+        } else if (item.instruction == CSYNC_INSTRUCTION_RENAME) {
             this.has_none_files = true; // If a file (or every file) has been renamed, it means not al files where deleted
-        } else if (item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE
-            || item._instruction == CSYNC_INSTRUCTION_SYNC) {
-            if (item._direction == SyncFileItem.Direction.UP) {
+        } else if (item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE
+            || item.instruction == CSYNC_INSTRUCTION_SYNC) {
+            if (item.direction == SyncFileItem.Direction.UP) {
                 // An upload of an existing file means that the file was left unchanged on the server
                 // This counts as a NONE for detecting if all the files on the server were changed
                 this.has_none_files = true;
@@ -790,7 +787,7 @@ signals:
         on_new_item (item);
 
         if (item.is_directory ()) {
-            on_folder_discovered (item._etag.is_empty (), item._file);
+            on_folder_discovered (item.etag.is_empty (), item.file);
         }
     }
 
@@ -798,9 +795,9 @@ signals:
         if (this.journal.exists ()) {
             GLib.Vector<SyncJournalDb.PollInfo> poll_infos = this.journal.get_poll_infos ();
             if (!poll_infos.is_empty ()) {
-                q_c_info (lc_engine) << "Finish Poll jobs before starting a sync";
+                GLib.Info (lc_engine) << "Finish Poll jobs before starting a sync";
                 var job = new CleanupPollsJob (poll_infos, this.account,
-                    this.journal, this.local_path, this.sync_options._vfs, this);
+                    this.journal, this.local_path, this.sync_options.vfs, this);
                 connect (job, &CleanupPollsJob.on_finished, this, &SyncEngine.on_start_sync);
                 connect (job, &CleanupPollsJob.aborted, this, &SyncEngine.on_clean_polls_job_aborted);
                 job.on_start ();
@@ -827,7 +824,7 @@ signals:
         if (!QDir (this.local_path).exists ()) {
             this.another_sync_needed = DelayedFollowUp;
             // No this.tr, it should only occur in non-mirall
-            Q_EMIT sync_error (QStringLiteral ("Unable to find local sync folder."));
+            /* Q_EMIT */ sync_error (QStringLiteral ("Unable to find local sync folder."));
             on_finalize (false);
             return;
         }
@@ -840,7 +837,7 @@ signals:
                 GLib.warn (lc_engine ()) << "Too little space available at" << this.local_path << ". Have"
                                       << free_bytes << "bytes and require at least" << min_free << "bytes";
                 this.another_sync_needed = DelayedFollowUp;
-                Q_EMIT sync_error (_("Only %1 are available, need at least %2 to on_start",
+                /* Q_EMIT */ sync_error (_("Only %1 are available, need at least %2 to on_start",
                     "Placeholders are postfixed with file sizes using Utility.octets_to_string ()")
                                      .arg (
                                          Utility.octets_to_string (free_bytes),
@@ -848,7 +845,7 @@ signals:
                 on_finalize (false);
                 return;
             } else {
-                q_c_info (lc_engine) << "There are" << free_bytes << "bytes available at" << this.local_path;
+                GLib.Info (lc_engine) << "There are" << free_bytes << "bytes available at" << this.local_path;
             }
         } else {
             GLib.warn (lc_engine) << "Could not determine free space available at" << this.local_path;
@@ -858,9 +855,9 @@ signals:
         this.needs_update = false;
 
         if (!this.journal.exists ()) {
-            q_c_info (lc_engine) << "New sync (no sync journal exists)";
+            GLib.Info (lc_engine) << "New sync (no sync journal exists)";
         } else {
-            q_c_info (lc_engine) << "Sync with existing sync journal";
+            GLib.Info (lc_engine) << "Sync with existing sync journal";
         }
 
         string ver_str ("Using Qt ");
@@ -868,12 +865,12 @@ signals:
 
         ver_str.append (" SSL library ").append (QSslSocket.ssl_library_version_"".to_utf8 ().data ());
         ver_str.append (" on ").append (Utility.platform_name ());
-        q_c_info (lc_engine) << ver_str;
+        GLib.Info (lc_engine) << ver_str;
 
         // This creates the DB if it does not exist yet.
         if (!this.journal.open ()) {
             GLib.warn (lc_engine) << "No way to create a sync journal!";
-            Q_EMIT sync_error (_("Unable to open or create the local sync database. Make sure you have write access in the sync folder."));
+            /* Q_EMIT */ sync_error (_("Unable to open or create the local sync database. Make sure you have write access in the sync folder."));
             on_finalize (false);
             return;
             // database creation error!
@@ -888,8 +885,8 @@ signals:
 
         this.last_local_discovery_style = this.local_discovery_style;
 
-        if (this.sync_options._vfs.mode () == Vfs.WithSuffix && this.sync_options._vfs.file_suffix ().is_empty ()) {
-            Q_EMIT sync_error (_("Using virtual files with suffix, but suffix is not set"));
+        if (this.sync_options.vfs.mode () == Vfs.WithSuffix && this.sync_options.vfs.file_suffix ().is_empty ()) {
+            /* Q_EMIT */ sync_error (_("Using virtual files with suffix, but suffix is not set"));
             on_finalize (false);
             return;
         }
@@ -898,48 +895,48 @@ signals:
         var selective_sync_block_list = this.journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (ok) {
             bool using_selective_sync = (!selective_sync_block_list.is_empty ());
-            q_c_info (lc_engine) << (using_selective_sync ? "Using Selective Sync" : "NOT Using Selective Sync");
+            GLib.Info (lc_engine) << (using_selective_sync ? "Using Selective Sync" : "NOT Using Selective Sync");
         } else {
             GLib.warn (lc_engine) << "Could not retrieve selective sync list from DB";
-            Q_EMIT sync_error (_("Unable to read the blocklist from the local database"));
+            /* Q_EMIT */ sync_error (_("Unable to read the blocklist from the local database"));
             on_finalize (false);
             return;
         }
 
         this.stop_watch.on_start ();
-        this.progress_info._status = ProgressInfo.Starting;
+        this.progress_info.status = ProgressInfo.Starting;
         /* emit */ transmission_progress (*this.progress_info);
 
-        q_c_info (lc_engine) << "#### Discovery on_start ####################################################";
-        q_c_info (lc_engine) << "Server" << account ().server_version ()
+        GLib.Info (lc_engine) << "#### Discovery on_start ####################################################";
+        GLib.Info (lc_engine) << "Server" << account ().server_version ()
                          << (account ().is_http2Supported () ? "Using HTTP/2" : "");
-        this.progress_info._status = ProgressInfo.Discovery;
+        this.progress_info.status = ProgressInfo.Discovery;
         /* emit */ transmission_progress (*this.progress_info);
 
         this.discovery_phase.on_reset (new DiscoveryPhase);
-        this.discovery_phase._account = this.account;
-        this.discovery_phase._excludes = this.excluded_files.data ();
+        this.discovery_phase.account = this.account;
+        this.discovery_phase.excludes = this.excluded_files.data ();
         const string exclude_file_path = this.local_path + QStringLiteral (".sync-exclude.lst");
         if (GLib.File.exists (exclude_file_path)) {
-            this.discovery_phase._excludes.add_exclude_file_path (exclude_file_path);
-            this.discovery_phase._excludes.on_reload_exclude_files ();
+            this.discovery_phase.excludes.add_exclude_file_path (exclude_file_path);
+            this.discovery_phase.excludes.on_reload_exclude_files ();
         }
-        this.discovery_phase._statedatabase = this.journal;
-        this.discovery_phase._local_dir = this.local_path;
-        if (!this.discovery_phase._local_dir.ends_with ('/'))
-            this.discovery_phase._local_dir+='/';
-        this.discovery_phase._remote_folder = this.remote_path;
-        if (!this.discovery_phase._remote_folder.ends_with ('/'))
-            this.discovery_phase._remote_folder+='/';
-        this.discovery_phase._sync_options = this.sync_options;
-        this.discovery_phase._should_discover_localy = [this] (string s) {
+        this.discovery_phase.statedatabase = this.journal;
+        this.discovery_phase.local_dir = this.local_path;
+        if (!this.discovery_phase.local_dir.ends_with ('/'))
+            this.discovery_phase.local_dir+='/';
+        this.discovery_phase.remote_folder = this.remote_path;
+        if (!this.discovery_phase.remote_folder.ends_with ('/'))
+            this.discovery_phase.remote_folder+='/';
+        this.discovery_phase.sync_options = this.sync_options;
+        this.discovery_phase.should_discover_localy = [this] (string s) {
             return should_discover_locally (s);
         };
         this.discovery_phase.set_selective_sync_block_list (selective_sync_block_list);
         this.discovery_phase.set_selective_sync_allow_list (this.journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok));
         if (!ok) {
             GLib.warn (lc_engine) << "Unable to read selective sync list, aborting.";
-            Q_EMIT sync_error (_("Unable to read from the sync journal."));
+            /* Q_EMIT */ sync_error (_("Unable to read from the sync journal."));
             on_finalize (false);
             return;
         }
@@ -956,14 +953,14 @@ signals:
             invalid_filename_pattern = R" ([\\:?*\"<>|])";
         }
         if (!invalid_filename_pattern.is_empty ())
-            this.discovery_phase._invalid_filename_rx = QRegularExpression (invalid_filename_pattern);
-        this.discovery_phase._server_blocklisted_files = this.account.capabilities ().blocklisted_files ();
-        this.discovery_phase._ignore_hidden_files = ignore_hidden_files ();
+            this.discovery_phase.invalid_filename_rx = QRegularExpression (invalid_filename_pattern);
+        this.discovery_phase.server_blocklisted_files = this.account.capabilities ().blocklisted_files ();
+        this.discovery_phase.ignore_hidden_files = ignore_hidden_files ();
 
         connect (this.discovery_phase.data (), &DiscoveryPhase.item_discovered, this, &SyncEngine.on_item_discovered);
         connect (this.discovery_phase.data (), &DiscoveryPhase.new_big_folder, this, &SyncEngine.new_big_folder);
         connect (this.discovery_phase.data (), &DiscoveryPhase.fatal_error, this, [this] (string error_string) {
-            Q_EMIT sync_error (error_string);
+            /* Q_EMIT */ sync_error (error_string);
             on_finalize (false);
         });
         connect (this.discovery_phase.data (), &DiscoveryPhase.on_finished, this, &SyncEngine.on_discovery_finished);
@@ -986,11 +983,11 @@ signals:
         }
 
         if (local) {
-            this.progress_info._current_discovered_local_folder = folder;
-            this.progress_info._current_discovered_remote_folder.clear ();
+            this.progress_info.current_discovered_local_folder = folder;
+            this.progress_info.current_discovered_remote_folder.clear ();
         } else {
-            this.progress_info._current_discovered_remote_folder = folder;
-            this.progress_info._current_discovered_local_folder.clear ();
+            this.progress_info.current_discovered_remote_folder = folder;
+            this.progress_info.current_discovered_local_folder.clear ();
         }
         /* emit */ transmission_progress (*this.progress_info);
     }
@@ -1013,12 +1010,12 @@ signals:
             return;
         }
 
-        q_c_info (lc_engine) << "#### Discovery end #################################################### " << this.stop_watch.add_lap_time (QLatin1String ("Discovery Finished")) << "ms";
+        GLib.Info (lc_engine) << "#### Discovery end #################################################### " << this.stop_watch.add_lap_time (QLatin1String ("Discovery Finished")) << "ms";
 
         // Sanity check
         if (!this.journal.open ()) {
             GLib.warn (lc_engine) << "Bailing out, DB failure";
-            Q_EMIT sync_error (_("Cannot open the sync journal"));
+            /* Q_EMIT */ sync_error (_("Cannot open the sync journal"));
             on_finalize (false);
             return;
         } else {
@@ -1026,39 +1023,39 @@ signals:
             this.journal.commit_if_needed_and_start_new_transaction ("Post discovery");
         }
 
-        this.progress_info._current_discovered_remote_folder.clear ();
-        this.progress_info._current_discovered_local_folder.clear ();
-        this.progress_info._status = ProgressInfo.Reconcile;
+        this.progress_info.current_discovered_remote_folder.clear ();
+        this.progress_info.current_discovered_local_folder.clear ();
+        this.progress_info.status = ProgressInfo.Reconcile;
         /* emit */ transmission_progress (*this.progress_info);
 
-        //    q_c_info (lc_engine) << "Permissions of the root folder : " << this.csync_ctx.remote.root_perms.to_string ();
+        //    GLib.Info (lc_engine) << "Permissions of the root folder : " << this.csync_ctx.remote.root_perms.to_string ();
         var finish = [this]{
             var database_fingerprint = this.journal.data_fingerprint ();
             // If database_fingerprint is empty, this means that there was no information in the database
             // (for example, upgrading from a previous version, or first sync, or server not supporting fingerprint)
             if (!database_fingerprint.is_empty () && this.discovery_phase
-                && this.discovery_phase._data_fingerprint != database_fingerprint) {
-                q_c_info (lc_engine) << "data fingerprint changed, assume restore from backup" << database_fingerprint << this.discovery_phase._data_fingerprint;
+                && this.discovery_phase.data_fingerprint != database_fingerprint) {
+                GLib.Info (lc_engine) << "data fingerprint changed, assume restore from backup" << database_fingerprint << this.discovery_phase.data_fingerprint;
                 restore_old_files (this.sync_items);
             }
 
-            if (this.discovery_phase._another_sync_needed && this.another_sync_needed == No_follow_up_sync) {
+            if (this.discovery_phase.another_sync_needed && this.another_sync_needed == No_follow_up_sync) {
                 this.another_sync_needed = Immediate_follow_up;
             }
 
-            Q_ASSERT (std.is_sorted (this.sync_items.begin (), this.sync_items.end ()));
+            //  Q_ASSERT (std.is_sorted (this.sync_items.begin (), this.sync_items.end ()));
 
-            q_c_info (lc_engine) << "#### Reconcile (about_to_propagate) #################################################### " << this.stop_watch.add_lap_time (QStringLiteral ("Reconcile (about_to_propagate)")) << "ms";
+            GLib.Info (lc_engine) << "#### Reconcile (about_to_propagate) #################################################### " << this.stop_watch.add_lap_time (QStringLiteral ("Reconcile (about_to_propagate)")) << "ms";
 
             this.local_discovery_paths.clear ();
 
             // To announce the beginning of the sync
             /* emit */ about_to_propagate (this.sync_items);
 
-            q_c_info (lc_engine) << "#### Reconcile (about_to_propagate OK) #################################################### "<< this.stop_watch.add_lap_time (QStringLiteral ("Reconcile (about_to_propagate OK)")) << "ms";
+            GLib.Info (lc_engine) << "#### Reconcile (about_to_propagate OK) #################################################### "<< this.stop_watch.add_lap_time (QStringLiteral ("Reconcile (about_to_propagate OK)")) << "ms";
 
             // it's important to do this before ProgressInfo.on_start (), to announce on_start of new sync
-            this.progress_info._status = ProgressInfo.Propagation;
+            this.progress_info.status = ProgressInfo.Propagation;
             /* emit */ transmission_progress (*this.progress_info);
             this.progress_info.start_estimate_updates ();
 
@@ -1105,19 +1102,19 @@ signals:
 
             // Emit the started signal only after the propagator has been set up.
             if (this.needs_update)
-                Q_EMIT started ();
+                /* Q_EMIT */ started ();
 
             this.propagator.on_start (std.move (this.sync_items));
 
-            q_c_info (lc_engine) << "#### Post-Reconcile end #################################################### " << this.stop_watch.add_lap_time (QStringLiteral ("Post-Reconcile Finished")) << "ms";
+            GLib.Info (lc_engine) << "#### Post-Reconcile end #################################################### " << this.stop_watch.add_lap_time (QStringLiteral ("Post-Reconcile Finished")) << "ms";
         };
 
         if (!this.has_none_files && this.has_remove_file) {
-            q_c_info (lc_engine) << "All the files are going to be changed, asking the user";
+            GLib.Info (lc_engine) << "All the files are going to be changed, asking the user";
             int side = 0; // > 0 means more deleted on the server.  < 0 means more deleted on the client
             foreach (var it, this.sync_items) {
-                if (it._instruction == CSYNC_INSTRUCTION_REMOVE) {
-                    side += it._direction == SyncFileItem.Direction.DOWN ? 1 : -1;
+                if (it.instruction == CSYNC_INSTRUCTION_REMOVE) {
+                    side += it.direction == SyncFileItem.Direction.DOWN ? 1 : -1;
                 }
             }
 
@@ -1131,7 +1128,7 @@ signals:
                 }
                 guard.delete_later ();
                 if (cancel) {
-                    q_c_info (lc_engine) << "User aborted sync";
+                    GLib.Info (lc_engine) << "User aborted sync";
                     on_finalize (false);
                     return;
                 } else {
@@ -1156,11 +1153,11 @@ signals:
         if (!this.propagator)
             return;
 
-        this.propagator._upload_limit = upload;
-        this.propagator._download_limit = download;
+        this.propagator.upload_limit = upload;
+        this.propagator.download_limit = download;
 
         if (upload != 0 || download != 0) {
-            q_c_info (lc_engine) << "Network Limits (down/up) " << upload << download;
+            GLib.Info (lc_engine) << "Network Limits (down/up) " << upload << download;
         }
     }
 
@@ -1172,12 +1169,12 @@ signals:
     }
 
     void SyncEngine.on_propagation_finished (bool on_success) {
-        if (this.propagator._another_sync_needed && this.another_sync_needed == No_follow_up_sync) {
+        if (this.propagator.another_sync_needed && this.another_sync_needed == No_follow_up_sync) {
             this.another_sync_needed = Immediate_follow_up;
         }
 
         if (on_success && this.discovery_phase) {
-            this.journal.set_data_fingerprint (this.discovery_phase._data_fingerprint);
+            this.journal.set_data_fingerprint (this.discovery_phase.data_fingerprint);
         }
 
         conflict_record_maintenance ();
@@ -1188,15 +1185,15 @@ signals:
         // Send final progress information even if no
         // files needed propagation, but clear the last_completed_item
         // so we don't count this twice (like Recent Files)
-        this.progress_info._last_completed_item = SyncFileItem ();
-        this.progress_info._status = ProgressInfo.Done;
+        this.progress_info.last_completed_item = SyncFileItem ();
+        this.progress_info.status = ProgressInfo.Done;
         /* emit */ transmission_progress (*this.progress_info);
 
         on_finalize (on_success);
     }
 
     void SyncEngine.on_finalize (bool on_success) {
-        q_c_info (lc_engine) << "Sync run took " << this.stop_watch.add_lap_time (QLatin1String ("Sync Finished")) << "ms";
+        GLib.Info (lc_engine) << "Sync run took " << this.stop_watch.add_lap_time (QLatin1String ("Sync Finished")) << "ms";
         this.stop_watch.stop ();
 
         if (this.discovery_phase) {
@@ -1211,7 +1208,7 @@ signals:
         this.seen_conflict_files.clear ();
         this.unique_errors.clear ();
         this.local_discovery_paths.clear ();
-        this.local_discovery_style = LocalDiscoveryStyle.FilesystemOnly;
+        this.local_discovery_style = LocalDiscoveryStyle.FILESYSTEM_ONLY;
 
         this.clear_touched_files_timer.on_start ();
     }
@@ -1234,18 +1231,18 @@ signals:
     void SyncEngine.restore_old_files (SyncFileItemVector sync_items) {
 
         for (var sync_item : q_as_const (sync_items)) {
-            if (sync_item._direction != SyncFileItem.Direction.DOWN)
+            if (sync_item.direction != SyncFileItem.Direction.DOWN)
                 continue;
 
-            switch (sync_item._instruction) {
+            switch (sync_item.instruction) {
             case CSYNC_INSTRUCTION_SYNC:
-                GLib.warn (lc_engine) << "restore_old_files : RESTORING" << sync_item._file;
-                sync_item._instruction = CSYNC_INSTRUCTION_CONFLICT;
+                GLib.warn (lc_engine) << "restore_old_files : RESTORING" << sync_item.file;
+                sync_item.instruction = CSYNC_INSTRUCTION_CONFLICT;
                 break;
             case CSYNC_INSTRUCTION_REMOVE:
-                GLib.warn (lc_engine) << "restore_old_files : RESTORING" << sync_item._file;
-                sync_item._instruction = CSYNC_INSTRUCTION_NEW;
-                sync_item._direction = SyncFileItem.Direction.UP;
+                GLib.warn (lc_engine) << "restore_old_files : RESTORING" << sync_item.file;
+                sync_item.instruction = CSYNC_INSTRUCTION_NEW;
+                sync_item.direction = SyncFileItem.Direction.UP;
                 break;
             case CSYNC_INSTRUCTION_RENAME:
             case CSYNC_INSTRUCTION_NEW:
@@ -1300,7 +1297,7 @@ signals:
         return this.account;
     }
 
-    void SyncEngine.set_local_discovery_options (LocalDiscoveryStyle style, std.set<string> paths) {
+    void SyncEngine.set_local_discovery_options (LocalDiscoveryStyle style, GLib.Set<string> paths) {
         this.local_discovery_style = style;
         this.local_discovery_paths = std.move (paths);
 
@@ -1322,7 +1319,7 @@ signals:
     }
 
     bool SyncEngine.should_discover_locally (string path) {
-        if (this.local_discovery_style == LocalDiscoveryStyle.FilesystemOnly)
+        if (this.local_discovery_style == LocalDiscoveryStyle.FILESYSTEM_ONLY)
             return true;
 
         // The intention is that if "A/X" is in this.local_discovery_paths:
@@ -1359,17 +1356,17 @@ signals:
     }
 
     void SyncEngine.wipe_virtual_files (string local_path, SyncJournalDb journal, Vfs vfs) {
-        q_c_info (lc_engine) << "Wiping virtual files inside" << local_path;
+        GLib.Info (lc_engine) << "Wiping virtual files inside" << local_path;
         journal.get_files_below_path (GLib.ByteArray (), [&] (SyncJournalFileRecord record) {
-            if (record._type != ItemTypeVirtualFile && record._type != ItemTypeVirtualFileDownload)
+            if (record.type != ItemTypeVirtualFile && record.type != ItemTypeVirtualFileDownload)
                 return;
 
             GLib.debug (lc_engine) << "Removing database record for" << record.path ();
-            journal.delete_file_record (record._path);
+            journal.delete_file_record (record.path);
 
             // If the local file is a dehydrated placeholder, wipe it too.
             // Otherwise leave it to allow the next sync to have a new-new conflict.
-            string local_file = local_path + record._path;
+            string local_file = local_path + record.path;
             if (GLib.File.exists (local_file) && vfs.is_dehydrated_placeholder (local_file)) {
                 GLib.debug (lc_engine) << "Removing local dehydrated placeholder" << record.path ();
                 GLib.File.remove (local_file);
@@ -1383,7 +1380,7 @@ signals:
     }
 
     void SyncEngine.switch_to_virtual_files (string local_path, SyncJournalDb journal, Vfs vfs) {
-        q_c_info (lc_engine) << "Convert to virtual files inside" << local_path;
+        GLib.Info (lc_engine) << "Convert to virtual files inside" << local_path;
         journal.get_files_below_path ({}, [&] (SyncJournalFileRecord record) {
             const var path = record.path ();
             const var filename = QFileInfo (path).filename ();
@@ -1401,7 +1398,7 @@ signals:
 
     void SyncEngine.on_abort () {
         if (this.propagator)
-            q_c_info (lc_engine) << "Aborting sync";
+            GLib.Info (lc_engine) << "Aborting sync";
 
         if (this.propagator) {
             // If we're already in the propagation phase, aborting that is sufficient
@@ -1409,10 +1406,10 @@ signals:
         } else if (this.discovery_phase) {
             // Delete the discovery and all child jobs after ensuring
             // it can't finish and on_start the propagator
-            disconnect (this.discovery_phase.data (), nullptr, this, nullptr);
+            disconnect (this.discovery_phase.data (), null, this, null);
             this.discovery_phase.take ().delete_later ();
 
-            Q_EMIT sync_error (_("Synchronization will resume shortly."));
+            /* Q_EMIT */ sync_error (_("Synchronization will resume shortly."));
             on_finalize (false);
         }
     }

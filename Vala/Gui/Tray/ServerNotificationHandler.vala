@@ -1,8 +1,8 @@
 
 
-// #include <QtCore>
-// #include <QJsonDocument>
-// #include <QJsonObject>
+//  #include <QtCore>
+//  #include <QJsonDocument>
+//  #include <QJsonObject>
 
 
 namespace Occ {
@@ -10,7 +10,7 @@ namespace Occ {
 const string notifications_path = QLatin1String ("ocs/v2.php/apps/notifications/api/v2/notifications");
 const char property_account_state_c[] = "oc_account_state";
 const int success_status_code = 200;
-const int not_modified_status_code = 304;
+const int NOT_MODIFIED_STATUS_CODE = 304;
 
 class Server_notification_handler : GLib.Object {
 
@@ -43,7 +43,7 @@ signals:
 
     Server_notification_handler.Server_notification_handler (AccountState account_state, GLib.Object parent)
         : GLib.Object (parent)
-        , this.account_state (account_state) {
+        this.account_state (account_state) {
     }
 
     void Server_notification_handler.on_fetch_notifications () {
@@ -56,7 +56,7 @@ signals:
         // not yet valid, its assumed that notifications are available.
         if (this.account_state.account ().capabilities ().is_valid ()) {
             if (!this.account_state.account ().capabilities ().notifications_available ()) {
-                q_c_info (lc_server_notification) << "Account" << this.account_state.account ().display_name () << "does not have notifications enabled.";
+                GLib.Info (lc_server_notification) << "Account" << this.account_state.account ().display_name () << "does not have notifications enabled.";
                 delete_later ();
                 return;
             }
@@ -85,19 +85,19 @@ signals:
 
     void Server_notification_handler.on_allow_desktop_notifications_changed (bool is_allowed) {
         var account = qvariant_cast<AccountState> (sender ().property (property_account_state_c));
-        if (account != nullptr) {
+        if (account != null) {
            account.set_desktop_notifications_allowed (is_allowed);
         }
     }
 
     void Server_notification_handler.on_notifications_received (QJsonDocument json, int status_code) {
-        if (status_code != success_status_code && status_code != not_modified_status_code) {
+        if (status_code != success_status_code && status_code != NOT_MODIFIED_STATUS_CODE) {
             GLib.warn (lc_server_notification) << "Notifications failed with status code " << status_code;
             delete_later ();
             return;
         }
 
-        if (status_code == not_modified_status_code) {
+        if (status_code == NOT_MODIFIED_STATUS_CODE) {
             GLib.warn (lc_server_notification) << "Status code " << status_code << " Not Modified - No new notifications.";
             delete_later ();
             return;
@@ -112,17 +112,17 @@ signals:
         foreach (var element, notifies) {
             Activity a;
             var json = element.to_object ();
-            a._type = Activity.Notification_type;
-            a._acc_name = ai.account ().display_name ();
-            a._id = json.value ("notification_id").to_int ();
+            a.type = Activity.Notification_type;
+            a.acc_name = ai.account ().display_name ();
+            a.id = json.value ("notification_id").to_int ();
 
             //need to know, specially for remote_share
-            a._object_type = json.value ("object_type").to_string ();
-            a._status = 0;
+            a.object_type = json.value ("object_type").to_string ();
+            a.status = 0;
 
-            a._subject = json.value ("subject").to_string ();
-            a._message = json.value ("message").to_string ();
-            a._icon = json.value ("icon").to_string ();
+            a.subject = json.value ("subject").to_string ();
+            a.message = json.value ("message").to_string ();
+            a.icon = json.value ("icon").to_string ();
 
             GLib.Uri link (json.value ("link").to_string ());
             if (!link.is_empty ()) {
@@ -134,29 +134,29 @@ signals:
                     link.set_port (ai.account ().url ().port ());
                 }
             }
-            a._link = link;
-            a._date_time = GLib.DateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
+            a.link = link;
+            a.date_time = GLib.DateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
 
             var actions = json.value ("actions").to_array ();
             foreach (var action, actions) {
                 var action_json = action.to_object ();
                 Activity_link al;
-                al._label = GLib.Uri.from_percent_encoding (action_json.value ("label").to_string ().to_utf8 ());
-                al._link = action_json.value ("link").to_string ();
-                al._verb = action_json.value ("type").to_string ().to_utf8 ();
-                al._primary = action_json.value ("primary").to_bool ();
+                al.label = GLib.Uri.from_percent_encoding (action_json.value ("label").to_string ().to_utf8 ());
+                al.link = action_json.value ("link").to_string ();
+                al.verb = action_json.value ("type").to_string ().to_utf8 ();
+                al.primary = action_json.value ("primary").to_bool ();
 
-                a._links.append (al);
+                a.links.append (al);
             }
 
             // Add another action to dismiss notification on server
             // https://github.com/owncloud/notifications/blob/master/docs/ocs-endpoint-v1.md#deleting-a-notification-for-a-user
             Activity_link al;
-            al._label = _("Dismiss");
-            al._link = Utility.concat_url_path (ai.account ().url (), notifications_path + "/" + string.number (a._id)).to_string ();
-            al._verb = "DELETE";
-            al._primary = false;
-            a._links.append (al);
+            al.label = _("Dismiss");
+            al.link = Utility.concat_url_path (ai.account ().url (), notifications_path + "/" + string.number (a.id)).to_string ();
+            al.verb = "DELETE";
+            al.primary = false;
+            a.links.append (al);
 
             list.append (a);
         }

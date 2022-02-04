@@ -20,9 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 
 #ifdef this.WIN32
-// #include <time.h>
-#else
-// #include <sys/time.h>
+//  #include <time.h>
+//  #include
+//  #include <sys/time.h>
 #endif
 
 OCSYNC_EXPORT int c_utimes (string uri, struct timeval times);
@@ -74,8 +74,8 @@ int c_utimes (string uri, struct timeval times) {
 #ifdef this.WIN32
 // implementation for utimes taken from KDE mingw headers
 
-// #include <errno.h>
-// #include <wtypes.h>
+//  #include <errno.h>
+//  #include <wtypes.h>
 const int CSYNC_SECONDS_SINCE_1601 11644473600LL
 const int CSYNC_USEC_IN_SEC            1000000LL
 //after Microsoft KB167296

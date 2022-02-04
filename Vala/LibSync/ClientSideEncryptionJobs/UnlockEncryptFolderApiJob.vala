@@ -27,7 +27,7 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
         GLib.ByteArray token,
         GLib.Object parent = new GLib.Object ()) {
         
-        base (account, e2ee_base_url () + "lock/" + file_identifier, parent)
+        base (account, E2EE_BASE_URL + "lock/" + file_identifier, parent)
         this.file_identifier = file_identifier;
         this.token = token;
     }
@@ -44,16 +44,17 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
         send_request ("DELETE", url, req);
 
         AbstractNetworkJob.on_start ();
-        q_c_info (lc_cse_job ()) << "Starting the request to unlock.";
+        GLib.Info (lc_cse_job ()) << "Starting the request to unlock.";
     }
+
 
     /***********************************************************
     ***********************************************************/
     protected bool on_finished () override {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
-            q_c_info (lc_cse_job ()) << "error unlocking file" << path () << error_string () << return_code;
-            q_c_info (lc_cse_job ()) << "Full Error Log" << reply ().read_all ();
+            GLib.Info (lc_cse_job ()) << "error unlocking file" << path () << error_string () << return_code;
+            GLib.Info (lc_cse_job ()) << "Full Error Log" << reply ().read_all ();
             /* emit */ error (this.file_identifier, return_code);
             return true;
         }

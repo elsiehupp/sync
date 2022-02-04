@@ -4,8 +4,8 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
-// #pragma once
+//  #include <QLoggingCategory>
+//  #pragma once
 
 namespace Occ {
 
@@ -17,7 +17,7 @@ namespace Occ {
 ***********************************************************/
 class PropagateRemoteDelete : PropagateItemJob {
     QPointer<DeleteJob> this.job;
-    AbstractPropagateRemoteDeleteEncrypted this.delete_encrypted_helper = nullptr;
+    AbstractPropagateRemoteDeleteEncrypted this.delete_encrypted_helper = null;
 
     /***********************************************************
     ***********************************************************/
@@ -49,13 +49,13 @@ class PropagateRemoteDelete : PropagateItemJob {
 }
 
     void PropagateRemoteDelete.on_start () {
-        q_c_info (lc_propagate_remote_delete) << "Start propagate remote delete job for" << this.item._file;
+        GLib.Info (lc_propagate_remote_delete) << "Start propagate remote delete job for" << this.item.file;
 
-        if (propagator ()._abort_requested)
+        if (propagator ().abort_requested)
             return;
 
-        if (!this.item._encrypted_filename.is_empty () || this.item._is_encrypted) {
-            if (!this.item._encrypted_filename.is_empty ()) {
+        if (!this.item.encrypted_filename.is_empty () || this.item.is_encrypted) {
+            if (!this.item.encrypted_filename.is_empty ()) {
                 this.delete_encrypted_helper = new Propagate_remote_delete_encrypted (propagator (), this.item, this);
             } else {
                 this.delete_encrypted_helper = new Propagate_remote_delete_encrypted_root_folder (propagator (), this.item, this);
@@ -64,7 +64,7 @@ class PropagateRemoteDelete : PropagateItemJob {
                 if (!on_success) {
                     SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR;
                     if (this.delete_encrypted_helper.network_error () != Soup.Reply.NoError && this.delete_encrypted_helper.network_error () != Soup.Reply.ContentNotFoundError) {
-                        status = classify_error (this.delete_encrypted_helper.network_error (), this.item._http_error_code, propagator ()._another_sync_needed);
+                        status = classify_error (this.delete_encrypted_helper.network_error (), this.item.http_error_code, propagator ().another_sync_needed);
                     }
                     on_done (status, this.delete_encrypted_helper.error_string ());
                 } else {
@@ -73,19 +73,19 @@ class PropagateRemoteDelete : PropagateItemJob {
             });
             this.delete_encrypted_helper.on_start ();
         } else {
-            create_delete_job (this.item._file);
+            create_delete_job (this.item.file);
         }
     }
 
     void PropagateRemoteDelete.create_delete_job (string filename) {
-        q_c_info (lc_propagate_remote_delete) << "Deleting file, local" << this.item._file << "remote" << filename;
+        GLib.Info (lc_propagate_remote_delete) << "Deleting file, local" << this.item.file << "remote" << filename;
 
         this.job = new DeleteJob (propagator ().account (),
             propagator ().full_remote_path (filename),
             this);
 
         connect (this.job.data (), &DeleteJob.finished_signal, this, &PropagateRemoteDelete.on_delete_job_finished);
-        propagator ()._active_job_list.append (this);
+        propagator ().active_job_list.append (this);
         this.job.on_start ();
     }
 
@@ -93,25 +93,25 @@ class PropagateRemoteDelete : PropagateItemJob {
         if (this.job && this.job.reply ())
             this.job.reply ().on_abort ();
 
-        if (abort_type == AbortType.Asynchronous) {
+        if (abort_type == AbortType.ASYNCHRONOUS) {
             /* emit */ abort_finished ();
         }
     }
 
     void PropagateRemoteDelete.on_delete_job_finished () {
-        propagator ()._active_job_list.remove_one (this);
+        propagator ().active_job_list.remove_one (this);
 
         ASSERT (this.job);
 
         Soup.Reply.NetworkError err = this.job.reply ().error ();
         const int http_status = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        this.item._http_error_code = http_status;
-        this.item._response_time_stamp = this.job.response_timestamp ();
-        this.item._request_id = this.job.request_id ();
+        this.item.http_error_code = http_status;
+        this.item.response_time_stamp = this.job.response_timestamp ();
+        this.item.request_id = this.job.request_id ();
 
         if (err != Soup.Reply.NoError && err != Soup.Reply.ContentNotFoundError) {
-            SyncFileItem.Status status = classify_error (err, this.item._http_error_code,
-                propagator ()._another_sync_needed);
+            SyncFileItem.Status status = classify_error (err, this.item.http_error_code,
+                propagator ().another_sync_needed);
             on_done (status, this.job.error_string ());
             return;
         }
@@ -126,13 +126,13 @@ class PropagateRemoteDelete : PropagateItemJob {
             // throw an error.
             on_done (SyncFileItem.Status.NORMAL_ERROR,
                 _("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
-                    .arg (this.item._http_error_code)
+                    .arg (this.item.http_error_code)
                     .arg (this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
             return;
         }
 
-        propagator ()._journal.delete_file_record (this.item._original_file, this.item.is_directory ());
-        propagator ()._journal.commit ("Remote Remove");
+        propagator ().journal.delete_file_record (this.item.original_file, this.item.is_directory ());
+        propagator ().journal.commit ("Remote Remove");
 
         on_done (SyncFileItem.Status.SUCCESS);
     }

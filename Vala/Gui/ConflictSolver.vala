@@ -4,14 +4,14 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFileDialog>
-// #include <QMessageBox>
+//  #include <QFileDialog>
+//  #include <QMessageBox>
 
 namespace Occ {
 
 class ConflictSolver : GLib.Object {
-    Q_PROPERTY (string local_version_filename READ local_version_filename WRITE on_set_local_version_filename NOTIFY local_version_filename_changed)
-    Q_PROPERTY (string remote_version_filename READ remote_version_filename WRITE on_set_remote_version_filename NOTIFY remote_version_filename_changed)
+    //  Q_PROPERTY (string local_version_filename READ local_version_filename WRITE on_set_local_version_filename NOTIFY local_version_filename_changed)
+    //  Q_PROPERTY (string remote_version_filename READ remote_version_filename WRITE on_set_remote_version_filename NOTIFY remote_version_filename_changed)
 
     /***********************************************************
     ***********************************************************/
@@ -23,7 +23,7 @@ class ConflictSolver : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ConflictSolver (Gtk.Widget parent = nullptr);
+    public ConflictSolver (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
@@ -68,7 +68,7 @@ signals:
 
     ConflictSolver.ConflictSolver (Gtk.Widget parent)
         : GLib.Object (parent)
-        , this.parent_widget (parent) {
+        this.parent_widget (parent) {
     }
 
     string ConflictSolver.local_version_filename () {
@@ -153,7 +153,7 @@ signals:
             uint32 i = 1;
             var result = rename_pattern.arg (i);
             while (QFileInfo.exists (result)) {
-                Q_ASSERT (i > 0);
+                //  Q_ASSERT (i > 0);
                 i++;
                 result = rename_pattern.arg (i);
             }

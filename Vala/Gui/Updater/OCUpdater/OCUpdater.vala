@@ -4,15 +4,15 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QtCore>
-// #include <Qt_network>
-// #include <QtGui>
-// #include <Qt_widgets>
-
-// #include <cstdio>
-
-// #include <QTemporary_file>
-// #include <QTimer>
+//  #include <QtCore>
+//  #include <Qt_network>
+//  #include <QtGui>
+//  #include <Qt_widgets>
+//  #include
+//  #include <cstdio>
+//  #include
+//  #include <QTemporary_file>
+//  #include <QTimer>
 
 
 namespace Occ {
@@ -160,10 +160,10 @@ protected slots:
 
     OCUpdater.OCUpdater (GLib.Uri url)
         : Updater ()
-        , this.update_url (url)
-        , this.state (Unknown)
-        , this.access_manager (new AccessManager (this))
-        , this.timeout_watchdog (new QTimer (this)) {
+        this.update_url (url)
+        this.state (Unknown)
+        this.access_manager (new AccessManager (this))
+        this.timeout_watchdog (new QTimer (this)) {
     }
 
     void OCUpdater.set_update_url (GLib.Uri url) {
@@ -171,8 +171,8 @@ protected slots:
     }
 
     bool OCUpdater.perform_update () {
-        ConfigFile cfg;
-        QSettings settings (cfg.config_file (), QSettings.IniFormat);
+        ConfigFile config;
+        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         string update_file = settings.value (update_available_c).to_string ();
         if (!update_file.is_empty () && GLib.File (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
@@ -182,7 +182,7 @@ protected slots:
                    "for additional privileges during the process. Your computer may reboot to complete the installation.")
                     .arg (Theme.instance ().app_name_gui ()),
                 QMessageBox.Ok,
-                nullptr);
+                null);
 
             message_box_start_installer.set_attribute (Qt.WA_DeleteOnClose);
 
@@ -203,14 +203,14 @@ protected slots:
         case Up_to_date:
         case Download_failed:
         case Download_timed_out:
-            q_c_info (lc_updater) << "Checking for available update";
+            GLib.Info (lc_updater) << "Checking for available update";
             check_for_update ();
             break;
         case Download_complete:
-            q_c_info (lc_updater) << "Update is downloaded, skip new check.";
+            GLib.Info (lc_updater) << "Update is downloaded, skip new check.";
             break;
         case Update_only_available_through_system:
-            q_c_info (lc_updater) << "Update is only available through system, skip check.";
+            GLib.Info (lc_updater) << "Update is only available through system, skip check.";
             break;
         }
     }
@@ -266,12 +266,12 @@ protected slots:
     }
 
     void OCUpdater.on_start_installer () {
-        ConfigFile cfg;
-        QSettings settings (cfg.config_file (), QSettings.IniFormat);
+        ConfigFile config;
+        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         string update_file = settings.value (update_available_c).to_string ();
         settings.set_value (auto_update_attempted_c, true);
         settings.sync ();
-        q_c_info (lc_updater) << "Running updater" << update_file;
+        GLib.Info (lc_updater) << "Running updater" << update_file;
 
         if (update_file.ends_with (".exe")) {
             QProcess.start_detached (update_file, string[] () << "/S"
@@ -288,7 +288,7 @@ protected slots:
                 return QDir.to_native_separators (path);
             };
 
-            string msi_log_file = cfg.config_path () + "msi.log";
+            string msi_log_file = config.config_path () + "msi.log";
             string command = string ("&{msiexec /promptrestart /passive /i '%1' /L*V '%2'| Out-Null ; &'%3'}")
                  .arg (prepare_path_for_powershell (update_file))
                  .arg (prepare_path_for_powershell (msi_log_file))
@@ -296,7 +296,7 @@ protected slots:
 
             QProcess.start_detached ("powershell.exe", string[]{"-Command", command});
         }
-        q_app.quit ();
+        Gtk.Application.quit ();
     }
 
     void OCUpdater.check_for_update () {
@@ -313,8 +313,8 @@ protected slots:
     }
 
     bool OCUpdater.update_succeeded () {
-        ConfigFile cfg;
-        QSettings settings (cfg.config_file (), QSettings.IniFormat);
+        ConfigFile config;
+        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
 
         int64 target_version_int = Helper.string_version_to_int (settings.value (update_target_version_c).to_string ());
         int64 current_version = Helper.current_version_to_int ();

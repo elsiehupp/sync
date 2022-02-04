@@ -5,7 +5,7 @@ Copyright (C) 2015 by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <Gtk.Dialog>
+//  #include <Gtk.Dialog>
 
 namespace Occ {
 
@@ -21,7 +21,7 @@ class Owncloud_connection_method_dialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public Owncloud_connection_method_dialog (Gtk.Widget parent = nullptr);
+    public Owncloud_connection_method_dialog (Gtk.Widget parent = null);
     ~Owncloud_connection_method_dialog () override;
     public enum {
         Closed = 0,

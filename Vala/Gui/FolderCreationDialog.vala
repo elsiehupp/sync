@@ -4,13 +4,13 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <limits>
+//  #include <limits>
+//  #include
+//  #include <QDir>
+//  #include <QMessageBox>
+//  #include <QLoggingCategory>
 
-// #include <QDir>
-// #include <QMessageBox>
-// #include <QLoggingCategory>
-
-// #include <Gtk.Dialog>
+//  #include <Gtk.Dialog>
 
 namespace Occ {
 
@@ -21,7 +21,7 @@ class FolderCreationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public FolderCreationDialog (string destination, Gtk.Widget parent = nullptr);
+    public FolderCreationDialog (string destination, Gtk.Widget parent = null);
     ~FolderCreationDialog () override;
 
 
@@ -47,7 +47,7 @@ class FolderCreationDialog : Gtk.Dialog {
     FolderCreationDialog.FolderCreationDialog (string destination, Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.FolderCreationDialog)
-        , this.destination (destination) {
+        this.destination (destination) {
         ui.setup_ui (this);
 
         ui.label_error_message.set_visible (false);
@@ -81,7 +81,7 @@ class FolderCreationDialog : Gtk.Dialog {
     }
 
     void FolderCreationDialog.on_accept () {
-        Q_ASSERT (!this.destination.ends_with ('/'));
+        //  Q_ASSERT (!this.destination.ends_with ('/'));
 
         if (QDir (this.destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
             ui.label_error_message.set_visible (true);

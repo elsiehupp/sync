@@ -28,7 +28,7 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
         GLib.ByteArray locked_token,
         GLib.Object parent = new GLib.Object ()) {
         
-        base (account, e2ee_base_url () + "meta-data/" + file_identifier, parent)
+        base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent)
         this.file_identifier = file_identifier;
         this.b64_metadata = b64_metadata;
         this.token = token;
@@ -57,7 +57,7 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
         var buffer = new Soup.Buffer (this);
         buffer.set_data (data);
 
-        q_c_info (lc_cse_job ()) << "updating the metadata for the file_identifier" << this.file_identifier << "as encrypted";
+        GLib.Info (lc_cse_job ()) << "updating the metadata for the file_identifier" << this.file_identifier << "as encrypted";
         send_request ("PUT", url, req, buffer);
         AbstractNetworkJob.on_start ();
     }
@@ -66,11 +66,11 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
     protected bool on_finished () override {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (return_code != 200) {
-                q_c_info (lc_cse_job ()) << "error updating the metadata" << path () << error_string () << return_code;
+                GLib.Info (lc_cse_job ()) << "error updating the metadata" << path () << error_string () << return_code;
                 emit error (this.file_identifier, return_code);
             }
 
-            q_c_info (lc_cse_job ()) << "Metadata submited to the server successfully";
+            GLib.Info (lc_cse_job ()) << "Metadata submited to the server successfully";
             emit success (this.file_identifier);
         return true;
     }

@@ -3,7 +3,7 @@ class HttpCredentialsTest : Occ.HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public HttpCredentialsTest (string& user, string& password)
+    public HttpCredentialsTest (string user, string password)
     : HttpCredentials (user, password) {}
 
 

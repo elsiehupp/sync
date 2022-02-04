@@ -4,7 +4,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
+//  #include <QLoggingCategory>
 
 
 namespace Occ {

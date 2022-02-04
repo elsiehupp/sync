@@ -38,9 +38,9 @@ class SqlQuery {
 
     /***********************************************************
     ***********************************************************/
-    private SqlDatabase this.sqldatabase = nullptr;
-    private Sqlite3 this.database = nullptr;
-    private Sqlite3Stmt this.stmt = nullptr;
+    private SqlDatabase this.sqldatabase = null;
+    private Sqlite3 this.database = null;
+    private Sqlite3Stmt this.stmt = null;
     private string this.error;
     private int this.err_id;
     private GLib.ByteArray this.sql;
@@ -56,10 +56,9 @@ class SqlQuery {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public SqlQuery (SqlDatabase database)
         : this.sqldatabase (&database)
-        , this.database (database.sqlite_database ()) {
+        this.database (database.sqlite_database ()) {
     }
 
 
@@ -67,7 +66,7 @@ class SqlQuery {
     ***********************************************************/
     public SqlQuery (GLib.ByteArray sql, SqlDatabase database)
         : this.sqldatabase (&database)
-        , this.database (database.sqlite_database ()) {
+        this.database (database.sqlite_database ()) {
         prepare (sql);
     }
 
@@ -95,7 +94,7 @@ class SqlQuery {
             int n = 0;
             int rc = 0;
             do {
-                rc = sqlite3_prepare_v2 (this.database, this.sql.const_data (), -1, this.stmt, nullptr);
+                rc = sqlite3_prepare_v2 (this.database, this.sql.const_data (), -1, this.stmt, null);
                 if ( (rc == SQLITE_BUSY) || (rc == SQLITE_LOCKED)) {
                     n++;
                     Occ.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
@@ -109,7 +108,7 @@ class SqlQuery {
                 ENFORCE (allow_failure, "SQLITE Prepare error");
             } else {
                 ASSERT (this.stmt);
-                this.sqldatabase._queries.insert (this);
+                this.sqldatabase.queries.insert (this);
             }
         }
         return this.err_id;
@@ -271,6 +270,7 @@ class SqlQuery {
         return result;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public template<class T, typename std.enable_if<std.is_enum<T>.value, int>.type = 0>
@@ -394,9 +394,9 @@ class SqlQuery {
         if (!this.stmt)
             return;
         SQLITE_DO (sqlite3_finalize (this.stmt));
-        this.stmt = nullptr;
+        this.stmt = null;
         if (this.sqldatabase) {
-            this.sqldatabase._queries.remove (this);
+            this.sqldatabase.queries.remove (this);
         }
     }
 }

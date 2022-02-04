@@ -12,10 +12,10 @@ class Selective_sync_widget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public Selective_sync_widget (AccountPointer account, Gtk.Widget parent = nullptr);
+    public Selective_sync_widget (AccountPointer account, Gtk.Widget parent = null);
 
     /// Returns a list of blocklisted paths, each including the trailing /
-    public string[] create_block_list (QTree_widget_item root = nullptr);
+    public string[] create_block_list (QTree_widget_item root = null);
 
 
     /***********************************************************
@@ -25,7 +25,7 @@ class Selective_sync_widget : Gtk.Widget {
     public string[] old_block_list ();
 
     // Estimates the total size of checked items (recursively)
-    public int64 estimated_size (QTree_widget_item root = nullptr);
+    public int64 estimated_size (QTree_widget_item root = null);
 
     // old_block_list is a list of excluded paths, each including a trailing /
     public void set_folder_info (string folder_path, string root_name,
@@ -83,9 +83,9 @@ class Selective_sync_widget : Gtk.Widget {
 
     Selective_sync_widget.Selective_sync_widget (AccountPointer account, Gtk.Widget parent)
         : Gtk.Widget (parent)
-        , this.account (account)
-        , this.inserting (false)
-        , this.folder_tree (new QTree_widget (this)) {
+        this.account (account)
+        this.inserting (false)
+        this.folder_tree (new QTree_widget (this)) {
         this.loading = new QLabel (_("Loading …"), this.folder_tree);
 
         var layout = new QVBoxLayout (this);
@@ -152,6 +152,7 @@ class Selective_sync_widget : Gtk.Widget {
         refresh_folders ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     static QTree_widget_item find_first_child (QTree_widget_item parent, string text) {
@@ -161,7 +162,7 @@ class Selective_sync_widget : Gtk.Widget {
                 return child;
             }
         }
-        return nullptr;
+        return null;
     }
 
     void Selective_sync_widget.recursive_insert (QTree_widget_item parent, string[] path_trail, string path, int64 size) {
@@ -257,7 +258,7 @@ class Selective_sync_widget : Gtk.Widget {
             root.set_icon (0, Theme.instance ().application_icon ());
             root.set_data (0, Qt.User_role, "");
             root.set_check_state (0, Qt.Checked);
-            int64 size = job ? job._folder_infos[path_to_remove].size : -1;
+            int64 size = job ? job.folder_infos[path_to_remove].size : -1;
             if (size >= 0) {
                 root.on_set_text (1, Utility.octets_to_string (size));
                 root.set_data (1, Qt.User_role, size);
@@ -266,7 +267,7 @@ class Selective_sync_widget : Gtk.Widget {
 
         Utility.sort_filenames (list);
         foreach (string path, list) {
-            var size = job ? job._folder_infos[path].size : 0;
+            var size = job ? job.folder_infos[path].size : 0;
             path.remove (path_to_remove);
 
             // Don't allow to select subfolders of encrypted subfolders
@@ -316,7 +317,7 @@ class Selective_sync_widget : Gtk.Widget {
         }
 
         const var webdav_folder = GLib.Uri (this.account.dav_url ()).path ();
-        Q_ASSERT (path.starts_with (webdav_folder));
+        //  Q_ASSERT (path.starts_with (webdav_folder));
         // This dialog use the postfix / convention for folder paths
         this.encrypted_paths << path.mid (webdav_folder.size ()) + '/';
     }

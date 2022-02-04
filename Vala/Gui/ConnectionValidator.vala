@@ -4,18 +4,17 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <QJsonArray>
-// #include <QLoggingCategory>
-using Soup;
-// #include <QNetworkProxyFactory>
-// #include <QXmlStreamReader>
+//  #include <QJsonDocument>
+//  #include <QJsonObject>
+//  #include <QJsonArray>
+//  #include <QLoggingCategory>
+//  #include
+//  #include <QNetworkProxyFacto
+//  #include <QXmlStreamReader>
+//  #include
+//  #include <creds/abstractcredentials.h>
 
-// #include <creds/abstractcredentials.h>
-
-// #include <string[]>
-// #include <QVariantMap>
+//  #include <QVariantMap>
 
 namespace Occ {
 
@@ -155,9 +154,9 @@ protected slots:
 
     ConnectionValidator.ConnectionValidator (AccountStatePtr account_state, GLib.Object parent)
         : GLib.Object (parent)
-        , this.account_state (account_state)
-        , this.account (account_state.account ())
-        , this.is_checking_server_and_auth (false) {
+        this.account_state (account_state)
+        this.account (account_state.account ())
+        this.is_checking_server_and_auth (false) {
     }
 
     void ConnectionValidator.on_check_server_and_auth () {
@@ -190,9 +189,9 @@ protected slots:
         }
 
         if (proxy.type () != QNetworkProxy.NoProxy) {
-            q_c_info (lc_connection_validator) << "Setting QNAM proxy to be system proxy" << ClientProxy.print_q_network_proxy (proxy);
+            GLib.Info (lc_connection_validator) << "Setting QNAM proxy to be system proxy" << ClientProxy.print_q_network_proxy (proxy);
         } else {
-            q_c_info (lc_connection_validator) << "No system proxy set by OS";
+            GLib.Info (lc_connection_validator) << "No system proxy set by OS";
         }
         this.account.network_access_manager ().set_proxy (proxy);
 
@@ -217,14 +216,14 @@ protected slots:
         string server_version = CheckServerJob.version (info);
 
         // status.php was found.
-        q_c_info (lc_connection_validator) << "** Application : own_cloud found : "
+        GLib.Info (lc_connection_validator) << "** Application : own_cloud found : "
                                       << url << " with version "
                                       << CheckServerJob.version_string (info)
                                       << " (" << server_version << ")";
 
         // Update server url in case of redirection
         if (this.account.url () != url) {
-            q_c_info (lc_connection_validator ()) << "status.php was redirected to" << url.to_string ();
+            GLib.Info (lc_connection_validator ()) << "status.php was redirected to" << url.to_string ();
             this.account.set_url (url);
             this.account.wants_account_saved (this.account.data ());
         }
@@ -335,20 +334,20 @@ protected slots:
     }
 
     void ConnectionValidator.on_capabilities_recieved (QJsonDocument json) {
-        var caps = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
-        q_c_info (lc_connection_validator) << "Server capabilities" << caps;
-        this.account.set_capabilities (caps.to_variant_map ());
+        var capabilities = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
+        GLib.Info (lc_connection_validator) << "Server capabilities" << capabilities;
+        this.account.set_capabilities (capabilities.to_variant_map ());
 
         // New servers also report the version in the capabilities
-        string server_version = caps["core"].to_object ()["status"].to_object ()["version"].to_string ();
+        string server_version = capabilities["core"].to_object ()["status"].to_object ()["version"].to_string ();
         if (!server_version.is_empty () && !set_and_check_server_version (server_version)) {
             return;
         }
 
         // Check for the direct_editing capability
-        GLib.Uri direct_editing_uRL = GLib.Uri (caps["files"].to_object ()["direct_editing"].to_object ()["url"].to_string ());
-        string direct_editing_e_tag = caps["files"].to_object ()["direct_editing"].to_object ()["etag"].to_string ();
-        this.account.fetch_direct_editors (direct_editing_uRL, direct_editing_e_tag);
+        GLib.Uri direct_editing_url = GLib.Uri (capabilities["files"].to_object ()["direct_editing"].to_object ()["url"].to_string ());
+        string direct_editing_e_tag = capabilities["files"].to_object ()["direct_editing"].to_object ()["etag"].to_string ();
+        this.account.fetch_direct_editors (direct_editing_url, direct_editing_e_tag);
 
         fetch_user ();
     }
@@ -360,7 +359,7 @@ protected slots:
     }
 
     bool ConnectionValidator.set_and_check_server_version (string version) {
-        q_c_info (lc_connection_validator) << this.account.url () << "has server version" << version;
+        GLib.Info (lc_connection_validator) << this.account.url () << "has server version" << version;
         this.account.set_server_version (version);
 
         // We cannot deal with servers < 7.0.0

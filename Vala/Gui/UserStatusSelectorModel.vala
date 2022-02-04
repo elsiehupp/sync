@@ -4,44 +4,44 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <ocsuserstatusconnector.h>
-// #include <qnamespace.h>
-// #include <userstatusconnector.h>
-// #include <theme.h>
+//  #include <ocsuserstatusconnector.h>
+//  #include <qnamespace.h>
+//  #include <userstatusconnector.h>
+//  #include <theme.h>
+//  #include
+//  #include <QLoggingCa
+//  #include
+//  #include <algorithm>
+//  #include <cmath>
+//  #include <cstddef>
 
-// #include <QLoggingCategory>
+//  #pragma once
 
-// #include <algorithm>
-// #include <cmath>
-// #include <cstddef>
-
-// #pragma once
-
-// #include <userstatusconnector.h>
-// #include <datetimeprovider.h>
-
-// #include <QMetaType>
-// #include <Qt_numeric>
-
-// #include <cstddef>
-// #include <memory>
-// #include <vector>
+//  #include <userstatusconnector.h>
+//  #include <datetimeprovider.h>
+//  #include
+//  #include <QMetaType>
+//  #include <Qt_numer
+//  #include
+//  #include <cstddef>
+//  #include <memory>
+//  #include <vector>
 
 namespace Occ {
 
 class User_status_selector_model : GLib.Object {
 
-    Q_PROPERTY (string user_status_message READ user_status_message NOTIFY user_status_changed)
-    Q_PROPERTY (string user_status_emoji READ user_status_emoji WRITE set_user_status_emoji NOTIFY user_status_changed)
-    Q_PROPERTY (Occ.UserStatus.OnlineStatus online_status READ online_status WRITE set_online_status NOTIFY online_status_changed)
-    Q_PROPERTY (int predefined_statuses_count READ predefined_statuses_count NOTIFY predefined_statuses_changed)
-    Q_PROPERTY (string[] clear_at_values READ clear_at_values CONSTANT)
-    Q_PROPERTY (string clear_at READ clear_at NOTIFY clear_at_changed)
-    Q_PROPERTY (string error_message READ error_message NOTIFY error_message_changed)
-    Q_PROPERTY (GLib.Uri online_icon READ online_icon CONSTANT)
-    Q_PROPERTY (GLib.Uri away_icon READ away_icon CONSTANT)
-    Q_PROPERTY (GLib.Uri dnd_icon READ dnd_icon CONSTANT)
-    Q_PROPERTY (GLib.Uri invisible_icon READ invisible_icon CONSTANT)
+    //  Q_PROPERTY (string user_status_message READ user_status_message NOTIFY user_status_changed)
+    //  Q_PROPERTY (string user_status_emoji READ user_status_emoji WRITE set_user_status_emoji NOTIFY user_status_changed)
+    //  Q_PROPERTY (Occ.UserStatus.OnlineStatus online_status READ online_status WRITE set_online_status NOTIFY online_status_changed)
+    //  Q_PROPERTY (int predefined_statuses_count READ predefined_statuses_count NOTIFY predefined_statuses_changed)
+    //  Q_PROPERTY (string[] clear_at_values READ clear_at_values CONSTANT)
+    //  Q_PROPERTY (string clear_at READ clear_at NOTIFY clear_at_changed)
+    //  Q_PROPERTY (string error_message READ error_message NOTIFY error_message_changed)
+    //  Q_PROPERTY (GLib.Uri online_icon READ online_icon CONSTANT)
+    //  Q_PROPERTY (GLib.Uri away_icon READ away_icon CONSTANT)
+    //  Q_PROPERTY (GLib.Uri dnd_icon READ dnd_icon CONSTANT)
+    //  Q_PROPERTY (GLib.Uri invisible_icon READ invisible_icon CONSTANT)
 
     /***********************************************************
     ***********************************************************/
@@ -53,7 +53,6 @@ class User_status_selector_model : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public User_status_selector_model (std.shared_ptr<UserStatusConnector> user_status_connector,
         std.unique_ptr<DateTimeProvider> date_time_provider,
         GLib.Object parent = new GLib.Object ());
@@ -150,7 +149,6 @@ class User_status_selector_model : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public Q_INVOKABLE string predefined_status_clear_at (int index);
 
 
@@ -191,7 +189,7 @@ signals:
     private void on_init ();
     private void on_reset ();
     private void on_user_status_fetched (UserStatus user_status);
-    private void on_predefined_statuses_fetched (std.vector<UserStatus> statuses);
+    private void on_predefined_statuses_fetched (GLib.Vector<UserStatus> statuses);
     private void on_user_status_set ();
     private void on_message_cleared ();
     private void on_error (UserStatusConnector.Error error);
@@ -210,7 +208,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private std.shared_ptr<UserStatusConnector> this.user_status_connector {};
-    private std.vector<UserStatus> this.predefined_statuses;
+    private GLib.Vector<UserStatus> this.predefined_statuses;
     private UserStatus this.user_status;
     private std.unique_ptr<DateTimeProvider> this.date_time_provider;
 
@@ -220,7 +218,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private std.vector<Clear_stage_type> this.clear_stages = {
+    private GLib.Vector<Clear_stage_type> this.clear_stages = {
         Clear_stage_type.Dont_clear,
         Clear_stage_type.Half_hour,
         Clear_stage_type.One_hour,
@@ -232,15 +230,15 @@ signals:
 
     User_status_selector_model.User_status_selector_model (GLib.Object parent)
         : GLib.Object (parent)
-        , this.date_time_provider (new DateTimeProvider) {
+        this.date_time_provider (new DateTimeProvider) {
         this.user_status.set_icon ("😀");
     }
 
     User_status_selector_model.User_status_selector_model (std.shared_ptr<UserStatusConnector> user_status_connector, GLib.Object parent)
         : GLib.Object (parent)
-        , this.user_status_connector (user_status_connector)
-        , this.user_status ("no-id", "", "😀", UserStatus.OnlineStatus.Online, false, {})
-        , this.date_time_provider (new DateTimeProvider) {
+        this.user_status_connector (user_status_connector)
+        this.user_status ("no-identifier", "", "😀", UserStatus.OnlineStatus.Online, false, {})
+        this.date_time_provider (new DateTimeProvider) {
         this.user_status.set_icon ("😀");
         on_init ();
     }
@@ -249,8 +247,8 @@ signals:
         std.unique_ptr<DateTimeProvider> date_time_provider,
         GLib.Object parent)
         : GLib.Object (parent)
-        , this.user_status_connector (user_status_connector)
-        , this.date_time_provider (std.move (date_time_provider)) {
+        this.user_status_connector (user_status_connector)
+        this.date_time_provider (std.move (date_time_provider)) {
         this.user_status.set_icon ("😀");
         on_init ();
     }
@@ -258,21 +256,21 @@ signals:
     User_status_selector_model.User_status_selector_model (UserStatus user_status,
         std.unique_ptr<DateTimeProvider> date_time_provider, GLib.Object parent)
         : GLib.Object (parent)
-        , this.user_status (user_status)
-        , this.date_time_provider (std.move (date_time_provider)) {
+        this.user_status (user_status)
+        this.date_time_provider (std.move (date_time_provider)) {
         this.user_status.set_icon ("😀");
     }
 
     User_status_selector_model.User_status_selector_model (UserStatus user_status,
         GLib.Object parent)
         : GLib.Object (parent)
-        , this.user_status (user_status) {
+        this.user_status (user_status) {
         this.user_status.set_icon ("😀");
     }
 
-    void User_status_selector_model.on_load (int id) {
+    void User_status_selector_model.on_load (int identifier) {
         on_reset ();
-        this.user_status_connector = User_model.instance ().user_status_connector (id);
+        this.user_status_connector = User_model.instance ().user_status_connector (identifier);
         on_init ();
     }
 
@@ -289,7 +287,7 @@ signals:
             disconnect (this.user_status_connector.get (), &UserStatusConnector.message_cleared, this,
                 &User_status_selector_model.on_message_cleared);
         }
-        this.user_status_connector = nullptr;
+        this.user_status_connector = null;
     }
 
     void User_status_selector_model.on_init () {
@@ -414,7 +412,7 @@ signals:
         }
         this.user_status.set_message (user_status.message ());
         this.user_status.set_message_predefined (user_status.message_predefined ());
-        this.user_status.set_id (user_status.id ());
+        this.user_status.set_id (user_status.identifier ());
         this.user_status.set_clear_at (user_status.clear_at ());
 
         if (!user_status.icon ().is_empty ()) {
@@ -433,36 +431,36 @@ signals:
 
         case Clear_stage_type.Half_hour: {
             ClearAt clear_at;
-            clear_at._type = ClearAtType.Period;
-            clear_at._period = 60 * 30;
+            clear_at.type = ClearAtType.Period;
+            clear_at.period = 60 * 30;
             return clear_at;
         }
 
         case Clear_stage_type.One_hour: {
             ClearAt clear_at;
-            clear_at._type = ClearAtType.Period;
-            clear_at._period = 60 * 60;
+            clear_at.type = ClearAtType.Period;
+            clear_at.period = 60 * 60;
             return clear_at;
         }
 
         case Clear_stage_type.Four_hour: {
             ClearAt clear_at;
-            clear_at._type = ClearAtType.Period;
-            clear_at._period = 60 * 60 * 4;
+            clear_at.type = ClearAtType.Period;
+            clear_at.period = 60 * 60 * 4;
             return clear_at;
         }
 
         case Clear_stage_type.Today: {
             ClearAt clear_at;
-            clear_at._type = ClearAtType.EndOf;
-            clear_at._endof = "day";
+            clear_at.type = ClearAtType.EndOf;
+            clear_at.endof = "day";
             return clear_at;
         }
 
         case Clear_stage_type.Week: {
             ClearAt clear_at;
-            clear_at._type = ClearAtType.EndOf;
-            clear_at._endof = "week";
+            clear_at.type = ClearAtType.EndOf;
+            clear_at.endof = "week";
             return clear_at;
         }
 
@@ -472,7 +470,7 @@ signals:
     }
 
     void User_status_selector_model.set_user_status () {
-        Q_ASSERT (this.user_status_connector);
+        //  Q_ASSERT (this.user_status_connector);
         if (!this.user_status_connector) {
             return;
         }
@@ -482,7 +480,7 @@ signals:
     }
 
     void User_status_selector_model.clear_user_status () {
-        Q_ASSERT (this.user_status_connector);
+        //  Q_ASSERT (this.user_status_connector);
         if (!this.user_status_connector) {
             return;
         }
@@ -491,13 +489,13 @@ signals:
         this.user_status_connector.clear_message ();
     }
 
-    void User_status_selector_model.on_predefined_statuses_fetched (std.vector<UserStatus> statuses) {
+    void User_status_selector_model.on_predefined_statuses_fetched (GLib.Vector<UserStatus> statuses) {
         this.predefined_statuses = statuses;
         /* emit */ predefined_statuses_changed ();
     }
 
     UserStatus User_status_selector_model.predefined_status (int index) {
-        Q_ASSERT (0 <= index && index < static_cast<int> (this.predefined_statuses.size ()));
+        //  Q_ASSERT (0 <= index && index < static_cast<int> (this.predefined_statuses.size ()));
         return this.predefined_statuses[index];
     }
 
@@ -506,11 +504,11 @@ signals:
     }
 
     void User_status_selector_model.set_predefined_status (int index) {
-        Q_ASSERT (0 <= index && index < static_cast<int> (this.predefined_statuses.size ()));
+        //  Q_ASSERT (0 <= index && index < static_cast<int> (this.predefined_statuses.size ()));
 
         this.user_status.set_message_predefined (true);
         const var predefined_status = this.predefined_statuses[index];
-        this.user_status.set_id (predefined_status.id ());
+        this.user_status.set_id (predefined_status.identifier ());
         this.user_status.set_message (predefined_status.message ());
         this.user_status.set_icon (predefined_status.icon ());
         this.user_status.set_clear_at (predefined_status.clear_at ());
@@ -556,7 +554,7 @@ signals:
     }
 
     void User_status_selector_model.set_clear_at (int index) {
-        Q_ASSERT (0 <= index && index < static_cast<int> (this.clear_stages.size ()));
+        //  Q_ASSERT (0 <= index && index < static_cast<int> (this.clear_stages.size ()));
         this.user_status.set_clear_at (clear_stage_type_to_date_time (this.clear_stages[index]));
         /* emit */ clear_at_changed ();
     }
@@ -594,20 +592,20 @@ signals:
 
     string User_status_selector_model.clear_at_readable (Optional<ClearAt> clear_at) {
         if (clear_at) {
-            switch (clear_at._type) {
+            switch (clear_at.type) {
             case ClearAtType.Period: {
-                return time_difference_to_string (clear_at._period);
+                return time_difference_to_string (clear_at.period);
             }
 
             case ClearAtType.Timestamp: {
-                const int difference = static_cast<int> (clear_at._timestamp - this.date_time_provider.current_date_time ().to_time_t ());
+                const int difference = static_cast<int> (clear_at.timestamp - this.date_time_provider.current_date_time ().to_time_t ());
                 return time_difference_to_string (difference);
             }
 
             case ClearAtType.EndOf: {
-                if (clear_at._endof == "day") {
+                if (clear_at.endof == "day") {
                     return _("Today");
-                } else if (clear_at._endof == "week") {
+                } else if (clear_at.endof == "week") {
                     return _("This week");
                 }
                 Q_UNREACHABLE ();

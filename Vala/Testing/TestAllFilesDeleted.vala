@@ -4,9 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
-// #include <configfile.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
+//  #include <configfile.h>
 
 using namespace Occ;
 
@@ -226,7 +226,7 @@ class TestAllFilesDeleted : GLib.Object {
                     }
                 }
             }
-            return nullptr;
+            return null;
         });
 
         QVERIFY (fakeFolder.syncOnce ());

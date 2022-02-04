@@ -78,7 +78,7 @@ class FakeFolder {
     public bool execUntilFinished () {
         QSignalSpy spy (this.syncEngine.get (), SIGNAL (on_finished (bool)));
         bool ok = spy.wait (3600000);
-        Q_ASSERT (ok && "Sync timed out");
+        //  Q_ASSERT (ok && "Sync timed out");
         return spy[0][0].toBool ();
     }
 

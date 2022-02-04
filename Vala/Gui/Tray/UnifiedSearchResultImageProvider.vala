@@ -4,14 +4,14 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QImage>
-// #include <QPainter>
-// #include <QSvgRenderer>
+//  #include <QImage>
+//  #include <QPainter>
+//  #include <QSvgRenderer>
 
-// #pragma once
+//  #pragma once
 
-// #include <QtCore>
-// #include <QQuick_image_provider>
+//  #include <QtCore>
+//  #include <QQuick_image_provider>
 
 namespace Occ {
 
@@ -25,7 +25,7 @@ class Unified_search_result_image_provider : QQuick_async_image_provider {
 
     /***********************************************************
     ***********************************************************/
-    public QQuick_image_response request_image_response (string id, QSize requested_size) override;
+    public QQuick_image_response request_image_response (string identifier, QSize requested_size) override;
 }
 }
 
@@ -39,13 +39,13 @@ class Unified_search_result_image_provider : QQuick_async_image_provider {
 namespace {
     class Async_image_response : QQuick_image_response {
 
-        public Async_image_response (string id, QSize requested_size) {
-            if (id.is_empty ()) {
+        public Async_image_response (string identifier, QSize requested_size) {
+            if (identifier.is_empty ()) {
                 set_image_and_emit_finished ();
                 return;
             }
 
-            this.image_paths = id.split (';', Qt.Skip_empty_parts);
+            this.image_paths = identifier.split (';', Qt.Skip_empty_parts);
             this.requested_image_size = requested_size;
 
             if (this.image_paths.is_empty ()) {
@@ -134,8 +134,8 @@ namespace {
     };
 
 
-    QQuick_image_response *Unified_search_result_image_provider.request_image_response (string id, QSize requested_size) {
-        return new Async_image_response (id, requested_size);
+    QQuick_image_response *Unified_search_result_image_provider.request_image_response (string identifier, QSize requested_size) {
+        return new Async_image_response (identifier, requested_size);
     }
 
 }

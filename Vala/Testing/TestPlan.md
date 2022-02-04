@@ -65,8 +65,8 @@ Test Plan
   - Start to configure oC. Checkmark the "Do not store password.." checkbox.
    = The password entry field is grayed.
    = A dialog pops up and asks for password with displaying dots instead of chars.
-   = The oC config file contains an empty passwd entry
-   = The oC config file contains the entry "nostoredpasswd=true"
+   = The oC config file contains an empty password entry
+   = The oC config file contains the entry "nostoredpassword=true"
   - restart oC
    = oC comes up with a password dialog
    - provide good password:
@@ -76,8 +76,8 @@ Test Plan
 
 4.2 Do store password
   - Start to configure oC. Checkmark the "Do not store password.." checkbox.
-   = The password entry field is enabled and takes a passwd
-   = No dialog pops up to ask for the passwd
-   = in oC config file the password appears and the nostoredpasswd param is false.
+   = The password entry field is enabled and takes a password
+   = No dialog pops up to ask for the password
+   = in oC config file the password appears and the nostoredpassword param is false.
   - Restart oC.
    = Sync starts, no ask for password.

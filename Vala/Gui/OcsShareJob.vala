@@ -4,11 +4,11 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QBuffer>
-// #include <QJsonDocument>
-
-// #include <GLib.List>
-// #include <QPair>
+//  #include <QBuffer>
+//  #include <QJsonDocument>
+//  #include
+//  #include <GLib.List>
+//  #include <QPair>
 
 
 namespace Occ {
@@ -112,7 +112,7 @@ class Ocs_share_job : Ocs_job {
 
     @param path The path of the file/folder to share
     @param share_type The type of share (user/group/link/fed
-    @param share_with The uid/gid/federated id to share wit
+    @param share_with The uid/gid/federated identifier to share wit
     @param permissions The permissions the share will have
     @param password The password to protect the share with
     ***********************************************************/

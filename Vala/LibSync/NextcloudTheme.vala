@@ -4,11 +4,11 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-#ifndef TOKEN_AUTH_ONLY
-// #include <QPixmap>
-// #include <QIcon>
-#endif
-// #include <QCoreApplication>
+//  #ifndef TOKEN_AUTH_ONLY
+//  #include <QPixmap>
+//  #include <QIcon>
+//  #include
+//  #include <QCoreApplication>
 
 namespace Occ {
 
@@ -20,19 +20,14 @@ class NextcloudTheme : Theme {
 
     /***********************************************************
     ***********************************************************/
-    public NextcloudTheme ();
+    public const string WIZARD_URL_HINT = "https://try.nextcloud.com";
 
     /***********************************************************
     ***********************************************************/
-    public string wizard_url_hint () override;
-}
+    public NextcloudTheme () {
+        base ();
+    }
 
-NextcloudTheme.NextcloudTheme ()
-    : Theme () {
-}
+} // class NextcloudTheme
 
-string NextcloudTheme.wizard_url_hint () {
-    return string ("https://try.nextcloud.com");
-}
-
-}
+} // namespace Occ

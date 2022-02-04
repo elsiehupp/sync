@@ -4,8 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
 
 using namespace Occ;
 
@@ -48,14 +48,14 @@ class TestBlocklist : GLib.Object {
                 ++counter;
             if (remote && op == QNetworkAccessManager.GetOperation)
                 ++counter;
-            return nullptr;
+            return null;
         });
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
         };
 
-        var initialEtag = journalRecord (fakeFolder, "A")._etag;
+        var initialEtag = journalRecord (fakeFolder, "A").etag;
         QVERIFY (!initialEtag.isEmpty ());
 
         // The first sync and the download will fail - the item will be blocklisted
@@ -64,19 +64,19 @@ class TestBlocklist : GLib.Object {
         QVERIFY (!fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.Status.NORMAL_ERROR); // initial error visible
-            QCOMPARE (it._instruction, CSYNC_INSTRUCTION_NEW);
+            QCOMPARE (it.status, SyncFileItem.Status.NORMAL_ERROR); // initial error visible
+            QCOMPARE (it.instruction, CSYNC_INSTRUCTION_NEW);
 
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
             QVERIFY (entry.isValid ());
-            QCOMPARE (entry._errorCategory, SyncJournalErrorBlocklistRecord.Normal);
-            QCOMPARE (entry._retryCount, 1);
+            QCOMPARE (entry.errorCategory, SyncJournalErrorBlocklistRecord.Normal);
+            QCOMPARE (entry.retryCount, 1);
             QCOMPARE (counter, 1);
-            QVERIFY (entry._ignoreDuration > 0);
-            QCOMPARE (entry._requestId, reqId);
+            QVERIFY (entry.ignoreDuration > 0);
+            QCOMPARE (entry.requestId, reqId);
 
             if (remote)
-                QCOMPARE (journalRecord (fakeFolder, "A")._etag, initialEtag);
+                QCOMPARE (journalRecord (fakeFolder, "A").etag, initialEtag);
         }
         on_cleanup ();
 
@@ -84,44 +84,44 @@ class TestBlocklist : GLib.Object {
         QVERIFY (!fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.Status.BLOCKLISTED_ERROR);
-            QCOMPARE (it._instruction, CSYNC_INSTRUCTION_IGNORE); // no retry happened!
+            QCOMPARE (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR);
+            QCOMPARE (it.instruction, CSYNC_INSTRUCTION_IGNORE); // no retry happened!
 
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
             QVERIFY (entry.isValid ());
-            QCOMPARE (entry._errorCategory, SyncJournalErrorBlocklistRecord.Normal);
-            QCOMPARE (entry._retryCount, 1);
+            QCOMPARE (entry.errorCategory, SyncJournalErrorBlocklistRecord.Normal);
+            QCOMPARE (entry.retryCount, 1);
             QCOMPARE (counter, 1);
-            QVERIFY (entry._ignoreDuration > 0);
-            QCOMPARE (entry._requestId, reqId);
+            QVERIFY (entry.ignoreDuration > 0);
+            QCOMPARE (entry.requestId, reqId);
 
             if (remote)
-                QCOMPARE (journalRecord (fakeFolder, "A")._etag, initialEtag);
+                QCOMPARE (journalRecord (fakeFolder, "A").etag, initialEtag);
         }
         on_cleanup ();
 
         // Let's expire the blocklist entry to verify it gets retried {
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
-            entry._ignoreDuration = 1;
-            entry._lastTryTime -= 1;
+            entry.ignoreDuration = 1;
+            entry.lastTryTime -= 1;
             fakeFolder.syncJournal ().setErrorBlocklistEntry (entry);
         }
         QVERIFY (!fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.Status.BLOCKLISTED_ERROR); // blocklisted as it's just a retry
-            QCOMPARE (it._instruction, CSYNC_INSTRUCTION_NEW); // retry!
+            QCOMPARE (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR); // blocklisted as it's just a retry
+            QCOMPARE (it.instruction, CSYNC_INSTRUCTION_NEW); // retry!
 
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
             QVERIFY (entry.isValid ());
-            QCOMPARE (entry._errorCategory, SyncJournalErrorBlocklistRecord.Normal);
-            QCOMPARE (entry._retryCount, 2);
+            QCOMPARE (entry.errorCategory, SyncJournalErrorBlocklistRecord.Normal);
+            QCOMPARE (entry.retryCount, 2);
             QCOMPARE (counter, 2);
-            QVERIFY (entry._ignoreDuration > 0);
-            QCOMPARE (entry._requestId, reqId);
+            QVERIFY (entry.ignoreDuration > 0);
+            QCOMPARE (entry.requestId, reqId);
 
             if (remote)
-                QCOMPARE (journalRecord (fakeFolder, "A")._etag, initialEtag);
+                QCOMPARE (journalRecord (fakeFolder, "A").etag, initialEtag);
         }
         on_cleanup ();
 
@@ -130,41 +130,41 @@ class TestBlocklist : GLib.Object {
         QVERIFY (!fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.Status.BLOCKLISTED_ERROR);
-            QCOMPARE (it._instruction, CSYNC_INSTRUCTION_NEW); // retry!
+            QCOMPARE (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR);
+            QCOMPARE (it.instruction, CSYNC_INSTRUCTION_NEW); // retry!
 
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
             QVERIFY (entry.isValid ());
-            QCOMPARE (entry._errorCategory, SyncJournalErrorBlocklistRecord.Normal);
-            QCOMPARE (entry._retryCount, 3);
+            QCOMPARE (entry.errorCategory, SyncJournalErrorBlocklistRecord.Normal);
+            QCOMPARE (entry.retryCount, 3);
             QCOMPARE (counter, 3);
-            QVERIFY (entry._ignoreDuration > 0);
-            QCOMPARE (entry._requestId, reqId);
+            QVERIFY (entry.ignoreDuration > 0);
+            QCOMPARE (entry.requestId, reqId);
 
             if (remote)
-                QCOMPARE (journalRecord (fakeFolder, "A")._etag, initialEtag);
+                QCOMPARE (journalRecord (fakeFolder, "A").etag, initialEtag);
         }
         on_cleanup ();
 
         // When the error goes away and the item is retried, the sync succeeds
         fakeFolder.serverErrorPaths ().clear (); {
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
-            entry._ignoreDuration = 1;
-            entry._lastTryTime -= 1;
+            entry.ignoreDuration = 1;
+            entry.lastTryTime -= 1;
             fakeFolder.syncJournal ().setErrorBlocklistEntry (entry);
         }
         QVERIFY (fakeFolder.syncOnce ()); {
             var it = completeSpy.findItem (testFileName);
             QVERIFY (it);
-            QCOMPARE (it._status, SyncFileItem.Status.SUCCESS);
-            QCOMPARE (it._instruction, CSYNC_INSTRUCTION_NEW);
+            QCOMPARE (it.status, SyncFileItem.Status.SUCCESS);
+            QCOMPARE (it.instruction, CSYNC_INSTRUCTION_NEW);
 
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
             QVERIFY (!entry.isValid ());
             QCOMPARE (counter, 4);
 
             if (remote)
-                QCOMPARE (journalRecord (fakeFolder, "A")._etag, fakeFolder.currentRemoteState ().find ("A").etag);
+                QCOMPARE (journalRecord (fakeFolder, "A").etag, fakeFolder.currentRemoteState ().find ("A").etag);
         }
         on_cleanup ();
 

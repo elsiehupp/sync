@@ -4,12 +4,12 @@ Copyright (C) 2016 by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QStyle>
-// #include <QStyle_option_frame>
-
-// #include <QLineEdit>
-// #include <QPaint_event>
-// #include <QPainter>
+//  #include <QStyle>
+//  #include <QStyle_option_frame>
+//  #include
+//  #include <QLineEdit>
+//  #include <QPaint_event>
+//  #include <QPainter>
 
 namespace Occ {
 

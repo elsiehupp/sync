@@ -17,7 +17,7 @@ class AvatarJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Uri this.avatar_url;
+    private GLib.Uri avatar_url;
 
 
     /***********************************************************
@@ -38,6 +38,7 @@ class AvatarJob : AbstractNetworkJob {
             this.avatar_url = Utility.concat_url_path (account.url (), string ("index.php/avatar/%1/%2").arg (user_id, string.number (size)));
         }
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -94,5 +95,8 @@ class AvatarJob : AbstractNetworkJob {
         /* emit */ (avatar_pixmap (av_image));
         return true;
     }
-}
+
+} // class AvatarJob
 #endif
+
+} // namespace Occ

@@ -4,13 +4,13 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <QJsonArray>
+//  #include <QJsonDocument>
+//  #include <QJsonObject>
+//  #include <QJsonArray>
 
 
-// #include <QDate>
-// #include <GLib.List>
+//  #include <QDate>
+//  #include <GLib.List>
 
 
 
@@ -136,7 +136,7 @@ static void update_folder (AccountPointer account, string path) {
 
 Share_manager.Share_manager (AccountPointer account, GLib.Object parent)
     : GLib.Object (parent)
-    , this.account (account) {
+    this.account (account) {
 }
 
 void Share_manager.create_link_share (string path,
@@ -268,7 +268,7 @@ unowned<User_group_share> Share_manager.parse_user_group_share (QJsonObject data
     }
 
     return unowned<User_group_share> (new User_group_share (this.account,
-        data.value ("id").to_variant ().to_string (), // "id" used to be an integer, support both
+        data.value ("identifier").to_variant ().to_string (), // "identifier" used to be an integer, support both
         data.value ("uid_owner").to_variant ().to_string (),
         data.value ("displayname_owner").to_variant ().to_string (),
         data.value ("path").to_string (),
@@ -307,7 +307,7 @@ unowned<Link_share> Share_manager.parse_link_share (QJsonObject data) {
     }
 
     return unowned<Link_share> (new Link_share (this.account,
-        data.value ("id").to_variant ().to_string (), // "id" used to be an integer, support both
+        data.value ("identifier").to_variant ().to_string (), // "identifier" used to be an integer, support both
         data.value ("uid_owner").to_string (),
         data.value ("displayname_owner").to_string (),
         data.value ("path").to_string (),
@@ -327,7 +327,7 @@ unowned<Share> Share_manager.parse_share (QJsonObject data) {
         (Sharee.Type)data.value ("share_type").to_int ()));
 
     return unowned<Share> (new Share (this.account,
-        data.value ("id").to_variant ().to_string (), // "id" used to be an integer, support both
+        data.value ("identifier").to_variant ().to_string (), // "identifier" used to be an integer, support both
         data.value ("uid_owner").to_variant ().to_string (),
         data.value ("displayname_owner").to_variant ().to_string (),
         data.value ("path").to_string (),

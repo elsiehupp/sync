@@ -4,10 +4,10 @@ Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QDir>
-// #include <QCoreApplication>
-
-// #include <QTimer>
+//  #include <QDir>
+//  #include <QCoreApplication>
+//  #include
+//  #include <QTimer>
 
 namespace Occ {
 
@@ -47,8 +47,8 @@ class NavigationPaneHelper : GLib.Object {
 
     NavigationPaneHelper.NavigationPaneHelper (FolderMan folder_man)
         : this.folder_man (folder_man) {
-        ConfigFile cfg;
-        this.show_in_explorer_navigation_pane = cfg.show_in_explorer_navigation_pane ();
+        ConfigFile config;
+        this.show_in_explorer_navigation_pane = config.show_in_explorer_navigation_pane ();
 
         this.update_cloud_storage_registry_timer.set_single_shot (true);
         connect (&this.update_cloud_storage_registry_timer, &QTimer.timeout, this, &NavigationPaneHelper.update_cloud_storage_registry);
@@ -102,10 +102,10 @@ class NavigationPaneHelper : GLib.Object {
                     // Write the account name in the sidebar only when using more than one account.
                     if (AccountManager.instance ().accounts ().size () > 1)
                         title = title % " - " % folder.account_state ().account ().display_name ();
-                    string icon_path = QDir.to_native_separators (q_app.application_file_path ());
+                    string icon_path = QDir.to_native_separators (Gtk.Application.application_file_path ());
                     string target_folder_path = QDir.to_native_separators (folder.clean_path ());
 
-                    q_c_info (lc_nav_pane) << "Explorer Cloud storage provider : saving path" << target_folder_path << "to CLSID" << clsid_str;
+                    GLib.Info (lc_nav_pane) << "Explorer Cloud storage provider : saving path" << target_folder_path << "to CLSID" << clsid_str;
 
                     // This code path should only occur on Windows (the config will be false, and the checkbox invisible on other platforms).
                     // Add runtime checks rather than #ifdefing out the whole code to help catch breakages when developing on other platforms.
@@ -123,7 +123,7 @@ class NavigationPaneHelper : GLib.Object {
             string clsid_path_wow64 = "" % R" (Software\Classes\Wow6432Node\CLSID\)" % clsid_str;
             string namespace_path = "" % R" (Software\Microsoft\Windows\Current_version\Explorer\Desktop\Name_space\)" % clsid_str;
 
-            q_c_info (lc_nav_pane) << "Explorer Cloud storage provider : now unused, removing own CLSID" << clsid_str;
+            GLib.Info (lc_nav_pane) << "Explorer Cloud storage provider : now unused, removing own CLSID" << clsid_str;
         }
     }
 

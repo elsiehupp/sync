@@ -4,14 +4,14 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFileInfo>
-// #include <QJsonArray>
-// #include <QRegularExpression>
+//  #include <QFileInfo>
+//  #include <QJsonArray>
+//  #include <QRegularExpression>
 
 using namespace Occ;
 
-// #pragma once
-// #include <QTemporary_file>
+//  #pragma once
+//  #include <QTemporary_file>
 
 namespace Occ {
 
@@ -24,7 +24,6 @@ class Socket_upload_job : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void on_start ();
 
 
@@ -78,7 +77,7 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> job)
     this.engine.set_parent (this.database);
 
     connect (this.engine, &Occ.SyncEngine.item_completed, this, [this] (Occ.SyncFileItemPtr item) {
-        this.synced_files.append (item._file);
+        this.synced_files.append (item.file);
     });
 
     connect (this.engine, &Occ.SyncEngine.on_finished, this, [this] (bool ok) {

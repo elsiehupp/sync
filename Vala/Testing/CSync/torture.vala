@@ -22,11 +22,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 extern "C" {
 #endif
 
-// #include <stdarg.h> // NOLINT sometimes compiled in C mode
-// #include <stddef.h> // NOLINT sometimes compiled in C mode
-// #include <setjmp.h> // NOLINT sometimes compiled in C mode
-
-// #include <cmocka.h>
+//  #include <stdarg.h> // NOLINT sometimes compiled in C mode
+//  #include <stddef.h> // NOLINT sometimes compiled in C mode
+//  #include <setjmp.h> // NOLINT sometimes compiled in C mode
+//  #include
+//  #include <cmocka.h>
 
 /***********************************************************
 Used by main to communicate with parse_opt. */

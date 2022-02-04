@@ -4,7 +4,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #pragma once
+//  #pragma once
 
 namespace Occ {
 
@@ -23,25 +23,25 @@ class Result {
     ***********************************************************/
     public Result (T value)
         : this.result (std.move (value))
-        , this.is_error (false) {
+        this.is_error (false) {
     }
 
 
     // TODO : This doesn't work if T and Error are too similar
     public Result (Error error)
         : this.error (std.move (error))
-        , this.is_error (true) {
+        this.is_error (true) {
     }
 
 
     /***********************************************************
     ***********************************************************/
     public Result (Result &&other)
-        : this.is_error (other._is_error) {
+        : this.is_error (other.is_error) {
         if (this.is_error) {
-            new (&this.error) Error (std.move (other._error));
+            new (&this.error) Error (std.move (other.error));
         } else {
-            new (&this.result) T (std.move (other._result));
+            new (&this.result) T (std.move (other.result));
         }
     }
 
@@ -49,11 +49,11 @@ class Result {
     /***********************************************************
     ***********************************************************/
     public Result (Result other)
-        : this.is_error (other._is_error) {
+        : this.is_error (other.is_error) {
         if (this.is_error) {
-            new (&this.error) Error (other._error);
+            new (&this.error) Error (other.error);
         } else {
-            new (&this.result) T (other._result);
+            new (&this.result) T (other.result);
         }
     }
 
@@ -62,11 +62,11 @@ class Result {
     ***********************************************************/
     public Result operator= (Result &&other) {
         if (&other != this) {
-            this.is_error = other._is_error;
+            this.is_error = other.is_error;
             if (this.is_error) {
-                new (&this.error) Error (std.move (other._error));
+                new (&this.error) Error (std.move (other.error));
             } else {
-                new (&this.result) T (std.move (other._result));
+                new (&this.result) T (std.move (other.result));
             }
         }
         return this;
@@ -77,11 +77,11 @@ class Result {
     ***********************************************************/
     public Result operator= (Result other) {
         if (&other != this) {
-            this.is_error = other._is_error;
+            this.is_error = other.is_error;
             if (this.is_error) {
-                new (&this.error) Error (other._error);
+                new (&this.error) Error (other.error);
             } else {
-                new (&this.result) T (other._result);
+                new (&this.result) T (other.result);
             }
         }
         return this;

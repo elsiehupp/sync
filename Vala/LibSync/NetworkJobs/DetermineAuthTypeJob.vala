@@ -5,6 +5,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+
 /***********************************************************
 @brief Checks with auth type to use for a server
 @ingroup libsync
@@ -14,54 +16,59 @@ class DetermineAuthTypeJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public enum AuthType {
-        NoAuthType, // used only before we got a chance to probe the server
+        /***********************************************************
+        Used only before we got a chance to probe the server
+        ***********************************************************/
+        NO_AUTH_TYPE,
+    
+        /***********************************************************
+        ***********************************************************/
 #ifdef WITH_WEBENGINE
-        WebViewFlow,
+        WEB_VIEW_FLOW,
 #endif // WITH_WEBENGINE
-        Basic, // also the catch-all fallback for backwards compatibility reasons
-        OAuth,
-        LoginFlowV2
-    };
-    Q_ENUM (AuthType)
 
-    /***********************************************************
-    ***********************************************************/
-    public DetermineAuthTypeJob (AccountPointer account, GLib.Object parent = new GLib.Object ());
+        /***********************************************************
+        Also the catch-all fallback for backwards compatibility
+        reasons
+        ***********************************************************/
+        BASIC,
 
-    /***********************************************************
-    ***********************************************************/
-    public 
-    public void on_start ();
-signals:
-    void auth_type (AuthType);
+        /***********************************************************
+        ***********************************************************/
+        OAUTH,
 
-
-    /***********************************************************
-    ***********************************************************/
-    private void check_all_done ();
-
-    /***********************************************************
-    ***********************************************************/
-    private AccountPointer this.account;
-    private AuthType this.result_get = NoAuthType;
-    private AuthType this.result_propfind = NoAuthType;
-    private AuthType this.result_old_flow = NoAuthType;
-    private bool this.get_done = false;
-    private bool this.propfind_done = false;
-    private bool this.old_flow_done = false;
-
-
-
-
-
-
-    DetermineAuthTypeJob.DetermineAuthTypeJob (AccountPointer account, GLib.Object parent)
-        : GLib.Object (parent)
-        , this.account (account) {
+        /***********************************************************
+        ***********************************************************/
+        LOGIN_FLOW_V2
     }
 
-    void DetermineAuthTypeJob.on_start () {
-        q_c_info (lc_determine_auth_type_job) << "Determining auth type for" << this.account.dav_url ();
+
+    /***********************************************************
+    ***********************************************************/
+    private AccountPointer account;
+    private AuthType result_get = AuthType.NO_AUTH_TYPE;
+    private AuthType result_propfind = AuthType.NO_AUTH_TYPE;
+    private AuthType result_old_flow = AuthType.NO_AUTH_TYPE;
+    private bool get_done = false;
+    private bool propfind_done = false;
+    private bool old_flow_done = false;
+
+
+    signal void auth_type (AuthType);
+
+
+    /***********************************************************
+    ***********************************************************/
+    public DetermineAuthTypeJob (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        this.account = account;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_start () {
+        GLib.Info (lc_determine_auth_type_job) << "Determining auth type for" << this.account.dav_url ();
 
         Soup.Request req;
         // Prevent HttpCredentialsAccessManager from setting an Authorization header.
@@ -125,7 +132,7 @@ signals:
                     if (flow != QJsonValue.Undefined) {
                         if (flow.to_int () == 1) {
     #ifdef WITH_WEBENGINE
-                            this.result_old_flow = WebViewFlow;
+                            this.result_old_flow = WEB_VIEW_FLOW;
     #else // WITH_WEBENGINE
                             GLib.warn (lc_determine_auth_type_job) << "Server does only support flow1, but this client was compiled without support for flow1";
     #endif // WITH_WEBENGINE
@@ -142,34 +149,37 @@ signals:
         old_flow_required.on_start ();
     }
 
-    void DetermineAuthTypeJob.check_all_done () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void check_all_done () {
         // Do not conitunue until eve
         if (!this.get_done || !this.propfind_done || !this.old_flow_done) {
             return;
         }
 
-        Q_ASSERT (this.result_get != NoAuthType);
-        Q_ASSERT (this.result_propfind != NoAuthType);
-        Q_ASSERT (this.result_old_flow != NoAuthType);
+        //  Q_ASSERT (this.result_get != NO_AUTH_TYPE);
+        //  Q_ASSERT (this.result_propfind != NO_AUTH_TYPE);
+        //  Q_ASSERT (this.result_old_flow != NO_AUTH_TYPE);
 
         var result = this.result_propfind;
 
     #ifdef WITH_WEBENGINE
-        // WebViewFlow > OAuth > Basic
+        // WEB_VIEW_FLOW > OAuth > Basic
         if (this.account.server_version_int () >= Account.make_server_version (12, 0, 0)) {
-            result = WebViewFlow;
+            result = WEB_VIEW_FLOW;
         }
     #endif // WITH_WEBENGINE
 
-        // LoginFlowV2 > WebViewFlow > OAuth > Basic
+        // LoginFlowV2 > WEB_VIEW_FLOW > OAuth > Basic
         if (this.account.server_version_int () >= Account.make_server_version (16, 0, 0)) {
             result = LoginFlowV2;
         }
 
     #ifdef WITH_WEBENGINE
         // If we determined that we need the webview flow (GS for example) then we switch to that
-        if (this.result_old_flow == WebViewFlow) {
-            result = WebViewFlow;
+        if (this.result_old_flow == WEB_VIEW_FLOW) {
+            result = WEB_VIEW_FLOW;
         }
     #endif // WITH_WEBENGINE
 
@@ -179,8 +189,11 @@ signals:
             result = Basic;
         }
 
-        q_c_info (lc_determine_auth_type_job) << "Auth type for" << this.account.dav_url () << "is" << result;
+        GLib.Info (lc_determine_auth_type_job) << "Auth type for" << this.account.dav_url () << "is" << result;
         /* emit */ auth_type (result);
         delete_later ();
     }
-};
+
+} // class DetermineAuthTypeJob
+
+} // namespace Occ

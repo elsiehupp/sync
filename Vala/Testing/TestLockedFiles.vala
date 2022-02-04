@@ -4,9 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
-// #include <localdiscoverytracker.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
+//  #include <localdiscoverytracker.h>
 
 using namespace Occ;
 

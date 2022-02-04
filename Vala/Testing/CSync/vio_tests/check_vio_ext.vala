@@ -17,14 +17,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
-// #include <sys/types.h>
-// #include <sys/stat.h>
-// #include <fcntl.h>
-// #include <cstring>
-// #include <cerrno>
-// #include <cstdio>
-
-// #include <QDir>
+//  #include <sys/types.h>
+//  #include <sys/stat.h>
+//  #include <fcntl.h>
+//  #include <cstring>
+//  #include <cerrno>
+//  #include <cstdio>
+//  #include
+//  #include <QDir>
 
 static const var CSYNC_TEST_DIR = []{
     return QStringLiteral ("%1/csync_test").arg (QDir.tempPath ());
@@ -138,7 +138,7 @@ whole tree.
 
 ***********************************************************/
 static void traverse_dir (void **state, string dir, int cnt) {
-    csync_vio_handle_t dh = nullptr;
+    csync_vio_handle_t dh = null;
     std.unique_ptr<csync_file_stat_t> dirent;
     var sv = (statevar*) *state;
     GLib.ByteArray subdir;
@@ -149,7 +149,7 @@ static void traverse_dir (void **state, string dir, int cnt) {
     dh = csync_vio_local_opendir (dir);
     assert_non_null (dh);
 
-    Occ.Vfs vfs = nullptr;
+    Occ.Vfs vfs = null;
     while ( (dirent = csync_vio_local_readdir (dh, vfs)) ) {
         assert_non_null (dirent.get ());
         if (!dirent.original_path.isEmpty ()) {
@@ -342,5 +342,5 @@ int torture_run_tests (void) {
         cmocka_unit_test_setup_teardown (check_readdir_bigunicode, setup_testenv, teardown),
     };
 
-    return cmocka_run_group_tests (tests, nullptr, nullptr);
+    return cmocka_run_group_tests (tests, null, null);
 }

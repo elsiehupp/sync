@@ -18,13 +18,13 @@ srcs = files([
     'ClientProxy/ClientProxy.vala',
     'ClientProxy/SystemProxyRunnable.vala',
 
-    'ClientSideEncryption/Bio.vala',
-    'ClientSideEncryption/CipherCtx.vala',
+    'ClientSideEncryption/Biometric.vala',
+    'ClientSideEncryption/CipherContext.vala',
     'ClientSideEncryption/ClientSideEncryption.vala',
     'ClientSideEncryption/EncryptionHelper.vala',
     'ClientSideEncryption/FolderMetadata.vala',
-    'ClientSideEncryption/PKey.vala',
-    'ClientSideEncryption/PKeyCtx.vala',
+    'ClientSideEncryption/PrivateKey.vala',
+    'ClientSideEncryption/PrivateKeyContext.vala',
     'ClientSideEncryption/StreamingDecryptor.vala',
     'ClientSideEncryption/X509Certificate.vala',
 
@@ -45,6 +45,7 @@ srcs = files([
     'Credentials/CredentialsCommon.vala',
     'Credentials/DummyCredentials.vala',
     'Credentials/HttpCredentials.vala',
+    'Credentials/HttpCredentialsAccessManager.vala.vala',
 
     'Credentials/KeychainChunk/DeleteJob.vala',
     'Credentials/KeychainChunk/Job.vala',
@@ -80,7 +81,11 @@ srcs = files([
     'NetworkJobs/SimpleNetworkJob.vala',
 
     'NextcloudTheme.vala',
-    'OcsProfileConnector.vala',
+
+    'OcsProfileConnector/Hovercard.vala',
+    'OcsProfileConnector/HovercardAction.vala',
+    'OcsProfileConnector/OcsProfileConnector.vala',
+
     'OcsUserStatusConnector.vala',
 
     'OwncloudPropagator/CleanupPollsJob.vala',

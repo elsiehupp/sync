@@ -22,9 +22,9 @@ class SyncJournalFileRecord {
 
 
     /***********************************************************
-    Returns the numeric part of the full id in this.file_id.
+    Returns the numeric part of the full identifier in this.file_id.
 
-    On the server this is sometimes known as the internal file id.
+    On the server this is sometimes known as the internal file identifier.
 
     It is used in the construction of private links.
     ***********************************************************/
@@ -97,7 +97,7 @@ operator== (SyncJournalFileRecord lhs,
 
 
     GLib.ByteArray SyncJournalFileRecord.numeric_file_id () {
-        // Use the id up until the first non-numeric character
+        // Use the identifier up until the first non-numeric character
         for (int i = 0; i < this.file_id.size (); ++i) {
             if (this.file_id[i] < '0' || this.file_id[i] > '9') {
                 return this.file_id.left (i);
@@ -114,16 +114,16 @@ operator== (SyncJournalFileRecord lhs,
 
     bool operator== (SyncJournalFileRecord lhs,
         const SyncJournalFileRecord rhs) {
-        return lhs._path == rhs._path
-            && lhs._inode == rhs._inode
-            && lhs._modtime == rhs._modtime
-            && lhs._type == rhs._type
-            && lhs._etag == rhs._etag
-            && lhs._file_id == rhs._file_id
-            && lhs._file_size == rhs._file_size
-            && lhs._remote_perm == rhs._remote_perm
-            && lhs._server_has_ignored_files == rhs._server_has_ignored_files
-            && lhs._checksum_header == rhs._checksum_header;
+        return lhs.path == rhs.path
+            && lhs.inode == rhs.inode
+            && lhs.modtime == rhs.modtime
+            && lhs.type == rhs.type
+            && lhs.etag == rhs.etag
+            && lhs.file_id == rhs.file_id
+            && lhs.file_size == rhs.file_size
+            && lhs.remote_perm == rhs.remote_perm
+            && lhs.server_has_ignored_files == rhs.server_has_ignored_files
+            && lhs.checksum_header == rhs.checksum_header;
     }
     }
     

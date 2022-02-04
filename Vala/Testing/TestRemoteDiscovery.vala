@@ -4,9 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
-// #include <localdiscoverytracker.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
+//  #include <localdiscoverytracker.h>
 
 using namespace Occ;
 
@@ -38,7 +38,7 @@ enum ErrorKind : int {
     Timeout,
 }
 
-Q_DECLARE_METATYPE (ErrorCategory)
+// Q_DECLARE_METATYPE (ErrorCategory)
 
 class TestRemoteDiscovery : GLib.Object {
 
@@ -96,7 +96,7 @@ class TestRemoteDiscovery : GLib.Object {
                     return new FakeErrorReply (op, req, this, errorKind);
                 }
             }
-            return nullptr;
+            return null;
         });
 
         // So the test that test timeout finishes fast
@@ -113,13 +113,13 @@ class TestRemoteDiscovery : GLib.Object {
             QCOMPARE (errorSpy.size (), 1);
             QCOMPARE (errorSpy[0][0].toString (), string (fatalErrorPrefix + expectedErrorString));
         } else {
-            QCOMPARE (completeSpy.findItem ("B")._instruction, CSYNC_INSTRUCTION_IGNORE);
-            QVERIFY (completeSpy.findItem ("B")._errorString.contains (expectedErrorString));
+            QCOMPARE (completeSpy.findItem ("B").instruction, CSYNC_INSTRUCTION_IGNORE);
+            QVERIFY (completeSpy.findItem ("B").errorString.contains (expectedErrorString));
 
             // The other folder should have been sync'ed as the sync just ignored the faulty dir
             QCOMPARE (fakeFolder.currentRemoteState ().children["A"], fakeFolder.currentLocalState ().children["A"]);
             QCOMPARE (fakeFolder.currentRemoteState ().children["C"], fakeFolder.currentLocalState ().children["C"]);
-            QCOMPARE (completeSpy.findItem ("A/z1")._instruction, CSYNC_INSTRUCTION_NEW);
+            QCOMPARE (completeSpy.findItem ("A/z1").instruction, CSYNC_INSTRUCTION_NEW);
         }
 
         //
@@ -150,20 +150,20 @@ class TestRemoteDiscovery : GLib.Object {
                 . Soup.Reply *{
             if (req.attribute (QNetworkRequest.CustomVerbAttribute) == "PROPFIND" && req.url ().path ().endsWith ("nopermissions"))
                 return new MissingPermissionsPropfindReply (fakeFolder.remoteModifier (), op, req, this);
-            return nullptr;
+            return null;
         });
 
         ItemCompletedSpy completeSpy (fakeFolder);
         QVERIFY (!fakeFolder.syncOnce ());
 
-        QCOMPARE (completeSpy.findItem ("good")._instruction, CSYNC_INSTRUCTION_NEW);
-        QCOMPARE (completeSpy.findItem ("noetag")._instruction, CSYNC_INSTRUCTION_ERROR);
-        QCOMPARE (completeSpy.findItem ("nofileid")._instruction, CSYNC_INSTRUCTION_ERROR);
-        QCOMPARE (completeSpy.findItem ("nopermissions")._instruction, CSYNC_INSTRUCTION_NEW);
-        QCOMPARE (completeSpy.findItem ("nopermissions/A")._instruction, CSYNC_INSTRUCTION_ERROR);
-        QVERIFY (completeSpy.findItem ("noetag")._errorString.contains ("ETag"));
-        QVERIFY (completeSpy.findItem ("nofileid")._errorString.contains ("file id"));
-        QVERIFY (completeSpy.findItem ("nopermissions/A")._errorString.contains ("permission"));
+        QCOMPARE (completeSpy.findItem ("good").instruction, CSYNC_INSTRUCTION_NEW);
+        QCOMPARE (completeSpy.findItem ("noetag").instruction, CSYNC_INSTRUCTION_ERROR);
+        QCOMPARE (completeSpy.findItem ("nofileid").instruction, CSYNC_INSTRUCTION_ERROR);
+        QCOMPARE (completeSpy.findItem ("nopermissions").instruction, CSYNC_INSTRUCTION_NEW);
+        QCOMPARE (completeSpy.findItem ("nopermissions/A").instruction, CSYNC_INSTRUCTION_ERROR);
+        QVERIFY (completeSpy.findItem ("noetag").errorString.contains ("ETag"));
+        QVERIFY (completeSpy.findItem ("nofileid").errorString.contains ("file identifier"));
+        QVERIFY (completeSpy.findItem ("nopermissions/A").errorString.contains ("permission"));
     }
 }
 

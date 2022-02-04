@@ -1,6 +1,6 @@
 
-// #include <GLib.List>
-// #include <openssl/rand.h>
+//  #include <GLib.List>
+//  #include <openssl/rand.h>
 
 namespace Occ {
     namespace Word_list {
@@ -11,12 +11,12 @@ namespace Occ {
     // #include <initializer_list>
 
     int get_random_number (int max) {
-        unsigned char d[8];
+        uchar d[8];
         RAND_bytes (d, 8);
 
         uint32 num = 0;
 
-        for (unsigned char c : d) {
+        for (uchar c : d) {
             num = num << 8;
             num += c;
         }

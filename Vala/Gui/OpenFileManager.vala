@@ -6,18 +6,18 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QProcess>
-// #include <QSettings>
-// #include <QDir>
-// #include <QDesktopServices>
-// #include <QApplication>
+//  #include <QProcess>
+//  #include <QSettings>
+//  #include <QDir>
+//  #include <QDesktopServices>
+//  #include <QApplication>
 
 const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
 #if ! (QTLEGACY)
-// #include <QOperatingSystemVersion>
+//  #include <QOperatingSystemVersion>
 #endif
-// #pragma once
+//  #pragma once
 
 
 namespace Occ {
@@ -124,11 +124,12 @@ void show_in_file_manager (string local_path) {
         can_handle_file = true;
     }
 
+
     /***********************************************************
     ***********************************************************/
     static string name;
     if (name.is_empty ()) {
-        name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name[%1]").arg (q_app.property ("ui_lang").to_string ())).to_string ();
+        name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name[%1]").arg (Gtk.Application.property ("ui_lang").to_string ())).to_string ();
         if (name.is_empty ()) {
             name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name")).to_string ();
         }

@@ -4,10 +4,10 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QRegularExpression>
-// #pragma once
-// #include <QRegularExpression>
-// #include <chrono>
+//  #include <QRegularExpression>
+//  #includeonce
+//  #include <QRegularExpression>
+//  #include <chrono>
 
 namespace Occ {
 

@@ -4,16 +4,16 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <algorithm>
+//  #include <algorithm>
+//  #include
+//  #include <QAbstractListModel>
+//  #include <QDesktopServices>
 
-// #include <QAbstractListModel>
-// #include <QDesktopServices>
+//  #pragma once
 
-// #pragma once
-
-// #include <limits>
-
-// #include <QtCore>
+//  #include <limits>
+//  #include
+//  #include <QtCore>
 
 namespace Occ {
 
@@ -25,14 +25,14 @@ Simple list model to provide the list view with data for the Unified Search resu
 
 class Unified_search_results_list_model : QAbstractListModel {
 
-    Q_PROPERTY (bool is_search_in_progress READ is_search_in_progress NOTIFY is_search_in_progress_changed)
-    Q_PROPERTY (string current_fetch_more_in_progress_provider_id READ current_fetch_more_in_progress_provider_id NOTIFY
-            current_fetch_more_in_progress_provider_id_changed)
-    Q_PROPERTY (string error_string READ error_string NOTIFY error_string_changed)
+    //  Q_PROPERTY (bool is_search_in_progress READ is_search_in_progress NOTIFY is_search_in_progress_changed)
+    //  Q_PROPERTY (string current_fetch_more_in_progress_provider_id READ current_fetch_more_in_progress_provider_id NOTIFY
+    //  Q_PROPERTY (ent_fetch_more_in_progress_provider_id_changed)
+    //  Q_PROPERTY (string error_string READ error_string NOTIFY error_string_changed)
     Q_PROPERTY (string search_term READ search_term WRITE on_set_search_term NOTIFY search_term_changed)
 
     struct Unified_search_provider {
-        string this.id;
+        string this.identifier;
         string this.name;
         int32 this.cursor = -1; // current pagination value
         int32 this.page_size = -1; // how many max items per step of pagination
@@ -169,7 +169,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private AccountState this.account_state = nullptr;
+    private AccountState this.account_state = null;
 }
 }
 
@@ -263,7 +263,7 @@ namespace {
             const string[] thumbnail_url_copy_splitted = thumbnail_url_copy.contains ('?')
                 ? thumbnail_url_copy.split ('?', Qt.Skip_empty_parts)
                 : string[]{thumbnail_url_copy};
-            Q_ASSERT (!thumbnail_url_copy_splitted.is_empty ());
+            //  Q_ASSERT (!thumbnail_url_copy_splitted.is_empty ());
             server_url_copy.set_path (thumbnail_url_copy_splitted[0]);
             thumbnail_url_copy = server_url_copy.to_string ();
             if (thumbnail_url_copy_splitted.size () > 1) {
@@ -284,7 +284,7 @@ namespace {
             // some icons may contain parameters after (?)
             const string[] fallack_icon_path_splitted =
                 fallack_icon_copy.contains ('?') ? fallack_icon_copy.split ('?') : string[]{fallack_icon_copy};
-            Q_ASSERT (!fallack_icon_path_splitted.is_empty ());
+            //  Q_ASSERT (!fallack_icon_path_splitted.is_empty ());
             server_url_copy.set_path (fallack_icon_path_splitted[0]);
             fallack_icon_copy = server_url_copy.to_string ();
             if (fallack_icon_path_splitted.size () > 1) {
@@ -326,40 +326,40 @@ namespace {
         return list_images.join (';');
     }
 
-    constexpr int search_term_editing_finished_search_start_delay = 800;
+    const int search_term_editing_finished_search_start_delay = 800;
 
     // server-side bug of returning the cursor > 0 and is_paginated == 'true', using '5' as it is done on Android client's end now
-    constexpr int minimum_entres_number_to_show_load_more = 5;
+    const int minimum_entres_number_to_show_load_more = 5;
 
     Unified_search_results_list_model.Unified_search_results_list_model (AccountState account_state, GLib.Object parent)
         : QAbstractListModel (parent)
-        , this.account_state (account_state) {
+        this.account_state (account_state) {
     }
 
     GLib.Variant Unified_search_results_list_model.data (QModelIndex index, int role) {
-        Q_ASSERT (check_index (index, QAbstractItemModel.Check_index_option.Index_is_valid));
+        //  Q_ASSERT (check_index (index, QAbstractItemModel.Check_index_option.Index_is_valid));
 
         switch (role) {
         case Provider_name_role:
-            return this.results.at (index.row ())._provider_name;
+            return this.results.at (index.row ()).provider_name;
         case Provider_id_role:
-            return this.results.at (index.row ())._provider_id;
+            return this.results.at (index.row ()).provider_id;
         case Image_placeholder_role:
-            return image_placeholder_url_for_provider_id (this.results.at (index.row ())._provider_id);
+            return image_placeholder_url_for_provider_id (this.results.at (index.row ()).provider_id);
         case Icons_role:
-            return this.results.at (index.row ())._icons;
+            return this.results.at (index.row ()).icons;
         case Title_role:
-            return this.results.at (index.row ())._title;
+            return this.results.at (index.row ()).title;
         case Subline_role:
-            return this.results.at (index.row ())._subline;
+            return this.results.at (index.row ()).subline;
         case Resource_url_role:
-            return this.results.at (index.row ())._resource_url;
+            return this.results.at (index.row ()).resource_url;
         case Rounded_role:
-            return this.results.at (index.row ())._is_rounded;
+            return this.results.at (index.row ()).is_rounded;
         case Type_role:
-            return this.results.at (index.row ())._type;
+            return this.results.at (index.row ()).type;
         case Type_as_string_role:
-            return Unified_search_result.type_as_string (this.results.at (index.row ())._type);
+            return Unified_search_result.type_as_string (this.results.at (index.row ()).type);
         }
 
         return {};
@@ -458,7 +458,7 @@ namespace {
                 FolderMan.instance ().find_file_in_local_folders (QFileInfo (relative_path).path (), this.account_state.account ());
 
             if (!local_files.is_empty ()) {
-                q_c_info (lc_unified_search) << "Opening file:" << local_files.const_first ();
+                GLib.Info (lc_unified_search) << "Opening file:" << local_files.const_first ();
                 QDesktopServices.open_url (GLib.Uri.from_local_file (local_files.const_first ()));
                 return;
             }
@@ -473,11 +473,11 @@ namespace {
 
         const var provider_info = this.providers.value (provider_id, {});
 
-        if (!provider_info._id.is_empty () && provider_info._id == provider_id && provider_info._is_paginated) {
+        if (!provider_info.id.is_empty () && provider_info.id == provider_id && provider_info.is_paginated) {
             // Load more items
             this.current_fetch_more_in_progress_provider_id = provider_id;
             /* emit */ current_fetch_more_in_progress_provider_id_changed ();
-            start_search_for_provider (provider_id, provider_info._cursor);
+            start_search_for_provider (provider_id, provider_info.cursor);
         }
     }
 
@@ -525,14 +525,14 @@ namespace {
 
         for (var provider : provider_list) {
             const var provider_map = provider.to_map ();
-            const var id = provider_map[QStringLiteral ("id")].to_string ();
+            const var identifier = provider_map[QStringLiteral ("identifier")].to_string ();
             const var name = provider_map[QStringLiteral ("name")].to_string ();
-            if (!name.is_empty () && id != QStringLiteral ("talk-message-current")) {
+            if (!name.is_empty () && identifier != QStringLiteral ("talk-message-current")) {
                 Unified_search_provider new_provider;
-                new_provider._name = name;
-                new_provider._id = id;
-                new_provider._order = provider_map[QStringLiteral ("order")].to_int ();
-                this.providers.insert (new_provider._id, new_provider);
+                new_provider.name = name;
+                new_provider.id = identifier;
+                new_provider.order = provider_map[QStringLiteral ("order")].to_int ();
+                this.providers.insert (new_provider.id, new_provider);
             }
         }
 
@@ -542,7 +542,7 @@ namespace {
     }
 
     void Unified_search_results_list_model.on_search_for_provider_finished (QJsonDocument json, int status_code) {
-        Q_ASSERT (this.account_state && this.account_state.account ());
+        //  Q_ASSERT (this.account_state && this.account_state.account ());
 
         const var job = qobject_cast<JsonApiJob> (sender ());
 
@@ -589,7 +589,7 @@ namespace {
     }
 
     void Unified_search_results_list_model.start_search () {
-        Q_ASSERT (this.account_state && this.account_state.account ());
+        //  Q_ASSERT (this.account_state && this.account_state.account ());
 
         disconnect_and_clear_search_jobs ();
 
@@ -604,12 +604,12 @@ namespace {
         }
 
         for (var provider : this.providers) {
-            start_search_for_provider (provider._id);
+            start_search_for_provider (provider.id);
         }
     }
 
     void Unified_search_results_list_model.start_search_for_provider (string provider_id, int32 cursor) {
-        Q_ASSERT (this.account_state && this.account_state.account ());
+        //  Q_ASSERT (this.account_state && this.account_state.account ());
 
         if (!this.account_state || !this.account_state.account ()) {
             return;
@@ -642,7 +642,7 @@ namespace {
 
         var provider = this.providers[provider_id];
 
-        if (provider._id.is_empty () && fetched_more) {
+        if (provider.id.is_empty () && fetched_more) {
             this.providers.remove (provider_id);
             return;
         }
@@ -651,27 +651,27 @@ namespace {
             // we may have received false pagination information from the server, such as, we expect more
             // results available via pagination, but, there are no more left, so, we need to stop paginating for
             // this provider
-            provider._is_paginated = false;
+            provider.is_paginated = false;
 
             if (fetched_more) {
-                remove_fetch_more_trigger (provider._id);
+                remove_fetch_more_trigger (provider.id);
             }
 
             return;
         }
 
-        provider._is_paginated = data.value (QStringLiteral ("is_paginated")).to_bool ();
-        provider._cursor = cursor;
+        provider.is_paginated = data.value (QStringLiteral ("is_paginated")).to_bool ();
+        provider.cursor = cursor;
 
-        if (provider._page_size == -1) {
-            provider._page_size = cursor;
+        if (provider.page_size == -1) {
+            provider.page_size = cursor;
         }
 
-        if ( (provider._page_size != -1 && entries.size () < provider._page_size)
+        if ( (provider.page_size != -1 && entries.size () < provider.page_size)
             || entries.size () < minimum_entres_number_to_show_load_more) {
             // for some providers we are still getting a non-null cursor and is_paginated true even thought
             // there are no more results to paginate
-            provider._is_paginated = false;
+            provider.is_paginated = false;
         }
 
         GLib.Vector<Unified_search_result> new_entries;
@@ -691,18 +691,18 @@ namespace {
                 continue;
             }
             Unified_search_result result;
-            result._provider_id = provider._id;
-            result._order = provider._order;
-            result._provider_name = provider._name;
-            result._is_rounded = entry_map.value (QStringLiteral ("rounded")).to_bool ();
-            result._title = entry_map.value (QStringLiteral ("title")).to_string ();
-            result._subline = entry_map.value (QStringLiteral ("subline")).to_string ();
+            result.provider_id = provider.id;
+            result.order = provider.order;
+            result.provider_name = provider.name;
+            result.is_rounded = entry_map.value (QStringLiteral ("rounded")).to_bool ();
+            result.title = entry_map.value (QStringLiteral ("title")).to_string ();
+            result.subline = entry_map.value (QStringLiteral ("subline")).to_string ();
 
             const var resource_url = entry_map.value (QStringLiteral ("resource_url")).to_string ();
             const var account_url = (this.account_state && this.account_state.account ()) ? this.account_state.account ().url () : GLib.Uri ();
 
-            result._resource_url = make_resource_url (resource_url, account_url);
-            result._icons = icons_from_thumbnail_and_fallback_icon (entry_map.value (QStringLiteral ("thumbnail_url")).to_string (),
+            result.resource_url = make_resource_url (resource_url, account_url);
+            result.icons = icons_from_thumbnail_and_fallback_icon (entry_map.value (QStringLiteral ("thumbnail_url")).to_string (),
                 entry_map.value (QStringLiteral ("icon")).to_string (), account_url);
 
             new_entries.push_back (result);
@@ -716,12 +716,12 @@ namespace {
     }
 
     void Unified_search_results_list_model.append_results (GLib.Vector<Unified_search_result> results, Unified_search_provider provider) {
-        if (provider._cursor > 0 && provider._is_paginated) {
+        if (provider.cursor > 0 && provider.is_paginated) {
             Unified_search_result fetch_more_trigger;
-            fetch_more_trigger._provider_id = provider._id;
-            fetch_more_trigger._provider_name = provider._name;
-            fetch_more_trigger._order = provider._order;
-            fetch_more_trigger._type = Unified_search_result.Type.Fetch_more_trigger;
+            fetch_more_trigger.provider_id = provider.id;
+            fetch_more_trigger.provider_name = provider.name;
+            fetch_more_trigger.order = provider.order;
+            fetch_more_trigger.type = Unified_search_result.Type.Fetch_more_trigger;
             results.push_back (fetch_more_trigger);
         }
 
@@ -736,12 +736,12 @@ namespace {
         const var it_to_insert_to = std.find_if (std.begin (this.results), std.end (this.results),
             [&provider] (Unified_search_result current) {
                 // insert before other results of higher order when possible
-                if (current._order > provider._order) {
+                if (current.order > provider.order) {
                     return true;
                 } else {
-                    if (current._order == provider._order) {
+                    if (current.order == provider.order) {
                         // insert before results of higher string value when possible
-                        return current._provider_name > provider._name;
+                        return current.provider_name > provider.name;
                     }
 
                     return false;
@@ -761,12 +761,12 @@ namespace {
             return;
         }
 
-        const var provider_id = provider._id;
+        const var provider_id = provider.id;
         /* we need to find the last result that is not a fetch-more-trigger or category-separator for the current
            provider */
         const var it_last_result_for_provider_reverse =
             std.find_if (std.rbegin (this.results), std.rend (this.results), [&provider_id] (Unified_search_result result) {
-                return result._provider_id == provider_id && result._type == Unified_search_result.Type.Default;
+                return result.provider_id == provider_id && result.type == Unified_search_result.Type.Default;
             });
 
         if (it_last_result_for_provider_reverse != std.rend (this.results)) {
@@ -780,7 +780,7 @@ namespace {
             end_insert_rows ();
 
             // #2 Remove the Fetch_more_trigger item if there are no more results to load for this provider
-            if (!provider._is_paginated) {
+            if (!provider.is_paginated) {
                 remove_fetch_more_trigger (provider_id);
             }
         }
@@ -791,7 +791,7 @@ namespace {
             std.rbegin (this.results),
             std.rend (this.results),
             [provider_id] (Unified_search_result result) {
-                return result._provider_id == provider_id && result._type == Unified_search_result.Type.Fetch_more_trigger;
+                return result.provider_id == provider_id && result.type == Unified_search_result.Type.Fetch_more_trigger;
             });
 
         if (it_fetch_more_trigger_for_provider_reverse != std.rend (this.results)) {
@@ -801,7 +801,7 @@ namespace {
             if (it_fetch_more_trigger_for_provider != std.end (this.results)
                 && it_fetch_more_trigger_for_provider != std.begin (this.results)) {
                 const var erase_index = static_cast<int> (std.distance (std.begin (this.results), it_fetch_more_trigger_for_provider));
-                Q_ASSERT (erase_index >= 0 && erase_index < static_cast<int> (this.results.size ()));
+                //  Q_ASSERT (erase_index >= 0 && erase_index < static_cast<int> (this.results.size ()));
                 begin_remove_rows ({}, erase_index, erase_index);
                 this.results.erase (it_fetch_more_trigger_for_provider);
                 end_remove_rows ();

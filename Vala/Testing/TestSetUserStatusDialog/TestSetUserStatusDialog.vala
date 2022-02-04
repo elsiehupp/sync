@@ -4,10 +4,10 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QTest>
-// #include <QSignalSpy>
-
-// #include <memory>
+//  #include <QTest>
+//  #include <QSignalSpy>
+//  #include
+//  #include <memory>
 
 
 
@@ -18,15 +18,15 @@ class TestSetUserStatusDialog : GLib.Object {
     private on_ void testCtor_fetchStatusAndPredefinedStatuses () {
         const GLib.DateTime currentDateTime (GLib.DateTime.currentDateTime ());
 
-        const string userStatusId ("fake-id");
+        const string userStatusId ("fake-identifier");
         const string userStatusMessage ("Some status");
         const string userStatusIcon ("❤");
         const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.DoNotDisturb);
         const bool userStatusMessagePredefined (false);
         Occ.Optional<Occ.ClearAt> userStatusClearAt; {
             Occ.ClearAt clearAt;
-            clearAt._type = Occ.ClearAtType.Timestamp;
-            clearAt._timestamp = currentDateTime.addDays (1).toTime_t ();
+            clearAt.type = Occ.ClearAtType.Timestamp;
+            clearAt.timestamp = currentDateTime.addDays (1).toTime_t ();
             userStatusClearAt = clearAt;
         }
 
@@ -53,8 +53,8 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (predefinedStatusesCount, fakePredefinedStatuses.size ());
         for (int i = 0; i < predefinedStatusesCount; ++i) {
             const var predefinedStatus = model.predefinedStatus (i);
-            QCOMPARE (predefinedStatus.id (),
-                fakePredefinedStatuses[i].id ());
+            QCOMPARE (predefinedStatus.identifier (),
+                fakePredefinedStatuses[i].identifier ());
             QCOMPARE (predefinedStatus.message (),
                 fakePredefinedStatuses[i].message ());
             QCOMPARE (predefinedStatus.icon (),
@@ -68,7 +68,7 @@ class TestSetUserStatusDialog : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testCtor_noStatusSet_showSensibleDefaults () {
-        Occ.UserStatusSelectorModel model (nullptr, nullptr);
+        Occ.UserStatusSelectorModel model (null, null);
 
         QCOMPARE (model.userStatusMessage (), "");
         QCOMPARE (model.userStatusEmoji (), "😀");
@@ -132,8 +132,8 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (userStatusSet.messagePredefined (), false);
         const var clearAt = userStatusSet.clearAt ();
         QVERIFY (clearAt.isValid ());
-        QCOMPARE (clearAt._type, Occ.ClearAtType.Period);
-        QCOMPARE (clearAt._period, 60 * 30);
+        QCOMPARE (clearAt.type, Occ.ClearAtType.Period);
+        QCOMPARE (clearAt.period, 60 * 30);
     }
 
 
@@ -162,8 +162,8 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (userStatusSet.messagePredefined (), false);
         const var clearAt = userStatusSet.clearAt ();
         QVERIFY (clearAt.isValid ());
-        QCOMPARE (clearAt._type, Occ.ClearAtType.Period);
-        QCOMPARE (clearAt._period, 60 * 30);
+        QCOMPARE (clearAt.type, Occ.ClearAtType.Period);
+        QCOMPARE (clearAt.period, 60 * 30);
     }
 
 
@@ -192,8 +192,8 @@ class TestSetUserStatusDialog : GLib.Object {
         QCOMPARE (userStatusSet.messagePredefined (), false);
         const var clearAt = userStatusSet.clearAt ();
         QVERIFY (clearAt.isValid ());
-        QCOMPARE (clearAt._type, Occ.ClearAtType.Period);
-        QCOMPARE (clearAt._period, 60 * 30);
+        QCOMPARE (clearAt.type, Occ.ClearAtType.Period);
+        QCOMPARE (clearAt.period, 60 * 30);
     }
 
 
@@ -344,8 +344,8 @@ class TestSetUserStatusDialog : GLib.Object {
         {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
-            clearAt._type = Occ.ClearAtType.Timestamp;
-            clearAt._timestamp = currentTime.addSecs (30).toTime_t ();
+            clearAt.type = Occ.ClearAtType.Timestamp;
+            clearAt.timestamp = currentTime.addSecs (30).toTime_t ();
             userStatus.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
@@ -358,8 +358,8 @@ class TestSetUserStatusDialog : GLib.Object {
  {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
-            clearAt._type = Occ.ClearAtType.Timestamp;
-            clearAt._timestamp = currentTime.addSecs (60).toTime_t ();
+            clearAt.type = Occ.ClearAtType.Timestamp;
+            clearAt.timestamp = currentTime.addSecs (60).toTime_t ();
             userStatus.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
@@ -372,8 +372,8 @@ class TestSetUserStatusDialog : GLib.Object {
  {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
-            clearAt._type = Occ.ClearAtType.Timestamp;
-            clearAt._timestamp = currentTime.addSecs (60 * 30).toTime_t ();
+            clearAt.type = Occ.ClearAtType.Timestamp;
+            clearAt.timestamp = currentTime.addSecs (60 * 30).toTime_t ();
             userStatus.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
@@ -386,8 +386,8 @@ class TestSetUserStatusDialog : GLib.Object {
  {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
-            clearAt._type = Occ.ClearAtType.Timestamp;
-            clearAt._timestamp = currentTime.addSecs (60 * 60).toTime_t ();
+            clearAt.type = Occ.ClearAtType.Timestamp;
+            clearAt.timestamp = currentTime.addSecs (60 * 60).toTime_t ();
             userStatus.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
@@ -400,8 +400,8 @@ class TestSetUserStatusDialog : GLib.Object {
  {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
-            clearAt._type = Occ.ClearAtType.Timestamp;
-            clearAt._timestamp = currentTime.addSecs (60 * 60 * 4).toTime_t ();
+            clearAt.type = Occ.ClearAtType.Timestamp;
+            clearAt.timestamp = currentTime.addSecs (60 * 60 * 4).toTime_t ();
             userStatus.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
@@ -414,8 +414,8 @@ class TestSetUserStatusDialog : GLib.Object {
  {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
-            clearAt._type = Occ.ClearAtType.Timestamp;
-            clearAt._timestamp = currentTime.addDays (1).toTime_t ();
+            clearAt.type = Occ.ClearAtType.Timestamp;
+            clearAt.timestamp = currentTime.addDays (1).toTime_t ();
             userStatus.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
@@ -428,8 +428,8 @@ class TestSetUserStatusDialog : GLib.Object {
  {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
-            clearAt._type = Occ.ClearAtType.Timestamp;
-            clearAt._timestamp = currentTime.addDays (7).toTime_t ();
+            clearAt.type = Occ.ClearAtType.Timestamp;
+            clearAt.timestamp = currentTime.addDays (7).toTime_t ();
             userStatus.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
@@ -447,8 +447,8 @@ class TestSetUserStatusDialog : GLib.Object {
     private on_ void testClearAt_clearAtEndOf () { {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
-            clearAt._type = Occ.ClearAtType.EndOf;
-            clearAt._endof = "day";
+            clearAt.type = Occ.ClearAtType.EndOf;
+            clearAt.endof = "day";
             userStatus.setClearAt (clearAt);
 
             Occ.UserStatusSelectorModel model (userStatus);
@@ -458,8 +458,8 @@ class TestSetUserStatusDialog : GLib.Object {
  {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
-            clearAt._type = Occ.ClearAtType.EndOf;
-            clearAt._endof = "week";
+            clearAt.type = Occ.ClearAtType.EndOf;
+            clearAt.endof = "week";
             userStatus.setClearAt (clearAt);
 
             Occ.UserStatusSelectorModel model (userStatus);
@@ -474,8 +474,8 @@ class TestSetUserStatusDialog : GLib.Object {
     private on_ void testClearAt_clearAtAfterPeriod () { {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
-            clearAt._type = Occ.ClearAtType.Period;
-            clearAt._period = 60 * 30;
+            clearAt.type = Occ.ClearAtType.Period;
+            clearAt.period = 60 * 30;
             userStatus.setClearAt (clearAt);
 
             Occ.UserStatusSelectorModel model (userStatus);
@@ -485,8 +485,8 @@ class TestSetUserStatusDialog : GLib.Object {
  {
             Occ.UserStatus userStatus;
             Occ.ClearAt clearAt;
-            clearAt._type = Occ.ClearAtType.Period;
-            clearAt._period = 60 * 60;
+            clearAt.type = Occ.ClearAtType.Period;
+            clearAt.period = 60 * 60;
             userStatus.setClearAt (clearAt);
 
             Occ.UserStatusSelectorModel model (userStatus);

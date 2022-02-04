@@ -10,7 +10,6 @@ class Web_view_page_url_request_interceptor : QWeb_engine_url_request_intercepto
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void intercept_request (QWeb_engine_url_request_info info) override;
 }
 

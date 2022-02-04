@@ -4,8 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
 
 using namespace Occ;
 
@@ -44,12 +44,12 @@ SyncFileItemPtr findDiscoveryItem (SyncFileItemVector spy, string path) {
 
 bool itemInstruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
-    return item._instruction == instr;
+    return item.instruction == instr;
 }
 
 bool discoveryInstruction (SyncFileItemVector spy, string path, SyncInstructions instr) {
     var item = findDiscoveryItem (spy, path);
-    return item._instruction == instr;
+    return item.instruction == instr;
 }
 
 class TestPermissions : GLib.Object {
@@ -64,7 +64,7 @@ class TestPermissions : GLib.Object {
         // that order becomes effectively random, but we want to make sure to test
         // all cases and thus disable threading.
         var syncOpts = fakeFolder.syncEngine ().syncOptions ();
-        syncOpts._parallelNetworkJobs = 1;
+        syncOpts.parallelNetworkJobs = 1;
         fakeFolder.syncEngine ().setSyncOptions (syncOpts);
 
         const int cannotBeModifiedSize = 133;
@@ -339,7 +339,7 @@ class TestPermissions : GLib.Object {
         // that order becomes effectively random, but we want to make sure to test
         // all cases and thus disable threading.
         var syncOpts = fakeFolder.syncEngine ().syncOptions ();
-        syncOpts._parallelNetworkJobs = 1;
+        syncOpts.parallelNetworkJobs = 1;
         fakeFolder.syncEngine ().setSyncOptions (syncOpts);
 
         var lm = fakeFolder.localModifier ();
@@ -458,7 +458,7 @@ class TestPermissions : GLib.Object {
         // that order becomes effectively random, but we want to make sure to test
         // all cases and thus disable threading.
         var syncOpts = fakeFolder.syncEngine ().syncOptions ();
-        syncOpts._parallelNetworkJobs = 1;
+        syncOpts.parallelNetworkJobs = 1;
         fakeFolder.syncEngine ().setSyncOptions (syncOpts);
 
         var lm = fakeFolder.localModifier ();

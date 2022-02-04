@@ -14,14 +14,14 @@ class KirigamiWheelEvent : GLib.Object {
 
     X coordinate of the mouse pointer
     ***********************************************************/
-    Q_PROPERTY (qreal x READ x CONSTANT)
+    //  Q_PROPERTY (qreal x READ x CONSTANT)
 
     /***********************************************************
     y : real
 
     Y coordinate of the mouse pointer
     ***********************************************************/
-    Q_PROPERTY (qreal y READ y CONSTANT)
+    //  Q_PROPERTY (qreal y READ y CONSTANT)
 
     /***********************************************************
     angle_delta : point
@@ -31,14 +31,14 @@ class KirigamiWheelEvent : GLib.Object {
     A positive value indicates it was rotated up/right, negative, bottom/left
     This value is more likely to be set in traditional mice.
     ***********************************************************/
-    Q_PROPERTY (QPoint_f angle_delta READ angle_delta CONSTANT)
+    //  Q_PROPERTY (QPoint_f angle_delta READ angle_delta CONSTANT)
 
     /***********************************************************
     pixel_delta : point
 
     provides the delta in screen pixels available on high resolution trackpads
     ***********************************************************/
-    Q_PROPERTY (QPoint_f pixel_delta READ pixel_delta CONSTANT)
+    //  Q_PROPERTY (QPoint_f pixel_delta READ pixel_delta CONSTANT)
 
     /***********************************************************
     buttons : int
@@ -46,7 +46,7 @@ class KirigamiWheelEvent : GLib.Object {
     it contains an OR combination of the buttons that were pressed during the wheel, they can be:
     Qt.Left_button, Qt.Middle_button, Qt.Right_button
     ***********************************************************/
-    Q_PROPERTY (int buttons READ buttons CONSTANT)
+    //  Q_PROPERTY (int buttons READ buttons CONSTANT)
 
     /***********************************************************
     modifiers : int
@@ -57,7 +57,7 @@ class KirigamiWheelEvent : GLib.Object {
     Qt.Shift_modifier
     ...
     ***********************************************************/
-    Q_PROPERTY (int modifiers READ modifiers CONSTANT)
+    //  Q_PROPERTY (int modifiers READ modifiers CONSTANT)
 
     /***********************************************************
     inverted : bool
@@ -65,7 +65,7 @@ class KirigamiWheelEvent : GLib.Object {
     Whether the delta values are inverted
     On some platformsthe returned delta are inverted, so positive values would mean bottom/left
     ***********************************************************/
-    Q_PROPERTY (bool inverted READ inverted CONSTANT)
+    //  Q_PROPERTY (bool inverted READ inverted CONSTANT)
 
     /***********************************************************
     accepted : bool
@@ -90,7 +90,7 @@ class KirigamiWheelEvent : GLib.Object {
     @endcode
 
     ***********************************************************/
-    Q_PROPERTY (bool accepted READ is_accepted WRITE set_accepted)
+    //  Q_PROPERTY (bool accepted READ is_accepted WRITE set_accepted)
 
 
     /***********************************************************

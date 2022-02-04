@@ -55,8 +55,8 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
 
 
 
-    SignPublicKeyApiJob.SignPublicKeyApiJob (AccountPointer& account, string& path, GLib.Object parent)
-    : AbstractNetworkJob (account, path, parent) {
+    SignPublicKeyApiJob.SignPublicKeyApiJob (AccountPointer& account, string path, GLib.Object parent)
+    : base (account, path, parent) {
     }
 
     void SignPublicKeyApiJob.set_csr (GLib.ByteArray csr) {
@@ -74,13 +74,13 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.set_query (query);
 
-        q_c_info (lc_sign_public_key_api_job) << "Sending the CSR" << this.csr.data ();
+        GLib.Info (lc_sign_public_key_api_job) << "Sending the CSR" << this.csr.data ();
         send_request ("POST", url, req, this.csr);
         AbstractNetworkJob.on_start ();
     }
 
     bool SignPublicKeyApiJob.on_finished () {
-        q_c_info (lc_store_private_key_api_job ()) << "Sending CSR ended with"  << path () << error_string () << reply ().attribute (Soup.Request.HttpStatusCodeAttribute);
+        GLib.Info (lc_store_private_key_api_job ()) << "Sending CSR ended with"  << path () << error_string () << reply ().attribute (Soup.Request.HttpStatusCodeAttribute);
 
         QJsonParseError error;
         var json = QJsonDocument.from_json (reply ().read_all (), error);

@@ -4,15 +4,15 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QMenu>
-// #include <Qt_network>
-// #include <QSslConfiguration>
-// #include <QWidget_action>
-// #include <QLabel>
-
-// #include <QToolButton>
-// #include <QPointer>
-// #include <QSsl>
+//  #include <QMenu>
+//  #include <Qt_network>
+//  #include <QSslConfiguration>
+//  #include <QWidget_action>
+//  #include <QLabel>
+//  #include
+//  #include <QToolButt
+//  #include <QPointer>
+//  #include <QSsl>
 
 
 namespace Occ {
@@ -26,7 +26,7 @@ class Ssl_button : QToolButton {
 
     /***********************************************************
     ***********************************************************/
-    public Ssl_button (Gtk.Widget parent = nullptr);
+    public Ssl_button (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
@@ -58,6 +58,7 @@ class Ssl_button : QToolButton {
             this, &Ssl_button.on_update_menu);
         set_menu (this.menu);
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -186,7 +187,7 @@ class Ssl_button : QToolButton {
         AccountPointer account = this.account_state.account ();
         if (account.url ().scheme () == QLatin1String ("https")) {
             set_icon (QIcon (QLatin1String (":/client/theme/lock-https.svg")));
-            QSslCipher cipher = account._session_cipher;
+            QSslCipher cipher = account.session_cipher;
             set_tool_tip (_("This connection is encrypted using %1 bit %2.\n").arg (cipher.used_bits ()).arg (cipher.name ()));
         } else {
             set_icon (QIcon (QLatin1String (":/client/theme/lock-http.svg")));
@@ -210,17 +211,17 @@ class Ssl_button : QToolButton {
         }
 
         if (account.url ().scheme () == QLatin1String ("https")) {
-            string ssl_version = account._session_cipher.protocol_""
-                + ", " + account._session_cipher.authentication_method ()
-                + ", " + account._session_cipher.key_exchange_method ()
-                + ", " + account._session_cipher.encryption_method ();
+            string ssl_version = account.session_cipher.protocol_""
+                + ", " + account.session_cipher.authentication_method ()
+                + ", " + account.session_cipher.key_exchange_method ()
+                + ", " + account.session_cipher.encryption_method ();
             this.menu.add_action (ssl_version).set_enabled (false);
 
-            if (account._session_ticket.is_empty ()) {
+            if (account.session_ticket.is_empty ()) {
                 this.menu.add_action (_("No support for SSL session tickets/identifiers")).set_enabled (false);
             }
 
-            GLib.List<QSslCertificate> chain = account._peer_certificate_chain;
+            GLib.List<QSslCertificate> chain = account.peer_certificate_chain;
 
             if (chain.is_empty ()) {
                 GLib.warn (lc_ssl) << "Empty certificate chain";
@@ -229,18 +230,18 @@ class Ssl_button : QToolButton {
 
             this.menu.add_action (_("Certificate information:")).set_enabled (false);
 
-            const var system_certs = QSslConfiguration.system_ca_certificates ();
+            const var system_certificates = QSslConfiguration.system_ca_certificates ();
 
             GLib.List<QSslCertificate> tmp_chain;
             foreach (QSslCertificate cert, chain) {
                 tmp_chain << cert;
-                if (system_certs.contains (cert))
+                if (system_certificates.contains (cert))
                     break;
             }
             chain = tmp_chain;
 
             // find trust anchor (informational only, verification is done by QSslSocket!)
-            for (QSslCertificate root_cA : system_certs) {
+            for (QSslCertificate root_cA : system_certificates) {
                 if (root_cA.issuer_info (QSslCertificate.Common_name) == chain.last ().issuer_info (QSslCertificate.Common_name)
                     && root_cA.issuer_info (QSslCertificate.Organization) == chain.last ().issuer_info (QSslCertificate.Organization)) {
                     chain.append (root_cA);
@@ -252,7 +253,7 @@ class Ssl_button : QToolButton {
             it.to_back ();
             int i = 0;
             while (it.has_previous ()) {
-                this.menu.add_menu (build_cert_menu (this.menu, it.previous (), account.approved_certs (), i, system_certs));
+                this.menu.add_menu (build_cert_menu (this.menu, it.previous (), account.approved_certificates (), i, system_certificates));
                 i++;
             }
         } else {

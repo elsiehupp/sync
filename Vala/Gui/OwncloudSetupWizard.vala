@@ -6,17 +6,17 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QAbstractButton>
-// #include <QtCore>
-// #include <QProcess>
-// #include <QMessageBox>
-// #include <QDesktopServices>
-// #include <QApplication>
-
-// #include <Gtk.Widget>
-// #include <QProcess>
+//  #include <QAbstractButton>
+//  #include <QtCore>
+//  #include <QProcess>
+//  #include <QMessageBox>
+//  #include <QDesktopServices>
+//  #include <QApplication>
+//  #include
+//  #include <Gtk.Widget>
+//  #include <QProcess>
 using Soup;
-// #include <QPointer>
+//  #include <QPointer>
 
 namespace Occ {
 
@@ -31,7 +31,7 @@ class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     Run the wizard
     ***********************************************************/
-    public static void run_wizard (GLib.Object obj, char amember, Gtk.Widget parent = nullptr);
+    public static void run_wizard (GLib.Object obj, char amember, Gtk.Widget parent = null);
 
 
     /***********************************************************
@@ -95,8 +95,8 @@ signals:
 
     OwncloudSetupWizard.OwncloudSetupWizard (GLib.Object parent)
         : GLib.Object (parent)
-        , this.oc_wizard (new OwncloudWizard)
-        , this.remote_folder () {
+        this.oc_wizard (new OwncloudWizard)
+        this.remote_folder () {
         connect (this.oc_wizard, &OwncloudWizard.determine_auth_type,
             this, &OwncloudSetupWizard.on_check_server);
         connect (this.oc_wizard, &OwncloudWizard.connect_to_oc_url,
@@ -116,9 +116,10 @@ signals:
         this.oc_wizard.delete_later ();
     }
 
+
     /***********************************************************
     ***********************************************************/
-    static QPointer<OwncloudSetupWizard> wiz = nullptr;
+    static QPointer<OwncloudSetupWizard> wiz = null;
 
     void OwncloudSetupWizard.run_wizard (GLib.Object obj, char amember, Gtk.Widget parent) {
         if (!wiz.is_null ()) {
@@ -137,7 +138,7 @@ signals:
             return false;
         }
 
-        OwncloudGui.raise_dialog (wiz._oc_wizard);
+        OwncloudGui.raise_dialog (wiz.oc_wizard);
         return true;
     }
 
@@ -202,13 +203,13 @@ signals:
         // Here the client certificate is added, if any. Later it'll be in HttpCredentials
         account.set_ssl_configuration (QSslConfiguration ());
         var ssl_configuration = account.get_or_create_ssl_config (); // let Account set defaults
-        if (!this.oc_wizard._client_ssl_certificate.is_null ()) {
-            ssl_configuration.set_local_certificate (this.oc_wizard._client_ssl_certificate);
-            ssl_configuration.set_private_key (this.oc_wizard._client_ssl_key);
+        if (!this.oc_wizard.client_ssl_certificate.is_null ()) {
+            ssl_configuration.set_local_certificate (this.oc_wizard.client_ssl_certificate);
+            ssl_configuration.set_private_key (this.oc_wizard.client_ssl_key);
         }
         // Be sure to merge the CAs
         var ca = ssl_configuration.system_ca_certificates ();
-        ca.append (this.oc_wizard._client_ssl_ca_certificates);
+        ca.append (this.oc_wizard.client_ssl_ca_certificates);
         ssl_configuration.set_ca_certificates (ca);
         account.set_ssl_configuration (ssl_configuration);
 
@@ -230,9 +231,9 @@ signals:
 
     void OwncloudSetupWizard.on_system_proxy_lookup_done (QNetworkProxy proxy) {
         if (proxy.type () != QNetworkProxy.NoProxy) {
-            q_c_info (lc_wizard) << "Setting QNAM proxy to be system proxy" << ClientProxy.print_q_network_proxy (proxy);
+            GLib.Info (lc_wizard) << "Setting QNAM proxy to be system proxy" << ClientProxy.print_q_network_proxy (proxy);
         } else {
-            q_c_info (lc_wizard) << "No system proxy set by OS";
+            GLib.Info (lc_wizard) << "No system proxy set by OS";
         }
         AccountPointer account = this.oc_wizard.account ();
         account.network_access_manager ().set_proxy (proxy);
@@ -282,7 +283,7 @@ signals:
             [permanent_redirects, account] (Soup.Reply reply, GLib.Uri target_url, int count) {
                 int http_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
                 if (count == *permanent_redirects && (http_code == 301 || http_code == 308)) {
-                    q_c_info (lc_wizard) << account.url () << " was redirected to" << target_url;
+                    GLib.Info (lc_wizard) << account.url () << " was redirected to" << target_url;
                     account.set_url (target_url);
                     *permanent_redirects += 1;
                 }
@@ -317,7 +318,7 @@ signals:
         if (url != this.oc_wizard.account ().url ()) {
             // We might be redirected, update the account
             this.oc_wizard.account ().set_url (url);
-            q_c_info (lc_wizard) << " was redirected to" << url.to_string ();
+            GLib.Info (lc_wizard) << " was redirected to" << url.to_string ();
         }
 
         on_determine_auth_type ();
@@ -361,7 +362,7 @@ signals:
     }
 
     void OwncloudSetupWizard.on_connect_to_oCUrl (string url) {
-        q_c_info (lc_wizard) << "Connect to url : " << url;
+        GLib.Info (lc_wizard) << "Connect to url : " << url;
         AbstractCredentials creds = this.oc_wizard.get_credentials ();
         this.oc_wizard.account ().set_credentials (creds);
 
@@ -374,7 +375,7 @@ signals:
             sender ().delete_later ();
 
             const var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-            const var user_id = obj_data.value ("id").to_string ("");
+            const var user_id = obj_data.value ("identifier").to_string ("");
             const var display_name = obj_data.value ("display-name").to_string ("");
             this.oc_wizard.account ().set_dav_user (user_id);
             this.oc_wizard.account ().set_dav_display_name (display_name);
@@ -417,7 +418,7 @@ signals:
         // the updated server URL, similar to redirects on status.php.
         GLib.Uri redirect_url = reply.attribute (QNetworkRequest.RedirectionTargetAttribute).to_url ();
         if (!redirect_url.is_empty ()) {
-            q_c_info (lc_wizard) << "Authed request was redirected to" << redirect_url.to_string ();
+            GLib.Info (lc_wizard) << "Authed request was redirected to" << redirect_url.to_string ();
 
             // strip the expected path
             string path = redirect_url.path ();
@@ -426,7 +427,7 @@ signals:
                 path.chop (expected_path.size ());
                 redirect_url.set_path (path);
 
-                q_c_info (lc_wizard) << "Setting account url to" << redirect_url.to_string ();
+                GLib.Info (lc_wizard) << "Setting account url to" << redirect_url.to_string ();
                 this.oc_wizard.account ().set_url (redirect_url);
                 test_owncloud_connect ();
                 return;
@@ -487,7 +488,7 @@ signals:
     }
 
     void OwncloudSetupWizard.on_create_local_and_remote_folders (string local_folder, string remote_folder) {
-        q_c_info (lc_wizard) << "Setup local sync folder for new o_c connection " << local_folder;
+        GLib.Info (lc_wizard) << "Setup local sync folder for new o_c connection " << local_folder;
         const QDir fi (local_folder);
 
         bool next_step = true;
@@ -522,7 +523,7 @@ signals:
                     Example: https://cloud.example.com/remote.php/dav//
 
             ***********************************************************/
-            q_c_info (lc_wizard) << "Sanitize got URL path:" << string (this.oc_wizard.account ().url ().to_string () + '/' + this.oc_wizard.account ().dav_path () + remote_folder);
+            GLib.Info (lc_wizard) << "Sanitize got URL path:" << string (this.oc_wizard.account ().url ().to_string () + '/' + this.oc_wizard.account ().dav_path () + remote_folder);
 
             string new_dav_path = this.oc_wizard.account ().dav_path (),
                     new_remote_folder = remote_folder;
@@ -543,7 +544,7 @@ signals:
 
             string new_url_path = new_dav_path + '/' + new_remote_folder;
 
-            q_c_info (lc_wizard) << "Sanitized to URL path:" << this.oc_wizard.account ().url ().to_string () + '/' + new_url_path;
+            GLib.Info (lc_wizard) << "Sanitized to URL path:" << this.oc_wizard.account ().url ().to_string () + '/' + new_url_path;
             /***********************************************************
             END - Sanitize URL paths to eliminate double-slashes
             ***********************************************************/
@@ -564,7 +565,7 @@ signals:
         Soup.Reply.NetworkError err_id = reply.error ();
 
         if (err_id == Soup.Reply.NoError) {
-            q_c_info (lc_wizard) << "Remote folder found, all cool!";
+            GLib.Info (lc_wizard) << "Remote folder found, all cool!";
         } else if (err_id == Soup.Reply.ContentNotFoundError) {
             if (this.remote_folder.is_empty ()) {
                 error = _("No remote folder specified!");
@@ -657,7 +658,7 @@ signals:
         while (!rename_ok) {
             rename_ok = FolderMan.instance ().start_from_scratch (local_folder);
             if (!rename_ok) {
-                QMessageBox.StandardButton but = QMessageBox.question (nullptr, _("Folder rename failed"),
+                QMessageBox.StandardButton but = QMessageBox.question (null, _("Folder rename failed"),
                     _("Cannot remove and back up the folder because the folder or a file in it is open in another program."
                        " Please close the folder or file and hit retry or cancel the setup."),
                     QMessageBox.Retry | QMessageBox.Abort, QMessageBox.Retry);
@@ -674,7 +675,7 @@ signals:
         FolderMan folder_man = FolderMan.instance ();
 
         if (result == Gtk.Dialog.Rejected) {
-            q_c_info (lc_wizard) << "Rejected the new config, use the old!";
+            GLib.Info (lc_wizard) << "Rejected the new config, use the old!";
 
         } else if (result == Gtk.Dialog.Accepted) {
             // This may or may not wipe all folder definitions, depending
@@ -686,7 +687,7 @@ signals:
 
             bool start_from_scratch = this.oc_wizard.field ("OCSync_from_scratch").to_bool ();
             if (!start_from_scratch || ensure_start_from_scratch (local_folder)) {
-                q_c_info (lc_wizard) << "Adding folder definition for" << local_folder << this.remote_folder;
+                GLib.Info (lc_wizard) << "Adding folder definition for" << local_folder << this.remote_folder;
                 FolderDefinition folder_definition;
                 folder_definition.local_path = local_folder;
                 folder_definition.target_path = FolderDefinition.prepare_target_path (this.remote_folder);

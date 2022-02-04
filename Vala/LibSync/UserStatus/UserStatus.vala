@@ -9,10 +9,10 @@ namespace Occ {
 class UserStatus {
     // Q_GADGET
 
-    Q_PROPERTY (string id MEMBER this.id)
-    Q_PROPERTY (string message MEMBER this.message)
-    Q_PROPERTY (string icon MEMBER this.icon)
-    Q_PROPERTY (OnlineStatus state MEMBER this.state)
+    //  Q_PROPERTY (string identifier MEMBER this.identifier)
+    //  Q_PROPERTY (string message MEMBER this.message)
+    //  Q_PROPERTY (string icon MEMBER this.icon)
+    //  Q_PROPERTY (OnlineStatus state MEMBER this.state)
 
 
     /***********************************************************
@@ -31,14 +31,14 @@ class UserStatus {
 
     /***********************************************************
     ***********************************************************/
-    public UserStatus (string id, string message, string icon,
+    public UserStatus (string identifier, string message, string icon,
         OnlineStatus state, bool message_predefined, Optional<ClearAt> clear_at = {});
 
 
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public string id ();
+    public string identifier ();
 
 
     /***********************************************************
@@ -66,10 +66,11 @@ class UserStatus {
         return this.clear_at;
     }
 
+
     /***********************************************************
     ***********************************************************/
-    public void set_id (string id) {
-        this.id = id;
+    public void set_id (string identifier) {
+        this.identifier = identifier;
     }
 
 
@@ -117,7 +118,7 @@ class UserStatus {
 
     /***********************************************************
     ***********************************************************/
-    private string this.id;
+    private string this.identifier;
     private string this.message;
     private string this.icon;
     private OnlineStatus this.state = OnlineStatus.Online;
@@ -131,18 +132,18 @@ class UserStatus {
 UserStatus.UserStatus () = default;
 
 UserStatus.UserStatus (
-    const string id, string message, string icon,
+    const string identifier, string message, string icon,
     OnlineStatus state, bool message_predefined, Optional<ClearAt> clear_at)
-    : this.id (id)
-    , this.message (message)
-    , this.icon (icon)
-    , this.state (state)
-    , this.message_predefined (message_predefined)
-    , this.clear_at (clear_at) {
+    : this.identifier (identifier)
+    this.message (message)
+    this.icon (icon)
+    this.state (state)
+    this.message_predefined (message_predefined)
+    this.clear_at (clear_at) {
 }
 
-string UserStatus.id () {
-    return this.id;
+string UserStatus.identifier () {
+    return this.identifier;
 }
 
 string UserStatus.message () {

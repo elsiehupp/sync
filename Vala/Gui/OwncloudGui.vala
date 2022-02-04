@@ -7,29 +7,29 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 #ifdef WITH_LIBCLOUDPROVIDERS
 #endif
 
-// #include <QQml_application_engine>
-// #include <QDesktopServices>
-// #include <QDir>
-// #include <QMessageBox>
-// #include <QSignal_mapper>
-#ifdef WITH_LIBCLOUDPROVIDERS
-// #include <Qt_d_bus/QDBus_connection>
-// #include <Qt_d_bus/QDBus_interface>
+//  #include <QQml_application_engine>
+//  #include <QDesktopServices>
+//  #include <QDir>
+//  #include <QMessageBox>
+//  #include <QSignal_mapper>
+//  #include_LIBCLOUDPROVIDERS
+//  #include <Qt_d_bus/QDBus_connection>
+//  #include <Qt_d_bus/QDBus_interface>
 #endif
 
-// #include <QQmlEngine>
-// #include <QQml_component>
-// #include <QQml_application_engine>
-// #include <QQuick_item>
-// #include <QQml_context>
-
-// #include <QPointer>
-// #include <QAction>
-// #include <QMenu>
-// #include <QSize>
-// #include <QTimer>
+//  #include <QQmlEngine>
+//  #include <QQml_component>
+//  #include <QQml_application_engine>
+//  #include <QQuick_item>
+//  #include <QQml_context>
+//  #include
+//  #include <QPointer
+//  #include <QActio
+//  #include <QMenu>
+//  #include <QSize>
+//  #include <QTimer>
 #ifdef WITH_LIBCLOUDPROVIDERS
-// #include <QDBus_connection>
+//  #include <QDBus_connection>
 #endif
 
 namespace Occ {
@@ -47,7 +47,7 @@ class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public OwncloudGui (Application parent = nullptr);
+    public OwncloudGui (Application parent = null);
 
     /***********************************************************
     ***********************************************************/
@@ -59,7 +59,6 @@ class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public static QSize settings_dialog_size () {
         return {800, 500};
     }
@@ -245,13 +244,13 @@ const char property_account_c[] = "oc_account";
 
 OwncloudGui.OwncloudGui (Application parent)
     : GLib.Object (parent)
-    , this.tray (nullptr)
-    , this.settings_dialog (nullptr)
-    , this.log_browser (nullptr)
+    this.tray (null)
+    this.settings_dialog (null)
+    this.log_browser (null)
 #ifdef WITH_LIBCLOUDPROVIDERS
-    , this.bus (QDBus_connection.session_bus ())
+    this.bus (QDBus_connection.session_bus ())
 #endif
-    , this.app (parent) {
+    this.app (parent) {
     this.tray = Systray.instance ();
     this.tray.set_tray_engine (new QQml_application_engine (this));
     // for the beginning, set the offline icon until the account was verified
@@ -315,7 +314,7 @@ bool OwncloudGui.cloud_provider_api_available () {
                               "org.freedesktop.Cloud_provider.Manager1", this.bus);
 
     if (!dbus_iface.is_valid ()) {
-        q_c_info (lc_application) << "DBus interface unavailable";
+        GLib.Info (lc_application) << "DBus interface unavailable";
         return false;
     }
     return true;
@@ -332,7 +331,7 @@ void OwncloudGui.on_open_settings_dialog () {
             this.settings_dialog.close ();
         }
     } else {
-        q_c_info (lc_application) << "No configured folders yet, starting setup wizard";
+        GLib.Info (lc_application) << "No configured folders yet, starting setup wizard";
         on_new_account_wizard ();
     }
 }
@@ -350,7 +349,7 @@ void OwncloudGui.on_tray_clicked (QSystemTrayIcon.Activation_reason reason) {
         } else if (this.share_dialogs.size () > 0) {
             // Share dialog (s) be hidden by other apps, bring them back
             Q_FOREACH (QPointer<Share_dialog> share_dialog, this.share_dialogs) {
-                Q_ASSERT (share_dialog.data ());
+                //  Q_ASSERT (share_dialog.data ());
                 raise_dialog (share_dialog);
             }
         } else if (this.tray.is_open ()) {
@@ -377,7 +376,7 @@ void OwncloudGui.on_sync_state_change (Folder folder) {
 
     var result = folder.sync_result ();
 
-    q_c_info (lc_application) << "Sync state changed for folder " << folder.remote_url ().to_string () << " : " << result.status_string ();
+    GLib.Info (lc_application) << "Sync state changed for folder " << folder.remote_url ().to_string () << " : " << result.status_string ();
 
     if (result.status () == SyncResult.Status.SUCCESS
         || result.status () == SyncResult.Status.PROBLEM
@@ -551,7 +550,7 @@ open the folder with the given Alias
 void OwncloudGui.on_folder_open_action (string alias) {
     Folder f = FolderMan.instance ().folder (alias);
     if (f) {
-        q_c_info (lc_application) << "opening local url " << f.path ();
+        GLib.Info (lc_application) << "opening local url " << f.path ();
         GLib.Uri url = GLib.Uri.from_local_file (f.path ());
         QDesktopServices.open_url (url);
     }
@@ -563,12 +562,12 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
     // FIXME : Lots of messages computed for nothing in this method, needs revisiting
     if (progress.status () == ProgressInfo.Discovery) {
 #if 0
-        if (!progress._current_discovered_remote_folder.is_empty ()) {
+        if (!progress.current_discovered_remote_folder.is_empty ()) {
             this.action_status.on_set_text (_("Checking for changes in remote \"%1\"")
-                                       .arg (progress._current_discovered_remote_folder));
-        } else if (!progress._current_discovered_local_folder.is_empty ()) {
+                                       .arg (progress.current_discovered_remote_folder));
+        } else if (!progress.current_discovered_local_folder.is_empty ()) {
             this.action_status.on_set_text (_("Checking for changes in local \"%1\"")
-                                       .arg (progress._current_discovered_local_folder));
+                                       .arg (progress.current_discovered_local_folder));
         }
 #endif
     } else if (progress.status () == ProgressInfo.Done) {
@@ -606,15 +605,15 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
         //this.action_status.on_set_text (msg);
     }
 
-    if (!progress._last_completed_item.is_empty ()) {
+    if (!progress.last_completed_item.is_empty ()) {
 
-        string kind_str = Progress.as_result_string (progress._last_completed_item);
+        string kind_str = Progress.as_result_string (progress.last_completed_item);
         string time_str = QTime.current_time ().to_string ("hh:mm");
-        string action_text = _("%1 (%2, %3)").arg (progress._last_completed_item._file, kind_str, time_str);
+        string action_text = _("%1 (%2, %3)").arg (progress.last_completed_item.file, kind_str, time_str);
         var action = new QAction (action_text, this);
         Folder f = FolderMan.instance ().folder (folder);
         if (f) {
-            string full_path = f.path () + '/' + progress._last_completed_item._file;
+            string full_path = f.path () + '/' + progress.last_completed_item.file;
             if (GLib.File (full_path).exists ()) {
                 connect (action, &QAction.triggered, this, [this, full_path] {
                     this.on_open_path (full_path);
@@ -655,7 +654,7 @@ void OwncloudGui.on_logout () {
 }
 
 void OwncloudGui.on_new_account_wizard () {
-    OwncloudSetupWizard.run_wizard (q_app, SLOT (on_owncloud_wizard_done (int)));
+    OwncloudSetupWizard.run_wizard (Gtk.Application, SLOT (on_owncloud_wizard_done (int)));
 }
 
 void OwncloudGui.on_show_gui_message (string title, string message) {
@@ -746,19 +745,19 @@ void OwncloudGui.on_show_share_dialog (string share_path, string local_path, Sha
     bool resharing_allowed = true; // lets assume the good
     if (folder.journal_database ().get_file_record (file, file_record) && file_record.is_valid ()) {
         // check the permission : Is resharing allowed?
-        if (!file_record._remote_perm.is_null () && !file_record._remote_perm.has_permission (RemotePermissions.Can_reshare)) {
+        if (!file_record.remote_perm.is_null () && !file_record.remote_perm.has_permission (RemotePermissions.Can_reshare)) {
             resharing_allowed = false;
         }
     }
 
     var max_sharing_permissions = resharing_allowed? Share_permissions (account_state.account ().capabilities ().share_default_permissions ()) : Share_permissions ({});
 
-    Share_dialog w = nullptr;
+    Share_dialog w = null;
     if (this.share_dialogs.contains (local_path) && this.share_dialogs[local_path]) {
-        q_c_info (lc_application) << "Raising share dialog" << share_path << local_path;
+        GLib.Info (lc_application) << "Raising share dialog" << share_path << local_path;
         w = this.share_dialogs[local_path];
     } else {
-        q_c_info (lc_application) << "Opening share dialog" << share_path << local_path << max_sharing_permissions;
+        GLib.Info (lc_application) << "Opening share dialog" << share_path << local_path << max_sharing_permissions;
         w = new Share_dialog (account_state, share_path, local_path, max_sharing_permissions, file_record.numeric_file_id (), start_page);
         w.set_attribute (Qt.WA_DeleteOnClose, true);
 

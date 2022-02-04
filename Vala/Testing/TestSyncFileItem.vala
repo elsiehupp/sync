@@ -4,7 +4,7 @@
          any purpose.
          */
 
-// #include <QtTest>
+//  #include <QtTest>
 
 using namespace Occ;
 
@@ -22,9 +22,9 @@ class TestSyncFileItem : GLib.Object {
 
 
     private
-    private on_ SyncFileItem createItem ( const string& file ) {
+    private on_ SyncFileItem createItem ( const string file ) {
         SyncFileItem i;
-        i._file = file;
+        i.file = file;
         return i;
     }
 
@@ -41,9 +41,9 @@ class TestSyncFileItem : GLib.Object {
         QTest.newRow ("a3") << createItem ("ABCD") << createItem ("abcd") << createItem ("zzzz");
 
         SyncFileItem movedItem1;
-        movedItem1._file = "folder/source/file.f";
-        movedItem1._renameTarget = "folder/destination/file.f";
-        movedItem1._instruction = CSYNC_INSTRUCTION_RENAME;
+        movedItem1.file = "folder/source/file.f";
+        movedItem1.renameTarget = "folder/destination/file.f";
+        movedItem1.instruction = CSYNC_INSTRUCTION_RENAME;
 
         QTest.newRow ("move1") << createItem ("folder/destination") << movedItem1 << createItem ("folder/destination-2");
         QTest.newRow ("move2") << createItem ("folder/destination/1") << movedItem1 << createItem ("folder/source");

@@ -4,7 +4,7 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <qglobal.h>
+//  #include <qglobal.h>
 
 namespace Occ {
 
@@ -19,8 +19,8 @@ enum Share_permission {
     Share_permission_share    = 1 << 4,
     Share_permission_default  = 1 << 30
 }
-Q_DECLARE_FLAGS (Share_permissions, Share_permission)
-Q_DECLARE_OPERATORS_FOR_FLAGS (Share_permissions)
+// Q_DECLARE_FLAGS (Share_permissions, Share_permission)
+// Q_DECLARE_OPERATORS_FOR_FLAGS (Share_permissions)
 
 } // namespace Occ
 

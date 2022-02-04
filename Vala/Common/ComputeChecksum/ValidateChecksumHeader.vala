@@ -78,13 +78,13 @@ class ValidateChecksumHeader : ComputeChecksumBase {
         // If the incoming header is empty no validation can happen. Just continue.
         if (checksum_header.is_empty ()) {
             /* emit */ validated (GLib.ByteArray (), GLib.ByteArray ());
-            return nullptr;
+            return null;
         }
 
         if (!parse_checksum_header (checksum_header, this.expected_checksum_type, this.expected_checksum)) {
             GLib.warn (lc_checksums) << "Checksum header malformed:" << checksum_header;
             /* emit */ validation_failed (_("The checksum header is malformed."));
-            return nullptr;
+            return null;
         }
 
         var calculator = new ComputeChecksum (this);

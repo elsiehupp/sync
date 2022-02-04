@@ -27,13 +27,13 @@ class CSyncChecksumHook : ComputeChecksumBase {
     public static GLib.ByteArray hook (GLib.ByteArray path, GLib.ByteArray other_checksum_header, void this_obj) {
         GLib.ByteArray type = parse_checksum_header_type (GLib.ByteArray (other_checksum_header));
         if (type.is_empty ())
-            return nullptr;
+            return null;
 
-        q_c_info (lc_checksums) << "Computing" << type << "checksum of" << path << "in the csync hook";
+        GLib.Info (lc_checksums) << "Computing" << type << "checksum of" << path << "in the csync hook";
         GLib.ByteArray checksum = ComputeChecksum.compute_now_on_file (string.from_utf8 (path), type);
         if (checksum.is_null ()) {
             GLib.warn (lc_checksums) << "Failed to compute checksum" << type << "for" << path;
-            return nullptr;
+            return null;
         }
 
         return make_checksum_header (type, checksum);

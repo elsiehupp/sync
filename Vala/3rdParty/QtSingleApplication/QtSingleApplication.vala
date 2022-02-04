@@ -11,7 +11,7 @@ rights.  These rights are described in the Digia Qt LGPL Exception
 version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
-// #include <QApplication>
+//  #include <QApplication>
 
 QT_FORWARD_DECLARE_CLASS (QShared_memory)
 
@@ -22,7 +22,7 @@ class QtSingleApplication : QApplication {
 
     /***********************************************************
     ***********************************************************/
-    public QtSingleApplication (string id, int argc, char **argv);
+    public QtSingleApplication (string identifier, int argc, char **argv);
 
     /***********************************************************
     ***********************************************************/
@@ -103,12 +103,12 @@ rights.  These rights are described in the Digia Qt LGPL Exception
 version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
-// #include <qtlockedfile.h>
-
-// #include <QDir>
-// #include <QFile_open_event>
-// #include <QShared_memory>
-// #include <Gtk.Widget>
+//  #include <qtlockedfile.h>
+//  #include
+//  #include <QDir>
+//  #include <QFile_open_even
+//  #include <QShared_memory>
+//  #include <Gtk.Widget>
 
 namespace SharedTools {
 
@@ -129,14 +129,14 @@ namespace SharedTools {
     QtSingleApplication.QtSingleApplication (string app_id, int argc, char **argv)
         : QApplication (argc, argv),
           first_peer (-1),
-          pid_peer (nullptr) {
+          pid_peer (null) {
         this.app_id = app_id;
 
         const string app_session_id = QtLocalPeer.app_session_id (app_id);
 
         // This shared memory holds a zero-terminated array of active (or crashed) instances
         instances = new QShared_memory (app_session_id, this);
-        act_win = nullptr;
+        act_win = null;
         block = false;
 
         // First instance creates the shared memory, later instances attach to it
@@ -146,7 +146,7 @@ namespace SharedTools {
                 q_warning () << "Failed to initialize instances shared memory : "
                            << instances.error_string ();
                 delete instances;
-                instances = nullptr;
+                instances = null;
                 return;
             }
         }

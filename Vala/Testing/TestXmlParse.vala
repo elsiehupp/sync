@@ -4,7 +4,7 @@
          any purpose.
          */
 
-// #include <QtTest>
+//  #include <QtTest>
 
 using namespace Occ;
 
@@ -27,7 +27,7 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_directory_listing_iterated (string& item, GLib.HashMap<string,string>& ) {
+    public void on_directory_listing_iterated (string item, GLib.HashMap<string,string>& ) {
         qDebug () << "     item : " << item;
         this.items.append (item);
     }
@@ -63,7 +63,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004213ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004213ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVCK</oc:permissions>"
             "<oc:size>121780</oc:size>"
             "<d:getetag>\"5527beb0400b0\"</d:getetag>"
@@ -87,7 +87,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/oc/remote.php/dav/sharefolder/quitte.pdf</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004215ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004215ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVW</oc:permissions>"
             "<d:getetag>\"2fa2f0d9ed49ea0c3e409d49e652dea0\"</d:getetag>"
             "<d:resourcetype/>"
@@ -139,7 +139,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004213ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004213ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVCK</oc:permissions>"
             "<oc:size>121780</oc:size>"
             "<d:getetag>\"5527beb0400b0\"</d:getetag>"
@@ -163,7 +163,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/oc/remote.php/dav/sharefolder/quitte.pdf</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004215ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004215ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVW</oc:permissions>"
             "<d:getetag>\"2fa2f0d9ed49ea0c3e409d49e652dea0\"</d:getetag>"
             "<d:resourcetype/>"
@@ -262,7 +262,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004213ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004213ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVCK</oc:permissions>"
             "<oc:size>121780</oc:size>"
             "<d:getetag>\"5527beb0400b0\"</d:getetag>"
@@ -298,7 +298,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>http://127.0.0.1:81/oc/remote.php/dav/sharefolder/</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004213ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004213ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVCK</oc:permissions>"
             "<oc:size>121780</oc:size>"
             "<d:getetag>\"5527beb0400b0\"</d:getetag>"
@@ -322,7 +322,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>http://127.0.0.1:81/oc/remote.php/dav/sharefolder/quitte.pdf</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004215ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004215ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVW</oc:permissions>"
             "<d:getetag>\"2fa2f0d9ed49ea0c3e409d49e652dea0\"</d:getetag>"
             "<d:resourcetype/>"
@@ -365,7 +365,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/sharefolder</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004213ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004213ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVCK</oc:permissions>"
             "<oc:size>121780</oc:size>"
             "<d:getetag>\"5527beb0400b0\"</d:getetag>"
@@ -389,7 +389,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/sharefolder/quitte.pdf</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004215ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004215ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVW</oc:permissions>"
             "<d:getetag>\"2fa2f0d9ed49ea0c3e409d49e652dea0\"</d:getetag>"
             "<d:resourcetype/>"
@@ -432,7 +432,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004213ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004213ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVCK</oc:permissions>"
             "<oc:size>121780</oc:size>"
             "<d:getetag>\"5527beb0400b0\"</d:getetag>"
@@ -456,7 +456,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/oc/remote.php/dav/sharefolder/../sharefolder/quitte.pdf</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004215ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004215ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVW</oc:permissions>"
             "<d:getetag>\"2fa2f0d9ed49ea0c3e409d49e652dea0\"</d:getetag>"
             "<d:resourcetype/>"
@@ -508,7 +508,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004213ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004213ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVCK</oc:permissions>"
             "<oc:size>121780</oc:size>"
             "<d:getetag>\"5527beb0400b0\"</d:getetag>"
@@ -532,7 +532,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/oc/remote.php/dav/sharefolder/../quitte.pdf</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004215ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004215ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVW</oc:permissions>"
             "<d:getetag>\"2fa2f0d9ed49ea0c3e409d49e652dea0\"</d:getetag>"
             "<d:resourcetype/>"
@@ -576,7 +576,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/%C3%A4</d:href>" // a-umlaut utf8
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004213ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004213ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVCK</oc:permissions>"
             "<oc:size>121780</oc:size>"
             "<d:getetag>\"5527beb0400b0\"</d:getetag>"
@@ -600,7 +600,7 @@ class TestXmlParse : GLib.Object {
             "<d:href>/%C3%A4/%C3%A4.pdf</d:href>"
             "<d:propstat>"
             "<d:prop>"
-            "<oc:id>00004215ocobzus5kn6s</oc:id>"
+            "<oc:identifier>00004215ocobzus5kn6s</oc:identifier>"
             "<oc:permissions>RDNVW</oc:permissions>"
             "<d:getetag>\"2fa2f0d9ed49ea0c3e409d49e652dea0\"</d:getetag>"
             "<d:resourcetype/>"

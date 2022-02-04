@@ -12,5 +12,5 @@ class SslDialogErrorHandler : AbstractSslErrorHandler {
 
     /***********************************************************
     ***********************************************************/
-    public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certs, AccountPointer) override;
+    public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certificates, AccountPointer) override;
 };

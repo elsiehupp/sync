@@ -51,7 +51,7 @@ struct VfsSetupParams {
 
     Note: The journal must live at least until the Vfs.stop () call.
     ***********************************************************/
-    SyncJournalDb journal = nullptr;
+    SyncJournalDb journal = null;
 
 
     /***********************************************************

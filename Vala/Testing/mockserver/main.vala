@@ -4,7 +4,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QCoreApplication>
+//  #include <QCoreApplication>
 
 int main (int argc, char* argv[]) {
   QCoreApplication app (argc, argv);

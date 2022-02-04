@@ -11,11 +11,11 @@ rights.  These rights are described in the Digia Qt LGPL Exception
 version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
-// #include <qtlockedfile.h>
-
-// #include <QLocal_server>
-// #include <QLocal_socket>
-// #include <QDir>
+//  #include <qtlockedfile.h>
+//  #include
+//  #include <QLocal_server>
+//  #include <QLocal_socket>
+//  #include <QDir>
 
 namespace SharedTools {
 
@@ -39,7 +39,7 @@ class QtLocalPeer : GLib.Object {
 
 
     public string application_id () {
-        return id;
+        return identifier;
     }
 
 
@@ -54,7 +54,7 @@ protected slots:
     void receive_connection ();
 
 
-    protected string id;
+    protected string identifier;
     protected string socket_name;
     protected QLocal_server* server;
     protected QtLockedFile lock_file;
@@ -83,13 +83,13 @@ rights.  These rights are described in the Digia Qt LGPL Exception
 version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
-// #include <QCoreApplication>
-// #include <QDataStream>
-// #include <QTime>
+//  #include <QCoreApplication>
+//  #include <QDataStream>
+//  #include <QTime>
 
 #if defined (Q_OS_UNIX)
-// #include <ctime>
-// #include <unistd.h>
+//  #include <ctime>
+//  #include <unistd.h>
 #endif
 
 namespace SharedTools {
@@ -99,7 +99,7 @@ static const char ack[] = "ack";
 string QtLocalPeer.app_session_id (string app_id) {
     GLib.ByteArray idc = app_id.to_utf8 ();
     uint16 id_num = q_checksum (idc.const_data (), idc.size ());
-    //### could do : two 16bit checksums over separate halves of id, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
+    //### could do : two 16bit checksums over separate halves of identifier, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
 
     string res = "qtsingleapplication-" + string.number (id_num, 16);
     res += '-' + string.number (.getuid (), 16);
@@ -107,11 +107,11 @@ string QtLocalPeer.app_session_id (string app_id) {
 }
 
 QtLocalPeer.QtLocalPeer (GLib.Object parent, string app_id)
-    : GLib.Object (parent), id (app_id) {
-    if (id.is_empty ())
-        id = QCoreApplication.application_file_path ();  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
+    : GLib.Object (parent), identifier (app_id) {
+    if (identifier.is_empty ())
+        identifier = QCoreApplication.application_file_path ();  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
 
-    socket_name = app_session_id (id);
+    socket_name = app_session_id (identifier);
     server = new QLocal_server (this);
     string lock_name = QDir (QDir.temp_path ()).absolute_path ()
                        + '/' + socket_name
@@ -152,7 +152,7 @@ bool QtLocalPeer.on_send_message (string message, int timeout, bool block) {
         struct timespec ts = {
             ms / 1000, (ms % 1000) * 1000 * 1000
         };
-        nanosleep (&ts, nullptr);
+        nanosleep (&ts, null);
     }
     if (!conn_ok)
         return false;

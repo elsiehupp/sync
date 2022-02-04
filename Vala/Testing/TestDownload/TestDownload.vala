@@ -4,9 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
-// #include <owncloudpropagator.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
+//  #include <owncloudpropagator.h>
 
 using namespace Occ;
 
@@ -29,12 +29,12 @@ class TestDownload : GLib.Object {
             if (op == QNetworkAccessManager.GetOperation && request.url ().path ().endsWith ("A/a0")) {
                 return new BrokenFakeGetReply (fakeFolder.remoteModifier (), op, request, this);
             }
-            return nullptr;
+            return null;
         });
 
         QVERIFY (!fakeFolder.syncOnce ()); // The sync must fail because not all the file was downloaded
-        QCOMPARE (getItem (completeSpy, "A/a0")._status, SyncFileItem.Status.SOFT_ERROR);
-        QCOMPARE (getItem (completeSpy, "A/a0")._errorString, string ("The file could not be downloaded completely."));
+        QCOMPARE (getItem (completeSpy, "A/a0").status, SyncFileItem.Status.SOFT_ERROR);
+        QCOMPARE (getItem (completeSpy, "A/a0").errorString, string ("The file could not be downloaded completely."));
         QVERIFY (fakeFolder.syncEngine ().isAnotherSyncNeeded ());
 
         // Now, we need to restart, this time, it should resume.
@@ -43,7 +43,7 @@ class TestDownload : GLib.Object {
             if (op == QNetworkAccessManager.GetOperation && request.url ().path ().endsWith ("A/a0")) {
                 ranges = request.rawHeader ("Range");
             }
-            return nullptr;
+            return null;
         });
         QVERIFY (fakeFolder.syncOnce ()); // now this succeeds
         QCOMPARE (ranges, GLib.ByteArray ("bytes=" + GLib.ByteArray.number (STOP_AFTER) + "-"));
@@ -74,15 +74,15 @@ class TestDownload : GLib.Object {
                     "<s:message>"+serverMessage+"</s:message>\n"
                     "</d:error>");
             }
-            return nullptr;
+            return null;
         });
 
         bool timedOut = false;
         QTimer.singleShot (10000, fakeFolder.syncEngine (), [&] () { timedOut = true; fakeFolder.syncEngine ().on_abort (); });
         QVERIFY (!fakeFolder.syncOnce ());  // Fail because A/broken
         QVERIFY (!timedOut);
-        QCOMPARE (getItem (completeSpy, "A/broken")._status, SyncFileItem.Status.NORMAL_ERROR);
-        QVERIFY (getItem (completeSpy, "A/broken")._errorString.contains (serverMessage));
+        QCOMPARE (getItem (completeSpy, "A/broken").status, SyncFileItem.Status.NORMAL_ERROR);
+        QVERIFY (getItem (completeSpy, "A/broken").errorString.contains (serverMessage));
     }
 
 
@@ -102,14 +102,14 @@ class TestDownload : GLib.Object {
                     "<s:message>System in maintenance mode.</s:message>\n"
                     "</d:error>");
             }
-            return nullptr;
+            return null;
         });
 
         QSignalSpy completeSpy (&fakeFolder.syncEngine (), &SyncEngine.itemCompleted);
         QVERIFY (!fakeFolder.syncOnce ()); // Fail because A/broken
         // FatalError means the sync was aborted, which is what we want
-        QCOMPARE (getItem (completeSpy, "A/broken")._status, SyncFileItem.Status.FATAL_ERROR);
-        QVERIFY (getItem (completeSpy, "A/broken")._errorString.contains ("System in maintenance mode"));
+        QCOMPARE (getItem (completeSpy, "A/broken").status, SyncFileItem.Status.FATAL_ERROR);
+        QVERIFY (getItem (completeSpy, "A/broken").errorString.contains ("System in maintenance mode"));
     }
 
 
@@ -160,7 +160,7 @@ class TestDownload : GLib.Object {
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &, QIODevice *) . Soup.Reply * {
             if (op == QNetworkAccessManager.GetOperation)
                 QTest.qFail ("There shouldn't be any download", __FILE__, __LINE__);
-            return nullptr;
+            return null;
         });
         QVERIFY (fakeFolder.syncOnce ());
 
@@ -193,7 +193,7 @@ class TestDownload : GLib.Object {
                 resendActual += 1;
                 return errorReply;
             }
-            return nullptr;
+            return null;
         });
 
         QVERIFY (fakeFolder.syncOnce ());
@@ -207,8 +207,8 @@ class TestDownload : GLib.Object {
         QSignalSpy completeSpy (&fakeFolder.syncEngine (), SIGNAL (itemCompleted (SyncFileItemPtr &)));
         QVERIFY (!fakeFolder.syncOnce ());
         QCOMPARE (resendActual, 4); // the 4th fails because it only resends 3 times
-        QCOMPARE (getItem (completeSpy, "A/resendme")._status, SyncFileItem.Status.NORMAL_ERROR);
-        QVERIFY (getItem (completeSpy, "A/resendme")._errorString.contains (serverMessage));
+        QCOMPARE (getItem (completeSpy, "A/resendme").status, SyncFileItem.Status.NORMAL_ERROR);
+        QVERIFY (getItem (completeSpy, "A/resendme").errorString.contains (serverMessage));
     }
 }
 

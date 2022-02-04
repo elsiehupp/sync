@@ -4,36 +4,49 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <csync_exclude.h>
+//  #include <csync_exclude.h>
+//  #include
+//  #include <QLoggingCa
+//  #include <QFileInfo>
+//  #include <QTextCodec>
+//  #include <cstring>
 
-// #include <QLoggingCategory>
-// #include <QFileInfo>
-// #include <QTextCodec>
-// #include <cstring>
+//  #pragma once
 
-// #pragma once
-
-// #include <QElapsedTimer>
-// #include <string[]>
-// #include <QMutex>
-// #include <QWaitCondition>
-// #include <QRunnable>
-// #include <deque>
+//  #include <QElapsedTimer>
+//  #include <QMutex>
+//  #include <QWaitCondition>
+//  #include <QRunnable>
+//  #include <deque>
 
 
 using CSync;
-namespace Occ {
 
-enum LocalDiscoveryStyle {
-    FilesystemOnly, //< read all local data from the filesystem
-    DatabaseAndFilesystem, //< read from the database, except for listed paths
-}
+namespace Occ {
 
 class DiscoveryPhase : GLib.Object {
 
-    friend class ProcessDirectoryJob;
+    /***********************************************************
+    ***********************************************************/
+    enum LocalDiscoveryStyle {
+    
+        /***********************************************************
+        Read all local data from the filesystem
+        ***********************************************************/
+        FILESYSTEM_ONLY,
 
-    QPointer<ProcessDirectoryJob> this.current_root_job;
+        /***********************************************************
+        Read from the database, except for listed paths
+        ***********************************************************/
+        DATABASE_AND_FILESYSTEM,
+    }
+
+    //  friend class ProcessDirectoryJob;
+
+
+    /***********************************************************
+    ***********************************************************/
+    QPointer<ProcessDirectoryJob> current_root_job;
 
 
     /***********************************************************
@@ -43,7 +56,7 @@ class DiscoveryPhase : GLib.Object {
     can be changed. See find_and_cancel_deleted_job (). Note that
     item_discovered () will already have been emitted for the item.
     ***********************************************************/
-    GLib.HashMap<string, SyncFileItemPtr> this.deleted_item;
+    GLib.HashMap<string, SyncFileItemPtr> deleted_item;
 
 
     /***********************************************************
@@ -57,21 +70,130 @@ class DiscoveryPhase : GLib.Object {
 
     See find_and_cancel_deleted_job ().
     ***********************************************************/
-    GLib.HashMap<string, ProcessDirectoryJob> this.queued_deleted_directories;
+    GLib.HashMap<string, ProcessDirectoryJob> queued_deleted_directories;
 
-    // map source (original path) . destinations (current server or local path)
-    GLib.HashMap<string, string> this.renamed_items_remote;
-    GLib.HashMap<string, string> this.renamed_items_local;
+    /***********************************************************
+    Map source (original path)
+    ***********************************************************/
+    GLib.HashMap<string, string> renamed_items_remote;
 
-    // set of paths that should not be removed even though they are removed locally:
-    // there was a move to an invalid destination and now the source should be restored
-    //
-    // This applies recursively to subdirectories.
-    // All entries should have a trailing slash (even files), so lookup with
-    // lower_bound () is reliable.
-    //
-    // The value of this map doesn't matter.
-    GLib.HashMap<string, bool> this.forbidden_deletes;
+    /***********************************************************
+    Map destinations (current server or local path)
+    ***********************************************************/
+    GLib.HashMap<string, string> renamed_items_local;
+
+    /***********************************************************
+    Set of paths that should not be removed even though they are
+    removed locally: there was a move to an invalid destination
+    and now the source should be restored
+
+    This applies recursively to subdirectories. All entries
+    should have a trailing slash (even files), so lookup with
+    lower_bound () is reliable.
+
+    The value of this map doesn't matter.
+    ***********************************************************/
+    GLib.HashMap<string, bool> forbidden_deletes;
+
+    /***********************************************************
+    Input
+    Absolute path to the local directory. ends with '/'
+    ***********************************************************/
+    public string local_dir;
+
+    /***********************************************************
+    Input
+    Remote folder, ends with '/'
+    ***********************************************************/
+    public string remote_folder;
+
+    /***********************************************************
+    Input
+    ***********************************************************/
+    public SyncJournalDb statedatabase;
+
+    /***********************************************************
+    Input
+    ***********************************************************/
+    public AccountPointer account;
+
+    /***********************************************************
+    Input
+    ***********************************************************/
+    public SyncOptions sync_options;
+
+    /***********************************************************
+    Input
+    ***********************************************************/
+    public ExcludedFiles excludes;
+
+    /***********************************************************
+    Input
+    FIXME: maybe move in ExcludedFiles
+    ***********************************************************/
+    public QRegularExpression invalid_filename_rx;
+
+    /***********************************************************
+    Input
+    The blocklist from the capabilities
+    ***********************************************************/
+    public string[] server_blocklisted_files;
+
+    /***********************************************************
+    Input
+    ***********************************************************/
+    public bool ignore_hidden_files = false;
+
+    /***********************************************************
+    Input
+    ***********************************************************/
+    public std.function<bool (string )> should_discover_localy;
+
+    /***********************************************************
+    ***********************************************************/
+    int currently_active_jobs = 0;
+
+    /***********************************************************
+    Both must contain a sorted list
+    ***********************************************************/
+    string[] selective_sync_block_list;
+    string[] selective_sync_allow_list;
+
+
+    /***********************************************************
+    Output
+    ***********************************************************/
+    public GLib.ByteArray data_fingerprint;
+
+
+    /***********************************************************
+    Output
+    ***********************************************************/
+    public bool another_sync_needed = false;
+
+
+    signal void fatal_error (string error_string);
+    signal void item_discovered (SyncFileItemPtr item);
+    signal void on_finished ();
+
+
+    /***********************************************************
+    A new folder was discovered and was not synced because of
+    the confirmation feature.
+    ***********************************************************/
+    signal void new_big_folder (string folder, bool is_external);
+
+
+    /***********************************************************
+    For excluded items that don't show up in item_discovered ()
+
+    The path is relative to the sync folder, similar to item.file
+    ***********************************************************/
+    signal void silently_excluded (string folder_path);
+
+    /***********************************************************
+    ***********************************************************/
+    signal void add_error_to_gui (SyncFileItem.Status status, string error_message, string subject);
 
 
     /***********************************************************
@@ -84,124 +206,19 @@ class DiscoveryPhase : GLib.Object {
         return this.renamed_items_local.contains (p) || this.renamed_items_remote.contains (p);
     }
 
-    int this.currently_active_jobs = 0;
-
-    // both must contain a sorted list
-    string[] this.selective_sync_block_list;
-    string[] this.selective_sync_allow_list;
-
-    void schedule_more_jobs ();
-
-    bool is_in_selective_sync_block_list (string path);
-
-    // Check if the new folder should be deselected or not.
-    // May be async. "Return" via the callback, true if the item is blocklisted
-    void check_selective_sync_new_folder (string path, RemotePermissions rp,
-        std.function<void (bool)> callback);
-
-
-    /***********************************************************
-    Given an original path, return the target path obtained when renaming is done.
-
-    Note that it only considers parent directory renames. So if A/B got renamed to C/D,
-    checking A/B/file would yield C/D/file, but checking A/B would yield A/B.
-    ***********************************************************/
-    string adjust_renamed_path (string original, SyncFileItem.Direction);
-
-
-    /***********************************************************
-    If the database-path is scheduled for deletion, on_abort it.
-
-    Check if there is already a job to delete that item:
-    If that's not the case, return { false, GLib.ByteArray () }.
-    If there is such a job, cancel that job and return true and the old etag.
-
-    Used when having detected a rename : The rename source
-    discovered before and would have looked like a delete.
-
-    See this.deleted_item and this.queued_deleted_directories.
-    ***********************************************************/
-    QPair<bool, GLib.ByteArray> find_and_cancel_deleted_job (string original_path);
-
-    // input
-    public string this.local_dir; // absolute path to the local directory. ends with '/'
-    public string this.remote_folder; // remote folder, ends with '/'
-    public SyncJournalDb this.statedatabase;
-    public AccountPointer this.account;
-    public SyncOptions this.sync_options;
-    public ExcludedFiles this.excludes;
-    public QRegularExpression this.invalid_filename_rx; // FIXME : maybe move in ExcludedFiles
-    public string[] this.server_blocklisted_files; // The blocklist from the capabilities
-    public bool this.ignore_hidden_files = false;
-    public std.function<bool (string )> this.should_discover_localy;
-
     /***********************************************************
     ***********************************************************/
-    public void start_job (ProcessDirectoryJob *);
-
-    /***********************************************************
-    ***********************************************************/
-    public void set_selective_sync_block_list (string[] list);
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-    public void set_selective_sync_allow_list (string[] list);
-
-    // output
-    public GLib.ByteArray this.data_fingerprint;
-    public bool this.another_sync_needed = false;
-
-signals:
-    void fatal_error (string error_string);
-    void item_discovered (SyncFileItemPtr item);
-    void on_finished ();
-
-    // A new folder was discovered and was not synced because of the confirmation feature
-    void new_big_folder (string folder, bool is_external);
-
-
-    /***********************************************************
-    For excluded items that don't show up in item_discovered ()
-
-    The path is relative to the sync folder, similar to item._file
-    ***********************************************************/
-    void silently_excluded (string folder_path);
-
-    void add_error_to_gui (SyncFileItem.Status status, string error_message, string subject);
-}
-
-    /// Implementation of DiscoveryPhase.adjust_renamed_path
-    string adjust_renamed_path (GLib.HashMap<string, string> renamed_items, string original);
-
-    /* Given a sorted list of paths ending with '/', return whether or not the given path is within one of the paths of the list*/
-    static bool find_path_in_list (string[] list, string path) {
-        Q_ASSERT (std.is_sorted (list.begin (), list.end ()));
-
-        if (list.size () == 1 && list.first () == QLatin1String ("/")) {
-            // Special case for the case "/" is there, it matches everything
-            return true;
+    void schedule_more_jobs () {
+        var limit = q_max (1, this.sync_options.parallel_network_jobs);
+        if (this.current_root_job && this.currently_active_jobs < limit) {
+            this.current_root_job.process_sub_jobs (limit - this.currently_active_jobs);
         }
-
-        string path_slash = path + '/';
-
-        // Since the list is sorted, we can do a binary search.
-        // If the path is a prefix of another item or right after in the lexical order.
-        var it = std.lower_bound (list.begin (), list.end (), path_slash);
-
-        if (it != list.end () && *it == path_slash) {
-            return true;
-        }
-
-        if (it == list.begin ()) {
-            return false;
-        }
-        --it;
-        Q_ASSERT (it.ends_with ('/')); // Folder.set_selective_sync_block_list makes sure of that
-        return path_slash.starts_with (*it);
     }
 
-    bool DiscoveryPhase.is_in_selective_sync_block_list (string path) {
+
+    /***********************************************************
+    ***********************************************************/
+    bool is_in_selective_sync_block_list (string path) {
         if (this.selective_sync_block_list.is_empty ()) {
             // If there is no block list, everything is allowed
             return false;
@@ -215,9 +232,15 @@ signals:
         return false;
     }
 
-    void DiscoveryPhase.check_selective_sync_new_folder (string path, RemotePermissions remote_perm,
+
+    /***********************************************************
+    Check if the new folder should be deselected or not.
+    May be async. "Return" via the callback, true if the item
+    is blocklisted.
+    ***********************************************************/
+    void check_selective_sync_new_folder (string path, RemotePermissions remote_perm,
         std.function<void (bool)> callback) {
-        if (this.sync_options._confirm_external_storage && this.sync_options._vfs.mode () == Vfs.Off
+        if (this.sync_options.confirm_external_storage && this.sync_options.vfs.mode () == Vfs.Off
             && remote_perm.has_permission (RemotePermissions.IsMounted)) {
             // external storage.
 
@@ -239,8 +262,8 @@ signals:
             return callback (false);
         }
 
-        var limit = this.sync_options._new_big_folder_size_limit;
-        if (limit < 0 || this.sync_options._vfs.mode () != Vfs.Off) {
+        var limit = this.sync_options.new_big_folder_size_limit;
+        if (limit < 0 || this.sync_options.vfs.mode () != Vfs.Off) {
             // no limit, everything is allowed;
             return callback (false);
         }
@@ -248,7 +271,7 @@ signals:
         // do a PROPFIND to know the size of this folder
         var propfind_job = new PropfindJob (this.account, this.remote_folder + path, this);
         propfind_job.set_properties (GLib.List<GLib.ByteArray> () << "resourcetype"
-                                                       << "http://owncloud.org/ns:size");
+                                                        << "http://owncloud.org/ns:size");
         GLib.Object.connect (propfind_job, &PropfindJob.finished_with_error,
             this, [=] {
                 return callback (false);
@@ -276,12 +299,21 @@ signals:
 
 
     /***********************************************************
-    Given a path on the remote, give the path as it is when the rename is done
+    Given an original path, return the target path obtained when
+    renaming is done.
+
+    Note that it only considers parent directory renames. So if
+    A/B got renamed to C/D, checking A/B/file would yield
+    C/D/file, but checking A/B would yield A/B.
     ***********************************************************/
-    string DiscoveryPhase.adjust_renamed_path (string original, SyncFileItem.Direction d) {
+    string adjust_renamed_path (string original, SyncFileItem.Direction d) {
         return Occ.adjust_renamed_path (d == SyncFileItem.Direction.DOWN ? this.renamed_items_remote : this.renamed_items_local, original);
     }
 
+
+    /***********************************************************
+    Implementation of DiscoveryPhase.adjust_renamed_path
+    ***********************************************************/
     string adjust_renamed_path (GLib.HashMap<string, string> renamed_items, string original) {
         int slash_pos = original.size ();
         while ( (slash_pos = original.last_index_of ('/', slash_pos - 1)) > 0) {
@@ -293,45 +325,59 @@ signals:
         return original;
     }
 
-    QPair<bool, GLib.ByteArray> DiscoveryPhase.find_and_cancel_deleted_job (string original_path) {
+
+    /***********************************************************
+    If the database-path is scheduled for deletion, on_abort it.
+
+    Check if there is already a job to delete that item:
+    If that's not the case, return { false, GLib.ByteArray () }.
+    If there is such a job, cancel that job and return true and
+    the old etag.
+
+    Used when having detected a rename : The rename source
+    discovered before and would have looked like a delete.
+
+    See this.deleted_item and this.queued_deleted_directories.
+    ***********************************************************/
+    public QPair<bool, GLib.ByteArray> find_and_cancel_deleted_job (string original_path) {
         bool result = false;
         GLib.ByteArray old_etag;
         var it = this.deleted_item.find (original_path);
         if (it != this.deleted_item.end ()) {
-            const SyncInstructions instruction = (*it)._instruction;
-            if (instruction == CSYNC_INSTRUCTION_IGNORE && (*it)._type == ItemTypeVirtualFile) {
+            const SyncInstructions instruction = (*it).instruction;
+            if (instruction == CSYNC_INSTRUCTION_IGNORE && (*it).type == ItemTypeVirtualFile) {
                 // re-creation of virtual files count as a delete
                 // a file might be in an error state and thus gets marked as CSYNC_INSTRUCTION_IGNORE
                 // after it was initially marked as CSYNC_INSTRUCTION_REMOVE
                 // return true, to not trigger any additional actions on that file that could elad to dataloss
                 result = true;
-                old_etag = (*it)._etag;
+                old_etag = (*it).etag;
             } else {
                 if (! (instruction == CSYNC_INSTRUCTION_REMOVE
                         // re-creation of virtual files count as a delete
-                        || ( (*it)._type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)
-                        || ( (*it)._is_restoration && instruction == CSYNC_INSTRUCTION_NEW))) {
+                        || ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)
+                        || ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW))) {
                     GLib.warn (lc_discovery) << "ENFORCE (FAILING)" << original_path;
                     GLib.warn (lc_discovery) << "instruction == CSYNC_INSTRUCTION_REMOVE" << (instruction == CSYNC_INSTRUCTION_REMOVE);
-                    GLib.warn (lc_discovery) << " ( (*it)._type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)"
-                                           << ( (*it)._type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW);
-                    GLib.warn (lc_discovery) << " ( (*it)._is_restoration && instruction == CSYNC_INSTRUCTION_NEW))"
-                                           << ( (*it)._is_restoration && instruction == CSYNC_INSTRUCTION_NEW);
+                    GLib.warn (lc_discovery) << " ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)"
+                                           << ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW);
+                    GLib.warn (lc_discovery) << " ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW))"
+                                           << ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW);
                     GLib.warn (lc_discovery) << "instruction" << instruction;
-                    GLib.warn (lc_discovery) << " (*it)._type" << (*it)._type;
-                    GLib.warn (lc_discovery) << " (*it)._is_restoration " << (*it)._is_restoration;
-                    Q_ASSERT (false);
+                    GLib.warn (lc_discovery) << " (*it).type" << (*it).type;
+                    GLib.warn (lc_discovery) << " (*it).is_restoration " << (*it).is_restoration;
+                    //  Q_ASSERT (false);
                     add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
                     /* emit */ fatal_error (_("Error while canceling delete of %1").arg (original_path));
                 }
-                (*it)._instruction = CSYNC_INSTRUCTION_NONE;
+                (*it).instruction = CSYNC_INSTRUCTION_NONE;
                 result = true;
-                old_etag = (*it)._etag;
+                old_etag = (*it).etag;
             }
             this.deleted_item.erase (it);
         }
         if (var other_job = this.queued_deleted_directories.take (original_path)) {
-            old_etag = other_job._dir_item._etag;
+            old_etag = other_job.dir_item.etag;
             delete other_job;
             result = true;
         }
@@ -340,13 +386,16 @@ signals:
         };
     }
 
-    void DiscoveryPhase.start_job (ProcessDirectoryJob job) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void start_job (ProcessDirectoryJob job) {
         ENFORCE (!this.current_root_job);
         connect (job, &ProcessDirectoryJob.on_finished, this, [this, job] {
             ENFORCE (this.current_root_job == sender ());
-            this.current_root_job = nullptr;
-            if (job._dir_item)
-                /* emit */ item_discovered (job._dir_item);
+            this.current_root_job = null;
+            if (job.dir_item)
+                /* emit */ item_discovered (job.dir_item);
             job.delete_later ();
 
             // Once the main job has on_finished recurse here to execute the remaining
@@ -362,110 +411,55 @@ signals:
         job.on_start ();
     }
 
-    void DiscoveryPhase.set_selective_sync_block_list (string[] list) {
+    /***********************************************************
+    ***********************************************************/
+    public void set_selective_sync_block_list (string[] list) {
         this.selective_sync_block_list = list;
         std.sort (this.selective_sync_block_list.begin (), this.selective_sync_block_list.end ());
-    }
-
-    void DiscoveryPhase.set_selective_sync_allow_list (string[] list) {
-        this.selective_sync_allow_list = list;
-        std.sort (this.selective_sync_allow_list.begin (), this.selective_sync_allow_list.end ());
-    }
-
-    void DiscoveryPhase.schedule_more_jobs () {
-        var limit = q_max (1, this.sync_options._parallel_network_jobs);
-        if (this.current_root_job && this.currently_active_jobs < limit) {
-            this.current_root_job.process_sub_jobs (limit - this.currently_active_jobs);
-        }
-    }
-
-    DiscoverySingleLocalDirectoryJob.DiscoverySingleLocalDirectoryJob (AccountPointer account, string local_path, Occ.Vfs vfs, GLib.Object parent)
-     : GLib.Object (parent), QRunnable (), this.local_path (local_path), this.account (account), this.vfs (vfs) {
-        q_register_meta_type<GLib.Vector<LocalInfo> > ("GLib.Vector<LocalInfo>");
-    }
-
-    // Use as QRunnable
-    void DiscoverySingleLocalDirectoryJob.run () {
-        string local_path = this.local_path;
-        if (local_path.ends_with ('/')) // Happens if this.current_folder._local.is_empty ()
-            local_path.chop (1);
-
-        var dh = csync_vio_local_opendir (local_path);
-        if (!dh) {
-            q_c_info (lc_discovery) << "Error while opening directory" << (local_path) << errno;
-            string error_string = _("Error while opening directory %1").arg (local_path);
-            if (errno == EACCES) {
-                error_string = _("Directory not accessible on client, permission denied");
-                /* emit */ finished_non_fatal_error (error_string);
-                return;
-            } else if (errno == ENOENT) {
-                error_string = _("Directory not found : %1").arg (local_path);
-            } else if (errno == ENOTDIR) {
-                // Not a directory..
-                // Just consider it is empty
-                return;
-            }
-            /* emit */ finished_fatal_error (error_string);
-            return;
-        }
-
-        GLib.Vector<LocalInfo> results;
-        while (true) {
-            errno = 0;
-            var dirent = csync_vio_local_readdir (dh, this.vfs);
-            if (!dirent)
-                break;
-            if (dirent.type == ItemTypeSkip)
-                continue;
-            LocalInfo i;
-            static QTextCodec codec = QTextCodec.codec_for_name ("UTF-8");
-            ASSERT (codec);
-            QTextCodec.ConverterState state;
-            i.name = codec.to_unicode (dirent.path, dirent.path.size (), state);
-            if (state.invalid_chars > 0 || state.remaining_chars > 0) {
-                /* emit */ child_ignored (true);
-                var item = SyncFileItemPtr.create ();
-                //item._file = this.current_folder._target + i.name;
-                // FIXME ^^ do we really need to use this.target or is local fine?
-                item._file = this.local_path + i.name;
-                item._instruction = CSYNC_INSTRUCTION_IGNORE;
-                item._status = SyncFileItem.Status.NORMAL_ERROR;
-                item._error_string = _("Filename encoding is not valid");
-                /* emit */ item_discovered (item);
-                continue;
-            }
-            i.modtime = dirent.modtime;
-            i.size = dirent.size;
-            i.inode = dirent.inode;
-            i.is_directory = dirent.type == ItemTypeDirectory;
-            i.is_hidden = dirent.is_hidden;
-            i.is_sym_link = dirent.type == ItemTypeSoftLink;
-            i.is_virtual_file = dirent.type == ItemTypeVirtualFile || dirent.type == ItemTypeVirtualFileDownload;
-            i.type = dirent.type;
-            results.push_back (i);
-        }
-        if (errno != 0) {
-            csync_vio_local_closedir (dh);
-
-            // Note: Windows vio converts any error into EACCES
-            GLib.warn (lc_discovery) << "readdir failed for file in " << local_path << " - errno : " << errno;
-            /* emit */ finished_fatal_error (_("Error while reading directory %1").arg (local_path));
-            return;
-        }
-
-        errno = 0;
-        csync_vio_local_closedir (dh);
-        if (errno != 0) {
-            GLib.warn (lc_discovery) << "closedir failed for file in " << local_path << " - errno : " << errno;
-        }
-
-        /* emit */ finished (results);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    static void property_map_to_remote_info (GLib.HashMap<string, string> map, RemoteInfo result) {
+    public void set_selective_sync_allow_list (string[] list) {
+        this.selective_sync_allow_list = list;
+        std.sort (this.selective_sync_allow_list.begin (), this.selective_sync_allow_list.end ());
+    }
+
+    /***********************************************************
+    Given a sorted list of paths ending with '/', return whether
+    or not the given path is within one of the paths of the list
+    ***********************************************************/
+    private static bool find_path_in_list (string[] list, string path) {
+        //  Q_ASSERT (std.is_sorted (list.begin (), list.end ()));
+
+        if (list.size () == 1 && list.first () == QLatin1String ("/")) {
+            // Special case for the case "/" is there, it matches everything
+            return true;
+        }
+
+        string path_slash = path + '/';
+
+        // Since the list is sorted, we can do a binary search.
+        // If the path is a prefix of another item or right after in the lexical order.
+        var it = std.lower_bound (list.begin (), list.end (), path_slash);
+
+        if (it != list.end () && *it == path_slash) {
+            return true;
+        }
+
+        if (it == list.begin ()) {
+            return false;
+        }
+        --it;
+        //  Q_ASSERT (it.ends_with ('/')); // Folder.set_selective_sync_block_list makes sure of that
+        return path_slash.starts_with (*it);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private static void property_map_to_remote_info (GLib.HashMap<string, string> map, RemoteInfo result) {
         for (var it = map.const_begin (); it != map.const_end (); ++it) {
             string property = it.key ();
             string value = it.value ();
@@ -473,7 +467,7 @@ signals:
                 result.is_directory = value.contains (QLatin1String ("collection"));
             } else if (property == QLatin1String ("getlastmodified")) {
                 const var date = GLib.DateTime.from_string (value, Qt.RFC2822Date);
-                Q_ASSERT (date.is_valid ());
+                //  Q_ASSERT (date.is_valid ());
                 result.modtime = date.to_time_t ();
             } else if (property == QLatin1String ("getcontentlength")) {
                 // See #4573, sometimes negative size values are returned
@@ -486,7 +480,7 @@ signals:
                 }
             } else if (property == "getetag") {
                 result.etag = Utility.normalize_etag (value.to_utf8 ());
-            } else if (property == "id") {
+            } else if (property == "identifier") {
                 result.file_identifier = value.to_utf8 ();
             } else if (property == "download_uRL") {
                 result.direct_download_url = value;
@@ -517,5 +511,7 @@ signals:
         }
     }
 
-    }
+} // class DiscoveryPhase
+
+} // namespace Occ
     

@@ -12,7 +12,7 @@ class FakeProvider {
 
     /***********************************************************
     ***********************************************************/
-    public string this.id;
+    public string this.identifier;
     public string this.name;
     public int32 this.order = std.numeric_limits<int32>.max ();
 

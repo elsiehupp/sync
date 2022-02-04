@@ -4,16 +4,16 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <pushnotifications.h>
-// #include <syncengine.h>
-
-// #include <QMessageBox>
-// #include <QtCore>
-// #include <QMutableSetIterator>
-// #include <QNetworkProxy>
-
-// #include <QQueue>
-// #include <GLib.List>
+//  #include <pushnotifications.h>
+//  #include <syncengine.h>
+//  #include
+//  #include <QMessag
+//  #include <QtCore>
+//  #include <QMutableSetIter
+//  #include <QNetwor
+//  #include
+//  #include <QQueue>
+//  #include <GLib.List>
 
 static const char VERSION_C[] = "version";
 static const int max_folders_version = 1;
@@ -56,7 +56,6 @@ class FolderMan : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public int setup_folders_migration ();
 
 
@@ -98,7 +97,7 @@ class FolderMan : GLib.Object {
 
 
     /***********************************************************
-    Returns the folder by alias or \c nullptr if no folder with the alias exists.
+    Returns the folder by alias or \c null if no folder with the alias exists.
     ***********************************************************/
     public Folder folder (string );
 
@@ -145,7 +144,6 @@ class FolderMan : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public NavigationPaneHelper navigation_pane_helper () {
         return this.navigation_pane_helper;
     }
@@ -250,7 +248,6 @@ class FolderMan : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void set_dirty_network_limits ();
 
 signals:
@@ -417,7 +414,7 @@ signals:
     private GLib.Set<Folder> this.disabled_folders;
     private Folder.Map this.folder_map;
     private string this.folder_config_path;
-    private Folder this.current_sync_folder = nullptr;
+    private Folder this.current_sync_folder = null;
     private QPointer<Folder> this.last_sync_folder;
     private bool this.sync_enabled = true;
 
@@ -458,20 +455,20 @@ signals:
     private friend class .TestFolderMan;
 }
 
-FolderMan *FolderMan._instance = nullptr;
+FolderMan *FolderMan.instance = null;
 
 FolderMan.FolderMan (GLib.Object parent)
     : GLib.Object (parent)
-    , this.lock_watcher (new LockWatcher)
-    , this.navigation_pane_helper (this) {
+    this.lock_watcher (new LockWatcher)
+    this.navigation_pane_helper (this) {
     ASSERT (!this.instance);
     this.instance = this;
 
     this.socket_api.on_reset (new SocketApi);
 
-    ConfigFile cfg;
-    std.chrono.milliseconds polltime = cfg.remote_poll_interval ();
-    q_c_info (lc_folder_man) << "setting remote poll timer interval to" << polltime.count () << "msec";
+    ConfigFile config;
+    std.chrono.milliseconds polltime = config.remote_poll_interval ();
+    GLib.Info (lc_folder_man) << "setting remote poll timer interval to" << polltime.count () << "msec";
     this.etag_poll_timer.set_interval (polltime.count ());
     GLib.Object.connect (&this.etag_poll_timer, &QTimer.timeout, this, &FolderMan.on_etag_poll_timer_timeout);
     this.etag_poll_timer.on_start ();
@@ -504,7 +501,7 @@ FolderMan *FolderMan.instance () {
 
 FolderMan.~FolderMan () {
     q_delete_all (this.folder_map);
-    this.instance = nullptr;
+    this.instance = null;
 }
 
 const Occ.Folder.Map &FolderMan.map () {
@@ -548,8 +545,8 @@ int FolderMan.unload_and_delete_all_folders () {
     }
     ASSERT (this.folder_map.is_empty ());
 
-    this.last_sync_folder = nullptr;
-    this.current_sync_folder = nullptr;
+    this.last_sync_folder = null;
+    this.current_sync_folder = null;
     this.scheduled_folders.clear ();
     /* emit */ folder_list_changed (this.folder_map);
     /* emit */ schedule_queue_changed ();
@@ -584,14 +581,14 @@ int FolderMan.setup_folders () {
         return r;
     }
 
-    q_c_info (lc_folder_man) << "Setup folders from settings file";
+    GLib.Info (lc_folder_man) << "Setup folders from settings file";
 
     for (var account : AccountManager.instance ().accounts ()) {
-        const var id = account.account ().id ();
-        if (!accounts_with_settings.contains (id)) {
+        const var identifier = account.account ().identifier ();
+        if (!accounts_with_settings.contains (identifier)) {
             continue;
         }
-        settings.begin_group (id);
+        settings.begin_group (identifier);
 
         // The "backwards_compatible" flag here is related to migrating old
         // database locations
@@ -629,7 +626,7 @@ void FolderMan.setup_folders_helper (QSettings settings, AccountStatePtr account
         // Skip folders with too-new version
         settings.begin_group (folder_alias);
         if (ignore_keys.contains (settings.group ())) {
-            q_c_info (lc_folder_man) << "Folder" << folder_alias << "is too new, ignoring";
+            GLib.Info (lc_folder_man) << "Folder" << folder_alias << "is too new, ignoring";
             this.additional_blocked_folder_aliases.insert (folder_alias);
             settings.end_group ();
             continue;
@@ -672,7 +669,7 @@ void FolderMan.setup_folders_helper (QSettings settings, AccountStatePtr account
                 if (!journal_file_move_success) {
                     GLib.warn (lc_folder_man) << "Wasn't able to move 3.0 syncjournal database files to new location. One-time loss off sync settings possible.";
                 } else {
-                    q_c_info (lc_folder_man) << "Successfully migrated syncjournal database.";
+                    GLib.Info (lc_folder_man) << "Successfully migrated syncjournal database.";
                 }
 
                 var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
@@ -686,11 +683,11 @@ void FolderMan.setup_folders_helper (QSettings settings, AccountStatePtr account
                 continue;
             }
 
-            // Migration : ._ files sometimes can't be created.
-            // So if the configured journal_path has a dot-underscore ("._sync_*.db")
+            // Migration : . files sometimes can't be created.
+            // So if the configured journal_path has a dot-underscore (".sync_*.db")
             // but the current default doesn't have the underscore, switch to the
             // new default if no database exists yet.
-            if (folder_definition.journal_path.starts_with ("._sync_")
+            if (folder_definition.journal_path.starts_with (".sync_")
                 && default_journal_path.starts_with (".sync_")
                 && !GLib.File.exists (folder_definition.absolute_journal_path ())) {
                 folder_definition.journal_path = default_journal_path;
@@ -720,7 +717,7 @@ void FolderMan.setup_folders_helper (QSettings settings, AccountStatePtr account
                 // Migrate the old "use_placeholders" setting to the root folder pin state
                 if (settings.value (QLatin1String (VERSION_C), 1).to_int () == 1
                     && settings.value (QLatin1String ("use_placeholders"), false).to_bool ()) {
-                    q_c_info (lc_folder_man) << "Migrate : From use_placeholders to PinState.VfsItemAvailability.ONLINE_ONLY";
+                    GLib.Info (lc_folder_man) << "Migrate : From use_placeholders to PinState.VfsItemAvailability.ONLINE_ONLY";
                     f.set_root_pin_state (PinState.VfsItemAvailability.ONLINE_ONLY);
                 }
 
@@ -739,11 +736,11 @@ void FolderMan.setup_folders_helper (QSettings settings, AccountStatePtr account
 }
 
 int FolderMan.setup_folders_migration () {
-    ConfigFile cfg;
-    QDir storage_dir (cfg.config_path ());
-    this.folder_config_path = cfg.config_path () + QLatin1String ("folders");
+    ConfigFile config;
+    QDir storage_dir (config.config_path ());
+    this.folder_config_path = config.config_path () + QLatin1String ("folders");
 
-    q_c_info (lc_folder_man) << "Setup folders from " << this.folder_config_path << " (migration)";
+    GLib.Info (lc_folder_man) << "Setup folders from " << this.folder_config_path << " (migration)";
 
     QDir dir (this.folder_config_path);
     //We need to include hidden files just in case the alias starts with '.'
@@ -800,7 +797,7 @@ bool FolderMan.ensure_journal_gone (string journal_database_file) {
     // remove the old journal file
     while (GLib.File.exists (journal_database_file) && !GLib.File.remove (journal_database_file)) {
         GLib.warn (lc_folder_man) << "Could not remove old database file at" << journal_database_file;
-        int ret = QMessageBox.warning (nullptr, _("Could not reset folder state"),
+        int ret = QMessageBox.warning (null, _("Could not reset folder state"),
             _("An old sync journal \"%1\" was found, "
                "but could not be removed. Please make sure "
                "that no application is currently using it.")
@@ -845,7 +842,7 @@ string FolderMan.escape_alias (string alias) {
 }
 
 SocketApi *FolderMan.socket_api () {
-    return this._socket_api.data ();
+    return this.socket_api.data ();
 }
 
 string FolderMan.unescape_alias (string alias) {
@@ -871,9 +868,9 @@ string FolderMan.unescape_alias (string alias) {
 // the configuration directory path
 // WARNING : Do not remove this code, it is used for predefined/automated deployments (2016)
 Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState account_state) {
-    Folder folder = nullptr;
+    Folder folder = null;
 
-    q_c_info (lc_folder_man) << "  ` . setting up:" << file;
+    GLib.Info (lc_folder_man) << "  ` . setting up:" << file;
     string escaped_alias (file);
     // check the unescaped variant (for the case when the filename comes out
     // of the directory listing). If the file does not exist, escape the
@@ -890,8 +887,8 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
         return folder;
     }
 
-    QSettings settings (this.folder_config_path + '/' + escaped_alias, QSettings.IniFormat);
-    q_c_info (lc_folder_man) << "    . file path : " << settings.filename ();
+    QSettings settings = new QSettings (this.folder_config_path + '/' + escaped_alias, QSettings.IniFormat);
+    GLib.Info (lc_folder_man) << "    . file path : " << settings.filename ();
 
     // Check if the filename is equal to the group setting. If not, use the group
     // name as an alias.
@@ -912,7 +909,7 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
 
     if (backend.is_empty () || backend != QLatin1String ("owncloud")) {
         GLib.warn (lc_folder_man) << "obsolete configuration of type" << backend;
-        return nullptr;
+        return null;
     }
 
     // cut off the leading slash, o_c_url always has a trailing.
@@ -922,7 +919,7 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
 
     if (!account_state) {
         q_c_critical (lc_folder_man) << "can't create folder without an account";
-        return nullptr;
+        return null;
     }
 
     FolderDefinition folder_definition;
@@ -945,7 +942,7 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
 
         folder.save_to_settings ();
     }
-    q_c_info (lc_folder_man) << "Migrated!" << folder;
+    GLib.Info (lc_folder_man) << "Migrated!" << folder;
     settings.sync ();
     return folder;
 }
@@ -980,7 +977,7 @@ Folder *FolderMan.folder (string alias) {
             return this.folder_map[alias];
         }
     }
-    return nullptr;
+    return null;
 }
 
 void FolderMan.schedule_all_folders () {
@@ -993,7 +990,7 @@ void FolderMan.schedule_all_folders () {
 
 void FolderMan.on_schedule_app_restart () {
     this.app_restart_required = true;
-    q_c_info (lc_folder_man) << "Application restart requested!";
+    GLib.Info (lc_folder_man) << "Application restart requested!";
 }
 
 void FolderMan.on_sync_once_file_unlocks (string path) {
@@ -1011,11 +1008,11 @@ void FolderMan.schedule_folder (Folder f) {
     }
     var alias = f.alias ();
 
-    q_c_info (lc_folder_man) << "Schedule folder " << alias << " to sync!";
+    GLib.Info (lc_folder_man) << "Schedule folder " << alias << " to sync!";
 
     if (!this.scheduled_folders.contains (f)) {
         if (!f.can_sync ()) {
-            q_c_info (lc_folder_man) << "Folder is not ready to sync, not scheduled!";
+            GLib.Info (lc_folder_man) << "Folder is not ready to sync, not scheduled!";
             this.socket_api.on_update_folder_view (f);
             return;
         }
@@ -1024,7 +1021,7 @@ void FolderMan.schedule_folder (Folder f) {
         this.scheduled_folders.enqueue (f);
         /* emit */ schedule_queue_changed ();
     } else {
-        q_c_info (lc_folder_man) << "Sync for folder " << alias << " already scheduled, do not enqueue!";
+        GLib.Info (lc_folder_man) << "Sync for folder " << alias << " already scheduled, do not enqueue!";
     }
 
     start_scheduled_sync_soon ();
@@ -1032,10 +1029,10 @@ void FolderMan.schedule_folder (Folder f) {
 
 void FolderMan.schedule_folder_next (Folder f) {
     var alias = f.alias ();
-    q_c_info (lc_folder_man) << "Schedule folder " << alias << " to sync! Front-of-queue.";
+    GLib.Info (lc_folder_man) << "Schedule folder " << alias << " to sync! Front-of-queue.";
 
     if (!f.can_sync ()) {
-        q_c_info (lc_folder_man) << "Folder is not ready to sync, not scheduled!";
+        GLib.Info (lc_folder_man) << "Folder is not ready to sync, not scheduled!";
         return;
     }
 
@@ -1063,7 +1060,7 @@ void FolderMan.on_etag_job_destroyed (GLib.Object * /*o*/) {
 
 void FolderMan.on_run_one_etag_job () {
     if (this.current_etag_job.is_null ()) {
-        Folder folder = nullptr;
+        Folder folder = null;
         for (Folder f : q_as_const (this.folder_map)) {
             if (f.etag_job ()) {
                 // Caveat: always grabs the first folder with a job, but we think this is Ok for now and avoids us having a seperate queue.
@@ -1094,7 +1091,7 @@ void FolderMan.on_account_state_changed () {
     string account_name = account_state.account ().display_name ();
 
     if (account_state.is_connected ()) {
-        q_c_info (lc_folder_man) << "Account" << account_name << "connected, scheduling its folders";
+        GLib.Info (lc_folder_man) << "Account" << account_name << "connected, scheduling its folders";
 
         for (Folder f : this.folder_map.values ()) {
             if (f
@@ -1104,7 +1101,7 @@ void FolderMan.on_account_state_changed () {
             }
         }
     } else {
-        q_c_info (lc_folder_man) << "Account" << account_name << "disconnected or paused, "
+        GLib.Info (lc_folder_man) << "Account" << account_name << "disconnected or paused, "
                                                            "terminating or descheduling sync folders";
 
         foreach (Folder f, this.folder_map.values ()) {
@@ -1135,7 +1132,7 @@ void FolderMan.set_sync_enabled (bool enabled) {
     }
     this.sync_enabled = enabled;
     // force a redraw in case the network connect status changed
-    /* emit */ (folder_sync_state_change (nullptr));
+    /* emit */ (folder_sync_state_change (null));
 }
 
 void FolderMan.start_scheduled_sync_soon () {
@@ -1172,7 +1169,7 @@ void FolderMan.start_scheduled_sync_soon () {
     // Time since the last sync run counts against the delay
     ms_delay = q_max (1ll, ms_delay - ms_since_last_sync);
 
-    q_c_info (lc_folder_man) << "Starting the next scheduled sync in" << (ms_delay / 1000) << "seconds";
+    GLib.Info (lc_folder_man) << "Starting the next scheduled sync in" << (ms_delay / 1000) << "seconds";
     this.start_scheduled_sync_timer.on_start (ms_delay);
 }
 
@@ -1185,13 +1182,13 @@ void FolderMan.on_start_scheduled_folder_sync () {
     if (is_any_sync_running ()) {
         for (var f : this.folder_map) {
             if (f.is_sync_running ())
-                q_c_info (lc_folder_man) << "Currently folder " << f.remote_url ().to_string () << " is running, wait for finish!";
+                GLib.Info (lc_folder_man) << "Currently folder " << f.remote_url ().to_string () << " is running, wait for finish!";
         }
         return;
     }
 
     if (!this.sync_enabled) {
-        q_c_info (lc_folder_man) << "FolderMan : Syncing is disabled, no scheduling.";
+        GLib.Info (lc_folder_man) << "FolderMan : Syncing is disabled, no scheduling.";
         return;
     }
 
@@ -1201,7 +1198,7 @@ void FolderMan.on_start_scheduled_folder_sync () {
     }
 
     // Find the first folder in the queue that can be synced.
-    Folder folder = nullptr;
+    Folder folder = null;
     while (!this.scheduled_folders.is_empty ()) {
         Folder g = this.scheduled_folders.dequeue ();
         if (g.can_sync ()) {
@@ -1226,7 +1223,7 @@ void FolderMan.on_start_scheduled_folder_sync () {
 
 bool FolderMan.push_notifications_files_ready (Account account) {
     const var push_notifications = account.push_notifications ();
-    const var push_files_available = account.capabilities ().available_push_notifications () & PushNotificationType.Files;
+    const var push_files_available = account.capabilities ().available_push_notifications () & PushNotificationType.FILES;
 
     return push_files_available && push_notifications && push_notifications.is_ready ();
 }
@@ -1244,11 +1241,11 @@ bool FolderMan.is_switch_to_vfs_needed (FolderDefinition folder_definition) {
 }
 
 void FolderMan.on_etag_poll_timer_timeout () {
-    q_c_info (lc_folder_man) << "Etag poll timer timeout";
+    GLib.Info (lc_folder_man) << "Etag poll timer timeout";
 
     const var folder_map_values = this.folder_map.values ();
 
-    q_c_info (lc_folder_man) << "Folders to sync:" << folder_map_values.size ();
+    GLib.Info (lc_folder_man) << "Folders to sync:" << folder_map_values.size ();
 
     GLib.List<Folder> folders_to_run;
 
@@ -1258,7 +1255,7 @@ void FolderMan.on_etag_poll_timer_timeout () {
         return !push_notifications_files_ready (account.data ());
     });
 
-    q_c_info (lc_folder_man) << "Number of folders that don't use push notifications:" << folders_to_run.size ();
+    GLib.Info (lc_folder_man) << "Number of folders that don't use push notifications:" << folders_to_run.size ();
 
     run_etag_jobs_if_possible (folders_to_run);
 }
@@ -1270,34 +1267,34 @@ void FolderMan.run_etag_jobs_if_possible (GLib.List<Folder> folder_map) {
 }
 
 void FolderMan.run_etag_job_if_possible (Folder folder) {
-    const ConfigFile cfg;
-    const var polltime = cfg.remote_poll_interval ();
+    const ConfigFile config;
+    const var polltime = config.remote_poll_interval ();
 
-    q_c_info (lc_folder_man) << "Run etag job on folder" << folder;
+    GLib.Info (lc_folder_man) << "Run etag job on folder" << folder;
 
     if (!folder) {
         return;
     }
     if (folder.is_sync_running ()) {
-        q_c_info (lc_folder_man) << "Can not run etag job : Sync is running";
+        GLib.Info (lc_folder_man) << "Can not run etag job : Sync is running";
         return;
     }
     if (this.scheduled_folders.contains (folder)) {
-        q_c_info (lc_folder_man) << "Can not run etag job : Folder is alreday scheduled";
+        GLib.Info (lc_folder_man) << "Can not run etag job : Folder is alreday scheduled";
         return;
     }
     if (this.disabled_folders.contains (folder)) {
-        q_c_info (lc_folder_man) << "Can not run etag job : Folder is disabled";
+        GLib.Info (lc_folder_man) << "Can not run etag job : Folder is disabled";
         return;
     }
     if (folder.etag_job () || folder.is_busy () || !folder.can_sync ()) {
-        q_c_info (lc_folder_man) << "Can not run etag job : Folder is busy";
+        GLib.Info (lc_folder_man) << "Can not run etag job : Folder is busy";
         return;
     }
     // When not using push notifications, make sure polltime is reached
     if (!push_notifications_files_ready (folder.account_state ().account ().data ())) {
         if (folder.msec_since_last_sync () < polltime) {
-            q_c_info (lc_folder_man) << "Can not run etag job : Polltime not reached";
+            GLib.Info (lc_folder_man) << "Can not run etag job : Polltime not reached";
             return;
         }
     }
@@ -1370,7 +1367,7 @@ void FolderMan.on_schedule_folder_by_time () {
         // Possibly it's just time for a new sync run
         bool force_sync_interval_expired = msecs_since_sync > ConfigFile ().force_sync_interval ();
         if (force_sync_interval_expired) {
-            q_c_info (lc_folder_man) << "Scheduling folder" << f.alias ()
+            GLib.Info (lc_folder_man) << "Scheduling folder" << f.alias ()
                                 << "because it has been" << msecs_since_sync.count () << "ms "
                                 << "since the last sync";
 
@@ -1386,7 +1383,7 @@ void FolderMan.on_schedule_folder_by_time () {
         if (f.consecutive_failing_syncs () > 1)
             sync_again_delay = std.chrono.seconds (60); // 60s for each further attempt
         if (sync_again && msecs_since_sync > sync_again_delay) {
-            q_c_info (lc_folder_man) << "Scheduling folder" << f.alias ()
+            GLib.Info (lc_folder_man) << "Scheduling folder" << f.alias ()
                                 << ", the last" << f.consecutive_failing_syncs () << "syncs failed"
                                 << ", another_sync_needed" << f.sync_engine ().is_another_sync_needed ()
                                 << ", last status:" << f.sync_result ().status_string ()
@@ -1417,7 +1414,7 @@ void FolderMan.on_folder_sync_started () {
     if (!f)
         return;
 
-    q_c_info (lc_folder_man, ">========== Sync started for folder [%s] of account [%s] with remote [%s]",
+    GLib.Info (lc_folder_man, ">========== Sync started for folder [%s] of account [%s] with remote [%s]",
         q_printable (f.short_gui_local_path ()),
         q_printable (f.account_state ().account ().display_name ()),
         q_printable (f.remote_url ().to_string ()));
@@ -1435,14 +1432,14 @@ void FolderMan.on_folder_sync_finished (SyncResult &) {
     if (!f)
         return;
 
-    q_c_info (lc_folder_man, "<========== Sync on_finished for folder [%s] of account [%s] with remote [%s]",
+    GLib.Info (lc_folder_man, "<========== Sync on_finished for folder [%s] of account [%s] with remote [%s]",
         q_printable (f.short_gui_local_path ()),
         q_printable (f.account_state ().account ().display_name ()),
         q_printable (f.remote_url ().to_string ()));
 
     if (f == this.current_sync_folder) {
         this.last_sync_folder = this.current_sync_folder;
-        this.current_sync_folder = nullptr;
+        this.current_sync_folder = null;
     }
     if (!is_any_sync_running ())
         start_scheduled_sync_soon ();
@@ -1454,13 +1451,13 @@ Folder *FolderMan.add_folder (AccountState account_state, FolderDefinition folde
     definition.journal_path = definition.default_journal_path (account_state.account ());
 
     if (!ensure_journal_gone (definition.absolute_journal_path ())) {
-        return nullptr;
+        return null;
     }
 
     var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
     if (!vfs) {
         GLib.warn (lc_folder_man) << "Could not load plugin for mode" << folder_definition.virtual_files_mode;
-        return nullptr;
+        return null;
     }
 
     var folder = add_folder_internal (definition, account_state, std.move (vfs));
@@ -1505,7 +1502,7 @@ Folder *FolderMan.add_folder_internal (
         folder.save_to_settings ();
     }
 
-    q_c_info (lc_folder_man) << "Adding folder to Folder Map " << folder << folder.alias ();
+    GLib.Info (lc_folder_man) << "Adding folder to Folder Map " << folder << folder.alias ();
     this.folder_map[folder.alias ()] = folder;
     if (folder.sync_paused ()) {
         this.disabled_folders.insert (folder);
@@ -1536,7 +1533,7 @@ Folder *FolderMan.folder_for_path (string path) {
         return absolute_path.starts_with (folder_path, (Utility.is_windows () || Utility.is_mac ()) ? Qt.CaseInsensitive : Qt.CaseSensitive);
     });
 
-    return it != folders.cend () ? *it : nullptr;
+    return it != folders.cend () ? *it : null;
 }
 
 string[] FolderMan.find_file_in_local_folders (string rel_path, AccountPointer acc) {
@@ -1569,7 +1566,7 @@ void FolderMan.remove_folder (Folder f) {
         return;
     }
 
-    q_c_info (lc_folder_man) << "Removing " << f.alias ();
+    GLib.Info (lc_folder_man) << "Removing " << f.alias ();
 
     const bool currently_running = f.is_sync_running ();
     if (currently_running) {
@@ -1691,7 +1688,7 @@ void FolderMan.on_wipe_folder_for_account (AccountState account_state) {
             return;
         }
 
-        q_c_info (lc_folder_man) << "Removing " << f.alias ();
+        GLib.Info (lc_folder_man) << "Removing " << f.alias ();
 
         const bool currently_running = (this.current_sync_folder == f);
         if (currently_running) {
@@ -1713,7 +1710,7 @@ void FolderMan.on_wipe_folder_for_account (AccountState account_state) {
             if (!on_success) {
                 GLib.warn (lc_folder_man) << "Failed to remove existing folder " << f.path ();
             } else {
-                q_c_info (lc_folder_man) << "wipe : Removed  file " << f.path ();
+                GLib.Info (lc_folder_man) << "wipe : Removed  file " << f.path ();
             }
 
         } else {
@@ -2049,9 +2046,9 @@ Folder *FolderMan.current_sync_folder () {
 void FolderMan.restart_application () {
     if (Utility.is_linux ()) {
         // restart:
-        q_c_info (lc_folder_man) << "Restarting application NOW, PID" << q_app.application_pid () << "is ending.";
-        q_app.quit ();
-        string[] args = q_app.arguments ();
+        GLib.Info (lc_folder_man) << "Restarting application NOW, PID" << Gtk.Application.application_pid () << "is ending.";
+        Gtk.Application.quit ();
+        string[] args = Gtk.Application.arguments ();
         string prg = args.take_first ();
 
         QProcess.start_detached (prg, args);
@@ -2073,7 +2070,7 @@ void FolderMan.on_setup_push_notifications (Folder.Map folder_map) {
 }
 
 void FolderMan.on_process_files_push_notification (Account account) {
-    q_c_info (lc_folder_man) << "Got files push notification for account" << account;
+    GLib.Info (lc_folder_man) << "Got files push notification for account" << account;
 
     for (var folder : this.folder_map) {
         // Just run on the folders that belong to this account
@@ -2081,7 +2078,7 @@ void FolderMan.on_process_files_push_notification (Account account) {
             continue;
         }
 
-        q_c_info (lc_folder_man) << "Schedule folder" << folder << "for sync";
+        GLib.Info (lc_folder_man) << "Schedule folder" << folder << "for sync";
         schedule_folder (folder);
     }
 }
@@ -2090,7 +2087,7 @@ void FolderMan.on_connect_to_push_notifications (Account account) {
     const var push_notifications = account.push_notifications ();
 
     if (push_notifications_files_ready (account)) {
-        q_c_info (lc_folder_man) << "Push notifications ready";
+        GLib.Info (lc_folder_man) << "Push notifications ready";
         connect (push_notifications, &PushNotifications.files_changed, this, &FolderMan.on_process_files_push_notification, Qt.UniqueConnection);
     }
 }

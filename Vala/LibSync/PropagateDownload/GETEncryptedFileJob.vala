@@ -40,14 +40,14 @@ GETEncrypted_file_job.GETEncrypted_file_job (AccountPointer account, string path
     const GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
     int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent)
     : GETFileJob (account, path, device, headers, expected_etag_for_resume, resume_start, parent)
-    , this.encrypted_file_info (encrypted_info) {
+    this.encrypted_file_info (encrypted_info) {
 }
 
 GETEncrypted_file_job.GETEncrypted_file_job (AccountPointer account, GLib.Uri url, QIODevice device,
     const GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
     int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent)
     : GETFileJob (account, url, device, headers, expected_etag_for_resume, resume_start, parent)
-    , this.encrypted_file_info (encrypted_info) {
+    this.encrypted_file_info (encrypted_info) {
 }
 
 int64 GETEncrypted_file_job.write_to_device (GLib.ByteArray data) {
@@ -103,23 +103,23 @@ int64 GETEncrypted_file_job.write_to_device (GLib.ByteArray data) {
 }
 
 void PropagateDownloadFile.on_start () {
-    if (propagator ()._abort_requested)
+    if (propagator ().abort_requested)
         return;
     this.is_encrypted = false;
 
-    GLib.debug (lc_propagate_download) << this.item._file << propagator ()._active_job_list.count ();
+    GLib.debug (lc_propagate_download) << this.item.file << propagator ().active_job_list.count ();
 
-    const var path = this.item._file;
+    const var path = this.item.file;
     const var slash_position = path.last_index_of ('/');
     const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
     SyncJournalFileRecord parent_rec;
-    propagator ()._journal.get_file_record (parent_path, parent_rec);
+    propagator ().journal.get_file_record (parent_path, parent_rec);
 
     const var account = propagator ().account ();
     if (!account.capabilities ().client_side_encryption_available () ||
         !parent_rec.is_valid () ||
-        !parent_rec._is_e2e_encrypted) {
+        !parent_rec.is_e2e_encrypted) {
         start_after_is_encrypted_is_checked ();
     } else {
         this.download_encrypted_helper = new Propagate_download_encrypted (propagator (), parent_path, this.item, this);
@@ -129,7 +129,7 @@ void PropagateDownloadFile.on_start () {
         });
         connect (this.download_encrypted_helper, &Propagate_download_encrypted.failed, [this] {
           on_done (SyncFileItem.Status.NORMAL_ERROR,
-               _("File %1 cannot be downloaded because encryption information is missing.").arg (QDir.to_native_separators (this.item._file)));
+               _("File %1 cannot be downloaded because encryption information is missing.").arg (QDir.to_native_separators (this.item.file)));
         });
         this.download_encrypted_helper.on_start ();
     }

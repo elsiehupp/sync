@@ -26,7 +26,7 @@ class ConflictRecord {
 
 
     /***********************************************************
-    File id of the base file
+    File identifier of the base file
     ***********************************************************/
     public GLib.ByteArray base_file_id;
 

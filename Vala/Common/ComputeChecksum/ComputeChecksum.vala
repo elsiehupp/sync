@@ -4,14 +4,14 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
-// #include <qtconcurrentrun.h>
-// #include <QCryptographicHash>
+//  #include <QLoggingCategory>
+//  #include <qtconcurrentrun.h>
+//  #include <QCryptographicHash>
 
 
-// #pragma once
-// #include <QFuture_watcher>
-// #include <memory>
+//  #pragma once
+//  #include <QFuture_watcher>
+//  #include <memory>
 
 using ZLib;
 namespace Occ {
@@ -118,7 +118,7 @@ class ComputeChecksum : ComputeChecksumBase {
     on_done () is emitted when the calculation finishes.
     ***********************************************************/
     public void on_start (string file_path) {
-        q_c_info (lc_checksums) << "Computing" << checksum_type () << "checksum of" << file_path << "in a thread";
+        GLib.Info (lc_checksums) << "Computing" << checksum_type () << "checksum of" << file_path << "in a thread";
         start_impl (std.make_unique<GLib.File> (file_path));
     }
 
@@ -133,7 +133,7 @@ class ComputeChecksum : ComputeChecksumBase {
     ***********************************************************/
     public void on_start (std.unique_ptr<QIODevice> device) {
         ENFORCE (device);
-        q_c_info (lc_checksums) << "Computing" << checksum_type () << "checksum of device" << device.get () << "in a thread";
+        GLib.Info (lc_checksums) << "Computing" << checksum_type () << "checksum of device" << device.get () << "in a thread";
         ASSERT (!device.parent ());
 
         start_impl (std.move (device));

@@ -4,14 +4,14 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QJsonObject>
-// #include <QJsonDocument>
-// #include <QJsonArray>
-
-// #include <QFlags>
-// #include <QAbstractListModel>
-// #include <QLoggingCategory>
-// #include <QModelIndex>
+//  #include <QJsonObject>
+//  #include <QJsonDocument>
+//  #include <QJsonArray>
+//  #include
+//  #include <QFlags>
+//  #include <QAbstractListMode
+//  #include <QLoggingCategory>
+//  #include <QModelIndex>
 
 
 namespace Occ {
@@ -68,8 +68,8 @@ class Sharee {
         const string display_name,
         const Type type)
         : this.share_with (share_with)
-        , this.display_name (display_name)
-        , this.type (type) {
+        this.display_name (display_name)
+        this.type (type) {
     }
 
     string Sharee.format () {

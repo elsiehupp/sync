@@ -4,11 +4,11 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
+//  #include <QLoggingCategory>
+//  #include
+//  #include <sys/xattr.h>
 
-// #include <sys/xattr.h>
-
-// #pragma once
+//  #pragma once
 
 
 namespace Occ {

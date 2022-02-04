@@ -38,10 +38,10 @@ class PropagateLocalRemove : PropagateItemJob {
     in the database.  But in case of error, we need to remove the entries from the database of the files
     that were deleted.
 
-    \a path is relative to propagator ()._local_dir + this.item._file and should on_start with a slash
+    \a path is relative to propagator ().local_dir + this.item.file and should on_start with a slash
     ***********************************************************/
     bool PropagateLocalRemove.remove_recursively (string path) {
-        string absolute = propagator ().full_local_path (this.item._file + path);
+        string absolute = propagator ().full_local_path (this.item.file + path);
         string[] errors;
         GLib.List<QPair<string, bool>> deleted;
         bool on_success = FileSystem.remove_recursively (
@@ -64,7 +64,7 @@ class PropagateLocalRemove : PropagateItemJob {
                 if (it.second) {
                     deleted_dir = it.first;
                 }
-                propagator ()._journal.delete_file_record (it.first.mid (propagator ().local_path ().size ()), it.second);
+                propagator ().journal.delete_file_record (it.first.mid (propagator ().local_path ().size ()), it.second);
             }
 
             this.error = errors.join (", ");
@@ -73,17 +73,17 @@ class PropagateLocalRemove : PropagateItemJob {
     }
 
     void PropagateLocalRemove.on_start () {
-        q_c_info (lc_propagate_local_remove) << "Start propagate local remove job";
+        GLib.Info (lc_propagate_local_remove) << "Start propagate local remove job";
 
-        this.move_to_trash = propagator ().sync_options ()._move_files_to_trash;
+        this.move_to_trash = propagator ().sync_options ().move_files_to_trash;
 
-        if (propagator ()._abort_requested)
+        if (propagator ().abort_requested)
             return;
 
-        const string filename = propagator ().full_local_path (this.item._file);
-        q_c_info (lc_propagate_local_remove) << "Going to delete:" << filename;
+        const string filename = propagator ().full_local_path (this.item.file);
+        GLib.Info (lc_propagate_local_remove) << "Going to delete:" << filename;
 
-        if (propagator ().local_filename_clash (this.item._file)) {
+        if (propagator ().local_filename_clash (this.item.file)) {
             on_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not remove %1 because of a local file name clash").arg (QDir.to_native_separators (filename)));
             return;
         }
@@ -110,7 +110,7 @@ class PropagateLocalRemove : PropagateItemJob {
             }
         }
         propagator ().report_progress (*this.item, 0);
-        propagator ()._journal.delete_file_record (this.item._original_file, this.item.is_directory ());
-        propagator ()._journal.commit ("Local remove");
+        propagator ().journal.delete_file_record (this.item.original_file, this.item.is_directory ());
+        propagator ().journal.commit ("Local remove");
         on_done (SyncFileItem.Status.SUCCESS);
     }

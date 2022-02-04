@@ -29,13 +29,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 @{
 ***********************************************************/
 
-// #include <sys/stat.h>
-
-// #include <cstdint>
-// #include <sys/types.h>
-// #include <config_csync.h>
-// #include <functional>
-// #include <memory>
+//  #include <sys/stat.h>
+//  #include
+//  #include <cstdint>
+//  #include <sys/types.h>
+//  #include <config_csyn
+//  #include <functional>
+//  #include <memory>
 
 namespace Occ {
 }
@@ -166,8 +166,8 @@ typedef struct csync_file_stat_s csync_file_stat_t;
 
 struct OCSYNC_EXPORT csync_file_stat_s {
   time_t modtime = 0;
-  int64_t size = 0;
-  uint64_t inode = 0;
+  int64 size = 0;
+  uint64 inode = 0;
 
   Occ.RemotePermissions remote_perm;
   ItemType type BITFIELD (4);

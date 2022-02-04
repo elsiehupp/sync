@@ -4,9 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
-// #include <localdiscoverytracker.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
+//  #include <localdiscoverytracker.h>
 
 using namespace Occ;
 
@@ -42,7 +42,7 @@ class TestLocalDiscovery : GLib.Object {
         fakeFolder.remoteModifier ().appendByte ("C/c1");
         tracker.addTouchedPath ("A/X");
 
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DatabaseAndFilesystem, tracker.localDiscoveryPaths ());
+        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
 
         tracker.startSyncPartialDiscovery ();
         QVERIFY (fakeFolder.syncOnce ());
@@ -52,12 +52,12 @@ class TestLocalDiscovery : GLib.Object {
         QVERIFY (!fakeFolder.currentRemoteState ().find ("A/Y/y2"));
         QVERIFY (!fakeFolder.currentRemoteState ().find ("B/b3"));
         QVERIFY (fakeFolder.currentLocalState ().find ("C/c3"));
-        QCOMPARE (fakeFolder.syncEngine ().lastLocalDiscoveryStyle (), LocalDiscoveryStyle.DatabaseAndFilesystem);
+        QCOMPARE (fakeFolder.syncEngine ().lastLocalDiscoveryStyle (), LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
         QVERIFY (tracker.localDiscoveryPaths ().empty ());
 
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        QCOMPARE (fakeFolder.syncEngine ().lastLocalDiscoveryStyle (), LocalDiscoveryStyle.FilesystemOnly);
+        QCOMPARE (fakeFolder.syncEngine ().lastLocalDiscoveryStyle (), LocalDiscoveryStyle.FILESYSTEM_ONLY);
         QVERIFY (tracker.localDiscoveryPaths ().empty ());
     }
 
@@ -73,7 +73,7 @@ class TestLocalDiscovery : GLib.Object {
         QVERIFY (engine.shouldDiscoverLocally ("A/X"));
 
         fakeFolder.syncEngine ().setLocalDiscoveryOptions (
-            LocalDiscoveryStyle.DatabaseAndFilesystem, { "A/X", "A/X space", "A/X/beta", "foo bar space/touch", "foo/", "zzz", "zzzz" });
+            LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, { "A/X", "A/X space", "A/X/beta", "foo bar space/touch", "foo/", "zzz", "zzzz" });
 
         QVERIFY (engine.shouldDiscoverLocally (""));
         QVERIFY (engine.shouldDiscoverLocally ("A"));
@@ -100,7 +100,7 @@ class TestLocalDiscovery : GLib.Object {
         QVERIFY (!engine.shouldDiscoverLocally ("A/X o"));
 
         fakeFolder.syncEngine ().setLocalDiscoveryOptions (
-            LocalDiscoveryStyle.DatabaseAndFilesystem, {});
+            LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, {});
 
         QVERIFY (!engine.shouldDiscoverLocally (""));
     }
@@ -127,7 +127,7 @@ class TestLocalDiscovery : GLib.Object {
         // We're not adding a4 as touched, it's in the same folder as a3 and will be seen.
         // And due to the error it should be added to the explicit list while a3 gets removed.
 
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DatabaseAndFilesystem, tracker.localDiscoveryPaths ());
+        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
         tracker.startSyncPartialDiscovery ();
         QVERIFY (!fakeFolder.syncOnce ());
 
@@ -137,7 +137,7 @@ class TestLocalDiscovery : GLib.Object {
         QVERIFY (trackerContains ("A/a4"));
         QVERIFY (trackerContains ("A/spurious")); // not removed since overall sync not successful
 
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.FilesystemOnly);
+        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.FILESYSTEM_ONLY);
         tracker.startSyncFullDiscovery ();
         QVERIFY (!fakeFolder.syncOnce ());
 
@@ -149,7 +149,7 @@ class TestLocalDiscovery : GLib.Object {
         fakeFolder.syncJournal ().wipeErrorBlocklist ();
         tracker.addTouchedPath ("A/newspurious"); // will be removed due to successful sync
 
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DatabaseAndFilesystem, tracker.localDiscoveryPaths ());
+        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
         tracker.startSyncPartialDiscovery ();
         QVERIFY (fakeFolder.syncOnce ());
 
@@ -171,7 +171,7 @@ class TestLocalDiscovery : GLib.Object {
 
         // Only "A" was modified according to the file system tracker
         fakeFolder.syncEngine ().setLocalDiscoveryOptions (
-            LocalDiscoveryStyle.DatabaseAndFilesystem, { "A" });
+            LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, { "A" });
 
         QVERIFY (fakeFolder.syncOnce ());
 

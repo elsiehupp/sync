@@ -19,7 +19,7 @@ class FakeSearchResultsStorage { {lass Provider {
             public bool this.rounded;
         };
 
-        string this.id;
+        string this.identifier;
         string this.name;
         int32 this.order = std.numeric_limits<int32>.max ();
         int32 this.cursor = 0;
@@ -48,7 +48,7 @@ class FakeSearchResultsStorage { {lass Provider {
             delete this.instance;
         }
 
-        this.instance = nullptr;
+        this.instance = null;
     }
 
 
@@ -71,7 +71,7 @@ class FakeSearchResultsStorage { {lass Provider {
         GLib.List<GLib.Variant> providersList;
 
         for (var fakeProviderInitInfo : fakeProvidersInitInfo) {
-            providersList.push_back (QVariantMap{ {QStringLiteral ("id"), fakeProviderInitInfo._id}, {QStringLiteral ("name"), fakeProviderInitInfo._name}, {QStringLiteral ("order"), fakeProviderInitInfo._order},
+            providersList.push_back (QVariantMap{ {QStringLiteral ("identifier"), fakeProviderInitInfo.id}, {QStringLiteral ("name"), fakeProviderInitInfo.name}, {QStringLiteral ("order"), fakeProviderInitInfo.order},
             });
         }
 
@@ -85,16 +85,16 @@ class FakeSearchResultsStorage { {lass Provider {
     // on_init the map of fake search results for each provider
     public void initSearchResultsData () {
         for (var fakeProvider : fakeProvidersInitInfo) {
-            var providerData = this.searchResultsData[fakeProvider._id];
-            providerData._id = fakeProvider._id;
-            providerData._name = fakeProvider._name;
-            providerData._order = fakeProvider._order;
-            if (fakeProvider._numItemsToInsert > pageSize) {
-                providerData._isPaginated = true;
+            var providerData = this.searchResultsData[fakeProvider.id];
+            providerData.id = fakeProvider.id;
+            providerData.name = fakeProvider.name;
+            providerData.order = fakeProvider.order;
+            if (fakeProvider.numItemsToInsert > pageSize) {
+                providerData.isPaginated = true;
             }
-            for (uint32 i = 0; i < fakeProvider._numItemsToInsert; ++i) {
-                providerData._results.push_back ( {"http://example.de/avatar/john/64", string (QStringLiteral ("John Doe in ") + fakeProvider._name),
-                        string (QStringLiteral ("We a discussion about ") + fakeProvider._name
+            for (uint32 i = 0; i < fakeProvider.numItemsToInsert; ++i) {
+                providerData.results.push_back ( {"http://example.de/avatar/john/64", string (QStringLiteral ("John Doe in ") + fakeProvider.name),
+                        string (QStringLiteral ("We a discussion about ") + fakeProvider.name
                             + QStringLiteral (" already. But, let's have a follow up tomorrow afternoon.")),
                         "http://example.de/call/abcde12345#message_12345", QStringLiteral ("icon-talk"), true});
             }
@@ -114,7 +114,7 @@ class FakeSearchResultsStorage { {lass Provider {
         }
 
         for (var result : results) {
-            list.push_back (QVariantMap{ {"thumbnailUrl", result._thumbnailUrl}, {"title", result._title}, {"subline", result._subline}, {"resourceUrl", result._resourceUrl}, {"icon", result._icon}, {"rounded", result._rounded}
+            list.push_back (QVariantMap{ {"thumbnailUrl", result.thumbnailUrl}, {"title", result.title}, {"subline", result.subline}, {"resourceUrl", result.resourceUrl}, {"icon", result.icon}, {"rounded", result.rounded}
             });
         }
 
@@ -129,16 +129,16 @@ class FakeSearchResultsStorage { {lass Provider {
 
         const var provider = this.searchResultsData.value (providerId, Provider ());
 
-        if (provider._id.isEmpty () || cursor > provider._results.size ()) {
+        if (provider.id.isEmpty () || cursor > provider.results.size ()) {
             return results;
         }
 
-        const int n = cursor + pageSize > provider._results.size ()
+        const int n = cursor + pageSize > provider.results.size ()
             ? 0
             : cursor + pageSize;
 
         for (int i = cursor; i < n; ++i) {
-            results.push_back (provider._results[i]);
+            results.push_back (provider.results[i]);
         }
 
         return results;
@@ -157,7 +157,7 @@ class FakeSearchResultsStorage { {lass Provider {
         }
 
         if (searchTerm == QStringLiteral ("[empty]")) {
-            const QVariantMap dataMap = {{QStringLiteral ("name"), this.searchResultsData[providerId]._name}, {QStringLiteral ("isPaginated"), false}, {QStringLiteral ("cursor"), 0}, {QStringLiteral ("entries"), QVariantList{}}};
+            const QVariantMap dataMap = {{QStringLiteral ("name"), this.searchResultsData[providerId].name}, {QStringLiteral ("isPaginated"), false}, {QStringLiteral ("cursor"), 0}, {QStringLiteral ("entries"), QVariantList{}}};
 
             const QVariantMap ocsMap = {{QStringLiteral ("meta"), this.metaSuccess}, {QStringLiteral ("data"), dataMap}};
 
@@ -169,7 +169,7 @@ class FakeSearchResultsStorage { {lass Provider {
 
         const var nextCursor = cursor + pageSize;
 
-        const QVariantMap dataMap = {{QStringLiteral ("name"), this.searchResultsData[providerId]._name}, {QStringLiteral ("isPaginated"), this.searchResultsData[providerId]._isPaginated}, {QStringLiteral ("cursor"), nextCursor}, {QStringLiteral ("entries"), resultsForProvider (providerId, cursor)}};
+        const QVariantMap dataMap = {{QStringLiteral ("name"), this.searchResultsData[providerId].name}, {QStringLiteral ("isPaginated"), this.searchResultsData[providerId].isPaginated}, {QStringLiteral ("cursor"), nextCursor}, {QStringLiteral ("entries"), resultsForProvider (providerId, cursor)}};
 
         const QVariantMap ocsMap = {{QStringLiteral ("meta"), this.metaSuccess}, {QStringLiteral ("data"), dataMap}};
 
@@ -203,4 +203,4 @@ class FakeSearchResultsStorage { {lass Provider {
     private QVariantMap this.metaSuccess;
 }
 
-FakeSearchResultsStorage *FakeSearchResultsStorage._instance = nullptr;
+FakeSearchResultsStorage *FakeSearchResultsStorage.instance = null;

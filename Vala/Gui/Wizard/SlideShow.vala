@@ -4,18 +4,18 @@ Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QGuiApplication>
-// #include <QMouse_event>
-// #include <QPainter>
-// #include <QStyle>
-// #include <QStyle_hints>
+//  #include <QGuiApplication>
+//  #include <QMouse_event>
+//  #include <QPainter>
+//  #include <QStyle>
+//  #include <QStyle_hints>
 
 const int HASQT5_11 (QT_VERSION >= QT_VERSION_CHECK (5,11,0))
 
-// #include <Gtk.Widget>
-// #include <QBasic_timer>
-// #include <QPointer>
-// #include <QVariant_animation>
+//  #include <Gtk.Widget>
+//  #include <QBasic_timer>
+//  #include <QPointer>
+//  #include <QVariant_animation>
 
 namespace Occ {
 
@@ -24,12 +24,12 @@ namespace Occ {
 @ingroup gui
 ***********************************************************/
 class Slide_show : Gtk.Widget {
-    Q_PROPERTY (int interval READ interval WRITE set_interval)
-    Q_PROPERTY (int current_slide READ current_slide WRITE set_current_slide NOTIFY current_slide_changed)
+    //  Q_PROPERTY (int interval READ interval WRITE set_interval)
+    //  Q_PROPERTY (int current_slide READ current_slide WRITE set_current_slide NOTIFY current_slide_changed)
 
     /***********************************************************
     ***********************************************************/
-    public Slide_show (Gtk.Widget* parent = nullptr);
+    public Slide_show (Gtk.Widget* parent = null);
 
     /***********************************************************
     ***********************************************************/
@@ -77,7 +77,6 @@ class Slide_show : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void on_next_slide ();
 
 
@@ -111,7 +110,7 @@ signals:
     private QBasic_timer this.timer;
     private string[] this.labels;
     private GLib.Vector<QPixmap> this.pixmaps;
-    private QPointer<QVariant_animation> this.animation = nullptr;
+    private QPointer<QVariant_animation> this.animation = null;
 }
 
 static const int Spacing = 6;

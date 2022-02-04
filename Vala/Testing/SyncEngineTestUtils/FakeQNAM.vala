@@ -27,7 +27,6 @@ class FakeQNAM : QNetworkAccessManager {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public FileInfo currentRemoteState () { return this.remoteRootFileInfo; }
     public FileInfo uploadState () { return this.uploadFileInfo; }
 
@@ -35,6 +34,7 @@ class FakeQNAM : QNetworkAccessManager {
     /***********************************************************
     ***********************************************************/
     public GLib.HashMap<string, int> errorPaths () { return this.errorPaths; }
+
 
     /***********************************************************
     ***********************************************************/
@@ -54,5 +54,5 @@ class FakeQNAM : QNetworkAccessManager {
 
 
     protected Soup.Reply createRequest (Operation op, QNetworkRequest request,
-        QIODevice outgoingData = nullptr) override;
+        QIODevice outgoingData = null) override;
 };

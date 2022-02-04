@@ -24,7 +24,6 @@ class Folder_wizard_remote_path : Format_warnings_wizard_page {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void initialize_page () override;
     public void cleanup_page () override;
 
@@ -67,8 +66,8 @@ protected slots:
 
     Folder_wizard_remote_path.Folder_wizard_remote_path (AccountPointer account)
         : Format_warnings_wizard_page ()
-        , this.warn_was_visible (false)
-        , this.account (account)
+        this.warn_was_visible (false)
+        this.account (account)
      {
         this.ui.setup_ui (this);
         this.ui.warn_frame.hide ();
@@ -161,6 +160,7 @@ protected slots:
                      .arg (job.error_string_parsing_body ()));
     }
 
+
     /***********************************************************
     ***********************************************************/
     static QTree_widget_item find_first_child (QTree_widget_item parent, string text) {
@@ -170,7 +170,7 @@ protected slots:
                 return child;
             }
         }
-        return nullptr;
+        return null;
     }
 
     void Folder_wizard_remote_path.recursive_insert (QTree_widget_item parent, string[] path_trail, string path) {
@@ -267,7 +267,7 @@ protected slots:
         }
 
         const var webdav_folder = GLib.Uri (this.account.dav_url ()).path ();
-        Q_ASSERT (path.starts_with (webdav_folder));
+        //  Q_ASSERT (path.starts_with (webdav_folder));
         this.encrypted_paths << path.mid (webdav_folder.size ());
     }
 
@@ -306,7 +306,7 @@ protected slots:
             return;
         }
 
-        this.ui.folder_tree_widget.set_current_item (nullptr);
+        this.ui.folder_tree_widget.set_current_item (null);
         this.lscol_timer.on_start (); // avoid sending a request on each keystroke
     }
 
@@ -318,7 +318,7 @@ protected slots:
         LsColJob job = run_ls_col_job (path);
         // No error handling, no updating, we do this manually
         // because of extra logic in the typed-path case.
-        disconnect (job, nullptr, this, nullptr);
+        disconnect (job, null, this, null);
         connect (job, &LsColJob.finished_with_error,
             this, &Folder_wizard_remote_path.on_handle_ls_col_network_error);
         connect (job, &LsColJob.directory_listing_subfolders,

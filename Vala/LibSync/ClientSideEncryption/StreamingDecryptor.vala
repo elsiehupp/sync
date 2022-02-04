@@ -1,5 +1,20 @@
+namespace Occ {
 
+/***********************************************************
+Simple classes for safe (RAII) handling of OpenSSL
+data structures
+***********************************************************/
 class StreamingDecryptor {
+
+    //  Q_DISABLE_COPY (StreamingDecryptor)
+
+    /***********************************************************
+    ***********************************************************/
+    private CipherContext context;
+    private bool is_initialized = false;
+    private bool is_finished = false;
+    private uint64 decrypted_so_far = 0;
+    private uint64 total_size = 0;
 
     /***********************************************************
     ***********************************************************/
@@ -7,26 +22,8 @@ class StreamingDecryptor {
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
     public bool is_finished ();
 
+} // class StreamingDecryptor
 
-    //  Q_DISABLE_COPY (StreamingDecryptor)
-
-    /***********************************************************
-    ***********************************************************/
-    private CipherCtx this.ctx;
-    private bool this.is_initialized = false;
-    private bool this.is_finished = false;
-    private uint64 this.decrypted_so_far = 0;
-    private uint64 this.total_size = 0;
-};
+} // namespace Occ

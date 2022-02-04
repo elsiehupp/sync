@@ -4,10 +4,10 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QtCore>
-
-// #include <QtCore>
-// #include <QIcon>
+//  #include <QtCore>
+//  #include
+//  #include <QtCore>
+//  #include <QIcon>
 
 namespace Occ {
 
@@ -19,10 +19,10 @@ These are part of notifications which are mapped into activities.
 class Activity_link {
     // Q_GADGET
 
-    Q_PROPERTY (string label MEMBER this.label)
-    Q_PROPERTY (string link MEMBER this.link)
-    Q_PROPERTY (GLib.ByteArray verb MEMBER this.verb)
-    Q_PROPERTY (bool primary MEMBER this.primary)
+    //  Q_PROPERTY (string label MEMBER this.label)
+    //  Q_PROPERTY (string link MEMBER this.link)
+    //  Q_PROPERTY (GLib.ByteArray verb MEMBER this.verb)
+    //  Q_PROPERTY (bool primary MEMBER this.primary)
 
     /***********************************************************
     ***********************************************************/

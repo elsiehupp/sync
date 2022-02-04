@@ -4,8 +4,8 @@
    any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <QDebug>
+//  #include <QtTest>
+//  #include <QDebug>
 
 using namespace Occ;
 namespace Occ {
@@ -17,7 +17,7 @@ class TestNextcloudPropagator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testUpdateErrorFromSession () {
-        //OwncloudPropagator propagator (nullptr, QLatin1String ("test1"), QLatin1String ("test2"), new ProgressDatabase);
+        //OwncloudPropagator propagator (null, QLatin1String ("test1"), QLatin1String ("test2"), new ProgressDatabase);
         QVERIFY ( true );
     }
 

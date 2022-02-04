@@ -37,9 +37,9 @@ signals:
 
 Socket_api_job_v2.Socket_api_job_v2 (unowned<Socket_listener> socket_listener, GLib.ByteArray command, QJsonObject arguments)
     : this.socket_listener (socket_listener)
-    , this.command (command)
-    , this.job_id (arguments[QStringLiteral ("id")].to_string ())
-    , this.arguments (arguments[QStringLiteral ("arguments")].to_object ()) {
+    this.command (command)
+    this.job_id (arguments[QStringLiteral ("identifier")].to_string ())
+    this.arguments (arguments[QStringLiteral ("arguments")].to_object ()) {
     ASSERT (!this.job_id.is_empty ())
 }
 
@@ -58,11 +58,11 @@ void Socket_api_job_v2.failure (string error) {
 void Socket_api_job_v2.do_finish (QJsonObject obj) {
     this.socket_listener.on_send_message (this.command + QStringLiteral ("this.RESULT:") + QJsonDocument ({
         {
-            QStringLiteral ("id"), this.job_id
+            QStringLiteral ("identifier"), this.job_id
         },
         {
             QStringLiteral ("arguments"), obj
         }
     }).to_json (QJsonDocument.Compact));
-    Q_EMIT on_finished ();
+    /* Q_EMIT */ on_finished ();
 }

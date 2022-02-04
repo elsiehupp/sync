@@ -4,9 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <qglobal.h>
-// #include <QTemporaryDir>
-// #include <QtTest>
+//  #include <qglobal.h>
+//  #include <QTemporaryDir>
+//  #include <QtTest>
 
 using namespace Occ;
 

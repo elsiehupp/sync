@@ -14,7 +14,7 @@ class Link_share : Share {
     /***********************************************************
     ***********************************************************/
     public Link_share (AccountPointer account,
-        const string id,
+        const string identifier,
         const string uidowner,
         const string owner_display_name,
         const string path,
@@ -161,7 +161,7 @@ QDate Link_share.get_expire_date () {
 }
 
 Link_share.Link_share (AccountPointer account,
-    const string id,
+    const string identifier,
     const string uidowner,
     const string owner_display_name,
     const string path,
@@ -173,13 +173,13 @@ Link_share.Link_share (AccountPointer account,
     const QDate expire_date,
     const string note,
     const string label)
-    : Share (account, id, uidowner, owner_display_name, path, Share.Type_link, is_password_set, permissions)
-    , this.name (name)
-    , this.token (token)
-    , this.note (note)
-    , this.expire_date (expire_date)
-    , this.url (url)
-    , this.label (label) {
+    : Share (account, identifier, uidowner, owner_display_name, path, Share.Type_link, is_password_set, permissions)
+    this.name (name)
+    this.token (token)
+    this.note (note)
+    this.expire_date (expire_date)
+    this.url (url)
+    this.label (label) {
 }
 
 bool Link_share.get_public_upload () {

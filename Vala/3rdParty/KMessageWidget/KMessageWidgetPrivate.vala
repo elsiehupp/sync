@@ -8,17 +8,17 @@ Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QAction>
-// #include <QApplication>
-// #include <QEvent>
-// #include <QGrid_layout>
-// #include <QHBox_layout>
-// #include <QLabel>
-// #include <QPainter>
-// #include <QShow_event>
-// #include <QTime_line>
-// #include <QToolButton>
-// #include <QStyle>
+//  #include <QAction>
+//  #include <QApplication>
+//  #include <QEvent>
+//  #include <QGrid_layout>
+//  #include <QHBox_layout>
+//  #include <QLabel>
+//  #include <QPainter>
+//  #include <QShow_event>
+//  #include <QTime_line>
+//  #include <QToolButton>
+//  #include <QStyle>
 
 //---------------------------------------------------------------------
 // KMessageWidgetPrivate
@@ -29,11 +29,11 @@ class KMessageWidgetPrivate {
     /***********************************************************
     ***********************************************************/
     public KMessageWidget q;
-    public QFrame content = nullptr;
-    public QLabel icon_label = nullptr;
-    public QLabel text_label = nullptr;
-    public QToolButton close_button = nullptr;
-    public QTime_line time_line = nullptr;
+    public QFrame content = null;
+    public QLabel icon_label = null;
+    public QLabel text_label = null;
+    public QToolButton close_button = null;
+    public QTime_line time_line = null;
     public QIcon icon;
     public bool ignore_show_event_doing_animated_show = false;
 
@@ -226,7 +226,7 @@ class KMessageWidgetPrivate {
             .arg (bg_final_color.name ())
             .arg (border.name ())
             // Default_frame_width returns the size of the external margin + border width. We know our border is 1px, so we subtract this from the frame normal QStyle Frame_width to get our margin
-            .arg (q.style ().pixel_metric (QStyle.PM_Default_frame_width, nullptr, q) - 1)
+            .arg (q.style ().pixel_metric (QStyle.PM_Default_frame_width, null, q) - 1)
             .arg (text_color.name ())
         );
     }

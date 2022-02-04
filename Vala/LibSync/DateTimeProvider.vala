@@ -1,30 +1,24 @@
-#pragma once
-
+//  #pragma once
 
 namespace Occ {
 
 class DateTimeProvider {
 
-    virtual ~DateTimeProvider ();
+    ~DateTimeProvider () = default;
 
     /***********************************************************
     ***********************************************************/
-    public virtual GLib.DateTime current_date_time ();
-
-    /***********************************************************
-    ***********************************************************/
-    public virtual QDate current_date ();
-}
-
-
-    DateTimeProvider.~DateTimeProvider () = default;
-
-    GLib.DateTime DateTimeProvider.current_date_time () {
+    public virtual GLib.DateTime current_date_time () {
         return GLib.DateTime.current_date_time ();
     }
 
-    QDate DateTimeProvider.current_date () {
+
+    /***********************************************************
+    ***********************************************************/
+    public virtual QDate current_date () {
         return QDate.current_date ();
     }
 
-}
+} // class DateTimeProvider
+
+} // namespace Occ

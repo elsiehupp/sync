@@ -4,7 +4,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <Gtk.Dialog>
+//  #include <Gtk.Dialog>
 
 namespace Occ {
 
@@ -20,7 +20,7 @@ class Legal_notice : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public Legal_notice (Gtk.Dialog parent = nullptr);
+    public Legal_notice (Gtk.Dialog parent = null);
     ~Legal_notice () override;
 
 
@@ -38,7 +38,7 @@ class Legal_notice : Gtk.Dialog {
 
     Legal_notice.Legal_notice (Gtk.Dialog parent)
         : Gtk.Dialog (parent)
-        , this.ui (new Ui.Legal_notice) {
+        this.ui (new Ui.Legal_notice) {
         this.ui.setup_ui (this);
 
         connect (this.ui.close_button, &QPushButton.clicked, this, &Legal_notice.accept);

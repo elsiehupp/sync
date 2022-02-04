@@ -5,7 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
-Q_DECLARE_LOGGING_CATEGORY (lc_propagate_upload_v1)
+//  Q_DECLARE_LOGGING_CATEGORY (lc_propagate_upload_v1)
 /***********************************************************
 @ingroup libsync
 
@@ -28,14 +28,14 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
     ***********************************************************/
     private int this.current_chunk = 0;
     private int this.chunk_count = 0; /// Total number of chunks for this file
-    private uint32 this.transfer_id = 0; /// transfer id (part of the url)
+    private uint32 this.transfer_id = 0; /// transfer identifier (part of the url)
 
     /***********************************************************
     ***********************************************************/
     private int64 chunk_size () {
         // Old chunking does not use dynamic chunking algorithm, and does not adjusts the chunk size respectively,
         // thus this value should be used as the one classifing item to be chunked
-        return propagator ().sync_options ()._initial_chunk_size;
+        return propagator ().sync_options ().initial_chunk_size;
     }
 
 

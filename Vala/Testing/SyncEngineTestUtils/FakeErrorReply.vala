@@ -20,7 +20,6 @@ class FakeErrorReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void on_abort () override { }
     public int64 readData (char buf, int64 max) override;
     public int64 bytesAvailable () override;

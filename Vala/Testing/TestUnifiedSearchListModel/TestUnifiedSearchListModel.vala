@@ -4,10 +4,10 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QAbstractItemModelTester>
-// #include <QDesktopServices>
-// #include <QSignalSpy>
-// #include <QTest>
+//  #include <QAbstractItemModelTester>
+//  #include <QDesktopServices>
+//  #include <QSignalSpy>
+//  #include <QTest>
 
 namespace {
 
@@ -47,7 +47,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
         fakeQnam.setOverride ([this] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice device) {
             Q_UNUSED (device);
-            Soup.Reply reply = nullptr;
+            Soup.Reply reply = null;
 
             const var urlQuery = QUrlQuery (req.url ());
             const var format = urlQuery.queryItemValue (QStringLiteral ("format"));

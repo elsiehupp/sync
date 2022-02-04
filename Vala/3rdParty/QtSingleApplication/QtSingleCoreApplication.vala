@@ -11,7 +11,7 @@ rights.  These rights are described in the Digia Qt LGPL Exception
 version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
-// #include <QCoreApplication>
+//  #include <QCoreApplication>
 
 namespace SharedTools {
 
@@ -36,11 +36,10 @@ class Qt_singleCoreApplication : QCoreApplication {
 
     /***********************************************************
     ***********************************************************/
-    public string id ();
+    public string identifier ();
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void set_block (bool value);
 
 
@@ -105,7 +104,7 @@ namespace SharedTools {
         return peer.on_send_message (message, timeout, block);
     }
 
-    string Qt_singleCoreApplication.id () {
+    string Qt_singleCoreApplication.identifier () {
         return peer.application_id ();
     }
 

@@ -1,17 +1,17 @@
 
 class User : GLib.Object {
-    Q_PROPERTY (string name READ name NOTIFY name_changed)
-    Q_PROPERTY (string server READ server CONSTANT)
-    Q_PROPERTY (bool server_has_user_status READ server_has_user_status CONSTANT)
-    Q_PROPERTY (GLib.Uri status_icon READ status_icon NOTIFY status_changed)
-    Q_PROPERTY (string status_emoji READ status_emoji NOTIFY status_changed)
-    Q_PROPERTY (string status_message READ status_message NOTIFY status_changed)
-    Q_PROPERTY (bool desktop_notifications_allowed READ is_desktop_notifications_allowed NOTIFY desktop_notifications_allowed_changed)
-    Q_PROPERTY (bool has_local_folder READ has_local_folder NOTIFY has_local_folder_changed)
-    Q_PROPERTY (bool server_has_talk READ server_has_talk NOTIFY server_has_talk_changed)
-    Q_PROPERTY (string avatar READ avatar_url NOTIFY avatar_changed)
-    Q_PROPERTY (bool is_connected READ is_connected NOTIFY account_state_changed)
-    Q_PROPERTY (Unified_search_results_list_model* unified_search_results_list_model READ get_unified_search_results_list_model CONSTANT)
+    //  Q_PROPERTY (string name READ name NOTIFY name_changed)
+    //  Q_PROPERTY (string server READ server CONSTANT)
+    //  Q_PROPERTY (bool server_has_user_status READ server_has_user_status CONSTANT)
+    //  Q_PROPERTY (GLib.Uri status_icon READ status_icon NOTIFY status_changed)
+    //  Q_PROPERTY (string status_emoji READ status_emoji NOTIFY status_changed)
+    //  Q_PROPERTY (string status_message READ status_message NOTIFY status_changed)
+    //  Q_PROPERTY (bool desktop_notifications_allowed READ is_desktop_notifications_allowed NOTIFY desktop_notifications_allowed_changed)
+    //  Q_PROPERTY (bool has_local_folder READ has_local_folder NOTIFY has_local_folder_changed)
+    //  Q_PROPERTY (bool server_has_talk READ server_has_talk NOTIFY server_has_talk_changed)
+    //  Q_PROPERTY (string avatar READ avatar_url NOTIFY avatar_changed)
+    //  Q_PROPERTY (bool is_connected READ is_connected NOTIFY account_state_changed)
+    //  Q_PROPERTY (Unified_search_results_list_model* unified_search_results_list_model READ get_unified_search_results_list_model CONSTANT)
 
     /***********************************************************
     ***********************************************************/
@@ -232,7 +232,6 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void on_refresh_activities ();
 
 
@@ -303,11 +302,11 @@ signals:
 
 User.User (AccountStatePtr account, bool is_current, GLib.Object parent)
     : GLib.Object (parent)
-    , this.account (account)
-    , this.is_current_user (is_current)
-    , this.activity_model (new ActivityListModel (this.account.data (), this))
-    , this.unified_search_results_model (new Unified_search_results_list_model (this.account.data (), this))
-    , this.notification_requests_running (0) {
+    this.account (account)
+    this.is_current_user (is_current)
+    this.activity_model (new ActivityListModel (this.account.data (), this))
+    this.unified_search_results_model (new Unified_search_results_list_model (this.account.data (), this))
+    this.notification_requests_running (0) {
     connect (Progress_dispatcher.instance (), &Progress_dispatcher.progress_info,
         this, &User.on_progress_info);
     connect (Progress_dispatcher.instance (), &Progress_dispatcher.item_completed,
@@ -346,8 +345,8 @@ User.User (AccountStatePtr account, bool is_current, GLib.Object parent)
 }
 
 void User.show_desktop_notification (string title, string message) {
-    ConfigFile cfg;
-    if (!cfg.optional_server_notifications () || !is_desktop_notifications_allowed ()) {
+    ConfigFile config;
+    if (!config.optional_server_notifications () || !is_desktop_notifications_allowed ()) {
         return;
     }
 
@@ -376,11 +375,11 @@ void User.on_build_notification_display (Activity_list list) {
 
     foreach (var activity, list) {
         if (this.blocklisted_notifications.contains (activity)) {
-            q_c_info (lc_activity) << "Activity in blocklist, skip";
+            GLib.Info (lc_activity) << "Activity in blocklist, skip";
             continue;
         }
-        const var message = AccountManager.instance ().accounts ().count () == 1 ? "" : activity._acc_name;
-        show_desktop_notification (activity._subject, message);
+        const var message = AccountManager.instance ().accounts ().count () == 1 ? "" : activity.acc_name;
+        show_desktop_notification (activity.subject, message);
         this.activity_model.add_notification_to_activity_list (activity);
     }
 }
@@ -393,7 +392,7 @@ void User.on_set_notification_refresh_interval (std.chrono.milliseconds interval
 }
 
 void User.on_push_notifications_ready () {
-    q_c_info (lc_activity) << "Push notifications are ready";
+    GLib.Info (lc_activity) << "Push notifications are ready";
 
     if (this.notification_check_timer.is_active ()) {
         // as we are now able to use push notifications - let's stop the polling timer
@@ -414,20 +413,20 @@ void User.on_disconnect_push_notifications () {
 }
 
 void User.on_received_push_notification (Account account) {
-    if (account.id () == this.account.account ().id ()) {
+    if (account.identifier () == this.account.account ().identifier ()) {
         on_refresh_notifications ();
     }
 }
 
 void User.on_received_push_activity (Account account) {
-    if (account.id () == this.account.account ().id ()) {
+    if (account.identifier () == this.account.account ().identifier ()) {
         on_refresh_activities ();
     }
 }
 
 void User.on_check_expired_activities () {
     for (Activity activity : this.activity_model.errors_list ()) {
-        if (activity._expire_at_msecs > 0 && GLib.DateTime.current_date_time ().to_m_secs_since_epoch () >= activity._expire_at_msecs) {
+        if (activity.expire_at_msecs > 0 && GLib.DateTime.current_date_time ().to_m_secs_since_epoch () >= activity.expire_at_msecs) {
             this.activity_model.remove_activity_from_activity_list (activity);
         }
     }
@@ -447,8 +446,8 @@ void User.connect_push_notifications () {
 bool User.check_push_notifications_are_ready () {
     const var push_notifications = this.account.account ().push_notifications ();
 
-    const var push_activities_available = this.account.account ().capabilities ().available_push_notifications () & PushNotificationType.Activities;
-    const var push_notifications_available = this.account.account ().capabilities ().available_push_notifications () & PushNotificationType.Notifications;
+    const var push_activities_available = this.account.account ().capabilities ().available_push_notifications () & PushNotificationType.ACTIVITIES;
+    const var push_notifications_available = this.account.account ().capabilities ().available_push_notifications () & PushNotificationType.NOTIFICATIONS;
 
     const var push_activities_and_notifications_available = push_activities_available && push_notifications_available;
 
@@ -546,7 +545,7 @@ void User.on_end_notification_request (int reply_code) {
 }
 
 void User.on_send_notification_request (string account_name, string link, GLib.ByteArray verb, int row) {
-    q_c_info (lc_activity) << "Server Notification Request " << verb << link << "on account" << account_name;
+    GLib.Info (lc_activity) << "Server Notification Request " << verb << link << "on account" << account_name;
 
     const string[] valid_verbs = string[] () << "GET"
                                                  << "PUT"
@@ -594,7 +593,7 @@ void User.on_notify_server_finished (string reply, int reply_code) {
     }
 
     on_end_notification_request (reply_code);
-    q_c_info (lc_activity) << "Server Notification reply code" << reply_code << reply;
+    GLib.Info (lc_activity) << "Server Notification reply code" << reply_code << reply;
 }
 
 void User.on_progress_info (string folder, ProgressInfo progress) {
@@ -607,40 +606,40 @@ void User.on_progress_info (string folder, ProgressInfo progress) {
         const var engine = f.sync_engine ();
         const var style = engine.last_local_discovery_style ();
         foreach (Activity activity, this.activity_model.errors_list ()) {
-            if (activity._expire_at_msecs != -1) {
+            if (activity.expire_at_msecs != -1) {
                 // we process expired activities in a different slot
                 continue;
             }
-            if (activity._folder != folder) {
+            if (activity.folder != folder) {
                 continue;
             }
 
-            if (style == LocalDiscoveryStyle.FilesystemOnly) {
+            if (style == LocalDiscoveryStyle.FILESYSTEM_ONLY) {
                 this.activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
 
-            if (activity._status == SyncFileItem.Status.CONFLICT && !QFileInfo (f.path () + activity._file).exists ()) {
+            if (activity.status == SyncFileItem.Status.CONFLICT && !QFileInfo (f.path () + activity.file).exists ()) {
                 this.activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
 
-            if (activity._status == SyncFileItem.Status.FILE_LOCKED && !QFileInfo (f.path () + activity._file).exists ()) {
+            if (activity.status == SyncFileItem.Status.FILE_LOCKED && !QFileInfo (f.path () + activity.file).exists ()) {
                 this.activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
 
-            if (activity._status == SyncFileItem.Status.FILE_IGNORED && !QFileInfo (f.path () + activity._file).exists ()) {
+            if (activity.status == SyncFileItem.Status.FILE_IGNORED && !QFileInfo (f.path () + activity.file).exists ()) {
                 this.activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
 
-            if (!QFileInfo (f.path () + activity._file).exists ()) {
+            if (!QFileInfo (f.path () + activity.file).exists ()) {
                 this.activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
 
-            var path = QFileInfo (activity._file).dir ().path ().to_utf8 ();
+            var path = QFileInfo (activity.file).dir ().path ().to_utf8 ();
             if (path == ".")
                 path.clear ();
 
@@ -654,9 +653,9 @@ void User.on_progress_info (string folder, ProgressInfo progress) {
         // Inform other components about them.
         string[] conflicts;
         foreach (Activity activity, this.activity_model.errors_list ()) {
-            if (activity._folder == folder
-                && activity._status == SyncFileItem.Status.CONFLICT) {
-                conflicts.append (activity._file);
+            if (activity.folder == folder
+                && activity.status == SyncFileItem.Status.CONFLICT) {
+                conflicts.append (activity.file);
             }
         }
 
@@ -673,22 +672,22 @@ void User.on_add_error (string folder_alias, string message, ErrorCategory categ
         GLib.warn (lc_activity) << "Item " << folder_instance.short_gui_local_path () << " retrieved resulted in " << message;
 
         Activity activity;
-        activity._type = Activity.Sync_result_type;
-        activity._status = SyncResult.Status.ERROR;
-        activity._date_time = GLib.DateTime.from_string (GLib.DateTime.current_date_time ().to_string (), Qt.ISODate);
-        activity._subject = message;
-        activity._message = folder_instance.short_gui_local_path ();
-        activity._link = folder_instance.short_gui_local_path ();
-        activity._acc_name = folder_instance.account_state ().account ().display_name ();
-        activity._folder = folder_alias;
+        activity.type = Activity.Sync_result_type;
+        activity.status = SyncResult.Status.ERROR;
+        activity.date_time = GLib.DateTime.from_string (GLib.DateTime.current_date_time ().to_string (), Qt.ISODate);
+        activity.subject = message;
+        activity.message = folder_instance.short_gui_local_path ();
+        activity.link = folder_instance.short_gui_local_path ();
+        activity.acc_name = folder_instance.account_state ().account ().display_name ();
+        activity.folder = folder_alias;
 
         if (category == ErrorCategory.InsufficientRemoteStorage) {
             Activity_link link;
-            link._label = _("Retry all uploads");
-            link._link = folder_instance.path ();
-            link._verb = "";
-            link._primary = true;
-            activity._links.append (link);
+            link.label = _("Retry all uploads");
+            link.link = folder_instance.path ();
+            link.verb = "";
+            link.primary = true;
+            activity.links.append (link);
         }
 
         // add 'other errors' to activity list
@@ -706,21 +705,21 @@ void User.on_add_error_to_gui (string folder_alias, SyncFileItem.Status status, 
         GLib.warn (lc_activity) << "Item " << folder_instance.short_gui_local_path () << " retrieved resulted in " << error_message;
 
         Activity activity;
-        activity._type = Activity.Sync_file_item_type;
-        activity._status = status;
+        activity.type = Activity.Sync_file_item_type;
+        activity.status = status;
         const var current_date_time = GLib.DateTime.current_date_time ();
-        activity._date_time = GLib.DateTime.from_string (current_date_time.to_string (), Qt.ISODate);
-        activity._expire_at_msecs = current_date_time.add_m_secs (activity_default_expiration_time_msecs).to_m_secs_since_epoch ();
-        activity._subject = !subject.is_empty () ? subject : folder_instance.short_gui_local_path ();
-        activity._message = error_message;
-        activity._link = folder_instance.short_gui_local_path ();
-        activity._acc_name = folder_instance.account_state ().account ().display_name ();
-        activity._folder = folder_alias;
+        activity.date_time = GLib.DateTime.from_string (current_date_time.to_string (), Qt.ISODate);
+        activity.expire_at_msecs = current_date_time.add_m_secs (activity_default_expiration_time_msecs).to_m_secs_since_epoch ();
+        activity.subject = !subject.is_empty () ? subject : folder_instance.short_gui_local_path ();
+        activity.message = error_message;
+        activity.link = folder_instance.short_gui_local_path ();
+        activity.acc_name = folder_instance.account_state ().account ().display_name ();
+        activity.folder = folder_alias;
 
         // add 'other errors' to activity list
         this.activity_model.add_error_to_activity_list (activity);
 
-        show_desktop_notification (activity._subject, activity._message);
+        show_desktop_notification (activity.subject, activity.message);
 
         if (!this.expired_activities_check_timer.is_active ()) {
             this.expired_activities_check_timer.on_start (expired_activities_check_interval_msecs);
@@ -734,57 +733,57 @@ bool User.is_activity_of_current_account (Folder folder) {
 
 bool User.is_unsolvable_conflict (SyncFileItemPtr item) {
     // We just care about conflict issues that we are able to resolve
-    return item._status == SyncFileItem.Status.CONFLICT && !Utility.is_conflict_file (item._file);
+    return item.status == SyncFileItem.Status.CONFLICT && !Utility.is_conflict_file (item.file);
 }
 
 void User.process_completed_sync_item (Folder folder, SyncFileItemPtr item) {
     Activity activity;
-    activity._type = Activity.Sync_file_item_type; //client activity
-    activity._status = item._status;
-    activity._date_time = GLib.DateTime.current_date_time ();
-    activity._message = item._original_file;
-    activity._link = folder.account_state ().account ().url ();
-    activity._acc_name = folder.account_state ().account ().display_name ();
-    activity._file = item._file;
-    activity._folder = folder.alias ();
-    activity._file_action = "";
+    activity.type = Activity.Sync_file_item_type; //client activity
+    activity.status = item.status;
+    activity.date_time = GLib.DateTime.current_date_time ();
+    activity.message = item.original_file;
+    activity.link = folder.account_state ().account ().url ();
+    activity.acc_name = folder.account_state ().account ().display_name ();
+    activity.file = item.file;
+    activity.folder = folder.alias ();
+    activity.file_action = "";
 
-    if (item._instruction == CSYNC_INSTRUCTION_REMOVE) {
-        activity._file_action = "file_deleted";
-    } else if (item._instruction == CSYNC_INSTRUCTION_NEW) {
-        activity._file_action = "file_created";
-    } else if (item._instruction == CSYNC_INSTRUCTION_RENAME) {
-        activity._file_action = "file_renamed";
+    if (item.instruction == CSYNC_INSTRUCTION_REMOVE) {
+        activity.file_action = "file_deleted";
+    } else if (item.instruction == CSYNC_INSTRUCTION_NEW) {
+        activity.file_action = "file_created";
+    } else if (item.instruction == CSYNC_INSTRUCTION_RENAME) {
+        activity.file_action = "file_renamed";
     } else {
-        activity._file_action = "file_changed";
+        activity.file_action = "file_changed";
     }
 
-    if (item._status == SyncFileItem.Status.NO_STATUS || item._status == SyncFileItem.Status.SUCCESS) {
-        GLib.warn (lc_activity) << "Item " << item._file << " retrieved successfully.";
+    if (item.status == SyncFileItem.Status.NO_STATUS || item.status == SyncFileItem.Status.SUCCESS) {
+        GLib.warn (lc_activity) << "Item " << item.file << " retrieved successfully.";
 
-        if (item._direction != SyncFileItem.Direction.UP) {
-            activity._message = _("Synced %1").arg (item._original_file);
-        } else if (activity._file_action == "file_renamed") {
-            activity._message = _("You renamed %1").arg (item._original_file);
-        } else if (activity._file_action == "file_deleted") {
-            activity._message = _("You deleted %1").arg (item._original_file);
-        } else if (activity._file_action == "file_created") {
-            activity._message = _("You created %1").arg (item._original_file);
+        if (item.direction != SyncFileItem.Direction.UP) {
+            activity.message = _("Synced %1").arg (item.original_file);
+        } else if (activity.file_action == "file_renamed") {
+            activity.message = _("You renamed %1").arg (item.original_file);
+        } else if (activity.file_action == "file_deleted") {
+            activity.message = _("You deleted %1").arg (item.original_file);
+        } else if (activity.file_action == "file_created") {
+            activity.message = _("You created %1").arg (item.original_file);
         } else {
-            activity._message = _("You changed %1").arg (item._original_file);
+            activity.message = _("You changed %1").arg (item.original_file);
         }
 
         this.activity_model.add_sync_file_item_to_activity_list (activity);
     } else {
-        GLib.warn (lc_activity) << "Item " << item._file << " retrieved resulted in error " << item._error_string;
-        activity._subject = item._error_string;
+        GLib.warn (lc_activity) << "Item " << item.file << " retrieved resulted in error " << item.error_string;
+        activity.subject = item.error_string;
 
-        if (item._status == SyncFileItem.Status.FileIgnored) {
+        if (item.status == SyncFileItem.Status.FileIgnored) {
             this.activity_model.add_ignored_file_to_list (activity);
         } else {
             // add 'protocol error' to activity list
-            if (item._status == SyncFileItem.Status.FileNameInvalid) {
-                show_desktop_notification (item._file, activity._subject);
+            if (item.status == SyncFileItem.Status.FileNameInvalid) {
+                show_desktop_notification (item.file, activity.subject);
             }
             this.activity_model.add_error_to_activity_list (activity);
         }
@@ -798,7 +797,7 @@ void User.on_item_completed (string folder, SyncFileItemPtr item) {
         return;
     }
 
-    GLib.warn (lc_activity) << "Item " << item._file << " retrieved resulted in " << item._error_string;
+    GLib.warn (lc_activity) << "Item " << item.file << " retrieved resulted in " << item.error_string;
     process_completed_sync_item (folder_instance, item);
 }
 
@@ -821,7 +820,7 @@ Folder *User.get_folder () {
         }
     }
 
-    return nullptr;
+    return null;
 }
 
 ActivityListModel *User.get_activity_model () {
@@ -896,15 +895,15 @@ string User.avatar_url () {
         return "";
     }
 
-    return QStringLiteral ("image://avatars/") + this.account.account ().id ();
+    return QStringLiteral ("image://avatars/") + this.account.account ().identifier ();
 }
 
 bool User.has_local_folder () {
-    return get_folder () != nullptr;
+    return get_folder () != null;
 }
 
 bool User.server_has_talk () {
-    return talk_app () != nullptr;
+    return talk_app () != null;
 }
 
 AccountApp *User.talk_app () {

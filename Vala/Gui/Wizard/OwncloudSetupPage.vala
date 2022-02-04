@@ -5,19 +5,19 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QDir>
-// #include <QFileDialog>
-// #include <QTimer>
-// #include <QPushButton>
-// #include <QMessageBox>
-// #include <QSsl>
-// #include <QSslCertificate>
-// #include <QNetworkAccessManager>
-// #include <QPropertyAnimation>
-// #include <QGraphics_pixmap_item>
-// #include <QBuffer>
-
-// #include <QWizard>
+//  #include <QDir>
+//  #include <QFileDialog>
+//  #include <QTimer>
+//  #include <QPushButton>
+//  #include <QMessageBox>
+//  #include <QSsl>
+//  #include <QSslCertificate>
+//  #include <QNetworkAccessManager>
+//  #include <QPropertyAnimation>
+//  #include <QGraphics_pixmap_item>
+//  #include <QBuffer>
+//  #include
+//  #include <QWizard>
 
 #include "../addcertificatedialog.h"
 
@@ -32,11 +32,10 @@ class Owncloud_setup_page : QWizard_page {
 
     /***********************************************************
     ***********************************************************/
-    public Owncloud_setup_page (Gtk.Widget parent = nullptr);
+    public Owncloud_setup_page (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
-    public 
     public bool is_complete () override;
     public void initialize_page () override;
     public int next_id () override;
@@ -128,19 +127,19 @@ signals:
     private string this.oc_user;
     private bool this.auth_type_known = false;
     private bool this.checking = false;
-    private DetermineAuthTypeJob.AuthType this.auth_type = DetermineAuthTypeJob.Basic;
+    private DetermineAuthTypeJob.AuthType this.auth_type = DetermineAuthTypeJob.AuthType.BASIC;
 
     /***********************************************************
     ***********************************************************/
     private QProgress_indicator this.progress_indi;
     private OwncloudWizard this.oc_wizard;
-    private AddCertificateDialog add_cert_dial = nullptr;
+    private AddCertificateDialog add_cert_dial = null;
 }
 
     Owncloud_setup_page.Owncloud_setup_page (Gtk.Widget parent)
         : QWizard_page ()
-        , this.progress_indi (new QProgress_indicator (this))
-        , this.oc_wizard (qobject_cast<OwncloudWizard> (parent)) {
+        this.progress_indi (new QProgress_indicator (this))
+        this.oc_wizard (qobject_cast<OwncloudWizard> (parent)) {
         this.ui.setup_ui (this);
 
         setup_server_address_description_label ();
@@ -148,7 +147,7 @@ signals:
         Theme theme = Theme.instance ();
         if (theme.override_server_url ().is_empty ()) {
             this.ui.le_url.set_postfix (theme.wizard_url_postfix ());
-            this.ui.le_url.set_placeholder_text (theme.wizard_url_hint ());
+            this.ui.le_url.set_placeholder_text (theme.WIZARD_URL_HINT);
         } else if (Theme.instance ().force_override_server_url ()) {
             this.ui.le_url.set_enabled (false);
         }
@@ -295,17 +294,17 @@ signals:
 
     int Owncloud_setup_page.next_id () {
         switch (this.auth_type) {
-        case DetermineAuthTypeJob.Basic:
+        case DetermineAuthTypeJob.AuthType.BASIC:
             return WizardCommon.Page_Http_creds;
-        case DetermineAuthTypeJob.OAuth:
+        case DetermineAuthTypeJob.AuthType.OAUTH:
             return WizardCommon.Page_OAuth_creds;
-        case DetermineAuthTypeJob.LoginFlowV2:
+        case DetermineAuthTypeJob.AuthType.LOGIN_FLOW_V2:
             return WizardCommon.Page_Flow2Auth_creds;
     #ifdef WITH_WEBENGINE
-        case DetermineAuthTypeJob.WebViewFlow:
+        case DetermineAuthTypeJob.WEB_VIEW_FLOW:
             return WizardCommon.Page_Web_view;
     #endif // WITH_WEBENGINE
-        case DetermineAuthTypeJob.NoAuthType:
+        case DetermineAuthTypeJob.NO_AUTH_TYPE:
             return WizardCommon.Page_Http_creds;
         }
         Q_UNREACHABLE ();
@@ -412,15 +411,15 @@ signals:
         GLib.File cert_file (add_cert_dial.get_certificate_path ());
         cert_file.open (GLib.File.ReadOnly);
         GLib.ByteArray cert_data = cert_file.read_all ();
-        GLib.ByteArray cert_password = add_cert_dial.get_certificate_passwd ().to_local8Bit ();
+        GLib.ByteArray cert_password = add_cert_dial.get_certificate_password ().to_local8Bit ();
 
         QBuffer cert_data_buffer (&cert_data);
         cert_data_buffer.open (QIODevice.ReadOnly);
         if (QSslCertificate.import_pkcs12 (&cert_data_buffer,
-                this.oc_wizard._client_ssl_key, this.oc_wizard._client_ssl_certificate,
-                this.oc_wizard._client_ssl_ca_certificates, cert_password)) {
-            this.oc_wizard._client_cert_bundle = cert_data;
-            this.oc_wizard._client_cert_password = cert_password;
+                this.oc_wizard.client_ssl_key, this.oc_wizard.client_ssl_certificate,
+                this.oc_wizard.client_ssl_ca_certificates, cert_password)) {
+            this.oc_wizard.client_cert_bundle = cert_data;
+            this.oc_wizard.client_cert_password = cert_password;
 
             add_cert_dial.reinit (); // FIXME : Why not just have this only created on use?
 

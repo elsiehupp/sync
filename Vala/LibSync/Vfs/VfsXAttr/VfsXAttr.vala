@@ -4,8 +4,8 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #pragma once
-// #include <QScopedPointer>
+//  #pragma once
+//  #include <QScopedPointer>
 
 namespace xattr {
     using namespace Occ.XAttr_wrapper;
@@ -108,14 +108,14 @@ class Vfs_xAttr : Vfs {
     }
 
     Result<void, string> Vfs_xAttr.create_placeholder (SyncFileItem item) {
-        if (item._modtime <= 0) {
+        if (item.modtime <= 0) {
             return {_("Error updating metadata due to invalid modified time")};
         }
 
-        const var path = string (this.setup_params.filesystem_path + item._file);
+        const var path = string (this.setup_params.filesystem_path + item.file);
         GLib.File file = new GLib.File (path);
         if (file.exists () && file.size () > 1
-            && !FileSystem.verify_file_unchanged (path, item._size, item._modtime)) {
+            && !FileSystem.verify_file_unchanged (path, item.size, item.modtime)) {
             return QStringLiteral ("Cannot create a placeholder because a file with the placeholder name already exist");
         }
 
@@ -125,12 +125,12 @@ class Vfs_xAttr : Vfs {
 
         file.write (" ");
         file.close ();
-        FileSystem.set_mod_time (path, item._modtime);
+        FileSystem.set_mod_time (path, item.modtime);
         return xattr.add_nextcloud_placeholder_attributes (path);
     }
 
     Result<void, string> Vfs_xAttr.dehydrate_placeholder (SyncFileItem item) {
-        const var path = string (this.setup_params.filesystem_path + item._file);
+        const var path = string (this.setup_params.filesystem_path + item.file);
         GLib.File file = new GLib.File (path);
         if (!file.remove ()) {
             return QStringLiteral ("Couldn't remove the original file to dehydrate");
@@ -141,9 +141,9 @@ class Vfs_xAttr : Vfs {
         }
 
         // Ensure the pin state isn't contradictory
-        const var pin = pin_state (item._file);
+        const var pin = pin_state (item.file);
         if (pin && *pin == PinState.PinState.ALWAYS_LOCAL) {
-            set_pin_state (item._rename_target, PinState.PinState.UNSPECIFIED);
+            set_pin_state (item.rename_target, PinState.PinState.UNSPECIFIED);
         }
         return {};
     }
@@ -169,13 +169,13 @@ class Vfs_xAttr : Vfs {
         }
 
         const var parent_path = static_cast<GLib.ByteArray> (stat_data);
-        Q_ASSERT (!parent_path.ends_with ('/'));
-        Q_ASSERT (!stat.path.starts_with ('/'));
+        //  Q_ASSERT (!parent_path.ends_with ('/'));
+        //  Q_ASSERT (!stat.path.starts_with ('/'));
 
         const var path = GLib.ByteArray (*parent_path + '/' + stat.path);
         const var pin = [=] {
             const var absolute_path = string.from_utf8 (path);
-            Q_ASSERT (absolute_path.starts_with (parameters ().filesystem_path.to_utf8 ()));
+            //  Q_ASSERT (absolute_path.starts_with (parameters ().filesystem_path.to_utf8 ()));
             const var folder_path = absolute_path.mid (parameters ().filesystem_path.length ());
             return pin_state (folder_path);
         } ();

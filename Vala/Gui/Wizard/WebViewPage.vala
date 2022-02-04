@@ -1,9 +1,9 @@
 
-// #include <QWeb_engine_url_request_job>
-// #include <QProgressBar>
-// #include <QVBoxLayout>
-// #include <QNetworkProxyFactory>
-// #include <QScreen>
+//  #include <QWeb_engine_url_request_job>
+//  #include <QProgressBar>
+//  #include <QVBoxLayout>
+//  #include <QNetworkProxyFactory>
+//  #include <QScreen>
 
 namespace Occ {
 
@@ -12,11 +12,10 @@ class Web_view_page : Abstract_credentials_wizard_page {
 
     /***********************************************************
     ***********************************************************/
-    public Web_view_page (Gtk.Widget parent = nullptr);
+    public Web_view_page (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void initialize_page () override;
     public void cleanup_page () override;
     public int next_id () override;
@@ -69,7 +68,7 @@ signals:
         : Abstract_credentials_wizard_page () {
         this.oc_wizard = qobject_cast<OwncloudWizard> (parent);
 
-        q_c_info (lc_wizard_webiew_page ()) << "Time for a webview!";
+        GLib.Info (lc_wizard_webiew_page ()) << "Time for a webview!";
         this.web_view = new WebView (this);
 
         var layout = new QVBoxLayout (this);
@@ -100,7 +99,7 @@ signals:
             }
             url += "index.php/login/flow";
         }
-        q_c_info (lc_wizard_webiew_page ()) << "Url to auth at : " << url;
+        GLib.Info (lc_wizard_webiew_page ()) << "Url to auth at : " << url;
         this.web_view.set_url (GLib.Uri (url));
 
         this.original_wizard_size = this.oc_wizard.size ();
@@ -148,15 +147,15 @@ signals:
     }
 
     AbstractCredentials* Web_view_page.get_credentials () {
-        return new WebFlowCredentials (this.user, this.pass, this.oc_wizard._client_ssl_certificate, this.oc_wizard._client_ssl_key);
+        return new WebFlowCredentials (this.user, this.pass, this.oc_wizard.client_ssl_certificate, this.oc_wizard.client_ssl_key);
     }
 
     void Web_view_page.set_connected () {
-        q_c_info (lc_wizard_webiew_page ()) << "YAY! we are connected!";
+        GLib.Info (lc_wizard_webiew_page ()) << "YAY! we are connected!";
     }
 
     void Web_view_page.on_url_catched (string user, string pass, string host) {
-        q_c_info (lc_wizard_webiew_page ()) << "Got user : " << user << ", server : " << host;
+        GLib.Info (lc_wizard_webiew_page ()) << "Got user : " << user << ", server : " << host;
 
         this.user = user;
         this.pass = pass;
@@ -164,7 +163,7 @@ signals:
         AccountPointer account = this.oc_wizard.account ();
         account.set_url (host);
 
-        q_c_info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_string ();
+        GLib.Info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_string ();
         /* emit */ connect_to_oc_url (host);
     }
 

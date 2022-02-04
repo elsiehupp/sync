@@ -5,8 +5,8 @@ Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
-// #include <map>
+//  #include <QLoggingCategory>
+//  #include <map>
 
 namespace Occ {
 
@@ -22,7 +22,7 @@ class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private struct PathComparator {
-        private bool operator () ( const string& lhs, string& rhs ) {
+        private bool operator () ( const string lhs, string rhs ) {
             // This will make sure that the std.map is ordered and queried case-insensitively on macOS and Windows.
             return path_compare (lhs, rhs) < 0;
         }
@@ -124,7 +124,7 @@ class SyncFileStatusTracker : GLib.Object {
         std.swap (this.sync_problems, old_problems);
 
         foreach (SyncFileItemPtr item, items) {
-            GLib.debug (lc_status_tracker) << "Investigating" << item.destination () << item._status << item._instruction;
+            GLib.debug (lc_status_tracker) << "Investigating" << item.destination () << item.status << item.instruction;
             this.dirty_paths.remove (item.destination ());
 
             if (has_error_status (*item)) {
@@ -134,11 +134,11 @@ class SyncFileStatusTracker : GLib.Object {
                 this.sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
             }
 
-            SharedFlag shared_flag = item._remote_perm.has_permission (RemotePermissions.IsShared) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
-            if (item._instruction != CSYNC_INSTRUCTION_NONE
-                && item._instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
-                && item._instruction != CSYNC_INSTRUCTION_IGNORE
-                && item._instruction != CSYNC_INSTRUCTION_ERROR) {
+            SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.IsShared) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
+            if (item.instruction != CSYNC_INSTRUCTION_NONE
+                && item.instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
+                && item.instruction != CSYNC_INSTRUCTION_IGNORE
+                && item.instruction != CSYNC_INSTRUCTION_ERROR) {
                 // Mark this path as syncing for instructions that will result in propagation.
                 inc_sync_count_and_emit_status_changed (item.destination (), shared_flag);
             } else {
@@ -171,7 +171,7 @@ class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_item_completed (SyncFileItemPtr item) {
-        GLib.debug (lc_status_tracker) << "Item completed" << item.destination () << item._status << item._instruction;
+        GLib.debug (lc_status_tracker) << "Item completed" << item.destination () << item.status << item.instruction;
 
         if (has_error_status (*item)) {
             this.sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_ERROR;
@@ -182,11 +182,11 @@ class SyncFileStatusTracker : GLib.Object {
             this.sync_problems.erase (item.destination ());
         }
 
-        SharedFlag shared_flag = item._remote_perm.has_permission (RemotePermissions.IsShared) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
-        if (item._instruction != CSYNC_INSTRUCTION_NONE
-            && item._instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
-            && item._instruction != CSYNC_INSTRUCTION_IGNORE
-            && item._instruction != CSYNC_INSTRUCTION_ERROR) {
+        SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.IsShared) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
+        if (item.instruction != CSYNC_INSTRUCTION_NONE
+            && item.instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
+            && item.instruction != CSYNC_INSTRUCTION_IGNORE
+            && item.instruction != CSYNC_INSTRUCTION_ERROR) {
             // dec_sync_count calls must* be symetric with inc_sync_count calls in on_about_to_propagate
             dec_sync_count_and_emit_status_changed (item.destination (), shared_flag);
         } else {
@@ -373,7 +373,7 @@ class SyncFileStatusTracker : GLib.Object {
         // First look it up in the database to know if it's shared
         SyncJournalFileRecord record;
         if (this.sync_engine.journal ().get_file_record (relative_path, record) && record.is_valid ()) {
-            return resolve_sync_and_error_status (relative_path, record._remote_perm.has_permission (RemotePermissions.IsShared) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED);
+            return resolve_sync_and_error_status (relative_path, record.remote_perm.has_permission (RemotePermissions.IsShared) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED);
         }
 
         // Must be a new file not yet in the database, check if it's syncing or has an error.
@@ -383,7 +383,7 @@ class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static int path_compare ( const string& lhs, string& rhs ) {
+    private static int path_compare ( const string lhs, string rhs ) {
         // Should match Utility.fs_case_preserving, we want don't want to pay for the runtime check on every comparison.
         return lhs.compare (rhs, Qt.CaseSensitive);
     }
@@ -391,7 +391,7 @@ class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static bool path_starts_with ( const string& lhs, string& rhs ) {
+    private static bool path_starts_with ( const string lhs, string rhs ) {
         return lhs.starts_with (rhs, Qt.CaseSensitive);
     }
 
@@ -406,21 +406,21 @@ class SyncFileStatusTracker : GLib.Object {
     likely going to resolve itself quickly and automatically.
     ***********************************************************/
     private static bool has_error_status (SyncFileItem item) {
-        const var status = item._status;
-        return item._instruction == CSYNC_INSTRUCTION_ERROR
+        const var status = item.status;
+        return item.instruction == CSYNC_INSTRUCTION_ERROR
             || status == SyncFileItem.Status.NORMAL_ERROR
             || status == SyncFileItem.Status.FATAL_ERROR
             || status == SyncFileItem.Status.DETAIL_ERROR
             || status == SyncFileItem.Status.BLOCKLISTED_ERROR
-            || item._has_blocklist_entry;
+            || item.has_blocklist_entry;
     }
 
 
     /***********************************************************
     ***********************************************************/
     private static bool has_excluded_status (SyncFileItem item) {
-        const var status = item._status;
-        return item._instruction == CSYNC_INSTRUCTION_IGNORE
+        const var status = item.status;
+        return item.instruction == CSYNC_INSTRUCTION_IGNORE
             || status == SyncFileItem.Status.FILE_IGNORED
             || status == SyncFileItem.Status.CONFLICT
             || status == SyncFileItem.Status.RESTORATION

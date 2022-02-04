@@ -20,7 +20,7 @@ version 0.91.3  (released 2013-12-11, ownCloud Client 1.5.0rc1)
 
 version 0.91.2 (released 2013-12-10, ownCloud Client 1.5.0beta3)
  * have translatable error message for indiv. file errors.
- * Use uint64_t for inode on win32 to fix a type glitch.
+ * Use uint64 for inode on win32 to fix a type glitch.
  * Add test that directories are properly moved.
  * Handle symlinks correctly.
  * No longer recurse into ignored directories in update 
@@ -85,7 +85,7 @@ version 0.90.0  (released 2013-09-04, ownCloud Client 1.4.0)
   * Fix: download resuming.
   * ownCloud module: Bandwith limitation added.
   * Added ability to remove ignored files automatically.
-  * Fix: Use int64_t and friends
+  * Fix: Use int64 and friends
   * Fix: Removed all compile warnings.
   * Left excluded files and links in csync's tree to be able to show.
     them to the user.

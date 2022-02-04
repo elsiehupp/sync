@@ -4,12 +4,12 @@ Copyright (C) by Camila Ayres <hello@camila.codes>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <QNetworkRequest>
-// #include <QBuffer>
-
-// #include <QNetworkAccessManager>
+//  #include <QJsonDocument>
+//  #include <QJsonObject>
+//  #include <QNetworkRequest>
+//  #include <QBuffer>
+//  #include
+//  #include <QNetworkAccessManager>
 
 
 namespace Occ {
@@ -74,9 +74,9 @@ signals:
           this.account (account),
           this.app_password (""),
           this.account_removed (false),
-          this.network_manager (nullptr),
-          this.network_reply_check (nullptr),
-          this.network_reply_success (nullptr) {
+          this.network_manager (null),
+          this.network_reply_check (null),
+          this.network_reply_success (null) {
         GLib.Object.connect (AccountManager.instance (), &AccountManager.on_account_removed,
                          this, [=] (AccountState *) {
             this.account_removed = true;
@@ -145,7 +145,7 @@ signals:
 
         if (wipe){
             /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
-            TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
+            TODO : For "Log out" & "Remove account" : Remove client CA certificates and KEY!
 
                   Disabled as long as selecting another cert is not supported by the UI.
 

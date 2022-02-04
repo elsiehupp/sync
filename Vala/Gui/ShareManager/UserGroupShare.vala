@@ -9,7 +9,7 @@ class User_group_share : Share {
     /***********************************************************
     ***********************************************************/
     public User_group_share (AccountPointer account,
-        const string id,
+        const string identifier,
         const string owner,
         const string owner_display_name,
         const string path,
@@ -63,7 +63,7 @@ signals:
 
 
 User_group_share.User_group_share (AccountPointer account,
-    const string id,
+    const string identifier,
     const string owner,
     const string owner_display_name,
     const string path,
@@ -73,11 +73,11 @@ User_group_share.User_group_share (AccountPointer account,
     const unowned<Sharee> share_with,
     const QDate expire_date,
     const string note)
-    : Share (account, id, owner, owner_display_name, path, share_type, is_password_set, permissions, share_with)
-    , this.note (note)
-    , this.expire_date (expire_date) {
-    Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share_type));
-    Q_ASSERT (share_with);
+    : Share (account, identifier, owner, owner_display_name, path, share_type, is_password_set, permissions, share_with)
+    this.note (note)
+    this.expire_date (expire_date) {
+    //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share_type));
+    //  Q_ASSERT (share_with);
 }
 
 void User_group_share.set_note (string note) {

@@ -4,29 +4,29 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <cstdio>
-// #include <iostream>
-
-// #include <QDialogButtonBox>
-// #include <QLayout>
-// #include <QPushButton>
-// #include <QLabel>
-// #include <QDir>
-// #include <QTextStream>
-// #include <QMessageBox>
-// #include <QCoreApplication>
-// #include <QSettings>
-// #include <QAction>
-// #include <QDesktopServices>
-
-// #include <QCheckBox>
-// #include <QPlain_text_edit>
-// #include <QTextStream>
-// #include <GLib.List>
-// #include <Gtk.Dialog>
-// #include <QLineEdit>
-// #include <QPushButton>
-// #include <QLabel>
+//  #include <cstdio>
+//  #include <iostream>
+//  #include
+//  #include <QDialogB
+//  #include <QLayout>
+//  #include <QPushBu
+//  #include <QLabe
+//  #include <QDir>
+//  #include <QTextStream>
+//  #include <QMessageBox>
+//  #include <QCoreAppli
+//  #include <QSetting
+//  #include <QAction>
+//  #include <QDesktopSe
+//  #include
+//  #include <QCheckBox>
+//  #include <QPlain_tex
+//  #include <QTextStream
+//  #include <GLib.List>
+//  #include <Gtk.Dialog>
+//  #include <QLineEdit>
+//  #include <QPushButton>
+//  #include <QLabel>
 
 namespace Occ {
 
@@ -38,7 +38,7 @@ class Log_browser : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public Log_browser (Gtk.Widget parent = nullptr);
+    public Log_browser (Gtk.Widget parent = null);
     ~Log_browser () override;
 
 
@@ -110,15 +110,15 @@ protected slots:
         connect (show_log_window, &QAction.triggered, this, &Gtk.Widget.close);
         add_action (show_log_window);
 
-        ConfigFile cfg;
-        cfg.restore_geometry (this);
+        ConfigFile config;
+        config.restore_geometry (this);
     }
 
     Log_browser.~Log_browser () = default;
 
     void Log_browser.close_event (QCloseEvent *) {
-        ConfigFile cfg;
-        cfg.save_geometry (this);
+        ConfigFile config;
+        config.save_geometry (this);
     }
 
     void Log_browser.toggle_permanent_logging (bool enabled) {

@@ -94,7 +94,6 @@ class FileInfo : FileModifier {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public string name;
     public int operationStatus = 200;
     public bool isDir = true;
@@ -145,12 +144,12 @@ inline const FileInfo findConflict (FileInfo dir, string filename) {
     QFileInfo info (filename);
     const FileInfo parentDir = dir.find (info.path ());
     if (!parentDir)
-        return nullptr;
+        return null;
     string on_start = info.baseName () + " (conflicted copy";
     for (var item : parentDir.children) {
         if (item.name.startsWith (on_start)) {
             return item;
         }
     }
-    return nullptr;
+    return null;
 }

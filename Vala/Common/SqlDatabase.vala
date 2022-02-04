@@ -4,14 +4,14 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
-// #include <QFileInfo>
-// #include <QDir>
+//  #include <QLoggingCategory>
+//  #include <QFileInfo>
+//  #include <QDir>
 
 using Sqlite3;
 
 
-// #include <QLoggingCategory>
+//  #include <QLoggingCategory>
 
 using Sqlite3;
 struct Sqlite3Stmt;
@@ -42,7 +42,7 @@ class SqlDatabase {
 
     /***********************************************************
     ***********************************************************/
-    private Sqlite3 this.database = nullptr;
+    private Sqlite3 this.database = null;
     private string this.error; // last error string
     private int this.err_id = 0;
 
@@ -64,7 +64,7 @@ class SqlDatabase {
     /***********************************************************
     ***********************************************************/
     public bool is_open () {
-        return this.database != nullptr;
+        return this.database != null;
     }
 
 
@@ -138,7 +138,7 @@ class SqlDatabase {
         if (!this.database) {
             return false;
         }
-        SQLITE_DO (sqlite3_exec (this.database, "BEGIN", nullptr, nullptr, nullptr));
+        SQLITE_DO (sqlite3_exec (this.database, "BEGIN", null, null, null));
         return this.err_id == SQLITE_OK;
     }
 
@@ -149,7 +149,7 @@ class SqlDatabase {
         if (!this.database) {
             return false;
         }
-        SQLITE_DO (sqlite3_exec (this.database, "COMMIT", nullptr, nullptr, nullptr));
+        SQLITE_DO (sqlite3_exec (this.database, "COMMIT", null, null, null));
         return this.err_id == SQLITE_OK;
     }
 
@@ -164,7 +164,7 @@ class SqlDatabase {
             SQLITE_DO (sqlite3_close (this.database));
             if (this.err_id != SQLITE_OK)
                 GLib.warn (lc_sql) << "Closing database failed" << this.error;
-            this.database = nullptr;
+            this.database = null;
         }
     }
 
@@ -203,7 +203,7 @@ class SqlDatabase {
 
         sqlite_flags |= SQLITE_OPEN_NOMUTEX;
 
-        SQLITE_DO (sqlite3_open_v2 (filename.to_utf8 ().const_data (), this.database, sqlite_flags, nullptr));
+        SQLITE_DO (sqlite3_open_v2 (filename.to_utf8 ().const_data (), this.database, sqlite_flags, null));
 
         if (this.err_id != SQLITE_OK) {
             GLib.warn (lc_sql) << "Error:" << this.error << "for" << filename;

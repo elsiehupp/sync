@@ -22,9 +22,9 @@ class OAuthTestCase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public FakeQNAM *fakeQnam = nullptr;
+    public FakeQNAM *fakeQnam = null;
     public QNetworkAccessManager realQNAM;
-    public QPointer<Soup.Reply> browserReply = nullptr;
+    public QPointer<Soup.Reply> browserReply = null;
     public string code = generateEtag ();
 
 
@@ -53,7 +53,7 @@ class OAuthTestCase : GLib.Object {
         GLib.Object.connect (&desktopServiceHook, &DesktopServiceHook.hooked,
                          this, &OAuthTestCase.openBrowserHook);
 
-        oauth.on_reset (new OAuth (account.data (), nullptr));
+        oauth.on_reset (new OAuth (account.data (), null));
         GLib.Object.connect (oauth.data (), &OAuth.result, this, &OAuthTestCase.oauthResult);
         oauth.on_start ();
         QTRY_VERIFY (on_done ());

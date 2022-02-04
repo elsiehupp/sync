@@ -14,52 +14,16 @@ splits too large keychain entry's data into chunks on Windows
 class ReadJob : KeychainChunk.Job {
 
     /***********************************************************
+    true if we haven't done yet any reading from keychain
     ***********************************************************/
-    public ReadJob (Account account, string key, bool keychain_migration, GLib.Object parent = new GLib.Object ());
+    private bool retry_on_key_chain_error = true;
+
+    signal void on_finished (KeychainChunk.ReadJob incoming_job);
 
     /***********************************************************
     ***********************************************************/
-    public 
-    public ReadJob (string key, GLib.Object parent = new GLib.Object ());
-
-
-    /***********************************************************
-    Call this method to on_start the job (async).
-    You should connect some slot to the on_finished () signal first.
-
-    @see QKeychain.Job.on_start ()
-    ***********************************************************/
-    public void on_start ();
-
-
-    /***********************************************************
-    Call this method to on_start the job synchronously.
-    Awaits completion with no need to connect some slot to the on_finished () signal first.
-
-    @return Returns true on succeess (QKeychain.NoError).
-    ***********************************************************/
-    public bool exec ();
-
-signals:
-    void on_finished (KeychainChunk.ReadJob incoming_job);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_read_job_done (QKeychain.Job incoming_job);
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private bool this.retry_on_key_chain_error = true; // true if we haven't done yet any reading from keychain
-
-
-
-    /***********************************************************
-    ReadJob
-    ***********************************************************/
-    ReadJob.ReadJob (Account account, string key, bool keychain_migration, GLib.Object parent)
-        : Job (parent) {
+    public ReadJob (Account account, string key, bool keychain_migration, GLib.Object parent = new GLib.Object ()) {
+        base (parent);
         this.account = account;
         this.key = key;
 
@@ -69,11 +33,20 @@ signals:
         this.chunk_buffer.clear ();
     }
 
-    ReadJob.ReadJob (string key, GLib.Object parent)
-        : ReadJob (nullptr, key, false, parent) {
+    /***********************************************************
+    ***********************************************************/
+    public ReadJob (string key, GLib.Object parent = new GLib.Object ()) {
+        base (null, key, false, parent);
     }
 
-    void ReadJob.on_start () {
+
+    /***********************************************************
+    Call this method to on_start the job (async).
+    You should connect some slot to the on_finished () signal first.
+
+    @see QKeychain.Job.on_start ()
+    ***********************************************************/
+    public void on_start () {
         this.chunk_count = 0;
         this.chunk_buffer.clear ();
         this.error = QKeychain.NoError;
@@ -81,7 +54,7 @@ signals:
         const string kck = this.account ? AbstractCredentials.keychain_key (
                 this.account.url ().to_string (),
                 this.key,
-                this.keychain_migration ? "" : this.account.id ()
+                this.keychain_migration ? "" : this.account.identifier ()
             ) : this.key;
 
         var job = new QKeychain.ReadPasswordJob (this.service_name, this);
@@ -94,7 +67,14 @@ signals:
         job.on_start ();
     }
 
-    bool ReadJob.exec () {
+
+    /***********************************************************
+    Call this method to on_start the job synchronously.
+    Awaits completion with no need to connect some slot to the on_finished () signal first.
+
+    @return Returns true on succeess (QKeychain.NoError).
+    ***********************************************************/
+    public bool exec () {
         on_start ();
 
         QEventLoop wait_loop;
@@ -113,10 +93,13 @@ signals:
         return false;
     }
 
-    void ReadJob.on_read_job_done (QKeychain.Job incoming_job) {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_read_job_done (QKeychain.Job incoming_job) {
         // Errors or next chunk?
         var read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming_job);
-        Q_ASSERT (read_job);
+        //  Q_ASSERT (read_job);
 
         if (read_job.error () == NoError && !read_job.binary_data ().is_empty ()) {
             this.chunk_buffer.append (read_job.binary_data ());
@@ -128,7 +111,7 @@ signals:
                     // Could be that the backend was not yet available. Wait some extra seconds.
                     // (Issues #4274 and #6522)
                     // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
-                    q_c_info (lc_keychain_chunk) << "Backend unavailable (yet?) Retrying in a few seconds." << read_job.error_string ();
+                    GLib.Info (lc_keychain_chunk) << "Backend unavailable (yet?) Retrying in a few seconds." << read_job.error_string ();
                     QTimer.single_shot (10000, this, &ReadJob.on_start);
                     this.retry_on_key_chain_error = false;
                     read_job.delete_later ();
@@ -152,6 +135,7 @@ signals:
             delete_later ();
         }
     }
+
 } // class ReadJob
 
 } // namespace KeychainChunk

@@ -5,17 +5,17 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <qfile.h>
-// #include <qdir.h>
-// #include <qdiriterator.h>
-// #include <qtemporaryfile.h>
-// #include <qsavefile.h>
-// #include <qstack.h>
-// #include <QCoreApplication>
+//  #include <qfile.h>
+//  #include <qdir.h>
+//  #include <qdiriterator.h>
+//  #include <qtemporaryfile.h>
+//  #include <qsavefile.h>
+//  #include <qstack.h>
+//  #include <QCoreApplication>
+//  #include
+//  #include <ctime>
 
-// #include <ctime>
-
-// #pragma once
+//  #pragma once
 
 
 namespace Occ {
@@ -30,8 +30,8 @@ static const char content_md5Header_c[] = "Content-MD5";
 
 
 
-    GLib.ByteArray local_file_id_from_full_id (GLib.ByteArray id) {
-        return id.left (8);
+    GLib.ByteArray local_file_id_from_full_id (GLib.ByteArray identifier) {
+        return identifier.left (8);
     }
 
 

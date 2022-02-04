@@ -4,20 +4,20 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QtCore>
-// #include <QAbstractListModel>
-// #include <QDesktopServices>
-// #include <Gtk.Widget>
-// #include <QJsonObject>
-// #include <QJsonDocument>
-// #include <qloggingcategory.h>
-
-// #include <QtCore>
+//  #include <QtCore>
+//  #include <QAbstractListModel>
+//  #include <QDesktopServices>
+//  #include <Gtk.Widget>
+//  #include <QJsonObject>
+//  #include <QJsonDocument>
+//  #include <qloggingcategory.h>
+//  #include
+//  #include <QtCore>
 
 
 namespace Occ {
 
-Q_DECLARE_LOGGING_CATEGORY (lc_activity)
+//  Q_DECLARE_LOGGING_CATEGORY (lc_activity)
 
 
 /***********************************************************
@@ -29,7 +29,7 @@ Simple list model to provide the list view with data.
 
 class ActivityListModel : QAbstractListModel {
 
-    Q_PROPERTY (AccountState account_state READ account_state CONSTANT)
+    //  Q_PROPERTY (AccountState account_state READ account_state CONSTANT)
 
     /***********************************************************
     ***********************************************************/
@@ -88,7 +88,6 @@ class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void add_notification_to_activity_list (Activity activity);
 
 
@@ -195,7 +194,7 @@ signals:
     /***********************************************************
     ***********************************************************/
     private 
-    private AccountState this.account_state = nullptr;
+    private AccountState this.account_state = null;
     private bool this.currently_fetching = false;
     private bool this.done_fetching = false;
     private bool this.hide_old_activities = true;
@@ -208,7 +207,7 @@ signals:
     ActivityListModel.ActivityListModel (AccountState account_state,
         GLib.Object parent)
         : QAbstractListModel (parent)
-        , this.account_state (account_state) {
+        this.account_state (account_state) {
     }
 
     GLib.HashMap<int, GLib.ByteArray> ActivityListModel.role_names () {
@@ -261,15 +260,15 @@ signals:
             return GLib.Variant ();
 
         a = this.final_list.at (index.row ());
-        AccountStatePtr ast = AccountManager.instance ().account (a._acc_name);
+        AccountStatePtr ast = AccountManager.instance ().account (a.acc_name);
         if (!ast && this.account_state != ast.data ())
             return GLib.Variant ();
 
         switch (role) {
         case Display_path_role:
-            if (!a._file.is_empty ()) {
-                var folder = FolderMan.instance ().folder (a._folder);
-                string rel_path (a._file);
+            if (!a.file.is_empty ()) {
+                var folder = FolderMan.instance ().folder (a.folder);
+                string rel_path (a.file);
                 if (folder) {
                     rel_path.prepend (folder.remote_path ());
                 }
@@ -284,10 +283,10 @@ signals:
             }
             return "";
         case Path_role:
-            if (!a._file.is_empty ()) {
-                const var folder = FolderMan.instance ().folder (a._folder);
+            if (!a.file.is_empty ()) {
+                const var folder = FolderMan.instance ().folder (a.folder);
 
-                string rel_path (a._file);
+                string rel_path (a.file);
                 if (folder) {
                     rel_path.prepend (folder.remote_path ());
                 }
@@ -303,8 +302,8 @@ signals:
                 // hiding the share button which is what we want
                 if (folder) {
                     SyncJournalFileRecord record;
-                    folder.journal_database ().get_file_record (a._file.mid (1), record);
-                    if (record.is_valid () && (record._is_e2e_encrypted || !record._e2e_mangled_name.is_empty ())) {
+                    folder.journal_database ().get_file_record (a.file.mid (1), record);
+                    if (record.is_valid () && (record.is_e2e_encrypted || !record.e2e_mangled_name.is_empty ())) {
                         return "";
                     }
                 }
@@ -313,9 +312,9 @@ signals:
             }
             return "";
         case Absolute_path_role: {
-            const var folder = FolderMan.instance ().folder (a._folder);
-            string rel_path (a._file);
-            if (!a._file.is_empty ()) {
+            const var folder = FolderMan.instance ().folder (a.folder);
+            string rel_path (a.file);
+            if (!a.file.is_empty ()) {
                 if (folder) {
                     rel_path.prepend (folder.remote_path ());
                 }
@@ -333,35 +332,35 @@ signals:
         }
         case Actions_links_role: {
             GLib.List<GLib.Variant> custom_list;
-            foreach (Activity_link activity_link, a._links) {
+            foreach (Activity_link activity_link, a.links) {
                 custom_list << GLib.Variant.from_value (activity_link);
             }
             return custom_list;
         }
         case Action_icon_role: {
-            if (a._type == Activity.Notification_type) {
+            if (a.type == Activity.Notification_type) {
                 return "qrc:///client/theme/black/bell.svg";
-            } else if (a._type == Activity.Sync_result_type) {
+            } else if (a.type == Activity.Sync_result_type) {
                 return "qrc:///client/theme/black/state-error.svg";
-            } else if (a._type == Activity.Sync_file_item_type) {
-                if (a._status == SyncFileItem.Status.NORMAL_ERROR
-                    || a._status == SyncFileItem.Status.FATAL_ERROR
-                    || a._status == SyncFileItem.Status.DETAIL_ERROR
-                    || a._status == SyncFileItem.Status.BLOCKLISTED_ERROR) {
+            } else if (a.type == Activity.Sync_file_item_type) {
+                if (a.status == SyncFileItem.Status.NORMAL_ERROR
+                    || a.status == SyncFileItem.Status.FATAL_ERROR
+                    || a.status == SyncFileItem.Status.DETAIL_ERROR
+                    || a.status == SyncFileItem.Status.BLOCKLISTED_ERROR) {
                     return "qrc:///client/theme/black/state-error.svg";
-                } else if (a._status == SyncFileItem.Status.SOFT_ERROR
-                    || a._status == SyncFileItem.Status.CONFLICT
-                    || a._status == SyncFileItem.Status.RESTORATION
-                    || a._status == SyncFileItem.Status.FILE_LOCKED
-                    || a._status == SyncFileItem.Status.FILENAME_INVALID) {
+                } else if (a.status == SyncFileItem.Status.SOFT_ERROR
+                    || a.status == SyncFileItem.Status.CONFLICT
+                    || a.status == SyncFileItem.Status.RESTORATION
+                    || a.status == SyncFileItem.Status.FILE_LOCKED
+                    || a.status == SyncFileItem.Status.FILENAME_INVALID) {
                     return "qrc:///client/theme/black/state-warning.svg";
-                } else if (a._status == SyncFileItem.Status.FILE_IGNORED) {
+                } else if (a.status == SyncFileItem.Status.FILE_IGNORED) {
                     return "qrc:///client/theme/black/state-info.svg";
                 } else {
                     // File sync successful
-                    if (a._file_action == "file_created") {
+                    if (a.file_action == "file_created") {
                         return "qrc:///client/theme/colored/add.svg";
-                    } else if (a._file_action == "file_deleted") {
+                    } else if (a.file_action == "file_deleted") {
                         return "qrc:///client/theme/colored/delete.svg";
                     } else {
                         return "qrc:///client/theme/change.svg";
@@ -369,17 +368,17 @@ signals:
                 }
             } else {
                 // We have an activity
-                if (a._icon.is_empty ()) {
+                if (a.icon.is_empty ()) {
                     return "qrc:///client/theme/black/activity.svg";
                 }
 
-                return a._icon;
+                return a.icon;
             }
         }
         case Object_type_role:
-            return a._object_type;
+            return a.object_type;
         case Action_role: {
-            switch (a._type) {
+            switch (a.type) {
             case Activity.Activity_type:
                 return "Activity";
             case Activity.Notification_type:
@@ -393,29 +392,29 @@ signals:
             }
         }
         case Action_text_role:
-            return a._subject;
+            return a.subject;
         case Action_text_color_role:
-            return a._id == -1 ? QLatin1String ("#808080") : QLatin1String ("#222");   // FIXME : This is a temporary workaround for this.show_more_activities_available_entry
+            return a.id == -1 ? QLatin1String ("#808080") : QLatin1String ("#222");   // FIXME : This is a temporary workaround for this.show_more_activities_available_entry
         case Message_role:
-            return a._message;
+            return a.message;
         case Link_role: {
-            if (a._link.is_empty ()) {
+            if (a.link.is_empty ()) {
                 return "";
             } else {
-                return a._link;
+                return a.link;
             }
         }
         case Account_role:
-            return a._acc_name;
+            return a.acc_name;
         case Point_in_time_role:
-            //return a._id == -1 ? "" : string ("%1 - %2").arg (Utility.time_ago_in_words (a._date_time.to_local_time ()), a._date_time.to_local_time ().to_string (Qt.Default_locale_short_date));
-            return a._id == -1 ? "" : Utility.time_ago_in_words (a._date_time.to_local_time ());
+            //return a.id == -1 ? "" : string ("%1 - %2").arg (Utility.time_ago_in_words (a.date_time.to_local_time ()), a.date_time.to_local_time ().to_string (Qt.Default_locale_short_date));
+            return a.id == -1 ? "" : Utility.time_ago_in_words (a.date_time.to_local_time ());
         case Account_connected_role:
             return (ast && ast.is_connected ());
         case Display_actions:
             return this.display_actions;
         case Shareable_role:
-            return !data (index, Path_role).to_string ().is_empty () && this.display_actions && a._file_action != "file_deleted" && a._status != SyncFileItem.Status.FILE_IGNORED;
+            return !data (index, Path_role).to_string ().is_empty () && this.display_actions && a.file_action != "file_deleted" && a.status != SyncFileItem.Status.FILE_IGNORED;
         default:
             return GLib.Variant ();
         }
@@ -452,7 +451,7 @@ signals:
         job.add_query_params (parameters);
 
         this.currently_fetching = true;
-        q_c_info (lc_activity) << "Start fetching activities for " << this.account_state.account ().display_name ();
+        GLib.Info (lc_activity) << "Start fetching activities for " << this.account_state.account ().display_name ();
         job.on_start ();
     }
 
@@ -478,24 +477,24 @@ signals:
             var json = activ.to_object ();
 
             Activity a;
-            a._type = Activity.Activity_type;
-            a._object_type = json.value ("object_type").to_string ();
-            a._acc_name = ast.account ().display_name ();
-            a._id = json.value ("activity_id").to_int ();
-            a._file_action = json.value ("type").to_string ();
-            a._subject = json.value ("subject").to_string ();
-            a._message = json.value ("message").to_string ();
-            a._file = json.value ("object_name").to_string ();
-            a._link = GLib.Uri (json.value ("link").to_string ());
-            a._date_time = GLib.DateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
-            a._icon = json.value ("icon").to_string ();
+            a.type = Activity.Activity_type;
+            a.object_type = json.value ("object_type").to_string ();
+            a.acc_name = ast.account ().display_name ();
+            a.id = json.value ("activity_id").to_int ();
+            a.file_action = json.value ("type").to_string ();
+            a.subject = json.value ("subject").to_string ();
+            a.message = json.value ("message").to_string ();
+            a.file = json.value ("object_name").to_string ();
+            a.link = GLib.Uri (json.value ("link").to_string ());
+            a.date_time = GLib.DateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
+            a.icon = json.value ("icon").to_string ();
 
             list.append (a);
-            this.current_item = list.last ()._id;
+            this.current_item = list.last ().id;
 
             this.total_activities_fetched++;
             if (this.total_activities_fetched == this.max_activities
-                || (this.hide_old_activities && a._date_time < oldest_date)) {
+                || (this.hide_old_activities && a.date_time < oldest_date)) {
                 this.show_more_activities_available_entry = true;
                 this.done_fetching = true;
                 break;
@@ -510,42 +509,42 @@ signals:
     }
 
     void ActivityListModel.add_error_to_activity_list (Activity activity) {
-        q_c_info (lc_activity) << "Error successfully added to the notification list : " << activity._subject;
+        GLib.Info (lc_activity) << "Error successfully added to the notification list : " << activity.subject;
         this.notification_errors_lists.prepend (activity);
         combine_activity_lists ();
     }
 
     void ActivityListModel.add_ignored_file_to_list (Activity new_activity) {
-        q_c_info (lc_activity) << "First checking for duplicates then add file to the notification list of ignored files : " << new_activity._file;
+        GLib.Info (lc_activity) << "First checking for duplicates then add file to the notification list of ignored files : " << new_activity.file;
 
         bool duplicate = false;
         if (this.list_of_ignored_files.size () == 0) {
             this.notification_ignored_files = new_activity;
-            this.notification_ignored_files._subject = _("Files from the ignore list as well as symbolic links are not synced.");
+            this.notification_ignored_files.subject = _("Files from the ignore list as well as symbolic links are not synced.");
             this.list_of_ignored_files.append (new_activity);
             return;
         }
 
         foreach (Activity activity, this.list_of_ignored_files) {
-            if (activity._file == new_activity._file) {
+            if (activity.file == new_activity.file) {
                 duplicate = true;
                 break;
             }
         }
 
         if (!duplicate) {
-            this.notification_ignored_files._message.append (", " + new_activity._file);
+            this.notification_ignored_files.message.append (", " + new_activity.file);
         }
     }
 
     void ActivityListModel.add_notification_to_activity_list (Activity activity) {
-        q_c_info (lc_activity) << "Notification successfully added to the notification list : " << activity._subject;
+        GLib.Info (lc_activity) << "Notification successfully added to the notification list : " << activity.subject;
         this.notification_lists.prepend (activity);
         combine_activity_lists ();
     }
 
     void ActivityListModel.clear_notifications () {
-        q_c_info (lc_activity) << "Clear the notifications";
+        GLib.Info (lc_activity) << "Clear the notifications";
         this.notification_lists.clear ();
         combine_activity_lists ();
     }
@@ -557,21 +556,21 @@ signals:
     }
 
     void ActivityListModel.add_sync_file_item_to_activity_list (Activity activity) {
-        q_c_info (lc_activity) << "Successfully added to the activity list : " << activity._subject;
+        GLib.Info (lc_activity) << "Successfully added to the activity list : " << activity.subject;
         this.sync_file_item_lists.prepend (activity);
         combine_activity_lists ();
     }
 
     void ActivityListModel.remove_activity_from_activity_list (Activity activity) {
-        q_c_info (lc_activity) << "Activity/Notification/Error successfully dismissed : " << activity._subject;
-        q_c_info (lc_activity) << "Trying to remove Activity/Notification/Error from view... ";
+        GLib.Info (lc_activity) << "Activity/Notification/Error successfully dismissed : " << activity.subject;
+        GLib.Info (lc_activity) << "Trying to remove Activity/Notification/Error from view... ";
 
         int index = -1;
-        if (activity._type == Activity.Activity_type) {
+        if (activity.type == Activity.Activity_type) {
             index = this.activity_lists.index_of (activity);
             if (index != -1)
                 this.activity_lists.remove_at (index);
-        } else if (activity._type == Activity.Notification_type) {
+        } else if (activity.type == Activity.Notification_type) {
             index = this.notification_lists.index_of (activity);
             if (index != -1)
                 this.notification_lists.remove_at (index);
@@ -582,8 +581,8 @@ signals:
         }
 
         if (index != -1) {
-            q_c_info (lc_activity) << "Activity/Notification/Error successfully removed from the list.";
-            q_c_info (lc_activity) << "Updating Activity/Notification/Error view.";
+            GLib.Info (lc_activity) << "Activity/Notification/Error successfully removed from the list.";
+            GLib.Info (lc_activity) << "Updating Activity/Notification/Error view.";
             combine_activity_lists ();
         }
     }
@@ -598,14 +597,14 @@ signals:
         const var path = data (model_index, Path_role).to_url ();
 
         const var activity = this.final_list.at (activity_index);
-        if (activity._status == SyncFileItem.Status.CONFLICT) {
-            Q_ASSERT (!activity._file.is_empty ());
-            Q_ASSERT (!activity._folder.is_empty ());
-            Q_ASSERT (Utility.is_conflict_file (activity._file));
+        if (activity.status == SyncFileItem.Status.CONFLICT) {
+            //  Q_ASSERT (!activity.file.is_empty ());
+            //  Q_ASSERT (!activity.folder.is_empty ());
+            //  Q_ASSERT (Utility.is_conflict_file (activity.file));
 
-            const var folder = FolderMan.instance ().folder (activity._folder);
+            const var folder = FolderMan.instance ().folder (activity.folder);
 
-            const var conflicted_relative_path = activity._file;
+            const var conflicted_relative_path = activity.file;
             const var base_relative_path = folder.journal_database ().conflict_file_base_name (conflicted_relative_path.to_utf8 ());
 
             const var dir = QDir (folder.path ());
@@ -628,15 +627,15 @@ signals:
             this.current_conflict_dialog.open ();
             OwncloudGui.raise_dialog (this.current_conflict_dialog);
             return;
-        } else if (activity._status == SyncFileItem.Status.FILENAME_INVALID) {
+        } else if (activity.status == SyncFileItem.Status.FILENAME_INVALID) {
             if (!this.current_invalid_filename_dialog.is_null ()) {
                 this.current_invalid_filename_dialog.close ();
             }
 
-            var folder = FolderMan.instance ().folder (activity._folder);
+            var folder = FolderMan.instance ().folder (activity.folder);
             const var folder_dir = QDir (folder.path ());
             this.current_invalid_filename_dialog = new Invalid_filename_dialog (this.account_state.account (), folder,
-                folder_dir.file_path (activity._file));
+                folder_dir.file_path (activity.file));
             connect (this.current_invalid_filename_dialog, &Invalid_filename_dialog.accepted, folder, [folder] () {
                 folder.schedule_this_folder_soon ();
             });
@@ -661,19 +660,19 @@ signals:
 
         const var activity = this.final_list[activity_index];
 
-        if (action_index < 0 || action_index >= activity._links.size ()) {
-            GLib.warn (lc_activity) << "Couldn't trigger action at index" << action_index << "/ actions list size:" << activity._links.size ();
+        if (action_index < 0 || action_index >= activity.links.size ()) {
+            GLib.warn (lc_activity) << "Couldn't trigger action at index" << action_index << "/ actions list size:" << activity.links.size ();
             return;
         }
 
-        const var action = activity._links[action_index];
+        const var action = activity.links[action_index];
 
-        if (action._verb == "WEB") {
-            Utility.open_browser (GLib.Uri (action._link));
+        if (action.verb == "WEB") {
+            Utility.open_browser (GLib.Uri (action.link));
             return;
         }
 
-        /* emit */ send_notification_request (activity._acc_name, action._link, action._verb, activity_index);
+        /* emit */ send_notification_request (activity.acc_name, action.link, action.verb, activity_index);
     }
 
     AccountState *ActivityListModel.account_state () {
@@ -706,15 +705,15 @@ signals:
 
             if (this.show_more_activities_available_entry) {
                 Activity a;
-                a._type = Activity.Activity_type;
-                a._acc_name = this.account_state.account ().display_name ();
-                a._id = -1;
-                a._subject = _("For more activities please open the Activity app.");
-                a._date_time = GLib.DateTime.current_date_time ();
+                a.type = Activity.Activity_type;
+                a.acc_name = this.account_state.account ().display_name ();
+                a.id = -1;
+                a.subject = _("For more activities please open the Activity app.");
+                a.date_time = GLib.DateTime.current_date_time ();
 
                 AccountApp app = this.account_state.find_app (QLatin1String ("activity"));
                 if (app) {
-                    a._link = app.url ();
+                    a.link = app.url ();
                 }
 
                 result_list.append (a);

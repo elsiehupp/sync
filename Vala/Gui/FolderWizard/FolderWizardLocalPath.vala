@@ -20,7 +20,6 @@ class Folder_wizard_local_path : Format_warnings_wizard_page {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public bool is_complete () override;
     public void initialize_page () override;
     public void cleanup_page () override;
@@ -47,7 +46,7 @@ protected slots:
 
     Folder_wizard_local_path.Folder_wizard_local_path (AccountPointer account)
         : Format_warnings_wizard_page ()
-        , this.account (account) {
+        this.account (account) {
         this.ui.setup_ui (this);
         register_field (QLatin1String ("source_folder*"), this.ui.local_folder_line_edit);
         connect (this.ui.local_folder_choose_btn, &QAbstractButton.clicked, this, &Folder_wizard_local_path.on_choose_local_folder);

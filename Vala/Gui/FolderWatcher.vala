@@ -6,26 +6,25 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // event masks
 
-// #include <cstdint>
-
-// #include <QFileInfo>
-// #include <QFlags>
-// #include <QDir>
-// #include <QMutexLocker>
-// #include <string[]>
-// #include <QTimer>
-
-// #include <GLib.List>
-// #include <QLoggingCategory>
-// #include <string[]>
-// #include <QElapsedTimer>
-// #include <QScopedPointer>
-// #include <QDir>
+//  #include <cstdint>
+//  #include
+//  #include <QFileIn
+//  #include <QFlag
+//  #include <QDir>
+//  #include <QMutexLoc
+//  #include <string[]
+//  #include <QTimer>
+//  #include
+//  #include <GLib.List
+//  #include <QLoggingCatego
+//  #include <QElapsedTimer>
+//  #include <QScopedPointer>
+//  #include <QDir>
 
 
 namespace Occ {
 
-Q_DECLARE_LOGGING_CATEGORY (lc_folder_watcher)
+//  Q_DECLARE_LOGGING_CATEGORY (lc_folder_watcher)
 
 
 /***********************************************************
@@ -41,7 +40,7 @@ through the path_changed () signal.
 class Folder_watcher : GLib.Object {
 
     // Construct, connect signals, call on_init ()
-    public Folder_watcher (Folder folder = nullptr);
+    public Folder_watcher (Folder folder = null);
     ~Folder_watcher () override;
 
 
@@ -142,7 +141,7 @@ protected slots:
 
     Folder_watcher.Folder_watcher (Folder folder)
         : GLib.Object (folder)
-        , this.folder (folder) {
+        this.folder (folder) {
     }
 
     Folder_watcher.~Folder_watcher () = default;
@@ -185,16 +184,16 @@ protected slots:
     }
 
     void Folder_watcher.start_notificaton_test (string path) {
-        Q_ASSERT (this.test_notification_path.is_empty ());
+        //  Q_ASSERT (this.test_notification_path.is_empty ());
         this.test_notification_path = path;
 
         // Don't do the local file modification immediately:
-        // wait for Folder_watch_private._ready
+        // wait for Folder_watch_private.ready
         on_start_notification_test_when_ready ();
     }
 
     void Folder_watcher.on_start_notification_test_when_ready () {
-        if (!this.d._ready) {
+        if (!this.d.ready) {
             QTimer.single_shot (1000, this, &Folder_watcher.on_start_notification_test_when_ready);
             return;
         }
@@ -267,7 +266,7 @@ protected slots:
             return;
         }
 
-        q_c_info (lc_folder_watcher) << "Detected changes in paths:" << changed_paths;
+        GLib.Info (lc_folder_watcher) << "Detected changes in paths:" << changed_paths;
         foreach (string path, changed_paths) {
             /* emit */ path_changed (path);
         }

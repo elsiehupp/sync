@@ -5,10 +5,10 @@ Copyright (C) 2015 by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFileDialog>
-// #include <QLineEdit>
-
-// #include <Gtk.Dialog>
+//  #include <QFileDialog>
+//  #include <QLineEdit>
+//  #include
+//  #include <Gtk.Dialog>
 
 namespace Occ {
 
@@ -24,14 +24,14 @@ class AddCertificateDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public AddCertificateDialog (Gtk.Widget parent = nullptr);
+    public AddCertificateDialog (Gtk.Widget parent = null);
     ~AddCertificateDialog () override;
     public string get_certificate_path ();
 
 
     /***********************************************************
     ***********************************************************/
-    public string get_certificate_passwd ();
+    public string get_certificate_password ();
 
     /***********************************************************
     ***********************************************************/
@@ -75,7 +75,7 @@ class AddCertificateDialog : Gtk.Dialog {
         return ui.line_edit_certificate_path.text ();
     }
 
-    string AddCertificateDialog.get_certificate_passwd () {
+    string AddCertificateDialog.get_certificate_password () {
         return ui.line_edit_p_wDCertificate.text ();
     }
 

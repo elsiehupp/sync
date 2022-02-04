@@ -12,14 +12,26 @@ namespace KeychainChunk {
 ***********************************************************/
 class DeleteJob : KeychainChunk.Job {
 
-    /***********************************************************
-    ***********************************************************/
-    public DeleteJob (Account account, string key, bool keychain_migration, GLib.Object parent = new GLib.Object ());
+
+    signal void on_finished (KeychainChunk.DeleteJob incoming_job);
+
 
     /***********************************************************
     ***********************************************************/
-    public 
-    public DeleteJob (string key, GLib.Object parent = new GLib.Object ());
+    public DeleteJob (Account account, string key, bool keychain_migration, GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        this.account = account;
+        this.key = key;
+
+        this.keychain_migration = keychain_migration;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public DeleteJob (string key, GLib.Object parent = new GLib.Object ()) {
+        base (null, key, false, parent);
+    }
 
 
     /***********************************************************
@@ -28,50 +40,14 @@ class DeleteJob : KeychainChunk.Job {
 
     @see QKeychain.Job.on_start ()
     ***********************************************************/
-    public void on_start ();
-
-
-    /***********************************************************
-    Call this method to on_start the job synchronously.
-    Awaits completion with no need to connect some slot to the on_finished () signal first.
-
-    @return Returns true on succeess (QKeychain.NoError).
-    ***********************************************************/
-    public bool exec ();
-
-signals:
-    void on_finished (KeychainChunk.DeleteJob incoming_job);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_delete_job_done (QKeychain.Job incoming_job);
-
-
-
-    /***********************************************************
-    DeleteJob
-    ***********************************************************/
-    DeleteJob.DeleteJob (Account account, string key, bool keychain_migration, GLib.Object parent)
-        : Job (parent) {
-        this.account = account;
-        this.key = key;
-
-        this.keychain_migration = keychain_migration;
-    }
-
-    DeleteJob.DeleteJob (string key, GLib.Object parent)
-        : DeleteJob (nullptr, key, false, parent) {
-    }
-
-    void DeleteJob.on_start () {
+    public void on_start () {
         this.chunk_count = 0;
         this.error = QKeychain.NoError;
 
         const string kck = this.account ? AbstractCredentials.keychain_key (
                 this.account.url ().to_string (),
                 this.key,
-                this.keychain_migration ? "" : this.account.id ()
+                this.keychain_migration ? "" : this.account.identifier ()
             ) : this.key;
 
         var job = new QKeychain.DeletePasswordJob (this.service_name, this);
@@ -84,7 +60,14 @@ signals:
         job.on_start ();
     }
 
-    bool DeleteJob.exec () {
+
+    /***********************************************************
+    Call this method to on_start the job synchronously.
+    Awaits completion with no need to connect some slot to the on_finished () signal first.
+
+    @return Returns true on succeess (QKeychain.NoError).
+    ***********************************************************/
+    public bool exec () {
         on_start ();
 
         QEventLoop wait_loop;
@@ -102,10 +85,13 @@ signals:
         return false;
     }
 
-    void DeleteJob.on_delete_job_done (QKeychain.Job incoming_job) {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_delete_job_done (QKeychain.Job incoming_job) {
         // Errors or next chunk?
         var delete_job = qobject_cast<QKeychain.DeletePasswordJob> (incoming_job);
-        Q_ASSERT (delete_job);
+        //  Q_ASSERT (delete_job);
 
         if (delete_job.error () == NoError) {
             this.chunk_count++;
@@ -126,6 +112,7 @@ signals:
             delete_later ();
         }
     }
+
 } // class DeleteJob
 
 } // namespace KeychainChunk

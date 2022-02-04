@@ -4,7 +4,7 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
+//  #include <QtTest>
 
 void touch (string file) {
     string cmd;

@@ -4,8 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
 
 namespace xattr {
 using namespace Occ.XAttrWrapper;
@@ -16,13 +16,13 @@ const int XAVERIFY_VIRTUAL (folder, path)
     QCOMPARE (QFileInfo ( (folder).localPath () + (path)).size (), 1);
     QVERIFY (xattr.hasNextcloudPlaceholderAttributes ( (folder).localPath () + (path)));
     QVERIFY (dbRecord ( (folder), (path)).isValid ());
-    QCOMPARE (dbRecord ( (folder), (path))._type, ItemTypeVirtualFile);
+    QCOMPARE (dbRecord ( (folder), (path)).type, ItemTypeVirtualFile);
 
 const int XAVERIFY_NONVIRTUAL (folder, path)
     QVERIFY (QFileInfo ( (folder).localPath () + (path)).exists ());
     QVERIFY (!xattr.hasNextcloudPlaceholderAttributes ( (folder).localPath () + (path)));
     QVERIFY (dbRecord ( (folder), (path)).isValid ());
-    QCOMPARE (dbRecord ( (folder), (path))._type, ItemTypeFile);
+    QCOMPARE (dbRecord ( (folder), (path)).type, ItemTypeFile);
 
 const int CFVERIFY_GONE (folder, path)
     QVERIFY (!QFileInfo ( (folder).localPath () + (path)).exists ());
@@ -32,7 +32,7 @@ using namespace Occ;
 
 bool itemInstruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
-    return item._instruction == instr;
+    return item.instruction == instr;
 }
 
 SyncJournalFileRecord dbRecord (FakeFolder folder, string path) {
@@ -47,9 +47,9 @@ void triggerDownload (FakeFolder folder, GLib.ByteArray path) {
     journal.getFileRecord (path, record);
     if (!record.isValid ())
         return;
-    record._type = ItemTypeVirtualFileDownload;
+    record.type = ItemTypeVirtualFileDownload;
     journal.setFileRecord (record);
-    journal.schedulePathForRemoteDiscovery (record._path);
+    journal.schedulePathForRemoteDiscovery (record.path);
 }
 
 void markForDehydration (FakeFolder folder, GLib.ByteArray path) {
@@ -58,9 +58,9 @@ void markForDehydration (FakeFolder folder, GLib.ByteArray path) {
     journal.getFileRecord (path, record);
     if (!record.isValid ())
         return;
-    record._type = ItemTypeVirtualFileDehydration;
+    record.type = ItemTypeVirtualFileDehydration;
     journal.setFileRecord (record);
-    journal.schedulePathForRemoteDiscovery (record._path);
+    journal.schedulePathForRemoteDiscovery (record.path);
 }
 
 unowned<Vfs> setupVfs (FakeFolder folder) {
@@ -101,7 +101,7 @@ class TestSyncXAttr : GLib.Object {
         var on_cleanup = [&] () {
             completeSpy.clear ();
             if (!doLocalDiscovery)
-                fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DatabaseAndFilesystem);
+                fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
         };
         on_cleanup ();
 
@@ -112,7 +112,7 @@ class TestSyncXAttr : GLib.Object {
         fakeFolder.remoteModifier ().setModTime ("A/a1", someDate);
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1");
-        QCOMPARE (dbRecord (fakeFolder, "A/a1")._fileSize, 64);
+        QCOMPARE (dbRecord (fakeFolder, "A/a1").fileSize, 64);
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1").lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_NEW));
@@ -121,7 +121,7 @@ class TestSyncXAttr : GLib.Object {
         // Another sync doesn't actually lead to changes
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1");
-        QCOMPARE (dbRecord (fakeFolder, "A/a1")._fileSize, 64);
+        QCOMPARE (dbRecord (fakeFolder, "A/a1").fileSize, 64);
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1").lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (completeSpy.isEmpty ());
@@ -131,7 +131,7 @@ class TestSyncXAttr : GLib.Object {
         fakeFolder.syncJournal ().forceRemoteDiscoveryNextSync ();
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1");
-        QCOMPARE (dbRecord (fakeFolder, "A/a1")._fileSize, 64);
+        QCOMPARE (dbRecord (fakeFolder, "A/a1").fileSize, 64);
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1").lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (completeSpy.isEmpty ());
@@ -141,16 +141,16 @@ class TestSyncXAttr : GLib.Object {
         fakeFolder.remoteModifier ().appendByte ("A/a1");
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1");
-        QCOMPARE (dbRecord (fakeFolder, "A/a1")._fileSize, 65);
+        QCOMPARE (dbRecord (fakeFolder, "A/a1").fileSize, 65);
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1").lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_UPDATE_METADATA));
-        QCOMPARE (dbRecord (fakeFolder, "A/a1")._fileSize, 65);
+        QCOMPARE (dbRecord (fakeFolder, "A/a1").fileSize, 65);
         on_cleanup ();
 
         // If the local virtual file is removed, this will be propagated remotely
         if (!doLocalDiscovery)
-            fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DatabaseAndFilesystem, { "A" });
+            fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, { "A" });
         fakeFolder.localModifier ().remove ("A/a1");
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (!fakeFolder.currentLocalState ().find ("A/a1"));
@@ -164,7 +164,7 @@ class TestSyncXAttr : GLib.Object {
         fakeFolder.remoteModifier ().setModTime ("A/a1", someDate);
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1");
-        QCOMPARE (dbRecord (fakeFolder, "A/a1")._fileSize, 65);
+        QCOMPARE (dbRecord (fakeFolder, "A/a1").fileSize, 65);
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1").lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_NEW));
@@ -175,7 +175,7 @@ class TestSyncXAttr : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (!QFileInfo (fakeFolder.localPath () + "A/a1").exists ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1m");
-        QCOMPARE (dbRecord (fakeFolder, "A/a1m")._fileSize, 65);
+        QCOMPARE (dbRecord (fakeFolder, "A/a1m").fileSize, 65);
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1m").lastModified (), someDate);
         QVERIFY (!fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1m"));
@@ -201,18 +201,18 @@ class TestSyncXAttr : GLib.Object {
         fakeFolder.remoteModifier ().insert ("A/a3", 33);
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a2");
-        QCOMPARE (dbRecord (fakeFolder, "A/a2")._fileSize, 32);
+        QCOMPARE (dbRecord (fakeFolder, "A/a2").fileSize, 32);
         XAVERIFY_VIRTUAL (fakeFolder, "A/a3");
-        QCOMPARE (dbRecord (fakeFolder, "A/a3")._fileSize, 33);
+        QCOMPARE (dbRecord (fakeFolder, "A/a3").fileSize, 33);
         on_cleanup ();
 
         fakeFolder.syncEngine ().journal ().deleteFileRecord ("A/a2");
         fakeFolder.syncEngine ().journal ().deleteFileRecord ("A/a3");
         fakeFolder.remoteModifier ().remove ("A/a3");
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.FilesystemOnly);
+        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.FILESYSTEM_ONLY);
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a2");
-        QCOMPARE (dbRecord (fakeFolder, "A/a2")._fileSize, 32);
+        QCOMPARE (dbRecord (fakeFolder, "A/a2").fileSize, 32);
         QVERIFY (itemInstruction (completeSpy, "A/a2", CSYNC_INSTRUCTION_UPDATE_METADATA));
         QVERIFY (!QFileInfo (fakeFolder.localPath () + "A/a3").exists ());
         QVERIFY (itemInstruction (completeSpy, "A/a3", CSYNC_INSTRUCTION_REMOVE));
@@ -244,9 +244,9 @@ class TestSyncXAttr : GLib.Object {
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1");
         XAVERIFY_VIRTUAL (fakeFolder, "A/a2");
         XAVERIFY_VIRTUAL (fakeFolder, "B/b1");
-        QCOMPARE (dbRecord (fakeFolder, "A/a1")._fileSize, 11);
-        QCOMPARE (dbRecord (fakeFolder, "A/a2")._fileSize, 12);
-        QCOMPARE (dbRecord (fakeFolder, "B/b1")._fileSize, 21);
+        QCOMPARE (dbRecord (fakeFolder, "A/a1").fileSize, 11);
+        QCOMPARE (dbRecord (fakeFolder, "A/a2").fileSize, 12);
+        QCOMPARE (dbRecord (fakeFolder, "B/b1").fileSize, 21);
         on_cleanup ();
 
         // All the files are touched on the server
@@ -312,7 +312,7 @@ class TestSyncXAttr : GLib.Object {
         fakeFolder.remoteModifier ().insert ("A/new", 42);
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/new");
-        QCOMPARE (dbRecord (fakeFolder, "A/new")._fileSize, 42);
+        QCOMPARE (dbRecord (fakeFolder, "A/new").fileSize, 42);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/new"));
         QVERIFY (itemInstruction (completeSpy, "A/new", CSYNC_INSTRUCTION_NEW));
         on_cleanup ();
@@ -390,9 +390,9 @@ class TestSyncXAttr : GLib.Object {
 
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_SYNC));
-        QCOMPARE (completeSpy.findItem ("A/a1")._type, ItemTypeVirtualFileDownload);
+        QCOMPARE (completeSpy.findItem ("A/a1").type, ItemTypeVirtualFileDownload);
         QVERIFY (itemInstruction (completeSpy, "A/a2", CSYNC_INSTRUCTION_SYNC));
-        QCOMPARE (completeSpy.findItem ("A/a2")._type, ItemTypeVirtualFileDownload);
+        QCOMPARE (completeSpy.findItem ("A/a2").type, ItemTypeVirtualFileDownload);
         QVERIFY (itemInstruction (completeSpy, "A/a3", CSYNC_INSTRUCTION_REMOVE));
         QVERIFY (itemInstruction (completeSpy, "A/a4m", CSYNC_INSTRUCTION_NEW));
         QVERIFY (itemInstruction (completeSpy, "A/a4", CSYNC_INSTRUCTION_REMOVE));
@@ -451,7 +451,7 @@ class TestSyncXAttr : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_SYNC));
         QVERIFY (xattr.hasNextcloudPlaceholderAttributes (fakeFolder.localPath () + "A/a1"));
         QVERIFY (QFileInfo (fakeFolder.localPath () + "A/a1").exists ());
-        QCOMPARE (dbRecord (fakeFolder, "A/a1")._type, ItemTypeVirtualFileDownload);
+        QCOMPARE (dbRecord (fakeFolder, "A/a1").type, ItemTypeVirtualFileDownload);
         on_cleanup ();
 
         fakeFolder.serverErrorPaths ().clear ();
@@ -713,18 +713,18 @@ class TestSyncXAttr : GLib.Object {
         var hasDehydratedDbEntries = [&] (string path) {
             SyncJournalFileRecord record;
             fakeFolder.syncJournal ().getFileRecord (path, record);
-            return record.isValid () && record._type == ItemTypeVirtualFile;
+            return record.isValid () && record.type == ItemTypeVirtualFile;
         };
 
         QVERIFY (isDehydrated ("A/a1"));
         QVERIFY (hasDehydratedDbEntries ("A/a1"));
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_SYNC));
-        QCOMPARE (completeSpy.findItem ("A/a1")._type, ItemTypeVirtualFileDehydration);
-        QCOMPARE (completeSpy.findItem ("A/a1")._file, QStringLiteral ("A/a1"));
+        QCOMPARE (completeSpy.findItem ("A/a1").type, ItemTypeVirtualFileDehydration);
+        QCOMPARE (completeSpy.findItem ("A/a1").file, QStringLiteral ("A/a1"));
         QVERIFY (isDehydrated ("A/a2"));
         QVERIFY (hasDehydratedDbEntries ("A/a2"));
         QVERIFY (itemInstruction (completeSpy, "A/a2", CSYNC_INSTRUCTION_SYNC));
-        QCOMPARE (completeSpy.findItem ("A/a2")._type, ItemTypeVirtualFileDehydration);
+        QCOMPARE (completeSpy.findItem ("A/a2").type, ItemTypeVirtualFileDehydration);
 
         QVERIFY (!QFileInfo (fakeFolder.localPath () + "B/b1").exists ());
         QVERIFY (!fakeFolder.currentRemoteState ().find ("B/b1"));
@@ -802,7 +802,7 @@ class TestSyncXAttr : GLib.Object {
         fakeFolder.localModifier ().insert ("A/a3", 100);
 
         // Now wipe the virtuals
-        SyncEngine.wipeVirtualFiles (fakeFolder.localPath (), fakeFolder.syncJournal (), *fakeFolder.syncEngine ().syncOptions ()._vfs);
+        SyncEngine.wipeVirtualFiles (fakeFolder.localPath (), fakeFolder.syncJournal (), *fakeFolder.syncEngine ().syncOptions ().vfs);
 
         CFVERIFY_GONE (fakeFolder, "f1");
         CFVERIFY_GONE (fakeFolder, "A/a1");

@@ -3,7 +3,7 @@ Copyright (C) by Julius Härtl <jus@bitgrid.net>
 
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
-// #include <cloudprovidersproviderexporter.h>
+//  #include <cloudprovidersproviderexporter.h>
 
 CloudProvidersProviderExporter this.provider_exporter;
 
@@ -65,7 +65,7 @@ void CloudProviderManager.register_signals () {
 
 CloudProviderManager.CloudProviderManager (GLib.Object parent) : GLib.Object (parent) {
     this.folder_index = 0;
-    g_bus_own_name (G_BUS_TYPE_SESSION, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, G_BUS_NAME_OWNER_FLAGS_NONE, nullptr, on_name_acquired, nullptr, this, nullptr);
+    g_bus_own_name (G_BUS_TYPE_SESSION, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, G_BUS_NAME_OWNER_FLAGS_NONE, null, on_name_acquired, null, this, null);
 }
 
 void CloudProviderManager.on_folder_list_changed (Folder.Map folder_map) {

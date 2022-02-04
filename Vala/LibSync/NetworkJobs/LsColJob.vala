@@ -5,78 +5,46 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+
 class LsColJob : AbstractNetworkJob {
 
-    /***********************************************************
-    ***********************************************************/
-    public LsColJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
+
+    public GLib.HashMap<string, ExtraFolderInfo> folder_infos;
 
     /***********************************************************
+    Used instead of path () if the url is specified in the constructor
     ***********************************************************/
-    public 
+    private GLib.Uri url;
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-    public void on_start () override;
-    public GLib.HashMap<string, ExtraFolderInfo> this.folder_infos;
+    private GLib.List<GLib.ByteArray> properties;
 
 
-    /***********************************************************
-    Used to specify which properties shall be retrieved.
-
-    The properties can
-     - contain no colon : they refer to a property in the DAV :
-     - contain a colon : and thus specify an explicit namespace,
-       e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
-    ***********************************************************/
-    public void set_properties (GLib.List<GLib.ByteArray> properties);
+    signal void directory_listing_subfolders (string[] items);
+    signal void directory_listing_iterated (string name, GLib.HashMap<string, string> properties);
+    signal void finished_with_error (Soup.Reply reply);
+    signal void finished_without_error ();
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.List<GLib.ByteArray> properties ();
-
-signals:
-    void directory_listing_subfolders (string[] items);
-    void directory_listing_iterated (string name, GLib.HashMap<string, string> properties);
-    void finished_with_error (Soup.Reply reply);
-    void finished_without_error ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private on_ bool on_finished () override;
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private GLib.List<GLib.ByteArray> this.properties;
-    private GLib.Uri this.url; // Used instead of path () if the url is specified in the constructor
-
-
-
-
-
-    LsColJob.LsColJob (AccountPointer account, string path, GLib.Object parent)
-        : AbstractNetworkJob (account, path, parent) {
+    public LsColJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+        base (account, path, parent);
     }
 
-    LsColJob.LsColJob (AccountPointer account, GLib.Uri url, GLib.Object parent)
-        : AbstractNetworkJob (account, "", parent)
-        , this.url (url) {
+    /***********************************************************
+    ***********************************************************/
+    public LsColJob (AccountPointer account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
+        base (account, "", parent);
+        this.url = url;
     }
 
-    void LsColJob.set_properties (GLib.List<GLib.ByteArray> properties) {
-        this.properties = properties;
-    }
 
-    GLib.List<GLib.ByteArray> LsColJob.properties () {
-        return this.properties;
-    }
-
-    void LsColJob.on_start () {
+    /***********************************************************
+    ***********************************************************/
+    public void on_start () {
         GLib.List<GLib.ByteArray> properties = this.properties;
 
         if (properties.is_empty ()) {
@@ -115,12 +83,36 @@ signals:
         AbstractNetworkJob.on_start ();
     }
 
-    // TODO : Instead of doing all in this slot, we should iteratively parse in ready_read (). This
-    // would allow us to be more asynchronous in processing while data is coming from the network,
-    // not all in one big blob at the end.
-    bool LsColJob.on_finished () {
-        q_c_info (lc_ls_col_job) << "LSCOL of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                        << reply_status_"";
+
+    /***********************************************************
+    ***********************************************************/
+    public GLib.List<GLib.ByteArray> properties () {
+        return this.properties;
+    }
+
+
+    /***********************************************************
+    Used to specify which properties shall be retrieved.
+
+    The properties can
+     - contain no colon : they refer to a property in the DAV :
+     - contain a colon : and thus specify an explicit namespace,
+       e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
+    ***********************************************************/
+    public void set_properties (GLib.List<GLib.ByteArray> properties) {
+        this.properties = properties;
+    }
+
+
+    /***********************************************************
+    TODO: Instead of doing all in this slot, we should
+    iteratively parse in ready_read (). This would allow us to
+    be more asynchronous in processing while data is coming from
+    the network, not all in one big blob at the end.
+    ***********************************************************/
+    private bool on_finished () {
+        GLib.Info (lc_ls_col_job) << "LSCOL of" << reply ().request ().url () << "FINISHED WITH STATUS"
+                        << reply_status_string ();
 
         string content_type = reply ().header (Soup.Request.ContentTypeHeader).to_string ();
         int http_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
@@ -147,4 +139,7 @@ signals:
 
         return true;
     }
-};
+
+} // class LsColJob
+
+} // namespace Occ

@@ -5,14 +5,14 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <theme.h>
-
-// #include <QTimer>
-// #include <QJsonDocument>
-// #include <QJsonObject>
-
-// #include <QPointer>
-// #include <QTimer>
+//  #include <theme.h>
+//  #include
+//  #include <QTimer>
+//  #include <QJsonDocument
+//  #include <QJsonObje
+//  #include
+//  #include <QPointer>
+//  #include <QTimer>
 
 namespace Occ {
 
@@ -128,12 +128,12 @@ signals:
 
     UserInfo.UserInfo (AccountState account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object parent)
         : GLib.Object (parent)
-        , this.account_state (account_state)
-        , this.allow_disconnected_account_state (allow_disconnected_account_state)
-        , this.fetch_avatar_image (fetch_avatar_image)
-        , this.last_quota_total_bytes (0)
-        , this.last_quota_used_bytes (0)
-        , this.active (false) {
+        this.account_state (account_state)
+        this.allow_disconnected_account_state (allow_disconnected_account_state)
+        this.fetch_avatar_image (fetch_avatar_image)
+        this.last_quota_total_bytes (0)
+        this.last_quota_used_bytes (0)
+        this.active (false) {
         connect (account_state, &AccountState.state_changed,
             this, &UserInfo.on_account_state_changed);
         connect (&this.job_restart_timer, &QTimer.timeout, this, &UserInfo.on_fetch_info);
@@ -200,7 +200,7 @@ signals:
         AccountPointer account = this.account_state.account ();
 
         // User Info
-        string user = obj_data.value ("id").to_string ();
+        string user = obj_data.value ("identifier").to_string ();
         if (!user.is_empty ()) {
             account.set_dav_user (user);
         }

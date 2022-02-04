@@ -4,9 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <qglobal.h>
-// #include <QTemporaryDir>
-// #include <QtTest>
+//  #include <qglobal.h>
+//  #include <QTemporaryDir>
+//  #include <QtTest>
 
 using namespace Occ;
 
@@ -34,8 +34,8 @@ class TestRemoteWipe : public GLib.Object {
 //        QVERIFY (newAccountState);
 
 //        GLib.Uri url ("http://example.de");
-//        HttpCredentialsTest cred = new HttpCredentialsTest ("testuser", "secret");
-//        account.setCredentials (cred);
+//        HttpCredentialsTest credentials = new HttpCredentialsTest ("testuser", "secret");
+//        account.setCredentials (credentials);
 //        account.setUrl ( url );
 
 //        FolderMan folderman = FolderMan.instance ();
@@ -43,7 +43,7 @@ class TestRemoteWipe : public GLib.Object {
 
 //        // check if account exists
 //        qDebug () << "Does account exists?!";
-//        QVERIFY (!account.id ().isEmpty ());
+//        QVERIFY (!account.identifier ().isEmpty ());
 
 //        manager.deleteAccount (newAccountState);
 //        manager.save ();

@@ -15,7 +15,6 @@ class User_apps_model : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public enum User_apps_roles {
         Name_role = Qt.User_role + 1,
         Url_role,
@@ -28,7 +27,6 @@ class User_apps_model : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void on_open_app_url (GLib.Uri url);
 
 
@@ -48,7 +46,7 @@ class User_apps_model : QAbstractListModel {
 
 
 
-User_apps_model *User_apps_model._instance = nullptr;
+User_apps_model *User_apps_model.instance = null;
 
 User_apps_model *User_apps_model.instance () {
     if (!this.instance) {
@@ -72,7 +70,7 @@ void User_apps_model.build_app_list () {
         const var talk_app = User_model.instance ().current_user ().talk_app ();
         foreach (AccountApp app, User_model.instance ().app_list ()) {
             // Filter out Talk because we have a dedicated button for it
-            if (talk_app && app.id () == talk_app.id ())
+            if (talk_app && app.identifier () == talk_app.identifier ())
                 continue;
 
             begin_insert_rows (QModelIndex (), row_count (), row_count ());

@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
 #ifdef HAVE_ARGP_H
-// #include <argp.h>
+//  #include <argp.h>
 
 const char argp_program_version = "csync test 0.2";
 const char argp_program_bug_address = "<csync-devel@csync.org>";

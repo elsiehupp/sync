@@ -4,8 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
 
 namespace cfapi {
 using namespace Occ.CfApiWrapper;
@@ -15,13 +15,13 @@ const int CFVERIFY_VIRTUAL (folder, path)
     QVERIFY (QFileInfo ( (folder).localPath () + (path)).exists ());
     QVERIFY (cfapi.isSparseFile ( (folder).localPath () + (path)));
     QVERIFY (dbRecord ( (folder), (path)).isValid ());
-    QCOMPARE (dbRecord ( (folder), (path))._type, ItemTypeVirtualFile);
+    QCOMPARE (dbRecord ( (folder), (path)).type, ItemTypeVirtualFile);
 
 const int CFVERIFY_NONVIRTUAL (folder, path)
     QVERIFY (QFileInfo ( (folder).localPath () + (path)).exists ());
     QVERIFY (!cfapi.isSparseFile ( (folder).localPath () + (path)));
     QVERIFY (dbRecord ( (folder), (path)).isValid ());
-    QCOMPARE (dbRecord ( (folder), (path))._type, ItemTypeFile);
+    QCOMPARE (dbRecord ( (folder), (path)).type, ItemTypeFile);
 
 const int CFVERIFY_GONE (folder, path)
     QVERIFY (!QFileInfo ( (folder).localPath () + (path)).exists ());
@@ -36,24 +36,24 @@ enum ErrorKind : int {
 }
 
 void setPinState (string path, PinState state, cfapi.SetPinRecurseMode mode) {
-    Q_ASSERT (mode == cfapi.Recurse || mode == cfapi.NoRecurse);
+    //  Q_ASSERT (mode == cfapi.Recurse || mode == cfapi.NoRecurse);
 
     const var p = QDir.toNativeSeparators (path);
     const var handle = cfapi.handleForPath (p);
-    Q_ASSERT (handle);
+    //  Q_ASSERT (handle);
 
     const var result = cfapi.setPinState (handle, state, mode);
-    Q_ASSERT (result);
+    //  Q_ASSERT (result);
 
     if (mode == cfapi.NoRecurse) {
         const var result = cfapi.setPinState (handle, PinState.PinState.INHERITED, cfapi.ChildrenOnly);
-        Q_ASSERT (result);
+        //  Q_ASSERT (result);
     }
 }
 
 bool itemInstruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
-    return item._instruction == instr;
+    return item.instruction == instr;
 }
 
 SyncJournalFileRecord dbRecord (FakeFolder folder, string path) {
@@ -68,9 +68,9 @@ void triggerDownload (FakeFolder folder, GLib.ByteArray path) {
     journal.getFileRecord (path, record);
     if (!record.isValid ())
         return;
-    record._type = ItemTypeVirtualFileDownload;
+    record.type = ItemTypeVirtualFileDownload;
     journal.setFileRecord (record);
-    journal.schedulePathForRemoteDiscovery (record._path);
+    journal.schedulePathForRemoteDiscovery (record.path);
 }
 
 void markForDehydration (FakeFolder folder, GLib.ByteArray path) {
@@ -79,9 +79,9 @@ void markForDehydration (FakeFolder folder, GLib.ByteArray path) {
     journal.getFileRecord (path, record);
     if (!record.isValid ())
         return;
-    record._type = ItemTypeVirtualFileDehydration;
+    record.type = ItemTypeVirtualFileDehydration;
     journal.setFileRecord (record);
-    journal.schedulePathForRemoteDiscovery (record._path);
+    journal.schedulePathForRemoteDiscovery (record.path);
 }
 
 unowned<Vfs> setupVfs (FakeFolder folder) {
@@ -120,7 +120,7 @@ class TestSyncCfApi : GLib.Object {
         var on_cleanup = [&] () {
             completeSpy.clear ();
             if (!doLocalDiscovery)
-                fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DatabaseAndFilesystem);
+                fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
         };
         on_cleanup ();
 
@@ -164,12 +164,12 @@ class TestSyncCfApi : GLib.Object {
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1").lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_UPDATE_METADATA));
-        QCOMPARE (dbRecord (fakeFolder, "A/a1")._fileSize, 65);
+        QCOMPARE (dbRecord (fakeFolder, "A/a1").fileSize, 65);
         on_cleanup ();
 
         // If the local virtual file is removed, this will be propagated remotely
         if (!doLocalDiscovery)
-            fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DatabaseAndFilesystem, { "A" });
+            fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, { "A" });
         fakeFolder.localModifier ().remove ("A/a1");
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (!fakeFolder.currentLocalState ().find ("A/a1"));
@@ -228,7 +228,7 @@ class TestSyncCfApi : GLib.Object {
         fakeFolder.syncEngine ().journal ().deleteFileRecord ("A/a2");
         fakeFolder.syncEngine ().journal ().deleteFileRecord ("A/a3");
         fakeFolder.remoteModifier ().remove ("A/a3");
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.FilesystemOnly);
+        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.FILESYSTEM_ONLY);
         QVERIFY (fakeFolder.syncOnce ());
         CFVERIFY_VIRTUAL (fakeFolder, "A/a2");
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a2").size (), 32);
@@ -409,9 +409,9 @@ class TestSyncCfApi : GLib.Object {
 
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_SYNC));
-        QCOMPARE (completeSpy.findItem ("A/a1")._type, ItemTypeVirtualFileDownload);
+        QCOMPARE (completeSpy.findItem ("A/a1").type, ItemTypeVirtualFileDownload);
         QVERIFY (itemInstruction (completeSpy, "A/a2", CSYNC_INSTRUCTION_SYNC));
-        QCOMPARE (completeSpy.findItem ("A/a2")._type, ItemTypeVirtualFileDownload);
+        QCOMPARE (completeSpy.findItem ("A/a2").type, ItemTypeVirtualFileDownload);
         QVERIFY (itemInstruction (completeSpy, "A/a3", CSYNC_INSTRUCTION_REMOVE));
         QVERIFY (itemInstruction (completeSpy, "A/a4m", CSYNC_INSTRUCTION_NEW));
         QVERIFY (itemInstruction (completeSpy, "A/a4", CSYNC_INSTRUCTION_REMOVE));
@@ -470,7 +470,7 @@ class TestSyncCfApi : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_SYNC));
         QVERIFY (cfapi.isSparseFile (fakeFolder.localPath () + "A/a1"));
         QVERIFY (QFileInfo (fakeFolder.localPath () + "A/a1").exists ());
-        QCOMPARE (dbRecord (fakeFolder, "A/a1")._type, ItemTypeVirtualFileDownload);
+        QCOMPARE (dbRecord (fakeFolder, "A/a1").type, ItemTypeVirtualFileDownload);
         on_cleanup ();
 
         fakeFolder.serverErrorPaths ().clear ();
@@ -732,18 +732,18 @@ class TestSyncCfApi : GLib.Object {
         var hasDehydratedDbEntries = [&] (string path) {
             SyncJournalFileRecord record;
             fakeFolder.syncJournal ().getFileRecord (path, record);
-            return record.isValid () && record._type == ItemTypeVirtualFile;
+            return record.isValid () && record.type == ItemTypeVirtualFile;
         };
 
         QVERIFY (isDehydrated ("A/a1"));
         QVERIFY (hasDehydratedDbEntries ("A/a1"));
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_SYNC));
-        QCOMPARE (completeSpy.findItem ("A/a1")._type, ItemTypeVirtualFileDehydration);
-        QCOMPARE (completeSpy.findItem ("A/a1")._file, QStringLiteral ("A/a1"));
+        QCOMPARE (completeSpy.findItem ("A/a1").type, ItemTypeVirtualFileDehydration);
+        QCOMPARE (completeSpy.findItem ("A/a1").file, QStringLiteral ("A/a1"));
         QVERIFY (isDehydrated ("A/a2"));
         QVERIFY (hasDehydratedDbEntries ("A/a2"));
         QVERIFY (itemInstruction (completeSpy, "A/a2", CSYNC_INSTRUCTION_SYNC));
-        QCOMPARE (completeSpy.findItem ("A/a2")._type, ItemTypeVirtualFileDehydration);
+        QCOMPARE (completeSpy.findItem ("A/a2").type, ItemTypeVirtualFileDehydration);
 
         QVERIFY (!QFileInfo (fakeFolder.localPath () + "B/b1").exists ());
         QVERIFY (!fakeFolder.currentRemoteState ().find ("B/b1"));
@@ -821,7 +821,7 @@ class TestSyncCfApi : GLib.Object {
         fakeFolder.localModifier ().insert ("A/a3", 100);
 
         // Now wipe the virtuals
-        SyncEngine.wipeVirtualFiles (fakeFolder.localPath (), fakeFolder.syncJournal (), *fakeFolder.syncEngine ().syncOptions ()._vfs);
+        SyncEngine.wipeVirtualFiles (fakeFolder.localPath (), fakeFolder.syncJournal (), *fakeFolder.syncEngine ().syncOptions ().vfs);
 
         CFVERIFY_GONE (fakeFolder, "f1");
         CFVERIFY_GONE (fakeFolder, "A/a1");
@@ -1189,7 +1189,7 @@ class TestSyncCfApi : GLib.Object {
                 if (req.url ().path ().endsWith ("online/sub/file1")) {
                     return new FakeHangingReply (op, req, this);
                 }
-                return nullptr;
+                return null;
             });
         } else if (errorKind != NoError) {
             fakeFolder.serverErrorPaths ().append ("online/sub/file1", errorKind);

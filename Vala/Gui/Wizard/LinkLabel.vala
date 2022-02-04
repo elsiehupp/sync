@@ -4,9 +4,9 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #pragma once
+//  #pragma once
 
-// #include <QLabel>
+//  #include <QLabel>
 
 namespace Occ {
 
@@ -14,7 +14,7 @@ class Link_label : QLabel {
 
     /***********************************************************
     ***********************************************************/
-    public Link_label (Gtk.Widget parent = nullptr);
+    public Link_label (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/

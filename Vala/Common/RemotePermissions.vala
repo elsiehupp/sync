@@ -9,12 +9,12 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <cstring>
+//  #include <cstring>
 
-// #pragma once
+//  #pragma once
 
-// #include <QMetaType>
-// #include <QDebug>
+//  #include <QMetaType>
+//  #include <QDebug>
 
 namespace Occ {
 
@@ -26,7 +26,7 @@ class RemotePermissions {
     // The first bit tells if the value is set or not
     // The remaining bits correspond to know if the value is set
     private uint16 this.value = 0;
-    private static constexpr int not_null_mask = 0x1;
+    private static const int not_null_mask = 0x1;
 
     /***********************************************************
     ***********************************************************/
@@ -156,7 +156,7 @@ class RemotePermissions {
     /***********************************************************
     ***********************************************************/
     public friend bool operator== (RemotePermissions a, RemotePermissions b) {
-        return a._value == b._value;
+        return a.value == b.value;
     }
 
 

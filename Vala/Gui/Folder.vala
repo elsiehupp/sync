@@ -6,19 +6,19 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QTimer>
-// #include <QDir>
-// #include <QSettings>
-
-// #include <QMessageBox>
-// #include <QPushButton>
-// #include <QApplication>
-
-// #include <string[]>
-// #include <QUuid>
-// #include <set>
-// #include <chrono>
-// #include <memory>
+//  #include <QTimer>
+//  #include <QDir>
+//  #include <QSettings>
+//  #include
+//  #include <QMessageBox>
+//  #include <QPushButton>
+//  #include <QApplicat
+//  #include
+//  #include <stri
+//  #include <QUuid>
+//  #include <set>
+//  #include <chrono>
+//  #include <memory>
 
 
 namespace Occ {
@@ -209,7 +209,6 @@ class Folder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public Vfs vfs () {
         return this.vfs;
     }
@@ -678,14 +677,14 @@ Folder.Folder (FolderDefinition definition,
     AccountState account_state, std.unique_ptr<Vfs> vfs,
     GLib.Object parent)
     : GLib.Object (parent)
-    , this.account_state (account_state)
-    , this.definition (definition)
-    , this.last_sync_duration (0)
-    , this.consecutive_failing_syncs (0)
-    , this.consecutive_follow_up_syncs (0)
-    , this.journal (this.definition.absolute_journal_path ())
-    , this.file_log (new SyncRunFileLog)
-    , this.vfs (vfs.release ()) {
+    this.account_state (account_state)
+    this.definition (definition)
+    this.last_sync_duration (0)
+    this.consecutive_failing_syncs (0)
+    this.consecutive_follow_up_syncs (0)
+    this.journal (this.definition.absolute_journal_path ())
+    this.file_log (new SyncRunFileLog)
+    this.vfs (vfs.release ()) {
     this.time_since_last_sync_start.on_start ();
     this.time_since_last_sync_done.on_start ();
 
@@ -922,17 +921,17 @@ void Folder.prepare_to_sync () {
 }
 
 void Folder.on_run_etag_job () {
-    q_c_info (lc_folder) << "Trying to check" << remote_url ().to_string () << "for changes via ETag check. (time since last sync:" << (this.time_since_last_sync_done.elapsed () / 1000) << "s)";
+    GLib.Info (lc_folder) << "Trying to check" << remote_url ().to_string () << "for changes via ETag check. (time since last sync:" << (this.time_since_last_sync_done.elapsed () / 1000) << "s)";
 
     AccountPointer account = this.account_state.account ();
 
     if (this.request_etag_job) {
-        q_c_info (lc_folder) << remote_url ().to_string () << "has ETag job queued, not trying to sync";
+        GLib.Info (lc_folder) << remote_url ().to_string () << "has ETag job queued, not trying to sync";
         return;
     }
 
     if (!can_sync ()) {
-        q_c_info (lc_folder) << "Not syncing.  :" << remote_url ().to_string () << this.definition.paused << AccountState.state_string (this.account_state.state ());
+        GLib.Info (lc_folder) << "Not syncing.  :" << remote_url ().to_string () << this.definition.paused << AccountState.state_string (this.account_state.state ());
         return;
     }
 
@@ -952,7 +951,7 @@ void Folder.on_etag_retrieved (GLib.ByteArray etag, GLib.DateTime tp) {
     FolderMan.instance ().set_sync_enabled (true);
 
     if (this.last_etag != etag) {
-        q_c_info (lc_folder) << "Compare etag with previous etag : last:" << this.last_etag << ", received:" << etag << ". CHANGED";
+        GLib.Info (lc_folder) << "Compare etag with previous etag : last:" << this.last_etag << ", received:" << etag << ". CHANGED";
         this.last_etag = etag;
         on_schedule_this_folder ();
     }
@@ -961,7 +960,7 @@ void Folder.on_etag_retrieved (GLib.ByteArray etag, GLib.DateTime tp) {
 }
 
 void Folder.on_etag_retrieved_from_sync_engine (GLib.ByteArray etag, GLib.DateTime time) {
-    q_c_info (lc_folder) << "Root etag from during sync:" << etag;
+    GLib.Info (lc_folder) << "Root etag from during sync:" << etag;
     account_state ().tag_last_successfull_e_tag_request (time);
     this.last_etag = etag;
 }
@@ -980,27 +979,27 @@ void Folder.show_sync_result_popup () {
     if (this.sync_result.first_item_renamed ()) {
         LogStatus status (Log_status_rename);
         // if the path changes it's rather a move
-        QDir ren_target = QFileInfo (this.sync_result.first_item_renamed ()._rename_target).dir ();
-        QDir ren_source = QFileInfo (this.sync_result.first_item_renamed ()._file).dir ();
+        QDir ren_target = QFileInfo (this.sync_result.first_item_renamed ().rename_target).dir ();
+        QDir ren_source = QFileInfo (this.sync_result.first_item_renamed ().file).dir ();
         if (ren_target != ren_source) {
             status = Log_status_move;
         }
-        create_gui_log (this.sync_result.first_item_renamed ()._file, status,
-            this.sync_result.num_renamed_items (), this.sync_result.first_item_renamed ()._rename_target);
+        create_gui_log (this.sync_result.first_item_renamed ().file, status,
+            this.sync_result.num_renamed_items (), this.sync_result.first_item_renamed ().rename_target);
     }
 
     if (this.sync_result.first_new_conflict_item ()) {
         create_gui_log (this.sync_result.first_new_conflict_item ().destination (), Log_status_conflict, this.sync_result.num_new_conflict_items ());
     }
     if (int error_count = this.sync_result.num_error_items ()) {
-        create_gui_log (this.sync_result.first_item_error ()._file, Log_status_error, error_count);
+        create_gui_log (this.sync_result.first_item_error ().file, Log_status_error, error_count);
     }
 
     if (int locked_count = this.sync_result.num_locked_items ()) {
-        create_gui_log (this.sync_result.first_item_locked ()._file, Log_status_file_locked, locked_count);
+        create_gui_log (this.sync_result.first_item_locked ().file, Log_status_file_locked, locked_count);
     }
 
-    q_c_info (lc_folder) << "Folder" << this.sync_result.folder () << "sync result : " << this.sync_result.status ();
+    GLib.Info (lc_folder) << "Folder" << this.sync_result.folder () << "sync result : " << this.sync_result.status ();
 }
 
 void Folder.create_gui_log (string filename, LogStatus status, int count,
@@ -1116,8 +1115,8 @@ int Folder.on_discard_download_progress () {
     const GLib.Vector<SyncJournalDb.DownloadInfo> deleted_infos =
         this.journal.get_and_delete_stale_download_infos (keep_nothing);
     for (var deleted_info : deleted_infos) {
-        const string tmppath = folderpath.file_path (deleted_info._tmpfile);
-        q_c_info (lc_folder) << "Deleting temporary file : " << tmppath;
+        const string tmppath = folderpath.file_path (deleted_info.tmpfile);
+        GLib.Info (lc_folder) << "Deleting temporary file : " << tmppath;
         FileSystem.remove (tmppath);
     }
     return deleted_infos.size ();
@@ -1169,7 +1168,7 @@ void Folder.on_watched_path_changed (string path, ChangeReason reason) {
         // an attribute change (pin state) that caused the notification
         bool spurious = false;
         if (record.is_valid ()
-            && !FileSystem.file_changed (path, record._file_size, record._modtime)) {
+            && !FileSystem.file_changed (path, record.file_size, record.modtime)) {
             spurious = true;
 
             if (var pin_state = this.vfs.pin_state (relative_path.to_string ())) {
@@ -1180,7 +1179,7 @@ void Folder.on_watched_path_changed (string path, ChangeReason reason) {
             }
         }
         if (spurious) {
-            q_c_info (lc_folder) << "Ignoring spurious notification for file" << relative_path;
+            GLib.Info (lc_folder) << "Ignoring spurious notification for file" << relative_path;
             return; // probably a spurious notification
         }
     }
@@ -1194,20 +1193,20 @@ void Folder.on_watched_path_changed (string path, ChangeReason reason) {
 }
 
 void Folder.on_implicitly_hydrate_file (string relativepath) {
-    q_c_info (lc_folder) << "Implicitly hydrate virtual file:" << relativepath;
+    GLib.Info (lc_folder) << "Implicitly hydrate virtual file:" << relativepath;
 
     // Set in the database that we should download the file
     SyncJournalFileRecord record;
     this.journal.get_file_record (relativepath.to_utf8 (), record);
     if (!record.is_valid ()) {
-        q_c_info (lc_folder) << "Did not find file in database";
+        GLib.Info (lc_folder) << "Did not find file in database";
         return;
     }
     if (!record.is_virtual_file ()) {
-        q_c_info (lc_folder) << "The file is not virtual";
+        GLib.Info (lc_folder) << "The file is not virtual";
         return;
     }
-    record._type = ItemTypeVirtualFileDownload;
+    record.type = ItemTypeVirtualFileDownload;
     this.journal.set_file_record (record);
 
     // Change the file's pin state if it's contradictory to being hydrated
@@ -1239,8 +1238,8 @@ void Folder.set_virtual_files_enabled (bool enabled) {
         this.vfs.stop ();
         this.vfs.unregister_folder ();
 
-        disconnect (this.vfs.data (), nullptr, this, nullptr);
-        disconnect (&this.engine.sync_file_status_tracker (), nullptr, this.vfs.data (), nullptr);
+        disconnect (this.vfs.data (), null, this, null);
+        disconnect (&this.engine.sync_file_status_tracker (), null, this.vfs.data (), null);
 
         this.vfs.on_reset (create_vfs_from_plugin (new_mode).release ());
 
@@ -1316,7 +1315,7 @@ void Folder.save_to_settings () {
     FolderDefinition.save (*settings, this.definition);
 
     settings.sync ();
-    q_c_info (lc_folder) << "Saved folder" << this.definition.alias << "to settings, status" << settings.status ();
+    GLib.Info (lc_folder) << "Saved folder" << this.definition.alias << "to settings, status" << settings.status ();
 }
 
 void Folder.remove_from_settings () {
@@ -1340,7 +1339,7 @@ bool Folder.is_file_excluded_relative (string relative_path) {
 }
 
 void Folder.on_terminate_sync () {
-    q_c_info (lc_folder) << "folder " << alias () << " Terminating!";
+    GLib.Info (lc_folder) << "folder " << alias () << " Terminating!";
 
     if (this.engine.is_sync_running ()) {
         this.engine.on_abort ();
@@ -1365,7 +1364,7 @@ void Folder.wipe_for_removal () {
         if (!file.remove ()) {
             GLib.warn (lc_folder) << "Failed to remove existing csync State_d_b " << state_database_file;
         } else {
-            q_c_info (lc_folder) << "wipe : Removed csync State_d_b " << state_database_file;
+            GLib.Info (lc_folder) << "wipe : Removed csync State_d_b " << state_database_file;
         }
     } else {
         GLib.warn (lc_folder) << "statedatabase is empty, can not remove.";
@@ -1379,7 +1378,7 @@ void Folder.wipe_for_removal () {
 
     this.vfs.stop ();
     this.vfs.unregister_folder ();
-    this.vfs.on_reset (nullptr); // warning : folder now in an invalid state
+    this.vfs.on_reset (null); // warning : folder now in an invalid state
 }
 
 bool Folder.reload_excludes () {
@@ -1398,7 +1397,7 @@ void Folder.on_start_sync (string[] path_list) {
     this.sync_result.set_status (SyncResult.Status.SYNC_PREPARE);
     /* emit */ sync_state_change ();
 
-    q_c_info (lc_folder) << "*** Start syncing " << remote_url ().to_string () << " -" << APPLICATION_NAME << "client version"
+    GLib.Info (lc_folder) << "*** Start syncing " << remote_url ().to_string () << " -" << APPLICATION_NAME << "client version"
                      << q_printable (Theme.instance ().version ());
 
     this.file_log.on_start (path ());
@@ -1429,14 +1428,14 @@ void Folder.on_start_sync (string[] path_list) {
     if (this.folder_watcher && this.folder_watcher.is_reliable ()
         && has_done_full_local_discovery
         && !periodic_full_local_discovery_now) {
-        q_c_info (lc_folder) << "Allowing local discovery to read from the database";
+        GLib.Info (lc_folder) << "Allowing local discovery to read from the database";
         this.engine.set_local_discovery_options (
-            LocalDiscoveryStyle.DatabaseAndFilesystem,
+            LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM,
             this.local_discovery_tracker.local_discovery_paths ());
         this.local_discovery_tracker.start_sync_partial_discovery ();
     } else {
-        q_c_info (lc_folder) << "Forbidding local discovery to read from the database";
-        this.engine.set_local_discovery_options (LocalDiscoveryStyle.FilesystemOnly);
+        GLib.Info (lc_folder) << "Forbidding local discovery to read from the database";
+        this.engine.set_local_discovery_options (LocalDiscoveryStyle.FILESYSTEM_ONLY);
         this.local_discovery_tracker.start_sync_full_discovery ();
     }
 
@@ -1467,16 +1466,16 @@ void Folder.set_sync_options () {
     ConfigFile cfg_file;
 
     var new_folder_limit = cfg_file.new_big_folder_size_limit ();
-    opt._new_big_folder_size_limit = new_folder_limit.first ? new_folder_limit.second * 1000LL * 1000LL : -1; // convert from MB to B
-    opt._confirm_external_storage = cfg_file.confirm_external_storage ();
-    opt._move_files_to_trash = cfg_file.move_to_trash ();
-    opt._vfs = this.vfs;
-    opt._parallel_network_jobs = this.account_state.account ().is_http2Supported () ? 20 : 6;
+    opt.new_big_folder_size_limit = new_folder_limit.first ? new_folder_limit.second * 1000LL * 1000LL : -1; // convert from MB to B
+    opt.confirm_external_storage = cfg_file.confirm_external_storage ();
+    opt.move_files_to_trash = cfg_file.move_to_trash ();
+    opt.vfs = this.vfs;
+    opt.parallel_network_jobs = this.account_state.account ().is_http2Supported () ? 20 : 6;
 
-    opt._initial_chunk_size = cfg_file.chunk_size ();
-    opt._min_chunk_size = cfg_file.min_chunk_size ();
-    opt._max_chunk_size = cfg_file.max_chunk_size ();
-    opt._target_chunk_upload_duration = cfg_file.target_chunk_upload_duration ();
+    opt.initial_chunk_size = cfg_file.chunk_size ();
+    opt.min_chunk_size = cfg_file.min_chunk_size ();
+    opt.max_chunk_size = cfg_file.max_chunk_size ();
+    opt.target_chunk_upload_duration = cfg_file.target_chunk_upload_duration ();
 
     opt.fill_from_environment_variables ();
     opt.verify_chunk_sizes ();
@@ -1485,19 +1484,19 @@ void Folder.set_sync_options () {
 }
 
 void Folder.set_dirty_network_limits () {
-    ConfigFile cfg;
+    ConfigFile config;
     int download_limit = -75; // 75%
-    int use_down_limit = cfg.use_download_limit ();
+    int use_down_limit = config.use_download_limit ();
     if (use_down_limit >= 1) {
-        download_limit = cfg.download_limit () * 1000;
+        download_limit = config.download_limit () * 1000;
     } else if (use_down_limit == 0) {
         download_limit = 0;
     }
 
     int upload_limit = -75; // 75%
-    int use_up_limit = cfg.use_upload_limit ();
+    int use_up_limit = config.use_upload_limit ();
     if (use_up_limit >= 1) {
-        upload_limit = cfg.upload_limit () * 1000;
+        upload_limit = config.upload_limit () * 1000;
     } else if (use_up_limit == 0) {
         upload_limit = 0;
     }
@@ -1515,13 +1514,13 @@ void Folder.on_add_error_to_gui (SyncFileItem.Status status, string error_messag
 }
 
 void Folder.on_sync_started () {
-    q_c_info (lc_folder) << "#### Propagation on_start ####################################################";
+    GLib.Info (lc_folder) << "#### Propagation on_start ####################################################";
     this.sync_result.set_status (SyncResult.Status.SYNC_RUNNING);
     /* emit */ sync_state_change ();
 }
 
 void Folder.on_sync_finished (bool on_success) {
-    q_c_info (lc_folder) << "Client version" << q_printable (Theme.instance ().version ())
+    GLib.Info (lc_folder) << "Client version" << q_printable (Theme.instance ().version ())
                      << " Qt" << q_version ()
                      << " SSL " << QSslSocket.ssl_library_version_"".to_utf8 ().data ()
         ;
@@ -1530,7 +1529,7 @@ void Folder.on_sync_finished (bool on_success) {
     if (sync_error) {
         GLib.warn (lc_folder) << "SyncEngine on_finished with ERROR";
     } else {
-        q_c_info (lc_folder) << "SyncEngine on_finished without problem.";
+        GLib.Info (lc_folder) << "SyncEngine on_finished without problem.";
     }
     this.file_log.finish ();
     show_sync_result_popup ();
@@ -1554,7 +1553,7 @@ void Folder.on_sync_finished (bool on_success) {
         this.consecutive_failing_syncs = 0;
     } else {
         this.consecutive_failing_syncs++;
-        q_c_info (lc_folder) << "the last" << this.consecutive_failing_syncs << "syncs failed";
+        GLib.Info (lc_folder) << "the last" << this.consecutive_failing_syncs << "syncs failed";
     }
 
     if (this.sync_result.status () == SyncResult.Status.SUCCESS && on_success) {
@@ -1565,7 +1564,7 @@ void Folder.on_sync_finished (bool on_success) {
     if ( (this.sync_result.status () == SyncResult.Status.SUCCESS
             || this.sync_result.status () == SyncResult.Status.PROBLEM)
         && on_success) {
-        if (this.engine.last_local_discovery_style () == LocalDiscoveryStyle.FilesystemOnly) {
+        if (this.engine.last_local_discovery_style () == LocalDiscoveryStyle.FILESYSTEM_ONLY) {
             this.time_since_last_full_local_discovery.on_start ();
         }
     }
@@ -1586,7 +1585,7 @@ void Folder.on_sync_finished (bool on_success) {
     // Increment the follow-up sync counter if necessary.
     if (another_sync_needed == Immediate_follow_up) {
         this.consecutive_follow_up_syncs++;
-        q_c_info (lc_folder) << "another sync was requested by the on_finished sync, this has"
+        GLib.Info (lc_folder) << "another sync was requested by the on_finished sync, this has"
                          << "happened" << this.consecutive_follow_up_syncs << "times";
     } else {
         this.consecutive_follow_up_syncs = 0;
@@ -1625,7 +1624,7 @@ void Folder.on_transmission_progress (ProgressInfo pi) {
 
 // a item is completed : count the errors and forward to the Progress_dispatcher
 void Folder.on_item_completed (SyncFileItemPtr item) {
-    if (item._instruction == CSYNC_INSTRUCTION_NONE || item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA) {
+    if (item.instruction == CSYNC_INSTRUCTION_NONE || item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA) {
         // We only care about the updates that deserve to be shown in the UI
         return;
     }

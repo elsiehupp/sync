@@ -4,15 +4,15 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QRegularExpression>
-
-// #include <qfileinfo.h>
-
-// #include <QTextStream>
-// #include <QScopedPointer>
-// #include <QElapsedTimer>
-// #include <QStandardPaths>
-// #include <QDir>
+//  #include <QRegularExpression>
+//  #include
+//  #include <qfileinfo.h>
+//  #include
+//  #include <QTextStream>
+//  #include <QScopedPointer>
+//  #include <QElapsedTimer>
+//  #include <QStandardPaths>
+//  #include <QDir>
 
 namespace Occ {
 
@@ -40,7 +40,6 @@ class SyncRunFileLog {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void log_lap (string name);
 
 
@@ -131,11 +130,11 @@ class SyncRunFileLog {
     }
     void SyncRunFileLog.log_item (SyncFileItem item) {
         // don't log the directory items that are in the list
-        if (item._direction == SyncFileItem.Direction.NONE
-            || item._instruction == CSYNC_INSTRUCTION_IGNORE) {
+        if (item.direction == SyncFileItem.Direction.NONE
+            || item.instruction == CSYNC_INSTRUCTION_IGNORE) {
             return;
         }
-        string ts = string.from_latin1 (item._response_time_stamp);
+        string ts = string.from_latin1 (item.response_time_stamp);
         if (ts.length () > 6) {
             const QRegularExpression rx (R" ( (\d\d:\d\d:\d\d))");
             const var rx_match = rx.match (ts);
@@ -147,23 +146,23 @@ class SyncRunFileLog {
         const char L = '|';
         this.out << ts << L;
         this.out << L;
-        if (item._instruction != CSYNC_INSTRUCTION_RENAME) {
+        if (item.instruction != CSYNC_INSTRUCTION_RENAME) {
             this.out << item.destination () << L;
         } else {
-            this.out << item._file << QLatin1String (" . ") << item._rename_target << L;
+            this.out << item.file << QLatin1String (" . ") << item.rename_target << L;
         }
-        this.out << item._instruction << L;
-        this.out << item._direction << L;
-        this.out << string.number (item._modtime) << L;
-        this.out << item._etag << L;
-        this.out << string.number (item._size) << L;
-        this.out << item._file_id << L;
-        this.out << item._status << L;
-        this.out << item._error_string << L;
-        this.out << string.number (item._http_error_code) << L;
-        this.out << string.number (item._previous_size) << L;
-        this.out << string.number (item._previous_modtime) << L;
-        this.out << item._request_id << L;
+        this.out << item.instruction << L;
+        this.out << item.direction << L;
+        this.out << string.number (item.modtime) << L;
+        this.out << item.etag << L;
+        this.out << string.number (item.size) << L;
+        this.out << item.file_id << L;
+        this.out << item.status << L;
+        this.out << item.error_string << L;
+        this.out << string.number (item.http_error_code) << L;
+        this.out << string.number (item.previous_size) << L;
+        this.out << string.number (item.previous_modtime) << L;
+        this.out << item.request_id << L;
 
         this.out << endl;
     }

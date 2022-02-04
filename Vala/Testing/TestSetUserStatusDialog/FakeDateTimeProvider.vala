@@ -10,6 +10,7 @@ class FakeDateTimeProvider : Occ.DateTimeProvider {
     ***********************************************************/
     public void setCurrentDateTime (GLib.DateTime dateTime) { this.dateTime = dateTime; }
 
+
     /***********************************************************
     ***********************************************************/
     public 
@@ -29,19 +30,19 @@ class FakeDateTimeProvider : Occ.DateTimeProvider {
 
 
 
-static std.vector<Occ.UserStatus>
+static GLib.Vector<Occ.UserStatus>
 createFakePredefinedStatuses (GLib.DateTime currentTime) {
-    std.vector<Occ.UserStatus> statuses;
+    GLib.Vector<Occ.UserStatus> statuses;
 
-    const string userStatusId ("fake-id");
+    const string userStatusId ("fake-identifier");
     const string userStatusMessage ("Predefined status");
     const string userStatusIcon ("🏖");
     const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.Online);
     const bool userStatusMessagePredefined (true);
     Occ.Optional<Occ.ClearAt> userStatusClearAt;
     Occ.ClearAt clearAt;
-    clearAt._type = Occ.ClearAtType.Timestamp;
-    clearAt._timestamp = currentTime.addSecs (60 * 60).toTime_t ();
+    clearAt.type = Occ.ClearAtType.Timestamp;
+    clearAt.timestamp = currentTime.addSecs (60 * 60).toTime_t ();
     userStatusClearAt = clearAt;
 
     statuses.emplace_back (userStatusId, userStatusMessage, userStatusIcon,

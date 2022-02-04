@@ -4,8 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
 
 using namespace Occ;
 
@@ -18,7 +18,7 @@ class TestAsyncOp : GLib.Object {
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } } });
         // Reduce max chunk size a bit so we get more chunks
         SyncOptions options;
-        options._maxChunkSize = 20 * 1000;
+        options.maxChunkSize = 20 * 1000;
         fakeFolder.syncEngine ().setSyncOptions (options);
         int nGET = 0;
 
@@ -31,7 +31,7 @@ class TestAsyncOp : GLib.Object {
         struct TestCase {
             using PollRequest_t = std.function<Soup.Reply * (TestCase *, QNetworkRequest request)>;
             PollRequest_t pollRequest;
-            std.function<FileInfo * ()> perform = nullptr;
+            std.function<FileInfo * ()> perform = null;
         };
         GLib.HashMap<string, TestCase> testCases;
 
@@ -40,7 +40,7 @@ class TestAsyncOp : GLib.Object {
 
             if (op == QNetworkAccessManager.GetOperation && path.startsWith ("/async-poll/")) {
                 var file = path.mid (sizeof ("/async-poll/") - 1);
-                Q_ASSERT (testCases.contains (file));
+                //  Q_ASSERT (testCases.contains (file));
                 var testCase = testCases[file];
                 return testCase.pollRequest (&testCase, request);
             }
@@ -48,9 +48,9 @@ class TestAsyncOp : GLib.Object {
             if (op == QNetworkAccessManager.PutOperation && !path.contains ("/uploads/")) {
                 // Not chunking
                 var file = getFilePathFromUrl (request.url ());
-                Q_ASSERT (testCases.contains (file));
+                //  Q_ASSERT (testCases.contains (file));
                 var testCase = testCases[file];
-                Q_ASSERT (!testCase.perform);
+                //  Q_ASSERT (!testCase.perform);
                 var putPayload = outgoingData.readAll ();
                 testCase.perform = [putPayload, request, fakeFolder] {
                     return FakePutReply.perform (fakeFolder.remoteModifier (), request, putPayload);
@@ -58,9 +58,9 @@ class TestAsyncOp : GLib.Object {
                 return new FakeAsyncReply ("/async-poll/" + file.toUtf8 (), op, request, fakeFolder.syncEngine ());
             } else if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
                 string file = getFilePathFromUrl (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
-                Q_ASSERT (testCases.contains (file));
+                //  Q_ASSERT (testCases.contains (file));
                 var testCase = testCases[file];
-                Q_ASSERT (!testCase.perform);
+                //  Q_ASSERT (!testCase.perform);
                 testCase.perform = [request, fakeFolder] {
                     return FakeChunkMoveReply.perform (fakeFolder.uploadState (), fakeFolder.remoteModifier (), request);
                 };
@@ -68,7 +68,7 @@ class TestAsyncOp : GLib.Object {
             } else if (op == QNetworkAccessManager.GetOperation) {
                 nGET++;
             }
-            return nullptr;
+            return null;
         });
 
         // Callback to be used to on_finalize the transaction and return the on_success
@@ -76,18 +76,18 @@ class TestAsyncOp : GLib.Object {
             tc.pollRequest = [] (TestCase *, QNetworkRequest &) . Soup.Reply * { std.on_abort (); }; // shall no longer be called
             FileInfo info = tc.perform ();
             GLib.ByteArray body = R" ({ "status":"on_finished", "ETag":"\")" + info.etag + R" (\"", "fileId":")" + info.fileId + "\"}\n";
-            return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, nullptr);
+            return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, null);
         };
         // Callback that never finishes
         var waitForeverCallback = [] (TestCase *, QNetworkRequest request) {
             GLib.ByteArray body = "{\"status\":\"started\"}\n";
-            return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, nullptr);
+            return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, null);
         };
         // Callback that simulate an error.
         var errorCallback = [] (TestCase tc, QNetworkRequest request) {
             tc.pollRequest = [] (TestCase *, QNetworkRequest &) . Soup.Reply * { std.on_abort (); }; // shall no longer be called;
             GLib.ByteArray body = "{\"status\":\"error\",\"errorCode\":500,\"errorMessage\":\"TestingErrors\"}\n";
-            return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, nullptr);
+            return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, null);
         };
         // This lambda takes another functor as a parameter, and returns a callback that will
         // tell the client needs to poll again, and further call to the poll url will call the
@@ -96,7 +96,7 @@ class TestAsyncOp : GLib.Object {
             return [chain] (TestCase tc, QNetworkRequest request) {
                 tc.pollRequest = chain;
                 GLib.ByteArray body = "{\"status\":\"started\"}\n";
-                return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, nullptr);
+                return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, null);
             };
         };
 
@@ -106,16 +106,16 @@ class TestAsyncOp : GLib.Object {
             testCases[file] = { std.move (cb) };
         };
         fakeFolder.localModifier ().mkdir ("on_success");
-        insertFile ("on_success/chunked_success", options._maxChunkSize * 3, successCallback);
+        insertFile ("on_success/chunked_success", options.maxChunkSize * 3, successCallback);
         insertFile ("on_success/single_success", 300, successCallback);
-        insertFile ("on_success/chunked_patience", options._maxChunkSize * 3,
+        insertFile ("on_success/chunked_patience", options.maxChunkSize * 3,
             waitAndChain (waitAndChain (successCallback)));
         insertFile ("on_success/single_patience", 300,
             waitAndChain (waitAndChain (successCallback)));
         fakeFolder.localModifier ().mkdir ("err");
-        insertFile ("err/chunked_error", options._maxChunkSize * 3, errorCallback);
+        insertFile ("err/chunked_error", options.maxChunkSize * 3, errorCallback);
         insertFile ("err/single_error", 300, errorCallback);
-        insertFile ("err/chunked_error2", options._maxChunkSize * 3, waitAndChain (errorCallback));
+        insertFile ("err/chunked_error2", options.maxChunkSize * 3, waitAndChain (errorCallback));
         insertFile ("err/single_error2", 300, waitAndChain (errorCallback));
 
         // First sync should finish by itself.
@@ -133,7 +133,7 @@ class TestAsyncOp : GLib.Object {
         fakeFolder.localModifier ().mkdir ("waiting");
         insertFile ("waiting/small", 300, waitForeverCallback);
         insertFile ("waiting/willNotConflict", 300, waitForeverCallback);
-        insertFile ("waiting/big", options._maxChunkSize * 3,
+        insertFile ("waiting/big", options.maxChunkSize * 3,
             waitAndChain (waitAndChain ([&] (TestCase tc, QNetworkRequest request) {
                 QTimer.singleShot (0, fakeFolder.syncEngine (), &SyncEngine.on_abort);
                 return waitAndChain (waitForeverCallback) (tc, request);
@@ -168,7 +168,7 @@ class TestAsyncOp : GLib.Object {
             var path = request.url ().path ();
             if (op == QNetworkAccessManager.GetOperation && path.startsWith ("/async-poll/")) {
                 var file = path.mid (sizeof ("/async-poll/") - 1);
-                Q_ASSERT (testCases.contains (file));
+                //  Q_ASSERT (testCases.contains (file));
                 var testCase = testCases[file];
                 return testCase.pollRequest (&testCase, request);
             } else if (op == QNetworkAccessManager.PutOperation) {
@@ -180,7 +180,7 @@ class TestAsyncOp : GLib.Object {
             } else if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
                 nMOVE++;
             }
-            return nullptr;
+            return null;
         });
 
         // This last sync will do the waiting stuff

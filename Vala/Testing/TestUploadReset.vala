@@ -4,9 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
-// #include <common/syncjournaldatabase.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
+//  #include <common/syncjournaldatabase.h>
 
 using namespace Occ;
 
@@ -23,12 +23,12 @@ class TestUploadReset : GLib.Object {
         GLib.DateTime modTime = GLib.DateTime.currentDateTime ();
         fakeFolder.localModifier ().setModTime ("A/a0", modTime);
 
-        // Create a transfer id, so we can make the final MOVE fail
+        // Create a transfer identifier, so we can make the final MOVE fail
         SyncJournalDb.UploadInfo uploadInfo;
-        uploadInfo._transferid = 1;
-        uploadInfo._valid = true;
-        uploadInfo._modtime = Utility.qDateTimeToTime_t (modTime);
-        uploadInfo._size = size;
+        uploadInfo.transferid = 1;
+        uploadInfo.valid = true;
+        uploadInfo.modtime = Utility.qDateTimeToTime_t (modTime);
+        uploadInfo.size = size;
         fakeFolder.syncEngine ().journal ().setUploadInfo ("A/a0", uploadInfo);
 
         fakeFolder.uploadState ().mkdir ("1");
@@ -37,30 +37,30 @@ class TestUploadReset : GLib.Object {
         QVERIFY (!fakeFolder.syncOnce ());
 
         uploadInfo = fakeFolder.syncEngine ().journal ().getUploadInfo ("A/a0");
-        QCOMPARE (uploadInfo._errorCount, 1);
-        QCOMPARE (uploadInfo._transferid, 1U);
+        QCOMPARE (uploadInfo.errorCount, 1);
+        QCOMPARE (uploadInfo.transferid, 1U);
 
         fakeFolder.syncEngine ().journal ().wipeErrorBlocklist ();
         QVERIFY (!fakeFolder.syncOnce ());
 
         uploadInfo = fakeFolder.syncEngine ().journal ().getUploadInfo ("A/a0");
-        QCOMPARE (uploadInfo._errorCount, 2);
-        QCOMPARE (uploadInfo._transferid, 1U);
+        QCOMPARE (uploadInfo.errorCount, 2);
+        QCOMPARE (uploadInfo.transferid, 1U);
 
         fakeFolder.syncEngine ().journal ().wipeErrorBlocklist ();
         QVERIFY (!fakeFolder.syncOnce ());
 
         uploadInfo = fakeFolder.syncEngine ().journal ().getUploadInfo ("A/a0");
-        QCOMPARE (uploadInfo._errorCount, 3);
-        QCOMPARE (uploadInfo._transferid, 1U);
+        QCOMPARE (uploadInfo.errorCount, 3);
+        QCOMPARE (uploadInfo.transferid, 1U);
 
         fakeFolder.syncEngine ().journal ().wipeErrorBlocklist ();
         QVERIFY (!fakeFolder.syncOnce ());
 
         uploadInfo = fakeFolder.syncEngine ().journal ().getUploadInfo ("A/a0");
-        QCOMPARE (uploadInfo._errorCount, 0);
-        QCOMPARE (uploadInfo._transferid, 0U);
-        QVERIFY (!uploadInfo._valid);
+        QCOMPARE (uploadInfo.errorCount, 0);
+        QCOMPARE (uploadInfo.transferid, 0U);
+        QVERIFY (!uploadInfo.valid);
     }
 }
 

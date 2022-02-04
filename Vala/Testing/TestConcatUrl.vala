@@ -4,14 +4,14 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
+//  #include <QtTest>
 
 
 using namespace Occ;
 
 using QueryItems = GLib.List<QPair<string, string>>;
 
-Q_DECLARE_METATYPE (QueryItems)
+// Q_DECLARE_METATYPE (QueryItems)
 
 static QueryItems make () {
     return QueryItems ();

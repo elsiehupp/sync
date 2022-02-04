@@ -4,9 +4,9 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #pragma once
+//  #pragma once
 
-// #include <QScopedPointer>
+//  #include <QScopedPointer>
 
 namespace Occ {
 
@@ -61,7 +61,6 @@ class Vfs_suffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public bool set_pin_state (string folder_path, PinState state) override {
         return set_pin_state_in_database (folder_path, state);
     }
@@ -75,7 +74,6 @@ class Vfs_suffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public AvailabilityResult availability (string folder_path) override;
 
 
@@ -107,8 +105,8 @@ class Vfs_suffix : Vfs {
         // files that were synced before vfs was enabled.
         QByte_array_list to_wipe;
         parameters.journal.get_files_below_path ("", [&to_wipe] (SyncJournalFileRecord record) {
-            if (!record.is_virtual_file () && record._path.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX))
-                to_wipe.append (record._path);
+            if (!record.is_virtual_file () && record.path.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX))
+                to_wipe.append (record.path);
         });
         for (var path : to_wipe)
             parameters.journal.delete_file_record (path);
@@ -134,12 +132,12 @@ class Vfs_suffix : Vfs {
     }
 
     Result<void, string> Vfs_suffix.create_placeholder (SyncFileItem item) {
-        if (item._modtime <= 0) {
+        if (item.modtime <= 0) {
             return {_("Error updating metadata due to invalid modified time")};
         }
 
         // The concrete shape of the placeholder is also used in is_dehydrated_placeholder () below
-        string fn = this.setup_params.filesystem_path + item._file;
+        string fn = this.setup_params.filesystem_path + item.file;
         if (!fn.ends_with (file_suffix ())) {
             ASSERT (false, "vfs file isn't ending with suffix");
             return string ("vfs file isn't ending with suffix");
@@ -147,7 +145,7 @@ class Vfs_suffix : Vfs {
 
         GLib.File file = new GLib.File (fn);
         if (file.exists () && file.size () > 1
-            && !FileSystem.verify_file_unchanged (fn, item._size, item._modtime)) {
+            && !FileSystem.verify_file_unchanged (fn, item.size, item.modtime)) {
             return string ("Cannot create a placeholder because a file with the placeholder name already exist");
         }
 
@@ -156,32 +154,32 @@ class Vfs_suffix : Vfs {
 
         file.write (" ");
         file.close ();
-        FileSystem.set_mod_time (fn, item._modtime);
+        FileSystem.set_mod_time (fn, item.modtime);
         return {};
     }
 
     Result<void, string> Vfs_suffix.dehydrate_placeholder (SyncFileItem item) {
         SyncFileItem virtual_item (item);
-        virtual_item._file = item._rename_target;
+        virtual_item.file = item.rename_target;
         var r = create_placeholder (virtual_item);
         if (!r)
             return r;
 
-        if (item._file != item._rename_target) { // can be the same when renaming foo . foo.owncloud to dehydrate
-            GLib.File.remove (this.setup_params.filesystem_path + item._file);
+        if (item.file != item.rename_target) { // can be the same when renaming foo . foo.owncloud to dehydrate
+            GLib.File.remove (this.setup_params.filesystem_path + item.file);
         }
 
         // Move the item's pin state
-        var pin = this.setup_params.journal.internal_pin_states ().raw_for_path (item._file.to_utf8 ());
+        var pin = this.setup_params.journal.internal_pin_states ().raw_for_path (item.file.to_utf8 ());
         if (pin && *pin != PinState.PinState.INHERITED) {
-            set_pin_state (item._rename_target, *pin);
-            set_pin_state (item._file, PinState.PinState.INHERITED);
+            set_pin_state (item.rename_target, *pin);
+            set_pin_state (item.file, PinState.PinState.INHERITED);
         }
 
         // Ensure the pin state isn't contradictory
-        pin = pin_state (item._rename_target);
+        pin = pin_state (item.rename_target);
         if (pin && *pin == PinState.PinState.ALWAYS_LOCAL)
-            set_pin_state (item._rename_target, PinState.PinState.UNSPECIFIED);
+            set_pin_state (item.rename_target, PinState.PinState.UNSPECIFIED);
         return {};
     }
 

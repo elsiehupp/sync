@@ -12,7 +12,7 @@ class FakeAsyncReply : FakeReply {
     ***********************************************************/
     public FakeAsyncReply (GLib.ByteArray pollLocation, QNetworkAccessManager.Operation op, QNetworkRequest request, GLib.Object parent)
         : FakeReply { parent }
-        , this.pollLocation (pollLocation) {
+        this.pollLocation (pollLocation) {
         setRequest (request);
         setUrl (request.url ());
         setOperation (op);

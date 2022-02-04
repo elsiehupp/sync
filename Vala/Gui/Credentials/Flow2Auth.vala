@@ -5,17 +5,17 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QDesktopServices>
-// #include <QApplication>
-// #include <QClipboard>
-// #include <QTimer>
-// #include <QBuffer>
-// #include <QJsonObject>
-// #include <QJsonDocument>
+//  #include <QDesktopServices>
+//  #include <QApplication>
+//  #include <QClipboard>
+//  #include <QTimer>
+//  #include <QBuffer>
+//  #include <QJsonObject>
+//  #include <QJsonDocument>
 
-// #pragma once
-// #include <QPointer>
-// #include <QTimer>
+//  #pragma once
+//  #include <QPointer>
+//  #include <QTimer>
 
 namespace Occ {
 
@@ -46,7 +46,6 @@ class Flow2Auth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public enum Result {
         NotSupported,
         LoggedIn,
@@ -114,9 +113,9 @@ signals:
 
     Flow2Auth.Flow2Auth (Account account, GLib.Object parent)
         : GLib.Object (parent)
-        , this.account (account)
-        , this.is_busy (false)
-        , this.has_token (false) {
+        this.account (account)
+        this.is_busy (false)
+        this.has_token (false) {
         this.poll_timer.set_interval (1000);
         GLib.Object.connect (&this.poll_timer, &QTimer.timeout, this, &Flow2Auth.on_poll_timer_timeout);
     }
@@ -219,9 +218,9 @@ signals:
             this.poll_endpoint = poll_endpoint;
 
             // Start polling
-            ConfigFile cfg;
-            std.chrono.milliseconds polltime = cfg.remote_poll_interval ();
-            q_c_info (lc_flow2auth) << "setting remote poll timer interval to" << polltime.count () << "msec";
+            ConfigFile config;
+            std.chrono.milliseconds polltime = config.remote_poll_interval ();
+            GLib.Info (lc_flow2auth) << "setting remote poll timer interval to" << polltime.count () << "msec";
             this.seconds_interval = (polltime.count () / 1000);
             this.seconds_left = this.seconds_interval;
             /* emit */ status_changed (PollStatus.status_poll_countdown, this.seconds_left);
@@ -329,7 +328,7 @@ signals:
             this.poll_timer.stop ();
 
             // Success
-            q_c_info (lc_flow2auth) << "Success getting the app_password for user : " << login_name << ", server : " << server_url.to_string ();
+            GLib.Info (lc_flow2auth) << "Success getting the app_password for user : " << login_name << ", server : " << server_url.to_string ();
 
             this.account.set_url (server_url);
 

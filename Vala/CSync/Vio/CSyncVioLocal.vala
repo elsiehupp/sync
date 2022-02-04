@@ -65,17 +65,17 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
-// #include <cerrno>
-// #include <sys/types.h>
-// #include <sys/stat.h>
-// #include <fcntl.h>
-// #include <dirent.h>
-// #include <cstdio>
-
-// #include <memory>
-
-// #include <QtCore/QLoggingCategory>
-// #include <QtCore/GLib.File>
+//  #include <cerrno>
+//  #include <sys/types.h>
+//  #include <sys/stat.h>
+//  #include <fcntl.h>
+//  #include <dirent.h>
+//  #include <cstdio>
+//  #include
+//  #include <memory>
+//  #include
+//  #include <QtCore/QLoggingCategory>
+//  #include <QtCore/GLib.File>
 
 
 /***********************************************************
@@ -96,7 +96,7 @@ csync_vio_handle_t csync_vio_local_opendir (string name) {
 
     handle.dh = this.topendir (dirname.const_data ());
     if (!handle.dh) {
-        return nullptr;
+        return null;
     }
 
     handle.path = dirname;
@@ -104,7 +104,7 @@ csync_vio_handle_t csync_vio_local_opendir (string name) {
 }
 
 int csync_vio_local_closedir (csync_vio_handle_t dhandle) {
-    Q_ASSERT (dhandle);
+    //  Q_ASSERT (dhandle);
     var rc = this.tclosedir (dhandle.dh);
     delete dhandle;
     return rc;
@@ -112,7 +112,7 @@ int csync_vio_local_closedir (csync_vio_handle_t dhandle) {
 
 std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t handle, Occ.Vfs vfs) {
 
-  struct this.tdirent dirent = nullptr;
+  struct this.tdirent dirent = null;
   std.unique_ptr<csync_file_stat_t> file_stat;
 
   do {

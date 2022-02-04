@@ -17,7 +17,7 @@ class Share_user_line : Gtk.Widget {
         unowned<User_group_share> Share,
         Share_permissions max_sharing_permissions,
         bool is_file,
-        Gtk.Widget parent = nullptr);
+        Gtk.Widget parent = null);
     ~Share_user_line () override;
 
     /***********************************************************
@@ -155,12 +155,12 @@ signals:
     Share_user_line.Share_user_line (AccountPointer account, unowned<User_group_share> share,
         Share_permissions max_sharing_permissions, bool is_file, Gtk.Widget parent)
         : Gtk.Widget (parent)
-        , this.ui (new Ui.Share_user_line)
-        , this.account (account)
-        , this.share (share)
-        , this.is_file (is_file)
-        , this.profile_page_menu (account, share.get_share_with ().share_with ()) {
-        Q_ASSERT (this.share);
+        this.ui (new Ui.Share_user_line)
+        this.account (account)
+        this.share (share)
+        this.is_file (is_file)
+        this.profile_page_menu (account, share.get_share_with ().share_with ()) {
+        //  Q_ASSERT (this.share);
         this.ui.setup_ui (this);
 
         this.ui.shared_with.set_elide_mode (Qt.Elide_right);
@@ -636,7 +636,7 @@ signals:
 
         const var calculate_background_based_on_text = [this] () {
             const var hash = QCryptographicHash.hash (this.ui.shared_with.text ().to_utf8 (), QCryptographicHash.Md5);
-            Q_ASSERT (hash.size () > 0);
+            //  Q_ASSERT (hash.size () > 0);
             if (hash.size () == 0) {
                 GLib.warn (lc_sharing) << "Failed to calculate hash color for share:" << this.share.path ();
                 return Gtk.Color{};

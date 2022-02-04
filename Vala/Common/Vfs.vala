@@ -5,16 +5,16 @@ Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QPluginLoader>
-// #include <QLoggingCategory>
-// #pragma once
-// #include <QScopedPointer>
-// #include <memory>
+//  #include <QPluginLoader>
+//  #include <QLoggingCategory>
+//  #includeonce
+//  #include <QScopedPointer>
+//  #include <memory>
 
 namespace Occ {
 
 using csync_file_stat_t = struct csync_file_stat_s;
-using AccountPointer = unowned<Account>;
+class AccountPointer : unowned<Account>;
 
 
 /***********************************************************
@@ -53,6 +53,7 @@ class Vfs : GLib.Object {
         Ok,
         Locked
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -164,7 +165,7 @@ class Vfs : GLib.Object {
     The plugin-specific work is done in start_impl ().
     ***********************************************************/
     public void on_start (VfsSetupParams parameters) {
-        this._setup_params = parameters;
+        this.setup_params = parameters;
         start_impl (parameters);
     }
 

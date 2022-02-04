@@ -5,38 +5,25 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+
 /***********************************************************
 @brief The RequestEtagJob class
 ***********************************************************/
 class RequestEtagJob : AbstractNetworkJob {
 
-    /***********************************************************
-    ***********************************************************/
-    public RequestEtagJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
+    signal void on_etag_retrieved (GLib.ByteArray etag, GLib.DateTime time);
+    signal void finished_with_result (HttpResult<GLib.ByteArray> etag);
 
     /***********************************************************
     ***********************************************************/
-    public 
-    public void on_start () override;
-
-signals:
-    void on_etag_retrieved (GLib.ByteArray etag, GLib.DateTime time);
-    void finished_with_result (HttpResult<GLib.ByteArray> etag);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private on_ bool on_finished () override;
-
-
-
-
-
-    RequestEtagJob.RequestEtagJob (AccountPointer account, string path, GLib.Object parent)
-        : AbstractNetworkJob (account, path, parent) {
+    public RequestEtagJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+        base (account, path, parent);
     }
 
-    void RequestEtagJob.on_start () {
+    /***********************************************************
+    ***********************************************************/
+    public void on_start () {
         Soup.Request req;
         req.set_raw_header ("Depth", "0");
 
@@ -58,9 +45,12 @@ signals:
         AbstractNetworkJob.on_start ();
     }
 
-    bool RequestEtagJob.on_finished () {
-        q_c_info (lc_etag_job) << "Request Etag of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                        <<  reply_status_"";
+
+    /***********************************************************
+    ***********************************************************/
+    private bool on_finished () {
+        GLib.Info (lc_etag_job) << "Request Etag of" << reply ().request ().url () << "FINISHED WITH STATUS"
+                        <<  reply_status_string ();
 
         var http_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (http_code == 207) {
@@ -92,4 +82,7 @@ signals:
         }
         return true;
     }
-};
+
+} // class RequestEtagJob
+
+} // namespace Occ

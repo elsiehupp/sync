@@ -4,16 +4,16 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <theme.h>
-// #include <creds/credentialsfactory.h>
-// #include <creds/abstractcredentials.h>
-// #include <cookiejar.h>
-// #include <QSettings>
-// #include <QDir>
-// #include <QNetworkAccessManager>
-// #include <QMessageBox>
+//  #include <theme.h>
+//  #include <creds/credentialsfactory.h>
+//  #include <creds/abstractcredentials.h>
+//  #include <cookiejar.h>
+//  #include <QSettings>
+//  #include <QDir>
+//  #include <QNetworkAccessManager>
+//  #include <QMessageBox>
 
-// #pragma once
+//  #pragma once
 
 namespace Occ {
 
@@ -79,14 +79,14 @@ class AccountManager : GLib.Object {
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
         settings.set_value (QLatin1String (VERSION_C), max_accounts_version);
         for (var acc : q_as_const (this.accounts)) {
-            settings.begin_group (acc.account ().id ());
+            settings.begin_group (acc.account ().identifier ());
             save_account_helper (acc.account ().data (), *settings, save_credentials);
             acc.write_to_settings (*settings);
             settings.end_group ();
         }
 
         settings.sync ();
-        q_c_info (lc_account_manager) << "Saved all account settings, status:" << settings.status ();
+        GLib.Info (lc_account_manager) << "Saved all account settings, status:" << settings.status ();
     }
 
 
@@ -124,9 +124,9 @@ class AccountManager : GLib.Object {
             settings.begin_group (account_id);
             if (!skip_settings_keys.contains (settings.group ())) {
                 if (var acc = load_account_helper (*settings)) {
-                    acc._id = account_id;
+                    acc.id = account_id;
                     if (var acc_state = AccountState.load_from_settings (acc, *settings)) {
-                        var jar = qobject_cast<CookieJar> (acc._am.cookie_jar ());
+                        var jar = qobject_cast<CookieJar> (acc.am.cookie_jar ());
                         ASSERT (jar);
                         if (jar)
                             jar.restore (acc.cookie_jar_path ());
@@ -134,7 +134,7 @@ class AccountManager : GLib.Object {
                     }
                 }
             } else {
-                q_c_info (lc_account_manager) << "Account" << account_id << "is too new, ignoring";
+                GLib.Info (lc_account_manager) << "Account" << account_id << "is too new, ignoring";
                 this.additional_blocked_account_ids.insert (account_id);
             }
             settings.end_group ();
@@ -149,11 +149,11 @@ class AccountManager : GLib.Object {
     Typically called from the wizard
     ***********************************************************/
     public AccountState add_account (AccountPointer new_account) {
-        var id = new_account.id ();
-        if (id.is_empty () || !is_account_id_available (id)) {
-            id = generate_free_account_id ();
+        var identifier = new_account.identifier ();
+        if (identifier.is_empty () || !is_account_id_available (identifier)) {
+            identifier = generate_free_account_id ();
         }
-        new_account._id = id;
+        new_account.id = identifier;
 
         var new_account_state = new AccountState (new_account);
         add_account_state (new_account_state);
@@ -203,7 +203,7 @@ class AccountManager : GLib.Object {
         GLib.File.remove (account.account ().cookie_jar_path ());
 
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
-        settings.remove (account.account ().id ());
+        settings.remove (account.account ().identifier ());
 
         // Forget E2E keys
         account.account ().e2e ().forget_sensitive_data (account.account ());
@@ -254,44 +254,44 @@ class AccountManager : GLib.Object {
     // saving and loading Account to settings
     private void save_account_helper (Account account, QSettings settings, bool save_credentials = true) {
         settings.set_value (QLatin1String (VERSION_C), max_account_version);
-        settings.set_value (QLatin1String (URL_C), acc._url.to_string ());
-        settings.set_value (QLatin1String (DAV_USER_C), acc._dav_user);
-        settings.set_value (QLatin1String (SERVER_VERSION_C), acc._server_version);
-        if (acc._credentials) {
+        settings.set_value (QLatin1String (URL_C), acc.url.to_string ());
+        settings.set_value (QLatin1String (DAV_USER_C), acc.dav_user);
+        settings.set_value (QLatin1String (SERVER_VERSION_C), acc.server_version);
+        if (acc.credentials) {
             if (save_credentials) {
                 // Only persist the credentials if the parameter is set, on migration from 1.8.x
                 // we want to save the accounts but not overwrite the credentials
                 // (This is easier than asynchronously fetching the credentials from keychain and then
                 // re-persisting them)
-                acc._credentials.persist ();
+                acc.credentials.persist ();
             }
-            for (var key : acc._settings_map.keys ()) {
-                settings.set_value (key, acc._settings_map.value (key));
+            for (var key : acc.settings_map.keys ()) {
+                settings.set_value (key, acc.settings_map.value (key));
             }
-            settings.set_value (QLatin1String (AUTH_TYPE_C), acc._credentials.auth_type ());
+            settings.set_value (QLatin1String (AUTH_TYPE_C), acc.credentials.auth_type ());
 
             // HACK : Save http_user also as user
-            if (acc._settings_map.contains (HTTP_USER_C))
-                settings.set_value (USER_C, acc._settings_map.value (HTTP_USER_C));
+            if (acc.settings_map.contains (HTTP_USER_C))
+                settings.set_value (USER_C, acc.settings_map.value (HTTP_USER_C));
         }
 
         // Save accepted certificates.
         settings.begin_group (QLatin1String ("General"));
-        q_c_info (lc_account_manager) << "Saving " << acc.approved_certs ().count () << " unknown certs.";
-        GLib.ByteArray certs;
-        foreach (var cert in acc.approved_certs ()) {
-            certs += cert.to_pem () + '\n';
+        GLib.Info (lc_account_manager) << "Saving " << acc.approved_certificates ().count () << " unknown certificates.";
+        GLib.ByteArray certificates;
+        foreach (var cert in acc.approved_certificates ()) {
+            certificates += cert.to_pem () + '\n';
         }
-        if (!certs.is_empty ()) {
-            settings.set_value (QLatin1String (CA_CERTS_KEY_C), certs);
+        if (!certificates.is_empty ()) {
+            settings.set_value (QLatin1String (CA_CERTS_KEY_C), certificates);
         }
         settings.end_group ();
 
         // Save cookies.
-        if (acc._am) {
-            var jar = qobject_cast<CookieJar> (acc._am.cookie_jar ());
+        if (acc.am) {
+            var jar = qobject_cast<CookieJar> (acc.am.cookie_jar ());
             if (jar) {
-                q_c_info (lc_account_manager) << "Saving cookies." << acc.cookie_jar_path ();
+                GLib.Info (lc_account_manager) << "Saving cookies." << acc.cookie_jar_path ();
                 if (!jar.save (acc.cookie_jar_path ())) {
                     GLib.warn (lc_account_manager) << "Failed to save cookies to" << acc.cookie_jar_path ();
                 }
@@ -349,27 +349,27 @@ class AccountManager : GLib.Object {
             }
         }
 
-        q_c_info (lc_account_manager) << "Account for" << acc.url () << "using auth type" << auth_type;
+        GLib.Info (lc_account_manager) << "Account for" << acc.url () << "using auth type" << auth_type;
 
-        acc._server_version = settings.value (QLatin1String (SERVER_VERSION_C)).to_string ();
-        acc._dav_user = settings.value (QLatin1String (DAV_USER_C), "").to_string ();
+        acc.server_version = settings.value (QLatin1String (SERVER_VERSION_C)).to_string ();
+        acc.dav_user = settings.value (QLatin1String (DAV_USER_C), "").to_string ();
 
         // We want to only restore settings for that auth type and the user value
-        acc._settings_map.insert (QLatin1String (USER_C), settings.value (USER_C));
+        acc.settings_map.insert (QLatin1String (USER_C), settings.value (USER_C));
         string auth_type_prefix = auth_type + "this.";
         foreach (var key in settings.child_keys ()) {
             if (!key.starts_with (auth_type_prefix))
                 continue;
-            acc._settings_map.insert (key, settings.value (key));
+            acc.settings_map.insert (key, settings.value (key));
         }
 
         acc.set_credentials (CredentialsFactory.create (auth_type));
 
         // now the server cert, it is in the general group
         settings.begin_group (QLatin1String ("General"));
-        const var certs = QSslCertificate.from_data (settings.value (CA_CERTS_KEY_C).to_byte_array ());
-        q_c_info (lc_account_manager) << "Restored : " << certs.count () << " unknown certs.";
-        acc.set_approved_certs (certs);
+        const var certificates = QSslCertificate.from_data (settings.value (CA_CERTS_KEY_C).to_byte_array ());
+        GLib.Info (lc_account_manager) << "Restored : " << certificates.count () << " unknown certificates.";
+        acc.set_approved_certificates (certificates);
         settings.end_group ();
 
         return acc;
@@ -379,7 +379,7 @@ class AccountManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool restore_from_legacy_settings () {
-        q_c_info (lc_account_manager) << "Migrate : restore_from_legacy_settings, checking settings group"
+        GLib.Info (lc_account_manager) << "Migrate : restore_from_legacy_settings, checking settings group"
                                  << Theme.instance ().app_name ();
 
         // try to open the correctly themed settings
@@ -390,12 +390,12 @@ class AccountManager : GLib.Object {
         if (settings.child_keys ().is_empty ()) {
             // Now try to open the original own_cloud settings to see if they exist.
             string o_c_cfg_file = QDir.from_native_separators (settings.filename ());
-            // replace the last two segments with own_cloud/owncloud.cfg
+            // replace the last two segments with own_cloud/owncloud.config
             o_c_cfg_file = o_c_cfg_file.left (o_c_cfg_file.last_index_of ('/'));
             o_c_cfg_file = o_c_cfg_file.left (o_c_cfg_file.last_index_of ('/'));
-            o_c_cfg_file += QLatin1String ("/own_cloud/owncloud.cfg");
+            o_c_cfg_file += QLatin1String ("/own_cloud/owncloud.config");
 
-            q_c_info (lc_account_manager) << "Migrate : checking old config " << o_c_cfg_file;
+            GLib.Info (lc_account_manager) << "Migrate : checking old config " << o_c_cfg_file;
 
             QFileInfo fi (o_c_cfg_file);
             if (fi.is_readable ()) {
@@ -415,7 +415,7 @@ class AccountManager : GLib.Object {
 
                     // in case the urls are equal reset the settings object to read from
                     // the own_cloud settings object
-                    q_c_info (lc_account_manager) << "Migrate o_c config if " << o_c_url << " == " << override_url << ":"
+                    GLib.Info (lc_account_manager) << "Migrate o_c config if " << o_c_url << " == " << override_url << ":"
                                              << (o_c_url == override_url ? "Yes" : "No");
                     if (o_c_url == override_url) {
                         settings = std.move (o_c_settings);
@@ -437,7 +437,7 @@ class AccountManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private bool is_account_id_available (string id);
+    private bool is_account_id_available (string identifier);
 
     /***********************************************************
     ***********************************************************/
@@ -453,7 +453,7 @@ class AccountManager : GLib.Object {
     public void on_save_account (Account a) {
         GLib.debug (lc_account_manager) << "Saving account" << a.url ().to_string ();
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
-        settings.begin_group (a.id ());
+        settings.begin_group (a.identifier ());
         save_account_helper (a, *settings, false); // don't save credentials they might not have been loaded yet
         settings.end_group ();
 
@@ -466,7 +466,7 @@ class AccountManager : GLib.Object {
     public void on_save_account_state (AccountState a) {
         GLib.debug (lc_account_manager) << "Saving account state" << a.account ().url ().to_string ();
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
-        settings.begin_group (a.account ().id ());
+        settings.begin_group (a.account ().identifier ());
         a.write_to_settings (*settings);
         settings.end_group ();
 
@@ -475,7 +475,7 @@ class AccountManager : GLib.Object {
     }
 
     /// Display a Box with the mnemonic so the user can copy it to a safe place.
-    public static void on_display_mnemonic (string& mnemonic);
+    public static void on_display_mnemonic (string mnemonic);
 
 
 }
@@ -495,7 +495,7 @@ class AccountManager : GLib.Object {
 
 
 
-    void AccountManager.on_display_mnemonic (string& mnemonic) {
+    void AccountManager.on_display_mnemonic (string mnemonic) {
         var widget = new Gtk.Dialog;
         Ui_Dialog ui;
         ui.setup_ui (widget);
@@ -524,21 +524,21 @@ class AccountManager : GLib.Object {
          return this.accounts;
     }
 
-    bool AccountManager.is_account_id_available (string id) {
-        if (this.additional_blocked_account_ids.contains (id))
+    bool AccountManager.is_account_id_available (string identifier) {
+        if (this.additional_blocked_account_ids.contains (identifier))
             return false;
 
-        return std.none_of (this.accounts.cbegin (), this.accounts.cend (), [id] (var acc) {
-            return acc.account ().id () == id;
+        return std.none_of (this.accounts.cbegin (), this.accounts.cend (), [identifier] (var acc) {
+            return acc.account ().identifier () == identifier;
         });
     }
 
     string AccountManager.generate_free_account_id () {
         int i = 0;
         forever {
-            string id = string.number (i);
-            if (is_account_id_available (id)) {
-                return id;
+            string identifier = string.number (i);
+            if (is_account_id_available (identifier)) {
+                return identifier;
             }
             ++i;
         }

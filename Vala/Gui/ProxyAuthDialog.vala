@@ -4,7 +4,7 @@ Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <Gtk.Dialog>
+//  #include <Gtk.Dialog>
 
 namespace Occ {
 
@@ -21,7 +21,7 @@ class Proxy_auth_dialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public Proxy_auth_dialog (Gtk.Widget parent = nullptr);
+    public Proxy_auth_dialog (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/

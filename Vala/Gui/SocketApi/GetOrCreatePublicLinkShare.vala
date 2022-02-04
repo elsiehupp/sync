@@ -16,9 +16,9 @@ class Get_or_create_public_link_share : GLib.Object {
     public Get_or_create_public_link_share (AccountPointer account, string local_file,
         GLib.Object parent)
         : GLib.Object (parent)
-        , this.account (account)
-        , this.share_manager (account)
-        , this.local_file (local_file) {
+        this.account (account)
+        this.share_manager (account)
+        this.local_file (local_file) {
         connect (&this.share_manager, &Share_manager.on_shares_fetched,
             this, &Get_or_create_public_link_share.on_shares_fetched);
         connect (&this.share_manager, &Share_manager.on_link_share_created,
@@ -73,7 +73,7 @@ class Get_or_create_public_link_share : GLib.Object {
     ***********************************************************/
     private void on_password_required () {
         bool ok = false;
-        string password = QInputDialog.get_text (nullptr,
+        string password = QInputDialog.get_text (null,
                                                  _("Password for share required"),
                                                  _("Please enter a password for your link share:"),
                                                  QLineEdit.Normal,
@@ -93,7 +93,7 @@ class Get_or_create_public_link_share : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_link_share_requires_password (string message) {
-        q_c_info (lc_public_link) << "Could not create link share:" << message;
+        GLib.Info (lc_public_link) << "Could not create link share:" << message;
         /* emit */ error (message);
         delete_later ();
     }
@@ -104,7 +104,7 @@ class Get_or_create_public_link_share : GLib.Object {
     private void on_server_error (int code, string message) {
         GLib.warn (lc_public_link) << "Share fetch/create error" << code << message;
         QMessageBox.warning (
-            nullptr,
+            null,
             _("Sharing error"),
             _("Could not retrieve or create the public link share. Error:\n\n%1").arg (message),
             QMessageBox.Ok,

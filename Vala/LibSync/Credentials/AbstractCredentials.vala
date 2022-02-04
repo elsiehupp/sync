@@ -5,21 +5,46 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
-// #include <QCoreApplication>
-
+//  #include <QLoggingCategory>
+//  #include <QCoreApplication>
 
 using CSync;
 
 namespace Occ {
 
-
 class AbstractCredentials : GLib.Object {
+
+    protected Account account = null;
+    protected bool was_fetched = false;
+
+
+    /***********************************************************
+    Emitted when fetch_from_keychain () is done.
+
+    Note that ready () can be true or false, depending on
+    whether there was useful data in the keychain.
+    ***********************************************************/
+    signal void fetched ();
+
+
+    /***********************************************************
+    Emitted when ask_from_user () is done.
+
+    Note that ready () can be true or false, depending on
+    whether the user provided data or not.
+    ***********************************************************/
+    signal void asked ();
+
 
     /***********************************************************
     ***********************************************************/
     public AbstractCredentials ();
-    // No need for virtual destructor - GLib.Object already has one.
+    AbstractCredentials.AbstractCredentials () = default;
+
+
+    /***********************************************************
+    No need for virtual destructor - GLib.Object already has one.
+    ***********************************************************/
 
     /***********************************************************
     The bound account for the credentials instance.
@@ -28,18 +53,35 @@ class AbstractCredentials : GLib.Object {
     Calling Account.set_credentials () will call this function.
     Credentials only live as long as the underlying account object.
     ***********************************************************/
-    public virtual void set_account (Account account);
+    public virtual void set_account (Account account) {
+        ENFORCE (!this.account, "should only set_account once");
+        this.account = account;
+    }
+
 
     /***********************************************************
     ***********************************************************/
     public virtual string auth_type ();
-    public virtual string user ();
-    public virtual string password ();
-    public virtual QNetworkAccessManager create_qNAM ();
 
 
     /***********************************************************
-    Whether there are credentials that can be used for a connection attempt.
+    ***********************************************************/
+    public virtual string user ();
+
+
+    /***********************************************************
+    ***********************************************************/
+    public virtual string password ();
+
+
+    /***********************************************************
+    ***********************************************************/
+    public virtual QNetworkAccessManager create_qnam ();
+
+
+    /***********************************************************
+    Whether there are credentials that can be used for a
+    connection attempt.
     ***********************************************************/
     public virtual bool ready ();
 
@@ -55,7 +97,8 @@ class AbstractCredentials : GLib.Object {
     /***********************************************************
     Trigger (async) fetching of credential information
 
-    Should set this.was_fetched = true, and later emit fetched () when done.
+    Should set this.was_fetched = true, and later emit
+    fetched () when done.
     ***********************************************************/
     public virtual void fetch_from_keychain ();
 
@@ -67,14 +110,20 @@ class AbstractCredentials : GLib.Object {
     ***********************************************************/
     public virtual void ask_from_user ();
 
+
     /***********************************************************
     ***********************************************************/
     public virtual bool still_valid (Soup.Reply reply);
+
+
+    /***********************************************************
+    ***********************************************************/
     public virtual void persist ();
 
 
     /***********************************************************
-    Invalidates token used to authorize requests, it will no longer be used.
+    Invalidates token used to authorize requests, it will no
+    longer be used.
 
     For http auth, this would be the session cookie.
 
@@ -95,50 +144,10 @@ class AbstractCredentials : GLib.Object {
     ***********************************************************/
     public virtual void forget_sensitive_data ();
 
-    /***********************************************************
-    ***********************************************************/
-    public static string keychain_key (string url, string user, string account_id);
-
 
     /***********************************************************
-    If the job need to be restarted or queue, this does it and returns true.
     ***********************************************************/
-    public virtual bool retry_if_needed (AbstractNetworkJob *) {
-        return false;
-    }
-
-signals:
-    /***********************************************************
-    Emitted when fetch_from_keychain () is done.
-
-    Note that ready () can be true or false, depending on whether there was useful
-    data in the keychain.
-    ***********************************************************/
-    void fetched ();
-
-
-    /***********************************************************
-    Emitted when ask_from_user () is done.
-
-    Note that ready () can be true or false, depending on whether the user provided
-    data or not.
-    ***********************************************************/
-    void asked ();
-
-
-    protected Account this.account = nullptr;
-    protected bool this.was_fetched = false;
-}
-
-
-    AbstractCredentials.AbstractCredentials () = default;
-
-    void AbstractCredentials.set_account (Account account) {
-        ENFORCE (!this.account, "should only set_account once");
-        this.account = account;
-    }
-
-    string AbstractCredentials.keychain_key (string url, string user, string account_id) {
+    public static string keychain_key (string url, string user, string account_id) {
         string u (url);
         if (u.is_empty ()) {
             GLib.warn (lc_credentials) << "Empty url in key_chain, error!";
@@ -159,5 +168,16 @@ signals:
         }
         return key;
     }
-    } // namespace Occ
+
+
+    /***********************************************************
+    If the job need to be restarted or queue, this does it and returns true.
+    ***********************************************************/
+    public virtual bool retry_if_needed (AbstractNetworkJob *) {
+        return false;
+    }
+
+} // class AbstractCredentials
+
+} // namespace Occ
     

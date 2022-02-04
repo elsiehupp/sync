@@ -60,9 +60,9 @@ signals:
 
     Owncloud_http_creds_page.Owncloud_http_creds_page (Gtk.Widget parent)
         : Abstract_credentials_wizard_page ()
-        , this.ui ()
-        , this.connected (false)
-        , this.progress_indi (new QProgress_indicator (this)) {
+        this.ui ()
+        this.connected (false)
+        this.progress_indi (new QProgress_indicator (this)) {
         this.ui.setup_ui (this);
 
         if (parent) {
@@ -115,8 +115,8 @@ signals:
         WizardCommon.init_error_label (this.ui.error_label);
 
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-        AbstractCredentials cred = oc_wizard.account ().credentials ();
-        var http_creds = qobject_cast<HttpCredentials> (cred);
+        AbstractCredentials credentials = oc_wizard.account ().credentials ();
+        var http_creds = qobject_cast<HttpCredentials> (credentials);
         if (http_creds) {
             const string user = http_creds.fetch_user ();
             if (!user.is_empty ()) {
@@ -213,7 +213,7 @@ signals:
     }
 
     AbstractCredentials *Owncloud_http_creds_page.get_credentials () {
-        return new HttpCredentialsGui (this.ui.le_username.text (), this.ui.le_password.text (), this.oc_wizard._client_cert_bundle, this.oc_wizard._client_cert_password);
+        return new HttpCredentialsGui (this.ui.le_username.text (), this.ui.le_password.text (), this.oc_wizard.client_cert_bundle, this.oc_wizard.client_cert_password);
     }
 
     void Owncloud_http_creds_page.on_style_changed () {

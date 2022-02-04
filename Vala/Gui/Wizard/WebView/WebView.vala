@@ -1,21 +1,21 @@
 
 
-// #include <Gtk.Widget>
-// #include <QWeb_engine_page>
-// #include <QWeb_engine_profile>
-// #include <QWeb_engine_url_request_interceptor>
-// #include <QWeb_engine_url_request_job>
-//  #if QT_VERSION >= 0x051200
-// #include <QWeb_engine_url_scheme>
-//  #endif
-// #include <QWeb_engine_url_scheme_handler>
-// #include <QWeb_engine_view>
-// #include <QDesktopServices>
-// #include <QProgressBar>
-// #include <QLoggingCategory>
-// #include <QLocale>
-// #include <QWeb_engine_certificate_error>
-// #include <QMessageBox>
+//  #include <Gtk.Widget>
+//  #include <QWeb_engine_page>
+//  #include <QWeb_engine_profile>
+//  #include <QWeb_engine_url_request_interceptor>
+//  #include <QWeb_engine_url_request_job>
+//  #includeVERSION >= 0x051200
+//  #include <QWeb_engine_url_scheme>
+//  #include
+//  #include <QWeb_engine_url_s
+//  #include <QWeb_engine_v
+//  #include <QDesktopServices>
+//  #include <QProgres
+//  #include <QLoggingCategory>
+//  #include <QLocale>
+//  #include <QWeb_engine_certificate_error>
+//  #include <QMessageBox>
 
 
 namespace Occ {
@@ -25,7 +25,7 @@ class WebView : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public WebView (Gtk.Widget parent = nullptr);
+    public WebView (Gtk.Widget parent = null);
     ~WebView () override;
     public void set_url (GLib.Uri url);
 

@@ -17,10 +17,10 @@
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA               *
  ******************************************************************************/
 
-// #pragma once
-// #include <QBasicTimer>
-// #include <QLocalSocket>
-// #include <QRegularExpression>
+//  #pragma once
+//  #include <QBasicTimer>
+//  #include <QLocalSocket>
+//  #include <QRegularExpression>
 
 class OWNCLOUDDOLPHINPLUGINHELPER_EXPORT OwncloudDolphinPluginHelper : GLib.Object {
 
@@ -58,7 +58,6 @@ class OWNCLOUDDOLPHINPLUGINHELPER_EXPORT OwncloudDolphinPluginHelper : GLib.Obje
 
     /***********************************************************
     ***********************************************************/
-    public 
     public string contextMenuIconName () {
         return this.strings.value ("CONTEXT_MENU_ICON", APPLICATION_ICON_NAME);
     }
@@ -120,9 +119,9 @@ signals:
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA               *
  ******************************************************************************/
 
-// #include <QtNetwork/QLocalSocket>
-// #include <qcoreevent.h>
-// #include <QStandardPaths>
+//  #include <QtNetwork/QLocalSocket>
+//  #include <qcoreevent.h>
+//  #include <QStandardPaths>
 
 OwncloudDolphinPluginHelper* OwncloudDolphinPluginHelper.instance () {
     static OwncloudDolphinPluginHelper self;

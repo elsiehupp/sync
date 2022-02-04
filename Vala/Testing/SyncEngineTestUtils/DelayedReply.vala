@@ -8,7 +8,7 @@ class DelayedReply : OriginalReply {
     public template <typename... Args>
     public DelayedReply (uint64 delayMS, Args &&... args)
         : OriginalReply (std.forward<Args> (args)...)
-        , this.delayMs (delayMS) {
+        this.delayMs (delayMS) {
     }
 
 

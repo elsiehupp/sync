@@ -4,9 +4,9 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
+//  #include <QLoggingCategory>
 
-// #pragma once
+//  #pragma once
 
 namespace Occ {
 
@@ -17,48 +17,35 @@ namespace Occ {
 class DeleteJob : AbstractNetworkJob {
 
     /***********************************************************
+    Only used if the constructor taking a url is taken.
     ***********************************************************/
-    public DeleteJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
+    private GLib.Uri url;
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public bool on_finished () override;
-
-    /***********************************************************
-    ***********************************************************/
-    public GLib.ByteArray folder_token ();
+    private GLib.ByteArray folder_token;
 
 
-    public void set_folder_token (GLib.ByteArray folder_token);
-
-signals:
-    void finished_signal ();
+    signal void finished_signal ();
 
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Uri this.url; // Only used if the constructor taking a url is taken.
-    private GLib.ByteArray this.folder_token;
-}
-
-    DeleteJob.DeleteJob (AccountPointer account, string path, GLib.Object parent)
-        : AbstractNetworkJob (account, path, parent) {
+    public DeleteJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+        base (account, path, parent);
     }
 
-    DeleteJob.DeleteJob (AccountPointer account, GLib.Uri url, GLib.Object parent)
-        : AbstractNetworkJob (account, "", parent)
-        , this.url (url) {
+    /***********************************************************
+    ***********************************************************/
+    public DeleteJob (AccountPointer account, GLib.Uri url, GLib.Object parent)
+        base (account, "", parent);
+        this.url = url;
     }
 
-    void DeleteJob.on_start () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_start () {
         Soup.Request req;
         if (!this.folder_token.is_empty ()) {
             req.set_raw_header ("e2e-token", this.folder_token);
@@ -76,21 +63,30 @@ signals:
         AbstractNetworkJob.on_start ();
     }
 
-    bool DeleteJob.on_finished () {
-        q_c_info (lc_delete_job) << "DELETE of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                           << reply_status_"";
+
+    /***********************************************************
+    ***********************************************************/
+    public bool on_finished () {
+        GLib.Info (lc_delete_job) << "DELETE of" << reply ().request ().url () << "FINISHED WITH STATUS"
+                           << reply_status_string ();
 
         /* emit */ finished_signal ();
         return true;
     }
 
-    GLib.ByteArray DeleteJob.folder_token () {
+
+    /***********************************************************
+    ***********************************************************/
+    public GLib.ByteArray folder_token () {
         return this.folder_token;
     }
 
-    void DeleteJob.set_folder_token (GLib.ByteArray folder_token) {
+
+    public void set_folder_token (GLib.ByteArray folder_token) {
         this.folder_token = folder_token;
     }
 
-    } // namespace Occ
+} // class DeleteJob
+
+} // namespace Occ
     

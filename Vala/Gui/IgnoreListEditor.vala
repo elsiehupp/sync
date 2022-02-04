@@ -4,13 +4,13 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QDir>
-// #include <QList_widget>
-// #include <QListWidgetTtem>
-// #include <QMessageBox>
-// #include <QInputDialog>
-
-// #include <Gtk.Dialog>
+//  #include <QDir>
+//  #include <QList_widget>
+//  #include <QListWidgetTtem>
+//  #include <QMessageBox>
+//  #include <QInputDialog>
+//  #include
+//  #include <Gtk.Dialog>
 
 
 namespace Occ {
@@ -27,11 +27,10 @@ class Ignore_list_editor : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public Ignore_list_editor (Gtk.Widget parent = nullptr);
+    public Ignore_list_editor (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
-    public 
     public bool ignore_hidden_files ();
 
 
@@ -58,10 +57,10 @@ class Ignore_list_editor : Gtk.Dialog {
         //FIXME This is not true. The entries are hardcoded below in setup_table_read_only_items
         read_only_tooltip = _("This entry is provided by the system at \"%1\" "
                              "and cannot be modified in this view.")
-                              .arg (QDir.to_native_separators (cfg_file.exclude_file (ConfigFile.SystemScope)));
+                              .arg (QDir.to_native_separators (cfg_file.exclude_file (ConfigFile.SYSTEM_SCOPE)));
 
         setup_table_read_only_items ();
-        const var user_config = cfg_file.exclude_file (ConfigFile.Scope.UserScope);
+        const var user_config = cfg_file.exclude_file (ConfigFile.Scope.USER_SCOPE);
         ui.ignore_table_widget.read_ignore_file (user_config);
 
         connect (this, &Gtk.Dialog.accepted, [=] () {
@@ -87,7 +86,7 @@ class Ignore_list_editor : Gtk.Dialog {
 
     void Ignore_list_editor.setup_table_read_only_items () {
         ui.ignore_table_widget.add_pattern (".csync_journal.db*", /*deletable=*/false, /*read_only=*/true);
-        ui.ignore_table_widget.add_pattern ("._sync_*.db*", /*deletable=*/false, /*read_only=*/true);
+        ui.ignore_table_widget.add_pattern (".sync_*.db*", /*deletable=*/false, /*read_only=*/true);
         ui.ignore_table_widget.add_pattern (".sync_*.db*", /*deletable=*/false, /*read_only=*/true);
     }
 
@@ -103,7 +102,7 @@ class Ignore_list_editor : Gtk.Dialog {
 
         ConfigFile cfg_file;
         setup_table_read_only_items ();
-        ui.ignore_table_widget.read_ignore_file (cfg_file.exclude_file (ConfigFile.SystemScope), false);
+        ui.ignore_table_widget.read_ignore_file (cfg_file.exclude_file (ConfigFile.SYSTEM_SCOPE), false);
     }
 
     } // namespace Occ

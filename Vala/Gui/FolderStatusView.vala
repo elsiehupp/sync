@@ -4,7 +4,7 @@ Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QTreeView>
+//  #include <QTreeView>
 
 namespace Occ {
 
@@ -16,7 +16,7 @@ class Folder_status_view : QTreeView {
 
     /***********************************************************
     ***********************************************************/
-    public Folder_status_view (Gtk.Widget parent = nullptr);
+    public Folder_status_view (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/

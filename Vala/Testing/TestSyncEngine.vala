@@ -4,33 +4,33 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
 
 using namespace Occ;
 
 bool itemDidComplete (ItemCompletedSpy spy, string path) {
     if (var item = spy.findItem (path)) {
-        return item._instruction != CSYNC_INSTRUCTION_NONE && item._instruction != CSYNC_INSTRUCTION_UPDATE_METADATA;
+        return item.instruction != CSYNC_INSTRUCTION_NONE && item.instruction != CSYNC_INSTRUCTION_UPDATE_METADATA;
     }
     return false;
 }
 
 bool itemInstruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
-    return item._instruction == instr;
+    return item.instruction == instr;
 }
 
 bool itemDidCompleteSuccessfully (ItemCompletedSpy spy, string path) {
     if (var item = spy.findItem (path)) {
-        return item._status == SyncFileItem.Status.SUCCESS;
+        return item.status == SyncFileItem.Status.SUCCESS;
     }
     return false;
 }
 
 bool itemDidCompleteSuccessfullyWithExpectedRank (ItemCompletedSpy spy, string path, int rank) {
     if (var item = spy.findItemWithExpectedRank (path, rank)) {
-        return item._status == SyncFileItem.Status.SUCCESS;
+        return item.status == SyncFileItem.Status.SUCCESS;
     }
     return false;
 }
@@ -177,7 +177,7 @@ class TestSyncEngine : GLib.Object {
         var getDbChecksum = [&] (string path) {
             SyncJournalFileRecord record;
             fakeFolder.syncJournal ().getFileRecord (path, record);
-            return record._checksumHeader;
+            return record.checksumHeader;
         };
 
         // printf 'A%.0s' {1..64} | sha1sum -
@@ -237,7 +237,7 @@ class TestSyncEngine : GLib.Object {
         var getEtag = [&] (GLib.ByteArray file) {
             SyncJournalFileRecord record;
             fakeFolder.syncJournal ().getFileRecord (file, record);
-            return record._etag;
+            return record.etag;
         };
         QVERIFY (getEtag ("parentFolder") == "this.invalid_");
         QVERIFY (getEtag ("parentFolder/subFolderA") == "this.invalid_");
@@ -301,8 +301,8 @@ class TestSyncEngine : GLib.Object {
         SyncJournalFileRecord record;
         fakeFolder.syncJournal ().getFileRecord (QByteArrayLiteral ("NewFolder"), record);
         QVERIFY (record.isValid ());
-        QCOMPARE (record._etag, QByteArrayLiteral ("this.invalid_"));
-        QVERIFY (!record._fileId.isEmpty ());
+        QCOMPARE (record.etag, QByteArrayLiteral ("this.invalid_"));
+        QVERIFY (!record.fileId.isEmpty ());
     }
 
 
@@ -331,15 +331,15 @@ class TestSyncEngine : GLib.Object {
         GLib.Set<string> seen;
         for (GLib.List<GLib.Variant> args : completeSpy) {
             var item = args[0].value<SyncFileItemPtr> ();
-            qDebug () << item._file << item.isDirectory () << item._status;
-            QVERIFY (!seen.contains (item._file)); // signal only sent once per item
-            seen.insert (item._file);
-            if (item._file == "Y/Z/d2") {
-                QVERIFY (item._status == SyncFileItem.Status.NORMAL_ERROR);
-            } else if (item._file == "Y/Z/d3") {
-                QVERIFY (item._status != SyncFileItem.Status.SUCCESS);
+            qDebug () << item.file << item.isDirectory () << item.status;
+            QVERIFY (!seen.contains (item.file)); // signal only sent once per item
+            seen.insert (item.file);
+            if (item.file == "Y/Z/d2") {
+                QVERIFY (item.status == SyncFileItem.Status.NORMAL_ERROR);
+            } else if (item.file == "Y/Z/d3") {
+                QVERIFY (item.status != SyncFileItem.Status.SUCCESS);
             } else if (!item.isDirectory ()) {
-                QVERIFY (item._status == SyncFileItem.Status.SUCCESS);
+                QVERIFY (item.status == SyncFileItem.Status.SUCCESS);
             }
         }
     }
@@ -400,7 +400,7 @@ class TestSyncEngine : GLib.Object {
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &, QIODevice *) {
             if (op == QNetworkAccessManager.GetOperation)
                 ++nGET;
-            return nullptr;
+            return null;
         });
 
         // For directly editing the remote checksum
@@ -424,7 +424,7 @@ class TestSyncEngine : GLib.Object {
         string a1path = fakeFolder.localPath () + "A/a1";
         SyncJournalFileRecord a1record;
         fakeFolder.syncJournal ().getFileRecord (GLib.ByteArray ("A/a1"), a1record);
-        QCOMPARE (a1record._modtime, (int64)FileSystem.getModTime (a1path));
+        QCOMPARE (a1record.modtime, (int64)FileSystem.getModTime (a1path));
 
         // Extra sync reads from database, no difference
         QVERIFY (fakeFolder.syncOnce ());
@@ -470,41 +470,41 @@ class TestSyncEngine : GLib.Object {
         connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToPropagate, [&] (SyncFileItemVector items) {
             SyncFileItemPtr a1, b1, c1;
             for (var item : items) {
-                if (item._file == "A/a1")
+                if (item.file == "A/a1")
                     a1 = item;
-                if (item._file == "B/b1")
+                if (item.file == "B/b1")
                     b1 = item;
-                if (item._file == "C/c1")
+                if (item.file == "C/c1")
                     c1 = item;
             }
 
             // a1 : should have local size and modtime
             QVERIFY (a1);
-            QCOMPARE (a1._instruction, CSYNC_INSTRUCTION_SYNC);
-            QCOMPARE (a1._direction, SyncFileItem.Direction.UP);
-            QCOMPARE (a1._size, int64 (5));
+            QCOMPARE (a1.instruction, CSYNC_INSTRUCTION_SYNC);
+            QCOMPARE (a1.direction, SyncFileItem.Direction.UP);
+            QCOMPARE (a1.size, int64 (5));
 
-            QCOMPARE (Utility.qDateTimeFromTime_t (a1._modtime), changedMtime);
-            QCOMPARE (a1._previousSize, int64 (4));
-            QCOMPARE (Utility.qDateTimeFromTime_t (a1._previousModtime), initialMtime);
+            QCOMPARE (Utility.qDateTimeFromTime_t (a1.modtime), changedMtime);
+            QCOMPARE (a1.previousSize, int64 (4));
+            QCOMPARE (Utility.qDateTimeFromTime_t (a1.previousModtime), initialMtime);
 
             // b2 : should have remote size and modtime
             QVERIFY (b1);
-            QCOMPARE (b1._instruction, CSYNC_INSTRUCTION_SYNC);
-            QCOMPARE (b1._direction, SyncFileItem.Direction.DOWN);
-            QCOMPARE (b1._size, int64 (17));
-            QCOMPARE (Utility.qDateTimeFromTime_t (b1._modtime), changedMtime);
-            QCOMPARE (b1._previousSize, int64 (16));
-            QCOMPARE (Utility.qDateTimeFromTime_t (b1._previousModtime), initialMtime);
+            QCOMPARE (b1.instruction, CSYNC_INSTRUCTION_SYNC);
+            QCOMPARE (b1.direction, SyncFileItem.Direction.DOWN);
+            QCOMPARE (b1.size, int64 (17));
+            QCOMPARE (Utility.qDateTimeFromTime_t (b1.modtime), changedMtime);
+            QCOMPARE (b1.previousSize, int64 (16));
+            QCOMPARE (Utility.qDateTimeFromTime_t (b1.previousModtime), initialMtime);
 
             // c1 : conflicts are downloads, so remote size and modtime
             QVERIFY (c1);
-            QCOMPARE (c1._instruction, CSYNC_INSTRUCTION_CONFLICT);
-            QCOMPARE (c1._direction, SyncFileItem.Direction.NONE);
-            QCOMPARE (c1._size, int64 (25));
-            QCOMPARE (Utility.qDateTimeFromTime_t (c1._modtime), changedMtime2);
-            QCOMPARE (c1._previousSize, int64 (26));
-            QCOMPARE (Utility.qDateTimeFromTime_t (c1._previousModtime), changedMtime);
+            QCOMPARE (c1.instruction, CSYNC_INSTRUCTION_CONFLICT);
+            QCOMPARE (c1.direction, SyncFileItem.Direction.NONE);
+            QCOMPARE (c1.size, int64 (25));
+            QCOMPARE (Utility.qDateTimeFromTime_t (c1.modtime), changedMtime2);
+            QCOMPARE (c1.previousSize, int64 (26));
+            QCOMPARE (Utility.qDateTimeFromTime_t (c1.previousModtime), changedMtime);
         });
 
         QVERIFY (fakeFolder.syncOnce ());
@@ -519,7 +519,7 @@ class TestSyncEngine : GLib.Object {
 
         // Disable parallel uploads
         SyncOptions syncOptions;
-        syncOptions._parallelNetworkJobs = 0;
+        syncOptions.parallelNetworkJobs = 0;
         fakeFolder.syncEngine ().setSyncOptions (syncOptions);
 
         // Produce an error based on upload size
@@ -536,7 +536,7 @@ class TestSyncEngine : GLib.Object {
                     return new FakeErrorReply (op, request, parent, 507);
                 }
             }
-            return nullptr;
+            return null;
         });
 
         fakeFolder.localModifier ().insert ("A/big", 800);
@@ -577,7 +577,7 @@ class TestSyncEngine : GLib.Object {
                     reply.setRawHeader ("Content-MD5", contentMd5Value);
                 return reply;
             }
-            return nullptr;
+            return null;
         });
 
         // Basic case
@@ -740,9 +740,9 @@ class TestSyncEngine : GLib.Object {
     private on_ void testUploadV1Multiabort () {
         FakeFolder fakeFolder{ FileInfo{} };
         SyncOptions options;
-        options._initialChunkSize = 10;
-        options._maxChunkSize = 10;
-        options._minChunkSize = 10;
+        options.initialChunkSize = 10;
+        options.maxChunkSize = 10;
+        options.minChunkSize = 10;
         fakeFolder.syncEngine ().setSyncOptions (options);
 
         GLib.Object parent;
@@ -752,7 +752,7 @@ class TestSyncEngine : GLib.Object {
                 ++nPUT;
                 return new FakeHangingReply (op, request, parent);
             }
-            return nullptr;
+            return null;
         });
 
         fakeFolder.localModifier ().insert ("file", 100, 'W');
@@ -823,7 +823,7 @@ class TestSyncEngine : GLib.Object {
 
         // Disable parallel uploads
         SyncOptions syncOptions;
-        syncOptions._parallelNetworkJobs = 0;
+        syncOptions.parallelNetworkJobs = 0;
         fakeFolder.syncEngine ().setSyncOptions (syncOptions);
 
         int nPUT = 0;
@@ -856,7 +856,7 @@ class TestSyncEngine : GLib.Object {
                         jsonReply.setObject (jsonReplyObject);
                         return new FakeJsonErrorReply{op, request, this, 200, jsonReply};
                     }
-                    return  nullptr;
+                    return  null;
                 }
             } else if (op == QNetworkAccessManager.PutOperation) {
                 ++nPUT;
@@ -869,9 +869,9 @@ class TestSyncEngine : GLib.Object {
                         fileName.endsWith ("B/big8")) {
                     return new FakeErrorReply (op, request, this, 412);
                 }
-                return  nullptr;
+                return  null;
             }
-            return  nullptr;
+            return  null;
         });
 
         fakeFolder.localModifier ().insert ("A/big", 1);

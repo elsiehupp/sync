@@ -7,7 +7,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 #ifndef FLOW2AUTHWIDGET_H
 const int FLOW2AUTHWIDGET_H
 
-// #include <Gtk.Widget>
+//  #include <Gtk.Widget>
 
 
 namespace Occ {
@@ -16,7 +16,7 @@ class Flow2AuthWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public Flow2AuthWidget (Gtk.Widget parent = nullptr);
+    public Flow2AuthWidget (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
@@ -44,7 +44,6 @@ class Flow2AuthWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void on_poll_now ();
 
 
@@ -60,7 +59,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private Account this.account = nullptr;
+    private Account this.account = null;
     private QScopedPointer<Flow2Auth> this.async_auth;
     private Ui_Flow2Auth_widget this.ui;
 

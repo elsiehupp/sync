@@ -5,24 +5,24 @@ Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QBuffer>
-// #include <QClipboard>
-// #include <QFileInfo>
-// #include <QDesktopServices>
-// #include <QMessageBox>
-// #include <QMenu>
-// #include <QText_edit>
-// #include <QToolButton>
-// #include <QPropertyAnimation>
-
-// #include <Gtk.Dialog>
-
-// #include <GLib.List>
-// #include <QToolButton>
-// #include <QHBox_layout>
-// #include <QLabel>
-// #include <QLineEdit>
-// #include <QWidget_action>
+//  #include <QBuffer>
+//  #include <QClipboard>
+//  #include <QFileInfo>
+//  #include <QDesktopServices>
+//  #include <QMessageBox>
+//  #include <QMenu>
+//  #include <QText_edit>
+//  #include <QToolButton>
+//  #include <QPropertyAnimation>
+//  #include
+//  #include <Gtk.Dialog
+//  #include
+//  #include <GLib.List>
+//  #include <QToolBu
+//  #include <QHBox_layo
+//  #include <QLabel>
+//  #include <QLineEdit>
+//  #include <QWidget_action>
 
 
 namespace Occ {
@@ -49,7 +49,7 @@ class Share_link_widget : Gtk.Widget {
         const string share_path,
         const string local_path,
         Share_permissions max_sharing_permissions,
-        Gtk.Widget parent = nullptr);
+        Gtk.Widget parent = null);
     ~Share_link_widget () override;
 
     /***********************************************************
@@ -216,24 +216,24 @@ Share_link_widget.Share_link_widget (AccountPointer account,
     Share_permissions max_sharing_permissions,
     Gtk.Widget parent)
     : Gtk.Widget (parent)
-    , this.ui (new Ui.Share_link_widget)
-    , this.account (account)
-    , this.share_path (share_path)
-    , this.local_path (local_path)
-    , this.link_share (nullptr)
-    , this.password_required (false)
-    , this.expiry_required (false)
-    , this.names_supported (true)
-    , this.note_required (false)
-    , this.link_context_menu (nullptr)
-    , this.read_only_link_action (nullptr)
-    , this.allow_editing_link_action (nullptr)
-    , this.allow_upload_editing_link_action (nullptr)
-    , this.allow_upload_link_action (nullptr)
-    , this.password_protect_link_action (nullptr)
-    , this.expiration_date_link_action (nullptr)
-    , this.unshare_link_action (nullptr)
-    , this.note_link_action (nullptr) {
+    this.ui (new Ui.Share_link_widget)
+    this.account (account)
+    this.share_path (share_path)
+    this.local_path (local_path)
+    this.link_share (null)
+    this.password_required (false)
+    this.expiry_required (false)
+    this.names_supported (true)
+    this.note_required (false)
+    this.link_context_menu (null)
+    this.read_only_link_action (null)
+    this.allow_editing_link_action (null)
+    this.allow_upload_editing_link_action (null)
+    this.allow_upload_link_action (null)
+    this.password_protect_link_action (null)
+    this.expiration_date_link_action (null)
+    this.unshare_link_action (null)
+    this.note_link_action (null) {
     this.ui.setup_ui (this);
 
     this.ui.share_link_tool_button.hide ();
@@ -684,7 +684,7 @@ void Share_link_widget.confirm_and_delete_share () {
         [message_box, yes_button, this] () {
             if (message_box.clicked_button () == yes_button) {
                 this.on_toggle_share_link_animation (true);
-                this._link_share.delete_share ();
+                this.link_share.delete_share ();
             }
         });
     message_box.open ();

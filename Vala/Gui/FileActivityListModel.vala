@@ -4,7 +4,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #pragma once
+//  #pragma once
 
 namespace Occ {
 
@@ -16,7 +16,6 @@ class FileActivityListModel : ActivityListModel {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void on_load (AccountState account_state, string file_id);
 
 
@@ -28,12 +27,12 @@ class FileActivityListModel : ActivityListModel {
     private string this.file_id;
 }
     FileActivityListModel.FileActivityListModel (GLib.Object parent)
-        : ActivityListModel (nullptr, parent) {
+        : ActivityListModel (null, parent) {
         set_display_actions (false);
     }
 
     void FileActivityListModel.on_load (AccountState account_state, string local_path) {
-        Q_ASSERT (account_state);
+        //  Q_ASSERT (account_state);
         if (!account_state || currently_fetching ()) {
             return;
         }
@@ -50,7 +49,7 @@ class FileActivityListModel : ActivityListModel {
             return;
         }
 
-        this.file_id = file_record._file_id;
+        this.file_id = file_record.file_id;
         on_refresh_activity ();
     }
 

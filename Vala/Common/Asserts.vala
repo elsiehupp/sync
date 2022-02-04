@@ -1,5 +1,5 @@
 
-// #include <qglobal.h>
+//  #include <qglobal.h>
 
 #if defined (QT_FORCE_ASSERTS) || !defined (QT_NO_DEBUG)
 const int OC_ASSERT_MSG q_fatal

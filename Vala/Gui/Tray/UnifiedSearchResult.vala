@@ -4,13 +4,13 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QtCore>
+//  #include <QtCore>
 
-// #pragma once
+//  #pragma once
 
-// #include <limits>
-
-// #include <QtCore>
+//  #include <limits>
+//  #include
+//  #include <QtCore>
 
 namespace Occ {
 

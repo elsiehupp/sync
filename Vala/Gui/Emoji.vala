@@ -32,7 +32,7 @@ struct Emoji {
     bool is_custom = false;
 
     // Q_GADGET
-    Q_PROPERTY (string unicode MEMBER unicode)
-    Q_PROPERTY (string shortname MEMBER shortname)
-    Q_PROPERTY (bool is_custom MEMBER is_custom)
+    //  Q_PROPERTY (string unicode MEMBER unicode)
+    //  Q_PROPERTY (string shortname MEMBER shortname)
+    //  Q_PROPERTY (bool is_custom MEMBER is_custom)
 };

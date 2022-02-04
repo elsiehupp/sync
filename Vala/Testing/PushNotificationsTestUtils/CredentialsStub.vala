@@ -4,13 +4,13 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-// #pragma once
+//  #pragma once
 
-// #include <functional>
-
-// #include <QWebSocketServer>
-// #include <QWebSocket>
-// #include <QSignalSpy>
+//  #include <functional>
+//  #include
+//  #include <QWebSocketS
+//  #include <QWebSocket>
+//  #include <QSignalSpy>
 
 class CredentialsStub : Occ.AbstractCredentials {
 
@@ -20,7 +20,6 @@ class CredentialsStub : Occ.AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public string authType () override;
     public string user () override;
     public string password () override;
@@ -54,7 +53,7 @@ class CredentialsStub : Occ.AbstractCredentials {
 
 CredentialsStub.CredentialsStub (string user, string password)
     : this.user (user)
-    , this.password (password) {
+    this.password (password) {
 }
 
 string CredentialsStub.authType () {
@@ -70,7 +69,7 @@ string CredentialsStub.password () {
 }
 
 QNetworkAccessManager *CredentialsStub.createQNAM () {
-    return nullptr;
+    return null;
 }
 
 bool CredentialsStub.ready () {

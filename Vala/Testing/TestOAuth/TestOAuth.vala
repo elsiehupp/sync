@@ -4,8 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest/QtTest>
-// #include <QDesktopServices>
+//  #include <QtTest/QtTest>
+//  #include <QDesktopServices>
 
 using namespace Occ;
 
@@ -81,7 +81,7 @@ class TestOAuth : public GLib.Object {
                         this.OAuthTestCase.createBrowserReply (request);
                     });
                });
-               return nullptr;
+               return null;
             }
 
             Soup.Reply tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest req) override {

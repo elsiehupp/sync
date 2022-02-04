@@ -4,10 +4,10 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QBuffer>
-
-// #include <GLib.List>
-// #include <QPair>
+//  #include <QBuffer>
+//  #include
+//  #include <GLib.List>
+//  #include <QPair>
 
 namespace Occ {
 
@@ -61,7 +61,7 @@ signals:
 }
 
     Notification_confirm_job.Notification_confirm_job (AccountPointer account)
-        : AbstractNetworkJob (account, "") {
+        : base (account, "") {
         set_ignore_credential_failure (true);
     }
 

@@ -4,14 +4,14 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QMenu>
-// #include <QClipboard>
+//  #include <QMenu>
+//  #include <QClipboard>
 
-// #pragma once
+//  #pragma once
 
-// #include <GLib.List>
-// #include <QNetworkCookie>
-// #include <QPointer>
+//  #include <GLib.List>
+//  #include <QNetworkCookie>
+//  #include <QPointer>
 
 namespace Occ {
 
@@ -39,7 +39,6 @@ class Owncloud_oauth_creds_page : Abstract_credentials_wizard_page {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void on_async_auth_result (OAuth.Result, string user, string token,
         const string reniew_token);
 
@@ -83,7 +82,7 @@ protected slots:
 
     void Owncloud_oauth_creds_page.initialize_page () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-        Q_ASSERT (oc_wizard);
+        //  Q_ASSERT (oc_wizard);
         oc_wizard.account ().set_credentials (CredentialsFactory.create ("http"));
         this.async_auth.on_reset (new OAuth (oc_wizard.account ().data (), this));
         connect (this.async_auth.data (), &OAuth.result, this, &Owncloud_oauth_creds_page.on_async_auth_result, Qt.QueuedConnection);
@@ -106,7 +105,7 @@ protected slots:
             /* OAuth not supported (can't open browser), fallback to HTTP credentials */
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             oc_wizard.back ();
-            oc_wizard.on_set_auth_type (DetermineAuthTypeJob.Basic);
+            oc_wizard.on_set_auth_type (DetermineAuthTypeJob.AuthType.BASIC);
             break;
         }
         case OAuth.Error:
@@ -119,7 +118,7 @@ protected slots:
             this.user = user;
             this.refresh_token = refresh_token;
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-            Q_ASSERT (oc_wizard);
+            //  Q_ASSERT (oc_wizard);
             /* emit */ connect_to_oc_url (oc_wizard.account ().url ().to_string ());
             break;
         }
@@ -136,9 +135,9 @@ protected slots:
 
     AbstractCredentials *Owncloud_oauth_creds_page.get_credentials () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-        Q_ASSERT (oc_wizard);
+        //  Q_ASSERT (oc_wizard);
         return new HttpCredentialsGui (this.user, this.token, this.refresh_token,
-            oc_wizard._client_cert_bundle, oc_wizard._client_cert_password);
+            oc_wizard.client_cert_bundle, oc_wizard.client_cert_password);
     }
 
     bool Owncloud_oauth_creds_page.is_complete () {

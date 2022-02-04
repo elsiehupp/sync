@@ -5,6 +5,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+
 /***********************************************************
 @brief Send a Proppatch request
 
@@ -18,53 +20,21 @@ class ProppatchJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public ProppatchJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
+    private GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties;
+
+    signal void on_success ();
+    signal void finished_with_error ();
 
     /***********************************************************
     ***********************************************************/
-    public 
-    public void on_start () override;
-
-
-    /***********************************************************
-    Used to specify which properties shall be set.
-
-    The property keys can
-     - contain no colon : they refer to a property in the DAV :
-     - contain a colon : and thus specify an explicit namespace,
-       e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
-    ***********************************************************/
-    public void set_properties (GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties);
-
-
-    /***********************************************************
-    ***********************************************************/
-    public GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties ();
-
-signals:
-    void on_success ();
-    void finished_with_error ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private on_ bool on_finished () override;
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private GLib.HashMap<GLib.ByteArray, GLib.ByteArray> this.properties;
-
-
-
-
-
-
-    ProppatchJob.ProppatchJob (AccountPointer account, string path, GLib.Object parent)
-        : AbstractNetworkJob (account, path, parent) {
+    public ProppatchJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+        base (account, path, parent);
     }
 
-    void ProppatchJob.on_start () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_start () {
         if (this.properties.is_empty ()) {
             GLib.warn (lc_proppatch_job) << "Proppatch with no properties!";
         }
@@ -103,17 +73,33 @@ signals:
         AbstractNetworkJob.on_start ();
     }
 
-    void ProppatchJob.set_properties (GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties) {
-        this.properties = properties;
-    }
 
-    GLib.HashMap<GLib.ByteArray, GLib.ByteArray> ProppatchJob.properties () {
+    /***********************************************************
+    ***********************************************************/
+    public GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties () {
         return this.properties;
     }
 
-    bool ProppatchJob.on_finished () {
-        q_c_info (lc_proppatch_job) << "PROPPATCH of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                            << reply_status_"";
+
+    /***********************************************************
+    Used to specify which properties shall be set.
+
+    The property keys can
+     - contain no colon : they refer to a property in the DAV :
+     - contain a colon : and thus specify an explicit namespace,
+       e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
+    ***********************************************************/
+    public void set_properties (GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties) {
+        this.properties = properties;
+    }
+
+
+
+    /***********************************************************
+    ***********************************************************/
+    private bool on_finished () {
+        GLib.Info (lc_proppatch_job) << "PROPPATCH of" << reply ().request ().url () << "FINISHED WITH STATUS"
+                            << reply_status_string ();
 
         int http_result_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
@@ -127,4 +113,6 @@ signals:
         return true;
     }
 
-};
+} // class ProppatchJob
+
+} // namespace Occ

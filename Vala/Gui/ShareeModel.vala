@@ -33,7 +33,6 @@ class Sharee_model : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public string current_search () {
         return this.search;
     }
@@ -71,8 +70,8 @@ signals:
 
     Sharee_model.Sharee_model (AccountPointer account, string type, GLib.Object parent)
         : QAbstractListModel (parent)
-        , this.account (account)
-        , this.type (type) {
+        this.account (account)
+        this.type (type) {
     }
 
     void Sharee_model.fetch (string search, Sharee_set blocklist, Lookup_mode lookup_mode) {
@@ -208,7 +207,7 @@ signals:
 
     unowned<Sharee> Sharee_model.get_sharee (int at) {
         if (at < 0 || at > this.sharees.size ()) {
-            return unowned<Sharee> (nullptr);
+            return unowned<Sharee> (null);
         }
 
         return this.sharees.at (at);

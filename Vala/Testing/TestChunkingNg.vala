@@ -4,8 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
 
 using namespace Occ;
 
@@ -41,9 +41,9 @@ static void partialUpload (FakeFolder fakeFolder, string name, int64 size) {
 // Reduce max chunk size a bit so we get more chunks
 static void setChunkSize (SyncEngine engine, int64 size) {
     SyncOptions options;
-    options._maxChunkSize = size;
-    options._initialChunkSize = size;
-    options._minChunkSize = size;
+    options.maxChunkSize = size;
+    options.initialChunkSize = size;
+    options.minChunkSize = size;
     engine.setSyncOptions (options);
 }
 
@@ -90,18 +90,18 @@ class TestChunkingNG : GLib.Object {
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 // Test that we properly resuming and are not sending past data again.
-                Q_ASSERT (request.rawHeader ("OC-Chunk-Offset").toLongLong () >= uploadedSize);
+                //  Q_ASSERT (request.rawHeader ("OC-Chunk-Offset").toLongLong () >= uploadedSize);
             } else if (op == QNetworkAccessManager.DeleteOperation) {
-                Q_ASSERT (request.url ().path ().endsWith ("/10000"));
+                //  Q_ASSERT (request.url ().path ().endsWith ("/10000"));
             }
-            return nullptr;
+            return null;
         });
 
         QVERIFY (fakeFolder.syncOnce ());
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         QCOMPARE (fakeFolder.currentRemoteState ().find ("A/a0").size, size);
-        // The same chunk id was re-used
+        // The same chunk identifier was re-used
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         QCOMPARE (fakeFolder.uploadState ().children.first ().name, chunkingId);
     }
@@ -134,11 +134,11 @@ class TestChunkingNG : GLib.Object {
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 // Test that we properly resuming, not resending the first chunk
-                Q_ASSERT (request.rawHeader ("OC-Chunk-Offset").toLongLong () >= firstChunk.size);
+                //  Q_ASSERT (request.rawHeader ("OC-Chunk-Offset").toLongLong () >= firstChunk.size);
             } else if (op == QNetworkAccessManager.DeleteOperation) {
                 deletedPaths.append (request.url ().path ());
             }
-            return nullptr;
+            return null;
         });
 
         QVERIFY (fakeFolder.syncOnce ());
@@ -156,7 +156,7 @@ class TestChunkingNG : GLib.Object {
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         QCOMPARE (fakeFolder.currentRemoteState ().find ("A/a0").size, size);
-        // The same chunk id was re-used
+        // The same chunk identifier was re-used
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         QCOMPARE (fakeFolder.uploadState ().children.first ().name, chunkingId);
     }
@@ -190,7 +190,7 @@ class TestChunkingNG : GLib.Object {
             } else if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
                 sawMove = true;
             }
-            return nullptr;
+            return null;
         });
 
         QVERIFY (fakeFolder.syncOnce ());
@@ -200,7 +200,7 @@ class TestChunkingNG : GLib.Object {
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         QCOMPARE (fakeFolder.currentRemoteState ().find ("A/a0").size, size);
-        // The same chunk id was re-used
+        // The same chunk identifier was re-used
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         QCOMPARE (fakeFolder.uploadState ().children.first ().name, chunkingId);
     }
@@ -228,7 +228,7 @@ class TestChunkingNG : GLib.Object {
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         QCOMPARE (fakeFolder.currentRemoteState ().find ("A/a0").size, size);
-        // Used a new transfer id but wiped the old one
+        // Used a new transfer identifier but wiped the old one
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         QVERIFY (fakeFolder.uploadState ().children.first ().name != chunkingId);
     }
@@ -254,7 +254,7 @@ class TestChunkingNG : GLib.Object {
             } else if (op == QNetworkAccessManager.GetOperation) {
                 nGET++;
             }
-            return nullptr;
+            return null;
         });
 
         // Test 1 : NEW file aborted
@@ -265,10 +265,10 @@ class TestChunkingNG : GLib.Object {
         // it just becomes a UPDATE_METADATA
         var checkEtagUpdated = [&] (SyncFileItemVector items) {
             QCOMPARE (items.size (), 1);
-            QCOMPARE (items[0]._file, QLatin1String ("A"));
+            QCOMPARE (items[0].file, QLatin1String ("A"));
             SyncJournalFileRecord record;
             QVERIFY (fakeFolder.syncJournal ().getFileRecord (GLib.ByteArray ("A/a0"), record));
-            QCOMPARE (record._etag, fakeFolder.remoteModifier ().find ("A/a0").etag);
+            QCOMPARE (record.etag, fakeFolder.remoteModifier ().find ("A/a0").etag);
         };
         var connection = connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToPropagate, checkEtagUpdated);
         QVERIFY (fakeFolder.syncOnce ());
@@ -328,7 +328,7 @@ class TestChunkingNG : GLib.Object {
                 QTimer.singleShot (50, parent, [&] () { fakeFolder.syncEngine ().on_abort (); });
                 return new DelayedReply<FakeChunkMoveReply> (responseDelay, fakeFolder.uploadState (), fakeFolder.remoteModifier (), op, request, parent);
             }
-            return nullptr;
+            return null;
         });
 
         // Test 1 : NEW file aborted
@@ -361,7 +361,7 @@ class TestChunkingNG : GLib.Object {
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         QCOMPARE (fakeFolder.currentRemoteState ().find ("A/a0").size, size + 1);
-        // A different chunk id was used, and the previous one is removed
+        // A different chunk identifier was used, and the previous one is removed
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         QVERIFY (fakeFolder.uploadState ().children.first ().name != chunkingId);
     }
@@ -477,7 +477,7 @@ class TestChunkingNG : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         QCOMPARE (fakeFolder.currentRemoteState ().find ("A/a0").size, size+1);
 
-        // A different chunk id was used, and the previous one is removed
+        // A different chunk identifier was used, and the previous one is removed
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         QVERIFY (fakeFolder.uploadState ().children.first ().name != chunkingId);
     }
@@ -502,7 +502,7 @@ class TestChunkingNG : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         QCOMPARE (fakeFolder.currentRemoteState ().find ("A/a0").size, size);
 
-        // A different chunk id was used
+        // A different chunk identifier was used
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         QVERIFY (fakeFolder.uploadState ().children.first ().name != chunkingId);
     }
@@ -533,7 +533,7 @@ class TestChunkingNG : GLib.Object {
         // This will perform the operation on the server, but the reply will not come to the client
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice outgoingData) . Soup.Reply * {
             if (!chunking) {
-                Q_ASSERT (!request.url ().path ().contains ("/uploads/")
+                //  Q_ASSERT (!request.url ().path ().contains ("/uploads/")
                     && "Should not touch uploads endpoint when not chunking");
             }
             if (!chunking && op == QNetworkAccessManager.PutOperation) {
@@ -545,7 +545,7 @@ class TestChunkingNG : GLib.Object {
             } else if (op == QNetworkAccessManager.GetOperation) {
                 nGET++;
             }
-            return nullptr;
+            return null;
         });
 
         // Test 1 : a NEW file
@@ -608,7 +608,7 @@ class TestChunkingNG : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         QCOMPARE (fakeFolder.currentRemoteState ().find ("A/a0").size, size);
 
-        // The same chunk id was re-used
+        // The same chunk identifier was re-used
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         QCOMPARE (fakeFolder.uploadState ().children.first ().name, chunkingId);
 

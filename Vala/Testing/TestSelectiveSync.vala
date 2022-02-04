@@ -4,8 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
 
 using namespace Occ;
 
@@ -16,7 +16,7 @@ class TestSelectiveSync : GLib.Object {
     private on_ void testSelectiveSyncBigFolders () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         SyncOptions options;
-        options._newBigFolderSizeLimit = 20000; // 20 K
+        options.newBigFolderSizeLimit = 20000; // 20 K
         fakeFolder.syncEngine ().setSyncOptions (options);
 
         string[] sizeRequests;
@@ -27,7 +27,7 @@ class TestSelectiveSync : GLib.Object {
                 if (device.readAll ().contains ("<size "))
                     sizeRequests << req.url ().path ();
             }
-            return nullptr;
+            return null;
         });
 
         QSignalSpy newBigFolder (&fakeFolder.syncEngine (), &SyncEngine.newBigFolder);
@@ -36,7 +36,7 @@ class TestSelectiveSync : GLib.Object {
 
         fakeFolder.remoteModifier ().createDir ("A/newBigDir");
         fakeFolder.remoteModifier ().createDir ("A/newBigDir/subDir");
-        fakeFolder.remoteModifier ().insert ("A/newBigDir/subDir/bigFile", options._newBigFolderSizeLimit + 10);
+        fakeFolder.remoteModifier ().insert ("A/newBigDir/subDir/bigFile", options.newBigFolderSizeLimit + 10);
         fakeFolder.remoteModifier ().insert ("A/newBigDir/subDir/smallFile", 10);
 
         fakeFolder.remoteModifier ().createDir ("B/newSmallDir");

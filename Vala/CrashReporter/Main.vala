@@ -4,12 +4,12 @@ Copyright (C) by Dominik Schmidt <domme@tomahawk-player.org>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <libcrashreporter-gui/CrashReporter.h>
-
-// #include <QApplication>
-// #include <QDir>
-// #include <QDebug>
-// #include <QFileInfo>
+//  #include <libcrashreporter-gui/CrashReporter.h>
+//  #include
+//  #include <QAppl
+//  #include <QDir>
+//  #include <QDebug>
+//  #include <QFileInfo>
 
 int main (int argc, char argv[]) {
     QCoreApplication.set_attribute (Qt.AA_Use_high_dpi_pixmaps, true);
@@ -49,7 +49,7 @@ int main (int argc, char argv[]) {
     //            << Pair ("Install_time", "1357622062")
     //            << Pair ("Theme", "classic/1.0")
     //            << Pair ("Version", "30")
-    //            << Pair ("id", "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}")
+    //            << Pair ("identifier", "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}")
     //            << Pair ("Vendor", "Mozilla")
     //            << Pair ("EMCheck_compatibility", "true")
     //            << Pair ("Throttleable", "0")

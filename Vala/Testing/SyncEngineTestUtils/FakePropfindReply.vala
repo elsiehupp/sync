@@ -24,9 +24,9 @@ class FakePropfindReply : FakeReply {
     ***********************************************************/
     public void on_abort () override { }
 
+
     /***********************************************************
     ***********************************************************/
-    public 
     public int64 bytesAvailable () override;
     public int64 readData (char data, int64 maxlen) override;
 };

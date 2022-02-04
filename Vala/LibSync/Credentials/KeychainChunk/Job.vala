@@ -10,7 +10,7 @@ namespace Occ {
 Workaround for Windows:
 
 Split the keychain entry's data into chunks of 2048 bytes,
-to allow 4k (4096 bit) keys / large certs to be saved (see
+to allow 4k (4096 bit) keys / large certificates to be saved (see
     limits in webflowcredentials.h)
 ***********************************************************/
 namespace KeychainChunk {
@@ -27,18 +27,18 @@ class Job : GLib.Object {
     const int MaxChunks = 10;
 
 
-    protected string this.service_name;
-    protected Account this.account;
-    protected string this.key;
-    protected bool this.insecure_fallback = false;
-    protected bool this.auto_delete = true;
-    protected bool this.keychain_migration = false;
+    protected string service_name;
+    protected Account account;
+    protected string key;
+    protected bool insecure_fallback = false;
+    protected bool auto_delete = true;
+    protected bool keychain_migration = false;
 
-    protected QKeychain.Error this.error = QKeychain.NoError;
-    protected string this.error_string;
+    protected QKeychain.Error error = QKeychain.NoError;
+    protected string error_string;
 
-    protected int this.chunk_count = 0;
-    protected GLib.ByteArray this.chunk_buffer;
+    protected int chunk_count = 0;
+    protected GLib.ByteArray chunk_buffer;
 
     /***********************************************************
     ***********************************************************/
@@ -52,11 +52,13 @@ class Job : GLib.Object {
         this.chunk_buffer.clear ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public QKeychain.Error error () {
         return this.error;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -64,11 +66,13 @@ class Job : GLib.Object {
         return this.error_string;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public  GLib.ByteArray binary_data () {
         return this.chunk_buffer;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -120,6 +124,7 @@ class Job : GLib.Object {
     public void set_auto_delete (bool auto_delete) {
         this.auto_delete = auto_delete;
     }
+
 } // class Job
 
 } // namespace KeychainChunk

@@ -4,12 +4,12 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #pragma once
+//  #pragma once
 
-// #include <QMetaType>
-// #include <QtGlobal>
-
-// #include <vector>
+//  #include <QMetaType>
+//  #include <QtGlobal>
+//  #include
+//  #include <vector>
 
 namespace Occ {
 
@@ -57,7 +57,7 @@ class UserStatusConnector : GLib.Object {
 
 signals:
     void user_status_fetched (UserStatus user_status);
-    void predefined_statuses_fetched (std.vector<UserStatus> statuses);
+    void predefined_statuses_fetched (GLib.Vector<UserStatus> statuses);
     void user_status_set ();
     void message_cleared ();
     void error (Error error);

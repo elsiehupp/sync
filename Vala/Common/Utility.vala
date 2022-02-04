@@ -5,45 +5,45 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QStandardPaths>
-// #include <QtGlobal>
+//  #include <QStandardPaths>
+//  #include <QtGlobal>
 
 // Note: This file must compile without QtGui
-// #include <QCoreApplication>
-// #include <QSettings>
-// #include <QTextStream>
-// #include <QDir>
-// #include <QProcess>
-// #include <QThread>
-// #include <QSysInfo>
-// #include <QStandardPaths>
-// #include <QCollator>
-// #include <QSysInfo>
-// #include <qrandom.h>
+//  #include <QCoreApplication>
+//  #include <QSettings>
+//  #include <QTextStream>
+//  #include <QDir>
+//  #include <QProcess>
+//  #include <QThread>
+//  #include <QSysInfo>
+//  #include <QStandardPaths>
+//  #include <QCollator>
+//  #include <QSysInfo>
+//  #include <qrandom.h>
 
 #ifdef Q_OS_UNIX
-// #include <sys/statvfs.h>
-// #include <sys/types.h>
-// #include <unistd.h>
+//  #include <sys/statvfs.h>
+//  #include <sys/types.h>
+//  #include <unistd.h>
 #endif
 
-// #include <cmath>
-// #include <cstdarg>
-// #include <cstring>
+//  #include <cmath>
+//  #include <cstdarg>
+//  #include <cstring>
 
 #include "utility_unix.cpp"
 
-// #include <QElapsedTimer>
-// #include <QLoggingCategory>
-// #include <QUrlQuery>
-// #include <functional>
-// #include <memory>
+//  #include <QElapsedTimer>
+//  #include <QLoggingCategory>
+//  #include <QUrlQuery>
+//  #include <functional>
+//  #include <memory>
 
 
 namespace Occ {
 
 
-Q_DECLARE_LOGGING_CATEGORY (lc_utility)
+//  Q_DECLARE_LOGGING_CATEGORY (lc_utility)
 
 /***********************************************************
 \addtogroup libsync
@@ -428,7 +428,7 @@ GLib.ByteArray Utility.user_agent_"" {
     return "Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture : %6 OsArchitecture : %7)"
         .arg (platform (),
             MIRALL_VERSION_STRING,
-            q_app.application_name (),
+            Gtk.Application.application_name (),
             QSysInfo.product_type (),
             QSysInfo.kernel_version (),
             QSysInfo.build_cpu_architecture (),
@@ -535,15 +535,15 @@ namespace {
         uint64 msec;
 
         string description (uint64 value) {
-            return QCoreApplication.translate ("Utility", name, nullptr, value);
+            return QCoreApplication.translate ("Utility", name, null, value);
         }
     };
 // QTBUG-3945 and issue #4855 : QT_TRANSLATE_NOOP does not work with plural form because lupdate
 // limitation unless we fake more arguments
 // (it must be in the form ("context", "source", "comment", n)
 #undef QT_TRANSLATE_NOOP
-const int QT_TRANSLATE_NOOP (ctx, string_value, ...) string_value
-    Q_DECL_CONSTEXPR Period periods[] = { { QT_TRANSLATE_NOOP ("Utility", "%n year (s)", 0, this.), 365 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n month (s)", 0, this.), 30 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n day (s)", 0, this.), 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n hour (s)", 0, this.), 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n minute (s)", 0, this.), 60 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n second (s)", 0, this.), 1000LL }, { nullptr, 0 }
+const int QT_TRANSLATE_NOOP (context, string_value, ...) string_value
+    Q_DECL_CONSTEXPR Period periods[] = { { QT_TRANSLATE_NOOP ("Utility", "%n year (s)", 0, this.), 365 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n month (s)", 0, this.), 30 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n day (s)", 0, this.), 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n hour (s)", 0, this.), 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n minute (s)", 0, this.), 60 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n second (s)", 0, this.), 1000LL }, { null, 0 }
     };
 } // anonymous namespace
 
@@ -614,7 +614,7 @@ string Utility.platform_name () {
 }
 
 void Utility.crash () {
-    volatile int a = (int *)nullptr;
+    volatile int a = (int *)null;
     *a = 1;
 }
 
@@ -648,7 +648,7 @@ GLib.ByteArray Utility.version_of_installed_binary (string command) {
     if (is_linux ()) {
         string binary (command);
         if (binary.is_empty ()) {
-            binary = q_app.arguments ()[0];
+            binary = Gtk.Application.arguments ()[0];
         }
         string[] parameters;
         parameters << "--version";
@@ -912,6 +912,7 @@ string Utility.sanitize_for_filename (string name) {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     static void remove_fav_link_private (string folder) {
@@ -975,6 +976,7 @@ string Utility.sanitize_for_filename (string name) {
             }
         }
     }
+
 
     /***********************************************************
     ***********************************************************/

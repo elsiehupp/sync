@@ -4,7 +4,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QTcpServer>
+//  #include <QTcpServer>
 
 class HttpServer : QTcpServer {
 
@@ -14,7 +14,6 @@ class HttpServer : QTcpServer {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void incomingConnection (int socket);
 
     /***********************************************************

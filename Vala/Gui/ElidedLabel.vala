@@ -4,9 +4,9 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QResizeEvent>
-
-// #include <QLabel>
+//  #include <QResizeEvent>
+//  #include
+//  #include <QLabel>
 
 namespace Occ {
 
@@ -15,7 +15,7 @@ class ElidedLabel : QLabel {
 
     /***********************************************************
     ***********************************************************/
-    public ElidedLabel (Gtk.Widget parent = nullptr);
+    public ElidedLabel (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
@@ -40,7 +40,6 @@ class ElidedLabel : QLabel {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public Qt.TextElideMode elide_mode () {
         return this.elide_mode;
     }
@@ -62,7 +61,7 @@ class ElidedLabel : QLabel {
 
     ElidedLabel.ElidedLabel (string text, Gtk.Widget parent)
         : QLabel (text, parent)
-        , this.text (text) {
+        this.text (text) {
     }
 
     void ElidedLabel.on_set_text (string text) {

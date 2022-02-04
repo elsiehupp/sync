@@ -4,10 +4,10 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QNetworkProxy>
-// #include <GLib.List>
-
-// #include <Gtk.Widget>
+//  #include <QNetworkProxy>
+//  #include <GLib.List>
+//  #include
+//  #include <Gtk.Widget>
 
 namespace Occ {
 
@@ -23,7 +23,7 @@ class Network_settings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public Network_settings (Gtk.Widget parent = nullptr);
+    public Network_settings (Gtk.Widget parent = null);
     ~Network_settings () override;
     public QSize size_hint () override;
 
@@ -56,7 +56,7 @@ class Network_settings : Gtk.Widget {
 
     Network_settings.Network_settings (Gtk.Widget parent)
         : Gtk.Widget (parent)
-        , this.ui (new Ui.Network_settings) {
+        this.ui (new Ui.Network_settings) {
         this.ui.setup_ui (this);
 
         this.ui.host_line_edit.set_placeholder_text (_("Hostname of proxy server"));

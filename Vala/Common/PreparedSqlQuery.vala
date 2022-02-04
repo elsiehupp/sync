@@ -5,7 +5,7 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 ***********************************************************/
 
 using Sqlite3;
-// #pragma once
+//  #pragma once
 
 namespace Occ {
 
@@ -42,12 +42,12 @@ class PreparedSqlQuery {
     }
 
     //  public SqlQuery operator. () {
-    //      Q_ASSERT (this.ok);
+    //      //  Q_ASSERT (this.ok);
     //      return this.query;
     //  }
 
     //  public SqlQuery operator* () & {
-    //      Q_ASSERT (this.ok);
+    //      //  Q_ASSERT (this.ok);
     //      return this.query;
     //  }
 }

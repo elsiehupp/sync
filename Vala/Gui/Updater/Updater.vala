@@ -4,17 +4,17 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QUrlQuery>
-// #include <QProcess>
+//  #include <QUrlQuery>
+//  #include <QProcess>
+//  #include
+//  #include <QSysInfo>
 
-// #include <QSysInfo>
-
-// #include <QLoggingCategory>
+//  #include <QLoggingCategory>
 
 
 namespace Occ {
 
-Q_DECLARE_LOGGING_CATEGORY (lc_updater)
+//  Q_DECLARE_LOGGING_CATEGORY (lc_updater)
 
 class Updater : GLib.Object {
 
@@ -36,7 +36,6 @@ class Updater : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public virtual void check_for_update ();
     public virtual void background_check_for_update ();
     public virtual bool handle_startup ();
@@ -44,7 +43,7 @@ class Updater : GLib.Object {
 
     protected static string client_version ();
     protected Updater ()
-        : GLib.Object (nullptr) {
+        : GLib.Object (null) {
     }
 
 
@@ -57,7 +56,7 @@ class Updater : GLib.Object {
 }
 
 
-    Updater *Updater._instance = nullptr;
+    Updater *Updater.instance = null;
 
     Updater *Updater.instance () {
         if (!this.instance) {
@@ -118,8 +117,8 @@ class Updater : GLib.Object {
         }
 
         // update_segment (see configfile.h)
-        ConfigFile cfg;
-        var update_segment = cfg.update_segment ();
+        ConfigFile config;
+        var update_segment = config.update_segment ();
         query.add_query_item (QLatin1String ("updatesegment"), string.number (update_segment));
 
         return query;
@@ -149,7 +148,7 @@ class Updater : GLib.Object {
         GLib.debug (lc_updater) << url;
         if (url.is_empty ()) {
             GLib.warn (lc_updater) << "Not a valid updater URL, will not do update check";
-            return nullptr;
+            return null;
         }
         // the best we can do is notify about updates
         return new Passive_update_notifier (url);

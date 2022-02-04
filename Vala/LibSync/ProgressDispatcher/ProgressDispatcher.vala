@@ -4,13 +4,13 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QMetaType>
-// #include <QCoreApplication>
-
-// #include <QTime>
-// #include <QQueue>
-// #include <QElapsedTimer>
-// #include <QTimer>
+//  #include <QMetaType>
+//  #include <QCoreApplication>
+//  #include
+//  #include <QTime>
+//  #include <QQueue>
+//  #include <QElapsedTimer>
+//  #include <QTimer>
 
 namespace Occ {
 namespace Progress {
@@ -32,7 +32,7 @@ class Progress_dispatcher : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private QElapsedTimer timer;
-    private static Progress_dispatcher instance = nullptr;
+    private static Progress_dispatcher instance = null;
 
 
     /***********************************************************
@@ -95,8 +95,8 @@ class Progress_dispatcher : GLib.Object {
     protected void set_progress_info (string folder, ProgressInfo progress) {
         if (folder.is_empty ()) {
         // The update phase now also has progress
-        //            (progress._current_items.size () == 0
-        //             && progress._total_file_count == 0) ) {
+        //            (progress.current_items.size () == 0
+        //             && progress.total_file_count == 0) ) {
             return;
         }
         /* emit */ progress_info (folder, progress);

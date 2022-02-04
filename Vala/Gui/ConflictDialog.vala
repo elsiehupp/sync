@@ -4,13 +4,13 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QDebug>
-// #include <QDesktopServices>
-// #include <QFileInfo>
-// #include <QMimeDatabase>
-// #include <QPushButton>
-
-// #include <Gtk.Dialog>
+//  #include <QDebug>
+//  #include <QDesktopServices>
+//  #include <QFileInfo>
+//  #include <QMimeDatabase>
+//  #include <QPushButton>
+//  #include
+//  #include <Gtk.Dialog>
 
 namespace Occ {
 
@@ -23,7 +23,7 @@ class ConflictDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public ConflictDialog (Gtk.Widget parent = nullptr);
+    public ConflictDialog (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
@@ -90,8 +90,8 @@ namespace {
 
     ConflictDialog.ConflictDialog (Gtk.Widget parent)
         : Gtk.Dialog (parent)
-        , this.ui (new Ui.ConflictDialog)
-        , this.solver (new ConflictSolver (this)) {
+        this.ui (new Ui.ConflictDialog)
+        this.solver (new ConflictSolver (this)) {
         this.ui.setup_ui (this);
         force_header_font (this.ui.conflict_message);
         this.ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
@@ -146,7 +146,7 @@ namespace {
         const var is_local_picked = this.ui.local_version_radio.is_checked ();
         const var is_remote_picked = this.ui.remote_version_radio.is_checked ();
 
-        Q_ASSERT (is_local_picked || is_remote_picked);
+        //  Q_ASSERT (is_local_picked || is_remote_picked);
         if (!is_local_picked && !is_remote_picked) {
             return;
         }

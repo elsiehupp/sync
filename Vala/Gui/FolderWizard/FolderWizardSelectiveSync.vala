@@ -24,7 +24,6 @@ class Folder_wizard_selective_sync : QWizard_page {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void initialize_page () override;
     public void cleanup_page () override;
 
@@ -37,7 +36,7 @@ class Folder_wizard_selective_sync : QWizard_page {
     ***********************************************************/
     private 
     private Selective_sync_widget this.selective_sync;
-    private QCheckBox this.virtual_files_check_box = nullptr;
+    private QCheckBox this.virtual_files_check_box = null;
 }
 
 

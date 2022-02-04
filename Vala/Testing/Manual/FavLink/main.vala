@@ -5,7 +5,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 #include "../../../src/libsync/utility.h"
 
-// #include <QDir>
+//  #include <QDir>
 
 int main (int argc, char* argv[]) {
    string dir="/tmp/linktest/";

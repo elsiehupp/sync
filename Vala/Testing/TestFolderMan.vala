@@ -4,9 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <qglobal.h>
-// #include <QTemporaryDir>
-// #include <QtTest>
+//  #include <qglobal.h>
+//  #include <QTemporaryDir>
+//  #include <QtTest>
 
 using namespace Occ;
 
@@ -33,8 +33,8 @@ class TestFolderMan : public GLib.Object {
 
         AccountPointer account = Account.create ();
         GLib.Uri url ("http://example.de");
-        var cred = new HttpCredentialsTest ("testuser", "secret");
-        account.setCredentials (cred);
+        var credentials = new HttpCredentialsTest ("testuser", "secret");
+        account.setCredentials (credentials);
         account.setUrl ( url );
 
         AccountStatePtr newAccountState (new AccountState (account));
@@ -50,7 +50,7 @@ class TestFolderMan : public GLib.Object {
         }
 
         // those should be allowed
-        // string FolderMan.checkPathValidityForNewFolder (string& path, GLib.Uri serverUrl, bool forNewDirectory)
+        // string FolderMan.checkPathValidityForNewFolder (string path, GLib.Uri serverUrl, bool forNewDirectory)
 
         QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free"), "");
         QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/free2/"), "");
@@ -145,10 +145,10 @@ class TestFolderMan : public GLib.Object {
 
         AccountPointer account = Account.create ();
         GLib.Uri url ("http://example.de");
-        var cred = new HttpCredentialsTest ("testuser", "secret");
-        account.setCredentials (cred);
+        var credentials = new HttpCredentialsTest ("testuser", "secret");
+        account.setCredentials (credentials);
         account.setUrl ( url );
-        url.setUserName (cred.user ());
+        url.setUserName (credentials.user ());
 
         AccountStatePtr newAccountState (new AccountState (account));
         FolderMan folderman = FolderMan.instance ();

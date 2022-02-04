@@ -4,38 +4,38 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QBuffer>
-// #include <QFile_icon_provider>
-// #include <QClipboard>
-// #include <QFileInfo>
-// #include <QAbstract_proxy_model>
-// #include <QCompleter>
-// #include <QBox_layout>
-// #include <QIcon>
-// #include <QLayout>
-// #include <QPropertyAnimation>
-// #include <QMenu>
-// #include <QAction>
-// #include <QDesktopServices>
-// #include <QInputDialog>
-// #include <QMessageBox>
-// #include <QCryptographicHash>
-// #include <Gtk.Color>
-// #include <QPainter>
-// #include <QList_widget>
-// #include <QSvgRenderer>
-// #include <QPushButton>
-// #include <QContext_menu_event>
-
-// #include <cstring>
-
-// #include <Gtk.Dialog>
-// #include <Gtk.Widget>
-
-// #include <GLib.List>
-// #include <QTimer>
-// #include <qpushbutton.h>
-// #include <qscrollarea.h>
+//  #include <QBuffer>
+//  #include <QFile_icon_provider>
+//  #include <QClipboard>
+//  #include <QFileInfo>
+//  #include <QAbstract_proxy_model>
+//  #include <QCompleter>
+//  #include <QBox_layout>
+//  #include <QIcon>
+//  #include <QLayout>
+//  #include <QPropertyAnimation>
+//  #include <QMenu>
+//  #include <QAction>
+//  #include <QDesktopServices>
+//  #include <QInputDialog>
+//  #include <QMessageBox>
+//  #include <QCryptographicHash>
+//  #include <Gtk.Color>
+//  #include <QPainter>
+//  #include <QList_widget>
+//  #include <QSvgRenderer>
+//  #include <QPushButton>
+//  #include <QContext_menu_event>
+//  #include
+//  #include <cstring>
+//  #include
+//  #include <Gtk.Dialog
+//  #include <Gtk.Wid
+//  #include
+//  #include <GLib.List>
+//  #include <QTimer>
+//  #include <qpushbutton.h>
+//  #include <qscrollarea.h>
 
 namespace {
     const char password_is_set_placeholder = "●●●●●●●●";
@@ -64,7 +64,7 @@ class Share_user_group_widget : Gtk.Widget {
         const string local_path,
         Share_permissions max_sharing_permissions,
         const string private_link_url,
-        Gtk.Widget parent = nullptr);
+        Gtk.Widget parent = null);
     ~Share_user_group_widget () override;
 
 signals:
@@ -162,13 +162,13 @@ signals:
         const string private_link_url,
         Gtk.Widget parent)
         : Gtk.Widget (parent)
-        , this.ui (new Ui.Share_user_group_widget)
-        , this.account (account)
-        , this.share_path (share_path)
-        , this.local_path (local_path)
-        , this.max_sharing_permissions (max_sharing_permissions)
-        , this.private_link_url (private_link_url)
-        , this.disable_completer_activated (false) {
+        this.ui (new Ui.Share_user_group_widget)
+        this.account (account)
+        this.share_path (share_path)
+        this.local_path (local_path)
+        this.max_sharing_permissions (max_sharing_permissions)
+        this.private_link_url (private_link_url)
+        this.disable_completer_activated (false) {
         set_attribute (Qt.WA_DeleteOnClose);
         set_object_name ("Sharing_dialog_uG"); // required as group for save_geometry call
 
@@ -319,7 +319,7 @@ signals:
         int height = 0;
         GLib.List<string> link_owners ({});
 
-        Share_user_line just_created_share_that_needs_password = nullptr;
+        Share_user_line just_created_share_that_needs_password = null;
 
         foreach (var share, shares) {
             // We don't handle link shares, only Type_user or Type_group
@@ -337,7 +337,7 @@ signals:
                 this.ui.main_owner_label.on_set_text (string ("SharedFlag.SHARED with you by ").append (share.get_owner_display_name ()));
             }
 
-            Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.get_share_type ()));
+            //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.get_share_type ()));
             var user_group_share = q_shared_pointer_dynamic_cast<User_group_share> (share);
             var s = new Share_user_line (this.account, user_group_share, this.max_sharing_permissions, this.is_file, this.parent_scroll_area);
             connect (s, &Share_user_line.resize_requested, this, &Share_user_group_widget.on_adjust_scroll_widget_size);

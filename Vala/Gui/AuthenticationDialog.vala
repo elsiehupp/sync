@@ -4,13 +4,13 @@ Copyright (C) 2014 by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLabel>
-// #include <QLineEdit>
-// #include <QVBoxLayout>
-// #include <QFormLayout>
-// #include <QDialogButtonBox>
-
-// #include <Gtk.Dialog>
+//  #include <QLabel>
+//  #include <QLineEdit>
+//  #include <QVBoxLayout>
+//  #include <QFormLayout>
+//  #include <QDialogButtonBox>
+//  #include
+//  #include <Gtk.Dialog>
 
 
 namespace Occ {
@@ -24,7 +24,7 @@ class AuthenticationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public AuthenticationDialog (string realm, string domain, Gtk.Widget parent = nullptr);
+    public AuthenticationDialog (string realm, string domain, Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
@@ -32,7 +32,6 @@ class AuthenticationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public string password ();
 
 
@@ -46,8 +45,8 @@ class AuthenticationDialog : Gtk.Dialog {
 
     AuthenticationDialog.AuthenticationDialog (string realm, string domain, Gtk.Widget parent)
         : Gtk.Dialog (parent)
-        , this.user (new QLineEdit)
-        , this.password (new QLineEdit) {
+        this.user (new QLineEdit)
+        this.password (new QLineEdit) {
         set_window_title (_("Authentication Required"));
         var lay = new QVBoxLayout (this);
         var label = new QLabel (_("Enter username and password for \"%1\" at %2.").arg (realm, domain));

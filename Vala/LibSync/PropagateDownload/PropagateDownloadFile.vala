@@ -4,23 +4,23 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <common/checksums.h>
-// #include <common/asserts.h>
-// #include <common/constants.h>
-
-// #include <QLoggingCategory>
-// #include <QNetworkAccessManager>
-// #include <QFileInfo>
-// #include <QDir>
-// #include <cmath>
+//  #include <common/checksums.h>
+//  #include <common/asserts.h>
+//  #include <common/constants.h>
+//  #include
+//  #include <QLoggingCategory>
+//  #include <QNetworkAc
+//  #include <QFile
+//  #include <QDir>
+//  #include <cmath>
 
 #ifdef Q_OS_UNIX
-// #include <unistd.h>
+//  #include <unistd.h>
 #endif
 
-// #pragma once
+//  #pragma once
 
-// #include <Soup.Buffer>
+//  #include <Soup.Buffer>
 
 namespace Occ {
 
@@ -70,9 +70,9 @@ class PropagateDownloadFile : PropagateItemJob {
     ***********************************************************/
     public PropagateDownloadFile (OwncloudPropagator propagator, SyncFileItemPtr item)
         : PropagateItemJob (propagator, item)
-        , this.resume_start (0)
-        , this.download_progress (0)
-        , this.delete_existing (false) {
+        this.resume_start (0)
+        this.download_progress (0)
+        this.delete_existing (false) {
     }
 
 
@@ -83,7 +83,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
     // We think it might finish quickly because it is a small file.
     public bool is_likely_finished_quickly () override {
-        return this.item._size < propagator ().small_file_size ();
+        return this.item.size < propagator ().small_file_size ();
     }
 
 
@@ -143,7 +143,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    private Propagate_download_encrypted this.download_encrypted_helper = nullptr;
+    private Propagate_download_encrypted this.download_encrypted_helper = null;
 }
 
 // Always coming in with forward slashes.
@@ -175,47 +175,47 @@ void PropagateDownloadFile.start_after_is_encrypted_is_checked () {
     this.stopwatch.on_start ();
 
     var sync_options = propagator ().sync_options ();
-    var vfs = sync_options._vfs;
+    var vfs = sync_options.vfs;
 
     // For virtual files just dehydrate or create the file and be done
-    if (this.item._type == ItemTypeVirtualFileDehydration) {
-        string fs_path = propagator ().full_local_path (this.item._file);
-        if (!FileSystem.verify_file_unchanged (fs_path, this.item._previous_size, this.item._previous_modtime)) {
-            propagator ()._another_sync_needed = true;
+    if (this.item.type == ItemTypeVirtualFileDehydration) {
+        string fs_path = propagator ().full_local_path (this.item.file);
+        if (!FileSystem.verify_file_unchanged (fs_path, this.item.previous_size, this.item.previous_modtime)) {
+            propagator ().another_sync_needed = true;
             on_done (SyncFileItem.Status.SOFT_ERROR, _("File has changed since discovery"));
             return;
         }
 
-        GLib.debug (lc_propagate_download) << "dehydrating file" << this.item._file;
+        GLib.debug (lc_propagate_download) << "dehydrating file" << this.item.file;
         var r = vfs.dehydrate_placeholder (*this.item);
         if (!r) {
             on_done (SyncFileItem.Status.NORMAL_ERROR, r.error ());
             return;
         }
-        propagator ()._journal.delete_file_record (this.item._original_file);
+        propagator ().journal.delete_file_record (this.item.original_file);
         update_metadata (false);
 
-        if (!this.item._remote_perm.is_null () && !this.item._remote_perm.has_permission (RemotePermissions.Can_write)) {
+        if (!this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Can_write)) {
             // make sure ReadOnly flag is preserved for placeholder, similarly to regular files
-            FileSystem.set_file_read_only (propagator ().full_local_path (this.item._file), true);
+            FileSystem.set_file_read_only (propagator ().full_local_path (this.item.file), true);
         }
 
         return;
     }
-    if (vfs.mode () == Vfs.Off && this.item._type == ItemTypeVirtualFile) {
-        GLib.warn (lc_propagate_download) << "ignored virtual file type of" << this.item._file;
-        this.item._type = ItemTypeFile;
+    if (vfs.mode () == Vfs.Off && this.item.type == ItemTypeVirtualFile) {
+        GLib.warn (lc_propagate_download) << "ignored virtual file type of" << this.item.file;
+        this.item.type = ItemTypeFile;
     }
-    if (this.item._type == ItemTypeVirtualFile) {
-        if (propagator ().local_filename_clash (this.item._file)) {
-            on_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").arg (QDir.to_native_separators (this.item._file)));
+    if (this.item.type == ItemTypeVirtualFile) {
+        if (propagator ().local_filename_clash (this.item.file)) {
+            on_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").arg (QDir.to_native_separators (this.item.file)));
             return;
         }
 
-        GLib.debug (lc_propagate_download) << "creating virtual file" << this.item._file;
+        GLib.debug (lc_propagate_download) << "creating virtual file" << this.item.file;
         // do a klaas' case clash check.
-        if (propagator ().local_filename_clash (this.item._file)) {
-            on_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 can not be downloaded because of a local file name clash!").arg (QDir.to_native_separators (this.item._file)));
+        if (propagator ().local_filename_clash (this.item.file)) {
+            on_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 can not be downloaded because of a local file name clash!").arg (QDir.to_native_separators (this.item.file)));
             return;
         }
         var r = vfs.create_placeholder (*this.item);
@@ -225,9 +225,9 @@ void PropagateDownloadFile.start_after_is_encrypted_is_checked () {
         }
         update_metadata (false);
 
-        if (!this.item._remote_perm.is_null () && !this.item._remote_perm.has_permission (RemotePermissions.Can_write)) {
+        if (!this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Can_write)) {
             // make sure ReadOnly flag is preserved for placeholder, similarly to regular files
-            FileSystem.set_file_read_only (propagator ().full_local_path (this.item._file), true);
+            FileSystem.set_file_read_only (propagator ().full_local_path (this.item.file), true);
         }
 
         return;
@@ -252,22 +252,22 @@ void PropagateDownloadFile.start_after_is_encrypted_is_checked () {
         return checksum_header.starts_with ("SHA")
             || checksum_header.starts_with ("MD5:");
     };
-    Q_ASSERT (this.item._modtime > 0);
-    if (this.item._modtime <= 0) {
-        GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item._file << this.item._modtime;
+    //  Q_ASSERT (this.item.modtime > 0);
+    if (this.item.modtime <= 0) {
+        GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item.file << this.item.modtime;
     }
-    if (this.item._instruction == CSYNC_INSTRUCTION_CONFLICT
-        && this.item._size == this.item._previous_size
-        && !this.item._checksum_header.is_empty ()
-        && (csync_is_collision_safe_hash (this.item._checksum_header)
-            || this.item._modtime == this.item._previous_modtime)) {
-        GLib.debug (lc_propagate_download) << this.item._file << "may not need download, computing checksum";
+    if (this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
+        && this.item.size == this.item.previous_size
+        && !this.item.checksum_header.is_empty ()
+        && (csync_is_collision_safe_hash (this.item.checksum_header)
+            || this.item.modtime == this.item.previous_modtime)) {
+        GLib.debug (lc_propagate_download) << this.item.file << "may not need download, computing checksum";
         var compute_checksum = new ComputeChecksum (this);
-        compute_checksum.set_checksum_type (parse_checksum_header_type (this.item._checksum_header));
+        compute_checksum.set_checksum_type (parse_checksum_header_type (this.item.checksum_header));
         connect (compute_checksum, &ComputeChecksum.done,
             this, &PropagateDownloadFile.conflict_checksum_computed);
-        propagator ()._active_job_list.append (this);
-        compute_checksum.on_start (propagator ().full_local_path (this.item._file));
+        propagator ().active_job_list.append (this);
+        compute_checksum.on_start (propagator ().full_local_path (this.item.file));
         return;
     }
 
@@ -275,28 +275,28 @@ void PropagateDownloadFile.start_after_is_encrypted_is_checked () {
 }
 
 void PropagateDownloadFile.conflict_checksum_computed (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
-    propagator ()._active_job_list.remove_one (this);
-    if (make_checksum_header (checksum_type, checksum) == this.item._checksum_header) {
+    propagator ().active_job_list.remove_one (this);
+    if (make_checksum_header (checksum_type, checksum) == this.item.checksum_header) {
         // No download necessary, just update fs and journal metadata
-        GLib.debug (lc_propagate_download) << this.item._file << "remote and local checksum match";
+        GLib.debug (lc_propagate_download) << this.item.file << "remote and local checksum match";
 
         // Apply the server mtime locally if necessary, ensuring the journal
         // and local mtimes end up identical
-        var fn = propagator ().full_local_path (this.item._file);
-        Q_ASSERT (this.item._modtime > 0);
-        if (this.item._modtime <= 0) {
-            GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item._file << this.item._modtime;
+        var fn = propagator ().full_local_path (this.item.file);
+        //  Q_ASSERT (this.item.modtime > 0);
+        if (this.item.modtime <= 0) {
+            GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item.file << this.item.modtime;
             return;
         }
-        if (this.item._modtime != this.item._previous_modtime) {
-            Q_ASSERT (this.item._modtime > 0);
-            FileSystem.set_mod_time (fn, this.item._modtime);
+        if (this.item.modtime != this.item.previous_modtime) {
+            //  Q_ASSERT (this.item.modtime > 0);
+            FileSystem.set_mod_time (fn, this.item.modtime);
             /* emit */ propagator ().touched_file (fn);
         }
-        this.item._modtime = FileSystem.get_mod_time (fn);
-        Q_ASSERT (this.item._modtime > 0);
-        if (this.item._modtime <= 0) {
-            GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item._file << this.item._modtime;
+        this.item.modtime = FileSystem.get_mod_time (fn);
+        //  Q_ASSERT (this.item.modtime > 0);
+        if (this.item.modtime <= 0) {
+            GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item.file << this.item.modtime;
             return;
         }
         update_metadata (/*is_conflict=*/false);
@@ -306,12 +306,12 @@ void PropagateDownloadFile.conflict_checksum_computed (GLib.ByteArray checksum_t
 }
 
 void PropagateDownloadFile.start_download () {
-    if (propagator ()._abort_requested)
+    if (propagator ().abort_requested)
         return;
 
     // do a klaas' case clash check.
-    if (propagator ().local_filename_clash (this.item._file)) {
-        on_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").arg (QDir.to_native_separators (this.item._file)));
+    if (propagator ().local_filename_clash (this.item.file)) {
+        on_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").arg (QDir.to_native_separators (this.item.file)));
         return;
     }
 
@@ -319,26 +319,26 @@ void PropagateDownloadFile.start_download () {
 
     string tmp_filename;
     GLib.ByteArray expected_etag_for_resume;
-    const SyncJournalDb.DownloadInfo progress_info = propagator ()._journal.get_download_info (this.item._file);
-    if (progress_info._valid) {
+    const SyncJournalDb.DownloadInfo progress_info = propagator ().journal.get_download_info (this.item.file);
+    if (progress_info.valid) {
         // if the etag has changed meanwhile, remove the already downloaded part.
-        if (progress_info._etag != this.item._etag) {
-            FileSystem.remove (propagator ().full_local_path (progress_info._tmpfile));
-            propagator ()._journal.set_download_info (this.item._file, SyncJournalDb.DownloadInfo ());
+        if (progress_info.etag != this.item.etag) {
+            FileSystem.remove (propagator ().full_local_path (progress_info.tmpfile));
+            propagator ().journal.set_download_info (this.item.file, SyncJournalDb.DownloadInfo ());
         } else {
-            tmp_filename = progress_info._tmpfile;
-            expected_etag_for_resume = progress_info._etag;
+            tmp_filename = progress_info.tmpfile;
+            expected_etag_for_resume = progress_info.etag;
         }
     }
 
     if (tmp_filename.is_empty ()) {
-        tmp_filename = create_download_tmp_filename (this.item._file);
+        tmp_filename = create_download_tmp_filename (this.item.file);
     }
     this.tmp_file.set_filename (propagator ().full_local_path (tmp_filename));
 
     this.resume_start = this.tmp_file.size ();
-    if (this.resume_start > 0 && this.resume_start == this.item._size) {
-        q_c_info (lc_propagate_download) << "File is already complete, no need to download";
+    if (this.resume_start > 0 && this.resume_start == this.item.size) {
+        GLib.Info (lc_propagate_download) << "File is already complete, no need to download";
         download_finished ();
         return;
     }
@@ -379,43 +379,43 @@ void PropagateDownloadFile.start_download () {
     }
  {
         SyncJournalDb.DownloadInfo pi;
-        pi._etag = this.item._etag;
-        pi._tmpfile = tmp_filename;
-        pi._valid = true;
-        propagator ()._journal.set_download_info (this.item._file, pi);
-        propagator ()._journal.commit ("download file on_start");
+        pi.etag = this.item.etag;
+        pi.tmpfile = tmp_filename;
+        pi.valid = true;
+        propagator ().journal.set_download_info (this.item.file, pi);
+        propagator ().journal.commit ("download file on_start");
     }
 
     GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
 
-    if (this.item._direct_download_url.is_empty ()) {
+    if (this.item.direct_download_url.is_empty ()) {
         // Normal job, download from o_c instance
         this.job = new GETFileJob (propagator ().account (),
-            propagator ().full_remote_path (this.is_encrypted ? this.item._encrypted_filename : this.item._file),
+            propagator ().full_remote_path (this.is_encrypted ? this.item.encrypted_filename : this.item.file),
             this.tmp_file, headers, expected_etag_for_resume, this.resume_start, this);
     } else {
         // We were provided a direct URL, use that one
-        q_c_info (lc_propagate_download) << "direct_download_url given for " << this.item._file << this.item._direct_download_url;
+        GLib.Info (lc_propagate_download) << "direct_download_url given for " << this.item.file << this.item.direct_download_url;
 
-        if (!this.item._direct_download_cookies.is_empty ()) {
-            headers["Cookie"] = this.item._direct_download_cookies.to_utf8 ();
+        if (!this.item.direct_download_cookies.is_empty ()) {
+            headers["Cookie"] = this.item.direct_download_cookies.to_utf8 ();
         }
 
-        GLib.Uri url = GLib.Uri.from_user_input (this.item._direct_download_url);
+        GLib.Uri url = GLib.Uri.from_user_input (this.item.direct_download_url);
         this.job = new GETFileJob (propagator ().account (),
             url,
             this.tmp_file, headers, expected_etag_for_resume, this.resume_start, this);
     }
-    this.job.set_bandwidth_manager (&propagator ()._bandwidth_manager);
+    this.job.set_bandwidth_manager (&propagator ().bandwidth_manager);
     connect (this.job.data (), &GETFileJob.finished_signal, this, &PropagateDownloadFile.on_get_finished);
     connect (this.job.data (), &GETFileJob.download_progress, this, &PropagateDownloadFile.on_download_progress);
-    propagator ()._active_job_list.append (this);
+    propagator ().active_job_list.append (this);
     this.job.on_start ();
 }
 
 int64 PropagateDownloadFile.committed_disk_space () {
     if (this.state == Running) {
-        return q_bound (0LL, this.item._size - this.resume_start - this.download_progress, this.item._size);
+        return q_bound (0LL, this.item.size - this.resume_start - this.download_progress, this.item.size);
     }
     return 0;
 }
@@ -426,32 +426,32 @@ void PropagateDownloadFile.set_delete_existing_folder (bool enabled) {
 
 const char owncloud_custom_soft_error_string_c[] = "owncloud-custom-soft-error-string";
 void PropagateDownloadFile.on_get_finished () {
-    propagator ()._active_job_list.remove_one (this);
+    propagator ().active_job_list.remove_one (this);
 
     GETFileJob job = this.job;
     ASSERT (job);
 
-    this.item._http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-    this.item._request_id = job.request_id ();
+    this.item.http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+    this.item.request_id = job.request_id ();
 
     Soup.Reply.NetworkError err = job.reply ().error ();
     if (err != Soup.Reply.NoError) {
         // If we sent a 'Range' header and get 416 back, we want to retry
         // without the header.
-        const bool bad_range_header = job.resume_start () > 0 && this.item._http_error_code == 416;
+        const bool bad_range_header = job.resume_start () > 0 && this.item.http_error_code == 416;
         if (bad_range_header) {
             GLib.warn (lc_propagate_download) << "server replied 416 to our range request, trying again without";
-            propagator ()._another_sync_needed = true;
+            propagator ().another_sync_needed = true;
         }
 
         // Getting a 404 probably means that the file was deleted on the server.
-        const bool file_not_found = this.item._http_error_code == 404;
+        const bool file_not_found = this.item.http_error_code == 404;
         if (file_not_found) {
             GLib.warn (lc_propagate_download) << "server replied 404, assuming file was deleted";
         }
 
         // Getting a 423 means that the file is locked
-        const bool file_locked = this.item._http_error_code == 423;
+        const bool file_locked = this.item.http_error_code == 423;
         if (file_locked) {
             GLib.warn (lc_propagate_download) << "server replied 423, file is Locked";
         }
@@ -461,13 +461,13 @@ void PropagateDownloadFile.on_get_finished () {
         if (this.tmp_file.exists () && (this.tmp_file.size () == 0 || bad_range_header || file_not_found)) {
             this.tmp_file.close ();
             FileSystem.remove (this.tmp_file.filename ());
-            propagator ()._journal.set_download_info (this.item._file, SyncJournalDb.DownloadInfo ());
+            propagator ().journal.set_download_info (this.item.file, SyncJournalDb.DownloadInfo ());
         }
 
-        if (!this.item._direct_download_url.is_empty () && err != Soup.Reply.OperationCanceledError) {
+        if (!this.item.direct_download_url.is_empty () && err != Soup.Reply.OperationCanceledError) {
             // If this was with a direct download, retry without direct download
-            GLib.warn (lc_propagate_download) << "Direct download of" << this.item._direct_download_url << "failed. Retrying through owncloud.";
-            this.item._direct_download_url.clear ();
+            GLib.warn (lc_propagate_download) << "Direct download of" << this.item.direct_download_url << "failed. Retrying through owncloud.";
+            this.item.direct_download_url.clear ();
             on_start ();
             return;
         }
@@ -490,36 +490,36 @@ void PropagateDownloadFile.on_get_finished () {
             // As a precaution against bugs that cause our database and the
             // reality on the server to diverge, rediscover this folder on the
             // next sync run.
-            propagator ()._journal.schedule_path_for_remote_discovery (this.item._file);
+            propagator ().journal.schedule_path_for_remote_discovery (this.item.file);
         }
 
         GLib.ByteArray error_body;
-        string error_string = this.item._http_error_code >= 400 ? job.error_string_parsing_body (&error_body)
+        string error_string = this.item.http_error_code >= 400 ? job.error_string_parsing_body (&error_body)
                                                            : job.error_string ();
         SyncFileItem.Status status = job.error_status ();
         if (status == SyncFileItem.Status.NO_STATUS) {
-            status = classify_error (err, this.item._http_error_code,
-                propagator ()._another_sync_needed, error_body);
+            status = classify_error (err, this.item.http_error_code,
+                propagator ().another_sync_needed, error_body);
         }
 
         on_done (status, error_string);
         return;
     }
 
-    this.item._response_time_stamp = job.response_timestamp ();
+    this.item.response_time_stamp = job.response_timestamp ();
 
     if (!job.etag ().is_empty ()) {
         // The etag will be empty if we used a direct download URL.
         // (If it was really empty by the server, the GETFileJob will have errored
-        this.item._etag = parse_etag (job.etag ());
+        this.item.etag = parse_etag (job.etag ());
     }
     if (job.last_modified ()) {
         // It is possible that the file was modified on the server since we did the discovery phase
         // so make sure we have the up-to-date time
-        this.item._modtime = job.last_modified ();
-        Q_ASSERT (this.item._modtime > 0);
-        if (this.item._modtime <= 0) {
-            GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item._file << this.item._modtime;
+        this.item.modtime = job.last_modified ();
+        //  Q_ASSERT (this.item.modtime > 0);
+        if (this.item.modtime <= 0) {
+            GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item.file << this.item.modtime;
         }
     }
 
@@ -548,7 +548,7 @@ void PropagateDownloadFile.on_get_finished () {
     if (has_size_header && this.tmp_file.size () > 0 && body_size == 0) {
         // Strange bug with broken webserver or webfirewall https://github.com/owncloud/client/issues/3373#issuecomment-122672322
         // This happened when trying to resume a file. The Content-Range header was files, Content-Length was == 0
-        GLib.debug (lc_propagate_download) << body_size << this.item._size << this.tmp_file.size () << job.resume_start ();
+        GLib.debug (lc_propagate_download) << body_size << this.item.size << this.tmp_file.size () << job.resume_start ();
         FileSystem.remove (this.tmp_file.filename ());
         on_done (SyncFileItem.Status.SOFT_ERROR, QLatin1String ("Broken webserver returning empty content length for non-empty file on resume"));
         return;
@@ -556,27 +556,27 @@ void PropagateDownloadFile.on_get_finished () {
 
     if (body_size > 0 && body_size != this.tmp_file.size () - job.resume_start ()) {
         GLib.debug (lc_propagate_download) << body_size << this.tmp_file.size () << job.resume_start ();
-        propagator ()._another_sync_needed = true;
+        propagator ().another_sync_needed = true;
         on_done (SyncFileItem.Status.SOFT_ERROR, _("The file could not be downloaded completely."));
         return;
     }
 
-    if (this.tmp_file.size () == 0 && this.item._size > 0) {
+    if (this.tmp_file.size () == 0 && this.item.size > 0) {
         FileSystem.remove (this.tmp_file.filename ());
         on_done (SyncFileItem.Status.NORMAL_ERROR,
             _("The downloaded file is empty, but the server said it should have been %1.")
-                .arg (Utility.octets_to_string (this.item._size)));
+                .arg (Utility.octets_to_string (this.item.size)));
         return;
     }
 
     // Did the file come with conflict headers? If so, store them now!
     // If we download conflict files but the server doesn't send conflict
     // headers, the record will be established by SyncEngine.conflict_record_maintenance.
-    // (we can't reliably determine the file id of the base file here,
+    // (we can't reliably determine the file identifier of the base file here,
     // it might still be downloaded in a parallel job and not exist in
     // the database yet!)
     if (job.reply ().raw_header ("OC-Conflict") == "1") {
-        this.conflict_record.path = this.item._file.to_utf8 ();
+        this.conflict_record.path = this.item.file.to_utf8 ();
         this.conflict_record.initial_base_path = job.reply ().raw_header ("OC-ConflictInitialBasePath");
         this.conflict_record.base_file_id = job.reply ().raw_header ("OC-ConflictBaseFileId");
         this.conflict_record.base_etag = job.reply ().raw_header ("OC-ConflictBaseEtag");
@@ -607,12 +607,12 @@ void PropagateDownloadFile.on_get_finished () {
 
 void PropagateDownloadFile.on_checksum_fail (string error_message) {
     FileSystem.remove (this.tmp_file.filename ());
-    propagator ()._another_sync_needed = true;
+    propagator ().another_sync_needed = true;
     on_done (SyncFileItem.Status.SOFT_ERROR, error_message); // _("The file downloaded with a broken checksum, will be redownloaded."));
 }
 
 void PropagateDownloadFile.delete_existing_folder () {
-    string existing_dir = propagator ().full_local_path (this.item._file);
+    string existing_dir = propagator ().full_local_path (this.item.file);
     if (!QFileInfo (existing_dir).is_dir ()) {
         return;
     }
@@ -680,7 +680,7 @@ namespace { // Anonymous namespace for the recall feature
                 continue;
             }
 
-            q_c_info (lc_propagate_download) << "Recalling" << local_recalled_file << "Checksum:" << record._checksum_header;
+            GLib.Info (lc_propagate_download) << "Recalling" << local_recalled_file << "Checksum:" << record.checksum_header;
 
             string target_path = make_recall_filename (recalled_file);
 
@@ -690,6 +690,7 @@ namespace { // Anonymous namespace for the recall feature
             GLib.File.copy (recalled_file, target_path);
         }
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -728,7 +729,7 @@ void PropagateDownloadFile.transmission_checksum_validated (GLib.ByteArray check
 }
 
 void PropagateDownloadFile.content_checksum_computed (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
-    this.item._checksum_header = make_checksum_header (checksum_type, checksum);
+    this.item.checksum_header = make_checksum_header (checksum_type, checksum);
 
     if (this.is_encrypted) {
         if (this.download_encrypted_helper.decrypt_file (this.tmp_file)) {
@@ -744,36 +745,36 @@ void PropagateDownloadFile.content_checksum_computed (GLib.ByteArray checksum_ty
 
 void PropagateDownloadFile.download_finished () {
     ASSERT (!this.tmp_file.is_open ());
-    string fn = propagator ().full_local_path (this.item._file);
+    string fn = propagator ().full_local_path (this.item.file);
 
     // In case of file name clash, report an error
     // This can happen if another parallel download saved a clashing file.
-    if (propagator ().local_filename_clash (this.item._file)) {
-        on_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be saved because of a local file name clash!").arg (QDir.to_native_separators (this.item._file)));
+    if (propagator ().local_filename_clash (this.item.file)) {
+        on_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be saved because of a local file name clash!").arg (QDir.to_native_separators (this.item.file)));
         return;
     }
 
-    if (this.item._modtime <= 0) {
+    if (this.item.modtime <= 0) {
         FileSystem.remove (this.tmp_file.filename ());
-        on_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").arg (QDir.to_native_separators (this.item._file)));
+        on_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").arg (QDir.to_native_separators (this.item.file)));
         return;
     }
-    Q_ASSERT (this.item._modtime > 0);
-    if (this.item._modtime <= 0) {
-        GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item._file << this.item._modtime;
+    //  Q_ASSERT (this.item.modtime > 0);
+    if (this.item.modtime <= 0) {
+        GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item.file << this.item.modtime;
     }
-    FileSystem.set_mod_time (this.tmp_file.filename (), this.item._modtime);
+    FileSystem.set_mod_time (this.tmp_file.filename (), this.item.modtime);
     // We need to fetch the time again because some file systems such as FAT have worse than a second
     // Accuracy, and we really need the time from the file system. (#3103)
-    this.item._modtime = FileSystem.get_mod_time (this.tmp_file.filename ());
-    if (this.item._modtime <= 0) {
+    this.item.modtime = FileSystem.get_mod_time (this.tmp_file.filename ());
+    if (this.item.modtime <= 0) {
         FileSystem.remove (this.tmp_file.filename ());
-        on_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").arg (QDir.to_native_separators (this.item._file)));
+        on_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").arg (QDir.to_native_separators (this.item.file)));
         return;
     }
-    Q_ASSERT (this.item._modtime > 0);
-    if (this.item._modtime <= 0) {
-        GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item._file << this.item._modtime;
+    //  Q_ASSERT (this.item.modtime > 0);
+    if (this.item.modtime <= 0) {
+        GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item.file << this.item.modtime;
     }
 
     bool previous_file_exists = FileSystem.file_exists (fn);
@@ -786,7 +787,7 @@ void PropagateDownloadFile.download_finished () {
         preserve_group_ownership (this.tmp_file.filename (), existing_file);
 
         // Make the file a hydrated placeholder if possible
-        const var result = propagator ().sync_options ()._vfs.convert_to_placeholder (this.tmp_file.filename (), this.item, fn);
+        const var result = propagator ().sync_options ().vfs.convert_to_placeholder (this.tmp_file.filename (), this.item, fn);
         if (!result) {
             on_done (SyncFileItem.Status.NORMAL_ERROR, result.error ());
             return;
@@ -794,9 +795,9 @@ void PropagateDownloadFile.download_finished () {
     }
 
     // Apply the remote permissions
-    FileSystem.set_file_read_only_weak (this.tmp_file.filename (), !this.item._remote_perm.is_null () && !this.item._remote_perm.has_permission (RemotePermissions.Can_write));
+    FileSystem.set_file_read_only_weak (this.tmp_file.filename (), !this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Can_write));
 
-    bool is_conflict = this.item._instruction == CSYNC_INSTRUCTION_CONFLICT
+    bool is_conflict = this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
         && (QFileInfo (fn).is_dir () || !FileSystem.file_equals (fn, this.tmp_file.filename ()));
     if (is_conflict) {
         string error;
@@ -807,21 +808,21 @@ void PropagateDownloadFile.download_finished () {
         previous_file_exists = false;
     }
 
-    const var vfs = propagator ().sync_options ()._vfs;
+    const var vfs = propagator ().sync_options ().vfs;
 
     // In the case of an hydration, this size is likely to change for placeholders
     // (except with the cfapi backend)
-    const var is_virtual_download = this.item._type == ItemTypeVirtualFileDownload;
+    const var is_virtual_download = this.item.type == ItemTypeVirtualFileDownload;
     const var is_cf_api_vfs = vfs && vfs.mode () == Vfs.WindowsCfApi;
     if (previous_file_exists && (is_cf_api_vfs || !is_virtual_download)) {
         // Check whether the existing file has changed since the discovery
         // phase by comparing size and mtime to the previous values. This
         // is necessary to avoid overwriting user changes that happened between
         // the discovery phase and now.
-        const int64 expected_size = this.item._previous_size;
-        const time_t expected_mtime = this.item._previous_modtime;
+        const int64 expected_size = this.item.previous_size;
+        const time_t expected_mtime = this.item.previous_modtime;
         if (!FileSystem.verify_file_unchanged (fn, expected_size, expected_mtime)) {
-            propagator ()._another_sync_needed = true;
+            propagator ().another_sync_needed = true;
             on_done (SyncFileItem.Status.SOFT_ERROR, _("File has changed since discovery"));
             return;
         }
@@ -837,7 +838,7 @@ void PropagateDownloadFile.download_finished () {
         if (FileSystem.is_file_locked (fn)) {
             /* emit */ propagator ().seen_locked_file (fn);
         } else {
-            propagator ()._another_sync_needed = true;
+            propagator ().another_sync_needed = true;
         }
 
         on_done (SyncFileItem.Status.SOFT_ERROR, error);
@@ -848,28 +849,28 @@ void PropagateDownloadFile.download_finished () {
 
     // Maybe we downloaded a newer version of the file than we thought we would...
     // Get up to date information for the journal.
-    this.item._size = FileSystem.get_size (fn);
+    this.item.size = FileSystem.get_size (fn);
 
     // Maybe what we downloaded was a conflict file? If so, set a conflict record.
     // (the data was prepared in on_get_finished above)
     if (this.conflict_record.is_valid ())
-        propagator ()._journal.set_conflict_record (this.conflict_record);
+        propagator ().journal.set_conflict_record (this.conflict_record);
 
     if (vfs && vfs.mode () == Vfs.WithSuffix) {
         // If the virtual file used to have a different name and database
         // entry, remove it transfer its old pin state.
-        if (this.item._type == ItemTypeVirtualFileDownload) {
-            string virtual_file = this.item._file + vfs.file_suffix ();
+        if (this.item.type == ItemTypeVirtualFileDownload) {
+            string virtual_file = this.item.file + vfs.file_suffix ();
             var fn = propagator ().full_local_path (virtual_file);
             GLib.debug (lc_propagate_download) << "Download of previous virtual file on_finished" << fn;
             GLib.File.remove (fn);
-            propagator ()._journal.delete_file_record (virtual_file);
+            propagator ().journal.delete_file_record (virtual_file);
 
             // Move the pin state to the new location
-            var pin = propagator ()._journal.internal_pin_states ().raw_for_path (virtual_file.to_utf8 ());
+            var pin = propagator ().journal.internal_pin_states ().raw_for_path (virtual_file.to_utf8 ());
             if (pin && *pin != PinState.PinState.INHERITED) {
-                if (!vfs.set_pin_state (this.item._file, *pin)) {
-                    GLib.warn (lc_propagate_download) << "Could not set pin state of" << this.item._file;
+                if (!vfs.set_pin_state (this.item.file, *pin)) {
+                    GLib.warn (lc_propagate_download) << "Could not set pin state of" << this.item.file;
                 }
                 if (!vfs.set_pin_state (virtual_file, PinState.PinState.INHERITED)) {
                     GLib.warn (lc_propagate_download) << "Could not set pin state of" << virtual_file << " to inherited";
@@ -878,10 +879,10 @@ void PropagateDownloadFile.download_finished () {
         }
 
         // Ensure the pin state isn't contradictory
-        var pin = vfs.pin_state (this.item._file);
+        var pin = vfs.pin_state (this.item.file);
         if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY)
-            if (!vfs.set_pin_state (this.item._file, PinState.PinState.UNSPECIFIED)) {
-                GLib.warn (lc_propagate_download) << "Could not set pin state of" << this.item._file << "to unspecified";
+            if (!vfs.set_pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
+                GLib.warn (lc_propagate_download) << "Could not set pin state of" << this.item.file << "to unspecified";
             }
     }
 
@@ -889,36 +890,36 @@ void PropagateDownloadFile.download_finished () {
 }
 
 void PropagateDownloadFile.update_metadata (bool is_conflict) {
-    const string fn = propagator ().full_local_path (this.item._file);
+    const string fn = propagator ().full_local_path (this.item.file);
     const var result = propagator ().update_metadata (*this.item);
     if (!result) {
         on_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
         return;
     } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-        on_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (this.item._file));
+        on_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (this.item.file));
         return;
     }
 
     if (this.is_encrypted) {
-        propagator ()._journal.set_download_info (this.item._file, SyncJournalDb.DownloadInfo ());
+        propagator ().journal.set_download_info (this.item.file, SyncJournalDb.DownloadInfo ());
     } else {
-        propagator ()._journal.set_download_info (this.item._encrypted_filename, SyncJournalDb.DownloadInfo ());
+        propagator ().journal.set_download_info (this.item.encrypted_filename, SyncJournalDb.DownloadInfo ());
     }
 
-    propagator ()._journal.commit ("download file start2");
+    propagator ().journal.commit ("download file start2");
 
     on_done (is_conflict ? SyncFileItem.Status.CONFLICT : SyncFileItem.Status.SUCCESS);
 
     // handle the special recall file
-    if (!this.item._remote_perm.has_permission (RemotePermissions.IsShared)
-        && (this.item._file == QLatin1String (".sys.admin#recall#")
-               || this.item._file.ends_with (QLatin1String ("/.sys.admin#recall#")))) {
-        handle_recall_file (fn, propagator ().local_path (), *propagator ()._journal);
+    if (!this.item.remote_perm.has_permission (RemotePermissions.IsShared)
+        && (this.item.file == QLatin1String (".sys.admin#recall#")
+               || this.item.file.ends_with (QLatin1String ("/.sys.admin#recall#")))) {
+        handle_recall_file (fn, propagator ().local_path (), *propagator ().journal);
     }
 
     int64 duration = this.stopwatch.elapsed ();
     if (is_likely_finished_quickly () && duration > 5 * 1000) {
-        GLib.warn (lc_propagate_download) << "WARNING : Unexpectedly slow connection, took" << duration << "msec for" << this.item._size - this.resume_start << "bytes for" << this.item._file;
+        GLib.warn (lc_propagate_download) << "WARNING : Unexpectedly slow connection, took" << duration << "msec for" << this.item.size - this.resume_start << "bytes for" << this.item.file;
     }
 }
 
@@ -933,7 +934,7 @@ void PropagateDownloadFile.on_abort (PropagatorJob.AbortType abort_type) {
     if (this.job && this.job.reply ())
         this.job.reply ().on_abort ();
 
-    if (abort_type == AbortType.Asynchronous) {
+    if (abort_type == AbortType.ASYNCHRONOUS) {
         /* emit */ abort_finished ();
     }
 }

@@ -4,18 +4,18 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
-// #include <Soup.Request>
-using Soup;
-// #include <QNetworkProxy>
-// #include <QAuthenticator>
-// #include <QSslConfiguration>
-// #include <QNetworkCookie>
-// #include <QNetworkCookieJar>
-// #include <QNetworkConfiguration>
-// #include <QUuid>
+//  #include <QLoggingCategory>
+//  #include <Soup.Request>
+//  #include
+//  #include <QNetworkProxy>
+//  #include <QAuthenticator>
+//  #include <QSslConfigurati
+//  #include <QNetworkCookie>
+//  #include <QNetworkCookieJar>
+//  #include <QNetwor
+//  #include <QUuid>
 
-// #include <QNetworkAccessManager>
+//  #include <QNetworkAccessManager>
 
 
 namespace Occ {
@@ -28,30 +28,23 @@ class AccessManager : QNetworkAccessManager {
 
     /***********************************************************
     ***********************************************************/
-    public static GLib.ByteArray generate_request_id ();
+    public AccessManager (GLib.Object parent = new GLib.Object ()) {
+        base (parent);
 
-    /***********************************************************
-    ***********************************************************/
-    public AccessManager (GLib.Object parent = new GLib.Object ());
-
-    protected Soup.Reply create_request (QNetworkAccessManager.Operation op, Soup.Request request, QIODevice outgoing_data = nullptr) override;
-}
-
-    AccessManager.AccessManager (GLib.Object parent)
-        : QNetworkAccessManager (parent) {
-
-    #ifndef Q_OS_LINUX
-        // Atempt to workaround for https://github.com/owncloud/client/issues/3969
-        set_configuration (QNetworkConfiguration ());
-    #endif
         set_cookie_jar (new CookieJar);
     }
 
-    GLib.ByteArray AccessManager.generate_request_id () {
+
+    /***********************************************************
+    ***********************************************************/
+    public static GLib.ByteArray generate_request_id () {
         return QUuid.create_uuid ().to_byte_array (QUuid.WithoutBraces);
     }
 
-    Soup.Reply *AccessManager.create_request (QNetworkAccessManager.Operation op, Soup.Request request, QIODevice outgoing_data) {
+
+    /***********************************************************
+    ***********************************************************/
+    protected Soup.Reply create_request (QNetworkAccessManager.Operation op, Soup.Request request, QIODevice outgoing_data = null) {
         Soup.Request new_request (request);
 
         // Respect request specific user agent if any
@@ -69,7 +62,7 @@ class AccessManager : QNetworkAccessManager {
             new_request.set_header (Soup.Request.ContentTypeHeader, QLatin1String ("text/xml; charset=utf-8"));
         }
 
-        // Generate a new request id
+        // Generate a new request identifier
         GLib.ByteArray request_id = generate_request_id ();
         q_info (lc_access_manager) << op << verb << new_request.url ().to_string () << "has X-Request-ID" << request_id;
         new_request.set_raw_header ("X-Request-ID", request_id);
@@ -88,6 +81,7 @@ class AccessManager : QNetworkAccessManager {
         HttpLogger.log_request (reply, op, outgoing_data);
         return reply;
     }
+} // class AccessManager
 
-    } // namespace Occ
+} // namespace Occ
     

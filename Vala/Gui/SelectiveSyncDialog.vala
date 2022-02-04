@@ -4,21 +4,21 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QDialogButtonBox>
-// #include <QVBoxLayout>
-// #include <QTree_widget>
-// #include <qpushbutton.h>
-// #include <QFile_icon_provider>
-// #include <QHeaderView>
-// #include <QSettings>
-// #include <QScoped_value_rollback>
-// #include <QTree_widget_item>
-// #include <QLabel>
-// #include <QVBoxLayout>
+//  #include <QDialogButtonBox>
+//  #include <QVBoxLayout>
+//  #include <QTree_widget>
+//  #include <qpushbutton.h>
+//  #include <QFile_icon_provider>
+//  #include <QHeaderView>
+//  #include <QSettings>
+//  #include <QScoped_value_rollback>
+//  #include <QTree_widget_item>
+//  #include <QLabel>
+//  #include <QVBoxLayout>
 
-// #pragma once
-// #include <Gtk.Dialog>
-// #include <QTree_widget>
+//  #pragma once
+//  #include <Gtk.Dialog>
+//  #include <QTree_widget>
 
 
 namespace Occ {
@@ -32,10 +32,10 @@ namespace Occ {
 class Selective_sync_dialog : Gtk.Dialog {
 
     // Dialog for a specific folder (used from the account settings button)
-    public Selective_sync_dialog (AccountPointer account, Folder folder, Gtk.Widget parent = nullptr, Qt.Window_flags f = {});
+    public Selective_sync_dialog (AccountPointer account, Folder folder, Gtk.Widget parent = null, Qt.Window_flags f = {});
 
     // Dialog for the whole account (Used from the wizard)
-    public Selective_sync_dialog (AccountPointer account, string folder, string[] blocklist, Gtk.Widget parent = nullptr, Qt.Window_flags f = {});
+    public Selective_sync_dialog (AccountPointer account, string folder, string[] blocklist, Gtk.Widget parent = null, Qt.Window_flags f = {});
 
     /***********************************************************
     ***********************************************************/
@@ -47,7 +47,6 @@ class Selective_sync_dialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public string[] old_block_list ();
 
     // Estimate the size of the total of sync'ed files from the server
@@ -71,8 +70,8 @@ class Selective_sync_dialog : Gtk.Dialog {
 
     Selective_sync_dialog.Selective_sync_dialog (AccountPointer account, Folder folder, Gtk.Widget parent, Qt.Window_flags f)
         : Gtk.Dialog (parent, f)
-        , this.folder (folder)
-        , this.ok_button (nullptr) // defined in on_init () {
+        this.folder (folder)
+        this.ok_button (null) // defined in on_init () {
         bool ok = false;
         on_init (account);
         string[] selective_sync_list = this.folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
@@ -88,7 +87,7 @@ class Selective_sync_dialog : Gtk.Dialog {
     Selective_sync_dialog.Selective_sync_dialog (AccountPointer account, string folder,
         const string[] blocklist, Gtk.Widget parent, Qt.Window_flags f)
         : Gtk.Dialog (parent, f)
-        , this.folder (nullptr) {
+        this.folder (null) {
         on_init (account);
         this.selective_sync.set_folder_info (folder, folder, blocklist);
     }
@@ -101,7 +100,7 @@ class Selective_sync_dialog : Gtk.Dialog {
         var button_box = new QDialogButtonBox (Qt.Horizontal);
         this.ok_button = button_box.add_button (QDialogButtonBox.Ok);
         connect (this.ok_button, &QPushButton.clicked, this, &Selective_sync_dialog.accept);
-        QPushButton button = nullptr;
+        QPushButton button = null;
         button = button_box.add_button (QDialogButtonBox.Cancel);
         connect (button, &QAbstractButton.clicked, this, &Gtk.Dialog.reject);
         layout.add_widget (button_box);

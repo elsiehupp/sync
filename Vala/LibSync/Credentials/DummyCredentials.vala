@@ -10,58 +10,83 @@ class DummyCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public string this.user;
-    public string this.password;
-    public string auth_type () override;
-    public string user () override;
-    public string password () override;
-    public QNetworkAccessManager create_qNAM () override;
-    public bool ready () override;
-    public bool still_valid (Soup.Reply reply) override;
-    public void fetch_from_keychain () override;
-    public void ask_from_user () override;
-    public void persist () override;
-    public void invalidate_token () override {}
-    public void forget_sensitive_data () override{};
-}
+    public string user;
+    public string password;
 
-    string DummyCredentials.auth_type () {
-        return string.from_latin1 ("dummy");
+    /***********************************************************
+    ***********************************************************/
+    public string auth_type () {
+        return "dummy";
     }
 
-    string DummyCredentials.user () {
+
+    /***********************************************************
+    ***********************************************************/
+    public string user () {
         return this.user;
     }
 
-    string DummyCredentials.password () {
+
+    /***********************************************************
+    ***********************************************************/
+    public string password () {
         Q_UNREACHABLE ();
         return "";
     }
 
-    QNetworkAccessManager *DummyCredentials.create_qNAM () {
+
+    /***********************************************************
+    ***********************************************************/
+    public QNetworkAccessManager create_qnam () {
         return new AccessManager;
     }
 
-    bool DummyCredentials.ready () {
+
+    /***********************************************************
+    ***********************************************************/
+    public bool ready () {
         return true;
     }
 
-    bool DummyCredentials.still_valid (Soup.Reply reply) {
+
+    /***********************************************************
+    ***********************************************************/
+    public bool still_valid (Soup.Reply reply) {
         Q_UNUSED (reply)
         return true;
     }
 
-    void DummyCredentials.fetch_from_keychain () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void fetch_from_keychain () {
         this.was_fetched = true;
-        Q_EMIT (fetched ());
+        /* Q_EMIT */ (fetched ());
     }
 
-    void DummyCredentials.ask_from_user () {
-        Q_EMIT (asked ());
+
+    /***********************************************************
+    ***********************************************************/
+    public void ask_from_user () {
+        /* Q_EMIT */ (asked ());
     }
 
-    void DummyCredentials.persist () {
-    }
 
-    } // namespace Occ
+    /***********************************************************
+    ***********************************************************/
+    public void persist () { }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void invalidate_token () {}
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void forget_sensitive_data () {}
+
+} // class DummyCredentials
+
+} // namespace Occ
     

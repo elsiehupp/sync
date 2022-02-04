@@ -5,12 +5,12 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLabel>
-// #include <QPixmap>
-// #include <QRadio_button>
-// #include <QAbstractButton>
-// #include <QCheckBox>
-// #include <QSpin_box>
+//  #include <QLabel>
+//  #include <QPixmap>
+//  #include <QRadio_button>
+//  #include <QAbstractButton>
+//  #include <QCheckBox>
+//  #include <QSpin_box>
 
 
 namespace Occ {

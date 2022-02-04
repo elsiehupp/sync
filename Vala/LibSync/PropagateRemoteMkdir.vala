@@ -4,8 +4,8 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
-// #pragma once
+//  #include <QLoggingCategory>
+//  #pragma once
 
 namespace Occ {
 
@@ -61,26 +61,26 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
     PropagateRemoteMkdir.PropagateRemoteMkdir (OwncloudPropagator propagator, SyncFileItemPtr item)
         : PropagateItemJob (propagator, item)
-        , this.delete_existing (false)
-        , this.upload_encrypted_helper (nullptr) {
-        const var path = this.item._file;
+        this.delete_existing (false)
+        this.upload_encrypted_helper (null) {
+        const var path = this.item.file;
         const var slash_position = path.last_index_of ('/');
         const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
         SyncJournalFileRecord parent_rec;
-        bool ok = propagator._journal.get_file_record (parent_path, parent_rec);
+        bool ok = propagator.journal.get_file_record (parent_path, parent_rec);
         if (!ok) {
             return;
         }
     }
 
     void PropagateRemoteMkdir.on_start () {
-        if (propagator ()._abort_requested)
+        if (propagator ().abort_requested)
             return;
 
-        GLib.debug (lc_propagate_remote_mkdir) << this.item._file;
+        GLib.debug (lc_propagate_remote_mkdir) << this.item.file;
 
-        propagator ()._active_job_list.append (this);
+        propagator ().active_job_list.append (this);
 
         if (!this.delete_existing) {
             on_mkdir ();
@@ -88,20 +88,20 @@ class PropagateRemoteMkdir : PropagateItemJob {
         }
 
         this.job = new DeleteJob (propagator ().account (),
-            propagator ().full_remote_path (this.item._file),
+            propagator ().full_remote_path (this.item.file),
             this);
         connect (qobject_cast<DeleteJob> (this.job), &DeleteJob.finished_signal, this, &PropagateRemoteMkdir.on_mkdir);
         this.job.on_start ();
     }
 
     void PropagateRemoteMkdir.on_start_mkcol_job () {
-        if (propagator ()._abort_requested)
+        if (propagator ().abort_requested)
             return;
 
-        GLib.debug (lc_propagate_remote_mkdir) << this.item._file;
+        GLib.debug (lc_propagate_remote_mkdir) << this.item.file;
 
         this.job = new MkColJob (propagator ().account (),
-            propagator ().full_remote_path (this.item._file),
+            propagator ().full_remote_path (this.item.file),
             this);
         connect (qobject_cast<MkColJob> (this.job), &MkColJob.finished_with_error, this, &PropagateRemoteMkdir.on_mkcol_job_finished);
         connect (qobject_cast<MkColJob> (this.job), &MkColJob.finished_without_error, this, &PropagateRemoteMkdir.on_mkcol_job_finished);
@@ -112,7 +112,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         Q_UNUSED (path)
         Q_UNUSED (size)
 
-        if (propagator ()._abort_requested)
+        if (propagator ().abort_requested)
             return;
 
         q_debug () << filename;
@@ -131,7 +131,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         if (this.job && this.job.reply ())
             this.job.reply ().on_abort ();
 
-        if (abort_type == AbortType.Asynchronous) {
+        if (abort_type == AbortType.ASYNCHRONOUS) {
             /* emit */ abort_finished ();
         }
     }
@@ -141,62 +141,62 @@ class PropagateRemoteMkdir : PropagateItemJob {
     }
 
     void PropagateRemoteMkdir.finalize_mk_col_job (Soup.Reply.NetworkError err, string job_http_reason_phrase_string, string job_path) {
-        if (this.item._http_error_code == 405) {
+        if (this.item.http_error_code == 405) {
             // This happens when the directory already exists. Nothing to do.
             q_debug (lc_propagate_remote_mkdir) << "Folder" << job_path << "already exists.";
         } else if (err != Soup.Reply.NoError) {
-            SyncFileItem.Status status = classify_error (err, this.item._http_error_code,
-                propagator ()._another_sync_needed);
-            on_done (status, this.item._error_string);
+            SyncFileItem.Status status = classify_error (err, this.item.http_error_code,
+                propagator ().another_sync_needed);
+            on_done (status, this.item.error_string);
             return;
-        } else if (this.item._http_error_code != 201) {
+        } else if (this.item.http_error_code != 201) {
             // Normally we expect "201 Created"
             // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
             // throw an error.
             on_done (SyncFileItem.Status.NORMAL_ERROR,
                 _("Wrong HTTP code returned by server. Expected 201, but received \"%1 %2\".")
-                    .arg (this.item._http_error_code)
+                    .arg (this.item.http_error_code)
                     .arg (job_http_reason_phrase_string));
             return;
         }
 
-        propagator ()._active_job_list.append (this);
+        propagator ().active_job_list.append (this);
         var propfind_job = new PropfindJob (propagator ().account (), job_path, this);
         propfind_job.set_properties ({"http://owncloud.org/ns:permissions"});
         connect (propfind_job, &PropfindJob.result, this, [this, job_path] (QVariantMap result){
-            propagator ()._active_job_list.remove_one (this);
-            this.item._remote_perm = RemotePermissions.from_server_string (result.value (QStringLiteral ("permissions")).to_string ());
+            propagator ().active_job_list.remove_one (this);
+            this.item.remote_perm = RemotePermissions.from_server_string (result.value (QStringLiteral ("permissions")).to_string ());
 
-            if (!this.upload_encrypted_helper && !this.item._is_encrypted) {
+            if (!this.upload_encrypted_helper && !this.item.is_encrypted) {
                 on_success ();
             } else {
                 // We still need to mark that folder encrypted in case we were uploading it as encrypted one
                 // Another scenario, is we are creating a new folder because of move operation on an encrypted folder that works via remove + re-upload
-                propagator ()._active_job_list.append (this);
+                propagator ().active_job_list.append (this);
 
                 // We're expecting directory path in /Foo/Bar convention...
-                Q_ASSERT (job_path.starts_with ('/') && !job_path.ends_with ('/'));
+                //  Q_ASSERT (job_path.starts_with ('/') && !job_path.ends_with ('/'));
                 // But encryption job expect it in Foo/Bar/ convention
-                var job = new Occ.EncryptFolderJob (propagator ().account (), propagator ()._journal, job_path.mid (1), this.item._file_id, this);
+                var job = new Occ.EncryptFolderJob (propagator ().account (), propagator ().journal, job_path.mid (1), this.item.file_id, this);
                 connect (job, &Occ.EncryptFolderJob.on_finished, this, &PropagateRemoteMkdir.on_encrypt_folder_finished);
                 job.on_start ();
             }
         });
         connect (propfind_job, &PropfindJob.finished_with_error, this, [this]{
             // ignore the PROPFIND error
-            propagator ()._active_job_list.remove_one (this);
+            propagator ().active_job_list.remove_one (this);
             on_done (SyncFileItem.Status.NORMAL_ERROR);
         });
         propfind_job.on_start ();
     }
 
     void PropagateRemoteMkdir.on_mkdir () {
-        const var path = this.item._file;
+        const var path = this.item.file;
         const var slash_position = path.last_index_of ('/');
         const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
         SyncJournalFileRecord parent_rec;
-        bool ok = propagator ()._journal.get_file_record (parent_path, parent_rec);
+        bool ok = propagator ().journal.get_file_record (parent_path, parent_rec);
         if (!ok) {
             on_done (SyncFileItem.Status.NORMAL_ERROR);
             return;
@@ -208,7 +208,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         }
 
         // We should be encrypted as well since our parent is
-        const var remote_parent_path = parent_rec._e2e_mangled_name.is_empty () ? parent_path : parent_rec._e2e_mangled_name;
+        const var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
         this.upload_encrypted_helper = new Propagate_upload_encrypted (propagator (), remote_parent_path, this.item, this);
         connect (this.upload_encrypted_helper, &Propagate_upload_encrypted.finalized,
             this, &PropagateRemoteMkdir.on_start_encrypted_mkcol_job);
@@ -220,18 +220,18 @@ class PropagateRemoteMkdir : PropagateItemJob {
     }
 
     void PropagateRemoteMkdir.on_mkcol_job_finished () {
-        propagator ()._active_job_list.remove_one (this);
+        propagator ().active_job_list.remove_one (this);
 
         ASSERT (this.job);
 
         Soup.Reply.NetworkError err = this.job.reply ().error ();
-        this.item._http_error_code = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        this.item._response_time_stamp = this.job.response_timestamp ();
-        this.item._request_id = this.job.request_id ();
+        this.item.http_error_code = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        this.item.response_time_stamp = this.job.response_timestamp ();
+        this.item.request_id = this.job.request_id ();
 
-        this.item._file_id = this.job.reply ().raw_header ("OC-File_id");
+        this.item.file_id = this.job.reply ().raw_header ("OC-File_id");
 
-        this.item._error_string = this.job.error_string ();
+        this.item.error_string = this.job.error_string ();
 
         const var job_http_reason_phrase_string = this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();
 
@@ -250,8 +250,8 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
     void PropagateRemoteMkdir.on_encrypt_folder_finished () {
         GLib.debug (lc_propagate_remote_mkdir) << "Success making the new folder encrypted";
-        propagator ()._active_job_list.remove_one (this);
-        this.item._is_encrypted = true;
+        propagator ().active_job_list.remove_one (this);
+        this.item.is_encrypted = true;
         on_success ();
     }
 
@@ -259,15 +259,15 @@ class PropagateRemoteMkdir : PropagateItemJob {
         // Never save the etag on first mkdir.
         // Only fully propagated directories should have the etag set.
         var item_copy = this.item;
-        item_copy._etag.clear ();
+        item_copy.etag.clear ();
 
-        // save the file id already so we can detect rename or remove
+        // save the file identifier already so we can detect rename or remove
         const var result = propagator ().update_metadata (item_copy);
         if (!result) {
             on_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_done (SyncFileItem.Status.FATAL_ERROR, _("The file %1 is currently in use").arg (this.item._file));
+            on_done (SyncFileItem.Status.FATAL_ERROR, _("The file %1 is currently in use").arg (this.item.file));
             return;
         }
 

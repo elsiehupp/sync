@@ -4,8 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
 
 using namespace Occ;
 
@@ -27,19 +27,19 @@ struct OperationCounter {
                 ++nDELETE;
             if (req.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE")
                 ++nMOVE;
-            return nullptr;
+            return null;
         };
     }
 }
 
 bool itemSuccessful (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
-    return item._status == SyncFileItem.Status.SUCCESS && item._instruction == instr;
+    return item.status == SyncFileItem.Status.SUCCESS && item.instruction == instr;
 }
 
 bool itemConflict (ItemCompletedSpy spy, string path) {
     var item = spy.findItem (path);
-    return item._status == SyncFileItem.Status.CONFLICT && item._instruction == CSYNC_INSTRUCTION_CONFLICT;
+    return item.status == SyncFileItem.Status.CONFLICT && item.instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
 bool itemSuccessfulMove (ItemCompletedSpy spy, string path) {
@@ -199,7 +199,7 @@ class TestSyncMove : GLib.Object {
                 ++nPUT;
             if (op == QNetworkAccessManager.DeleteOperation)
                 ++nDELETE;
-            return nullptr;
+            return null;
         });
 
         // For directly editing the remote checksum
@@ -376,10 +376,10 @@ class TestSyncMove : GLib.Object {
             QCOMPARE (counter.nDELETE, 0);
             QVERIFY (itemSuccessfulMove (completeSpy, "A/a1m"));
             QVERIFY (itemSuccessfulMove (completeSpy, "B/b1m"));
-            QCOMPARE (completeSpy.findItem ("A/a1m")._file, QStringLiteral ("A/a1"));
-            QCOMPARE (completeSpy.findItem ("A/a1m")._renameTarget, QStringLiteral ("A/a1m"));
-            QCOMPARE (completeSpy.findItem ("B/b1m")._file, QStringLiteral ("B/b1"));
-            QCOMPARE (completeSpy.findItem ("B/b1m")._renameTarget, QStringLiteral ("B/b1m"));
+            QCOMPARE (completeSpy.findItem ("A/a1m").file, QStringLiteral ("A/a1"));
+            QCOMPARE (completeSpy.findItem ("A/a1m").renameTarget, QStringLiteral ("A/a1m"));
+            QCOMPARE (completeSpy.findItem ("B/b1m").file, QStringLiteral ("B/b1"));
+            QCOMPARE (completeSpy.findItem ("B/b1m").renameTarget, QStringLiteral ("B/b1m"));
         }
 
         // Touch+Move on same side
@@ -506,10 +506,10 @@ class TestSyncMove : GLib.Object {
             QCOMPARE (counter.nDELETE, 0);
             QVERIFY (itemSuccessfulMove (completeSpy, "AM"));
             QVERIFY (itemSuccessfulMove (completeSpy, "BM"));
-            QCOMPARE (completeSpy.findItem ("AM")._file, QStringLiteral ("A"));
-            QCOMPARE (completeSpy.findItem ("AM")._renameTarget, QStringLiteral ("AM"));
-            QCOMPARE (completeSpy.findItem ("BM")._file, QStringLiteral ("B"));
-            QCOMPARE (completeSpy.findItem ("BM")._renameTarget, QStringLiteral ("BM"));
+            QCOMPARE (completeSpy.findItem ("AM").file, QStringLiteral ("A"));
+            QCOMPARE (completeSpy.findItem ("AM").renameTarget, QStringLiteral ("AM"));
+            QCOMPARE (completeSpy.findItem ("BM").file, QStringLiteral ("B"));
+            QCOMPARE (completeSpy.findItem ("BM").renameTarget, QStringLiteral ("BM"));
         }
 
         // Folder move with contents touched on the same side {
@@ -905,7 +905,7 @@ class TestSyncMove : GLib.Object {
         const string dest = "folder/folderB/file.txt";
         FakeFolder fakeFolder{ FileInfo{ "", { FileInfo{ QStringLiteral ("folder"), { FileInfo{ QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
         var syncOpts = fakeFolder.syncEngine ().syncOptions ();
-        syncOpts._parallelNetworkJobs = 0;
+        syncOpts.parallelNetworkJobs = 0;
         fakeFolder.syncEngine ().setSyncOptions (syncOpts);
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());

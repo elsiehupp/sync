@@ -26,6 +26,5 @@ class FakeGetReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public int64 readData (char data, int64 maxlen) override;
 };

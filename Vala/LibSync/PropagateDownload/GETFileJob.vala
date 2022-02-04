@@ -139,7 +139,6 @@ class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public time_t last_modified () {
         return this.last_modified;
     }
@@ -160,7 +159,6 @@ class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void set_expected_content_length (int64 size) {
         this.expected_content_length = size;
     }
@@ -184,40 +182,40 @@ signals:
 GETFileJob.GETFileJob (AccountPointer account, string path, QIODevice device,
     const GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
     int64 resume_start, GLib.Object parent)
-    : AbstractNetworkJob (account, path, parent)
-    , this.device (device)
-    , this.headers (headers)
-    , this.expected_etag_for_resume (expected_etag_for_resume)
-    , this.expected_content_length (-1)
-    , this.resume_start (resume_start)
-    , this.error_status (SyncFileItem.Status.NO_STATUS)
-    , this.bandwidth_limited (false)
-    , this.bandwidth_choked (false)
-    , this.bandwidth_quota (0)
-    , this.bandwidth_manager (nullptr)
-    , this.has_emitted_finished_signal (false)
-    , this.last_modified ()
-    , this.content_length (-1) {
+    : base (account, path, parent)
+    this.device (device)
+    this.headers (headers)
+    this.expected_etag_for_resume (expected_etag_for_resume)
+    this.expected_content_length (-1)
+    this.resume_start (resume_start)
+    this.error_status (SyncFileItem.Status.NO_STATUS)
+    this.bandwidth_limited (false)
+    this.bandwidth_choked (false)
+    this.bandwidth_quota (0)
+    this.bandwidth_manager (null)
+    this.has_emitted_finished_signal (false)
+    this.last_modified ()
+    this.content_length (-1) {
 }
 
 GETFileJob.GETFileJob (AccountPointer account, GLib.Uri url, QIODevice device,
     const GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
     int64 resume_start, GLib.Object parent)
-    : AbstractNetworkJob (account, url.to_encoded (), parent)
-    , this.device (device)
-    , this.headers (headers)
-    , this.expected_etag_for_resume (expected_etag_for_resume)
-    , this.expected_content_length (-1)
-    , this.resume_start (resume_start)
-    , this.error_status (SyncFileItem.Status.NO_STATUS)
-    , this.direct_download_url (url)
-    , this.bandwidth_limited (false)
-    , this.bandwidth_choked (false)
-    , this.bandwidth_quota (0)
-    , this.bandwidth_manager (nullptr)
-    , this.has_emitted_finished_signal (false)
-    , this.last_modified ()
-    , this.content_length (-1) {
+    : base (account, url.to_encoded (), parent)
+    this.device (device)
+    this.headers (headers)
+    this.expected_etag_for_resume (expected_etag_for_resume)
+    this.expected_content_length (-1)
+    this.resume_start (resume_start)
+    this.error_status (SyncFileItem.Status.NO_STATUS)
+    this.direct_download_url (url)
+    this.bandwidth_limited (false)
+    this.bandwidth_choked (false)
+    this.bandwidth_quota (0)
+    this.bandwidth_manager (null)
+    this.has_emitted_finished_signal (false)
+    this.last_modified ()
+    this.content_length (-1) {
 }
 
 void GETFileJob.on_start () {
@@ -292,7 +290,7 @@ void GETFileJob.on_meta_data_changed () {
     this.etag = get_etag_from_reply (reply ());
 
     if (!this.direct_download_url.is_empty () && !this.etag.is_empty ()) {
-        q_c_info (lc_get_job) << "Direct download used, ignoring server ETag" << this.etag;
+        GLib.Info (lc_get_job) << "Direct download used, ignoring server ETag" << this.etag;
         this.etag = GLib.ByteArray (); // reset received ETag
     } else if (!this.direct_download_url.is_empty ()) {
         // All fine, ETag empty and direct_download_url used
@@ -436,8 +434,8 @@ void GETFileJob.on_ready_read () {
             this.bandwidth_manager.on_unregister_download_job (this);
         }
         if (!this.has_emitted_finished_signal) {
-            q_c_info (lc_get_job) << "GET of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
-                             << reply_status_""
+            GLib.Info (lc_get_job) << "GET of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
+                             << reply_status_string ()
                              << reply ().raw_header ("Content-Range") << reply ().raw_header ("Content-Length");
 
             /* emit */ finished_signal ();

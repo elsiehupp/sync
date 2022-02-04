@@ -4,23 +4,23 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLabel>
-// #include <QStandard_item_model>
-// #include <QStacked_widget>
-// #include <QPushButton>
-// #include <QSettings>
-// #include <QTool_bar>
-// #include <QToolButton>
-// #include <QLayout>
-// #include <QVBoxLayout>
-// #include <QPixmap>
-// #include <QImage>
-// #include <QWidget_action>
-// #include <QPainter>
-// #include <QPainterPath>
-
-// #include <Gtk.Dialog>
-// #include <QStyled_item_delegate>
+//  #include <QLabel>
+//  #include <QStandard_item_model>
+//  #include <QStacked_widget>
+//  #include <QPushButton>
+//  #include <QSettings>
+//  #include <QTool_bar>
+//  #include <QToolButton>
+//  #include <QLayout>
+//  #include <QVBoxLayout>
+//  #include <QPixmap>
+//  #include <QImage>
+//  #include <QWidget_action>
+//  #include <QPainter>
+//  #include <QPainterPath>
+//  #include
+//  #include <Gtk.Dialog>
+//  #include <QStyled_item_delegate>
 
 
 
@@ -73,11 +73,11 @@ namespace Ui {
 @ingroup gui
 ***********************************************************/
 class SettingsDialog : Gtk.Dialog {
-    Q_PROPERTY (Gtk.Widget* current_page READ current_page)
+    //  Q_PROPERTY (Gtk.Widget* current_page READ current_page)
 
     /***********************************************************
     ***********************************************************/
-    public SettingsDialog (OwncloudGui gui, Gtk.Widget parent = nullptr);
+    public SettingsDialog (OwncloudGui gui, Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
@@ -159,9 +159,9 @@ signals:
 
     SettingsDialog.SettingsDialog (OwncloudGui gui, Gtk.Widget parent)
         : Gtk.Dialog (parent)
-        , this.ui (new Ui.SettingsDialog)
-        , this.gui (gui) {
-        ConfigFile cfg;
+        this.ui (new Ui.SettingsDialog)
+        this.gui (gui) {
+        ConfigFile config;
 
         this.ui.setup_ui (this);
         this.tool_bar = new QTool_bar;
@@ -234,7 +234,7 @@ signals:
         customize_style ();
 
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
-        cfg.restore_geometry (this);
+        config.restore_geometry (this);
     }
 
     SettingsDialog.~SettingsDialog () {
@@ -247,14 +247,14 @@ signals:
 
     // close event is not being called here
     void SettingsDialog.reject () {
-        ConfigFile cfg;
-        cfg.save_geometry (this);
+        ConfigFile config;
+        config.save_geometry (this);
         Gtk.Dialog.reject ();
     }
 
     void SettingsDialog.on_accept () {
-        ConfigFile cfg;
-        cfg.save_geometry (this);
+        ConfigFile config;
+        config.save_geometry (this);
         Gtk.Dialog.on_accept ();
     }
 
@@ -292,8 +292,8 @@ signals:
 
     void SettingsDialog.show_issues_list (AccountState account) {
         const var user_model = User_model.instance ();
-        const var id = user_model.find_user_id_for_account (account);
-        User_model.instance ().switch_current_user (id);
+        const var identifier = user_model.find_user_id_for_account (account);
+        User_model.instance ().switch_current_user (identifier);
         /* emit */ Systray.instance ().show_window ();
     }
 
@@ -301,7 +301,7 @@ signals:
         var height = this.tool_bar.size_hint ().height ();
         bool branding_single_account = !Theme.instance ().multi_account ();
 
-        QAction account_action = nullptr;
+        QAction account_action = null;
         QImage avatar = s.account ().avatar ();
         const string action_text = branding_single_account ? _("Account") : s.account ().display_name ();
         if (avatar.is_null ()) {
@@ -431,7 +431,7 @@ signals:
             var toolbar = qobject_cast<QTool_bar> (parent);
             if (!toolbar) {
                 // this means we are in the extention menu, no special action here
-                return nullptr;
+                return null;
             }
 
             var btn = new QToolButton (parent);

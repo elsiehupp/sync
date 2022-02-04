@@ -4,23 +4,23 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <theme.h>
+//  #include <theme.h>
 
-// #pragma once
+//  #pragma once
 
-// #include <theme.h>
-// #include <folder.h>
+//  #include <theme.h>
+//  #include <folder.h>
 
 
 namespace Occ {
 
 class Sync_status_summary : GLib.Object {
 
-    Q_PROPERTY (double sync_progress READ sync_progress NOTIFY sync_progress_changed)
-    Q_PROPERTY (GLib.Uri sync_icon READ sync_icon NOTIFY sync_icon_changed)
-    Q_PROPERTY (bool syncing READ syncing NOTIFY syncing_changed)
-    Q_PROPERTY (string sync_status_string READ sync_status_string NOTIFY sync_status_string_changed)
-    Q_PROPERTY (string sync_status_detail_string READ sync_status_detail_string NOTIFY sync_status_detail_string_changed)
+    //  Q_PROPERTY (double sync_progress READ sync_progress NOTIFY sync_progress_changed)
+    //  Q_PROPERTY (GLib.Uri sync_icon READ sync_icon NOTIFY sync_icon_changed)
+    //  Q_PROPERTY (bool syncing READ syncing NOTIFY syncing_changed)
+    //  Q_PROPERTY (string sync_status_string READ sync_status_string NOTIFY sync_status_string_changed)
+    //  Q_PROPERTY (string sync_status_detail_string READ sync_status_detail_string NOTIFY sync_status_detail_string_changed)
 
     /***********************************************************
     ***********************************************************/
@@ -44,7 +44,6 @@ class Sync_status_summary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public string sync_status_"";
 
 

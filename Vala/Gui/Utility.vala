@@ -4,16 +4,16 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QClipboard>
-// #include <QApplication>
-// #include <QDesktopServices>
-// #include <QLoggingCategory>
-// #include <QMessageBox>
-// #include <QUrlQuery>
+//  #include <QClipboard>
+//  #include <QApplication>
+//  #include <QDesktopServices>
+//  #include <QLoggingCategory>
+//  #include <QMessageBox>
+//  #include <QUrlQuery>
 
 using namespace Occ;
 
-// #include <Gtk.Widget>
+//  #include <Gtk.Widget>
 
 namespace Occ {
 namespace Utility {
@@ -23,7 +23,7 @@ namespace Utility {
 
     If launching the browser fails, display a message.
     ***********************************************************/
-    bool open_browser (GLib.Uri url, Gtk.Widget error_widget_parent = nullptr);
+    bool open_browser (GLib.Uri url, Gtk.Widget error_widget_parent = null);
 
 
     /***********************************************************

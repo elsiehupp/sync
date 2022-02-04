@@ -31,7 +31,7 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
 
 
     LockEncryptFolderApiJob.LockEncryptFolderApiJob (AccountPointer& account, GLib.ByteArray file_identifier, GLib.Object parent)
-    : AbstractNetworkJob (account, e2ee_base_url () + QStringLiteral ("lock/") + file_identifier, parent), this.file_identifier (file_identifier) {
+    : base (account, E2EE_BASE_URL + QStringLiteral ("lock/") + file_identifier, parent), this.file_identifier (file_identifier) {
     }
 
     void LockEncryptFolderApiJob.on_start () {
@@ -42,7 +42,7 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.set_query (query);
 
-        q_c_info (lc_cse_job ()) << "locking the folder with id" << this.file_identifier << "as encrypted";
+        GLib.Info (lc_cse_job ()) << "locking the folder with identifier" << this.file_identifier << "as encrypted";
         send_request ("POST", url, req);
         AbstractNetworkJob.on_start ();
     }
@@ -50,7 +50,7 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
     bool LockEncryptFolderApiJob.on_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
-            q_c_info (lc_cse_job ()) << "error locking file" << path () << error_string () << return_code;
+            GLib.Info (lc_cse_job ()) << "error locking file" << path () << error_string () << return_code;
             /* emit */ error (this.file_identifier, return_code);
             return true;
         }
@@ -59,7 +59,7 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
         var json = QJsonDocument.from_json (reply ().read_all (), error);
         var obj = json.object ().to_variant_map ();
         var token = obj["ocs"].to_map ()["data"].to_map ()["e2e-token"].to_byte_array ();
-        q_c_info (lc_cse_job ()) << "got json:" << token;
+        GLib.Info (lc_cse_job ()) << "got json:" << token;
 
         //TODO : Parse the token and submit.
         /* emit */ success (this.file_identifier, token);

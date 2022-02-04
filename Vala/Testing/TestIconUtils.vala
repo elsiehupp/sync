@@ -4,7 +4,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QTest>
+//  #include <QTest>
 
 class TestIconUtils : GLib.Object {
 
@@ -23,7 +23,7 @@ class TestIconUtils : GLib.Object {
         const QDir blackSvgDir (blackSvgDirPath);
         const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
 
-        Q_ASSERT (!blackImages.isEmpty ());
+        //  Q_ASSERT (!blackImages.isEmpty ());
 
         QVERIFY (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (blackSvgDirPath + QStringLiteral ("/") + blackImages.at (0), QColorConstants.Svg.red).isNull ());
 
@@ -33,7 +33,7 @@ class TestIconUtils : GLib.Object {
         const QDir whiteSvgDir (whiteSvgDirPath);
         const string[] whiteImages = whiteSvgDir.entryList (string[] ("*.svg"));
 
-        Q_ASSERT (!whiteImages.isEmpty ());
+        //  Q_ASSERT (!whiteImages.isEmpty ());
 
         QVERIFY (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (whiteSvgDirPath + QStringLiteral ("/") + whiteImages.at (0), QColorConstants.Svg.blue).isNull ());
     }

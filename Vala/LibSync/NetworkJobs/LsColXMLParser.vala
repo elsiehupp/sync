@@ -5,6 +5,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+
 /***********************************************************
 @brief The LsColJob class
 @ingroup libsync
@@ -135,4 +137,34 @@ signals:
         }
         return true;
     }
-};
+
+
+    /***********************************************************
+    supposed to read <D:collection> when pointing to
+    <D:resourcetype><D:collection></D:resourcetype>..
+    ***********************************************************/
+    private static string read_contents_as_string (QXmlStreamReader reader) {
+        string result;
+        int level = 0;
+        do {
+            QXmlStreamReader.TokenType type = reader.read_next ();
+            if (type == QXmlStreamReader.StartElement) {
+                level++;
+                result += "<" + reader.name ().to_string () + ">";
+            } else if (type == QXmlStreamReader.Characters) {
+                result += reader.text ();
+            } else if (type == QXmlStreamReader.EndElement) {
+                level--;
+                if (level < 0) {
+                    break;
+                }
+                result += "</" + reader.name ().to_string () + ">";
+            }
+
+        } while (!reader.at_end ());
+        return result;
+    }
+
+} // class LsColXMLParser
+
+} // namespace Occ

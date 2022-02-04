@@ -7,7 +7,7 @@
 #  VARIABLE - The variable to store the result.
 # Example:
 #  check_prototype_definition(getpwent_r
-#   "struct passwd *getpwent_r(struct passwd *src, char *buf, int buflen)"
+#   "struct password *getpwent_r(struct password *src, char *buf, int buflen)"
 #   "NULL"
 #   "unistd.h;pwd.h"
 #   SOLARIS_GETPWENT_R)

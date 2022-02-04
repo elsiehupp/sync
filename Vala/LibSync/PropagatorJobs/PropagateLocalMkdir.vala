@@ -15,7 +15,7 @@ class PropagateLocalMkdir : PropagateItemJob {
     ***********************************************************/
     public PropagateLocalMkdir (OwncloudPropagator propagator, SyncFileItemPtr item)
         : PropagateItemJob (propagator, item)
-        , this.delete_existing_file (false) {
+        this.delete_existing_file (false) {
     }
 
 
@@ -48,7 +48,7 @@ class PropagateLocalMkdir : PropagateItemJob {
 
 
 void PropagateLocalMkdir.on_start () {
-    if (propagator ()._abort_requested)
+    if (propagator ().abort_requested)
         return;
 
     start_local_mkdir ();
@@ -59,7 +59,7 @@ void PropagateLocalMkdir.set_delete_existing_file (bool enabled) {
 }
 
 void PropagateLocalMkdir.start_local_mkdir () {
-    QDir new_dir (propagator ().full_local_path (this.item._file));
+    QDir new_dir (propagator ().full_local_path (this.item.file));
     string new_dir_str = QDir.to_native_separators (new_dir.path ());
 
     // When turning something that used to be a file into a directory
@@ -74,7 +74,7 @@ void PropagateLocalMkdir.start_local_mkdir () {
                         .arg (new_dir_str, remove_error));
                 return;
             }
-        } else if (this.item._instruction == CSYNC_INSTRUCTION_CONFLICT) {
+        } else if (this.item.instruction == CSYNC_INSTRUCTION_CONFLICT) {
             string error;
             if (!propagator ().create_conflict (this.item, this.associated_composite, error)) {
                 on_done (SyncFileItem.Status.SOFT_ERROR, error);
@@ -83,14 +83,14 @@ void PropagateLocalMkdir.start_local_mkdir () {
         }
     }
 
-    if (Utility.fs_case_preserving () && propagator ().local_filename_clash (this.item._file)) {
-        GLib.warn (lc_propagate_local_mkdir) << "New folder to create locally already exists with different case:" << this.item._file;
+    if (Utility.fs_case_preserving () && propagator ().local_filename_clash (this.item.file)) {
+        GLib.warn (lc_propagate_local_mkdir) << "New folder to create locally already exists with different case:" << this.item.file;
         on_done (SyncFileItem.Status.NORMAL_ERROR, _("Attention, possible case sensitivity clash with %1").arg (new_dir_str));
         return;
     }
     /* emit */ propagator ().touched_file (new_dir_str);
     QDir local_dir (propagator ().local_path ());
-    if (!local_dir.mkpath (this.item._file)) {
+    if (!local_dir.mkpath (this.item.file)) {
         on_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not create folder %1").arg (new_dir_str));
         return;
     }
@@ -101,18 +101,18 @@ void PropagateLocalMkdir.start_local_mkdir () {
     // so the database is aware that this folder exists even if the sync is aborted
     // before the correct etag is stored.
     SyncFileItem new_item (*this.item);
-    new_item._etag = "this.invalid_";
+    new_item.etag = "this.invalid_";
     const var result = propagator ().update_metadata (new_item);
     if (!result) {
         on_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
         return;
     } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-        on_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (new_item._file));
+        on_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (new_item.file));
         return;
     }
-    propagator ()._journal.commit ("local_mkdir");
+    propagator ().journal.commit ("local_mkdir");
 
-    var result_status = this.item._instruction == CSYNC_INSTRUCTION_CONFLICT
+    var result_status = this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
         ? SyncFileItem.Status.CONFLICT
         : SyncFileItem.Status.SUCCESS;
     on_done (result_status);

@@ -16,7 +16,6 @@ class NSISUpdater : OCUpdater {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public bool handle_startup () override;
 
     /***********************************************************
@@ -52,8 +51,8 @@ class NSISUpdater : OCUpdater {
     }
 
     void NSISUpdater.wipe_update_data () {
-        ConfigFile cfg;
-        QSettings settings (cfg.config_file (), QSettings.IniFormat);
+        ConfigFile config;
+        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         string update_filename = settings.value (update_available_c).to_string ();
         if (!update_filename.is_empty ())
             GLib.File.remove (update_filename);
@@ -74,8 +73,8 @@ class NSISUpdater : OCUpdater {
         GLib.Uri url (reply.url ());
         this.file.close ();
 
-        ConfigFile cfg;
-        QSettings settings (cfg.config_file (), QSettings.IniFormat);
+        ConfigFile config;
+        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
 
         // remove previously downloaded but not used installer
         GLib.File old_target_file (settings.value (update_available_c).to_string ());
@@ -85,20 +84,20 @@ class NSISUpdater : OCUpdater {
 
         GLib.File.copy (this.file.filename (), this.target_file);
         set_download_state (Download_complete);
-        q_c_info (lc_updater) << "Downloaded" << url.to_string () << "to" << this.target_file;
+        GLib.Info (lc_updater) << "Downloaded" << url.to_string () << "to" << this.target_file;
         settings.set_value (update_target_version_c, update_info ().version ());
         settings.set_value (update_target_version_string_c, update_info ().version_"");
         settings.set_value (update_available_c, this.target_file);
     }
 
     void NSISUpdater.version_info_arrived (Update_info info) {
-        ConfigFile cfg;
-        QSettings settings (cfg.config_file (), QSettings.IniFormat);
+        ConfigFile config;
+        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         int64 info_version = Helper.string_version_to_int (info.version ());
         var seen_string = settings.value (seen_version_c).to_string ();
         int64 seen_version = Helper.string_version_to_int (seen_string);
         int64 curr_version = Helper.current_version_to_int ();
-        q_c_info (lc_updater) << "Version info arrived:"
+        GLib.Info (lc_updater) << "Version info arrived:"
                 << "Your version:" << curr_version
                 << "Skipped version:" << seen_version << seen_string
                 << "Available version:" << info_version << info.version ()
@@ -106,18 +105,18 @@ class NSISUpdater : OCUpdater {
                 << "Web url:" << info.web ()
                 << "Download url:" << info.download_url ();
         if (info.version ().is_empty ()) {
-            q_c_info (lc_updater) << "No version information available at the moment";
+            GLib.Info (lc_updater) << "No version information available at the moment";
             set_download_state (Up_to_date);
         } else if (info_version <= curr_version
                    || info_version <= seen_version) {
-            q_c_info (lc_updater) << "Client is on latest version!";
+            GLib.Info (lc_updater) << "Client is on latest version!";
             set_download_state (Up_to_date);
         } else {
             string url = info.download_url ();
             if (url.is_empty ()) {
                 show_no_url_dialog (info);
             } else {
-                this.target_file = cfg.config_path () + url.mid (url.last_index_of ('/')+1);
+                this.target_file = config.config_path () + url.mid (url.last_index_of ('/')+1);
                 if (GLib.File (this.target_file).exists ()) {
                     set_download_state (Download_complete);
                 } else {
@@ -246,29 +245,29 @@ class NSISUpdater : OCUpdater {
     }
 
     bool NSISUpdater.handle_startup () {
-        ConfigFile cfg;
-        QSettings settings (cfg.config_file (), QSettings.IniFormat);
+        ConfigFile config;
+        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         string update_filename = settings.value (update_available_c).to_string ();
         // has the previous run downloaded an update?
         if (!update_filename.is_empty () && GLib.File (update_filename).exists ()) {
-            q_c_info (lc_updater) << "An updater file is available";
+            GLib.Info (lc_updater) << "An updater file is available";
             // did it try to execute the update?
             if (settings.value (auto_update_attempted_c, false).to_bool ()) {
                 if (update_succeeded ()) {
                     // on_success : clean up
-                    q_c_info (lc_updater) << "The requested update attempt has succeeded"
+                    GLib.Info (lc_updater) << "The requested update attempt has succeeded"
                             << Helper.current_version_to_int ();
                     wipe_update_data ();
                     return false;
                 } else {
                     // var update failed. Ask user what to do
-                    q_c_info (lc_updater) << "The requested update attempt has failed"
+                    GLib.Info (lc_updater) << "The requested update attempt has failed"
                             << settings.value (update_target_version_c).to_string ();
                     show_update_error_dialog (settings.value (update_target_version_string_c).to_string ());
                     return false;
                 }
             } else {
-                q_c_info (lc_updater) << "Triggering an update";
+                GLib.Info (lc_updater) << "Triggering an update";
                 return perform_update ();
             }
         }
@@ -276,7 +275,7 @@ class NSISUpdater : OCUpdater {
     }
 
     void NSISUpdater.on_set_seen_version () {
-        ConfigFile cfg;
-        QSettings settings (cfg.config_file (), QSettings.IniFormat);
+        ConfigFile config;
+        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         settings.set_value (seen_version_c, update_info ().version ());
     }

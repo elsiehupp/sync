@@ -4,27 +4,27 @@ Copyright (C) by Cédric Bellegarde <gnumdk@gmail.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QCursor>
-// #include <QGuiApplication>
-// #include <QQml_application_engine>
-// #include <QQml_context>
-// #include <QQuick_window>
-// #include <QScreen>
-// #include <QMenu>
+//  #include <QCursor>
+//  #include <QGuiApplication>
+//  #include <QQml_application_engine>
+//  #include <QQml_context>
+//  #include <QQuick_window>
+//  #include <QScreen>
+//  #include <QMenu>
 
 #ifdef USE_FDO_NOTIFICATIONS
-// #include <QDBus_connection>
-// #include <QDBus_interface>
-// #include <QDBus_message>
-// #include <QDBus_pending_call>
+//  #include <QDBus_connection>
+//  #include <QDBus_interface>
+//  #include <QDBus_message>
+//  #include <QDBus_pending_call>
 const int NOTIFICATIONS_SERVICE "org.freedesktop.Notifications"
 const int NOTIFICATIONS_PATH "/org/freedesktop/Notifications"
 const int NOTIFICATIONS_IFACE "org.freedesktop.Notifications"
 #endif
 
-// #include <QSystemTrayIcon>
-
-// #include <QQml_network_access_manager_factory>
+//  #include <QSystemTrayIcon>
+//  #include
+//  #include <QQml_network_access_manager_factory>
 
 namespace Occ {
 
@@ -52,8 +52,8 @@ void set_tray_window_level_and_visible_on_all_spaces (QWindow window);
 class Systray
    : QSystemTrayIcon {
 
-    Q_PROPERTY (string window_title READ window_title CONSTANT)
-    Q_PROPERTY (bool use_normal_window READ use_normal_window CONSTANT)
+    //  Q_PROPERTY (string window_title READ window_title CONSTANT)
+    //  Q_PROPERTY (bool use_normal_window READ use_normal_window CONSTANT)
 
     /***********************************************************
     ***********************************************************/
@@ -61,7 +61,6 @@ class Systray
 
     /***********************************************************
     ***********************************************************/
-    public 
     public enum Task_bar_position {
         Bottom,
         Left,
@@ -188,7 +187,7 @@ signals:
 }
 
 
-Systray *Systray._instance = nullptr;
+Systray *Systray.instance = null;
 
 Systray *Systray.instance () {
     if (!this.instance) {
@@ -209,7 +208,7 @@ void Systray.set_tray_engine (QQml_application_engine tray_engine) {
 }
 
 Systray.Systray ()
-    : QSystemTrayIcon (nullptr) {
+    : QSystemTrayIcon (null) {
     qml_register_singleton_type<User_model> ("com.nextcloud.desktopclient", 1, 0, "User_model",
         [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
             return User_model.instance ();
@@ -352,8 +351,8 @@ bool Systray.use_normal_window () {
         return true;
     }
 
-    ConfigFile cfg;
-    return cfg.show_main_dialog_as_normal_window ();
+    ConfigFile config;
+    return config.show_main_dialog_as_normal_window ();
 }
 
 // Q_INVOKABLE
@@ -475,7 +474,7 @@ QRect Systray.taskbar_geometry () {
 
 QRect Systray.current_screen_rect () {
     const var screen = current_screen ();
-    Q_ASSERT (screen);
+    //  Q_ASSERT (screen);
     return screen.geometry ();
 }
 

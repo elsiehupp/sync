@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ***********************************************************/
 
-// #include <Gtk.Widget>
-// #include <Gtk.Color>
+//  #include <Gtk.Widget>
+//  #include <Gtk.Color>
 
 /***********************************************************
     \class QProgress_indicator
@@ -33,13 +33,13 @@ SOFTWARE.
     \sa QProgressBar
 ***********************************************************/
 class QProgress_indicator : Gtk.Widget {
-    Q_PROPERTY (int delay READ animation_delay WRITE on_set_animation_delay)
-    Q_PROPERTY (bool displayed_when_stopped READ is_displayed_when_stopped WRITE on_set_displayed_when_stopped)
-    Q_PROPERTY (Gtk.Color color READ color WRITE on_set_color)
+    //  Q_PROPERTY (int delay READ animation_delay WRITE on_set_animation_delay)
+    //  Q_PROPERTY (bool displayed_when_stopped READ is_displayed_when_stopped WRITE on_set_displayed_when_stopped)
+    //  Q_PROPERTY (Gtk.Color color READ color WRITE on_set_color)
 
     /***********************************************************
     ***********************************************************/
-    public QProgress_indicator (Gtk.Widget* parent = nullptr);
+    public QProgress_indicator (Gtk.Widget* parent = null);
 
 
     /***********************************************************
@@ -165,7 +165,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ***********************************************************/
 
-// #include <QPainter>
+//  #include <QPainter>
 
 QProgress_indicator.QProgress_indicator (Gtk.Widget* parent)
     : Gtk.Widget (parent) {

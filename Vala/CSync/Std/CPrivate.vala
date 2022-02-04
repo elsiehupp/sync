@@ -22,19 +22,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 /***********************************************************
 cross platform defines */
-// #include <sys/types.h>
-// #include <sys/stat.h>
+//  #include <sys/types.h>
+//  #include <sys/stat.h>
 
 #ifdef this.WIN32
-// #include <windows.h>
-// #include <windef.h>
-// #include <winbase.h>
-// #include <wchar.h>
-#else
-// #include <unistd.h>
+//  #include <windows.h>
+//  #include <windef.h>
+//  #include <winbase.h>
+//  #include <wchar.h>
+//  #include
+//  #include <unistd.h>
 #endif
 
-// #include <cerrno>
+//  #include <cerrno>
 
 #ifdef __MINGW32__
 #ifndef S_IRGRP
@@ -64,7 +64,7 @@ const int geteuid () 0
 #elif defined (this.WIN32)
 const int mode_t int
 #else
-// #include <fcntl.h>
+//  #include <fcntl.h>
 #endif
 
 #ifdef this.WIN32

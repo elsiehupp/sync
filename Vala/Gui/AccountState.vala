@@ -4,20 +4,20 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QSettings>
-// #include <QTimer>
-// #include <qfontmetrics.h>
-
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <QJsonArray>
-// #include <QNetworkRequest>
-// #include <QBuffer>
-
-// #include <QElapsedTimer>
-// #include <QPointer>
-
-// #include <memory>
+//  #include <QSettings>
+//  #include <QTimer>
+//  #include <qfontmetrics.h>
+//  #include
+//  #include <QJsonDocumen
+//  #include <QJsonObject
+//  #include <QJsonArray>
+//  #include <QNetworkR
+//  #include <QBuffer>
+//  #include
+//  #include <QElapsedTimer>
+//  #include <QPointer>
+//  #include
+//  #include <memory>
 
 
 namespace Occ {
@@ -30,7 +30,7 @@ using AccountAppList = GLib.List<AccountApp>;
 @ingroup gui
 ***********************************************************/
 class AccountState : GLib.Object, public QSharedData {
-    Q_PROPERTY (AccountPointer account MEMBER this.account)
+    //  Q_PROPERTY (AccountPointer account MEMBER this.account)
 
     /***********************************************************
     ***********************************************************/
@@ -318,13 +318,13 @@ class AccountState : GLib.Object, public QSharedData {
 
     AccountState.AccountState (AccountPointer account)
         : GLib.Object ()
-        , this.account (account)
-        , this.state (AccountState.Disconnected)
-        , this.connection_status (ConnectionValidator.Undefined)
-        , this.waiting_for_new_credentials (false)
-        , this.maintenance_to_connected_delay (60000 + (qrand () % (4 * 60000))) // 1-5min delay
-        , this.remote_wipe (new RemoteWipe (this.account))
-        , this.is_desktop_notifications_allowed (true) {
+        this.account (account)
+        this.state (AccountState.Disconnected)
+        this.connection_status (ConnectionValidator.Undefined)
+        this.waiting_for_new_credentials (false)
+        this.maintenance_to_connected_delay (60000 + (qrand () % (4 * 60000))) // 1-5min delay
+        this.remote_wipe (new RemoteWipe (this.account))
+        this.is_desktop_notifications_allowed (true) {
         q_register_meta_type<AccountState> ("AccountState*");
 
         connect (account.data (), &Account.invalid_credentials,
@@ -370,7 +370,7 @@ class AccountState : GLib.Object, public QSharedData {
 
     void AccountState.set_state (State state) {
         if (this.state != state) {
-            q_c_info (lc_account_state) << "AccountState state change : "
+            GLib.Info (lc_account_state) << "AccountState state change : "
                                    << state_string (this.state) << "." << state_string (state);
             State old_state = this.state;
             this.state = state;
@@ -491,7 +491,7 @@ class AccountState : GLib.Object, public QSharedData {
         }
 
         // If we never fetched credentials, do that now - otherwise connection attempts
-        // make little sense, we might be missing client certs.
+        // make little sense, we might be missing client certificates.
         if (!account ().credentials ().was_fetched ()) {
             this.waiting_for_new_credentials = true;
             account ().credentials ().fetch_from_keychain ();
@@ -547,20 +547,20 @@ class AccountState : GLib.Object, public QSharedData {
             && (this.connection_status == ConnectionValidator.ServiceUnavailable
                 || this.connection_status == ConnectionValidator.MaintenanceMode)) {
             if (!this.time_since_maintenance_over.is_valid ()) {
-                q_c_info (lc_account_state) << "AccountState reconnection : delaying for"
+                GLib.Info (lc_account_state) << "AccountState reconnection : delaying for"
                                        << this.maintenance_to_connected_delay << "ms";
                 this.time_since_maintenance_over.on_start ();
                 QTimer.single_shot (this.maintenance_to_connected_delay + 100, this, &AccountState.on_check_connectivity);
                 return;
             } else if (this.time_since_maintenance_over.elapsed () < this.maintenance_to_connected_delay) {
-                q_c_info (lc_account_state) << "AccountState reconnection : only"
+                GLib.Info (lc_account_state) << "AccountState reconnection : only"
                                        << this.time_since_maintenance_over.elapsed () << "ms have passed";
                 return;
             }
         }
 
         if (this.connection_status != status) {
-            q_c_info (lc_account_state) << "AccountState connection status change : "
+            GLib.Info (lc_account_state) << "AccountState connection status change : "
                                    << this.connection_status << "."
                                    << status;
             this.connection_status = status;
@@ -617,7 +617,7 @@ class AccountState : GLib.Object, public QSharedData {
         // make sure it changes account state and icons
         sign_out_by_ui ();
 
-        q_c_info (lc_account_state) << "Invalid credentials for" << this.account.url ().to_string ()
+        GLib.Info (lc_account_state) << "Invalid credentials for" << this.account.url ().to_string ()
                                << "checking for remote wipe request";
 
         this.waiting_for_new_credentials = false;
@@ -628,7 +628,7 @@ class AccountState : GLib.Object, public QSharedData {
         if (is_signed_out () || this.waiting_for_new_credentials)
             return;
 
-        q_c_info (lc_account_state) << "Invalid credentials for" << this.account.url ().to_string ()
+        GLib.Info (lc_account_state) << "Invalid credentials for" << this.account.url ().to_string ()
                                << "asking user";
 
         this.waiting_for_new_credentials = true;
@@ -648,14 +648,14 @@ class AccountState : GLib.Object, public QSharedData {
         // Make a connection attempt, no matter whether the credentials are
         // ready or not - we want to check whether we can get an SSL connection
         // going before bothering the user for a password.
-        q_c_info (lc_account_state) << "Fetched credentials for" << this.account.url ().to_string ()
+        GLib.Info (lc_account_state) << "Fetched credentials for" << this.account.url ().to_string ()
                                << "attempting to connect";
         this.waiting_for_new_credentials = false;
         on_check_connectivity ();
     }
 
     void AccountState.on_credentials_asked (AbstractCredentials credentials) {
-        q_c_info (lc_account_state) << "Credentials asked for" << this.account.url ().to_string ()
+        GLib.Info (lc_account_state) << "Credentials asked for" << this.account.url ().to_string ()
                                << "are they ready?" << credentials.ready ();
 
         this.waiting_for_new_credentials = false;
@@ -670,7 +670,7 @@ class AccountState : GLib.Object, public QSharedData {
             // When new credentials become available we always want to restart the
             // connection validation, even if it's currently running.
             this.connection_validator.delete_later ();
-            this.connection_validator = nullptr;
+            this.connection_validator = null;
         }
 
         on_check_connectivity ();
@@ -678,7 +678,7 @@ class AccountState : GLib.Object, public QSharedData {
 
     std.unique_ptr<QSettings> AccountState.settings () {
         var s = ConfigFile.settings_with_group (QLatin1String ("Accounts"));
-        s.begin_group (this.account.id ());
+        s.begin_group (this.account.identifier ());
         return s;
     }
 
@@ -718,7 +718,7 @@ class AccountState : GLib.Object, public QSharedData {
                             var nav_link = value.to_object ();
 
                             var app = new AccountApp (nav_link.value ("name").to_string (), GLib.Uri (nav_link.value ("href").to_string ()),
-                                nav_link.value ("id").to_string (), GLib.Uri (nav_link.value ("icon").to_string ()));
+                                nav_link.value ("identifier").to_string (), GLib.Uri (nav_link.value ("icon").to_string ()));
 
                             this.apps << app;
                         }
@@ -738,14 +738,14 @@ class AccountState : GLib.Object, public QSharedData {
         if (!app_id.is_empty ()) {
             const var apps = app_list ();
             const var it = std.find_if (apps.cbegin (), apps.cend (), [app_id] (var app) {
-                return app.id () == app_id;
+                return app.identifier () == app_id;
             });
             if (it != apps.cend ()) {
                 return it;
             }
         }
 
-        return nullptr;
+        return null;
     }
 
 

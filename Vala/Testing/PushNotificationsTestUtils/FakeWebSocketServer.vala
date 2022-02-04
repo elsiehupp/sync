@@ -42,7 +42,6 @@ class FakeWebSocketServer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public static Occ.AccountPointer createAccount (string username = "user", string password = "password");
 
 signals:
@@ -68,17 +67,17 @@ signals:
 }
 
 
-// #include <QLoggingCategory>
-// #include <QSignalSpy>
-// #include <QTest>
-// #include <cstdint>
-// #include <functional>
+//  #include <QLoggingCategory>
+//  #include <QSignalSpy>
+//  #include <QTest>
+//  #include <cstdint>
+//  #include <functional>
 
 Q_LOGGING_CATEGORY (lcFakeWebSocketServer, "nextcloud.test.fakewebserver", QtInfoMsg)
 
 FakeWebSocketServer.FakeWebSocketServer (uint16 port, GLib.Object parent)
     : GLib.Object (parent)
-    , this.webSocketServer (new QWebSocketServer (QStringLiteral ("Fake Server"), QWebSocketServer.NonSecureMode, this)) {
+    this.webSocketServer (new QWebSocketServer (QStringLiteral ("Fake Server"), QWebSocketServer.NonSecureMode, this)) {
     if (!this.webSocketServer.listen (QHostAddress.Any, port)) {
         Q_UNREACHABLE ();
     }
@@ -94,19 +93,19 @@ FakeWebSocketServer.~FakeWebSocketServer () {
 
 QWebSocket *FakeWebSocketServer.authenticateAccount (Occ.AccountPointer account, std.function<void (Occ.PushNotifications pushNotifications)> beforeAuthentication, std.function<void (void)> afterAuthentication) {
     const var pushNotifications = account.pushNotifications ();
-    Q_ASSERT (pushNotifications);
+    //  Q_ASSERT (pushNotifications);
     QSignalSpy readySpy (pushNotifications, &Occ.PushNotifications.ready);
 
     beforeAuthentication (pushNotifications);
 
     // Wait for authentication
     if (!waitForTextMessages ()) {
-        return nullptr;
+        return null;
     }
 
     // Right authentication data should be sent
     if (textMessagesCount () != 2) {
-        return nullptr;
+        return null;
     }
 
     const var socket = socketForTextMessage (0);
@@ -114,7 +113,7 @@ QWebSocket *FakeWebSocketServer.authenticateAccount (Occ.AccountPointer account,
     const var passwordSent = textMessage (1);
 
     if (userSent != account.credentials ().user () || passwordSent != account.credentials ().password ()) {
-        return nullptr;
+        return null;
     }
 
     // Sent authenticated
@@ -123,7 +122,7 @@ QWebSocket *FakeWebSocketServer.authenticateAccount (Occ.AccountPointer account,
     // Wait for ready signal
     readySpy.wait ();
     if (readySpy.count () != 1 || !account.pushNotifications ().isReady ()) {
-        return nullptr;
+        return null;
     }
 
     afterAuthentication ();
@@ -176,12 +175,12 @@ uint32_t FakeWebSocketServer.textMessagesCount () {
 }
 
 string FakeWebSocketServer.textMessage (int messageNumber) {
-    Q_ASSERT (0 <= messageNumber && messageNumber < this.processTextMessageSpy.count ());
+    //  Q_ASSERT (0 <= messageNumber && messageNumber < this.processTextMessageSpy.count ());
     return this.processTextMessageSpy.at (messageNumber).at (1).toString ();
 }
 
 QWebSocket *FakeWebSocketServer.socketForTextMessage (int messageNumber) {
-    Q_ASSERT (0 <= messageNumber && messageNumber < this.processTextMessageSpy.count ());
+    //  Q_ASSERT (0 <= messageNumber && messageNumber < this.processTextMessageSpy.count ());
     return this.processTextMessageSpy.at (messageNumber).at (0).value<QWebSocket> ();
 }
 

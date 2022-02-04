@@ -4,24 +4,24 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QDesktopServices>
-// #include <QDir>
-// #include <QFileDialog>
-// #include <QFileInfo>
-// #include <QFile_icon_provider>
-// #include <QInputDialog>
-// #include <QValidator>
-// #include <QWizard_page>
-// #include <QTree_widget>
-// #include <QVBoxLayout>
-// #include <QEvent>
-// #include <QCheckBox>
-// #include <QMessageBox>
-
-// #include <cstdlib>
-
-// #include <QWizard>
-// #include <QTimer>
+//  #include <QDesktopServices>
+//  #include <QDir>
+//  #include <QFileDialog>
+//  #include <QFileInfo>
+//  #include <QFile_icon_provider>
+//  #include <QInputDialog>
+//  #include <QValidator>
+//  #include <QWizard_page>
+//  #include <QTree_widget>
+//  #include <QVBoxLayout>
+//  #include <QEvent>
+//  #include <QCheckBox>
+//  #include <QMessageBox>
+//  #include
+//  #include <cstdlib>
+//  #include
+//  #include <QWizard>
+//  #include <QTimer>
 
 using Soup;
 
@@ -43,11 +43,10 @@ class FolderWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public FolderWizard (AccountPointer account, Gtk.Widget parent = nullptr);
+    public FolderWizard (AccountPointer account, Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
-    public 
     public bool event_filter (GLib.Object watched, QEvent event) override;
     public void resize_event (QResizeEvent event) override;
 
@@ -69,9 +68,9 @@ class FolderWizard : QWizard {
 
     FolderWizard.FolderWizard (AccountPointer account, Gtk.Widget parent)
         : QWizard (parent)
-        , this.folder_wizard_source_page (new Folder_wizard_local_path (account))
-        , this.folder_wizard_target_page (nullptr)
-        , this.folder_wizard_selective_sync_page (new Folder_wizard_selective_sync (account)) {
+        this.folder_wizard_source_page (new Folder_wizard_local_path (account))
+        this.folder_wizard_target_page (null)
+        this.folder_wizard_selective_sync_page (new Folder_wizard_selective_sync (account)) {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         set_page (Page_Source, this.folder_wizard_source_page);
         this.folder_wizard_source_page.install_event_filter (this);

@@ -5,7 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
-Q_DECLARE_LOGGING_CATEGORY (lc_propagate_upload_nG)
+//  Q_DECLARE_LOGGING_CATEGORY (lc_propagate_upload_nG)
 /***********************************************************
 @ingroup libsync
 
@@ -17,7 +17,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private int64 this.sent = 0; /// amount of data (bytes) that was already sent
-    private uint32 this.transfer_id = 0; /// transfer id (part of the url)
+    private uint32 this.transfer_id = 0; /// transfer identifier (part of the url)
     private int this.current_chunk = 0; /// Id of the next chunk that will be sent
     private int64 this.current_chunk_size = 0; /// current chunk size
     private bool this.remove_job_error = false; /// If not null, there was an error removing the job

@@ -4,19 +4,19 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QDir>
-// #include <QCoreApplication>
+//  #include <QDir>
+//  #include <QCoreApplication>
+//  #include
+//  #include <sys/stat.h>
+//  #include <sys/types.h>
 
-// #include <sys/stat.h>
-// #include <sys/types.h>
+//  #pragma once
 
-// #pragma once
-
-// #include <ctime>
-// #include <QFileInfo>
-// #include <QLoggingCategory>
-
-// #include <ocsynclib.h>
+//  #include <ctime>
+//  #include <QFileInfo>
+//  #include <QLoggingCategory>
+//  #include
+//  #include <ocsynclib.h>
 
 
 namespace Occ {

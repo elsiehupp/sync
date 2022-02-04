@@ -4,14 +4,13 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <sys/inotify.h>
-
-// #include <cerrno>
-// #include <string[]>
-// #include <QVarLengthArray>
-
-// #include <QSocket_notifier>
-// #include <QDir>
+//  #include <sys/inotify.h>
+//  #include
+//  #include <cerrno>
+//  #include <QVarLengthArray>
+//  #include
+//  #include <QSocket_notifier>
+//  #include <QDir>
 
 
 namespace Occ {
@@ -63,8 +62,8 @@ protected slots:
 
     Folder_watcher_private.Folder_watcher_private (Folder_watcher p, string path)
         : GLib.Object ()
-        , this.parent (p)
-        , this.folder (path) {
+        this.parent (p)
+        this.folder (path) {
         this.fd = inotify_init ();
         if (this.fd != -1) {
             this.socket.on_reset (new QSocket_notifier (this.fd, QSocket_notifier.Read));
@@ -114,8 +113,8 @@ protected slots:
         } else {
             // If we're running out of memory or inotify watches, become
             // unreliable.
-            if (this.parent._is_reliable && (errno == ENOMEM || errno == ENOSPC)) {
-                this.parent._is_reliable = false;
+            if (this.parent.is_reliable && (errno == ENOMEM || errno == ENOSPC)) {
+                this.parent.is_reliable = false;
                 /* emit */ this.parent.became_unreliable (
                     _("This problem usually happens when the inotify watches are exhausted. "
                        "Check the FAQ for details."));
@@ -160,7 +159,7 @@ protected slots:
 
     void Folder_watcher_private.on_received_notification (int fd) {
         int len = 0;
-        struct inotify_event event = nullptr;
+        struct inotify_event event = null;
         size_t i = 0;
         int error = 0;
         QVarLengthArray<char, 2048> buffer (2048);
@@ -200,7 +199,7 @@ protected slots:
             GLib.ByteArray filename (event.name);
             // Filter out journal changes - redundant with filtering in
             // Folder_watcher.path_is_ignored.
-            if (filename.starts_with ("._sync_")
+            if (filename.starts_with (".sync_")
                 || filename.starts_with (".csync_journal.db")
                 || filename.starts_with (".sync_")) {
                 continue;

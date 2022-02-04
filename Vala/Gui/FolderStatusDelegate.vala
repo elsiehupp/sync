@@ -5,15 +5,15 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <theme.h>
-// #include <account.h>
-
-// #include <QFile_icon_provider>
-// #include <QPainter>
-// #include <QApplication>
-// #include <QMouse_event>
-// #pragma once
-// #include <QStyled_item_delegate>
+//  #include <theme.h>
+//  #include <account.h>
+//  #include
+//  #include <QFile_ico
+//  #include <QPainter>
+//  #include <QApplication>
+//  #include <QMouse_event>
+//  #pragma once
+//  #include <QStyled_item_delegate>
 
 namespace Occ {
 
@@ -128,7 +128,7 @@ QSize FolderStatusDelegate.size_hint (QStyleOptionViewItem option,
     var classif = static_cast<const FolderStatusModel> (index.model ()).classify (index);
     if (classif == FolderStatusModel.AddButton) {
         const int margins = alias_fm.height (); // same as 2*alias_margin of paint
-        QFontMetrics fm (q_app.font ("QPushButton"));
+        QFontMetrics fm (Gtk.Application.font ("QPushButton"));
         QStyle_option_button opt;
         static_cast<QStyle_option &> (opt) = option;
         opt.text = add_folder_text ();
@@ -207,7 +207,7 @@ void FolderStatusDelegate.paint (QPainter painter, QStyleOptionViewItem option,
         opt.text = add_folder_text ();
         opt.rect = add_button_rect (option.rect, option.direction);
         painter.save ();
-        painter.set_font (q_app.font ("QPushButton"));
+        painter.set_font (Gtk.Application.font ("QPushButton"));
         QApplication.style ().draw_control (QStyle.CE_Push_button, opt, painter, option.widget);
         painter.restore ();
         return;
@@ -288,7 +288,7 @@ void FolderStatusDelegate.paint (QPainter painter, QStyleOptionViewItem option,
 
     var palette = option.palette;
 
-    if (q_app.style ().inherits ("QWindows_vista_style")) {
+    if (Gtk.Application.style ().inherits ("QWindows_vista_style")) {
         // Hack : Windows Vista's light blue is not contrasting enough for white
 
         // (code from QWindows_vista_style.draw_control for CE_Item_view_item)
@@ -468,7 +468,7 @@ QRect FolderStatusDelegate.options_button_rect (QRect within, Qt.Layout_directio
 }
 
 QRect FolderStatusDelegate.add_button_rect (QRect within, Qt.Layout_direction direction) {
-    QFontMetrics fm (q_app.font ("QPushButton"));
+    QFontMetrics fm (Gtk.Application.font ("QPushButton"));
     QStyle_option_button opt;
     opt.text = add_folder_text ();
     QSize size = QApplication.style ().size_from_contents (QStyle.CT_Push_button, opt, fm.size (Qt.Text_single_line, opt.text)).expanded_to (QApplication.global_strut ());

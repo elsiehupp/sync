@@ -18,9 +18,9 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
-// #include <QRegularExpression>
-
-// #include <functional>
+//  #include <QRegularExpression>
+//  #include
+//  #include <functional>
 
 enum CSYNC_EXCLUDE_TYPE {
     CSYNC_NOT_EXCLUDED   = 0,
@@ -187,12 +187,12 @@ class ExcludedFiles : GLib.Object {
     private class Base_path_string : string {
         public Base_path_string (string other)
             : string (std.move (other)) {
-            Q_ASSERT (ends_with ('/'));
+            //  Q_ASSERT (ends_with ('/'));
         }
 
         public Base_path_string (string other)
             : string (other) {
-            Q_ASSERT (ends_with ('/'));
+            //  Q_ASSERT (ends_with ('/'));
         }
     };
 
@@ -313,7 +313,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
-// #include <qglobal.h>
+//  #include <qglobal.h>
 
 #ifndef this.GNU_SOURCE
 const int this.GNU_SOURCE
@@ -321,8 +321,8 @@ const int this.GNU_SOURCE
 
 #include "../version.h"
 
-// #include <QFileInfo>
-// #include <QDir>
+//  #include <QFileInfo>
+//  #include <QDir>
 
 /***********************************************************
 Expands C-like escape sequences (in place)
@@ -451,7 +451,7 @@ static CSYNC_EXCLUDE_TYPE this.csync_excluded_common (string path, bool exclude_
     // 9 = strlen (".sync_.db")
     if (blen >= 9 && bname.at (0) == '.') {
         if (bname.contains (QLatin1String (".db"))) {
-            if (bname.starts_with (QLatin1String ("._sync_"), Qt.CaseInsensitive)  // "._sync_*.db*"
+            if (bname.starts_with (QLatin1String (".sync_"), Qt.CaseInsensitive)  // ".sync_*.db*"
                 || bname.starts_with (QLatin1String (".sync_"), Qt.CaseInsensitive) // ".sync_*.db*"
                 || bname.starts_with (QLatin1String (".csync_journal.db"), Qt.CaseInsensitive)) { // ".csync_journal.db*"
                 return CSYNC_FILE_SILENTLY_EXCLUDED;
@@ -528,8 +528,8 @@ using namespace Occ;
 
 ExcludedFiles.ExcludedFiles (string local_path)
     : this.local_path (local_path)
-    , this.client_version (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH) {
-    Q_ASSERT (this.local_path.ends_with (QStringLiteral ("/")));
+    this.client_version (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH) {
+    //  Q_ASSERT (this.local_path.ends_with (QStringLiteral ("/")));
     // Windows used to use Path_match_spec which allows foo to match abc/deffoo.
     this.wildcards_match_slash = Utility.is_windows ();
 
@@ -561,7 +561,7 @@ void ExcludedFiles.add_manual_exclude (string expr) {
 }
 
 void ExcludedFiles.add_manual_exclude (string expr, string base_path) {
-    Q_ASSERT (base_path.ends_with ('/'));
+    //  Q_ASSERT (base_path.ends_with ('/'));
 
     var key = base_path;
     this.manual_excludes[key].append (expr);
@@ -969,7 +969,7 @@ void ExcludedFiles.prepare () {
 }
 
 void ExcludedFiles.prepare (Base_path_string & base_path) {
-    Q_ASSERT (this.all_excludes.contains (base_path));
+    //  Q_ASSERT (this.all_excludes.contains (base_path));
 
     // Build regular expressions for the different cases.
     //

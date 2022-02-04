@@ -19,7 +19,6 @@ class WriteJob : KeychainChunk.Job {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public WriteJob (string key, GLib.ByteArray data, GLib.Object parent = new GLib.Object ());
 
 
@@ -64,13 +63,13 @@ signals:
     }
 
     WriteJob.WriteJob (string key, GLib.ByteArray data, GLib.Object parent)
-        : WriteJob (nullptr, key, data, parent) {
+        : WriteJob (null, key, data, parent) {
     }
 
     void WriteJob.on_start () {
         this.error = QKeychain.NoError;
 
-        on_write_job_done (nullptr);
+        on_write_job_done (null);
     }
 
     bool WriteJob.exec () {
@@ -91,7 +90,7 @@ signals:
     void WriteJob.on_write_job_done (QKeychain.Job incoming_job) {
         var write_job = qobject_cast<QKeychain.WritePasswordJob> (incoming_job);
 
-        // Errors? (write_job can be nullptr here, see : WriteJob.on_start)
+        // Errors? (write_job can be null here, see : WriteJob.on_start)
         if (write_job) {
             this.error = write_job.error ();
             this.error_string = write_job.error_string ();
@@ -131,7 +130,7 @@ signals:
             const string kck = this.account ? AbstractCredentials.keychain_key (
                     this.account.url ().to_string (),
                     key_with_index,
-                    this.account.id ()
+                    this.account.identifier ()
                 ) : key_with_index;
 
             var job = new QKeychain.WritePasswordJob (this.service_name, this);

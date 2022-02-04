@@ -4,14 +4,14 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QtCore>
-//  #ifndef TOKEN_AUTH_ONLY
-// #include <QtGui>
-// #include <QStyle>
-// #include <QApplication>
-//  #endif
-// #include <QSslSocket>
-// #include <QSvgRenderer>
+//  #include <QtCore>
+//  #include TOKEN_A
+//  #include <QtGui>
+//  #include <QStyle>
+//  #include <QApplicatio
+//  #include
+//  #include <QSslSocket>
+//  #include <QSvgRenderer>
 
 //  #ifdef THEME_INCLUDE
 //  const int Mirall Occ // namespace hack to make old themes work
@@ -21,7 +21,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #undef Mirall
 //  #endif
 
-// #include <QIcon>
+//  #include <QIcon>
 
 namespace Occ {
 
@@ -86,7 +86,7 @@ class Theme : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected Theme () {
-        base (nullptr);
+        base (null);
     }
 
 
@@ -102,7 +102,7 @@ class Theme : GLib.Object {
         if (!this.instance) {
             this.instance = new THEME_CLASS;
             // some themes may not call the base ctor
-            this.instance._mono = false;
+            this.instance.mono = false;
         }
         return this.instance;
     }
@@ -261,14 +261,14 @@ class Theme : GLib.Object {
     @return the name of the config file.
     ***********************************************************/
     public string config_filename () {
-        return APPLICATION_EXECUTABLE + ".cfg";
+        return APPLICATION_EXECUTABLE + ".config";
     }
 
 
     /***********************************************************
     ***********************************************************/
 #ifndef TOKEN_AUTH_ONLY
-    public static string hidpi_filename (string filename, QPaint_device dev = nullptr) {
+    public static string hidpi_filename (string filename, QPaint_device dev = null) {
         if (!Theme.is_hidpi (dev)) {
             return filename;
         }
@@ -288,7 +288,7 @@ class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static string hidpi_filename (string icon_name, Gtk.Color background_color, QPaint_device dev = nullptr) {
+    public static string hidpi_filename (string icon_name, Gtk.Color background_color, QPaint_device dev = null) {
         const var is_dark_background = Theme.is_dark_color (background_color);
 
         const string icon_path = string (Theme.theme_prefix) + (is_dark_background ? "white/" : "black/") + icon_name;
@@ -299,8 +299,8 @@ class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static bool is_hidpi (QPaint_device dev = nullptr) {
-        const var device_pixel_ratio = dev ? dev.device_pixel_ratio () : q_app.primary_screen ().device_pixel_ratio ();
+    public static bool is_hidpi (QPaint_device dev = null) {
+        const var device_pixel_ratio = dev ? dev.device_pixel_ratio () : Gtk.Application.primary_screen ().device_pixel_ratio ();
         return device_pixel_ratio > 1;
     }
 
@@ -663,7 +663,7 @@ class Theme : GLib.Object {
             return QPixmap ();
 
         QSize size (750, 78);
-        if (var screen = q_app.primary_screen ()) {
+        if (var screen = Gtk.Application.primary_screen ()) {
             // Adjust the the size if there is a different DPI. (Issue #6156)
             // Indeed, this size need to be big enough to for the banner height, and the wizard's width
             var ratio = screen.logical_dots_per_inch () / 96.;
@@ -847,7 +847,7 @@ class Theme : GLib.Object {
 
 
     /***********************************************************
-    @brief How to handle the user id
+    @brief How to handle the user identifier
 
     @value UserIdentifierType.USER_NAME Wizard asks for user name a
     @value UserIdentifierType.EMAIL Wizard asks for an email as ID
@@ -861,7 +861,7 @@ class Theme : GLib.Object {
 
 
     /***********************************************************
-    @brief What to display as the user id (e.g. in the wizards)
+    @brief What to display as the user identifier (e.g. in the wizards)
 
     @return UserIdentifierType.UserIdentifierType.USER_NAME, unless reimplemented
     ***********************************************************/
@@ -887,7 +887,7 @@ class Theme : GLib.Object {
 
     /***********************************************************
     @brief Demo string to be displayed when no text has been
-    entered for the user id (e.g. mylogin@company.com)
+    entered for the user identifier (e.g. mylogin@company.com)
 
     @return An empty string, unless reimplemented
     ***********************************************************/
@@ -913,7 +913,7 @@ class Theme : GLib.Object {
 
     @return An empty string, unless reimplemented
     ***********************************************************/
-    public string wizard_url_hint () {
+    public string WIZARD_URL_HINT {
         return "";
     }
 

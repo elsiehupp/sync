@@ -4,12 +4,12 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QBuffer>
-// #include <QJsonDocument>
-// #include <QJsonObject>
-
-// #include <GLib.List>
-// #include <QPair>
+//  #include <QBuffer>
+//  #include <QJsonDocument>
+//  #include <QJsonObject>
+//  #include
+//  #include <GLib.List>
+//  #include <QPair>
 
 const int OCS_SUCCESS_STATUS_CODE 100
 // Apparantly the v2.php URLs can return that
@@ -76,9 +76,9 @@ class Ocs_job : AbstractNetworkJob {
     The base path for an Ocs_job is always the same. But it could be the case that
     certain operations need to append something to the URL.
 
-    This function appends the common id. so <PATH>/<ID>
+    This function appends the common identifier. so <PATH>/<ID>
     ***********************************************************/
-    protected void append_path (string id);
+    protected void append_path (string identifier);
 
 
     /***********************************************************
@@ -149,7 +149,7 @@ signals:
 }
 
     Ocs_job.Ocs_job (AccountPointer account)
-        : AbstractNetworkJob (account, "") {
+        : base (account, "") {
         this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE);
         this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE_V2);
         this.pass_status_codes.append (OCS_NOT_MODIFIED_STATUS_CODE_V2);
@@ -168,13 +168,14 @@ signals:
         this.pass_status_codes.append (code);
     }
 
-    void Ocs_job.append_path (string id) {
-        set_path (path () + '/' + id);
+    void Ocs_job.append_path (string identifier) {
+        set_path (path () + '/' + identifier);
     }
 
     void Ocs_job.add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
         this.request.set_raw_header (header_name, value);
     }
+
 
     /***********************************************************
     ***********************************************************/

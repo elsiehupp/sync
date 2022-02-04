@@ -4,8 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <QTemporaryDir>
+//  #include <QtTest>
+//  #include <QTemporaryDir>
 
 using namespace Occ;
 
@@ -82,16 +82,16 @@ private on_ void check_csync_exclude_add () {
     excludedFiles.addManualExclude ("/tmp/check_csync1/*");
     QCOMPARE (check_file_full ("/tmp/check_csync1/foo"), CSYNC_FILE_EXCLUDE_LIST);
     QCOMPARE (check_file_full ("/tmp/check_csync2/foo"), CSYNC_NOT_EXCLUDED);
-    QVERIFY (excludedFiles._allExcludes[QStringLiteral ("/")].contains ("/tmp/check_csync1/*"));
+    QVERIFY (excludedFiles.allExcludes[QStringLiteral ("/")].contains ("/tmp/check_csync1/*"));
 
-    QVERIFY (excludedFiles._fullRegexFile[QStringLiteral ("/")].pattern ().contains ("csync1"));
-    QVERIFY (excludedFiles._fullTraversalRegexFile[QStringLiteral ("/")].pattern ().contains ("csync1"));
-    QVERIFY (!excludedFiles._bnameTraversalRegexFile[QStringLiteral ("/")].pattern ().contains ("csync1"));
+    QVERIFY (excludedFiles.fullRegexFile[QStringLiteral ("/")].pattern ().contains ("csync1"));
+    QVERIFY (excludedFiles.fullTraversalRegexFile[QStringLiteral ("/")].pattern ().contains ("csync1"));
+    QVERIFY (!excludedFiles.bnameTraversalRegexFile[QStringLiteral ("/")].pattern ().contains ("csync1"));
 
     excludedFiles.addManualExclude ("foo");
-    QVERIFY (excludedFiles._bnameTraversalRegexFile[QStringLiteral ("/")].pattern ().contains ("foo"));
-    QVERIFY (excludedFiles._fullRegexFile[QStringLiteral ("/")].pattern ().contains ("foo"));
-    QVERIFY (!excludedFiles._fullTraversalRegexFile[QStringLiteral ("/")].pattern ().contains ("foo"));
+    QVERIFY (excludedFiles.bnameTraversalRegexFile[QStringLiteral ("/")].pattern ().contains ("foo"));
+    QVERIFY (excludedFiles.fullRegexFile[QStringLiteral ("/")].pattern ().contains ("foo"));
+    QVERIFY (!excludedFiles.fullTraversalRegexFile[QStringLiteral ("/")].pattern ().contains ("foo"));
 }
 
 private on_ void check_csync_exclude_add_per_dir () {
@@ -99,15 +99,15 @@ private on_ void check_csync_exclude_add_per_dir () {
     excludedFiles.addManualExclude ("*", "/tmp/check_csync1/");
     QCOMPARE (check_file_full ("/tmp/check_csync1/foo"), CSYNC_FILE_EXCLUDE_LIST);
     QCOMPARE (check_file_full ("/tmp/check_csync2/foo"), CSYNC_NOT_EXCLUDED);
-    QVERIFY (excludedFiles._allExcludes[QStringLiteral ("/tmp/check_csync1/")].contains ("*"));
+    QVERIFY (excludedFiles.allExcludes[QStringLiteral ("/tmp/check_csync1/")].contains ("*"));
 
     excludedFiles.addManualExclude ("foo");
-    QVERIFY (excludedFiles._fullRegexFile[QStringLiteral ("/")].pattern ().contains ("foo"));
+    QVERIFY (excludedFiles.fullRegexFile[QStringLiteral ("/")].pattern ().contains ("foo"));
 
     excludedFiles.addManualExclude ("foo/bar", "/tmp/check_csync1/");
-    QVERIFY (excludedFiles._fullRegexFile[QStringLiteral ("/tmp/check_csync1/")].pattern ().contains ("bar"));
-    QVERIFY (excludedFiles._fullTraversalRegexFile[QStringLiteral ("/tmp/check_csync1/")].pattern ().contains ("bar"));
-    QVERIFY (!excludedFiles._bnameTraversalRegexFile[QStringLiteral ("/tmp/check_csync1/")].pattern ().contains ("foo"));
+    QVERIFY (excludedFiles.fullRegexFile[QStringLiteral ("/tmp/check_csync1/")].pattern ().contains ("bar"));
+    QVERIFY (excludedFiles.fullTraversalRegexFile[QStringLiteral ("/tmp/check_csync1/")].pattern ().contains ("bar"));
+    QVERIFY (!excludedFiles.bnameTraversalRegexFile[QStringLiteral ("/tmp/check_csync1/")].pattern ().contains ("foo"));
 }
 
 private on_ void check_csync_excluded () {
@@ -143,10 +143,10 @@ private on_ void check_csync_excluded () {
     QCOMPARE (check_file_full ("subdir/.csync_journal.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
 
     /* also the new form of the database name */
-    QCOMPARE (check_file_full ("._sync_5bdd60bdfcfa.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
-    QCOMPARE (check_file_full ("._sync_5bdd60bdfcfa.db.ctmp"), CSYNC_FILE_SILENTLY_EXCLUDED);
-    QCOMPARE (check_file_full ("._sync_5bdd60bdfcfa.db-shm"), CSYNC_FILE_SILENTLY_EXCLUDED);
-    QCOMPARE (check_file_full ("subdir/._sync_5bdd60bdfcfa.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
+    QCOMPARE (check_file_full (".sync_5bdd60bdfcfa.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
+    QCOMPARE (check_file_full (".sync_5bdd60bdfcfa.db.ctmp"), CSYNC_FILE_SILENTLY_EXCLUDED);
+    QCOMPARE (check_file_full (".sync_5bdd60bdfcfa.db-shm"), CSYNC_FILE_SILENTLY_EXCLUDED);
+    QCOMPARE (check_file_full ("subdir/.sync_5bdd60bdfcfa.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
 
     QCOMPARE (check_file_full (".sync_5bdd60bdfcfa.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
     QCOMPARE (check_file_full (".sync_5bdd60bdfcfa.db.ctmp"), CSYNC_FILE_SILENTLY_EXCLUDED);
@@ -292,10 +292,10 @@ private on_ void check_csync_excluded_traversal () {
     QCOMPARE (check_file_traversal ("/two/subdir/.csync_journal.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
 
     /* also the new form of the database name */
-    QCOMPARE (check_file_traversal ("._sync_5bdd60bdfcfa.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
-    QCOMPARE (check_file_traversal ("._sync_5bdd60bdfcfa.db.ctmp"), CSYNC_FILE_SILENTLY_EXCLUDED);
-    QCOMPARE (check_file_traversal ("._sync_5bdd60bdfcfa.db-shm"), CSYNC_FILE_SILENTLY_EXCLUDED);
-    QCOMPARE (check_file_traversal ("subdir/._sync_5bdd60bdfcfa.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
+    QCOMPARE (check_file_traversal (".sync_5bdd60bdfcfa.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
+    QCOMPARE (check_file_traversal (".sync_5bdd60bdfcfa.db.ctmp"), CSYNC_FILE_SILENTLY_EXCLUDED);
+    QCOMPARE (check_file_traversal (".sync_5bdd60bdfcfa.db-shm"), CSYNC_FILE_SILENTLY_EXCLUDED);
+    QCOMPARE (check_file_traversal ("subdir/.sync_5bdd60bdfcfa.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
 
     QCOMPARE (check_file_traversal (".sync_5bdd60bdfcfa.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
     QCOMPARE (check_file_traversal (".sync_5bdd60bdfcfa.db.ctmp"), CSYNC_FILE_SILENTLY_EXCLUDED);
@@ -657,7 +657,7 @@ private on_ void check_csync_is_windows_reserved_word () {
         ExcludedFiles excludes;
         excludes.setClientVersion (ExcludedFiles.Version (2, 5, 0));
 
-        std.vector<std.pair<const char *, bool>> tests = { { "#!version == 2.5.0", true }, { "#!version == 2.6.0", false }, { "#!version < 2.6.0", true }, { "#!version <= 2.6.0", true }, { "#!version > 2.6.0", false }, { "#!version >= 2.6.0", false }, { "#!version < 2.4.0", false }, { "#!version <= 2.4.0", false }, { "#!version > 2.4.0", true }, { "#!version >= 2.4.0", true }, { "#!version < 2.5.0", false }, { "#!version <= 2.5.0", true }, { "#!version > 2.5.0", false }, { "#!version >= 2.5.0", true },
+        GLib.Vector<std.pair<const char *, bool>> tests = { { "#!version == 2.5.0", true }, { "#!version == 2.6.0", false }, { "#!version < 2.6.0", true }, { "#!version <= 2.6.0", true }, { "#!version > 2.6.0", false }, { "#!version >= 2.6.0", false }, { "#!version < 2.4.0", false }, { "#!version <= 2.4.0", false }, { "#!version > 2.4.0", true }, { "#!version >= 2.4.0", true }, { "#!version < 2.5.0", false }, { "#!version <= 2.5.0", true }, { "#!version > 2.5.0", false }, { "#!version >= 2.5.0", true },
         };
         for (var test : tests) {
             QVERIFY (excludes.versionDirectiveKeepNextLine (test.first) == test.second);
@@ -674,7 +674,7 @@ private on_ void check_csync_is_windows_reserved_word () {
         excludedFiles.addExcludeFilePath (filePath);
         excludedFiles.addExcludeFilePath (filePath);
 
-        QCOMPARE (excludedFiles._excludeFiles.size (), 1);
+        QCOMPARE (excludedFiles.excludeFiles.size (), 1);
     }
 
 
@@ -689,7 +689,7 @@ private on_ void check_csync_is_windows_reserved_word () {
         excludedFiles.addExcludeFilePath (filePath1);
         excludedFiles.addExcludeFilePath (filePath2);
 
-        QCOMPARE (excludedFiles._excludeFiles.size (), 2);
+        QCOMPARE (excludedFiles.excludeFiles.size (), 2);
     }
 
 
@@ -709,10 +709,10 @@ private on_ void check_csync_is_windows_reserved_word () {
         excludedFiles.addExcludeFilePath (folder1ExcludeList);
         excludedFiles.addExcludeFilePath (folder2ExcludeList);
 
-        QCOMPARE (excludedFiles._excludeFiles.size (), 3);
-        QCOMPARE (excludedFiles._excludeFiles[basePath].first (), defaultExcludeList);
-        QCOMPARE (excludedFiles._excludeFiles[folder1].first (), folder1ExcludeList);
-        QCOMPARE (excludedFiles._excludeFiles[folder2].first (), folder2ExcludeList);
+        QCOMPARE (excludedFiles.excludeFiles.size (), 3);
+        QCOMPARE (excludedFiles.excludeFiles[basePath].first (), defaultExcludeList);
+        QCOMPARE (excludedFiles.excludeFiles[folder1].first (), folder1ExcludeList);
+        QCOMPARE (excludedFiles.excludeFiles[folder2].first (), folder2ExcludeList);
     }
 
 
@@ -723,7 +723,7 @@ private on_ void check_csync_is_windows_reserved_word () {
         const string nonExistingFile ("directory/.sync-exclude.lst");
         excludedFiles.addExcludeFilePath (nonExistingFile);
         QCOMPARE (excludedFiles.reloadExcludeFiles (), false);
-        QCOMPARE (excludedFiles._allExcludes.size (), 0);
+        QCOMPARE (excludedFiles.allExcludes.size (), 0);
     }
 
 
@@ -743,7 +743,7 @@ private on_ void check_csync_is_windows_reserved_word () {
 
         excludedFiles.addExcludeFilePath (existingFilePath);
         QCOMPARE (excludedFiles.reloadExcludeFiles (), true);
-        QCOMPARE (excludedFiles._allExcludes.size (), 1);
+        QCOMPARE (excludedFiles.allExcludes.size (), 1);
     }
 }
 

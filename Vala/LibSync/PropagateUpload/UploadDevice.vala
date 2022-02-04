@@ -37,7 +37,6 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public bool is_bandwidth_limited () {
         return this.bandwidth_limited;
     }
@@ -49,7 +48,6 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public bool is_choked () {
         return this.choked;
     }
@@ -88,9 +86,9 @@ class UploadDevice : QIODevice {
 
     UploadDevice.UploadDevice (string filename, int64 on_start, int64 size, BandwidthManager bwm)
         : this.file (filename)
-        , this.start (on_start)
-        , this.size (size)
-        , this.bandwidth_manager (bwm) {
+        this.start (on_start)
+        this.size (size)
+        this.bandwidth_manager (bwm) {
         this.bandwidth_manager.on_register_upload_device (this);
     }
 

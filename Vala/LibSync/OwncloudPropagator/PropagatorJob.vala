@@ -1,3 +1,11 @@
+/***********************************************************
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+<GPLv3-or-later-Boilerplate>
+***********************************************************/
+
+namespace Occ {
 
 /***********************************************************
 @brief the base class of propagator jobs
@@ -9,29 +17,20 @@ If it is a composite job, it then inherits from PropagateDirectory
 ***********************************************************/
 class PropagatorJob : GLib.Object {
 
-
-    /***********************************************************
-    ***********************************************************/
-    public PropagatorJob (OwncloudPropagator propagator);
-
     /***********************************************************
     ***********************************************************/
     public enum AbortType {
-        Synchronous,
-        Asynchronous
-    };
+        SYNCHRONOUS,
+        ASYNCHRONOUS
+    }
 
     /***********************************************************
     ***********************************************************/
     public enum JobState {
-        NotYetStarted,
-        Running,
-        Finished
-    };
-
-    /***********************************************************
-    ***********************************************************/
-    public JobState this.state;
+        NOT_YET_STARTED,
+        RUNNING,
+        FINISHED
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -39,20 +38,53 @@ class PropagatorJob : GLib.Object {
         /***********************************************************
         Jobs can be run in parallel to this job
         ***********************************************************/
-        FullParallelism,
+        FULL_PARALLELISM,
 
         /***********************************************************
         No other job shall be started until this one has on_finished.
         So this job is guaranteed to finish before any jobs below
         it are executed.
         ***********************************************************/
-        WaitForFinished,
-    };
+        WAIT_FOR_FINISHED,
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public JobState state;
+
+    /***********************************************************
+    If this job gets added to a composite job, this will point to the parent.
+
+    For the PropagateDirectory.first_job it will point to
+    PropagateDirectory.sub_jobs.
+
+    That can be useful for jobs that want to spawn follow-up jobs without
+    becoming composite jobs themselves.
+    ***********************************************************/
+    protected PropagatorCompositeJob associated_composite = null;
+
+    /***********************************************************
+    Emitted when the job is fully on_finished
+    ***********************************************************/
+    signal void on_finished (SyncFileItem.Status);
+
+    /***********************************************************
+    Emitted when the on_abort is fully on_finished
+    ***********************************************************/
+    signal void abort_finished (SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR);
+
+    /***********************************************************
+    ***********************************************************/
+    public PropagatorJob (OwncloudPropagator propagator) {
+        base (propagator);
+        this.state = JobState.NOT_YET_STARTED;
+    }
 
     /***********************************************************
     ***********************************************************/
     public virtual JobParallelism parallelism () {
-        return FullParallelism;
+        return JobParallelism.FULL_PARALLELISM;
     }
 
 
@@ -91,8 +123,8 @@ class PropagatorJob : GLib.Object {
     Asynchronous on_abort requires emit of abort_finished () signal,
     while synchronous is expected to on_abort immedietaly.
     ***********************************************************/
-    public virtual void on_abort (PropagatorJob.AbortType abort_type) {
-        if (abort_type == AbortType.Asynchronous)
+    public void on_abort (PropagatorJob.AbortType abort_type) {
+        if (abort_type == AbortType.ASYNCHRONOUS)
             /* emit */ abort_finished ();
     }
 
@@ -102,40 +134,12 @@ class PropagatorJob : GLib.Object {
     returns true if a job was started.
     ***********************************************************/
     public virtual bool on_schedule_self_or_child ();
-signals:
-    /***********************************************************
-    Emitted when the job is fully on_finished
-    ***********************************************************/
-    void on_finished (SyncFileItem.Status);
 
 
-    /***********************************************************
-    Emitted when the on_abort is fully on_finished
-    ***********************************************************/
-    void abort_finished (SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR);
-
-    protected OwncloudPropagator propagator ();
-
-
-    /***********************************************************
-    If this job gets added to a composite job, this will point to the parent.
-
-    For the PropagateDirectory._first_job it will point to
-    PropagateDirectory._sub_jobs.
-
-    That can be useful for jobs that want to spawn follow-up jobs without
-    becoming composite jobs themselves.
-    ***********************************************************/
-    protected PropagatorCompositeJob this.associated_composite = nullptr;
-}
-
-
-
-    PropagatorJob.PropagatorJob (OwncloudPropagator propagator)
-        : GLib.Object (propagator)
-        , this.state (NotYetStarted) {
-    }
-
-    OwncloudPropagator *PropagatorJob.propagator () {
+    protected OwncloudPropagator propagator () {
         return qobject_cast<OwncloudPropagator> (parent ());
     }
+
+} // class PropagatorJob
+
+} // namespace Occ

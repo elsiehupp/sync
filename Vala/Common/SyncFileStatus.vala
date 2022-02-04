@@ -4,7 +4,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QMetaType>
+//  #include <QMetaType>
 
 namespace Occ {
 
@@ -35,34 +35,35 @@ class SyncFileStatus {
     /***********************************************************
     ***********************************************************/
     public SyncFileStatus (SyncFileStatusTag tag = SyncFileStatusTag.STATUS_NONE) {
-        this._tag = tag;
+        this.tag = tag;
     }
+
 
     /***********************************************************
     ***********************************************************/
     public void set (SyncFileStatusTag tag) {
-        this._tag = tag;
+        this.tag = tag;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public SyncFileStatusTag tag () {
-        return this._tag;
+        return this.tag;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void set_shared (bool is_shared) {
-        this._shared = is_shared;
+        this.shared = is_shared;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool shared () {
-        return this._shared;
+        return this.shared;
     }
 
 

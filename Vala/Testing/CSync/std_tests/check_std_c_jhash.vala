@@ -136,21 +136,21 @@ static void check_c_jhash_null_strings (void **state) {
 static void check_c_jhash64_trials (void **state) {
     uint8_t qa[MAXLEN + 1], qb[MAXLEN + 2];
     uint8_t a = NULL, *b = NULL;
-    uint64_t c[HASHSTATE];
-    uint64_t d[HASHSTATE];
-    uint64_t i = 0;
-    uint64_t j=0;
-    uint64_t k = 0;
-    uint64_t l = 0;
-    uint64_t m = 0;
-    uint64_t z = 0;
-    uint64_t e[HASHSTATE];
-    uint64_t f[HASHSTATE];
-    uint64_t g[HASHSTATE];
-    uint64_t h[HASHSTATE];
-    uint64_t x[HASHSTATE];
-    uint64_t y[HASHSTATE];
-    uint64_t hlen = 0;
+    uint64 c[HASHSTATE];
+    uint64 d[HASHSTATE];
+    uint64 i = 0;
+    uint64 j=0;
+    uint64 k = 0;
+    uint64 l = 0;
+    uint64 m = 0;
+    uint64 z = 0;
+    uint64 e[HASHSTATE];
+    uint64 f[HASHSTATE];
+    uint64 g[HASHSTATE];
+    uint64 h[HASHSTATE];
+    uint64 x[HASHSTATE];
+    uint64 y[HASHSTATE];
+    uint64 hlen = 0;
 
     (void) state; /* unused */
 
@@ -162,11 +162,11 @@ static void check_c_jhash64_trials (void **state) {
         for (i=0; i<hlen; ++i) { /*----------------------- for each byte, */
             for (j=0; j<8; ++j) { /*------------------------ for each bit, */
                 for (m=0; m<8; ++m) { /*-------- for serveral possible levels, */
-                    for (l=0; l<HASHSTATE; ++l) e[l]=f[l]=g[l]=h[l]=x[l]=y[l]=~ ( (uint64_t)0);
+                    for (l=0; l<HASHSTATE; ++l) e[l]=f[l]=g[l]=h[l]=x[l]=y[l]=~ ( (uint64)0);
 
                     /*---- check that every input bit affects every output bit */
                     for (k=0; k<MAXPAIR; k+=2) {
-                        uint64_t on_finished=1;
+                        uint64 on_finished=1;
                         /* keys have one bit different */
                         for (l=0; l<hlen+1; ++l) {a[l] = b[l] = (uint8_t)0;}
                         /* have a and b be two keys differing in only one bit */
@@ -221,7 +221,7 @@ static void check_c_jhash64_trials (void **state) {
 static void check_c_jhash64_alignment_problems (void **state) {
     uint8_t buf[MAXLEN+20];
     uint8_t b = NULL;
-    uint64_t len = 0;
+    uint64 len = 0;
     uint8_t q[] = "This is the time for all good men to come to the aid of their country";
     uint8_t qq[] = "xThis is the time for all good men to come to the aid of their country";
     uint8_t qqq[] = "xxThis is the time for all good men to come to the aid of their country";
@@ -230,39 +230,39 @@ static void check_c_jhash64_alignment_problems (void **state) {
     uint8_t oo[] = "xxxxxThis is the time for all good men to come to the aid of their country";
     uint8_t ooo[] = "xxxxxxThis is the time for all good men to come to the aid of their country";
     uint8_t oooo[] = "xxxxxxxThis is the time for all good men to come to the aid of their country";
-    uint64_t h = 0;
-    uint64_t i = 0;
-    uint64_t j = 0;
-    uint64_t ref = 0;
-    uint64_t t = 0;
-    uint64_t x = 0;
-    uint64_t y = 0;
+    uint64 h = 0;
+    uint64 i = 0;
+    uint64 j = 0;
+    uint64 ref = 0;
+    uint64 t = 0;
+    uint64 x = 0;
+    uint64 y = 0;
 
     (void) state; /* unused */
 
-    h = c_jhash64 (q+0, (uint64_t) (sizeof (q)-1), (uint64_t)0);
+    h = c_jhash64 (q+0, (uint64) (sizeof (q)-1), (uint64)0);
     t = h;
     assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
-    h = c_jhash64 (qq+1, (uint64_t) (sizeof (q)-1), (uint64_t)0);
+    h = c_jhash64 (qq+1, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
-    h = c_jhash64 (qqq+2, (uint64_t) (sizeof (q)-1), (uint64_t)0);
+    h = c_jhash64 (qqq+2, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
-    h = c_jhash64 (qqqq+3, (uint64_t) (sizeof (q)-1), (uint64_t)0);
+    h = c_jhash64 (qqqq+3, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
-    h = c_jhash64 (o+4, (uint64_t) (sizeof (q)-1), (uint64_t)0);
+    h = c_jhash64 (o+4, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
-    h = c_jhash64 (oo+5, (uint64_t) (sizeof (q)-1), (uint64_t)0);
+    h = c_jhash64 (oo+5, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
-    h = c_jhash64 (ooo+6, (uint64_t) (sizeof (q)-1), (uint64_t)0);
+    h = c_jhash64 (ooo+6, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
-    h = c_jhash64 (oooo+7, (uint64_t) (sizeof (q)-1), (uint64_t)0);
+    h = c_jhash64 (oooo+7, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
     for (h=0, b=buf+1; h<8; ++h, ++b) {
@@ -271,11 +271,11 @@ static void check_c_jhash64_alignment_problems (void **state) {
             for (j=0; j<i; ++j) * (b+j)=0;
 
             /* these should all be equal */
-            ref = c_jhash64 (b, len, (uint64_t)1);
+            ref = c_jhash64 (b, len, (uint64)1);
             * (b+i)= (uint8_t)~0;
             * (b-1)= (uint8_t)~0;
-            x = c_jhash64 (b, len, (uint64_t)1);
-            y = c_jhash64 (b, len, (uint64_t)1);
+            x = c_jhash64 (b, len, (uint64)1);
+            y = c_jhash64 (b, len, (uint64)1);
             assert_false ( (ref != x) || (ref != y));
 #if 0
             print_error ("alignment error : %.8lx %.8lx %.8lx %ld %ld\n", ref, x, y, h, i);
@@ -286,16 +286,16 @@ static void check_c_jhash64_alignment_problems (void **state) {
 
 static void check_c_jhash64_null_strings (void **state) {
     uint8_t buf[1];
-    uint64_t h = 0;
-    uint64_t i = 0;
-    uint64_t t = 0;
+    uint64 h = 0;
+    uint64 i = 0;
+    uint64 t = 0;
 
     (void) state; /* unused */
 
     buf[0] = ~0;
     for (i=0, h=0; i<8; ++i) {
         t = h;
-        h = c_jhash64 (buf, (uint64_t)0, h);
+        h = c_jhash64 (buf, (uint64)0, h);
         assert_false (t == h);
 #if 0
         print_error ("0-byte-string check failed : t = %.8lx, h = %.8lx", t, h);

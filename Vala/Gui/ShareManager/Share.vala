@@ -29,14 +29,14 @@ class Share : GLib.Object {
     Constructor for shares
     ***********************************************************/
     public Share (AccountPointer account,
-        const string id,
+        const string identifier,
         const string owner,
         const string owner_display_name,
         const string path,
         const Share_type share_type,
         bool is_password_set = false,
         const Permissions permissions = Share_permission_default,
-        const unowned<Sharee> share_with = unowned<Sharee> (nullptr));
+        const unowned<Sharee> share_with = unowned<Sharee> (null));
 
 
     /***********************************************************
@@ -50,7 +50,7 @@ class Share : GLib.Object {
 
 
     /***********************************************************
-    Get the id
+    Get the identifier
     ***********************************************************/
     public string get_id ();
 
@@ -130,7 +130,7 @@ signals:
 
 
     protected AccountPointer this.account;
-    protected string this.id;
+    protected string this.identifier;
     protected string this.uidowner;
     protected string this.owner_display_name;
     protected string this.path;
@@ -156,7 +156,7 @@ protected slots:
 
 
 Share.Share (AccountPointer account,
-    const string id,
+    const string identifier,
     const string uidowner,
     const string owner_display_name,
     const string path,
@@ -165,14 +165,14 @@ Share.Share (AccountPointer account,
     const Permissions permissions,
     const unowned<Sharee> share_with)
     : this.account (account)
-    , this.id (id)
-    , this.uidowner (uidowner)
-    , this.owner_display_name (owner_display_name)
-    , this.path (path)
-    , this.share_type (share_type)
-    , this.is_password_set (is_password_set)
-    , this.permissions (permissions)
-    , this.share_with (share_with) {
+    this.identifier (identifier)
+    this.uidowner (uidowner)
+    this.owner_display_name (owner_display_name)
+    this.path (path)
+    this.share_type (share_type)
+    this.is_password_set (is_password_set)
+    this.permissions (permissions)
+    this.share_with (share_with) {
 }
 
 AccountPointer Share.account () {
@@ -184,7 +184,7 @@ string Share.path () {
 }
 
 string Share.get_id () {
-    return this.id;
+    return this.identifier;
 }
 
 string Share.get_uid_owner () {

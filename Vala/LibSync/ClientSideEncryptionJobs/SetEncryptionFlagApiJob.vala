@@ -33,7 +33,6 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void on_start () override;
 
     protected bool on_finished () override;
@@ -51,7 +50,7 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
 
 
     SetEncryptionFlagApiJob.SetEncryptionFlagApiJob (AccountPointer& account, GLib.ByteArray file_identifier, FlagAction flag_action, GLib.Object parent)
-    : AbstractNetworkJob (account, e2ee_base_url () + QStringLiteral ("encrypted/") + file_identifier, parent), this.file_identifier (file_identifier), this.flag_action (flag_action) {
+    : base (account, E2EE_BASE_URL + QStringLiteral ("encrypted/") + file_identifier, parent), this.file_identifier (file_identifier), this.flag_action (flag_action) {
     }
 
     void SetEncryptionFlagApiJob.on_start () {
@@ -59,7 +58,7 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
         req.set_raw_header ("OCS-APIREQUEST", "true");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
 
-        q_c_info (lc_cse_job ()) << "marking the file with id" << this.file_identifier << "as" << (this.flag_action == Set ? "encrypted" : "non-encrypted") << ".";
+        GLib.Info (lc_cse_job ()) << "marking the file with identifier" << this.file_identifier << "as" << (this.flag_action == Set ? "encrypted" : "non-encrypted") << ".";
 
         send_request (this.flag_action == Set ? "PUT" : "DELETE", url, req);
 
@@ -68,11 +67,11 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
 
     bool SetEncryptionFlagApiJob.on_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        q_c_info (lc_cse_job ()) << "Encryption Flag Return" << reply ().read_all ();
+        GLib.Info (lc_cse_job ()) << "Encryption Flag Return" << reply ().read_all ();
         if (return_code == 200) {
             /* emit */ success (this.file_identifier);
         } else {
-            q_c_info (lc_cse_job ()) << "Setting the encrypted flag failed with" << path () << error_string () << return_code;
+            GLib.Info (lc_cse_job ()) << "Setting the encrypted flag failed with" << path () << error_string () << return_code;
             /* emit */ error (this.file_identifier, return_code);
         }
         return true;

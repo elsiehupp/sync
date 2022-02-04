@@ -4,9 +4,9 @@
          any purpose.
          */
 
-// #include <QtTest>
-
-// #include <sqlite3.h>
+//  #include <QtTest>
+//  #include
+//  #include <sqlite3.h>
 
 using namespace Occ;
 
@@ -49,17 +49,17 @@ class TestSyncJournalDB : GLib.Object {
         QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("nonexistant"), record));
         QVERIFY (!record.isValid ());
 
-        record._path = "foo";
+        record.path = "foo";
         // Use a value that exceeds uint32 and isn't representable by the
         // signed int being cast to uint64 either (like uint64.max would be)
-        record._inode = std.numeric_limits<uint32>.max () + 12ull;
-        record._modtime = dropMsecs (GLib.DateTime.currentDateTime ());
-        record._type = ItemTypeDirectory;
-        record._etag = "789789";
-        record._fileId = "abcd";
-        record._remotePerm = RemotePermissions.fromDbValue ("RW");
-        record._fileSize = 213089055;
-        record._checksumHeader = "MD5:mychecksum";
+        record.inode = std.numeric_limits<uint32>.max () + 12ull;
+        record.modtime = dropMsecs (GLib.DateTime.currentDateTime ());
+        record.type = ItemTypeDirectory;
+        record.etag = "789789";
+        record.fileId = "abcd";
+        record.remotePerm = RemotePermissions.fromDbValue ("RW");
+        record.fileSize = 213089055;
+        record.checksumHeader = "MD5:mychecksum";
         QVERIFY (this.database.setFileRecord (record));
 
         SyncJournalFileRecord storedRecord;
@@ -67,20 +67,20 @@ class TestSyncJournalDB : GLib.Object {
         QVERIFY (storedRecord == record);
 
         // Update checksum
-        record._checksumHeader = "Adler32:newchecksum";
+        record.checksumHeader = "Adler32:newchecksum";
         this.database.updateFileRecordChecksum ("foo", "newchecksum", "Adler32");
         QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo"), storedRecord));
         QVERIFY (storedRecord == record);
 
         // Update metadata
-        record._modtime = dropMsecs (GLib.DateTime.currentDateTime ().addDays (1));
+        record.modtime = dropMsecs (GLib.DateTime.currentDateTime ().addDays (1));
         // try a value that only fits uint64, not int64
-        record._inode = std.numeric_limits<uint64>.max () - std.numeric_limits<uint32>.max () - 1;
-        record._type = ItemTypeFile;
-        record._etag = "789FFF";
-        record._fileId = "efg";
-        record._remotePerm = RemotePermissions.fromDbValue ("NV");
-        record._fileSize = 289055;
+        record.inode = std.numeric_limits<uint64>.max () - std.numeric_limits<uint32>.max () - 1;
+        record.type = ItemTypeFile;
+        record.etag = "789FFF";
+        record.fileId = "efg";
+        record.remotePerm = RemotePermissions.fromDbValue ("NV");
+        record.fileSize = 289055;
         this.database.setFileRecord (record);
         QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo"), storedRecord));
         QVERIFY (storedRecord == record);
@@ -96,29 +96,29 @@ class TestSyncJournalDB : GLib.Object {
     private on_ void testFileRecordChecksum () { {// Try with and without a checksum
         {
             SyncJournalFileRecord record;
-            record._path = "foo-checksum";
-            record._remotePerm = RemotePermissions.fromDbValue (" ");
-            record._checksumHeader = "MD5:mychecksum";
-            record._modtime = Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ());
+            record.path = "foo-checksum";
+            record.remotePerm = RemotePermissions.fromDbValue (" ");
+            record.checksumHeader = "MD5:mychecksum";
+            record.modtime = Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ());
             QVERIFY (this.database.setFileRecord (record));
 
             SyncJournalFileRecord storedRecord;
             QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo-checksum"), storedRecord));
-            QVERIFY (storedRecord._path == record._path);
-            QVERIFY (storedRecord._remotePerm == record._remotePerm);
-            QVERIFY (storedRecord._checksumHeader == record._checksumHeader);
+            QVERIFY (storedRecord.path == record.path);
+            QVERIFY (storedRecord.remotePerm == record.remotePerm);
+            QVERIFY (storedRecord.checksumHeader == record.checksumHeader);
 
-            // qDebug ()<< "OOOOO " << storedRecord._modtime.toTime_t () << record._modtime.toTime_t ();
+            // qDebug ()<< "OOOOO " << storedRecord.modtime.toTime_t () << record.modtime.toTime_t ();
 
             // Attention : compare time_t types here, as GLib.DateTime seem to maintain
             // milliseconds internally, which disappear in sqlite. Go for full seconds here.
-            QVERIFY (storedRecord._modtime == record._modtime);
+            QVERIFY (storedRecord.modtime == record.modtime);
             QVERIFY (storedRecord == record);
         } {
             SyncJournalFileRecord record;
-            record._path = "foo-nochecksum";
-            record._remotePerm = RemotePermissions.fromDbValue ("RW");
-            record._modtime = Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ());
+            record.path = "foo-nochecksum";
+            record.remotePerm = RemotePermissions.fromDbValue ("RW");
+            record.modtime = Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ());
 
             QVERIFY (this.database.setFileRecord (record));
 
@@ -134,12 +134,12 @@ class TestSyncJournalDB : GLib.Object {
     private on_ void testDownloadInfo () {
         using Info = SyncJournalDb.DownloadInfo;
         Info record = this.database.getDownloadInfo ("nonexistant");
-        QVERIFY (!record._valid);
+        QVERIFY (!record.valid);
 
-        record._errorCount = 5;
-        record._etag = "ABCDEF";
-        record._valid = true;
-        record._tmpfile = "/tmp/foo";
+        record.errorCount = 5;
+        record.etag = "ABCDEF";
+        record.valid = true;
+        record.tmpfile = "/tmp/foo";
         this.database.setDownloadInfo ("foo", record);
 
         Info storedRecord = this.database.getDownloadInfo ("foo");
@@ -147,7 +147,7 @@ class TestSyncJournalDB : GLib.Object {
 
         this.database.setDownloadInfo ("foo", Info ());
         Info wipedRecord = this.database.getDownloadInfo ("foo");
-        QVERIFY (!wipedRecord._valid);
+        QVERIFY (!wipedRecord.valid);
     }
 
 
@@ -156,14 +156,14 @@ class TestSyncJournalDB : GLib.Object {
     private on_ void testUploadInfo () {
         using Info = SyncJournalDb.UploadInfo;
         Info record = this.database.getUploadInfo ("nonexistant");
-        QVERIFY (!record._valid);
+        QVERIFY (!record.valid);
 
-        record._errorCount = 5;
-        record._chunk = 12;
-        record._transferid = 812974891;
-        record._size = 12894789147;
-        record._modtime = dropMsecs (GLib.DateTime.currentDateTime ());
-        record._valid = true;
+        record.errorCount = 5;
+        record.chunk = 12;
+        record.transferid = 812974891;
+        record.size = 12894789147;
+        record.modtime = dropMsecs (GLib.DateTime.currentDateTime ());
+        record.valid = true;
         this.database.setUploadInfo ("foo", record);
 
         Info storedRecord = this.database.getUploadInfo ("foo");
@@ -171,7 +171,7 @@ class TestSyncJournalDB : GLib.Object {
 
         this.database.setUploadInfo ("foo", Info ());
         Info wipedRecord = this.database.getUploadInfo ("foo");
-        QVERIFY (!wipedRecord._valid);
+        QVERIFY (!wipedRecord.valid);
     }
 
 
@@ -180,12 +180,12 @@ class TestSyncJournalDB : GLib.Object {
     private on_ void testNumericId () {
         SyncJournalFileRecord record;
 
-        // Typical 8-digit padded id
-        record._fileId = "00000001abcd";
+        // Typical 8-digit padded identifier
+        record.fileId = "00000001abcd";
         QCOMPARE (record.numericFileId (), GLib.ByteArray ("00000001"));
 
-        // When the numeric id overflows the 8-digit boundary
-        record._fileId = "123456789ocidblaabcd";
+        // When the numeric identifier overflows the 8-digit boundary
+        record.fileId = "123456789ocidblaabcd";
         QCOMPARE (record.numericFileId (), GLib.ByteArray ("123456789"));
     }
 
@@ -221,16 +221,16 @@ class TestSyncJournalDB : GLib.Object {
         var initialEtag = GLib.ByteArray ("etag");
         var makeEntry = [&] (GLib.ByteArray path, ItemType type) {
             SyncJournalFileRecord record;
-            record._path = path;
-            record._type = type;
-            record._etag = initialEtag;
-            record._remotePerm = RemotePermissions.fromDbValue ("RW");
+            record.path = path;
+            record.type = type;
+            record.etag = initialEtag;
+            record.remotePerm = RemotePermissions.fromDbValue ("RW");
             this.database.setFileRecord (record);
         };
         var getEtag = [&] (GLib.ByteArray path) {
             SyncJournalFileRecord record;
             this.database.getFileRecord (path, record);
-            return record._etag;
+            return record.etag;
         };
 
         makeEntry ("foodir", ItemTypeDirectory);
@@ -287,8 +287,8 @@ class TestSyncJournalDB : GLib.Object {
     private on_ void testRecursiveDelete () {
         var makeEntry = [&] (GLib.ByteArray path) {
             SyncJournalFileRecord record;
-            record._path = path;
-            record._remotePerm = RemotePermissions.fromDbValue ("RW");
+            record.path = path;
+            record.remotePerm = RemotePermissions.fromDbValue ("RW");
             this.database.setFileRecord (record);
         };
 

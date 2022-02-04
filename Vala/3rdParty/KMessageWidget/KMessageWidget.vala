@@ -7,7 +7,7 @@ Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFrame>
+//  #include <QFrame>
 
 
 /***********************************************************
@@ -82,11 +82,11 @@ Example of acceptable uses:
 ***********************************************************/
 class KMessageWidget : QFrame {
 
-    Q_PROPERTY (string text READ text WRITE on_set_text)
-    Q_PROPERTY (bool word_wrap READ word_wrap WRITE set_word_wrap)
-    Q_PROPERTY (bool close_button_visible READ is_close_button_visible WRITE set_close_button_visible)
-    Q_PROPERTY (Message_type message_type READ message_type WRITE set_message_type)
-    Q_PROPERTY (QIcon icon READ icon WRITE set_icon)
+    //  Q_PROPERTY (string text READ text WRITE on_set_text)
+    //  Q_PROPERTY (bool word_wrap READ word_wrap WRITE set_word_wrap)
+    //  Q_PROPERTY (bool close_button_visible READ is_close_button_visible WRITE set_close_button_visible)
+    //  Q_PROPERTY (Message_type message_type READ message_type WRITE set_message_type)
+    //  Q_PROPERTY (QIcon icon READ icon WRITE set_icon)
 
     /***********************************************************
     Available message types.
@@ -103,14 +103,14 @@ class KMessageWidget : QFrame {
     /***********************************************************
     Constructs a KMessageWidget with the specified @p parent.
     ***********************************************************/
-    public KMessageWidget (Gtk.Widget parent = nullptr);
+    public KMessageWidget (Gtk.Widget parent = null);
 
 
     /***********************************************************
     Constructs a KMessageWidget with the specified @p parent and
     contents @p text.
     ***********************************************************/
-    public KMessageWidget (string text, Gtk.Widget parent = nullptr);
+    public KMessageWidget (string text, Gtk.Widget parent = null);
 
 
     /***********************************************************
@@ -481,7 +481,7 @@ signals:
             /* emit */ hide_animation_finished ();
         }
 
-        if (!style ().style_hint (QStyle.SH_Widget_Animate, nullptr, this)
+        if (!style ().style_hint (QStyle.SH_Widget_Animate, null, this)
          || (parent_widget () && !parent_widget ().is_visible ())) {
             show ();
             /* emit */ show_animation_finished ();
@@ -517,7 +517,7 @@ signals:
             /* emit */ show_animation_finished ();
         }
 
-        if (!style ().style_hint (QStyle.SH_Widget_Animate, nullptr, this)) {
+        if (!style ().style_hint (QStyle.SH_Widget_Animate, null, this)) {
             hide ();
             /* emit */ hide_animation_finished ();
             return;

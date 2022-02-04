@@ -4,11 +4,11 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QTreeView>
-// #include <QHelp_event>
-// #include <QToolTip>
-
-// #include <QPoint>
+//  #include <QTreeView>
+//  #include <QHelp_event>
+//  #include <QToolTip>
+//  #include
+//  #include <QPoint>
 
 
 namespace Occ {
@@ -64,7 +64,7 @@ using namespace Occ;
 
 ToolTipUpdater.ToolTipUpdater (QTreeView tree_view)
     : GLib.Object (tree_view)
-    , this.tree_view (tree_view) {
+    this.tree_view (tree_view) {
     connect (this.tree_view.model (), &QAbstractItemModel.on_data_changed,
         this, &ToolTipUpdater.on_data_changed);
     this.tree_view.viewport ().install_event_filter (this);

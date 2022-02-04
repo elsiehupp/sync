@@ -7,6 +7,5 @@ class Image_provider : QQuick_image_provider {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    public QImage request_image (string id, QSize size, QSize requested_size) override;
+    public QImage request_image (string identifier, QSize size, QSize requested_size) override;
 }

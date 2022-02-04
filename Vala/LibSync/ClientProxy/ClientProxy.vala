@@ -4,16 +4,15 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
-// #include <QThreadPool>
-
-// #include <QNetworkProxy>
-// #include <QRunnable>
+//  #include <QLoggingCategory>
+//  #include <QThreadPool>
+//  #include
+//  #include <QNetworkProxy>
+//  #include <QRunnable>
 
 using CSync;
 
 namespace Occ {
-
 
 /***********************************************************
 @brief The ClientProxy class
@@ -23,67 +22,60 @@ class ClientProxy : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ClientProxy (GLib.Object parent = new GLib.Object ());
-
-    /***********************************************************
-    ***********************************************************/
-    public static bool is_using_system_default ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public static const char proxy_type_to_c_str (QNetworkProxy.ProxyType type);
-
-
-    public void on_setup_qt_proxy_from_config ();
-}
-
-
-
-    ClientProxy.ClientProxy (GLib.Object parent) {
+    public ClientProxy (GLib.Object parent = new GLib.Object ()) {
         base (parent);
     }
 
+
     /***********************************************************
     ***********************************************************/
-    static QNetworkProxy proxy_from_config (ConfigFile cfg) {
-        QNetworkProxy proxy;
-
-        if (cfg.proxy_host_name ().is_empty ())
-            return QNetworkProxy ();
-
-        proxy.set_host_name (cfg.proxy_host_name ());
-        proxy.set_port (cfg.proxy_port ());
-        if (cfg.proxy_needs_auth ()) {
-            proxy.set_user (cfg.proxy_user ());
-            proxy.set_password (cfg.proxy_password ());
-        }
-        return proxy;
-    }
-
-    bool ClientProxy.is_using_system_default () {
-        Occ.ConfigFile cfg;
+    public static bool is_using_system_default () {
+        Occ.ConfigFile config;
 
         // if there is no config file, default to system proxy.
-        if (cfg.exists ()) {
-            return cfg.proxy_type () == QNetworkProxy.DefaultProxy;
+        if (config.exists ()) {
+            return config.proxy_type () == QNetworkProxy.DefaultProxy;
         }
 
         return true;
     }
 
-    const char *ClientProxy.proxy_type_to_c_str (QNetworkProxy.ProxyType type) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void lookup_system_proxy_async (GLib.Uri url, GLib.Object dst, char slot) {
+        var runnable = new SystemProxyRunnable (url);
+        GLib.Object.connect (runnable, SIGNAL (system_proxy_looked_up (QNetworkProxy)), dst, slot);
+        QThreadPool.global_instance ().on_start (runnable); // takes ownership and deletes
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private string print_q_network_proxy (QNetworkProxy proxy) {
+        return string ("%1://%2:%3").arg (proxy_type_to_c_str (proxy.type ())).arg (proxy.host_name ()).arg (proxy.port ());
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    private static QNetworkProxy proxy_from_config (ConfigFile config) {
+        QNetworkProxy proxy;
+
+        if (config.proxy_host_name ().is_empty ())
+            return QNetworkProxy ();
+
+        proxy.set_host_name (config.proxy_host_name ());
+        proxy.set_port (config.proxy_port ());
+        if (config.proxy_needs_auth ()) {
+            proxy.set_user (config.proxy_user ());
+            proxy.set_password (config.proxy_password ());
+        }
+        return proxy;
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public static const char proxy_type_to_c_str (QNetworkProxy.ProxyType type) {
         switch (type) {
         case QNetworkProxy.NoProxy:
             return "NoProxy";
@@ -102,29 +94,28 @@ class ClientProxy : GLib.Object {
         }
     }
 
-    string ClientProxy.print_q_network_proxy (QNetworkProxy proxy) {
-        return string ("%1://%2:%3").arg (proxy_type_to_c_str (proxy.type ())).arg (proxy.host_name ()).arg (proxy.port ());
-    }
 
-    void ClientProxy.on_setup_qt_proxy_from_config () {
-        Occ.ConfigFile cfg;
+    /***********************************************************
+    ***********************************************************/
+    public void on_setup_qt_proxy_from_config () {
+        Occ.ConfigFile config;
         int proxy_type = QNetworkProxy.DefaultProxy;
         QNetworkProxy proxy;
 
         // if there is no config file, default to system proxy.
-        if (cfg.exists ()) {
-            proxy_type = cfg.proxy_type ();
-            proxy = proxy_from_config (cfg);
+        if (config.exists ()) {
+            proxy_type = config.proxy_type ();
+            proxy = proxy_from_config (config);
         }
 
         switch (proxy_type) {
             case QNetworkProxy.NoProxy:
-                q_c_info (lc_client_proxy) << "Set proxy configuration to use NO proxy";
+                GLib.Info (lc_client_proxy) << "Set proxy configuration to use NO proxy";
                 QNetworkProxyFactory.set_use_system_configuration (false);
                 QNetworkProxy.set_application_proxy (QNetworkProxy.NoProxy);
                 break;
             case QNetworkProxy.DefaultProxy:
-                q_c_info (lc_client_proxy) << "Set proxy configuration to use the preferred system proxy for http tcp connections"; {
+                GLib.Info (lc_client_proxy) << "Set proxy configuration to use the preferred system proxy for http tcp connections"; {
                     QNetworkProxyQuery query;
                     query.set_protocol_tag ("http");
                     query.set_query_type (QNetworkProxyQuery.TcpSocket);
@@ -136,13 +127,13 @@ class ClientProxy : GLib.Object {
                 break;
             case QNetworkProxy.Socks5Proxy:
                 proxy.set_type (QNetworkProxy.Socks5Proxy);
-                q_c_info (lc_client_proxy) << "Set proxy configuration to SOCKS5" << print_q_network_proxy (proxy);
+                GLib.Info (lc_client_proxy) << "Set proxy configuration to SOCKS5" << print_q_network_proxy (proxy);
                 QNetworkProxyFactory.set_use_system_configuration (false);
                 QNetworkProxy.set_application_proxy (proxy);
                 break;
             case QNetworkProxy.HttpProxy:
                 proxy.set_type (QNetworkProxy.HttpProxy);
-                q_c_info (lc_client_proxy) << "Set proxy configuration to HTTP" << print_q_network_proxy (proxy);
+                GLib.Info (lc_client_proxy) << "Set proxy configuration to HTTP" << print_q_network_proxy (proxy);
                 QNetworkProxyFactory.set_use_system_configuration (false);
                 QNetworkProxy.set_application_proxy (proxy);
                 break;
@@ -150,12 +141,7 @@ class ClientProxy : GLib.Object {
                 break;
         }
     }
+} // class ClientProxy
 
-    void ClientProxy.lookup_system_proxy_async (GLib.Uri url, GLib.Object dst, char slot) {
-        var runnable = new SystemProxyRunnable (url);
-        GLib.Object.connect (runnable, SIGNAL (system_proxy_looked_up (QNetworkProxy)), dst, slot);
-        QThreadPool.global_instance ().on_start (runnable); // takes ownership and deletes
-    }
-
-    }
+} // namespace Occ
     

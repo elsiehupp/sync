@@ -43,24 +43,24 @@ UpdaterScheduler.UpdaterScheduler (GLib.Object parent) {
     // at startup, do a check in any case.
     QTimer.single_shot (3000, this, &UpdaterScheduler.on_timer_fired);
 
-    ConfigFile cfg;
-    var check_interval = cfg.update_check_interval ();
+    ConfigFile config;
+    var check_interval = config.update_check_interval ();
     this.update_check_timer.on_start (std.chrono.milliseconds (check_interval).count ());
 }
 
 void UpdaterScheduler.on_timer_fired () {
-    ConfigFile cfg;
+    ConfigFile config;
 
     // re-set the check interval if it changed in the config file meanwhile
-    var check_interval = std.chrono.milliseconds (cfg.update_check_interval ()).count ();
+    var check_interval = std.chrono.milliseconds (config.update_check_interval ()).count ();
     if (check_interval != this.update_check_timer.interval ()) {
         this.update_check_timer.set_interval (check_interval);
-        q_c_info (lc_updater) << "Setting new update check interval " << check_interval;
+        GLib.Info (lc_updater) << "Setting new update check interval " << check_interval;
     }
 
     // consider the skip_update_check and !auto_update_check flags in the config.
-    if (cfg.skip_update_check () || !cfg.auto_update_check ()) {
-        q_c_info (lc_updater) << "Skipping update check because of config file";
+    if (config.skip_update_check () || !config.auto_update_check ()) {
+        GLib.Info (lc_updater) << "Skipping update check because of config file";
         return;
     }
 

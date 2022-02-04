@@ -5,19 +5,21 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+
 /***********************************************************
 @brief The CheckServerJob class
 @ingroup libsync
 ***********************************************************/
 class CheckServerJob : AbstractNetworkJob {
 
-    const char statusphp_c[] = "status.php";
-    const char nextcloud_dir_c[] = "nextcloud/";
+    const string STATUS_PHP_C = "status.php";
+    const string NEXTCLOUD_DIR_C = "nextcloud/";
 
 
     /***********************************************************
     ***********************************************************/
-    private bool this.subdir_fallback;
+    private bool subdir_fallback;
 
 
     /***********************************************************
@@ -26,13 +28,13 @@ class CheckServerJob : AbstractNetworkJob {
     Note that temporary redirects or a permanent redirect behind a temporary
     one do not affect this url.
     ***********************************************************/
-    private GLib.Uri this.server_url;
+    private GLib.Uri server_url;
 
 
     /***********************************************************
     Keep track of how many permanent redirect were applied.
     ***********************************************************/
-    private int this.permanent_redirects;
+    private int permanent_redirects;
 
 
     /***********************************************************
@@ -64,7 +66,7 @@ class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public CheckServerJob (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
-        base (account, QLatin1String (statusphp_c), parent);
+        base (account, QLatin1String (STATUS_PHP_C), parent);
         this.subdir_fallback = false;
         this.permanent_redirects = 0;
         set_ignore_credential_failure (true);
@@ -79,7 +81,7 @@ class CheckServerJob : AbstractNetworkJob {
         this.server_url = account ().url ();
         send_request ("GET", Utility.concat_url_path (this.server_url, path ()));
         connect (reply (), &Soup.Reply.meta_data_changed, this, &CheckServerJob.meta_data_changed_slot);
-        connect (reply (), &Soup.Reply.encrypted, this, &CheckServerJob.encrypted_slot);
+        connect (reply (), &Soup.Reply.encrypted, this, &CheckServerJob.on_encrypted);
         AbstractNetworkJob.on_start ();
     }
 
@@ -133,9 +135,9 @@ class CheckServerJob : AbstractNetworkJob {
         // at the original location
         if ( (reply ().error () == Soup.Reply.ContentNotFoundError) && (!this.subdir_fallback)) {
             this.subdir_fallback = true;
-            set_path (QLatin1String (nextcloud_dir_c) + QLatin1String (statusphp_c));
+            set_path (QLatin1String (NEXTCLOUD_DIR_C) + QLatin1String (STATUS_PHP_C));
             on_start ();
-            q_c_info (lc_check_server_job) << "Retrying with" << reply ().url ();
+            GLib.Info (lc_check_server_job) << "Retrying with" << reply ().url ();
             return false;
         }
 
@@ -152,7 +154,7 @@ class CheckServerJob : AbstractNetworkJob {
                 GLib.warn (lc_check_server_job) << "status.php from server is not valid JSON!" << body << reply ().request ().url () << error.error_string ();
             }
 
-            q_c_info (lc_check_server_job) << "status.php returns : " << status << " " << reply ().error () << " Reply : " << reply ();
+            GLib.Info (lc_check_server_job) << "status.php returns : " << status << " " << reply ().error () << " Reply : " << reply ();
             if (status.object ().contains ("installed")) {
                 /* emit */ instance_found (this.server_url, status.object ());
             } else {
@@ -174,7 +176,7 @@ class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void encrypted_slot () {
+    private void on_encrypted () {
         merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account ());
     }
 
@@ -183,7 +185,7 @@ class CheckServerJob : AbstractNetworkJob {
     ***********************************************************/
     private void on_redirected (Soup.Reply reply, GLib.Uri target_url, int redirect_count) {
         GLib.ByteArray slash_status_php ("/");
-        slash_status_php.append (statusphp_c);
+        slash_status_php.append (STATUS_PHP_C);
 
         int http_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         string path = target_url.path ();
@@ -192,7 +194,7 @@ class CheckServerJob : AbstractNetworkJob {
             && path.ends_with (slash_status_php)) {
             this.server_url = target_url;
             this.server_url.set_path (path.left (path.size () - slash_status_php.size ()));
-            q_c_info (lc_check_server_job) << "status.php was permanently redirected to"
+            GLib.Info (lc_check_server_job) << "status.php was permanently redirected to"
                                     << target_url << "new server url is" << this.server_url;
             ++this.permanent_redirects;
         }
@@ -201,13 +203,16 @@ class CheckServerJob : AbstractNetworkJob {
 
     private static void merge_ssl_configuration_for_ssl_button (QSslConfiguration config, AccountPointer account) {
         if (config.peer_certificate_chain ().length () > 0) {
-            account._peer_certificate_chain = config.peer_certificate_chain ();
+            account.peer_certificate_chain = config.peer_certificate_chain ();
         }
         if (!config.session_cipher ().is_null ()) {
-            account._session_cipher = config.session_cipher ();
+            account.session_cipher = config.session_cipher ();
         }
         if (config.session_ticket ().length () > 0) {
-            account._session_ticket = config.session_ticket ();
+            account.session_ticket = config.session_ticket ();
         }
     }
-}
+
+} // class CheckServerJob
+
+} // namespace Occ

@@ -4,46 +4,36 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
-// #include <QThreadPool>
+//  #include <QLoggingCategory>
+//  #include <QThreadPool>
 
-// #include <QNetworkProxy>
-// #include <QRunnable>
+//  #include <QNetworkProxy>
+//  #include <QRunnable>
 
 using CSync;
 
 namespace Occ {
 
-class SystemProxyRunnable : GLib.Object, public QRunnable {
+class SystemProxyRunnable : GLib.Object, QRunnable {
 
     /***********************************************************
     ***********************************************************/
-    public SystemProxyRunnable (GLib.Uri url);
+    private GLib.Uri url;
 
     /***********************************************************
     ***********************************************************/
-    public 
-    public void run () override;
-signals:
-    void system_proxy_looked_up (QNetworkProxy url);
-
+    signal void system_proxy_looked_up (QNetworkProxy url);
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Uri this.url;
-}
-
-
-
-
-
-    SystemProxyRunnable.SystemProxyRunnable (GLib.Uri url)
-        : GLib.Object ()
-        , QRunnable ()
-        , this.url (url) {
+    public SystemProxyRunnable (GLib.Uri url) {
+        base ();
+        this.url = url;
     }
 
-    void SystemProxyRunnable.run () {
+    /***********************************************************
+    ***********************************************************/
+    public void run () {
         q_register_meta_type<QNetworkProxy> ("QNetworkProxy");
         GLib.List<QNetworkProxy> proxies = QNetworkProxyFactory.system_proxy_for_query (QNetworkProxyQuery (this.url));
 
@@ -54,3 +44,6 @@ signals:
             // FIXME Would we really ever return more?
         }
     }
+} // class SystemProxyRunnable
+
+} // namespace Occ

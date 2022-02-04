@@ -230,10 +230,10 @@ rights.  These rights are described in the Digia Qt LGPL Exception
 version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
-// #include <cstring>
-// #include <cerrno>
-// #include <unistd.h>
-// #include <fcntl.h>
+//  #include <cstring>
+//  #include <cerrno>
+//  #include <unistd.h>
+//  #include <fcntl.h>
 
 namespace SharedTools {
 

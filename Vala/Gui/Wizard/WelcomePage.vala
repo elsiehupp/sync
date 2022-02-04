@@ -4,9 +4,9 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #pragma once
+//  #pragma once
 
-// #include <QWizard_page>
+//  #include <QWizard_page>
 
 namespace Occ {
 
@@ -49,8 +49,8 @@ class Welcome_page : QWizard_page {
 
     Welcome_page.Welcome_page (OwncloudWizard oc_wizard)
         : QWizard_page ()
-        , this.ui (new Ui.Welcome_page)
-        , this.oc_wizard (oc_wizard) {
+        this.ui (new Ui.Welcome_page)
+        this.oc_wizard (oc_wizard) {
         setup_ui ();
     }
 

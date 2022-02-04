@@ -4,100 +4,34 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFileInfo>
-// #include <QDir>
-// #include <QDirIterator>
-// #include <QCoreApplication>
+//  #include <QFileInfo>
+//  #include <QDir>
+//  #include <QDirIterator>
+//  #include <QCoreApplication>
 
-// #pragma once
+//  #pragma once
 
-// #include <ctime>
-// #include <functional>
+//  #include <ctime>
+//  #include <functional>
+//  #include
+//  #include <owncloudlib.h>
 
-// #include <owncloudlib.h>
+
 // Chain in the base include and extend the namespace
-
-
 namespace Occ {
-
-
-/***********************************************************
- \addtogroup libsync
- @{
-***********************************************************/
 
 /***********************************************************
 @brief This file contains file system helper
+
+ \addtogroup libsync
+ @{
 ***********************************************************/
-namespace FileSystem {
+static class FileSystem {
 
     /***********************************************************
     @brief compare two files with given filename and return true if they have the same content
     ***********************************************************/
-    bool file_equals (string fn1, string fn2);
-
-
-    /***********************************************************
-    @brief Get the mtime for a filepath
-
-    Use this over QFileInfo.last_modified () to avoid timezone related bugs. See
-    owncloud/core#9781 for details.
-    ***********************************************************/
-    time_t get_mod_time (string filename);
-
-    bool set_mod_time (string filename, time_t mod_time);
-
-
-    /***********************************************************
-    @brief Get the size for a file
-
-    Use this over QFileInfo.size () to avoid bugs with lnk files on Windows.
-    See https://bugreports.qt.io/browse/QTBUG-24831.
-    ***********************************************************/
-    int64 get_size (string filename);
-
-
-    /***********************************************************
-    @brief Retrieve a file inode with csync
-    ***********************************************************/
-    bool get_inode (string filename, uint64 inode);
-
-
-    /***********************************************************
-    @brief Check if \a filename has changed given previous size and mtime
-
-    Nonexisting files are covered through mtime : they have an mtime of -1.
-
-    @return true if the file's mtime or size are not what is expected.
-    ***********************************************************/
-    bool file_changed (string filename,
-        int64 previous_size,
-        time_t previous_mtime);
-
-
-    /***********************************************************
-    @brief Like !file_changed () but with verbose logging if the file did* change.
-    ***********************************************************/
-    bool verify_file_unchanged (string filename,
-        int64 previous_size,
-        time_t previous_mtime);
-
-
-    /***********************************************************
-    Removes a directory and its contents recursively
-
-    Returns true if all removes succeeded.
-    on_deleted () is called for each deleted file or directory, including the root.
-    errors are collected in errors.
-    ***********************************************************/
-    bool remove_recursively (string path,
-        const std.function<void (string path, bool is_dir)> on_deleted = nullptr,
-        string[] *errors = nullptr);
-}
-
-
-
-    bool FileSystem.file_equals (string fn1, string fn2) {
+    bool file_equals (string fn1, string fn2) {
         // compare two files with given filename and return true if they have the same content
         GLib.File f1 (fn1);
         GLib.File f2 (fn2);
@@ -124,7 +58,14 @@ namespace FileSystem {
         return true;
     }
 
-    time_t FileSystem.get_mod_time (string filename) {
+
+    /***********************************************************
+    @brief Get the mtime for a filepath
+
+    Use this over QFileInfo.last_modified () to avoid timezone related bugs. See
+    owncloud/core#9781 for details.
+    ***********************************************************/
+    time_t get_mod_time (string filename) {
         csync_file_stat_t stat;
         int64 result = -1;
         if (csync_vio_local_stat (filename, stat) != -1
@@ -138,7 +79,8 @@ namespace FileSystem {
         return result;
     }
 
-    bool FileSystem.set_mod_time (string filename, time_t mod_time) {
+
+    bool set_mod_time (string filename, time_t mod_time) {
         struct timeval times[2];
         times[0].tv_sec = times[1].tv_sec = mod_time;
         times[0].tv_usec = times[1].tv_usec = 0;
@@ -151,33 +93,76 @@ namespace FileSystem {
         return true;
     }
 
-    bool FileSystem.file_changed (string filename,
+
+    /***********************************************************
+    @brief Get the size for a file
+
+    Use this over QFileInfo.size () to avoid bugs with lnk files on Windows.
+    See https://bugreports.qt.io/browse/QTBUG-24831.
+    ***********************************************************/
+    int64 get_size (string filename) {
+        return QFileInfo (filename).size ();
+    }
+
+
+    /***********************************************************
+    @brief Retrieve a file inode with csync
+    ***********************************************************/
+    bool get_inode (string filename, uint64 inode) {
+        csync_file_stat_t fs;
+        if (csync_vio_local_stat (filename, fs) == 0) {
+            *inode = fs.inode;
+            return true;
+        }
+        return false;
+    }
+
+
+    /***********************************************************
+    @brief Check if \a filename has changed given previous size and mtime
+
+    Nonexisting files are covered through mtime : they have an mtime of -1.
+
+    @return true if the file's mtime or size are not what is expected.
+    ***********************************************************/
+    bool file_changed (string filename,
         int64 previous_size,
         time_t previous_mtime) {
         return get_size (filename) != previous_size
             || get_mod_time (filename) != previous_mtime;
     }
 
-    bool FileSystem.verify_file_unchanged (string filename,
+
+    /***********************************************************
+    @brief Like !file_changed () but with verbose logging if the file did* change.
+    ***********************************************************/
+    bool verify_file_unchanged (string filename,
         int64 previous_size,
         time_t previous_mtime) {
         const int64 actual_size = get_size (filename);
         const time_t actual_mtime = get_mod_time (filename);
         if ( (actual_size != previous_size && actual_mtime > 0) || (actual_mtime != previous_mtime && previous_mtime > 0 && actual_mtime > 0)) {
-            q_c_info (lc_file_system) << "File" << filename << "has changed:"
-                                 << "size : " << previous_size << "<." << actual_size
-                                 << ", mtime : " << previous_mtime << "<." << actual_mtime;
+            GLib.Info (lc_file_system) << "File" << filename << "has changed:"
+                                    << "size : " << previous_size << "<." << actual_size
+                                    << ", mtime : " << previous_mtime << "<." << actual_mtime;
             return false;
         }
         return true;
     }
 
-    int64 FileSystem.get_size (string filename) {
-        return QFileInfo (filename).size ();
-    }
 
-    // Code inspired from Qt5's QDir.remove_recursively
-    bool FileSystem.remove_recursively (string path, std.function<void (string path, bool is_dir)> on_deleted, string[] *errors) {
+    /***********************************************************
+    Removes a directory and its contents recursively
+
+    Returns true if all removes succeeded.
+    on_deleted () is called for each deleted file or directory, including the root.
+    errors are collected in errors.
+
+    Code inspired from Qt5's QDir.remove_recursively
+    ***********************************************************/
+    bool remove_recursively (string path,
+        const std.function<void (string path, bool is_dir)> on_deleted = null,
+        string[] errors = null) {
         bool all_removed = true;
         QDirIterator di (path, QDir.AllEntries | QDir.Hidden | QDir.System | QDir.NoDotAndDotDot);
 
@@ -199,7 +184,7 @@ namespace FileSystem {
                 } else {
                     if (errors) {
                         errors.append (QCoreApplication.translate ("FileSystem", "Error removing \"%1\" : %2")
-                                           .arg (QDir.to_native_separators (di.file_path ()), remove_error));
+                                            .arg (QDir.to_native_separators (di.file_path ()), remove_error));
                     }
                     GLib.warn (lc_file_system) << "Error removing " << di.file_path () << ':' << remove_error;
                 }
@@ -215,7 +200,7 @@ namespace FileSystem {
             } else {
                 if (errors) {
                     errors.append (QCoreApplication.translate ("FileSystem", "Could not remove folder \"%1\"")
-                                       .arg (QDir.to_native_separators (path)));
+                                        .arg (QDir.to_native_separators (path)));
                 }
                 GLib.warn (lc_file_system) << "Error removing folder" << path;
             }
@@ -223,14 +208,7 @@ namespace FileSystem {
         return all_removed;
     }
 
-    bool FileSystem.get_inode (string filename, uint64 inode) {
-        csync_file_stat_t fs;
-        if (csync_vio_local_stat (filename, fs) == 0) {
-            *inode = fs.inode;
-            return true;
-        }
-        return false;
-    }
+} // static class FileSystem
 
-    } // namespace Occ
+} // namespace Occ
     

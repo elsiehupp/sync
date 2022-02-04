@@ -5,6 +5,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+
 /***********************************************************
 @brief The PropfindJob class
 
@@ -19,53 +21,21 @@ class PropfindJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropfindJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
+    private GLib.List<GLib.ByteArray> properties;
+
+    signal void result (QVariantMap values);
+    signal void finished_with_error (Soup.Reply reply = null);
 
     /***********************************************************
     ***********************************************************/
-    public 
-    public void on_start () override;
-
-
-    /***********************************************************
-    Used to specify which properties shall be retrieved.
-
-    The properties can
-     - contain no colon : they refer to a property in the DAV :
-     - contain a colon : and thus specify an explicit namespace,
-       e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
-    ***********************************************************/
-    public void set_properties (GLib.List<GLib.ByteArray> properties);
-
-
-    /***********************************************************
-    ***********************************************************/
-    public GLib.List<GLib.ByteArray> properties ();
-
-signals:
-    void result (QVariantMap values);
-    void finished_with_error (Soup.Reply reply = nullptr);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private on_ bool on_finished () override;
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private GLib.List<GLib.ByteArray> this.properties;
-
-
-
-
-
-
-    PropfindJob.PropfindJob (AccountPointer account, string path, GLib.Object parent)
-        : AbstractNetworkJob (account, path, parent) {
+    public PropfindJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+        base (account, path, parent);
     }
 
-    void PropfindJob.on_start () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_start () {
         GLib.List<GLib.ByteArray> properties = this.properties;
 
         if (properties.is_empty ()) {
@@ -100,17 +70,32 @@ signals:
         AbstractNetworkJob.on_start ();
     }
 
-    void PropfindJob.set_properties (GLib.List<GLib.ByteArray> properties) {
-        this.properties = properties;
-    }
 
-    GLib.List<GLib.ByteArray> PropfindJob.properties () {
+    /***********************************************************
+    ***********************************************************/
+    public GLib.List<GLib.ByteArray> properties () {
         return this.properties;
     }
 
-    bool PropfindJob.on_finished () {
-        q_c_info (lc_propfind_job) << "PROPFIND of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                            << reply_status_"";
+
+    /***********************************************************
+    Used to specify which properties shall be retrieved.
+
+    The properties can
+     - contain no colon : they refer to a property in the DAV :
+     - contain a colon : and thus specify an explicit namespace,
+       e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
+    ***********************************************************/
+    public void set_properties (GLib.List<GLib.ByteArray> properties) {
+        this.properties = properties;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private bool on_finished () {
+        GLib.Info (lc_propfind_job) << "PROPFIND of" << reply ().request ().url () << "FINISHED WITH STATUS"
+                            << reply_status_string ();
 
         int http_result_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
@@ -152,4 +137,6 @@ signals:
         return true;
     }
 
-};
+} // class PropfindJob
+
+} // namespace Occ

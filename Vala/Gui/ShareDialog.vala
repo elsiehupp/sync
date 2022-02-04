@@ -4,17 +4,17 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFileInfo>
-// #include <QFile_icon_provider>
-// #include <QInputDialog>
-// #include <QPointer>
-// #include <QPushButton>
-// #include <QFrame>
+//  #include <QFileInfo>
+//  #include <QFile_icon_provider>
+//  #include <QInputDialog>
+//  #include <QPointer>
+//  #include <QPushButton>
+//  #include <QFrame>
 
 
-// #include <QPointer>
-// #include <Gtk.Dialog>
-// #include <Gtk.Widget>
+//  #include <QPointer>
+//  #include <Gtk.Dialog>
+//  #include <Gtk.Widget>
 
 namespace {
     string create_random_password () {
@@ -46,7 +46,7 @@ class Share_dialog : Gtk.Dialog {
         Share_permissions max_sharing_permissions,
         const GLib.ByteArray numeric_file_id,
         Share_dialog_start_page start_page,
-        Gtk.Widget parent = nullptr);
+        Gtk.Widget parent = null);
     ~Share_dialog () override;
 
 
@@ -96,15 +96,16 @@ signals:
     private GLib.ByteArray this.numeric_file_id;
     private string this.private_link_url;
     private Share_dialog_start_page this.start_page;
-    private Share_manager this.manager = nullptr;
+    private Share_manager this.manager = null;
 
     /***********************************************************
     ***********************************************************/
     private GLib.List<Share_link_widget> this.link_widget_list;
-    private Share_link_widget* this.empty_share_link_widget = nullptr;
-    private Share_user_group_widget this.user_group_widget = nullptr;
-    private QProgress_indicator this.progress_indicator = nullptr;
+    private Share_link_widget* this.empty_share_link_widget = null;
+    private Share_user_group_widget this.user_group_widget = null;
+    private QProgress_indicator this.progress_indicator = null;
 }
+
 
     /***********************************************************
     ***********************************************************/
@@ -118,13 +119,13 @@ signals:
         Share_dialog_start_page start_page,
         Gtk.Widget parent)
         : Gtk.Dialog (parent)
-        , this.ui (new Ui.Share_dialog)
-        , this.account_state (account_state)
-        , this.share_path (share_path)
-        , this.local_path (local_path)
-        , this.max_sharing_permissions (max_sharing_permissions)
-        , this.private_link_url (account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded))
-        , this.start_page (start_page) {
+        this.ui (new Ui.Share_dialog)
+        this.account_state (account_state)
+        this.share_path (share_path)
+        this.local_path (local_path)
+        this.max_sharing_permissions (max_sharing_permissions)
+        this.private_link_url (account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded))
+        this.start_page (start_page) {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         set_attribute (Qt.WA_DeleteOnClose);
         set_object_name ("Sharing_dialog"); // required as group for save_geometry call
@@ -171,7 +172,7 @@ signals:
 
         this.set_window_title (_("%1 Sharing").arg (Theme.instance ().app_name_gui ()));
 
-        if (!account_state.account ().capabilities ().share_a_p_i ()) {
+        if (!account_state.account ().capabilities ().share_api ()) {
             return;
         }
 
@@ -185,7 +186,7 @@ signals:
         job.set_properties (
             GLib.List<GLib.ByteArray> ()
             << "http://open-collaboration-services.org/ns:share-permissions"
-            << "http://owncloud.org/ns:fileid" // numeric file id for fallback private link generation
+            << "http://owncloud.org/ns:fileid" // numeric file identifier for fallback private link generation
             << "http://owncloud.org/ns:privatelink");
         job.on_set_timeout (10 * 1000);
         connect (job, &PropfindJob.result, this, &Share_dialog.on_propfind_received);
@@ -256,7 +257,7 @@ signals:
             this.empty_share_link_widget.hide ();
             this.ui.vertical_layout.remove_widget (this.empty_share_link_widget);
             this.link_widget_list.remove_all (this.empty_share_link_widget);
-            this.empty_share_link_widget = nullptr;
+            this.empty_share_link_widget = null;
         }
     }
 
@@ -274,7 +275,7 @@ signals:
         /* emit */ toggle_share_link_animation (true);
 
         const string version_string = this.account_state.account ().server_version ();
-        q_c_info (lc_sharing) << version_string << "Fetched" << shares.count () << "shares";
+        GLib.Info (lc_sharing) << version_string << "Fetched" << shares.count () << "shares";
         foreach (var share, shares) {
             if (share.get_share_type () != Share.Type_link || share.get_uid_owner () != share.account ().dav_user ()) {
                 continue;
@@ -303,8 +304,8 @@ signals:
     }
 
     void Share_dialog.on_done (int r) {
-        ConfigFile cfg;
-        cfg.save_geometry (this);
+        ConfigFile config;
+        config.save_geometry (this);
         Gtk.Dialog.on_done (r);
     }
 
@@ -312,15 +313,15 @@ signals:
         const GLib.Variant received_permissions = result["share-permissions"];
         if (!received_permissions.to_string ().is_empty ()) {
             this.max_sharing_permissions = static_cast<Share_permissions> (received_permissions.to_int ());
-            q_c_info (lc_sharing) << "Received sharing permissions for" << this.share_path << this.max_sharing_permissions;
+            GLib.Info (lc_sharing) << "Received sharing permissions for" << this.share_path << this.max_sharing_permissions;
         }
         var private_link_url = result["privatelink"].to_string ();
         var numeric_file_id = result["fileid"].to_byte_array ();
         if (!private_link_url.is_empty ()) {
-            q_c_info (lc_sharing) << "Received private link url for" << this.share_path << private_link_url;
+            GLib.Info (lc_sharing) << "Received private link url for" << this.share_path << private_link_url;
             this.private_link_url = private_link_url;
         } else if (!numeric_file_id.is_empty ()) {
-            q_c_info (lc_sharing) << "Received numeric file id for" << this.share_path << numeric_file_id;
+            GLib.Info (lc_sharing) << "Received numeric file identifier for" << this.share_path << numeric_file_id;
             this.private_link_url = this.account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded);
         }
 
@@ -382,7 +383,7 @@ signals:
 
     void Share_dialog.on_create_password_for_link_share (string password) {
         const var share_link_widget = qobject_cast<Share_link_widget> (sender ());
-        Q_ASSERT (share_link_widget);
+        //  Q_ASSERT (share_link_widget);
         if (share_link_widget) {
             connect (this.manager, &Share_manager.on_link_share_requires_password, share_link_widget, &Share_link_widget.on_create_share_requires_password);
             connect (share_link_widget, &Share_link_widget.create_password_processed, this, &Share_dialog.on_create_password_for_link_share_processed);
@@ -394,7 +395,7 @@ signals:
 
     void Share_dialog.on_create_password_for_link_share_processed () {
         const var share_link_widget = qobject_cast<Share_link_widget> (sender ());
-        Q_ASSERT (share_link_widget);
+        //  Q_ASSERT (share_link_widget);
         if (share_link_widget) {
             disconnect (this.manager, &Share_manager.on_link_share_requires_password, share_link_widget, &Share_link_widget.on_create_share_requires_password);
             disconnect (share_link_widget, &Share_link_widget.create_password_processed, this, &Share_dialog.on_create_password_for_link_share_processed);

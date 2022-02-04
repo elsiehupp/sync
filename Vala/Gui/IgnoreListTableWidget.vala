@@ -1,9 +1,9 @@
 //  #pragma once
 
-// #include <Gtk.Widget>
-// #include <QInputDialog>
-// #include <QLineEdit>
-// #include <QMessageBox>
+//  #include <Gtk.Widget>
+//  #include <QInputDialog>
+//  #include <QLineEdit>
+//  #include <QMessageBox>
 
 
 namespace Occ {
@@ -16,7 +16,7 @@ class IgnoreListTableWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public IgnoreListTableWidget (Gtk.Widget parent = nullptr);
+    public IgnoreListTableWidget (Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
@@ -55,9 +55,9 @@ class IgnoreListTableWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    static constexpr int pattern_col = 0;
-    static constexpr int deletable_col = 1;
-    static constexpr int read_only_rows = 3;
+    static const int pattern_col = 0;
+    static const int deletable_col = 1;
+    static const int read_only_rows = 3;
 
     IgnoreListTableWidget.IgnoreListTableWidget (Gtk.Widget parent)
         : Gtk.Widget (parent)

@@ -4,9 +4,9 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QLoggingCategory>
-// #include <QMetaType>
-// #include <owncloudlib.h>
+//  #include <QLoggingCategory>
+//  #include <QMetaType>
+//  #include <owncloudlib.h>
 
 using CSync;
 
@@ -21,6 +21,7 @@ class SyncFileItem {
 
     private class SyncFileItemPtr : unowned SyncFileItem { }
     private class SyncFileItemVector : GLib.Vector<SyncFileItemPtr> { }
+
 
     /***********************************************************
     ***********************************************************/
@@ -328,29 +329,29 @@ class SyncFileItem {
     ***********************************************************/
     public SyncJournalFileRecord to_sync_journal_file_record_with_inode (string local_filename) {
         SyncJournalFileRecord record;
-        record._path = destination ().to_utf8 ();
-        record._modtime = this.modtime;
+        record.path = destination ().to_utf8 ();
+        record.modtime = this.modtime;
 
         // Some types should never be written to the database when propagation completes
-        record._type = this.type;
-        if (record._type == ItemTypeVirtualFileDownload)
-            record._type = ItemTypeFile;
-        if (record._type == ItemTypeVirtualFileDehydration)
-            record._type = ItemTypeVirtualFile;
+        record.type = this.type;
+        if (record.type == ItemTypeVirtualFileDownload)
+            record.type = ItemTypeFile;
+        if (record.type == ItemTypeVirtualFileDehydration)
+            record.type = ItemTypeVirtualFile;
 
-        record._etag = this.etag;
-        record._file_id = this.file_identifier;
-        record._file_size = this.size;
-        record._remote_perm = this.remote_perm;
-        record._server_has_ignored_files = this.server_has_ignored_files;
-        record._checksum_header = this.checksum_header;
-        record._e2e_mangled_name = this.encrypted_filename.to_utf8 ();
-        record._is_e2e_encrypted = this.is_encrypted;
+        record.etag = this.etag;
+        record.file_id = this.file_identifier;
+        record.file_size = this.size;
+        record.remote_perm = this.remote_perm;
+        record.server_has_ignored_files = this.server_has_ignored_files;
+        record.checksum_header = this.checksum_header;
+        record.e2e_mangled_name = this.encrypted_filename.to_utf8 ();
+        record.is_e2e_encrypted = this.is_encrypted;
 
         // Update the inode if possible
-        record._inode = this.inode;
-        if (FileSystem.get_inode (local_filename, record._inode)) {
-            GLib.debug (lc_file_item) << local_filename << "Retrieved inode " << record._inode << " (previous item inode : " << this.inode << ")";
+        record.inode = this.inode;
+        if (FileSystem.get_inode (local_filename, record.inode)) {
+            GLib.debug (lc_file_item) << local_filename << "Retrieved inode " << record.inode << " (previous item inode : " << this.inode << ")";
         } else {
             // use the "old" inode coming with the item for the case where the
             // filesystem stat fails. That can happen if the the file was removed
@@ -370,20 +371,21 @@ class SyncFileItem {
     ***********************************************************/
     public static SyncFileItemPtr from_sync_journal_file_record (SyncJournalFileRecord record) {
         var item = SyncFileItemPtr.create ();
-        item._file = record.path ();
-        item._inode = record._inode;
-        item._modtime = record._modtime;
-        item._type = record._type;
-        item._etag = record._etag;
-        item._file_id = record._file_id;
-        item._size = record._file_size;
-        item._remote_perm = record._remote_perm;
-        item._server_has_ignored_files = record._server_has_ignored_files;
-        item._checksum_header = record._checksum_header;
-        item._encrypted_filename = record.e2e_mangled_name ();
-        item._is_encrypted = record._is_e2e_encrypted;
+        item.file = record.path ();
+        item.inode = record.inode;
+        item.modtime = record.modtime;
+        item.type = record.type;
+        item.etag = record.etag;
+        item.file_id = record.file_id;
+        item.size = record.file_size;
+        item.remote_perm = record.remote_perm;
+        item.server_has_ignored_files = record.server_has_ignored_files;
+        item.checksum_header = record.checksum_header;
+        item.encrypted_filename = record.e2e_mangled_name ();
+        item.is_encrypted = record.is_e2e_encrypted;
         return item;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -463,7 +465,7 @@ class SyncFileItem {
     /***********************************************************
     ***********************************************************/
     //  public friend bool operator== (SyncFileItem item1, SyncFileItem item2) {
-    //      return item1._original_file == item2._original_file;
+    //      return item1.original_file == item2.original_file;
     //  }
 
 

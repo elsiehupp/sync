@@ -1,20 +1,19 @@
 #ifndef USERMODEL_H
 const int USERMODEL_H
 
-// #include <QAbstractListModel>
-// #include <QImage>
-// #include <string[]>
-// #include <QQuick_image_provider>
-
-// #include <chrono>
-// #include <pushnotifications.h>
-
-// #include <QDesktopServices>
-// #include <QIcon>
-// #include <QMessageBox>
-// #include <QSvgRenderer>
-// #include <QPainter>
-// #include <QPushButton>
+//  #include <QAbstractListModel>
+//  #include <QImage>
+//  #include <QQuick_image_provider>
+//  #include
+//  #include <chrono>
+//  #include <pushnotifications
+//  #include
+//  #include <QDesktopServ
+//  #include <QIcon>
+//  #include <QMessageB
+//  #include <QSvgRenderer>
+//  #include <QPainter>
+//  #include <QPushButton>
 
 // time span in milliseconds which has to be between two
 // refreshes of the notifications
@@ -28,8 +27,8 @@ constexpr int64 activity_default_expiration_time_msecs = 1000 * 60 * 10;
 namespace Occ {
 
 class User_model : QAbstractListModel {
-    Q_PROPERTY (User* current_user READ current_user NOTIFY new_user_selected)
-    Q_PROPERTY (int current_user_id READ current_user_id NOTIFY new_user_selected)
+    //  Q_PROPERTY (User* current_user READ current_user NOTIFY new_user_selected)
+    //  Q_PROPERTY (int current_user_id READ current_user_id NOTIFY new_user_selected)
 
     /***********************************************************
     ***********************************************************/
@@ -117,20 +116,19 @@ class User_model : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public void switch_current_user (int id);
+    public void switch_current_user (int identifier);
 
     /***********************************************************
     ***********************************************************/
-    public 
-    public void login (int id);
+    public void login (int identifier);
 
 
-    public void logout (int id);
+    public void logout (int identifier);
 
 
-    public void remove_account (int id);
+    public void remove_account (int identifier);
 
-    public std.shared_ptr<Occ.UserStatusConnector> user_status_connector (int id);
+    public std.shared_ptr<Occ.UserStatusConnector> user_status_connector (int identifier);
 
     public ActivityListModel current_activity_model ();
 
@@ -173,7 +171,7 @@ signals:
     private void build_user_list ();
 }
 
-User_model *User_model._instance = nullptr;
+User_model *User_model.instance = null;
 
 User_model *User_model.instance () {
     if (!this.instance) {
@@ -215,18 +213,18 @@ int User_model.current_user_id () {
 }
 
 // Q_INVOKABLE
-bool User_model.is_user_connected (int id) {
-    if (id < 0 || id >= this.users.size ())
+bool User_model.is_user_connected (int identifier) {
+    if (identifier < 0 || identifier >= this.users.size ())
         return false;
 
-    return this.users[id].is_connected ();
+    return this.users[identifier].is_connected ();
 }
 
-QImage User_model.avatar_by_id (int id) {
-    if (id < 0 || id >= this.users.size ())
+QImage User_model.avatar_by_id (int identifier) {
+    if (identifier < 0 || identifier >= this.users.size ())
         return {};
 
-    return this.users[id].avatar ();
+    return this.users[identifier].avatar ();
 }
 
 // Q_INVOKABLE
@@ -280,8 +278,8 @@ void User_model.add_user (AccountStatePtr user, bool is_current) {
         }
 
         end_insert_rows ();
-        ConfigFile cfg;
-        this.users.last ().on_set_notification_refresh_interval (cfg.notification_refresh_interval ());
+        ConfigFile config;
+        this.users.last ().on_set_notification_refresh_interval (config.notification_refresh_interval ());
         /* emit */ new_user_selected ();
     }
 }
@@ -325,42 +323,42 @@ void User_model.open_current_account_server () {
 }
 
 // Q_INVOKABLE
-void User_model.switch_current_user (int id) {
+void User_model.switch_current_user (int identifier) {
     if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
         return;
 
     this.users[this.current_user_id].set_current_user (false);
-    this.users[id].set_current_user (true);
-    this.current_user_id = id;
+    this.users[identifier].set_current_user (true);
+    this.current_user_id = identifier;
     /* emit */ new_user_selected ();
 }
 
 // Q_INVOKABLE
-void User_model.login (int id) {
-    if (id < 0 || id >= this.users.size ())
+void User_model.login (int identifier) {
+    if (identifier < 0 || identifier >= this.users.size ())
         return;
 
-    this.users[id].login ();
+    this.users[identifier].login ();
 }
 
 // Q_INVOKABLE
-void User_model.logout (int id) {
-    if (id < 0 || id >= this.users.size ())
+void User_model.logout (int identifier) {
+    if (identifier < 0 || identifier >= this.users.size ())
         return;
 
-    this.users[id].logout ();
+    this.users[identifier].logout ();
 }
 
 // Q_INVOKABLE
-void User_model.remove_account (int id) {
-    if (id < 0 || id >= this.users.size ())
+void User_model.remove_account (int identifier) {
+    if (identifier < 0 || identifier >= this.users.size ())
         return;
 
     QMessageBox message_box (QMessageBox.Question,
         _("Confirm Account Removal"),
         _("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
            "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
-            .arg (this.users[id].name ()),
+            .arg (this.users[identifier].name ()),
         QMessageBox.NoButton);
     QPushButton yes_button =
         message_box.add_button (_("Remove connection"), QMessageBox.YesRole);
@@ -371,24 +369,24 @@ void User_model.remove_account (int id) {
         return;
     }
 
-    if (this.users[id].is_current_user () && this.users.count () > 1) {
-        id == 0 ? switch_current_user (1) : switch_current_user (0);
+    if (this.users[identifier].is_current_user () && this.users.count () > 1) {
+        identifier == 0 ? switch_current_user (1) : switch_current_user (0);
     }
 
-    this.users[id].logout ();
-    this.users[id].remove_account ();
+    this.users[identifier].logout ();
+    this.users[identifier].remove_account ();
 
-    begin_remove_rows (QModelIndex (), id, id);
-    this.users.remove_at (id);
+    begin_remove_rows (QModelIndex (), identifier, identifier);
+    this.users.remove_at (identifier);
     end_remove_rows ();
 }
 
-std.shared_ptr<Occ.UserStatusConnector> User_model.user_status_connector (int id) {
-    if (id < 0 || id >= this.users.size ()) {
-        return nullptr;
+std.shared_ptr<Occ.UserStatusConnector> User_model.user_status_connector (int identifier) {
+    if (identifier < 0 || identifier >= this.users.size ()) {
+        return null;
     }
 
-    return this.users[id].account ().user_status_connector ();
+    return this.users[identifier].account ().user_status_connector ();
 }
 
 int User_model.row_count (QModelIndex parent) {
@@ -439,13 +437,13 @@ GLib.HashMap<int, GLib.ByteArray> User_model.role_names () {
     roles[Avatar_role] = "avatar";
     roles[Is_current_user_role] = "is_current_user";
     roles[Is_connected_role] = "is_connected";
-    roles[Id_role] = "id";
+    roles[Id_role] = "identifier";
     return roles;
 }
 
 ActivityListModel *User_model.current_activity_model () {
     if (current_user_index () < 0 || current_user_index () >= this.users.size ())
-        return nullptr;
+        return null;
 
     return this.users[current_user_index ()].get_activity_model ();
 }
@@ -466,22 +464,22 @@ AccountAppList User_model.app_list () {
 
 User *User_model.current_user () {
     if (current_user_id () < 0 || current_user_id () >= this.users.size ())
-        return nullptr;
+        return null;
 
     return this.users[current_user_id ()];
 }
 
 int User_model.find_user_id_for_account (AccountState account) {
     const var it = std.find_if (std.cbegin (this.users), std.cend (this.users), [=] (User user) {
-        return user.account ().id () == account.account ().id ();
+        return user.account ().identifier () == account.account ().identifier ();
     });
 
     if (it == std.cend (this.users)) {
         return -1;
     }
 
-    const var id = std.distance (std.cbegin (this.users), it);
-    return id;
+    const var identifier = std.distance (std.cbegin (this.users), it);
+    return identifier;
 }
 
 /*-------------------------------------------------------------------------------------*/
@@ -490,7 +488,7 @@ Image_provider.Image_provider ()
     : QQuick_image_provider (QQuick_image_provider.Image) {
 }
 
-QImage Image_provider.request_image (string id, QSize size, QSize requested_size) {
+QImage Image_provider.request_image (string identifier, QSize size, QSize requested_size) {
     Q_UNUSED (size)
     Q_UNUSED (requested_size)
 
@@ -503,15 +501,15 @@ QImage Image_provider.request_image (string id, QSize size, QSize requested_size
         return image;
     };
 
-    if (id == QLatin1String ("fallback_white")) {
+    if (identifier == QLatin1String ("fallback_white")) {
         return make_icon (QStringLiteral (":/client/theme/white/user.svg"));
     }
 
-    if (id == QLatin1String ("fallback_black")) {
+    if (identifier == QLatin1String ("fallback_black")) {
         return make_icon (QStringLiteral (":/client/theme/black/user.svg"));
     }
 
-    const int uid = id.to_int ();
+    const int uid = identifier.to_int ();
     return User_model.instance ().avatar_by_id (uid);
 }
 

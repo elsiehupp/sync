@@ -12,7 +12,6 @@ class External_web_engine_page : QWeb_engine_page {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public bool accept_navigation_request (GLib.Uri url, QWeb_engine_page.Navigation_type type, bool is_main_frame) override;
 }
 

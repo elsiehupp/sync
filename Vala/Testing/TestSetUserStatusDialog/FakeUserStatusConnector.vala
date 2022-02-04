@@ -76,7 +76,7 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
     /***********************************************************
     ***********************************************************/
     public void setFakePredefinedStatuses (
-        const std.vector<Occ.UserStatus> statuses) {
+        const GLib.Vector<Occ.UserStatus> statuses) {
         this.predefinedStatuses = statuses;
     }
 
@@ -84,6 +84,7 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
     /***********************************************************
     ***********************************************************/
     public Occ.UserStatus userStatusSetByCallerOfSetUserStatus () { return this.userStatusSetByCallerOfSetUserStatus; }
+
 
     /***********************************************************
     ***********************************************************/
@@ -137,7 +138,7 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
     ***********************************************************/
     private Occ.UserStatus this.userStatusSetByCallerOfSetUserStatus;
     private Occ.UserStatus this.userStatus;
-    private std.vector<Occ.UserStatus> this.predefinedStatuses;
+    private GLib.Vector<Occ.UserStatus> this.predefinedStatuses;
     private bool this.isMessageCleared = false;
     private bool this.couldNotFetchPredefinedUserStatuses = false;
     private bool this.couldNotFetchUserStatus = false;

@@ -4,7 +4,6 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <string[]>
 
 namespace Occ {
 
@@ -167,6 +166,7 @@ class SyncResult {
         return this.status;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void on_reset () {
@@ -188,6 +188,7 @@ class SyncResult {
     public void clear_errors () {
         this.errors.clear ();
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -224,6 +225,7 @@ class SyncResult {
         }
         return "";
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -287,6 +289,7 @@ class SyncResult {
     public int num_renamed_items () {
         return this.num_renamed_items;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -400,19 +403,19 @@ class SyncResult {
     /***********************************************************
     ***********************************************************/
     public void process_completed_item (SyncFileItemPtr item) {
-        if (Progress.is_warning_kind (item._status)) {
+        if (Progress.is_warning_kind (item.status)) {
             // Count any error conditions, error strings will have priority anyway.
             this.found_files_not_synced = true;
         }
 
-        if (item.is_directory () && (item._instruction == CSYNC_INSTRUCTION_NEW
-                                      || item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE
-                                      || item._instruction == CSYNC_INSTRUCTION_REMOVE
-                                      || item._instruction == CSYNC_INSTRUCTION_RENAME)) {
+        if (item.is_directory () && (item.instruction == CSYNC_INSTRUCTION_NEW
+                                      || item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE
+                                      || item.instruction == CSYNC_INSTRUCTION_REMOVE
+                                      || item.instruction == CSYNC_INSTRUCTION_RENAME)) {
             this.folder_structure_was_changed = true;
         }
 
-        if (item._status == SyncFileItem.Status.FILE_LOCKED){
+        if (item.status == SyncFileItem.Status.FILE_LOCKED){
             this.num_locked_items++;
             if (!this.first_item_locked) {
                 this.first_item_locked = item;
@@ -420,15 +423,15 @@ class SyncResult {
         }
 
         // Process the item to the gui
-        if (item._status == SyncFileItem.Status.FATAL_ERROR || item._status == SyncFileItem.Status.NORMAL_ERROR) {
+        if (item.status == SyncFileItem.Status.FATAL_ERROR || item.status == SyncFileItem.Status.NORMAL_ERROR) {
             // : this displays an error string (%2) for a file %1
-            append_error_string (GLib.Object._("%1 : %2").arg (item._file, item._error_string));
+            append_error_string (GLib.Object._("%1 : %2").arg (item.file, item.error_string));
             this.num_error_items++;
             if (!this.first_item_error) {
                 this.first_item_error = item;
             }
-        } else if (item._status == SyncFileItem.Status.CONFLICT) {
-            if (item._instruction == CSYNC_INSTRUCTION_CONFLICT) {
+        } else if (item.status == SyncFileItem.Status.CONFLICT) {
+            if (item.instruction == CSYNC_INSTRUCTION_CONFLICT) {
                 this.num_new_conflict_items++;
                 if (!this.first_new_conflict_item) {
                     this.first_new_conflict_item = item;
@@ -437,8 +440,8 @@ class SyncResult {
                 this.num_old_conflict_items++;
             }
         } else {
-            if (!item.has_error_status () && item._status != SyncFileItem.Status.FILE_IGNORED && item._direction == SyncFileItem.Direction.DOWN) {
-                switch (item._instruction) {
+            if (!item.has_error_status () && item.status != SyncFileItem.Status.FILE_IGNORED && item.direction == SyncFileItem.Direction.DOWN) {
+                switch (item.instruction) {
                 case CSYNC_INSTRUCTION_NEW:
                 case CSYNC_INSTRUCTION_TYPE_CHANGE:
                     this.num_new_items++;
@@ -465,7 +468,7 @@ class SyncResult {
                     // nothing.
                     break;
                 }
-            } else if (item._instruction == CSYNC_INSTRUCTION_IGNORE) {
+            } else if (item.instruction == CSYNC_INSTRUCTION_IGNORE) {
                 this.found_files_not_synced = true;
             }
         }

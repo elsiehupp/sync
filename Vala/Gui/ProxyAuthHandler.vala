@@ -4,20 +4,20 @@ Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QApplication>
-
-// #include <qt5keychain/keychain.h>
+//  #include <QApplication>
+//  #include
+//  #include <qt5keychain/keychain.h>
 
 using namespace Occ;
 using namespace QKeychain;
 
-// #pragma once
+//  #pragma once
 
-// #include <QNetworkProxy>
-// #include <QAuthenticator>
-// #include <QPointer>
-// #include <QScopedPointer>
-// #include <QSettings>
+//  #include <QNetworkProxy>
+//  #include <QAuthenticator>
+//  #include <QPointer>
+//  #include <QScopedPointer>
+//  #include <QSettings>
 
 namespace QKeychain {
 }
@@ -171,7 +171,7 @@ void ProxyAuthHandler.on_handle_proxy_authentication_required (
     }
 
     // Find the responsible QNAM if possible.
-    QPointer<QNetworkAccessManager> sending_qnam = nullptr;
+    QPointer<QNetworkAccessManager> sending_qnam = null;
     if (var account = qobject_cast<Account> (sender ())) {
         // Since we go into an event loop, it's possible for the account's qnam
         // to be destroyed before we get back. We can use this to check for its
@@ -182,7 +182,7 @@ void ProxyAuthHandler.on_handle_proxy_authentication_required (
         GLib.warn (lc_proxy) << "Could not get the sending QNAM for" << sender ();
     }
 
-    q_c_info (lc_proxy) << "Proxy auth required for" << key << proxy.type ();
+    GLib.Info (lc_proxy) << "Proxy auth required for" << key << proxy.type ();
 
     // If we already had a username but auth still failed,
     // invalidate the old credentials! Unfortunately, authenticator.user ()
@@ -191,7 +191,7 @@ void ProxyAuthHandler.on_handle_proxy_authentication_required (
     bool invalidated = false;
     if (!this.waiting_for_dialog && !this.waiting_for_keychain && (!authenticator.user ().is_empty ()
                                                           || (sending_qnam && this.gave_credentials_to.contains (sending_qnam)))) {
-        q_c_info (lc_proxy) << "invalidating old creds" << key;
+        GLib.Info (lc_proxy) << "invalidating old creds" << key;
         this.username.clear ();
         this.password.clear ();
         invalidated = true;
@@ -210,7 +210,7 @@ void ProxyAuthHandler.on_handle_proxy_authentication_required (
         }
     }
 
-    q_c_info (lc_proxy) << "got creds for" << this.proxy;
+    GLib.Info (lc_proxy) << "got creds for" << this.proxy;
     authenticator.set_user (this.username);
     authenticator.set_password (this.password);
     if (sending_qnam) {
@@ -243,7 +243,7 @@ bool ProxyAuthHandler.get_creds_from_dialog () {
     }
 
     if (this.dialog && this.dialog.result () == Gtk.Dialog.Accepted) {
-        q_c_info (lc_proxy) << "got creds for" << this.proxy << "from dialog";
+        GLib.Info (lc_proxy) << "got creds for" << this.proxy << "from dialog";
         this.username = this.dialog.username ();
         this.password = this.dialog.password ();
         return true;
@@ -298,7 +298,7 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
               this.waiting_for_keychain);
 
     if (this.read_password_job.error () == NoError) {
-        q_c_info (lc_proxy) << "got creds for" << this.proxy << "from keychain";
+        GLib.Info (lc_proxy) << "got creds for" << this.proxy << "from keychain";
         this.password = this.read_password_job.text_data ();
         return true;
     }
@@ -315,7 +315,7 @@ void ProxyAuthHandler.store_creds_in_keychain () {
         return;
     }
 
-    q_c_info (lc_proxy) << "storing" << this.proxy;
+    GLib.Info (lc_proxy) << "storing" << this.proxy;
 
     this.settings.set_value (keychain_username_key (), this.username);
 

@@ -4,23 +4,23 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QFileDialog>
-// #include <QMessageBox>
-// #include <QNetworkProxy>
-// #include <QDir>
-// #include <QScoped_value_rollback>
-// #include <QMessageBox>
-
-// #include <private/qzipwriter_p.h>
+//  #include <QFileDialog>
+//  #include <QMessageBox>
+//  #include <QNetworkProxy>
+//  #include <QDir>
+//  #include <QScoped_value_rollback>
+//  #include <QMessageBox>
+//  #include
+//  #include <private/qzipwriter_p.h>
 
 const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
 #if ! (QTLEGACY)
-// #include <QOperatingSystemVersion>
+//  #include <QOperatingSystemVersion>
 #endif
 
-// #include <Gtk.Widget>
-// #include <QPointer>
+//  #include <Gtk.Widget>
+//  #include <QPointer>
 
 namespace Occ {
 
@@ -36,7 +36,7 @@ class General_settings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public General_settings (Gtk.Widget parent = nullptr);
+    public General_settings (Gtk.Widget parent = null);
     ~General_settings () override;
     public QSize size_hint () override;
 
@@ -108,9 +108,9 @@ Zip_entry sync_folder_to_zip_entry (Occ.Folder f) {
 
 GLib.Vector<Zip_entry> create_file_list () {
     var list = GLib.Vector<Zip_entry> ();
-    Occ.ConfigFile cfg;
+    Occ.ConfigFile config;
 
-    list.append (file_info_to_zip_entry (QFileInfo (cfg.config_file ())));
+    list.append (file_info_to_zip_entry (QFileInfo (config.config_file ())));
 
     const var logger = Occ.Logger.instance ();
 
@@ -159,7 +159,7 @@ void create_debug_archive (string filename) {
 
 General_settings.General_settings (Gtk.Widget parent)
     : Gtk.Widget (parent)
-    , this.ui (new Ui.General_settings) {
+    this.ui (new Ui.General_settings) {
     this.ui.setup_ui (this);
 
     connect (this.ui.server_notifications_check_box, &QAbstractButton.toggled,
@@ -270,7 +270,7 @@ void General_settings.on_update_info () {
     if (ocupdater) {
         connect (ocupdater, &OCUpdater.download_state_changed, this, &General_settings.on_update_info, Qt.UniqueConnection);
         connect (this.ui.restart_button, &QAbstractButton.clicked, ocupdater, &OCUpdater.on_start_installer, Qt.UniqueConnection);
-        connect (this.ui.restart_button, &QAbstractButton.clicked, q_app, &QApplication.quit, Qt.UniqueConnection);
+        connect (this.ui.restart_button, &QAbstractButton.clicked, Gtk.Application, &QApplication.quit, Qt.UniqueConnection);
         connect (this.ui.update_button, &QAbstractButton.clicked, this, &General_settings.on_update_check_now, Qt.UniqueConnection);
         connect (this.ui.auto_check_for_updates_check_box, &QAbstractButton.toggled, this, &General_settings.on_toggle_auto_update_check);
 
@@ -338,7 +338,7 @@ void General_settings.on_update_channel_changed (string channel) {
 void General_settings.on_update_check_now () {
     var updater = qobject_cast<OCUpdater> (Updater.instance ());
     if (ConfigFile ().skip_update_check ()) {
-        updater = nullptr; // don't show update info if updates are disabled
+        updater = null; // don't show update info if updates are disabled
     }
 
     if (updater) {

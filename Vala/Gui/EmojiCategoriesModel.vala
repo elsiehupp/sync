@@ -4,13 +4,13 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QtGlobal>
-// #include <memory>
+//  #include <QtGlobal>
+//  #include <memory>
 
-// #pragma once
+//  #pragma once
 
-// #include <QQmlEngine>
-// #include <QAbstractItemModel>
+//  #include <QQmlEngine>
+//  #include <QAbstractItemModel>
 
 namespace Occ {
 
@@ -39,7 +39,7 @@ class EmojiCategoriesModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private static const std.vector<Category> categories;
+    private static const GLib.Vector<Category> categories;
 }
 
 
@@ -72,7 +72,7 @@ class EmojiCategoriesModel : QAbstractListModel {
         return roles;
     }
 
-    const std.vector<EmojiCategoriesModel.Category> EmojiCategoriesModel.categories = {
+    const GLib.Vector<EmojiCategoriesModel.Category> EmojiCategoriesModel.categories = {
         {
             "⌛️",
             "history"

@@ -11,7 +11,7 @@ class AccountApp : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public AccountApp (string name, GLib.Uri url,
-        const string id, GLib.Uri icon_url,
+        const string identifier, GLib.Uri icon_url,
         GLib.Object parent = new GLib.Object ());
 
     /***********************************************************
@@ -28,7 +28,7 @@ class AccountApp : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string id ();
+    public string identifier ();
 
 
     public GLib.Uri icon_url ();
@@ -41,19 +41,19 @@ class AccountApp : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private 
-    private string this.id;
+    private string this.identifier;
     private GLib.Uri this.icon_url;
 }
 
 
     AccountApp.AccountApp (string name, GLib.Uri url,
-        const string id, GLib.Uri icon_url,
+        const string identifier, GLib.Uri icon_url,
         GLib.Object parent)
         : GLib.Object (parent)
-        , this.name (name)
-        , this.url (url)
-        , this.id (id)
-        , this.icon_url (icon_url) {
+        this.name (name)
+        this.url (url)
+        this.identifier (identifier)
+        this.icon_url (icon_url) {
     }
 
     string AccountApp.name () {
@@ -64,8 +64,8 @@ class AccountApp : GLib.Object {
         return this.url;
     }
 
-    string AccountApp.id () {
-        return this.id;
+    string AccountApp.identifier () {
+        return this.identifier;
     }
 
     GLib.Uri AccountApp.icon_url () {

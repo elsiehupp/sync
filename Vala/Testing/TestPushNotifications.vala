@@ -4,9 +4,9 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QTest>
-// #include <QWebSocketServer>
-// #include <QSignalSpy>
+//  #include <QTest>
+//  #include <QWebSocketServer>
+//  #include <QSignalSpy>
 
 const int RETURN_FALSE_ON_FAIL (expr)
     if (! (expr)) {

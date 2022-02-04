@@ -4,10 +4,10 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-// #pragma once
+//  #pragma once
 
-// #include <QPaintDevice>
-// #include <QTest>
+//  #include <QPaintDevice>
+//  #include <QTest>
 
 class FakePaintDevice : QPaintDevice {
 
@@ -48,7 +48,7 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 FakePaintDevice.FakePaintDevice () = default;
 
 QPaintEngine *FakePaintDevice.paintEngine () {
-    return nullptr;
+    return null;
 }
 
 void FakePaintDevice.setHidpi (bool value) {

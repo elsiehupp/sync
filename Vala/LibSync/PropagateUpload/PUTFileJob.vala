@@ -5,7 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
-Q_DECLARE_LOGGING_CATEGORY (lc_put_job)
+//  Q_DECLARE_LOGGING_CATEGORY (lc_put_job)
 /***********************************************************
 @brief The PUTFile_job class
 @ingroup libsync
@@ -24,10 +24,10 @@ class PUTFile_job : AbstractNetworkJob {
     // Takes ownership of the device
     public PUTFile_job (AccountPointer account, string path, std.unique_ptr<QIODevice> device,
         const GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ())
-        : AbstractNetworkJob (account, path, parent)
-        , this.device (device.release ())
-        , this.headers (headers)
-        , this.chunk (chunk) {
+        : base (account, path, parent)
+        this.device (device.release ())
+        this.headers (headers)
+        this.chunk (chunk) {
         this.device.set_parent (this);
     }
 
@@ -36,11 +36,11 @@ class PUTFile_job : AbstractNetworkJob {
     ***********************************************************/
     public PUTFile_job (AccountPointer account, GLib.Uri url, std.unique_ptr<QIODevice> device,
         const GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ())
-        : AbstractNetworkJob (account, "", parent)
-        , this.device (device.release ())
-        , this.headers (headers)
-        , this.url (url)
-        , this.chunk (chunk) {
+        : base (account, "", parent)
+        this.device (device.release ())
+        this.headers (headers)
+        this.url (url)
+        this.chunk (chunk) {
         this.device.set_parent (this);
     }
     ~PUTFile_job () override;
@@ -88,7 +88,7 @@ signals:
 
 PUTFile_job.~PUTFile_job () {
     // Make sure that we destroy the Soup.Reply before our this.device of which it keeps an internal pointer.
-    set_reply (nullptr);
+    set_reply (null);
 }
 
 void PUTFile_job.on_start () {
@@ -118,8 +118,8 @@ void PUTFile_job.on_start () {
 bool PUTFile_job.on_finished () {
     this.device.close ();
 
-    q_c_info (lc_put_job) << "PUT of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
-                     << reply_status_""
+    GLib.Info (lc_put_job) << "PUT of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
+                     << reply_status_string ()
                      << reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
                      << reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);
 

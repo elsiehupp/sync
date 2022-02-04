@@ -4,19 +4,19 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-// #include <QtTest>
-// #include <syncengine.h>
+//  #include <QtTest>
+//  #include <syncengine.h>
 
 using namespace Occ;
 
 bool itemSuccessful (ItemCompletedSpy spy, string path, SyncInstructions instr) {
     var item = spy.findItem (path);
-    return item._status == SyncFileItem.Status.SUCCESS && item._instruction == instr;
+    return item.status == SyncFileItem.Status.SUCCESS && item.instruction == instr;
 }
 
 bool itemConflict (ItemCompletedSpy spy, string path) {
     var item = spy.findItem (path);
-    return item._status == SyncFileItem.Status.CONFLICT && item._instruction == CSYNC_INSTRUCTION_CONFLICT;
+    return item.status == SyncFileItem.Status.CONFLICT && item.instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
 bool itemSuccessfulMove (ItemCompletedSpy spy, string path) {
@@ -100,7 +100,7 @@ class TestSyncConflict : GLib.Object {
                     } ();
                 }
             }
-            return nullptr;
+            return null;
         });
 
         fakeFolder.localModifier ().setContents ("A/a1", 'L');
@@ -152,7 +152,7 @@ class TestSyncConflict : GLib.Object {
                     } ();
                 }
             }
-            return nullptr;
+            return null;
         });
 
         // Explicitly add a conflict file to simulate the case where the upload of the
@@ -230,7 +230,7 @@ class TestSyncConflict : GLib.Object {
                 reply.setRawHeader ("OC-ConflictInitialBasePath", "A/original");
                 return reply;
             }
-            return nullptr;
+            return null;
         });
         fakeFolder.remoteModifier ().insert ("A/really-a-conflict"); // doesn't look like a conflict, but headers say it is
         QVERIFY (fakeFolder.syncOnce ());

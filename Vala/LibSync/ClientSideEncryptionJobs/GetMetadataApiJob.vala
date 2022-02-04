@@ -24,7 +24,7 @@ class GetMetadataApiJob : AbstractNetworkJob {
         GLib.ByteArray file_identifier,
         GLib.Object parent = new GLib.Object ()) {
 
-        base (account, e2ee_base_url () + "meta-data/" + file_identifier, parent)
+        base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent)
         this.file_identifier = file_identifier;
     }
 
@@ -39,7 +39,7 @@ class GetMetadataApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.set_query (query);
 
-        q_c_info (lc_cse_job ()) << "Requesting the metadata for the file_identifier" << this.file_identifier << "as encrypted";
+        GLib.Info (lc_cse_job ()) << "Requesting the metadata for the file_identifier" << this.file_identifier << "as encrypted";
         send_request ("GET", url, req);
         AbstractNetworkJob.on_start ();
     }
@@ -48,7 +48,7 @@ class GetMetadataApiJob : AbstractNetworkJob {
     protected bool on_finished () override {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
-            q_c_info (lc_cse_job ()) << "error requesting the metadata" << path () << error_string () << return_code;
+            GLib.Info (lc_cse_job ()) << "error requesting the metadata" << path () << error_string () << return_code;
             /* emit */ error (this.file_identifier, return_code);
             return true;
         }

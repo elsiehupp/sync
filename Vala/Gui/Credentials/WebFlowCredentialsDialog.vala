@@ -1,7 +1,7 @@
 
-// #include <Gtk.Dialog>
-// #include <QVBoxLayout>
-// #include <QLabel>
+//  #include <Gtk.Dialog>
+//  #include <QVBoxLayout>
+//  #include <QLabel>
 
 #ifdef WITH_WEBENGINE
 #endif // WITH_WEBENGINE
@@ -16,7 +16,7 @@ class WebFlowCredentialsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public WebFlowCredentialsDialog (Account account, bool use_flow2, Gtk.Widget parent = nullptr);
+    public WebFlowCredentialsDialog (Account account, bool use_flow2, Gtk.Widget parent = null);
 
     /***********************************************************
     ***********************************************************/
@@ -49,7 +49,6 @@ class WebFlowCredentialsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public 
     public void on_show_settings_dialog ();
 
 signals:
@@ -83,10 +82,10 @@ signals:
 
 WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flow2, Gtk.Widget parent)
     : Gtk.Dialog (parent)
-    , this.use_flow2 (use_flow2)
-    , this.flow_2_auth_widget (nullptr)
+    this.use_flow2 (use_flow2)
+    this.flow_2_auth_widget (null)
 #ifdef WITH_WEBENGINE
-    , this.web_view (nullptr)
+    this.web_view (null)
 #endif // WITH_WEBENGINE {
     set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
 
@@ -126,7 +125,7 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flo
 #endif // WITH_WEBENGINE
     }
 
-    var app = static_cast<Application> (q_app);
+    var app = static_cast<Application> (Gtk.Application);
     connect (app, &Application.is_showing_settings_dialog, this, &WebFlowCredentialsDialog.on_show_settings_dialog);
 
     this.error_label = new QLabel ();
@@ -149,14 +148,14 @@ void WebFlowCredentialsDialog.close_event (QCloseEvent* e) {
         // Force calling WebView.~WebView () earlier so that this.profile and this.page are
         // deleted in the correct order.
         this.web_view.delete_later ();
-        this.web_view = nullptr;
+        this.web_view = null;
     }
 #endif // WITH_WEBENGINE
 
     if (this.flow_2_auth_widget) {
         this.flow_2_auth_widget.reset_auth ();
         this.flow_2_auth_widget.delete_later ();
-        this.flow_2_auth_widget = nullptr;
+        this.flow_2_auth_widget = null;
     }
 
     /* emit */ close ();

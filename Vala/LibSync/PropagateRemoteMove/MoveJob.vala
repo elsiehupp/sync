@@ -4,9 +4,8 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <string[]>
-// #include <QDir>
-// #pragma once
+//  #include <QDir>
+//  #pragma once
 
 namespace Occ {
 
@@ -43,16 +42,16 @@ signals:
 
 Move_job.Move_job (AccountPointer account, string path,
     const string destination, GLib.Object parent)
-    : AbstractNetworkJob (account, path, parent)
-    , this.destination (destination) {
+    : base (account, path, parent)
+    this.destination (destination) {
 }
 
 Move_job.Move_job (AccountPointer account, GLib.Uri url, string destination,
     GLib.HashMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent)
-    : AbstractNetworkJob (account, "", parent)
-    , this.destination (destination)
-    , this.url (url)
-    , this.extra_headers (extra_headers) {
+    : base (account, "", parent)
+    this.destination (destination)
+    this.url (url)
+    this.extra_headers (extra_headers) {
 }
 
 void Move_job.on_start () {
@@ -74,8 +73,8 @@ void Move_job.on_start () {
 }
 
 bool Move_job.on_finished () {
-    q_c_info (lc_move_job) << "MOVE of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                      << reply_status_"";
+    GLib.Info (lc_move_job) << "MOVE of" << reply ().request ().url () << "FINISHED WITH STATUS"
+                      << reply_status_string ();
 
     /* emit */ finished_signal ();
     return true;
