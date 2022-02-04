@@ -45,7 +45,7 @@ srcs = files([
     'Credentials/CredentialsCommon.vala',
     'Credentials/DummyCredentials.vala',
     'Credentials/HttpCredentials.vala',
-    'Credentials/HttpCredentialsAccessManager.vala.vala',
+    'Credentials/HttpCredentialsAccessManager.vala',
 
     'Credentials/KeychainChunk/DeleteJob.vala',
     'Credentials/KeychainChunk/Job.vala',
