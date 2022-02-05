@@ -75,7 +75,7 @@ class Updater : GLib.Object {
 
         var url_query = get_query_params ();
 
-        update_base_url.set_query (url_query);
+        update_base_url.query (url_query);
 
         return update_base_url;
     }

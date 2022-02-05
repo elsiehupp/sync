@@ -134,22 +134,22 @@ class HeaderBanner : Gtk.Widget {
 
     HeaderBanner.HeaderBanner (Gtk.Widget parent)
         : Gtk.Widget (parent) {
-        set_size_policy (QSize_policy.Expanding, QSize_policy.Fixed);
-        set_background_role (QPalette.Base);
+        size_policy (QSize_policy.Expanding, QSize_policy.Fixed);
+        background_role (QPalette.Base);
         title_label = new QLabel (this);
-        title_label.set_background_role (QPalette.Base);
+        title_label.background_role (QPalette.Base);
         logo_label = new QLabel (this);
         QFont font = title_label.font ();
-        font.set_bold (true);
-        title_label.set_font (font);
+        font.bold (true);
+        title_label.font (font);
         layout = new QGrid_layout (this);
-        layout.set_contents_margins (QMargins ());
-        layout.set_spacing (0);
-        layout.set_row_minimum_height (3, 1);
-        layout.set_row_stretch (4, 1);
-        layout.set_column_stretch (2, 1);
-        layout.set_column_minimum_width (4, 2 * Gap_between_logo_and_right_edge);
-        layout.set_column_minimum_width (6, Gap_between_logo_and_right_edge);
+        layout.contents_margins (QMargins ());
+        layout.spacing (0);
+        layout.row_minimum_height (3, 1);
+        layout.row_stretch (4, 1);
+        layout.column_stretch (2, 1);
+        layout.column_minimum_width (4, 2 * Gap_between_logo_and_right_edge);
+        layout.column_minimum_width (6, Gap_between_logo_and_right_edge);
         layout.add_widget (title_label, 1, 1, 5, 1);
         layout.add_widget (logo_label, 1, 5, 5, 1);
     }
@@ -163,25 +163,25 @@ class HeaderBanner : Gtk.Widget {
         int top_level_margin_top = style.pixel_metric (QStyle.PM_Layout_top_margin, null, parent_widget ());
         //int top_level_margin_bottom = style.pixel_metric (QStyle.PM_Layout_bottom_margin, 0, parent_widget ());
 
-        layout.set_row_minimum_height (0, Modern_header_top_margin);
-        layout.set_row_minimum_height (1, top_level_margin_top - Modern_header_top_margin - 1);
-        layout.set_row_minimum_height (6, 3);
+        layout.row_minimum_height (0, Modern_header_top_margin);
+        layout.row_minimum_height (1, top_level_margin_top - Modern_header_top_margin - 1);
+        layout.row_minimum_height (6, 3);
         int min_column_width0 = top_level_margin_left + top_level_margin_right;
         int min_column_width1 = top_level_margin_left + top_level_margin_right + 1;
-        layout.set_column_minimum_width (0, min_column_width0);
-        layout.set_column_minimum_width (1, min_column_width1);
-        title_label.set_text_format (title_format);
-        title_label.on_set_text (title);
+        layout.column_minimum_width (0, min_column_width0);
+        layout.column_minimum_width (1, min_column_width1);
+        title_label.text_format (title_format);
+        title_label.on_text (title);
         if (!style_sheet.is_empty ())
-            title_label.set_style_sheet (style_sheet);
-        logo_label.set_pixmap (logo);
+            title_label.style_sheet (style_sheet);
+        logo_label.pixmap (logo);
         banner_pixmap = banner;
         if (banner_pixmap.is_null ()) {
             QSize size = layout.total_minimum_size ();
-            set_minimum_size (size);
-            set_maximum_size (QWIDGETSIZE_MAX, size.height ());
+            minimum_size (size);
+            maximum_size (QWIDGETSIZE_MAX, size.height ());
         } else {
-            set_fixed_height (banner.height () + 2);
+            fixed_height (banner.height () + 2);
         }
         update_geometry ();
     }
@@ -192,9 +192,9 @@ class HeaderBanner : Gtk.Widget {
         int x = width () - 2;
         int y = height () - 2;
         const QPalette pal = QGuiApplication.palette ();
-        painter.set_pen (pal.mid ().color ());
+        painter.pen (pal.mid ().color ());
         painter.draw_line (0, y, x, y);
-        painter.set_pen (pal.base ().color ());
+        painter.pen (pal.base ().color ());
         painter.draw_point (x + 1, y);
         painter.draw_line (0, y + 1, x + 1, y + 1);
     }

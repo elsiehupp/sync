@@ -74,7 +74,7 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> job)
 
     this.database = new SyncJournalDb (this.tmp.filename (), this);
     this.engine = new SyncEngine (account.account (), this.local_path.ends_with ('/') ? this.local_path : this.local_path + '/', this.remote_path, this.database);
-    this.engine.set_parent (this.database);
+    this.engine.parent (this.database);
 
     connect (this.engine, &Occ.SyncEngine.item_completed, this, [this] (Occ.SyncFileItemPtr item) {
         this.synced_files.append (item.file);
@@ -101,12 +101,12 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> job)
 
 void Socket_upload_job.on_start () {
     var opt = this.engine.sync_options ();
-    opt.set_file_pattern (this.pattern);
+    opt.file_pattern (this.pattern);
     if (!opt.file_regex ().is_valid ()) {
         this.api_job.failure (opt.file_regex ().error_string ());
         return;
     }
-    this.engine.set_sync_options (opt);
+    this.engine.sync_options (opt);
 
     // create the dir, fail if it already exists
     var mkdir = new Occ.MkColJob (this.engine.account (), this.remote_path);

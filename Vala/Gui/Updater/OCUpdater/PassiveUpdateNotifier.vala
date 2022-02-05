@@ -68,8 +68,8 @@ class Passive_update_notifier : OCUpdater {
 
         if (info.version ().is_empty () || current_ver >= remote_ver) {
             GLib.info (lc_updater) << "Client is on latest version!";
-            set_download_state (Up_to_date);
+            download_state (Up_to_date);
         } else {
-            set_download_state (Update_only_available_through_system);
+            download_state (Update_only_available_through_system);
         }
     }

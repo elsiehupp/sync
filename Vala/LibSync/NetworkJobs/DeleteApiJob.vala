@@ -29,7 +29,7 @@ class DeleteApiJob : AbstractNetworkJob {
     ***********************************************************/
     public void on_start () {
         Soup.Request req;
-        req.set_raw_header ("OCS-APIREQUEST", "true");
+        req.raw_header ("OCS-APIREQUEST", "true");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         send_request ("DELETE", url, req);
         AbstractNetworkJob.on_start ();

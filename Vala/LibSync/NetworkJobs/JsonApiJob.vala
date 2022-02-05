@@ -96,24 +96,24 @@ class JsonApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
-        this.request.set_raw_header (header_name, value);
+        this.request.raw_header (header_name, value);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_body (QJsonDocument body) {
+    public void body (QJsonDocument body) {
         this.body = body.to_json ();
         GLib.debug (lc_json_api_job) << "Set body for request:" << this.body;
         if (!this.body.is_empty ()) {
-            this.request.set_header (Soup.Request.ContentTypeHeader, "application/json");
+            this.request.header (Soup.Request.ContentTypeHeader, "application/json");
         }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_verb (Verb value) {
+    public void verb (Verb value) {
         this.verb = value;
     }
 
@@ -158,7 +158,7 @@ class JsonApiJob : AbstractNetworkJob {
                 // this is a error message coming back from ocs.
                 status_code = rex_match.captured (1).to_int ();
             }
-        } else if (json_str.is_empty () && http_status_code == NOT_MODIFIED_STATUS_CODE){
+        } else if (json_str.is_empty () && http_status_code == NOT_MODIFIED_STATUS_CODE) {
             GLib.warn (lc_json_api_job) << "Nothing changed so nothing to retrieve - status code : " << http_status_code;
             status_code = http_status_code;
         } else {

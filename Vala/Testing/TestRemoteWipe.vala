@@ -13,7 +13,7 @@ using namespace Occ;
 class TestRemoteWipe : public GLib.Object {
 
     // TODO
-    private on_ void testWipe (){
+    private on_ void testWipe () {
 //        QTemporaryDir dir;
 //        ConfigFile.setConfDir (dir.path ()); // we don't want to pollute the user's config file
 //        QVERIFY (dir.isValid ());

@@ -41,7 +41,7 @@ namespace {
 
         public Async_image_response (string identifier, QSize requested_size) {
             if (identifier.is_empty ()) {
-                set_image_and_emit_finished ();
+                image_and_emit_finished ();
                 return;
             }
 
@@ -49,13 +49,13 @@ namespace {
             this.requested_image_size = requested_size;
 
             if (this.image_paths.is_empty ()) {
-                set_image_and_emit_finished ();
+                image_and_emit_finished ();
             } else {
                 process_next_image ();
             }
         }
 
-        public void set_image_and_emit_finished (QImage image = {}) {
+        public void image_and_emit_finished (QImage image = {}) {
             this.image = image;
             /* emit */ finished ();
         }
@@ -67,12 +67,12 @@ namespace {
 
         private void process_next_image () {
             if (this.index < 0 || this.index >= this.image_paths.size ()) {
-                set_image_and_emit_finished ();
+                image_and_emit_finished ();
                 return;
             }
 
             if (this.image_paths.at (this.index).starts_with (QStringLiteral (":/client"))) {
-                set_image_and_emit_finished (QIcon (this.image_paths.at (this.index)).pixmap (this.requested_image_size).to_image ());
+                image_and_emit_finished (QIcon (this.image_paths.at (this.index)).pixmap (this.requested_image_size).to_image ());
                 return;
             }
 
@@ -88,7 +88,7 @@ namespace {
                 }
             }
 
-            set_image_and_emit_finished ();
+            image_and_emit_finished ();
         }
 
 
@@ -98,7 +98,7 @@ namespace {
         void on_process_network_reply () {
             const var reply = qobject_cast<Soup.Reply> (sender ());
             if (!reply) {
-                set_image_and_emit_finished ();
+                image_and_emit_finished ();
                 return;
             }
 
@@ -116,13 +116,13 @@ namespace {
                         scaled_svg.fill ("transparent");
                         QPainter painter_for_svg (&scaled_svg);
                         svg_renderer.render (&painter_for_svg);
-                        set_image_and_emit_finished (scaled_svg);
+                        image_and_emit_finished (scaled_svg);
                         return;
                     } else {
                         process_next_image ();
                     }
                 } else {
-                    set_image_and_emit_finished (QImage.from_data (image_data));
+                    image_and_emit_finished (QImage.from_data (image_data));
                 }
             }
         }

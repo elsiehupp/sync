@@ -180,7 +180,7 @@ class PropagateRemoteMove : PropagateItemJob {
         }
 
         if (changed) {
-            journal.set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, list);
+            journal.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, list);
         }
         return true;
     }
@@ -235,7 +235,7 @@ class PropagateRemoteMove : PropagateItemJob {
 
         // Delete old database data.
         propagator ().journal.delete_file_record (this.item.original_file);
-        if (!vfs.set_pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
+        if (!vfs.pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
             GLib.warn (lc_propagate_remote_move) << "Could not set pin state of" << this.item.original_file << "to inherited";
         }
 
@@ -259,7 +259,7 @@ class PropagateRemoteMove : PropagateItemJob {
             return;
         }
         if (pin_state && *pin_state != PinState.PinState.INHERITED
-            && !vfs.set_pin_state (new_item.rename_target, *pin_state)) {
+            && !vfs.pin_state (new_item.rename_target, *pin_state)) {
             on_done (SyncFileItem.Status.NORMAL_ERROR, _("Error setting pin state"));
             return;
         }

@@ -132,7 +132,7 @@ namespace EncryptionHelper {
         }
 
         // No padding
-        EVP_CIPHER_CTX_set_padding (context, 0);
+        EVP_CIPHER_CTX_padding (context, 0);
 
         // Set IV length.
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, iv.size (), null)) {
@@ -398,7 +398,7 @@ namespace EncryptionHelper {
         }
 
         // No padding
-        EVP_CIPHER_CTX_set_padding (context, 0);
+        EVP_CIPHER_CTX_padding (context, 0);
 
         // Set IV length.
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, iv.size (), null)) {
@@ -480,19 +480,19 @@ namespace EncryptionHelper {
             return {};
         }
 
-        if (EVP_PKEY_CTX_set_rsa_padding (context, RSA_PKCS1_OAEP_PADDING) <= 0) {
+        if (EVP_PKEY_CTX_rsa_padding (context, RSA_PKCS1_OAEP_PADDING) <= 0) {
             GLib.info (lc_cse_decryption ()) << "Error setting the encryption padding.";
             handle_errors ();
             return {};
         }
 
-        if (EVP_PKEY_CTX_set_rsa_oaep_md (context, EVP_sha256 ()) <= 0) {
+        if (EVP_PKEY_CTX_rsa_oaep_md (context, EVP_sha256 ()) <= 0) {
             GLib.info (lc_cse_decryption ()) << "Error setting OAEP SHA 256";
             handle_errors ();
             return {};
         }
 
-        if (EVP_PKEY_CTX_set_rsa_mgf1_md (context, EVP_sha256 ()) <= 0) {
+        if (EVP_PKEY_CTX_rsa_mgf1_md (context, EVP_sha256 ()) <= 0) {
             GLib.info (lc_cse_decryption ()) << "Error setting MGF1 padding";
             handle_errors ();
             return {};
@@ -537,17 +537,17 @@ namespace EncryptionHelper {
             exit (1);
         }
 
-        if (EVP_PKEY_CTX_set_rsa_padding (context, RSA_PKCS1_OAEP_PADDING) <= 0) {
+        if (EVP_PKEY_CTX_rsa_padding (context, RSA_PKCS1_OAEP_PADDING) <= 0) {
             GLib.info (lc_cse ()) << "Error setting the encryption padding.";
             exit (1);
         }
 
-        if (EVP_PKEY_CTX_set_rsa_oaep_md (context, EVP_sha256 ()) <= 0) {
+        if (EVP_PKEY_CTX_rsa_oaep_md (context, EVP_sha256 ()) <= 0) {
             GLib.info (lc_cse ()) << "Error setting OAEP SHA 256";
             exit (1);
         }
 
-        if (EVP_PKEY_CTX_set_rsa_mgf1_md (context, EVP_sha256 ()) <= 0) {
+        if (EVP_PKEY_CTX_rsa_mgf1_md (context, EVP_sha256 ()) <= 0) {
             GLib.info (lc_cse ()) << "Error setting MGF1 padding";
             exit (1);
         }
@@ -599,7 +599,7 @@ namespace EncryptionHelper {
             return false;
         }
 
-        EVP_CIPHER_CTX_set_padding (context, 0);
+        EVP_CIPHER_CTX_padding (context, 0);
 
         // Set IV length.
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, iv.size (), null)) {
@@ -678,7 +678,7 @@ namespace EncryptionHelper {
             return false;
         }
 
-        EVP_CIPHER_CTX_set_padding (context, 0);
+        EVP_CIPHER_CTX_padding (context, 0);
 
         // Set IV length.
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN,  iv.size (), null)) {
@@ -748,7 +748,7 @@ namespace EncryptionHelper {
                 this.is_initialized = false;
             }
 
-            EVP_CIPHER_CTX_set_padding (this.context, 0);
+            EVP_CIPHER_CTX_padding (this.context, 0);
 
             // Set IV length.
             if (!EVP_CIPHER_CTX_ctrl (this.context, EVP_CTRL_GCM_SET_IVLEN, iv.size (), null)) {

@@ -69,7 +69,7 @@ class WebFlowCredentials : AbstractCredentials {
     public void forget_sensitive_data () override;
 
     // To fetch the user name as early as possible
-    public void set_account (Account account) override;
+    public void account (Account account) override;
 
 
     /***********************************************************
@@ -222,13 +222,13 @@ void WebFlowCredentials.ask_from_user () {
         if (!use_flow2) {
             GLib.Uri url = this.account.url ();
             string path = url.path () + "/index.php/login/flow";
-            url.set_path (path);
-            this.ask_dialog.set_url (url);
+            url.path (path);
+            this.ask_dialog.url (url);
         }
 
         string message = _("You have been logged out of %1 as user %2. Please login again.")
                           .arg (this.account.display_name (), this.user);
-        this.ask_dialog.set_info (message);
+        this.ask_dialog.info (message);
 
         this.ask_dialog.show ();
 
@@ -252,13 +252,13 @@ void WebFlowCredentials.on_ask_from_user_credentials_provided (string user, stri
 
         string message = _("Please login with the user : %1")
                 .arg (this.user);
-        this.ask_dialog.set_error (message);
+        this.ask_dialog.error (message);
 
         if (!this.ask_dialog.is_using_flow2 ()) {
             GLib.Uri url = this.account.url ();
             string path = url.path () + "/index.php/login/flow";
-            url.set_path (path);
-            this.ask_dialog.set_url (url);
+            url.path (path);
+            this.ask_dialog.url (url);
         }
 
         return;
@@ -300,7 +300,7 @@ void WebFlowCredentials.persist () {
         return;
     }
 
-    this.account.set_credential_setting (USER_C, this.user);
+    this.account.credential_setting (USER_C, this.user);
     this.account.wants_account_saved (this.account);
 
     // write cert if there is one
@@ -397,10 +397,10 @@ void WebFlowCredentials.on_write_client_ca_certificates_pem_job_done (KeychainCh
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
     add_settings_to_job (this.account, job);
 //  #endif
-    job.set_insecure_fallback (false);
+    job.insecure_fallback (false);
     connect (job, &Job.on_finished, this, &WebFlowCredentials.on_write_job_done);
-    job.set_key (keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ()));
-    job.set_text_data (this.password);
+    job.key (keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ()));
+    job.text_data (this.password);
     job.on_start ();
 }
 
@@ -441,8 +441,8 @@ void WebFlowCredentials.forget_sensitive_data () {
     }
 
     var job = new DeletePasswordJob (Theme.instance ().app_name (), this);
-    job.set_insecure_fallback (false);
-    job.set_key (kck);
+    job.insecure_fallback (false);
+    job.key (kck);
     job.on_start ();
 
     invalidate_token ();
@@ -450,8 +450,8 @@ void WebFlowCredentials.forget_sensitive_data () {
     delete_keychain_entries ();
 }
 
-void WebFlowCredentials.set_account (Account account) {
-    AbstractCredentials.set_account (account);
+void WebFlowCredentials.account (Account account) {
+    AbstractCredentials.account (account);
     if (this.user.is_empty ()) {
         fetch_user ();
     }
@@ -475,8 +475,8 @@ void WebFlowCredentials.on_authentication (Soup.Reply reply, QAuthenticator auth
 
     GLib.debug (lc_web_flow_credentials ()) << "Requires authentication";
 
-    authenticator.set_user (this.user);
-    authenticator.set_password (this.password);
+    authenticator.user (this.user);
+    authenticator.password (this.password);
     this.credentials_valid = false;
 }
 
@@ -594,8 +594,8 @@ void WebFlowCredentials.on_read_client_ca_certificates_pem_job_done (KeychainChu
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
     add_settings_to_job (this.account, job);
 //  #endif
-    job.set_insecure_fallback (false);
-    job.set_key (kck);
+    job.insecure_fallback (false);
+    job.key (kck);
     connect (job, &Job.on_finished, this, &WebFlowCredentials.on_read_password_job_done);
     job.on_start ();
 }

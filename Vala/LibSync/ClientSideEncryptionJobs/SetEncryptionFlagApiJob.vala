@@ -55,7 +55,7 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
 
     void SetEncryptionFlagApiJob.on_start () {
         Soup.Request req;
-        req.set_raw_header ("OCS-APIREQUEST", "true");
+        req.raw_header ("OCS-APIREQUEST", "true");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
 
         GLib.info (lc_cse_job ()) << "marking the file with identifier" << this.file_identifier << "as" << (this.flag_action == Set ? "encrypted" : "non-encrypted") << ".";

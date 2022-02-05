@@ -251,9 +251,9 @@ OwncloudGui.OwncloudGui (Application parent)
 //  #endif
     this.app (parent) {
     this.tray = Systray.instance ();
-    this.tray.set_tray_engine (new QQml_application_engine (this));
+    this.tray.tray_engine (new QQml_application_engine (this));
     // for the beginning, set the offline icon until the account was verified
-    this.tray.set_icon (Theme.instance ().folder_offline_icon (/*systray?*/ true));
+    this.tray.icon (Theme.instance ().folder_offline_icon (/*systray?*/ true));
 
     this.tray.show ();
 
@@ -413,13 +413,13 @@ void OwncloudGui.on_compute_overall_sync_status () {
     bool all_paused = true;
     bool all_disconnected = true;
     GLib.Vector<AccountStatePtr> problem_accounts;
-    var set_status_text = [&] (string text) {
+    var status_text = [&] (string text) {
         // FIXME : So this doesn't do anything? Needs to be revisited
         //  Q_UNUSED (text)
         // Don't overwrite the status if we're currently syncing
         if (FolderMan.instance ().is_any_sync_running ())
             return;
-        //this.action_status.on_set_text (text);
+        //this.action_status.on_text (text);
     }
 
     foreach (var a, AccountManager.instance ().accounts ()) {
@@ -439,11 +439,11 @@ void OwncloudGui.on_compute_overall_sync_status () {
     }
 
     if (!problem_accounts.empty ()) {
-        this.tray.set_icon (Theme.instance ().folder_offline_icon (true));
+        this.tray.icon (Theme.instance ().folder_offline_icon (true));
         if (all_disconnected) {
-            set_status_text (_("Disconnected"));
+            status_text (_("Disconnected"));
         } else {
-            set_status_text (_("Disconnected from some accounts"));
+            status_text (_("Disconnected from some accounts"));
         }
         string[] messages;
         messages.append (_("Disconnected from accounts:"));
@@ -455,20 +455,20 @@ void OwncloudGui.on_compute_overall_sync_status () {
             }
             messages.append (message);
         }
-        this.tray.set_tool_tip (messages.join (QLatin1String ("\n\n")));
+        this.tray.tool_tip (messages.join (QLatin1String ("\n\n")));
 //  #endif
         return;
     }
 
     if (all_signed_out) {
-        this.tray.set_icon (Theme.instance ().folder_offline_icon (true));
-        this.tray.set_tool_tip (_("Please sign in"));
-        set_status_text (_("Signed out"));
+        this.tray.icon (Theme.instance ().folder_offline_icon (true));
+        this.tray.tool_tip (_("Please sign in"));
+        status_text (_("Signed out"));
         return;
     } else if (all_paused) {
-        this.tray.set_icon (Theme.instance ().sync_state_icon (SyncResult.Status.PAUSED, true));
-        this.tray.set_tool_tip (_("Account synchronization is disabled"));
-        set_status_text (_("Synchronization is paused"));
+        this.tray.icon (Theme.instance ().sync_state_icon (SyncResult.Status.PAUSED, true));
+        this.tray.tool_tip (_("Account synchronization is disabled"));
+        status_text (_("Synchronization is paused"));
         return;
     }
 
@@ -494,7 +494,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
     }
 
     QIcon status_icon = Theme.instance ().sync_state_icon (icon_status, true);
-    this.tray.set_icon (status_icon);
+    this.tray.icon (status_icon);
 
     // create the tray blob message, check if we have an defined state
     if (map.count () > 0) {
@@ -508,22 +508,22 @@ void OwncloudGui.on_compute_overall_sync_status () {
         }
         tray_message = all_status_strings.join (QLatin1String ("\n"));
 //  #endif
-        this.tray.set_tool_tip (tray_message);
+        this.tray.tool_tip (tray_message);
 
         if (overall_status == SyncResult.Status.SUCCESS || overall_status == SyncResult.Status.PROBLEM) {
             if (has_unresolved_conflicts) {
-                set_status_text (_("Unresolved conflicts"));
+                status_text (_("Unresolved conflicts"));
             } else {
-                set_status_text (_("Up to date"));
+                status_text (_("Up to date"));
             }
         } else if (overall_status == SyncResult.Status.PAUSED) {
-            set_status_text (_("Synchronization is paused"));
+            status_text (_("Synchronization is paused"));
         } else {
-            set_status_text (_("Error during synchronization"));
+            status_text (_("Error during synchronization"));
         }
     } else {
-        this.tray.set_tool_tip (_("There are no sync folders configured."));
-        set_status_text (_("No sync folders configured"));
+        this.tray.tool_tip (_("There are no sync folders configured."));
+        status_text (_("No sync folders configured"));
     }
 }
 
@@ -562,10 +562,10 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
     if (progress.status () == ProgressInfo.Status.DISCOVERY) {
 #if 0
         if (!progress.current_discovered_remote_folder.is_empty ()) {
-            this.action_status.on_set_text (_("Checking for changes in remote \"%1\"")
+            this.action_status.on_text (_("Checking for changes in remote \"%1\"")
                                        .arg (progress.current_discovered_remote_folder));
         } else if (!progress.current_discovered_local_folder.is_empty ()) {
-            this.action_status.on_set_text (_("Checking for changes in local \"%1\"")
+            this.action_status.on_text (_("Checking for changes in local \"%1\"")
                                        .arg (progress.current_discovered_local_folder));
         }
 //  #endif
@@ -590,7 +590,7 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
                       .arg (current_file)
                       .arg (total_file_count);
         }
-        //this.action_status.on_set_text (message);
+        //this.action_status.on_text (message);
     } else {
         string total_size_str = Utility.octets_to_string (progress.total_size ());
         string message;
@@ -601,7 +601,7 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
             message = _("Syncing %1")
                       .arg (total_size_str);
         }
-        //this.action_status.on_set_text (message);
+        //this.action_status.on_text (message);
     }
 
     if (!progress.last_completed_item.is_empty ()) {
@@ -618,7 +618,7 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
                     this.on_open_path (full_path);
                 });
             } else {
-                action.set_enabled (false);
+                action.enabled (false);
             }
         }
         if (this.recent_items_actions.length () > 5) {
@@ -658,18 +658,18 @@ void OwncloudGui.on_new_account_wizard () {
 
 void OwncloudGui.on_show_gui_message (string title, string message) {
     var msg_box = new QMessageBox;
-    msg_box.set_window_flags (msg_box.window_flags () | Qt.Window_stays_on_top_hint);
-    msg_box.set_attribute (Qt.WA_DeleteOnClose);
-    msg_box.on_set_text (message);
-    msg_box.set_window_title (title);
-    msg_box.set_icon (QMessageBox.Information);
+    msg_box.window_flags (msg_box.window_flags () | Qt.Window_stays_on_top_hint);
+    msg_box.attribute (Qt.WA_DeleteOnClose);
+    msg_box.on_text (message);
+    msg_box.window_title (title);
+    msg_box.icon (QMessageBox.Information);
     msg_box.open ();
 }
 
 void OwncloudGui.on_show_settings () {
     if (this.settings_dialog.is_null ()) {
         this.settings_dialog = new SettingsDialog (this);
-        this.settings_dialog.set_attribute (Qt.WA_DeleteOnClose, true);
+        this.settings_dialog.attribute (Qt.WA_DeleteOnClose, true);
         this.settings_dialog.show ();
     }
     raise_dialog (this.settings_dialog.data ());
@@ -758,7 +758,7 @@ void OwncloudGui.on_show_share_dialog (string share_path, string local_path, Sha
     } else {
         GLib.info (lc_application) << "Opening share dialog" << share_path << local_path << max_sharing_permissions;
         w = new Share_dialog (account_state, share_path, local_path, max_sharing_permissions, file_record.numeric_file_id (), start_page);
-        w.set_attribute (Qt.WA_DeleteOnClose, true);
+        w.attribute (Qt.WA_DeleteOnClose, true);
 
         this.share_dialogs[local_path] = w;
         connect (w, &GLib.Object.destroyed, this, &OwncloudGui.on_remove_destroyed_share_dialogs);

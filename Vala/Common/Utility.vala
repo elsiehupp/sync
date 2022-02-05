@@ -287,12 +287,12 @@ class Utility {
     /***********************************************************
     OCSYNC_EXPORT
     ***********************************************************/
-    public static void set_launch_on_startup (string app_name, string gui_name, bool enable) {
-        set_launch_on_startup_private (app_name, gui_name, enable);
+    public static void launch_on_startup (string app_name, string gui_name, bool enable) {
+        launch_on_startup_private (app_name, gui_name, enable);
     }
 
 
-    static void set_launch_on_startup_private (string app_name, string gui_name, bool enable) {
+    static void launch_on_startup_private (string app_name, string gui_name, bool enable) {
         //  Q_UNUSED (app_name)
         string user_auto_start_path = get_user_autostart_dir_private ();
         string desktop_file_location = user_auto_start_path
@@ -315,7 +315,7 @@ class Utility {
             const string executable_path = running_inside_app_image ? app_image_path : QCoreApplication.application_file_path ();
 
             QTextStream ts = new QTextStream (&ini_file);
-            ts.set_codec ("UTF-8");
+            ts.codec ("UTF-8");
             ts << "[Desktop Entry]\n"
             << "Name=" << gui_name << '\n'
             << "GenericName=" << "File Synchronizer\n"
@@ -779,7 +779,7 @@ class Utility {
 
         public void reset () {
             this.timer.invalidate ();
-            this.start_time.set_m_secs_since_epoch (0);
+            this.start_time.m_secs_since_epoch (0);
             this.lap_times.clear ();
         }
 
@@ -810,8 +810,8 @@ class Utility {
     ***********************************************************/
     public static void sort_filenames (string[] filenames) {
         QCollator collator;
-        collator.set_numeric_mode (true);
-        collator.set_case_sensitivity (Qt.CaseInsensitive);
+        collator.numeric_mode (true);
+        collator.case_sensitivity (Qt.CaseInsensitive);
         std.sort (filenames.begin (), filenames.end (), collator);
     }
 
@@ -837,8 +837,8 @@ class Utility {
         }
 
         GLib.Uri tmp_url = url;
-        tmp_url.set_path (path);
-        tmp_url.set_query (query_items);
+        tmp_url.path (path);
+        tmp_url.query (query_items);
         return tmp_url;
     }
 

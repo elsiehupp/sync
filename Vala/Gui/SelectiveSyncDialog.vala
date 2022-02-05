@@ -76,9 +76,9 @@ class Selective_sync_dialog : Gtk.Dialog {
         on_init (account);
         string[] selective_sync_list = this.folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (ok) {
-            this.selective_sync.set_folder_info (this.folder.remote_path (), this.folder.alias (), selective_sync_list);
+            this.selective_sync.folder_info (this.folder.remote_path (), this.folder.alias (), selective_sync_list);
         } else {
-            this.ok_button.set_enabled (false);
+            this.ok_button.enabled (false);
         }
         // Make sure we don't get crashes if the folder is destroyed while we are still open
         connect (this.folder, &GLib.Object.destroyed, this, &GLib.Object.delete_later);
@@ -89,11 +89,11 @@ class Selective_sync_dialog : Gtk.Dialog {
         : Gtk.Dialog (parent, f)
         this.folder (null) {
         on_init (account);
-        this.selective_sync.set_folder_info (folder, folder, blocklist);
+        this.selective_sync.folder_info (folder, folder, blocklist);
     }
 
     void Selective_sync_dialog.on_init (AccountPointer account) {
-        set_window_title (_("Choose What to Sync"));
+        window_title (_("Choose What to Sync"));
         var layout = new QVBoxLayout (this);
         this.selective_sync = new Selective_sync_widget (account, this);
         layout.add_widget (this.selective_sync);
@@ -114,7 +114,7 @@ class Selective_sync_dialog : Gtk.Dialog {
                 return;
             }
             string[] block_list = this.selective_sync.create_block_list ();
-            this.folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
+            this.folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
 
             FolderMan folder_man = FolderMan.instance ();
             if (this.folder.is_busy ()) {

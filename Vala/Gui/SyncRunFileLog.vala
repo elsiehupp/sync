@@ -109,7 +109,7 @@ class SyncRunFileLog {
         this.file.on_reset (new GLib.File (filename));
 
         this.file.open (QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text);
-        this.out.set_device (this.file.data ());
+        this.out.device (this.file.data ());
 
         if (!exists) {
             this.out << folder_path << endl;
@@ -119,7 +119,7 @@ class SyncRunFileLog {
                     "other size | other modtime | X-Request-ID"
                  << endl;
 
-            FileSystem.set_file_hidden (filename, true);
+            FileSystem.file_hidden (filename, true);
         }
 
         this.total_duration.on_start ();

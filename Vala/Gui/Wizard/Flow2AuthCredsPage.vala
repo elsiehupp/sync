@@ -32,7 +32,7 @@ class Flow2Auth_creds_page : Abstract_credentials_wizard_page {
     public void initialize_page () override;
     public void cleanup_page () override;
     public int next_id () override;
-    public void set_connected ();
+    public void connected ();
 
 
     /***********************************************************
@@ -91,7 +91,7 @@ signals:
     void Flow2Auth_creds_page.initialize_page () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         //  Q_ASSERT (oc_wizard);
-        oc_wizard.account ().set_credentials (CredentialsFactory.create ("http"));
+        oc_wizard.account ().credentials (CredentialsFactory.create ("http"));
 
         if (this.flow_2_auth_widget)
             this.flow_2_auth_widget.start_auth (oc_wizard.account ().data ());
@@ -123,7 +123,7 @@ signals:
             /* Don't fallback to HTTP credentials */
             /*OwncloudWizard oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             oc_wizard.back ();
-            oc_wizard.on_set_auth_type (DetermineAuthTypeJob.AuthType.BASIC);*/
+            oc_wizard.on_auth_type (DetermineAuthTypeJob.AuthType.BASIC);*/
             break;
         }
         case Flow2Auth.Error:
@@ -146,7 +146,7 @@ signals:
         return WizardCommon.Page_Advanced_setup;
     }
 
-    void Flow2Auth_creds_page.set_connected () {
+    void Flow2Auth_creds_page.connected () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         //  Q_ASSERT (oc_wizard);
 

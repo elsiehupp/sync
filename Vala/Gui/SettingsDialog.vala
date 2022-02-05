@@ -162,22 +162,22 @@ signals:
         this.gui (gui) {
         ConfigFile config;
 
-        this.ui.set_up_ui (this);
+        this.ui.up_ui (this);
         this.tool_bar = new QTool_bar;
-        this.tool_bar.set_icon_size (QSize (32, 32));
-        this.tool_bar.set_tool_button_style (Qt.Tool_button_text_under_icon);
-        layout ().set_menu_bar (this.tool_bar);
+        this.tool_bar.icon_size (QSize (32, 32));
+        this.tool_bar.tool_button_style (Qt.Tool_button_text_under_icon);
+        layout ().menu_bar (this.tool_bar);
 
         // People perceive this as a Window, so also make Ctrl+W work
         var close_window_action = new QAction (this);
-        close_window_action.set_shortcut (QKeySequence ("Ctrl+W"));
+        close_window_action.shortcut (QKeySequence ("Ctrl+W"));
         connect (close_window_action, &QAction.triggered, this, &SettingsDialog.accept);
         add_action (close_window_action);
 
-        set_object_name ("Settings"); // required as group for save_geometry call
+        object_name ("Settings"); // required as group for save_geometry call
 
         // : This name refers to the application name e.g Nextcloud
-        set_window_title (_("%1 Settings").arg (Theme.instance ().app_name_gui ()));
+        window_title (_("%1 Settings").arg (Theme.instance ().app_name_gui ()));
 
         connect (AccountManager.instance (), &AccountManager.on_account_added,
             this, &SettingsDialog.on_account_added);
@@ -185,13 +185,13 @@ signals:
             this, &SettingsDialog.on_account_removed);
 
         this.action_group = new QAction_group (this);
-        this.action_group.set_exclusive (true);
+        this.action_group.exclusive (true);
         connect (this.action_group, &QAction_group.triggered, this, &SettingsDialog.on_switch_page);
 
         // Adds space between users + activities and general + network actions
         var spacer = new Gtk.Widget ();
-        spacer.set_minimum_width (10);
-        spacer.set_size_policy (QSize_policy.Minimum_expanding, QSize_policy.Minimum);
+        spacer.minimum_width (10);
+        spacer.size_policy (QSize_policy.Minimum_expanding, QSize_policy.Minimum);
         this.tool_bar.add_widget (spacer);
 
         QAction general_action = create_color_aware_action (QLatin1String (":/client/theme/settings.svg"), _("General"));
@@ -219,12 +219,12 @@ signals:
         QTimer.single_shot (1, this, &SettingsDialog.show_first_page);
 
         var show_log_window = new QAction (this);
-        show_log_window.set_shortcut (QKeySequence ("F12"));
+        show_log_window.shortcut (QKeySequence ("F12"));
         connect (show_log_window, &QAction.triggered, gui, &OwncloudGui.on_toggle_log_browser);
         add_action (show_log_window);
 
         var show_log_window2 = new QAction (this);
-        show_log_window2.set_shortcut (QKeySequence (Qt.CTRL + Qt.Key_L));
+        show_log_window2.shortcut (QKeySequence (Qt.CTRL + Qt.Key_L));
         connect (show_log_window2, &QAction.triggered, gui, &OwncloudGui.on_toggle_log_browser);
         add_action (show_log_window2);
 
@@ -232,7 +232,7 @@ signals:
 
         customize_style ();
 
-        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         config.restore_geometry (this);
     }
 
@@ -279,7 +279,7 @@ signals:
     }
 
     void SettingsDialog.on_switch_page (QAction action) {
-        this.ui.stack.set_current_widget (this.action_group_widgets.value (action));
+        this.ui.stack.current_widget (this.action_group_widgets.value (action));
     }
 
     void SettingsDialog.show_first_page () {
@@ -312,15 +312,15 @@ signals:
         }
 
         if (!branding_single_account) {
-            account_action.set_tool_tip (s.account ().display_name ());
-            account_action.set_icon_text (short_display_name_for_settings (s.account ().data (), static_cast<int> (height * button_size_ratio)));
+            account_action.tool_tip (s.account ().display_name ());
+            account_action.icon_text (short_display_name_for_settings (s.account ().data (), static_cast<int> (height * button_size_ratio)));
         }
 
         this.tool_bar.insert_action (this.tool_bar.actions ().at (0), account_action);
         var account_settings = new AccountSettings (s, this);
         string object_name = QLatin1String ("account_settings_");
         object_name += s.account ().display_name ();
-        account_settings.set_object_name (object_name);
+        account_settings.object_name (object_name);
         this.ui.stack.insert_widget (0 , account_settings);
 
         this.action_group.add_action (account_action);
@@ -346,7 +346,7 @@ signals:
             if (action) {
                 QImage pix = account.avatar ();
                 if (!pix.is_null ()) {
-                    action.set_icon (QPixmap.from_image (AvatarJob.make_circular_avatar (pix)));
+                    action.icon (QPixmap.from_image (AvatarJob.make_circular_avatar (pix)));
                 }
             }
         }
@@ -358,9 +358,9 @@ signals:
             QAction action = this.action_for_account[account];
             if (action) {
                 string display_name = account.display_name ();
-                action.on_set_text (display_name);
+                action.on_text (display_name);
                 var height = this.tool_bar.size_hint ().height ();
-                action.set_icon_text (short_display_name_for_settings (account, static_cast<int> (height * button_size_ratio)));
+                action.icon_text (short_display_name_for_settings (account, static_cast<int> (height * button_size_ratio)));
             }
         }
     }
@@ -402,14 +402,14 @@ signals:
         string highlight_text_color (palette ().highlighted_text ().color ().name ());
         string dark (palette ().dark ().color ().name ());
         string background (palette ().base ().color ().name ());
-        this.tool_bar.set_style_sheet (TOOLBAR_CSS ().arg (background, dark, highlight_color, highlight_text_color));
+        this.tool_bar.style_sheet (TOOLBAR_CSS ().arg (background, dark, highlight_color, highlight_text_color));
 
         Q_FOREACH (QAction a, this.action_group.actions ()) {
             QIcon icon = Theme.create_color_aware_icon (a.property ("icon_path").to_string (), palette ());
-            a.set_icon (icon);
+            a.icon (icon);
             var btn = qobject_cast<QToolButton> (this.tool_bar.widget_for_action (a));
             if (btn)
-                btn.set_icon (icon);
+                btn.icon (icon);
         }
     }
 
@@ -419,8 +419,8 @@ signals:
         ***********************************************************/
         public Tool_button_action (QIcon icon, string text, GLib.Object parent)
             : QWidget_action (parent) {
-            on_set_text (text);
-            set_icon (icon);
+            on_text (text);
+            icon (icon);
         }
 
 
@@ -436,11 +436,11 @@ signals:
             var btn = new QToolButton (parent);
             string object_name = QLatin1String ("settingsdialog_toolbutton_");
             object_name += text ();
-            btn.set_object_name (object_name);
+            btn.object_name (object_name);
 
-            btn.set_default_action (this);
-            btn.set_tool_button_style (Qt.Tool_button_text_under_icon);
-            btn.set_size_policy (QSize_policy.Fixed, QSize_policy.Expanding);
+            btn.default_action (this);
+            btn.tool_button_style (Qt.Tool_button_text_under_icon);
+            btn.size_policy (QSize_policy.Fixed, QSize_policy.Expanding);
             return btn;
         }
     }
@@ -448,9 +448,9 @@ signals:
 
     QAction *SettingsDialog.create_action_with_icon (QIcon icon, string text, string icon_path) {
         QAction action = new Tool_button_action (icon, text, this);
-        action.set_checkable (true);
+        action.checkable (true);
         if (!icon_path.is_empty ()) {
-            action.set_property ("icon_path", icon_path);
+            action.property ("icon_path", icon_path);
         }
         return action;
     }

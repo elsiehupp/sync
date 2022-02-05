@@ -152,7 +152,7 @@ class ProgressInfo : GLib.Object {
         Changes the this.completed value and does sanity checks on
         this.prev_completed and this.total.
         ***********************************************************/
-        private void set_completed (int64 completed) {
+        private void completed (int64 completed) {
             this.completed = q_min (completed, this.total);
             this.prev_completed = q_min (this.prev_completed, this.completed);
         }
@@ -347,13 +347,13 @@ class ProgressInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    void set_progress_complete (SyncFileItem item) {
+    void progress_complete (SyncFileItem item) {
         if (!should_count_progress (item)) {
             return;
         }
 
         this.current_items.remove (item.file);
-        this.file_progress.set_completed (this.file_progress.completed + item.affected_items);
+        this.file_progress.completed (this.file_progress.completed + item.affected_items);
         if (ProgressInfo.is_size_dependent (item)) {
             this.total_size_of_completed_jobs += item.size;
         }
@@ -364,14 +364,14 @@ class ProgressInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    void set_progress_item (SyncFileItem item, int64 completed) {
+    void progress_item (SyncFileItem item, int64 completed) {
         if (!should_count_progress (item)) {
             return;
         }
 
         this.current_items[item.file].item = item;
         this.current_items[item.file].progress.total = item.size;
-        this.current_items[item.file].progress.set_completed (completed);
+        this.current_items[item.file].progress.completed (completed);
         recompute_completed_size ();
 
         // This seems dubious!
@@ -509,7 +509,7 @@ class ProgressInfo : GLib.Object {
             if (is_size_dependent (i.item))
                 r += i.progress.completed;
         }
-        this.size_progress.set_completed (r);
+        this.size_progress.completed (r);
     }
 
     static string as_action_string (SyncFileItem item) {

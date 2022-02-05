@@ -117,7 +117,7 @@ class PropagatorJob : GLib.Object {
     and from PropagateDirectory to associate the sub_jobs with the first
     job.
     ***********************************************************/
-    public void set_associated_composite (PropagatorCompositeJob job) {
+    public void associated_composite (PropagatorCompositeJob job) {
         this.associated_composite = job;
     }
 

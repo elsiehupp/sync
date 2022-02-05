@@ -192,7 +192,7 @@ class SyncResult {
 
     /***********************************************************
     ***********************************************************/
-    public void set_status (Status stat) {
+    public void status (Status stat) {
         this.status = stat;
         this.sync_time = GLib.DateTime.current_date_time_utc ();
     }
@@ -236,7 +236,7 @@ class SyncResult {
 
     /***********************************************************
     ***********************************************************/
-    public void set_folder (string folder) {
+    public void folder (string folder) {
         this.folder = folder;
     }
 
@@ -308,7 +308,7 @@ class SyncResult {
 
     /***********************************************************
     ***********************************************************/
-    public void set_num_old_conflict_items (int n) {
+    public void num_old_conflict_items (int n) {
         this.num_old_conflict_items = n;
     }
 
@@ -415,7 +415,7 @@ class SyncResult {
             this.folder_structure_was_changed = true;
         }
 
-        if (item.status == SyncFileItem.Status.FILE_LOCKED){
+        if (item.status == SyncFileItem.Status.FILE_LOCKED) {
             this.num_locked_items++;
             if (!this.first_item_locked) {
                 this.first_item_locked = item;

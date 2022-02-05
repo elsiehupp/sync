@@ -91,7 +91,7 @@ class ProgressDispatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void set_progress_info (string folder, ProgressInfo progress) {
+    protected void progress_info (string folder, ProgressInfo progress) {
         if (folder.is_empty ()) {
         // The update phase now also has progress
         //            (progress.current_items.size () == 0

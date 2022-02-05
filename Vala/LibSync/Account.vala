@@ -301,7 +301,7 @@ class Account : GLib.Object {
         q_register_meta_type<AccountPointer> ("AccountPointer");
         q_register_meta_type<Account> ("Account*");
 
-        this.push_notifications_reconnect_timer.set_interval (PUSH_NOTIFICATIONS_RECONNECT_INTERVAL);
+        this.push_notifications_reconnect_timer.interval (PUSH_NOTIFICATIONS_RECONNECT_INTERVAL);
         connect (&this.push_notifications_reconnect_timer, &QTimer.timeout, this, &Account.try_setup_push_notifications);
     }
 
@@ -313,14 +313,14 @@ class Account : GLib.Object {
     ***********************************************************/
     public static AccountPointer create () {
         AccountPointer acc = AccountPointer (new Account);
-        acc.set_shared_this (acc);
+        acc.shared_this (acc);
         return acc;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_shared_this (AccountPointer shared_this) {
+    public void shared_this (AccountPointer shared_this) {
         this.shared_this = shared_this.to_weak_ref ();
         setup_user_status_connector ();
     }
@@ -346,7 +346,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_dav_user (string new_dav_user) {
+    public void dav_user (string new_dav_user) {
         if (this.dav_user == new_dav_user) {
             return;
         }
@@ -364,7 +364,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_dav_display_name (string new_display_name) {
+    public void dav_display_name (string new_display_name) {
         this.display_name = new_display_name;
         /* emit */ account_changed_display_name ();
     }
@@ -380,7 +380,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_avatar (QImage img) {
+    public void avatar (QImage img) {
         this.avatar_img = img;
         /* emit */ account_changed_avatar ();
     }
@@ -413,7 +413,7 @@ class Account : GLib.Object {
     /***********************************************************
     Server url of the account
     ***********************************************************/
-    public void set_url (GLib.Uri url) {
+    public void url (GLib.Uri url) {
         this.url = url;
         this.user_visible_url = url;
     }
@@ -429,8 +429,8 @@ class Account : GLib.Object {
     /***********************************************************
     Adjusts this.user_visible_url once the host to use is discovered.
     ***********************************************************/
-    public void set_user_visible_host (string host) {
-        this.user_visible_url.set_host (host);
+    public void user_visible_host (string host) {
+        this.user_visible_url.host (host);
     }
 
 
@@ -480,14 +480,14 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_credentials (AbstractCredentials credentials) {
+    public void credentials (AbstractCredentials credentials) {
         // set active credential manager
         QNetworkCookieJar jar = null;
         QNetworkProxy proxy;
 
         if (this.access_manager) {
             jar = this.access_manager.cookie_jar ();
-            jar.set_parent (null);
+            jar.parent (null);
 
             // Remember proxy (issue #2108)
             proxy = this.access_manager.proxy ();
@@ -498,7 +498,7 @@ class Account : GLib.Object {
         // The order for these two is important! Reading the credential's
         // settings accesses the account as well as account.credentials,
         this.credentials.on_reset (credentials);
-        credentials.set_account (this);
+        credentials.account (this);
 
         // Note: This way the QNAM can outlive the Account and Credentials.
         // This is necessary to avoid issues with the QNAM being deleted while
@@ -506,10 +506,10 @@ class Account : GLib.Object {
         this.access_manager = unowned<QNetworkAccessManager> (this.credentials.create_qnam (), &GLib.Object.delete_later);
 
         if (jar) {
-            this.access_manager.set_cookie_jar (jar);
+            this.access_manager.cookie_jar (jar);
         }
         if (proxy.type () != QNetworkProxy.DefaultProxy) {
-            this.access_manager.set_proxy (proxy);
+            this.access_manager.proxy (proxy);
         }
         connect (this.access_manager.data (), SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
             SLOT (on_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
@@ -535,8 +535,8 @@ class Account : GLib.Object {
         const GLib.Uri url,
         Soup.Request req = Soup.Request (),
         QIODevice data = null) {
-        req.set_url (url);
-        req.set_ssl_configuration (this.get_or_create_ssl_config ());
+        req.url (url);
+        req.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "HEAD" && !data) {
             return this.access_manager.head (req);
         } else if (verb == "GET" && !data) {
@@ -556,8 +556,8 @@ class Account : GLib.Object {
     ***********************************************************/
     public Soup.Reply send_raw_request (GLib.ByteArray verb,
         GLib.Uri url, Soup.Request req, GLib.ByteArray data)  {
-        req.set_url (url);
-        req.set_ssl_configuration (this.get_or_create_ssl_config ());
+        req.url (url);
+        req.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "HEAD" && data.is_empty ()) {
             return this.access_manager.head (req);
         } else if (verb == "GET" && data.is_empty ()) {
@@ -577,8 +577,8 @@ class Account : GLib.Object {
     ***********************************************************/
     public Soup.Reply send_raw_request (GLib.ByteArray verb,
         GLib.Uri url, Soup.Request req, QHttpMultiPart data) {
-        req.set_url (url);
-        req.set_ssl_configuration (this.get_or_create_ssl_config ());
+        req.url (url);
+        req.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "PUT") {
             return this.access_manager.put (req, data);
         } else if (verb == "POST") {
@@ -619,11 +619,11 @@ class Account : GLib.Object {
         QSslConfiguration ssl_config = QSslConfiguration.default_configuration ();
 
         // Try hard to re-use session for different requests
-        ssl_config.set_ssl_option (QSsl.SslOptionDisableSessionTickets, false);
-        ssl_config.set_ssl_option (QSsl.SslOptionDisableSessionSharing, false);
-        ssl_config.set_ssl_option (QSsl.SslOptionDisableSessionPersistence, false);
+        ssl_config.ssl_option (QSsl.SslOptionDisableSessionTickets, false);
+        ssl_config.ssl_option (QSsl.SslOptionDisableSessionSharing, false);
+        ssl_config.ssl_option (QSsl.SslOptionDisableSessionPersistence, false);
 
-        ssl_config.set_ocsp_stapling_enabled (Theme.instance ().enable_stapling_ocsp ());
+        ssl_config.ocsp_stapling_enabled (Theme.instance ().enable_stapling_ocsp ());
 
         return ssl_config;
     }
@@ -638,7 +638,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_ssl_configuration (QSslConfiguration config) {
+    public void ssl_configuration (QSslConfiguration config) {
         this.ssl_configuration = config;
     }
 
@@ -653,7 +653,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_approved_certificates (GLib.List<QSslCertificate> certificates) {
+    public void approved_certificates (GLib.List<QSslCertificate> certificates) {
         this.approved_certificates = certificates;
         QSslConfiguration.default_configuration ().add_ca_certificates (certificates);
     }
@@ -680,7 +680,7 @@ class Account : GLib.Object {
     /***********************************************************
     Pluggable handler
     ***********************************************************/
-    public void set_ssl_error_handler (AbstractSslErrorHandler handler) {
+    public void ssl_error_handler (AbstractSslErrorHandler handler) {
         this.ssl_error_handler.on_reset (handler);
     }
 
@@ -704,7 +704,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_credential_setting (string key, GLib.Variant value) {
+    public void credential_setting (string key, GLib.Variant value) {
         if (this.credentials) {
             string prefix = this.credentials.auth_type ();
             this.settings_map.insert (prefix + "this." + key, value);
@@ -715,7 +715,7 @@ class Account : GLib.Object {
     /***********************************************************
     Assign a client certificate
     ***********************************************************/
-    public void set_certificate (GLib.ByteArray certficate = GLib.ByteArray (), string private_key = "");
+    public void certificate (GLib.ByteArray certficate = GLib.ByteArray (), string private_key = "");
 
 
     /***********************************************************
@@ -728,7 +728,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_capabilities (QVariantMap capabilities) {
+    public void capabilities (QVariantMap capabilities) {
         this.capabilities = Capabilities (capabilities);
 
         setup_user_status_connector ();
@@ -754,7 +754,7 @@ class Account : GLib.Object {
 
     Will be 0 if the version is not available yet.
     ***********************************************************/
-    public int server_version_int (){
+    public int server_version_int () {
         // FIXME : Use Qt 5.5 QVersionNumber
         var components = server_version ().split ('.');
         return make_server_version (components.value (0).to_int (),
@@ -772,7 +772,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_server_version (string version) {
+    public void server_version (string version) {
         if (version == this.server_version) {
             return;
         }
@@ -822,7 +822,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_http2Supported (bool value) {
+    public void http2Supported (bool value) {
         http2Supported = value;
     }
 
@@ -833,7 +833,7 @@ class Account : GLib.Object {
     public void clear_cookie_jar () {
         var jar = qobject_cast<CookieJar> (this.access_manager.cookie_jar ());
         //  ASSERT (jar);
-        jar.set_all_cookies (GLib.List<QNetworkCookie> ());
+        jar.all_cookies (GLib.List<QNetworkCookie> ());
         /* emit */ wants_account_saved (this);
     }
 
@@ -846,8 +846,8 @@ class Account : GLib.Object {
     public void lend_cookie_jar_to (QNetworkAccessManager guest) {
         var jar = this.access_manager.cookie_jar ();
         var old_parent = jar.parent ();
-        guest.set_cookie_jar (jar); // takes ownership of our precious cookie jar
-        jar.set_parent (old_parent); // takes it back
+        guest.cookie_jar (jar); // takes ownership of our precious cookie jar
+        jar.parent (old_parent); // takes it back
     }
 
 
@@ -885,7 +885,7 @@ class Account : GLib.Object {
                 connect (this.push_notifications, &PushNotifications.authentication_failed, this, disable_push_notifications);
             }
             // If push notifications already running it is no problem to call setup again
-            this.push_notifications.set_up ();
+            this.push_notifications.up ();
         }
     }
 
@@ -905,8 +905,8 @@ class Account : GLib.Object {
         }
 
         var job = new DeletePasswordJob (Theme.instance ().app_name ());
-        job.set_insecure_fallback (false);
-        job.set_key (kck);
+        job.insecure_fallback (false);
+        job.key (kck);
         connect (job, &DeletePasswordJob.on_finished, [this] (Job incoming) {
             var delete_job = static_cast<DeletePasswordJob> (incoming);
             if (delete_job.error () == NoError)
@@ -943,8 +943,8 @@ class Account : GLib.Object {
         // Make it call delete_later to make sure that we can return to any QNAM stack frames safely.
         this.access_manager = unowned<QNetworkAccessManager> (this.credentials.create_qnam (), &GLib.Object.delete_later);
 
-        this.access_manager.set_cookie_jar (jar); // takes ownership of the old cookie jar
-        this.access_manager.set_proxy (proxy);   // Remember proxy (issue #2108)
+        this.access_manager.cookie_jar (jar); // takes ownership of the old cookie jar
+        this.access_manager.proxy (proxy);   // Remember proxy (issue #2108)
 
         connect (this.access_manager.data (), SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
             SLOT (on_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
@@ -998,8 +998,8 @@ class Account : GLib.Object {
         );
 
         var job = new ReadPasswordJob (Theme.instance ().app_name ());
-        job.set_insecure_fallback (false);
-        job.set_key (kck);
+        job.insecure_fallback (false);
+        job.key (kck);
         connect (job, &ReadPasswordJob.on_finished, [this] (Job incoming) {
             var read_job = static_cast<ReadPasswordJob> (incoming);
             string pwd ("");
@@ -1036,9 +1036,9 @@ class Account : GLib.Object {
         );
 
         var job = new WritePasswordJob (Theme.instance ().app_name ());
-        job.set_insecure_fallback (false);
-        job.set_key (kck);
-        job.set_binary_data (app_password.to_latin1 ());
+        job.insecure_fallback (false);
+        job.key (kck);
+        job.binary_data (app_password.to_latin1 ());
         connect (job, &WritePasswordJob.on_finished, [this] (Job incoming) {
             var write_job = static_cast<WritePasswordJob> (incoming);
             if (write_job.error () == NoError)
@@ -1116,8 +1116,8 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_push_notifications_reconnect_interval (int interval) {
-        this.push_notifications_reconnect_timer.set_interval (interval);
+    public void push_notifications_reconnect_interval (int interval) {
+        this.push_notifications_reconnect_timer.interval (interval);
     }
 
 
@@ -1228,7 +1228,7 @@ class Account : GLib.Object {
 
                 const var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
                 const var user_id = obj_data.value ("identifier").to_string ("");
-                set_dav_user (user_id);
+                dav_user (user_id);
                 /* emit */ credentials_fetched (this.credentials.data ());
             });
             fetch_user_name_job.on_start ();
@@ -1292,7 +1292,7 @@ class Account : GLib.Object {
     We introduce this dirty hack here, to allow deleting them
     upon Remote Wipe.
     ***********************************************************/
-    public void set_remote_wipe_requested_HACK () {
+    public void remote_wipe_requested_HACK () {
         this.is_remote_wipe_requested_HACK = true;
     }
 

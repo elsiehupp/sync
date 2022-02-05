@@ -56,9 +56,9 @@ class MkColJob : AbstractNetworkJob {
     public void on_start () {
         // add 'Content-Length : 0' header (see https://github.com/owncloud/client/issues/3256)
         Soup.Request req;
-        req.set_raw_header ("Content-Length", "0");
+        req.raw_header ("Content-Length", "0");
         for (var it = this.extra_headers.const_begin (); it != this.extra_headers.const_end (); ++it) {
-            req.set_raw_header (it.key (), it.value ());
+            req.raw_header (it.key (), it.value ());
         }
 
         // assumes ownership

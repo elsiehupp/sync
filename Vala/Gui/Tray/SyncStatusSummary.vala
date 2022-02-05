@@ -75,24 +75,24 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void set_sync_state_for_folder (Folder folder);
+    private void sync_state_for_folder (Folder folder);
     private void mark_folder_as_error (Folder folder);
     private void mark_folder_as_success (Folder folder);
     private bool folder_errors ();
     private bool folder_error (Folder folder);
     private void clear_folder_errors ();
-    private void set_sync_state_to_connected_state ();
+    private void sync_state_to_connected_state ();
     private bool reload_needed (AccountState account_state);
     private void init_sync_state ();
 
     /***********************************************************
     ***********************************************************/
-    private void set_sync_progress (double value);
-    private void set_syncing (bool value);
-    private void set_sync_status_string (string value);
-    private void set_sync_status_detail_string (string value);
-    private void set_sync_icon (GLib.Uri value);
-    private void set_account_state (AccountStatePtr account_state);
+    private void sync_progress (double value);
+    private void syncing (bool value);
+    private void sync_status_string (string value);
+    private void sync_status_detail_string (string value);
+    private void sync_icon (GLib.Uri value);
+    private void account_state (AccountStatePtr account_state);
 
     /***********************************************************
     ***********************************************************/
@@ -153,7 +153,7 @@ namespace {
         if (!current_user) {
             return;
         }
-        set_account_state (current_user.account_state ());
+        account_state (current_user.account_state ());
         clear_folder_errors ();
         connect_to_folders_progress (FolderMan.instance ().map ());
         init_sync_state ();
@@ -195,12 +195,12 @@ namespace {
         this.folders_with_errors.clear ();
     }
 
-    void Sync_status_summary.set_sync_state_for_folder (Folder folder) {
+    void Sync_status_summary.sync_state_for_folder (Folder folder) {
         if (this.account_state && !this.account_state.is_connected ()) {
-            set_syncing (false);
-            set_sync_status_string (_("Offline"));
-            set_sync_status_detail_string ("");
-            set_sync_icon (Theme.instance ().folder_offline ());
+            syncing (false);
+            sync_status_string (_("Offline"));
+            sync_status_detail_string ("");
+            sync_icon (Theme.instance ().folder_offline ());
             return;
         }
 
@@ -211,41 +211,41 @@ namespace {
         case SyncResult.Status.SYNC_PREPARE:
             // Success should only be shown if all folders were fine
             if (!folder_errors () || folder_error (folder)) {
-                set_syncing (false);
-                set_sync_status_string (_("All synced!"));
-                set_sync_status_detail_string ("");
-                set_sync_icon (Theme.instance ().sync_status_ok ());
+                syncing (false);
+                sync_status_string (_("All synced!"));
+                sync_status_detail_string ("");
+                sync_icon (Theme.instance ().sync_status_ok ());
                 mark_folder_as_success (folder);
             }
             break;
         case SyncResult.Status.ERROR:
         case SyncResult.Status.SETUP_ERROR:
-            set_syncing (false);
-            set_sync_status_string (_("Some files couldn't be synced!"));
-            set_sync_status_detail_string (_("See below for errors"));
-            set_sync_icon (Theme.instance ().sync_status_error ());
+            syncing (false);
+            sync_status_string (_("Some files couldn't be synced!"));
+            sync_status_detail_string (_("See below for errors"));
+            sync_icon (Theme.instance ().sync_status_error ());
             mark_folder_as_error (folder);
             break;
         case SyncResult.Status.SYNC_RUNNING:
         case SyncResult.Status.NOT_YET_STARTED:
-            set_syncing (true);
-            set_sync_status_string (_("Syncing"));
-            set_sync_status_detail_string ("");
-            set_sync_icon (Theme.instance ().sync_status_running ());
+            syncing (true);
+            sync_status_string (_("Syncing"));
+            sync_status_detail_string ("");
+            sync_icon (Theme.instance ().sync_status_running ());
             break;
         case SyncResult.Status.PAUSED:
         case SyncResult.Status.SYNC_ABORT_REQUESTED:
-            set_syncing (false);
-            set_sync_status_string (_("Sync paused"));
-            set_sync_status_detail_string ("");
-            set_sync_icon (Theme.instance ().sync_status_pause ());
+            syncing (false);
+            sync_status_string (_("Sync paused"));
+            sync_status_detail_string ("");
+            sync_icon (Theme.instance ().sync_status_pause ());
             break;
         case SyncResult.Status.PROBLEM:
         case SyncResult.Status.UNDEFINED:
-            set_syncing (false);
-            set_sync_status_string (_("Some files could not be synced!"));
-            set_sync_status_detail_string (_("See below for warnings"));
-            set_sync_icon (Theme.instance ().sync_status_warning ());
+            syncing (false);
+            sync_status_string (_("Some files could not be synced!"));
+            sync_status_detail_string (_("See below for warnings"));
+            sync_icon (Theme.instance ().sync_status_warning ());
             mark_folder_as_error (folder);
             break;
         }
@@ -260,7 +260,7 @@ namespace {
             return;
         }
 
-        set_sync_state_for_folder (folder);
+        sync_state_for_folder (folder);
     }
 
     constexpr double calculate_overall_percent (
@@ -281,28 +281,28 @@ namespace {
         const int64 total_size = q_max (completed_size, progress.total_size ());
         const int64 total_file_count = q_max (current_file, progress.total_files ());
 
-        set_sync_progress (calculate_overall_percent (total_file_count, completed_file, total_size, completed_size));
+        sync_progress (calculate_overall_percent (total_file_count, completed_file, total_size, completed_size));
 
         if (total_size > 0) {
             const var completed_size_string = Utility.octets_to_string (completed_size);
             const var total_size_string = Utility.octets_to_string (total_size);
 
             if (progress.trust_eta ()) {
-                set_sync_status_detail_string (
+                sync_status_detail_string (
                     _("%1 of %2 · %3 left")
                         .arg (completed_size_string, total_size_string)
                         .arg (Utility.duration_to_descriptive_string1 (progress.total_progress ().estimated_eta)));
             } else {
-                set_sync_status_detail_string (_("%1 of %2").arg (completed_size_string, total_size_string));
+                sync_status_detail_string (_("%1 of %2").arg (completed_size_string, total_size_string));
             }
         }
 
         if (total_file_count > 0) {
-            set_sync_status_string (_("Syncing file %1 of %2").arg (current_file).arg (total_file_count));
+            sync_status_string (_("Syncing file %1 of %2").arg (current_file).arg (total_file_count));
         }
     }
 
-    void Sync_status_summary.set_syncing (bool value) {
+    void Sync_status_summary.syncing (bool value) {
         if (value == this.is_syncing) {
             return;
         }
@@ -311,7 +311,7 @@ namespace {
         /* emit */ syncing_changed ();
     }
 
-    void Sync_status_summary.set_sync_progress (double value) {
+    void Sync_status_summary.sync_progress (double value) {
         if (this.progress == value) {
             return;
         }
@@ -320,7 +320,7 @@ namespace {
         /* emit */ sync_progress_changed ();
     }
 
-    void Sync_status_summary.set_sync_status_string (string value) {
+    void Sync_status_summary.sync_status_string (string value) {
         if (this.sync_status_string == value) {
             return;
         }
@@ -337,7 +337,7 @@ namespace {
         return this.sync_status_detail_string;
     }
 
-    void Sync_status_summary.set_sync_icon (GLib.Uri value) {
+    void Sync_status_summary.sync_icon (GLib.Uri value) {
         if (this.sync_icon == value) {
             return;
         }
@@ -346,7 +346,7 @@ namespace {
         /* emit */ sync_icon_changed ();
     }
 
-    void Sync_status_summary.set_sync_status_detail_string (string value) {
+    void Sync_status_summary.sync_status_detail_string (string value) {
         if (this.sync_status_detail_string == value) {
             return;
         }
@@ -367,22 +367,22 @@ namespace {
     }
 
     void Sync_status_summary.on_is_connected_changed () {
-        set_sync_state_to_connected_state ();
+        sync_state_to_connected_state ();
     }
 
-    void Sync_status_summary.set_sync_state_to_connected_state () {
-        set_syncing (false);
-        set_sync_status_detail_string ("");
+    void Sync_status_summary.sync_state_to_connected_state () {
+        syncing (false);
+        sync_status_detail_string ("");
         if (this.account_state && !this.account_state.is_connected ()) {
-            set_sync_status_string (_("Offline"));
-            set_sync_icon (Theme.instance ().folder_offline ());
+            sync_status_string (_("Offline"));
+            sync_icon (Theme.instance ().folder_offline ());
         } else {
-            set_sync_status_string (_("All synced!"));
-            set_sync_icon (Theme.instance ().sync_status_ok ());
+            sync_status_string (_("All synced!"));
+            sync_icon (Theme.instance ().sync_status_ok ());
         }
     }
 
-    void Sync_status_summary.set_account_state (AccountStatePtr account_state) {
+    void Sync_status_summary.account_state (AccountStatePtr account_state) {
         if (!reload_needed (account_state.data ())) {
             return;
         }
@@ -402,7 +402,7 @@ namespace {
         }
 
         if (sync_state_fallback_needed) {
-            set_sync_state_to_connected_state ();
+            sync_state_to_connected_state ();
         }
     }
     }

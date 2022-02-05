@@ -20,22 +20,22 @@ class WebFlowCredentialsAccessManager : AccessManager {
         if (!req.attribute (WebFlowCredentials.DontAddCredentialsAttribute).to_bool ()) {
             if (this.credentials && !this.credentials.password ().is_empty ()) {
                 GLib.ByteArray cred_hash = GLib.ByteArray (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
-                req.set_raw_header ("Authorization", "Basic " + cred_hash);
+                req.raw_header ("Authorization", "Basic " + cred_hash);
             }
         }
 
         if (this.credentials && !this.credentials.client_ssl_key.is_null () && !this.credentials.client_ssl_certificate.is_null ()) {
             // SSL configuration
             QSslConfiguration ssl_configuration = req.ssl_configuration ();
-            ssl_configuration.set_local_certificate (this.credentials.client_ssl_certificate);
-            ssl_configuration.set_private_key (this.credentials.client_ssl_key);
+            ssl_configuration.local_certificate (this.credentials.client_ssl_certificate);
+            ssl_configuration.private_key (this.credentials.client_ssl_key);
 
             // Merge client side CA with system CA
             var ca = ssl_configuration.system_ca_certificates ();
             ca.append (this.credentials.client_ssl_ca_certificates);
-            ssl_configuration.set_ca_certificates (ca);
+            ssl_configuration.ca_certificates (ca);
 
-            req.set_ssl_configuration (ssl_configuration);
+            req.ssl_configuration (ssl_configuration);
         }
 
         return AccessManager.create_request (op, req, outgoing_data);
@@ -51,7 +51,7 @@ class WebFlowCredentialsAccessManager : AccessManager {
 static void add_settings_to_job (Account account, QKeychain.Job job) {
     //  Q_UNUSED (account)
     var settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
-    settings.set_parent (job); // make the job parent to make setting deleted properly
-    job.set_settings (settings.release ());
+    settings.parent (job); // make the job parent to make setting deleted properly
+    job.settings (settings.release ());
 }
 //  #endif

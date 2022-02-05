@@ -233,15 +233,15 @@ class Capabilities {
         PushNotificationTypes push_notification_types;
 
         if (types.contains ("files")) {
-            push_notification_types.set_flag (PushNotificationType.FILES);
+            push_notification_types.flag (PushNotificationType.FILES);
         }
 
         if (types.contains ("activities")) {
-            push_notification_types.set_flag (PushNotificationType.ACTIVITIES);
+            push_notification_types.flag (PushNotificationType.ACTIVITIES);
         }
 
         if (types.contains ("notifications")) {
-            push_notification_types.set_flag (PushNotificationType.NOTIFICATIONS);
+            push_notification_types.flag (PushNotificationType.NOTIFICATIONS);
         }
 
         return push_notification_types;

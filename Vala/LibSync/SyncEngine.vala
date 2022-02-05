@@ -296,8 +296,8 @@ class SyncEngine : GLib.Object {
 
         this.sync_file_status_tracker.on_reset (new SyncFileStatusTracker (this));
 
-        this.clear_touched_files_timer.set_single_shot (true);
-        this.clear_touched_files_timer.set_interval (30 * 1000);
+        this.clear_touched_files_timer.single_shot (true);
+        this.clear_touched_files_timer.interval (30 * 1000);
         connect (&this.clear_touched_files_timer, &QTimer.timeout, this, &SyncEngine.on_clear_touched_files);
         connect (this, &SyncEngine.on_finished, [this] (bool /* on_finished */) {
             this.journal.key_value_store_set ("last_sync", GLib.DateTime.current_secs_since_epoch ());
@@ -403,7 +403,7 @@ class SyncEngine : GLib.Object {
         // undo the filter to allow this sync to retrieve and store the correct etags.
         this.journal.clear_etag_storage_filter ();
 
-        this.excluded_files.set_exclude_conflict_files (!this.account.capabilities ().upload_conflict_files ());
+        this.excluded_files.exclude_conflict_files (!this.account.capabilities ().upload_conflict_files ());
 
         this.last_local_discovery_style = this.local_discovery_style;
 
@@ -454,8 +454,8 @@ class SyncEngine : GLib.Object {
         this.discovery_phase.should_discover_localy = [this] (string s) {
             return should_discover_locally (s);
         }
-        this.discovery_phase.set_selective_sync_block_list (selective_sync_block_list);
-        this.discovery_phase.set_selective_sync_allow_list (this.journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok));
+        this.discovery_phase.selective_sync_block_list (selective_sync_block_list);
+        this.discovery_phase.selective_sync_allow_list (this.journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok));
         if (!ok) {
             GLib.warn (lc_engine) << "Unable to read selective sync list, aborting.";
             /* Q_EMIT */ sync_error (_("Unable to read from the sync journal."));
@@ -499,7 +499,7 @@ class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_network_limits (int upload, int download) {
+    public void network_limits (int upload, int download) {
         this.upload_limit = upload;
         this.download_limit = download;
 
@@ -553,7 +553,7 @@ class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_sync_options (SyncOptions options) { }
+    public void sync_options (SyncOptions options) { }
 
 
     /***********************************************************
@@ -565,7 +565,7 @@ class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_ignore_hidden_files (bool ignore) {
+    public void ignore_hidden_files (bool ignore) {
         this.ignore_hidden_files = ignore;
     }
 
@@ -644,7 +644,7 @@ class SyncEngine : GLib.Object {
     this.last_local_discovery_style to discover the last
     sync's style.
     ***********************************************************/
-    public void set_local_discovery_options (LocalDiscoveryStyle style, GLib.Set<string> paths) {
+    public void local_discovery_options (LocalDiscoveryStyle style, GLib.Set<string> paths) {
         this.local_discovery_style = style;
         this.local_discovery_paths = std.move (paths);
 
@@ -846,7 +846,7 @@ class SyncEngine : GLib.Object {
                     && prev.is_valid ()
                     && prev.remote_perm.has_permission (RemotePermissions.Can_write) != item.remote_perm.has_permission (RemotePermissions.Can_write)) {
                     const bool is_read_only = !item.remote_perm.is_null () && !item.remote_perm.has_permission (RemotePermissions.Can_write);
-                    FileSystem.set_file_read_only_weak (file_path, is_read_only);
+                    FileSystem.file_read_only_weak (file_path, is_read_only);
                 }
                 var record = item.to_sync_journal_file_record_with_inode (file_path);
                 if (record.checksum_header.is_empty ())
@@ -874,7 +874,7 @@ class SyncEngine : GLib.Object {
                 }
 
                 // Updating the database happens on on_success
-                this.journal.set_file_record (record);
+                this.journal.file_record (record);
 
                 // This might have changed the shared flag, so we must notify SyncFileStatusTracker for example
                 /* emit */ item_completed (item);
@@ -940,7 +940,7 @@ class SyncEngine : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_item_completed (SyncFileItemPtr item) {
-        this.progress_info.set_progress_complete (*item);
+        this.progress_info.progress_complete (*item);
 
         /* emit */ transmission_progress (*this.progress_info);
         /* emit */ item_completed (item);
@@ -1025,7 +1025,7 @@ class SyncEngine : GLib.Object {
 
             this.propagator = unowned<OwncloudPropagator> (
                 new OwncloudPropagator (this.account, this.local_path, this.remote_path, this.journal, this.bulk_upload_block_list));
-            this.propagator.set_sync_options (this.sync_options);
+            this.propagator.sync_options (this.sync_options);
             connect (this.propagator.data (), &OwncloudPropagator.item_completed,
                 this, &SyncEngine.on_item_completed);
             connect (this.propagator.data (), &OwncloudPropagator.progress,
@@ -1038,7 +1038,7 @@ class SyncEngine : GLib.Object {
             connect (this.propagator.data (), &OwncloudPropagator.new_item, this, &SyncEngine.on_new_item);
 
             // apply the network limits to the propagator
-            set_network_limits (this.upload_limit, this.download_limit);
+            network_limits (this.upload_limit, this.download_limit);
 
             delete_stale_download_infos (this.sync_items);
             delete_stale_upload_infos (this.sync_items);
@@ -1095,7 +1095,7 @@ class SyncEngine : GLib.Object {
         }
 
         if (on_success && this.discovery_phase) {
-            this.journal.set_data_fingerprint (this.discovery_phase.data_fingerprint);
+            this.journal.data_fingerprint (this.discovery_phase.data_fingerprint);
         }
 
         conflict_record_maintenance ();
@@ -1117,7 +1117,7 @@ class SyncEngine : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_progress (SyncFileItem item, int64 current) {
-        this.progress_info.set_progress_item (item, current);
+        this.progress_info.progress_item (item, current);
         /* emit */ transmission_progress (*this.progress_info);
     }
 
@@ -1390,7 +1390,7 @@ class SyncEngine : GLib.Object {
                     record.base_file_id = base_record.file_id;
                 }
 
-                this.journal.set_conflict_record (record);
+                this.journal.conflict_record (record);
             }
         }
     }

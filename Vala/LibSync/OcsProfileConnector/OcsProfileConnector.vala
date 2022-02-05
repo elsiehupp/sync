@@ -100,7 +100,7 @@ class OcsProfileConnector : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void set_hovercard_action_icon (size_t index, QPixmap pixmap) {
+    private void hovercard_action_icon (size_t index, QPixmap pixmap) {
         var hovercard_action = this.current_hovercard.actions[index];
         QPixmapCache.insert (hovercard_action.icon_url.to_string (), pixmap);
         hovercard_action.icon = pixmap;
@@ -117,7 +117,7 @@ class OcsProfileConnector : GLib.Object {
         }
         const var icon = icon_data_to_pixmap (icon_data);
         if (icon.is_valid ()) {
-            set_hovercard_action_icon (hovercard_action_index, icon.get ());
+            hovercard_action_icon (hovercard_action_index, icon.get ());
             return;
         }
         GLib.warn (lc_ocs_profile_connector) << "Could not load Svg icon from data" << icon_data;

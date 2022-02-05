@@ -49,7 +49,7 @@ class DeleteJob : AbstractNetworkJob {
     public void on_start () {
         Soup.Request req;
         if (!this.folder_token.is_empty ()) {
-            req.set_raw_header ("e2e-token", this.folder_token);
+            req.raw_header ("e2e-token", this.folder_token);
         }
 
         if (this.url.is_valid ()) {
@@ -83,7 +83,7 @@ class DeleteJob : AbstractNetworkJob {
     }
 
 
-    public void set_folder_token (GLib.ByteArray folder_token) {
+    public void folder_token (GLib.ByteArray folder_token) {
         this.folder_token = folder_token;
     }
 

@@ -87,7 +87,7 @@ class OwncloudPropagator : GLib.Object {
         this.finished_emited (false)
         this.bandwidth_manager (this)
         this.another_sync_needed (false)
-        this.chunk_size (10 * 1000 * 1000) // 10 MB, overridden in set_sync_options
+        this.chunk_size (10 * 1000 * 1000) // 10 MB, overridden in sync_options
         this.account (account)
         this.local_dir ( (local_dir.ends_with (char ('/'))) ? local_dir : local_dir + '/')
         this.remote_folder ( (remote_folder.ends_with (char ('/'))) ? remote_folder : remote_folder + '/')
@@ -337,7 +337,7 @@ class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_schedule_delayed_tasks (bool active);
+    public void schedule_delayed_tasks (bool active);
 
     /***********************************************************
     ***********************************************************/
@@ -583,7 +583,7 @@ signals:
         }
 
         var new_entry = create_blocklist_entry (old_entry, item);
-        journal.set_error_blocklist_entry (new_entry);
+        journal.error_blocklist_entry (new_entry);
 
         // Suppress the error if it was and continues to be blocklisted.
         // An ignore_duration of 0 mean we're tracking the error, but not actively
@@ -625,18 +625,18 @@ signals:
                 // CONFLICT has this.direction == None
                 if (item.direction != SyncFileItem.Direction.UP) {
                     var job = new PropagateLocalMkdir (this, item);
-                    job.set_delete_existing_file (delete_existing);
+                    job.delete_existing_file (delete_existing);
                     return job;
                 } else {
                     var job = new PropagateRemoteMkdir (this, item);
-                    job.set_delete_existing (delete_existing);
+                    job.delete_existing (delete_existing);
                     return job;
                 }
             } //fall through
         case CSYNC_INSTRUCTION_SYNC:
             if (item.direction != SyncFileItem.Direction.UP) {
                 var job = new PropagateDownloadFile (this, item);
-                job.set_delete_existing_folder (delete_existing);
+                job.delete_existing_folder (delete_existing);
                 return job;
             } else {
                 if (delete_existing || !is_delayed_upload_item (item)) {
@@ -672,7 +672,7 @@ signals:
             job = std.make_unique<PropagateUploadFileV1> (this, item);
         }
 
-        job.set_delete_existing (delete_existing);
+        job.delete_existing (delete_existing);
 
         remove_from_bulk_upload_block_list (item.file);
 
@@ -874,7 +874,7 @@ signals:
         return this.sync_options;
     }
 
-    void OwncloudPropagator.set_sync_options (SyncOptions sync_options) {
+    void OwncloudPropagator.sync_options (SyncOptions sync_options) {
         this.sync_options = sync_options;
         this.chunk_size = sync_options.initial_chunk_size;
     }
@@ -1024,7 +1024,7 @@ signals:
             // We might very well end up with no fileid/etag for new/new conflicts
         }
 
-        this.journal.set_conflict_record (conflict_record);
+        this.journal.conflict_record (conflict_record);
 
         // Create a new upload job if the new conflict file should be uploaded
         if (account ().capabilities ().upload_conflict_files ()) {
@@ -1065,7 +1065,7 @@ signals:
             return Vfs.ConvertToPlaceholderResult.Locked;
         }
         var record = item.to_sync_journal_file_record_with_inode (fs_path);
-        const var d_bresult = journal.set_file_record (record);
+        const var d_bresult = journal.file_record (record);
         if (!d_bresult) {
             return d_bresult.error ();
         }
@@ -1076,7 +1076,7 @@ signals:
         return account ().capabilities ().bulk_upload () && !this.schedule_delayed_tasks && !item.is_encrypted && this.sync_options.min_chunk_size > item.size && !is_in_bulk_upload_block_list (item.file);
     }
 
-    void OwncloudPropagator.set_schedule_delayed_tasks (bool active) {
+    void OwncloudPropagator.schedule_delayed_tasks (bool active) {
         this.schedule_delayed_tasks = active;
     }
 

@@ -210,8 +210,8 @@ void ProxyAuthHandler.on_handle_proxy_authentication_required (
     }
 
     GLib.info (lc_proxy) << "got creds for" << this.proxy;
-    authenticator.set_user (this.username);
-    authenticator.set_password (this.password);
+    authenticator.user (this.username);
+    authenticator.password (this.password);
     if (sending_qnam) {
         this.gave_credentials_to.insert (sending_qnam);
         connect (sending_qnam, &GLib.Object.destroyed,
@@ -227,7 +227,7 @@ bool ProxyAuthHandler.get_creds_from_dialog () {
     // Open the credentials dialog
     if (!this.waiting_for_dialog) {
         this.dialog.on_reset ();
-        this.dialog.set_proxy_address (this.proxy);
+        this.dialog.proxy_address (this.proxy);
         this.dialog.open ();
     }
 
@@ -281,10 +281,10 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
         }
 
         this.read_password_job.on_reset (new ReadPasswordJob (Theme.instance ().app_name ()));
-        this.read_password_job.set_settings (this.settings.data ());
-        this.read_password_job.set_insecure_fallback (false);
-        this.read_password_job.set_key (keychain_password_key ());
-        this.read_password_job.set_auto_delete (false);
+        this.read_password_job.settings (this.settings.data ());
+        this.read_password_job.insecure_fallback (false);
+        this.read_password_job.key (keychain_password_key ());
+        this.read_password_job.auto_delete (false);
         this.read_password_job.on_start ();
     }
 
@@ -316,14 +316,14 @@ void ProxyAuthHandler.store_creds_in_keychain () {
 
     GLib.info (lc_proxy) << "storing" << this.proxy;
 
-    this.settings.set_value (keychain_username_key (), this.username);
+    this.settings.value (keychain_username_key (), this.username);
 
     var job = new WritePasswordJob (Theme.instance ().app_name (), this);
-    job.set_settings (this.settings.data ());
-    job.set_insecure_fallback (false);
-    job.set_key (keychain_password_key ());
-    job.set_text_data (this.password);
-    job.set_auto_delete (false);
+    job.settings (this.settings.data ());
+    job.insecure_fallback (false);
+    job.key (keychain_password_key ());
+    job.text_data (this.password);
+    job.auto_delete (false);
     job.on_start ();
 
     exec_await (job,

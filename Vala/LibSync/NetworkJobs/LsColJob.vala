@@ -67,14 +67,14 @@ class LsColJob : AbstractNetworkJob {
         }
 
         Soup.Request req;
-        req.set_raw_header ("Depth", "1");
+        req.raw_header ("Depth", "1");
         GLib.ByteArray xml ("<?xml version=\"1.0\" ?>\n"
                     "<d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\">\n"
                     "  <d:prop>\n"
             + prop_str + "  </d:prop>\n"
                         "</d:propfind>\n");
         var buf = new Soup.Buffer (this);
-        buf.set_data (xml);
+        buf.data (xml);
         buf.open (QIODevice.ReadOnly);
         if (this.url.is_valid ()) {
             send_request ("PROPFIND", this.url, req, buf);
@@ -100,7 +100,7 @@ class LsColJob : AbstractNetworkJob {
      - contain a colon : and thus specify an explicit namespace,
        e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
     ***********************************************************/
-    public void set_properties (GLib.List<GLib.ByteArray> properties) {
+    public void properties (GLib.List<GLib.ByteArray> properties) {
         this.properties = properties;
     }
 

@@ -52,7 +52,7 @@ class LockWatcher : GLib.Object {
     /***********************************************************
     Adjusts the default interval for checking whether the lock is still present
     ***********************************************************/
-    public void set_check_interval (std.chrono.milliseconds interval);
+    public void check_interval (std.chrono.milliseconds interval);
 
 
     /***********************************************************
@@ -99,7 +99,7 @@ void LockWatcher.add_file (string path) {
     this.watched_paths.insert (path);
 }
 
-void LockWatcher.set_check_interval (std.chrono.milliseconds interval) {
+void LockWatcher.check_interval (std.chrono.milliseconds interval) {
     this.timer.on_start (interval.count ());
 }
 

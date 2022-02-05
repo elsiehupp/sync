@@ -20,7 +20,7 @@ class NSISUpdater : OCUpdater {
 
     /***********************************************************
     ***********************************************************/
-    private void on_set_seen_version ();
+    private void on_seen_version ();
     private void on_download_finished ();
     private void on_write_file ();
 
@@ -66,7 +66,7 @@ class NSISUpdater : OCUpdater {
         var reply = qobject_cast<Soup.Reply> (sender ());
         reply.delete_later ();
         if (reply.error () != Soup.Reply.NoError) {
-            set_download_state (Download_failed);
+            download_state (Download_failed);
             return;
         }
 
@@ -83,11 +83,11 @@ class NSISUpdater : OCUpdater {
         }
 
         GLib.File.copy (this.file.filename (), this.target_file);
-        set_download_state (Download_complete);
+        download_state (Download_complete);
         GLib.info (lc_updater) << "Downloaded" << url.to_string () << "to" << this.target_file;
-        settings.set_value (update_target_version_c, update_info ().version ());
-        settings.set_value (update_target_version_string_c, update_info ().version_"");
-        settings.set_value (update_available_c, this.target_file);
+        settings.value (update_target_version_c, update_info ().version ());
+        settings.value (update_target_version_string_c, update_info ().version_"");
+        settings.value (update_available_c, this.target_file);
     }
 
     void NSISUpdater.version_info_arrived (Update_info info) {
@@ -106,11 +106,11 @@ class NSISUpdater : OCUpdater {
                 << "Download url:" << info.download_url ();
         if (info.version ().is_empty ()) {
             GLib.info (lc_updater) << "No version information available at the moment";
-            set_download_state (Up_to_date);
+            download_state (Up_to_date);
         } else if (info_version <= curr_version
                    || info_version <= seen_version) {
             GLib.info (lc_updater) << "Client is on latest version!";
-            set_download_state (Up_to_date);
+            download_state (Up_to_date);
         } else {
             string url = info.download_url ();
             if (url.is_empty ()) {
@@ -118,16 +118,16 @@ class NSISUpdater : OCUpdater {
             } else {
                 this.target_file = config.config_path () + url.mid (url.last_index_of ('/')+1);
                 if (GLib.File (this.target_file).exists ()) {
-                    set_download_state (Download_complete);
+                    download_state (Download_complete);
                 } else {
                     var request = QNetworkRequest (GLib.Uri (url));
-                    request.set_attribute (QNetworkRequest.Redirect_policy_attribute, QNetworkRequest.No_less_safe_redirect_policy);
+                    request.attribute (QNetworkRequest.Redirect_policy_attribute, QNetworkRequest.No_less_safe_redirect_policy);
                     Soup.Reply reply = qnam ().get (request);
                     connect (reply, &QIODevice.ready_read, this, &NSISUpdater.on_write_file);
                     connect (reply, &Soup.Reply.on_finished, this, &NSISUpdater.on_download_finished);
-                    set_download_state (Downloading);
+                    download_state (Downloading);
                     this.file.on_reset (new QTemporary_file);
-                    this.file.set_auto_remove (true);
+                    this.file.auto_remove (true);
                     this.file.open ();
                 }
             }
@@ -137,32 +137,32 @@ class NSISUpdater : OCUpdater {
     void NSISUpdater.show_no_url_dialog (Update_info info) {
         // if the version tag is set, there is a newer version.
         var msg_box = new Gtk.Dialog;
-        msg_box.set_attribute (Qt.WA_DeleteOnClose);
-        msg_box.set_window_flags (msg_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
+        msg_box.attribute (Qt.WA_DeleteOnClose);
+        msg_box.window_flags (msg_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
 
         QIcon info_icon = msg_box.style ().standard_icon (QStyle.SP_Message_box_information);
         int icon_size = msg_box.style ().pixel_metric (QStyle.PM_Message_box_icon_size);
 
-        msg_box.set_window_icon (info_icon);
+        msg_box.window_icon (info_icon);
 
         var layout = new QVBoxLayout (msg_box);
         var hlayout = new QHBox_layout;
         layout.add_layout (hlayout);
 
-        msg_box.set_window_title (_("New Version Available"));
+        msg_box.window_title (_("New Version Available"));
 
         var ico = new QLabel;
-        ico.set_fixed_size (icon_size, icon_size);
-        ico.set_pixmap (info_icon.pixmap (icon_size));
+        ico.fixed_size (icon_size, icon_size);
+        ico.pixmap (info_icon.pixmap (icon_size));
         var lbl = new QLabel;
         string txt = _("<p>A new version of the %1 Client is available.</p>"
                          "<p><b>%2</b> is available for download. The installed version is %3.</p>")
                           .arg (Utility.escape (Theme.instance ().app_name_gui ()),
                               Utility.escape (info.version_""), Utility.escape (client_version ()));
 
-        lbl.on_set_text (txt);
-        lbl.set_text_format (Qt.RichText);
-        lbl.set_word_wrap (true);
+        lbl.on_text (txt);
+        lbl.text_format (Qt.RichText);
+        lbl.word_wrap (true);
 
         hlayout.add_widget (ico);
         hlayout.add_widget (lbl);
@@ -176,7 +176,7 @@ class NSISUpdater : OCUpdater {
         connect (reject, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
         connect (getupdate, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.accept);
 
-        connect (skip, &QAbstractButton.clicked, this, &NSISUpdater.on_set_seen_version);
+        connect (skip, &QAbstractButton.clicked, this, &NSISUpdater.on_seen_version);
         connect (getupdate, &QAbstractButton.clicked, this, &NSISUpdater.on_open_update_url);
 
         layout.add_widget (bb);
@@ -186,32 +186,32 @@ class NSISUpdater : OCUpdater {
 
     void NSISUpdater.show_update_error_dialog (string target_version) {
         var msg_box = new Gtk.Dialog;
-        msg_box.set_attribute (Qt.WA_DeleteOnClose);
-        msg_box.set_window_flags (msg_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
+        msg_box.attribute (Qt.WA_DeleteOnClose);
+        msg_box.window_flags (msg_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
 
         QIcon info_icon = msg_box.style ().standard_icon (QStyle.SP_Message_box_information);
         int icon_size = msg_box.style ().pixel_metric (QStyle.PM_Message_box_icon_size);
 
-        msg_box.set_window_icon (info_icon);
+        msg_box.window_icon (info_icon);
 
         var layout = new QVBoxLayout (msg_box);
         var hlayout = new QHBox_layout;
         layout.add_layout (hlayout);
 
-        msg_box.set_window_title (_("Update Failed"));
+        msg_box.window_title (_("Update Failed"));
 
         var ico = new QLabel;
-        ico.set_fixed_size (icon_size, icon_size);
-        ico.set_pixmap (info_icon.pixmap (icon_size));
+        ico.fixed_size (icon_size, icon_size);
+        ico.pixmap (info_icon.pixmap (icon_size));
         var lbl = new QLabel;
         string txt = _("<p>A new version of the %1 Client is available but the updating process failed.</p>"
                          "<p><b>%2</b> has been downloaded. The installed version is %3. If you confirm restart and update, your computer may reboot to complete the installation.</p>")
                           .arg (Utility.escape (Theme.instance ().app_name_gui ()),
                               Utility.escape (target_version), Utility.escape (client_version ()));
 
-        lbl.on_set_text (txt);
-        lbl.set_text_format (Qt.RichText);
-        lbl.set_word_wrap (true);
+        lbl.on_text (txt);
+        lbl.text_format (Qt.RichText);
+        lbl.word_wrap (true);
 
         hlayout.add_widget (ico);
         hlayout.add_widget (lbl);
@@ -229,7 +229,7 @@ class NSISUpdater : OCUpdater {
 
         connect (skip, &QAbstractButton.clicked, this, [this] () {
             wipe_update_data ();
-            on_set_seen_version ();
+            on_seen_version ();
         });
         // askagain : do nothing
         connect (retry, &QAbstractButton.clicked, this, [this] () {
@@ -274,8 +274,8 @@ class NSISUpdater : OCUpdater {
         return false;
     }
 
-    void NSISUpdater.on_set_seen_version () {
+    void NSISUpdater.on_seen_version () {
         ConfigFile config;
         QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
-        settings.set_value (seen_version_c, update_info ().version ());
+        settings.value (seen_version_c, update_info ().version ());
     }

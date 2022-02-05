@@ -270,7 +270,7 @@ class DiscoveryPhase : GLib.Object {
 
         // do a PROPFIND to know the size of this folder
         var propfind_job = new PropfindJob (this.account, this.remote_folder + path, this);
-        propfind_job.set_properties (GLib.List<GLib.ByteArray> () << "resourcetype"
+        propfind_job.properties (GLib.List<GLib.ByteArray> () << "resourcetype"
                                                         << "http://owncloud.org/ns:size");
         GLib.Object.connect (propfind_job, &PropfindJob.finished_with_error,
             this, [=] {
@@ -414,7 +414,7 @@ class DiscoveryPhase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_selective_sync_block_list (string[] list) {
+    public void selective_sync_block_list (string[] list) {
         this.selective_sync_block_list = list;
         std.sort (this.selective_sync_block_list.begin (), this.selective_sync_block_list.end ());
     }
@@ -422,7 +422,7 @@ class DiscoveryPhase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_selective_sync_allow_list (string[] list) {
+    public void selective_sync_allow_list (string[] list) {
         this.selective_sync_allow_list = list;
         std.sort (this.selective_sync_allow_list.begin (), this.selective_sync_allow_list.end ());
     }
@@ -454,7 +454,7 @@ class DiscoveryPhase : GLib.Object {
             return false;
         }
         --it;
-        //  Q_ASSERT (it.ends_with ('/')); // Folder.set_selective_sync_block_list makes sure of that
+        //  Q_ASSERT (it.ends_with ('/')); // Folder.selective_sync_block_list makes sure of that
         return path_slash.starts_with (*it);
     }
 
@@ -501,7 +501,7 @@ class DiscoveryPhase : GLib.Object {
                     // But for our purpose, we want to know if the file is shared. It does not matter
                     // if we are the owner or not.
                     // Piggy back on the persmission field
-                    result.remote_perm.set_permission (RemotePermissions.IsShared);
+                    result.remote_perm.permission (RemotePermissions.IsShared);
                 }
             } else if (property == "is-encrypted" && value == QStringLiteral ("1")) {
                 result.is_e2e_encrypted = true;

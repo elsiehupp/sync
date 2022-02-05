@@ -53,7 +53,7 @@ class Vfs_xAttr : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public bool set_pin_state (string folder_path, PinState state) override;
+    public bool pin_state (string folder_path, PinState state) override;
     public Optional<PinState> pin_state (string folder_path) override;
     public AvailabilityResult availability (string folder_path) override;
 
@@ -103,7 +103,7 @@ class Vfs_xAttr : Vfs {
             return {_("Error updating metadata due to invalid modified time")};
         }
 
-        FileSystem.set_mod_time (file_path, modtime);
+        FileSystem.mod_time (file_path, modtime);
         return {};
     }
 
@@ -125,7 +125,7 @@ class Vfs_xAttr : Vfs {
 
         file.write (" ");
         file.close ();
-        FileSystem.set_mod_time (path, item.modtime);
+        FileSystem.mod_time (path, item.modtime);
         return xattr.add_nextcloud_placeholder_attributes (path);
     }
 
@@ -143,7 +143,7 @@ class Vfs_xAttr : Vfs {
         // Ensure the pin state isn't contradictory
         const var pin = pin_state (item.file);
         if (pin && *pin == PinState.PinState.ALWAYS_LOCAL) {
-            set_pin_state (item.rename_target, PinState.PinState.UNSPECIFIED);
+            pin_state (item.rename_target, PinState.PinState.UNSPECIFIED);
         }
         return {};
     }
@@ -194,8 +194,8 @@ class Vfs_xAttr : Vfs {
         return false;
     }
 
-    bool Vfs_xAttr.set_pin_state (string folder_path, PinState state) {
-        return set_pin_state_in_database (folder_path, state);
+    bool Vfs_xAttr.pin_state (string folder_path, PinState state) {
+        return pin_state_in_database (folder_path, state);
     }
 
     Optional<PinState> Vfs_xAttr.pin_state (string folder_path) {

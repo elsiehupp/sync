@@ -18,7 +18,7 @@ class Link_label : QLabel {
 
     /***********************************************************
     ***********************************************************/
-    public void set_url (GLib.Uri url);
+    public void url (GLib.Uri url);
 
 signals:
     void clicked ();
@@ -33,7 +33,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void set_font_underline (bool value);
+    private void font_underline (bool value);
 
     /***********************************************************
     ***********************************************************/
@@ -44,18 +44,18 @@ signals:
 
     }
 
-    void Link_label.set_url (GLib.Uri url) {
+    void Link_label.url (GLib.Uri url) {
         this.url = url;
     }
 
     void Link_label.enter_event (QEvent * /*event*/) {
-        set_font_underline (true);
-        set_cursor (Qt.PointingHandCursor);
+        font_underline (true);
+        cursor (Qt.PointingHandCursor);
     }
 
     void Link_label.leave_event (QEvent * /*event*/) {
-        set_font_underline (false);
-        set_cursor (Qt.ArrowCursor);
+        font_underline (false);
+        cursor (Qt.ArrowCursor);
     }
 
     void Link_label.mouse_release_event (QMouse_event * /*event*/) {
@@ -66,10 +66,10 @@ signals:
         /* emit */ clicked ();
     }
 
-    void Link_label.set_font_underline (bool value) {
+    void Link_label.font_underline (bool value) {
         var label_font = font ();
-        label_font.set_underline (value);
-        set_font (label_font);
+        label_font.underline (value);
+        font (label_font);
     }
 
     }

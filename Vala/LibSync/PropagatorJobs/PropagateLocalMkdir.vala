@@ -41,7 +41,7 @@ class PropagateLocalMkdir : PropagateItemJob {
 
     Default: false.
     ***********************************************************/
-    public void set_delete_existing_file (bool enabled) {
+    public void delete_existing_file (bool enabled) {
         this.delete_existing_file = enabled;
     }
 

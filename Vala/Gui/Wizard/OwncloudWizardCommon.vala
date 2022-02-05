@@ -46,16 +46,16 @@ namespace WizardCommon {
 
         QPixmap pix = variant.value<QPixmap> ();
         if (!pix.is_null ()) {
-            label.set_pixmap (pix);
-            label.set_alignment (Qt.Align_top | Qt.Align_right);
-            label.set_visible (true);
+            label.pixmap (pix);
+            label.alignment (Qt.Align_top | Qt.Align_right);
+            label.visible (true);
         } else {
             string string_value = variant.to_string ();
             if (!string_value.is_empty ()) {
-                label.on_set_text (string_value);
-                label.set_text_format (Qt.RichText);
-                label.set_visible (true);
-                label.set_open_external_links (true);
+                label.on_text (string_value);
+                label.text_format (Qt.RichText);
+                label.visible (true);
+                label.open_external_links (true);
             }
         }
     }
@@ -72,20 +72,20 @@ namespace WizardCommon {
         string style = QLatin1String ("border : 1px solid #eed3d7; border-radius : 5px; padding : 3px;"
                                         "background-color : #f2dede; color : #b94a48;");
 
-        error_label.set_style_sheet (style);
-        error_label.set_word_wrap (true);
+        error_label.style_sheet (style);
+        error_label.word_wrap (true);
         var size_policy = error_label.size_policy ();
-        size_policy.set_retain_size_when_hidden (true);
-        error_label.set_size_policy (size_policy);
-        error_label.set_visible (false);
+        size_policy.retain_size_when_hidden (true);
+        error_label.size_policy (size_policy);
+        error_label.visible (false);
     }
 
     void customize_hint_label (QLabel label) {
         var palette = label.palette ();
         Gtk.Color text_color = palette.color (QPalette.Text);
-        text_color.set_alpha (128);
-        palette.on_set_color (QPalette.Text, text_color);
-        label.set_palette (palette);
+        text_color.alpha (128);
+        palette.on_color (QPalette.Text, text_color);
+        label.palette (palette);
     }
 
 } // namespace WizardCommon

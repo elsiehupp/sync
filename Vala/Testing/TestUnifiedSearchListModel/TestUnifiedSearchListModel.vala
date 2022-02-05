@@ -95,7 +95,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_set_search_term_start_stop_search () {
+    private void on_test_search_term_start_stop_search () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
         QVERIFY (model.rowCount () == 0);
@@ -130,7 +130,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_set_search_term_results_found () {
+    private void on_test_search_term_results_found () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
         QVERIFY (model.rowCount () == 0);
@@ -158,7 +158,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_set_search_term_results_not_found () {
+    private void on_test_search_term_results_not_found () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
         QVERIFY (model.rowCount () == 0);
@@ -348,7 +348,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_set_search_term_results_error () {
+    private void on_test_search_term_results_error () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
         QVERIFY (model.rowCount () == 0);

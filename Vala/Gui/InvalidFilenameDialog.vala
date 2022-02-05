@@ -114,13 +114,13 @@ class Invalid_filename_dialog : Gtk.Dialog {
 
         this.original_filename = this.relative_file_path + file_path_file_info.filename ();
 
-        this.ui.set_up_ui (this);
-        this.ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
-        this.ui.button_box.button (QDialogButtonBox.Ok).on_set_text (_("Rename file"));
+        this.ui.up_ui (this);
+        this.ui.button_box.button (QDialogButtonBox.Ok).enabled (false);
+        this.ui.button_box.button (QDialogButtonBox.Ok).on_text (_("Rename file"));
 
-        this.ui.description_label.on_set_text (_("The file %1 could not be synced because the name contains characters which are not allowed on this system.").arg (this.original_filename));
-        this.ui.explanation_label.on_set_text (_("The following characters are not allowed on the system : * \" | & ? , ; : \\ / ~ < >"));
-        this.ui.filename_line_edit.on_set_text (file_path_file_info.filename ());
+        this.ui.description_label.on_text (_("The file %1 could not be synced because the name contains characters which are not allowed on this system.").arg (this.original_filename));
+        this.ui.explanation_label.on_text (_("The following characters are not allowed on the system : * \" | & ? , ; : \\ / ~ < >"));
+        this.ui.filename_line_edit.on_text (file_path_file_info.filename ());
 
         connect (this.ui.button_box, &QDialogButtonBox.accepted, this, &Gtk.Dialog.accept);
         connect (this.ui.button_box, &QDialogButtonBox.rejected, this, &Gtk.Dialog.reject);
@@ -135,7 +135,7 @@ class Invalid_filename_dialog : Gtk.Dialog {
 
     void Invalid_filename_dialog.check_if_allowed_to_rename () {
         const var propfind_job = new PropfindJob (this.account, QDir.clean_path (this.folder.remote_path () + this.original_filename));
-        propfind_job.set_properties ({
+        propfind_job.properties ({
             "http://owncloud.org/ns:permissions"
         });
         connect (propfind_job, &PropfindJob.result, this, &Invalid_filename_dialog.on_propfind_permission_success);
@@ -149,10 +149,10 @@ class Invalid_filename_dialog : Gtk.Dialog {
         const var remote_permissions = RemotePermissions.from_server_string (values["permissions"].to_string ());
         if (!remote_permissions.has_permission (remote_permissions.Can_rename)
             || !remote_permissions.has_permission (remote_permissions.Can_move)) {
-            this.ui.error_label.on_set_text (
+            this.ui.error_label.on_text (
                 _("You don't have the permission to rename this file. Please ask the author of the file to rename it."));
-            this.ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
-            this.ui.filename_line_edit.set_enabled (false);
+            this.ui.button_box.button (QDialogButtonBox.Ok).enabled (false);
+            this.ui.filename_line_edit.enabled (false);
         }
     }
 
@@ -171,14 +171,14 @@ class Invalid_filename_dialog : Gtk.Dialog {
         const var is_text_valid = is_new_filename_different && !contains_illegal_chars;
 
         if (is_text_valid) {
-            this.ui.error_label.on_set_text ("");
+            this.ui.error_label.on_text ("");
         } else {
-            this.ui.error_label.on_set_text (_("Filename contains illegal characters : %1")
+            this.ui.error_label.on_text (_("Filename contains illegal characters : %1")
                                          .arg (illegal_character_list_to_string (illegal_contained_characters)));
         }
 
         this.ui.button_box.button (QDialogButtonBox.Ok)
-            .set_enabled (is_text_valid);
+            .enabled (is_text_valid);
     }
 
     void Invalid_filename_dialog.on_move_job_finished () {
@@ -186,7 +186,7 @@ class Invalid_filename_dialog : Gtk.Dialog {
         const var error = job.reply ().error ();
 
         if (error != Soup.Reply.NoError) {
-            this.ui.error_label.on_set_text (_("Could not rename file. Please make sure you are connected to the server."));
+            this.ui.error_label.on_text (_("Could not rename file. Please make sure you are connected to the server."));
             return;
         }
 
@@ -196,8 +196,8 @@ class Invalid_filename_dialog : Gtk.Dialog {
     void Invalid_filename_dialog.on_remote_file_already_exists (QVariantMap values) {
         //  Q_UNUSED (values);
 
-        this.ui.error_label.on_set_text (_("Cannot rename file because a file with the same name does already exist on the server. Please pick another name."));
-        this.ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
+        this.ui.error_label.on_text (_("Cannot rename file because a file with the same name does already exist on the server. Please pick another name."));
+        this.ui.button_box.button (QDialogButtonBox.Ok).enabled (false);
     }
 
     void Invalid_filename_dialog.on_remote_file_does_not_exist (Soup.Reply reply) {

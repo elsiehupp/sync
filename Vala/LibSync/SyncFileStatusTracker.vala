@@ -266,7 +266,7 @@ class SyncFileStatusTracker : GLib.Object {
         //  ASSERT (shared_flag != SharedFlag.UNKNOWN_SHARED,
             "The shared status needs to have been fetched from a SyncFileItem or the DB at this point.");
         if (shared_flag == SharedFlag.SHARED)
-            status.set_shared (true);
+            status.shared (true);
 
         return status;
     }

@@ -39,7 +39,7 @@ class Ocs_job : AbstractNetworkJob {
 
     @param verb currently supported PUT POST DELETE
     ***********************************************************/
-    protected void set_verb (GLib.ByteArray verb);
+    protected void verb (GLib.ByteArray verb);
 
 
     /***********************************************************
@@ -58,7 +58,7 @@ class Ocs_job : AbstractNetworkJob {
     @param post_params list of pairs to add (url_encoded) to the body of the
     request
     ***********************************************************/
-    protected void set_post_params (GLib.List<QPair<string, string>> post_params);
+    protected void post_params (GLib.List<QPair<string, string>> post_params);
 
 
     /***********************************************************
@@ -152,10 +152,10 @@ signals:
         this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE);
         this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE_V2);
         this.pass_status_codes.append (OCS_NOT_MODIFIED_STATUS_CODE_V2);
-        set_ignore_credential_failure (true);
+        ignore_credential_failure (true);
     }
 
-    void Ocs_job.set_verb (GLib.ByteArray verb) {
+    void Ocs_job.verb (GLib.ByteArray verb) {
         this.verb = verb;
     }
 
@@ -168,11 +168,11 @@ signals:
     }
 
     void Ocs_job.append_path (string identifier) {
-        set_path (path () + '/' + identifier);
+        path (path () + '/' + identifier);
     }
 
     void Ocs_job.add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
-        this.request.set_raw_header (header_name, value);
+        this.request.raw_header (header_name, value);
     }
 
 
@@ -181,7 +181,7 @@ signals:
     static QUrlQuery percent_encode_query_items (
         const GLib.List<QPair<string, string>> items) {
         QUrlQuery result;
-        // Note: QUrlQuery.set_query_items () does not fully percent encode
+        // Note: QUrlQuery.query_items () does not fully percent encode
         // the query items, see #5042
         foreach (var item, items) {
             result.add_query_item (
@@ -211,7 +211,7 @@ signals:
                 post_data.append ("=");
                 post_data.append (GLib.Uri.to_percent_encoding (tmp.second));
             }
-            buffer.set_data (post_data);
+            buffer.data (post_data);
         }
         query_items.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path (), query_items);

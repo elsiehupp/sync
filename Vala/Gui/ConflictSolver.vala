@@ -10,8 +10,8 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 namespace Occ {
 
 class ConflictSolver : GLib.Object {
-    //  Q_PROPERTY (string local_version_filename READ local_version_filename WRITE on_set_local_version_filename NOTIFY local_version_filename_changed)
-    //  Q_PROPERTY (string remote_version_filename READ remote_version_filename WRITE on_set_remote_version_filename NOTIFY remote_version_filename_changed)
+    //  Q_PROPERTY (string local_version_filename READ local_version_filename WRITE on_local_version_filename NOTIFY local_version_filename_changed)
+    //  Q_PROPERTY (string remote_version_filename READ remote_version_filename WRITE on_remote_version_filename NOTIFY remote_version_filename_changed)
 
     /***********************************************************
     ***********************************************************/
@@ -43,10 +43,10 @@ class ConflictSolver : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_set_local_version_filename (string local_version_filename);
+    public void on_local_version_filename (string local_version_filename);
 
 
-    public void on_set_remote_version_filename (string remote_version_filename);
+    public void on_remote_version_filename (string remote_version_filename);
 
 signals:
     void local_version_filename_changed ();
@@ -92,7 +92,7 @@ signals:
         return false;
     }
 
-    void ConflictSolver.on_set_local_version_filename (string local_version_filename) {
+    void ConflictSolver.on_local_version_filename (string local_version_filename) {
         if (this.local_version_filename == local_version_filename) {
             return;
         }
@@ -101,7 +101,7 @@ signals:
         /* emit */ local_version_filename_changed ();
     }
 
-    void ConflictSolver.on_set_remote_version_filename (string remote_version_filename) {
+    void ConflictSolver.on_remote_version_filename (string remote_version_filename) {
         if (this.remote_version_filename == remote_version_filename) {
             return;
         }

@@ -38,12 +38,12 @@ class Owncloud_setup_page : QWizard_page {
     public bool is_complete () override;
     public void initialize_page () override;
     public int next_id () override;
-    public void set_server_url (string );
+    public void server_url (string );
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_allow_password_storage (bool);
+    public void allow_password_storage (bool);
 
     /***********************************************************
     ***********************************************************/
@@ -67,7 +67,7 @@ class Owncloud_setup_page : QWizard_page {
 
     /***********************************************************
     ***********************************************************/
-    public void on_set_remote_folder (string remote_fo);
+    public void on_remote_folder (string remote_fo);
 
     /***********************************************************
     ***********************************************************/
@@ -79,7 +79,7 @@ class Owncloud_setup_page : QWizard_page {
 
     /***********************************************************
     ***********************************************************/
-    public void on_set_auth_type (De
+    public void on_auth_type (De
 
     /***********************************************************
     ***********************************************************/
@@ -112,7 +112,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void set_logo ();
+    private void logo ();
     private void customize_style ();
     private void setup_server_address_description_label ();
 
@@ -139,23 +139,23 @@ signals:
         : QWizard_page ()
         this.progress_indi (new QProgress_indicator (this))
         this.oc_wizard (qobject_cast<OwncloudWizard> (parent)) {
-        this.ui.set_up_ui (this);
+        this.ui.up_ui (this);
 
         setup_server_address_description_label ();
 
         Theme theme = Theme.instance ();
         if (theme.override_server_url ().is_empty ()) {
-            this.ui.le_url.set_postfix (theme.wizard_url_postfix ());
-            this.ui.le_url.set_placeholder_text (theme.WIZARD_URL_HINT);
+            this.ui.le_url.postfix (theme.wizard_url_postfix ());
+            this.ui.le_url.placeholder_text (theme.WIZARD_URL_HINT);
         } else if (Theme.instance ().force_override_server_url ()) {
-            this.ui.le_url.set_enabled (false);
+            this.ui.le_url.enabled (false);
         }
 
         register_field (QLatin1String ("OCUrl*"), this.ui.le_url);
 
         var size_policy = this.progress_indi.size_policy ();
-        size_policy.set_retain_size_when_hidden (true);
-        this.progress_indi.set_size_policy (size_policy);
+        size_policy.retain_size_when_hidden (true);
+        this.progress_indi.size_policy (size_policy);
 
         this.ui.progress_layout.add_widget (this.progress_indi);
         on_stop_spinner ();
@@ -170,24 +170,24 @@ signals:
         connect (add_cert_dial, &Gtk.Dialog.accepted, this, &Owncloud_setup_page.on_certificate_accepted);
     }
 
-    void Owncloud_setup_page.set_logo () {
-        this.ui.logo_label.set_pixmap (Theme.instance ().wizard_application_logo ());
+    void Owncloud_setup_page.logo () {
+        this.ui.logo_label.pixmap (Theme.instance ().wizard_application_logo ());
     }
 
     void Owncloud_setup_page.setup_server_address_description_label () {
         const var app_name = Theme.instance ().app_name_gui ();
-        this.ui.server_address_description_label.on_set_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
+        this.ui.server_address_description_label.on_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
     }
 
-    void Owncloud_setup_page.set_server_url (string new_url) {
-        this.oc_wizard.set_registration (false);
+    void Owncloud_setup_page.server_url (string new_url) {
+        this.oc_wizard.registration (false);
         this.o_c_url = new_url;
         if (this.o_c_url.is_empty ()) {
             this.ui.le_url.clear ();
             return;
         }
 
-        this.ui.le_url.on_set_text (this.o_c_url);
+        this.ui.le_url.on_text (this.o_c_url);
     }
 
     void Owncloud_setup_page.setup_customization () {
@@ -205,9 +205,9 @@ signals:
         WizardCommon.setup_custom_media (variant, this.ui.bottom_label);
 
         var le_url_palette = this.ui.le_url.palette ();
-        le_url_palette.on_set_color (QPalette.Text, Qt.black);
-        le_url_palette.on_set_color (QPalette.Base, Qt.white);
-        this.ui.le_url.set_palette (le_url_palette);
+        le_url_palette.on_color (QPalette.Text, Qt.black);
+        le_url_palette.on_color (QPalette.Base, Qt.white);
+        this.ui.le_url.palette (le_url_palette);
     }
 
     // slot hit from text_changed of the url entry field.
@@ -217,7 +217,7 @@ signals:
         // button
         var next_button = qobject_cast<QPushButton> (this.oc_wizard.button (QWizard.Next_button));
         if (next_button) {
-            next_button.set_default (true);
+            next_button.default (true);
         }
 
         this.auth_type_known = false;
@@ -239,7 +239,7 @@ signals:
             }
         }
         if (new_url != url) {
-            this.ui.le_url.on_set_text (new_url);
+            this.ui.le_url.on_text (new_url);
         }
     }
 
@@ -248,7 +248,7 @@ signals:
         if (GLib.Uri (url).is_relative () && !url.is_empty ()) {
             // no scheme defined, set one
             url.prepend ("https://");
-            this.ui.le_url.set_full_text (url);
+            this.ui.le_url.full_text (url);
         }
     }
 
@@ -267,27 +267,27 @@ signals:
         QAbstractButton next_button = wizard ().button (QWizard.Next_button);
         var push_button = qobject_cast<QPushButton> (next_button);
         if (push_button) {
-            push_button.set_default (true);
+            push_button.default (true);
         }
 
-        this.ui.le_url.set_focus ();
+        this.ui.le_url.focus ();
 
         const var is_server_url_overridden = !Theme.instance ().override_server_url ().is_empty ();
         if (is_server_url_overridden && !Theme.instance ().force_override_server_url ()) {
             // If the url is overwritten but we don't force to use that url
             // Just focus the next button to let the user navigate quicker
             if (next_button) {
-                next_button.set_focus ();
+                next_button.focus ();
             }
         } else if (is_server_url_overridden) {
             // If the overwritten url is not empty and we force this overwritten url
             // we just check the server type and switch to next page
             // immediately.
-            set_commit_page (true);
-            // Hack : set_commit_page () changes caption, but after an error this page could still be visible
-            set_button_text (QWizard.Commit_button, _("&Next >"));
+            commit_page (true);
+            // Hack : commit_page () changes caption, but after an error this page could still be visible
+            button_text (QWizard.Commit_button, _("&Next >"));
             validate_page ();
-            set_visible (false);
+            visible (false);
         }
     }
 
@@ -320,11 +320,11 @@ signals:
             string u = url ();
             GLib.Uri qurl (u);
             if (!qurl.is_valid () || qurl.host ().is_empty ()) {
-                on_set_error_string (_("Server address does not seem to be valid"), false);
+                on_error_string (_("Server address does not seem to be valid"), false);
                 return false;
             }
 
-            on_set_error_string ("", false);
+            on_error_string ("", false);
             this.checking = true;
             on_start_spinner ();
             /* emit */ complete_changed ();
@@ -340,15 +340,15 @@ signals:
         }
     }
 
-    void Owncloud_setup_page.on_set_auth_type (DetermineAuthTypeJob.AuthType type) {
+    void Owncloud_setup_page.on_auth_type (DetermineAuthTypeJob.AuthType type) {
         this.auth_type_known = true;
         this.auth_type = type;
         on_stop_spinner ();
     }
 
-    void Owncloud_setup_page.on_set_error_string (string err, bool retry_http_only) {
+    void Owncloud_setup_page.on_error_string (string err, bool retry_http_only) {
         if (err.is_empty ()) {
-            this.ui.error_label.set_visible (false);
+            this.ui.error_label.visible (false);
         } else {
             if (retry_http_only) {
                 GLib.Uri url (this.ui.le_url.full_text ());
@@ -358,14 +358,14 @@ signals:
                     // but that it has no way of informing the owncloud client that this is the case.
 
                     Owncloud_connection_method_dialog dialog;
-                    dialog.set_url (url);
+                    dialog.url (url);
                     // FIXME : Synchronous dialogs are not so nice because of event loop recursion
                     int ret_val = dialog.exec ();
 
                     switch (ret_val) {
                     case Owncloud_connection_method_dialog.No_TLS: {
-                        url.set_scheme ("http");
-                        this.ui.le_url.set_full_text (url.to_string ());
+                        url.scheme ("http");
+                        this.ui.le_url.full_text (url.to_string ());
                         // skip ahead to next page, since the user would expect us to retry automatically
                         wizard ().next ();
                     } break;
@@ -381,8 +381,8 @@ signals:
                 }
             }
 
-            this.ui.error_label.set_visible (true);
-            this.ui.error_label.on_set_text (err);
+            this.ui.error_label.visible (true);
+            this.ui.error_label.on_text (err);
         }
         this.checking = false;
         /* emit */ complete_changed ();
@@ -390,14 +390,14 @@ signals:
     }
 
     void Owncloud_setup_page.on_start_spinner () {
-        this.ui.progress_layout.set_enabled (true);
-        this.progress_indi.set_visible (true);
+        this.ui.progress_layout.enabled (true);
+        this.progress_indi.visible (true);
         this.progress_indi.on_start_animation ();
     }
 
     void Owncloud_setup_page.on_stop_spinner () {
-        this.ui.progress_layout.set_enabled (false);
-        this.progress_indi.set_visible (false);
+        this.ui.progress_layout.enabled (false);
+        this.progress_indi.visible (false);
         this.progress_indi.on_stop_animation ();
     }
 
@@ -437,14 +437,14 @@ signals:
     }
 
     void Owncloud_setup_page.customize_style () {
-        set_logo ();
+        logo ();
 
         if (this.progress_indi) {
             const var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
-                this.progress_indi.on_set_color (Qt.white);
+                this.progress_indi.on_color (Qt.white);
             } else {
-                this.progress_indi.on_set_color (Qt.black);
+                this.progress_indi.on_color (Qt.black);
             }
         }
 

@@ -405,7 +405,7 @@ SocketApi.SocketApi (GLib.Object parent) {
         bool result = info.dir ().mkpath (".");
         GLib.debug (lc_socket_api) << "creating" << info.dir ().path () << result;
         if (result) {
-            GLib.File.set_permissions (socket_path,
+            GLib.File.permissions (socket_path,
                 GLib.File.Permissions (GLib.File.Read_owner + GLib.File.Write_owner + GLib.File.Exe_owner));
         }
     }
@@ -740,9 +740,9 @@ void SocketApi.command_EDIT (string local_file, Socket_listener listener) {
     parameters.add_query_item ("path", file_data.server_relative_path);
     parameters.add_query_item ("editor_id", editor.identifier ());
     job.add_query_params (parameters);
-    job.set_verb (JsonApiJob.Verb.POST);
+    job.verb (JsonApiJob.Verb.POST);
 
-    GLib.Object.connect (job, &JsonApiJob.json_received, [] (QJsonDocument json){
+    GLib.Object.connect (job, &JsonApiJob.json_received, [] (QJsonDocument json) {
         var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         var url = GLib.Uri (data.value ("url").to_string ());
 
@@ -817,11 +817,11 @@ void fetch_private_link_url (
 
     // Retrieve the new link by PROPFIND
     var job = new PropfindJob (account, remote_path, target);
-    job.set_properties (
+    job.properties (
         GLib.List<GLib.ByteArray> ()
         << "http://owncloud.org/ns:fileid" // numeric file identifier for fallback private link generation
         << "http://owncloud.org/ns:privatelink");
-    job.on_set_timeout (10 * 1000);
+    job.on_timeout (10 * 1000);
     GLib.Object.connect (job, &PropfindJob.result, target, [=] (QVariantMap result) {
         var private_link_url = result["privatelink"].to_string ();
         var numeric_file_id = result["fileid"].to_byte_array ();
@@ -860,7 +860,7 @@ void SocketApi.command_MAKE_AVAILABLE_LOCALLY (string files_arg, Socket_listener
             continue;
 
         // Update the pin state on all items
-        if (!data.folder.vfs ().set_pin_state (data.folder_relative_path, PinState.PinState.ALWAYS_LOCAL)) {
+        if (!data.folder.vfs ().pin_state (data.folder_relative_path, PinState.PinState.ALWAYS_LOCAL)) {
             GLib.warn (lc_socket_api) << "Could not set pin state of" << data.folder_relative_path << "to always local";
         }
 
@@ -882,7 +882,7 @@ void SocketApi.command_MAKE_ONLINE_ONLY (string files_arg, Socket_listener *) {
             continue;
 
         // Update the pin state on all items
-        if (!data.folder.vfs ().set_pin_state (data.folder_relative_path, PinState.VfsItemAvailability.ONLINE_ONLY)) {
+        if (!data.folder.vfs ().pin_state (data.folder_relative_path, PinState.VfsItemAvailability.ONLINE_ONLY)) {
             GLib.warn (lc_socket_api) << "Could not set pin state of" << data.folder_relative_path << "to online only";
         }
 
@@ -893,7 +893,7 @@ void SocketApi.command_MAKE_ONLINE_ONLY (string files_arg, Socket_listener *) {
 }
 
 void SocketApi.copy_url_to_clipboard (string link) {
-    QApplication.clipboard ().on_set_text (link);
+    QApplication.clipboard ().on_text (link);
 }
 
 void SocketApi.command_RESOLVE_CONFLICT (string local_file, Socket_listener *) {
@@ -912,9 +912,9 @@ void SocketApi.command_RESOLVE_CONFLICT (string local_file, Socket_listener *) {
 
 //  #ifndef OWNCLOUD_TEST
     ConflictDialog dialog;
-    dialog.on_set_base_filename (base_name);
-    dialog.on_set_local_version_filename (conflicted_path);
-    dialog.on_set_remote_version_filename (base_path);
+    dialog.on_base_filename (base_name);
+    dialog.on_local_version_filename (conflicted_path);
+    dialog.on_remote_version_filename (base_path);
     if (dialog.exec () == ConflictDialog.Accepted) {
         file_data.folder.schedule_this_folder_soon ();
     }
@@ -923,7 +923,7 @@ void SocketApi.command_RESOLVE_CONFLICT (string local_file, Socket_listener *) {
 
 void SocketApi.command_DELETE_ITEM (string local_file, Socket_listener *) {
     ConflictSolver solver;
-    solver.on_set_local_version_filename (local_file);
+    solver.on_local_version_filename (local_file);
     solver.exec (ConflictSolver.KeepRemoteVersion);
 }
 
@@ -960,8 +960,8 @@ void SocketApi.command_MOVE_ITEM (string local_file, Socket_listener *) {
         return;
 
     ConflictSolver solver;
-    solver.on_set_local_version_filename (local_file);
-    solver.on_set_remote_version_filename (target);
+    solver.on_local_version_filename (local_file);
+    solver.on_remote_version_filename (target);
 }
 
 void SocketApi.command_V2_LIST_ACCOUNTS (unowned<Socket_api_job_v2> job) {
@@ -1366,7 +1366,7 @@ void SocketApi.command_ASYNC_SET_WIDGET_PROPERTY (unowned<Socket_api_job> job) {
         job.reject (message);
         return;
     }
-    widget.set_property (arguments["property"].to_string ().to_utf8 ().const_data (),
+    widget.property (arguments["property"].to_string ().to_utf8 ().const_data (),
         arguments["value"]);
 
     job.resolve ();

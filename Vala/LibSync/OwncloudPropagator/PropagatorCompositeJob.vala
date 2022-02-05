@@ -44,7 +44,7 @@ class PropagatorCompositeJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     public void append_job (PropagatorJob job) {
-        job.set_associated_composite (this);
+        job.associated_composite (this);
         this.jobs_to_do.append (job);
     }
 
@@ -144,7 +144,7 @@ class PropagatorCompositeJob : PropagatorJob {
                 }
                 j.on_abort (abort_type);
             }
-        } else if (abort_type == AbortType.ASYNCHRONOUS){
+        } else if (abort_type == AbortType.ASYNCHRONOUS) {
             /* emit */ abort_finished ();
         }
     }

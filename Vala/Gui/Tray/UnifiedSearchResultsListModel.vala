@@ -27,7 +27,7 @@ class Unified_search_results_list_model : QAbstractListModel {
     //  Q_PROPERTY (string current_fetch_more_in_progress_provider_id READ current_fetch_more_in_progress_provider_id NOTIFY
     //  Q_PROPERTY (ent_fetch_more_in_progress_provider_id_changed)
     //  Q_PROPERTY (string error_string READ error_string NOTIFY error_string_changed)
-    Q_PROPERTY (string search_term READ search_term WRITE on_set_search_term NOTIFY search_term_changed)
+    Q_PROPERTY (string search_term READ search_term WRITE on_search_term NOTIFY search_term_changed)
 
     struct Unified_search_provider {
         string this.identifier;
@@ -131,7 +131,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public void on_set_search_term (string term);
+    public void on_search_term (string term);
 
 
     /***********************************************************
@@ -262,7 +262,7 @@ namespace {
                 ? thumbnail_url_copy.split ('?', Qt.Skip_empty_parts)
                 : string[]{thumbnail_url_copy};
             //  Q_ASSERT (!thumbnail_url_copy_splitted.is_empty ());
-            server_url_copy.set_path (thumbnail_url_copy_splitted[0]);
+            server_url_copy.path (thumbnail_url_copy_splitted[0]);
             thumbnail_url_copy = server_url_copy.to_string ();
             if (thumbnail_url_copy_splitted.size () > 1) {
                 thumbnail_url_copy += '?' + thumbnail_url_copy_splitted[1];
@@ -283,7 +283,7 @@ namespace {
             const string[] fallack_icon_path_splitted =
                 fallack_icon_copy.contains ('?') ? fallack_icon_copy.split ('?') : string[]{fallack_icon_copy};
             //  Q_ASSERT (!fallack_icon_path_splitted.is_empty ());
-            server_url_copy.set_path (fallack_icon_path_splitted[0]);
+            server_url_copy.path (fallack_icon_path_splitted[0]);
             fallack_icon_copy = server_url_copy.to_string ();
             if (fallack_icon_path_splitted.size () > 1) {
                 fallack_icon_copy += '?' + fallack_icon_path_splitted[1];
@@ -398,7 +398,7 @@ namespace {
         return this.current_fetch_more_in_progress_provider_id;
     }
 
-    void Unified_search_results_list_model.on_set_search_term (string term) {
+    void Unified_search_results_list_model.on_search_term (string term) {
         if (term == this.search_term) {
             return;
         }
@@ -423,7 +423,7 @@ namespace {
         }
 
         if (!this.search_term.is_empty ()) {
-            this.unified_search_text_editing_finished_timer.set_interval (search_term_editing_finished_search_start_delay);
+            this.unified_search_text_editing_finished_timer.interval (search_term_editing_finished_search_start_delay);
             connect (&this.unified_search_text_editing_finished_timer, &QTimer.timeout, this,
                 &Unified_search_results_list_model.on_search_term_editing_finished);
             this.unified_search_text_editing_finished_timer.on_start ();
@@ -620,9 +620,9 @@ namespace {
         parameters.add_query_item (QStringLiteral ("term"), this.search_term);
         if (cursor > 0) {
             parameters.add_query_item (QStringLiteral ("cursor"), string.number (cursor));
-            job.set_property ("append_results", true);
+            job.property ("append_results", true);
         }
-        job.set_property ("provider_id", provider_id);
+        job.property ("provider_id", provider_id);
         job.add_query_params (parameters);
         const var was_search_in_progress = is_search_in_progress ();
         this.search_job_connections.insert (provider_id,
@@ -678,7 +678,7 @@ namespace {
             GLib.Uri final_resurce_url (resource_url);
             if (final_resurce_url.scheme ().is_empty () && account_url.scheme ().is_empty ()) {
                 final_resurce_url = account_url;
-                final_resurce_url.set_path (resource_url);
+                final_resurce_url.path (resource_url);
             }
             return final_resurce_url;
         }

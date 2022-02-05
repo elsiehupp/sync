@@ -20,7 +20,7 @@ class WebFlowCredentialsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public void set_url (GLib.Uri url);
+    public void url (GLib.Uri url);
 
     /***********************************************************
     ***********************************************************/
@@ -32,7 +32,7 @@ class WebFlowCredentialsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public void set_error (string error);
+    public void error (string error);
 
     public bool is_using_flow2 () {
         return this.use_flow2;
@@ -87,20 +87,20 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flo
 #ifdef WITH_WEBENGINE
     this.web_view (null)
 //  #endif // WITH_WEBENGINE {
-    set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+    window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
 
     this.layout = new QVBoxLayout (this);
     int spacing = this.layout.spacing ();
     int margin = this.layout.margin ();
-    this.layout.set_spacing (0);
-    this.layout.set_margin (0);
+    this.layout.spacing (0);
+    this.layout.margin (0);
 
     this.container_layout = new QVBoxLayout (this);
-    this.container_layout.set_spacing (spacing);
-    this.container_layout.set_margin (margin);
+    this.container_layout.spacing (spacing);
+    this.container_layout.margin (margin);
 
     this.info_label = new QLabel ();
-    this.info_label.set_alignment (Qt.AlignCenter);
+    this.info_label.alignment (Qt.AlignCenter);
     this.container_layout.add_widget (this.info_label);
 
     if (this.use_flow2) {
@@ -135,7 +135,7 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flo
     WizardCommon.init_error_label (this.error_label);
 
     this.layout.add_layout (this.container_layout);
-    set_layout (this.layout);
+    layout (this.layout);
 
     customize_style ();
 }
@@ -161,32 +161,32 @@ void WebFlowCredentialsDialog.close_event (QCloseEvent* e) {
     /* emit */ close ();
 }
 
-void WebFlowCredentialsDialog.set_url (GLib.Uri url) {
+void WebFlowCredentialsDialog.url (GLib.Uri url) {
 #ifdef WITH_WEBENGINE
     if (this.web_view)
-        this.web_view.set_url (url);
+        this.web_view.url (url);
 #else // WITH_WEBENGINE
     //  Q_UNUSED (url);
 //  #endif // WITH_WEBENGINE
 }
 
-void WebFlowCredentialsDialog.set_info (string message) {
-    this.info_label.on_set_text (message);
+void WebFlowCredentialsDialog.info (string message) {
+    this.info_label.on_text (message);
 }
 
-void WebFlowCredentialsDialog.set_error (string error) {
+void WebFlowCredentialsDialog.error (string error) {
     // bring window to top
     on_show_settings_dialog ();
 
     if (this.use_flow2 && this.flow_2_auth_widget) {
-        this.flow_2_auth_widget.set_error (error);
+        this.flow_2_auth_widget.error (error);
         return;
     }
 
     if (error.is_empty ()) {
         this.error_label.hide ();
     } else {
-        this.error_label.on_set_text (error);
+        this.error_label.on_text (error);
         this.error_label.show ();
     }
 }

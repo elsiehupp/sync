@@ -181,7 +181,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
     Default: false.
     ***********************************************************/
-    public void set_delete_existing_folder (bool enabled) {
+    public void delete_existing_folder (bool enabled) {
         this.delete_existing = enabled;
     }
 
@@ -207,7 +207,7 @@ class PropagateDownloadFile : PropagateItemJob {
             }
             if (this.item.modtime != this.item.previous_modtime) {
                 //  Q_ASSERT (this.item.modtime > 0);
-                FileSystem.set_mod_time (fn, this.item.modtime);
+                FileSystem.mod_time (fn, this.item.modtime);
                 /* emit */ propagator ().touched_file (fn);
             }
             this.item.modtime = FileSystem.get_mod_time (fn);
@@ -245,7 +245,7 @@ class PropagateDownloadFile : PropagateItemJob {
             // if the etag has changed meanwhile, remove the already downloaded part.
             if (progress_info.etag != this.item.etag) {
                 FileSystem.remove (propagator ().full_local_path (progress_info.tmpfile));
-                propagator ().journal.set_download_info (this.item.file, SyncJournalDb.DownloadInfo ());
+                propagator ().journal.download_info (this.item.file, SyncJournalDb.DownloadInfo ());
             } else {
                 tmp_filename = progress_info.tmpfile;
                 expected_etag_for_resume = progress_info.etag;
@@ -255,7 +255,7 @@ class PropagateDownloadFile : PropagateItemJob {
         if (tmp_filename.is_empty ()) {
             tmp_filename = create_download_tmp_filename (this.item.file);
         }
-        this.tmp_file.set_filename (propagator ().full_local_path (tmp_filename));
+        this.tmp_file.filename (propagator ().full_local_path (tmp_filename));
 
         this.resume_start = this.tmp_file.size ();
         if (this.resume_start > 0 && this.resume_start == this.item.size) {
@@ -267,14 +267,14 @@ class PropagateDownloadFile : PropagateItemJob {
         // Can't open (Append) read-only files, make sure to make
         // file writable if it exists.
         if (this.tmp_file.exists ())
-            FileSystem.set_file_read_only (this.tmp_file.filename (), false);
+            FileSystem.file_read_only (this.tmp_file.filename (), false);
         if (!this.tmp_file.open (QIODevice.Append | QIODevice.Unbuffered)) {
             GLib.warn (lc_propagate_download) << "could not open temporary file" << this.tmp_file.filename ();
             on_done (SyncFileItem.Status.NORMAL_ERROR, this.tmp_file.error_string ());
             return;
         }
         // Hide temporary after creation
-        FileSystem.set_file_hidden (this.tmp_file.filename (), true);
+        FileSystem.file_hidden (this.tmp_file.filename (), true);
 
         // If there's not enough space to fully download this file, stop.
         const var disk_space_result = propagator ().disk_space_check ();
@@ -303,7 +303,7 @@ class PropagateDownloadFile : PropagateItemJob {
             pi.etag = this.item.etag;
             pi.tmpfile = tmp_filename;
             pi.valid = true;
-            propagator ().journal.set_download_info (this.item.file, pi);
+            propagator ().journal.download_info (this.item.file, pi);
             propagator ().journal.commit ("download file on_start");
         }
 
@@ -327,7 +327,7 @@ class PropagateDownloadFile : PropagateItemJob {
                 url,
                 this.tmp_file, headers, expected_etag_for_resume, this.resume_start, this);
         }
-        this.job.set_bandwidth_manager (&propagator ().bandwidth_manager);
+        this.job.bandwidth_manager (&propagator ().bandwidth_manager);
         connect (this.job.data (), &GETFileJob.finished_signal, this, &PropagateDownloadFile.on_get_finished);
         connect (this.job.data (), &GETFileJob.download_progress, this, &PropagateDownloadFile.on_download_progress);
         propagator ().active_job_list.append (this);
@@ -374,7 +374,7 @@ class PropagateDownloadFile : PropagateItemJob {
             if (this.tmp_file.exists () && (this.tmp_file.size () == 0 || bad_range_header || file_not_found)) {
                 this.tmp_file.close ();
                 FileSystem.remove (this.tmp_file.filename ());
-                propagator ().journal.set_download_info (this.item.file, SyncJournalDb.DownloadInfo ());
+                propagator ().journal.download_info (this.item.file, SyncJournalDb.DownloadInfo ());
             }
 
             if (!this.item.direct_download_url.is_empty () && err != Soup.Reply.OperationCanceledError) {
@@ -390,15 +390,15 @@ class PropagateDownloadFile : PropagateItemJob {
             // the whole sync and allows for a custom error message.
             Soup.Reply reply = job.reply ();
             if (err == Soup.Reply.OperationCanceledError && reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).is_valid ()) {
-                job.on_set_error_string (reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).to_string ());
-                job.set_error_status (SyncFileItem.Status.SOFT_ERROR);
+                job.on_error_string (reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).to_string ());
+                job.error_status (SyncFileItem.Status.SOFT_ERROR);
             } else if (bad_range_header) {
                 // Can't do this in classify_error () because 416 without a
                 // Range header should result in NormalError.
-                job.set_error_status (SyncFileItem.Status.SOFT_ERROR);
+                job.error_status (SyncFileItem.Status.SOFT_ERROR);
             } else if (file_not_found) {
-                job.on_set_error_string (_("File was deleted from server"));
-                job.set_error_status (SyncFileItem.Status.SOFT_ERROR);
+                job.on_error_string (_("File was deleted from server"));
+                job.error_status (SyncFileItem.Status.SOFT_ERROR);
 
                 // As a precaution against bugs that cause our database and the
                 // reality on the server to diverge, rediscover this folder on the
@@ -535,7 +535,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
         // Compute the content checksum.
         var compute_checksum = new ComputeChecksum (this);
-        compute_checksum.set_checksum_type (the_content_checksum_type);
+        compute_checksum.checksum_type (the_content_checksum_type);
 
         connect (compute_checksum, &ComputeChecksum.done,
             this, &PropagateDownloadFile.on_content_checksum_computed);
@@ -584,7 +584,7 @@ class PropagateDownloadFile : PropagateItemJob {
         if (this.item.modtime <= 0) {
             GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item.file << this.item.modtime;
         }
-        FileSystem.set_mod_time (this.tmp_file.filename (), this.item.modtime);
+        FileSystem.mod_time (this.tmp_file.filename (), this.item.modtime);
         // We need to fetch the time again because some file systems such as FAT have worse than a second
         // Accuracy, and we really need the time from the file system. (#3103)
         this.item.modtime = FileSystem.get_mod_time (this.tmp_file.filename ());
@@ -603,7 +603,7 @@ class PropagateDownloadFile : PropagateItemJob {
             // Preserve the existing file permissions.
             QFileInfo existing_file (fn);
             if (existing_file.permissions () != this.tmp_file.permissions ()) {
-                this.tmp_file.set_permissions (existing_file.permissions ());
+                this.tmp_file.permissions (existing_file.permissions ());
             }
             preserve_group_ownership (this.tmp_file.filename (), existing_file);
 
@@ -616,7 +616,7 @@ class PropagateDownloadFile : PropagateItemJob {
         }
 
         // Apply the remote permissions
-        FileSystem.set_file_read_only_weak (this.tmp_file.filename (), !this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Can_write));
+        FileSystem.file_read_only_weak (this.tmp_file.filename (), !this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Can_write));
 
         bool is_conflict = this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
             && (QFileInfo (fn).is_dir () || !FileSystem.file_equals (fn, this.tmp_file.filename ()));
@@ -666,7 +666,7 @@ class PropagateDownloadFile : PropagateItemJob {
             return;
         }
 
-        FileSystem.set_file_hidden (fn, false);
+        FileSystem.file_hidden (fn, false);
 
         // Maybe we downloaded a newer version of the file than we thought we would...
         // Get up to date information for the journal.
@@ -675,7 +675,7 @@ class PropagateDownloadFile : PropagateItemJob {
         // Maybe what we downloaded was a conflict file? If so, set a conflict record.
         // (the data was prepared in on_get_finished above)
         if (this.conflict_record.is_valid ())
-            propagator ().journal.set_conflict_record (this.conflict_record);
+            propagator ().journal.conflict_record (this.conflict_record);
 
         if (vfs && vfs.mode () == Vfs.WithSuffix) {
             // If the virtual file used to have a different name and database
@@ -690,10 +690,10 @@ class PropagateDownloadFile : PropagateItemJob {
                 // Move the pin state to the new location
                 var pin = propagator ().journal.internal_pin_states ().raw_for_path (virtual_file.to_utf8 ());
                 if (pin && *pin != PinState.PinState.INHERITED) {
-                    if (!vfs.set_pin_state (this.item.file, *pin)) {
+                    if (!vfs.pin_state (this.item.file, *pin)) {
                         GLib.warn (lc_propagate_download) << "Could not set pin state of" << this.item.file;
                     }
-                    if (!vfs.set_pin_state (virtual_file, PinState.PinState.INHERITED)) {
+                    if (!vfs.pin_state (virtual_file, PinState.PinState.INHERITED)) {
                         GLib.warn (lc_propagate_download) << "Could not set pin state of" << virtual_file << " to inherited";
                     }
                 }
@@ -702,7 +702,7 @@ class PropagateDownloadFile : PropagateItemJob {
             // Ensure the pin state isn't contradictory
             var pin = vfs.pin_state (this.item.file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY)
-                if (!vfs.set_pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
+                if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
                     GLib.warn (lc_propagate_download) << "Could not set pin state of" << this.item.file << "to unspecified";
                 }
         }
@@ -726,9 +726,9 @@ class PropagateDownloadFile : PropagateItemJob {
         }
 
         if (this.is_encrypted) {
-            propagator ().journal.set_download_info (this.item.file, SyncJournalDb.DownloadInfo ());
+            propagator ().journal.download_info (this.item.file, SyncJournalDb.DownloadInfo ());
         } else {
-            propagator ().journal.set_download_info (this.item.encrypted_filename, SyncJournalDb.DownloadInfo ());
+            propagator ().journal.download_info (this.item.encrypted_filename, SyncJournalDb.DownloadInfo ());
         }
 
         propagator ().journal.commit ("download file start2");
@@ -808,7 +808,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
             if (!this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Can_write)) {
                 // make sure ReadOnly flag is preserved for placeholder, similarly to regular files
-                FileSystem.set_file_read_only (propagator ().full_local_path (this.item.file), true);
+                FileSystem.file_read_only (propagator ().full_local_path (this.item.file), true);
             }
 
             return;
@@ -838,7 +838,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
             if (!this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Can_write)) {
                 // make sure ReadOnly flag is preserved for placeholder, similarly to regular files
-                FileSystem.set_file_read_only (propagator ().full_local_path (this.item.file), true);
+                FileSystem.file_read_only (propagator ().full_local_path (this.item.file), true);
             }
 
             return;
@@ -874,7 +874,7 @@ class PropagateDownloadFile : PropagateItemJob {
                 || this.item.modtime == this.item.previous_modtime)) {
             GLib.debug (lc_propagate_download) << this.item.file << "may not need download, computing checksum";
             var compute_checksum = new ComputeChecksum (this);
-            compute_checksum.set_checksum_type (parse_checksum_header_type (this.item.checksum_header));
+            compute_checksum.checksum_type (parse_checksum_header_type (this.item.checksum_header));
             connect (compute_checksum, &ComputeChecksum.done,
                 this, &PropagateDownloadFile.on_conflict_checksum_computed);
             propagator ().active_job_list.append (this);
@@ -938,7 +938,7 @@ class PropagateDownloadFile : PropagateItemJob {
     static void handle_recall_file (string file_path, string folder_path, SyncJournalDb journal) {
         GLib.debug (lc_propagate_download) << "handle_recall_file : " << file_path;
 
-        FileSystem.set_file_hidden (file_path, true);
+        FileSystem.file_hidden (file_path, true);
 
         GLib.File file = new GLib.File (file_path);
         if (!file.open (QIODevice.ReadOnly)) {

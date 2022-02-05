@@ -150,8 +150,8 @@ class AbstractNetworkJob : GLib.Object {
         // Since we hold a unowned to the account, this makes no sense. (issue #6893)
         //  ASSERT (account != parent);
 
-        this.timer.set_single_shot (true);
-        this.timer.set_interval ( (http_timeout ? http_timeout : 300) * 1000); // default to 5 minutes.
+        this.timer.single_shot (true);
+        this.timer.interval ( (http_timeout ? http_timeout : 300) * 1000); // default to 5 minutes.
         connect (&this.timer, &QTimer.timeout, this, &AbstractNetworkJob.on_timeout);
 
         connect (this, &AbstractNetworkJob.network_activity, this, &AbstractNetworkJob.on_reset_timeout);
@@ -166,7 +166,7 @@ class AbstractNetworkJob : GLib.Object {
 
 
     ~AbstractNetworkJob () {
-        set_reply (null);
+        reply (null);
     }
 
 
@@ -199,7 +199,7 @@ class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_path (string path) {
+    public void path (string path) {
         this.path = path;
     }
 
@@ -213,9 +213,9 @@ class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_reply (Soup.Reply reply) {
+    public void reply (Soup.Reply reply) {
         if (reply)
-            reply.set_property ("do_not_handle_auth", true);
+            reply.property ("do_not_handle_auth", true);
 
         Soup.Reply old = this.reply;
         this.reply = reply;
@@ -232,7 +232,7 @@ class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_ignore_credential_failure (bool ignore) {
+    public void ignore_credential_failure (bool ignore) {
         this.ignore_credential_failure = ignore;
     }
 
@@ -255,7 +255,7 @@ class AbstractNetworkJob : GLib.Object {
     The transparent redirect following may be disabled for some
     requests where custom handling is necessary.
     ***********************************************************/
-    public void set_follow_redirects (bool follow) {
+    public void follow_redirects (bool follow) {
         this.follow_redirects = follow;
     }
 
@@ -354,14 +354,14 @@ class AbstractNetworkJob : GLib.Object {
             this.request_body.seek (0);
         }
         // The cookie will be added automatically, we don't want AccessManager.create_request to duplicate them
-        req.set_raw_header ("cookie", GLib.ByteArray ());
+        req.raw_header ("cookie", GLib.ByteArray ());
         send_request (verb, requested_url, req, this.request_body);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_set_timeout (int64 msec) {
+    public void on_timeout (int64 msec) {
         this.timer.on_start (msec);
     }
 
@@ -378,7 +378,7 @@ class AbstractNetworkJob : GLib.Object {
     /***********************************************************
     Initiate a network request, returning a Soup.Reply.
 
-    Calls set_reply () and set_up_connections () on it.
+    Calls reply () and up_connections () on it.
 
     Takes ownership of the request_body (to allow redirects).
     ***********************************************************/
@@ -419,7 +419,7 @@ class AbstractNetworkJob : GLib.Object {
         var reply = this.account.send_raw_request (verb, url, req, request_body);
         this.request_body = request_body;
         if (this.request_body) {
-            this.request_body.set_parent (reply);
+            this.request_body.parent (reply);
         }
         adopt_request (reply);
         return reply;
@@ -434,13 +434,13 @@ class AbstractNetworkJob : GLib.Object {
     ***********************************************************/
     protected void adopt_request (Soup.Reply reply) {
         add_timer (reply);
-        set_reply (reply);
-        set_up_connections (reply);
+        reply (reply);
+        up_connections (reply);
         new_reply_hook (reply);
     }
 
 
-    protected void set_up_connections (Soup.Reply reply) {
+    protected void up_connections (Soup.Reply reply) {
         connect (reply, &Soup.Reply.on_finished, this, &AbstractNetworkJob.on_finished);
         connect (reply, &Soup.Reply.encrypted, this, &AbstractNetworkJob.network_activity);
         connect (reply.manager (), &QNetworkAccessManager.proxy_authentication_required, this, &AbstractNetworkJob.network_activity);
@@ -513,7 +513,7 @@ class AbstractNetworkJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private Soup.Reply add_timer (Soup.Reply reply) {
-        reply.set_property ("timer", GLib.Variant.from_value (&this.timer));
+        reply.property ("timer", GLib.Variant.from_value (&this.timer));
         return reply;
     }
 

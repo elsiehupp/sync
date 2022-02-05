@@ -57,8 +57,8 @@ class AddCertificateDialog : Gtk.Dialog {
     AddCertificateDialog.AddCertificateDialog (Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.AddCertificateDialog) {
-        ui.set_up_ui (this);
-        ui.label_error_certif.on_set_text ("");
+        ui.up_ui (this);
+        ui.label_error_certif.on_text ("");
     }
 
     AddCertificateDialog.~AddCertificateDialog () {
@@ -67,7 +67,7 @@ class AddCertificateDialog : Gtk.Dialog {
 
     void AddCertificateDialog.on_push_button_browse_certificate_clicked () {
         string filename = QFileDialog.get_open_filename (this, _("Select a certificate"), "", _("Certificate files (*.p12 *.pfx)"));
-        ui.line_edit_certificate_path.on_set_text (filename);
+        ui.line_edit_certificate_path.on_text (filename);
     }
 
     string AddCertificateDialog.get_certificate_path () {
@@ -79,7 +79,7 @@ class AddCertificateDialog : Gtk.Dialog {
     }
 
     void AddCertificateDialog.show_error_message (string message) {
-        ui.label_error_certif.on_set_text (message);
+        ui.label_error_certif.on_text (message);
     }
 
     void AddCertificateDialog.reinit () {

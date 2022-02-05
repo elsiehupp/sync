@@ -12,7 +12,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 namespace Occ {
 
-using QNetworkCookieJar.set_all_cookies;
+using QNetworkCookieJar.all_cookies;
 using QNetworkCookieJar.all_cookies;
 
 /***********************************************************
@@ -41,8 +41,8 @@ class CookieJar : QNetworkCookieJar {
 
     /***********************************************************
     ***********************************************************/
-    public bool set_cookies_from_url (GLib.List<QNetworkCookie> cookie_list, GLib.Uri url) {
-        if (QNetworkCookieJar.set_cookies_from_url (cookie_list, url)) {
+    public bool cookies_from_url (GLib.List<QNetworkCookie> cookie_list, GLib.Uri url) {
+        if (QNetworkCookieJar.cookies_from_url (cookie_list, url)) {
             /* Q_EMIT */ new_cookies_for_url (cookie_list, url);
             return true;
         }
@@ -63,7 +63,7 @@ class CookieJar : QNetworkCookieJar {
     /***********************************************************
     ***********************************************************/
     public void clear_session_cookies () {
-        set_all_cookies (remove_expired (all_cookies ()));
+        all_cookies (remove_expired (all_cookies ()));
     }
 
 
@@ -102,7 +102,7 @@ class CookieJar : QNetworkCookieJar {
         QDataStream stream (&file);
         GLib.List<QNetworkCookie> list;
         stream >> list;
-        set_all_cookies (remove_expired (list));
+        all_cookies (remove_expired (list));
         file.close ();
         return true;
     }

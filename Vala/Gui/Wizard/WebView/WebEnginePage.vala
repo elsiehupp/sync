@@ -11,7 +11,7 @@ class Web_engine_page : QWeb_engine_page {
     /***********************************************************
     ***********************************************************/
     public QWeb_engine_page * create_window (QWeb_engine_page.Web_window_type type) override;
-    public void set_url (GLib.Uri url);
+    public void url (GLib.Uri url);
 
 
     protected bool certificate_error (QWeb_engine_certificate_error certificate_error) override;
@@ -37,8 +37,8 @@ QWeb_engine_page * Web_engine_page.create_window (QWeb_engine_page.Web_window_ty
     return view;
 }
 
-void Web_engine_page.set_url (GLib.Uri url) {
-    QWeb_engine_page.set_url (url);
+void Web_engine_page.url (GLib.Uri url) {
+    QWeb_engine_page.url (url);
     this.enforce_https = url.scheme () == QStringLiteral ("https");
 }
 
@@ -51,11 +51,11 @@ bool Web_engine_page.certificate_error (QWeb_engine_certificate_error certificat
     This is just a quick fix for now.
     ***********************************************************/
     QMessageBox message_box;
-    message_box.on_set_text (_("Invalid certificate detected"));
-    message_box.set_informative_text (_("The host \"%1\" provided an invalid certificate. Continue?").arg (certificate_error.url ().host ()));
-    message_box.set_icon (QMessageBox.Warning);
-    message_box.set_standard_buttons (QMessageBox.Yes|QMessageBox.No);
-    message_box.set_default_button (QMessageBox.No);
+    message_box.on_text (_("Invalid certificate detected"));
+    message_box.informative_text (_("The host \"%1\" provided an invalid certificate. Continue?").arg (certificate_error.url ().host ()));
+    message_box.icon (QMessageBox.Warning);
+    message_box.standard_buttons (QMessageBox.Yes|QMessageBox.No);
+    message_box.default_button (QMessageBox.No);
 
     int ret = message_box.exec ();
 

@@ -14,13 +14,13 @@ const int EXCLUDE_LIST_FILE SOURCEDIR "/../../sync-exclude.lst"
 // The tests were converted from the old CMocka framework, that's why there is a global
 static QScopedPointer<ExcludedFiles> excludedFiles;
 
-static void set_up () {
+static void up () {
     excludedFiles.on_reset (new ExcludedFiles);
     excludedFiles.setWildcardsMatchSlash (false);
 }
 
 static void setup_init () {
-    set_up ();
+    up ();
 
     excludedFiles.addExcludeFilePath (EXCLUDE_LIST_FILE);
     QVERIFY (excludedFiles.reloadExcludeFiles ());
@@ -78,7 +78,7 @@ private on_ void testFun () {
 }
 
 private on_ void check_csync_exclude_add () {
-    set_up ();
+    up ();
     excludedFiles.addManualExclude ("/tmp/check_csync1/*");
     QCOMPARE (check_file_full ("/tmp/check_csync1/foo"), CSYNC_FILE_EXCLUDE_LIST);
     QCOMPARE (check_file_full ("/tmp/check_csync2/foo"), CSYNC_NOT_EXCLUDED);
@@ -95,7 +95,7 @@ private on_ void check_csync_exclude_add () {
 }
 
 private on_ void check_csync_exclude_add_per_dir () {
-    set_up ();
+    up ();
     excludedFiles.addManualExclude ("*", "/tmp/check_csync1/");
     QCOMPARE (check_file_full ("/tmp/check_csync1/foo"), CSYNC_FILE_EXCLUDE_LIST);
     QCOMPARE (check_file_full ("/tmp/check_csync2/foo"), CSYNC_NOT_EXCLUDED);
@@ -407,7 +407,7 @@ private on_ void check_csync_excluded_traversal () {
 }
 
 private on_ void check_csync_dir_only () {
-    set_up ();
+    up ();
     excludedFiles.addManualExclude ("filedir");
     excludedFiles.addManualExclude ("dir/");
 
@@ -467,7 +467,7 @@ private on_ void check_csync_pathes () {
 }
 
 private on_ void check_csync_wildcards () {
-    set_up ();
+    up ();
     excludedFiles.addManualExclude ("a/foo*bar");
     excludedFiles.addManualExclude ("b/foo*bar*");
     excludedFiles.addManualExclude ("c/foo?bar");
@@ -509,7 +509,7 @@ private on_ void check_csync_wildcards () {
 }
 
 private on_ void check_csync_regex_translation () {
-    set_up ();
+    up ();
     GLib.ByteArray storage;
     var translate = [&storage] (char pattern) {
         storage = ExcludedFiles.convertToRegexpSyntax (pattern, false).toUtf8 ();
@@ -529,7 +529,7 @@ private on_ void check_csync_regex_translation () {
 }
 
 private on_ void check_csync_bname_trigger () {
-    set_up ();
+    up ();
     bool wildcardsMatchSlash = false;
     GLib.ByteArray storage;
     var translate = [&storage, wildcardsMatchSlash] (char pattern) {

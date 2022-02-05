@@ -59,7 +59,7 @@ class PushNotifications : GLib.Object {
     /***********************************************************
     Will be emitted if push notifications are unable to authenticate
 
-    It's save to call #PushNotifications.set_up () after this signal has been emitted.
+    It's save to call #PushNotifications.up () after this signal has been emitted.
     ***********************************************************/
     signal void authentication_failed ();
 
@@ -67,7 +67,7 @@ class PushNotifications : GLib.Object {
     /***********************************************************
     Will be emitted if push notifications are unable to connect or the connection timed out
 
-    It's save to call #PushNotifications.set_up () after this signal has been emitted.
+    It's save to call #PushNotifications.up () after this signal has been emitted.
     ***********************************************************/
     signal void connection_lost ();
 
@@ -84,12 +84,12 @@ class PushNotifications : GLib.Object {
         connect (this.web_socket, &QWeb_socket.pong, this, &PushNotifications.on_web_socket_pong_received);
 
         connect (&this.ping_timer, &QTimer.timeout, this, &PushNotifications.ping_web_socket_server);
-        this.ping_timer.set_single_shot (true);
-        this.ping_timer.set_interval (PING_INTERVAL);
+        this.ping_timer.single_shot (true);
+        this.ping_timer.interval (PING_INTERVAL);
 
         connect (&this.ping_timed_out_timer, &QTimer.timeout, this, &PushNotifications.on_ping_timed_out);
-        this.ping_timed_out_timer.set_single_shot (true);
-        this.ping_timed_out_timer.set_interval (PING_INTERVAL);
+        this.ping_timed_out_timer.single_shot (true);
+        this.ping_timed_out_timer.interval (PING_INTERVAL);
     }
 
 
@@ -103,7 +103,7 @@ class PushNotifications : GLib.Object {
 
     This method needs to be called before push notifications can be used.
     ***********************************************************/
-    public void set_up () {
+    public void up () {
         GLib.info (lc_push_notifications) << "Setup push notifications";
         this.failed_authentication_attempts_count = 0;
         reconnect_to_web_socket ();
@@ -115,7 +115,7 @@ class PushNotifications : GLib.Object {
 
     @param interval Interval in milliseconds.
     ***********************************************************/
-    public void set_reconnect_timer_interval (uint32 interval) {
+    public void reconnect_timer_interval (uint32 interval) {
         this.reconnect_timer_interval = interval;
     }
 
@@ -137,9 +137,9 @@ class PushNotifications : GLib.Object {
 
     @param interval Interval in milliseconds.
     ***********************************************************/
-    public void set_ping_interval (int timeout_interval) {
-        this.ping_timer.set_interval (timeout_interval);
-        this.ping_timed_out_timer.set_interval (timeout_interval);
+    public void ping_interval (int timeout_interval) {
+        this.ping_timer.interval (timeout_interval);
+        this.ping_timed_out_timer.interval (timeout_interval);
     }
 
 
@@ -226,7 +226,7 @@ class PushNotifications : GLib.Object {
 
         GLib.info (lc_push_notifications) << "Websocket did not respond with a pong in time. Try to reconnect.";
         // Try again to connect
-        set_up ();
+        up ();
     }
 
 
@@ -299,8 +299,8 @@ class PushNotifications : GLib.Object {
             this.reconnect_timer = new QTimer (this);
         }
 
-        this.reconnect_timer.set_interval (this.reconnect_timer_interval);
-        this.reconnect_timer.set_single_shot (true);
+        this.reconnect_timer.interval (this.reconnect_timer_interval);
+        this.reconnect_timer.single_shot (true);
         connect (this.reconnect_timer, &QTimer.timeout, [this] () {
             reconnect_to_web_socket ();
         });

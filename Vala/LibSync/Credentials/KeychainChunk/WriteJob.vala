@@ -137,11 +137,11 @@ signals:
     #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
             add_settings_to_job (this.account, job);
     #endif
-            job.set_insecure_fallback (this.insecure_fallback);
+            job.insecure_fallback (this.insecure_fallback);
             connect (job, &QKeychain.Job.on_finished, this, &KeychainChunk.WriteJob.on_write_job_done);
             // only add the key's (sub)"index" after the first element, to stay compatible with older versions and non-Windows
-            job.set_key (kck);
-            job.set_binary_data (chunk);
+            job.key (kck);
+            job.binary_data (chunk);
             job.on_start ();
 
             chunk.clear ();

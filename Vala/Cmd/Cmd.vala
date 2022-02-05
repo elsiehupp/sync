@@ -69,7 +69,7 @@ struct CmdOptions {
     int uplimit;
 }
 
-// we can't use csync_set_userdata because the SyncEngine sets it already.
+// we can't use csync_userdata because the SyncEngine sets it already.
 // So we have to use a global variable
 CmdOptions opts = null;
 
@@ -183,8 +183,8 @@ void parse_options (string[] app_args, CmdOptions options) {
         } else if (option == "--downlimit" && !it.peek_next ().starts_with ("-")) {
             options.downlimit = it.next ().to_int () * 1000;
         } else if (option == "--logdebug") {
-            Logger.instance ().set_log_file ("-");
-            Logger.instance ().set_log_debug (true);
+            Logger.instance ().log_file ("-");
+            Logger.instance ().log_debug (true);
         } else if (option == "--path" && !it.peek_next ().starts_with ("-")) {
             options.remote_path = it.next ();
         }
@@ -219,7 +219,7 @@ void selective_sync_fixup (Occ.SyncJournalDb journal, string[] new_list) {
             journal.schedule_path_for_remote_discovery (it);
         }
 
-        journal.set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, new_list);
+        journal.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, new_list);
     }
 }
 
@@ -241,7 +241,7 @@ int main (int argc, char **argv) {
     if (options.silent) {
         q_install_message_handler (null_message_handler);
     } else {
-        q_set_message_pattern ("%{time MM-dd hh:mm:ss:zzz} [ %{type} %{category} ]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}");
+        q_message_pattern ("%{time MM-dd hh:mm:ss:zzz} [ %{type} %{category} ]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}");
     }
 
     AccountPointer account = Account.create ();
@@ -300,11 +300,11 @@ int main (int argc, char **argv) {
 
     // Find the folder and the original owncloud url
 
-    host_url.set_scheme (host_url.scheme ().replace ("owncloud", "http"));
+    host_url.scheme (host_url.scheme ().replace ("owncloud", "http"));
 
     GLib.Uri credential_free_url = host_url;
-    credential_free_url.set_user_name ("");
-    credential_free_url.set_password ("");
+    credential_free_url.user_name ("");
+    credential_free_url.password ("");
 
     const string folder = options.remote_path;
 
@@ -323,8 +323,8 @@ int main (int argc, char **argv) {
 
             port = p_list.at (2).to_int (&ok);
 
-            QNetworkProxyFactory.set_use_system_configuration (false);
-            QNetworkProxy.set_application_proxy (QNetworkProxy (QNetworkProxy.HttpProxy, host, port));
+            QNetworkProxyFactory.use_system_configuration (false);
+            QNetworkProxy.application_proxy (QNetworkProxy (QNetworkProxy.HttpProxy, host, port));
         } else {
             q_fatal ("Could not read httpproxy. The proxy should have the format \"http://hostname:port\".");
         }
@@ -334,31 +334,31 @@ int main (int argc, char **argv) {
 
 #ifdef TOKEN_AUTH_ONLY
     var credentials = new TokenCredentials (user, password, "");
-    account.set_credentials (credentials);
+    account.credentials (credentials);
 #else
     var credentials = new HttpCredentialsText (user, password);
-    account.set_credentials (credentials);
+    account.credentials (credentials);
     if (options.trust_s_sL) {
-        credentials.set_s_sLTrusted (true);
+        credentials.s_sLTrusted (true);
     }
 //  #endif
 
-    account.set_url (host_url);
-    account.set_ssl_error_handler (ssl_error_handler);
+    account.url (host_url);
+    account.ssl_error_handler (ssl_error_handler);
 
     QEventLoop loop;
     var job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/capabilities"));
     GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument json) {
         var capabilities = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
         GLib.debug () << "Server capabilities" << capabilities;
-        account.set_capabilities (capabilities.to_variant_map ());
-        account.set_server_version (capabilities["core"].to_object ()["status"].to_object ()["version"].to_string ());
+        account.capabilities (capabilities.to_variant_map ());
+        account.server_version (capabilities["core"].to_object ()["status"].to_object ()["version"].to_string ());
         loop.quit ();
     });
     job.on_start ();
     loop.exec ();
 
-    if (job.reply ().error () != Soup.Reply.NoError){
+    if (job.reply ().error () != Soup.Reply.NoError) {
         std.cout<<"Error connecting to server\n";
         return EXIT_FAILURE;
     }
@@ -366,8 +366,8 @@ int main (int argc, char **argv) {
     job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"));
     GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument json) {
         const QJsonObject data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-        account.set_dav_user (data.value ("identifier").to_string ());
-        account.set_dav_display_name (data.value ("display-name").to_string ());
+        account.dav_user (data.value ("identifier").to_string ());
+        account.dav_display_name (data.value ("display-name").to_string ());
         loop.quit ();
     });
     job.on_start ();
@@ -410,8 +410,8 @@ restart_sync:
     opt.fill_from_environment_variables ();
     opt.verify_chunk_sizes ();
     SyncEngine engine (account, options.source_dir, folder, database);
-    engine.set_ignore_hidden_files (options.ignore_hidden_files);
-    engine.set_network_limits (options.uplimit, options.downlimit);
+    engine.ignore_hidden_files (options.ignore_hidden_files);
+    engine.network_limits (options.uplimit, options.downlimit);
     GLib.Object.connect (&engine, &SyncEngine.on_finished,
         [&app] (bool result) {
             app.exit (result ? EXIT_SUCCESS : EXIT_FAILURE);

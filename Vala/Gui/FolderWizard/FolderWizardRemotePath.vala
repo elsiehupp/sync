@@ -69,10 +69,10 @@ protected slots:
         this.warn_was_visible (false)
         this.account (account)
      {
-        this.ui.set_up_ui (this);
+        this.ui.up_ui (this);
         this.ui.warn_frame.hide ();
 
-        this.ui.folder_tree_widget.set_sorting_enabled (true);
+        this.ui.folder_tree_widget.sorting_enabled (true);
         this.ui.folder_tree_widget.sort_by_column (0, Qt.Ascending_order);
 
         connect (this.ui.add_folder_button, &QAbstractButton.clicked, this, &Folder_wizard_remote_path.on_add_remote_folder);
@@ -81,13 +81,13 @@ protected slots:
         connect (this.ui.folder_tree_widget, &QTree_widget.current_item_changed, this, &Folder_wizard_remote_path.on_current_item_changed);
         connect (this.ui.folder_entry, &QLineEdit.text_edited, this, &Folder_wizard_remote_path.on_folder_entry_edited);
 
-        this.lscol_timer.set_interval (500);
-        this.lscol_timer.set_single_shot (true);
+        this.lscol_timer.interval (500);
+        this.lscol_timer.single_shot (true);
         connect (&this.lscol_timer, &QTimer.timeout, this, &Folder_wizard_remote_path.on_ls_col_folder_entry);
 
-        this.ui.folder_tree_widget.header ().set_section_resize_mode (0, QHeaderView.Resize_to_contents);
+        this.ui.folder_tree_widget.header ().section_resize_mode (0, QHeaderView.Resize_to_contents);
         // Make sure that there will be a scrollbar when the contents is too wide
-        this.ui.folder_tree_widget.header ().set_stretch_last_section (false);
+        this.ui.folder_tree_widget.header ().stretch_last_section (false);
     }
 
     void Folder_wizard_remote_path.on_add_remote_folder () {
@@ -100,11 +100,11 @@ protected slots:
 
         var dlg = new QInputDialog (this);
 
-        dlg.set_window_title (_("Create Remote Folder"));
-        dlg.set_label_text (_("Enter the name of the new folder to be created below \"%1\":")
+        dlg.window_title (_("Create Remote Folder"));
+        dlg.label_text (_("Enter the name of the new folder to be created below \"%1\":")
                               .arg (parent));
         dlg.open (this, SLOT (on_create_remote_folder (string)));
-        dlg.set_attribute (Qt.WA_DeleteOnClose);
+        dlg.attribute (Qt.WA_DeleteOnClose);
     }
 
     void Folder_wizard_remote_path.on_create_remote_folder (string folder) {
@@ -130,7 +130,7 @@ protected slots:
         GLib.debug (lc_wizard) << "webdav mkdir request on_finished";
         show_warn (_("Folder was successfully created on %1.").arg (Theme.instance ().app_name_gui ()));
         on_refresh_folders ();
-        this.ui.folder_entry.on_set_text (static_cast<MkColJob> (sender ()).path ());
+        this.ui.folder_entry.on_text (static_cast<MkColJob> (sender ()).path ());
         on_ls_col_folder_entry ();
     }
 
@@ -190,11 +190,11 @@ protected slots:
             item = new QTree_widget_item (parent);
             QFile_icon_provider prov;
             QIcon folder_icon = prov.icon (QFile_icon_provider.Folder);
-            item.set_icon (0, folder_icon);
-            item.on_set_text (0, folder_name);
-            item.set_data (0, Qt.User_role, folder_path);
-            item.set_tool_tip (0, folder_path);
-            item.set_child_indicator_policy (QTree_widget_item.Show_indicator);
+            item.icon (0, folder_icon);
+            item.on_text (0, folder_name);
+            item.data (0, Qt.User_role, folder_path);
+            item.tool_tip (0, folder_path);
+            item.child_indicator_policy (QTree_widget_item.Show_indicator);
         }
 
         path_trail.remove_first ();
@@ -223,7 +223,7 @@ protected slots:
             return false;
         }
 
-        this.ui.folder_tree_widget.set_current_item (it);
+        this.ui.folder_tree_widget.current_item (it);
         this.ui.folder_tree_widget.scroll_to_item (it);
         return true;
     }
@@ -234,10 +234,10 @@ protected slots:
         QTree_widget_item root = this.ui.folder_tree_widget.top_level_item (0);
         if (!root) {
             root = new QTree_widget_item (this.ui.folder_tree_widget);
-            root.on_set_text (0, Theme.instance ().app_name_gui ());
-            root.set_icon (0, Theme.instance ().application_icon ());
-            root.set_tool_tip (0, _("Choose this to sync the entire account"));
-            root.set_data (0, Qt.User_role, "/");
+            root.on_text (0, Theme.instance ().app_name_gui ());
+            root.icon (0, Theme.instance ().application_icon ());
+            root.tool_tip (0, _("Choose this to sync the entire account"));
+            root.data (0, Qt.User_role, "/");
         }
         string[] sorted_list = list;
         Utility.sort_filenames (sorted_list);
@@ -257,7 +257,7 @@ protected slots:
                 paths.remove_last ();
             recursive_insert (root, paths, path);
         }
-        root.set_expanded (true);
+        root.expanded (true);
     }
 
     void Folder_wizard_remote_path.on_gather_encrypted_paths (string path, GLib.HashMap<string, string> properties) {
@@ -289,12 +289,12 @@ protected slots:
 
             // We don't want to allow creating subfolders in encrypted folders outside of the sync logic
             const var encrypted = this.encrypted_paths.contains (dir);
-            this.ui.add_folder_button.set_enabled (!encrypted);
+            this.ui.add_folder_button.enabled (!encrypted);
 
             if (!dir.starts_with ('/')) {
                 dir.prepend ('/');
             }
-            this.ui.folder_entry.on_set_text (dir);
+            this.ui.folder_entry.on_text (dir);
         }
 
         /* emit */ complete_changed ();
@@ -306,7 +306,7 @@ protected slots:
             return;
         }
 
-        this.ui.folder_tree_widget.set_current_item (null);
+        this.ui.folder_tree_widget.current_item (null);
         this.lscol_timer.on_start (); // avoid sending a request on each keystroke
     }
 
@@ -336,7 +336,7 @@ protected slots:
         if (this.account.capabilities ().client_side_encryption_available ()) {
             props << "http://nextcloud.org/ns:is-encrypted";
         }
-        job.set_properties (props);
+        job.properties (props);
         connect (job, &LsColJob.directory_listing_subfolders,
             this, &Folder_wizard_remote_path.on_update_directories);
         connect (job, &LsColJob.finished_with_error,
@@ -359,7 +359,7 @@ protected slots:
         if (!dir.starts_with ('/')) {
             dir.prepend ('/');
         }
-        wizard ().set_property ("target_path", dir);
+        wizard ().property ("target_path", dir);
 
         Folder.Map map = FolderMan.instance ().map ();
         Folder.Map.Const_iterator i = map.const_begin ();
@@ -397,6 +397,6 @@ protected slots:
 
         } else {
             this.ui.warn_frame.show ();
-            this.ui.warn_label.on_set_text (message);
+            this.ui.warn_label.on_text (message);
         }
     }

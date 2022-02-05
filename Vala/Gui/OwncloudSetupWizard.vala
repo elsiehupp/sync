@@ -128,7 +128,7 @@ signals:
 
         wiz = new OwncloudSetupWizard (parent);
         connect (wiz, SIGNAL (own_cloud_wizard_done (int)), obj, amember);
-        FolderMan.instance ().set_sync_enabled (false);
+        FolderMan.instance ().sync_enabled (false);
         wiz.start_wizard ();
     }
 
@@ -143,10 +143,10 @@ signals:
 
     void OwncloudSetupWizard.start_wizard () {
         AccountPointer account = AccountManager.create_account ();
-        account.set_credentials (CredentialsFactory.create ("dummy"));
-        account.set_url (Theme.instance ().override_server_url ());
-        this.oc_wizard.set_account (account);
-        this.oc_wizard.set_oCUrl (account.url ().to_string ());
+        account.credentials (CredentialsFactory.create ("dummy"));
+        account.url (Theme.instance ().override_server_url ());
+        this.oc_wizard.account (account);
+        this.oc_wizard.oCUrl (account.url ().to_string ());
 
         this.remote_folder = Theme.instance ().default_server_folder ();
         // remote_folder may be empty, which means /
@@ -158,7 +158,7 @@ signals:
             local_folder = QDir.home_path () + '/' + local_folder;
         }
 
-        this.oc_wizard.set_property ("local_folder", local_folder);
+        this.oc_wizard.property ("local_folder", local_folder);
 
         // remember the local folder to compare later if it changed, but clean first
         string lf = QDir.from_native_separators (local_folder);
@@ -168,14 +168,14 @@ signals:
 
         this.init_local_folder = lf;
 
-        this.oc_wizard.on_set_remote_folder (this.remote_folder);
+        this.oc_wizard.on_remote_folder (this.remote_folder);
 
     #ifdef WITH_PROVIDERS
         const var start_page = WizardCommon.Page_Welcome;
     #else // WITH_PROVIDERS
         const var start_page = WizardCommon.Page_Server_setup;
     #endif // WITH_PROVIDERS
-        this.oc_wizard.set_start_id (start_page);
+        this.oc_wizard.start_id (start_page);
 
         this.oc_wizard.restart ();
 
@@ -189,28 +189,28 @@ signals:
         GLib.Uri url = GLib.Uri.from_user_input (fixed_url);
         // from_user_input defaults to http, not http if no scheme is specified
         if (!fixed_url.starts_with ("http://") && !fixed_url.starts_with ("https://")) {
-            url.set_scheme ("https");
+            url.scheme ("https");
         }
         AccountPointer account = this.oc_wizard.account ();
-        account.set_url (url);
+        account.url (url);
 
         // Reset the proxy which might had been determined previously in ConnectionValidator.on_check_server_and_auth ()
         // when there was a previous account.
-        account.network_access_manager ().set_proxy (QNetworkProxy (QNetworkProxy.NoProxy));
+        account.network_access_manager ().proxy (QNetworkProxy (QNetworkProxy.NoProxy));
 
         // And also reset the QSslConfiguration, for the same reason (#6832)
         // Here the client certificate is added, if any. Later it'll be in HttpCredentials
-        account.set_ssl_configuration (QSslConfiguration ());
+        account.ssl_configuration (QSslConfiguration ());
         var ssl_configuration = account.get_or_create_ssl_config (); // let Account set defaults
         if (!this.oc_wizard.client_ssl_certificate.is_null ()) {
-            ssl_configuration.set_local_certificate (this.oc_wizard.client_ssl_certificate);
-            ssl_configuration.set_private_key (this.oc_wizard.client_ssl_key);
+            ssl_configuration.local_certificate (this.oc_wizard.client_ssl_certificate);
+            ssl_configuration.private_key (this.oc_wizard.client_ssl_key);
         }
         // Be sure to merge the CAs
         var ca = ssl_configuration.system_ca_certificates ();
         ca.append (this.oc_wizard.client_ssl_ca_certificates);
-        ssl_configuration.set_ca_certificates (ca);
-        account.set_ssl_configuration (ssl_configuration);
+        ssl_configuration.ca_certificates (ca);
+        account.ssl_configuration (ssl_configuration);
 
         // Make sure TCP connections get re-established
         account.network_access_manager ().clear_access_cache ();
@@ -222,7 +222,7 @@ signals:
                 this, SLOT (on_system_proxy_lookup_done (QNetworkProxy)));
         } else {
             // We want to reset the QNAM proxy so that the global proxy settings are used (via ClientProxy settings)
-            account.network_access_manager ().set_proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
+            account.network_access_manager ().proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
             QMetaObject.invoke_method (this, "on_find_server", Qt.QueuedConnection);
         }
@@ -235,7 +235,7 @@ signals:
             GLib.info (lc_wizard) << "No system proxy set by OS";
         }
         AccountPointer account = this.oc_wizard.account ();
-        account.network_access_manager ().set_proxy (proxy);
+        account.network_access_manager ().proxy (proxy);
 
         on_find_server ();
     }
@@ -244,7 +244,7 @@ signals:
         AccountPointer account = this.oc_wizard.account ();
 
         // Set fake credentials before we check what credential it actually is.
-        account.set_credentials (CredentialsFactory.create ("dummy"));
+        account.credentials (CredentialsFactory.create ("dummy"));
 
         // Determining the actual server URL can be a multi-stage process
         // 1. Check url/status.php with CheckServerJob
@@ -255,11 +255,11 @@ signals:
 
         // Step 1 : Check url/status.php
         var job = new CheckServerJob (account, this);
-        job.set_ignore_credential_failure (true);
+        job.ignore_credential_failure (true);
         connect (job, &CheckServerJob.instance_found, this, &OwncloudSetupWizard.on_found_server);
         connect (job, &CheckServerJob.instance_not_found, this, &OwncloudSetupWizard.on_find_server_behind_redirect);
         connect (job, &CheckServerJob.timeout, this, &OwncloudSetupWizard.on_no_server_found_timeout);
-        job.on_set_timeout ( (account.url ().scheme () == "https") ? 30 * 1000 : 10 * 1000);
+        job.on_timeout ( (account.url ().scheme () == "https") ? 30 * 1000 : 10 * 1000);
         job.on_start ();
 
         // Step 2 and 3 are in on_find_server_behind_redirect ()
@@ -273,7 +273,7 @@ signals:
 
         // Use a significantly reduced timeout for this redirect check:
         // the 5-minute default is inappropriate.
-        redirect_check_job.on_set_timeout (q_min (2000ll, redirect_check_job.timeout_msec ()));
+        redirect_check_job.on_timeout (q_min (2000ll, redirect_check_job.timeout_msec ()));
 
         // Grab the chain of permanent redirects and adjust the account url
         // accordingly
@@ -283,7 +283,7 @@ signals:
                 int http_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
                 if (count == *permanent_redirects && (http_code == 301 || http_code == 308)) {
                     GLib.info (lc_wizard) << account.url () << " was redirected to" << target_url;
-                    account.set_url (target_url);
+                    account.url (target_url);
                     *permanent_redirects += 1;
                 }
             });
@@ -292,11 +292,11 @@ signals:
         connect (redirect_check_job, &SimpleNetworkJob.finished_signal, this,
             [this, account] () {
                 var job = new CheckServerJob (account, this);
-                job.set_ignore_credential_failure (true);
+                job.ignore_credential_failure (true);
                 connect (job, &CheckServerJob.instance_found, this, &OwncloudSetupWizard.on_found_server);
                 connect (job, &CheckServerJob.instance_not_found, this, &OwncloudSetupWizard.on_no_server_found);
                 connect (job, &CheckServerJob.timeout, this, &OwncloudSetupWizard.on_no_server_found_timeout);
-                job.on_set_timeout ( (account.url ().scheme () == "https") ? 30 * 1000 : 10 * 1000);
+                job.on_timeout ( (account.url ().scheme () == "https") ? 30 * 1000 : 10 * 1000);
                 job.on_start ();
         });
     }
@@ -312,11 +312,11 @@ signals:
 
         // Note with newer servers we get the version actually only later in capabilities
         // https://github.com/owncloud/core/pull/27473/files
-        this.oc_wizard.account ().set_server_version (server_version);
+        this.oc_wizard.account ().server_version (server_version);
 
         if (url != this.oc_wizard.account ().url ()) {
             // We might be redirected, update the account
-            this.oc_wizard.account ().set_url (url);
+            this.oc_wizard.account ().url (url);
             GLib.info (lc_wizard) << " was redirected to" << url.to_string ();
         }
 
@@ -356,14 +356,14 @@ signals:
     void OwncloudSetupWizard.on_determine_auth_type () {
         var job = new DetermineAuthTypeJob (this.oc_wizard.account (), this);
         connect (job, &DetermineAuthTypeJob.auth_type,
-            this.oc_wizard, &OwncloudWizard.on_set_auth_type);
+            this.oc_wizard, &OwncloudWizard.on_auth_type);
         job.on_start ();
     }
 
     void OwncloudSetupWizard.on_connect_to_oCUrl (string url) {
         GLib.info (lc_wizard) << "Connect to url : " << url;
         AbstractCredentials creds = this.oc_wizard.get_credentials ();
-        this.oc_wizard.account ().set_credentials (creds);
+        this.oc_wizard.account ().credentials (creds);
 
         const var fetch_user_name_job = new JsonApiJob (this.oc_wizard.account ().shared_from_this (), "/ocs/v1.php/cloud/user");
         connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, url] (QJsonDocument json, int status_code) {
@@ -376,10 +376,10 @@ signals:
             const var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
             const var user_id = obj_data.value ("identifier").to_string ("");
             const var display_name = obj_data.value ("display-name").to_string ("");
-            this.oc_wizard.account ().set_dav_user (user_id);
-            this.oc_wizard.account ().set_dav_display_name (display_name);
+            this.oc_wizard.account ().dav_user (user_id);
+            this.oc_wizard.account ().dav_display_name (display_name);
 
-            this.oc_wizard.set_field (QLatin1String ("OCUrl"), url);
+            this.oc_wizard.field (QLatin1String ("OCUrl"), url);
             this.oc_wizard.on_append_to_configuration_log (_("Trying to connect to %1 at %2 …")
                                                     .arg (Theme.instance ().app_name_gui ())
                                                     .arg (url));
@@ -393,11 +393,11 @@ signals:
         AccountPointer account = this.oc_wizard.account ();
 
         var job = new PropfindJob (account, "/", this);
-        job.set_ignore_credential_failure (true);
+        job.ignore_credential_failure (true);
         // There is custom redirect handling in the error handler,
         // so don't automatically follow redirects.
-        job.set_follow_redirects (false);
-        job.set_properties (GLib.List<GLib.ByteArray> () << "getlastmodified");
+        job.follow_redirects (false);
+        job.properties (GLib.List<GLib.ByteArray> () << "getlastmodified");
         connect (job, &PropfindJob.result, this.oc_wizard, &OwncloudWizard.on_successful_step);
         connect (job, &PropfindJob.finished_with_error, this, &OwncloudSetupWizard.on_auth_error);
         job.on_start ();
@@ -424,10 +424,10 @@ signals:
             static string expected_path = "/" + this.oc_wizard.account ().dav_path ();
             if (path.ends_with (expected_path)) {
                 path.chop (expected_path.size ());
-                redirect_url.set_path (path);
+                redirect_url.path (path);
 
                 GLib.info (lc_wizard) << "Setting account url to" << redirect_url.to_string ();
-                this.oc_wizard.account ().set_url (redirect_url);
+                this.oc_wizard.account ().url (redirect_url);
                 test_owncloud_connect ();
                 return;
             }
@@ -492,7 +492,7 @@ signals:
 
         bool next_step = true;
         if (fi.exists ()) {
-            FileSystem.set_folder_minimum_permissions (local_folder);
+            FileSystem.folder_minimum_permissions (local_folder);
             Utility.setup_fav_link (local_folder);
             // there is an existing local folder. If its non empty, it can only be synced if the
             // own_cloud is newly created.
@@ -502,7 +502,7 @@ signals:
         } else {
             string res = _("Creating local sync folder %1 …").arg (local_folder);
             if (fi.mkpath (local_folder)) {
-                FileSystem.set_folder_minimum_permissions (local_folder);
+                FileSystem.folder_minimum_permissions (local_folder);
                 Utility.setup_fav_link (local_folder);
                 res += _("OK");
             } else {
@@ -700,13 +700,13 @@ signals:
                 var f = folder_man.add_folder (account, folder_definition);
                 if (f) {
                     if (folder_definition.virtual_files_mode != Vfs.Off && this.oc_wizard.use_virtual_file_sync ())
-                        f.set_root_pin_state (PinState.VfsItemAvailability.ONLINE_ONLY);
+                        f.root_pin_state (PinState.VfsItemAvailability.ONLINE_ONLY);
 
-                    f.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
+                    f.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                         this.oc_wizard.selective_sync_blocklist ());
                     if (!this.oc_wizard.is_confirm_big_folder_checked ()) {
                         // The user already accepted the selective sync dialog. everything is in the allow list
-                        f.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
+                        f.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
                             string[] () << QLatin1String ("/"));
                     }
                 }
@@ -735,7 +735,7 @@ signals:
         // wizard to ensure it doesn't accidentally get modified
         // later (such as from running on_cleanup such as
         // Abstract_credentials_wizard_page.cleanup_page ())
-        this.oc_wizard.set_account (AccountManager.create_account ());
+        this.oc_wizard.account (AccountManager.create_account ());
 
         var manager = AccountManager.instance ();
 

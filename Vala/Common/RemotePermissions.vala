@@ -134,7 +134,7 @@ class RemotePermissions {
 
     /***********************************************************
     ***********************************************************/
-    public void set_permission (Permissions permissions) {
+    public void permission (Permissions permissions) {
         this.value |= (1 << static_cast<int> (permissions)) | not_null_mask;
     }
 

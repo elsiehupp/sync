@@ -67,7 +67,7 @@ class ProppatchJob : AbstractNetworkJob {
                         "</d:propertyupdate>\n";
 
         var buf = new Soup.Buffer (this);
-        buf.set_data (xml);
+        buf.data (xml);
         buf.open (QIODevice.ReadOnly);
         send_request ("PROPPATCH", make_dav_url (path ()), req, buf);
         AbstractNetworkJob.on_start ();
@@ -89,7 +89,7 @@ class ProppatchJob : AbstractNetworkJob {
      - contain a colon : and thus specify an explicit namespace,
        e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
     ***********************************************************/
-    public void set_properties (GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties) {
+    public void properties (GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties) {
         this.properties = properties;
     }
 

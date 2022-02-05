@@ -157,7 +157,7 @@ class TokenCredentials : AbstractCredentials {
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,
         // those credentials were invalid and we terminate.
         GLib.warn (lc_token_credentials) << "Stop request : Authentication failed for " << reply.url ().to_string ();
-        reply.set_property (AUTHENTICATION_FAILED_C, true);
+        reply.property (AUTHENTICATION_FAILED_C, true);
         reply.close ();
     }
 

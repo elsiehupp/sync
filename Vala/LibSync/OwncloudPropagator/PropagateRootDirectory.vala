@@ -141,7 +141,7 @@ class PropagateRootDirectory : PropagateDirectory {
     ***********************************************************/
     private bool schedule_delayed_jobs () {
         GLib.info (lc_propagator) << "PropagateRootDirectory.schedule_delayed_jobs";
-        propagator ().set_schedule_delayed_tasks (true);
+        propagator ().schedule_delayed_tasks (true);
         var bulk_propagator_job = std.make_unique<BulkPropagatorJob> (propagator (), propagator ().delayed_tasks ());
         propagator ().clear_delayed_tasks ();
         this.sub_jobs.append_job (bulk_propagator_job.release ());

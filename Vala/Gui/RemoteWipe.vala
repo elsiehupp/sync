@@ -88,7 +88,7 @@ signals:
                          &RemoteWipe.on_start_check_job_with_app_password);
     }
 
-    void RemoteWipe.on_start_check_job_with_app_password (string pwd){
+    void RemoteWipe.on_start_check_job_with_app_password (string pwd) {
         if (pwd.is_empty ())
             return;
 
@@ -96,13 +96,13 @@ signals:
         GLib.Uri request_url = Utility.concat_url_path (this.account.url ().to_string (),
                                                  QLatin1String ("/index.php/core/wipe/check"));
         QNetworkRequest request;
-        request.set_header (QNetworkRequest.ContentTypeHeader,
+        request.header (QNetworkRequest.ContentTypeHeader,
                           "application/x-www-form-urlencoded");
-        request.set_url (request_url);
-        request.set_ssl_configuration (this.account.get_or_create_ssl_config ());
+        request.url (request_url);
+        request.ssl_configuration (this.account.get_or_create_ssl_config ());
         var request_body = new QBuffer;
         QUrlQuery arguments (string ("token=%1").arg (this.app_password));
-        request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
+        request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
         this.network_reply_check = this.network_manager.post (request, request_body);
         GLib.Object.connect (&this.network_manager, SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
             this.account.data (), SLOT (on_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
@@ -135,14 +135,14 @@ signals:
             }
 
         // check for wipe request
-        } else if (!json.value ("wipe").is_undefined ()){
+        } else if (!json.value ("wipe").is_undefined ()) {
             wipe = json["wipe"].to_bool ();
         }
 
         var manager = AccountManager.instance ();
         var account_state = manager.account (this.account.display_name ()).data ();
 
-        if (wipe){
+        if (wipe) {
             /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
             TODO : For "Log out" & "Remove account" : Remove client CA certificates and KEY!
 
@@ -152,7 +152,7 @@ signals:
 
                   We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
              */
-            this.account.set_remote_wipe_requested_HACK ();
+            this.account.remote_wipe_requested_HACK ();
             // <-- FIXME MS@2019-12-07
 
             // delete account
@@ -170,18 +170,18 @@ signals:
         this.network_reply_check.delete_later ();
     }
 
-    void RemoteWipe.on_notify_server_success_job (AccountState account_state, bool data_wiped){
-        if (this.account_removed && data_wiped && this.account == account_state.account ()){
+    void RemoteWipe.on_notify_server_success_job (AccountState account_state, bool data_wiped) {
+        if (this.account_removed && data_wiped && this.account == account_state.account ()) {
             GLib.Uri request_url = Utility.concat_url_path (this.account.url ().to_string (),
                                                      QLatin1String ("/index.php/core/wipe/on_success"));
             QNetworkRequest request;
-            request.set_header (QNetworkRequest.ContentTypeHeader,
+            request.header (QNetworkRequest.ContentTypeHeader,
                               "application/x-www-form-urlencoded");
-            request.set_url (request_url);
-            request.set_ssl_configuration (this.account.get_or_create_ssl_config ());
+            request.url (request_url);
+            request.ssl_configuration (this.account.get_or_create_ssl_config ());
             var request_body = new QBuffer;
             QUrlQuery arguments (string ("token=%1").arg (this.app_password));
-            request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
+            request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
             this.network_reply_success = this.network_manager.post (request, request_body);
             GLib.Object.connect (this.network_reply_success, &Soup.Reply.on_finished, this,
                              &RemoteWipe.on_notify_server_success_job_slot);

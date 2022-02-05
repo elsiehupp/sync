@@ -54,7 +54,7 @@ void UpdaterScheduler.on_timer_fired () {
     // re-set the check interval if it changed in the config file meanwhile
     var check_interval = std.chrono.milliseconds (config.update_check_interval ()).count ();
     if (check_interval != this.update_check_timer.interval ()) {
-        this.update_check_timer.set_interval (check_interval);
+        this.update_check_timer.interval (check_interval);
         GLib.info (lc_updater) << "Setting new update check interval " << check_interval;
     }
 

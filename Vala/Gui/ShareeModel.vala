@@ -52,7 +52,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void set_new_sharees (GLib.Vector<unowned<Sharee>> new_sharees);
+    private void new_sharees (GLib.Vector<unowned<Sharee>> new_sharees);
 
     /***********************************************************
     ***********************************************************/
@@ -117,7 +117,7 @@ signals:
             }
         }
 
-        set_new_sharees (filtered_sharees);
+        new_sharees (filtered_sharees);
         sharees_ready ();
     }
 
@@ -133,7 +133,7 @@ signals:
         return unowned<Sharee> (new Sharee (share_with, display_name, type));
     }
 
-    // Helper function for set_new_sharees   (could be a lambda when we can use them)
+    // Helper function for new_sharees   (could be a lambda when we can use them)
     static unowned<Sharee> sharee_from_model_index (QModelIndex index) {
         return index.data (Qt.User_role).value<unowned<Sharee>> ();
     }
@@ -149,7 +149,7 @@ signals:
 
         Do that while preserving the model index so the selection stays
     ***********************************************************/
-    void Sharee_model.set_new_sharees (GLib.Vector<unowned<Sharee>> new_sharees) {
+    void Sharee_model.new_sharees (GLib.Vector<unowned<Sharee>> new_sharees) {
         layout_about_to_be_changed ();
         const var persistent = persistent_index_list ();
         GLib.Vector<unowned<Sharee>> old_persistant_sharee;

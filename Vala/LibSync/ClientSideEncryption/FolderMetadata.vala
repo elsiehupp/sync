@@ -16,10 +16,10 @@ class FolderMetadata {
         this.account = account;
         if (metadata.is_empty () || status_code == 404) {
             GLib.info (lc_cse_metadata ()) << "Setupping Empty Metadata";
-            set_up_empty_metadata ();
+            up_empty_metadata ();
         } else {
             GLib.info (lc_cse_metadata ()) << "Setting up existing metadata";
-            set_up_existing_metadata (metadata);
+            up_existing_metadata (metadata);
         }
     }
 
@@ -82,7 +82,7 @@ class FolderMetadata {
             recepients.insert (it.first, it.second);
         }
         QJsonDocument recepient_doc;
-        recepient_doc.set_object (recepients);
+        recepient_doc.object (recepients);
         string sharing_encrypted = encrypt_json_object (recepient_doc.to_json (QJsonDocument.Compact), this.metadata_keys.last ());
         ***********************************************************/
 
@@ -100,7 +100,7 @@ class FolderMetadata {
             encrypted.insert ("mimetype", string (it.mimetype));
             encrypted.insert ("version", it.file_version);
             QJsonDocument encrypted_doc;
-            encrypted_doc.set_object (encrypted);
+            encrypted_doc.object (encrypted);
 
             string encrypted_encrypted = encrypt_json_object (encrypted_doc.to_json (QJsonDocument.Compact), this.metadata_keys.last ());
             if (encrypted_encrypted.is_empty ()) {
@@ -122,7 +122,7 @@ class FolderMetadata {
         }
 
         QJsonDocument internal_metadata;
-        internal_metadata.set_object (meta_object);
+        internal_metadata.object (meta_object);
         return internal_metadata.to_json ();
     }
 
@@ -157,7 +157,7 @@ class FolderMetadata {
     Use std.string and GLib.Vector internally on this class
     to ease the port to Nlohmann Json API
     ***********************************************************/
-    private void set_up_empty_metadata () {
+    private void up_empty_metadata () {
         GLib.debug (lc_cse) << "Settint up empty metadata";
         GLib.ByteArray new_metadata_pass = EncryptionHelper.generate_random (16);
         this.metadata_keys.insert (0, new_metadata_pass);
@@ -171,7 +171,7 @@ class FolderMetadata {
 
     /***********************************************************
     ***********************************************************/
-    private void set_up_existing_metadata (GLib.ByteArray metadata) {
+    private void up_existing_metadata (GLib.ByteArray metadata) {
         /***********************************************************
         This is the json response from the server, it contains two extra objects that we are not* interested.
         * ocs and data.
@@ -197,7 +197,7 @@ class FolderMetadata {
         QJsonObject files = meta_data_doc.object ()["files"].to_object ();
 
         QJsonDocument debug_helper;
-        debug_helper.set_object (metadata_keys);
+        debug_helper.object (metadata_keys);
         GLib.debug (lc_cse) << "Keys : " << debug_helper.to_json (QJsonDocument.Compact);
 
         // Iterate over the document to store the keys. I'm unsure that the keys are in order,

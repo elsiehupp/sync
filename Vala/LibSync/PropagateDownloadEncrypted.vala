@@ -48,7 +48,7 @@ class PropagateDownloadEncrypted : GLib.Object {
 
             // Is encrypted Now we need the folder-identifier
             var job = new LsColJob (this.propagator.account (), remote_parent_path, this);
-            job.set_properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
+            job.properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
             connect (job, &LsColJob.directory_listing_subfolders,
                             this, &PropagateDownloadEncrypted.on_check_folder_id);
             connect (job, &LsColJob.finished_with_error,
@@ -89,7 +89,7 @@ class PropagateDownloadEncrypted : GLib.Object {
             }
 
             // Let's fool the rest of the logic into thinking this was the actual download
-            tmp_file.set_filename (this.tmp_output.filename ());
+            tmp_file.filename (this.tmp_output.filename ());
 
             return true;
     }

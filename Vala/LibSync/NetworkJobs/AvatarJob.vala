@@ -64,11 +64,11 @@ class AvatarJob : AbstractNetworkJob {
         avatar.fill (Qt.transparent);
 
         QPainter painter (&avatar);
-        painter.set_render_hint (QPainter.Antialiasing);
+        painter.render_hint (QPainter.Antialiasing);
 
         QPainterPath path;
         path.add_ellipse (0, 0, dim, dim);
-        painter.set_clip_path (path);
+        painter.clip_path (path);
 
         painter.draw_image (0, 0, base_avatar);
         painter.end ();

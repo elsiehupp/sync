@@ -24,8 +24,8 @@ namespace Occ {
 @ingroup gui
 ***********************************************************/
 class Slide_show : Gtk.Widget {
-    //  Q_PROPERTY (int interval READ interval WRITE set_interval)
-    //  Q_PROPERTY (int current_slide READ current_slide WRITE set_current_slide NOTIFY current_slide_changed)
+    //  Q_PROPERTY (int interval READ interval WRITE interval)
+    //  Q_PROPERTY (int current_slide READ current_slide WRITE current_slide NOTIFY current_slide_changed)
 
     /***********************************************************
     ***********************************************************/
@@ -57,7 +57,7 @@ class Slide_show : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void set_current_slide (int i
+    public void current_slide (int i
 
     /***********************************************************
     ***********************************************************/
@@ -118,7 +118,7 @@ const int Slide_duration = 1000;
 const int Slide_distance = 400;
 
 Slide_show.Slide_show (Gtk.Widget parent) : Gtk.Widget (parent) {
-    set_size_policy (QSize_policy.Minimum, QSize_policy.Minimum);
+    size_policy (QSize_policy.Minimum, QSize_policy.Minimum);
 }
 
 void Slide_show.add_slide (QPixmap pixmap, string label) {
@@ -135,7 +135,7 @@ int Slide_show.interval () {
     return this.interval;
 }
 
-void Slide_show.set_interval (int interval) {
+void Slide_show.interval (int interval) {
     if (this.interval == interval)
         return;
 
@@ -147,18 +147,18 @@ int Slide_show.current_slide () {
     return this.current_index;
 }
 
-void Slide_show.set_current_slide (int index) {
+void Slide_show.current_slide (int index) {
     if (this.current_index == index)
         return;
 
     if (!this.animation) {
         this.animation = new QVariant_animation (this);
-        this.animation.set_duration (Slide_duration);
-        this.animation.set_easing_curve (QEasing_curve.Out_cubic);
-        this.animation.set_start_value (static_cast<qreal> (this.current_index));
+        this.animation.duration (Slide_duration);
+        this.animation.easing_curve (QEasing_curve.Out_cubic);
+        this.animation.start_value (static_cast<qreal> (this.current_index));
         connect (this.animation.data (), SIGNAL (value_changed (GLib.Variant)), this, SLOT (update ()));
     }
-    this.animation.set_end_value (static_cast<qreal> (index));
+    this.animation.end_value (static_cast<qreal> (index));
     this.animation.on_start (QAbstractAnimation.DeleteWhenStopped);
 
     this.reverse = index < this.current_index;
@@ -173,15 +173,15 @@ QSize Slide_show.size_hint () {
     QSize label_size (0, fm.height ());
     for (string label : this.labels) {
 #if (HASQT5_11)
-        label_size.set_width (std.max (fm.horizontal_advance (label), label_size.width ()));
+        label_size.width (std.max (fm.horizontal_advance (label), label_size.width ()));
 #else
-        label_size.set_width (std.max (fm.width (label), label_size.width ()));
+        label_size.width (std.max (fm.width (label), label_size.width ()));
 //  #endif
     }
     QSize pixmap_size;
     for (QPixmap pixmap : this.pixmaps) {
-        pixmap_size.set_width (std.max (pixmap.width (), pixmap_size.width ()));
-        pixmap_size.set_height (std.max (pixmap.height (), pixmap_size.height ()));
+        pixmap_size.width (std.max (pixmap.width (), pixmap_size.width ()));
+        pixmap_size.height (std.max (pixmap.height (), pixmap_size.height ()));
     }
     return {
         std.max (label_size.width (), pixmap_size.width ()),
@@ -200,12 +200,12 @@ void Slide_show.on_stop_show () {
 }
 
 void Slide_show.on_next_slide () {
-    set_current_slide ( (this.current_index + 1) % this.labels.count ());
+    current_slide ( (this.current_index + 1) % this.labels.count ());
     this.reverse = false;
 }
 
 void Slide_show.on_prev_slide () {
-    set_current_slide ( (this.current_index > 0 ? this.current_index : this.labels.count ()) - 1);
+    current_slide ( (this.current_index > 0 ? this.current_index : this.labels.count ()) - 1);
     this.reverse = true;
 }
 
@@ -235,12 +235,12 @@ void Slide_show.paint_event (QPaint_event *) {
         qreal progress = this.animation.easing_curve ().value_for_progress (this.animation.current_time () / static_cast<qreal> (this.animation.duration ()));
 
         painter.save ();
-        painter.set_opacity (1.0 - progress);
+        painter.opacity (1.0 - progress);
         painter.translate (progress * (this.reverse ? Slide_distance : -Slide_distance), 0);
         draw_slide (&painter, from);
 
         painter.restore ();
-        painter.set_opacity (progress);
+        painter.opacity (progress);
         painter.translate ( (1.0 - progress) * (this.reverse ? -Slide_distance : Slide_distance), 0);
         draw_slide (&painter, to);
     } else {

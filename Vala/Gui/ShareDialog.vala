@@ -126,11 +126,11 @@ signals:
         this.max_sharing_permissions (max_sharing_permissions)
         this.private_link_url (account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded))
         this.start_page (start_page) {
-        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
-        set_attribute (Qt.WA_DeleteOnClose);
-        set_object_name ("Sharing_dialog"); // required as group for save_geometry call
+        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        attribute (Qt.WA_DeleteOnClose);
+        object_name ("Sharing_dialog"); // required as group for save_geometry call
 
-        this.ui.set_up_ui (this);
+        this.ui.up_ui (this);
 
         // We want to act on account state changes
         connect (this.account_state.data (), &AccountState.state_changed, this, &Share_dialog.on_account_state_changed);
@@ -141,15 +141,15 @@ signals:
         QIcon icon = icon_provider.icon (f_info);
         var pixmap = icon.pixmap (thumbnail_size, thumbnail_size);
         if (pixmap.width () > 0) {
-            this.ui.label_icon.set_pixmap (pixmap);
+            this.ui.label_icon.pixmap (pixmap);
         }
 
         // Set filename
         string filename = QFileInfo (this.share_path).filename ();
-        this.ui.label_name.on_set_text (_("%1").arg (filename));
+        this.ui.label_name.on_text (_("%1").arg (filename));
         QFont f (this.ui.label_name.font ());
-        f.set_point_size (q_round (f.point_size () * 1.4));
-        this.ui.label_name.set_font (f);
+        f.point_size (q_round (f.point_size () * 1.4));
+        this.ui.label_name.font (f);
 
         string oc_dir (this.share_path);
         oc_dir.truncate (oc_dir.length () - filename.length ());
@@ -163,14 +163,14 @@ signals:
         this.ui.grid_layout.remove_widget (this.ui.label_name);
         if (oc_dir.is_empty ()) {
             this.ui.grid_layout.add_widget (this.ui.label_name, 0, 1, 2, 1);
-            this.ui.label_share_path.on_set_text ("");
+            this.ui.label_share_path.on_text ("");
         } else {
             this.ui.grid_layout.add_widget (this.ui.label_name, 0, 1, 1, 1);
             this.ui.grid_layout.add_widget (this.ui.label_share_path, 1, 1, 1, 1);
-            this.ui.label_share_path.on_set_text (_("Folder : %2").arg (oc_dir));
+            this.ui.label_share_path.on_text (_("Folder : %2").arg (oc_dir));
         }
 
-        this.set_window_title (_("%1 Sharing").arg (Theme.instance ().app_name_gui ()));
+        this.window_title (_("%1 Sharing").arg (Theme.instance ().app_name_gui ()));
 
         if (!account_state.account ().capabilities ().share_api ()) {
             return;
@@ -183,12 +183,12 @@ signals:
         }
 
         var job = new PropfindJob (account_state.account (), this.share_path);
-        job.set_properties (
+        job.properties (
             GLib.List<GLib.ByteArray> ()
             << "http://open-collaboration-services.org/ns:share-permissions"
             << "http://owncloud.org/ns:fileid" // numeric file identifier for fallback private link generation
             << "http://owncloud.org/ns:privatelink");
-        job.on_set_timeout (10 * 1000);
+        job.on_timeout (10 * 1000);
         connect (job, &PropfindJob.result, this, &Share_dialog.on_propfind_received);
         connect (job, &PropfindJob.finished_with_error, this, &Share_dialog.on_propfind_error);
         job.on_start ();
@@ -214,7 +214,7 @@ signals:
         this.link_widget_list.append (new Share_link_widget (this.account_state.account (), this.share_path, this.local_path, this.max_sharing_permissions, this));
 
         const var link_share_widget = this.link_widget_list.at (this.link_widget_list.size () - 1);
-        link_share_widget.set_link_share (link_share);
+        link_share_widget.link_share (link_share);
 
         connect (link_share.data (), &Share.on_server_error, link_share_widget, &Share_link_widget.on_server_error);
         connect (link_share.data (), &Share.share_deleted, link_share_widget, &Share_link_widget.on_delete_share_fetched);
@@ -291,11 +291,11 @@ signals:
 
     void Share_dialog.on_adjust_scroll_widget_size () {
         int count = this.find_children<Share_link_widget> ().count ();
-        this.ui.scroll_area.set_visible (count > 0);
+        this.ui.scroll_area.visible (count > 0);
         if (count > 0 && count <= 3) {
-            this.ui.scroll_area.set_fixed_height (this.ui.scroll_area.widget ().size_hint ().height ());
+            this.ui.scroll_area.fixed_height (this.ui.scroll_area.widget ().size_hint ().height ());
         }
-        this.ui.scroll_area.set_frame_shape (count > 3 ? QFrame.Styled_panel : QFrame.No_frame);
+        this.ui.scroll_area.frame_shape (count > 3 ? QFrame.Styled_panel : QFrame.No_frame);
     }
 
     Share_dialog.~Share_dialog () {
@@ -345,8 +345,8 @@ signals:
 
         if (!can_reshare) {
             var label = new QLabel (this);
-            label.on_set_text (_("The file cannot be shared because it does not have sharing permission."));
-            label.set_word_wrap (true);
+            label.on_text (_("The file cannot be shared because it does not have sharing permission."));
+            label.word_wrap (true);
             this.ui.vertical_layout.insert_widget (1, label);
             return;
         }
@@ -387,7 +387,7 @@ signals:
         if (share_link_widget) {
             connect (this.manager, &Share_manager.on_link_share_requires_password, share_link_widget, &Share_link_widget.on_create_share_requires_password);
             connect (share_link_widget, &Share_link_widget.create_password_processed, this, &Share_dialog.on_create_password_for_link_share_processed);
-            share_link_widget.get_link_share ().set_password (password);
+            share_link_widget.get_link_share ().password (password);
         } else {
             q_c_critical (lc_sharing) << "share_link_widget is not a sender!";
         }
@@ -442,7 +442,7 @@ signals:
         QPixmap p;
         p.load_from_data (reply, "PNG");
         p = p.scaled_to_height (thumbnail_size, Qt.Smooth_transformation);
-        this.ui.label_icon.set_pixmap (p);
+        this.ui.label_icon.pixmap (p);
         this.ui.label_icon.show ();
     }
 
@@ -451,12 +451,12 @@ signals:
         GLib.debug (lc_sharing) << "Account connected?" << enabled;
 
         if (this.user_group_widget) {
-            this.user_group_widget.set_enabled (enabled);
+            this.user_group_widget.enabled (enabled);
         }
 
-        if (this.link_widget_list.size () > 0){
-            foreach (Share_link_widget widget, this.link_widget_list){
-                widget.set_enabled (state);
+        if (this.link_widget_list.size () > 0) {
+            foreach (Share_link_widget widget, this.link_widget_list) {
+                widget.enabled (state);
             }
         }
     }

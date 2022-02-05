@@ -45,7 +45,7 @@ signals:
 
     Ocs_sharee_job.Ocs_sharee_job (AccountPointer account)
         : Ocs_job (account) {
-        set_path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
+        path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
         connect (this, &Ocs_job.job_finished, this, &Ocs_sharee_job.on_job_done);
     }
 
@@ -54,7 +54,7 @@ signals:
         int page,
         int per_page,
         bool lookup) {
-        set_verb ("GET");
+        verb ("GET");
 
         add_param (string.from_latin1 ("search"), search);
         add_param (string.from_latin1 ("item_type"), item_type);

@@ -35,7 +35,7 @@ class PropagateDirectory : PropagatorJob {
         this.sub_jobs = propagator;
         if (this.first_job) {
             connect (this.first_job.data (), &PropagatorJob.on_finished, this, &PropagateDirectory.on_first_job_finished);
-            this.first_job.set_associated_composite (&this.sub_jobs);
+            this.first_job.associated_composite (&this.sub_jobs);
         }
         connect (&this.sub_jobs, &PropagatorJob.on_finished, this, &PropagateDirectory.on_sub_jobs_finished);
     }
@@ -101,7 +101,7 @@ class PropagateDirectory : PropagatorJob {
             // even if caller allows async on_abort (async_abort)
             this.first_job.on_abort (AbortType.SYNCHRONOUS);
 
-        if (abort_type == AbortType.ASYNCHRONOUS){
+        if (abort_type == AbortType.ASYNCHRONOUS) {
             connect (&this.sub_jobs, &PropagatorCompositeJob.abort_finished, this, &PropagateDirectory.abort_finished);
         }
         this.sub_jobs.on_abort (abort_type);
@@ -165,7 +165,7 @@ class PropagateDirectory : PropagatorJob {
                     GLib.warn (lc_directory) << "Error writing to the database for file" << this.item.file;
                 }
 
-                FileSystem.set_mod_time (propagator ().full_local_path (this.item.destination ()), this.item.modtime);
+                FileSystem.mod_time (propagator ().full_local_path (this.item.destination ()), this.item.modtime);
             }
 
             // For new directories we always want to update the etag once

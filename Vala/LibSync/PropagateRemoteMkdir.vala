@@ -88,7 +88,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
     Default: false.
     ***********************************************************/
-    public void set_delete_existing (bool enabled) {
+    public void delete_existing (bool enabled) {
         this.delete_existing = enabled;
     }
 
@@ -252,8 +252,8 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
         propagator ().active_job_list.append (this);
         var propfind_job = new PropfindJob (propagator ().account (), job_path, this);
-        propfind_job.set_properties ({"http://owncloud.org/ns:permissions"});
-        connect (propfind_job, &PropfindJob.result, this, [this, job_path] (QVariantMap result){
+        propfind_job.properties ({"http://owncloud.org/ns:permissions"});
+        connect (propfind_job, &PropfindJob.result, this, [this, job_path] (QVariantMap result) {
             propagator ().active_job_list.remove_one (this);
             this.item.remote_perm = RemotePermissions.from_server_string (result.value (QStringLiteral ("permissions")).to_string ());
 

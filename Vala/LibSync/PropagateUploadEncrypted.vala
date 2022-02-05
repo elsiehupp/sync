@@ -112,7 +112,7 @@ class PropagateUploadEncrypted : GLib.Object {
         */
         GLib.debug (lc_propagate_upload_encrypted) << "Folder is encrypted, let's get the Id from it.";
         var job = new LsColJob (this.propagator.account (), absolute_remote_parent_path, this);
-        job.set_properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
+        job.properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
         connect (job, &LsColJob.directory_listing_subfolders, this, &PropagateUploadEncrypted.on_folder_encrypted_id_received);
         connect (job, &LsColJob.finished_with_error, this, &PropagateUploadEncrypted.on_folder_encrypted_id_error);
         job.on_start ();

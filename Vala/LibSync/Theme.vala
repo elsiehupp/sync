@@ -577,9 +577,9 @@ class Theme : GLib.Object {
             QPixmap pix (img_path);
             if (pix.is_null ()) {
                 // pixmap loading hasn't succeeded. We take the text instead.
-                re.set_value (key);
+                re.value (key);
             } else {
-                re.set_value (pix);
+                re.value (pix);
             }
         }
         return re;
@@ -746,7 +746,7 @@ class Theme : GLib.Object {
     /***********************************************************
     Define if the systray icons should be using mono design
     ***********************************************************/
-    public void set_systray_use_mono_icons (bool mono) {
+    public void systray_use_mono_icons (bool mono) {
         this.mono = mono;
         /* emit */ systray_use_mono_icons_changed (mono);
     }
@@ -1224,7 +1224,7 @@ class Theme : GLib.Object {
                 if (qgetenv ("DESKTOP_SESSION") == "ubuntu") {
                     QBitmap mask = px.create_mask_from_color (Qt.white, Qt.Mask_out_color);
                     QPainter p (&px);
-                    p.set_pen (Gtk.Color ("#dfdbd2"));
+                    p.pen (Gtk.Color ("#dfdbd2"));
                     p.draw_pixmap (px.rect (), mask, mask.rect ());
                 }
                 cached.add_pixmap (px);
@@ -1269,8 +1269,8 @@ class Theme : GLib.Object {
     private static GLib.Uri image_path_to_url (string image_path) {
         if (image_path.starts_with (':')) {
             var url = GLib.Uri ();
-            url.set_scheme ("qrc");
-            url.set_path (image_path.mid (1));
+            url.scheme ("qrc");
+            url.path (image_path.mid (1));
             return url;
         } else {
             return GLib.Uri.from_local_file (image_path);

@@ -19,5 +19,5 @@ Web_view_page_url_request_interceptor.Web_view_page_url_request_interceptor (GLi
 }
 
 void Web_view_page_url_request_interceptor.intercept_request (QWeb_engine_url_request_info info) {
-    info.set_http_header ("OCS-APIREQUEST", "true");
+    info.http_header ("OCS-APIREQUEST", "true");
 }

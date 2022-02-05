@@ -77,7 +77,7 @@ class FolderStatusDelegate : QStyledItemDelegate {
         QFont error_font = sub_font;
         QFont progress_font = sub_font;
 
-        progress_font.set_point_size (sub_font.point_size () - 2);
+        progress_font.point_size (sub_font.point_size () - 2);
 
         QFontMetrics sub_fm (sub_font);
         QFontMetrics alias_fm (alias_font);
@@ -97,7 +97,7 @@ class FolderStatusDelegate : QStyledItemDelegate {
             opt.text = add_folder_text ();
             opt.rect = add_button_rect (option.rect, option.direction);
             painter.save ();
-            painter.set_font (Gtk.Application.font ("QPushButton"));
+            painter.font (Gtk.Application.font ("QPushButton"));
             QApplication.style ().draw_control (QStyle.CE_Push_button, opt, painter, option.widget);
             painter.restore ();
             return;
@@ -127,31 +127,31 @@ class FolderStatusDelegate : QStyledItemDelegate {
         var icon_rect = option.rect;
         var alias_rect = option.rect;
 
-        icon_rect.set_left (option.rect.left () + alias_margin);
-        icon_rect.set_top (icon_rect.top () + alias_margin); // (icon_rect.height ()-iconsize.height ())/2);
+        icon_rect.left (option.rect.left () + alias_margin);
+        icon_rect.top (icon_rect.top () + alias_margin); // (icon_rect.height ()-iconsize.height ())/2);
 
         // alias box
-        alias_rect.set_top (alias_rect.top () + alias_margin);
-        alias_rect.set_bottom (alias_rect.top () + alias_fm.height ());
-        alias_rect.set_right (alias_rect.right () - alias_margin);
+        alias_rect.top (alias_rect.top () + alias_margin);
+        alias_rect.bottom (alias_rect.top () + alias_fm.height ());
+        alias_rect.right (alias_rect.right () - alias_margin);
 
         // remote directory box
         var remote_path_rect = alias_rect;
-        remote_path_rect.set_top (alias_rect.bottom () + margin);
-        remote_path_rect.set_bottom (remote_path_rect.top () + sub_fm.height ());
+        remote_path_rect.top (alias_rect.bottom () + margin);
+        remote_path_rect.bottom (remote_path_rect.top () + sub_fm.height ());
 
         // local directory box
         var local_path_rect = remote_path_rect;
-        local_path_rect.set_top (remote_path_rect.bottom () + margin);
-        local_path_rect.set_bottom (local_path_rect.top () + sub_fm.height ());
+        local_path_rect.top (remote_path_rect.bottom () + margin);
+        local_path_rect.bottom (local_path_rect.top () + sub_fm.height ());
 
-        icon_rect.set_bottom (local_path_rect.bottom ());
-        icon_rect.set_width (icon_rect.height ());
+        icon_rect.bottom (local_path_rect.bottom ());
+        icon_rect.width (icon_rect.height ());
 
         int next_to_icon = icon_rect.right () + alias_margin;
-        alias_rect.set_left (next_to_icon);
-        local_path_rect.set_left (next_to_icon);
-        remote_path_rect.set_left (next_to_icon);
+        alias_rect.left (next_to_icon);
+        local_path_rect.left (next_to_icon);
+        remote_path_rect.left (next_to_icon);
 
         int icon_size = icon_rect.width ();
 
@@ -165,10 +165,10 @@ class FolderStatusDelegate : QStyledItemDelegate {
         // encoded in the status icon.
         if (warning_count > 0 && sync_ongoing) {
             QRect warn_rect;
-            warn_rect.set_left (icon_rect.left ());
-            warn_rect.set_top (icon_rect.bottom () - 17);
-            warn_rect.set_width (16);
-            warn_rect.set_height (16);
+            warn_rect.left (icon_rect.left ());
+            warn_rect.top (icon_rect.bottom () - 17);
+            warn_rect.width (16);
+            warn_rect.height (16);
 
             QIcon warn_icon (":/client/theme/warning");
             QPixmap pm = warn_icon.pixmap (16, 16, sync_enabled ? QIcon.Normal : QIcon.Disabled);
@@ -182,8 +182,8 @@ class FolderStatusDelegate : QStyledItemDelegate {
             // Hack : Windows Vista's light blue is not contrasting enough for white
 
             // (code from QWindows_vista_style.draw_control for CE_Item_view_item)
-            palette.on_set_color (QPalette.All, QPalette.Highlighted_text, palette.color (QPalette.Active, QPalette.Text));
-            palette.on_set_color (QPalette.All, QPalette.Highlight, palette.base ().color ().darker (108));
+            palette.on_color (QPalette.All, QPalette.Highlighted_text, palette.color (QPalette.Active, QPalette.Text));
+            palette.on_color (QPalette.All, QPalette.Highlight, palette.base ().color ().darker (108));
         }
 
         QPalette.Color_group cg = option.state & QStyle.State_Enabled
@@ -193,17 +193,17 @@ class FolderStatusDelegate : QStyledItemDelegate {
             cg = QPalette.Inactive;
 
         if (option.state & QStyle.State_Selected) {
-            painter.set_pen (palette.color (cg, QPalette.Highlighted_text));
+            painter.pen (palette.color (cg, QPalette.Highlighted_text));
         } else {
-            painter.set_pen (palette.color (cg, QPalette.Text));
+            painter.pen (palette.color (cg, QPalette.Text));
         }
         string elided_alias = alias_fm.elided_text (alias_text, Qt.Elide_right, alias_rect.width ());
-        painter.set_font (alias_font);
+        painter.font (alias_font);
         painter.draw_text (QStyle.visual_rect (option.direction, option.rect, alias_rect), text_align, elided_alias);
 
         const bool show_progess = !overall_string.is_empty () || !item_string.is_empty ();
         if (!show_progess) {
-            painter.set_font (sub_font);
+            painter.font (sub_font);
             string elided_remote_path_text = sub_fm.elided_text (
                 sync_text,
                 Qt.Elide_right, remote_path_rect.width ());
@@ -220,19 +220,19 @@ class FolderStatusDelegate : QStyledItemDelegate {
         // paint an error overlay if there is an error string or conflict string
         var draw_text_box = [&] (string[] texts, Gtk.Color color) {
             QRect rect = local_path_rect;
-            rect.set_left (icon_rect.left ());
-            rect.set_top (h);
-            rect.set_height (texts.count () * sub_fm.height () + 2 * margin);
-            rect.set_right (option.rect.right () - margin);
+            rect.left (icon_rect.left ());
+            rect.top (h);
+            rect.height (texts.count () * sub_fm.height () + 2 * margin);
+            rect.right (option.rect.right () - margin);
 
             // save previous state to not mess up colours with the background (fixes issue : https://github.com/nextcloud/desktop/issues/1237)
             painter.save ();
-            painter.set_brush (color);
-            painter.set_pen (Gtk.Color (0xaa, 0xaa, 0xaa));
+            painter.brush (color);
+            painter.pen (Gtk.Color (0xaa, 0xaa, 0xaa));
             painter.draw_rounded_rect (QStyle.visual_rect (option.direction, option.rect, rect),
                 4, 4);
-            painter.set_pen (Qt.white);
-            painter.set_font (error_font);
+            painter.pen (Qt.white);
+            painter.font (error_font);
             QRect text_rect (rect.left () + margin,
                 rect.top () + margin,
                 rect.width () - 2 * margin,
@@ -266,10 +266,10 @@ class FolderStatusDelegate : QStyledItemDelegate {
 
             // Overall Progress Bar.
             QRect p_bRect;
-            p_bRect.set_top (remote_path_rect.top ());
-            p_bRect.set_left (next_to_icon);
-            p_bRect.set_height (bar_height);
-            p_bRect.set_width (overall_width - 2 * margin);
+            p_bRect.top (remote_path_rect.top ());
+            p_bRect.left (next_to_icon);
+            p_bRect.height (bar_height);
+            p_bRect.width (overall_width - 2 * margin);
 
             QStyle_option_progress_bar p_bar_opt;
 
@@ -283,11 +283,11 @@ class FolderStatusDelegate : QStyledItemDelegate {
 
             // Overall Progress Text
             QRect overall_progress_rect;
-            overall_progress_rect.set_top (p_bRect.bottom () + margin);
-            overall_progress_rect.set_height (filename_text_height);
-            overall_progress_rect.set_left (p_bRect.left ());
-            overall_progress_rect.set_width (p_bRect.width ());
-            painter.set_font (progress_font);
+            overall_progress_rect.top (p_bRect.bottom () + margin);
+            overall_progress_rect.height (filename_text_height);
+            overall_progress_rect.left (p_bRect.left ());
+            overall_progress_rect.width (p_bRect.width ());
+            painter.font (progress_font);
 
             painter.draw_text (QStyle.visual_rect (option.direction, option.rect, overall_progress_rect),
                 Qt.Align_left | Qt.Align_vCenter, overall_string);
@@ -394,11 +394,11 @@ class FolderStatusDelegate : QStyledItemDelegate {
         QFont alias_font = make_alias_font (font);
         QFontMetrics fm (font);
         QFontMetrics alias_fm (alias_font);
-        within.set_height (FolderStatusDelegate.root_folder_height_without_errors (fm, alias_fm));
+        within.height (FolderStatusDelegate.root_folder_height_without_errors (fm, alias_fm));
 
         QStyle_option_tool_button opt;
         int e = QApplication.style ().pixel_metric (QStyle.PM_Button_icon_size);
-        opt.rect.set_size (QSize (e,e));
+        opt.rect.size (QSize (e,e));
         QSize size = QApplication.style ().size_from_contents (QStyle.CT_Tool_button, opt, opt.rect.size ()).expanded_to (QApplication.global_strut ());
 
         int margin = QApplication.style ().pixel_metric (QStyle.PM_Default_layout_spacing);
@@ -428,7 +428,7 @@ class FolderStatusDelegate : QStyledItemDelegate {
         QFont alias_font = make_alias_font (font);
         QFontMetrics fm (font);
         QFontMetrics alias_fm (alias_font);
-        within.set_top (within.top () + FolderStatusDelegate.root_folder_height_without_errors (fm, alias_fm));
+        within.top (within.top () + FolderStatusDelegate.root_folder_height_without_errors (fm, alias_fm));
         return within;
     }
 
@@ -468,8 +468,8 @@ class FolderStatusDelegate : QStyledItemDelegate {
     ***********************************************************/
     private static QFont make_alias_font (QFont normal_font) {
         QFont alias_font = normal_font;
-        alias_font.set_bold (true);
-        alias_font.set_point_size (normal_font.point_size () + 2);
+        alias_font.bold (true);
+        alias_font.point_size (normal_font.point_size () + 2);
         return alias_font;
     }
 

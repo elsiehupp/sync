@@ -96,21 +96,21 @@ class Ssl_error_dialog : Gtk.Dialog {
         this.all_trusted (false)
         this.ui (new Ui.Ssl_error_dialog)
         this.account (account) {
-        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
-        this.ui.set_up_ui (this);
-        set_window_title (_("Untrusted Certificate"));
+        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        this.ui.up_ui (this);
+        window_title (_("Untrusted Certificate"));
         QPushButton ok_button =
             this.ui.dialog_button_box.button (QDialogButtonBox.Ok);
         QPushButton cancel_button =
             this.ui.dialog_button_box.button (QDialogButtonBox.Cancel);
-        ok_button.set_enabled (false);
+        ok_button.enabled (false);
 
-        this.ui.cb_trust_connect.set_enabled (!Theme.instance ().forbid_bad_ssl ());
+        this.ui.cb_trust_connect.enabled (!Theme.instance ().forbid_bad_ssl ());
         connect (this.ui.cb_trust_connect, &QAbstractButton.clicked,
-            ok_button, &Gtk.Widget.set_enabled);
+            ok_button, &Gtk.Widget.enabled);
 
         if (ok_button) {
-            ok_button.set_default (true);
+            ok_button.default (true);
             connect (ok_button, &QAbstractButton.clicked, this, &Gtk.Dialog.accept);
             connect (cancel_button, &QAbstractButton.clicked, this, &Gtk.Dialog.reject);
         }
@@ -200,9 +200,9 @@ class Ssl_error_dialog : Gtk.Dialog {
         var doc = new QText_document (null);
         string style = style_sheet ();
         doc.add_resource (QText_document.Style_sheet_resource, GLib.Uri (QL ("format.css")), style);
-        doc.set_html (message);
+        doc.html (message);
 
-        this.ui.tb_errors.set_document (doc);
+        this.ui.tb_errors.document (doc);
         this.ui.tb_errors.show ();
 
         return false;

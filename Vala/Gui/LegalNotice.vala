@@ -39,7 +39,7 @@ class Legal_notice : Gtk.Dialog {
     Legal_notice.Legal_notice (Gtk.Dialog parent)
         : Gtk.Dialog (parent)
         this.ui (new Ui.Legal_notice) {
-        this.ui.set_up_ui (this);
+        this.ui.up_ui (this);
 
         connect (this.ui.close_button, &QPushButton.clicked, this, &Legal_notice.accept);
 
@@ -75,10 +75,10 @@ class Legal_notice : Gtk.Dialog {
 
         Theme.replace_link_color_string_background_aware (notice);
 
-        this.ui.notice.set_text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
-        this.ui.notice.on_set_text (notice);
-        this.ui.notice.set_word_wrap (true);
-        this.ui.notice.set_open_external_links (true);
+        this.ui.notice.text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
+        this.ui.notice.on_text (notice);
+        this.ui.notice.word_wrap (true);
+        this.ui.notice.open_external_links (true);
     }
 
     } // namespace Occ

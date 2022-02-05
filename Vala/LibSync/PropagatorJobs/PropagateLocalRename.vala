@@ -64,7 +64,7 @@ class PropagateLocalRename : PropagateItemJob {
 
         var vfs = propagator ().sync_options ().vfs;
         var pin_state = vfs.pin_state (this.item.original_file);
-        if (!vfs.set_pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
+        if (!vfs.pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
             GLib.warn (lc_propagate_local_rename) << "Could not set pin state of" << this.item.original_file << "to inherited";
         }
 
@@ -91,7 +91,7 @@ class PropagateLocalRename : PropagateItemJob {
             }
         }
         if (pin_state && *pin_state != PinState.PinState.INHERITED
-            && !vfs.set_pin_state (this.item.rename_target, *pin_state)) {
+            && !vfs.pin_state (this.item.rename_target, *pin_state)) {
             on_done (SyncFileItem.Status.NORMAL_ERROR, _("Error setting pin state"));
             return;
         }

@@ -157,7 +157,7 @@ QImage draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fill_c
         QImage image (req_size, QImage.Format_ARGB32);
         image.fill (Gtk.Color (fill_color)); {
             QPainter image_painter (&image);
-            image_painter.set_composition_mode (QPainter.Composition_mode_Destination_in);
+            image_painter.composition_mode (QPainter.Composition_mode_Destination_in);
             image_painter.draw_image (0, 0, svg_image);
         }
 

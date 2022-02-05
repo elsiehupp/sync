@@ -116,7 +116,7 @@ signals:
         this.account (account)
         this.is_busy (false)
         this.has_token (false) {
-        this.poll_timer.set_interval (1000);
+        this.poll_timer.interval (1000);
         GLib.Object.connect (&this.poll_timer, &QTimer.timeout, this, &Flow2Auth.on_poll_timer_timeout);
     }
 
@@ -156,11 +156,11 @@ signals:
 
         // add 'Content-Length : 0' header (see https://github.com/nextcloud/desktop/issues/1473)
         QNetworkRequest req;
-        req.set_header (QNetworkRequest.ContentLengthHeader, "0");
-        req.set_header (QNetworkRequest.UserAgentHeader, Utility.friendly_user_agent_string ());
+        req.header (QNetworkRequest.ContentLengthHeader, "0");
+        req.header (QNetworkRequest.UserAgentHeader, Utility.friendly_user_agent_string ());
 
         var job = this.account.send_request ("POST", url, req);
-        job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
+        job.on_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
 
         GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, action] (Soup.Reply reply) {
             var json_data = reply.read_all ();
@@ -210,7 +210,7 @@ signals:
                 if (!user_name.is_empty ()) {
                     var query = QUrlQuery (this.login_url);
                     query.add_query_item (QStringLiteral ("user"), user_name);
-                    this.login_url.set_query (query);
+                    this.login_url.query (query);
                 }
             }
 
@@ -239,7 +239,7 @@ signals:
                 }
                 break;
             case action_copy_link_to_clipboard:
-                QApplication.clipboard ().on_set_text (authorisation_link ().to_string (GLib.Uri.FullyEncoded));
+                QApplication.clipboard ().on_text (authorisation_link ().to_string (GLib.Uri.FullyEncoded));
                 /* emit */ status_changed (PollStatus.status_copy_link_to_clipboard, 0);
                 break;
             }
@@ -265,14 +265,14 @@ signals:
 
         // Step 2 : Poll
         QNetworkRequest req;
-        req.set_header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
+        req.header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         var request_body = new QBuffer;
         QUrlQuery arguments (string ("token=%1").arg (this.poll_token));
-        request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
+        request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
         var job = this.account.send_request ("POST", this.poll_endpoint, req, request_body);
-        job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
+        job.on_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
 
         GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (Soup.Reply reply) {
             var json_data = reply.read_all ();
@@ -330,7 +330,7 @@ signals:
             // Success
             GLib.info (lc_flow2auth) << "Success getting the app_password for user : " << login_name << ", server : " << server_url.to_string ();
 
-            this.account.set_url (server_url);
+            this.account.url (server_url);
 
             /* emit */ result (LoggedIn, "", login_name, app_password);
 

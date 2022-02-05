@@ -70,7 +70,7 @@ signals:
             this, &Server_notification_handler.on_etag_response_header_received);
         GLib.Object.connect (this.notification_job.data (), &JsonApiJob.allow_desktop_notifications_changed,
                 this, &Server_notification_handler.on_allow_desktop_notifications_changed);
-        this.notification_job.set_property (property_account_state_c, GLib.Variant.from_value<AccountState> (this.account_state));
+        this.notification_job.property (property_account_state_c, GLib.Variant.from_value<AccountState> (this.account_state));
         this.notification_job.add_raw_header ("If-None-Match", this.account_state.notifications_etag_response_header ());
         this.notification_job.on_start ();
     }
@@ -79,14 +79,14 @@ signals:
         if (status_code == success_status_code) {
             GLib.warn (lc_server_notification) << "New Notification ETag Response Header received " << value;
             var account = qvariant_cast<AccountState> (sender ().property (property_account_state_c));
-            account.set_notifications_etag_response_header (value);
+            account.notifications_etag_response_header (value);
         }
     }
 
     void Server_notification_handler.on_allow_desktop_notifications_changed (bool is_allowed) {
         var account = qvariant_cast<AccountState> (sender ().property (property_account_state_c));
         if (account != null) {
-           account.set_desktop_notifications_allowed (is_allowed);
+           account.desktop_notifications_allowed (is_allowed);
         }
     }
 
@@ -127,11 +127,11 @@ signals:
             GLib.Uri link (json.value ("link").to_string ());
             if (!link.is_empty ()) {
                 if (link.host ().is_empty ()) {
-                    link.set_scheme (ai.account ().url ().scheme ());
-                    link.set_host (ai.account ().url ().host ());
+                    link.scheme (ai.account ().url ().scheme ());
+                    link.host (ai.account ().url ().host ());
                 }
                 if (link.port () == -1) {
-                    link.set_port (ai.account ().url ().port ());
+                    link.port (ai.account ().url ().port ());
                 }
             }
             a.link = link;

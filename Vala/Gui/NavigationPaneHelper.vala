@@ -26,7 +26,7 @@ class NavigationPaneHelper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_show_in_explorer_navigation_pane (bool show);
+    public void show_in_explorer_navigation_pane (bool show);
 
     /***********************************************************
     ***********************************************************/
@@ -49,16 +49,16 @@ class NavigationPaneHelper : GLib.Object {
         ConfigFile config;
         this.show_in_explorer_navigation_pane = config.show_in_explorer_navigation_pane ();
 
-        this.update_cloud_storage_registry_timer.set_single_shot (true);
+        this.update_cloud_storage_registry_timer.single_shot (true);
         connect (&this.update_cloud_storage_registry_timer, &QTimer.timeout, this, &NavigationPaneHelper.update_cloud_storage_registry);
 
         // Ensure that the folder integration stays persistent in Explorer,
         // the uninstaller removes the folder upon updating the client.
         this.show_in_explorer_navigation_pane = !this.show_in_explorer_navigation_pane;
-        set_show_in_explorer_navigation_pane (!this.show_in_explorer_navigation_pane);
+        show_in_explorer_navigation_pane (!this.show_in_explorer_navigation_pane);
     }
 
-    void NavigationPaneHelper.set_show_in_explorer_navigation_pane (bool show) {
+    void NavigationPaneHelper.show_in_explorer_navigation_pane (bool show) {
         if (this.show_in_explorer_navigation_pane == show)
             return;
 
@@ -66,7 +66,7 @@ class NavigationPaneHelper : GLib.Object {
         // Re-generate a new CLSID when enabling, possibly throwing away the old one.
         // update_cloud_storage_registry will take care of removing any unknown CLSID our application owns from the registry.
         foreach (Folder folder, this.folder_man.map ())
-            folder.set_navigation_pane_clsid (show ? QUuid.create_uuid () : QUuid ());
+            folder.navigation_pane_clsid (show ? QUuid.create_uuid () : QUuid ());
 
         schedule_update_cloud_storage_registry ();
     }

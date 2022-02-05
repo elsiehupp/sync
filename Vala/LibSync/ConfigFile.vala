@@ -119,9 +119,9 @@ class ConfigFile {
     ***********************************************************/
     public ConfigFile () {
         // QDesktopServices uses the application name to create a config path
-        Gtk.Application.set_application_name (Theme.instance ().app_name_gui ());
+        Gtk.Application.application_name (Theme.instance ().app_name_gui ());
 
-        QSettings.set_default_format (QSettings.IniFormat);
+        QSettings.default_format (QSettings.IniFormat);
 
         const string config = config_file ();
 
@@ -185,13 +185,13 @@ class ConfigFile {
 
         switch (scope) {
         case USER_SCOPE:
-            fi.set_file (config_path (), EXCL_FILE);
+            fi.file (config_path (), EXCL_FILE);
 
             if (!fi.is_readable ()) {
-                fi.set_file (config_path (), QLatin1String ("exclude.lst"));
+                fi.file (config_path (), QLatin1String ("exclude.lst"));
             }
             if (!fi.is_readable ()) {
-                fi.set_file (config_path (), EXCL_FILE);
+                fi.file (config_path (), EXCL_FILE);
             }
             return fi.absolute_file_path ();
         case SYSTEM_SCOPE:
@@ -209,7 +209,7 @@ class ConfigFile {
     ***********************************************************/
     public static string exclude_file_from_system () {
         QFileInfo fi;
-        fi.set_file (string (SYSCONFDIR "/" + Theme.instance ().app_name ()), EXCL_FILE);
+        fi.file (string (SYSCONFDIR "/" + Theme.instance ().app_name ()), EXCL_FILE);
         if (!fi.exists ()) {
             // Prefer to return the preferred path! Only use the fallback location
             // if the other path does not exist and the fallback is valid.
@@ -286,7 +286,7 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_ca_certificates (GLib.ByteArray );
+    public void ca_certificates (GLib.ByteArray );
 
 
     /***********************************************************
@@ -320,7 +320,7 @@ class ConfigFile {
     Set poll interval. Value in milliseconds has to be larger
     than 5000
     ***********************************************************/
-    public void set_remote_poll_interval (std.chrono.milliseconds interval, string connection = "") {
+    public void remote_poll_interval (std.chrono.milliseconds interval, string connection = "") {
         string con = connection;
         if (connection.is_empty ())
             con = default_connection ();
@@ -331,7 +331,7 @@ class ConfigFile {
         }
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.begin_group (con);
-        settings.set_value (QLatin1String (REMOTE_POLL_INTERVAL_C), qlonglong (interval.count ()));
+        settings.value (QLatin1String (REMOTE_POLL_INTERVAL_C), qlonglong (interval.count ()));
         settings.sync ();
     }
 
@@ -403,9 +403,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_mono_icons (bool use_mono_icons) {
+    public void mono_icons (bool use_mono_icons) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (MONO_ICONS_C), use_mono_icons);
+        settings.value (QLatin1String (MONO_ICONS_C), use_mono_icons);
     }
 
 
@@ -421,9 +421,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_crash_reporter (bool enabled) {
+    public void crash_reporter (bool enabled) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (CRASH_REPORTER_C), enabled);
+        settings.value (QLatin1String (CRASH_REPORTER_C), enabled);
     }
 
 
@@ -437,9 +437,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_prompt_delete_files (bool prompt_delete_files) {
+    public void prompt_delete_files (bool prompt_delete_files) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (PROMPT_DELETE_C), prompt_delete_files);
+        settings.value (QLatin1String (PROMPT_DELETE_C), prompt_delete_files);
     }
 
 
@@ -463,9 +463,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_automatic_log_dir (bool enabled) {
+    public void automatic_log_dir (bool enabled) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (AUTOMATIC_LOG_DIR_C), enabled);
+        settings.value (QLatin1String (AUTOMATIC_LOG_DIR_C), enabled);
     }
 
 
@@ -481,9 +481,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_log_dir (string dir) {
+    public void log_dir (string dir) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (LOG_DIR_C), dir);
+        settings.value (QLatin1String (LOG_DIR_C), dir);
     }
 
 
@@ -501,9 +501,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_log_debug (bool enabled) {
+    public void log_debug (bool enabled) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (LOG_DEBUG_C), enabled);
+        settings.value (QLatin1String (LOG_DEBUG_C), enabled);
     }
 
 
@@ -519,9 +519,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_log_expire (int hours) {
+    public void log_expire (int hours) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (LOG_EXPIRE_C), hours);
+        settings.value (QLatin1String (LOG_EXPIRE_C), hours);
     }
 
 
@@ -537,9 +537,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_log_flush (bool enabled) {
+    public void log_flush (bool enabled) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (LOG_FLUSH_C), enabled);
+        settings.value (QLatin1String (LOG_FLUSH_C), enabled);
     }
 
 
@@ -555,25 +555,25 @@ class ConfigFile {
     /***********************************************************
     Proxy settings
     ***********************************************************/
-    public void set_proxy_type (int proxy_type,
+    public void proxy_type (int proxy_type,
         const string host = "",
         int port = 0, bool needs_auth = false,
         const string user = "",
         const string pass = "");
-    void ConfigFile.set_proxy_type (int proxy_type,
+    void ConfigFile.proxy_type (int proxy_type,
         const string host,
         int port, bool needs_auth,
         const string user,
         const string pass) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
 
-        settings.set_value (QLatin1String (PROXY_TYPE_C), proxy_type);
+        settings.value (QLatin1String (PROXY_TYPE_C), proxy_type);
 
         if (proxy_type == QNetworkProxy.HttpProxy || proxy_type == QNetworkProxy.Socks5Proxy) {
-            settings.set_value (QLatin1String (PROXY_HOST_C), host);
-            settings.set_value (QLatin1String (PROXY_PORT_C), port);
-            settings.set_value (QLatin1String (PROXY_NEEDS_AUTH_C), needs_auth);
-            settings.set_value (QLatin1String (PROXY_USER_C), user);
+            settings.value (QLatin1String (PROXY_HOST_C), host);
+            settings.value (QLatin1String (PROXY_PORT_C), port);
+            settings.value (QLatin1String (PROXY_NEEDS_AUTH_C), needs_auth);
+            settings.value (QLatin1String (PROXY_USER_C), user);
 
             if (pass.is_empty ()) {
                 // Security : Don't keep password in config file
@@ -702,8 +702,8 @@ class ConfigFile {
     /***********************************************************
     ***********************************************************/
     public 
-    void ConfigFile.set_use_upload_limit (int val) {
-        set_value (USE_UPLOAD_LIMIT_C, val);
+    void ConfigFile.use_upload_limit (int val) {
+        value (USE_UPLOAD_LIMIT_C, val);
     }
 
 
@@ -714,9 +714,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_use_download_limit (int);
-    void ConfigFile.set_use_download_limit (int val) {
-        set_value (USE_DOWNLOAD_LIMIT_C, val);
+    public void use_download_limit (int);
+    void ConfigFile.use_download_limit (int val) {
+        value (USE_DOWNLOAD_LIMIT_C, val);
     }
 
 
@@ -743,8 +743,8 @@ class ConfigFile {
     /***********************************************************
     ***********************************************************/
     public 
-    void ConfigFile.set_upload_limit (int kbytes) {
-        set_value (UPLOAD_LIMIT_C, kbytes);
+    void ConfigFile.upload_limit (int kbytes) {
+        value (UPLOAD_LIMIT_C, kbytes);
     }
 
 
@@ -755,9 +755,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_download_limit (int kbytes);
-    void ConfigFile.set_download_limit (int kbytes) {
-        set_value (DOWNLOAD_LIMIT_C, kbytes);
+    public void download_limit (int kbytes);
+    void ConfigFile.download_limit (int kbytes) {
+        value (DOWNLOAD_LIMIT_C, kbytes);
     }
 
 
@@ -776,10 +776,10 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_new_big_folder_size_limit (bool is_checked, int64 mbytes);
-    void ConfigFile.set_new_big_folder_size_limit (bool is_checked, int64 mbytes) {
-        set_value (NEW_BIG_FOLDER_SIZE_LIMIT_C, mbytes);
-        set_value (USE_NEW_BIG_FOLDER_SIZE_LIMIT_C, is_checked);
+    public void new_big_folder_size_limit (bool is_checked, int64 mbytes);
+    void ConfigFile.new_big_folder_size_limit (bool is_checked, int64 mbytes) {
+        value (NEW_BIG_FOLDER_SIZE_LIMIT_C, mbytes);
+        value (USE_NEW_BIG_FOLDER_SIZE_LIMIT_C, is_checked);
     }
 
 
@@ -799,9 +799,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_confirm_external_storage (bool);
-    void ConfigFile.set_confirm_external_storage (bool is_checked) {
-        set_value (CONFIRM_EXTERNAL_STORAGE_C, is_checked);
+    public void confirm_external_storage (bool);
+    void ConfigFile.confirm_external_storage (bool is_checked) {
+        value (CONFIRM_EXTERNAL_STORAGE_C, is_checked);
     }
 
 
@@ -825,9 +825,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_move_to_trash (bool);
-    void ConfigFile.set_move_to_trash (bool is_checked) {
-        set_value (MOVE_TO_TRASH_C, is_checked);
+    public void move_to_trash (bool);
+    void ConfigFile.move_to_trash (bool is_checked) {
+        value (MOVE_TO_TRASH_C, is_checked);
     }
 
 
@@ -869,7 +869,7 @@ class ConfigFile {
     ***********************************************************/
     bool copy_dir_recursive (string from_dir, string to_dir) {
         QDir dir;
-        dir.set_path (from_dir);
+        dir.path (from_dir);
 
         from_dir += QDir.separator ();
         to_dir += QDir.separator ();
@@ -913,7 +913,7 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public static bool set_conf_dir (string value) {
+    public static bool conf_dir (string value) {
         string dir_path = value;
         if (dir_path.is_empty ())
             return false;
@@ -921,7 +921,7 @@ class ConfigFile {
         QFileInfo fi (dir_path);
         if (!fi.exists ()) {
             QDir ().mkpath (dir_path);
-            fi.set_file (dir_path);
+            fi.file (dir_path);
         }
         if (fi.exists () && fi.is_dir ()) {
             dir_path = fi.absolute_file_path ();
@@ -962,9 +962,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_show_in_explorer_navigation_pane (bool show) {
+    public void show_in_explorer_navigation_pane (bool show) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (SHOW_IN_EXPLORER_NAVIGATION_PANE_C), show);
+        settings.value (QLatin1String (SHOW_IN_EXPLORER_NAVIGATION_PANE_C), show);
         settings.sync ();
     }
 
@@ -1018,9 +1018,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_optional_server_notifications (bool show) {
+    public void optional_server_notifications (bool show) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (OPTIONAL_SERVER_NOTIFICATIONS_C), show);
+        settings.value (QLatin1String (OPTIONAL_SERVER_NOTIFICATIONS_C), show);
         settings.sync ();
     }
 
@@ -1032,7 +1032,7 @@ class ConfigFile {
         //  ASSERT (!w.object_name ().is_null ());
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.begin_group (w.object_name ());
-        settings.set_value (QLatin1String (GEOMETRY_C), w.save_geometry ());
+        settings.value (QLatin1String (GEOMETRY_C), w.save_geometry ());
         settings.sync ();
     #endif
     }
@@ -1058,7 +1058,7 @@ class ConfigFile {
 
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.begin_group (header.object_name ());
-        settings.set_value (QLatin1String (GEOMETRY_C), header.save_state ());
+        settings.value (QLatin1String (GEOMETRY_C), header.save_state ());
         settings.sync ();
     #endif
     }
@@ -1122,8 +1122,8 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_skip_update_check (bool, string );
-    void ConfigFile.set_skip_update_check (bool skip, string connection) {
+    public void skip_update_check (bool, string );
+    void ConfigFile.skip_update_check (bool skip, string connection) {
         string con (connection);
         if (connection.is_empty ())
             con = default_connection ();
@@ -1131,7 +1131,7 @@ class ConfigFile {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.begin_group (con);
 
-        settings.set_value (QLatin1String (SKIP_UPDATE_CHECK_C), GLib.Variant (skip));
+        settings.value (QLatin1String (SKIP_UPDATE_CHECK_C), GLib.Variant (skip));
         settings.sync ();
     }
 
@@ -1155,8 +1155,8 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_auto_update_check (bool, string );
-    void ConfigFile.set_auto_update_check (bool auto_check, string connection) {
+    public void auto_update_check (bool, string );
+    void ConfigFile.auto_update_check (bool auto_check, string connection) {
         string con (connection);
         if (connection.is_empty ())
             con = default_connection ();
@@ -1164,7 +1164,7 @@ class ConfigFile {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.begin_group (con);
 
-        settings.set_value (QLatin1String (AUTO_UPDATE_CHECK_C), GLib.Variant (auto_check));
+        settings.value (QLatin1String (AUTO_UPDATE_CHECK_C), GLib.Variant (auto_check));
         settings.sync ();
     }
 
@@ -1183,7 +1183,7 @@ class ConfigFile {
         if (segment < 0 || segment > 99) {
             // Save valid segment value, normally has to be done only once.
             segment = Utility.rand () % 99;
-            settings.set_value (QLatin1String (UPDATE_SEGMENT_C), segment);
+            settings.value (QLatin1String (UPDATE_SEGMENT_C), segment);
         }
 
         return segment;
@@ -1212,9 +1212,9 @@ class ConfigFile {
     /***********************************************************
     ***********************************************************/
     public 
-    void ConfigFile.set_update_channel (string channel) {
+    void ConfigFile.update_channel (string channel) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (UPDATE_CHANNEL_C), channel);
+        settings.value (QLatin1String (UPDATE_CHANNEL_C), channel);
     }
 
 
@@ -1245,9 +1245,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_certificate_path (string c_path) {
+    public void certificate_path (string c_path) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (CERT_PATH), c_path);
+        settings.value (QLatin1String (CERT_PATH), c_path);
         settings.sync ();
     }
 
@@ -1261,9 +1261,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_certificate_password (string c_password) {
+    public void certificate_password (string c_password) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (CERT_PASSWORD), c_password);
+        settings.value (QLatin1String (CERT_PASSWORD), c_password);
         settings.sync ();
     }
 
@@ -1280,9 +1280,9 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void set_client_version_string (string version) {
+    public void client_version_string (string version) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        settings.set_value (QLatin1String (CLIENT_VERSION_C), version);
+        settings.value (QLatin1String (CLIENT_VERSION_C), version);
     }
 
 
@@ -1358,7 +1358,7 @@ class ConfigFile {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
 
         settings.begin_group (con);
-        settings.set_value (key, value);
+        settings.value (key, value);
         settings.sync ();
     }
 
@@ -1433,10 +1433,10 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    private void set_value (string key, GLib.Variant value) {
+    private void value (string key, GLib.Variant value) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
 
-        settings.set_value (key, value);
+        settings.value (key, value);
     }
 
 } // class ConfigFile

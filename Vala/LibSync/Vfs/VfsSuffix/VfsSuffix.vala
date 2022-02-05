@@ -61,8 +61,8 @@ class Vfs_suffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public bool set_pin_state (string folder_path, PinState state) override {
-        return set_pin_state_in_database (folder_path, state);
+    public bool pin_state (string folder_path, PinState state) override {
+        return pin_state_in_database (folder_path, state);
     }
 
 
@@ -127,7 +127,7 @@ class Vfs_suffix : Vfs {
             return {_("Error updating metadata due to invalid modified time")};
         }
 
-        FileSystem.set_mod_time (file_path, modtime);
+        FileSystem.mod_time (file_path, modtime);
         return {};
     }
 
@@ -154,7 +154,7 @@ class Vfs_suffix : Vfs {
 
         file.write (" ");
         file.close ();
-        FileSystem.set_mod_time (fn, item.modtime);
+        FileSystem.mod_time (fn, item.modtime);
         return {};
     }
 
@@ -172,14 +172,14 @@ class Vfs_suffix : Vfs {
         // Move the item's pin state
         var pin = this.setup_params.journal.internal_pin_states ().raw_for_path (item.file.to_utf8 ());
         if (pin && *pin != PinState.PinState.INHERITED) {
-            set_pin_state (item.rename_target, *pin);
-            set_pin_state (item.file, PinState.PinState.INHERITED);
+            pin_state (item.rename_target, *pin);
+            pin_state (item.file, PinState.PinState.INHERITED);
         }
 
         // Ensure the pin state isn't contradictory
         pin = pin_state (item.rename_target);
         if (pin && *pin == PinState.PinState.ALWAYS_LOCAL)
-            set_pin_state (item.rename_target, PinState.PinState.UNSPECIFIED);
+            pin_state (item.rename_target, PinState.PinState.UNSPECIFIED);
         return {};
     }
 

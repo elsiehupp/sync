@@ -27,12 +27,12 @@ class Owncloud_http_creds_page : Abstract_credentials_wizard_page {
     public void cleanup_page () override;
     public bool validate_page () override;
     public int next_id () override;
-    public void set_connected ();
+    public void connected ();
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_set_error_string (string err);
+    public void on_error_string (string err);
 
 signals:
     void connect_to_oc_url (string );
@@ -63,7 +63,7 @@ signals:
         this.ui ()
         this.connected (false)
         this.progress_indi (new QProgress_indicator (this)) {
-        this.ui.set_up_ui (this);
+        this.ui.up_ui (this);
 
         if (parent) {
             this.oc_wizard = qobject_cast<OwncloudWizard> (parent);
@@ -78,18 +78,18 @@ signals:
             // default, handled in ui file
             break;
         case Theme.UserIdentifierType.EMAIL:
-            this.ui.username_label.on_set_text (_("&Email"));
+            this.ui.username_label.on_text (_("&Email"));
             break;
         case Theme.UserIdentifierType.CUSTOM:
-            this.ui.username_label.on_set_text (theme.custom_user_id ());
+            this.ui.username_label.on_text (theme.custom_user_id ());
             break;
         default:
             break;
         }
-        this.ui.le_username.set_placeholder_text (theme.user_id_hint ());
+        this.ui.le_username.placeholder_text (theme.user_id_hint ());
 
-        set_title (WizardCommon.title_template ().arg (_("Connect to %1").arg (Theme.instance ().app_name_gui ())));
-        set_sub_title (WizardCommon.sub_title_template ().arg (_("Enter user credentials")));
+        title (WizardCommon.title_template ().arg (_("Connect to %1").arg (Theme.instance ().app_name_gui ())));
+        sub_title (WizardCommon.sub_title_template ().arg (_("Enter user credentials")));
 
         this.ui.result_layout.add_widget (this.progress_indi);
         on_stop_spinner ();
@@ -120,7 +120,7 @@ signals:
         if (http_creds) {
             const string user = http_creds.fetch_user ();
             if (!user.is_empty ()) {
-                this.ui.le_username.on_set_text (user);
+                this.ui.le_username.on_text (user);
             }
         } else {
             GLib.Uri url = oc_wizard.account ().url ();
@@ -136,15 +136,15 @@ signals:
             const string password = url.password ();
 
             if (!user.is_empty ()) {
-                this.ui.le_username.on_set_text (user);
+                this.ui.le_username.on_text (user);
             }
             if (!password.is_empty ()) {
-                this.ui.le_password.on_set_text (password);
+                this.ui.le_password.on_text (password);
             }
         }
-        this.ui.token_label.on_set_text (HttpCredentialsGui.request_app_password_text (oc_wizard.account ().data ()));
-        this.ui.token_label.set_visible (!this.ui.token_label.text ().is_empty ());
-        this.ui.le_username.set_focus ();
+        this.ui.token_label.on_text (HttpCredentialsGui.request_app_password_text (oc_wizard.account ().data ()));
+        this.ui.token_label.visible (!this.ui.token_label.text ().is_empty ());
+        this.ui.le_username.focus ();
     }
 
     void Owncloud_http_creds_page.cleanup_page () {
@@ -158,7 +158,7 @@ signals:
         }
 
         if (!this.connected) {
-            this.ui.error_label.set_visible (false);
+            this.ui.error_label.visible (false);
             on_start_spinner ();
 
             // Reset cookies to ensure the username / password is actually used
@@ -184,29 +184,29 @@ signals:
         return WizardCommon.Page_Advanced_setup;
     }
 
-    void Owncloud_http_creds_page.set_connected () {
+    void Owncloud_http_creds_page.connected () {
         this.connected = true;
         on_stop_spinner ();
     }
 
     void Owncloud_http_creds_page.on_start_spinner () {
-        this.ui.result_layout.set_enabled (true);
-        this.progress_indi.set_visible (true);
+        this.ui.result_layout.enabled (true);
+        this.progress_indi.visible (true);
         this.progress_indi.on_start_animation ();
     }
 
     void Owncloud_http_creds_page.on_stop_spinner () {
-        this.ui.result_layout.set_enabled (false);
-        this.progress_indi.set_visible (false);
+        this.ui.result_layout.enabled (false);
+        this.progress_indi.visible (false);
         this.progress_indi.on_stop_animation ();
     }
 
-    void Owncloud_http_creds_page.on_set_error_string (string err) {
+    void Owncloud_http_creds_page.on_error_string (string err) {
         if (err.is_empty ()) {
-            this.ui.error_label.set_visible (false);
+            this.ui.error_label.visible (false);
         } else {
-            this.ui.error_label.set_visible (true);
-            this.ui.error_label.on_set_text (err);
+            this.ui.error_label.visible (true);
+            this.ui.error_label.on_text (err);
         }
         /* emit */ complete_changed ();
         on_stop_spinner ();
@@ -222,7 +222,7 @@ signals:
 
     void Owncloud_http_creds_page.customize_style () {
         if (this.progress_indi)
-            this.progress_indi.on_set_color (QGuiApplication.palette ().color (QPalette.Text));
+            this.progress_indi.on_color (QGuiApplication.palette ().color (QPalette.Text));
     }
 
     } // namespace Occ

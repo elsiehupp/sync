@@ -78,7 +78,7 @@ class AccountManager : GLib.Object {
     ***********************************************************/
     public void save (bool save_credentials = true) {
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
-        settings.set_value (QLatin1String (VERSION_C), MAX_ACCOUNTS_VERSION);
+        settings.value (QLatin1String (VERSION_C), MAX_ACCOUNTS_VERSION);
         for (var acc : q_as_const (this.accounts)) {
             settings.begin_group (acc.account ().identifier ());
             save_account_helper (acc.account ().data (), *settings, save_credentials);
@@ -222,7 +222,7 @@ class AccountManager : GLib.Object {
     ***********************************************************/
     public static AccountPointer create_account () {
         AccountPointer acc = Account.create ();
-        acc.set_ssl_error_handler (new SslDialogErrorHandler);
+        acc.ssl_error_handler (new SslDialogErrorHandler);
         connect (acc.data (), &Account.proxy_authentication_required,
             ProxyAuthHandler.instance (), &ProxyAuthHandler.on_handle_proxy_authentication_required);
 
@@ -256,10 +256,10 @@ class AccountManager : GLib.Object {
     ***********************************************************/
     // saving and loading Account to settings
     private void save_account_helper (Account account, QSettings settings, bool save_credentials = true) {
-        settings.set_value (QLatin1String (VERSION_C), MAX_ACCOUNT_VERSION);
-        settings.set_value (QLatin1String (URL_C), acc.url.to_string ());
-        settings.set_value (QLatin1String (DAV_USER_C), acc.dav_user);
-        settings.set_value (QLatin1String (SERVER_VERSION_C), acc.server_version);
+        settings.value (QLatin1String (VERSION_C), MAX_ACCOUNT_VERSION);
+        settings.value (QLatin1String (URL_C), acc.url.to_string ());
+        settings.value (QLatin1String (DAV_USER_C), acc.dav_user);
+        settings.value (QLatin1String (SERVER_VERSION_C), acc.server_version);
         if (acc.credentials) {
             if (save_credentials) {
                 // Only persist the credentials if the parameter is set, on migration from 1.8.x
@@ -269,13 +269,13 @@ class AccountManager : GLib.Object {
                 acc.credentials.persist ();
             }
             for (var key : acc.settings_map.keys ()) {
-                settings.set_value (key, acc.settings_map.value (key));
+                settings.value (key, acc.settings_map.value (key));
             }
-            settings.set_value (QLatin1String (AUTH_TYPE_C), acc.credentials.auth_type ());
+            settings.value (QLatin1String (AUTH_TYPE_C), acc.credentials.auth_type ());
 
             // HACK : Save http_user also as user
             if (acc.settings_map.contains (HTTP_USER_C))
-                settings.set_value (USER_C, acc.settings_map.value (HTTP_USER_C));
+                settings.value (USER_C, acc.settings_map.value (HTTP_USER_C));
         }
 
         // Save accepted certificates.
@@ -286,7 +286,7 @@ class AccountManager : GLib.Object {
             certificates += cert.to_pem () + '\n';
         }
         if (!certificates.is_empty ()) {
-            settings.set_value (QLatin1String (CA_CERTS_KEY_C), certificates);
+            settings.value (QLatin1String (CA_CERTS_KEY_C), certificates);
         }
         settings.end_group ();
 
@@ -332,22 +332,22 @@ class AccountManager : GLib.Object {
         if (!force_auth.is_empty () && !override_url.is_empty ()) {
             // If force_auth is set, this might also mean the override_uRL has changed.
             // See enterprise issues #1126
-            acc.set_url (override_url);
+            acc.url (override_url);
             auth_type = force_auth;
         } else {
-            acc.set_url (url_config.to_url ());
+            acc.url (url_config.to_url ());
         }
 
         // Migrate to webflow
         if (auth_type == QLatin1String ("http")) {
             auth_type = "webflow";
-            settings.set_value (QLatin1String (AUTH_TYPE_C), auth_type);
+            settings.value (QLatin1String (AUTH_TYPE_C), auth_type);
 
             foreach (string key in settings.child_keys ()) {
                 if (!key.starts_with ("http_"))
                     continue;
                 var newkey = string.from_latin1 ("webflow_").append (key.mid (5));
-                settings.set_value (newkey, settings.value ( (key)));
+                settings.value (newkey, settings.value ( (key)));
                 settings.remove (key);
             }
         }
@@ -366,13 +366,13 @@ class AccountManager : GLib.Object {
             acc.settings_map.insert (key, settings.value (key));
         }
 
-        acc.set_credentials (CredentialsFactory.create (auth_type));
+        acc.credentials (CredentialsFactory.create (auth_type));
 
         // now the server cert, it is in the general group
         settings.begin_group (QLatin1String ("General"));
         const var certificates = QSslCertificate.from_data (settings.value (CA_CERTS_KEY_C).to_byte_array ());
         GLib.info (lc_account_manager) << "Restored : " << certificates.count () << " unknown certificates.";
-        acc.set_approved_certificates (certificates);
+        acc.approved_certificates (certificates);
         settings.end_group ();
 
         return acc;
@@ -509,15 +509,15 @@ class AccountManager : GLib.Object {
     void AccountManager.on_display_mnemonic (string mnemonic) {
         var widget = new Gtk.Dialog;
         Ui_Dialog ui;
-        ui.set_up_ui (widget);
-        widget.set_window_title (_("End to end encryption mnemonic"));
-        ui.label.on_set_text (_("To protect your Cryptographic Identity, we encrypt it with a mnemonic of 12 dictionary words. "
+        ui.up_ui (widget);
+        widget.window_title (_("End to end encryption mnemonic"));
+        ui.label.on_text (_("To protect your Cryptographic Identity, we encrypt it with a mnemonic of 12 dictionary words. "
                              "Please note these down and keep them safe. "
                              "They will be needed to add other devices to your account (like your mobile phone or laptop)."));
-        ui.text_edit.on_set_text (mnemonic);
+        ui.text_edit.on_text (mnemonic);
         ui.text_edit.focus_widget ();
         ui.text_edit.select_all ();
-        ui.text_edit.set_alignment (Qt.AlignCenter);
+        ui.text_edit.alignment (Qt.AlignCenter);
         widget.exec ();
         widget.resize (widget.size_hint ());
     }

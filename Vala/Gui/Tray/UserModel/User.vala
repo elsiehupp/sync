@@ -244,7 +244,7 @@ signals:
     public void on_refresh_immediately ();
 
 
-    public void on_set_notification_refresh_interval (std.chrono.milliseconds interval);
+    public void on_notification_refresh_interval (std.chrono.milliseconds interval);
 
 
     public void on_rebuild_navigation_app_list ();
@@ -384,7 +384,7 @@ void User.on_build_notification_display (Activity_list list) {
     }
 }
 
-void User.on_set_notification_refresh_interval (std.chrono.milliseconds interval) {
+void User.on_notification_refresh_interval (std.chrono.milliseconds interval) {
     if (!check_push_notifications_are_ready ()) {
         GLib.debug (lc_activity) << "Starting Notification refresh timer with " << interval.count () / 1000 << " sec interval";
         this.notification_check_timer.on_start (interval.count ());
@@ -409,7 +409,7 @@ void User.on_disconnect_push_notifications () {
     disconnect (this.account.account ().data (), &Account.push_notifications_disabled, this, &User.on_disconnect_push_notifications);
 
     // connection to Web_socket may have dropped or an error occured, so we need to bring back the polling until we have re-established the connection
-    on_set_notification_refresh_interval (ConfigFile ().notification_refresh_interval ());
+    on_notification_refresh_interval (ConfigFile ().notification_refresh_interval ());
 }
 
 void User.on_received_push_notification (Account account) {
@@ -557,8 +557,8 @@ void User.on_send_notification_request (string account_name, string link, GLib.B
         if (acc) {
             var job = new Notification_confirm_job (acc.account ());
             GLib.Uri l (link);
-            job.set_link_and_verb (l, verb);
-            job.set_property ("activity_row", GLib.Variant.from_value (row));
+            job.link_and_verb (l, verb);
+            job.property ("activity_row", GLib.Variant.from_value (row));
             connect (job, &AbstractNetworkJob.network_error,
                 this, &User.on_notify_network_error);
             connect (job, &Notification_confirm_job.job_finished,
@@ -809,7 +809,7 @@ AccountStatePtr User.account_state () {
     return this.account;
 }
 
-void User.set_current_user (bool is_current) {
+void User.current_user (bool is_current) {
     this.is_current_user = is_current;
 }
 

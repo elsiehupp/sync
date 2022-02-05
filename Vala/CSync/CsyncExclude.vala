@@ -75,7 +75,7 @@ class ExcludedFiles : GLib.Object {
 
     Defaults to true.
     ***********************************************************/
-    public void set_exclude_conflict_files (bool onoff);
+    public void exclude_conflict_files (bool onoff);
 
 
     /***********************************************************
@@ -115,13 +115,13 @@ class ExcludedFiles : GLib.Object {
     /***********************************************************
     Adjusts behavior of wildcards. Only used for testing.
     ***********************************************************/
-    public void set_wildcards_match_slash (bool onoff);
+    public void wildcards_match_slash (bool onoff);
 
 
     /***********************************************************
     Sets the client version, only used for testing.
     ***********************************************************/
-    public void set_client_version (Version version);
+    public void client_version (Version version);
 
 
     /***********************************************************
@@ -551,7 +551,7 @@ void ExcludedFiles.add_exclude_file_path (string path) {
     }
 }
 
-void ExcludedFiles.set_exclude_conflict_files (bool onoff) {
+void ExcludedFiles.exclude_conflict_files (bool onoff) {
     this.exclude_conflict_files = onoff;
 }
 
@@ -573,12 +573,12 @@ void ExcludedFiles.clear_manual_excludes () {
     on_reload_exclude_files ();
 }
 
-void ExcludedFiles.set_wildcards_match_slash (bool onoff) {
+void ExcludedFiles.wildcards_match_slash (bool onoff) {
     this.wildcards_match_slash = onoff;
     prepare ();
 }
 
-void ExcludedFiles.set_client_version (ExcludedFiles.Version version) {
+void ExcludedFiles.client_version (ExcludedFiles.Version version) {
     this.client_version = version;
 }
 
@@ -598,7 +598,7 @@ void ExcludedFiles.on_load_exclude_file_patterns (string base_path, GLib.File fi
     this.all_excludes[base_path].append (patterns);
 
     // nothing to prepare if the user decided to not exclude anything
-    if (!this.all_excludes.value (base_path).is_empty ()){
+    if (!this.all_excludes.value (base_path).is_empty ()) {
         prepare (base_path);
     }
 }
@@ -1083,12 +1083,12 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
     // (exclude)| (excluderemove)| (bname triggers).
     // If the third group matches, the full_activated_regex needs to be applied
     // to the full path.
-    this.bname_traversal_regex_file[base_path].set_pattern (
+    this.bname_traversal_regex_file[base_path].pattern (
         QStringLiteral ("^ (?P<exclude>%1)$|"
                        "^ (?P<excluderemove>%2)$|"
                        "^ (?P<trigger>%3)$")
             .arg (bname_file_dir_keep, bname_file_dir_remove, bname_trigger_file_dir));
-    this.bname_traversal_regex_dir[base_path].set_pattern (
+    this.bname_traversal_regex_dir[base_path].pattern (
         QStringLiteral ("^ (?P<exclude>%1|%2)$|"
                        "^ (?P<excluderemove>%3|%4)$|"
                        "^ (?P<trigger>%5|%6)$")
@@ -1098,13 +1098,13 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
     // the bname regex matches. Its basic form is (exclude)| (excluderemove)".
     // This pattern can be much simpler than full_regex since we can assume a traversal
     // situation and doesn't need to look for bname patterns in parent paths.
-    this.full_traversal_regex_file[base_path].set_pattern (
+    this.full_traversal_regex_file[base_path].pattern (
         // Full patterns are anchored to the beginning
         QStringLiteral ("^ (?P<exclude>%1) (?:$|/)"
                        "|"
                        "^ (?P<excluderemove>%2) (?:$|/)")
             .arg (full_file_dir_keep, full_file_dir_remove));
-    this.full_traversal_regex_dir[base_path].set_pattern (
+    this.full_traversal_regex_dir[base_path].pattern (
         QStringLiteral ("^ (?P<exclude>%1|%2) (?:$|/)"
                        "|"
                        "^ (?P<excluderemove>%3|%4) (?:$|/)")
@@ -1112,7 +1112,7 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
 
     // The full regex is applied to the full path and incorporates both bname and
     // full-path patterns. It has the form " (exclude)| (excluderemove)".
-    this.full_regex_file[base_path].set_pattern (
+    this.full_regex_file[base_path].pattern (
         QStringLiteral (" (?P<exclude>"
                        // Full patterns are anchored to the beginning
                        "^ (?:%1) (?:$|/)|"
@@ -1127,7 +1127,7 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
                        " (?:^|/) (?:%5) (?:$|/)|"
                        " (?:^|/) (?:%6)/)")
             .arg (full_file_dir_keep, bname_file_dir_keep, bname_dir_keep, full_file_dir_remove, bname_file_dir_remove, bname_dir_remove));
-    this.full_regex_dir[base_path].set_pattern (
+    this.full_regex_dir[base_path].pattern (
         QStringLiteral (" (?P<exclude>"
                        "^ (?:%1|%2) (?:$|/)|"
                        " (?:^|/) (?:%3|%4) (?:$|/))"
@@ -1140,16 +1140,16 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
     QRegularExpression.Pattern_options pattern_options = QRegularExpression.No_pattern_option;
     if (Occ.Utility.fs_case_preserving ())
         pattern_options |= QRegularExpression.Case_insensitive_option;
-    this.bname_traversal_regex_file[base_path].set_pattern_options (pattern_options);
+    this.bname_traversal_regex_file[base_path].pattern_options (pattern_options);
     this.bname_traversal_regex_file[base_path].optimize ();
-    this.bname_traversal_regex_dir[base_path].set_pattern_options (pattern_options);
+    this.bname_traversal_regex_dir[base_path].pattern_options (pattern_options);
     this.bname_traversal_regex_dir[base_path].optimize ();
-    this.full_traversal_regex_file[base_path].set_pattern_options (pattern_options);
+    this.full_traversal_regex_file[base_path].pattern_options (pattern_options);
     this.full_traversal_regex_file[base_path].optimize ();
-    this.full_traversal_regex_dir[base_path].set_pattern_options (pattern_options);
+    this.full_traversal_regex_dir[base_path].pattern_options (pattern_options);
     this.full_traversal_regex_dir[base_path].optimize ();
-    this.full_regex_file[base_path].set_pattern_options (pattern_options);
+    this.full_regex_file[base_path].pattern_options (pattern_options);
     this.full_regex_file[base_path].optimize ();
-    this.full_regex_dir[base_path].set_pattern_options (pattern_options);
+    this.full_regex_dir[base_path].pattern_options (pattern_options);
     this.full_regex_dir[base_path].optimize ();
 }

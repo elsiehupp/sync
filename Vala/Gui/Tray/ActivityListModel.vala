@@ -150,12 +150,12 @@ signals:
     protected void activities_received (QJsonDocument json, int status_code);
     protected GLib.HashMap<int, GLib.ByteArray> role_names () override;
 
-    protected void set_account_state (AccountState state);
-    protected void set_currently_fetching (bool value);
+    protected void account_state (AccountState state);
+    protected void currently_fetching (bool value);
     protected bool currently_fetching ();
-    protected void set_done_fetching (bool value);
-    protected void set_hide_old_activities (bool value);
-    protected void set_display_actions (bool value);
+    protected void done_fetching (bool value);
+    protected void hide_old_activities (bool value);
+    protected void display_actions (bool value);
 
     protected virtual void start_fetch_job ();
 
@@ -228,11 +228,11 @@ signals:
         return roles;
     }
 
-    void ActivityListModel.set_account_state (AccountState state) {
+    void ActivityListModel.account_state (AccountState state) {
         this.account_state = state;
     }
 
-    void ActivityListModel.set_currently_fetching (bool value) {
+    void ActivityListModel.currently_fetching (bool value) {
         this.currently_fetching = value;
     }
 
@@ -240,15 +240,15 @@ signals:
         return this.currently_fetching;
     }
 
-    void ActivityListModel.set_done_fetching (bool value) {
+    void ActivityListModel.done_fetching (bool value) {
         this.done_fetching = value;
     }
 
-    void ActivityListModel.set_hide_old_activities (bool value) {
+    void ActivityListModel.hide_old_activities (bool value) {
         this.hide_old_activities = value;
     }
 
-    void ActivityListModel.set_display_actions (bool value) {
+    void ActivityListModel.display_actions (bool value) {
         this.display_actions = value;
     }
 
@@ -616,10 +616,10 @@ signals:
                 this.current_conflict_dialog.close ();
             }
             this.current_conflict_dialog = new ConflictDialog;
-            this.current_conflict_dialog.on_set_base_filename (base_name);
-            this.current_conflict_dialog.on_set_local_version_filename (conflicted_path);
-            this.current_conflict_dialog.on_set_remote_version_filename (base_path);
-            this.current_conflict_dialog.set_attribute (Qt.WA_DeleteOnClose);
+            this.current_conflict_dialog.on_base_filename (base_name);
+            this.current_conflict_dialog.on_local_version_filename (conflicted_path);
+            this.current_conflict_dialog.on_remote_version_filename (base_path);
+            this.current_conflict_dialog.attribute (Qt.WA_DeleteOnClose);
             connect (this.current_conflict_dialog, &ConflictDialog.accepted, folder, [folder] () {
                 folder.schedule_this_folder_soon ();
             });

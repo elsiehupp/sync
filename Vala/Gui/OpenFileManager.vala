@@ -67,7 +67,7 @@ static string find_default_file_manager () {
             << "/applications/kde4/";
     foreach (string dir, dirs) {
         foreach (string subdir, subdirs) {
-            fi.set_file (dir + subdir + filename);
+            fi.file (dir + subdir + filename);
             if (fi.exists ()) {
                 return fi.absolute_file_path ();
             }

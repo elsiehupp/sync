@@ -130,7 +130,7 @@ protected slots:
 
     /***********************************************************
     ***********************************************************/
-    private void set_help ();
+    private void help ();
 
 
     /***********************************************************
@@ -275,7 +275,7 @@ bool Application.config_version_migration () {
             settings.remove (bad_key);
     }
 
-    config_file.set_client_version_string (MIRALL_VERSION_STRING);
+    config_file.client_version_string (MIRALL_VERSION_STRING);
     return true;
 }
 
@@ -301,23 +301,23 @@ Application.Application (int argc, char **argv)
     qsrand (std.random_device () ());
 
     // TODO : Can't set this without breaking current config paths
-    //    set_organization_name (QLatin1String (APPLICATION_VENDOR));
-    set_organization_domain (QLatin1String (APPLICATION_REV_DOMAIN));
+    //    organization_name (QLatin1String (APPLICATION_VENDOR));
+    organization_domain (QLatin1String (APPLICATION_REV_DOMAIN));
 
-    // set_desktop_filename to provide wayland compatibility (in general : conformance with naming standards)
-    // but only on Qt >= 5.7, where set_desktop_filename was introduced
+    // desktop_filename to provide wayland compatibility (in general : conformance with naming standards)
+    // but only on Qt >= 5.7, where desktop_filename was introduced
 #if (QT_VERSION >= 0x050700)
     string desktop_filename = string (QLatin1String (LINUX_APPLICATION_ID)
                                         + QLatin1String (".desktop"));
-    set_desktop_filename (desktop_filename);
+    desktop_filename (desktop_filename);
 //  #endif
 
-    set_application_name (this.theme.app_name ());
-    set_window_icon (this.theme.application_icon ());
+    application_name (this.theme.app_name ());
+    window_icon (this.theme.application_icon ());
 
     if (!ConfigFile ().exists ()) {
         // Migrate from version <= 2.4
-        set_application_name (this.theme.app_name_gui ());
+        application_name (this.theme.app_name_gui ());
 //  #ifndef QT_WARNING_DISABLE_DEPRECATED // Was added in Qt 5.9
 const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-declarations")
 //  #endif
@@ -328,7 +328,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         string old_dir = QDesktopServices.storage_location (QDesktopServices.DataLocation);
         if (old_dir.ends_with ('/')) old_dir.chop (1); // macOS 10.11.x does not like trailing slash for rename/move.
         QT_WARNING_POP
-        set_application_name (this.theme.app_name ());
+        application_name (this.theme.app_name ());
         if (QFileInfo (old_dir).is_dir ()) {
             var conf_dir = ConfigFile ().config_path ();
             if (conf_dir.ends_with ('/')) conf_dir.chop (1);  // macOS 10.11.x does not like trailing slash for rename/move.
@@ -415,11 +415,11 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         }
     }
 
-    FolderMan.instance ().set_sync_enabled (true);
+    FolderMan.instance ().sync_enabled (true);
 
-    set_quit_on_last_window_closed (false);
+    quit_on_last_window_closed (false);
 
-    this.theme.set_systray_use_mono_icons (config.mono_icons ());
+    this.theme.systray_use_mono_icons (config.mono_icons ());
     connect (this.theme, &Theme.systray_use_mono_icons_changed, this, &Application.on_use_mono_icons_changed);
 
     // Setting up the gui class will allow tray notifications for the
@@ -451,7 +451,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
 
     // startup procedure.
     connect (&this.check_connection_timer, &QTimer.timeout, this, &Application.on_check_connection);
-    this.check_connection_timer.set_interval (ConnectionValidator.DefaultCallingIntervalMsec); // check for connection every 32 seconds.
+    this.check_connection_timer.interval (ConnectionValidator.DefaultCallingIntervalMsec); // check for connection every 32 seconds.
     this.check_connection_timer.on_start ();
     // Also check immediately
     QTimer.single_shot (0, this, &Application.on_check_connection);
@@ -574,7 +574,7 @@ void Application.on_owncloud_wizard_done (int res) {
     FolderMan folder_man = FolderMan.instance ();
 
     // During the wizard, scheduling of new syncs is disabled
-    folder_man.set_sync_enabled (true);
+    folder_man.sync_enabled (true);
 
     if (res == Gtk.Dialog.Accepted) {
         // Check connectivity of the newly created account
@@ -583,12 +583,12 @@ void Application.on_owncloud_wizard_done (int res) {
 
         // If one account is configured : enable autostart
 //  #ifndef QT_DEBUG
-        bool should_set_auto_start = AccountManager.instance ().accounts ().size () == 1;
+        bool should_auto_start = AccountManager.instance ().accounts ().size () == 1;
 #else
-        bool should_set_auto_start = false;
+        bool should_auto_start = false;
 //  #endif
-        if (should_set_auto_start) {
-            Utility.set_launch_on_startup (this.theme.app_name (), this.theme.app_name_gui (), true);
+        if (should_auto_start) {
+            Utility.launch_on_startup (this.theme.app_name (), this.theme.app_name_gui (), true);
         }
 
         Systray.instance ().show_window ();
@@ -598,13 +598,13 @@ void Application.on_owncloud_wizard_done (int res) {
 void Application.setup_logging () {
     // might be called from second instance
     var logger = Logger.instance ();
-    logger.set_log_file (this.log_file);
+    logger.log_file (this.log_file);
     if (this.log_file.is_empty ()) {
-        logger.set_log_dir (this.log_dir.is_empty () ? ConfigFile ().log_dir () : this.log_dir);
+        logger.log_dir (this.log_dir.is_empty () ? ConfigFile ().log_dir () : this.log_dir);
     }
-    logger.set_log_expire (this.log_expire > 0 ? this.log_expire : ConfigFile ().log_expire ());
-    logger.set_log_flush (this.log_flush || ConfigFile ().log_flush ());
-    logger.set_log_debug (this.log_debug || ConfigFile ().log_debug ());
+    logger.log_expire (this.log_expire > 0 ? this.log_expire : ConfigFile ().log_expire ());
+    logger.log_flush (this.log_flush || ConfigFile ().log_flush ());
+    logger.log_debug (this.log_debug || ConfigFile ().log_debug ());
     if (!logger.is_logging_to_file () && ConfigFile ().automatic_log_dir ()) {
         logger.setup_temporary_folder_log_dir ();
     }
@@ -664,7 +664,7 @@ void Application.parse_options (string[] options) {
     while (it.has_next ()) {
         string option = it.next ();
         if (option == QLatin1String ("--help") || option == QLatin1String ("-h")) {
-            set_help ();
+            help ();
             break;
         } else if (option == QLatin1String ("--quit") || option == QLatin1String ("-q")) {
             this.quit_instance = true;
@@ -695,7 +695,7 @@ void Application.parse_options (string[] options) {
         } else if (option == QLatin1String ("--confdir")) {
             if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
                 string conf_dir = it.next ();
-                if (!ConfigFile.set_conf_dir (conf_dir)) {
+                if (!ConfigFile.conf_dir (conf_dir)) {
                     show_hint ("Invalid path passed to --confdir");
                 }
             } else {
@@ -726,7 +726,7 @@ static void display_help_text (string t) {
 }
 
 void Application.show_help () {
-    set_help ();
+    help ();
     string help_text;
     QTextStream stream (&help_text);
     stream << this.theme.app_name ()
@@ -764,7 +764,7 @@ bool Application.background_mode () {
     return this.background_mode;
 }
 
-void Application.set_help () {
+void Application.help () {
     this.help_only = true;
 }
 
@@ -806,7 +806,7 @@ void Application.setup_translations () {
             // "en" is an exception as it is the default language and may not
             // have a translation file provided.
             GLib.info (lc_application) << "Using" << lang << "translation";
-            set_property ("ui_lang", lang);
+            property ("ui_lang", lang);
             const string qt_tr_path = QLibraryInfo.location (QLibraryInfo.TranslationsPath);
             const string qt_tr_file = QLatin1String ("qt_") + lang;
             const string qt_base_tr_file = QLatin1String ("qtbase_") + lang;
@@ -830,7 +830,7 @@ void Application.setup_translations () {
             break;
         }
         if (property ("ui_lang").is_null ())
-            set_property ("ui_lang", "C");
+            property ("ui_lang", "C");
     }
 }
 

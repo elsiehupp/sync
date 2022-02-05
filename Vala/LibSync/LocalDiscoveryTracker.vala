@@ -19,7 +19,7 @@ It does this by being notified about
 - on_finished syncs (on_sync_finished (), by SyncEngine signal)
 
 Then local_discovery_paths () can be used to determine paths to redis
-and send to SyncEngine.set_local_disco
+and send to SyncEngine.local_disco
 
 This class is primarily used from Folder and separate primarily for
 readability and testing purposes.

@@ -67,7 +67,7 @@ class EncryptFolderJob : GLib.Object {
         this.journal.get_file_record (this.path, record);
         if (record.is_valid ()) {
             record.is_e2e_encrypted = true;
-            this.journal.set_file_record (record);
+            this.journal.file_record (record);
         }
 
         var lock_job = new LockEncryptFolderApiJob (this.account, file_identifier, this);

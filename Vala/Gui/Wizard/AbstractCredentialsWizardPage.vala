@@ -30,7 +30,7 @@ class Abstract_credentials_wizard_page : QWizard_page {
         AbstractCredentials creds = account.credentials ();
         if (creds) {
             if (!creds.inherits ("DummyCredentials")) {
-                account.set_credentials (CredentialsFactory.create ("dummy"));
+                account.credentials (CredentialsFactory.create ("dummy"));
             }
         }
     }

@@ -78,7 +78,7 @@ class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void set_bandwidth_manager (BandwidthManager bandwidth_manager);
+    public void bandwidth_manager (BandwidthManager bandwidth_manager);
 
     /***********************************************************
     ***********************************************************/
@@ -90,7 +90,7 @@ class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void set_bandwidth_limited (bool b);
+    public void bandwidth_limited (bool b);
 
     /***********************************************************
     ***********************************************************/
@@ -103,7 +103,7 @@ class GETFileJob : AbstractNetworkJob {
     public int64 current_download_position ();
 
     public string error_string () override;
-    public void on_set_error_string (string s) {
+    public void on_error_string (string s) {
         this.error_string = s;
     }
 
@@ -117,7 +117,7 @@ class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void set_error_status (SyncFileItem.Status s) {
+    public void error_status (SyncFileItem.Status s) {
         this.error_status = s;
     }
 
@@ -161,7 +161,7 @@ class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void set_expected_content_length (int64 size) {
+    public void expected_content_length (int64 size) {
         this.expected_content_length = size;
     }
 
@@ -229,10 +229,10 @@ void GETFileJob.on_start () {
 
     Soup.Request req;
     for (GLib.HashMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = this.headers.begin (); it != this.headers.end (); ++it) {
-        req.set_raw_header (it.key (), it.value ());
+        req.raw_header (it.key (), it.value ());
     }
 
-    req.set_priority (Soup.Request.Low_priority); // Long downloads must not block non-propagation jobs.
+    req.priority (Soup.Request.Low_priority); // Long downloads must not block non-propagation jobs.
 
     if (this.direct_download_url.is_empty ()) {
         send_request ("GET", make_dav_url (path ()), req);
@@ -252,7 +252,7 @@ void GETFileJob.on_start () {
 }
 
 void GETFileJob.new_reply_hook (Soup.Reply reply) {
-    reply.set_read_buffer_size (16 * 1024); // keep low so we can easier limit the bandwidth
+    reply.read_buffer_size (16 * 1024); // keep low so we can easier limit the bandwidth
 
     connect (reply, &Soup.Reply.meta_data_changed, this, &GETFileJob.on_meta_data_changed);
     connect (reply, &QIODevice.ready_read, this, &GETFileJob.on_ready_read);
@@ -263,7 +263,7 @@ void GETFileJob.new_reply_hook (Soup.Reply reply) {
 void GETFileJob.on_meta_data_changed () {
     // For some reason setting the read buffer in GETFileJob.on_start doesn't seem to go
     // through the HTTP layer thread (?)
-    reply ().set_read_buffer_size (16 * 1024);
+    reply ().read_buffer_size (16 * 1024);
 
     int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
@@ -283,7 +283,7 @@ void GETFileJob.on_meta_data_changed () {
     if (http_status / 100 != 2) {
         // Disable the buffer limit, as we don't limit the bandwidth for error messages.
         // (We are only going to do a read_all () at the end.)
-        reply ().set_read_buffer_size (0);
+        reply ().read_buffer_size (0);
         return;
     }
     if (reply ().error () != Soup.Reply.NoError) {
@@ -359,16 +359,16 @@ void GETFileJob.on_meta_data_changed () {
     this.save_body_to_file = true;
 }
 
-void GETFileJob.set_bandwidth_manager (BandwidthManager bandwidth_manager) {
+void GETFileJob.bandwidth_manager (BandwidthManager bandwidth_manager) {
     this.bandwidth_manager = bandwidth_manager;
 }
 
-void GETFileJob.set_choked (bool c) {
+void GETFileJob.choked (bool c) {
     this.bandwidth_choked = c;
     QMetaObject.invoke_method (this, "on_ready_read", Qt.QueuedConnection);
 }
 
-void GETFileJob.set_bandwidth_limited (bool b) {
+void GETFileJob.bandwidth_limited (bool b) {
     this.bandwidth_limited = b;
     QMetaObject.invoke_method (this, "on_ready_read", Qt.QueuedConnection);
 }

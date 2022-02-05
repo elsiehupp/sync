@@ -52,7 +52,7 @@ class Logger : GLib.Object {
     ***********************************************************/
     private Logger (GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        q_set_message_pattern (QStringLiteral ("%{time yyyy-MM-dd hh:mm:ss:zzz} [ %{type} %{category} %{file}:%{line} "
+        q_message_pattern (QStringLiteral ("%{time yyyy-MM-dd hh:mm:ss:zzz} [ %{type} %{category} %{file}:%{line} "
                                         "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}"));
         this.crash_log.resize (CRASH_LOG_SIZE);
     #ifndef NO_MSG_HANDLER
@@ -149,7 +149,7 @@ class Logger : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_log_file (string name) {
+    public void log_file (string name) {
         QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (this.logstream) {
             this.logstream.on_reset (null);
@@ -164,7 +164,7 @@ class Logger : GLib.Object {
         if (name == QLatin1String ("-")) {
             open_succeeded = this.log_file.open (stdout, QIODevice.WriteOnly);
         } else {
-            this.log_file.set_filename (name);
+            this.log_file.filename (name);
             open_succeeded = this.log_file.open (QIODevice.WriteOnly);
         }
 
@@ -178,13 +178,13 @@ class Logger : GLib.Object {
         }
 
         this.logstream.on_reset (new QTextStream (&this.log_file));
-        this.logstream.set_codec (QTextCodec.codec_for_name ("UTF-8"));
+        this.logstream.codec (QTextCodec.codec_for_name ("UTF-8"));
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_log_expire (int expire) {
+    public void log_expire (int expire) {
         this.log_expire = expire;
     }
 
@@ -198,14 +198,14 @@ class Logger : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_log_dir (string dir) {
+    public void log_dir (string dir) {
         this.log_directory = dir;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_log_flush (bool flush) {
+    public void log_flush (bool flush) {
         this.do_file_flush = flush;
     }
 
@@ -219,7 +219,7 @@ class Logger : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_log_debug (bool debug) {
+    public void log_debug (bool debug) {
         const GLib.Set<string> rules = {debug ? QStringLiteral ("nextcloud.*.debug=true") : ""};
         if (debug) {
             add_log_rule (rules);
@@ -251,9 +251,9 @@ class Logger : GLib.Object {
         var dir = temporary_folder_log_dir_path ();
         if (!QDir ().mkpath (dir))
             return;
-        set_log_debug (true);
-        set_log_expire (4 /*hours*/);
-        set_log_dir (dir);
+        log_debug (true);
+        log_expire (4 /*hours*/);
+        log_dir (dir);
         this.temporary_folder_log_dir = true;
     }
 
@@ -266,9 +266,9 @@ class Logger : GLib.Object {
             return;
 
         on_enter_next_log_file ();
-        set_log_dir ("");
-        set_log_debug (false);
-        set_log_file ("");
+        log_dir ("");
+        log_debug (false);
+        log_file ("");
         this.temporary_folder_log_dir = false;
     }
 
@@ -276,7 +276,7 @@ class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void add_log_rule (GLib.Set<string> rules) {
-        set_log_rules (this.log_rules + rules);
+        log_rules (this.log_rules + rules);
     }
 
 
@@ -287,7 +287,7 @@ class Logger : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_log_rules (GLib.Set<string> rules) {
+    public void log_rules (GLib.Set<string> rules) {
         this.log_rules = rules;
         string tmp;
         QTextStream out (&tmp);
@@ -295,7 +295,7 @@ class Logger : GLib.Object {
             out << p << '\n';
         }
         GLib.debug () << tmp;
-        QLoggingCategory.set_filter_rules (tmp);
+        QLoggingCategory.filter_rules (tmp);
     }
 
 
@@ -333,7 +333,7 @@ class Logger : GLib.Object {
             new_log_name.append ("." + string.number (max_number + 1));
 
             var previous_log = this.log_file.filename ();
-            set_log_file (dir.file_path (new_log_name));
+            log_file (dir.file_path (new_log_name));
 
             // Compress the previous log file. On a restart this can be the most recent
             // log file.

@@ -96,7 +96,7 @@ bool Utility.open_browser (GLib.Uri url, Gtk.Widget error_widget_parent) {
 bool Utility.open_email_composer (string subject, string body, Gtk.Widget error_widget_parent) {
     GLib.Uri url (QLatin1String ("mailto:"));
     QUrlQuery query;
-    query.set_query_items ({
+    query.query_items ({
         {
             QLatin1String ("subject"),
             subject
@@ -106,7 +106,7 @@ bool Utility.open_email_composer (string subject, string body, Gtk.Widget error_
             body
         }
     });
-    url.set_query (query);
+    url.query (query);
 
     if (!QDesktopServices.open_url (url)) {
         if (error_widget_parent) {

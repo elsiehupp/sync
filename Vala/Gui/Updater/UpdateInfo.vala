@@ -13,7 +13,7 @@ class Update_info {
 
     /***********************************************************
     ***********************************************************/
-    public void set_version (string v);
+    public void version (string v);
 
     /***********************************************************
     ***********************************************************/
@@ -25,7 +25,7 @@ class Update_info {
 
     /***********************************************************
     ***********************************************************/
-    public void set_version_string (s
+    public void version_string (s
 
     /***********************************************************
     ***********************************************************/
@@ -37,14 +37,14 @@ class Update_info {
 
     /***********************************************************
     ***********************************************************/
-    public void set_web (string v);
+    public void web (string v);
 
     /***********************************************************
     ***********************************************************/
     public string web ();
 
 
-    public void set_download_url (string v);
+    public void download_url (string v);
 
 
     public string download_url ();
@@ -63,7 +63,7 @@ class Update_info {
     private string m_download_url;
 }
 
-    void Update_info.set_version (string v) {
+    void Update_info.version (string v) {
         m_version = v;
     }
 
@@ -71,7 +71,7 @@ class Update_info {
         return m_version;
     }
 
-    void Update_info.set_version_string (string v) {
+    void Update_info.version_string (string v) {
         m_version_string = v;
     }
 
@@ -79,7 +79,7 @@ class Update_info {
         return m_version_string;
     }
 
-    void Update_info.set_web (string v) {
+    void Update_info.web (string v) {
         m_web = v;
     }
 
@@ -87,7 +87,7 @@ class Update_info {
         return m_web;
     }
 
-    void Update_info.set_download_url (string v) {
+    void Update_info.download_url (string v) {
         m_download_url = v;
     }
 
@@ -109,13 +109,13 @@ class Update_info {
         for (n = element.first_child (); !n.is_null (); n = n.next_sibling ()) {
             QDom_element e = n.to_element ();
             if (e.tag_name () == QLatin1String ("version")) {
-                result.set_version (e.text ());
+                result.version (e.text ());
             } else if (e.tag_name () == QLatin1String ("versionstring")) {
-                result.set_version_string (e.text ());
+                result.version_string (e.text ());
             } else if (e.tag_name () == QLatin1String ("web")) {
-                result.set_web (e.text ());
+                result.web (e.text ());
             } else if (e.tag_name () == QLatin1String ("downloadurl")) {
-                result.set_download_url (e.text ());
+                result.download_url (e.text ());
             }
         }
 
@@ -128,7 +128,7 @@ class Update_info {
         string error_msg;
         int error_line = 0, error_col = 0;
         QDom_document doc;
-        if (!doc.set_content (xml, false, error_msg, error_line, error_col)) {
+        if (!doc.content (xml, false, error_msg, error_line, error_col)) {
             GLib.warn (lc_updater).noquote ().nospace () << error_msg << " at " << error_line << "," << error_col
                                     << "\n" <<  xml.split_ref ("\n").value (error_line-1) << "\n"
                                     << string (" ").repeated (error_col - 1) << "^\n"

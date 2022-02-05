@@ -38,8 +38,8 @@ class OcsUserStatusConnector : UserStatusConnector {
     /***********************************************************
     ***********************************************************/
     private QPointer<JsonApiJob> clear_message_job {};
-    private QPointer<JsonApiJob> set_message_job {};
-    private QPointer<JsonApiJob> set_online_status_job {};
+    private QPointer<JsonApiJob> message_job {};
+    private QPointer<JsonApiJob> online_status_job {};
     private QPointer<JsonApiJob> get_predefined_stauses_job {};
     private QPointer<JsonApiJob> get_user_status_job {};
 
@@ -86,19 +86,19 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    public void set_user_status (UserStatus user_status) {
+    public void user_status (UserStatus user_status) {
         if (!this.user_status_supported) {
             /* emit */ error (Error.UserStatusNotSupported);
             return;
         }
 
-        if (this.set_online_status_job || this.set_message_job) {
+        if (this.online_status_job || this.message_job) {
             GLib.debug (lc_ocs_user_status_connector) << "Set online status job or set message job are already running.";
             return;
         }
 
-        set_user_status_online_status (user_status.state ());
-        set_user_status_message (user_status);
+        user_status_online_status (user_status.state ());
+        user_status_message (user_status);
     }
 
 
@@ -106,7 +106,7 @@ class OcsUserStatusConnector : UserStatusConnector {
     ***********************************************************/
     public void clear_message () {
         this.clear_message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + QStringLiteral ("/message"));
-        this.clear_message_job.set_verb (JsonApiJob.Verb.DELETE);
+        this.clear_message_job.verb (JsonApiJob.Verb.DELETE);
         connect (this.clear_message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_message_cleared);
         this.clear_message_job.on_start ();
     }
@@ -240,42 +240,42 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    private void set_user_status_online_status (UserStatus.OnlineStatus online_status) {
-        this.set_online_status_job = new JsonApiJob (this.account,
+    private void user_status_online_status (UserStatus.OnlineStatus online_status) {
+        this.online_status_job = new JsonApiJob (this.account,
             USER_STATUS_BASE_URL + QStringLiteral ("/status"), this);
-        this.set_online_status_job.set_verb (JsonApiJob.Verb.PUT);
+        this.online_status_job.verb (JsonApiJob.Verb.PUT);
         // Set body
         QJsonObject data_object;
         data_object.insert ("status_type", online_status_to_string (online_status));
         QJsonDocument body;
-        body.set_object (data_object);
-        this.set_online_status_job.set_body (body);
-        connect (this.set_online_status_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_online_status_set);
-        this.set_online_status_job.on_start ();
+        body.object (data_object);
+        this.online_status_job.body (body);
+        connect (this.online_status_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_online_status_set);
+        this.online_status_job.on_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void set_user_status_message (UserStatus user_status) {
+    private void user_status_message (UserStatus user_status) {
         if (user_status.message_predefined ()) {
-            set_user_status_message_predefined (user_status);
+            user_status_message_predefined (user_status);
             return;
         }
-        set_user_status_message_custom (user_status);
+        user_status_message_custom (user_status);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void set_user_status_message_predefined (UserStatus user_status) {
+    private void user_status_message_predefined (UserStatus user_status) {
         //  Q_ASSERT (user_status.message_predefined ());
         if (!user_status.message_predefined ()) {
             return;
         }
 
-        this.set_message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + QStringLiteral ("/message/predefined"), this);
-        this.set_message_job.set_verb (JsonApiJob.Verb.PUT);
+        this.message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + QStringLiteral ("/message/predefined"), this);
+        this.message_job.verb (JsonApiJob.Verb.PUT);
         // Set body
         QJsonObject data_object;
         data_object.insert ("message_id", user_status.identifier ());
@@ -285,16 +285,16 @@ class OcsUserStatusConnector : UserStatusConnector {
             data_object.insert ("clear_at", QJsonValue ());
         }
         QJsonDocument body;
-        body.set_object (data_object);
-        this.set_message_job.set_body (body);
-        connect (this.set_message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_message_set);
-        this.set_message_job.on_start ();
+        body.object (data_object);
+        this.message_job.body (body);
+        connect (this.message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_message_set);
+        this.message_job.on_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void set_user_status_message_custom (UserStatus user_status) {
+    private void user_status_message_custom (UserStatus user_status) {
         //  Q_ASSERT (!user_status.message_predefined ());
         if (user_status.message_predefined ()) {
             return;
@@ -304,8 +304,8 @@ class OcsUserStatusConnector : UserStatusConnector {
             /* emit */ error (Error.EmojisNotSupported);
             return;
         }
-        this.set_message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + QStringLiteral ("/message/custom"), this);
-        this.set_message_job.set_verb (JsonApiJob.Verb.PUT);
+        this.message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + QStringLiteral ("/message/custom"), this);
+        this.message_job.verb (JsonApiJob.Verb.PUT);
         // Set body
         QJsonObject data_object;
         data_object.insert ("status_icon", user_status.icon ());
@@ -317,10 +317,10 @@ class OcsUserStatusConnector : UserStatusConnector {
             data_object.insert ("clear_at", QJsonValue ());
         }
         QJsonDocument body;
-        body.set_object (data_object);
-        this.set_message_job.set_body (body);
-        connect (this.set_message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_message_set);
-        this.set_message_job.on_start ();
+        body.object (data_object);
+        this.message_job.body (body);
+        connect (this.message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_user_status_message_set);
+        this.message_job.on_start ();
     }
 
 

@@ -42,7 +42,7 @@ signals:
 
     Thumbnail_job.Thumbnail_job (string path, AccountPointer account, GLib.Object parent)
         : base (account, QLatin1String ("index.php/apps/files/api/v1/thumbnail/150/150/") + path, parent) {
-        set_ignore_credential_failure (true);
+        ignore_credential_failure (true);
     }
 
     void Thumbnail_job.on_start () {

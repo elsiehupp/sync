@@ -282,7 +282,7 @@ class AccountState : GLib.Object, QSharedData {
     public void sign_out_by_ui () {
         account ().credentials ().forget_sensitive_data ();
         account ().clear_cookie_jar ();
-        set_state (State.SIGNED_OUT);
+        state (State.SIGNED_OUT);
     }
 
 
@@ -297,7 +297,7 @@ class AccountState : GLib.Object, QSharedData {
     ***********************************************************/
     public void fresh_connection_attempt () {
         if (is_connected ())
-            set_state (State.DISCONNECTED);
+            state (State.DISCONNECTED);
         on_check_connectivity ();
     }
 
@@ -309,7 +309,7 @@ class AccountState : GLib.Object, QSharedData {
     void AccountState.sign_in () {
         if (this.state == State.SIGNED_OUT) {
             this.waiting_for_new_credentials = false;
-            set_state (State.DISCONNECTED);
+            state (State.DISCONNECTED);
         }
     }
 
@@ -357,7 +357,7 @@ class AccountState : GLib.Object, QSharedData {
     Returns the ETag Response header from the last Notifications
     API request with status_code 200.
     ***********************************************************/
-    public void set_notifications_etag_response_header (GLib.ByteArray value) {
+    public void notifications_etag_response_header (GLib.ByteArray value) {
         this.notifications_etag_response_header = value;
     }
 
@@ -375,7 +375,7 @@ class AccountState : GLib.Object, QSharedData {
     Returns the ETag Response header from the last Navigation
     Apps API request with status_code 200.
     ***********************************************************/
-    public void set_navigation_apps_etag_response_header (GLib.ByteArray value) {
+    public void navigation_apps_etag_response_header (GLib.ByteArray value) {
         this.navigation_apps_etag_response_header = value;
     }
 
@@ -391,7 +391,7 @@ class AccountState : GLib.Object, QSharedData {
                                << "asking user";
 
         this.waiting_for_new_credentials = true;
-        set_state (State.ASKING_CREDENTIALS);
+        state (State.ASKING_CREDENTIALS);
 
         if (account ().credentials ().ready ()) {
             account ().credentials ().invalidate_token ();
@@ -418,7 +418,7 @@ class AccountState : GLib.Object, QSharedData {
     Set desktop notifications status retrieved by the
     notificatons endpoint
     ***********************************************************/
-    public void set_desktop_notifications_allowed (bool is_allowed) {
+    public void desktop_notifications_allowed (bool is_allowed) {
         if (this.is_desktop_notifications_allowed == is_allowed) {
             return;
         }
@@ -482,7 +482,7 @@ class AccountState : GLib.Object, QSharedData {
 
             // If we don't reset the ssl config a second CheckServerJob can produce a
             // ssl config that does not have a sensible certificate chain.
-            account ().set_ssl_configuration (QSslConfiguration ());
+            account ().ssl_configuration (QSslConfiguration ());
             //#endif
             con_validator.on_check_server_and_auth ();
         }
@@ -491,7 +491,7 @@ class AccountState : GLib.Object, QSharedData {
 
     /***********************************************************
     ***********************************************************/
-    private void set_state (State state) {
+    private void state (State state) {
         if (this.state != state) {
             GLib.info (lc_account_state) << "AccountState state change : "
                                    << state_string (this.state) << "." << state_string (state);
@@ -524,7 +524,7 @@ class AccountState : GLib.Object, QSharedData {
 
     /***********************************************************
     ***********************************************************/
-    private void fetch_navigation_apps (){
+    private void fetch_navigation_apps () {
         var job = new OcsNavigationAppsJob (this.account);
         job.add_raw_header ("If-None-Match", navigation_apps_etag_response_header ());
         connect (job, &OcsNavigationAppsJob.apps_job_finished, this, &AccountState.on_navigation_apps_fetched);
@@ -570,7 +570,7 @@ class AccountState : GLib.Object, QSharedData {
         switch (status) {
         case ConnectionValidator.State.CONNECTED:
             if (this.state != State.CONNECTED) {
-                set_state (State.CONNECTED);
+                state (State.CONNECTED);
 
                 // Get the Apps available on the server.
                 fetch_navigation_apps ();
@@ -581,34 +581,34 @@ class AccountState : GLib.Object, QSharedData {
             break;
         case ConnectionValidator.Undefined:
         case ConnectionValidator.NotConfigured:
-            set_state (State.DISCONNECTED);
+            state (State.DISCONNECTED);
             break;
         case ConnectionValidator.ServerVersionMismatch:
-            set_state (State.CONFIGURATION_ERROR);
+            state (State.CONFIGURATION_ERROR);
             break;
         case ConnectionValidator.StatusNotFound:
             // This can happen either because the server does not exist
             // or because we are having network issues. The latter one is
             // much more likely, so keep trying to connect.
-            set_state (State.NETWORK_ERROR);
+            state (State.NETWORK_ERROR);
             break;
         case ConnectionValidator.CredentialsWrong:
         case ConnectionValidator.CredentialsNotReady:
             handle_invalid_credentials ();
             break;
         case ConnectionValidator.SslError:
-            set_state (State.SIGNED_OUT);
+            state (State.SIGNED_OUT);
             break;
         case ConnectionValidator.State.SERVICE_UNAVAILABLE:
             this.time_since_maintenance_over.invalidate ();
-            set_state (State.SERVICE_UNAVAILABLE);
+            state (State.SERVICE_UNAVAILABLE);
             break;
         case ConnectionValidator.State.MAINTENANCE_MODE:
             this.time_since_maintenance_over.invalidate ();
-            set_state (State.MAINTENANCE_MODE);
+            state (State.MAINTENANCE_MODE);
             break;
         case ConnectionValidator.Timeout:
-            set_state (State.NETWORK_ERROR);
+            state (State.NETWORK_ERROR);
             break;
         }
     }
@@ -626,7 +626,7 @@ class AccountState : GLib.Object, QSharedData {
                                << "checking for remote wipe request";
 
         this.waiting_for_new_credentials = false;
-        set_state (State.SIGNED_OUT);
+        state (State.SIGNED_OUT);
     }
 
 
@@ -653,7 +653,7 @@ class AccountState : GLib.Object, QSharedData {
 
         if (!credentials.ready ()) {
             // User canceled the connection or did not give a password
-            set_state (State.SIGNED_OUT);
+            state (State.SIGNED_OUT);
             return;
         }
 
@@ -671,17 +671,17 @@ class AccountState : GLib.Object, QSharedData {
     /***********************************************************
     ***********************************************************/
     protected void on_navigation_apps_fetched (QJsonDocument reply, int status_code) {
-        if (this.account){
+        if (this.account) {
             if (status_code == 304) {
                 GLib.warn (lc_account_state) << "Status code " << status_code << " Not Modified - No new navigation apps.";
             } else {
                 this.apps.clear ();
 
-                if (!reply.is_empty ()){
+                if (!reply.is_empty ()) {
                     var element = reply.object ().value ("ocs").to_object ().value ("data");
                     const var nav_links = element.to_array ();
 
-                    if (nav_links.size () > 0){
+                    if (nav_links.size () > 0) {
                         for (QJsonValue value : nav_links) {
                             var nav_link = value.to_object ();
 
@@ -701,10 +701,10 @@ class AccountState : GLib.Object, QSharedData {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_etag_response_header_received (GLib.ByteArray value, int status_code){
-        if (status_code == 200){
+    protected void on_etag_response_header_received (GLib.ByteArray value, int status_code) {
+        if (status_code == 200) {
             GLib.debug (lc_account_state) << "New navigation apps ETag Response Header received " << value;
-            set_navigation_apps_etag_response_header (value);
+            navigation_apps_etag_response_header (value);
         }
     }
 

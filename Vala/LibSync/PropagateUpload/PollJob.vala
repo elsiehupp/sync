@@ -38,7 +38,7 @@ class PollJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_start () {
-        on_set_timeout (120 * 1000);
+        on_timeout (120 * 1000);
         GLib.Uri account_url = account ().url ();
         GLib.Uri final_url = GLib.Uri.from_user_input (account_url.scheme () + QLatin1String ("://") + account_url.authority ()
             + (path ().starts_with ('/') ? QLatin1String ("") : QLatin1String ("/")) + path ());
@@ -64,7 +64,7 @@ class PollJob : AbstractNetworkJob {
                     SyncJournalDb.PollInfo info;
                     info.file = this.item.file;
                     // no info.url removes it from the database
-                    this.journal.set_poll_info (info);
+                    this.journal.poll_info (info);
                     this.journal.commit ("remove poll info");
                 }
                 /* emit */ finished_signal ();
@@ -106,7 +106,7 @@ class PollJob : AbstractNetworkJob {
         SyncJournalDb.PollInfo info;
         info.file = this.item.file;
         // no info.url removes it from the database
-        this.journal.set_poll_info (info);
+        this.journal.poll_info (info);
         this.journal.commit ("remove poll info");
 
         /* emit */ finished_signal ();

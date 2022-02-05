@@ -108,7 +108,7 @@ class VfsOff : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public bool set_pin_state (string , PinState) override {
+    public bool pin_state (string , PinState) override {
         return true;
     }
 

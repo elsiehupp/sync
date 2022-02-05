@@ -24,7 +24,7 @@ class Web_view_page : Abstract_credentials_wizard_page {
     /***********************************************************
     ***********************************************************/
     public AbstractCredentials* get_credentials () override;
-    public void set_connected ();
+    public void connected ();
 
 signals:
     void connect_to_oc_url (string&);
@@ -40,7 +40,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private bool try_to_set_wizard_size (int width, int height);
+    private bool try_to_wizard_size (int width, int height);
 
     /***********************************************************
     ***********************************************************/
@@ -72,9 +72,9 @@ signals:
         this.web_view = new WebView (this);
 
         var layout = new QVBoxLayout (this);
-        layout.set_margin (0);
+        layout.margin (0);
         layout.add_widget (this.web_view);
-        set_layout (layout);
+        layout (layout);
 
         connect (this.web_view, &WebView.on_url_catched, this, &Web_view_page.on_url_catched);
 
@@ -83,11 +83,11 @@ signals:
 
     Web_view_page.~Web_view_page () = default;
     //{
-    //    QNetworkProxyFactory.set_use_system_configuration (this.use_system_proxy);
+    //    QNetworkProxyFactory.use_system_configuration (this.use_system_proxy);
     //}
 
     void Web_view_page.initialize_page () {
-        //QNetworkProxy.set_application_proxy (QNetworkProxy.application_proxy ());
+        //QNetworkProxy.application_proxy (QNetworkProxy.application_proxy ());
 
         string url;
         if (this.oc_wizard.registration ()) {
@@ -100,7 +100,7 @@ signals:
             url += "index.php/login/flow";
         }
         GLib.info (lc_wizard_webiew_page ()) << "Url to auth at : " << url;
-        this.web_view.set_url (GLib.Uri (url));
+        this.web_view.url (GLib.Uri (url));
 
         this.original_wizard_size = this.oc_wizard.size ();
         resize_wizard ();
@@ -108,10 +108,10 @@ signals:
 
     void Web_view_page.resize_wizard () {
         // The webview needs a little bit more space
-        var wizard_size_changed = try_to_set_wizard_size (this.original_wizard_size.width () * 2, this.original_wizard_size.height () * 2);
+        var wizard_size_changed = try_to_wizard_size (this.original_wizard_size.width () * 2, this.original_wizard_size.height () * 2);
 
         if (!wizard_size_changed) {
-            wizard_size_changed = try_to_set_wizard_size (static_cast<int> (this.original_wizard_size.width () * 1.5), static_cast<int> (this.original_wizard_size.height () * 1.5));
+            wizard_size_changed = try_to_wizard_size (static_cast<int> (this.original_wizard_size.width () * 1.5), static_cast<int> (this.original_wizard_size.height () * 1.5));
         }
 
         if (wizard_size_changed) {
@@ -119,7 +119,7 @@ signals:
         }
     }
 
-    bool Web_view_page.try_to_set_wizard_size (int width, int height) {
+    bool Web_view_page.try_to_wizard_size (int width, int height) {
         const var window = this.oc_wizard.window ();
         const var screen_geometry = QGuiApplication.screen_at (window.position ()).geometry ();
         const var window_width = screen_geometry.width ();
@@ -150,7 +150,7 @@ signals:
         return new WebFlowCredentials (this.user, this.pass, this.oc_wizard.client_ssl_certificate, this.oc_wizard.client_ssl_key);
     }
 
-    void Web_view_page.set_connected () {
+    void Web_view_page.connected () {
         GLib.info (lc_wizard_webiew_page ()) << "YAY! we are connected!";
     }
 
@@ -161,7 +161,7 @@ signals:
         this.pass = pass;
 
         AccountPointer account = this.oc_wizard.account ();
-        account.set_url (host);
+        account.url (host);
 
         GLib.info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_string ();
         /* emit */ connect_to_oc_url (host);

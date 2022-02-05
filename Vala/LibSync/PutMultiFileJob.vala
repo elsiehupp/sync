@@ -48,9 +48,9 @@ class PutMultiFileJob : AbstractNetworkJob {
         base (account, {}, parent);
         this.devices = std.move (devices);
         this.url = url;
-        this.body.set_content_type (QHttpMultiPart.Related_type);
+        this.body.content_type (QHttpMultiPart.Related_type);
         for (var single_device : this.devices) {
-            single_device.device.set_parent (this);
+            single_device.device.parent (this);
             connect (this, &PutMultiFileJob.upload_progress,
                     single_device.device.get (), &UploadDevice.on_job_upload_progress);
         }
@@ -66,13 +66,13 @@ class PutMultiFileJob : AbstractNetworkJob {
         for (var one_device : this.devices) {
             var one_part = QHttp_part{};
 
-            one_part.set_body_device (one_device.device.get ());
+            one_part.body_device (one_device.device.get ());
 
             for (GLib.HashMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = one_device.headers.begin (); it != one_device.headers.end (); ++it) {
-                one_part.set_raw_header (it.key (), it.value ());
+                one_part.raw_header (it.key (), it.value ());
             }
 
-            req.set_priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
+            req.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
 
             this.body.append (one_part);
         }

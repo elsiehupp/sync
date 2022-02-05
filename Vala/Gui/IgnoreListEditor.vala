@@ -49,8 +49,8 @@ class Ignore_list_editor : Gtk.Dialog {
     Ignore_list_editor.Ignore_list_editor (Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.Ignore_list_editor) {
-        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
-        ui.set_up_ui (this);
+        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        ui.up_ui (this);
 
         ConfigFile cfg_file;
         //FIXME This is not true. The entries are hardcoded below in setup_table_read_only_items
@@ -71,12 +71,12 @@ class Ignore_list_editor : Gtk.Dialog {
            TODO this can now be fixed, simply attach this Ignore_list_editor to top-level account
            settings
             */
-            FolderMan.instance ().set_ignore_hidden_files (ignore_hidden_files ());
+            FolderMan.instance ().ignore_hidden_files (ignore_hidden_files ());
         });
         connect (ui.button_box, &QDialogButtonBox.clicked,
                 this, &Ignore_list_editor.on_restore_defaults);
 
-        ui.sync_hidden_files_check_box.set_checked (!FolderMan.instance ().ignore_hidden_files ());
+        ui.sync_hidden_files_check_box.checked (!FolderMan.instance ().ignore_hidden_files ());
     }
 
     Ignore_list_editor.~Ignore_list_editor () {

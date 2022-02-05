@@ -48,9 +48,9 @@ class MoveJob : AbstractNetworkJob {
     ***********************************************************/
     public void on_start () {
         Soup.Request req;
-        req.set_raw_header ("Destination", GLib.Uri.to_percent_encoding (this.destination, "/"));
+        req.raw_header ("Destination", GLib.Uri.to_percent_encoding (this.destination, "/"));
         for (var it = this.extra_headers.const_begin (); it != this.extra_headers.const_end (); ++it) {
-            req.set_raw_header (it.key (), it.value ());
+            req.raw_header (it.key (), it.value ());
         }
         if (this.url.is_valid ()) {
             send_request ("MOVE", this.url, req);

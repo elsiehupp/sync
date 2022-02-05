@@ -91,16 +91,16 @@ class Share : GLib.Object {
     On on_success the permissions_set signal is emitted
     In case of a server error the on_server_error signal is emitted.
     ***********************************************************/
-    public void set_permissions (Permissions permissions);
+    public void permissions (Permissions permissions);
 
 
     /***********************************************************
     Set the password for remote share
 
     On on_success the password_set signal is emitted
-    In case of a server error the password_set_error signal is emitted.
+    In case of a server error the password_error signal is emitted.
     ***********************************************************/
-    public void set_password (string password);
+    public void password (string password);
 
     /***********************************************************
     ***********************************************************/
@@ -126,7 +126,7 @@ signals:
     void share_deleted ();
     void on_server_error (int code, string message);
     void password_set ();
-    void password_set_error (int status_code, string message);
+    void password_error (int status_code, string message);
 
 
     protected AccountPointer this.account;
@@ -142,7 +142,7 @@ signals:
 protected slots:
     void on_ocs_error (int status_code, string message);
     void on_password_set (QJsonDocument &, GLib.Variant value);
-    void on_set_password_error (int status_code, string message);
+    void on_password_error (int status_code, string message);
 
 
     /***********************************************************
@@ -203,22 +203,22 @@ unowned<Sharee> Share.get_share_with () {
     return this.share_with;
 }
 
-void Share.set_password (string password) {
+void Share.password (string password) {
     var * const job = new Ocs_share_job (this.account);
     connect (job, &Ocs_share_job.share_job_finished, this, &Share.on_password_set);
-    connect (job, &Ocs_job.ocs_error, this, &Share.on_set_password_error);
-    job.set_password (get_id (), password);
+    connect (job, &Ocs_job.ocs_error, this, &Share.on_password_error);
+    job.password (get_id (), password);
 }
 
 bool Share.is_password_set () {
     return this.is_password_set;
 }
 
-void Share.set_permissions (Permissions permissions) {
+void Share.permissions (Permissions permissions) {
     var job = new Ocs_share_job (this.account);
     connect (job, &Ocs_share_job.share_job_finished, this, &Share.on_permissions_set);
     connect (job, &Ocs_job.ocs_error, this, &Share.on_ocs_error);
-    job.set_permissions (get_id (), permissions);
+    job.permissions (get_id (), permissions);
 }
 
 void Share.on_permissions_set (QJsonDocument &, GLib.Variant value) {
@@ -256,6 +256,6 @@ void Share.on_password_set (QJsonDocument &, GLib.Variant value) {
     /* emit */ password_set ();
 }
 
-void Share.on_set_password_error (int status_code, string message) {
-    /* emit */ password_set_error (status_code, message);
+void Share.on_password_error (int status_code, string message) {
+    /* emit */ password_error (status_code, message);
 }

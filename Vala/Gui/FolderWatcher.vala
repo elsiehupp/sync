@@ -199,7 +199,7 @@ protected slots:
         var path = this.test_notification_path;
         if (GLib.File.exists (path)) {
             var mtime = FileSystem.get_mod_time (path);
-            FileSystem.set_mod_time (path, mtime + 1);
+            FileSystem.mod_time (path, mtime + 1);
         } else {
             GLib.File f (path);
             f.open (QIODevice.WriteOnly | QIODevice.Append);

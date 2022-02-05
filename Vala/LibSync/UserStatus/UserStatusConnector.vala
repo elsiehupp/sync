@@ -44,7 +44,7 @@ class UserStatusConnector : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual void set_user_status (UserStatus user_status);
+    public virtual void user_status (UserStatus user_status);
 
     /***********************************************************
     ***********************************************************/

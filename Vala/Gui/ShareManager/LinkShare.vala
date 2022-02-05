@@ -75,13 +75,13 @@ class Link_share : Share {
 
     Emits either name_set () or on_server_error ().
     ***********************************************************/
-    public void set_name (string name);
+    public void name (string name);
 
 
     /***********************************************************
     Set the note of the link share.
     ***********************************************************/
-    public void set_note (string note);
+    public void note (string note);
 
 
     /***********************************************************
@@ -102,13 +102,13 @@ class Link_share : Share {
     On on_success the expire_date_set signal is emitted
     In case of a server error the on_server_error signal is emitted.
     ***********************************************************/
-    public void set_expire_date (QDate expire_date);
+    public void expire_date (QDate expire_date);
 
 
     /***********************************************************
     Set the label of the share link.
     ***********************************************************/
-    public void set_label (string label);
+    public void label (string label);
 
 
     /***********************************************************
@@ -152,7 +152,7 @@ GLib.Uri Link_share.get_link () {
 
 GLib.Uri Link_share.get_direct_download_link () {
     GLib.Uri url = this.url;
-    url.set_path (url.path () + "/download");
+    url.path (url.path () + "/download");
     return url;
 }
 
@@ -202,12 +202,12 @@ string Link_share.get_label () {
     return this.label;
 }
 
-void Link_share.set_name (string name) {
-    create_share_job (&Link_share.on_name_set).set_name (get_id (), name);
+void Link_share.name (string name) {
+    create_share_job (&Link_share.on_name_set).name (get_id (), name);
 }
 
-void Link_share.set_note (string note) {
-    create_share_job (&Link_share.on_note_set).set_note (get_id (), note);
+void Link_share.note (string note) {
+    create_share_job (&Link_share.on_note_set).note (get_id (), note);
 }
 
 void Link_share.on_note_set (QJsonDocument &, GLib.Variant note) {
@@ -219,12 +219,12 @@ string Link_share.get_token () {
     return this.token;
 }
 
-void Link_share.set_expire_date (QDate date) {
-    create_share_job (&Link_share.on_expire_date_set).set_expire_date (get_id (), date);
+void Link_share.expire_date (QDate date) {
+    create_share_job (&Link_share.on_expire_date_set).expire_date (get_id (), date);
 }
 
-void Link_share.set_label (string label) {
-    create_share_job (&Link_share.on_label_set).set_label (get_id (), label);
+void Link_share.label (string label) {
+    create_share_job (&Link_share.on_label_set).label (get_id (), label);
 }
 
 template <typename Link_share_slot>

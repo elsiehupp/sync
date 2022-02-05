@@ -22,7 +22,7 @@ class User_group_share : Share {
 
     /***********************************************************
     ***********************************************************/
-    public void set_note (string note);
+    public void note (string note);
 
     /***********************************************************
     ***********************************************************/
@@ -34,7 +34,7 @@ class User_group_share : Share {
 
     /***********************************************************
     ***********************************************************/
-    public void set_expire_date (QDate date);
+    public void expire_date (QDate date);
 
     /***********************************************************
     ***********************************************************/
@@ -46,7 +46,7 @@ class User_group_share : Share {
 
 signals:
     void note_set ();
-    void note_set_error ();
+    void note_error ();
     void expire_date_set ();
 
 
@@ -80,11 +80,11 @@ User_group_share.User_group_share (AccountPointer account,
     //  Q_ASSERT (share_with);
 }
 
-void User_group_share.set_note (string note) {
+void User_group_share.note (string note) {
     var job = new Ocs_share_job (this.account);
     connect (job, &Ocs_share_job.share_job_finished, this, &User_group_share.on_note_set);
-    connect (job, &Ocs_job.ocs_error, this, &User_group_share.note_set_error);
-    job.set_note (get_id (), note);
+    connect (job, &Ocs_job.ocs_error, this, &User_group_share.note_error);
+    job.note (get_id (), note);
 }
 
 string User_group_share.get_note () {
@@ -100,7 +100,7 @@ QDate User_group_share.get_expire_date () {
     return this.expire_date;
 }
 
-void User_group_share.set_expire_date (QDate date) {
+void User_group_share.expire_date (QDate date) {
     if (this.expire_date == date) {
         /* emit */ expire_date_set ();
         return;
@@ -109,7 +109,7 @@ void User_group_share.set_expire_date (QDate date) {
     var job = new Ocs_share_job (this.account);
     connect (job, &Ocs_share_job.share_job_finished, this, &User_group_share.on_expire_date_set);
     connect (job, &Ocs_job.ocs_error, this, &User_group_share.on_ocs_error);
-    job.set_expire_date (get_id (), date);
+    job.expire_date (get_id (), date);
 }
 
 void User_group_share.on_expire_date_set (QJsonDocument reply, GLib.Variant value) {

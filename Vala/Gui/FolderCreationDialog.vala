@@ -47,11 +47,11 @@ class FolderCreationDialog : Gtk.Dialog {
         : Gtk.Dialog (parent)
         , ui (new Ui.FolderCreationDialog)
         this.destination (destination) {
-        ui.set_up_ui (this);
+        ui.up_ui (this);
 
-        ui.label_error_message.set_visible (false);
+        ui.label_error_message.visible (false);
 
-        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
 
         connect (ui.new_folder_name_edit, &QLineEdit.text_changed, this, &FolderCreationDialog.on_new_folder_name_edit_text_edited);
 
@@ -59,19 +59,19 @@ class FolderCreationDialog : Gtk.Dialog {
 
         const string new_folder_full_path = this.destination + '/' + suggested_folder_name_prefix;
         if (!QDir (new_folder_full_path).exists ()) {
-            ui.new_folder_name_edit.on_set_text (suggested_folder_name_prefix);
+            ui.new_folder_name_edit.on_text (suggested_folder_name_prefix);
         } else {
             for (uint32 i = 2; i < std.numeric_limits<uint32>.max (); ++i) {
                 const string suggested_postfix = string (" (%1)").arg (i);
 
                 if (!QDir (new_folder_full_path + suggested_postfix).exists ()) {
-                    ui.new_folder_name_edit.on_set_text (suggested_folder_name_prefix + suggested_postfix);
+                    ui.new_folder_name_edit.on_text (suggested_folder_name_prefix + suggested_postfix);
                     break;
                 }
             }
         }
 
-        ui.new_folder_name_edit.set_focus ();
+        ui.new_folder_name_edit.focus ();
         ui.new_folder_name_edit.select_all ();
     }
 
@@ -83,7 +83,7 @@ class FolderCreationDialog : Gtk.Dialog {
         //  Q_ASSERT (!this.destination.ends_with ('/'));
 
         if (QDir (this.destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
-            ui.label_error_message.set_visible (true);
+            ui.label_error_message.visible (true);
             return;
         }
 
@@ -96,9 +96,9 @@ class FolderCreationDialog : Gtk.Dialog {
 
     void FolderCreationDialog.on_new_folder_name_edit_text_edited () {
         if (!ui.new_folder_name_edit.text ().is_empty () && QDir (this.destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
-            ui.label_error_message.set_visible (true);
+            ui.label_error_message.visible (true);
         } else {
-            ui.label_error_message.set_visible (false);
+            ui.label_error_message.visible (false);
         }
     }
 

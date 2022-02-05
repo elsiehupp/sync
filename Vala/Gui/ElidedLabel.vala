@@ -35,7 +35,7 @@ class ElidedLabel : QLabel {
 
     /***********************************************************
     ***********************************************************/
-    public void set_elide_mode (Qt.TextElideMode elide_mode);
+    public void elide_mode (Qt.TextElideMode elide_mode);
 
     /***********************************************************
     ***********************************************************/
@@ -63,13 +63,13 @@ class ElidedLabel : QLabel {
         this.text (text) {
     }
 
-    void ElidedLabel.on_set_text (string text) {
+    void ElidedLabel.on_text (string text) {
         this.text = text;
-        QLabel.on_set_text (text);
+        QLabel.on_text (text);
         update ();
     }
 
-    void ElidedLabel.set_elide_mode (Qt.TextElideMode elide_mode) {
+    void ElidedLabel.elide_mode (Qt.TextElideMode elide_mode) {
         this.elide_mode = elide_mode;
         update ();
     }
@@ -79,7 +79,7 @@ class ElidedLabel : QLabel {
 
         QFontMetrics fm = font_metrics ();
         string elided = fm.elided_text (this.text, this.elide_mode, event.size ().width ());
-        QLabel.on_set_text (elided);
+        QLabel.on_text (elided);
     }
     }
     

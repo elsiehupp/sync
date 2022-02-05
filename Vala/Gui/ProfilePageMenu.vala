@@ -66,7 +66,7 @@ class Profile_page_menu : Gtk.Widget {
             return;
         }
         const var menu_action = menu_actions[static_cast<int> (hovercard_action_index)];
-        menu_action.set_icon (hovercard_actions[hovercard_action_index].icon);
+        menu_action.icon (hovercard_actions[hovercard_action_index].icon);
     }
     }
     

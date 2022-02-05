@@ -28,7 +28,7 @@ class PUTFile_job : AbstractNetworkJob {
         this.device (device.release ())
         this.headers (headers)
         this.chunk (chunk) {
-        this.device.set_parent (this);
+        this.device.parent (this);
     }
 
 
@@ -41,7 +41,7 @@ class PUTFile_job : AbstractNetworkJob {
         this.headers (headers)
         this.url (url)
         this.chunk (chunk) {
-        this.device.set_parent (this);
+        this.device.parent (this);
     }
     ~PUTFile_job () override;
 
@@ -88,16 +88,16 @@ signals:
 
 PUTFile_job.~PUTFile_job () {
     // Make sure that we destroy the Soup.Reply before our this.device of which it keeps an internal pointer.
-    set_reply (null);
+    reply (null);
 }
 
 void PUTFile_job.on_start () {
     Soup.Request req;
     for (GLib.HashMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = this.headers.begin (); it != this.headers.end (); ++it) {
-        req.set_raw_header (it.key (), it.value ());
+        req.raw_header (it.key (), it.value ());
     }
 
-    req.set_priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
+    req.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
 
     if (this.url.is_valid ()) {
         send_request ("PUT", this.url, req, this.device);

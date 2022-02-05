@@ -72,9 +72,9 @@ class DetermineAuthTypeJob : GLib.Object {
 
         Soup.Request req;
         // Prevent HttpCredentialsAccessManager from setting an Authorization header.
-        req.set_attribute (HttpCredentials.DontAddCredentialsAttribute, true);
+        req.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
         // Don't reuse previous auth credentials
-        req.set_attribute (Soup.Request.AuthenticationReuseAttribute, Soup.Request.Manual);
+        req.attribute (Soup.Request.AuthenticationReuseAttribute, Soup.Request.Manual);
 
         // Start three parallel requests
 
@@ -87,12 +87,12 @@ class DetermineAuthTypeJob : GLib.Object {
         // 3. Determines if the old flow has to be used (GS for now)
         var old_flow_required = new JsonApiJob (this.account, "/ocs/v2.php/cloud/capabilities", this);
 
-        get.on_set_timeout (30 * 1000);
-        propfind.on_set_timeout (30 * 1000);
-        old_flow_required.on_set_timeout (30 * 1000);
-        get.set_ignore_credential_failure (true);
-        propfind.set_ignore_credential_failure (true);
-        old_flow_required.set_ignore_credential_failure (true);
+        get.on_timeout (30 * 1000);
+        propfind.on_timeout (30 * 1000);
+        old_flow_required.on_timeout (30 * 1000);
+        get.ignore_credential_failure (true);
+        propfind.ignore_credential_failure (true);
+        old_flow_required.ignore_credential_failure (true);
 
         connect (get, &SimpleNetworkJob.finished_signal, this, [this, get] () {
             const var reply = get.reply ();

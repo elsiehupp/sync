@@ -93,7 +93,7 @@ class Job : GLib.Object {
     If we use it but don't support insecure fallback, give us
     nice compilation errors ;p
     ***********************************************************/
-    public void set_insecure_fallback (bool insecure_fallback) {
+    public void insecure_fallback (bool insecure_fallback) {
         this.insecure_fallback = insecure_fallback;
     }
 
@@ -103,14 +103,14 @@ class Job : GLib.Object {
     private static void add_settings_to_job (Account account, QKeychain.Job job) {
         //  Q_UNUSED (account)
         var settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
-        settings.set_parent (job); // make the job parent to make setting deleted properly
-        job.set_settings (settings.release ());
+        settings.parent (job); // make the job parent to make setting deleted properly
+        job.settings (settings.release ());
     }
 //  #endif
 
     /***********************************************************
     @return Whether this job autodeletes itself once on_finished () has been emitted. Default is true.
-    @see set_auto_delete ()
+    @see auto_delete ()
     ***********************************************************/
     public bool auto_delete () {
         return this.auto_delete;
@@ -121,7 +121,7 @@ class Job : GLib.Object {
     Set whether this job should autodelete itself once on_finished () has been emitted.
     @see auto_delete ()
     ***********************************************************/
-    public void set_auto_delete (bool auto_delete) {
+    public void auto_delete (bool auto_delete) {
         this.auto_delete = auto_delete;
     }
 

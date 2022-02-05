@@ -67,7 +67,7 @@ void PropagateUploadFileNG.do_start_upload () {
         var url = chunk_url ();
         var job = new LsColJob (propagator ().account (), url, this);
         this.jobs.append (job);
-        job.set_properties (GLib.List<GLib.ByteArray> () << "resourcetype"
+        job.properties (GLib.List<GLib.ByteArray> () << "resourcetype"
                                                << "getcontentlength");
         connect (job, &LsColJob.finished_without_error, this, &PropagateUploadFileNG.on_propfind_finished);
         connect (job, &LsColJob.finished_with_error,
@@ -224,7 +224,7 @@ void PropagateUploadFileNG.start_new_upload () {
     pi.modtime = this.item.modtime;
     pi.content_checksum = this.item.checksum_header;
     pi.size = this.item.size;
-    propagator ().journal.set_upload_info (this.item.file, pi);
+    propagator ().journal.upload_info (this.item.file, pi);
     propagator ().journal.commit ("Upload info");
     GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
 
@@ -425,7 +425,7 @@ void PropagateUploadFileNG.on_put_finished () {
         // Reset the error count on successful chunk upload
         var upload_info = propagator ().journal.get_upload_info (this.item.file);
         upload_info.error_count = 0;
-        propagator ().journal.set_upload_info (this.item.file, upload_info);
+        propagator ().journal.upload_info (this.item.file, upload_info);
         propagator ().journal.commit ("Upload info");
     }
     on_start_next_chunk ();

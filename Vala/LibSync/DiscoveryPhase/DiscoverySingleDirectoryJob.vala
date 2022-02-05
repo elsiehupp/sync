@@ -88,7 +88,7 @@ class DiscoverySingleDirectoryJob : GLib.Object {
     Specify that this is the root and we need to check the
     data-fingerprint
     ***********************************************************/
-    public void set_is_root_path () {
+    public void is_root_path () {
         this.is_root_path = true;
     }
 
@@ -121,7 +121,7 @@ class DiscoverySingleDirectoryJob : GLib.Object {
             props << "http://nextcloud.org/ns:is-encrypted";
         }
 
-        ls_col_job.set_properties (props);
+        ls_col_job.properties (props);
 
         GLib.Object.connect (ls_col_job, &LsColJob.directory_listing_iterated,
             this, &DiscoverySingleDirectoryJob.on_directory_listing_iterated_slot);

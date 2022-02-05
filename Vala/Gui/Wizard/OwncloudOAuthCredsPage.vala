@@ -30,7 +30,7 @@ class Owncloud_oauth_creds_page : Abstract_credentials_wizard_page {
     public void initialize_page () override;
     public void cleanup_page () override;
     public int next_id () override;
-    public void set_connected ();
+    public void connected ();
 
 
     /***********************************************************
@@ -61,7 +61,7 @@ protected slots:
 
     Owncloud_oauth_creds_page.Owncloud_oauth_creds_page ()
         : Abstract_credentials_wizard_page () {
-        this.ui.set_up_ui (this);
+        this.ui.up_ui (this);
 
         Theme theme = Theme.instance ();
         this.ui.top_label.hide ();
@@ -73,8 +73,8 @@ protected slots:
 
         WizardCommon.init_error_label (this.ui.error_label);
 
-        set_title (WizardCommon.title_template ().arg (_("Connect to %1").arg (Theme.instance ().app_name_gui ())));
-        set_sub_title (WizardCommon.sub_title_template ().arg (_("Login in your browser")));
+        title (WizardCommon.title_template ().arg (_("Connect to %1").arg (Theme.instance ().app_name_gui ())));
+        sub_title (WizardCommon.sub_title_template ().arg (_("Login in your browser")));
 
         connect (this.ui.open_link_button, &QCommand_link_button.clicked, this, &Owncloud_oauth_creds_page.on_open_browser);
         connect (this.ui.copy_link_button, &QCommand_link_button.clicked, this, &Owncloud_oauth_creds_page.on_copy_link_to_clipboard);
@@ -83,7 +83,7 @@ protected slots:
     void Owncloud_oauth_creds_page.initialize_page () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         //  Q_ASSERT (oc_wizard);
-        oc_wizard.account ().set_credentials (CredentialsFactory.create ("http"));
+        oc_wizard.account ().credentials (CredentialsFactory.create ("http"));
         this.async_auth.on_reset (new OAuth (oc_wizard.account ().data (), this));
         connect (this.async_auth.data (), &OAuth.result, this, &Owncloud_oauth_creds_page.on_async_auth_result, Qt.QueuedConnection);
         this.async_auth.on_start ();
@@ -105,7 +105,7 @@ protected slots:
             /* OAuth not supported (can't open browser), fallback to HTTP credentials */
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             oc_wizard.back ();
-            oc_wizard.on_set_auth_type (DetermineAuthTypeJob.AuthType.BASIC);
+            oc_wizard.on_auth_type (DetermineAuthTypeJob.AuthType.BASIC);
             break;
         }
         case OAuth.Error:
@@ -129,7 +129,7 @@ protected slots:
         return WizardCommon.Page_Advanced_setup;
     }
 
-    void Owncloud_oauth_creds_page.set_connected () {
+    void Owncloud_oauth_creds_page.connected () {
         wizard ().show ();
     }
 
@@ -156,7 +156,7 @@ protected slots:
 
     void Owncloud_oauth_creds_page.on_copy_link_to_clipboard () {
         if (this.async_auth)
-            QApplication.clipboard ().on_set_text (this.async_auth.authorisation_link ().to_string (GLib.Uri.FullyEncoded));
+            QApplication.clipboard ().on_text (this.async_auth.authorisation_link ().to_string (GLib.Uri.FullyEncoded));
     }
 
     } // namespace Occ

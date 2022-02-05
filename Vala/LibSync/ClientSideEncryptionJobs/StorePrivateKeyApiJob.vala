@@ -12,7 +12,7 @@ namespace Occ {
 To be
 \code
 this.job = new StorePrivateKeyApiJob
-this.job.set_private_key
+this.job.private_key
 connect (this.job.
 this.job.on_start
 \encode
@@ -27,10 +27,10 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
 
 
     /***********************************************************
-    @brief set_csr - the CSR with the public key.
+    @brief csr - the CSR with the public key.
     This function needs to be called before on_start () obviously.
     ***********************************************************/
-    public void set_private_key (GLib.ByteArray private_key);
+    public void private_key (GLib.ByteArray private_key);
 
 
     /***********************************************************
@@ -58,19 +58,19 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
     : base (account, path, parent) {
     }
 
-    void StorePrivateKeyApiJob.set_private_key (GLib.ByteArray priv_key) {
+    void StorePrivateKeyApiJob.private_key (GLib.ByteArray priv_key) {
         GLib.ByteArray data = "private_key=";
         data += GLib.Uri.to_percent_encoding (priv_key);
-        this.priv_key.set_data (data);
+        this.priv_key.data (data);
     }
 
     void StorePrivateKeyApiJob.on_start () {
         Soup.Request req;
-        req.set_raw_header ("OCS-APIREQUEST", "true");
+        req.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
         query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
-        url.set_query (query);
+        url.query (query);
 
         GLib.info (lc_store_private_key_api_job) << "Sending the private key" << this.priv_key.data ();
         send_request ("POST", url, req, this.priv_key);

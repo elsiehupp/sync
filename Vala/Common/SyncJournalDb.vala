@@ -230,7 +230,7 @@ class SyncJournalDb : GLib.Object {
         The path should not have a trailing slash.
         It's valid to use the root path "".
         ***********************************************************/
-        void set_for_path (GLib.ByteArray path, PinState state) {
+        void for_path (GLib.ByteArray path, PinState state) {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return;
@@ -782,7 +782,7 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Result<void, string> set_file_record (SyncJournalFileRecord record) {
+    public Result<void, string> file_record (SyncJournalFileRecord record) {
         SyncJournalFileRecord record = this.record;
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
@@ -1117,7 +1117,7 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_error_blocklist_entry (SyncJournalErrorBlocklistRecord item) {
+    public void error_blocklist_entry (SyncJournalErrorBlocklistRecord item) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
         GLib.info (lc_database) << "Setting blocklist entry for" << item.file << item.retry_count
@@ -1257,7 +1257,7 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_download_info (string file, DownloadInfo i) {
+    public void download_info (string file, DownloadInfo i) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
         if (!check_connect ()) {
@@ -1398,7 +1398,7 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_upload_info (string file, UploadInfo i) {
+    public void upload_info (string file, UploadInfo i) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
         if (!check_connect ()) {
@@ -1576,7 +1576,7 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_poll_info (PollInfo info) {
+    public void poll_info (PollInfo info) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         if (!check_connect ()) {
             return;
@@ -1697,7 +1697,7 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     Write the selective sync list (remove all other entries of that list
     ***********************************************************/
-    public void set_selective_sync_list (SelectiveSyncListType type, string[] list) {
+    public void selective_sync_list (SelectiveSyncListType type, string[] list) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         if (!check_connect ()) {
             return;
@@ -1722,7 +1722,7 @@ class SyncJournalDb : GLib.Object {
             }
         }
 
-        commit_internal ("set_selective_sync_list");
+        commit_internal ("selective_sync_list");
     }
 
 
@@ -1739,7 +1739,7 @@ class SyncJournalDb : GLib.Object {
     this.csync_detect_update skip them), the this.invalid_ marker will stay. And any
     child items in the database will be ignored when reading a remote tree from the database.
 
-    Any set_file_record () call to affected directories before the next sync run will be
+    Any file_record () call to affected directories before the next sync run will be
     adjusted to retain the invalid etag via this.etag_storage_filter.
     ***********************************************************/
     //  public void schedule_path_for_remote_discovery (string filename) {
@@ -1891,22 +1891,22 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     The data-fingerprint used to detect backup
     ***********************************************************/
-    void set_data_fingerprint (GLib.ByteArray data_fingerprint) {
+    void data_fingerprint (GLib.ByteArray data_fingerprint) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         if (!check_connect ()) {
             return;
         }
 
-        PreparedSqlQuery set_data_fingerprint_query1 = this.query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query1, QByteArrayLiteral ("DELETE FROM datafingerprint;"), this.database);
-        PreparedSqlQuery set_data_fingerprint_query2 = this.query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query2, QByteArrayLiteral ("INSERT INTO datafingerprint (fingerprint) VALUES (?1);"), this.database);
-        if (!set_data_fingerprint_query1 || !set_data_fingerprint_query2) {
+        PreparedSqlQuery data_fingerprint_query1 = this.query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query1, QByteArrayLiteral ("DELETE FROM datafingerprint;"), this.database);
+        PreparedSqlQuery data_fingerprint_query2 = this.query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query2, QByteArrayLiteral ("INSERT INTO datafingerprint (fingerprint) VALUES (?1);"), this.database);
+        if (!data_fingerprint_query1 || !data_fingerprint_query2) {
             return;
         }
 
-        set_data_fingerprint_query1.exec ();
+        data_fingerprint_query1.exec ();
 
-        set_data_fingerprint_query2.bind_value (1, data_fingerprint);
-        set_data_fingerprint_query2.exec ();
+        data_fingerprint_query2.bind_value (1, data_fingerprint);
+        data_fingerprint_query2.exec ();
     }
 
 
@@ -1942,7 +1942,7 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     Store a new or updated record in the database
     ***********************************************************/
-    public void set_conflict_record (ConflictRecord record) {
+    public void conflict_record (ConflictRecord record) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         if (!check_connect ())
             return;
@@ -2817,10 +2817,10 @@ class SyncJournalDb : GLib.Object {
         this.metadata_table_is_empty = (get_file_record_count () == 0);
 
         // Hide 'em all!
-        FileSystem.set_file_hidden (database_file_path (), true);
-        FileSystem.set_file_hidden (database_file_path () + QStringLiteral ("-wal"), true);
-        FileSystem.set_file_hidden (database_file_path () + QStringLiteral ("-shm"), true);
-        FileSystem.set_file_hidden (database_file_path () + QStringLiteral ("-journal"), true);
+        FileSystem.file_hidden (database_file_path (), true);
+        FileSystem.file_hidden (database_file_path () + QStringLiteral ("-wal"), true);
+        FileSystem.file_hidden (database_file_path () + QStringLiteral ("-shm"), true);
+        FileSystem.file_hidden (database_file_path () + QStringLiteral ("-journal"), true);
 
         return rc;
     }

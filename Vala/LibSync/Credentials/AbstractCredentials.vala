@@ -50,11 +50,11 @@ class AbstractCredentials : GLib.Object {
     The bound account for the credentials instance.
 
     Credentials are always used in conjunction with an account.
-    Calling Account.set_credentials () will call this function.
+    Calling Account.credentials () will call this function.
     Credentials only live as long as the underlying account object.
     ***********************************************************/
-    public virtual void set_account (Account account) {
-        ENFORCE (!this.account, "should only set_account once");
+    public virtual void account (Account account) {
+        ENFORCE (!this.account, "should only account once");
         this.account = account;
     }
 

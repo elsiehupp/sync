@@ -43,12 +43,12 @@ signals:
 
     OcsNavigationAppsJob.OcsNavigationAppsJob (AccountPointer account)
         : Ocs_job (account) {
-        set_path ("ocs/v2.php/core/navigation/apps");
+        path ("ocs/v2.php/core/navigation/apps");
         connect (this, &OcsNavigationAppsJob.job_finished, this, &OcsNavigationAppsJob.on_job_done);
     }
 
     void OcsNavigationAppsJob.get_navigation_apps () {
-        set_verb ("GET");
+        verb ("GET");
         add_param ("absolute", "true");
         on_start ();
     }

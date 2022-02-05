@@ -79,7 +79,7 @@ class CleanupPollsJob : GLib.Object {
                 delete_later ();
                 return;
             }
-            this.journal.set_upload_info (job.item.file, SyncJournalDb.UploadInfo ());
+            this.journal.upload_info (job.item.file, SyncJournalDb.UploadInfo ());
         }
         // Continue with the next entry, or finish
         on_start ();

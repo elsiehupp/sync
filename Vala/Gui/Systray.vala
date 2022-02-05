@@ -41,7 +41,7 @@ class Access_manager_factory : QQml_network_access_manager_factory {
 #ifdef Q_OS_OSX
 bool can_os_x_send_user_notification ();
 void send_os_xUser_notification (string title, string message);
-void set_tray_window_level_and_visible_on_all_spaces (QWindow window);
+void tray_window_level_and_visible_on_all_spaces (QWindow window);
 //  #endif
 
 /***********************************************************
@@ -69,7 +69,7 @@ class Systray
 
     /***********************************************************
     ***********************************************************/
-    public void set_tray_engine (QQml_application_engine tray_engine);
+    public void tray_engine (QQml_application_engine tray_engine);
 
     /***********************************************************
     ***********************************************************/
@@ -119,10 +119,10 @@ class Systray
     ***********************************************************/
     public 
 
-    public Q_INVOKABLE void set_opened ();
+    public Q_INVOKABLE void opened ();
 
 
-    public Q_INVOKABLE void set_closed ();
+    public Q_INVOKABLE void closed ();
 
 
     public Q_INVOKABLE void position_window (QQuick_window window);
@@ -157,7 +157,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void set_pause_on_all_folders_helper (bool pause);
+    private void pause_on_all_folders_helper (bool pause);
 
     /***********************************************************
     ***********************************************************/
@@ -195,10 +195,10 @@ Systray *Systray.instance () {
     return this.instance;
 }
 
-void Systray.set_tray_engine (QQml_application_engine tray_engine) {
+void Systray.tray_engine (QQml_application_engine tray_engine) {
     this.tray_engine = tray_engine;
 
-    this.tray_engine.set_network_access_manager_factory (&this.access_manager_factory);
+    this.tray_engine.network_access_manager_factory (&this.access_manager_factory);
 
     this.tray_engine.add_import_path ("qrc:/qml/theme");
     this.tray_engine.add_image_provider ("avatars", new Image_provider);
@@ -245,7 +245,7 @@ Systray.Systray ()
     var resume_action = context_menu.add_action (_("Resume sync"), this, &Systray.on_unpause_all_folders);
     context_menu.add_action (_("Settings"), this, &Systray.open_settings);
     context_menu.add_action (_("Exit %1").arg (Theme.instance ().app_name_gui ()), this, &Systray.shutdown);
-    set_context_menu (context_menu);
+    context_menu (context_menu);
 
     connect (context_menu, &QMenu.about_to_show, [=] {
         const var folders = FolderMan.instance ().map ();
@@ -254,17 +254,17 @@ Systray.Systray ()
             return f.sync_paused ();
         });
         const var pause_text = folders.size () > 1 ? _("Pause sync for all") : _("Pause sync");
-        pause_action.on_set_text (pause_text);
-        pause_action.set_visible (!all_paused);
-        pause_action.set_enabled (!all_paused);
+        pause_action.on_text (pause_text);
+        pause_action.visible (!all_paused);
+        pause_action.enabled (!all_paused);
 
         const var any_paused = std.any_of (std.cbegin (folders), std.cend (folders), [] (Folder f) {
             return f.sync_paused ();
         });
         const var resume_text = folders.size () > 1 ? _("Resume sync for all") : _("Resume sync");
-        resume_action.on_set_text (resume_text);
-        resume_action.set_visible (any_paused);
-        resume_action.set_enabled (any_paused);
+        resume_action.on_text (resume_text);
+        resume_action.visible (any_paused);
+        resume_action.enabled (any_paused);
     });
 
     connect (User_model.instance (), &User_model.new_user_selected,
@@ -279,7 +279,7 @@ Systray.Systray ()
 void Systray.create () {
     if (this.tray_engine) {
         if (!AccountManager.instance ().accounts ().is_empty ()) {
-            this.tray_engine.root_context ().set_context_property ("activity_model", User_model.instance ().current_activity_model ());
+            this.tray_engine.root_context ().context_property ("activity_model", User_model.instance ().current_activity_model ());
         }
         this.tray_engine.on_load ("qrc:/qml/src/gui/tray/Window.qml");
     }
@@ -298,7 +298,7 @@ void Systray.create () {
 void Systray.on_new_user_selected () {
     if (this.tray_engine) {
         // Change Activity_model
-        this.tray_engine.root_context ().set_context_property ("activity_model", User_model.instance ().current_activity_model ());
+        this.tray_engine.root_context ().context_property ("activity_model", User_model.instance ().current_activity_model ());
     }
 
     // Rebuild App list
@@ -306,14 +306,14 @@ void Systray.on_new_user_selected () {
 }
 
 void Systray.on_unpause_all_folders () {
-    set_pause_on_all_folders_helper (false);
+    pause_on_all_folders_helper (false);
 }
 
 void Systray.on_pause_all_folders () {
-    set_pause_on_all_folders_helper (true);
+    pause_on_all_folders_helper (true);
 }
 
-void Systray.set_pause_on_all_folders_helper (bool pause) {
+void Systray.pause_on_all_folders_helper (bool pause) {
     // For some reason we get the raw pointer from Folder.account_state ()
     // that's why we need a list of raw pointers for the call to contains
     // later on...
@@ -329,7 +329,7 @@ void Systray.set_pause_on_all_folders_helper (bool pause) {
     const var folders = FolderMan.instance ().map ();
     for (var f : folders) {
         if (accounts.contains (f.account_state ())) {
-            f.set_sync_paused (pause);
+            f.sync_paused (pause);
             if (pause) {
                 f.on_terminate_sync ();
             }
@@ -355,12 +355,12 @@ bool Systray.use_normal_window () {
 }
 
 // Q_INVOKABLE
-void Systray.set_opened () {
+void Systray.opened () {
     this.is_open = true;
 }
 
 // Q_INVOKABLE
-void Systray.set_closed () {
+void Systray.closed () {
     this.is_open = false;
 }
 
@@ -371,7 +371,7 @@ void Systray.show_message (string title, string message, Message_icon icon) {
         GLib.List<GLib.Variant> args = GLib.List<GLib.Variant> () << APPLICATION_NAME << uint32 (0) << APPLICATION_ICON_NAME
                                                  << title << message << string[] () << hints << int32 (-1);
         QDBus_message method = QDBus_message.create_method_call (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE, "Notify");
-        method.set_arguments (args);
+        method.arguments (args);
         QDBus_connection.session_bus ().async_call (method);
     } else
 //  #endif
@@ -384,8 +384,8 @@ void Systray.show_message (string title, string message, Message_icon icon) {
     }
 }
 
-void Systray.set_tool_tip (string tip) {
-    QSystemTrayIcon.set_tool_tip (_("%1 : %2").arg (Theme.instance ().app_name_gui (), tip));
+void Systray.tool_tip (string tip) {
+    QSystemTrayIcon.tool_tip (_("%1 : %2").arg (Theme.instance ().app_name_gui (), tip));
 }
 
 bool Systray.sync_is_paused () {
@@ -409,9 +409,9 @@ Helper functions for cross-platform tray icon position and taskbar orientation d
 
 void Systray.position_window (QQuick_window window) {
     if (!use_normal_window ()) {
-        window.set_screen (current_screen ());
+        window.screen (current_screen ());
         const var position = compute_window_position (window.width (), window.height ());
-        window.set_position (position);
+        window.position (position);
     }
 }
 
@@ -539,15 +539,15 @@ QPoint Systray.compute_window_position (int width, int height) {
         var offset = QPoint ();
 
         if (rect.left () < screen_rect.left ()) {
-            offset.set_x (screen_rect.left () - rect.left () + 4);
+            offset.x (screen_rect.left () - rect.left () + 4);
         } else if (rect.right () > screen_rect.right ()) {
-            offset.set_x (screen_rect.right () - rect.right () - 4);
+            offset.x (screen_rect.right () - rect.right () - 4);
         }
 
         if (rect.top () < screen_rect.top ()) {
-            offset.set_y (screen_rect.top () - rect.top () + 4);
+            offset.y (screen_rect.top () - rect.top () + 4);
         } else if (rect.bottom () > screen_rect.bottom ()) {
-            offset.set_y (screen_rect.bottom () - rect.bottom () - 4);
+            offset.y (screen_rect.bottom () - rect.bottom () - 4);
         }
 
         return rect.translated (offset);

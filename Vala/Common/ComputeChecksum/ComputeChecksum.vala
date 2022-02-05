@@ -100,7 +100,7 @@ class ComputeChecksum : ComputeChecksumBase {
     /***********************************************************
     Sets the checksum type to be used. The default is empty.
     ***********************************************************/
-    public void set_checksum_type (GLib.ByteArray type) {
+    public void checksum_type (GLib.ByteArray type) {
         this.checksum_type = type;
     }
 
@@ -216,7 +216,7 @@ class ComputeChecksum : ComputeChecksumBase {
 
         // Bug : The thread will keep running even if ComputeChecksum is deleted.
         var type = checksum_type ();
-        this.watcher.set_future (Qt_concurrent.run ([shared_device, type] () {
+        this.watcher.future (Qt_concurrent.run ([shared_device, type] () {
             if (!shared_device.open (QIODevice.ReadOnly)) {
                 if (var file = qobject_cast<GLib.File> (shared_device.data ())) {
                     GLib.warn (lc_checksums) << "Could not open file" << file.filename ()

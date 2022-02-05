@@ -161,14 +161,14 @@ void HttpCredentialsGui.on_show_dialog () {
     }
 
     var dialog = new QInputDialog ();
-    dialog.set_attribute (Qt.WA_DeleteOnClose, true);
-    dialog.set_window_title (_("Enter Password"));
-    dialog.set_label_text (message);
-    dialog.set_text_value (this.previous_password);
-    dialog.set_text_echo_mode (QLineEdit.Password);
+    dialog.attribute (Qt.WA_DeleteOnClose, true);
+    dialog.window_title (_("Enter Password"));
+    dialog.label_text (message);
+    dialog.text_value (this.previous_password);
+    dialog.text_echo_mode (QLineEdit.Password);
     if (var dialog_label = dialog.find_child<QLabel> ()) {
-        dialog_label.set_open_external_links (true);
-        dialog_label.set_text_format (Qt.RichText);
+        dialog_label.open_external_links (true);
+        dialog_label.text_format (Qt.RichText);
     }
 
     dialog.open ();

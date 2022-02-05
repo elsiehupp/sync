@@ -386,7 +386,7 @@ class ProcessDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_inside_encrypted_tree (bool is_inside_encrypted_tree) {
+    public void inside_encrypted_tree (bool is_inside_encrypted_tree) {
         this.is_inside_encrypted_tree = is_inside_encrypted_tree;
     }
 
@@ -472,7 +472,7 @@ class ProcessDirectoryJob : GLib.Object {
                     chop_virtual_file_suffix (name);
                 var db_entry = entries[name].db_entry;
                 db_entry = record;
-                set_up_database_pin_state_actions (db_entry);
+                up_database_pin_state_actions (db_entry);
             })) {
             db_error ();
             return;
@@ -1662,7 +1662,7 @@ class ProcessDirectoryJob : GLib.Object {
                 record.file_size = server_entry.size;
                 record.remote_perm = server_entry.remote_perm;
                 record.checksum_header = server_entry.checksum_header;
-                this.discovery_data.statedatabase.set_file_record (record);
+                this.discovery_data.statedatabase.file_record (record);
             }
             return;
         }
@@ -1720,9 +1720,9 @@ class ProcessDirectoryJob : GLib.Object {
         if (recurse) {
             var job = new ProcessDirectoryJob (path, item, recurse_query_local, recurse_query_server,
                 this.last_sync_timestamp, this);
-            job.set_inside_encrypted_tree (is_inside_encrypted_tree () || item.is_encrypted);
+            job.inside_encrypted_tree (is_inside_encrypted_tree () || item.is_encrypted);
             if (removed) {
-                job.set_parent (this.discovery_data);
+                job.parent (this.discovery_data);
                 this.discovery_data.queued_deleted_directories[path.original] = job;
             } else {
                 connect (job, &ProcessDirectoryJob.on_finished, this, &ProcessDirectoryJob.sub_job_finished);
@@ -1971,7 +1971,7 @@ class ProcessDirectoryJob : GLib.Object {
         var server_job = new DiscoverySingleDirectoryJob (this.discovery_data.account,
             this.discovery_data.remote_folder + this.current_folder.server, this);
         if (!this.dir_item)
-            server_job.set_is_root_path (); // query the fingerprint on the root
+            server_job.is_root_path (); // query the fingerprint on the root
         connect (server_job, &DiscoverySingleDirectoryJob.etag, this, &ProcessDirectoryJob.etag);
         this.discovery_data.currently_active_jobs++;
         this.pending_async_jobs++;
@@ -2099,7 +2099,7 @@ class ProcessDirectoryJob : GLib.Object {
     state suggests a hydration or dehydration action and changes the
     this.type field accordingly.
     ***********************************************************/
-    private void set_up_database_pin_state_actions (SyncJournalFileRecord record) {
+    private void up_database_pin_state_actions (SyncJournalFileRecord record) {
         // Only suffix-vfs uses the database for pin states.
         // Other plugins will set local_entry.type according to the file's pin state.
         if (!is_vfs_with_suffix ())

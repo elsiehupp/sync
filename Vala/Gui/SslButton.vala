@@ -49,13 +49,13 @@ class Ssl_button : QToolButton {
 
     Ssl_button.Ssl_button (Gtk.Widget parent)
         : QToolButton (parent) {
-        set_popup_mode (QToolButton.Instant_popup);
-        set_auto_raise (true);
+        popup_mode (QToolButton.Instant_popup);
+        auto_raise (true);
 
         this.menu = new QMenu (this);
         GLib.Object.connect (this.menu, &QMenu.about_to_show,
             this, &Ssl_button.on_update_menu);
-        set_menu (this.menu);
+        menu (this.menu);
     }
 
 
@@ -159,16 +159,16 @@ class Ssl_button : QToolButton {
 
         // create label first
         var label = new QLabel (parent);
-        label.set_style_sheet (QLatin1String ("QLabel { padding : 8px; }"));
-        label.set_text_format (Qt.RichText);
-        label.on_set_text (details);
+        label.style_sheet (QLatin1String ("QLabel { padding : 8px; }"));
+        label.text_format (Qt.RichText);
+        label.on_text (details);
 
         // plug label into widget action
         var action = new QWidget_action (parent);
-        action.set_default_widget (label);
+        action.default_widget (label);
         // plug action into menu
         var menu = new QMenu (parent);
-        menu.menu_action ().on_set_text (txt);
+        menu.menu_action ().on_text (txt);
         menu.add_action (action);
 
         return menu;
@@ -176,21 +176,21 @@ class Ssl_button : QToolButton {
 
     void Ssl_button.update_account_state (AccountState account_state) {
         if (!account_state || !account_state.is_connected ()) {
-            set_visible (false);
+            visible (false);
             return;
         } else {
-            set_visible (true);
+            visible (true);
         }
         this.account_state = account_state;
 
         AccountPointer account = this.account_state.account ();
         if (account.url ().scheme () == QLatin1String ("https")) {
-            set_icon (QIcon (QLatin1String (":/client/theme/lock-https.svg")));
+            icon (QIcon (QLatin1String (":/client/theme/lock-https.svg")));
             QSslCipher cipher = account.session_cipher;
-            set_tool_tip (_("This connection is encrypted using %1 bit %2.\n").arg (cipher.used_bits ()).arg (cipher.name ()));
+            tool_tip (_("This connection is encrypted using %1 bit %2.\n").arg (cipher.used_bits ()).arg (cipher.name ()));
         } else {
-            set_icon (QIcon (QLatin1String (":/client/theme/lock-http.svg")));
-            set_tool_tip (_("This connection is NOT secure as it is not encrypted.\n"));
+            icon (QIcon (QLatin1String (":/client/theme/lock-http.svg")));
+            tool_tip (_("This connection is NOT secure as it is not encrypted.\n"));
         }
     }
 
@@ -203,10 +203,10 @@ class Ssl_button : QToolButton {
 
         AccountPointer account = this.account_state.account ();
 
-        this.menu.add_action (_("Server version : %1").arg (account.server_version ())).set_enabled (false);
+        this.menu.add_action (_("Server version : %1").arg (account.server_version ())).enabled (false);
 
         if (account.is_http2Supported ()) {
-            this.menu.add_action ("HTTP/2").set_enabled (false);
+            this.menu.add_action ("HTTP/2").enabled (false);
         }
 
         if (account.url ().scheme () == QLatin1String ("https")) {
@@ -214,10 +214,10 @@ class Ssl_button : QToolButton {
                 + ", " + account.session_cipher.authentication_method ()
                 + ", " + account.session_cipher.key_exchange_method ()
                 + ", " + account.session_cipher.encryption_method ();
-            this.menu.add_action (ssl_version).set_enabled (false);
+            this.menu.add_action (ssl_version).enabled (false);
 
             if (account.session_ticket.is_empty ()) {
-                this.menu.add_action (_("No support for SSL session tickets/identifiers")).set_enabled (false);
+                this.menu.add_action (_("No support for SSL session tickets/identifiers")).enabled (false);
             }
 
             GLib.List<QSslCertificate> chain = account.peer_certificate_chain;
@@ -227,7 +227,7 @@ class Ssl_button : QToolButton {
                 return;
             }
 
-            this.menu.add_action (_("Certificate information:")).set_enabled (false);
+            this.menu.add_action (_("Certificate information:")).enabled (false);
 
             const var system_certificates = QSslConfiguration.system_ca_certificates ();
 
@@ -256,7 +256,7 @@ class Ssl_button : QToolButton {
                 i++;
             }
         } else {
-            this.menu.add_action (_("The connection is not secure")).set_enabled (false);
+            this.menu.add_action (_("The connection is not secure")).enabled (false);
         }
     }
 

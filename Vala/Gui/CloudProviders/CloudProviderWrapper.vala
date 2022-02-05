@@ -113,14 +113,14 @@ CloudProviderWrapper.CloudProviderWrapper (GLib.Object parent, Folder folder, in
     this.cloud_provider = CLOUD_PROVIDERS_PROVIDER_EXPORTER (cloudprovider);
     this.cloud_provider_account = cloud_providers_account_exporter_new (this.cloud_provider, account_name.to_utf8 ().data ());
 
-    cloud_providers_account_exporter_set_name (this.cloud_provider_account, folder.short_gui_local_path ().to_utf8 ().data ());
-    cloud_providers_account_exporter_set_icon (this.cloud_provider_account, g_icon_new_for_string (APPLICATION_ICON_NAME, null));
-    cloud_providers_account_exporter_set_path (this.cloud_provider_account, folder.clean_path ().to_utf8 ().data ());
-    cloud_providers_account_exporter_set_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
+    cloud_providers_account_exporter_name (this.cloud_provider_account, folder.short_gui_local_path ().to_utf8 ().data ());
+    cloud_providers_account_exporter_icon (this.cloud_provider_account, g_icon_new_for_string (APPLICATION_ICON_NAME, null));
+    cloud_providers_account_exporter_path (this.cloud_provider_account, folder.clean_path ().to_utf8 ().data ());
+    cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
     model = get_menu_model ();
-    cloud_providers_account_exporter_set_menu_model (this.cloud_provider_account, model);
+    cloud_providers_account_exporter_menu_model (this.cloud_provider_account, model);
     action_group = get_action_group ();
-    cloud_providers_account_exporter_set_action_group (this.cloud_provider_account, action_group);
+    cloud_providers_account_exporter_action_group (this.cloud_provider_account, action_group);
 
     connect (ProgressDispatcher.instance (), SIGNAL (progress_info (string, ProgressInfo)), this, SLOT (on_update_progress (string, ProgressInfo)));
     connect (this.folder, SIGNAL (sync_started ()), this, SLOT (on_sync_started ()));
@@ -221,7 +221,7 @@ void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo progre
                 string label = i.first;
                 string full_path = i.second;
                 item = menu_item_new (label, "cloudprovider.showfile");
-                g_menu_item_set_action_and_target_value (item, "cloudprovider.showfile", g_variant_new_string (full_path.to_utf8 ().data ()));
+                g_menu_item_action_and_target_value (item, "cloudprovider.showfile", g_variant_new_string (full_path.to_utf8 ().data ()));
                 g_menu_append_item (this.recent_menu, item);
                 g_clear_object (&item);
             }
@@ -235,16 +235,16 @@ void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo progre
 
 void CloudProviderWrapper.update_status_text (string status_text) {
     string status = string ("%1 - %2").arg (this.folder.account_state ().state_string (this.folder.account_state ().state ()), status_text);
-    cloud_providers_account_exporter_set_status_details (this.cloud_provider_account, status.to_utf8 ().data ());
+    cloud_providers_account_exporter_status_details (this.cloud_provider_account, status.to_utf8 ().data ());
 }
 
 void CloudProviderWrapper.update_pause_status () {
     if (this.paused) {
         update_status_text (_("Sync paused"));
-        cloud_providers_account_exporter_set_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_ERROR);
+        cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_ERROR);
     } else {
         update_status_text (_("Syncing"));
-        cloud_providers_account_exporter_set_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_SYNCING);
+        cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_SYNCING);
     }
 }
 
@@ -253,16 +253,16 @@ Folder* CloudProviderWrapper.folder () {
 }
 
 void CloudProviderWrapper.on_sync_started () {
-    cloud_providers_account_exporter_set_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_SYNCING);
+    cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_SYNCING);
 }
 
 void CloudProviderWrapper.on_sync_finished (SyncResult result) {
     if (result.status () == result.Success || result.status () == result.Problem) {
-        cloud_providers_account_exporter_set_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
+        cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
         update_status_text (result.status_string ());
         return;
     }
-    cloud_providers_account_exporter_set_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_ERROR);
+    cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_ERROR);
     update_status_text (result.status_string ());
 }
 
@@ -375,8 +375,8 @@ activate_action_pause (GSimple_action action,
 
     old_state = g_action_get_state (G_ACTION (action));
     new_state = g_variant_new_boolean (! (bool)g_variant_get_boolean (old_state));
-    self.folder ().set_sync_paused ( (bool)g_variant_get_boolean (new_state));
-    g_simple_action_set_state (action, new_state);
+    self.folder ().sync_paused ( (bool)g_variant_get_boolean (new_state));
+    g_simple_action_state (action, new_state);
     g_variant_unref (old_state);
 }
 
@@ -461,7 +461,7 @@ GAction_group* CloudProviderWrapper.get_action_group () {
     g_action_map_add_action_entries (G_ACTION_MAP (action_group), actions, G_N_ELEMENTS (actions), this);
     bool state = this.folder.sync_paused ();
     GAction pause = g_action_map_lookup_action (G_ACTION_MAP (action_group), "pause");
-    g_simple_action_set_state (G_SIMPLE_ACTION (pause), g_variant_new_boolean (state));
+    g_simple_action_state (G_SIMPLE_ACTION (pause), g_variant_new_boolean (state));
     return G_ACTION_GROUP (g_object_ref (action_group));
 }
 
@@ -469,6 +469,6 @@ void CloudProviderWrapper.on_sync_paused_changed (Folder folder, bool state) {
     //  Q_UNUSED (folder);
     this.paused = state;
     GAction pause = g_action_map_lookup_action (G_ACTION_MAP (action_group), "pause");
-    g_simple_action_set_state (G_SIMPLE_ACTION (pause), g_variant_new_boolean (state));
+    g_simple_action_state (G_SIMPLE_ACTION (pause), g_variant_new_boolean (state));
     update_pause_status ();
 }

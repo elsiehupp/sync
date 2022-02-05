@@ -17,8 +17,8 @@ class Bloom_filter {
     }
 
     public void store_hash (uint32 hash) {
-        hash_bits.set_bit ( (hash & 0x_f_f_f_f) % Num_bits); // NOLINT it's uint32 all the way and the modulo puts us back in the 0..1023 range
-        hash_bits.set_bit ( (hash >> 16) % Num_bits); // NOLINT
+        hash_bits.bit ( (hash & 0x_f_f_f_f) % Num_bits); // NOLINT it's uint32 all the way and the modulo puts us back in the 0..1023 range
+        hash_bits.bit ( (hash >> 16) % Num_bits); // NOLINT
     }
     public bool is_hash_maybe_stored (uint32 hash) {
         return hash_bits.test_bit ( (hash & 0x_f_f_f_f) % Num_bits) // NOLINT

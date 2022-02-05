@@ -12,7 +12,7 @@ namespace Occ {
 To be
 \code
 this.job = new SignPubli
-this.job.set_csr ( csr
+this.job.csr ( csr
 connect (this.job.
 this.job.on_start
 \encode
@@ -27,10 +27,10 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
 
 
     /***********************************************************
-    @brief set_csr - the CSR with the public key.
+    @brief csr - the CSR with the public key.
     This function needs to be called before on_start () obviously.
     ***********************************************************/
-    public void set_csr (GLib.ByteArray csr);
+    public void csr (GLib.ByteArray csr);
 
 
     /***********************************************************
@@ -59,20 +59,20 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
     : base (account, path, parent) {
     }
 
-    void SignPublicKeyApiJob.set_csr (GLib.ByteArray csr) {
+    void SignPublicKeyApiJob.csr (GLib.ByteArray csr) {
         GLib.ByteArray data = "csr=";
         data += GLib.Uri.to_percent_encoding (csr);
-        this.csr.set_data (data);
+        this.csr.data (data);
     }
 
     void SignPublicKeyApiJob.on_start () {
         Soup.Request req;
-        req.set_raw_header ("OCS-APIREQUEST", "true");
-        req.set_header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
+        req.raw_header ("OCS-APIREQUEST", "true");
+        req.header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
         QUrlQuery query;
         query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
-        url.set_query (query);
+        url.query (query);
 
         GLib.info (lc_sign_public_key_api_job) << "Sending the CSR" << this.csr.data ();
         send_request ("POST", url, req, this.csr);

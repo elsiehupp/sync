@@ -49,15 +49,15 @@ class Proxy_auth_dialog : Gtk.Dialog {
     Proxy_auth_dialog.Proxy_auth_dialog (Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.Proxy_auth_dialog) {
-        ui.set_up_ui (this);
+        ui.up_ui (this);
     }
 
     Proxy_auth_dialog.~Proxy_auth_dialog () {
         delete ui;
     }
 
-    void Proxy_auth_dialog.set_proxy_address (string address) {
-        ui.proxy_address.on_set_text (address);
+    void Proxy_auth_dialog.proxy_address (string address) {
+        ui.proxy_address.on_text (address);
     }
 
     string Proxy_auth_dialog.username () {
@@ -69,7 +69,7 @@ class Proxy_auth_dialog : Gtk.Dialog {
     }
 
     void Proxy_auth_dialog.on_reset () {
-        ui.username_edit.set_focus ();
+        ui.username_edit.focus ();
         ui.username_edit.clear ();
         ui.password_edit.clear ();
     }

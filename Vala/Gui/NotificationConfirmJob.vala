@@ -30,7 +30,7 @@ class Notification_confirm_job : AbstractNetworkJob {
 
     @param verb currently supported GET PUT POST DELETE
     ***********************************************************/
-    public void set_link_and_verb (GLib.Uri link, GLib.ByteArray verb);
+    public void link_and_verb (GLib.Uri link, GLib.ByteArray verb);
 
 
     /***********************************************************
@@ -61,10 +61,10 @@ signals:
 
     Notification_confirm_job.Notification_confirm_job (AccountPointer account)
         : base (account, "") {
-        set_ignore_credential_failure (true);
+        ignore_credential_failure (true);
     }
 
-    void Notification_confirm_job.set_link_and_verb (GLib.Uri link, GLib.ByteArray verb) {
+    void Notification_confirm_job.link_and_verb (GLib.Uri link, GLib.ByteArray verb) {
         this.link = link;
         this.verb = verb;
     }
@@ -75,8 +75,8 @@ signals:
             return;
         }
         QNetworkRequest req;
-        req.set_raw_header ("Ocs-APIREQUEST", "true");
-        req.set_raw_header ("Content-Type", "application/x-www-form-urlencoded");
+        req.raw_header ("Ocs-APIREQUEST", "true");
+        req.raw_header ("Content-Type", "application/x-www-form-urlencoded");
 
         send_request (this.verb, this.link, req);
 

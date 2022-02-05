@@ -26,7 +26,7 @@ class IconJob : GLib.Object {
         base (parent);
         Soup.Request request (url);
     #if (QT_VERSION >= 0x050600)
-        request.set_attribute (Soup.Request.FollowRedirectsAttribute, true);
+        request.attribute (Soup.Request.FollowRedirectsAttribute, true);
     #endif
         const var reply = account.send_raw_request (QByteArrayLiteral ("GET"), url, request);
         connect (reply, &Soup.Reply.on_finished, this, &IconJob.on_finished);

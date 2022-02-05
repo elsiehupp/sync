@@ -920,10 +920,10 @@ void FakeErrorReply.respond () {
     /* emit */ metaDataChanged ();
     /* emit */ readyRead ();
     // finishing can come strictly after readyRead was called
-    QTimer.singleShot (5, this, &FakeErrorReply.on_slot_set_finished);
+    QTimer.singleShot (5, this, &FakeErrorReply.on_slot_finished);
 }
 
-void FakeErrorReply.on_slot_set_finished () {
+void FakeErrorReply.on_slot_finished () {
     setFinished (true);
     /* emit */ finished ();
 }

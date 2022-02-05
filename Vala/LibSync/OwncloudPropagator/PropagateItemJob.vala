@@ -58,7 +58,7 @@ class PropagateItemJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    protected void set_restore_job_msg (string message = "") {
+    protected void restore_job_msg (string message = "") {
         this.item.is_restoration = true;
         this.item.error_string = message;
     }
@@ -95,7 +95,7 @@ class PropagateItemJob : PropagatorJob {
         string message;
         if (this.restore_job) {
             message = this.restore_job.restore_job_msg ();
-            this.restore_job.set_restore_job_msg ();
+            this.restore_job.restore_job_msg ();
         }
 
         if (status == SyncFileItem.Status.SUCCESS || status == SyncFileItem.Status.CONFLICT

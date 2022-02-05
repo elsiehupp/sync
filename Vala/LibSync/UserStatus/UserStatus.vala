@@ -69,21 +69,21 @@ class UserStatus {
 
     /***********************************************************
     ***********************************************************/
-    public void set_id (string identifier) {
+    public void id (string identifier) {
         this.identifier = identifier;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void UserStatus.set_message (string message) {
+    public void UserStatus.message (string message) {
         this.message = message;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_state (OnlineStatus state) {
+    public void state (OnlineStatus state) {
         this.state = state;
     }
 
@@ -91,21 +91,21 @@ class UserStatus {
 
     /***********************************************************
     ***********************************************************/
-    public void set_icon (string icon) {
+    public void icon (string icon) {
         this.icon = icon;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_message_predefined (bool value) {
+    public void message_predefined (bool value) {
         this.message_predefined = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_clear_at (Optional<ClearAt> date_time) {
+    public void clear_at (Optional<ClearAt> date_time) {
         this.clear_at = date_time;
     }
 

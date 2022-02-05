@@ -73,7 +73,7 @@ protected slots:
     private void on_start_spinner ();
     private void on_stop_spinner (bool show_status_label);
     private void customize_style ();
-    private void set_logo ();
+    private void logo ();
 
     /***********************************************************
     ***********************************************************/

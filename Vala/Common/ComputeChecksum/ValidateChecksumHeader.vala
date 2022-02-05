@@ -88,7 +88,7 @@ class ValidateChecksumHeader : ComputeChecksumBase {
         }
 
         var calculator = new ComputeChecksum (this);
-        calculator.set_checksum_type (this.expected_checksum_type);
+        calculator.checksum_type (this.expected_checksum_type);
         connect (calculator, &ComputeChecksum.done,
             this, &ValidateChecksumHeader.on_checksum_calculated);
         return calculator;

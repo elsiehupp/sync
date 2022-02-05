@@ -136,7 +136,7 @@ protected slots:
 
     Returns false and reports ServerVersionMismatch for very old servers.
     ***********************************************************/
-    private bool set_and_check_server_version (string version);
+    private bool and_check_server_version (string version);
 
     /***********************************************************
     ***********************************************************/
@@ -174,7 +174,7 @@ protected slots:
                 this, SLOT (on_system_proxy_lookup_done (QNetworkProxy)));
         } else {
             // We want to reset the QNAM proxy so that the global proxy settings are used (via ClientProxy settings)
-            this.account.network_access_manager ().set_proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
+            this.account.network_access_manager ().proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
             QMetaObject.invoke_method (this, "on_check_server_and_auth", Qt.QueuedConnection);
         }
@@ -191,7 +191,7 @@ protected slots:
         } else {
             GLib.info (lc_connection_validator) << "No system proxy set by OS";
         }
-        this.account.network_access_manager ().set_proxy (proxy);
+        this.account.network_access_manager ().proxy (proxy);
 
         on_check_server_and_auth ();
     }
@@ -199,8 +199,8 @@ protected slots:
     // The actual check
     void ConnectionValidator.on_check_server_and_auth () {
         var check_job = new CheckServerJob (this.account, this);
-        check_job.on_set_timeout (timeout_to_use_msec);
-        check_job.set_ignore_credential_failure (true);
+        check_job.on_timeout (timeout_to_use_msec);
+        check_job.ignore_credential_failure (true);
         connect (check_job, &CheckServerJob.instance_found, this, &ConnectionValidator.on_status_found);
         connect (check_job, &CheckServerJob.instance_not_found, this, &ConnectionValidator.on_no_status_found);
         connect (check_job, &CheckServerJob.timeout, this, &ConnectionValidator.on_job_timeout);
@@ -222,11 +222,11 @@ protected slots:
         // Update server url in case of redirection
         if (this.account.url () != url) {
             GLib.info (lc_connection_validator ()) << "status.php was redirected to" << url.to_string ();
-            this.account.set_url (url);
+            this.account.url (url);
             this.account.wants_account_saved (this.account.data ());
         }
 
-        if (!server_version.is_empty () && !set_and_check_server_version (server_version)) {
+        if (!server_version.is_empty () && !and_check_server_version (server_version)) {
             return;
         }
 
@@ -279,8 +279,8 @@ protected slots:
         // continue in on_auth_check here :-)
         GLib.debug (lc_connection_validator) << "# Check whether authenticated propfind works.";
         var job = new PropfindJob (this.account, "/", this);
-        job.on_set_timeout (timeout_to_use_msec);
-        job.set_properties (GLib.List<GLib.ByteArray> () << "getlastmodified");
+        job.on_timeout (timeout_to_use_msec);
+        job.properties (GLib.List<GLib.ByteArray> () << "getlastmodified");
         connect (job, &PropfindJob.result, this, &ConnectionValidator.on_auth_success);
         connect (job, &PropfindJob.finished_with_error, this, &ConnectionValidator.on_auth_failed);
         job.on_start ();
@@ -326,7 +326,7 @@ protected slots:
     void ConnectionValidator.check_server_capabilities () {
         // The main flow now needs the capabilities
         var job = new JsonApiJob (this.account, QLatin1String ("ocs/v1.php/cloud/capabilities"), this);
-        job.on_set_timeout (timeout_to_use_msec);
+        job.on_timeout (timeout_to_use_msec);
         GLib.Object.connect (job, &JsonApiJob.json_received, this, &ConnectionValidator.on_capabilities_recieved);
         job.on_start ();
     }
@@ -334,11 +334,11 @@ protected slots:
     void ConnectionValidator.on_capabilities_recieved (QJsonDocument json) {
         var capabilities = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
         GLib.info (lc_connection_validator) << "Server capabilities" << capabilities;
-        this.account.set_capabilities (capabilities.to_variant_map ());
+        this.account.capabilities (capabilities.to_variant_map ());
 
         // New servers also report the version in the capabilities
         string server_version = capabilities["core"].to_object ()["status"].to_object ()["version"].to_string ();
-        if (!server_version.is_empty () && !set_and_check_server_version (server_version)) {
+        if (!server_version.is_empty () && !and_check_server_version (server_version)) {
             return;
         }
 
@@ -353,12 +353,12 @@ protected slots:
     void ConnectionValidator.fetch_user () {
         var user_info = new UserInfo (this.account_state.data (), true, true, this);
         GLib.Object.connect (user_info, &UserInfo.fetched_last_info, this, &ConnectionValidator.on_user_fetched);
-        user_info.set_active (true);
+        user_info.active (true);
     }
 
-    bool ConnectionValidator.set_and_check_server_version (string version) {
+    bool ConnectionValidator.and_check_server_version (string version) {
         GLib.info (lc_connection_validator) << this.account.url () << "has server version" << version;
-        this.account.set_server_version (version);
+        this.account.server_version (version);
 
         // We cannot deal with servers < 7.0.0
         if (this.account.server_version_int ()
@@ -376,7 +376,7 @@ protected slots:
         // Actual decision if we should use HTTP/2 is done in AccessManager.create_request
         if (var job = qobject_cast<AbstractNetworkJob> (sender ())) {
             if (var reply = job.reply ()) {
-                this.account.set_http2Supported (
+                this.account.http2Supported (
                     reply.attribute (QNetworkRequest.HTTP2WasUsedAttribute).to_bool ());
             }
         }
@@ -386,7 +386,7 @@ protected slots:
 
     void ConnectionValidator.on_user_fetched (UserInfo user_info) {
         if (user_info) {
-            user_info.set_active (false);
+            user_info.active (false);
             user_info.delete_later ();
         }
 

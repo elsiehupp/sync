@@ -135,9 +135,9 @@ class BulkPropagatorJob : PropagatorJob {
         // Compute the transmission checksum.
         var compute_checksum = std.make_unique<ComputeChecksum> (this);
         if (upload_checksum_enabled ()) {
-            compute_checksum.set_checksum_type ("MD5" /*propagator ().account ().capabilities ().upload_checksum_type ()*/);
+            compute_checksum.checksum_type ("MD5" /*propagator ().account ().capabilities ().upload_checksum_type ()*/);
         } else {
-            compute_checksum.set_checksum_type (GLib.ByteArray ());
+            compute_checksum.checksum_type (GLib.ByteArray ());
         }
 
         connect (compute_checksum.get (), &ComputeChecksum.done,
@@ -289,13 +289,13 @@ class BulkPropagatorJob : PropagatorJob {
             || one_file.item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE) {
             var vfs = propagator ().sync_options ().vfs;
             const var pin = vfs.pin_state (one_file.item.file);
-            if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY && !vfs.set_pin_state (one_file.item.file, PinState.PinState.UNSPECIFIED)) {
+            if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY && !vfs.pin_state (one_file.item.file, PinState.PinState.UNSPECIFIED)) {
                 GLib.warn (lc_bulk_propagator_job) << "Could not set pin state of" << one_file.item.file << "to unspecified";
             }
         }
 
         // Remove from the progress database:
-        propagator ().journal.set_upload_info (one_file.item.file, SyncJournalDb.UploadInfo ());
+        propagator ().journal.upload_info (one_file.item.file, SyncJournalDb.UploadInfo ());
         propagator ().journal.commit ("upload file on_start");
     }
 
@@ -342,7 +342,7 @@ class BulkPropagatorJob : PropagatorJob {
         pi.error_count = 0;
         pi.content_checksum = item.checksum_header;
         pi.size = item.size;
-        propagator ().journal.set_upload_info (item.file, pi);
+        propagator ().journal.upload_info (item.file, pi);
         propagator ().journal.commit ("Upload info");
 
         var current_headers = headers (item);
@@ -461,7 +461,7 @@ class BulkPropagatorJob : PropagatorJob {
         AbstractNetworkJob job, int64 file_size) {
         constexpr double three_minutes = 3.0 * 60 * 1000;
 
-        job.on_set_timeout (q_bound (
+        job.on_timeout (q_bound (
             job.timeout_msec (),
             // Calculate 3 minutes for each gigabyte of data
             q_round64 (three_minutes * static_cast<double> (file_size) / 1e9),
@@ -681,7 +681,7 @@ class BulkPropagatorJob : PropagatorJob {
                                           << "on file" << item.file
                                           << "is" << upload_info.error_count;
             }
-            propagator ().journal.set_upload_info (item.file, upload_info);
+            propagator ().journal.upload_info (item.file, upload_info);
             propagator ().journal.commit ("Upload info");
         }
     }

@@ -100,7 +100,7 @@ class UploadDevice : QIODevice {
 
         string open_error;
         if (!FileSystem.open_and_seek_file_shared_read (&this.file, open_error, this.start)) {
-            on_set_error_string (open_error);
+            on_error_string (open_error);
             return false;
         }
 
@@ -155,7 +155,7 @@ class UploadDevice : QIODevice {
 
         var c = this.file.read (data, maxlen);
         if (c < 0) {
-            on_set_error_string (this.file.error_string ());
+            on_error_string (this.file.error_string ());
             return -1;
         }
         this.read += c;
@@ -212,7 +212,7 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public void set_bandwidth_limited (bool);
+    public void bandwidth_limited (bool);
 
 
     /***********************************************************
@@ -224,7 +224,7 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public void set_choked (bool);
+    public void choked (bool);
 
 
     /***********************************************************
@@ -270,12 +270,12 @@ class UploadDevice : QIODevice {
         }
     }
 
-    void UploadDevice.set_bandwidth_limited (bool b) {
+    void UploadDevice.bandwidth_limited (bool b) {
         this.bandwidth_limited = b;
         QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection);
     }
 
-    void UploadDevice.set_choked (bool b) {
+    void UploadDevice.choked (bool b) {
         this.choked = b;
         if (!this.choked) {
             QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection);

@@ -26,7 +26,7 @@ class WebView : Gtk.Widget {
     ***********************************************************/
     public WebView (Gtk.Widget parent = null);
     ~WebView () override;
-    public void set_url (GLib.Uri url);
+    public void url (GLib.Uri url);
 
 signals:
     void on_url_catched (string user, string pass, string host);
@@ -55,7 +55,7 @@ signals:
 WebView.WebView (Gtk.Widget parent)
     : Gtk.Widget (parent),
       this.ui () {
-    this.ui.set_up_ui (this);
+    this.ui.up_ui (this);
 #if QT_VERSION >= 0x051200
     QWeb_engine_url_scheme this.ncsheme ("nc");
     QWeb_engine_url_scheme.register_scheme (this.ncsheme);
@@ -67,9 +67,9 @@ WebView.WebView (Gtk.Widget parent)
     this.scheme_handler = new Web_view_page_url_scheme_handler (this);
 
     const string user_agent (Utility.user_agent_string ());
-    this.profile.set_http_user_agent (user_agent);
-    QWeb_engine_profile.default_profile ().set_http_user_agent (user_agent);
-    this.profile.set_request_interceptor (this.interceptor);
+    this.profile.http_user_agent (user_agent);
+    QWeb_engine_profile.default_profile ().http_user_agent (user_agent);
+    this.profile.request_interceptor (this.interceptor);
     this.profile.install_url_scheme_handler ("nc", this.scheme_handler);
 
 
@@ -86,18 +86,18 @@ WebView.WebView (Gtk.Widget parent)
         } else {
             accept_language = system_locale + QLatin1String (",en,*");
         }
-        this.profile.set_http_accept_language (accept_language);
+        this.profile.http_accept_language (accept_language);
     }
 
-    this.webview.set_page (this.page);
+    this.webview.page (this.page);
     this.ui.vertical_layout.add_widget (this.webview);
 
-    connect (this.webview, &QWeb_engine_view.load_progress, this.ui.progress_bar, &QProgressBar.set_value);
+    connect (this.webview, &QWeb_engine_view.load_progress, this.ui.progress_bar, &QProgressBar.value);
     connect (this.scheme_handler, &Web_view_page_url_scheme_handler.on_url_catched, this, &WebView.on_url_catched);
 }
 
-void WebView.set_url (GLib.Uri url) {
-    this.page.set_url (url);
+void WebView.url (GLib.Uri url) {
+    this.page.url (url);
 }
 
 WebView.~WebView () {

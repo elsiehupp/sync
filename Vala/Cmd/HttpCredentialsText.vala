@@ -32,7 +32,7 @@ class HttpCredentialsText : HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public void set_s_sLTrusted (bool is_trusted) {
+    public void s_sLTrusted (bool is_trusted) {
         this.ssl_trusted = is_trusted;
     }
 

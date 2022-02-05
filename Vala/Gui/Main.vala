@@ -58,12 +58,12 @@ int main (int argc, char **argv) {
     // the platformtheme plugin won't try to force qqc2-desktops-style
     // anymore.
     // Can be removed once the bug in qqc2-desktop-style is gone.
-    QQuick_style.set_style ("Default");
+    QQuick_style.style ("Default");
 
     // OpenSSL 1.1.0 : No explicit initialisation or de-initialisation is necessary.
 
-    QCoreApplication.set_attribute (Qt.AA_Use_high_dpi_pixmaps, true);
-    QCoreApplication.set_attribute (Qt.AA_Enable_high_dpi_scaling, true);
+    QCoreApplication.attribute (Qt.AA_Use_high_dpi_pixmaps, true);
+    QCoreApplication.attribute (Qt.AA_Enable_high_dpi_scaling, true);
     Occ.Application app (argc, argv);
 
     if (app.give_help ()) {
@@ -76,17 +76,17 @@ int main (int argc, char **argv) {
     }
 
 #if QT_VERSION >= QT_VERSION_CHECK (5, 14, 0)
-    QQuick_window.set_text_render_type (QQuick_window.Native_text_rendering);
+    QQuick_window.text_render_type (QQuick_window.Native_text_rendering);
 #else
     // See https://bugreports.qt.io/browse/QTBUG-70481
     if (std.fmod (app.device_pixel_ratio (), 1) == 0) {
-        QQuick_window.set_text_render_type (QQuick_window.Native_text_rendering);
+        QQuick_window.text_render_type (QQuick_window.Native_text_rendering);
     }
 //  #endif
 
     var surface_format = QSurface_format.default_format ();
-    surface_format.set_option (QSurface_format.Reset_notification);
-    QSurface_format.set_default_format (surface_format);
+    surface_format.option (QSurface_format.Reset_notification);
+    QSurface_format.default_format (surface_format);
 
 // check a environment variable for core dumps
 #ifdef Q_OS_UNIX

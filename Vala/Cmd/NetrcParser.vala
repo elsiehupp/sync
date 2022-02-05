@@ -81,7 +81,7 @@ class NetrcParser {
         string content = netrc.read_all ();
 
         QStringTokenizer tokenizer = new QStringTokenizer (content, " \n\t");
-        tokenizer.set_quote_characters ("\"'");
+        tokenizer.quote_characters ("\"'");
 
         Login_pair pair;
         string machine;

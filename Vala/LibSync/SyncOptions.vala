@@ -162,18 +162,18 @@ class SyncOptions {
     /***********************************************************
     A pattern like *.txt, matching only file names
     ***********************************************************/
-    public void set_file_pattern (string pattern) {
+    public void file_pattern (string pattern) {
         // full match or a path ending with this pattern
-        set_path_pattern (QStringLiteral (" (^|/|\\\\)") + pattern + '$');
+        path_pattern (QStringLiteral (" (^|/|\\\\)") + pattern + '$');
     }
 
 
     /***********************************************************
     A pattern like /own.*\/.*txt matching the full path
     ***********************************************************/
-    public void set_path_pattern (string pattern) {
-        this.file_regex.set_pattern_options (Utility.fs_case_preserving () ? QRegularExpression.Case_insensitive_option : QRegularExpression.No_pattern_option);
-        this.file_regex.set_pattern (pattern);
+    public void path_pattern (string pattern) {
+        this.file_regex.pattern_options (Utility.fs_case_preserving () ? QRegularExpression.Case_insensitive_option : QRegularExpression.No_pattern_option);
+        this.file_regex.pattern (pattern);
     }
 
 } // class SyncOptions

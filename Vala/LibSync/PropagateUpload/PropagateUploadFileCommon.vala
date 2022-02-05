@@ -117,7 +117,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
 
     Default: false.
     ***********************************************************/
-    public void set_delete_existing (bool enabled) {
+    public void delete_existing (bool enabled) {
         this.delete_existing = enabled;
     }
 
@@ -161,7 +161,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         if (!account.capabilities ().client_side_encryption_available () ||
             !parent_rec.is_valid () ||
             !parent_rec.is_e2e_encrypted) {
-            set_up_unencrypted_file ();
+            up_unencrypted_file ();
             return;
         }
 
@@ -191,7 +191,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void set_up_unencrypted_file () {
+    public void up_unencrypted_file () {
         this.uploading_encrypted = false;
         this.file_to_upload.file = this.item.file;
         this.file_to_upload.size = this.item.size;
@@ -292,7 +292,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
 
         // Compute the content checksum.
         var compute_checksum = new ComputeChecksum (this);
-        compute_checksum.set_checksum_type (checksum_type);
+        compute_checksum.checksum_type (checksum_type);
 
         connect (compute_checksum, &ComputeChecksum.done,
             this, &PropagateUploadFileCommon.on_compute_transmission_checksum);
@@ -319,9 +319,9 @@ class PropagateUploadFileCommon : PropagateItemJob {
         // Compute the transmission checksum.
         var compute_checksum = new ComputeChecksum (this);
         if (upload_checksum_enabled ()) {
-            compute_checksum.set_checksum_type (propagator ().account ().capabilities ().upload_checksum_type ());
+            compute_checksum.checksum_type (propagator ().account ().capabilities ().upload_checksum_type ());
         } else {
-            compute_checksum.set_checksum_type (GLib.ByteArray ());
+            compute_checksum.checksum_type (GLib.ByteArray ());
         }
 
         connect (compute_checksum, &ComputeChecksum.done,
@@ -444,7 +444,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             GLib.warn (lc_propagate_upload ()) << "invalid modified time" << this.item.file << this.item.modtime;
         }
         info.file_size = this.item.size;
-        propagator ().journal.set_poll_info (info);
+        propagator ().journal.poll_info (info);
         propagator ().journal.commit ("add poll info");
         propagator ().active_job_list.append (this);
         job.on_start ();
@@ -518,14 +518,14 @@ class PropagateUploadFileCommon : PropagateItemJob {
             var vfs = propagator ().sync_options ().vfs;
             const var pin = vfs.pin_state (this.item.file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
-                if (!vfs.set_pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
+                if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
                     GLib.warn (lc_propagate_upload) << "Could not set pin state of" << this.item.file << "to unspecified";
                 }
             }
         }
 
         // Remove from the progress database:
-        propagator ().journal.set_upload_info (this.item.file, SyncJournalDb.UploadInfo ());
+        propagator ().journal.upload_info (this.item.file, SyncJournalDb.UploadInfo ());
         propagator ().journal.commit ("upload file on_start");
 
         if (this.uploading_encrypted) {
@@ -617,7 +617,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
                                           << "on file" << this.item.file
                                           << "is" << upload_info.error_count;
             }
-            propagator ().journal.set_upload_info (this.item.file, upload_info);
+            propagator ().journal.upload_info (this.item.file, upload_info);
             propagator ().journal.commit ("Upload info");
         }
     }
@@ -682,7 +682,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
     protected static void adjust_last_job_timeout (AbstractNetworkJob job, int64 file_size) {
         const double three_minutes = 3.0 * 60 * 1000;
 
-        job.on_set_timeout (q_bound (
+        job.on_timeout (q_bound (
             job.timeout_msec (),
             // Calculate 3 minutes for each gigabyte of data
             q_round64 (three_minutes * file_size / 1e9),

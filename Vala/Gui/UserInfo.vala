@@ -20,7 +20,7 @@ namespace Occ {
 It is typically owned by the Account_setting page.
 
 The user info and quota is r
- - This object is active via set_active () (typically if the settings page is visible.)
+ - This object is active via active () (typically if the settings page is visible.)
  - The account is connected.
  - Every 30 seconds (default_interval_t) or 5 seconds in case of failure (fail_interval_t)
 
@@ -77,7 +77,7 @@ class UserInfo : GLib.Object {
     When setting it to active it will request the quota immediately if the last time
     the quota was requested was more than the interval
     ***********************************************************/
-    public void set_active (bool active);
+    public void active (bool active);
 
 
     /***********************************************************
@@ -135,10 +135,10 @@ signals:
         connect (account_state, &AccountState.state_changed,
             this, &UserInfo.on_account_state_changed);
         connect (&this.job_restart_timer, &QTimer.timeout, this, &UserInfo.on_fetch_info);
-        this.job_restart_timer.set_single_shot (true);
+        this.job_restart_timer.single_shot (true);
     }
 
-    void UserInfo.set_active (bool active) {
+    void UserInfo.active (bool active) {
         this.active = active;
         on_account_state_changed ();
     }
@@ -186,7 +186,7 @@ signals:
 
         AccountPointer account = this.account_state.account ();
         this.job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"), this);
-        this.job.on_set_timeout (20 * 1000);
+        this.job.on_timeout (20 * 1000);
         connect (this.job.data (), &JsonApiJob.json_received, this, &UserInfo.on_update_last_info);
         connect (this.job.data (), &AbstractNetworkJob.network_error, this, &UserInfo.on_request_failed);
         this.job.on_start ();
@@ -200,11 +200,11 @@ signals:
         // User Info
         string user = obj_data.value ("identifier").to_string ();
         if (!user.is_empty ()) {
-            account.set_dav_user (user);
+            account.dav_user (user);
         }
         string display_name = obj_data.value ("display-name").to_string ();
         if (!display_name.is_empty ()) {
-            account.set_dav_display_name (display_name);
+            account.dav_display_name (display_name);
         }
 
         // Quota
@@ -224,7 +224,7 @@ signals:
         // Avatar Image
         if (this.fetch_avatar_image) {
             var job = new AvatarJob (account, account.dav_user (), 128, this);
-            job.on_set_timeout (20 * 1000);
+            job.on_timeout (20 * 1000);
             GLib.Object.connect (job, &AvatarJob.avatar_pixmap, this, &UserInfo.on_avatar_image);
             job.on_start ();
         }
@@ -233,7 +233,7 @@ signals:
     }
 
     void UserInfo.on_avatar_image (QImage img) {
-        this.account_state.account ().set_avatar (img);
+        this.account_state.account ().avatar (img);
 
         /* emit */ fetched_last_info (this);
     }

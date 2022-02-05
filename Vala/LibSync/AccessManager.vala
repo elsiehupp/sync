@@ -30,7 +30,7 @@ class AccessManager : QNetworkAccessManager {
     public AccessManager (GLib.Object parent = new GLib.Object ()) {
         base (parent);
 
-        set_cookie_jar (new CookieJar);
+        cookie_jar (new CookieJar);
     }
 
 
@@ -48,23 +48,23 @@ class AccessManager : QNetworkAccessManager {
 
         // Respect request specific user agent if any
         if (!new_request.header (Soup.Request.UserAgentHeader).is_valid ()) {
-            new_request.set_header (Soup.Request.UserAgentHeader, Utility.user_agent_string ());
+            new_request.header (Soup.Request.UserAgentHeader, Utility.user_agent_string ());
         }
 
         // Some firewalls reject requests that have a "User-Agent" but no "Accept" header
-        new_request.set_raw_header (GLib.ByteArray ("Accept"), "*/*");
+        new_request.raw_header (GLib.ByteArray ("Accept"), "*/*");
 
         GLib.ByteArray verb = new_request.attribute (Soup.Request.CustomVerbAttribute).to_byte_array ();
         // For PROPFIND (assumed to be a WebDAV op), set xml/utf8 as content type/encoding
         // This needs extension
         if (verb == "PROPFIND") {
-            new_request.set_header (Soup.Request.ContentTypeHeader, QLatin1String ("text/xml; charset=utf-8"));
+            new_request.header (Soup.Request.ContentTypeHeader, QLatin1String ("text/xml; charset=utf-8"));
         }
 
         // Generate a new request identifier
         GLib.ByteArray request_id = generate_request_id ();
         q_info (lc_access_manager) << op << verb << new_request.url ().to_string () << "has X-Request-ID" << request_id;
-        new_request.set_raw_header ("X-Request-ID", request_id);
+        new_request.raw_header ("X-Request-ID", request_id);
 
     #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 4)
         // only enable HTTP2 with Qt 5.9.4 because old Qt have too many bugs (e.g. QTBUG-64359 is fixed in >= Qt 5.9.4)
@@ -72,7 +72,7 @@ class AccessManager : QNetworkAccessManager {
             // http2 seems to cause issues, as with our recommended server setup we don't support http2, disable it by default for now
             const bool http2_enabled_env = q_environment_variable_int_value ("OWNCLOUD_HTTP2_ENABLED") == 1;
 
-            new_request.set_attribute (Soup.Request.HTTP2AllowedAttribute, http2_enabled_env);
+            new_request.attribute (Soup.Request.HTTP2AllowedAttribute, http2_enabled_env);
         }
     #endif
 

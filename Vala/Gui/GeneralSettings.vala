@@ -159,33 +159,33 @@ void create_debug_archive (string filename) {
 General_settings.General_settings (Gtk.Widget parent)
     : Gtk.Widget (parent)
     this.ui (new Ui.General_settings) {
-    this.ui.set_up_ui (this);
+    this.ui.up_ui (this);
 
     connect (this.ui.server_notifications_check_box, &QAbstractButton.toggled,
         this, &General_settings.on_toggle_optional_server_notifications);
-    this.ui.server_notifications_check_box.set_tool_tip (_("Server notifications that require attention."));
+    this.ui.server_notifications_check_box.tool_tip (_("Server notifications that require attention."));
 
     connect (this.ui.show_in_explorer_navigation_pane_check_box, &QAbstractButton.toggled, this, &General_settings.on_show_in_explorer_navigation_pane);
 
     // Rename 'Explorer' appropriately on non-Windows
 
     if (Utility.has_system_launch_on_startup (Theme.instance ().app_name ())) {
-        this.ui.autostart_check_box.set_checked (true);
-        this.ui.autostart_check_box.set_disabled (true);
-        this.ui.autostart_check_box.set_tool_tip (_("You cannot disable autostart because system-wide autostart is enabled."));
+        this.ui.autostart_check_box.checked (true);
+        this.ui.autostart_check_box.disabled (true);
+        this.ui.autostart_check_box.tool_tip (_("You cannot disable autostart because system-wide autostart is enabled."));
     } else {
         const bool has_auto_start = Utility.has_launch_on_startup (Theme.instance ().app_name ());
         // make sure the binary location is correctly set
         on_toggle_launch_on_startup (has_auto_start);
-        this.ui.autostart_check_box.set_checked (has_auto_start);
+        this.ui.autostart_check_box.checked (has_auto_start);
         connect (this.ui.autostart_check_box, &QAbstractButton.toggled, this, &General_settings.on_toggle_launch_on_startup);
     }
 
     // setup about section
     string about = Theme.instance ().about ();
-    this.ui.about_label.set_text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
-    this.ui.about_label.on_set_text (about);
-    this.ui.about_label.set_open_external_links (true);
+    this.ui.about_label.text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
+    this.ui.about_label.on_text (about);
+    this.ui.about_label.open_external_links (true);
 
     // About legal notice
     connect (this.ui.legal_notice_button, &QPushButton.clicked, this, &General_settings.on_show_legal_notice);
@@ -202,11 +202,11 @@ General_settings.General_settings (Gtk.Widget parent)
     connect (this.ui.new_external_storage, &QAbstractButton.toggled, this, &General_settings.on_save_misc_settings);
 
 //  #ifndef WITH_CRASHREPORTER
-    this.ui.crashreporter_check_box.set_visible (false);
+    this.ui.crashreporter_check_box.visible (false);
 //  #endif
 
     // Hide on non-Windows
-    this.ui.show_in_explorer_navigation_pane_check_box.set_visible (false);
+    this.ui.show_in_explorer_navigation_pane_check_box.visible (false);
 
     /* Set the left contents margin of the layout to zero to make the checkboxes
     align properly vertically , fixes bug #3758
@@ -216,11 +216,11 @@ General_settings.General_settings (Gtk.Widget parent)
     int m2 = 0;
     int m3 = 0;
     this.ui.horizontal_layout_3.get_contents_margins (&m0, m1, m2, m3);
-    this.ui.horizontal_layout_3.set_contents_margins (0, m1, m2, m3);
+    this.ui.horizontal_layout_3.contents_margins (0, m1, m2, m3);
 
     // OEM themes are not obliged to ship mono icons, so there
     // is no point in offering an option
-    this.ui.mono_icons_check_box.set_visible (Theme.instance ().mono_icons_available ());
+    this.ui.mono_icons_check_box.visible (Theme.instance ().mono_icons_available ());
 
     connect (this.ui.ignored_files_button, &QAbstractButton.clicked, this, &General_settings.on_ignore_files_editor);
     connect (this.ui.debug_archive_button, &QAbstractButton.clicked, this, &General_settings.on_create_debug_archive);
@@ -245,22 +245,22 @@ QSize General_settings.size_hint () {
 void General_settings.on_load_misc_settings () {
     QScoped_value_rollback<bool> scope (this.currently_loading, true);
     ConfigFile cfg_file;
-    this.ui.mono_icons_check_box.set_checked (cfg_file.mono_icons ());
-    this.ui.server_notifications_check_box.set_checked (cfg_file.optional_server_notifications ());
-    this.ui.show_in_explorer_navigation_pane_check_box.set_checked (cfg_file.show_in_explorer_navigation_pane ());
-    this.ui.crashreporter_check_box.set_checked (cfg_file.crash_reporter ());
+    this.ui.mono_icons_check_box.checked (cfg_file.mono_icons ());
+    this.ui.server_notifications_check_box.checked (cfg_file.optional_server_notifications ());
+    this.ui.show_in_explorer_navigation_pane_check_box.checked (cfg_file.show_in_explorer_navigation_pane ());
+    this.ui.crashreporter_check_box.checked (cfg_file.crash_reporter ());
     var new_folder_limit = cfg_file.new_big_folder_size_limit ();
-    this.ui.new_folder_limit_check_box.set_checked (new_folder_limit.first);
-    this.ui.new_folder_limit_spin_box.set_value (new_folder_limit.second);
-    this.ui.new_external_storage.set_checked (cfg_file.confirm_external_storage ());
-    this.ui.mono_icons_check_box.set_checked (cfg_file.mono_icons ());
+    this.ui.new_folder_limit_check_box.checked (new_folder_limit.first);
+    this.ui.new_folder_limit_spin_box.value (new_folder_limit.second);
+    this.ui.new_external_storage.checked (cfg_file.confirm_external_storage ());
+    this.ui.mono_icons_check_box.checked (cfg_file.mono_icons ());
 }
 
 #if defined (BUILD_UPDATER)
 void General_settings.on_update_info () {
     if (ConfigFile ().skip_update_check () || !Updater.instance ()) {
         // updater disabled on compile
-        this.ui.updates_group_box.set_visible (false);
+        this.ui.updates_group_box.visible (false);
         return;
     }
 
@@ -276,23 +276,23 @@ void General_settings.on_update_info () {
         string status = ocupdater.status_string (OCUpdater.Update_status_string_format.Html);
         Theme.replace_link_color_string_background_aware (status);
 
-        this.ui.update_state_label.set_open_external_links (false);
+        this.ui.update_state_label.open_external_links (false);
         connect (this.ui.update_state_label, &QLabel.link_activated, this, [] (string link) {
             Utility.open_browser (GLib.Uri (link));
         });
-        this.ui.update_state_label.on_set_text (status);
+        this.ui.update_state_label.on_text (status);
 
-        this.ui.restart_button.set_visible (ocupdater.download_state () == OCUpdater.Download_complete);
+        this.ui.restart_button.visible (ocupdater.download_state () == OCUpdater.Download_complete);
 
-        this.ui.update_button.set_enabled (ocupdater.download_state () != OCUpdater.Checking_server &&
+        this.ui.update_button.enabled (ocupdater.download_state () != OCUpdater.Checking_server &&
                                       ocupdater.download_state () != OCUpdater.Downloading &&
                                       ocupdater.download_state () != OCUpdater.Download_complete);
 
-        this.ui.auto_check_for_updates_check_box.set_checked (ConfigFile ().auto_update_check ());
+        this.ui.auto_check_for_updates_check_box.checked (ConfigFile ().auto_update_check ());
     }
 
     // Channel selection
-    this.ui.update_channel.set_current_index (ConfigFile ().update_channel () == "beta" ? 1 : 0);
+    this.ui.update_channel.current_index (ConfigFile ().update_channel () == "beta" ? 1 : 0);
     connect (this.ui.update_channel, &QCombo_box.current_text_changed,
         this, &General_settings.on_update_channel_changed, Qt.UniqueConnection);
 }
@@ -322,13 +322,13 @@ void General_settings.on_update_channel_changed (string channel) {
     connect (msg_box, &QMessageBox.on_finished, msg_box, [this, channel, msg_box, accept_button] {
         msg_box.delete_later ();
         if (msg_box.clicked_button () == accept_button) {
-            ConfigFile ().set_update_channel (channel);
+            ConfigFile ().update_channel (channel);
             if (var updater = qobject_cast<OCUpdater> (Updater.instance ())) {
-                updater.set_update_url (Updater.update_url ());
+                updater.update_url (Updater.update_url ());
                 updater.check_for_update ();
             }
         } else {
-            this.ui.update_channel.set_current_text (ConfigFile ().update_channel ());
+            this.ui.update_channel.current_text (ConfigFile ().update_channel ());
         }
     });
     msg_box.open ();
@@ -341,7 +341,7 @@ void General_settings.on_update_check_now () {
     }
 
     if (updater) {
-        this.ui.update_button.set_enabled (false);
+        this.ui.update_button.enabled (false);
 
         updater.check_for_update ();
     }
@@ -350,7 +350,7 @@ void General_settings.on_update_check_now () {
 void General_settings.on_toggle_auto_update_check () {
     ConfigFile cfg_file;
     bool is_checked = this.ui.auto_check_for_updates_check_box.is_checked ();
-    cfg_file.set_auto_update_check (is_checked, "");
+    cfg_file.auto_update_check (is_checked, "");
 }
 //  #endif // defined (BUILD_UPDATER)
 
@@ -359,37 +359,37 @@ void General_settings.on_save_misc_settings () {
         return;
     ConfigFile cfg_file;
     bool is_checked = this.ui.mono_icons_check_box.is_checked ();
-    cfg_file.set_mono_icons (is_checked);
-    Theme.instance ().set_systray_use_mono_icons (is_checked);
-    cfg_file.set_crash_reporter (this.ui.crashreporter_check_box.is_checked ());
+    cfg_file.mono_icons (is_checked);
+    Theme.instance ().systray_use_mono_icons (is_checked);
+    cfg_file.crash_reporter (this.ui.crashreporter_check_box.is_checked ());
 
-    cfg_file.set_new_big_folder_size_limit (this.ui.new_folder_limit_check_box.is_checked (),
+    cfg_file.new_big_folder_size_limit (this.ui.new_folder_limit_check_box.is_checked (),
         this.ui.new_folder_limit_spin_box.value ());
-    cfg_file.set_confirm_external_storage (this.ui.new_external_storage.is_checked ());
+    cfg_file.confirm_external_storage (this.ui.new_external_storage.is_checked ());
 }
 
 void General_settings.on_toggle_launch_on_startup (bool enable) {
     Theme theme = Theme.instance ();
-    Utility.set_launch_on_startup (theme.app_name (), theme.app_name_gui (), enable);
+    Utility.launch_on_startup (theme.app_name (), theme.app_name_gui (), enable);
 }
 
 void General_settings.on_toggle_optional_server_notifications (bool enable) {
     ConfigFile cfg_file;
-    cfg_file.set_optional_server_notifications (enable);
+    cfg_file.optional_server_notifications (enable);
 }
 
 void General_settings.on_show_in_explorer_navigation_pane (bool checked) {
     ConfigFile cfg_file;
-    cfg_file.set_show_in_explorer_navigation_pane (checked);
+    cfg_file.show_in_explorer_navigation_pane (checked);
     // Now update the registry with the change.
-    FolderMan.instance ().navigation_pane_helper ().set_show_in_explorer_navigation_pane (checked);
+    FolderMan.instance ().navigation_pane_helper ().show_in_explorer_navigation_pane (checked);
 }
 
 void General_settings.on_ignore_files_editor () {
     if (this.ignore_editor.is_null ()) {
         ConfigFile cfg_file;
         this.ignore_editor = new Ignore_list_editor (this);
-        this.ignore_editor.set_attribute (Qt.WA_DeleteOnClose, true);
+        this.ignore_editor.attribute (Qt.WA_DeleteOnClose, true);
         this.ignore_editor.open ();
     } else {
         OwncloudGui.raise_dialog (this.ignore_editor);
@@ -420,13 +420,13 @@ void General_settings.customize_style () {
     // setup about section
     string about = Theme.instance ().about ();
     Theme.replace_link_color_string_background_aware (about);
-    this.ui.about_label.on_set_text (about);
+    this.ui.about_label.on_text (about);
 
 #if defined (BUILD_UPDATER)
     // updater info
     on_update_info ();
 #else
-    this.ui.updates_group_box.set_visible (false);
+    this.ui.updates_group_box.visible (false);
 //  #endif
 }
 

@@ -69,7 +69,7 @@ class CheckServerJob : AbstractNetworkJob {
         base (account, QLatin1String (STATUS_PHP_C), parent);
         this.subdir_fallback = false;
         this.permanent_redirects = 0;
-        set_ignore_credential_failure (true);
+        ignore_credential_failure (true);
         connect (this, &AbstractNetworkJob.redirected,
             this, &CheckServerJob.on_redirected);
     }
@@ -135,7 +135,7 @@ class CheckServerJob : AbstractNetworkJob {
         // at the original location
         if ( (reply ().error () == Soup.Reply.ContentNotFoundError) && (!this.subdir_fallback)) {
             this.subdir_fallback = true;
-            set_path (QLatin1String (NEXTCLOUD_DIR_C) + QLatin1String (STATUS_PHP_C));
+            path (QLatin1String (NEXTCLOUD_DIR_C) + QLatin1String (STATUS_PHP_C));
             on_start ();
             GLib.info (lc_check_server_job) << "Retrying with" << reply ().url ();
             return false;
@@ -169,7 +169,7 @@ class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private on_ void meta_data_changed_slot () {
-        account ().set_ssl_configuration (reply ().ssl_configuration ());
+        account ().ssl_configuration (reply ().ssl_configuration ());
         merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account ());
     }
 
@@ -193,7 +193,7 @@ class CheckServerJob : AbstractNetworkJob {
             && redirect_count == this.permanent_redirects // don't apply permanent redirects after a temporary one
             && path.ends_with (slash_status_php)) {
             this.server_url = target_url;
-            this.server_url.set_path (path.left (path.size () - slash_status_php.size ()));
+            this.server_url.path (path.left (path.size () - slash_status_php.size ()));
             GLib.info (lc_check_server_job) << "status.php was permanently redirected to"
                                     << target_url << "new server url is" << this.server_url;
             ++this.permanent_redirects;

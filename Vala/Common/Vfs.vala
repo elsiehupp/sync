@@ -282,7 +282,7 @@ class Vfs : GLib.Object {
     folder_path is relative to the sync folder. Can be "" for root folder.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public virtual bool set_pin_state (string folder_path, PinState state);
+    public virtual bool pin_state (string folder_path, PinState state);
 
 
     /***********************************************************
@@ -349,11 +349,11 @@ class Vfs : GLib.Object {
     /***********************************************************
     Db-backed pin state handling. Derived classes may use it to implement pin states.
     ***********************************************************/
-    protected bool set_pin_state_in_database (string folder_path, PinState state) {
+    protected bool pin_state_in_database (string folder_path, PinState state) {
         var path = folder_path.to_utf8 ();
         this.setup_params.journal.internal_pin_states ().wipe_for_path_and_below (path);
         if (state != PinState.PinState.INHERITED)
-            this.setup_params.journal.internal_pin_states ().set_for_path (path, state);
+            this.setup_params.journal.internal_pin_states ().for_path (path, state);
         return true;
     }
 

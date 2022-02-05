@@ -47,7 +47,7 @@ static class FileSystem {
         GLib.ByteArray buffer1 (BufferSize, 0);
         GLib.ByteArray buffer2 (BufferSize, 0);
         // the files have the same size, compare all of it
-        while (!f1.at_end ()){
+        while (!f1.at_end ()) {
             f1.read (buffer1.data (), BufferSize);
             f2.read (buffer2.data (), BufferSize);
             if (buffer1 != buffer2) {
@@ -79,7 +79,7 @@ static class FileSystem {
     }
 
 
-    bool set_mod_time (string filename, time_t mod_time) {
+    bool mod_time (string filename, time_t mod_time) {
         struct timeval times[2];
         times[0].tv_sec = times[1].tv_sec = mod_time;
         times[0].tv_usec = times[1].tv_usec = 0;

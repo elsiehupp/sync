@@ -43,7 +43,7 @@ namespace Ui {
 ***********************************************************/
 class Share_user_group_widget : Gtk.Widget {
 
-    const string password_is_set_placeholder = "●●●●●●●●";
+    const string password_is_placeholder = "●●●●●●●●";
 
     /***********************************************************
     ***********************************************************/
@@ -157,10 +157,10 @@ signals:
         this.max_sharing_permissions (max_sharing_permissions)
         this.private_link_url (private_link_url)
         this.disable_completer_activated (false) {
-        set_attribute (Qt.WA_DeleteOnClose);
-        set_object_name ("Sharing_dialog_uG"); // required as group for save_geometry call
+        attribute (Qt.WA_DeleteOnClose);
+        object_name ("Sharing_dialog_uG"); // required as group for save_geometry call
 
-        this.ui.set_up_ui (this);
+        this.ui.up_ui (this);
 
         //Is this a file or folder?
         this.is_file = QFileInfo (local_path).is_file ();
@@ -172,14 +172,14 @@ signals:
         connect (this.completer_model, &Sharee_model.sharees_ready, this, &Share_user_group_widget.on_sharees_ready);
         connect (this.completer_model, &Sharee_model.display_error_message, this, &Share_user_group_widget.on_display_error);
 
-        this.completer.set_model (this.completer_model);
-        this.completer.set_case_sensitivity (Qt.CaseInsensitive);
-        this.completer.set_completion_mode (QCompleter.Unfiltered_popup_completion);
-        this.ui.sharee_line_edit.set_completer (this.completer);
+        this.completer.model (this.completer_model);
+        this.completer.case_sensitivity (Qt.CaseInsensitive);
+        this.completer.completion_mode (QCompleter.Unfiltered_popup_completion);
+        this.ui.sharee_line_edit.completer (this.completer);
 
         var search_globally_action = new QAction (this.ui.sharee_line_edit);
-        search_globally_action.set_icon (QIcon (":/client/theme/magnifying-glass.svg"));
-        search_globally_action.set_tool_tip (_("Search globally"));
+        search_globally_action.icon (QIcon (":/client/theme/magnifying-glass.svg"));
+        search_globally_action.tool_tip (_("Search globally"));
 
         connect (search_globally_action, &QAction.triggered, this, [this] () {
             on_search_for_sharees (Sharee_model.Global_search);
@@ -209,8 +209,8 @@ signals:
         connect (&this.completion_timer, &QTimer.timeout, this, [this] () {
             on_search_for_sharees (Sharee_model.Local_search);
         });
-        this.completion_timer.set_single_shot (true);
-        this.completion_timer.set_interval (600);
+        this.completion_timer.single_shot (true);
+        this.completion_timer.interval (600);
 
         this.ui.error_label.hide ();
 
@@ -268,7 +268,7 @@ signals:
             return;
         }
 
-        this.ui.sharee_line_edit.set_enabled (false);
+        this.ui.sharee_line_edit.enabled (false);
         this.completion_timer.stop ();
         this.pi_sharee.on_start_animation ();
         Sharee_model.Sharee_set blocklist;
@@ -302,7 +302,7 @@ signals:
 
         var new_view_port = new Gtk.Widget (scroll_area);
         var layout = new QVBoxLayout (new_view_port);
-        layout.set_contents_margins (0, 0, 0, 0);
+        layout.contents_margins (0, 0, 0, 0);
         int x = 0;
         int height = 0;
         GLib.List<string> link_owners ({});
@@ -313,7 +313,7 @@ signals:
             // We don't handle link shares, only Type_user or Type_group
             if (share.get_share_type () == Share.Type_link) {
                 if (!share.get_uid_owner ().is_empty () &&
-                        share.get_uid_owner () != share.account ().dav_user ()){
+                        share.get_uid_owner () != share.account ().dav_user ()) {
                     link_owners.append (share.get_owner_display_name ());
                  }
                 continue;
@@ -322,7 +322,7 @@ signals:
             // the owner of the file that shared it first
             // leave out if it's the current user
             if (x == 0 && !share.get_uid_owner ().is_empty () && ! (share.get_uid_owner () == this.account.credentials ().user ())) {
-                this.ui.main_owner_label.on_set_text (string ("SharedFlag.SHARED with you by ").append (share.get_owner_display_name ()));
+                this.ui.main_owner_label.on_text (string ("SharedFlag.SHARED with you by ").append (share.get_owner_display_name ()));
             }
 
             //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.get_share_type ()));
@@ -330,7 +330,7 @@ signals:
             var s = new Share_user_line (this.account, user_group_share, this.max_sharing_permissions, this.is_file, this.parent_scroll_area);
             connect (s, &Share_user_line.resize_requested, this, &Share_user_group_widget.on_adjust_scroll_widget_size);
             connect (s, &Share_user_line.visual_deletion_done, this, &Share_user_group_widget.on_get_shares);
-            s.set_background_role (layout.count () % 2 == 0 ? QPalette.Base : QPalette.Alternate_base);
+            s.background_role (layout.count () % 2 == 0 ? QPalette.Base : QPalette.Alternate_base);
 
             // Connect style_changed events to our widget, so it can adapt (Dark-/Light-Mode switching)
             connect (this, &Share_user_group_widget.style_changed, s, &Share_user_line.on_style_changed);
@@ -353,7 +353,7 @@ signals:
         foreach (string owner, link_owners) {
             var owner_label = new QLabel (string (owner + " shared via link"));
             layout.add_widget (owner_label);
-            owner_label.set_visible (true);
+            owner_label.visible (true);
 
             x++;
             if (x <= 6) {
@@ -361,10 +361,10 @@ signals:
             }
         }
 
-        scroll_area.set_frame_shape (x > 6 ? QFrame.Styled_panel : QFrame.No_frame);
-        scroll_area.set_visible (!shares.is_empty ());
-        scroll_area.set_fixed_height (height);
-        scroll_area.set_widget (new_view_port);
+        scroll_area.frame_shape (x > 6 ? QFrame.Styled_panel : QFrame.No_frame);
+        scroll_area.visible (!shares.is_empty ());
+        scroll_area.fixed_height (height);
+        scroll_area.widget (new_view_port);
 
         this.disable_completer_activated = false;
         activate_sharee_line_edit ();
@@ -385,16 +385,16 @@ signals:
         }
 
         const var share_user_line_childs_count = share_user_line_childs.count ();
-        scroll_area.set_visible (share_user_line_childs_count > 0);
+        scroll_area.visible (share_user_line_childs_count > 0);
         if (share_user_line_childs_count > 0 && share_user_line_childs_count <= 3) {
-            scroll_area.set_fixed_height (scroll_area.widget ().size_hint ().height ());
+            scroll_area.fixed_height (scroll_area.widget ().size_hint ().height ());
         }
-        scroll_area.set_frame_shape (share_user_line_childs_count > 3 ? QFrame.Styled_panel : QFrame.No_frame);
+        scroll_area.frame_shape (share_user_line_childs_count > 3 ? QFrame.Styled_panel : QFrame.No_frame);
     }
 
     void Share_user_group_widget.on_private_link_share () {
         var menu = new QMenu (this);
-        menu.set_attribute (Qt.WA_DeleteOnClose);
+        menu.attribute (Qt.WA_DeleteOnClose);
 
         // this icon is not handled by on_style_changed () . customize_style but we can live with that
         menu.add_action (Theme.create_color_aware_icon (":/client/theme/copy.svg"),
@@ -468,14 +468,14 @@ signals:
         this.manager.create_share (this.share_path, Share.Share_type (sharee.type ()),
             sharee.share_with (), this.max_sharing_permissions, password);
 
-        this.ui.sharee_line_edit.set_enabled (false);
+        this.ui.sharee_line_edit.enabled (false);
         this.ui.sharee_line_edit.clear ();
     }
 
     void Share_user_group_widget.on_completer_highlighted (QModelIndex index) {
         // By default the completer would set the text to EditRole,
         // override that here.
-        this.ui.sharee_line_edit.on_set_text (index.data (Qt.Display_role).to_string ());
+        this.ui.sharee_line_edit.on_text (index.data (Qt.Display_role).to_string ());
     }
 
     void Share_user_group_widget.on_display_error (int code, string message) {
@@ -487,7 +487,7 @@ signals:
         }
 
         GLib.warn (lc_sharing) << "Sharing error from server" << code << message;
-        this.ui.error_label.on_set_text (message);
+        this.ui.error_label.on_text (message);
         this.ui.error_label.show ();
         activate_sharee_line_edit ();
     }
@@ -497,7 +497,7 @@ signals:
     }
 
     void Share_user_group_widget.on_private_link_copy () {
-        QApplication.clipboard ().on_set_text (this.private_link_url);
+        QApplication.clipboard ().on_text (this.private_link_url);
     }
 
     void Share_user_group_widget.on_private_link_email () {
@@ -515,18 +515,18 @@ signals:
     }
 
     void Share_user_group_widget.customize_style () {
-        this.ui.confirm_share.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+        this.ui.confirm_share.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
 
-        this.pi_sharee.on_set_color (QGuiApplication.palette ().color (QPalette.Text));
+        this.pi_sharee.on_color (QGuiApplication.palette ().color (QPalette.Text));
 
         foreach (var pi, this.parent_scroll_area.find_children<QProgress_indicator> ()) {
-            pi.on_set_color (QGuiApplication.palette ().color (QPalette.Text));;
+            pi.on_color (QGuiApplication.palette ().color (QPalette.Text));;
         }
     }
 
     void Share_user_group_widget.activate_sharee_line_edit () {
-        this.ui.sharee_line_edit.set_enabled (true);
-        this.ui.sharee_line_edit.set_focus ();
+        this.ui.sharee_line_edit.enabled (true);
+        this.ui.sharee_line_edit.focus ();
     }
 
     }

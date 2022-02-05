@@ -36,7 +36,7 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    void set_file_hidden (string filename, bool hidden) {
+    void file_hidden (string filename, bool hidden) {
         //  Q_UNUSED (filename);
         //  Q_UNUSED (hidden);
     }
@@ -50,7 +50,7 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    void set_file_read_only (string filename, bool read_only) {
+    void file_read_only (string filename, bool read_only) {
         GLib.File file = new GLib.File (filename);
         GLib.File.Permissions permissions = file.permissions ();
 
@@ -62,22 +62,22 @@ namespace FileSystem {
         if (!read_only) {
             permissions |= default_write_permissions;
         }
-        file.set_permissions (permissions);
+        file.permissions (permissions);
     }
 
 
     /***********************************************************
     @brief Marks the file as read-only.
 
-    It's like set_file_read_only (), but weaker : if read_only is false and t
+    It's like file_read_only (), but weaker : if read_only is false and t
     already has write permissions, no change to the permissions is made.
 
     This means that it will preserve explicitly set rw-r--r-- permissions even
-    when the umask is 0002. (set_file_read_only () would adjust to rw-rw-r--)
+    when the umask is 0002. (file_read_only () would adjust to rw-rw-r--)
 
     OCSYNC_EXPORT
     ***********************************************************/
-    void set_file_read_only_weak (string filename, bool read_only) {
+    void file_read_only_weak (string filename, bool read_only) {
         GLib.File file = new GLib.File (filename);
         GLib.File.Permissions permissions = file.permissions ();
 
@@ -85,7 +85,7 @@ namespace FileSystem {
             return; // already writable enough
         }
 
-        set_file_read_only (filename, read_only);
+        file_read_only (filename, read_only);
     }
 
 
@@ -95,7 +95,7 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    void set_folder_minimum_permissions (string filename) {
+    void folder_minimum_permissions (string filename) {
         //  Q_UNUSED (filename);
     }
 
@@ -270,10 +270,10 @@ namespace FileSystem {
         GLib.File info_file;
         if (file.exists (trash_info_path + f.filename () + ".trashinfo")) { //Trash_info file already exists, create "filename.1.trashinfo"
             string filename = trash_info_path + f.filename () + '.' + string.number (suffix_number) + ".trashinfo";
-            info_file.set_filename (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
+            info_file.filename (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
         } else {
             string filename = trash_info_path + f.filename () + ".trashinfo";
-            info_file.set_filename (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
+            info_file.filename (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
         }
 
         info_file.open (QIODevice.ReadWrite);

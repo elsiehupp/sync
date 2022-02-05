@@ -33,11 +33,11 @@ class GetMetadataApiJob : AbstractNetworkJob {
     ***********************************************************/
     public void on_start () override {
         Soup.Request req;
-        req.set_raw_header ("OCS-APIREQUEST", "true");
+        req.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
         query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
-        url.set_query (query);
+        url.query (query);
 
         GLib.info (lc_cse_job ()) << "Requesting the metadata for the file_identifier" << this.file_identifier << "as encrypted";
         send_request ("GET", url, req);

@@ -195,7 +195,7 @@ void User_model.build_user_list () {
         add_user (user);
     }
     if (this.init) {
-        this.users.first ().set_current_user (true);
+        this.users.first ().current_user (true);
         this.init = false;
     }
 }
@@ -277,7 +277,7 @@ void User_model.add_user (AccountStatePtr user, bool is_current) {
 
         end_insert_rows ();
         ConfigFile config;
-        this.users.last ().on_set_notification_refresh_interval (config.notification_refresh_interval ());
+        this.users.last ().on_notification_refresh_interval (config.notification_refresh_interval ());
         /* emit */ new_user_selected ();
     }
 }
@@ -325,8 +325,8 @@ void User_model.switch_current_user (int identifier) {
     if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
         return;
 
-    this.users[this.current_user_id].set_current_user (false);
-    this.users[identifier].set_current_user (true);
+    this.users[this.current_user_id].current_user (false);
+    this.users[identifier].current_user (true);
     this.current_user_id = identifier;
     /* emit */ new_user_selected ();
 }

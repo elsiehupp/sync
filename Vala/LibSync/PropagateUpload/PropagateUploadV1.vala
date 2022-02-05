@@ -48,7 +48,7 @@ void PropagateUploadFileV1.do_start_upload () {
         pi.error_count = 0;
         pi.content_checksum = this.item.checksum_header;
         pi.size = this.item.size;
-        propagator ().journal.set_upload_info (this.item.file, pi);
+        propagator ().journal.upload_info (this.item.file, pi);
         propagator ().journal.commit ("Upload info");
     }
 
@@ -281,7 +281,7 @@ void PropagateUploadFileV1.on_put_finished () {
         pi.error_count = 0; // successful chunk upload resets
         pi.content_checksum = this.item.checksum_header;
         pi.size = this.item.size;
-        propagator ().journal.set_upload_info (this.item.file, pi);
+        propagator ().journal.upload_info (this.item.file, pi);
         propagator ().journal.commit ("Upload info");
         on_start_next_chunk ();
         return;
@@ -328,7 +328,7 @@ void PropagateUploadFileV1.on_upload_progress (int64 sent, int64 total) {
     // has not been on_finished (which should not happen because the last chunk is sent sequentially)
     int64 amount = progress_chunk * chunk_size ();
 
-    sender ().set_property ("byte_written", sent);
+    sender ().property ("byte_written", sent);
     if (this.jobs.count () > 1) {
         amount -= (this.jobs.count () - 1) * chunk_size ();
         foreach (GLib.Object j, this.jobs) {
@@ -345,7 +345,7 @@ void PropagateUploadFileV1.on_abort (PropagatorJob.AbortType abort_type) {
     abort_network_jobs (
         abort_type,
         [this, abort_type] (AbstractNetworkJob job) {
-            if (var put_job = qobject_cast<PUTFile_job> (job)){
+            if (var put_job = qobject_cast<PUTFile_job> (job)) {
                 if (abort_type == AbortType.ASYNCHRONOUS
                     && this.chunk_count > 0
                     && ( ( (this.current_chunk + this.start_chunk) % this.chunk_count) == 0)

@@ -37,8 +37,8 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
     ***********************************************************/
     public void on_start () override {
         Soup.Request req;
-        req.set_raw_header ("OCS-APIREQUEST", "true");
-        req.set_raw_header ("e2e-token", this.token);
+        req.raw_header ("OCS-APIREQUEST", "true");
+        req.raw_header ("e2e-token", this.token);
 
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         send_request ("DELETE", url, req);

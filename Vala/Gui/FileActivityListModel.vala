@@ -28,7 +28,7 @@ class FileActivityListModel : ActivityListModel {
 }
     FileActivityListModel.FileActivityListModel (GLib.Object parent)
         : ActivityListModel (null, parent) {
-        set_display_actions (false);
+        display_actions (false);
     }
 
     void FileActivityListModel.on_load (AccountState account_state, string local_path) {
@@ -36,7 +36,7 @@ class FileActivityListModel : ActivityListModel {
         if (!account_state || currently_fetching ()) {
             return;
         }
-        set_account_state (account_state);
+        account_state (account_state);
 
         const var folder = FolderMan.instance ().folder_for_path (local_path);
         if (!folder) {
@@ -57,7 +57,7 @@ class FileActivityListModel : ActivityListModel {
         if (!account_state ().is_connected ()) {
             return;
         }
-        set_currently_fetching (true);
+        currently_fetching (true);
 
         const string url (QStringLiteral ("ocs/v2.php/apps/activity/api/v2/activity/filter"));
         var job = new JsonApiJob (account_state ().account (), url, this);
@@ -69,8 +69,8 @@ class FileActivityListModel : ActivityListModel {
         parameters.add_query_item (QStringLiteral ("object_type"), "files");
         parameters.add_query_item (QStringLiteral ("object_id"), this.file_id);
         job.add_query_params (parameters);
-        set_done_fetching (true);
-        set_hide_old_activities (true);
+        done_fetching (true);
+        hide_old_activities (true);
         job.on_start ();
     }
     }

@@ -36,16 +36,16 @@ class StoreMetaDataApiJob : AbstractNetworkJob {
     ***********************************************************/
     public void on_start () override {
         Soup.Request req;
-        req.set_raw_header ("OCS-APIREQUEST", "true");
-        req.set_header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
+        req.raw_header ("OCS-APIREQUEST", "true");
+        req.header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
         QUrlQuery query;
         query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
-        url.set_query (query);
+        url.query (query);
 
         GLib.ByteArray data = GLib.ByteArray ("meta_data=") + GLib.Uri.to_percent_encoding (this.b64_metadata);
         var buffer = new Soup.Buffer (this);
-        buffer.set_data (data);
+        buffer.data (data);
 
         GLib.info (lc_cse_job ()) << "sending the metadata for the file_identifier" << this.file_identifier << "as encrypted";
         send_request ("POST", url, req, buffer);

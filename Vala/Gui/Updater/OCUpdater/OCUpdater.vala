@@ -81,7 +81,7 @@ class OCUpdater : Updater {
 
     /***********************************************************
     ***********************************************************/
-    public void set_update_url (GLib.Uri url);
+    public void update_url (GLib.Uri url);
 
     /***********************************************************
     ***********************************************************/
@@ -103,7 +103,7 @@ class OCUpdater : Updater {
     ***********************************************************/
     public 
 
-    public void set_download_state (Download_state state);
+    public void download_state (Download_state state);
 
 signals:
     void download_state_changed ();
@@ -164,7 +164,7 @@ protected slots:
         this.timeout_watchdog (new QTimer (this)) {
     }
 
-    void OCUpdater.set_update_url (GLib.Uri url) {
+    void OCUpdater.update_url (GLib.Uri url) {
         this.update_url = url;
     }
 
@@ -182,7 +182,7 @@ protected slots:
                 QMessageBox.Ok,
                 null);
 
-            message_box_start_installer.set_attribute (Qt.WA_DeleteOnClose);
+            message_box_start_installer.attribute (Qt.WA_DeleteOnClose);
 
             connect (message_box_start_installer, &QMessageBox.on_finished, this, [this] {
                 on_start_installer ();
@@ -250,7 +250,7 @@ protected slots:
         return this.state;
     }
 
-    void OCUpdater.set_download_state (Download_state state) {
+    void OCUpdater.download_state (Download_state state) {
         var old_state = this.state;
         this.state = state;
         /* emit */ download_state_changed ();
@@ -267,7 +267,7 @@ protected slots:
         ConfigFile config;
         QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         string update_file = settings.value (update_available_c).to_string ();
-        settings.set_value (auto_update_attempted_c, true);
+        settings.value (auto_update_attempted_c, true);
         settings.sync ();
         GLib.info (lc_updater) << "Running updater" << update_file;
 
@@ -303,7 +303,7 @@ protected slots:
         this.timeout_watchdog.on_start (30 * 1000);
         connect (reply, &Soup.Reply.on_finished, this, &OCUpdater.on_version_info_arrived);
 
-        set_download_state (Checking_server);
+        download_state (Checking_server);
     }
 
     void OCUpdater.on_open_update_url () {
@@ -325,7 +325,7 @@ protected slots:
         reply.delete_later ();
         if (reply.error () != Soup.Reply.NoError) {
             GLib.warn (lc_updater) << "Failed to reach version check url : " << reply.error_string ();
-            set_download_state (Download_timed_out);
+            download_state (Download_timed_out);
             return;
         }
 
@@ -337,12 +337,12 @@ protected slots:
             version_info_arrived (this.update_info);
         } else {
             GLib.warn (lc_updater) << "Could not parse update information.";
-            set_download_state (Download_timed_out);
+            download_state (Download_timed_out);
         }
     }
 
     void OCUpdater.on_timed_out () {
-        set_download_state (Download_timed_out);
+        download_state (Download_timed_out);
     }
 
 

@@ -28,8 +28,8 @@ namespace Occ {
 class User_status_selector_model : GLib.Object {
 
     //  Q_PROPERTY (string user_status_message READ user_status_message NOTIFY user_status_changed)
-    //  Q_PROPERTY (string user_status_emoji READ user_status_emoji WRITE set_user_status_emoji NOTIFY user_status_changed)
-    //  Q_PROPERTY (Occ.UserStatus.OnlineStatus online_status READ online_status WRITE set_online_status NOTIFY online_status_changed)
+    //  Q_PROPERTY (string user_status_emoji READ user_status_emoji WRITE user_status_emoji NOTIFY user_status_changed)
+    //  Q_PROPERTY (Occ.UserStatus.OnlineStatus online_status READ online_status WRITE online_status NOTIFY online_status_changed)
     //  Q_PROPERTY (int predefined_statuses_count READ predefined_statuses_count NOTIFY predefined_statuses_changed)
     //  Q_PROPERTY (string[] clear_at_values READ clear_at_values CONSTANT)
     //  Q_PROPERTY (string clear_at READ clear_at NOTIFY clear_at_changed)
@@ -77,7 +77,7 @@ class User_status_selector_model : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Q_INVOKABLE void set_online_status (Occ.Use
+    public Q_INVOKABLE void online_status (Occ.Use
 
     /***********************************************************
     ***********************************************************/
@@ -109,7 +109,7 @@ class User_status_selector_model : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Q_INVOKABLE void set_user_status_mess
+    public Q_INVOKABLE void user_status_mess
 
     /***********************************************************
     ***********************************************************/
@@ -125,7 +125,7 @@ class User_status_selector_model : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Q_INVOKABLE void set_user_status ();
+    public Q_INVOKABLE void user_status ();
 
     /***********************************************************
     ***********************************************************/
@@ -148,7 +148,7 @@ class User_status_selector_model : GLib.Object {
     public Q_INVOKABLE string predefined_status_clear_at (int index);
 
 
-    public Q_INVOKABLE void set_predefined_status (int index);
+    public Q_INVOKABLE void predefined_status (int index);
 
     public Q_REQUIRED_RESULT string[] clear_at_values ();
 
@@ -156,7 +156,7 @@ class User_status_selector_model : GLib.Object {
     public Q_REQUIRED_RESULT string clear_at ();
 
 
-    public Q_INVOKABLE void set_clear_at (int index);
+    public Q_INVOKABLE void clear_at (int index);
 
     public Q_REQUIRED_RESULT string error_message ();
 
@@ -198,7 +198,7 @@ signals:
     private string time_difference_to_string (int difference_secs);
     //  Q_REQUIRED_RESULT
     private Optional<ClearAt> clear_stage_type_to_date_time (Clear_stage_type type);
-    private void set_error (string reason);
+    private void error (string reason);
     private void clear_error ();
 
     /***********************************************************
@@ -227,7 +227,7 @@ signals:
     User_status_selector_model.User_status_selector_model (GLib.Object parent)
         : GLib.Object (parent)
         this.date_time_provider (new DateTimeProvider) {
-        this.user_status.set_icon ("😀");
+        this.user_status.icon ("😀");
     }
 
     User_status_selector_model.User_status_selector_model (std.shared_ptr<UserStatusConnector> user_status_connector, GLib.Object parent)
@@ -235,7 +235,7 @@ signals:
         this.user_status_connector (user_status_connector)
         this.user_status ("no-identifier", "", "😀", UserStatus.OnlineStatus.Online, false, {})
         this.date_time_provider (new DateTimeProvider) {
-        this.user_status.set_icon ("😀");
+        this.user_status.icon ("😀");
         on_init ();
     }
 
@@ -245,7 +245,7 @@ signals:
         : GLib.Object (parent)
         this.user_status_connector (user_status_connector)
         this.date_time_provider (std.move (date_time_provider)) {
-        this.user_status.set_icon ("😀");
+        this.user_status.icon ("😀");
         on_init ();
     }
 
@@ -254,14 +254,14 @@ signals:
         : GLib.Object (parent)
         this.user_status (user_status)
         this.date_time_provider (std.move (date_time_provider)) {
-        this.user_status.set_icon ("😀");
+        this.user_status.icon ("😀");
     }
 
     User_status_selector_model.User_status_selector_model (UserStatus user_status,
         GLib.Object parent)
         : GLib.Object (parent)
         this.user_status (user_status) {
-        this.user_status.set_icon ("😀");
+        this.user_status.icon ("😀");
     }
 
     void User_status_selector_model.on_load (int identifier) {
@@ -319,48 +319,48 @@ signals:
 
         switch (error) {
         case UserStatusConnector.Error.CouldNotFetchPredefinedUserStatuses:
-            set_error (_("Could not fetch predefined statuses. Make sure you are connected to the server."));
+            error (_("Could not fetch predefined statuses. Make sure you are connected to the server."));
             return;
 
         case UserStatusConnector.Error.CouldNotFetchUserStatus:
-            set_error (_("Could not fetch user status. Make sure you are connected to the server."));
+            error (_("Could not fetch user status. Make sure you are connected to the server."));
             return;
 
         case UserStatusConnector.Error.UserStatusNotSupported:
-            set_error (_("User status feature is not supported. You will not be able to set your user status."));
+            error (_("User status feature is not supported. You will not be able to set your user status."));
             return;
 
         case UserStatusConnector.Error.EmojisNotSupported:
-            set_error (_("Emojis feature is not supported. Some user status functionality may not work."));
+            error (_("Emojis feature is not supported. Some user status functionality may not work."));
             return;
 
         case UserStatusConnector.Error.CouldNotSetUserStatus:
-            set_error (_("Could not set user status. Make sure you are connected to the server."));
+            error (_("Could not set user status. Make sure you are connected to the server."));
             return;
 
         case UserStatusConnector.Error.CouldNotClearMessage:
-            set_error (_("Could not clear user status message. Make sure you are connected to the server."));
+            error (_("Could not clear user status message. Make sure you are connected to the server."));
             return;
         }
 
         Q_UNREACHABLE ();
     }
 
-    void User_status_selector_model.set_error (string reason) {
+    void User_status_selector_model.error (string reason) {
         this.error_message = reason;
         /* emit */ error_message_changed ();
     }
 
     void User_status_selector_model.clear_error () {
-        set_error ("");
+        error ("");
     }
 
-    void User_status_selector_model.set_online_status (UserStatus.OnlineStatus status) {
+    void User_status_selector_model.online_status (UserStatus.OnlineStatus status) {
         if (status == this.user_status.state ()) {
             return;
         }
 
-        this.user_status.set_state (status);
+        this.user_status.state (status);
         /* emit */ online_status_changed ();
     }
 
@@ -386,15 +386,15 @@ signals:
         return this.user_status.message ();
     }
 
-    void User_status_selector_model.set_user_status_message (string message) {
-        this.user_status.set_message (message);
-        this.user_status.set_message_predefined (false);
+    void User_status_selector_model.user_status_message (string message) {
+        this.user_status.message (message);
+        this.user_status.message_predefined (false);
         /* emit */ user_status_changed ();
     }
 
-    void User_status_selector_model.set_user_status_emoji (string emoji) {
-        this.user_status.set_icon (emoji);
-        this.user_status.set_message_predefined (false);
+    void User_status_selector_model.user_status_emoji (string emoji) {
+        this.user_status.icon (emoji);
+        this.user_status.message_predefined (false);
         /* emit */ user_status_changed ();
     }
 
@@ -404,15 +404,15 @@ signals:
 
     void User_status_selector_model.on_user_status_fetched (UserStatus user_status) {
         if (user_status.state () != UserStatus.OnlineStatus.Offline) {
-            this.user_status.set_state (user_status.state ());
+            this.user_status.state (user_status.state ());
         }
-        this.user_status.set_message (user_status.message ());
-        this.user_status.set_message_predefined (user_status.message_predefined ());
-        this.user_status.set_id (user_status.identifier ());
-        this.user_status.set_clear_at (user_status.clear_at ());
+        this.user_status.message (user_status.message ());
+        this.user_status.message_predefined (user_status.message_predefined ());
+        this.user_status.id (user_status.identifier ());
+        this.user_status.clear_at (user_status.clear_at ());
 
         if (!user_status.icon ().is_empty ()) {
-            this.user_status.set_icon (user_status.icon ());
+            this.user_status.icon (user_status.icon ());
         }
 
         /* emit */ user_status_changed ();
@@ -465,14 +465,14 @@ signals:
         }
     }
 
-    void User_status_selector_model.set_user_status () {
+    void User_status_selector_model.user_status () {
         //  Q_ASSERT (this.user_status_connector);
         if (!this.user_status_connector) {
             return;
         }
 
         clear_error ();
-        this.user_status_connector.set_user_status (this.user_status);
+        this.user_status_connector.user_status (this.user_status);
     }
 
     void User_status_selector_model.clear_user_status () {
@@ -499,15 +499,15 @@ signals:
         return static_cast<int> (this.predefined_statuses.size ());
     }
 
-    void User_status_selector_model.set_predefined_status (int index) {
+    void User_status_selector_model.predefined_status (int index) {
         //  Q_ASSERT (0 <= index && index < static_cast<int> (this.predefined_statuses.size ()));
 
-        this.user_status.set_message_predefined (true);
+        this.user_status.message_predefined (true);
         const var predefined_status = this.predefined_statuses[index];
-        this.user_status.set_id (predefined_status.identifier ());
-        this.user_status.set_message (predefined_status.message ());
-        this.user_status.set_icon (predefined_status.icon ());
-        this.user_status.set_clear_at (predefined_status.clear_at ());
+        this.user_status.id (predefined_status.identifier ());
+        this.user_status.message (predefined_status.message ());
+        this.user_status.icon (predefined_status.icon ());
+        this.user_status.clear_at (predefined_status.clear_at ());
 
         /* emit */ user_status_changed ();
         /* emit */ clear_at_changed ();
@@ -549,9 +549,9 @@ signals:
         return clear_at_stages;
     }
 
-    void User_status_selector_model.set_clear_at (int index) {
+    void User_status_selector_model.clear_at (int index) {
         //  Q_ASSERT (0 <= index && index < static_cast<int> (this.clear_stages.size ()));
-        this.user_status.set_clear_at (clear_stage_type_to_date_time (this.clear_stages[index]));
+        this.user_status.clear_at (clear_stage_type_to_date_time (this.clear_stages[index]));
         /* emit */ clear_at_changed ();
     }
 

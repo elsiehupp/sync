@@ -62,8 +62,8 @@ class ReadJob : KeychainChunk.Job {
     #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
         add_settings_to_job (this.account, job);
     #endif
-        job.set_insecure_fallback (this.insecure_fallback);
-        job.set_key (kck);
+        job.insecure_fallback (this.insecure_fallback);
+        job.key (kck);
         connect (job, &QKeychain.Job.on_finished, this, &KeychainChunk.ReadJob.on_read_job_done);
         job.on_start ();
     }

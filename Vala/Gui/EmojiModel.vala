@@ -85,7 +85,7 @@ signals:
         return this.settings.value ("Editor/emojis", QVariantList ()).to_list ();
     }
 
-    void EmojiModel.set_category (string category) {
+    void EmojiModel.category (string category) {
         if (this.category == category) {
             return;
         }
@@ -133,7 +133,7 @@ signals:
         }
 
         history_emojis.push_front (model_data);
-        this.settings.set_value ("Editor/emojis", history_emojis);
+        this.settings.value ("Editor/emojis", history_emojis);
 
         /* emit */ history_changed ();
     }

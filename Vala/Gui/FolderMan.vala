@@ -180,7 +180,7 @@ class FolderMan : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_ignore_hidden_files (bool ignore);
+    public void ignore_hidden_files (bool ignore);
 
 
     /***********************************************************
@@ -219,7 +219,7 @@ class FolderMan : GLib.Object {
     If enabled is set to false, no new folders will on_start to sync.
     The current one will finish.
     ***********************************************************/
-    public void set_sync_enabled (bool);
+    public void sync_enabled (bool);
 
 
     /***********************************************************
@@ -241,11 +241,11 @@ class FolderMan : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void set_dirty_proxy ();
+    public void dirty_proxy ();
 
     /***********************************************************
     ***********************************************************/
-    public void set_dirty_network_limits ();
+    public void dirty_network_limits ();
 
 signals:
     /***********************************************************
@@ -466,16 +466,16 @@ FolderMan.FolderMan (GLib.Object parent)
     ConfigFile config;
     std.chrono.milliseconds polltime = config.remote_poll_interval ();
     GLib.info (lc_folder_man) << "setting remote poll timer interval to" << polltime.count () << "msec";
-    this.etag_poll_timer.set_interval (polltime.count ());
+    this.etag_poll_timer.interval (polltime.count ());
     GLib.Object.connect (&this.etag_poll_timer, &QTimer.timeout, this, &FolderMan.on_etag_poll_timer_timeout);
     this.etag_poll_timer.on_start ();
 
-    this.start_scheduled_sync_timer.set_single_shot (true);
+    this.start_scheduled_sync_timer.single_shot (true);
     connect (&this.start_scheduled_sync_timer, &QTimer.timeout,
         this, &FolderMan.on_start_scheduled_folder_sync);
 
-    this.time_scheduler.set_interval (5000);
-    this.time_scheduler.set_single_shot (false);
+    this.time_scheduler.interval (5000);
+    this.time_scheduler.single_shot (false);
     connect (&this.time_scheduler, &QTimer.timeout,
         this, &FolderMan.on_schedule_folder_by_time);
     this.time_scheduler.on_start ();
@@ -715,14 +715,14 @@ void FolderMan.setup_folders_helper (QSettings settings, AccountStatePtr account
                 if (settings.value (QLatin1String (VERSION_C), 1).to_int () == 1
                     && settings.value (QLatin1String ("use_placeholders"), false).to_bool ()) {
                     GLib.info (lc_folder_man) << "Migrate : From use_placeholders to PinState.VfsItemAvailability.ONLINE_ONLY";
-                    f.set_root_pin_state (PinState.VfsItemAvailability.ONLINE_ONLY);
+                    f.root_pin_state (PinState.VfsItemAvailability.ONLINE_ONLY);
                 }
 
                 // Migration : Mark folders that shall be saved in a backwards-compatible way
                 if (backwards_compatible)
-                    f.set_save_backwards_compatible (true);
+                    f.save_backwards_compatible (true);
                 if (folders_with_placeholders)
-                    f.set_save_in_folders_with_placeholders ();
+                    f.save_in_folders_with_placeholders ();
 
                 schedule_folder (f);
                 /* emit */ folder_sync_state_change (f);
@@ -741,7 +741,7 @@ int FolderMan.setup_folders_migration () {
 
     QDir dir (this.folder_config_path);
     //We need to include hidden files just in case the alias starts with '.'
-    dir.set_filter (QDir.Files | QDir.Hidden);
+    dir.filter (QDir.Files | QDir.Hidden);
     const var list = dir.entry_list ();
 
     // Normally there should be only one account when migrating.
@@ -877,7 +877,7 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
     if (!cfg_file.exists ()) {
         // try the escaped variant.
         escaped_alias = escape_alias (file);
-        cfg_file.set_file (this.folder_config_path, escaped_alias);
+        cfg_file.file (this.folder_config_path, escaped_alias);
     }
     if (!cfg_file.is_readable ()) {
         GLib.warn (lc_folder_man) << "Cannot read folder definition for alias " << cfg_file.file_path ();
@@ -931,7 +931,7 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
         string[] block_list = settings.value (QLatin1String ("block_list")).to_string_list ();
         if (!block_list.empty ()) {
             //migrate settings
-            folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
+            folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
             settings.remove (QLatin1String ("block_list"));
             // FIXME : If you remove this codepath, you need to provide another way to do
             // this via theme.h or the normal FolderMan.setup_folders
@@ -1122,7 +1122,7 @@ void FolderMan.on_account_state_changed () {
 
 // only enable or disable foldermans will schedule and do syncs.
 // this is not the same as Pause and Resume of folders.
-void FolderMan.set_sync_enabled (bool enabled) {
+void FolderMan.sync_enabled (bool enabled) {
     if (!this.sync_enabled && enabled && !this.scheduled_folders.is_empty ()) {
         // We have things in our queue that were waiting for the connection to come back on.
         start_scheduled_sync_soon ();
@@ -1338,7 +1338,7 @@ void FolderMan.on_server_version_changed (Account account) {
 
         for (var f : q_as_const (this.folder_map)) {
             if (f.account_state ().account ().data () == account) {
-                f.set_sync_paused (true);
+                f.sync_paused (true);
             }
         }
     }
@@ -1466,10 +1466,10 @@ Folder *FolderMan.add_folder (AccountState account_state, FolderDefinition folde
         return other != folder && other.clean_path () == folder.clean_path ();
     });
 
-    folder.set_save_backwards_compatible (one_account_only);
+    folder.save_backwards_compatible (one_account_only);
 
     if (folder) {
-        folder.set_save_backwards_compatible (one_account_only);
+        folder.save_backwards_compatible (one_account_only);
         folder.save_to_settings ();
         /* emit */ folder_sync_state_change (folder);
         /* emit */ folder_list_changed (this.folder_map);
@@ -1495,7 +1495,7 @@ Folder *FolderMan.add_folder_internal (
     var folder = new Folder (folder_definition, account_state, std.move (vfs), this);
 
     if (this.navigation_pane_helper.show_in_explorer_navigation_pane () && folder_definition.navigation_pane_clsid.is_null ()) {
-        folder.set_navigation_pane_clsid (QUuid.create_uuid ());
+        folder.navigation_pane_clsid (QUuid.create_uuid ());
         folder.save_to_settings ();
     }
 
@@ -1575,7 +1575,7 @@ void FolderMan.remove_folder (Folder f) {
         /* emit */ schedule_queue_changed ();
     }
 
-    f.set_sync_paused (true);
+    f.sync_paused (true);
     f.wipe_for_removal ();
 
     // remove the folder configuration
@@ -1610,7 +1610,7 @@ string FolderMan.get_backup_name (string full_path_name) {
     do {
         if (fi.exists ()) {
             new_name = full_path_name + _(" (backup %1)").arg (cnt++);
-            fi.set_file (new_name);
+            fi.file (new_name);
         }
     } while (fi.exists ());
 
@@ -1715,7 +1715,7 @@ void FolderMan.on_wipe_folder_for_account (AccountState account_state) {
             GLib.warn (lc_folder_man) << "folder does not exist, can not remove.";
         }
 
-        f.set_sync_paused (true);
+        f.sync_paused (true);
 
         // remove the folder configuration
         f.remove_from_settings ();
@@ -1732,24 +1732,24 @@ void FolderMan.on_wipe_folder_for_account (AccountState account_state) {
     /* emit */ wipe_done (account_state, on_success);
 }
 
-void FolderMan.set_dirty_proxy () {
+void FolderMan.dirty_proxy () {
     for (Folder f : this.folder_map.values ()) {
         if (f) {
             if (f.account_state () && f.account_state ().account ()
                 && f.account_state ().account ().network_access_manager ()) {
                 // Need to do this so we do not use the old determined system proxy
-                f.account_state ().account ().network_access_manager ().set_proxy (
+                f.account_state ().account ().network_access_manager ().proxy (
                     QNetworkProxy (QNetworkProxy.DefaultProxy));
             }
         }
     }
 }
 
-void FolderMan.set_dirty_network_limits () {
+void FolderMan.dirty_network_limits () {
     for (Folder f : this.folder_map.values ()) {
         // set only in busy folders. Otherwise they read the config anyway.
         if (f && f.is_busy ()) {
-            f.set_dirty_network_limits ();
+            f.dirty_network_limits ();
         }
     }
 }
@@ -1967,7 +1967,7 @@ string FolderMan.check_path_validity_for_new_folder (string path, GLib.Uri serve
         if (server_url.is_valid () && !different_paths) {
             GLib.Uri folder_url = f.account_state ().account ().url ();
             string user = f.account_state ().account ().credentials ().user ();
-            folder_url.set_user_name (user);
+            folder_url.user_name (user);
 
             if (server_url == folder_url) {
                 return _("There is already a sync from the server to this local folder. "
@@ -2023,11 +2023,11 @@ bool FolderMan.ignore_hidden_files () {
     return this.folder_map.begin ().value ().ignore_hidden_files ();
 }
 
-void FolderMan.set_ignore_hidden_files (bool ignore) {
+void FolderMan.ignore_hidden_files (bool ignore) {
     // Note that the setting will revert to 'true' if all folders
     // are deleted...
     for (Folder folder : q_as_const (this.folder_map)) {
-        folder.set_ignore_hidden_files (ignore);
+        folder.ignore_hidden_files (ignore);
         folder.save_to_settings ();
     }
 }

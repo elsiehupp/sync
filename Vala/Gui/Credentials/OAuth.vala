@@ -106,7 +106,7 @@ signals:
         socket.disconnect_from_host ();
         // We don't want that deleting the server too early prevent queued data to be sent on this socket.
         // The socket will be deleted after disconnection because disconnected is connected to delete_later
-        socket.set_parent (null);
+        socket.parent (null);
     }
 
     void OAuth.on_start () {
@@ -137,22 +137,22 @@ signals:
 
                     GLib.Uri request_token = Utility.concat_url_path (this.account.url ().to_string (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
                     QNetworkRequest req;
-                    req.set_header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
+                    req.header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
 
                     string basic_auth = string ("%1:%2").arg (
                         Theme.instance ().oauth_client_id (), Theme.instance ().oauth_client_secret ());
-                    req.set_raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
+                    req.raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
                     // We just added the Authorization header, don't let HttpCredentialsAccessManager tamper with it
-                    req.set_attribute (HttpCredentials.DontAddCredentialsAttribute, true);
+                    req.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
 
                     var request_body = new QBuffer;
                     QUrlQuery arguments (string (
                         "grant_type=authorization_code&code=%1&redirect_uri=http://localhost:%2")
                                             .arg (code, string.number (this.server.server_port ())));
-                    request_body.set_data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
+                    request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
                     var job = this.account.send_request ("POST", request_token, req, request_body);
-                    job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
+                    job.on_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
                     GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, socket] (Soup.Reply reply) {
                         var json_data = reply.read_all ();
                         QJsonParseError json_parse_error;
@@ -220,7 +220,7 @@ signals:
     GLib.Uri OAuth.authorisation_link () {
         //  Q_ASSERT (this.server.is_listening ());
         QUrlQuery query;
-        query.set_query_items ({
+        query.query_items ({
             {
                 QLatin1String ("response_type"),
                 QLatin1String ("code")
