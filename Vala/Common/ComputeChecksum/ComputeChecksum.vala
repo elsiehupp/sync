@@ -9,7 +9,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QCryptographicHash>
 
 
-//  #pragma once
 //  #include <QFuture_watcher>
 //  #include <memory>
 

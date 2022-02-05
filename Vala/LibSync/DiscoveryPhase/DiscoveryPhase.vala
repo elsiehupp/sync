@@ -10,7 +10,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QTextCodec>
 //  #include <cstring>
 
-//  #pragma once
 
 //  #include <QElapsedTimer>
 //  #include <QMutex>

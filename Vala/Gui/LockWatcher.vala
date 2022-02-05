@@ -7,7 +7,6 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 //  #include <QLoggingCategory>
 //  #include <QTimer>
 
-//  #pragma once
 
 //  #include <QTimer>
 //  #include <chrono>

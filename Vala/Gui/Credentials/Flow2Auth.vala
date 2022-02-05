@@ -13,7 +13,6 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 //  #include <QJsonObject>
 //  #include <QJsonDocument>
 
-//  #pragma once
 //  #include <QPointer>
 //  #include <QTimer>
 

@@ -14,7 +14,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 //  #include <array>
 
-//  #pragma once
 
 //  #include <accountfwd.h>
 //  #include <account.h>

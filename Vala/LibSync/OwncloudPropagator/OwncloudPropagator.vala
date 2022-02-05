@@ -5,7 +5,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #pragma once
 
 //  #include <QLoggingCategory>
 using Soup;

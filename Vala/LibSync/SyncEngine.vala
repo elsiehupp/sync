@@ -24,7 +24,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QFileInfo>
 //  #include <qtextcodec.h>
 
-//  #pragma once
 
 //  #include <cstdint>
 //  #include <QMutex>

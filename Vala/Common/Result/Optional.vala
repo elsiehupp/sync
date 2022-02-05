@@ -4,7 +4,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #pragma once
 
 namespace Occ {
 

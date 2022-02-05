@@ -14,7 +14,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 using namespace QKeychain;
 
-//  #pragma once
 //  #include <QPointer>
 //  #include <QTcpServer>
 

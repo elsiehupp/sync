@@ -4,7 +4,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-//  #pragma once
 
 //  #include <functional>
 //  #include <QWebSocketS

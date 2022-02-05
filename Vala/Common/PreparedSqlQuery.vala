@@ -5,7 +5,6 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 ***********************************************************/
 
 using Sqlite3;
-//  #pragma once
 
 namespace Occ {
 

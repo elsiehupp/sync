@@ -7,7 +7,6 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 //  #include <QFileInfo>
 //  #include <QJsonArray>
 //  #include <QRegularExpression>
-//  #pragma once
 //  #include <QTemporary_file>
 
 namespace Occ {

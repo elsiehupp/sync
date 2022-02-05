@@ -11,7 +11,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 //  #include <cstring>
 
-//  #pragma once
 
 //  #include <QMetaType>
 //  #include <QDebug>

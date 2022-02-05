@@ -10,7 +10,6 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 using namespace Occ;
 
 
-//  #pragma once
 
 namespace Occ {
 

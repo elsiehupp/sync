@@ -4,7 +4,6 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #pragma once
 
 using Soup;
 //  #include <QFileInfo>

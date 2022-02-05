@@ -4,7 +4,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #pragma once
 
 //  #include <QMetaType>
 //  #include <QtGlobal>

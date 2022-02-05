@@ -7,7 +7,6 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 //  #include <QRegularExpression>
 //  #include <QLoggingCategory>
 //  #include <Soup.Buffer>
-//  #pragma once
 
 using Soup;
 

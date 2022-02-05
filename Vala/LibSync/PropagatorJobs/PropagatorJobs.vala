@@ -14,7 +14,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QCoreApplication>
 //  #include <ctime>
 
-//  #pragma once
 
 namespace Occ {
 

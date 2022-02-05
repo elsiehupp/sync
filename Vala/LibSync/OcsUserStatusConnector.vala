@@ -16,7 +16,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <qjsonobject.h>
 //  #include <qloggingcategory.h>
 
-//  #pragma once
 
 //  #include <QPointer>
 

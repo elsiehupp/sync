@@ -1,5 +1,4 @@
 
-//  #pragma once
 
 //  #include <QBox_layout>
 //  #include <QLabel>

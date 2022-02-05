@@ -1,6 +1,5 @@
 
 
-//  #pragma once
 
 namespace Occ {
 namespace Ui {

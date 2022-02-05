@@ -9,7 +9,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <sys/stat.h>
 //  #include <sys/types.h>
 
-//  #pragma once
 
 //  #include <ctime>
 //  #include <QFileInfo>

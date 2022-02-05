@@ -9,7 +9,6 @@ Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
 
 using namespace QKeychain;
 
-//  #pragma once
 
 //  #include <QNetworkProxy>
 //  #include <QAuthenticator>

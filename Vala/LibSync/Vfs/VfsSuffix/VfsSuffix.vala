@@ -4,7 +4,6 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #pragma once
 
 //  #include <QScopedPointer>
 

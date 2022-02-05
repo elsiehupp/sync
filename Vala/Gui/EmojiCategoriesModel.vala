@@ -7,7 +7,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <QtGlobal>
 //  #include <memory>
 
-//  #pragma once
 
 //  #include <QQmlEngine>
 //  #include <QAbstractItemModel>

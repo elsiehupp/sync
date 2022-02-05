@@ -5,7 +5,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 //  #include <QDir>
-//  #pragma once
 
 namespace Occ {
 

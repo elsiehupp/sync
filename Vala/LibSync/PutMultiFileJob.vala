@@ -6,7 +6,6 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 
 //  #include <QHttp_part>
 
-//  #pragma once
 
 //  #include <QLoggingCategory>
 //  #include <QElapsedTimer>

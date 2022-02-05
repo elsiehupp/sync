@@ -9,7 +9,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <QDirIterator>
 //  #include <QCoreApplication>
 
-//  #pragma once
 
 //  #include <ctime>
 //  #include <functional>

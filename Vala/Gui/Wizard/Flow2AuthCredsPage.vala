@@ -7,7 +7,6 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 
 //  #include <QVBoxLayout>
 
-//  #pragma once
 
 //  #include <QNetworkCookie>
 //  #include <QPointer>

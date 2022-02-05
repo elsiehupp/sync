@@ -17,7 +17,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <unistd.h>
 //  #endif
 
-//  #pragma once
 
 //  #include <Soup.Buffer>
 

@@ -6,7 +6,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 //  #include <QLoggingCategory>
 
-//  #pragma once
 
 namespace Occ {
 

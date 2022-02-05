@@ -16,7 +16,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QLabel>
 //  #include <QVBoxLayout>
 
-//  #pragma once
 //  #include <Gtk.Dialog>
 //  #include <QTree_widget>
 

@@ -15,7 +15,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <common/checksums.h>
 //  #include <common/constants.h>
 
-//  #pragma once
 
 
 

@@ -17,7 +17,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #if ! (QTLEGACY)
 //  #include <QOperatingSystemVersion>
 //  #endif
-//  #pragma once
 
 namespace Occ {
 namespace Ui {

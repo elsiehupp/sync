@@ -11,7 +11,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QPainter>
 //  #include <QApplication>
 //  #include <QMouse_event>
-//  #pragma once
 //  #include <QStyled_item_delegate>
 
 namespace Occ {

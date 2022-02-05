@@ -6,7 +6,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 //  #include <QMenu>
 //  #include <QClipboard>
-//  #pragma once
 //  #include <QNetworkCookie>
 //  #include <QPointer>
 

@@ -4,7 +4,6 @@ Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-//  #pragma once
 
 
 namespace Occ {

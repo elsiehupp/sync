@@ -4,7 +4,6 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #pragma once
 //  #include <QLabel>
 
 namespace Occ {

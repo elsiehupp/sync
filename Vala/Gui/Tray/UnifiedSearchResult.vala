@@ -5,7 +5,6 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 ***********************************************************/
 
 //  #include <QtCore>
-//  #pragma once
 //  #include <limits>
 //  #include <QtCore>
 

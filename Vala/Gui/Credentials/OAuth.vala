@@ -10,7 +10,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QJsonObject>
 //  #include <QJsonDocument>
 
-//  #pragma once
 //  #include <QPointer>
 //  #include <QTcpServer>
 

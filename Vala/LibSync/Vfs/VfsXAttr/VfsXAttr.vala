@@ -4,7 +4,6 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #pragma once
 //  #include <QScopedPointer>
 
 namespace xattr {

@@ -13,7 +13,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QNetworkAccessManager>
 //  #include <QMessageBox>
 
-//  #pragma once
 
 namespace Occ {
 
