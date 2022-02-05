@@ -9,6 +9,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QIcon>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Activity_link class describes actions of an activity

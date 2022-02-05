@@ -1,6 +1,7 @@
 
 
 namespace Occ {
+namespace Ui {
 
 class Web_view_page_url_scheme_handler : QWeb_engine_url_scheme_handler {
 

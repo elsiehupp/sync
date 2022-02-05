@@ -4,8 +4,8 @@ Copyright (C) by Camila Ayres <camila@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Ocs_apps_job class

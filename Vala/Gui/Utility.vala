@@ -11,19 +11,19 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 //  #include <QMessageBox>
 //  #include <QUrlQuery>
 
-using namespace Occ;
-
 //  #include <Gtk.Widget>
 
 namespace Occ {
-namespace Utility {
+namespace Ui {
+
+class Utility {
 
     /***********************************************************
     Open an url in the browser.
 
     If launching the browser fails, display a message.
     ***********************************************************/
-    bool open_browser (GLib.Uri url, Gtk.Widget error_widget_parent = null);
+    public static bool open_browser (GLib.Uri url, Gtk.Widget error_widget_parent = null);
 
 
     /***********************************************************
@@ -31,7 +31,7 @@ namespace Utility {
 
     If launching the email program fails, display a message.
     ***********************************************************/
-    bool open_email_composer (string subject, string body,
+    public static bool open_email_composer (string subject, string body,
         Gtk.Widget error_widget_parent);
 
 
@@ -40,24 +40,22 @@ namespace Utility {
 
     This will be used in context menus to describe the current state.
     ***********************************************************/
-    string vfs_current_availability_text (VfsItemAvailability availability);
+    public static string vfs_current_availability_text (VfsItemAvailability availability);
 
 
     /***********************************************************
     Translated text for "making items always available locally"
     ***********************************************************/
-    string vfs_pin_action_text ();
+    public static string vfs_pin_action_text ();
 
 
     /***********************************************************
     Translated text for "free up local space" (and unpinning the item)
     ***********************************************************/
-    string vfs_free_space_action_text ();
+    public static string vfs_free_space_action_text ();
 
 } // namespace Utility
 } // namespace Occ
-
-//  #endif
 
 
 

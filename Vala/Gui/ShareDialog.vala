@@ -11,30 +11,12 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 //  #include <QPushButton>
 //  #include <QFrame>
 
-
 //  #include <QPointer>
 //  #include <Gtk.Dialog>
 //  #include <Gtk.Widget>
 
-namespace {
-    string create_random_password () {
-        const var words = Occ.Word_list.get_random_words (10);
-
-        const var add_first_letter = [] (string current, string next) . string {
-            return current + next.at (0);
-        }
-
-        return std.accumulate (std.cbegin (words), std.cend (words), "", add_first_letter);
-    }
-}
-
 namespace Occ {
-
 namespace Ui {
-    class Share_dialog;
-}
-
-
 
 class Share_dialog : Gtk.Dialog {
 
@@ -474,6 +456,17 @@ signals:
         }
 
         Gtk.Dialog.change_event (e);
+    }
+    
+
+    static string create_random_password () {
+        const var words = Occ.Word_list.get_random_words (10);
+
+        const var add_first_letter = [] (string current, string next) . string {
+            return current + next.at (0);
+        }
+
+        return std.accumulate (std.cbegin (words), std.cend (words), "", add_first_letter);
     }
 
     } // namespace Occ

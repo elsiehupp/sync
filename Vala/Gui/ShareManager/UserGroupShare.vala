@@ -4,6 +4,9 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+namespace Ui {
+
 class User_group_share : Share {
 
     /***********************************************************

@@ -13,9 +13,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QPointer>
 //  #include <QSsl>
 
-
 namespace Occ {
-
+namespace Ui {
 
 /***********************************************************
 @brief The Ssl_button class

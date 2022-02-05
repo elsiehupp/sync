@@ -1,4 +1,7 @@
 
+namespace Occ {
+namespace Ui {
+
 class Image_provider : QQuick_image_provider {
 
     /***********************************************************

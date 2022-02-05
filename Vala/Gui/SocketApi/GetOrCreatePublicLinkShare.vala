@@ -9,6 +9,9 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 // don't pull the share manager into socketapi unittests
 //  #ifndef OWNCLOUD_TEST
 
+namespace Occ {
+namespace Ui {
+
 class Get_or_create_public_link_share : GLib.Object {
 
     /***********************************************************

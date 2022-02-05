@@ -1,4 +1,7 @@
 
+namespace Occ {
+namespace Ui {
+
 class User_apps_model : QAbstractListModel {
 
     /***********************************************************

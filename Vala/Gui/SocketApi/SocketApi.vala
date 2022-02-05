@@ -50,16 +50,16 @@ const int MIRALL_SOCKET_API_VERSION "1.1"
 //  #include <QLocal_server>
 using Socket_api_server = QLocal_server;
 
-
 namespace Occ {
-
-//  Q_DECLARE_LOGGING_CATEGORY (lc_socket_api)
+namespace Ui {
 
 /***********************************************************
 @brief The SocketApi class
 @ingroup gui
 ***********************************************************/
 class SocketApi : GLib.Object {
+
+    //  Q_DECLARE_LOGGING_CATEGORY (lc_socket_api)
 
     /***********************************************************
     ***********************************************************/

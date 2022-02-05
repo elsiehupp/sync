@@ -1,4 +1,7 @@
 
+namespace Occ {
+namespace Ui {
+
 class User : GLib.Object {
     //  Q_PROPERTY (string name READ name NOTIFY name_changed)
     //  Q_PROPERTY (string server READ server CONSTANT)

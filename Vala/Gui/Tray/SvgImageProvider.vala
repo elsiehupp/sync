@@ -5,9 +5,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 ***********************************************************/
 
 //  #include <QLoggingCategory>
-
 //  #pragma once
-
 //  #include <QQuick_image_provider>
 
 namespace Occ {

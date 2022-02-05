@@ -1,5 +1,3 @@
-#ifndef USERMODEL_H
-const int USERMODEL_H
 
 //  #include <QAbstractListModel>
 //  #include <QImage>
@@ -13,20 +11,21 @@ const int USERMODEL_H
 //  #include <QPainter>
 //  #include <QPushButton>
 
-// time span in milliseconds which has to be between two
-// refreshes of the notifications
-const int NOTIFICATION_REQUEST_FREE_PERIOD 15000
-
-namespace {
-constexpr int64 expired_activities_check_interval_msecs = 1000 * 60;
-constexpr int64 activity_default_expiration_time_msecs = 1000 * 60 * 10;
-}
-
 namespace Occ {
+namespace Ui {
 
 class User_model : QAbstractListModel {
     //  Q_PROPERTY (User* current_user READ current_user NOTIFY new_user_selected)
     //  Q_PROPERTY (int current_user_id READ current_user_id NOTIFY new_user_selected)
+
+    // time span in milliseconds which has to be between two
+    // refreshes of the notifications
+    const int NOTIFICATION_REQUEST_FREE_PERIOD = 15000;
+
+
+    const int64 expired_activities_check_interval_msecs = 1000 * 60;
+    const int64 activity_default_expiration_time_msecs = 1000 * 60 * 10;
+
 
     /***********************************************************
     ***********************************************************/

@@ -5,10 +5,10 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 ***********************************************************/
 
 //  #pragma once
-
 //  #include <QLabel>
 
 namespace Occ {
+namespace Ui {
 
 class Link_label : QLabel {
 

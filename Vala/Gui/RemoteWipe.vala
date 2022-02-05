@@ -10,8 +10,8 @@ Copyright (C) by Camila Ayres <hello@camila.codes>
 //  #include <QBuffer>
 //  #include <QNetworkAccessManager>
 
-
 namespace Occ {
+namespace Ui {
 
 class RemoteWipe : GLib.Object {
 

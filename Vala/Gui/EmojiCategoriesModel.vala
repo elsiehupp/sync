@@ -13,6 +13,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <QAbstractItemModel>
 
 namespace Occ {
+namespace Ui {
 
 class EmojiCategoriesModel : QAbstractListModel {
 

@@ -12,6 +12,9 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 //  #include <Gtk.Color>
 //  #include <QPixmap>
 
+namespace Occ {
+namespace Ui {
+
 namespace {
     string find_svg_file_path (string filename, string[] possible_colors) {
         string result;

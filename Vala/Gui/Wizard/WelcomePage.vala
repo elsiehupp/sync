@@ -5,15 +5,10 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 ***********************************************************/
 
 //  #pragma once
-
 //  #include <QWizard_page>
 
 namespace Occ {
-
-
 namespace Ui {
-    class Welcome_page;
-}
 
 class Welcome_page : QWizard_page {
 

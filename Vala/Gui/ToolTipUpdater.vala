@@ -9,8 +9,8 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 //  #include <QToolTip>
 //  #include <QPoint>
 
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief Updates tooltips of items in a QTreeView when they change.

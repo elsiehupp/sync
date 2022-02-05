@@ -18,8 +18,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <chrono>
 //  #include <memory>
 
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Folder class

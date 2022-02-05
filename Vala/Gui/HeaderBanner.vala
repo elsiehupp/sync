@@ -100,8 +100,8 @@ https://www.gnu.org/licenses/gpl-3.0.html.
 //  #include <QStyle>
 //  #include <QGuiApplication>
 
-
 namespace Occ {
+namespace Ui {
 
 class HeaderBanner : Gtk.Widget {
 

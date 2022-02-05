@@ -20,13 +20,13 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QCheckBox>
 //  #include <QPlain_tex
 //  #include <QTextStream
-//  #include <GLib.List>
 //  #include <Gtk.Dialog>
 //  #include <QLineEdit>
 //  #include <QPushButton>
 //  #include <QLabel>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Log_browser class

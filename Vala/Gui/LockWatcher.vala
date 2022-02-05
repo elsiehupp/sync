@@ -7,17 +7,13 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 //  #include <QLoggingCategory>
 //  #include <QTimer>
 
-using namespace Occ;
-
-const int check_frequency = 20 * 1000; // ms
-
 //  #pragma once
 
-//  #include <GLib.List>
 //  #include <QTimer>
 //  #include <chrono>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief Monitors files that are locked, signaling when they become unlocked
@@ -34,6 +30,8 @@ the file is still being locked.
 ***********************************************************/
 
 class LockWatcher : GLib.Object {
+
+    const int check_frequency = 20 * 1000; // ms
 
     /***********************************************************
     ***********************************************************/

@@ -7,10 +7,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 //  #include <Gtk.Dialog>
 
 namespace Occ {
-
 namespace Ui {
-    class Legal_notice;
-}
 
 /***********************************************************
 @brief The Legal_notice class

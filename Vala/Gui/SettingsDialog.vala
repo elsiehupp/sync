@@ -21,10 +21,16 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <Gtk.Dialog>
 //  #include <QStyled_item_delegate>
 
+namespace Occ {
+namespace Ui {
 
+/***********************************************************
+@brief The SettingsDialog class
+@ingroup gui
+***********************************************************/
+class SettingsDialog : Gtk.Dialog {
+    //  Q_PROPERTY (Gtk.Widget* current_page READ current_page)
 
-
-namespace {
     const string TOOLBAR_CSS () {
         return QStringLiteral ("QTool_bar { background : %1; margin : 0; padding : 0; border : none; border-bottom : 1px solid %2; spacing : 0; } "
                                "QTool_bar QToolButton { background : %1; border : none; border-bottom : 1px solid %2; margin : 0; padding : 5px; } "
@@ -57,22 +63,6 @@ namespace {
         }
         return QStringLiteral ("%1\n%2").arg (user, host);
     }
-}
-
-namespace Occ {
-
-
-namespace Ui {
-    class SettingsDialog;
-}
-
-
-/***********************************************************
-@brief The SettingsDialog class
-@ingroup gui
-***********************************************************/
-class SettingsDialog : Gtk.Dialog {
-    //  Q_PROPERTY (Gtk.Widget* current_page READ current_page)
 
     /***********************************************************
     ***********************************************************/

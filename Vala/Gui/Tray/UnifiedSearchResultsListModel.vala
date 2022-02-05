@@ -7,13 +7,12 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 //  #include <algorithm>
 //  #include <QAbstractListModel>
 //  #include <QDesktopServices>
-
 //  #pragma once
-
 //  #include <limits>
 //  #include <QtCore>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Unified_search_results_list_model

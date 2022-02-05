@@ -4,15 +4,15 @@
 //  #include <QJsonDocument>
 //  #include <QJsonObject>
 
-
 namespace Occ {
-
-const string notifications_path = "ocs/v2.php/apps/notifications/api/v2/notifications";
-const string property_account_state_c = "oc_account_state";
-const int success_status_code = 200;
-const int NOT_MODIFIED_STATUS_CODE = 304;
+namespace Ui {
 
 class Server_notification_handler : GLib.Object {
+
+    const string notifications_path = "ocs/v2.php/apps/notifications/api/v2/notifications";
+    const string property_account_state_c = "oc_account_state";
+    const int success_status_code = 200;
+    const int NOT_MODIFIED_STATUS_CODE = 304;    
 
     /***********************************************************
     ***********************************************************/

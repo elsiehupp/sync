@@ -5,8 +5,8 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Owncloud_http_creds_page class

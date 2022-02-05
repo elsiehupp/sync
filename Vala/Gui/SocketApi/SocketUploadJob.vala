@@ -7,14 +7,11 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 //  #include <QFileInfo>
 //  #include <QJsonArray>
 //  #include <QRegularExpression>
-
-using namespace Occ;
-
 //  #pragma once
 //  #include <QTemporary_file>
 
 namespace Occ {
-
+namespace Ui {
 
 class Socket_upload_job : GLib.Object {
 

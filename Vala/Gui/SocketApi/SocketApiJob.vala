@@ -6,6 +6,9 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+namespace Ui {
+
 class Socket_api_job : GLib.Object {
 
     public Socket_api_job (string job_id, unowned<Socket_listener> socket_listener, QJsonObject arguments)

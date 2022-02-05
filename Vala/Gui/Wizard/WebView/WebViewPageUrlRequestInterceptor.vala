@@ -1,6 +1,7 @@
 
 
 namespace Occ {
+namespace Ui {
 
 class Web_view_page_url_request_interceptor : QWeb_engine_url_request_interceptor {
 

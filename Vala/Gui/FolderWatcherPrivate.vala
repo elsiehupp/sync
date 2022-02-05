@@ -10,8 +10,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QSocket_notifier>
 //  #include <QDir>
 
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief Linux (inotify) API implementation of Folder_watcher

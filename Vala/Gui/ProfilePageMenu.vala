@@ -1,4 +1,5 @@
-#pragma once
+
+//  #pragma once
 
 //  #include <QBox_layout>
 //  #include <QLabel>
@@ -7,6 +8,7 @@
 //  #include <cstddef>
 
 namespace Occ {
+namespace Ui {
 
 class Profile_page_menu : Gtk.Widget {
 

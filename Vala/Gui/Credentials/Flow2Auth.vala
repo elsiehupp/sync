@@ -18,6 +18,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 //  #include <QTimer>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 Job that does the authorization, grants and fetches the

@@ -9,15 +9,14 @@ Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
 //  #include <QPainter>
 //  #include <QStyle>
 //  #include <QStyle_hints>
-
-const int HASQT5_11 (QT_VERSION >= QT_VERSION_CHECK (5,11,0))
-
+//  const int HASQT5_11 (QT_VERSION >= QT_VERSION_CHECK (5,11,0))
 //  #include <Gtk.Widget>
 //  #include <QBasic_timer>
 //  #include <QPointer>
 //  #include <QVariant_animation>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Slide_show class

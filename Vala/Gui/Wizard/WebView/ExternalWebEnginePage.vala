@@ -1,6 +1,7 @@
 
 
 namespace Occ {
+namespace Ui {
 
 // We need a separate class here, since we cannot simply return the same Web_engine_page object
 // this leads to a strage segfault somewhere deep inside of the QWeb_engine code

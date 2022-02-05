@@ -18,8 +18,7 @@ using Soup;
 //  #include <QPointer>
 
 namespace Occ {
-
-
+namespace Ui {
 
 /***********************************************************
 @brief The OwncloudSetupWizard class

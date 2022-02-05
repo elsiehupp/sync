@@ -6,6 +6,9 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+namespace Ui {
+
 class Listener_closure : GLib.Object {
 
     public using Callback_function = std.function<void ()>;

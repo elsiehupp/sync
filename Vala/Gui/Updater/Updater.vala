@@ -7,15 +7,14 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QUrlQuery>
 //  #include <QProcess>
 //  #include <QSysInfo>
-
 //  #include <QLoggingCategory>
 
-
 namespace Occ {
-
-//  Q_DECLARE_LOGGING_CATEGORY (lc_updater)
+namespace Ui {
 
 class Updater : GLib.Object {
+
+    //  Q_DECLARE_LOGGING_CATEGORY (lc_updater)
 
     /***********************************************************
     ***********************************************************/

@@ -6,7 +6,7 @@
 //  #include <QScreen>
 
 namespace Occ {
-
+namespace Ui {
 
 class Web_view_page : Abstract_credentials_wizard_page {
 

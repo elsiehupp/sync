@@ -6,8 +6,8 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 //  #include <QLoggingCategory>
 
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The HttpCredentialsGui namespace

@@ -5,6 +5,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 The widget displayed for each user/group share

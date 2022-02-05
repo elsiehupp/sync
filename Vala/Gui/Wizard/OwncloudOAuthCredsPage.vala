@@ -6,14 +6,12 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 //  #include <QMenu>
 //  #include <QClipboard>
-
 //  #pragma once
-
-//  #include <GLib.List>
 //  #include <QNetworkCookie>
 //  #include <QPointer>
 
 namespace Occ {
+namespace Ui {
 
 class Owncloud_oauth_creds_page : Abstract_credentials_wizard_page {
 

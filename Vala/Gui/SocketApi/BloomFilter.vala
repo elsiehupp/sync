@@ -6,6 +6,9 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+namespace Ui {
+
 class Bloom_filter {
     // Initialize with m=1024 bits and k=2 (high and low 16 bits of a q_hash).
     // For a client navigating in less than 100 directories, this gives us a probability less than

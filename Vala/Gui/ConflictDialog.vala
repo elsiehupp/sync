@@ -11,12 +11,10 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 //  #include <QPushButton>
 //  #include <Gtk.Dialog>
 
+
+
 namespace Occ {
-
-
 namespace Ui {
-    class ConflictDialog;
-}
 
 class ConflictDialog : Gtk.Dialog {
 

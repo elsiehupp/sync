@@ -13,6 +13,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 //  #include <QTimer>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief handles getting the user info and quota to display in the UI

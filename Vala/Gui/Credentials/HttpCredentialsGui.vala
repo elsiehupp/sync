@@ -19,6 +19,7 @@ using namespace QKeychain;
 //  #include <QTcpServer>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The HttpCredentialsGui class

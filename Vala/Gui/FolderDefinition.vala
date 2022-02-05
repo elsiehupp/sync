@@ -6,6 +6,9 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+namespace Ui {
+
 /***********************************************************
 @brief The FolderDefinition class
 @ingroup gui

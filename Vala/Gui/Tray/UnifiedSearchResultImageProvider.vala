@@ -7,13 +7,12 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 //  #include <QImage>
 //  #include <QPainter>
 //  #include <QSvgRenderer>
-
 //  #pragma once
-
 //  #include <QtCore>
 //  #include <QQuick_image_provider>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Unified_search_result_image_provider

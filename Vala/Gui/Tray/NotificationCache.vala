@@ -1,7 +1,9 @@
-#pragma once
 
+
+//  #pragma once
 
 namespace Occ {
+namespace Ui {
 
 class Notification_cache {
 

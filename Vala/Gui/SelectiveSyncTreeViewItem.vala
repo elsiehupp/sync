@@ -4,6 +4,9 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+namespace Ui {
+
 class Selective_sync_tree_view_item : QTree_widget_item {
 
     /***********************************************************

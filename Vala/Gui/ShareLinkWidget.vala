@@ -15,18 +15,14 @@ Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 //  #include <QToolButton>
 //  #include <QPropertyAnimation>
 //  #include <Gtk.Dialog
-//  #include <GLib.List>
 //  #include <QToolBu
 //  #include <QHBox_layo
 //  #include <QLabel>
 //  #include <QLineEdit>
 //  #include <QWidget_action>
 
-
 namespace Occ {
 namespace Ui {
-
-
 
 /***********************************************************
 @brief The Share_dialog class

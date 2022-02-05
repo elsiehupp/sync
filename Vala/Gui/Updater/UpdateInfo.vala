@@ -8,6 +8,7 @@
 //  #include <QtCore/GLib.File>
 
 namespace Occ {
+namespace Ui {
 
 class Update_info {
 

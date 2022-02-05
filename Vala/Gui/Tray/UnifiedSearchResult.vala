@@ -5,13 +5,12 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 ***********************************************************/
 
 //  #include <QtCore>
-
 //  #pragma once
-
 //  #include <limits>
 //  #include <QtCore>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Unified_search_result class

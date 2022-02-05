@@ -16,14 +16,15 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QSslCertificate>
 
 namespace Occ {
-
-//  Q_DECLARE_LOGGING_CATEGORY (lc_wizard)
+namespace Ui {
 
 /***********************************************************
 @brief The OwncloudWizard class
 @ingroup gui
 ***********************************************************/
 class OwncloudWizard : QWizard {
+
+    //  Q_DECLARE_LOGGING_CATEGORY (lc_wizard)
 
     /***********************************************************
     ***********************************************************/

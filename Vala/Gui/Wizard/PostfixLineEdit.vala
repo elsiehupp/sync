@@ -11,6 +11,7 @@ Copyright (C) 2016 by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QPainter>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief A lineedit class with a pre-set postfix.

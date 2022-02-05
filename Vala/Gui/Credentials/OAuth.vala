@@ -15,6 +15,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QTcpServer>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 Job that do the authorization grant and fetch the access token

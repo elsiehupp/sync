@@ -7,6 +7,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #pragma once
 
 namespace Occ {
+namespace Ui {
 
 class FileActivityListModel : ActivityListModel {
 

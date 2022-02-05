@@ -4,12 +4,15 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+namespace Ui {
+
 /***********************************************************
- @brief Updater that only implements notification for use in settings
+@brief Updater that only implements notification for use in settings
 
- The implementation does not show popups
+The implementation does not show popups
 
- @ingroup gui
+@ingroup gui
 ***********************************************************/
 class Passive_update_notifier : OCUpdater {
 

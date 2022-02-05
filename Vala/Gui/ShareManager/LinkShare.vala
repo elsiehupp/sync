@@ -4,6 +4,9 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+namespace Ui {
+
 /***********************************************************
 A Link share is just like a regular share but then slightly different.
 There are several methods in the API that either work differently for

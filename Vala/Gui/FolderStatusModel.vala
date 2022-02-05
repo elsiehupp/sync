@@ -10,6 +10,7 @@ Copyright (C) by Klaas Freitag <freitag@kde.org>
 //  #include <QPointer>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The FolderStatusModel class

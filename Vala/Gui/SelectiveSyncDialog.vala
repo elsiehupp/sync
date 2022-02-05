@@ -20,10 +20,8 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <Gtk.Dialog>
 //  #include <QTree_widget>
 
-
 namespace Occ {
-
-
+namespace Ui {
 
 /***********************************************************
 @brief The Selective_sync_dialog class

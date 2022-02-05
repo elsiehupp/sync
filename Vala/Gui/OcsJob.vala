@@ -7,17 +7,10 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 //  #include <QBuffer>
 //  #include <QJsonDocument>
 //  #include <QJsonObject>
-//  #include <GLib.List>
 //  #include <QPair>
 
-const int OCS_SUCCESS_STATUS_CODE 100
-// Apparantly the v2.php URLs can return that
-const int OCS_SUCCESS_STATUS_CODE_V2 200
-// not modified when using  ETag
-const int OCS_NOT_MODIFIED_STATUS_CODE_V2 304
-
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Ocs_share_job class
@@ -30,6 +23,12 @@ All OCS jobs (e.g. sharing) should extend this class.
 ***********************************************************/
 class Ocs_job : AbstractNetworkJob {
 
+    const int OCS_SUCCESS_STATUS_CODE 100
+    // Apparantly the v2.php URLs can return that
+    const int OCS_SUCCESS_STATUS_CODE_V2 200
+    // not modified when using  ETag
+    const int OCS_NOT_MODIFIED_STATUS_CODE_V2 304
+    
 
     protected Ocs_job (AccountPointer account);
 

@@ -14,7 +14,10 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 //  #include <QVariantMap>
 
+
+
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 This is a job-like class to check that the server is up and

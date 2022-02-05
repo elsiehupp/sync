@@ -7,7 +7,9 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 //  #include <QResizeEvent>
 //  #include <QLabel>
 
+
 namespace Occ {
+namespace Ui {
 
 /// Label that can elide its text
 class ElidedLabel : QLabel {

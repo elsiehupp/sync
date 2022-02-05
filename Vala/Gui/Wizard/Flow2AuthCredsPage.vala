@@ -9,13 +9,11 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 
 //  #pragma once
 
-//  #include <GLib.List>
 //  #include <QNetworkCookie>
 //  #include <QPointer>
 
-
 namespace Occ {
-
+namespace Ui {
 
 class Flow2Auth_creds_page : Abstract_credentials_wizard_page {
 

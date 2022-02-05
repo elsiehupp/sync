@@ -9,7 +9,7 @@ Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 //  #include <QTimer>
 
 namespace Occ {
-
+namespace Ui {
 
 class NavigationPaneHelper : GLib.Object {
 

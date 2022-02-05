@@ -1,6 +1,7 @@
 
 
 namespace Occ {
+namespace Ui {
 
 class Web_engine_page : QWeb_engine_page {
 

@@ -21,11 +21,9 @@ const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 //  #include <Gtk.Widget>
 //  #include <QPointer>
 
-namespace Occ {
 
+namespace Occ {
 namespace Ui {
-    class General_settings;
-}
 
 /***********************************************************
 @brief The General_settings class

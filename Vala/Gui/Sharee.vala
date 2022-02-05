@@ -12,10 +12,8 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 //  #include <QLoggingCategory>
 //  #include <QModelIndex>
 
-
 namespace Occ {
-
-
+namespace Ui {
 
 class Sharee {
 

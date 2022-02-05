@@ -12,7 +12,7 @@ Copyright (C) by Cédric Bellegarde <gnumdk@gmail.com>
 //  #include <QScreen>
 //  #include <QMenu>
 
-#ifdef USE_FDO_NOTIFICATIONS
+//  #ifdef USE_FDO_NOTIFICATIONS
 //  #include <QDBus_connection>
 //  #include <QDBus_interface>
 //  #include <QDBus_message>
@@ -26,6 +26,7 @@ const int NOTIFICATIONS_IFACE "org.freedesktop.Notifications"
 //  #include <QQml_network_access_manager_factory>
 
 namespace Occ {
+namespace Ui {
 
 class Access_manager_factory : QQml_network_access_manager_factory {
 

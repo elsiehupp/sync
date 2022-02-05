@@ -29,7 +29,6 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 //  #include <cstring>
 //  #include <Gtk.Dialog
 //  #include <Gtk.Wid
-//  #include <GLib.List>
 //  #include <QTimer>
 //  #include <qpushbutton.h>
 //  #include <qscrollarea.h>

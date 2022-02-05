@@ -13,8 +13,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <qloggingcategory.h>
 //  #include <QtCore>
 
-
 namespace Occ {
+namespace Ui {
 
 //  Q_DECLARE_LOGGING_CATEGORY (lc_activity)
 

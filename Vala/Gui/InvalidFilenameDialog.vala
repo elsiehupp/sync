@@ -55,11 +55,7 @@ namespace {
 }
 
 namespace Occ {
-
-
 namespace Ui {
-    class Invalid_filename_dialog;
-}
 
 class Invalid_filename_dialog : Gtk.Dialog {
 

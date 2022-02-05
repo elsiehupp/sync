@@ -4,9 +4,8 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <qglobal.h>
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 Possible permissions, must match the server permission constants

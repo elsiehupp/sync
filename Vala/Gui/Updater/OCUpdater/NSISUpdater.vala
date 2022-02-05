@@ -4,6 +4,9 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+namespace Ui {
+
 /***********************************************************
 @brief Windows Updater Using NSIS
 @ingroup gui

@@ -10,16 +10,9 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 
 
 //  #include <QDate>
-//  #include <GLib.List>
-
-
-
 
 namespace Occ {
-
-
-
-
+namespace Ui {
 
 /***********************************************************
 The share manager allows for creating, retrieving and deletion

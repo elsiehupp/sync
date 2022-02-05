@@ -12,9 +12,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 //  #include <Gtk.Dialog>
 
 namespace Occ {
-
 namespace Ui {
-}
 
 class FolderCreationDialog : Gtk.Dialog {
 

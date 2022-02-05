@@ -6,6 +6,9 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+namespace Ui {
+
 class Socket_listener {
 
     public QPointer<QIODevice> socket;

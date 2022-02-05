@@ -11,9 +11,9 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QMutableSetIter
 //  #include <QNetwor
 //  #include <QQueue>
-//  #include <GLib.List>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The FolderMan class

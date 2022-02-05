@@ -11,8 +11,8 @@ Copyright (C) 2014 by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QDialogButtonBox>
 //  #include <Gtk.Dialog>
 
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief Authenticate a user for a specific credential given

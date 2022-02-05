@@ -12,8 +12,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QTemporary_file>
 //  #include <QTimer>
 
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief Schedule update checks every couple of hours if the client runs.

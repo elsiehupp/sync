@@ -4,7 +4,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-#ifdef WITH_LIBCLOUDPROVIDERS
+//  #ifdef WITH_LIBCLOUDPROVIDERS
 //  #endif
 
 //  #include <QQml_application_engine>
@@ -27,22 +27,23 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QMenu>
 //  #include <QSize>
 //  #include <QTimer>
-#ifdef WITH_LIBCLOUDPROVIDERS
+//  #ifdef WITH_LIBCLOUDPROVIDERS
 //  #include <QDBus_connection>
 //  #endif
 
 namespace Occ {
-
-enum Share_dialog_start_page {
-    Users_and_groups,
-    Public_links,
-}
+namespace Ui {
 
 /***********************************************************
 @brief The OwncloudGui class
 @ingroup gui
 ***********************************************************/
 class OwncloudGui : GLib.Object {
+
+    enum Share_dialog_start_page {
+        Users_and_groups,
+        Public_links,
+    }
 
     /***********************************************************
     ***********************************************************/

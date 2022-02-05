@@ -9,12 +9,12 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 //  #include <csignal>
 //  #include <qqml.h>
 
-#ifdef Q_OS_UNIX
+//  #ifdef Q_OS_UNIX
 //  #include <sys/time.h>
 //  #include <sys/resource.h>
 //  #endif
 
-#if defined (BUILD_UPDATER)
+//  #if defined (BUILD_UPDATER)
 //  #endif
 
 //  #include <QTimer>
@@ -24,7 +24,8 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 //  #include <QQuick_window>
 //  #include <QSurface_format>
 
-using namespace Occ;
+namespace Occ {
+namespace Ui {
 
 void warn_systray () {
     QMessageBox.critical (null, Gtk.Application.translate ("main.cpp", "System Tray not available"),

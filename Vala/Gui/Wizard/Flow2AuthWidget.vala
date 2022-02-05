@@ -4,13 +4,10 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #ifndef FLOW2AUTHWIDGET_H
-const int FLOW2AUTHWIDGET_H
-
 //  #include <Gtk.Widget>
 
-
 namespace Occ {
+namespace Ui {
 
 class Flow2AuthWidget : Gtk.Widget {
 

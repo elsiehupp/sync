@@ -5,10 +5,10 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 //  #include <QBuffer>
-//  #include <GLib.List>
 //  #include <QPair>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Notification_confirm_job class

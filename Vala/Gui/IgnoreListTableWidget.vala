@@ -5,12 +5,8 @@
 //  #include <QLineEdit>
 //  #include <QMessageBox>
 
-
 namespace Occ {
-
 namespace Ui {
-    class IgnoreListTableWidget;
-}
 
 class IgnoreListTableWidget : Gtk.Widget {
 

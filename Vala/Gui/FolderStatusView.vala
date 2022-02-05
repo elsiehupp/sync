@@ -7,6 +7,7 @@ Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
 //  #include <QTreeView>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Folder_status_view class

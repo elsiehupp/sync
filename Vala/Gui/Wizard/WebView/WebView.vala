@@ -16,9 +16,8 @@
 //  #include <QWeb_engine_certificate_error>
 //  #include <QMessageBox>
 
-
 namespace Occ {
-
+namespace Ui {
 
 class WebView : Gtk.Widget {
 

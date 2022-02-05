@@ -19,7 +19,9 @@ namespace QKeychain {
     class Job;
 }
 
+
 namespace Occ {
+namespace Ui {
 
 namespace KeychainChunk {
     class ReadJob;

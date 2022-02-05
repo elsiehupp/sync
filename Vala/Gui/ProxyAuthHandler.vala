@@ -7,7 +7,6 @@ Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
 //  #include <QApplication>
 //  #include <qt5keychain/keychain.h>
 
-using namespace Occ;
 using namespace QKeychain;
 
 //  #pragma once
@@ -18,11 +17,8 @@ using namespace QKeychain;
 //  #include <QScopedPointer>
 //  #include <QSettings>
 
-namespace QKeychain {
-}
-
 namespace Occ {
-
+namespace Ui {
 
 /***********************************************************
 @brief Handle proxy_authentication_required signals from our QNetwork_access_managers.

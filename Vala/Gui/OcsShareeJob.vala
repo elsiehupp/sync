@@ -6,8 +6,8 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 
 //  #include <QJsonDocument>
 
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Ocs_sharee_job class

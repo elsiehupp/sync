@@ -19,8 +19,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QScopedPointer>
 //  #include <QDir>
 
-
 namespace Occ {
+namespace Ui {
 
 //  Q_DECLARE_LOGGING_CATEGORY (lc_folder_watcher)
 

@@ -4,6 +4,9 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+namespace Ui {
+
 /***********************************************************
 @brief The Selective_sync_widget contains a folder tree with labels
 @ingroup gui

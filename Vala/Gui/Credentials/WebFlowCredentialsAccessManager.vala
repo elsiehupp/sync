@@ -1,6 +1,9 @@
 
 
 
+namespace Occ {
+namespace Ui {
+
 class WebFlowCredentialsAccessManager : AccessManager {
     const string USER_C = "user";
     const string CLIENT_CERTIFICATE_PEM_C = "this.client_certificate_pem";

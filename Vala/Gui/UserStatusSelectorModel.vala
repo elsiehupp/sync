@@ -12,9 +12,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <algorithm>
 //  #include <cmath>
 //  #include <cstddef>
-
 //  #pragma once
-
 //  #include <userstatusconnector.h>
 //  #include <datetimeprovider.h>
 //  #include <QMetaType>
@@ -24,6 +22,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <vector>
 
 namespace Occ {
+namespace Ui {
 
 class User_status_selector_model : GLib.Object {
 

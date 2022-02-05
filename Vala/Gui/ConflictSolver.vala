@@ -8,6 +8,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 //  #include <QMessageBox>
 
 namespace Occ {
+namespace Ui {
 
 class ConflictSolver : GLib.Object {
     //  Q_PROPERTY (string local_version_filename READ local_version_filename WRITE on_local_version_filename NOTIFY local_version_filename_changed)

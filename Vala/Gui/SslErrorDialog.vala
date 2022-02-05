@@ -10,15 +10,9 @@ Copyright (C) by Klaas Freitag <freitag@kde.org>
 //  #include <QtCore>
 //  #include <Gtk.Dialog>
 //  #include <QSslCertificate>
-//  #include <GLib.List>
-
 
 namespace Occ {
-
 namespace Ui {
-    class Ssl_error_dialog;
-}
-
 
 /***********************************************************
 @brief The Ssl_error_dialog class

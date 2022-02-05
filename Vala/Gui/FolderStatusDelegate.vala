@@ -15,6 +15,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QStyled_item_delegate>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The FolderStatusDelegate class

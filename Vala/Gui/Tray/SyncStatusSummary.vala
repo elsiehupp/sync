@@ -4,15 +4,10 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <theme.h>
-
 //  #pragma once
 
-//  #include <theme.h>
-//  #include <folder.h>
-
-
 namespace Occ {
+namespace Ui {
 
 class Sync_status_summary : GLib.Object {
 

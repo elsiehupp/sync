@@ -4,6 +4,9 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+namespace Ui {
+
 class Sharee_model : QAbstractListModel {
 
     /***********************************************************

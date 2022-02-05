@@ -7,6 +7,7 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 using Soup;
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief Page to ask for the local source folder

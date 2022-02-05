@@ -11,12 +11,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QInputDialog>
 //  #include <Gtk.Dialog>
 
-
 namespace Occ {
-
 namespace Ui {
-    class Ignore_list_editor;
-}
 
 /***********************************************************
 @brief The Ignore_list_editor class

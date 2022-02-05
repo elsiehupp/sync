@@ -9,7 +9,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QWizard_page>
 
 namespace Occ {
-
+namespace Ui {
 
 /***********************************************************
 @brief The Abstract_credentials_wizard_page class

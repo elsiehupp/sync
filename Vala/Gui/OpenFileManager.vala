@@ -12,15 +12,16 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QDesktopServices>
 //  #include <QApplication>
 
-const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
+//  const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
-#if ! (QTLEGACY)
+//  #if ! (QTLEGACY)
 //  #include <QOperatingSystemVersion>
 //  #endif
 //  #pragma once
 
-
 namespace Occ {
+namespace Ui {
+
 /***********************************************************
 @brief Open the file manager with the specified file pre-selected
 @ingroup gui

@@ -18,10 +18,8 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QBuffer>
 //  #include <QWizard>
 
-#include "../addcertificatedialog.h"
-
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The Owncloud_setup_page class

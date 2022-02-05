@@ -10,10 +10,7 @@ Copyright (C) 2015 by Daniel Molkentin <danimo@owncloud.com>
 //  #include <Gtk.Dialog>
 
 namespace Occ {
-
 namespace Ui {
-    class AddCertificateDialog;
-}
 
 /***********************************************************
 @brief The AddCertificateDialog class
@@ -23,8 +20,20 @@ class AddCertificateDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
+    private Ui.AddCertificateDialog ui;
+
+    /***********************************************************
+    ***********************************************************/
     public AddCertificateDialog (Gtk.Widget parent = null);
+
+
+    /***********************************************************
+    ***********************************************************/
     ~AddCertificateDialog () override;
+
+
+    /***********************************************************
+    ***********************************************************/
     public string get_certificate_path ();
 
 
@@ -32,14 +41,18 @@ class AddCertificateDialog : Gtk.Dialog {
     ***********************************************************/
     public string get_certificate_password ();
 
-    /***********************************************************
-    ***********************************************************/
-    public 
 
     /***********************************************************
     ***********************************************************/
     public 
 
+    /***********************************************************
+    ***********************************************************/
+    public 
+
+
+    /***********************************************************
+    ***********************************************************/
     public void reinit ();
 
 
@@ -47,11 +60,12 @@ class AddCertificateDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_push_button_browse_certificate_clicked ();
 
+
     /***********************************************************
     ***********************************************************/
     private 
-    private Ui.AddCertificateDialog ui;
-}
+
+
 
 
     AddCertificateDialog.AddCertificateDialog (Gtk.Widget parent)
@@ -87,5 +101,8 @@ class AddCertificateDialog : Gtk.Dialog {
         ui.line_edit_certificate_path.clear ();
         ui.line_edit_p_wDCertificate.clear ();
     }
-    }
+
+} // class AddCertificateDialog
     
+} // namespace Ui
+} // namespace Occ

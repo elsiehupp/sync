@@ -8,10 +8,7 @@ Copyright (C) 2015 by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <Gtk.Dialog>
 
 namespace Occ {
-
 namespace Ui {
-    class Owncloud_connection_method_dialog;
-}
 
 /***********************************************************
 @brief The Owncloud_connection_method_dialog class

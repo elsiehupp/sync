@@ -12,8 +12,8 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QCheckBox>
 //  #include <QSpin_box>
 
-
 namespace Occ {
+namespace Ui {
 
 namespace WizardCommon {
 

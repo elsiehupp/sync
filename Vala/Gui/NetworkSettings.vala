@@ -5,14 +5,10 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 //  #include <QNetworkProxy>
-//  #include <GLib.List>
 //  #include <Gtk.Widget>
 
 namespace Occ {
-
 namespace Ui {
-    class Network_settings;
-}
 
 /***********************************************************
 @brief The Network_settings class

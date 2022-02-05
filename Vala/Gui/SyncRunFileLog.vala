@@ -13,6 +13,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QDir>
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The SyncRunFileLog class

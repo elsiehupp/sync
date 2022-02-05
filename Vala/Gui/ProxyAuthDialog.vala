@@ -7,10 +7,7 @@ Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
 //  #include <Gtk.Dialog>
 
 namespace Occ {
-
 namespace Ui {
-    class Proxy_auth_dialog;
-}
 
 /***********************************************************
 @brief Ask for username and password for a given proxy.

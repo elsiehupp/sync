@@ -4,8 +4,8 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief Job to fetch a thumbnail for a file

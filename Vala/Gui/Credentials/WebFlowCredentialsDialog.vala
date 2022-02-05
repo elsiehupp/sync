@@ -3,14 +3,8 @@
 //  #include <QVBoxLayout>
 //  #include <QLabel>
 
-#ifdef WITH_WEBENGINE
-//  #endif // WITH_WEBENGINE
-
-
 namespace Occ {
-
-#ifdef WITH_WEBENGINE
-//  #endif // WITH_WEBENGINE
+namespace Ui {
 
 class WebFlowCredentialsDialog : Gtk.Dialog {
 

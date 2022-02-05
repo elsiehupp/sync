@@ -15,9 +15,8 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 //  #include <QWizard>
 
-
 namespace Occ {
-
+namespace Ui {
 
 /***********************************************************
 @brief The Owncloud_advanced_setup_page class

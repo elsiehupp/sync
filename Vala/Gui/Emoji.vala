@@ -5,6 +5,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace Ui {
 
 struct Emoji {
     Emoji (string u, string s, bool is_custom = false)
