@@ -31,7 +31,7 @@ class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private using ProblemsMap = GLib.HashMap<string, SyncFileStatus.SyncFileStatusTag, PathComparator>;
+    private class ProblemsMap : GLib.HashMap<string, SyncFileStatus.SyncFileStatusTag, PathComparator> { }
 
 
     /***********************************************************
@@ -40,7 +40,7 @@ class SyncFileStatusTracker : GLib.Object {
         UNKNOWN_SHARED,
         NOT_SHARED,
         SHARED
-    };
+    }
 
 
     /***********************************************************
@@ -48,12 +48,12 @@ class SyncFileStatusTracker : GLib.Object {
     private enum PathKnownFlag {
         PATH_UNKNOWN = 0,
         PATH_KNOWN
-    };
+    }
 
 
     /***********************************************************
     ***********************************************************/
-    private SyncEngine this.sync_engine;
+    private SyncEngine sync_engine;
 
 
     /***********************************************************
@@ -98,7 +98,7 @@ class SyncFileStatusTracker : GLib.Object {
     public void on_path_touched (string filename) {
         string folder_path = this.sync_engine.local_path ();
 
-        ASSERT (filename.starts_with (folder_path));
+        //  ASSERT (filename.starts_with (folder_path));
         string local_path = filename.mid (folder_path.size ());
         this.dirty_paths.insert (local_path);
 
@@ -118,7 +118,7 @@ class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_about_to_propagate (SyncFileItemVector items) {
-        ASSERT (this.sync_count.is_empty ());
+        //  ASSERT (this.sync_count.is_empty ());
 
         ProblemsMap old_problems;
         std.swap (this.sync_problems, old_problems);
@@ -263,7 +263,7 @@ class SyncFileStatusTracker : GLib.Object {
                 status.set (problem_status);
         }
 
-        ASSERT (shared_flag != SharedFlag.UNKNOWN_SHARED,
+        //  ASSERT (shared_flag != SharedFlag.UNKNOWN_SHARED,
             "The shared status needs to have been fetched from a SyncFileItem or the DB at this point.");
         if (shared_flag == SharedFlag.SHARED)
             status.set_shared (true);
@@ -309,7 +309,7 @@ class SyncFileStatusTracker : GLib.Object {
 
             // We passed from OK to SYNC, increment the parent to keep it marked as
             // SYNC while we propagate ourselves and our own children.
-            ASSERT (!relative_path.ends_with ('/'));
+            //  ASSERT (!relative_path.ends_with ('/'));
             int last_slash_index = relative_path.last_index_of ('/');
             if (last_slash_index != -1)
                 inc_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), SharedFlag.UNKNOWN_SHARED);
@@ -333,7 +333,7 @@ class SyncFileStatusTracker : GLib.Object {
             /* emit */ file_status_changed (get_system_destination (relative_path), status);
 
             // We passed from SYNC to OK, decrement our parent.
-            ASSERT (!relative_path.ends_with ('/'));
+            //  ASSERT (!relative_path.ends_with ('/'));
             int last_slash_index = relative_path.last_index_of ('/');
             if (last_slash_index != -1)
                 dec_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), SharedFlag.UNKNOWN_SHARED);
@@ -346,7 +346,7 @@ class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private SyncFileStatus file_status (string relative_path) {
-        ASSERT (!relative_path.ends_with ('/'));
+        //  ASSERT (!relative_path.ends_with ('/'));
 
         if (relative_path.is_empty ()) {
             // This is the root sync folder, it doesn't have an entry in the database and won't be walked by csync, so resolve manually.
@@ -426,6 +426,7 @@ class SyncFileStatusTracker : GLib.Object {
             || status == SyncFileItem.Status.RESTORATION
             || status == SyncFileItem.Status.FILE_LOCKED;
     }
-}
+
+} // class SyncFileStatusTracker
 
 } // namespace Occ

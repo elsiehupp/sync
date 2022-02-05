@@ -181,7 +181,7 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
     /***********************************************************
     ***********************************************************/
     private void delete_nested_remote_item (string filename) {
-        GLib.Info (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Deleting nested encrypted remote item" << filename;
+        GLib.info (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Deleting nested encrypted remote item" << filename;
 
         var delete_job = new DeleteJob (this.propagator.account (), this.propagator.full_remote_path (filename), this);
         delete_job.set_folder_token (this.folder_token);

@@ -70,7 +70,7 @@ class PropagatorCompositeJob : PropagatorJob {
 
         // Ask all the running composite jobs if they have something new to schedule.
         for (var running_job : q_as_const (this.running_jobs)) {
-            ASSERT (running_job.state == Running);
+            //  ASSERT (running_job.state == Running);
 
             if (on_possibly_run_next_job (running_job)) {
                 return true;
@@ -188,7 +188,7 @@ class PropagatorCompositeJob : PropagatorJob {
     ***********************************************************/
     private void on_sub_job_finished (SyncFileItem.Status status) {
         var sub_job = static_cast<PropagatorJob> (sender ());
-        ASSERT (sub_job);
+        //  ASSERT (sub_job);
 
         // Delete the job and remove it from our list of jobs.
         sub_job.delete_later ();

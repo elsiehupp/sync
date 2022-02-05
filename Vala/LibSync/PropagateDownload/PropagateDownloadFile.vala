@@ -7,7 +7,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <common/checksums.h>
 //  #include <common/asserts.h>
 //  #include <common/constants.h>
-//  #include
 //  #include <QLoggingCategory>
 //  #include <QNetworkAc
 //  #include <QFile
@@ -260,7 +259,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
         this.resume_start = this.tmp_file.size ();
         if (this.resume_start > 0 && this.resume_start == this.item.size) {
-            GLib.Info (lc_propagate_download) << "File is already complete, no need to download";
+            GLib.info (lc_propagate_download) << "File is already complete, no need to download";
             on_download_finished ();
             return;
         }
@@ -317,7 +316,7 @@ class PropagateDownloadFile : PropagateItemJob {
                 this.tmp_file, headers, expected_etag_for_resume, this.resume_start, this);
         } else {
             // We were provided a direct URL, use that one
-            GLib.Info (lc_propagate_download) << "direct_download_url given for " << this.item.file << this.item.direct_download_url;
+            GLib.info (lc_propagate_download) << "direct_download_url given for " << this.item.file << this.item.direct_download_url;
 
             if (!this.item.direct_download_cookies.is_empty ()) {
                 headers["Cookie"] = this.item.direct_download_cookies.to_utf8 ();
@@ -343,7 +342,7 @@ class PropagateDownloadFile : PropagateItemJob {
         propagator ().active_job_list.remove_one (this);
 
         GETFileJob job = this.job;
-        ASSERT (job);
+        //  ASSERT (job);
 
         this.item.http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.request_id = job.request_id ();
@@ -512,8 +511,8 @@ class PropagateDownloadFile : PropagateItemJob {
             this, &PropagateDownloadFile.on_transmission_checksum_validated);
         connect (validator, &ValidateChecksumHeader.validation_failed,
             this, &PropagateDownloadFile.on_checksum_fail);
-        var checksum_header = find_best_checksum (job.reply ().raw_header (check_sum_header_c));
-        var content_md5Header = job.reply ().raw_header (content_md5Header_c);
+        var checksum_header = find_best_checksum (job.reply ().raw_header (CHECK_SUM_HEADER_C));
+        var content_md5Header = job.reply ().raw_header (CONTENT_MD5_HEADER_C);
         if (checksum_header.is_empty () && !content_md5Header.is_empty ())
             checksum_header = "MD5:" + content_md5Header;
         validator.on_start (this.tmp_file.filename (), checksum_header);
@@ -566,7 +565,7 @@ class PropagateDownloadFile : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void on_download_finished () {
-        ASSERT (!this.tmp_file.is_open ());
+        //  ASSERT (!this.tmp_file.is_open ());
         string fn = propagator ().full_local_path (this.item.file);
 
         // In case of file name clash, report an error
@@ -968,7 +967,7 @@ class PropagateDownloadFile : PropagateItemJob {
                 continue;
             }
 
-            GLib.Info (lc_propagate_download) << "Recalling" << local_recalled_file << "Checksum:" << record.checksum_header;
+            GLib.info (lc_propagate_download) << "Recalling" << local_recalled_file << "Checksum:" << record.checksum_header;
 
             string target_path = make_recall_filename (recalled_file);
 
@@ -993,7 +992,7 @@ class PropagateDownloadFile : PropagateItemJob {
 #else
         //  Q_UNUSED (filename);
         //  Q_UNUSED (fi);
-#endif
+//  #endif
     }
 
 } // class PropagateDownloadFile

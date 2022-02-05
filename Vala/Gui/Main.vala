@@ -5,7 +5,6 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 //  #include <QtGlobal>
-//  #include
 //  #include <cmath>
 //  #include <csignal>
 //  #include <qqml.h>
@@ -13,10 +12,10 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 #ifdef Q_OS_UNIX
 //  #include <sys/time.h>
 //  #include <sys/resource.h>
-#endif
+//  #endif
 
 #if defined (BUILD_UPDATER)
-#endif
+//  #endif
 
 //  #include <QTimer>
 //  #include <QMessageBox>
@@ -83,7 +82,7 @@ int main (int argc, char **argv) {
     if (std.fmod (app.device_pixel_ratio (), 1) == 0) {
         QQuick_window.set_text_render_type (QQuick_window.Native_text_rendering);
     }
-#endif
+//  #endif
 
     var surface_format = QSurface_format.default_format ();
     surface_format.set_option (QSurface_format.Reset_notification);
@@ -99,10 +98,10 @@ int main (int argc, char **argv) {
         if (setrlimit (RLIMIT_CORE, core_limit) < 0) {
             fprintf (stderr, "Unable to set core dump limit\n");
         } else {
-            GLib.Info (lc_application) << "Core dumps enabled";
+            GLib.info (lc_application) << "Core dumps enabled";
         }
     }
-#endif
+//  #endif
 
 #if defined (BUILD_UPDATER)
     // if handle_startup returns true, main ()
@@ -112,14 +111,14 @@ int main (int argc, char **argv) {
     if (updater && updater.handle_startup ()) {
         return 1;
     }
-#endif
+//  #endif
 
     // if the application is already running, notify it.
     if (app.is_running ()) {
-        GLib.Info (lc_application) << "Already running, exiting...";
+        GLib.info (lc_application) << "Already running, exiting...";
         if (app.is_session_restored ()) {
             // This call is mirrored with the one in Application.on_parse_message
-            GLib.Info (lc_application) << "Session was restored, don't notify app!";
+            GLib.info (lc_application) << "Session was restored, don't notify app!";
             return -1;
         }
 
@@ -141,7 +140,7 @@ int main (int argc, char **argv) {
             // If the systemtray is not there, we will wait one second for it to maybe on_start
             // (eg boot time) then we show the settings dialog if there is still no systemtray.
             // On XFCE however, we show a message box with explainaition how to install a systemtray.
-            GLib.Info (lc_application) << "System tray is not available, waiting...";
+            GLib.info (lc_application) << "System tray is not available, waiting...";
             Utility.sleep (1);
 
             var desktop_session = qgetenv ("XDG_CURRENT_DESKTOP").to_lower ();
@@ -165,11 +164,11 @@ int main (int argc, char **argv) {
                 app.on_try_tray_again ();
             } else if (!app.background_mode () && !AccountManager.instance ().accounts ().is_empty ()) {
                 if (desktop_session != "ubuntu") {
-                    GLib.Info (lc_application) << "System tray still not available, showing window and trying again later";
+                    GLib.info (lc_application) << "System tray still not available, showing window and trying again later";
                     app.show_main_dialog ();
                     QTimer.single_shot (10000, app, &Application.on_try_tray_again);
                 } else {
-                    GLib.Info (lc_application) << "System tray still not available, but assuming it's fine on 'ubuntu' desktop";
+                    GLib.info (lc_application) << "System tray still not available, but assuming it's fine on 'ubuntu' desktop";
                 }
             }
         }

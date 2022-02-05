@@ -40,7 +40,7 @@ Socket_api_job_v2.Socket_api_job_v2 (unowned<Socket_listener> socket_listener, G
     this.command (command)
     this.job_id (arguments[QStringLiteral ("identifier")].to_string ())
     this.arguments (arguments[QStringLiteral ("arguments")].to_object ()) {
-    ASSERT (!this.job_id.is_empty ())
+    //  ASSERT (!this.job_id.is_empty ())
 }
 
 void Socket_api_job_v2.on_success (QJsonObject response) {

@@ -106,7 +106,7 @@ class Job : GLib.Object {
         settings.set_parent (job); // make the job parent to make setting deleted properly
         job.set_settings (settings.release ());
     }
-#endif
+//  #endif
 
     /***********************************************************
     @return Whether this job autodeletes itself once on_finished () has been emitted. Default is true.

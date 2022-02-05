@@ -4,10 +4,8 @@ const int USERMODEL_H
 //  #include <QAbstractListModel>
 //  #include <QImage>
 //  #include <QQuick_image_provider>
-//  #include
 //  #include <chrono>
 //  #include <pushnotifications
-//  #include
 //  #include <QDesktopServ
 //  #include <QIcon>
 //  #include <QMessageB

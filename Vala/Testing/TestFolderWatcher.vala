@@ -66,7 +66,7 @@ class TestFolderWatcher : GLib.Object {
 const int CHECK_WATCH_COUNT (n) QCOMPARE (this.watcher.testLinuxWatchCount (), (n))
 #else
 const int CHECK_WATCH_COUNT (n) do {} while (false)
-#endif
+//  #endif
 
     /***********************************************************
     ***********************************************************/

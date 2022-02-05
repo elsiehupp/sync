@@ -7,16 +7,13 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QSettings>
 //  #include <QTimer>
 //  #include <qfontmetrics.h>
-//  #include
 //  #include <QJsonDocumen
 //  #include <QJsonObject
 //  #include <QJsonArray>
 //  #include <QNetworkR
 //  #include <QBuffer>
-//  #include
 //  #include <QElapsedTimer>
 //  #include <QPointer>
-//  #include
 //  #include <memory>
 
 
@@ -370,7 +367,7 @@ class AccountState : GLib.Object, public QSharedData {
 
     void AccountState.set_state (State state) {
         if (this.state != state) {
-            GLib.Info (lc_account_state) << "AccountState state change : "
+            GLib.info (lc_account_state) << "AccountState state change : "
                                    << state_string (this.state) << "." << state_string (state);
             State old_state = this.state;
             this.state = state;
@@ -547,20 +544,20 @@ class AccountState : GLib.Object, public QSharedData {
             && (this.connection_status == ConnectionValidator.ServiceUnavailable
                 || this.connection_status == ConnectionValidator.MaintenanceMode)) {
             if (!this.time_since_maintenance_over.is_valid ()) {
-                GLib.Info (lc_account_state) << "AccountState reconnection : delaying for"
+                GLib.info (lc_account_state) << "AccountState reconnection : delaying for"
                                        << this.maintenance_to_connected_delay << "ms";
                 this.time_since_maintenance_over.on_start ();
                 QTimer.single_shot (this.maintenance_to_connected_delay + 100, this, &AccountState.on_check_connectivity);
                 return;
             } else if (this.time_since_maintenance_over.elapsed () < this.maintenance_to_connected_delay) {
-                GLib.Info (lc_account_state) << "AccountState reconnection : only"
+                GLib.info (lc_account_state) << "AccountState reconnection : only"
                                        << this.time_since_maintenance_over.elapsed () << "ms have passed";
                 return;
             }
         }
 
         if (this.connection_status != status) {
-            GLib.Info (lc_account_state) << "AccountState connection status change : "
+            GLib.info (lc_account_state) << "AccountState connection status change : "
                                    << this.connection_status << "."
                                    << status;
             this.connection_status = status;
@@ -617,7 +614,7 @@ class AccountState : GLib.Object, public QSharedData {
         // make sure it changes account state and icons
         sign_out_by_ui ();
 
-        GLib.Info (lc_account_state) << "Invalid credentials for" << this.account.url ().to_string ()
+        GLib.info (lc_account_state) << "Invalid credentials for" << this.account.url ().to_string ()
                                << "checking for remote wipe request";
 
         this.waiting_for_new_credentials = false;
@@ -628,7 +625,7 @@ class AccountState : GLib.Object, public QSharedData {
         if (is_signed_out () || this.waiting_for_new_credentials)
             return;
 
-        GLib.Info (lc_account_state) << "Invalid credentials for" << this.account.url ().to_string ()
+        GLib.info (lc_account_state) << "Invalid credentials for" << this.account.url ().to_string ()
                                << "asking user";
 
         this.waiting_for_new_credentials = true;
@@ -648,14 +645,14 @@ class AccountState : GLib.Object, public QSharedData {
         // Make a connection attempt, no matter whether the credentials are
         // ready or not - we want to check whether we can get an SSL connection
         // going before bothering the user for a password.
-        GLib.Info (lc_account_state) << "Fetched credentials for" << this.account.url ().to_string ()
+        GLib.info (lc_account_state) << "Fetched credentials for" << this.account.url ().to_string ()
                                << "attempting to connect";
         this.waiting_for_new_credentials = false;
         on_check_connectivity ();
     }
 
     void AccountState.on_credentials_asked (AbstractCredentials credentials) {
-        GLib.Info (lc_account_state) << "Credentials asked for" << this.account.url ().to_string ()
+        GLib.info (lc_account_state) << "Credentials asked for" << this.account.url ().to_string ()
                                << "are they ready?" << credentials.ready ();
 
         this.waiting_for_new_credentials = false;

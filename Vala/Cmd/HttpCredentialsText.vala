@@ -8,7 +8,7 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 
 using namespace Occ;
 
-#ifndef TOKEN_AUTH_ONLY
+//  #ifndef TOKEN_AUTH_ONLY
 class HttpCredentialsText : HttpCredentials {
 
     /***********************************************************
@@ -48,4 +48,4 @@ class HttpCredentialsText : HttpCredentials {
     ***********************************************************/
     private bool this.ssl_trusted;
 }
-#endif /* TOKEN_AUTH_ONLY */
+//  #endif /* TOKEN_AUTH_ONLY */

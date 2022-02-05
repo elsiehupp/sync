@@ -29,7 +29,7 @@ class Folder_status_view : QTreeView {
 
     QModelIndex Folder_status_view.index_at (QPoint point) {
         QModelIndex index = QTreeView.index_at (point);
-        if (index.data (FolderStatusDelegate.AddButton).to_bool () && !visual_rect (index).contains (point)) {
+        if (index.data (DataRole.ADD_BUTTON).to_bool () && !visual_rect (index).contains (point)) {
             return {};
         }
         return index;
@@ -37,7 +37,7 @@ class Folder_status_view : QTreeView {
 
     QRect Folder_status_view.visual_rect (QModelIndex index) {
         QRect rect = QTreeView.visual_rect (index);
-        if (index.data (FolderStatusDelegate.AddButton).to_bool ()) {
+        if (index.data (DataRole.ADD_BUTTON).to_bool ()) {
             return FolderStatusDelegate.add_button_rect (rect, layout_direction ());
         }
         return rect;

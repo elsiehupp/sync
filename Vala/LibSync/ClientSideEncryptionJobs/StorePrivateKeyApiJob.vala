@@ -72,7 +72,7 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.set_query (query);
 
-        GLib.Info (lc_store_private_key_api_job) << "Sending the private key" << this.priv_key.data ();
+        GLib.info (lc_store_private_key_api_job) << "Sending the private key" << this.priv_key.data ();
         send_request ("POST", url, req, this.priv_key);
         AbstractNetworkJob.on_start ();
     }
@@ -80,7 +80,7 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
     bool StorePrivateKeyApiJob.on_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200)
-            GLib.Info (lc_store_private_key_api_job ()) << "Sending private key ended with"  << path () << error_string () << return_code;
+            GLib.info (lc_store_private_key_api_job ()) << "Sending private key ended with"  << path () << error_string () << return_code;
 
         QJsonParseError error;
         var json = QJsonDocument.from_json (reply ().read_all (), error);

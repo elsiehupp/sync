@@ -78,7 +78,7 @@ class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void set_bandwidth_manager (BandwidthManager bwm);
+    public void set_bandwidth_manager (BandwidthManager bandwidth_manager);
 
     /***********************************************************
     ***********************************************************/
@@ -274,7 +274,7 @@ void GETFileJob.on_meta_data_changed () {
         // request. new_reply_hook () will reestablish signal connections for the follow-up request.
         bool ok = disconnect (reply (), &Soup.Reply.on_finished, this, &GETFileJob.on_ready_read)
             && disconnect (reply (), &Soup.Reply.ready_read, this, &GETFileJob.on_ready_read);
-        ASSERT (ok);
+        //  ASSERT (ok);
         return;
     }
 
@@ -292,7 +292,7 @@ void GETFileJob.on_meta_data_changed () {
     this.etag = get_etag_from_reply (reply ());
 
     if (!this.direct_download_url.is_empty () && !this.etag.is_empty ()) {
-        GLib.Info (lc_get_job) << "Direct download used, ignoring server ETag" << this.etag;
+        GLib.info (lc_get_job) << "Direct download used, ignoring server ETag" << this.etag;
         this.etag = GLib.ByteArray (); // reset received ETag
     } else if (!this.direct_download_url.is_empty ()) {
         // All fine, ETag empty and direct_download_url used
@@ -359,8 +359,8 @@ void GETFileJob.on_meta_data_changed () {
     this.save_body_to_file = true;
 }
 
-void GETFileJob.set_bandwidth_manager (BandwidthManager bwm) {
-    this.bandwidth_manager = bwm;
+void GETFileJob.set_bandwidth_manager (BandwidthManager bandwidth_manager) {
+    this.bandwidth_manager = bandwidth_manager;
 }
 
 void GETFileJob.set_choked (bool c) {
@@ -380,8 +380,8 @@ void GETFileJob.give_bandwidth_quota (int64 q) {
 }
 
 int64 GETFileJob.current_download_position () {
-    if (this.device && this.device.pos () > 0 && this.device.pos () > int64 (this.resume_start)) {
-        return this.device.pos ();
+    if (this.device && this.device.position () > 0 && this.device.position () > int64 (this.resume_start)) {
+        return this.device.position ();
     }
     return this.resume_start;
 }
@@ -436,7 +436,7 @@ void GETFileJob.on_ready_read () {
             this.bandwidth_manager.on_unregister_download_job (this);
         }
         if (!this.has_emitted_finished_signal) {
-            GLib.Info (lc_get_job) << "GET of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
+            GLib.info (lc_get_job) << "GET of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
                              << reply_status_string ()
                              << reply ().raw_header ("Content-Range") << reply ().raw_header ("Content-Length");
 

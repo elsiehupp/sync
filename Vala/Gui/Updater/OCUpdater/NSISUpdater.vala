@@ -84,7 +84,7 @@ class NSISUpdater : OCUpdater {
 
         GLib.File.copy (this.file.filename (), this.target_file);
         set_download_state (Download_complete);
-        GLib.Info (lc_updater) << "Downloaded" << url.to_string () << "to" << this.target_file;
+        GLib.info (lc_updater) << "Downloaded" << url.to_string () << "to" << this.target_file;
         settings.set_value (update_target_version_c, update_info ().version ());
         settings.set_value (update_target_version_string_c, update_info ().version_"");
         settings.set_value (update_available_c, this.target_file);
@@ -97,7 +97,7 @@ class NSISUpdater : OCUpdater {
         var seen_string = settings.value (seen_version_c).to_string ();
         int64 seen_version = Helper.string_version_to_int (seen_string);
         int64 curr_version = Helper.current_version_to_int ();
-        GLib.Info (lc_updater) << "Version info arrived:"
+        GLib.info (lc_updater) << "Version info arrived:"
                 << "Your version:" << curr_version
                 << "Skipped version:" << seen_version << seen_string
                 << "Available version:" << info_version << info.version ()
@@ -105,11 +105,11 @@ class NSISUpdater : OCUpdater {
                 << "Web url:" << info.web ()
                 << "Download url:" << info.download_url ();
         if (info.version ().is_empty ()) {
-            GLib.Info (lc_updater) << "No version information available at the moment";
+            GLib.info (lc_updater) << "No version information available at the moment";
             set_download_state (Up_to_date);
         } else if (info_version <= curr_version
                    || info_version <= seen_version) {
-            GLib.Info (lc_updater) << "Client is on latest version!";
+            GLib.info (lc_updater) << "Client is on latest version!";
             set_download_state (Up_to_date);
         } else {
             string url = info.download_url ();
@@ -250,24 +250,24 @@ class NSISUpdater : OCUpdater {
         string update_filename = settings.value (update_available_c).to_string ();
         // has the previous run downloaded an update?
         if (!update_filename.is_empty () && GLib.File (update_filename).exists ()) {
-            GLib.Info (lc_updater) << "An updater file is available";
+            GLib.info (lc_updater) << "An updater file is available";
             // did it try to execute the update?
             if (settings.value (auto_update_attempted_c, false).to_bool ()) {
                 if (update_succeeded ()) {
                     // on_success : clean up
-                    GLib.Info (lc_updater) << "The requested update attempt has succeeded"
+                    GLib.info (lc_updater) << "The requested update attempt has succeeded"
                             << Helper.current_version_to_int ();
                     wipe_update_data ();
                     return false;
                 } else {
                     // var update failed. Ask user what to do
-                    GLib.Info (lc_updater) << "The requested update attempt has failed"
+                    GLib.info (lc_updater) << "The requested update attempt has failed"
                             << settings.value (update_target_version_c).to_string ();
                     show_update_error_dialog (settings.value (update_target_version_string_c).to_string ());
                     return false;
                 }
             } else {
-                GLib.Info (lc_updater) << "Triggering an update";
+                GLib.info (lc_updater) << "Triggering an update";
                 return perform_update ();
             }
         }

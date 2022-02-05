@@ -12,27 +12,26 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <qsavefile.h>
 //  #include <qstack.h>
 //  #include <QCoreApplication>
-//  #include
 //  #include <ctime>
 
 //  #pragma once
 
-
 namespace Occ {
 
-/***********************************************************
-Tags for checksum header.
-It's here for being shared between Upload- and Download Job
-***********************************************************/
-static const char check_sum_header_c[] = "OC-Checksum";
-static const char content_md5Header_c[] = "Content-MD5";
+static class PropagatorJobs {
 
+    /***********************************************************
+    Tags for checksum header.
+    It's here for being shared between Upload- and Download Job
+    ***********************************************************/
+    const string CHECK_SUM_HEADER_C = "OC-Checksum";
+    const string CONTENT_MD5_HEADER_C = "Content-MD5";
 
-
-
-    GLib.ByteArray local_file_id_from_full_id (GLib.ByteArray identifier) {
+    public GLib.ByteArray local_file_id_from_full_id (GLib.ByteArray identifier) {
         return identifier.left (8);
     }
 
+} // class PropagatorJobs
 
+} //namespace Occ
     

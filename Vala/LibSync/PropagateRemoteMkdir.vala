@@ -169,7 +169,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
     private void on_mkcol_job_finished () {
         propagator ().active_job_list.remove_one (this);
 
-        ASSERT (this.job);
+        //  ASSERT (this.job);
 
         Soup.Reply.NetworkError err = this.job.reply ().error ();
         this.item.http_error_code = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

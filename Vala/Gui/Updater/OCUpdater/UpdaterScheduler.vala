@@ -55,12 +55,12 @@ void UpdaterScheduler.on_timer_fired () {
     var check_interval = std.chrono.milliseconds (config.update_check_interval ()).count ();
     if (check_interval != this.update_check_timer.interval ()) {
         this.update_check_timer.set_interval (check_interval);
-        GLib.Info (lc_updater) << "Setting new update check interval " << check_interval;
+        GLib.info (lc_updater) << "Setting new update check interval " << check_interval;
     }
 
     // consider the skip_update_check and !auto_update_check flags in the config.
     if (config.skip_update_check () || !config.auto_update_check ()) {
-        GLib.Info (lc_updater) << "Skipping update check because of config file";
+        GLib.info (lc_updater) << "Skipping update check because of config file";
         return;
     }
 

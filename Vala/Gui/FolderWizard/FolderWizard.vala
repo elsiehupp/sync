@@ -17,9 +17,7 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 //  #include <QEvent>
 //  #include <QCheckBox>
 //  #include <QMessageBox>
-//  #include
 //  #include <cstdlib>
-//  #include
 //  #include <QWizard>
 //  #include <QTimer>
 

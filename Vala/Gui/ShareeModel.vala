@@ -134,8 +134,8 @@ signals:
     }
 
     // Helper function for set_new_sharees   (could be a lambda when we can use them)
-    static unowned<Sharee> sharee_from_model_index (QModelIndex idx) {
-        return idx.data (Qt.User_role).value<unowned<Sharee>> ();
+    static unowned<Sharee> sharee_from_model_index (QModelIndex index) {
+        return index.data (Qt.User_role).value<unowned<Sharee>> ();
     }
 
     struct Find_sharee_helper {
@@ -191,7 +191,7 @@ signals:
         if (role == Qt.Display_role) {
             return sharee.format ();
 
-        } else if (role == Qt.Edit_role) {
+        } else if (role == Qt.EditRole) {
             // This role is used by the completer - it should match
             // the full name and the user name and thus we include both
             // in the output here. But we need to take care this string

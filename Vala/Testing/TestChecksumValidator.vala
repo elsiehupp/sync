@@ -107,7 +107,7 @@ using namespace Occ.Utility;
     }
 
     void testUploadChecksummingAdler () {
-#ifndef ZLIB_FOUND
+//  #ifndef ZLIB_FOUND
         QSKIP ("ZLIB not found.", SkipSingle);
 #else
         var vali = new ComputeChecksum (this);
@@ -127,7 +127,7 @@ using namespace Occ.Utility;
         loop.exec ();
 
         delete vali;
-#endif
+//  #endif
     }
 
     void testUploadChecksummingMd5 () {
@@ -170,7 +170,7 @@ using namespace Occ.Utility;
     }
 
     void testDownloadChecksummingAdler () {
-#ifndef ZLIB_FOUND
+//  #ifndef ZLIB_FOUND
         QSKIP ("ZLIB not found.", SkipSingle);
 #else
         var vali = new ValidateChecksumHeader (this);
@@ -204,7 +204,7 @@ using namespace Occ.Utility;
         QTRY_VERIFY (this.errorSeen);
 
         delete vali;
-#endif
+//  #endif
     }
 
     void on_cleanup_test_case () {

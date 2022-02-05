@@ -75,7 +75,7 @@ void FolderDefinition.save (QSettings settings, FolderDefinition folder) {
     settings.set_value (QLatin1String ("paused"), folder.paused);
     settings.set_value (QLatin1String ("ignore_hidden_files"), folder.ignore_hidden_files);
 
-    settings.set_value (QStringLiteral ("virtual_files_mode"), Vfs.mode_to_string (folder.virtual_files_mode));
+    settings.set_value (QStringLiteral ("virtual_files_mode"), Vfs.Mode.to_string (folder.virtual_files_mode));
 
     // Ensure new vfs modes won't be attempted by older clients
     if (folder.virtual_files_mode == Vfs.WindowsCfApi) {
@@ -104,7 +104,7 @@ bool FolderDefinition.on_load (QSettings settings, string alias,
     folder.virtual_files_mode = Vfs.Off;
     string vfs_mode_string = settings.value (QStringLiteral ("virtual_files_mode")).to_string ();
     if (!vfs_mode_string.is_empty ()) {
-        if (var mode = Vfs.mode_from_string (vfs_mode_string)) {
+        if (var mode = Vfs.Mode.from_string (vfs_mode_string)) {
             folder.virtual_files_mode = *mode;
         } else {
             GLib.warn (lc_folder) << "Unknown virtual_files_mode:" << vfs_mode_string << "assuming 'off'";

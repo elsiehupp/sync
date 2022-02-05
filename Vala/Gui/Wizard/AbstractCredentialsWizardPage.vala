@@ -6,7 +6,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 //  #include <accountmanager.h>
-//  #include
 //  #include <QWizard_page>
 
 namespace Occ {

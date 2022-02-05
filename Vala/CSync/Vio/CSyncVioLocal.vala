@@ -71,9 +71,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 //  #include <fcntl.h>
 //  #include <dirent.h>
 //  #include <cstdio>
-//  #include
 //  #include <memory>
-//  #include
 //  #include <QtCore/QLoggingCategory>
 //  #include <QtCore/GLib.File>
 
@@ -148,7 +146,7 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t ha
     default:
       break;
   }
-#endif
+//  #endif
 
   if (file_stat.path.is_null ())
       return file_stat;
@@ -200,7 +198,7 @@ static int this.csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf) {
   if (sb.st_flags & UF_HIDDEN) {
       buf.is_hidden = true;
   }
-#endif
+//  #endif
 
   buf.inode = sb.st_ino;
   buf.modtime = sb.st_mtime;

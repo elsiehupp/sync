@@ -5,7 +5,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 //  #include <cmath>
-//  #include
 //  #include <QDesktopServices>
 //  #include <QDial
 //  #include <QDir>
@@ -18,7 +17,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QIcon>
 //  #include <QJsonDocum
 //  #include <QToolTip>
-//  #include
 //  #include <Gtk.Widget>
 //  #include <QPointer>
 //  #include <QTimer>
@@ -117,7 +115,7 @@ protected slots:
     void on_toggle_sign_in_state ();
     void refresh_selective_sync_status ();
     void on_mark_subfolder_encrypted (FolderStatusModel.SubFolderInfo folder_info);
-    void on_subfolder_context_menu_requested (QModelIndex& idx, QPoint& point);
+    void on_subfolder_context_menu_requested (QModelIndex& index, QPoint& point);
     void on_custom_context_menu_requested (QPoint &);
     void on_folder_list_clicked (QModelIndex indx);
     void do_expand ();
@@ -169,7 +167,7 @@ protected slots:
 
     /***********************************************************
     ***********************************************************/
-    static const char progress_bar_style_c[] =
+    const string progress_bar_style_c[] =
         "QProgressBar {"
         "border : 1px solid grey;"
         "border-radius : 5px;"
@@ -220,11 +218,11 @@ protected slots:
         protected bool event_filter (GLib.Object watched, QEvent event) override {
             if (event.type () == QEvent.HoverMove) {
                 Qt.CursorShape shape = Qt.ArrowCursor;
-                var pos = folder_list.map_from_global (QCursor.pos ());
-                var index = folder_list.index_at (pos);
-                if (model.classify (index) == FolderStatusModel.RootFolder
-                    && (FolderStatusDelegate.errors_list_rect (folder_list.visual_rect (index)).contains (pos)
-                        || FolderStatusDelegate.options_button_rect (folder_list.visual_rect (index),folder_list.layout_direction ()).contains (pos))) {
+                var position = folder_list.map_from_global (QCursor.position ());
+                var index = folder_list.index_at (position);
+                if (model.classify (index) == FolderStatusModel.ItemType.ROOT_FOLDER
+                    && (FolderStatusDelegate.errors_list_rect (folder_list.visual_rect (index)).contains (position)
+                        || FolderStatusDelegate.options_button_rect (folder_list.visual_rect (index),folder_list.layout_direction ()).contains (position))) {
                     shape = Qt.PointingHandCursor;
                 }
                 folder_list.set_cursor (shape);
@@ -348,7 +346,7 @@ protected slots:
     }
 
     void AccountSettings.on_encrypt_folder_finished (int status) {
-        GLib.Info (lc_account_settings) << "Current folder encryption status code:" << status;
+        GLib.info (lc_account_settings) << "Current folder encryption status code:" << status;
         var job = qobject_cast<EncryptFolderJob> (sender ());
         //  Q_ASSERT (job);
         if (!job.error_string ().is_empty ()) {
@@ -369,7 +367,7 @@ protected slots:
         QModelIndex selected = this.ui.folder_list.selection_model ().current_index ();
         if (!selected.is_valid ())
             return "";
-        return this.model.data (selected, FolderStatusDelegate.FolderAliasRole).to_string ();
+        return this.model.data (selected, DataRole.FOLDER_ALIAS_ROLE).to_string ();
     }
 
     void AccountSettings.on_toggle_sign_in_state () {
@@ -384,9 +382,9 @@ protected slots:
     void AccountSettings.do_expand () {
         // Make sure at least the root items are expanded
         for (int i = 0; i < this.model.row_count (); ++i) {
-            var idx = this.model.index (i);
-            if (!this.ui.folder_list.is_expanded (idx))
-                this.ui.folder_list.set_expanded (idx, true);
+            var index = this.model.index (i);
+            if (!this.ui.folder_list.is_expanded (index))
+                this.ui.folder_list.set_expanded (index, true);
         }
     }
 
@@ -471,19 +469,19 @@ protected slots:
 
         const var classification = this.model.classify (selected);
 
-        if (classification != FolderStatusModel.SubFolder && classification != FolderStatusModel.RootFolder) {
+        if (classification != FolderStatusModel.ItemType.SUBFOLDER && classification != FolderStatusModel.ItemType.ROOT_FOLDER) {
             return;
         }
 
         const string filename = [this, selected, classification] {
             string result;
-            if (classification == FolderStatusModel.RootFolder) {
-                const var alias = this.model.data (selected, FolderStatusDelegate.FolderAliasRole).to_string ();
+            if (classification == FolderStatusModel.ItemType.ROOT_FOLDER) {
+                const var alias = this.model.data (selected, DataRole.FOLDER_ALIAS_ROLE).to_string ();
                 if (var folder = FolderMan.instance ().folder (alias)) {
                     result = folder.path ();
                 }
             } else {
-                result = this.model.data (selected, FolderStatusDelegate.FolderPathRole).to_string ();
+                result = this.model.data (selected, DataRole.FOLDER_PATH_ROLE).to_string ();
             }
 
             if (result.ends_with ('/')) {
@@ -502,9 +500,9 @@ protected slots:
 
     void AccountSettings.on_edit_current_local_ignored_files () {
         QModelIndex selected = this.ui.folder_list.selection_model ().current_index ();
-        if (!selected.is_valid () || this.model.classify (selected) != FolderStatusModel.SubFolder)
+        if (!selected.is_valid () || this.model.classify (selected) != FolderStatusModel.ItemType.SUBFOLDER)
             return;
-        string filename = this.model.data (selected, FolderStatusDelegate.FolderPathRole).to_string ();
+        string filename = this.model.data (selected, DataRole.FOLDER_PATH_ROLE).to_string ();
         open_ignored_files_dialog (filename);
     }
 
@@ -534,14 +532,14 @@ protected slots:
         dialog.open ();
     }
 
-    void AccountSettings.on_subfolder_context_menu_requested (QModelIndex& index, QPoint& pos) {
-        //  Q_UNUSED (pos);
+    void AccountSettings.on_subfolder_context_menu_requested (QModelIndex& index, QPoint& position) {
+        //  Q_UNUSED (position);
 
         QMenu menu;
         var ac = menu.add_action (_("Open folder"));
         connect (ac, &QAction.triggered, this, &AccountSettings.on_open_current_local_sub_folder);
 
-        var filename = this.model.data (index, FolderStatusDelegate.FolderPathRole).to_string ();
+        var filename = this.model.data (index, DataRole.FOLDER_PATH_ROLE).to_string ();
         if (!GLib.File.exists (filename)) {
             ac.set_enabled (false);
         }
@@ -601,29 +599,29 @@ protected slots:
             });
         }
 
-        menu.exec (QCursor.pos ());
+        menu.exec (QCursor.position ());
     }
 
-    void AccountSettings.on_custom_context_menu_requested (QPoint pos) {
+    void AccountSettings.on_custom_context_menu_requested (QPoint position) {
         QTreeView tv = this.ui.folder_list;
-        QModelIndex index = tv.index_at (pos);
+        QModelIndex index = tv.index_at (position);
         if (!index.is_valid ()) {
             return;
         }
 
-        if (this.model.classify (index) == FolderStatusModel.SubFolder) {
-            on_subfolder_context_menu_requested (index, pos);
+        if (this.model.classify (index) == FolderStatusModel.ItemType.SUBFOLDER) {
+            on_subfolder_context_menu_requested (index, position);
             return;
         }
 
-        if (this.model.classify (index) != FolderStatusModel.RootFolder) {
+        if (this.model.classify (index) != FolderStatusModel.ItemType.ROOT_FOLDER) {
             return;
         }
 
         tv.set_current_index (index);
-        string alias = this.model.data (index, FolderStatusDelegate.FolderAliasRole).to_string ();
-        bool folder_paused = this.model.data (index, FolderStatusDelegate.FolderSyncPaused).to_bool ();
-        bool folder_connected = this.model.data (index, FolderStatusDelegate.FolderAccountConnected).to_bool ();
+        string alias = this.model.data (index, DataRole.FOLDER_ALIAS_ROLE).to_string ();
+        bool folder_paused = this.model.data (index, DataRole.FOLDER_SYNC_PAUSED).to_bool ();
+        bool folder_connected = this.model.data (index, DataRole.FOLDER_ACCOUNT_CONNECTED).to_bool ();
         var folder_man = FolderMan.instance ();
         QPointer<Folder> folder = folder_man.folder (alias);
         if (!folder)
@@ -695,41 +693,41 @@ protected slots:
             }
         }
 
-        menu.popup (tv.map_to_global (pos));
+        menu.popup (tv.map_to_global (position));
     }
 
     void AccountSettings.on_folder_list_clicked (QModelIndex indx) {
-        if (indx.data (FolderStatusDelegate.AddButton).to_bool ()) {
+        if (indx.data (DataRole.ADD_BUTTON).to_bool ()) {
             // "Add Folder Sync Connection"
             QTreeView tv = this.ui.folder_list;
-            var pos = tv.map_from_global (QCursor.pos ());
+            var position = tv.map_from_global (QCursor.position ());
             QStyleOptionViewItem opt;
             opt.init_from (tv);
             var btn_rect = tv.visual_rect (indx);
             var btn_size = tv.item_delegate (indx).size_hint (opt, indx);
             var actual = QStyle.visual_rect (opt.direction, btn_rect, QRect (btn_rect.top_left (), btn_size));
-            if (!actual.contains (pos))
+            if (!actual.contains (position))
                 return;
 
             if (indx.flags () & Qt.ItemIsEnabled) {
                 on_add_folder ();
             } else {
                 QToolTip.show_text (
-                    QCursor.pos (),
+                    QCursor.position (),
                     this.model.data (indx, Qt.ToolTipRole).to_string (),
                     this);
             }
             return;
         }
-        if (this.model.classify (indx) == FolderStatusModel.RootFolder) {
+        if (this.model.classify (indx) == FolderStatusModel.ItemType.ROOT_FOLDER) {
             // tries to find if we clicked on the '...' button.
             QTreeView tv = this.ui.folder_list;
-            var pos = tv.map_from_global (QCursor.pos ());
-            if (FolderStatusDelegate.options_button_rect (tv.visual_rect (indx), layout_direction ()).contains (pos)) {
-                on_custom_context_menu_requested (pos);
+            var position = tv.map_from_global (QCursor.position ());
+            if (FolderStatusDelegate.options_button_rect (tv.visual_rect (indx), layout_direction ()).contains (position)) {
+                on_custom_context_menu_requested (position);
                 return;
             }
-            if (FolderStatusDelegate.errors_list_rect (tv.visual_rect (indx)).contains (pos)) {
+            if (FolderStatusDelegate.errors_list_rect (tv.visual_rect (indx)).contains (position)) {
                 /* emit */ show_issues_list (this.account_state);
                 return;
             }
@@ -758,7 +756,7 @@ protected slots:
         var folder_wizard = qobject_cast<FolderWizard> (sender ());
         FolderMan folder_man = FolderMan.instance ();
 
-        GLib.Info (lc_account_settings) << "Folder wizard completed";
+        GLib.info (lc_account_settings) << "Folder wizard completed";
 
         FolderDefinition definition;
         definition.local_path = FolderDefinition.prepare_local_path (
@@ -772,7 +770,7 @@ protected slots:
      {
             QDir dir (definition.local_path);
             if (!dir.exists ()) {
-                GLib.Info (lc_account_settings) << "Creating folder" << definition.local_path;
+                GLib.info (lc_account_settings) << "Creating folder" << definition.local_path;
                 if (!dir.mkpath (".")) {
                     QMessageBox.warning (this, _("Folder creation failed"),
                         _("<p>Could not create local folder <i>%1</i>.</p>")
@@ -814,7 +812,7 @@ protected slots:
     }
 
     void AccountSettings.on_folder_wizard_rejected () {
-        GLib.Info (lc_account_settings) << "Folder wizard cancelled";
+        GLib.info (lc_account_settings) << "Folder wizard cancelled";
         FolderMan folder_man = FolderMan.instance ();
         folder_man.set_sync_enabled (true);
     }
@@ -825,7 +823,7 @@ protected slots:
         if (selected.is_valid () && folder) {
             int row = selected.row ();
 
-            GLib.Info (lc_account_settings) << "Remove Folder alias " << folder.alias ();
+            GLib.info (lc_account_settings) << "Remove Folder alias " << folder.alias ();
             string short_gui_local_path = folder.short_gui_local_path ();
 
             var message_box = new QMessageBox (QMessageBox.Question,
@@ -862,9 +860,9 @@ protected slots:
 
     void AccountSettings.on_open_current_local_sub_folder () {
         QModelIndex selected = this.ui.folder_list.selection_model ().current_index ();
-        if (!selected.is_valid () || this.model.classify (selected) != FolderStatusModel.SubFolder)
+        if (!selected.is_valid () || this.model.classify (selected) != FolderStatusModel.ItemType.SUBFOLDER)
             return;
-        string filename = this.model.data (selected, FolderStatusDelegate.FolderPathRole).to_string ();
+        string filename = this.model.data (selected, DataRole.FOLDER_PATH_ROLE).to_string ();
         GLib.Uri url = GLib.Uri.from_local_file (filename);
         QDesktopServices.open_url (url);
     }
@@ -889,7 +887,7 @@ protected slots:
                 if (*connection)
                     GLib.Object.disconnect (*connection);
 
-                GLib.Info (lc_account_settings) << "Enabling vfs support for folder" << folder.path ();
+                GLib.info (lc_account_settings) << "Enabling vfs support for folder" << folder.path ();
 
                 // Wipe selective sync blocklist
                 bool ok = false;
@@ -961,7 +959,7 @@ protected slots:
                 if (*connection)
                     GLib.Object.disconnect (*connection);
 
-                GLib.Info (lc_account_settings) << "Disabling vfs support for folder" << folder.path ();
+                GLib.info (lc_account_settings) << "Disabling vfs support for folder" << folder.path ();
 
                 // Also wipes virtual files, schedules remote discovery
                 folder.set_virtual_files_enabled (false);
@@ -992,7 +990,7 @@ protected slots:
     }
 
     void AccountSettings.on_set_current_folder_availability (PinState state) {
-        ASSERT (state == PinState.VfsItemAvailability.ONLINE_ONLY || state == PinState.PinState.ALWAYS_LOCAL);
+        //  ASSERT (state == PinState.VfsItemAvailability.ONLINE_ONLY || state == PinState.PinState.ALWAYS_LOCAL);
 
         FolderMan folder_man = FolderMan.instance ();
         QPointer<Folder> folder = folder_man.folder (selected_folder_alias ());
@@ -1047,7 +1045,7 @@ protected slots:
         if (!alias.is_empty ()) {
             FolderMan folder_man = FolderMan.instance ();
 
-            GLib.Info (lc_account_settings) << "Application : enable folder with alias " << alias;
+            GLib.info (lc_account_settings) << "Application : enable folder with alias " << alias;
             bool currently_paused = false;
 
             // this sets the folder status to disabled but does not interrupt it.
@@ -1259,7 +1257,7 @@ protected slots:
             Verify if the user has a private key already uploaded to the server,
             if it has, do not offer to create one.
              */
-            GLib.Info (lc_account_settings) << "Account" << on_accounts_state ().account ().display_name ()
+            GLib.info (lc_account_settings) << "Account" << on_accounts_state ().account ().display_name ()
                 << "Client Side Encryption" << on_accounts_state ().account ().capabilities ().client_side_encryption_available ();
 
             if (this.account_state.account ().capabilities ().client_side_encryption_available ()) {

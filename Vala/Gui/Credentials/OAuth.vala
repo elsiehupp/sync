@@ -5,7 +5,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 ***********************************************************/
 
 //  #include <QDesktopServices>
-//  #include
 //  #include <QTimer>
 //  #include <QBuffer>
 //  #include <QJsonObject>
@@ -90,8 +89,8 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    static void http_reply_and_close (QTcpSocket socket, char code, char html,
-        const char more_headers = null) {
+    static void http_reply_and_close (QTcpSocket socket, string code, string html,
+        string more_headers = null) {
         if (!socket)
             return; // socket can have been deleted if the browser was closed
         socket.write ("HTTP/1.1 ");
@@ -204,7 +203,7 @@ signals:
                             // We are still listening on the socket so we will get the new connection
                             return;
                         }
-                        const char login_successfull_html = "<h1>Login Successful</h1><p>You can close this window.</p>";
+                        const string login_successfull_html = "<h1>Login Successful</h1><p>You can close this window.</p>";
                         if (message_url.is_valid ()) {
                             http_reply_and_close (socket, "303 See Other", login_successfull_html,
                                 GLib.ByteArray ("Location : " + message_url.to_encoded ()).const_data ());

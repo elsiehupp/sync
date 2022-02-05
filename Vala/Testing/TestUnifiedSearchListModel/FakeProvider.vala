@@ -23,7 +23,7 @@ class FakeProvider {
 }
 
 // this will be used when initializing fake search results data for each provider
-static const GLib.Vector<FakeProvider> fakeProvidersInitInfo = { {QStringLiteral ("settings_apps"), QStringLiteral ("Apps"), -50, 10}, {QStringLiteral ("talk-message"), QStringLiteral ("Messages"), -2, 17}, {QStringLiteral ("files"), QStringLiteral ("Files"), 5, 3}, {QStringLiteral ("deck"), QStringLiteral ("Deck"), 10, 5}, {QStringLiteral ("comments"), QStringLiteral ("Comments"), 10, 2}, {QStringLiteral ("mail"), QStringLiteral ("Mails"), 10, 15}, {QStringLiteral ("calendar"), QStringLiteral ("Events"), 30, 11}
+const GLib.Vector<FakeProvider> fakeProvidersInitInfo = { {QStringLiteral ("settings_apps"), QStringLiteral ("Apps"), -50, 10}, {QStringLiteral ("talk-message"), QStringLiteral ("Messages"), -2, 17}, {QStringLiteral ("files"), QStringLiteral ("Files"), 5, 3}, {QStringLiteral ("deck"), QStringLiteral ("Deck"), 10, 5}, {QStringLiteral ("comments"), QStringLiteral ("Comments"), 10, 2}, {QStringLiteral ("mail"), QStringLiteral ("Mails"), 10, 15}, {QStringLiteral ("calendar"), QStringLiteral ("Events"), 30, 11}
 }
 
 static GLib.ByteArray fake404Response = R" ( {"ocs":{"meta":{"status":"failure","statuscode":404,"message":"Invalid query, please check the syntax. API specifications are here : http:\/\/www.freedesktop.org\/wiki\/Specifications\/open-collaboration-services.\n"},"data":[]}}

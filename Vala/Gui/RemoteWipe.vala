@@ -8,7 +8,6 @@ Copyright (C) by Camila Ayres <hello@camila.codes>
 //  #include <QJsonObject>
 //  #include <QNetworkRequest>
 //  #include <QBuffer>
-//  #include
 //  #include <QNetworkAccessManager>
 
 

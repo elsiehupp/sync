@@ -7,30 +7,15 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QLoggingCategory>
 //  #include <QFileInfo>
 //  #include <QDir>
-
-using Sqlite3;
-
-
 //  #include <QLoggingCategory>
 
 using Sqlite3;
-struct Sqlite3Stmt;
+//  struct Sqlite3Stmt;
 
 namespace Occ {
 
-OCSYNC_EXPORT Q_DECLARE_LOGGING_CATEGORY (lc_sql)
+//  OCSYNC_EXPORT Q_DECLARE_LOGGING_CATEGORY (lc_sql)
 
-const int SQLITE_SLEEP_TIME_USEC = 100000
-const int SQLITE_REPEAT_COUNT = 20
-
-const int SQLITE_DO (A) {
-    if (1) {
-        this.err_id = (A);
-        if (this.err_id != SQLITE_OK && this.err_id != SQLITE_DONE && this.err_id != SQLITE_ROW) {
-            this.error = string.from_utf8 (sqlite3_errmsg (this.database));
-        }
-    }
-}
 
 
 /***********************************************************
@@ -40,20 +25,49 @@ const int SQLITE_DO (A) {
 class SqlDatabase {
     // Q_DISABLE_COPY (SqlDatabase)
 
-    /***********************************************************
-    ***********************************************************/
-    private Sqlite3 this.database = null;
-    private string this.error; // last error string
-    private int this.err_id = 0;
+    const int SQLITE_SLEEP_TIME_USEC = 100000;
+    const int SQLITE_REPEAT_COUNT = 20;
+    
+    int sqlite_do (var A) {
+        if (1) {
+            this.err_id = (A);
+            if (this.err_id != SQLITE_OK && this.err_id != SQLITE_DONE && this.err_id != SQLITE_ROW) {
+                this.error = string.from_utf8 (sqlite3_errmsg (this.database));
+            }
+        }
+    }
 
     /***********************************************************
     ***********************************************************/
-    private friend class SqlQuery;
-    private GLib.Set<SqlQuery> this.queries;
+    private Sqlite3 database = null;
+
+    /***********************************************************
+    Last error string
+    ***********************************************************/
+    string error {
+        public get {
+            string err = this.error;
+            // this.error.clear ();
+            return err;
+        }
+        private set {
+            error = value;
+        }
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public SqlDatabase () = default;
+    private int err_id = 0;
+
+    /***********************************************************
+    ***********************************************************/
+    //  private friend class SqlQuery;
+    private GLib.Set<SqlQuery> queries;
+
+    /***********************************************************
+    ***********************************************************/
+    //  public SqlDatabase () = default;
 
 
     ~SqlDatabase () {
@@ -138,7 +152,7 @@ class SqlDatabase {
         if (!this.database) {
             return false;
         }
-        SQLITE_DO (sqlite3_exec (this.database, "BEGIN", null, null, null));
+        sqlite_do (sqlite3_exec (this.database, "BEGIN", null, null, null));
         return this.err_id == SQLITE_OK;
     }
 
@@ -149,7 +163,7 @@ class SqlDatabase {
         if (!this.database) {
             return false;
         }
-        SQLITE_DO (sqlite3_exec (this.database, "COMMIT", null, null, null));
+        sqlite_do (sqlite3_exec (this.database, "COMMIT", null, null, null));
         return this.err_id == SQLITE_OK;
     }
 
@@ -158,23 +172,14 @@ class SqlDatabase {
     ***********************************************************/
     public void close () {
         if (this.database) {
-            foreach (var q, this.queries) {
+            foreach (var q in this.queries) {
                 q.finish ();
             }
-            SQLITE_DO (sqlite3_close (this.database));
+            sqlite_do (sqlite3_close (this.database));
             if (this.err_id != SQLITE_OK)
                 GLib.warn (lc_sql) << "Closing database failed" << this.error;
             this.database = null;
         }
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string error () {
-        const string err (this.error);
-        // this.error.clear ();
-        return err;
     }
 
 
@@ -188,11 +193,11 @@ class SqlDatabase {
     /***********************************************************
     ***********************************************************/
     private enum CheckDbResult {
-        Ok,
-        CheckDbResult.CANT_PREPARE,
-        Cant_exec,
-        Not_ok,
-    };
+        OK,
+        CANT_PREPARE,
+        CANT_EXEC,
+        NOT_OKAY,
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -203,15 +208,15 @@ class SqlDatabase {
 
         sqlite_flags |= SQLITE_OPEN_NOMUTEX;
 
-        SQLITE_DO (sqlite3_open_v2 (filename.to_utf8 ().const_data (), this.database, sqlite_flags, null));
+        sqlite_do (sqlite3_open_v2 (filename.to_utf8 ().const_data (), this.database, sqlite_flags, null));
 
         if (this.err_id != SQLITE_OK) {
             GLib.warn (lc_sql) << "Error:" << this.error << "for" << filename;
             if (this.err_id == SQLITE_CANTOPEN) {
-                GLib.warn (lc_sql) << "CANTOPEN extended errcode : " << sqlite3_extended_errcode (this.database);
-    #if SQLITE_VERSION_NUMBER >= 3012000
+                //  GLib.warn (lc_sql) << "CANTOPEN extended errcode : " << sqlite3_extended_errcode (this.database);
+    //  #if SQLITE_VERSION_NUMBER >= 3012000
                 GLib.warn (lc_sql) << "CANTOPEN system errno : " << sqlite3_system_errno (this.database);
-    #endif
+    //  #endif
             }
             close ();
             return false;
@@ -232,7 +237,7 @@ class SqlDatabase {
     ***********************************************************/
     private CheckDbResult check_database () {
         // quick_check can fail with a disk IO error when diskspace is low
-        SqlQuery quick_check (*this);
+        SqlQuery quick_check = new SqlQuery (*this);
 
         if (quick_check.prepare ("PRAGMA quick_check;", /*allow_failure=*/true) != SQLITE_OK) {
             GLib.warn (lc_sql) << "Error preparing quick_check on database";
@@ -244,14 +249,14 @@ class SqlDatabase {
             GLib.warn (lc_sql) << "Error running quick_check on database";
             this.err_id = quick_check.error_id ();
             this.error = quick_check.error ();
-            return CheckDbResult.Cant_exec;
+            return CheckDbResult.CANT_EXEC;
         }
 
         quick_check.next ();
         string result = quick_check.string_value (0);
         if (result != QLatin1String ("ok")) {
             GLib.warn (lc_sql) << "quick_check returned failure:" << result;
-            return CheckDbResult.Not_ok;
+            return CheckDbResult.NOT_OKAY;
         }
 
         return CheckDbResult.OK;

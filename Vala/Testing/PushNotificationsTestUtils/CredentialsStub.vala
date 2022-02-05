@@ -7,7 +7,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #pragma once
 
 //  #include <functional>
-//  #include
 //  #include <QWebSocketS
 //  #include <QWebSocket>
 //  #include <QSignalSpy>

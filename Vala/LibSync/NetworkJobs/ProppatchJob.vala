@@ -47,9 +47,9 @@ class ProppatchJob : AbstractNetworkJob {
             GLib.ByteArray key_name = it.key ();
             GLib.ByteArray key_ns;
             if (key_name.contains (':')) {
-                int col_idx = key_name.last_index_of (":");
-                key_ns = key_name.left (col_idx);
-                key_name = key_name.mid (col_idx + 1);
+                int col_index = key_name.last_index_of (":");
+                key_ns = key_name.left (col_index);
+                key_name = key_name.mid (col_index + 1);
             }
 
             prop_str += "    <" + key_name;
@@ -98,7 +98,7 @@ class ProppatchJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_finished () {
-        GLib.Info (lc_proppatch_job) << "PROPPATCH of" << reply ().request ().url () << "FINISHED WITH STATUS"
+        GLib.info (lc_proppatch_job) << "PROPPATCH of" << reply ().request ().url () << "FINISHED WITH STATUS"
                             << reply_status_string ();
 
         int http_result_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

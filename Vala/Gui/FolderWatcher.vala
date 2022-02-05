@@ -7,14 +7,12 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // event masks
 
 //  #include <cstdint>
-//  #include
 //  #include <QFileIn
 //  #include <QFlag
 //  #include <QDir>
 //  #include <QMutexLoc
 //  #include <string[]
 //  #include <QTimer>
-//  #include
 //  #include <GLib.List
 //  #include <QLoggingCatego
 //  #include <QElapsedTimer>
@@ -266,7 +264,7 @@ protected slots:
             return;
         }
 
-        GLib.Info (lc_folder_watcher) << "Detected changes in paths:" << changed_paths;
+        GLib.info (lc_folder_watcher) << "Detected changes in paths:" << changed_paths;
         foreach (string path, changed_paths) {
             /* emit */ path_changed (path);
         }

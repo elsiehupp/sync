@@ -309,7 +309,7 @@ class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_start () {
-        GLib.Info (lc_disco) << "STARTING" << this.current_folder.server << this.query_server << this.current_folder.local << this.query_local;
+        GLib.info (lc_disco) << "STARTING" << this.current_folder.server << this.query_server << this.current_folder.local << this.query_local;
 
         if (this.query_server == NORMAL_QUERY) {
             this.server_job = start_async_server_query ();
@@ -450,7 +450,7 @@ class ProcessDirectoryJob : GLib.Object {
     Will on_start scheduling subdir jobs when done.
     ***********************************************************/
     private void process () {
-        ASSERT (this.local_query_done && this.server_query_done);
+        //  ASSERT (this.local_query_done && this.server_query_done);
 
         // Build lookup tables for local, remote and database entries.
         // For suffix-virtual files, the key will normally be the base file name
@@ -704,9 +704,9 @@ class ProcessDirectoryJob : GLib.Object {
     private void process_file (PathTuple path,
         LocalInfo local_entry, RemoteInfo server_entry,
         SyncJournalFileRecord db_entry) {
-        const char has_server = server_entry.is_valid () ? "true" : this.query_server == PARENT_NOT_CHANGED ? "database" : "false";
-        const char has_local = local_entry.is_valid () ? "true" : this.query_local == PARENT_NOT_CHANGED ? "database" : "false";
-        GLib.Info (lc_disco).nospace () << "Processing " << path.original
+        const string has_server = server_entry.is_valid () ? "true" : this.query_server == PARENT_NOT_CHANGED ? "database" : "false";
+        const string has_local = local_entry.is_valid () ? "true" : this.query_local == PARENT_NOT_CHANGED ? "database" : "false";
+        GLib.info (lc_disco).nospace () << "Processing " << path.original
                                   << " | valid : " << db_entry.is_valid () << "/" << has_local << "/" << has_server
                                   << " | mtime : " << db_entry.modtime << "/" << local_entry.modtime << "/" << server_entry.modtime
                                   << " | size : " << db_entry.file_size << "/" << local_entry.size << "/" << server_entry.size
@@ -917,7 +917,7 @@ class ProcessDirectoryJob : GLib.Object {
                         const bool list_files_succeeded = this.discovery_data.statedatabase.list_files_in_path (db_entry.path ().to_utf8 (), list_files_callback);
 
                         if (list_files_succeeded && local_folder_size != 0 && local_folder_size == server_entry.size_of_folder) {
-                            GLib.Info (lc_disco) << "Migration of E2EE folder " << db_entry.path () << " from older version to the one, supporting the implicit VFS hydration.";
+                            GLib.info (lc_disco) << "Migration of E2EE folder " << db_entry.path () << " from older version to the one, supporting the implicit VFS hydration.";
                             return NORMAL_QUERY;
                         }
                     }
@@ -1014,13 +1014,13 @@ class ProcessDirectoryJob : GLib.Object {
             // Since we don't do the same checks again in reconcile, we can't
             // just skip the candidate, but have to give up completely.
             if (base.is_directory () != item.is_directory ()) {
-                GLib.Info (lc_disco, "file types different, not a rename");
+                GLib.info (lc_disco, "file types different, not a rename");
                 done = true;
                 return;
             }
             if (!server_entry.is_directory && base.etag != server_entry.etag) {
                 // File with different etag, don't do a rename, but download the file again
-                GLib.Info (lc_disco, "file etag different, not a rename");
+                GLib.info (lc_disco, "file etag different, not a rename");
                 done = true;
                 return;
             }
@@ -1029,7 +1029,7 @@ class ProcessDirectoryJob : GLib.Object {
             string original_path = base.path ();
 
             if (this.discovery_data.is_renamed (original_path)) {
-                GLib.Info (lc_disco, "folder already has a rename entry, skipping");
+                GLib.info (lc_disco, "folder already has a rename entry, skipping");
                 return;
             }
 
@@ -1046,18 +1046,18 @@ class ProcessDirectoryJob : GLib.Object {
             if (!base.is_directory ()) {
                 csync_file_stat_t buf;
                 if (csync_vio_local_stat (this.discovery_data.local_dir + original_path_adjusted, buf)) {
-                    GLib.Info (lc_disco) << "Local file does not exist anymore." << original_path_adjusted;
+                    GLib.info (lc_disco) << "Local file does not exist anymore." << original_path_adjusted;
                     return;
                 }
                 // Note: This prohibits some VFS renames from being detected since
                 // suffix-file size is different from the database size. That's ok, they'll DELETE+NEW.
                 if (buf.modtime != base.modtime || buf.size != base.file_size || buf.type == ItemTypeDirectory) {
-                    GLib.Info (lc_disco) << "File has changed locally, not a rename." << original_path;
+                    GLib.info (lc_disco) << "File has changed locally, not a rename." << original_path;
                     return;
                 }
             } else {
                 if (!QFileInfo (this.discovery_data.local_dir + original_path_adjusted).is_dir ()) {
-                    GLib.Info (lc_disco) << "Local directory does not exist anymore." << original_path_adjusted;
+                    GLib.info (lc_disco) << "Local directory does not exist anymore." << original_path_adjusted;
                     return;
                 }
             }
@@ -1081,7 +1081,7 @@ class ProcessDirectoryJob : GLib.Object {
                 item.original_file = original_path;
                 path.original = original_path;
                 path.local = adjusted_original_path;
-                GLib.Info (lc_disco) << "Rename detected (down) " << item.file << " . " << item.rename_target;
+                GLib.info (lc_disco) << "Rename detected (down) " << item.file << " . " << item.rename_target;
             };
 
             if (was_deleted_on_server) {
@@ -1179,7 +1179,7 @@ class ProcessDirectoryJob : GLib.Object {
                 // Not modified locally (PARENT_NOT_CHANGED)
                 if (no_server_entry) {
                     // not on the server : Removed on the server, delete locally
-                    GLib.Info (lc_disco) << "File" << item.file << "is not anymore on server. Going to delete it locally.";
+                    GLib.info (lc_disco) << "File" << item.file << "is not anymore on server. Going to delete it locally.";
                     item.instruction = CSYNC_INSTRUCTION_REMOVE;
                     item.direction = SyncFileItem.Direction.DOWN;
                 } else if (db_entry.type == ItemTypeVirtualFileDehydration) {
@@ -1190,7 +1190,7 @@ class ProcessDirectoryJob : GLib.Object {
                 }
             } else if (no_server_entry) {
                 // Not locally, not on the server. The entry is stale!
-                GLib.Info (lc_disco) << "Stale DB entry";
+                GLib.info (lc_disco) << "Stale DB entry";
                 this.discovery_data.statedatabase.delete_file_record (path.original, true);
                 return;
             } else if (db_entry.type == ItemTypeVirtualFile && is_vfs_with_suffix ()) {
@@ -1204,7 +1204,7 @@ class ProcessDirectoryJob : GLib.Object {
             } else if (!server_modified) {
                 // Removed locally : also remove on the server.
                 if (!db_entry.server_has_ignored_files) {
-                    GLib.Info (lc_disco) << "File" << item.file << "was deleted locally. Going to delete it on the server.";
+                    GLib.info (lc_disco) << "File" << item.file << "was deleted locally. Going to delete it on the server.";
                     item.instruction = CSYNC_INSTRUCTION_REMOVE;
                     item.direction = SyncFileItem.Direction.UP;
                 }
@@ -1229,21 +1229,21 @@ class ProcessDirectoryJob : GLib.Object {
                     // might have been renamed to that. Make sure that the base file is not
                     // deleted from the server.
                     if (db_entry.modtime == local_entry.modtime && db_entry.file_size == local_entry.size) {
-                        GLib.Info (lc_disco) << "Base file was renamed to virtual file:" << item.file;
+                        GLib.info (lc_disco) << "Base file was renamed to virtual file:" << item.file;
                         item.direction = SyncFileItem.Direction.DOWN;
                         item.instruction = CSYNC_INSTRUCTION_SYNC;
                         item.type = ItemTypeVirtualFileDehydration;
                         add_virtual_file_suffix (item.file);
                         item.rename_target = item.file;
                     } else {
-                        GLib.Info (lc_disco) << "Virtual file with non-virtual database entry, ignoring:" << item.file;
+                        GLib.info (lc_disco) << "Virtual file with non-virtual database entry, ignoring:" << item.file;
                         item.instruction = CSYNC_INSTRUCTION_IGNORE;
                     }
                 }
             } else if (!type_change && ( (db_entry.modtime == local_entry.modtime && db_entry.file_size == local_entry.size) || local_entry.is_directory)) {
                 // Local file unchanged.
                 if (no_server_entry) {
-                    GLib.Info (lc_disco) << "File" << item.file << "is not anymore on server. Going to delete it locally.";
+                    GLib.info (lc_disco) << "File" << item.file << "is not anymore on server. Going to delete it locally.";
                     item.instruction = CSYNC_INSTRUCTION_REMOVE;
                     item.direction = SyncFileItem.Direction.DOWN;
                 } else if (db_entry.type == ItemTypeVirtualFileDehydration || local_entry.type == ItemTypeVirtualFileDehydration) {
@@ -1315,7 +1315,7 @@ class ProcessDirectoryJob : GLib.Object {
                 if (is_eml_file && db_entry.file_size == local_entry.size && !db_entry.checksum_header.is_empty ()) {
                     if (compute_local_checksum (db_entry.checksum_header, this.discovery_data.local_dir + path.local, item)
                             && item.checksum_header == db_entry.checksum_header) {
-                        GLib.Info (lc_disco) << "Note: Checksums are identical, file did not actually change : " << path.local;
+                        GLib.info (lc_disco) << "Note: Checksums are identical, file did not actually change : " << path.local;
                         item.instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
                     }
                 }
@@ -1330,8 +1330,8 @@ class ProcessDirectoryJob : GLib.Object {
         if (local_entry.is_virtual_file && !no_server_entry) {
             // Somehow there is a missing DB entry while the virtual file already exists.
             // The instruction should already be set correctly.
-            ASSERT (item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA);
-            ASSERT (item.type == ItemTypeVirtualFile);
+            //  ASSERT (item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA);
+            //  ASSERT (item.type == ItemTypeVirtualFile);
             on_finalize ();
             return;
         } else if (server_modified) {
@@ -1377,7 +1377,7 @@ class ProcessDirectoryJob : GLib.Object {
             const bool is_file_place_holder = !local_entry.is_directory && this.discovery_data.sync_options.vfs.is_dehydrated_placeholder (this.discovery_data.local_dir + path.local);
 
             // either correct availability, or a result with error if the folder is new or otherwise has no availability set yet
-            const var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : Vfs.AvailabilityResult (Vfs.AvailabilityError.NoSuchItem);
+            const var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : Vfs.AvailabilityResult (Vfs.AvailabilityError.NO_SUCH_ITEM);
 
             const var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Optional<PinStateEnums.PinState> (PinState.PinState.UNSPECIFIED);
 
@@ -1396,7 +1396,7 @@ class ProcessDirectoryJob : GLib.Object {
             if (!is_file_place_holder && !is_online_only_folder) {
                 if (local_entry.is_directory && folder_place_holder_availability.is_valid () && !is_online_only_folder) {
                     // a VFS folder but is not online0only (has some files hydrated)
-                    GLib.Info (lc_disco) << "Virtual directory without database entry for" << path.local << "but it contains hydrated file (s), so let's keep it and reupload.";
+                    GLib.info (lc_disco) << "Virtual directory without database entry for" << path.local << "but it contains hydrated file (s), so let's keep it and reupload.";
                     /* emit */ this.discovery_data.add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading some files to a folder. Those, conflicted, are going to get cleared!"), path.local);
                     return;
                 }
@@ -1409,16 +1409,16 @@ class ProcessDirectoryJob : GLib.Object {
 
             if (is_online_only_folder) {
                 // if we're wiping a folder, we will only get this function called once and will wipe a folder along with it's files and also display one error in GUI
-                GLib.Info (lc_disco) << "Wiping virtual folder without database entry for" << path.local;
+                GLib.info (lc_disco) << "Wiping virtual folder without database entry for" << path.local;
                 if (isfolder_place_holder_availability_online_only && folder_place_holder_availability.is_valid ()) {
-                    GLib.Info (lc_disco) << "*folder_place_holder_availability:" << *folder_place_holder_availability;
+                    GLib.info (lc_disco) << "*folder_place_holder_availability:" << *folder_place_holder_availability;
                 }
                 if (is_folder_pin_state_online_only && folder_pin_state.is_valid ()) {
-                    GLib.Info (lc_disco) << "*folder_pin_state:" << *folder_pin_state;
+                    GLib.info (lc_disco) << "*folder_pin_state:" << *folder_pin_state;
                 }
                 /* emit */ this.discovery_data.add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading a folder. It's going to get cleared!"), path.local);
             } else {
-                GLib.Info (lc_disco) << "Wiping virtual file without database entry for" << path.local;
+                GLib.info (lc_disco) << "Wiping virtual file without database entry for" << path.local;
                 /* emit */ this.discovery_data.add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading a file. It's going to get removed!"), path.local);
             }
             item.instruction = CSYNC_INSTRUCTION_REMOVE;
@@ -1438,7 +1438,7 @@ class ProcessDirectoryJob : GLib.Object {
         // Function to gradually check conditions for accepting a move-candidate
         var move_check = [&] () {
             if (!base.is_valid ()) {
-                GLib.Info (lc_disco) << "Not a move, no item in database with inode" << local_entry.inode;
+                GLib.info (lc_disco) << "Not a move, no item in database with inode" << local_entry.inode;
                 return false;
             }
 
@@ -1447,13 +1447,13 @@ class ProcessDirectoryJob : GLib.Object {
             }
 
             if (base.is_directory () != item.is_directory ()) {
-                GLib.Info (lc_disco) << "Not a move, types don't match" << base.type << item.type << local_entry.type;
+                GLib.info (lc_disco) << "Not a move, types don't match" << base.type << item.type << local_entry.type;
                 return false;
             }
             // Directories and virtual files don't need size/mtime equality
             if (!local_entry.is_directory && !base.is_virtual_file ()
                 && (base.modtime != local_entry.modtime || base.file_size != local_entry.size)) {
-                GLib.Info (lc_disco) << "Not a move, mtime or size differs, "
+                GLib.info (lc_disco) << "Not a move, mtime or size differs, "
                                 << "modtime:" << base.modtime << local_entry.modtime << ", "
                                 << "size:" << base.file_size << local_entry.size;
                 return false;
@@ -1466,23 +1466,23 @@ class ProcessDirectoryJob : GLib.Object {
                 && ! (Utility.fs_case_preserving ()
                      && original_path.compare (path.local, Qt.CaseInsensitive) == 0
                      && original_path != path.local)) {
-                GLib.Info (lc_disco) << "Not a move, base file still exists at" << original_path;
+                GLib.info (lc_disco) << "Not a move, base file still exists at" << original_path;
                 return false;
             }
 
             // Verify the checksum where possible
             if (!base.checksum_header.is_empty () && item.type == ItemTypeFile && base.type == ItemTypeFile) {
                 if (compute_local_checksum (base.checksum_header, this.discovery_data.local_dir + path.original, item)) {
-                    GLib.Info (lc_disco) << "checking checksum of potential rename " << path.original << item.checksum_header << base.checksum_header;
+                    GLib.info (lc_disco) << "checking checksum of potential rename " << path.original << item.checksum_header << base.checksum_header;
                     if (item.checksum_header != base.checksum_header) {
-                        GLib.Info (lc_disco) << "Not a move, checksums differ";
+                        GLib.info (lc_disco) << "Not a move, checksums differ";
                         return false;
                     }
                 }
             }
 
             if (this.discovery_data.is_renamed (original_path)) {
-                GLib.Info (lc_disco) << "Not a move, base path already renamed";
+                GLib.info (lc_disco) << "Not a move, base path already renamed";
                 return false;
             }
 
@@ -1505,7 +1505,7 @@ class ProcessDirectoryJob : GLib.Object {
         // Technically we should use the permissions from the server, but we'll assume it is the same
         var move_perms = check_move_permissions (base.remote_perm, original_path, item.is_directory ());
         if (!move_perms.source_ok || !move_perms.destination_ok) {
-            GLib.Info (lc_disco) << "Move without permission to rename base file, "
+            GLib.info (lc_disco) << "Move without permission to rename base file, "
                             << "source:" << move_perms.source_ok
                             << ", target:" << move_perms.destination_ok
                             << ", target_new:" << move_perms.destination_new_ok;
@@ -1525,13 +1525,13 @@ class ProcessDirectoryJob : GLib.Object {
             var was_deleted_on_client = this.discovery_data.find_and_cancel_deleted_job (original_path);
             if (was_deleted_on_client.first) {
                 // More complicated. The REMOVE is canceled. Restore will happen next sync.
-                GLib.Info (lc_disco) << "Undid remove instruction on source" << original_path;
+                GLib.info (lc_disco) << "Undid remove instruction on source" << original_path;
                 this.discovery_data.statedatabase.delete_file_record (original_path, true);
                 this.discovery_data.statedatabase.schedule_path_for_remote_discovery (original_path);
                 this.discovery_data.another_sync_needed = true;
             } else {
                 // Signal to future check_permissions () to forbid the REMOVE and set to restore instead
-                GLib.Info (lc_disco) << "Preventing future remove on source" << original_path;
+                GLib.info (lc_disco) << "Preventing future remove on source" << original_path;
                 this.discovery_data.forbidden_deletes[original_path + '/'] = true;
             }
             return;
@@ -1564,7 +1564,7 @@ class ProcessDirectoryJob : GLib.Object {
             if (item.type == ItemTypeVirtualFileDehydration)
                 item.type = ItemTypeFile;
 
-            GLib.Info (lc_disco) << "Rename detected (up) " << item.file << " . " << item.rename_target;
+            GLib.info (lc_disco) << "Rename detected (up) " << item.file << " . " << item.rename_target;
         };
         if (was_deleted_on_client.first) {
             recurse_query_server = was_deleted_on_client.second == base.etag ? PARENT_NOT_CHANGED : NORMAL_QUERY;
@@ -1578,7 +1578,7 @@ class ProcessDirectoryJob : GLib.Object {
             var job = new RequestEtagJob (this.discovery_data.account, server_original_path, this);
             connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> etag) mutable {
                 if (!etag || (etag.get () != base.etag && !item.is_directory ()) || this.discovery_data.is_renamed (original_path)) {
-                    GLib.Info (lc_disco) << "Can't rename because the etag has changed or the directory is gone" << original_path;
+                    GLib.info (lc_disco) << "Can't rename because the etag has changed or the directory is gone" << original_path;
                     // Can't be a rename, leave it as a new.
                     post_process_local_new ();
                 } else {
@@ -1698,7 +1698,7 @@ class ProcessDirectoryJob : GLib.Object {
         }
 
         if (path.original != path.target && (item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA || item.instruction == CSYNC_INSTRUCTION_NONE)) {
-            ASSERT (this.dir_item && this.dir_item.instruction == CSYNC_INSTRUCTION_RENAME);
+            //  ASSERT (this.dir_item && this.dir_item.instruction == CSYNC_INSTRUCTION_RENAME);
             // This is because otherwise subitems are not updated!  (ideally renaming a directory could
             // update the database for all items!  See PropagateDirectory.on_sub_jobs_finished)
             item.instruction = CSYNC_INSTRUCTION_RENAME;
@@ -1706,7 +1706,7 @@ class ProcessDirectoryJob : GLib.Object {
             item.direction = this.dir_item.direction;
         }
 
-        GLib.Info (lc_disco) << "Discovered" << item.file << item.instruction << item.direction << item.type;
+        GLib.info (lc_disco) << "Discovered" << item.file << item.instruction << item.direction << item.type;
 
         if (item.is_directory () && item.instruction == CSYNC_INSTRUCTION_SYNC)
             item.instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
@@ -1887,7 +1887,7 @@ class ProcessDirectoryJob : GLib.Object {
             this.child_ignored = true;
         }
 
-        GLib.Info (lc_disco) << "Discovered (blocklisted) " << item.file << item.instruction << item.direction << item.is_directory ();
+        GLib.info (lc_disco) << "Discovered (blocklisted) " << item.file << item.instruction << item.direction << item.is_directory ();
 
         if (item.is_directory () && item.instruction != CSYNC_INSTRUCTION_IGNORE) {
             var job = new ProcessDirectoryJob (path, item, NORMAL_QUERY, IN_BLOCK_LIST, this.last_sync_timestamp, this);
@@ -1903,7 +1903,7 @@ class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     private void sub_job_finished () {
         var job = qobject_cast<ProcessDirectoryJob> (sender ());
-        ASSERT (job);
+        //  ASSERT (job);
 
         this.child_ignored |= job.child_ignored;
         this.child_modified |= job.child_modified;
@@ -1912,7 +1912,7 @@ class ProcessDirectoryJob : GLib.Object {
             /* emit */ this.discovery_data.item_discovered (job.dir_item);
 
         int count = this.running_jobs.remove_all (job);
-        ASSERT (count == 1);
+        //  ASSERT (count == 1);
         job.delete_later ();
         QTimer.single_shot (0, this.discovery_data, &DiscoveryPhase.schedule_more_jobs);
     }
@@ -1948,7 +1948,7 @@ class ProcessDirectoryJob : GLib.Object {
         if (!is_vfs_with_suffix ())
             return;
         bool has_suffix = has_virtual_file_suffix (string_value);
-        ASSERT (has_suffix);
+        //  ASSERT (has_suffix);
         if (has_suffix)
             string_value.chop (this.discovery_data.sync_options.vfs.file_suffix ().size ());
     }

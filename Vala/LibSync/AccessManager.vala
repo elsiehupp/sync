@@ -6,7 +6,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 //  #include <QLoggingCategory>
 //  #include <Soup.Request>
-//  #include
 //  #include <QNetworkProxy>
 //  #include <QAuthenticator>
 //  #include <QSslConfigurati
@@ -49,7 +48,7 @@ class AccessManager : QNetworkAccessManager {
 
         // Respect request specific user agent if any
         if (!new_request.header (Soup.Request.UserAgentHeader).is_valid ()) {
-            new_request.set_header (Soup.Request.UserAgentHeader, Utility.user_agent_"");
+            new_request.set_header (Soup.Request.UserAgentHeader, Utility.user_agent_string ());
         }
 
         // Some firewalls reject requests that have a "User-Agent" but no "Accept" header
@@ -71,7 +70,7 @@ class AccessManager : QNetworkAccessManager {
         // only enable HTTP2 with Qt 5.9.4 because old Qt have too many bugs (e.g. QTBUG-64359 is fixed in >= Qt 5.9.4)
         if (new_request.url ().scheme () == "https") { // Not for "http" : QTBUG-61397
             // http2 seems to cause issues, as with our recommended server setup we don't support http2, disable it by default for now
-            static const bool http2_enabled_env = q_environment_variable_int_value ("OWNCLOUD_HTTP2_ENABLED") == 1;
+            const bool http2_enabled_env = q_environment_variable_int_value ("OWNCLOUD_HTTP2_ENABLED") == 1;
 
             new_request.set_attribute (Soup.Request.HTTP2AllowedAttribute, http2_enabled_env);
         }

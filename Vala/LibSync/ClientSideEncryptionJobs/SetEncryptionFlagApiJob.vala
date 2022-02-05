@@ -58,7 +58,7 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
         req.set_raw_header ("OCS-APIREQUEST", "true");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
 
-        GLib.Info (lc_cse_job ()) << "marking the file with identifier" << this.file_identifier << "as" << (this.flag_action == Set ? "encrypted" : "non-encrypted") << ".";
+        GLib.info (lc_cse_job ()) << "marking the file with identifier" << this.file_identifier << "as" << (this.flag_action == Set ? "encrypted" : "non-encrypted") << ".";
 
         send_request (this.flag_action == Set ? "PUT" : "DELETE", url, req);
 
@@ -67,11 +67,11 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
 
     bool SetEncryptionFlagApiJob.on_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        GLib.Info (lc_cse_job ()) << "Encryption Flag Return" << reply ().read_all ();
+        GLib.info (lc_cse_job ()) << "Encryption Flag Return" << reply ().read_all ();
         if (return_code == 200) {
             /* emit */ success (this.file_identifier);
         } else {
-            GLib.Info (lc_cse_job ()) << "Setting the encrypted flag failed with" << path () << error_string () << return_code;
+            GLib.info (lc_cse_job ()) << "Setting the encrypted flag failed with" << path () << error_string () << return_code;
             /* emit */ error (this.file_identifier, return_code);
         }
         return true;

@@ -82,10 +82,10 @@ static void check_c_jhash_alignment_problems (void **state) {
     uint8_t buf[MAXLEN+20];
     uint8_t b = NULL;
     uint32_t len = 0;
-    uint8_t q[] = "This is the time for all good men to come to the aid of their country";
-    uint8_t qq[] = "xThis is the time for all good men to come to the aid of their country";
-    uint8_t qqq[] = "xxThis is the time for all good men to come to the aid of their country";
-    uint8_t qqqq[] = "xxxThis is the time for all good men to come to the aid of their country";
+    uint8_t q = "This is the time for all good men to come to the aid of their country";
+    uint8_t qq = "xThis is the time for all good men to come to the aid of their country";
+    uint8_t qqq = "xxThis is the time for all good men to come to the aid of their country";
+    uint8_t qqqq = "xxxThis is the time for all good men to come to the aid of their country";
     uint32_t h = 0;
     uint32_t i = 0;
     uint32_t j = 0;
@@ -201,13 +201,13 @@ static void check_c_jhash64_trials (void **state) {
                                                  (long long uint32) y[0]);
                          print_error ("i %d j %d m %d len %d\n",
                                                  (uint32_t)i, (uint32_t)j, (uint32_t)m, (uint32_t)hlen);
-#endif
+//  #endif
                     }
                     if (z == MAXPAIR) {
                             if (z < MAXPAIR) {
 #if 0
                                     print_error ("%lu trials needed, should be less than 40", z/2);
-#endif
+//  #endif
                                     assert_true (z < MAXPAIR);
                             }
                             return;
@@ -222,14 +222,14 @@ static void check_c_jhash64_alignment_problems (void **state) {
     uint8_t buf[MAXLEN+20];
     uint8_t b = NULL;
     uint64 len = 0;
-    uint8_t q[] = "This is the time for all good men to come to the aid of their country";
-    uint8_t qq[] = "xThis is the time for all good men to come to the aid of their country";
-    uint8_t qqq[] = "xxThis is the time for all good men to come to the aid of their country";
-    uint8_t qqqq[] = "xxxThis is the time for all good men to come to the aid of their country";
-    uint8_t o[] = "xxxxThis is the time for all good men to come to the aid of their country";
-    uint8_t oo[] = "xxxxxThis is the time for all good men to come to the aid of their country";
-    uint8_t ooo[] = "xxxxxxThis is the time for all good men to come to the aid of their country";
-    uint8_t oooo[] = "xxxxxxxThis is the time for all good men to come to the aid of their country";
+    uint8_t q = "This is the time for all good men to come to the aid of their country";
+    uint8_t qq = "xThis is the time for all good men to come to the aid of their country";
+    uint8_t qqq = "xxThis is the time for all good men to come to the aid of their country";
+    uint8_t qqqq = "xxxThis is the time for all good men to come to the aid of their country";
+    uint8_t o = "xxxxThis is the time for all good men to come to the aid of their country";
+    uint8_t oo = "xxxxxThis is the time for all good men to come to the aid of their country";
+    uint8_t ooo = "xxxxxxThis is the time for all good men to come to the aid of their country";
+    uint8_t oooo = "xxxxxxxThis is the time for all good men to come to the aid of their country";
     uint64 h = 0;
     uint64 i = 0;
     uint64 j = 0;
@@ -279,7 +279,7 @@ static void check_c_jhash64_alignment_problems (void **state) {
             assert_false ( (ref != x) || (ref != y));
 #if 0
             print_error ("alignment error : %.8lx %.8lx %.8lx %ld %ld\n", ref, x, y, h, i);
-#endif
+//  #endif
         }
     }
 }
@@ -299,7 +299,7 @@ static void check_c_jhash64_null_strings (void **state) {
         assert_false (t == h);
 #if 0
         print_error ("0-byte-string check failed : t = %.8lx, h = %.8lx", t, h);
-#endif
+//  #endif
     }
 }
 

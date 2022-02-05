@@ -133,10 +133,10 @@ void PropagateUploadFileNG.on_propfind_finished () {
         return;
     }
 
-    GLib.Info (lc_propagate_upload_nG) << "Resuming " << this.item.file << " from chunk " << this.current_chunk << "; sent =" << this.sent;
+    GLib.info (lc_propagate_upload_nG) << "Resuming " << this.item.file << " from chunk " << this.current_chunk << "; sent =" << this.sent;
 
     if (!this.server_chunks.is_empty ()) {
-        GLib.Info (lc_propagate_upload_nG) << "To Delete" << this.server_chunks.keys ();
+        GLib.info (lc_propagate_upload_nG) << "To Delete" << this.server_chunks.keys ();
         propagator ().active_job_list.append (this);
         this.remove_job_error = false;
 
@@ -173,7 +173,7 @@ void PropagateUploadFileNG.on_propfind_finished_with_error () {
 
 void PropagateUploadFileNG.on_delete_job_finished () {
     var job = qobject_cast<DeleteJob> (sender ());
-    ASSERT (job);
+    //  ASSERT (job);
     this.jobs.remove (this.jobs.index_of (job));
 
     Soup.Reply.NetworkError err = job.reply ().error ();
@@ -203,7 +203,7 @@ void PropagateUploadFileNG.on_delete_job_finished () {
 }
 
 void PropagateUploadFileNG.start_new_upload () {
-    ASSERT (propagator ().active_job_list.count (this) == 1);
+    //  ASSERT (propagator ().active_job_list.count (this) == 1);
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
         GLib.warn (lc_propagate_upload ()) << "invalid modified time" << this.item.file << this.item.modtime;
@@ -283,8 +283,8 @@ void PropagateUploadFileNG.on_start_next_chunk () {
             headers[QByteArrayLiteral ("If")] = "<" + GLib.Uri.to_percent_encoding (destination, "/") + "> ([" + if_match + "])";
         }
         if (!this.transmission_checksum_header.is_empty ()) {
-            GLib.Info (lc_propagate_upload) << destination << this.transmission_checksum_header;
-            headers[check_sum_header_c] = this.transmission_checksum_header;
+            GLib.info (lc_propagate_upload) << destination << this.transmission_checksum_header;
+            headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
         }
         headers[QByteArrayLiteral ("OC-Total-Length")] = GLib.ByteArray.number (file_size);
 
@@ -338,7 +338,7 @@ void PropagateUploadFileNG.on_start_next_chunk () {
 
 void PropagateUploadFileNG.on_put_finished () {
     var job = qobject_cast<PUTFile_job> (sender ());
-    ASSERT (job);
+    //  ASSERT (job);
 
     on_job_destroyed (job); // remove it from the this.jobs list
 
@@ -383,7 +383,7 @@ void PropagateUploadFileNG.on_put_finished () {
             target_size,
             propagator ().sync_options ().max_chunk_size);
 
-        GLib.Info (lc_propagate_upload_nG) << "Chunked upload of" << this.current_chunk_size << "bytes took" << upload_time.count ()
+        GLib.info (lc_propagate_upload_nG) << "Chunked upload of" << this.current_chunk_size << "bytes took" << upload_time.count ()
                                   << "ms, desired is" << target_duration.count () << "ms, expected good chunk size is"
                                   << predicted_good_size << "bytes and nudged next chunk size to "
                                   << propagator ().chunk_size << "bytes";

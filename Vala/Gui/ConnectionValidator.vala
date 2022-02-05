@@ -8,10 +8,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QJsonObject>
 //  #include <QJsonArray>
 //  #include <QLoggingCategory>
-//  #include
 //  #include <QNetworkProxyFacto
 //  #include <QXmlStreamReader>
-//  #include
 //  #include <creds/abstractcredentials.h>
 
 //  #include <QVariantMap>
@@ -125,9 +123,9 @@ protected slots:
     void on_user_fetched (UserInfo user_info);
 
 
-#ifndef TOKEN_AUTH_ONLY
+//  #ifndef TOKEN_AUTH_ONLY
     private void report_connected ();
-#endif
+//  #endif
     private void report_result (Status status);
     private void check_server_capabilities ();
     private void fetch_user ();
@@ -189,9 +187,9 @@ protected slots:
         }
 
         if (proxy.type () != QNetworkProxy.NoProxy) {
-            GLib.Info (lc_connection_validator) << "Setting QNAM proxy to be system proxy" << ClientProxy.print_q_network_proxy (proxy);
+            GLib.info (lc_connection_validator) << "Setting QNAM proxy to be system proxy" << ClientProxy.print_q_network_proxy (proxy);
         } else {
-            GLib.Info (lc_connection_validator) << "No system proxy set by OS";
+            GLib.info (lc_connection_validator) << "No system proxy set by OS";
         }
         this.account.network_access_manager ().set_proxy (proxy);
 
@@ -216,14 +214,14 @@ protected slots:
         string server_version = CheckServerJob.version (info);
 
         // status.php was found.
-        GLib.Info (lc_connection_validator) << "** Application : own_cloud found : "
+        GLib.info (lc_connection_validator) << "** Application : own_cloud found : "
                                       << url << " with version "
                                       << CheckServerJob.version_string (info)
                                       << " (" << server_version << ")";
 
         // Update server url in case of redirection
         if (this.account.url () != url) {
-            GLib.Info (lc_connection_validator ()) << "status.php was redirected to" << url.to_string ();
+            GLib.info (lc_connection_validator ()) << "status.php was redirected to" << url.to_string ();
             this.account.set_url (url);
             this.account.wants_account_saved (this.account.data ());
         }
@@ -335,7 +333,7 @@ protected slots:
 
     void ConnectionValidator.on_capabilities_recieved (QJsonDocument json) {
         var capabilities = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
-        GLib.Info (lc_connection_validator) << "Server capabilities" << capabilities;
+        GLib.info (lc_connection_validator) << "Server capabilities" << capabilities;
         this.account.set_capabilities (capabilities.to_variant_map ());
 
         // New servers also report the version in the capabilities
@@ -359,7 +357,7 @@ protected slots:
     }
 
     bool ConnectionValidator.set_and_check_server_version (string version) {
-        GLib.Info (lc_connection_validator) << this.account.url () << "has server version" << version;
+        GLib.info (lc_connection_validator) << this.account.url () << "has server version" << version;
         this.account.set_server_version (version);
 
         // We cannot deal with servers < 7.0.0

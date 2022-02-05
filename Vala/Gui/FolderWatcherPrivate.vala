@@ -5,10 +5,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 //  #include <sys/inotify.h>
-//  #include
 //  #include <cerrno>
 //  #include <QVarLengthArray>
-//  #include
 //  #include <QSocket_notifier>
 //  #include <QDir>
 

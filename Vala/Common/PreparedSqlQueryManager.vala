@@ -36,7 +36,7 @@ class PreparedSqlQueryManager {
         Key.DELETE_FILE_RECORD_PHASH,
         Key.DELETE_FILE_RECORD_RECURSIVELY,
         GetErrorBlocklistQuery,
-        Set_error_blocklist_query,
+        SetErrorBlocklistQuery,
         Get_selective_sync_list_query,
         Get_checksum_type_id_query,
         Get_checksum_type_query,

@@ -13,15 +13,9 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 //  #include <QHttpMultiPart>
 //  #include <memory>
 
-
-namespace Occ {
-
 //  Q_DECLARE_LOGGING_CATEGORY (lc_put_multi_file_job)
 
-struct SingleUploadFileData {
-    std.unique_ptr<UploadDevice> this.device;
-    GLib.HashMap<GLib.ByteArray, GLib.ByteArray> this.headers;
-}
+namespace Occ {
 
 /***********************************************************
 @brief The PutMultiFileJob class
@@ -29,13 +23,31 @@ struct SingleUploadFileData {
 ***********************************************************/
 class PutMultiFileJob : AbstractNetworkJob {
 
+    struct SingleUploadFileData {
+        std.unique_ptr<UploadDevice> device;
+        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private QHttpMultiPart body;
+    private GLib.Vector<SingleUploadFileData> devices;
+    private string error_string;
+    private GLib.Uri url;
+    private QElapsedTimer request_timer;
+
+
+    signal void finished_signal ();
+    signal void upload_progress (int64, int64);
+
     /***********************************************************
     ***********************************************************/
     public PutMultiFileJob (AccountPointer account, GLib.Uri url,
-                             GLib.Vector<SingleUploadFileData> devices, GLib.Object parent = new GLib.Object ())
-        : base (account, {}, parent)
-        this.devices (std.move (devices))
-        this.url (url) {
+        GLib.Vector<SingleUploadFileData> devices, GLib.Object parent = new GLib.Object ()) {
+        base (account, {}, parent);
+        this.devices = std.move (devices);
+        this.url = url;
         this.body.set_content_type (QHttpMultiPart.Related_type);
         for (var single_device : this.devices) {
             single_device.device.set_parent (this);
@@ -44,47 +56,11 @@ class PutMultiFileJob : AbstractNetworkJob {
         }
     }
 
-    ~PutMultiFileJob () override;
+    ~PutMultiFileJob () = default;
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override;
-
-    /***********************************************************
-    ***********************************************************/
-    public bool on_finished () override;
-
-    /***********************************************************
-    ***********************************************************/
-    public string error_string () override {
-        return this.error_string.is_empty () ? AbstractNetworkJob.error_string () : this.error_string;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public std.chrono.milliseconds ms_since_start () {
-        return std.chrono.milliseconds (this.request_timer.elapsed ());
-    }
-
-signals:
-    void finished_signal ();
-    void upload_progress (int64, int64);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private QHttpMultiPart this.body;
-    private GLib.Vector<SingleUploadFileData> this.devices;
-    private string this.error_string;
-    private GLib.Uri this.url;
-    private QElapsedTimer this.request_timer;
-}
-
-
-    PutMultiFileJob.~PutMultiFileJob () = default;
-
-    void PutMultiFileJob.on_start () {
+    public void on_start () {
         Soup.Request req;
 
         for (var one_device : this.devices) {
@@ -113,12 +89,15 @@ signals:
         AbstractNetworkJob.on_start ();
     }
 
-    bool PutMultiFileJob.on_finished () {
+
+    /***********************************************************
+    ***********************************************************/
+    public bool on_finished () {
         for (var one_device : this.devices) {
             one_device.device.close ();
         }
 
-        GLib.Info (lc_put_multi_file_job) << "POST of" << reply ().request ().url ().to_string () << path () << "FINISHED WITH STATUS"
+        GLib.info (lc_put_multi_file_job) << "POST of" << reply ().request ().url ().to_string () << path () << "FINISHED WITH STATUS"
                          << reply_status_string ()
                          << reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
                          << reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);
@@ -127,5 +106,21 @@ signals:
         return true;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
+    public string error_string () override {
+        return this.error_string.is_empty () ? AbstractNetworkJob.error_string () : this.error_string;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public std.chrono.milliseconds ms_since_start () {
+        return std.chrono.milliseconds (this.request_timer.elapsed ());
+    }
+
+} // class PutMultiFileJob
+
+} // namespace Occ
     

@@ -7,7 +7,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 ***********************************************************/
 
 // don't pull the share manager into socketapi unittests
-#ifndef OWNCLOUD_TEST
+//  #ifndef OWNCLOUD_TEST
 
 class Get_or_create_public_link_share : GLib.Object {
 
@@ -93,7 +93,7 @@ class Get_or_create_public_link_share : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_link_share_requires_password (string message) {
-        GLib.Info (lc_public_link) << "Could not create link share:" << message;
+        GLib.info (lc_public_link) << "Could not create link share:" << message;
         /* emit */ error (message);
         delete_later ();
     }
@@ -150,4 +150,4 @@ class Get_or_create_public_link_share : GLib.Object {
     }
 }
 
-#endif
+//  #endif

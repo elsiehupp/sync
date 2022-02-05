@@ -54,12 +54,12 @@ class LsColJob : AbstractNetworkJob {
         GLib.ByteArray prop_str;
         foreach (GLib.ByteArray prop, properties) {
             if (prop.contains (':')) {
-                int col_idx = prop.last_index_of (":");
-                var ns = prop.left (col_idx);
+                int col_index = prop.last_index_of (":");
+                var ns = prop.left (col_index);
                 if (ns == "http://owncloud.org/ns") {
-                    prop_str += "    <oc:" + prop.mid (col_idx + 1) + " />\n";
+                    prop_str += "    <oc:" + prop.mid (col_index + 1) + " />\n";
                 } else {
-                    prop_str += "    <" + prop.mid (col_idx + 1) + " xmlns=\"" + ns + "\" />\n";
+                    prop_str += "    <" + prop.mid (col_index + 1) + " xmlns=\"" + ns + "\" />\n";
                 }
             } else {
                 prop_str += "    <d:" + prop + " />\n";
@@ -112,7 +112,7 @@ class LsColJob : AbstractNetworkJob {
     the network, not all in one big blob at the end.
     ***********************************************************/
     private bool on_finished () {
-        GLib.Info (lc_ls_col_job) << "LSCOL of" << reply ().request ().url () << "FINISHED WITH STATUS"
+        GLib.info (lc_ls_col_job) << "LSCOL of" << reply ().request ().url () << "FINISHED WITH STATUS"
                         << reply_status_string ();
 
         string content_type = reply ().header (Soup.Request.ContentTypeHeader).to_string ();

@@ -157,7 +157,7 @@ signals:
         // add 'Content-Length : 0' header (see https://github.com/nextcloud/desktop/issues/1473)
         QNetworkRequest req;
         req.set_header (QNetworkRequest.ContentLengthHeader, "0");
-        req.set_header (QNetworkRequest.UserAgentHeader, Utility.friendly_user_agent_"");
+        req.set_header (QNetworkRequest.UserAgentHeader, Utility.friendly_user_agent_string ());
 
         var job = this.account.send_request ("POST", url, req);
         job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
@@ -220,7 +220,7 @@ signals:
             // Start polling
             ConfigFile config;
             std.chrono.milliseconds polltime = config.remote_poll_interval ();
-            GLib.Info (lc_flow2auth) << "setting remote poll timer interval to" << polltime.count () << "msec";
+            GLib.info (lc_flow2auth) << "setting remote poll timer interval to" << polltime.count () << "msec";
             this.seconds_interval = (polltime.count () / 1000);
             this.seconds_left = this.seconds_interval;
             /* emit */ status_changed (PollStatus.status_poll_countdown, this.seconds_left);
@@ -328,7 +328,7 @@ signals:
             this.poll_timer.stop ();
 
             // Success
-            GLib.Info (lc_flow2auth) << "Success getting the app_password for user : " << login_name << ", server : " << server_url.to_string ();
+            GLib.info (lc_flow2auth) << "Success getting the app_password for user : " << login_name << ", server : " << server_url.to_string ();
 
             this.account.set_url (server_url);
 

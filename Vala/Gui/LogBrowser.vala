@@ -6,7 +6,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 //  #include <cstdio>
 //  #include <iostream>
-//  #include
 //  #include <QDialogB
 //  #include <QLayout>
 //  #include <QPushBu
@@ -18,7 +17,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QSetting
 //  #include <QAction>
 //  #include <QDesktopSe
-//  #include
 //  #include <QCheckBox>
 //  #include <QPlain_tex
 //  #include <QTextStream

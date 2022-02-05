@@ -55,9 +55,9 @@ class IgnoreListTableWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    static const int pattern_col = 0;
-    static const int deletable_col = 1;
-    static const int read_only_rows = 3;
+    const int pattern_col = 0;
+    const int deletable_col = 1;
+    const int read_only_rows = 3;
 
     IgnoreListTableWidget.IgnoreListTableWidget (Gtk.Widget parent)
         : Gtk.Widget (parent)
@@ -185,7 +185,7 @@ class IgnoreListTableWidget : Gtk.Widget {
         ui.table_widget.set_item (new_row, pattern_col, pattern_item);
 
         var deletable_item = new QTable_widget_item;
-        deletable_item.set_flags (Qt.Item_is_user_checkable | Qt.ItemIsEnabled);
+        deletable_item.set_flags (Qt.ItemIsUserCheckable | Qt.ItemIsEnabled);
         deletable_item.set_check_state (deletable ? Qt.Checked : Qt.Unchecked);
         ui.table_widget.set_item (new_row, deletable_col, deletable_item);
 

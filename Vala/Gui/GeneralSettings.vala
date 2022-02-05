@@ -10,14 +10,13 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QDir>
 //  #include <QScoped_value_rollback>
 //  #include <QMessageBox>
-//  #include
 //  #include <private/qzipwriter_p.h>
 
 const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
 #if ! (QTLEGACY)
 //  #include <QOperatingSystemVersion>
-#endif
+//  #endif
 
 //  #include <Gtk.Widget>
 //  #include <QPointer>
@@ -60,7 +59,7 @@ class General_settings : Gtk.Widget {
     private void on_update_channel_changed (string channel);
     private void on_update_check_now ();
     private void on_toggle_auto_update_check ();
-#endif
+//  #endif
 
     /***********************************************************
     ***********************************************************/
@@ -202,9 +201,9 @@ General_settings.General_settings (Gtk.Widget parent)
     connect (this.ui.new_folder_limit_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &General_settings.on_save_misc_settings);
     connect (this.ui.new_external_storage, &QAbstractButton.toggled, this, &General_settings.on_save_misc_settings);
 
-#ifndef WITH_CRASHREPORTER
+//  #ifndef WITH_CRASHREPORTER
     this.ui.crashreporter_check_box.set_visible (false);
-#endif
+//  #endif
 
     // Hide on non-Windows
     this.ui.show_in_explorer_navigation_pane_check_box.set_visible (false);
@@ -353,7 +352,7 @@ void General_settings.on_toggle_auto_update_check () {
     bool is_checked = this.ui.auto_check_for_updates_check_box.is_checked ();
     cfg_file.set_auto_update_check (is_checked, "");
 }
-#endif // defined (BUILD_UPDATER)
+//  #endif // defined (BUILD_UPDATER)
 
 void General_settings.on_save_misc_settings () {
     if (this.currently_loading)
@@ -428,7 +427,7 @@ void General_settings.customize_style () {
     on_update_info ();
 #else
     this.ui.updates_group_box.set_visible (false);
-#endif
+//  #endif
 }
 
 } // namespace Occ

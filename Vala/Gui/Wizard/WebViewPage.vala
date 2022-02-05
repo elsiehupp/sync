@@ -68,7 +68,7 @@ signals:
         : Abstract_credentials_wizard_page () {
         this.oc_wizard = qobject_cast<OwncloudWizard> (parent);
 
-        GLib.Info (lc_wizard_webiew_page ()) << "Time for a webview!";
+        GLib.info (lc_wizard_webiew_page ()) << "Time for a webview!";
         this.web_view = new WebView (this);
 
         var layout = new QVBoxLayout (this);
@@ -99,7 +99,7 @@ signals:
             }
             url += "index.php/login/flow";
         }
-        GLib.Info (lc_wizard_webiew_page ()) << "Url to auth at : " << url;
+        GLib.info (lc_wizard_webiew_page ()) << "Url to auth at : " << url;
         this.web_view.set_url (GLib.Uri (url));
 
         this.original_wizard_size = this.oc_wizard.size ();
@@ -121,7 +121,7 @@ signals:
 
     bool Web_view_page.try_to_set_wizard_size (int width, int height) {
         const var window = this.oc_wizard.window ();
-        const var screen_geometry = QGuiApplication.screen_at (window.pos ()).geometry ();
+        const var screen_geometry = QGuiApplication.screen_at (window.position ()).geometry ();
         const var window_width = screen_geometry.width ();
         const var window_height = screen_geometry.height ();
 
@@ -151,11 +151,11 @@ signals:
     }
 
     void Web_view_page.set_connected () {
-        GLib.Info (lc_wizard_webiew_page ()) << "YAY! we are connected!";
+        GLib.info (lc_wizard_webiew_page ()) << "YAY! we are connected!";
     }
 
     void Web_view_page.on_url_catched (string user, string pass, string host) {
-        GLib.Info (lc_wizard_webiew_page ()) << "Got user : " << user << ", server : " << host;
+        GLib.info (lc_wizard_webiew_page ()) << "Got user : " << user << ", server : " << host;
 
         this.user = user;
         this.pass = pass;
@@ -163,7 +163,7 @@ signals:
         AccountPointer account = this.oc_wizard.account ();
         account.set_url (host);
 
-        GLib.Info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_string ();
+        GLib.info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_string ();
         /* emit */ connect_to_oc_url (host);
     }
 

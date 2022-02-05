@@ -47,11 +47,11 @@ class ClientSideEncryption : GLib.Object {
 
     const string E2EE_BASE_URL = "ocs/v2.php/apps/end_to_end_encryption/api/v1/";
 
-    const char[] ACCOUNT_PROPERTY = "account";
+    const string ACCOUNT_PROPERTY = "account";
 
-    const char[] E2E_CERTIFICATE = "e2e-certificate";
-    const char[] E2E_PRIVATE = "e2e-private";
-    const char[] E2E_MNEMONIC = "e2e-mnemonic";
+    const string E2E_CERTIFICATE = "e2e-certificate";
+    const string E2E_PRIVATE = "e2e-private";
+    const string E2E_MNEMONIC = "e2e-mnemonic";
 
     const int64 BLOCK_SIZE = 1024;
 
@@ -107,9 +107,9 @@ class ClientSideEncryption : GLib.Object {
     public void initialize (AccountPointer account) {
         //  Q_ASSERT (account);
 
-        GLib.Info (lc_cse ()) << "Initializing";
+        GLib.info (lc_cse ()) << "Initializing";
         if (!account.capabilities ().client_side_encryption_available ()) {
-            GLib.Info (lc_cse ()) << "No Client side encryption available on server.";
+            GLib.info (lc_cse ()) << "No Client side encryption available on server.";
             /* emit */ initialization_finished ();
             return;
         }
@@ -123,41 +123,41 @@ class ClientSideEncryption : GLib.Object {
     private void generate_key_pair (AccountPointer account) {
         // AES/GCM/No_padding,
         // metadata_keys with RSA/ECB/OAEPWith_sHA-256And_mGF1Padding
-        GLib.Info (lc_cse ()) << "No public key, generating a pair.";
+        GLib.info (lc_cse ()) << "No public key, generating a pair.";
         const int rsa_key_len = 2048;
 
         // Init RSA
         PrivateKeyContext context (EVP_PKEY_RSA);
 
         if (EVP_PKEY_keygen_init (context) <= 0) {
-            GLib.Info (lc_cse ()) << "Couldn't initialize the key generator";
+            GLib.info (lc_cse ()) << "Couldn't initialize the key generator";
             return;
         }
 
         if (EVP_PKEY_CTX_set_rsa_keygen_bits (context, rsa_key_len) <= 0) {
-            GLib.Info (lc_cse ()) << "Couldn't initialize the key generator bits";
+            GLib.info (lc_cse ()) << "Couldn't initialize the key generator bits";
             return;
         }
 
         var local_key_pair = PrivateKey.generate (context);
         if (!local_key_pair) {
-            GLib.Info (lc_cse ()) << "Could not generate the key";
+            GLib.info (lc_cse ()) << "Could not generate the key";
             return;
         }
 
-        GLib.Info (lc_cse ()) << "Key correctly generated";
-        GLib.Info (lc_cse ()) << "Storing keys locally";
+        GLib.info (lc_cse ()) << "Key correctly generated";
+        GLib.info (lc_cse ()) << "Storing keys locally";
 
         Biometric priv_key;
         if (PEM_write_bio_Private_key (priv_key, local_key_pair, null, null, 0, null, null) <= 0) {
-            GLib.Info (lc_cse ()) << "Could not read private key from bio.";
+            GLib.info (lc_cse ()) << "Could not read private key from bio.";
             return;
         }
         GLib.ByteArray key = BIO2Byte_array (priv_key);
         //this.private_key = QSslKey (key, QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
         this.private_key = key;
 
-        GLib.Info (lc_cse ()) << "Keys generated correctly, sending to server.";
+        GLib.info (lc_cse ()) << "Keys generated correctly, sending to server.";
         generate_csr (account, local_key_pair);
     }
 
@@ -167,7 +167,7 @@ class ClientSideEncryption : GLib.Object {
     private void generate_csr (AccountPointer account, EVP_PKEY key_pair) {
         // OpenSSL expects const char.
         var cn_array = account.dav_user ().to_local8Bit ();
-        GLib.Info (lc_cse ()) << "Getting the following array for the account Id" << cn_array;
+        GLib.info (lc_cse ()) << "Getting the following array for the account Id" << cn_array;
 
         var cert_params = GLib.HashMap<const char *, char> {
             {"C", "DE"},
@@ -194,20 +194,20 @@ class ClientSideEncryption : GLib.Object {
         for (var& v : cert_params) {
             ret = X509_NAME_add_entry_by_txt (x509_name, v.first,  MBSTRING_ASC, (uchar) v.second, -1, -1, 0);
             if (ret != 1) {
-                GLib.Info (lc_cse ()) << "Error Generating the Certificate while adding" << v.first << v.second;
+                GLib.info (lc_cse ()) << "Error Generating the Certificate while adding" << v.first << v.second;
                 return;
             }
         }
 
         ret = X509_REQ_set_pubkey (x509_req, key_pair);
         if (ret != 1){
-            GLib.Info (lc_cse ()) << "Error setting the public key on the csr";
+            GLib.info (lc_cse ()) << "Error setting the public key on the csr";
             return;
         }
 
         ret = X509_REQ_sign (x509_req, key_pair, EVP_sha1 ());    // return x509_req.signature.length
         if (ret <= 0){
-            GLib.Info (lc_cse ()) << "Error setting the public key on the csr";
+            GLib.info (lc_cse ()) << "Error setting the public key on the csr";
             return;
         }
 
@@ -215,8 +215,8 @@ class ClientSideEncryption : GLib.Object {
         ret = PEM_write_bio_X509_REQ (out, x509_req);
         GLib.ByteArray output = BIO2Byte_array (out);
 
-        GLib.Info (lc_cse ()) << "Returning the certificate";
-        GLib.Info (lc_cse ()) << output;
+        GLib.info (lc_cse ()) << "Returning the certificate";
+        GLib.info (lc_cse ()) << output;
 
         var job = new SignPublicKeyApiJob (account, E2EE_BASE_URL + "public-key", this);
         job.set_csr (output);
@@ -228,7 +228,7 @@ class ClientSideEncryption : GLib.Object {
                 this.public_key = this.certificate.public_key ();
                 fetch_and_validate_public_key_from_server (account);
             }
-            GLib.Info (lc_cse ()) << return_code;
+            GLib.info (lc_cse ()) << return_code;
         });
         job.on_start ();
     }
@@ -240,12 +240,12 @@ class ClientSideEncryption : GLib.Object {
         string[] list = Word_list.get_random_words (12);
         this.mnemonic = list.join (' ');
         this.new_mnemonic_generated = true;
-        GLib.Info (lc_cse ()) << "mnemonic Generated:" << this.mnemonic;
+        GLib.info (lc_cse ()) << "mnemonic Generated:" << this.mnemonic;
 
         /* emit */ mnemonic_generated (this.mnemonic);
 
         string pass_phrase = list.join ("").to_lower ();
-        GLib.Info (lc_cse ()) << "Passphrase Generated:" << pass_phrase;
+        GLib.info (lc_cse ()) << "Passphrase Generated:" << pass_phrase;
 
         var salt = EncryptionHelper.generate_random (40);
         var secret_key = EncryptionHelper.generate_password (pass_phrase, salt);
@@ -258,14 +258,14 @@ class ClientSideEncryption : GLib.Object {
             //  Q_UNUSED (doc);
             switch (return_code) {
                 case 200:
-                    GLib.Info (lc_cse ()) << "Private key stored encrypted on server.";
+                    GLib.info (lc_cse ()) << "Private key stored encrypted on server.";
                     write_private_key (account);
                     write_certificate (account);
                     write_mnemonic (account);
                     /* emit */ initialization_finished ();
                     break;
                 default:
-                    GLib.Info (lc_cse ()) << "Store private key failed, return code:" << return_code;
+                    GLib.info (lc_cse ()) << "Store private key failed, return code:" << return_code;
             }
         });
         job.on_start ();
@@ -330,7 +330,7 @@ class ClientSideEncryption : GLib.Object {
 
         this.public_key = this.certificate.public_key ();
 
-        GLib.Info (lc_cse ()) << "Public key fetched from keychain";
+        GLib.info (lc_cse ()) << "Public key fetched from keychain";
 
         const string kck = AbstractCredentials.keychain_key (
                     account.url ().to_string (),
@@ -370,7 +370,7 @@ class ClientSideEncryption : GLib.Object {
             return;
         }
 
-        GLib.Info (lc_cse ()) << "Private key fetched from keychain";
+        GLib.info (lc_cse ()) << "Private key fetched from keychain";
 
         const string kck = AbstractCredentials.keychain_key (
                     account.url ().to_string (),
@@ -405,7 +405,7 @@ class ClientSideEncryption : GLib.Object {
 
         this.mnemonic = read_job.text_data ();
 
-        GLib.Info (lc_cse ()) << "Mnemonic key fetched from keychain : " << this.mnemonic;
+        GLib.info (lc_cse ()) << "Mnemonic key fetched from keychain : " << this.mnemonic;
 
         /* emit */ initialization_finished ();
     }
@@ -414,18 +414,18 @@ class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void get_private_key_from_server (AccountPointer account) {
-        GLib.Info (lc_cse ()) << "Retrieving private key from server";
+        GLib.info (lc_cse ()) << "Retrieving private key from server";
         var job = new JsonApiJob (account, E2EE_BASE_URL + "private-key", this);
         connect (job, &JsonApiJob.json_received, [this, account] (QJsonDocument& doc, int return_code) {
                 if (return_code == 200) {
                     string key = doc.object ()["ocs"].to_object ()["data"].to_object ()["private-key"].to_string ();
-                    GLib.Info (lc_cse ()) << key;
-                    GLib.Info (lc_cse ()) << "Found private key, lets decrypt it!";
+                    GLib.info (lc_cse ()) << key;
+                    GLib.info (lc_cse ()) << "Found private key, lets decrypt it!";
                     decrypt_private_key (account, key.to_local8Bit ());
                 } else if (return_code == 404) {
-                    GLib.Info (lc_cse ()) << "No private key on the server : setup is incomplete.";
+                    GLib.info (lc_cse ()) << "No private key on the server : setup is incomplete.";
                 } else {
-                    GLib.Info (lc_cse ()) << "Error while requesting public key : " << return_code;
+                    GLib.info (lc_cse ()) << "Error while requesting public key : " << return_code;
                 }
         });
         job.on_start ();
@@ -435,20 +435,20 @@ class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void get_public_key_from_server (AccountPointer account) {
-        GLib.Info (lc_cse ()) << "Retrieving public key from server";
+        GLib.info (lc_cse ()) << "Retrieving public key from server";
         var job = new JsonApiJob (account, E2EE_BASE_URL + "public-key", this);
         connect (job, &JsonApiJob.json_received, [this, account] (QJsonDocument& doc, int return_code) {
                 if (return_code == 200) {
                     string public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-keys"].to_object ()[account.dav_user ()].to_string ();
                     this.certificate = QSslCertificate (public_key.to_local8Bit (), QSsl.Pem);
                     this.public_key = this.certificate.public_key ();
-                    GLib.Info (lc_cse ()) << "Found Public key, requesting Server Public Key. Public key:" << public_key;
+                    GLib.info (lc_cse ()) << "Found Public key, requesting Server Public Key. Public key:" << public_key;
                     fetch_and_validate_public_key_from_server (account);
                 } else if (return_code == 404) {
-                    GLib.Info (lc_cse ()) << "No public key on the server";
+                    GLib.info (lc_cse ()) << "No public key on the server";
                     generate_key_pair (account);
                 } else {
-                    GLib.Info (lc_cse ()) << "Error while requesting public key : " << return_code;
+                    GLib.info (lc_cse ()) << "Error while requesting public key : " << return_code;
                 }
         });
         job.on_start ();
@@ -458,22 +458,22 @@ class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void fetch_and_validate_public_key_from_server (AccountPointer account) {
-        GLib.Info (lc_cse ()) << "Retrieving public key from server";
+        GLib.info (lc_cse ()) << "Retrieving public key from server";
         var job = new JsonApiJob (account, E2EE_BASE_URL + "server-key", this);
         connect (job, &JsonApiJob.json_received, [this, account] (QJsonDocument& doc, int return_code) {
             if (return_code == 200) {
                 const var server_public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-key"].to_string ().to_latin1 ();
-                GLib.Info (lc_cse ()) << "Found Server Public key, checking it. Server public key:" << server_public_key;
+                GLib.info (lc_cse ()) << "Found Server Public key, checking it. Server public key:" << server_public_key;
                 if (check_server_public_key_validity (server_public_key)) {
                     if (this.private_key.is_empty ()) {
-                        GLib.Info (lc_cse ()) << "Valid Server Public key, requesting Private Key.";
+                        GLib.info (lc_cse ()) << "Valid Server Public key, requesting Private Key.";
                         get_private_key_from_server (account);
                     } else {
-                        GLib.Info (lc_cse ()) << "Certificate saved, Encrypting Private Key.";
+                        GLib.info (lc_cse ()) << "Certificate saved, Encrypting Private Key.";
                         encrypt_private_key (account);
                     }
                 } else {
-                    GLib.Info (lc_cse ()) << "Error invalid server public key";
+                    GLib.info (lc_cse ()) << "Error invalid server public key";
                     this.certificate = QSslCertificate ();
                     this.public_key = QSslKey ();
                     this.private_key = GLib.ByteArray ();
@@ -481,7 +481,7 @@ class ClientSideEncryption : GLib.Object {
                     return;
                 }
             } else {
-                GLib.Info (lc_cse ()) << "Error while requesting server public key : " << return_code;
+                GLib.info (lc_cse ()) << "Error while requesting server public key : " << return_code;
             }
         });
         job.on_start ();
@@ -511,24 +511,24 @@ class ClientSideEncryption : GLib.Object {
             }
             bool ok = dialog.exec ();
             if (ok) {
-                GLib.Info (lc_cse ()) << "Got mnemonic:" << dialog.text_value ();
+                GLib.info (lc_cse ()) << "Got mnemonic:" << dialog.text_value ();
                 prev = dialog.text_value ();
 
                 this.mnemonic = prev;
                 string mnemonic = prev.split (" ").join ("").to_lower ();
-                GLib.Info (lc_cse ()) << "mnemonic:" << mnemonic;
+                GLib.info (lc_cse ()) << "mnemonic:" << mnemonic;
 
                 // split off salt
                 const var salt = EncryptionHelper.extract_private_key_salt (key);
 
                 var pass = EncryptionHelper.generate_password (mnemonic, salt);
-                GLib.Info (lc_cse ()) << "Generated key:" << pass;
+                GLib.info (lc_cse ()) << "Generated key:" << pass;
 
                 GLib.ByteArray private_key = EncryptionHelper.decrypt_private_key (pass, key);
                 //this.private_key = QSslKey (private_key, QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
                 this.private_key = private_key;
 
-                GLib.Info (lc_cse ()) << "Private key : " << this.private_key;
+                GLib.info (lc_cse ()) << "Private key : " << this.private_key;
 
                 if (!this.private_key.is_null () && check_public_key_validity (account)) {
                     write_private_key (account);
@@ -539,7 +539,7 @@ class ClientSideEncryption : GLib.Object {
             } else {
                 this.mnemonic = "";
                 this.private_key = GLib.ByteArray ();
-                GLib.Info (lc_cse ()) << "Cancelled";
+                GLib.info (lc_cse ()) << "Cancelled";
                 break;
             }
         }
@@ -586,7 +586,7 @@ class ClientSideEncryption : GLib.Object {
         GLib.ByteArray decrypt_result = GLib.ByteArray.from_base64 (EncryptionHelper.decrypt_string_asymmetric ( key, GLib.ByteArray.from_base64 (encrypted_data)));
 
         if (data != decrypt_result) {
-            GLib.Info (lc_cse ()) << "invalid private key";
+            GLib.info (lc_cse ()) << "invalid private key";
             return false;
         }
 
@@ -606,12 +606,12 @@ class ClientSideEncryption : GLib.Object {
         BIO_write (certificate_bio, certificate_pem.const_data (), certificate_pem.size ());
         const var x509Certificate = X509Certificate.read_certificate (certificate_bio);
         if (!x509Certificate) {
-            GLib.Info (lc_cse ()) << "Client certificate is invalid. Could not check it against the server public key";
+            GLib.info (lc_cse ()) << "Client certificate is invalid. Could not check it against the server public key";
             return false;
         }
 
         if (X509_verify (x509Certificate, server_public_key) == 0) {
-            GLib.Info (lc_cse ()) << "Client certificate is not valid against the server public key";
+            GLib.info (lc_cse ()) << "Client certificate is not valid against the server public key";
             return false;
         }
 
@@ -635,7 +635,7 @@ class ClientSideEncryption : GLib.Object {
         job.set_binary_data (this.private_key);
         connect (job, &WritePasswordJob.on_finished, [] (Job incoming) {
             //  Q_UNUSED (incoming);
-            GLib.Info (lc_cse ()) << "Private key stored in keychain";
+            GLib.info (lc_cse ()) << "Private key stored in keychain";
         });
         job.on_start ();
     }
@@ -656,7 +656,7 @@ class ClientSideEncryption : GLib.Object {
         job.set_binary_data (this.certificate.to_pem ());
         connect (job, &WritePasswordJob.on_finished, [] (Job incoming) {
             //  Q_UNUSED (incoming);
-            GLib.Info (lc_cse ()) << "Certificate stored in keychain";
+            GLib.info (lc_cse ()) << "Certificate stored in keychain";
         });
         job.on_start ();
     }
@@ -677,7 +677,7 @@ class ClientSideEncryption : GLib.Object {
         job.set_text_data (this.mnemonic);
         connect (job, &WritePasswordJob.on_finished, [] (Job incoming) {
             //  Q_UNUSED (incoming);
-            GLib.Info (lc_cse ()) << "Mnemonic stored in keychain";
+            GLib.info (lc_cse ()) << "Mnemonic stored in keychain";
         });
         job.on_start ();
     }
@@ -701,7 +701,7 @@ class ClientSideEncryption : GLib.Object {
     GLib.List<GLib.ByteArray> split_cipher_parts (GLib.ByteArray data) {
         const var is_old_format = !data.contains ('|');
         const var parts = is_old_format ? old_cipher_format_split (data) : data.split ('|');
-        GLib.Info (lc_cse ()) << "found parts:" << parts << "old format?" << is_old_format;
+        GLib.info (lc_cse ()) << "found parts:" << parts << "old format?" << is_old_format;
         return parts;
     }
 

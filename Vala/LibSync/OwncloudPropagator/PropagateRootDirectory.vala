@@ -32,7 +32,7 @@ class PropagateRootDirectory : PropagateDirectory {
     /***********************************************************
     ***********************************************************/
     public bool on_schedule_self_or_child () {
-        GLib.Info (lc_root_directory ()) << "on_schedule_self_or_child" << this.state << "pending uploads" << propagator ().delayed_tasks ().size () << "subjobs state" << this.sub_jobs.state;
+        GLib.info (lc_root_directory ()) << "on_schedule_self_or_child" << this.state << "pending uploads" << propagator ().delayed_tasks ().size () << "subjobs state" << this.sub_jobs.state;
 
         if (this.state == Finished) {
             return false;
@@ -105,7 +105,7 @@ class PropagateRootDirectory : PropagateDirectory {
     ***********************************************************/
     private void on_dir_deletion_jobs_finished (SyncFileItem.Status status) {
         this.state = Finished;
-        GLib.Info (lc_propagator) << "PropagateRootDirectory.on_dir_deletion_jobs_finished" << "emit finished" << status;
+        GLib.info (lc_propagator) << "PropagateRootDirectory.on_dir_deletion_jobs_finished" << "emit finished" << status;
         /* emit */ finished (status);
     }
 
@@ -113,7 +113,7 @@ class PropagateRootDirectory : PropagateDirectory {
     /***********************************************************
     ***********************************************************/
     private void on_sub_jobs_finished (SyncFileItem.Status status) {
-        GLib.Info (lc_root_directory ()) << status << "on_sub_jobs_finished" << this.state << "pending uploads" << propagator ().delayed_tasks ().size () << "subjobs state" << this.sub_jobs.state;
+        GLib.info (lc_root_directory ()) << status << "on_sub_jobs_finished" << this.state << "pending uploads" << propagator ().delayed_tasks ().size () << "subjobs state" << this.sub_jobs.state;
 
         if (!propagator ().delayed_tasks ().empty ()) {
             schedule_delayed_jobs ();
@@ -127,7 +127,7 @@ class PropagateRootDirectory : PropagateDirectory {
                 // Synchronously on_abort
                 on_abort (AbortType.SYNCHRONOUS);
                 this.state = Finished;
-                GLib.Info (lc_propagator) << "PropagateRootDirectory.on_sub_jobs_finished" << "emit finished" << status;
+                GLib.info (lc_propagator) << "PropagateRootDirectory.on_sub_jobs_finished" << "emit finished" << status;
                 /* emit */ finished (status);
             }
             return;
@@ -140,7 +140,7 @@ class PropagateRootDirectory : PropagateDirectory {
     /***********************************************************
     ***********************************************************/
     private bool schedule_delayed_jobs () {
-        GLib.Info (lc_propagator) << "PropagateRootDirectory.schedule_delayed_jobs";
+        GLib.info (lc_propagator) << "PropagateRootDirectory.schedule_delayed_jobs";
         propagator ().set_schedule_delayed_tasks (true);
         var bulk_propagator_job = std.make_unique<BulkPropagatorJob> (propagator (), propagator ().delayed_tasks ());
         propagator ().clear_delayed_tasks ();

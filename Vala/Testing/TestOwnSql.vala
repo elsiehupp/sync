@@ -5,7 +5,6 @@
          */
 
 //  #include <QtTest>
-//  #include
 //  #include <sqlite3.h>
 
 using namespace Occ;
@@ -28,7 +27,7 @@ class TestOwnSql : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testCreate () {
-        const char sql = "CREATE TABLE addresses ( identifier INTEGER, name VARCHAR (4096), "
+        const string sql = "CREATE TABLE addresses ( identifier INTEGER, name VARCHAR (4096), "
                 "address VARCHAR (4096), entered INTEGER (8), PRIMARY KEY (identifier));";
 
         SqlQuery q (this.database);
@@ -52,7 +51,7 @@ class TestOwnSql : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testInsert () {
-        const char sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
+        const string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
                 " (1, 'Gonzo Alberto', 'Moriabata 24, Palermo', 1403100844);";
         SqlQuery q (this.database);
         q.prepare (sql);
@@ -63,7 +62,7 @@ class TestOwnSql : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testInsert2 () {
-        const char sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
+        const string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
                 " (?1, ?2, ?3, ?4);";
         SqlQuery q (this.database);
         q.prepare (sql);
@@ -78,7 +77,7 @@ class TestOwnSql : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testSelect () {
-        const char sql = "SELECT * FROM addresses;";
+        const string sql = "SELECT * FROM addresses;";
 
         SqlQuery q (this.database);
         q.prepare (sql);
@@ -94,7 +93,7 @@ class TestOwnSql : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testSelect2 () {
-        const char sql = "SELECT * FROM addresses WHERE identifier=?1";
+        const string sql = "SELECT * FROM addresses WHERE identifier=?1";
         SqlQuery q (this.database);
         q.prepare (sql);
         q.bindValue (1, 2);
@@ -109,7 +108,7 @@ class TestOwnSql : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testPragma () {
-        const char sql = "PRAGMA table_info (addresses)";
+        const string sql = "PRAGMA table_info (addresses)";
 
         SqlQuery q (this.database);
         int rc = q.prepare (sql);
@@ -124,7 +123,7 @@ class TestOwnSql : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testUnicode () {
-        const char sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
+        const string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
                 " (?1, ?2, ?3, ?4);";
         SqlQuery q (this.database);
         q.prepare (sql);
@@ -139,7 +138,7 @@ class TestOwnSql : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testReadUnicode () {
-        const char sql = "SELECT * FROM addresses WHERE identifier=3;";
+        const string sql = "SELECT * FROM addresses WHERE identifier=3;";
         SqlQuery q (this.database);
         q.prepare (sql);
 

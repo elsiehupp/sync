@@ -6,9 +6,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 
 //  #include <QVariantMap>
 //  #include <QLoggingCategory>
-//  #include
 //  #include <QDebug>
-//  #include
 //  #include <QVariantMap>
 //  #include <QMimeDatabase>
 
@@ -185,7 +183,7 @@ class Capabilities {
     /***********************************************************
     ***********************************************************/
     public bool chunking_ng () {
-        static const var chunkng = qgetenv ("OWNCLOUD_CHUNKING_NG");
+        const var chunkng = qgetenv ("OWNCLOUD_CHUNKING_NG");
         if (chunkng == "0")
             return false;
         if (chunkng == "1")
@@ -300,7 +298,7 @@ class Capabilities {
         }
 
         const var version = properties.value (QStringLiteral ("api-version"), "1.0").to_byte_array ();
-        GLib.Info (lc_server_capabilities) << "E2EE API version:" << version;
+        GLib.info (lc_server_capabilities) << "E2EE API version:" << version;
         const var splitted_version = version.split ('.');
 
         bool ok = false;

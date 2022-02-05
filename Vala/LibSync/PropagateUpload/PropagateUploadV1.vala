@@ -31,7 +31,7 @@ void PropagateUploadFileV1.do_start_upload () {
         && (progress_info.content_checksum == this.item.checksum_header || progress_info.content_checksum.is_empty () || this.item.checksum_header.is_empty ())) {
         this.start_chunk = progress_info.chunk;
         this.transfer_id = progress_info.transferid;
-        GLib.Info (lc_propagate_upload_v1) << this.item.file << " : Resuming from chunk " << this.start_chunk;
+        GLib.info (lc_propagate_upload_v1) << this.item.file << " : Resuming from chunk " << this.start_chunk;
     } else if (this.chunk_count <= 1 && !this.item.checksum_header.is_empty ()) {
         // If there is only one chunk, write the checksum in the database, so if the PUT is sent
         // to the server, but the connection drops before we get the etag, we can check the checksum
@@ -84,7 +84,7 @@ void PropagateUploadFileV1.on_start_next_chunk () {
         int sending_chunk = (this.current_chunk + this.start_chunk) % this.chunk_count;
         // XOR with chunk size to make sure everything goes well if chunk size changes between runs
         uint32 transid = this.transfer_id ^ uint32 (chunk_size ());
-        GLib.Info (lc_propagate_upload_v1) << "Upload chunk" << sending_chunk << "of" << this.chunk_count << "transferid (remote)=" << transid;
+        GLib.info (lc_propagate_upload_v1) << "Upload chunk" << sending_chunk << "of" << this.chunk_count << "transferid (remote)=" << transid;
         path += string ("-chunking-%1-%2-%3").arg (transid).arg (this.chunk_count).arg (sending_chunk);
 
         headers[QByteArrayLiteral ("OC-Chunked")] = QByteArrayLiteral ("1");
@@ -105,8 +105,8 @@ void PropagateUploadFileV1.on_start_next_chunk () {
     GLib.debug (lc_propagate_upload_v1) << this.chunk_count << is_final_chunk << chunk_start << current_chunk_size;
 
     if (is_final_chunk && !this.transmission_checksum_header.is_empty ()) {
-        GLib.Info (lc_propagate_upload_v1) << propagator ().full_remote_path (path) << this.transmission_checksum_header;
-        headers[check_sum_header_c] = this.transmission_checksum_header;
+        GLib.info (lc_propagate_upload_v1) << propagator ().full_remote_path (path) << this.transmission_checksum_header;
+        headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
     }
 
     const string filename = this.file_to_upload.path;
@@ -175,7 +175,7 @@ void PropagateUploadFileV1.on_start_next_chunk () {
 
 void PropagateUploadFileV1.on_put_finished () {
     var job = qobject_cast<PUTFile_job> (sender ());
-    ASSERT (job);
+    //  ASSERT (job);
 
     on_job_destroyed (job); // remove it from the this.jobs list
 

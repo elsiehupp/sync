@@ -26,36 +26,24 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 //  #include <QSvgRenderer>
 //  #include <QPushButton>
 //  #include <QContext_menu_event>
-//  #include
 //  #include <cstring>
-//  #include
 //  #include <Gtk.Dialog
 //  #include <Gtk.Wid
-//  #include
 //  #include <GLib.List>
 //  #include <QTimer>
 //  #include <qpushbutton.h>
 //  #include <qscrollarea.h>
 
-namespace {
-    const char password_is_set_placeholder = "●●●●●●●●";
-
-}
-
 namespace Occ {
-
 namespace Ui {
-    class Share_user_group_widget;
-    class Share_user_line;
-}
-
-
 
 /***********************************************************
 @brief The Share_dialog (user/group) class
 @ingroup gui
 ***********************************************************/
 class Share_user_group_widget : Gtk.Widget {
+
+    const string password_is_set_placeholder = "●●●●●●●●";
 
     /***********************************************************
     ***********************************************************/
@@ -413,7 +401,7 @@ signals:
                         _("Copy link"),
             this, SLOT (on_private_link_copy ()));
 
-        menu.exec (QCursor.pos ());
+        menu.exec (QCursor.position ());
     }
 
     void Share_user_group_widget.on_sharees_ready () {
@@ -485,7 +473,7 @@ signals:
     }
 
     void Share_user_group_widget.on_completer_highlighted (QModelIndex index) {
-        // By default the completer would set the text to Edit_role,
+        // By default the completer would set the text to EditRole,
         // override that here.
         this.ui.sharee_line_edit.on_set_text (index.data (Qt.Display_role).to_string ());
     }

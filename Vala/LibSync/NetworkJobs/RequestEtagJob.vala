@@ -50,7 +50,7 @@ class RequestEtagJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_finished () {
-        GLib.Info (lc_etag_job) << "Request Etag of" << reply ().request ().url () << "FINISHED WITH STATUS"
+        GLib.info (lc_etag_job) << "Request Etag of" << reply ().request ().url () << "FINISHED WITH STATUS"
                         <<  reply_status_string ();
 
         var http_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

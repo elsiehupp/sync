@@ -8,7 +8,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QLoggingCategory>
 //  #include <Soup.Request>
 //  #include <QNetworkAccessManager>
-//  #include
 //  #include <Soup.Request>
 //  #include <QSslConfigur
 //  #include <Soup.Buffer>
@@ -24,7 +23,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #pragma once
 
 //  #include <Soup.Request>
-//  #include
 //  #include <QPointer>
 //  #include <QElapsedTimer>
 //  #include <QTimer>
@@ -150,7 +148,7 @@ class AbstractNetworkJob : GLib.Object {
         this.reply = null;
         this.path = path;
         // Since we hold a unowned to the account, this makes no sense. (issue #6893)
-        ASSERT (account != parent);
+        //  ASSERT (account != parent);
 
         this.timer.set_single_shot (true);
         this.timer.set_interval ( (http_timeout ? http_timeout : 300) * 1000); // default to 5 minutes.
@@ -181,7 +179,7 @@ class AbstractNetworkJob : GLib.Object {
         const string display_url = string ("%1://%2%3").arg (url.scheme ()).arg (url.host ()).arg (url.path ());
 
         string parent_meta_object_name = parent () ? parent ().meta_object ().class_name () : "";
-        GLib.Info (lc_network_job) << meta_object ().class_name () << "created for" << display_url << "+" << path () << parent_meta_object_name;
+        GLib.info (lc_network_job) << meta_object ().class_name () << "created for" << display_url << "+" << path () << parent_meta_object_name;
     }
 
 
@@ -265,7 +263,7 @@ class AbstractNetworkJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public GLib.ByteArray response_timestamp () {
-        ASSERT (!this.response_timestamp.is_empty ());
+        //  ASSERT (!this.response_timestamp.is_empty ());
         return this.response_timestamp;
     }
 
@@ -350,7 +348,7 @@ class AbstractNetworkJob : GLib.Object {
         var req = this.reply.request ();
         GLib.Uri requested_url = req.url ();
         GLib.ByteArray verb = HttpLogger.request_verb (*this.reply);
-        GLib.Info (lc_network_job) << "Restarting" << verb << requested_url;
+        GLib.info (lc_network_job) << "Restarting" << verb << requested_url;
         on_reset_timeout ();
         if (this.request_body) {
             this.request_body.seek (0);
@@ -544,7 +542,7 @@ class AbstractNetworkJob : GLib.Object {
                 GLib.warn (lc_network_job) << "Not resending HTTP2 request, number of resends exhausted"
                                         << this.reply.request ().url () << this.http2_resend_count;
             } else {
-                GLib.Info (lc_network_job) << "HTTP2 resending" << this.reply.request ().url ();
+                GLib.info (lc_network_job) << "HTTP2 resending" << this.reply.request ().url ();
                 this.http2_resend_count++;
 
                 on_reset_timeout ();
@@ -616,7 +614,7 @@ class AbstractNetworkJob : GLib.Object {
                     this.redirect_count++;
 
                     // Create the redirected request and send it
-                    GLib.Info (lc_network_job) << "Redirecting" << verb << requested_url << redirect_url;
+                    GLib.info (lc_network_job) << "Redirecting" << verb << requested_url << redirect_url;
                     on_reset_timeout ();
                     if (this.request_body) {
                         if (!this.request_body.is_open ()) {

@@ -233,7 +233,7 @@ class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void delete_remote_item (string filename) {
-        GLib.Info (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Deleting nested encrypted item" << filename;
+        GLib.info (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Deleting nested encrypted item" << filename;
 
         var delete_job = new DeleteJob (this.propagator.account (), this.propagator.full_remote_path (filename), this);
         delete_job.set_folder_token (this.folder_token);

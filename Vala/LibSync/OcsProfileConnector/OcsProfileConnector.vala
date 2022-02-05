@@ -62,7 +62,7 @@ class OcsProfileConnector : GLib.Object {
         GLib.debug (lc_ocs_profile_connector) << "Hovercard fetched:" << json;
 
         if (status_code != 200) {
-            GLib.Info (lc_ocs_profile_connector) << "Fetching of hovercard on_finished with status code" << status_code;
+            GLib.info (lc_ocs_profile_connector) << "Fetching of hovercard on_finished with status code" << status_code;
             return;
         }
         const var json_data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("actions");

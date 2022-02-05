@@ -104,7 +104,6 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
 //  #include <qtlockedfile.h>
-//  #include
 //  #include <QDir>
 //  #include <QFile_open_even
 //  #include <QShared_memory>
@@ -114,12 +113,12 @@ namespace SharedTools {
 
     /***********************************************************
     ***********************************************************/
-    static const int instances_size = 1024;
+    const int instances_size = 1024;
 
     /***********************************************************
     ***********************************************************/
     static string instances_lock_filename (string app_session_id) {
-        const char slash = '/';
+        const string slash = '/';
         string res = QDir.temp_path ();
         if (!res.ends_with (slash))
             res += slash;

@@ -74,7 +74,7 @@ class PropagateRemoteMove : PropagateItemJob {
 
         var vfs = propagator ().sync_options ().vfs;
         var itype = this.item.type;
-        ASSERT (itype != ItemTypeVirtualFileDownload && itype != ItemTypeVirtualFileDehydration);
+        //  ASSERT (itype != ItemTypeVirtualFileDownload && itype != ItemTypeVirtualFileDehydration);
         if (vfs.mode () == Vfs.WithSuffix && itype != ItemTypeDirectory) {
             const var suffix = vfs.file_suffix ();
             bool source_had_suffix = remote_source.ends_with (suffix);
@@ -98,13 +98,13 @@ class PropagateRemoteMove : PropagateItemJob {
             // name.
             string folder_target_alt = folder_target;
             if (itype == ItemTypeFile) {
-                ASSERT (!source_had_suffix && !destination_had_suffix);
+                //  ASSERT (!source_had_suffix && !destination_had_suffix);
 
                 // If foo . bar.owncloud, the rename target will be "bar"
                 folder_target_alt = folder_target + suffix;
 
             } else if (itype == ItemTypeVirtualFile) {
-                ASSERT (source_had_suffix && destination_had_suffix);
+                //  ASSERT (source_had_suffix && destination_had_suffix);
 
                 // If foo.owncloud . bar, the rename target will be "bar.owncloud"
                 folder_target_alt.chop (suffix.size ());
@@ -123,7 +123,7 @@ class PropagateRemoteMove : PropagateItemJob {
                          .arg (folder_target_alt, folder_target, error));
                     return;
                 }
-                GLib.Info (lc_propagate_remote_move) << "Suffix vfs required local rename of"
+                GLib.info (lc_propagate_remote_move) << "Suffix vfs required local rename of"
                                               << folder_target_alt << "to" << folder_target;
             }
         }
@@ -167,8 +167,8 @@ class PropagateRemoteMove : PropagateItemJob {
             return false;
 
         bool changed = false;
-        ASSERT (!from_.ends_with (QLatin1String ("/")));
-        ASSERT (!to_.ends_with (QLatin1String ("/")));
+        //  ASSERT (!from_.ends_with (QLatin1String ("/")));
+        //  ASSERT (!to_.ends_with (QLatin1String ("/")));
         string from = from_ + QLatin1String ("/");
         string to = to_ + QLatin1String ("/");
 
@@ -191,7 +191,7 @@ class PropagateRemoteMove : PropagateItemJob {
     private void on_move_job_finished () {
         propagator ().active_job_list.remove_one (this);
 
-        ASSERT (this.job);
+        //  ASSERT (this.job);
 
         Soup.Reply.NetworkError err = this.job.reply ().error ();
         this.item.http_error_code = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

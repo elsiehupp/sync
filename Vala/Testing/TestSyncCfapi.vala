@@ -994,7 +994,7 @@ class TestSyncCfApi : GLib.Object {
 
         var r = vfs.availability ("nonexistant");
         QVERIFY (!r);
-        QCOMPARE (r.error (), Vfs.AvailabilityError.NoSuchItem);
+        QCOMPARE (r.error (), Vfs.AvailabilityError.NO_SUCH_ITEM);
     }
 
 

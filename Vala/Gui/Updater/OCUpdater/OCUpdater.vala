@@ -8,9 +8,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <Qt_network>
 //  #include <QtGui>
 //  #include <Qt_widgets>
-//  #include
 //  #include <cstdio>
-//  #include
 //  #include <QTemporary_file>
 //  #include <QTimer>
 
@@ -151,11 +149,11 @@ protected slots:
 
     /***********************************************************
     ***********************************************************/
-    static const char update_available_c[] = "Updater/update_available";
-    static const char update_target_version_c[] = "Updater/update_target_version";
-    static const char update_target_version_string_c[] = "Updater/update_target_version_string";
-    static const char seen_version_c[] = "Updater/seen_version";
-    static const char auto_update_attempted_c[] = "Updater/auto_update_attempted";
+    const string update_available_c = "Updater/update_available";
+    const string update_target_version_c = "Updater/update_target_version";
+    const string update_target_version_string_c = "Updater/update_target_version_string";
+    const string seen_version_c = "Updater/seen_version";
+    const string auto_update_attempted_c = "Updater/auto_update_attempted";
 
 
     OCUpdater.OCUpdater (GLib.Uri url)
@@ -203,14 +201,14 @@ protected slots:
         case Up_to_date:
         case Download_failed:
         case Download_timed_out:
-            GLib.Info (lc_updater) << "Checking for available update";
+            GLib.info (lc_updater) << "Checking for available update";
             check_for_update ();
             break;
         case Download_complete:
-            GLib.Info (lc_updater) << "Update is downloaded, skip new check.";
+            GLib.info (lc_updater) << "Update is downloaded, skip new check.";
             break;
         case Update_only_available_through_system:
-            GLib.Info (lc_updater) << "Update is only available through system, skip check.";
+            GLib.info (lc_updater) << "Update is only available through system, skip check.";
             break;
         }
     }
@@ -271,7 +269,7 @@ protected slots:
         string update_file = settings.value (update_available_c).to_string ();
         settings.set_value (auto_update_attempted_c, true);
         settings.sync ();
-        GLib.Info (lc_updater) << "Running updater" << update_file;
+        GLib.info (lc_updater) << "Running updater" << update_file;
 
         if (update_file.ends_with (".exe")) {
             QProcess.start_detached (update_file, string[] () << "/S"

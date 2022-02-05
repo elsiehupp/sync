@@ -107,7 +107,7 @@ class SqlQuery {
                 GLib.warn (lc_sql) << "Sqlite prepare statement error:" << this.error << "in" << this.sql;
                 ENFORCE (allow_failure, "SQLITE Prepare error");
             } else {
-                ASSERT (this.stmt);
+                //  ASSERT (this.stmt);
                 this.sqldatabase.queries.insert (this);
             }
         }
@@ -248,7 +248,7 @@ class SqlQuery {
         const bool first_step = !Sqlite3Stmt_busy (this.stmt);
 
         int n = 0;
-        forever {
+        while (true) {
             this.err_id = sqlite3_step (this.stmt);
             if (n < SQLITE_REPEAT_COUNT && first_step && (this.err_id == SQLITE_LOCKED || this.err_id == SQLITE_BUSY)) {
                 sqlite3_reset (this.stmt); // not necessary after sqlite version 3.6.23.1
@@ -315,8 +315,8 @@ class SqlQuery {
     ***********************************************************/
     public void reset_and_clear_bindings () {
         if (this.stmt) {
-            SQLITE_DO (sqlite3_reset (this.stmt));
-            SQLITE_DO (sqlite3_clear_bindings (this.stmt));
+            sqlite_do (sqlite3_reset (this.stmt));
+            sqlite_do (sqlite3_clear_bindings (this.stmt));
         }
     }
 
@@ -326,7 +326,7 @@ class SqlQuery {
     private void bind_value_internal (int pos, GLib.Variant value) {
         int res = -1;
         if (!this.stmt) {
-            ASSERT (false);
+            //  ASSERT (false);
             return;
         }
 
@@ -384,7 +384,7 @@ class SqlQuery {
         if (res != SQLITE_OK) {
             GLib.warn (lc_sql) << "ERROR binding SQL value:" << value << "error:" << res;
         }
-        ASSERT (res == SQLITE_OK);
+        //  ASSERT (res == SQLITE_OK);
     }
 
 
@@ -393,7 +393,7 @@ class SqlQuery {
     private void finish () {
         if (!this.stmt)
             return;
-        SQLITE_DO (sqlite3_finalize (this.stmt));
+        sqlite_do (sqlite3_finalize (this.stmt));
         this.stmt = null;
         if (this.sqldatabase) {
             this.sqldatabase.queries.remove (this);

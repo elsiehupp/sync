@@ -11,7 +11,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QJsonObject>
 //  #include <QJsonDocument>
 //  #include <qloggingcategory.h>
-//  #include
 //  #include <QtCore>
 
 
@@ -451,7 +450,7 @@ signals:
         job.add_query_params (parameters);
 
         this.currently_fetching = true;
-        GLib.Info (lc_activity) << "Start fetching activities for " << this.account_state.account ().display_name ();
+        GLib.info (lc_activity) << "Start fetching activities for " << this.account_state.account ().display_name ();
         job.on_start ();
     }
 
@@ -509,13 +508,13 @@ signals:
     }
 
     void ActivityListModel.add_error_to_activity_list (Activity activity) {
-        GLib.Info (lc_activity) << "Error successfully added to the notification list : " << activity.subject;
+        GLib.info (lc_activity) << "Error successfully added to the notification list : " << activity.subject;
         this.notification_errors_lists.prepend (activity);
         combine_activity_lists ();
     }
 
     void ActivityListModel.add_ignored_file_to_list (Activity new_activity) {
-        GLib.Info (lc_activity) << "First checking for duplicates then add file to the notification list of ignored files : " << new_activity.file;
+        GLib.info (lc_activity) << "First checking for duplicates then add file to the notification list of ignored files : " << new_activity.file;
 
         bool duplicate = false;
         if (this.list_of_ignored_files.size () == 0) {
@@ -538,13 +537,13 @@ signals:
     }
 
     void ActivityListModel.add_notification_to_activity_list (Activity activity) {
-        GLib.Info (lc_activity) << "Notification successfully added to the notification list : " << activity.subject;
+        GLib.info (lc_activity) << "Notification successfully added to the notification list : " << activity.subject;
         this.notification_lists.prepend (activity);
         combine_activity_lists ();
     }
 
     void ActivityListModel.clear_notifications () {
-        GLib.Info (lc_activity) << "Clear the notifications";
+        GLib.info (lc_activity) << "Clear the notifications";
         this.notification_lists.clear ();
         combine_activity_lists ();
     }
@@ -556,14 +555,14 @@ signals:
     }
 
     void ActivityListModel.add_sync_file_item_to_activity_list (Activity activity) {
-        GLib.Info (lc_activity) << "Successfully added to the activity list : " << activity.subject;
+        GLib.info (lc_activity) << "Successfully added to the activity list : " << activity.subject;
         this.sync_file_item_lists.prepend (activity);
         combine_activity_lists ();
     }
 
     void ActivityListModel.remove_activity_from_activity_list (Activity activity) {
-        GLib.Info (lc_activity) << "Activity/Notification/Error successfully dismissed : " << activity.subject;
-        GLib.Info (lc_activity) << "Trying to remove Activity/Notification/Error from view... ";
+        GLib.info (lc_activity) << "Activity/Notification/Error successfully dismissed : " << activity.subject;
+        GLib.info (lc_activity) << "Trying to remove Activity/Notification/Error from view... ";
 
         int index = -1;
         if (activity.type == Activity.Activity_type) {
@@ -581,8 +580,8 @@ signals:
         }
 
         if (index != -1) {
-            GLib.Info (lc_activity) << "Activity/Notification/Error successfully removed from the list.";
-            GLib.Info (lc_activity) << "Updating Activity/Notification/Error view.";
+            GLib.info (lc_activity) << "Activity/Notification/Error successfully removed from the list.";
+            GLib.info (lc_activity) << "Updating Activity/Notification/Error view.";
             combine_activity_lists ();
         }
     }

@@ -113,9 +113,9 @@ signals:
     private QPointer<QVariant_animation> this.animation = null;
 }
 
-static const int Spacing = 6;
-static const int Slide_duration = 1000;
-static const int Slide_distance = 400;
+const int Spacing = 6;
+const int Slide_duration = 1000;
+const int Slide_distance = 400;
 
 Slide_show.Slide_show (Gtk.Widget parent) : Gtk.Widget (parent) {
     set_size_policy (QSize_policy.Minimum, QSize_policy.Minimum);
@@ -176,7 +176,7 @@ QSize Slide_show.size_hint () {
         label_size.set_width (std.max (fm.horizontal_advance (label), label_size.width ()));
 #else
         label_size.set_width (std.max (fm.width (label), label_size.width ()));
-#endif
+//  #endif
     }
     QSize pixmap_size;
     for (QPixmap pixmap : this.pixmaps) {
@@ -218,11 +218,11 @@ void Slide_show.on_reset () {
 }
 
 void Slide_show.mouse_press_event (QMouse_event event) {
-    this.press_point = event.pos ();
+    this.press_point = event.position ();
 }
 
 void Slide_show.mouse_release_event (QMouse_event event) {
-    if (!this.animation && QLine_f (this.press_point, event.pos ()).length () < QGuiApplication.style_hints ().start_drag_distance ())
+    if (!this.animation && QLine_f (this.press_point, event.position ()).length () < QGuiApplication.style_hints ().start_drag_distance ())
         /* emit */ clicked ();
 }
 

@@ -14,13 +14,13 @@ const int EXCLUDE_LIST_FILE SOURCEDIR "/../../sync-exclude.lst"
 // The tests were converted from the old CMocka framework, that's why there is a global
 static QScopedPointer<ExcludedFiles> excludedFiles;
 
-static void setup () {
+static void set_up () {
     excludedFiles.on_reset (new ExcludedFiles);
     excludedFiles.setWildcardsMatchSlash (false);
 }
 
 static void setup_init () {
-    setup ();
+    set_up ();
 
     excludedFiles.addExcludeFilePath (EXCLUDE_LIST_FILE);
     QVERIFY (excludedFiles.reloadExcludeFiles ());
@@ -78,7 +78,7 @@ private on_ void testFun () {
 }
 
 private on_ void check_csync_exclude_add () {
-    setup ();
+    set_up ();
     excludedFiles.addManualExclude ("/tmp/check_csync1/*");
     QCOMPARE (check_file_full ("/tmp/check_csync1/foo"), CSYNC_FILE_EXCLUDE_LIST);
     QCOMPARE (check_file_full ("/tmp/check_csync2/foo"), CSYNC_NOT_EXCLUDED);
@@ -95,7 +95,7 @@ private on_ void check_csync_exclude_add () {
 }
 
 private on_ void check_csync_exclude_add_per_dir () {
-    setup ();
+    set_up ();
     excludedFiles.addManualExclude ("*", "/tmp/check_csync1/");
     QCOMPARE (check_file_full ("/tmp/check_csync1/foo"), CSYNC_FILE_EXCLUDE_LIST);
     QCOMPARE (check_file_full ("/tmp/check_csync2/foo"), CSYNC_NOT_EXCLUDED);
@@ -182,7 +182,7 @@ private on_ void check_csync_excluded () {
     QCOMPARE (check_file_full ("AUX"), CSYNC_FILE_EXCLUDE_INVALID_CHAR);
     QCOMPARE (check_file_full ("file_invalid_char<"), CSYNC_FILE_EXCLUDE_INVALID_CHAR);
     QCOMPARE (check_file_full ("file_invalid_char\n"), CSYNC_FILE_EXCLUDE_INVALID_CHAR);
-#endif
+//  #endif
 
     /* ? character */
     excludedFiles.addManualExclude ("bond00?");
@@ -331,7 +331,7 @@ private on_ void check_csync_excluded_traversal () {
     QCOMPARE (check_file_traversal ("file_trailing_dot."), CSYNC_FILE_EXCLUDE_INVALID_CHAR);
     QCOMPARE (check_file_traversal ("AUX"), CSYNC_FILE_EXCLUDE_INVALID_CHAR);
     QCOMPARE (check_file_traversal ("file_invalid_char<"), CSYNC_FILE_EXCLUDE_INVALID_CHAR);
-#endif
+//  #endif
 
     /* From here the actual traversal tests */
 
@@ -407,7 +407,7 @@ private on_ void check_csync_excluded_traversal () {
 }
 
 private on_ void check_csync_dir_only () {
-    setup ();
+    set_up ();
     excludedFiles.addManualExclude ("filedir");
     excludedFiles.addManualExclude ("dir/");
 
@@ -467,7 +467,7 @@ private on_ void check_csync_pathes () {
 }
 
 private on_ void check_csync_wildcards () {
-    setup ();
+    set_up ();
     excludedFiles.addManualExclude ("a/foo*bar");
     excludedFiles.addManualExclude ("b/foo*bar*");
     excludedFiles.addManualExclude ("c/foo?bar");
@@ -509,7 +509,7 @@ private on_ void check_csync_wildcards () {
 }
 
 private on_ void check_csync_regex_translation () {
-    setup ();
+    set_up ();
     GLib.ByteArray storage;
     var translate = [&storage] (char pattern) {
         storage = ExcludedFiles.convertToRegexpSyntax (pattern, false).toUtf8 ();
@@ -529,7 +529,7 @@ private on_ void check_csync_regex_translation () {
 }
 
 private on_ void check_csync_bname_trigger () {
-    setup ();
+    set_up ();
     bool wildcardsMatchSlash = false;
     GLib.ByteArray storage;
     var translate = [&storage, wildcardsMatchSlash] (char pattern) {

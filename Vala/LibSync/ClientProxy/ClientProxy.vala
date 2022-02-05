@@ -6,7 +6,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 //  #include <QLoggingCategory>
 //  #include <QThreadPool>
-//  #include
 //  #include <QNetworkProxy>
 //  #include <QRunnable>
 
@@ -77,7 +76,7 @@ class ClientProxy : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static const char proxy_type_to_c_str (QNetworkProxy.ProxyType type) {
+    public static string proxy_type_to_c_str (QNetworkProxy.ProxyType type) {
         switch (type) {
         case QNetworkProxy.NoProxy:
             return "NoProxy";
@@ -112,12 +111,12 @@ class ClientProxy : GLib.Object {
 
         switch (proxy_type) {
             case QNetworkProxy.NoProxy:
-                GLib.Info (lc_client_proxy) << "Set proxy configuration to use NO proxy";
+                GLib.info (lc_client_proxy) << "Set proxy configuration to use NO proxy";
                 QNetworkProxyFactory.set_use_system_configuration (false);
                 QNetworkProxy.set_application_proxy (QNetworkProxy.NoProxy);
                 break;
             case QNetworkProxy.DefaultProxy:
-                GLib.Info (lc_client_proxy) << "Set proxy configuration to use the preferred system proxy for http tcp connections"; {
+                GLib.info (lc_client_proxy) << "Set proxy configuration to use the preferred system proxy for http tcp connections"; {
                     QNetworkProxyQuery query;
                     query.set_protocol_tag ("http");
                     query.set_query_type (QNetworkProxyQuery.TcpSocket);
@@ -129,13 +128,13 @@ class ClientProxy : GLib.Object {
                 break;
             case QNetworkProxy.Socks5Proxy:
                 proxy.set_type (QNetworkProxy.Socks5Proxy);
-                GLib.Info (lc_client_proxy) << "Set proxy configuration to SOCKS5" << print_q_network_proxy (proxy);
+                GLib.info (lc_client_proxy) << "Set proxy configuration to SOCKS5" << print_q_network_proxy (proxy);
                 QNetworkProxyFactory.set_use_system_configuration (false);
                 QNetworkProxy.set_application_proxy (proxy);
                 break;
             case QNetworkProxy.HttpProxy:
                 proxy.set_type (QNetworkProxy.HttpProxy);
-                GLib.Info (lc_client_proxy) << "Set proxy configuration to HTTP" << print_q_network_proxy (proxy);
+                GLib.info (lc_client_proxy) << "Set proxy configuration to HTTP" << print_q_network_proxy (proxy);
                 QNetworkProxyFactory.set_use_system_configuration (false);
                 QNetworkProxy.set_application_proxy (proxy);
                 break;

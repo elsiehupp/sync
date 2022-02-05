@@ -155,7 +155,7 @@ protected slots:
             return;
         }
         var job = qobject_cast<LsColJob> (sender ());
-        ASSERT (job);
+        //  ASSERT (job);
         show_warn (_("Failed to list a folder. Error : %1")
                      .arg (job.error_string_parsing_body ()));
     }

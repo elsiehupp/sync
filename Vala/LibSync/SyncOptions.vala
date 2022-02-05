@@ -175,6 +175,7 @@ class SyncOptions {
         this.file_regex.set_pattern_options (Utility.fs_case_preserving () ? QRegularExpression.Case_insensitive_option : QRegularExpression.No_pattern_option);
         this.file_regex.set_pattern (pattern);
     }
-}
+
+} // class SyncOptions
 
 } // namespace Occ

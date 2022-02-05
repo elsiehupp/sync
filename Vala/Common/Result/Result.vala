@@ -106,7 +106,7 @@ class Result {
     /***********************************************************
     ***********************************************************/
     public const T operator* () & {
-        ASSERT (!this.is_error);
+        //  ASSERT (!this.is_error);
         return this.result;
     }
 
@@ -114,7 +114,7 @@ class Result {
     /***********************************************************
     ***********************************************************/
     public T operator* () && {
-        ASSERT (!this.is_error);
+        //  ASSERT (!this.is_error);
         return std.move (this.result);
     }
 
@@ -122,7 +122,7 @@ class Result {
     /***********************************************************
     ***********************************************************/
     public const T *operator. () {
-        ASSERT (!this.is_error);
+        //  ASSERT (!this.is_error);
         return this.result;
     }
 
@@ -130,7 +130,7 @@ class Result {
     /***********************************************************
     ***********************************************************/
     public const T get () {
-        ASSERT (!this.is_error)
+        //  ASSERT (!this.is_error)
         return this.result;
     }
 
@@ -138,7 +138,7 @@ class Result {
     /***********************************************************
     ***********************************************************/
     public const Error error () & {
-        ASSERT (this.is_error);
+        //  ASSERT (this.is_error);
         return this.error;
     }
 
@@ -146,7 +146,7 @@ class Result {
     /***********************************************************
     ***********************************************************/
     public Error error () && {
-        ASSERT (this.is_error);
+        //  ASSERT (this.is_error);
         return std.move (this.error);
     }
 

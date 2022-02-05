@@ -5,7 +5,7 @@
 const int OC_ASSERT_MSG q_fatal
 #else
 const int OC_ASSERT_MSG q_critical
-#endif
+//  #endif
 
 // For overloading macros by argument count
 // See stackoverflow.com/questions/16683146/can-macros-be-overloaded-by-number-of-arguments
@@ -59,4 +59,4 @@ const int ENFORCE (...) OC_ASSERT_OVERLOAD (ENFORCE, __VA_ARGS__)
 //
 // Q_ASSERT
 
-#endif
+//  #endif

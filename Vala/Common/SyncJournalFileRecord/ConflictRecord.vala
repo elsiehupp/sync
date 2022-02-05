@@ -10,9 +10,10 @@ namespace Occ {
 /***********************************************************
 Represents a conflict in the conflicts table.
 
-In the following the "conflict file" is the file that has the conflict
-tag in the filename, and the base file is the file that it's a conflict for.
-So if "a/foo.txt" is the base file, its conflict file could be
+In the following the "conflict file" is the file that has
+the conflict tag in the filename, and the base file is the
+file that it's a conflict for. So if "a/foo.txt" is the
+base file, its conflict file could be
 "a/foo (conflicted copy 1234).txt".
 ***********************************************************/
 class ConflictRecord {
@@ -62,4 +63,7 @@ class ConflictRecord {
     public bool is_valid () {
         return !path.is_empty ();
     }
-};
+
+} // class ConflictRecord
+
+} // namespace Occ

@@ -5,14 +5,11 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 //  #include <deletejob.h>
-//  #include
 //  #include <QLoggingCategory>
-//  #include
 //  #include <QNetworkAccessMana
 //  #include <QSslSocket>
 //  #include <QNetworkCo
 //  #include <QNetw
-//  #include
 //  #include <QFileInfo>
 //  #include <QDir>
 //  #include <QSslKey>
@@ -23,7 +20,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QJsonArray>
 //  #include <QLoggingCategory>
 //  #include <QHttpMultiPart>
-//  #include
 //  #include <qsslconfiguration.h>
 //  #include <qt5keychain/keychain.h>
 
@@ -42,18 +38,10 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QPixmap>
 //  #endif
 
-const char app_password[] = "app-password";
 
 //  #include <memory>
 
-
-namespace {
-}
-
 namespace Occ {
-
-class AccountPointer : unowned<Account>;
-
 
 /***********************************************************
 @brief The Account class represents an account on an
@@ -64,6 +52,10 @@ The Account has a name and url. It also has information
 about credentials, SSL errors and certificates.
 ***********************************************************/
 class Account : GLib.Object {
+
+    class AccountPointer : unowned<Account> { }
+
+    const string app_password = "app-password";
 
     const int PUSH_NOTIFICATIONS_RECONNECT_INTERVAL = 1000 * 60 * 2;
     const int USERNAME_PREFILL_SERVER_VERSION_MIN_SUPPORTED_MAJOR = 24;
@@ -122,9 +114,9 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-#ifndef TOKEN_AUTH_ONLY
+//  #ifndef TOKEN_AUTH_ONLY
     private QImage avatar_img;
-#endif
+//  #endif
 
     /***********************************************************
     ***********************************************************/
@@ -380,7 +372,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-#ifndef TOKEN_AUTH_ONLY
+//  #ifndef TOKEN_AUTH_ONLY
     public QImage avatar () {
         return this.avatar_img;
     }
@@ -392,7 +384,7 @@ class Account : GLib.Object {
         this.avatar_img = img;
         /* emit */ account_changed_avatar ();
     }
-#endif
+//  #endif
 
 
     /***********************************************************
@@ -840,7 +832,7 @@ class Account : GLib.Object {
     ***********************************************************/
     public void clear_cookie_jar () {
         var jar = qobject_cast<CookieJar> (this.access_manager.cookie_jar ());
-        ASSERT (jar);
+        //  ASSERT (jar);
         jar.set_all_cookies (GLib.List<QNetworkCookie> ());
         /* emit */ wants_account_saved (this);
     }
@@ -866,7 +858,7 @@ class Account : GLib.Object {
         this.push_notifications_reconnect_timer.stop ();
 
         if (this.capabilities.available_push_notifications () != PushNotificationType.NONE) {
-            GLib.Info (lc_account) << "Try to setup push notifications";
+            GLib.info (lc_account) << "Try to setup push notifications";
 
             if (!this.push_notifications) {
                 this.push_notifications = new PushNotifications (this, this);
@@ -877,7 +869,7 @@ class Account : GLib.Object {
                 });
 
                 const var disable_push_notifications = [this] () {
-                    GLib.Info (lc_account) << "Disable push notifications object because authentication failed or connection lost";
+                    GLib.info (lc_account) << "Disable push notifications object because authentication failed or connection lost";
                     if (!this.push_notifications) {
                         return;
                     }
@@ -893,7 +885,7 @@ class Account : GLib.Object {
                 connect (this.push_notifications, &PushNotifications.authentication_failed, this, disable_push_notifications);
             }
             // If push notifications already running it is no problem to call setup again
-            this.push_notifications.setup ();
+            this.push_notifications.set_up ();
         }
     }
 
@@ -918,7 +910,7 @@ class Account : GLib.Object {
         connect (job, &DeletePasswordJob.on_finished, [this] (Job incoming) {
             var delete_job = static_cast<DeletePasswordJob> (incoming);
             if (delete_job.error () == NoError)
-                GLib.Info (lc_account) << "app_password deleted from keychain";
+                GLib.info (lc_account) << "app_password deleted from keychain";
             else
                 GLib.warn (lc_account) << "Unable to delete app_password from keychain" << delete_job.error_string ();
 
@@ -1050,7 +1042,7 @@ class Account : GLib.Object {
         connect (job, &WritePasswordJob.on_finished, [this] (Job incoming) {
             var write_job = static_cast<WritePasswordJob> (incoming);
             if (write_job.error () == NoError)
-                GLib.Info (lc_account) << "app_password stored in keychain";
+                GLib.info (lc_account) << "app_password stored in keychain";
             else
                 GLib.warn (lc_account) << "Unable to store app_password in keychain" << write_job.error_string ();
 
@@ -1071,7 +1063,7 @@ class Account : GLib.Object {
                 if (http_code != 200) {
                     GLib.warn (lc_account) << "AppToken remove failed for user : " << display_name () << " with code : " << http_code;
                 } else {
-                    GLib.Info (lc_account) << "AppToken for user : " << display_name () << " has been removed.";
+                    GLib.info (lc_account) << "AppToken for user : " << display_name () << " has been removed.";
                 }
             } else {
                 //  Q_ASSERT (false);
@@ -1157,8 +1149,8 @@ class Account : GLib.Object {
                         << "\n";
         }
 
-        GLib.Info (lc_account ()) << "ssl errors" << out;
-        GLib.Info (lc_account ()) << reply.ssl_configuration ().peer_certificate_chain ();
+        GLib.info (lc_account ()) << "ssl errors" << out;
+        GLib.info (lc_account ()) << reply.ssl_configuration ().peer_certificate_chain ();
 
         bool all_previously_rejected = true;
         foreach (QSslError error, errors) {
@@ -1169,7 +1161,7 @@ class Account : GLib.Object {
 
         // If all certificates have previously been rejected by the user, don't ask again.
         if (all_previously_rejected) {
-            GLib.Info (lc_account) << out << "Certs not trusted by user decision, returning.";
+            GLib.info (lc_account) << out << "Certs not trusted by user decision, returning.";
             return;
         }
 
@@ -1196,7 +1188,7 @@ class Account : GLib.Object {
                 /* emit */ wants_account_saved (this);
 
                 // all ssl certificates are known and accepted. We can ignore the problems right away.
-                GLib.Info (lc_account) << out << "Certs are known and trusted! This is not an actual error.";
+                GLib.info (lc_account) << out << "Certs are known and trusted! This is not an actual error.";
             }
 
             // Warning : Do not* use ignore_ssl_errors () (without args) here:

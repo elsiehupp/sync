@@ -114,7 +114,7 @@ class EncryptFolderJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_lock_for_encryption_error (GLib.ByteArray file_identifier, int http_error_code) {
-        GLib.Info (lc_encrypt_folder_job ()) << "Locking error for" << file_identifier << "HTTP code:" << http_error_code;
+        GLib.info (lc_encrypt_folder_job ()) << "Locking error for" << file_identifier << "HTTP code:" << http_error_code;
         /* emit */ finished (Error);
     }
 
@@ -122,7 +122,7 @@ class EncryptFolderJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_unlock_folder_success (GLib.ByteArray file_identifier) {
-        GLib.Info (lc_encrypt_folder_job ()) << "Unlocking on_success for" << file_identifier;
+        GLib.info (lc_encrypt_folder_job ()) << "Unlocking on_success for" << file_identifier;
         /* emit */ finished (Success);
     }
 
@@ -130,7 +130,7 @@ class EncryptFolderJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_unlock_folder_error (GLib.ByteArray file_identifier, int http_error_code) {
-        GLib.Info (lc_encrypt_folder_job ()) << "Unlocking error for" << file_identifier << "HTTP code:" << http_error_code;
+        GLib.info (lc_encrypt_folder_job ()) << "Unlocking error for" << file_identifier << "HTTP code:" << http_error_code;
         /* emit */ finished (Error);
     }
 

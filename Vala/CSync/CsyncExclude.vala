@@ -19,7 +19,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
 //  #include <QRegularExpression>
-//  #include
 //  #include <functional>
 
 enum CSYNC_EXCLUDE_TYPE {
@@ -315,9 +314,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 //  #include <qglobal.h>
 
-#ifndef this.GNU_SOURCE
+//  #ifndef this.GNU_SOURCE
 const int this.GNU_SOURCE
-#endif
+//  #endif
 
 #include "../version.h"
 
@@ -365,13 +364,13 @@ OCSYNC_EXPORT void csync_exclude_expand_escapes (GLib.ByteArray input) {
 // See http://support.microsoft.com/kb/74496 and
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247 (v=vs.85).aspx
 // Additionally, we ignore '$Recycle.Bin', see https://github.com/owncloud/client/issues/2955
-static const char win_reserved_words_3[] = {
+const string win_reserved_words_3[] = {
     "CON",
     "PRN",
     "AUX",
     "NUL"
 }
-static const char win_reserved_words_4[] = {
+const string win_reserved_words_4[] = {
     "COM1",
     "COM2",
     "COM3",
@@ -391,7 +390,7 @@ static const char win_reserved_words_4[] = {
     "LPT8",
     "LPT9"
 }
-static const char win_reserved_words_n[] = {
+const string win_reserved_words_n[] = {
     "CLOCK$",
     "$Recycle.Bin"
 }
@@ -505,7 +504,7 @@ static CSYNC_EXCLUDE_TYPE this.csync_excluded_common (string path, bool exclude_
             break;
         }
     }
-#endif
+//  #endif
 
     /* Do not sync desktop.ini files anywhere in the tree. */
     const var desktop_ini_file = QStringLiteral ("desktop.ini");

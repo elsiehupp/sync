@@ -63,7 +63,7 @@ class CleanupPollsJob : GLib.Object {
     ***********************************************************/
     private void on_poll_finished () {
         var job = qobject_cast<PollJob> (sender ());
-        ASSERT (job);
+        //  ASSERT (job);
         if (job.item.status == SyncFileItem.Status.FATAL_ERROR) {
             /* emit */ aborted (job.item.error_string);
             delete_later ();

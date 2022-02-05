@@ -29,7 +29,7 @@ class PropagateIgnoreJob : PropagateItemJob {
                 status = SyncFileItem.Status.NORMAL_ERROR;
             } else {
                 status = SyncFileItem.Status.FILE_IGNORED;
-                ASSERT (this.item.instruction == CSYNC_INSTRUCTION_IGNORE);
+                //  ASSERT (this.item.instruction == CSYNC_INSTRUCTION_IGNORE);
             }
         }
         on_done (status, this.item.error_string);

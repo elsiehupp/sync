@@ -481,7 +481,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
     ***********************************************************/
     private void on_poll_finished () {
         var job = qobject_cast<PollJob> (sender ());
-        ASSERT (job);
+        //  ASSERT (job);
 
         propagator ().active_job_list.remove_one (this);
 
@@ -609,11 +609,11 @@ class PropagateUploadFileCommon : PropagateItemJob {
             var upload_info = propagator ().journal.get_upload_info (this.item.file);
             upload_info.error_count += 1;
             if (upload_info.error_count > 3) {
-                GLib.Info (lc_propagate_upload) << "Reset transfer of" << this.item.file
+                GLib.info (lc_propagate_upload) << "Reset transfer of" << this.item.file
                                           << "due to repeated error" << this.item.http_error_code;
                 upload_info = SyncJournalDb.UploadInfo ();
             } else {
-                GLib.Info (lc_propagate_upload) << "Error count for maybe-reset error" << this.item.http_error_code
+                GLib.info (lc_propagate_upload) << "Error count for maybe-reset error" << this.item.http_error_code
                                           << "on file" << this.item.file
                                           << "is" << upload_info.error_count;
             }

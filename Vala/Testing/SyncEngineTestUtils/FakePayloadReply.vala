@@ -29,5 +29,5 @@ class FakePayloadReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public static const int defaultDelay = 10;
+    public const int defaultDelay = 10;
 };

@@ -7,8 +7,8 @@
 
 namespace Occ {
 
-const string notifications_path = QLatin1String ("ocs/v2.php/apps/notifications/api/v2/notifications");
-const char property_account_state_c[] = "oc_account_state";
+const string notifications_path = "ocs/v2.php/apps/notifications/api/v2/notifications";
+const string property_account_state_c = "oc_account_state";
 const int success_status_code = 200;
 const int NOT_MODIFIED_STATUS_CODE = 304;
 
@@ -56,7 +56,7 @@ signals:
         // not yet valid, its assumed that notifications are available.
         if (this.account_state.account ().capabilities ().is_valid ()) {
             if (!this.account_state.account ().capabilities ().notifications_available ()) {
-                GLib.Info (lc_server_notification) << "Account" << this.account_state.account ().display_name () << "does not have notifications enabled.";
+                GLib.info (lc_server_notification) << "Account" << this.account_state.account ().display_name () << "does not have notifications enabled.";
                 delete_later ();
                 return;
             }

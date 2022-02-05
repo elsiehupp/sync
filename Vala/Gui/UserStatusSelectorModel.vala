@@ -8,9 +8,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <qnamespace.h>
 //  #include <userstatusconnector.h>
 //  #include <theme.h>
-//  #include
 //  #include <QLoggingCa
-//  #include
 //  #include <algorithm>
 //  #include <cmath>
 //  #include <cstddef>
@@ -19,10 +17,8 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 //  #include <userstatusconnector.h>
 //  #include <datetimeprovider.h>
-//  #include
 //  #include <QMetaType>
 //  #include <Qt_numer
-//  #include
 //  #include <cstddef>
 //  #include <memory>
 //  #include <vector>

@@ -12,7 +12,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QMessageBox>
 //  #include <QDesktopServices>
 //  #include <QApplication>
-//  #include
 //  #include <Gtk.Widget>
 //  #include <QProcess>
 using Soup;
@@ -231,9 +230,9 @@ signals:
 
     void OwncloudSetupWizard.on_system_proxy_lookup_done (QNetworkProxy proxy) {
         if (proxy.type () != QNetworkProxy.NoProxy) {
-            GLib.Info (lc_wizard) << "Setting QNAM proxy to be system proxy" << ClientProxy.print_q_network_proxy (proxy);
+            GLib.info (lc_wizard) << "Setting QNAM proxy to be system proxy" << ClientProxy.print_q_network_proxy (proxy);
         } else {
-            GLib.Info (lc_wizard) << "No system proxy set by OS";
+            GLib.info (lc_wizard) << "No system proxy set by OS";
         }
         AccountPointer account = this.oc_wizard.account ();
         account.network_access_manager ().set_proxy (proxy);
@@ -283,7 +282,7 @@ signals:
             [permanent_redirects, account] (Soup.Reply reply, GLib.Uri target_url, int count) {
                 int http_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
                 if (count == *permanent_redirects && (http_code == 301 || http_code == 308)) {
-                    GLib.Info (lc_wizard) << account.url () << " was redirected to" << target_url;
+                    GLib.info (lc_wizard) << account.url () << " was redirected to" << target_url;
                     account.set_url (target_url);
                     *permanent_redirects += 1;
                 }
@@ -318,7 +317,7 @@ signals:
         if (url != this.oc_wizard.account ().url ()) {
             // We might be redirected, update the account
             this.oc_wizard.account ().set_url (url);
-            GLib.Info (lc_wizard) << " was redirected to" << url.to_string ();
+            GLib.info (lc_wizard) << " was redirected to" << url.to_string ();
         }
 
         on_determine_auth_type ();
@@ -362,7 +361,7 @@ signals:
     }
 
     void OwncloudSetupWizard.on_connect_to_oCUrl (string url) {
-        GLib.Info (lc_wizard) << "Connect to url : " << url;
+        GLib.info (lc_wizard) << "Connect to url : " << url;
         AbstractCredentials creds = this.oc_wizard.get_credentials ();
         this.oc_wizard.account ().set_credentials (creds);
 
@@ -418,7 +417,7 @@ signals:
         // the updated server URL, similar to redirects on status.php.
         GLib.Uri redirect_url = reply.attribute (QNetworkRequest.RedirectionTargetAttribute).to_url ();
         if (!redirect_url.is_empty ()) {
-            GLib.Info (lc_wizard) << "Authed request was redirected to" << redirect_url.to_string ();
+            GLib.info (lc_wizard) << "Authed request was redirected to" << redirect_url.to_string ();
 
             // strip the expected path
             string path = redirect_url.path ();
@@ -427,7 +426,7 @@ signals:
                 path.chop (expected_path.size ());
                 redirect_url.set_path (path);
 
-                GLib.Info (lc_wizard) << "Setting account url to" << redirect_url.to_string ();
+                GLib.info (lc_wizard) << "Setting account url to" << redirect_url.to_string ();
                 this.oc_wizard.account ().set_url (redirect_url);
                 test_owncloud_connect ();
                 return;
@@ -488,7 +487,7 @@ signals:
     }
 
     void OwncloudSetupWizard.on_create_local_and_remote_folders (string local_folder, string remote_folder) {
-        GLib.Info (lc_wizard) << "Setup local sync folder for new o_c connection " << local_folder;
+        GLib.info (lc_wizard) << "Setup local sync folder for new o_c connection " << local_folder;
         const QDir fi (local_folder);
 
         bool next_step = true;
@@ -523,7 +522,7 @@ signals:
                     Example: https://cloud.example.com/remote.php/dav//
 
             ***********************************************************/
-            GLib.Info (lc_wizard) << "Sanitize got URL path:" << string (this.oc_wizard.account ().url ().to_string () + '/' + this.oc_wizard.account ().dav_path () + remote_folder);
+            GLib.info (lc_wizard) << "Sanitize got URL path:" << string (this.oc_wizard.account ().url ().to_string () + '/' + this.oc_wizard.account ().dav_path () + remote_folder);
 
             string new_dav_path = this.oc_wizard.account ().dav_path (),
                     new_remote_folder = remote_folder;
@@ -544,7 +543,7 @@ signals:
 
             string new_url_path = new_dav_path + '/' + new_remote_folder;
 
-            GLib.Info (lc_wizard) << "Sanitized to URL path:" << this.oc_wizard.account ().url ().to_string () + '/' + new_url_path;
+            GLib.info (lc_wizard) << "Sanitized to URL path:" << this.oc_wizard.account ().url ().to_string () + '/' + new_url_path;
             /***********************************************************
             END - Sanitize URL paths to eliminate double-slashes
             ***********************************************************/
@@ -565,7 +564,7 @@ signals:
         Soup.Reply.NetworkError err_id = reply.error ();
 
         if (err_id == Soup.Reply.NoError) {
-            GLib.Info (lc_wizard) << "Remote folder found, all cool!";
+            GLib.info (lc_wizard) << "Remote folder found, all cool!";
         } else if (err_id == Soup.Reply.ContentNotFoundError) {
             if (this.remote_folder.is_empty ()) {
                 error = _("No remote folder specified!");
@@ -675,7 +674,7 @@ signals:
         FolderMan folder_man = FolderMan.instance ();
 
         if (result == Gtk.Dialog.Rejected) {
-            GLib.Info (lc_wizard) << "Rejected the new config, use the old!";
+            GLib.info (lc_wizard) << "Rejected the new config, use the old!";
 
         } else if (result == Gtk.Dialog.Accepted) {
             // This may or may not wipe all folder definitions, depending
@@ -687,7 +686,7 @@ signals:
 
             bool start_from_scratch = this.oc_wizard.field ("OCSync_from_scratch").to_bool ();
             if (!start_from_scratch || ensure_start_from_scratch (local_folder)) {
-                GLib.Info (lc_wizard) << "Adding folder definition for" << local_folder << this.remote_folder;
+                GLib.info (lc_wizard) << "Adding folder definition for" << local_folder << this.remote_folder;
                 FolderDefinition folder_definition;
                 folder_definition.local_path = local_folder;
                 folder_definition.target_path = FolderDefinition.prepare_target_path (this.remote_folder);

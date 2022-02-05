@@ -11,7 +11,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QStorage_info>
 //  #include <QMessageBox>
 //  #include <QJsonObject>
-//  #include
 //  #include <folderman.h>
 
 //  #include <QWizard>

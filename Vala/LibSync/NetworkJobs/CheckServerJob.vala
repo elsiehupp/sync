@@ -137,7 +137,7 @@ class CheckServerJob : AbstractNetworkJob {
             this.subdir_fallback = true;
             set_path (QLatin1String (NEXTCLOUD_DIR_C) + QLatin1String (STATUS_PHP_C));
             on_start ();
-            GLib.Info (lc_check_server_job) << "Retrying with" << reply ().url ();
+            GLib.info (lc_check_server_job) << "Retrying with" << reply ().url ();
             return false;
         }
 
@@ -154,7 +154,7 @@ class CheckServerJob : AbstractNetworkJob {
                 GLib.warn (lc_check_server_job) << "status.php from server is not valid JSON!" << body << reply ().request ().url () << error.error_string ();
             }
 
-            GLib.Info (lc_check_server_job) << "status.php returns : " << status << " " << reply ().error () << " Reply : " << reply ();
+            GLib.info (lc_check_server_job) << "status.php returns : " << status << " " << reply ().error () << " Reply : " << reply ();
             if (status.object ().contains ("installed")) {
                 /* emit */ instance_found (this.server_url, status.object ());
             } else {
@@ -194,7 +194,7 @@ class CheckServerJob : AbstractNetworkJob {
             && path.ends_with (slash_status_php)) {
             this.server_url = target_url;
             this.server_url.set_path (path.left (path.size () - slash_status_php.size ()));
-            GLib.Info (lc_check_server_job) << "status.php was permanently redirected to"
+            GLib.info (lc_check_server_job) << "status.php was permanently redirected to"
                                     << target_url << "new server url is" << this.server_url;
             ++this.permanent_redirects;
         }

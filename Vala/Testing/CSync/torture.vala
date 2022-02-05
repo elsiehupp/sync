@@ -20,12 +20,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+//  #endif
 
 //  #include <stdarg.h> // NOLINT sometimes compiled in C mode
 //  #include <stddef.h> // NOLINT sometimes compiled in C mode
 //  #include <setjmp.h> // NOLINT sometimes compiled in C mode
-//  #include
 //  #include <cmocka.h>
 
 /***********************************************************
@@ -46,8 +45,8 @@ int torture_run_tests (void);
 
 #ifdef __cplusplus
 }
-#endif
-
+//  #endif
+//  #endif
 #endif /* this.TORTURE_H */
 
 

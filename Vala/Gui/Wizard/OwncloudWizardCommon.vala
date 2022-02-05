@@ -36,7 +36,7 @@ namespace WizardCommon {
         Page_Flow2Auth_creds,
 #ifdef WITH_WEBENGINE
         Page_Web_view,
-#endif // WITH_WEBENGINE
+//  #endif // WITH_WEBENGINE
         Page_Advanced_setup,
     };
 

@@ -139,7 +139,7 @@ class Vfs_suffix : Vfs {
         // The concrete shape of the placeholder is also used in is_dehydrated_placeholder () below
         string fn = this.setup_params.filesystem_path + item.file;
         if (!fn.ends_with (file_suffix ())) {
-            ASSERT (false, "vfs file isn't ending with suffix");
+            //  ASSERT (false, "vfs file isn't ending with suffix");
             return string ("vfs file isn't ending with suffix");
         }
 

@@ -28,48 +28,21 @@ class SyncFileStatus {
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileStatusTag this.tag;
-    private bool this.shared = false;
+    SyncFileStatusTag tag { public get; public set; }
+    bool shared { public get; public set; }
 
 
     /***********************************************************
     ***********************************************************/
     public SyncFileStatus (SyncFileStatusTag tag = SyncFileStatusTag.STATUS_NONE) {
         this.tag = tag;
+        this.shared = false;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set (SyncFileStatusTag tag) {
-        this.tag = tag;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public SyncFileStatusTag tag () {
-        return this.tag;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void set_shared (bool is_shared) {
-        this.shared = is_shared;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool shared () {
-        return this.shared;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string to_socket_api_"" {
+    public string to_socket_api_string () {
         string status_string = "";
         bool can_be_shared = true;
 

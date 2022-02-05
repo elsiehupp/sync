@@ -15,10 +15,10 @@ class FolderMetadata {
     public FolderMetadata (AccountPointer account, GLib.ByteArray metadata = GLib.ByteArray (), int status_code = -1) {
         this.account = account;
         if (metadata.is_empty () || status_code == 404) {
-            GLib.Info (lc_cse_metadata ()) << "Setupping Empty Metadata";
+            GLib.info (lc_cse_metadata ()) << "Setupping Empty Metadata";
             set_up_empty_metadata ();
         } else {
-            GLib.Info (lc_cse_metadata ()) << "Setting up existing metadata";
+            GLib.info (lc_cse_metadata ()) << "Setting up existing metadata";
             set_up_existing_metadata (metadata);
         }
     }
@@ -177,7 +177,7 @@ class FolderMetadata {
         * ocs and data.
         */
         QJsonDocument doc = QJsonDocument.from_json (metadata);
-        GLib.Info (lc_cse_metadata ()) << doc.to_json (QJsonDocument.Compact);
+        GLib.info (lc_cse_metadata ()) << doc.to_json (QJsonDocument.Compact);
 
         // The metadata is being retrieved as a string stored in a json.
         // This seems* to be broken but the RFC doesn't explicits how it wants.

@@ -86,7 +86,7 @@ class AccountManager : GLib.Object {
         }
 
         settings.sync ();
-        GLib.Info (lc_account_manager) << "Saved all account settings, status:" << settings.status ();
+        GLib.info (lc_account_manager) << "Saved all account settings, status:" << settings.status ();
     }
 
 
@@ -127,14 +127,14 @@ class AccountManager : GLib.Object {
                     acc.id = account_id;
                     if (var acc_state = AccountState.load_from_settings (acc, *settings)) {
                         var jar = qobject_cast<CookieJar> (acc.am.cookie_jar ());
-                        ASSERT (jar);
+                        //  ASSERT (jar);
                         if (jar)
                             jar.restore (acc.cookie_jar_path ());
                         add_account_state (acc_state);
                     }
                 }
             } else {
-                GLib.Info (lc_account_manager) << "Account" << account_id << "is too new, ignoring";
+                GLib.info (lc_account_manager) << "Account" << account_id << "is too new, ignoring";
                 this.additional_blocked_account_ids.insert (account_id);
             }
             settings.end_group ();
@@ -277,7 +277,7 @@ class AccountManager : GLib.Object {
 
         // Save accepted certificates.
         settings.begin_group (QLatin1String ("General"));
-        GLib.Info (lc_account_manager) << "Saving " << acc.approved_certificates ().count () << " unknown certificates.";
+        GLib.info (lc_account_manager) << "Saving " << acc.approved_certificates ().count () << " unknown certificates.";
         GLib.ByteArray certificates;
         foreach (var cert in acc.approved_certificates ()) {
             certificates += cert.to_pem () + '\n';
@@ -291,7 +291,7 @@ class AccountManager : GLib.Object {
         if (acc.am) {
             var jar = qobject_cast<CookieJar> (acc.am.cookie_jar ());
             if (jar) {
-                GLib.Info (lc_account_manager) << "Saving cookies." << acc.cookie_jar_path ();
+                GLib.info (lc_account_manager) << "Saving cookies." << acc.cookie_jar_path ();
                 if (!jar.save (acc.cookie_jar_path ())) {
                     GLib.warn (lc_account_manager) << "Failed to save cookies to" << acc.cookie_jar_path ();
                 }
@@ -349,7 +349,7 @@ class AccountManager : GLib.Object {
             }
         }
 
-        GLib.Info (lc_account_manager) << "Account for" << acc.url () << "using auth type" << auth_type;
+        GLib.info (lc_account_manager) << "Account for" << acc.url () << "using auth type" << auth_type;
 
         acc.server_version = settings.value (QLatin1String (SERVER_VERSION_C)).to_string ();
         acc.dav_user = settings.value (QLatin1String (DAV_USER_C), "").to_string ();
@@ -368,7 +368,7 @@ class AccountManager : GLib.Object {
         // now the server cert, it is in the general group
         settings.begin_group (QLatin1String ("General"));
         const var certificates = QSslCertificate.from_data (settings.value (CA_CERTS_KEY_C).to_byte_array ());
-        GLib.Info (lc_account_manager) << "Restored : " << certificates.count () << " unknown certificates.";
+        GLib.info (lc_account_manager) << "Restored : " << certificates.count () << " unknown certificates.";
         acc.set_approved_certificates (certificates);
         settings.end_group ();
 
@@ -379,7 +379,7 @@ class AccountManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool restore_from_legacy_settings () {
-        GLib.Info (lc_account_manager) << "Migrate : restore_from_legacy_settings, checking settings group"
+        GLib.info (lc_account_manager) << "Migrate : restore_from_legacy_settings, checking settings group"
                                  << Theme.instance ().app_name ();
 
         // try to open the correctly themed settings
@@ -395,7 +395,7 @@ class AccountManager : GLib.Object {
             o_c_cfg_file = o_c_cfg_file.left (o_c_cfg_file.last_index_of ('/'));
             o_c_cfg_file += QLatin1String ("/own_cloud/owncloud.config");
 
-            GLib.Info (lc_account_manager) << "Migrate : checking old config " << o_c_cfg_file;
+            GLib.info (lc_account_manager) << "Migrate : checking old config " << o_c_cfg_file;
 
             QFileInfo fi (o_c_cfg_file);
             if (fi.is_readable ()) {
@@ -415,7 +415,7 @@ class AccountManager : GLib.Object {
 
                     // in case the urls are equal reset the settings object to read from
                     // the own_cloud settings object
-                    GLib.Info (lc_account_manager) << "Migrate o_c config if " << o_c_url << " == " << override_url << ":"
+                    GLib.info (lc_account_manager) << "Migrate o_c config if " << o_c_url << " == " << override_url << ":"
                                              << (o_c_url == override_url ? "Yes" : "No");
                     if (o_c_url == override_url) {
                         settings = std.move (o_c_settings);
@@ -535,7 +535,7 @@ class AccountManager : GLib.Object {
 
     string AccountManager.generate_free_account_id () {
         int i = 0;
-        forever {
+        while (true) {
             string identifier = string.number (i);
             if (is_account_id_available (identifier)) {
                 return identifier;

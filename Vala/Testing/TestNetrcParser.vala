@@ -8,15 +8,11 @@ any purpose.
 
 using namespace Occ;
 
-namespace {
-
-const char testfileC[] = "netrctest";
-const char testfileWithDefaultC[] = "netrctestDefault";
-const char testfileEmptyC[] = "netrctestEmpty";
-
-}
-
 class TestNetrcParser : GLib.Object {
+
+    const string testfileC = "netrctest";
+    const string testfileWithDefaultC = "netrctestDefault";
+    const string testfileEmptyC = "netrctestEmpty";
 
     /***********************************************************
     ***********************************************************/

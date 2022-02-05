@@ -7,7 +7,6 @@ Copyright (c) by Markus Goetz <guruz@owncloud.com>
 
 //  #include <QLoggingCategory>
 //  #include <QMutex>
-//  #include
 //  #include <QSettings>
 //  #include <QNetworkCookieJar>
 
@@ -15,7 +14,7 @@ namespace Occ {
 
 class TokenCredentials : AbstractCredentials {
 
-    const char AUTHENTICATION_FAILED_C[] = "owncloud-authentication-failed";
+    const string AUTHENTICATION_FAILED_C = "owncloud-authentication-failed";
 
     /***********************************************************
     ***********************************************************/
@@ -125,7 +124,7 @@ class TokenCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public void invalidate_token () {
-        GLib.Info (lc_token_credentials) << "Invalidating token";
+        GLib.info (lc_token_credentials) << "Invalidating token";
         this.ready = false;
         this.account.clear_cookie_jar ();
         this.token = "";

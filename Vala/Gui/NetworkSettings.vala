@@ -6,7 +6,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 //  #include <QNetworkProxy>
 //  #include <GLib.List>
-//  #include
 //  #include <Gtk.Widget>
 
 namespace Occ {

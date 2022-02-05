@@ -5,12 +5,10 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 ***********************************************************/
 
 //  #include <theme.h>
-//  #include
 //  #include <QLoggingC
 //  #include <QPainter>
 //  #include <QPixmapCache>
 //  #include <QSvgRender
-//  #include
 //  #include <Gtk.Color>
 //  #include <QPixmap>
 

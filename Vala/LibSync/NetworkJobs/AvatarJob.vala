@@ -5,7 +5,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-#ifndef TOKEN_AUTH_ONLY
+//  #ifndef TOKEN_AUTH_ONLY
 /***********************************************************
 @brief Retrieves the account users avatar from the server using a GET request.
 
@@ -97,6 +97,6 @@ class AvatarJob : AbstractNetworkJob {
     }
 
 } // class AvatarJob
-#endif
+//  #endif
 
 } // namespace Occ

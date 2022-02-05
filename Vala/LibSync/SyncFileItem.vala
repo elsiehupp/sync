@@ -503,7 +503,8 @@ class SyncFileItem {
 
     //      return data1[prefix_l] < data2[prefix_l];
     //  }
-}
+
+} // class SyncFileItem
 
 } // namespace Occ
     

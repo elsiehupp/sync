@@ -6,11 +6,9 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 ***********************************************************/
 
 //  #include <theme.h>
-//  #include
 //  #include <QTimer>
 //  #include <QJsonDocument
 //  #include <QJsonObje
-//  #include
 //  #include <QPointer>
 //  #include <QTimer>
 
@@ -122,8 +120,8 @@ signals:
 
 
     namespace {
-        static const int default_interval_t = 30 * 1000;
-        static const int fail_interval_t = 5 * 1000;
+        const int default_interval_t = 30 * 1000;
+        const int fail_interval_t = 5 * 1000;
     }
 
     UserInfo.UserInfo (AccountState account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object parent)

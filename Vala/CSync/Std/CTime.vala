@@ -21,9 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #ifdef this.WIN32
 //  #include <time.h>
-//  #include
 //  #include <sys/time.h>
-#endif
+//  #endif
 
 OCSYNC_EXPORT int c_utimes (string uri, struct timeval times);
 
@@ -138,5 +137,5 @@ int c_utimes (string uri, struct timeval times) {
     return 0;
 }
 
-#endif // this.WIN32
-#endif // HAVE_UTIMES
+//  #endif // this.WIN32
+//  #endif // HAVE_UTIMES

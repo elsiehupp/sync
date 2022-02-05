@@ -7,7 +7,6 @@
 //  #include <QWeb_engine_url_request_job>
 //  #includeVERSION >= 0x051200
 //  #include <QWeb_engine_url_scheme>
-//  #include
 //  #include <QWeb_engine_url_s
 //  #include <QWeb_engine_v
 //  #include <QDesktopServices>
@@ -60,14 +59,14 @@ WebView.WebView (Gtk.Widget parent)
 #if QT_VERSION >= 0x051200
     QWeb_engine_url_scheme this.ncsheme ("nc");
     QWeb_engine_url_scheme.register_scheme (this.ncsheme);
-#endif
+//  #endif
     this.webview = new QWeb_engine_view (this);
     this.profile = new QWeb_engine_profile (this);
     this.page = new Web_engine_page (this.profile);
     this.interceptor = new Web_view_page_url_request_interceptor (this);
     this.scheme_handler = new Web_view_page_url_scheme_handler (this);
 
-    const string user_agent (Utility.user_agent_"");
+    const string user_agent (Utility.user_agent_string ());
     this.profile.set_http_user_agent (user_agent);
     QWeb_engine_profile.default_profile ().set_http_user_agent (user_agent);
     this.profile.set_request_interceptor (this.interceptor);
@@ -78,7 +77,7 @@ WebView.WebView (Gtk.Widget parent)
     Set a proper accept langauge to the language of the client
     code from : http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection
     ***********************************************************/ {
-        string system_locale = QLocale.system ().name ().replace (char.from_latin1 ('this.'),char.from_latin1 ('-'));
+        string system_locale = QLocale.system ().name ().replace (char.from_latin1 ('_'),char.from_latin1 ('-'));
         string accept_language;
         if (system_locale == QLatin1String ("C")) {
             accept_language = string.from_latin1 ("en,*");

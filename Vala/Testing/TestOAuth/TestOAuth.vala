@@ -10,7 +10,7 @@ implied, as to its usefulness for any purpose.
 using namespace Occ;
 
 
-static const GLib.Uri sOAuthTestServer ("oauthtest://someserver/owncloud");
+const GLib.Uri sOAuthTestServer ("oauthtest://someserver/owncloud");
 
 
 class TestOAuth : public GLib.Object {
@@ -26,12 +26,12 @@ class TestOAuth : public GLib.Object {
     private on_ void testCloseBrowserDontCrash () {
         struct Test : OAuthTestCase {
             Soup.Reply tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest & req) override {
-                ASSERT (browserReply);
+                //  ASSERT (browserReply);
                 // simulate the fact that the browser is closing the connection
                 browserReply.on_abort ();
                 QCoreApplication.processEvents ();
 
-                ASSERT (state == BrowserOpened);
+                //  ASSERT (state == BrowserOpened);
                 state = TokenAsked;
 
                 std.unique_ptr<QBuffer> payload (new QBuffer);
@@ -107,7 +107,7 @@ class TestOAuth : public GLib.Object {
         struct Test : OAuthTestCase {
             int redirectsDone = 0;
             Soup.Reply tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest & request) override {
-                ASSERT (browserReply);
+                //  ASSERT (browserReply);
                 // Kind of reproduces what we had in https://github.com/owncloud/enterprise/issues/2951 (not 1:1)
                 if (redirectsDone == 0) {
                     std.unique_ptr<QBuffer> payload (new QBuffer ());

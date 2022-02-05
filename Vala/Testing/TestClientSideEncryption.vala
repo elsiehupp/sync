@@ -5,7 +5,6 @@
 ***********************************************************/
 
 //  #include <QtTest>
-//  #include
 //  #include <QTemporaryFile>
 //  #include <QRandomGenerator>
 
@@ -219,12 +218,12 @@ class TestClientSideEncryption : GLib.Object {
 
         QFETCH (int, bytesToRead);
 
-        while (dummyEncryptionOutputFile.pos () < dummyEncryptionOutputFile.size ()) {
-            const var bytesRemaining = dummyEncryptionOutputFile.size () - dummyEncryptionOutputFile.pos ();
+        while (dummyEncryptionOutputFile.position () < dummyEncryptionOutputFile.size ()) {
+            const var bytesRemaining = dummyEncryptionOutputFile.size () - dummyEncryptionOutputFile.position ();
             var toRead = bytesRemaining > bytesToRead ? bytesToRead : bytesRemaining;
 
-            if (dummyEncryptionOutputFile.pos () + toRead > dummyEncryptionOutputFile.size ()) {
-                toRead = dummyEncryptionOutputFile.size () - dummyEncryptionOutputFile.pos ();
+            if (dummyEncryptionOutputFile.position () + toRead > dummyEncryptionOutputFile.size ()) {
+                toRead = dummyEncryptionOutputFile.size () - dummyEncryptionOutputFile.position ();
             }
 
             if (bytesRemaining - toRead != 0 && bytesRemaining - toRead < Occ.Constants.e2EeTagSize) {

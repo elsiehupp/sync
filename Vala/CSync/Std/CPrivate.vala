@@ -30,25 +30,24 @@ cross platform defines */
 //  #include <windef.h>
 //  #include <winbase.h>
 //  #include <wchar.h>
-//  #include
 //  #include <unistd.h>
-#endif
+//  #endif
 
 //  #include <cerrno>
 
 #ifdef __MINGW32__
-#ifndef S_IRGRP
+//  #ifndef S_IRGRP
 const int S_IRGRP 0
-#endif
-#ifndef S_IROTH
+//  #endif
+//  #ifndef S_IROTH
 const int S_IROTH 0
-#endif
-#ifndef S_IXGRP
+//  #endif
+//  #ifndef S_IXGRP
 const int S_IXGRP 0
-#endif
-#ifndef S_IXOTH
+//  #endif
+//  #ifndef S_IXOTH
 const int S_IXOTH 0
-#endif
+//  #endif
 
 const int S_IFSOCK 10000 /* dummy val on Win32 */
 const int S_IFLNK 10001  /* dummy val on Win32 */
@@ -65,28 +64,28 @@ const int geteuid () 0
 const int mode_t int
 #else
 //  #include <fcntl.h>
-#endif
+//  #endif
 
 #ifdef this.WIN32
 using csync_stat_t = struct stat64;
 const int this.FILE_OFFSET_BITS 64
 #else
 using csync_stat_t = struct stat;
-#endif
+//  #endif
 
-#ifndef O_NOATIME
+//  #ifndef O_NOATIME
 const int O_NOATIME 0
-#endif
+//  #endif
 
-#ifndef HAVE_LSTAT
+//  #ifndef HAVE_LSTAT
 const int lstat this.stat
-#endif
+//  #endif
 
 /***********************************************************
 tchar definitions for clean win32 filenames */
-#ifndef this.UNICODE
+//  #ifndef this.UNICODE
 const int this.UNICODE
-#endif
+//  #endif
 
 #if defined this.WIN32 && defined this.UNICODE
 using mbchar_t = wchar_t;
@@ -130,7 +129,7 @@ const int this.trewinddir    rewinddir
 const int this.tchown (X,Y,Z) chown (X,Y,Z)
 const int this.tchdir        chdir
 const int this.tgetcwd       getcwd
-#endif
+//  #endif
 
 /***********************************************************
 FIXME : Implement TLS for OS X */
@@ -140,8 +139,8 @@ FIXME : Implement TLS for OS X */
 # define CSYNC_THREAD __declspec (thread)
 #else
 # define CSYNC_THREAD
-#endif
-
+//  #endif
+//  #endif
 #endif //this.C_PRIVATE_H
 
 /***********************************************************

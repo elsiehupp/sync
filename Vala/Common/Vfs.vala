@@ -13,10 +13,6 @@ Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
 
 namespace Occ {
 
-using csync_file_stat_t = struct csync_file_stat_s;
-class AccountPointer : unowned<Account>;
-
-
 /***********************************************************
 Interface describing how to deal with virtual/placeholder files.
 
@@ -32,6 +28,9 @@ function.
 ***********************************************************/
 class Vfs : GLib.Object {
 
+    struct csync_file_stat_t : csync_file_stat_s { }
+    class AccountPointer : unowned Account { }
+    public class AvailabilityResult : Result<VfsItemAvailability, AvailabilityError> { }
 
     /***********************************************************
     The kind of VFS in use (or no-VFS)
@@ -39,63 +38,77 @@ class Vfs : GLib.Object {
     Currently plugins and modes are one-to-one but that's not required.
     ***********************************************************/
     public enum Mode {
-        Off,
-        WithSuffix,
-        WindowsCfApi,
-        XAttr,
+        OFF,
+        WITH_SUFFIX,
+        WINDOWS_CF_API,
+        XATTR;
+
+        /***********************************************************
+        Note: Strings are used for config and must be stable
+        ***********************************************************/
+        public static string to_string (Mode mode) {
+            switch (mode) {
+            case OFF:
+                return "off";
+            case WITH_SUFFIX:
+                return "suffix";
+            case WINDOWS_CF_API:
+                return "wincfapi";
+            case XATTR:
+                return "xattr";
+            }
+            return "off";
+        }
+
+
+        /***********************************************************
+        ***********************************************************/
+        public static Optional<Mode> from_string (string string_value) {
+            // Note: Strings are used for config and must be stable
+            if (string_value == "off") {
+                return OFF;
+            } else if (string_value == "suffix") {
+                return WITH_SUFFIX;
+            } else if (string_value == "wincfapi") {
+                return WINDOWS_CF_API;
+            }
+            return {};
+        }
+
+    
+        protected static string to_plugin_name (Vfs.Mode mode) {
+            if (mode == Vfs.WITH_SUFFIX)
+                return "suffix";
+            if (mode == Vfs.WINDOWS_CF_API)
+                return "cfapi";
+            if (mode == Vfs.XATTR)
+                return "xattr";
+            return "";
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public enum ConvertToPlaceholderResult {
-        Error,
-        Ok,
-        Locked
+        ERROR,
+        OK,
+        LOCKED
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public static string mode_to_string (Mode mode) {
-        // Note: Strings are used for config and must be stable
-        switch (mode) {
-        case Off:
-            return "off";
-        case WithSuffix:
-            return "suffix";
-        case WindowsCfApi:
-            return "wincfapi";
-        case XAttr:
-            return "xattr";
-        }
-        return "off";
-    }
+    public enum AvailabilityError {
+        /***********************************************************
+        Availability can't be retrieved due to database error
+        ***********************************************************/
+        DATABASE_ERROR,
 
-
-    /***********************************************************
-    ***********************************************************/
-    public static Optional<Mode> mode_from_string (string string_value) {
-        // Note: Strings are used for config and must be stable
-        if (string_value == "off") {
-            return Off;
-        } else if (string_value == "suffix") {
-            return WithSuffix;
-        } else if (string_value == "wincfapi") {
-            return WindowsCfApi;
-        }
-        return {};
-    }
-
-
-    protected static string mode_to_plugin_name (Vfs.Mode mode) {
-        if (mode == Vfs.WithSuffix)
-            return "suffix";
-        if (mode == Vfs.WindowsCfApi)
-            return "cfapi";
-        if (mode == Vfs.XAttr)
-            return "xattr";
-        return "";
+        /***********************************************************
+        Availability not available since the item doesn't exist
+        ***********************************************************/
+        NO_SUCH_ITEM,
     }
 
 
@@ -110,27 +123,9 @@ class Vfs : GLib.Object {
 
 
     /***********************************************************
-    ***********************************************************/
-    public enum AvailabilityError {
-        /***********************************************************
-        Availability can't be retrieved due to database error
-        ***********************************************************/
-        DbError,
-
-        /***********************************************************
-        Availability not available since the item doesn't exist
-        ***********************************************************/
-        NoSuchItem,
-    };
-
-
-    public using AvailabilityResult = Result<VfsItemAvailability, AvailabilityError>;
-
-
-    /***********************************************************
     the parameters passed to on_start ()
     ***********************************************************/
-    protected VfsSetupParams this.setup_params;
+    protected VfsSetupParams setup_params;
 
 
     /***********************************************************
@@ -146,7 +141,7 @@ class Vfs : GLib.Object {
 
 
     /***********************************************************
-    For WithSuffix modes: the suffix (including the dot)
+    For WITH_SUFFIX modes: the suffix (including the dot)
     ***********************************************************/
     public virtual string file_suffix ();
 
@@ -379,7 +374,7 @@ class Vfs : GLib.Object {
         // not being able to retrieve the pin state isn't too bad
         var hydration_status = this.setup_params.journal.has_hydrated_or_dehydrated_files (path);
         if (!hydration_status)
-            return AvailabilityError.DbError;
+            return AvailabilityError.DATABASE_ERROR;
 
         if (hydration_status.has_dehydrated) {
             if (hydration_status.has_hydrated)
@@ -394,10 +389,9 @@ class Vfs : GLib.Object {
             else
                 return VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED;
         }
-        return AvailabilityError.NoSuchItem;
+        return AvailabilityError.NO_SUCH_ITEM;
     }
-}
 
-
+} // class Vfs
 
 } // namespace Occ

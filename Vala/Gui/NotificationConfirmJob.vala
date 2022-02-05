@@ -5,7 +5,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 //  #include <QBuffer>
-//  #include
 //  #include <GLib.List>
 //  #include <QPair>
 

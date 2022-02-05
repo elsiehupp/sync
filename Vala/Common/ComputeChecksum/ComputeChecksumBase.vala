@@ -13,14 +13,14 @@ abstract class ComputeChecksumBase : GLib.Object {
     Tags for checksum headers values.
     They are here for being shared between Upload- and Download Job
     ***********************************************************/
-    const char[] CHECKSUM_MD5C = "MD5";
-    const char[] CHECKSUM_SHA1C = "SHA1";
-    const char[] CHECKSUM_SHA2C = "SHA256";
-    const char[] CHECKSUM_SHA3C = "SHA3-256";
-    const char[] CHECKSUM_ADLER_C = "Adler32";
+    const string CHECKSUM_MD5C = "MD5";
+    const string CHECKSUM_SHA1C = "SHA1";
+    const string CHECKSUM_SHA2C = "SHA256";
+    const string CHECKSUM_SHA3C = "SHA3-256";
+    const string CHECKSUM_ADLER_C = "Adler32";
 
 
-    const int BUFSIZE int64 (500 * 1024) // 500 KiB
+    const int64 BUFSIZE = 500 * 1024; // 500 KiB
 
 
     /***********************************************************
@@ -84,13 +84,13 @@ abstract class ComputeChecksumBase : GLib.Object {
             return true;
         }
 
-        const var idx = header.index_of (':');
-        if (idx < 0) {
+        const var index = header.index_of (':');
+        if (index < 0) {
             return false;
         }
 
-        *type = header.left (idx);
-        *checksum = header.mid (idx + 1);
+        *type = header.left (index);
+        *checksum = header.mid (index + 1);
         return true;
     }
 
@@ -100,11 +100,11 @@ abstract class ComputeChecksumBase : GLib.Object {
     OCSYNC_EXPORT
     ***********************************************************/
     GLib.ByteArray parse_checksum_header_type (GLib.ByteArray header) {
-        const var idx = header.index_of (':');
-        if (idx < 0) {
+        const var index = header.index_of (':');
+        if (index < 0) {
             return GLib.ByteArray ();
         }
-        return header.left (idx);
+        return header.left (index);
     }
 
 

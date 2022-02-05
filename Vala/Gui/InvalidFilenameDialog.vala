@@ -5,7 +5,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 ***********************************************************/
 
 //  #include <folder.h>
-//  #include
 //  #include <QPush
 //  #include <QDir>
 //  #include <qabstractbutton.h
@@ -19,7 +18,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 //  #include <accountfwd.h>
 //  #include <account.h>
-//  #include
 //  #include <memory>
 
 //  #include <Gtk.Dialog>

@@ -5,7 +5,6 @@
          */
 
 //  #include <QtTest>
-//  #include
 //  #include <sqlite3.h>
 
 using namespace Occ;

@@ -9,7 +9,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QSslConfiguration>
 //  #include <QWidget_action>
 //  #include <QLabel>
-//  #include
 //  #include <QToolButt
 //  #include <QPointer>
 //  #include <QSsl>
@@ -42,7 +41,7 @@ class Ssl_button : QToolButton {
     /***********************************************************
     ***********************************************************/
     private QMenu build_cert_menu (QMenu parent, QSslCertificate cert,
-        const GLib.List<QSslCertificate> user_approved, int pos, GLib.List<QSslCertificate> system_ca_certificates);
+        const GLib.List<QSslCertificate> user_approved, int position, GLib.List<QSslCertificate> system_ca_certificates);
     private QPointer<AccountState> this.account_state;
     private QMenu this.menu;
 }
@@ -78,7 +77,7 @@ class Ssl_button : QToolButton {
     }
 
     QMenu *Ssl_button.build_cert_menu (QMenu parent, QSslCertificate cert,
-        const GLib.List<QSslCertificate> user_approved, int pos, GLib.List<QSslCertificate> system_ca_certificates) {
+        const GLib.List<QSslCertificate> user_approved, int position, GLib.List<QSslCertificate> system_ca_certificates) {
         string cn = string[] (cert.subject_info (QSslCertificate.Common_name)).join (char (';'));
         string ou = string[] (cert.subject_info (QSslCertificate.Organizational_unit_name)).join (char (';'));
         string org = string[] (cert.subject_info (QSslCertificate.Organization)).join (char (';'));
@@ -137,8 +136,8 @@ class Ssl_button : QToolButton {
         stream << QLatin1String ("</body></html>");
 
         string txt;
-        if (pos > 0) {
-            txt += string (2 * pos, ' ');
+        if (position > 0) {
+            txt += string (2 * position, ' ');
             if (!Utility.is_windows ()) {
                 // doesn't seem to work reliably on Windows
                 txt += char (0x21AA); // nicer '.' symbol

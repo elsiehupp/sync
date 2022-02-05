@@ -134,7 +134,7 @@ class PropagateDirectory : PropagatorJob {
                 // Synchronously on_abort
                 on_abort (AbortType.SYNCHRONOUS);
                 this.state = Finished;
-                GLib.Info (lc_propagator) << "PropagateDirectory.on_first_job_finished" << "emit finished" << status;
+                GLib.info (lc_propagator) << "PropagateDirectory.on_first_job_finished" << "emit finished" << status;
                 /* emit */ finished (status);
             }
             return;
@@ -186,7 +186,7 @@ class PropagateDirectory : PropagatorJob {
             }
         }
         this.state = Finished;
-        GLib.Info (lc_propagator) << "PropagateDirectory.on_sub_jobs_finished" << "emit finished" << status;
+        GLib.info (lc_propagator) << "PropagateDirectory.on_sub_jobs_finished" << "emit finished" << status;
         /* emit */ finished (status);
     }
 

@@ -5,7 +5,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 #ifdef WITH_LIBCLOUDPROVIDERS
-#endif
+//  #endif
 
 //  #include <QQml_application_engine>
 //  #include <QDesktopServices>
@@ -15,14 +15,13 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include_LIBCLOUDPROVIDERS
 //  #include <Qt_d_bus/QDBus_connection>
 //  #include <Qt_d_bus/QDBus_interface>
-#endif
+//  #endif
 
 //  #include <QQmlEngine>
 //  #include <QQml_component>
 //  #include <QQml_application_engine>
 //  #include <QQuick_item>
 //  #include <QQml_context>
-//  #include
 //  #include <QPointer
 //  #include <QActio
 //  #include <QMenu>
@@ -30,7 +29,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QTimer>
 #ifdef WITH_LIBCLOUDPROVIDERS
 //  #include <QDBus_connection>
-#endif
+//  #endif
 
 namespace Occ {
 
@@ -74,7 +73,7 @@ class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool cloud_provider_api_available ();
-#endif
+//  #endif
     public void create_tray ();
 
     /***********************************************************
@@ -220,7 +219,7 @@ signals:
 
 #ifdef WITH_LIBCLOUDPROVIDERS
     private QDBus_connection this.bus;
-#endif
+//  #endif
 
     /***********************************************************
     ***********************************************************/
@@ -240,7 +239,7 @@ signals:
 
 
 
-const char property_account_c[] = "oc_account";
+const string property_account_c = "oc_account";
 
 OwncloudGui.OwncloudGui (Application parent)
     : GLib.Object (parent)
@@ -249,7 +248,7 @@ OwncloudGui.OwncloudGui (Application parent)
     this.log_browser (null)
 #ifdef WITH_LIBCLOUDPROVIDERS
     this.bus (QDBus_connection.session_bus ())
-#endif
+//  #endif
     this.app (parent) {
     this.tray = Systray.instance ();
     this.tray.set_tray_engine (new QQml_application_engine (this));
@@ -314,12 +313,12 @@ bool OwncloudGui.cloud_provider_api_available () {
                               "org.freedesktop.Cloud_provider.Manager1", this.bus);
 
     if (!dbus_iface.is_valid ()) {
-        GLib.Info (lc_application) << "DBus interface unavailable";
+        GLib.info (lc_application) << "DBus interface unavailable";
         return false;
     }
     return true;
 }
-#endif
+//  #endif
 
 // This should rather be in application.... or rather in ConfigFile?
 void OwncloudGui.on_open_settings_dialog () {
@@ -331,7 +330,7 @@ void OwncloudGui.on_open_settings_dialog () {
             this.settings_dialog.close ();
         }
     } else {
-        GLib.Info (lc_application) << "No configured folders yet, starting setup wizard";
+        GLib.info (lc_application) << "No configured folders yet, starting setup wizard";
         on_new_account_wizard ();
     }
 }
@@ -376,7 +375,7 @@ void OwncloudGui.on_sync_state_change (Folder folder) {
 
     var result = folder.sync_result ();
 
-    GLib.Info (lc_application) << "Sync state changed for folder " << folder.remote_url ().to_string () << " : " << result.status_string ();
+    GLib.info (lc_application) << "Sync state changed for folder " << folder.remote_url ().to_string () << " : " << result.status_string ();
 
     if (result.status () == SyncResult.Status.SUCCESS
         || result.status () == SyncResult.Status.PROBLEM
@@ -457,7 +456,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
             messages.append (message);
         }
         this.tray.set_tool_tip (messages.join (QLatin1String ("\n\n")));
-#endif
+//  #endif
         return;
     }
 
@@ -508,7 +507,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
             all_status_strings += _("Folder %1 : %2").arg (folder.short_gui_local_path (), folder_message);
         }
         tray_message = all_status_strings.join (QLatin1String ("\n"));
-#endif
+//  #endif
         this.tray.set_tool_tip (tray_message);
 
         if (overall_status == SyncResult.Status.SUCCESS || overall_status == SyncResult.Status.PROBLEM) {
@@ -550,7 +549,7 @@ open the folder with the given Alias
 void OwncloudGui.on_folder_open_action (string alias) {
     Folder f = FolderMan.instance ().folder (alias);
     if (f) {
-        GLib.Info (lc_application) << "opening local url " << f.path ();
+        GLib.info (lc_application) << "opening local url " << f.path ();
         GLib.Uri url = GLib.Uri.from_local_file (f.path ());
         QDesktopServices.open_url (url);
     }
@@ -569,7 +568,7 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
             this.action_status.on_set_text (_("Checking for changes in local \"%1\"")
                                        .arg (progress.current_discovered_local_folder));
         }
-#endif
+//  #endif
     } else if (progress.status () == ProgressInfo.Status.DONE) {
         QTimer.single_shot (2000, this, &OwncloudGui.on_compute_overall_sync_status);
     }
@@ -754,10 +753,10 @@ void OwncloudGui.on_show_share_dialog (string share_path, string local_path, Sha
 
     Share_dialog w = null;
     if (this.share_dialogs.contains (local_path) && this.share_dialogs[local_path]) {
-        GLib.Info (lc_application) << "Raising share dialog" << share_path << local_path;
+        GLib.info (lc_application) << "Raising share dialog" << share_path << local_path;
         w = this.share_dialogs[local_path];
     } else {
-        GLib.Info (lc_application) << "Opening share dialog" << share_path << local_path << max_sharing_permissions;
+        GLib.info (lc_application) << "Opening share dialog" << share_path << local_path << max_sharing_permissions;
         w = new Share_dialog (account_state, share_path, local_path, max_sharing_permissions, file_record.numeric_file_id (), start_page);
         w.set_attribute (Qt.WA_DeleteOnClose, true);
 

@@ -5,14 +5,12 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 ***********************************************************/
 
 //  #include <algorithm>
-//  #include
 //  #include <QAbstractListModel>
 //  #include <QDesktopServices>
 
 //  #pragma once
 
 //  #include <limits>
-//  #include
 //  #include <QtCore>
 
 namespace Occ {
@@ -458,7 +456,7 @@ namespace {
                 FolderMan.instance ().find_file_in_local_folders (QFileInfo (relative_path).path (), this.account_state.account ());
 
             if (!local_files.is_empty ()) {
-                GLib.Info (lc_unified_search) << "Opening file:" << local_files.const_first ();
+                GLib.info (lc_unified_search) << "Opening file:" << local_files.const_first ();
                 QDesktopServices.open_url (GLib.Uri.from_local_file (local_files.const_first ()));
                 return;
             }

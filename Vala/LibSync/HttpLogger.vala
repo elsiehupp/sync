@@ -73,7 +73,7 @@ static class HttpLogger {
 
 
     static bool is_text_body (string s) {
-        static const QRegularExpression regexp (QStringLiteral ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))"));
+        const QRegularExpression regexp (QStringLiteral ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))"));
         return regexp.match (s).has_match ();
     }
 
@@ -112,7 +112,7 @@ static class HttpLogger {
                     // should we close it again?
                     device.open (QIODevice.ReadOnly);
                 }
-                //  Q_ASSERT (device.pos () == 0);
+                //  Q_ASSERT (device.position () == 0);
                 stream << device.peek (PEEK_SIZE);
                 if (PEEK_SIZE < content_length) {
                     stream << "... (" << (content_length - PEEK_SIZE) << "bytes elided)";
@@ -122,7 +122,7 @@ static class HttpLogger {
             }
         }
         stream << "]";
-        GLib.Info (lc_network_http) << msg;
+        GLib.info (lc_network_http) << msg;
     }
 
 } // static class HttpLogger

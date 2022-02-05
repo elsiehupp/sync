@@ -20,7 +20,7 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 # include "creds/tokencredentials.h"
 #else
 # include "creds/httpcredentials.h"
-#endif
+//  #endif
 
 //  #include <termios.h>
 //  #include <unistd.h>
@@ -84,7 +84,7 @@ string query_password (string user) {
 
 
 void help () {
-    const char binary_name = APPLICATION_EXECUTABLE "cmd";
+    const string binary_name = APPLICATION_EXECUTABLE + "cmd";
 
     std.cout << binary_name << " - command line " APPLICATION_NAME " client tool" << std.endl;
     std.cout << "" << std.endl;
@@ -341,7 +341,7 @@ int main (int argc, char **argv) {
     if (options.trust_s_sL) {
         credentials.set_s_sLTrusted (true);
     }
-#endif
+//  #endif
 
     account.set_url (host_url);
     account.set_ssl_error_handler (ssl_error_handler);
@@ -446,7 +446,7 @@ restart_sync:
 
     int result_code = app.exec ();
 
-    if (engine.is_another_sync_needed () != No_follow_up_sync) {
+    if (engine.is_another_sync_needed () != AnotherSyncNeeded.NO_FOLLOW_UP_SYNC) {
         if (restart_count < options.restart_times) {
             restart_count++;
             GLib.debug () << "Restarting Sync, because another sync is needed" << restart_count;

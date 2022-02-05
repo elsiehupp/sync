@@ -113,7 +113,7 @@ class PropagateItemJob : PropagatorJob {
         if (this.state != NotYetStarted) {
             return false;
         }
-        GLib.Info (lc_propagator) << "Starting" << this.item.instruction << "propagation of" << this.item.destination () << "by" << this;
+        GLib.info (lc_propagator) << "Starting" << this.item.instruction << "propagation of" << this.item.destination () << "by" << this;
 
         this.state = Running;
         QMetaObject.invoke_method (this, "on_start"); // We could be in a different thread (neon jobs)
@@ -196,7 +196,7 @@ class PropagateItemJob : PropagatorJob {
         if (this.item.has_error_status ())
             GLib.warn (lc_propagator) << "Could not complete propagation of" << this.item.destination () << "by" << this << "with status" << this.item.status << "and error:" << this.item.error_string;
         else
-            GLib.Info (lc_propagator) << "Completed propagation of" << this.item.destination () << "by" << this << "with status" << this.item.status;
+            GLib.info (lc_propagator) << "Completed propagation of" << this.item.destination () << "by" << this << "with status" << this.item.status;
         /* emit */ propagator ().item_completed (this.item);
         /* emit */ finished (this.item.status);
 

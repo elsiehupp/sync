@@ -5,9 +5,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 //  #include <QRegularExpression>
-//  #include
 //  #include <qfileinfo.h>
-//  #include
 //  #include <QTextStream>
 //  #include <QScopedPointer>
 //  #include <QElapsedTimer>

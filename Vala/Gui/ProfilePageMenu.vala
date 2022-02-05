@@ -4,7 +4,6 @@
 //  #include <QLabel>
 //  #include <account.h>
 //  #include <QMenu>
-//  #include
 //  #include <cstddef>
 
 namespace Occ {

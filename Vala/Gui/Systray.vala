@@ -20,10 +20,9 @@ Copyright (C) by Cédric Bellegarde <gnumdk@gmail.com>
 const int NOTIFICATIONS_SERVICE "org.freedesktop.Notifications"
 const int NOTIFICATIONS_PATH "/org/freedesktop/Notifications"
 const int NOTIFICATIONS_IFACE "org.freedesktop.Notifications"
-#endif
+//  #endif
 
 //  #include <QSystemTrayIcon>
-//  #include
 //  #include <QQml_network_access_manager_factory>
 
 namespace Occ {
@@ -43,7 +42,7 @@ class Access_manager_factory : QQml_network_access_manager_factory {
 bool can_os_x_send_user_notification ();
 void send_os_xUser_notification (string title, string message);
 void set_tray_window_level_and_visible_on_all_spaces (QWindow window);
-#endif
+//  #endif
 
 /***********************************************************
 @brief The Systray class
@@ -375,12 +374,12 @@ void Systray.show_message (string title, string message, Message_icon icon) {
         method.set_arguments (args);
         QDBus_connection.session_bus ().async_call (method);
     } else
-#endif
+//  #endif
 #ifdef Q_OS_OSX
         if (can_os_x_send_user_notification ()) {
         send_os_xUser_notification (title, message);
     } else
-#endif {
+//  #endif {
         QSystemTrayIcon.show_message (title, message, icon);
     }
 }
@@ -426,7 +425,7 @@ void Systray.force_window_init (QQuick_window window) {
 
 QScreen *Systray.current_screen () {
     const var screens = QGuiApplication.screens ();
-    const var cursor_pos = QCursor.pos ();
+    const var cursor_pos = QCursor.position ();
 
     for (var screen : screens) {
         if (screen.geometry ().contains (cursor_pos)) {
@@ -564,7 +563,7 @@ QPoint Systray.compute_window_position (int width, int height) {
 
 QPoint Systray.calc_tray_icon_center () {
     // On Linux, fall back to mouse position (assuming tray icon is activated by mouse click)
-    return QCursor.pos (current_screen ());
+    return QCursor.position (current_screen ());
 }
 
 Access_manager_factory.Access_manager_factory ()

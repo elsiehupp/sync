@@ -198,7 +198,7 @@ class ConfigFile {
             return ConfigFile.exclude_file_from_system ();
         }
 
-        ASSERT (false);
+        //  ASSERT (false);
         return "";
     }
 
@@ -245,7 +245,7 @@ class ConfigFile {
         string base_file = config_file ();
         var version_string = client_version_string ();
         if (!version_string.is_empty ())
-            version_string.prepend ('this.');
+            version_string.prepend ('_');
         string backup_file =
             string ("%1.backup_%2%3")
                 .arg (base_file)
@@ -668,7 +668,7 @@ class ConfigFile {
             if (job.exec ()) {
                 QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
                 settings.remove (QLatin1String (PROXY_PASS_C));
-                GLib.Info (lc_config_file ()) << "Migrated proxy password to keychain";
+                GLib.info (lc_config_file ()) << "Migrated proxy password to keychain";
             }
         } else {
             // Read password from keychain
@@ -925,7 +925,7 @@ class ConfigFile {
         }
         if (fi.exists () && fi.is_dir ()) {
             dir_path = fi.absolute_file_path ();
-            GLib.Info (lc_config_file) << "Using custom config dir " << dir_path;
+            GLib.info (lc_config_file) << "Using custom config dir " << dir_path;
             this.conf_dir = dir_path;
             return true;
         }
@@ -1029,7 +1029,7 @@ class ConfigFile {
     ***********************************************************/
     public void save_geometry (Gtk.Widget w) {
     #ifndef TOKEN_AUTH_ONLY
-        ASSERT (!w.object_name ().is_null ());
+        //  ASSERT (!w.object_name ().is_null ());
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.begin_group (w.object_name ());
         settings.set_value (QLatin1String (GEOMETRY_C), w.save_geometry ());
@@ -1054,7 +1054,7 @@ class ConfigFile {
     #ifndef TOKEN_AUTH_ONLY
         if (!header)
             return;
-        ASSERT (!header.object_name ().is_empty ());
+        //  ASSERT (!header.object_name ().is_empty ());
 
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.begin_group (header.object_name ());
@@ -1070,7 +1070,7 @@ class ConfigFile {
     #ifndef TOKEN_AUTH_ONLY
         if (!header)
             return;
-        ASSERT (!header.object_name ().is_null ());
+        //  ASSERT (!header.object_name ().is_null ());
 
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.begin_group (header.object_name ());
@@ -1311,17 +1311,17 @@ class ConfigFile {
         string user_list = config.exclude_file (ConfigFile.USER_SCOPE);
 
         if (!GLib.File.exists (user_list)) {
-            GLib.Info (lc_config_file) << "User defined ignore list does not exist:" << user_list;
+            GLib.info (lc_config_file) << "User defined ignore list does not exist:" << user_list;
             if (!GLib.File.copy (system_list, user_list)) {
-                GLib.Info (lc_config_file) << "Could not copy over default list to:" << user_list;
+                GLib.info (lc_config_file) << "Could not copy over default list to:" << user_list;
             }
         }
 
         if (!GLib.File.exists (user_list)) {
-            GLib.Info (lc_config_file) << "Adding system ignore list to csync:" << system_list;
+            GLib.info (lc_config_file) << "Adding system ignore list to csync:" << system_list;
             excluded_files.add_exclude_file_path (system_list);
         } else {
-            GLib.Info (lc_config_file) << "Adding user defined ignore list to csync:" << user_list;
+            GLib.info (lc_config_file) << "Adding user defined ignore list to csync:" << user_list;
             excluded_files.add_exclude_file_path (user_list);
         }
     }

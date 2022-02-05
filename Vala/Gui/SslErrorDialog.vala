@@ -7,7 +7,6 @@ Copyright (C) by Klaas Freitag <freitag@kde.org>
 //  #include <QtGui>
 //  #include <Qt_network>
 //  #include <Qt_widgets>
-//  #include
 //  #include <QtCore>
 //  #include <Gtk.Dialog>
 //  #include <QSslCertificate>
@@ -266,7 +265,7 @@ class Ssl_error_dialog : Gtk.Dialog {
             return true;
 
         bool stat = (this.ui.cb_trust_connect.check_state () == Qt.Checked);
-        GLib.Info (lc_ssl_error_dialog) << "SSL-Connection is trusted : " << stat;
+        GLib.info (lc_ssl_error_dialog) << "SSL-Connection is trusted : " << stat;
 
         return stat;
     }

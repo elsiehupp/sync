@@ -4,7 +4,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-
 namespace Occ {
 
 class SyncJournalErrorBlocklistRecord {
@@ -13,69 +12,70 @@ class SyncJournalErrorBlocklistRecord {
     ***********************************************************/
     public enum Category {
         /***********************************************************
-        Normal errors have no special behavior
+        NORMAL errors have no special behavior
         ***********************************************************/
-        Normal = 0,
+        NORMAL = 0,
 
         /***********************************************************
         These get a special summary message
         ***********************************************************/
         INSUFFICIENT_REMOTE_STORAGE
-    };
+    }
 
 
     /***********************************************************
     The number of times the operation was unsuccessful so far.
     ***********************************************************/
-    public int this.retry_count = 0;
+    public int retry_count = 0;
 
 
     /***********************************************************
     The last error string.
     ***********************************************************/
-    public string this.error_string;
-
+    public string error_string;
 
     /***********************************************************
     The error category. Sometimes used for special actions.
     ***********************************************************/
-    public Category this.error_category = Category.Normal;
-
-    /***********************************************************
-    ***********************************************************/
-    public int64 this.last_try_modtime = 0;
+    public Category error_category = Category.NORMAL;
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray this.last_try_etag;
+    public int64 last_try_modtime = 0;
+
+
+    /***********************************************************
+    ***********************************************************/
+    public GLib.ByteArray last_try_etag;
 
 
     /***********************************************************
     The last time the operation was attempted (in s since epoch).
     ***********************************************************/
-    public int64 this.last_try_time = 0;
+    public int64 last_try_time = 0;
 
 
     /***********************************************************
     The number of seconds the file shall be ignored.
     ***********************************************************/
-    public int64 this.ignore_duration = 0;
+    public int64 ignore_duration = 0;
 
     /***********************************************************
     ***********************************************************/
-    public string this.file;
+    public string file;
 
 
     /***********************************************************
     ***********************************************************/
-    public string this.rename_target;
+    public string rename_target;
 
 
     /***********************************************************
     The last X-Request-ID of the request that failled
     ***********************************************************/
-    public GLib.ByteArray this.request_id;
+    public GLib.ByteArray request_id;
+
 
     /***********************************************************
     ***********************************************************/

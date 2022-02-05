@@ -13,7 +13,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 //  #include <ctime>
 //  #include <functional>
-//  #include
 //  #include <owncloudlib.h>
 
 
@@ -142,7 +141,7 @@ static class FileSystem {
         const int64 actual_size = get_size (filename);
         const time_t actual_mtime = get_mod_time (filename);
         if ( (actual_size != previous_size && actual_mtime > 0) || (actual_mtime != previous_mtime && previous_mtime > 0 && actual_mtime > 0)) {
-            GLib.Info (lc_file_system) << "File" << filename << "has changed:"
+            GLib.info (lc_file_system) << "File" << filename << "has changed:"
                                     << "size : " << previous_size << "<." << actual_size
                                     << ", mtime : " << previous_mtime << "<." << actual_mtime;
             return false;
@@ -183,7 +182,7 @@ static class FileSystem {
                         on_deleted (di.file_path (), false);
                 } else {
                     if (errors) {
-                        errors.append (QCoreApplication.translate ("FileSystem", "Error removing \"%1\" : %2")
+                        errors.append (_("FileSystem", "Error removing \"%1\" : %2")
                                             .arg (QDir.to_native_separators (di.file_path ()), remove_error));
                     }
                     GLib.warn (lc_file_system) << "Error removing " << di.file_path () << ':' << remove_error;
@@ -199,7 +198,7 @@ static class FileSystem {
                     on_deleted (path, true);
             } else {
                 if (errors) {
-                    errors.append (QCoreApplication.translate ("FileSystem", "Could not remove folder \"%1\"")
+                    errors.append (_("FileSystem", "Could not remove folder \"%1\"")
                                         .arg (QDir.to_native_separators (path)));
                 }
                 GLib.warn (lc_file_system) << "Error removing folder" << path;

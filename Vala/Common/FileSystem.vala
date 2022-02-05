@@ -6,7 +6,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 //  #include <QDir>
 //  #include <QCoreApplication>
-//  #include
 //  #include <sys/stat.h>
 //  #include <sys/types.h>
 
@@ -15,7 +14,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <ctime>
 //  #include <QFileInfo>
 //  #include <QLoggingCategory>
-//  #include
 //  #include <ocsynclib.h>
 
 
@@ -242,7 +240,7 @@ namespace FileSystem {
         trash_info_path = trash_path + "info/"; // trash info path contain delete files information
 
         if (! (QDir ().mkpath (trash_file_path) && QDir ().mkpath (trash_info_path))) {
-            *error_string = QCoreApplication.translate ("FileSystem", "Could not make directories in trash");
+            *error_string = _("FileSystem", "Could not make directories in trash");
             return false; //mkpath will return true if path exists
         }
 
@@ -256,13 +254,13 @@ namespace FileSystem {
                 suffix_number++;
             }
             if (!file.rename (f.absolute_file_path (), path + string.number (suffix_number))) { // rename (file old path, file trash path)
-                *error_string = QCoreApplication.translate ("FileSystem", R" (Could not move "%1" to "%2")")
+                *error_string = _("FileSystem", R" (Could not move "%1" to "%2")")
                                    .arg (f.absolute_file_path (), path + string.number (suffix_number));
                 return false;
             }
         } else {
             if (!file.rename (f.absolute_file_path (), trash_file_path + f.filename ())) { // rename (file old path, file trash path)
-                *error_string = QCoreApplication.translate ("FileSystem", R" (Could not move "%1" to "%2")")
+                *error_string = _("FileSystem", R" (Could not move "%1" to "%2")")
                                    .arg (f.absolute_file_path (), trash_file_path + f.filename ());
                 return false;
             }

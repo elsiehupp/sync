@@ -5,7 +5,6 @@ Copyright (C) by Dominik Schmidt <domme@tomahawk-player.org>
 ***********************************************************/
 
 //  #include <libcrashreporter-gui/CrashReporter.h>
-//  #include
 //  #include <QAppl
 //  #include <QDir>
 //  #include <QDebug>
@@ -25,7 +24,7 @@ int main (int argc, char argv[]) {
 
 #ifdef CRASHREPORTER_ICON
     reporter.set_logo (QPixmap (CRASHREPORTER_ICON));
-#endif
+//  #endif
     reporter.set_window_title (CRASHREPORTER_PRODUCT_NAME);
     reporter.on_set_text ("<html><head/><body><p><span style=\" font-weight:600;\">Sorry!</span> " CRASHREPORTER_PRODUCT_NAME " crashed. Please tell us about it! " CRASHREPORTER_PRODUCT_NAME " has created an error report for you that can help improve the stability in the future. You can now send this report directly to the " CRASHREPORTER_PRODUCT_NAME " developers.</p></body></html>");
 

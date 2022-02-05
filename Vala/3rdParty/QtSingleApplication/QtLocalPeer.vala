@@ -12,7 +12,6 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
 //  #include <qtlockedfile.h>
-//  #include
 //  #include <QLocal_server>
 //  #include <QLocal_socket>
 //  #include <QDir>
@@ -90,11 +89,11 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 #if defined (Q_OS_UNIX)
 //  #include <ctime>
 //  #include <unistd.h>
-#endif
+//  #endif
 
 namespace SharedTools {
 
-static const char ack[] = "ack";
+const string ack = "ack";
 
 string QtLocalPeer.app_session_id (string app_id) {
     GLib.ByteArray idc = app_id.to_utf8 ();
@@ -128,10 +127,10 @@ bool QtLocalPeer.is_client () {
         return true;
 
     if (!QLocal_server.remove_server (socket_name))
-        q_warning ("Qt_singleCoreApplication : could not on_cleanup socket");
+        q_warning ("QtSingleCoreApplication : could not on_cleanup socket");
     bool res = server.listen (socket_name);
     if (!res)
-        q_warning ("Qt_singleCoreApplication : listen on local socket failed, %s", q_printable (server.error_string ()));
+        q_warning ("QtSingleCoreApplication : listen on local socket failed, %s", q_printable (server.error_string ()));
     GLib.Object.connect (server, &QLocal_server.new_connection, this, &QtLocalPeer.receive_connection);
     return false;
 }

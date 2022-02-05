@@ -25,7 +25,7 @@ class DetermineAuthTypeJob : GLib.Object {
         ***********************************************************/
 #ifdef WITH_WEBENGINE
         WEB_VIEW_FLOW,
-#endif // WITH_WEBENGINE
+//  #endif // WITH_WEBENGINE
 
         /***********************************************************
         Also the catch-all fallback for backwards compatibility
@@ -68,7 +68,7 @@ class DetermineAuthTypeJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_start () {
-        GLib.Info (lc_determine_auth_type_job) << "Determining auth type for" << this.account.dav_url ();
+        GLib.info (lc_determine_auth_type_job) << "Determining auth type for" << this.account.dav_url ();
 
         Soup.Request req;
         // Prevent HttpCredentialsAccessManager from setting an Authorization header.
@@ -189,7 +189,7 @@ class DetermineAuthTypeJob : GLib.Object {
             result = Basic;
         }
 
-        GLib.Info (lc_determine_auth_type_job) << "Auth type for" << this.account.dav_url () << "is" << result;
+        GLib.info (lc_determine_auth_type_job) << "Auth type for" << this.account.dav_url () << "is" << result;
         /* emit */ auth_type (result);
         delete_later ();
     }

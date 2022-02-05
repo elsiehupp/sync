@@ -4,13 +4,13 @@
 //  #include <QLabel>
 
 #ifdef WITH_WEBENGINE
-#endif // WITH_WEBENGINE
+//  #endif // WITH_WEBENGINE
 
 
 namespace Occ {
 
 #ifdef WITH_WEBENGINE
-#endif // WITH_WEBENGINE
+//  #endif // WITH_WEBENGINE
 
 class WebFlowCredentialsDialog : Gtk.Dialog {
 
@@ -69,7 +69,7 @@ signals:
     Flow2AuthWidget this.flow_2_auth_widget;
 #ifdef WITH_WEBENGINE
     private WebView this.web_view;
-#endif // WITH_WEBENGINE
+//  #endif // WITH_WEBENGINE
 
     /***********************************************************
     ***********************************************************/
@@ -86,7 +86,7 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flo
     this.flow_2_auth_widget (null)
 #ifdef WITH_WEBENGINE
     this.web_view (null)
-#endif // WITH_WEBENGINE {
+//  #endif // WITH_WEBENGINE {
     set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
 
     this.layout = new QVBoxLayout (this);
@@ -122,7 +122,7 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flo
         this.container_layout.add_widget (this.web_view);
 
         connect (this.web_view, &WebView.on_url_catched, this, &WebFlowCredentialsDialog.on_url_catched);
-#endif // WITH_WEBENGINE
+//  #endif // WITH_WEBENGINE
     }
 
     var app = static_cast<Application> (Gtk.Application);
@@ -150,7 +150,7 @@ void WebFlowCredentialsDialog.close_event (QCloseEvent* e) {
         this.web_view.delete_later ();
         this.web_view = null;
     }
-#endif // WITH_WEBENGINE
+//  #endif // WITH_WEBENGINE
 
     if (this.flow_2_auth_widget) {
         this.flow_2_auth_widget.reset_auth ();
@@ -167,7 +167,7 @@ void WebFlowCredentialsDialog.set_url (GLib.Uri url) {
         this.web_view.set_url (url);
 #else // WITH_WEBENGINE
     //  Q_UNUSED (url);
-#endif // WITH_WEBENGINE
+//  #endif // WITH_WEBENGINE
 }
 
 void WebFlowCredentialsDialog.set_info (string msg) {

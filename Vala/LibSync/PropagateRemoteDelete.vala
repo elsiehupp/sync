@@ -28,7 +28,7 @@ class PropagateRemoteDelete : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public void on_start () {
-        GLib.Info (lc_propagate_remote_delete) << "Start propagate remote delete job for" << this.item.file;
+        GLib.info (lc_propagate_remote_delete) << "Start propagate remote delete job for" << this.item.file;
 
         if (propagator ().abort_requested)
             return;
@@ -60,7 +60,7 @@ class PropagateRemoteDelete : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public void create_delete_job (string filename) {
-        GLib.Info (lc_propagate_remote_delete) << "Deleting file, local" << this.item.file << "remote" << filename;
+        GLib.info (lc_propagate_remote_delete) << "Deleting file, local" << this.item.file << "remote" << filename;
 
         this.job = new DeleteJob (propagator ().account (),
             propagator ().full_remote_path (filename),
@@ -96,7 +96,7 @@ class PropagateRemoteDelete : PropagateItemJob {
     private void on_delete_job_finished () {
         propagator ().active_job_list.remove_one (this);
 
-        ASSERT (this.job);
+        //  ASSERT (this.job);
 
         Soup.Reply.NetworkError err = this.job.reply ().error ();
         const int http_status = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

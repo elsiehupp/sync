@@ -6,7 +6,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 //  #include <QMetaType>
 //  #include <QCoreApplication>
-//  #include
 //  #include <QTime>
 //  #include <QQueue>
 //  #include <QElapsedTimer>

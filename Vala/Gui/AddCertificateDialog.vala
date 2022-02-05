@@ -7,7 +7,6 @@ Copyright (C) 2015 by Daniel Molkentin <danimo@owncloud.com>
 
 //  #include <QFileDialog>
 //  #include <QLineEdit>
-//  #include
 //  #include <Gtk.Dialog>
 
 namespace Occ {

@@ -375,7 +375,7 @@ void User.on_build_notification_display (Activity_list list) {
 
     foreach (var activity, list) {
         if (this.blocklisted_notifications.contains (activity)) {
-            GLib.Info (lc_activity) << "Activity in blocklist, skip";
+            GLib.info (lc_activity) << "Activity in blocklist, skip";
             continue;
         }
         const var message = AccountManager.instance ().accounts ().count () == 1 ? "" : activity.acc_name;
@@ -392,7 +392,7 @@ void User.on_set_notification_refresh_interval (std.chrono.milliseconds interval
 }
 
 void User.on_push_notifications_ready () {
-    GLib.Info (lc_activity) << "Push notifications are ready";
+    GLib.info (lc_activity) << "Push notifications are ready";
 
     if (this.notification_check_timer.is_active ()) {
         // as we are now able to use push notifications - let's stop the polling timer
@@ -545,7 +545,7 @@ void User.on_end_notification_request (int reply_code) {
 }
 
 void User.on_send_notification_request (string account_name, string link, GLib.ByteArray verb, int row) {
-    GLib.Info (lc_activity) << "Server Notification Request " << verb << link << "on account" << account_name;
+    GLib.info (lc_activity) << "Server Notification Request " << verb << link << "on account" << account_name;
 
     const string[] valid_verbs = string[] () << "GET"
                                                  << "PUT"
@@ -593,7 +593,7 @@ void User.on_notify_server_finished (string reply, int reply_code) {
     }
 
     on_end_notification_request (reply_code);
-    GLib.Info (lc_activity) << "Server Notification reply code" << reply_code << reply;
+    GLib.info (lc_activity) << "Server Notification reply code" << reply_code << reply;
 }
 
 void User.on_progress_info (string folder, ProgressInfo progress) {

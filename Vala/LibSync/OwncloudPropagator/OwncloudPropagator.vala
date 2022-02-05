@@ -18,7 +18,6 @@ using Soup;
 //  #include <QTimerEvent>
 //  #include <QRegularExpression>
 //  #include <qmath.h>
-//  #include
 //  #include <QElapse
 //  #include <QTimer>
 //  #include <QPointer>
@@ -592,7 +591,7 @@ signals:
         if (item.has_blocklist_entry && new_entry.ignore_duration > 0) {
             item.status = SyncFileItem.Status.BLOCKLISTED_ERROR;
 
-            GLib.Info (lc_propagator) << "blocklisting " << item.file
+            GLib.info (lc_propagator) << "blocklisting " << item.file
                                  << " for " << new_entry.ignore_duration
                                  << ", retry count " << new_entry.retry_count;
 
@@ -766,7 +765,7 @@ signals:
             // when there's a new local directory at the same time as a remote file.
             if (!maybe_conflict_directory.is_empty ()) {
                 if (item.destination ().starts_with (maybe_conflict_directory)) {
-                    GLib.Info (lc_propagator) << "Skipping job inside CONFLICT directory"
+                    GLib.info (lc_propagator) << "Skipping job inside CONFLICT directory"
                                          << item.file << item.instruction;
                     item.instruction = CSYNC_INSTRUCTION_NONE;
                     continue;
@@ -1009,7 +1008,7 @@ signals:
                 *error = rename_error;
             return false;
         }
-        GLib.Info (lc_propagator) << "Created conflict file" << fn << "." << conflict_filename;
+        GLib.info (lc_propagator) << "Created conflict file" << fn << "." << conflict_filename;
 
         // Create a new conflict record. To get the base etag, we need to read it from the database.
         ConflictRecord conflict_record;

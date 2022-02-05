@@ -5,7 +5,7 @@ subdir('QProgressIndicator')
 subdir('QtLockedFile')
 subdir('QTokenizer')
 subdir('QtSingleApplication')
-subdir('Sqlite3')
+# subdir('Sqlite3')
 
 executable(
     meson.project_name(),

@@ -9,7 +9,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QtGui>
 //  #include <QStyle>
 //  #include <QApplicatio
-//  #include
 //  #include <QSslSocket>
 //  #include <QSvgRenderer>
 
@@ -67,15 +66,15 @@ class Theme : GLib.Object {
         OC_SETUP_SIDE,
         OC_SETUP_BOTTOM,
         OC_SETUP_RESULT_BOTTOM // own_cloud connect result page
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
     private static Theme instance;
     private bool mono = false;
-#ifndef TOKEN_AUTH_ONLY
+//  #ifndef TOKEN_AUTH_ONLY
     private mutable GLib.HashMap<string, QIcon> icon_cache;
-#endif
+//  #endif
 
 
     /***********************************************************
@@ -267,7 +266,7 @@ class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-#ifndef TOKEN_AUTH_ONLY
+//  #ifndef TOKEN_AUTH_ONLY
     public static string hidpi_filename (string filename, QPaint_device dev = null) {
         if (!Theme.is_hidpi (dev)) {
             return filename;
@@ -371,25 +370,25 @@ class Theme : GLib.Object {
 
         switch (status) {
         case SyncResult.Status.UNDEFINED:
-            return QCoreApplication.translate ("theme", "Status undefined");
+            return _("theme", "Status undefined");
         case SyncResult.Status.NOT_YET_STARTED:
-            return QCoreApplication.translate ("theme", "Waiting to on_start sync");
+            return _("theme", "Waiting to on_start sync");
         case SyncResult.Status.SYNC_RUNNING:
-            return QCoreApplication.translate ("theme", "Sync is running");
+            return _("theme", "Sync is running");
         case SyncResult.Status.SUCCESS:
-            return QCoreApplication.translate ("theme", "Sync Success");
+            return _("theme", "Sync Success");
         case SyncResult.Status.PROBLEM:
-            return QCoreApplication.translate ("theme", "Sync Success, some files were ignored.");
+            return _("theme", "Sync Success, some files were ignored.");
         case SyncResult.Status.ERROR:
-            return QCoreApplication.translate ("theme", "Sync Error");
+            return _("theme", "Sync Error");
         case SyncResult.Status.SETUP_ERROR:
-            return QCoreApplication.translate ("theme", "Setup Error");
+            return _("theme", "Setup Error");
         case SyncResult.Status.SYNC_PREPARE:
-            return QCoreApplication.translate ("theme", "Preparing to sync");
+            return _("theme", "Preparing to sync");
         case SyncResult.Status.SYNC_ABORT_REQUESTED:
-            return QCoreApplication.translate ("theme", "Aborting …");
+            return _("theme", "Aborting …");
         case SyncResult.Status.PAUSED:
-            return QCoreApplication.translate ("theme", "Sync is paused");
+            return _("theme", "Sync is paused");
         }
         return "";
     }
@@ -548,7 +547,7 @@ class Theme : GLib.Object {
         return flavor;
     }
 
-#ifndef TOKEN_AUTH_ONLY
+//  #ifndef TOKEN_AUTH_ONLY
     /***********************************************************
     Override to use a string or a custom image name.
     The default implementation will try to look up
@@ -674,7 +673,7 @@ class Theme : GLib.Object {
         pix.fill (wizard_header_background_color ());
         return pix;
     }
-#endif
+//  #endif
 
     /***********************************************************
     The SHA sum of the released git commit
@@ -685,7 +684,7 @@ class Theme : GLib.Object {
         const string github_prefix =
             "https://github.com/nextcloud/desktop/commit/";
         const string git_sha1 = GIT_SHA1;
-        dev_string = QCoreApplication.translate ("nextcloud_theme.about ()",
+        dev_string = _("nextcloud_theme.about ()",
             "<p><small>Built from Git revision <a href=\"%1\">%2</a>"
             " on %3, %4 using Qt %5, %6</small></p>")
                         .arg (github_prefix + git_sha1)
@@ -718,7 +717,7 @@ class Theme : GLib.Object {
                 .arg (help_url ());
 
         dev_string += _("<p><small>Using files plugin : %1</small></p>")
-                        .arg (Vfs.mode_to_string (best_available_vfs_mode ()));
+                        .arg (Vfs.Mode.to_string (best_available_vfs_mode ()));
         dev_string += "<br>%1"
                 .arg (QSysInfo.product_type () % '-' % QSysInfo.kernel_version ());
 
@@ -1178,7 +1177,7 @@ class Theme : GLib.Object {
     helper to load a icon from either the icon theme the desktop
     provides or from the apps Qt resources.
     ***********************************************************/
-#ifndef TOKEN_AUTH_ONLY
+//  #ifndef TOKEN_AUTH_ONLY
     protected QIcon theme_icon (string name, bool sys_tray = false) {
         string flavor;
         if (sys_tray) {
@@ -1234,7 +1233,7 @@ class Theme : GLib.Object {
 
         return cached;
     }
-#endif
+//  #endif
     /***********************************************************
     @brief Generates image path in the resources
     @param name Name of the image file

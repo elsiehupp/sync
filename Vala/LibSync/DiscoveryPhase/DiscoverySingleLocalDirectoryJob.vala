@@ -50,7 +50,7 @@ class DiscoverySingleLocalDirectoryJob : GLib.Object, QRunnable {
 
         var dh = csync_vio_local_opendir (local_path);
         if (!dh) {
-            GLib.Info (lc_discovery) << "Error while opening directory" << (local_path) << errno;
+            GLib.info (lc_discovery) << "Error while opening directory" << (local_path) << errno;
             string error_string = _("Error while opening directory %1").arg (local_path);
             if (errno == EACCES) {
                 error_string = _("Directory not accessible on client, permission denied");
@@ -77,7 +77,7 @@ class DiscoverySingleLocalDirectoryJob : GLib.Object, QRunnable {
                 continue;
             LocalInfo i;
             static QTextCodec codec = QTextCodec.codec_for_name ("UTF-8");
-            ASSERT (codec);
+            //  ASSERT (codec);
             QTextCodec.ConverterState state;
             i.name = codec.to_unicode (dirent.path, dirent.path.size (), state);
             if (state.invalid_chars > 0 || state.remaining_chars > 0) {

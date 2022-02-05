@@ -7,7 +7,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QPair>
 //  #include <QDir>
 //  #include <QTextStream>
-//  #include
 //  #include <qtokenizer.h>
 
 //  #include <QDebug>

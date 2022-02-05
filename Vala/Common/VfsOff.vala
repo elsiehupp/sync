@@ -146,7 +146,7 @@ class VfsOff : Vfs {
             return true;
         }
 
-        var name = mode_to_plugin_name (mode);
+        var name = Mode.to_plugin_name (mode);
         if (name.is_empty ()) {
             return false;
         }
@@ -229,7 +229,7 @@ class VfsOff : Vfs {
         if (mode == Vfs.Off)
             return std.unique_ptr<Vfs> (new VfsOff);
 
-        var name = mode_to_plugin_name (mode);
+        var name = Mode.to_plugin_name (mode);
         if (name.is_empty ()) {
             return null;
         }
@@ -260,7 +260,7 @@ class VfsOff : Vfs {
             return null;
         }
 
-        GLib.Info (lc_plugin) << "Created VFS instance from plugin" << plugin_path;
+        GLib.info (lc_plugin) << "Created VFS instance from plugin" << plugin_path;
         return vfs;
     }
 

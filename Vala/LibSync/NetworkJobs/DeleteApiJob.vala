@@ -39,7 +39,7 @@ class DeleteApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_finished () {
-        GLib.Info (lc_json_api_job) << "JsonApiJob of" << reply ().request ().url () << "FINISHED WITH STATUS"
+        GLib.info (lc_json_api_job) << "JsonApiJob of" << reply ().request ().url () << "FINISHED WITH STATUS"
                             << reply ().error ()
                             << (reply ().error () == Soup.Reply.NoError ? QLatin1String ("") : error_string ());
 
@@ -52,7 +52,7 @@ class DeleteApiJob : AbstractNetworkJob {
         }
 
         const var reply_data = string.from_utf8 (reply ().read_all ());
-        GLib.Info (lc_json_api_job ()) << "TMX Delete Job" << reply_data;
+        GLib.info (lc_json_api_job ()) << "TMX Delete Job" << reply_data;
         /* emit */ result (http_status);
         return true;
     }

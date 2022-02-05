@@ -96,7 +96,6 @@ https://www.gnu.org/licenses/gpl-3.0.html.
 //  #include <Gtk.Widget>
 //  #include <QVBoxLayout>
 //  #include <QLabel>
-//  #include
 //  #include <QPainte
 //  #include <QStyle>
 //  #include <QGuiApplication>

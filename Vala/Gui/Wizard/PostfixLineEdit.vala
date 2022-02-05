@@ -6,7 +6,6 @@ Copyright (C) 2016 by Daniel Molkentin <danimo@owncloud.com>
 
 //  #include <QStyle>
 //  #include <QStyle_option_frame>
-//  #include
 //  #include <QLineEdit>
 //  #include <QPaint_event>
 //  #include <QPainter>

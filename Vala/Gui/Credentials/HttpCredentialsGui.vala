@@ -8,7 +8,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QInputDialog>
 //  #include <QLabel>
 //  #include <QDesktopServices>
-//  #include
 //  #include <QTimer>
 //  #include <QBuffer>
 //  #include <QMessageBox>
@@ -131,7 +130,7 @@ void HttpCredentialsGui.on_async_auth_result (OAuth.Result r, string user,
         break;
     }
 
-    ASSERT (this.user == user); // ensured by this.async_auth
+    //  ASSERT (this.user == user); // ensured by this.async_auth
 
     this.password = token;
     this.refresh_token = refresh_token;

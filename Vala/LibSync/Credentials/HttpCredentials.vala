@@ -7,15 +7,12 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 //  #include <QLoggingCategory>
 //  #include <QMutex>
-//  #include
 //  #include <QSetting
 //  #include <QSslKey>
 //  #include <QJsonObject>
 //  #include <QJsonDocument
 //  #include <Soup.Buffer>
-//  #include
 //  #include <qt5keychain/keyc
-//  #include
 //  #include <QAuthenticator>
 
 //  #include <QSslCertificate>
@@ -172,7 +169,7 @@ class HttpCredentials : AbstractCredentials {
         this.client_cert_password = client_cert_password;
         this.retry_on_key_chain_error = false;
         if (!unpack_client_cert_bundle ()) {
-            ASSERT (false, "pkcs12 client cert bundle passed to HttpCredentials must be valid");
+            //  ASSERT (false, "pkcs12 client cert bundle passed to HttpCredentials must be valid");
         }
     }
 
@@ -475,7 +472,7 @@ class HttpCredentials : AbstractCredentials {
             reply.set_property (NEED_RETRY_C, true);
         } else if (is_using_oauth () && !reply.property (NEED_RETRY_C).to_bool ()) {
             reply.set_property (NEED_RETRY_C, true);
-            GLib.Info (lc_http_credentials) << "Refreshing token";
+            GLib.info (lc_http_credentials) << "Refreshing token";
             refresh_access_token ();
         }
     }
@@ -774,7 +771,7 @@ class HttpCredentials : AbstractCredentials {
             // Could be that the backend was not yet available. Wait some extra seconds.
             // (Issues #4274 and #6522)
             // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
-            GLib.Info (lc_http_credentials) << "Backend unavailable (yet?) Retrying in a few seconds." << incoming.error_string ();
+            GLib.info (lc_http_credentials) << "Backend unavailable (yet?) Retrying in a few seconds." << incoming.error_string ();
             QTimer.single_shot (10000, this, &HttpCredentials.fetch_from_keychain_helper);
             this.retry_on_key_chain_error = false;
             return true;

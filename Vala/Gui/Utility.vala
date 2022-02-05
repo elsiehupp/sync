@@ -57,7 +57,7 @@ namespace Utility {
 } // namespace Utility
 } // namespace Occ
 
-#endif
+//  #endif
 
 
 
@@ -81,8 +81,8 @@ bool Utility.open_browser (GLib.Uri url, Gtk.Widget error_widget_parent) {
         if (error_widget_parent) {
             QMessageBox.warning (
                 error_widget_parent,
-                QCoreApplication.translate ("utility", "Could not open browser"),
-                QCoreApplication.translate ("utility",
+                _("utility", "Could not open browser"),
+                _("utility",
                     "There was an error when launching the browser to go to "
                     "URL %1. Maybe no default browser is configured?")
                     .arg (url.to_string ()));
@@ -112,8 +112,8 @@ bool Utility.open_email_composer (string subject, string body, Gtk.Widget error_
         if (error_widget_parent) {
             QMessageBox.warning (
                 error_widget_parent,
-                QCoreApplication.translate ("utility", "Could not open email client"),
-                QCoreApplication.translate ("utility",
+                _("utility", "Could not open email client"),
+                _("utility",
                     "There was an error when launching the email client to "
                     "create a new message. Maybe no default email client is "
                     "configured?"));
@@ -127,22 +127,22 @@ bool Utility.open_email_composer (string subject, string body, Gtk.Widget error_
 string Utility.vfs_current_availability_text (VfsItemAvailability availability) {
     switch (availability) {
     case VfsItemAvailability.PinState.ALWAYS_LOCAL:
-        return QCoreApplication.translate ("utility", "Always available locally");
+        return _("utility", "Always available locally");
     case VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED:
-        return QCoreApplication.translate ("utility", "Currently available locally");
+        return _("utility", "Currently available locally");
     case VfsItemAvailability.VfsItemAvailability.MIXED:
-        return QCoreApplication.translate ("utility", "Some available online only");
+        return _("utility", "Some available online only");
     case VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED:
     case VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY:
-        return QCoreApplication.translate ("utility", "Available online only");
+        return _("utility", "Available online only");
     }
     Q_UNREACHABLE ();
 }
 
 string Utility.vfs_pin_action_text () {
-    return QCoreApplication.translate ("utility", "Make always available locally");
+    return _("utility", "Make always available locally");
 }
 
 string Utility.vfs_free_space_action_text () {
-    return QCoreApplication.translate ("utility", "Free up local space");
+    return _("utility", "Free up local space");
 }

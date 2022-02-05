@@ -10,18 +10,17 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <random>
 
 #if defined (BUILD_UPDATER)
-#endif
+//  #endif
 
 #if defined (WITH_CRASHREPORTER)
 //  #include <libcrashreporter-handler/Handler.h>
-#endif
+//  #endif
 
 //  #include <QTranslator>
 //  #include <QMenu>
 //  #include <QMessageBox>
 //  #include <QDesktopServices>
 //  #include <QGuiApplication>
-//  #include
 //  #include <QApplicat
 //  #include <QPointe
 //  #include <QQueue>
@@ -180,7 +179,7 @@ protected slots:
 
 #if defined (WITH_CRASHREPORTER)
     private QScopedPointer<CrashReporter.Handler> this.crash_handler;
-#endif
+//  #endif
     private QScopedPointer<FolderMan> this.folder_manager;
 }
 
@@ -190,7 +189,7 @@ namespace {
 
     /***********************************************************
     ***********************************************************/
-    static const char options_c[] =
+    const strings options_c[] =
         "Options:\n"
         "  --help, -h           : show this help screen.\n"
         "  --version, -v        : show version information.\n"
@@ -215,7 +214,7 @@ namespace {
         }
 #if defined (Q_OS_UNIX)
         return string.from_latin1 (SHAREDIR "/" APPLICATION_EXECUTABLE "/i18n/");
-#endif
+//  #endif
     }
 }
 
@@ -311,7 +310,7 @@ Application.Application (int argc, char **argv)
     string desktop_filename = string (QLatin1String (LINUX_APPLICATION_ID)
                                         + QLatin1String (".desktop"));
     set_desktop_filename (desktop_filename);
-#endif
+//  #endif
 
     set_application_name (this.theme.app_name ());
     set_window_icon (this.theme.application_icon ());
@@ -319,9 +318,9 @@ Application.Application (int argc, char **argv)
     if (!ConfigFile ().exists ()) {
         // Migrate from version <= 2.4
         set_application_name (this.theme.app_name_gui ());
-#ifndef QT_WARNING_DISABLE_DEPRECATED // Was added in Qt 5.9
+//  #ifndef QT_WARNING_DISABLE_DEPRECATED // Was added in Qt 5.9
 const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-declarations")
-#endif
+//  #endif
         QT_WARNING_PUSH
         QT_WARNING_DISABLE_DEPRECATED
         // We need to use the deprecated QDesktopServices.storage_location because of its Qt4
@@ -333,7 +332,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         if (QFileInfo (old_dir).is_dir ()) {
             var conf_dir = ConfigFile ().config_path ();
             if (conf_dir.ends_with ('/')) conf_dir.chop (1);  // macOS 10.11.x does not like trailing slash for rename/move.
-            GLib.Info (lc_application) << "Migrating old config from" << old_dir << "to" << conf_dir;
+            GLib.info (lc_application) << "Migrating old config from" << old_dir << "to" << conf_dir;
 
             if (!GLib.File.rename (old_dir, conf_dir)) {
                 GLib.warn (lc_application) << "Failed to move the old config directory to its new location (" << old_dir << "to" << conf_dir << ")";
@@ -341,7 +340,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
                 // Try to move the files one by one
                 if (QFileInfo (conf_dir).is_dir () || QDir ().mkdir (conf_dir)) {
                     const string[] files_list = QDir (old_dir).entry_list (QDir.Files);
-                    GLib.Info (lc_application) << "Will move the individual files" << files_list;
+                    GLib.info (lc_application) << "Will move the individual files" << files_list;
                     for (var name : files_list) {
                         if (!GLib.File.rename (old_dir + "/" + name,  conf_dir + "/" + name)) {
                             GLib.warn (lc_application) << "Fallback move of " << name << "also failed";
@@ -370,7 +369,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         var reporter = CRASHREPORTER_EXECUTABLE;
         this.crash_handler.on_reset (new CrashReporter.Handler (QDir.temp_path (), true, reporter));
     }
-#endif
+//  #endif
 
     setup_logging ();
     setup_translations ();
@@ -389,9 +388,9 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         GLib.warn (lc_application) << "Theme wants to show vfs mode, but no vfs plugins are available";
     }
     if (is_vfs_plugin_available (Vfs.WindowsCfApi))
-        GLib.Info (lc_application) << "VFS windows plugin is available";
+        GLib.info (lc_application) << "VFS windows plugin is available";
     if (is_vfs_plugin_available (Vfs.WithSuffix))
-        GLib.Info (lc_application) << "VFS suffix plugin is available";
+        GLib.info (lc_application) << "VFS suffix plugin is available";
 
     this.folder_manager.on_reset (new FolderMan);
 
@@ -431,7 +430,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
     }
 #if WITH_LIBCLOUDPROVIDERS
     this.gui.setup_cloud_providers ();
-#endif
+//  #endif
 
     FolderMan.instance ().setup_folders ();
     this.proxy.on_setup_qt_proxy_from_config (); // folders have to be defined first, than we set up the Qt proxy.
@@ -468,7 +467,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         this.gui.data (), &OwncloudGui.on_show_tray_message);
     connect (updater_scheduler, &UpdaterScheduler.request_restart,
         this.folder_manager.data (), &FolderMan.on_schedule_app_restart);
-#endif
+//  #endif
 
     // Cleanup at Quit.
     connect (this, &QCoreApplication.about_to_quit, this, &Application.on_cleanup);
@@ -583,11 +582,11 @@ void Application.on_owncloud_wizard_done (int res) {
         on_check_connection ();
 
         // If one account is configured : enable autostart
-#ifndef QT_DEBUG
+//  #ifndef QT_DEBUG
         bool should_set_auto_start = AccountManager.instance ().accounts ().size () == 1;
 #else
         bool should_set_auto_start = false;
-#endif
+//  #endif
         if (should_set_auto_start) {
             Utility.set_launch_on_startup (this.theme.app_name (), this.theme.app_name_gui (), true);
         }
@@ -612,12 +611,12 @@ void Application.setup_logging () {
 
     logger.on_enter_next_log_file ();
 
-    GLib.Info (lc_application) << "##################" << this.theme.app_name ()
+    GLib.info (lc_application) << "##################" << this.theme.app_name ()
                           << "locale:" << QLocale.system ().name ()
                           << "ui_lang:" << property ("ui_lang")
                           << "version:" << this.theme.version ()
                           << "os:" << Utility.platform_name ();
-    GLib.Info (lc_application) << "Arguments:" << Gtk.Application.arguments ();
+    GLib.info (lc_application) << "Arguments:" << Gtk.Application.arguments ();
 }
 
 void Application.on_use_mono_icons_changed (bool) {
@@ -639,7 +638,7 @@ void Application.on_parse_message (string msg, GLib.Object *) {
         }
 
     } else if (msg.starts_with (QLatin1String ("MSG_SHOWMAINDIALOG"))) {
-        GLib.Info (lc_application) << "Running for" << this.started_at.elapsed () / 1000.0 << "sec";
+        GLib.info (lc_application) << "Running for" << this.started_at.elapsed () / 1000.0 << "sec";
         if (this.started_at.elapsed () < 10 * 1000) {
             // This call is mirrored with the one in int main ()
             GLib.warn (lc_application) << "Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and var on_start";
@@ -796,7 +795,7 @@ void Application.setup_translations () {
     var qtkeychain_translator = new QTranslator (this);
 
     for (string lang : q_as_const (ui_languages)) {
-        lang.replace ('-', 'this.'); // work around QTBUG-25973
+        lang.replace ('-', '_'); // work around QTBUG-25973
         lang = subst_lang (lang);
         const string tr_path = application_tr_path ();
         const string tr_file = "client_" + lang;
@@ -806,7 +805,7 @@ void Application.setup_translations () {
             // for us to accept the language. Otherwise, we try with the next.
             // "en" is an exception as it is the default language and may not
             // have a translation file provided.
-            GLib.Info (lc_application) << "Using" << lang << "translation";
+            GLib.info (lc_application) << "Using" << lang << "translation";
             set_property ("ui_lang", lang);
             const string qt_tr_path = QLibraryInfo.location (QLibraryInfo.TranslationsPath);
             const string qt_tr_file = QLatin1String ("qt_") + lang;
@@ -876,7 +875,7 @@ void Application.on_open_virtual_file (string filename) {
 }
 
 void Application.on_try_tray_again () {
-    GLib.Info (lc_application) << "Trying tray icon, tray available:" << QSystemTrayIcon.is_system_tray_available ();
+    GLib.info (lc_application) << "Trying tray icon, tray available:" << QSystemTrayIcon.is_system_tray_available ();
     this.gui.hide_and_show_tray ();
 }
 

@@ -138,7 +138,7 @@ class JsonApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     protected bool on_finished () {
-        GLib.Info (lc_json_api_job) << "JsonApiJob of" << reply ().request ().url () << "FINISHED WITH STATUS"
+        GLib.info (lc_json_api_job) << "JsonApiJob of" << reply ().request ().url () << "FINISHED WITH STATUS"
                             << reply_status_string ();
 
         int status_code = 0;

@@ -73,7 +73,7 @@ namespace EncryptionHelper {
 
         int ret = RAND_bytes (unsigned_data (result), size);
         if (ret != 1) {
-            GLib.Info (lc_cse ()) << "Random byte generation failed!";
+            GLib.info (lc_cse ()) << "Random byte generation failed!";
             // Error out?
         }
 
@@ -81,7 +81,7 @@ namespace EncryptionHelper {
     }
 
     GLib.ByteArray generate_password (string wordlist, GLib.ByteArray salt) {
-        GLib.Info (lc_cse ()) << "Start encryption key generation!";
+        GLib.info (lc_cse ()) << "Start encryption key generation!";
 
         const int iteration_count = 1024;
         const int key_strength = 256;
@@ -91,20 +91,20 @@ namespace EncryptionHelper {
 
         int ret = PKCS5_PBKDF2_HMAC_SHA1 (
             wordlist.to_local8Bit ().const_data (),     // const char password,
-            wordlist.size (),                        // int password length,
-            (uchar *)salt.const_data (),// const uchar salt,
-            salt.size (),                            // int saltlen,
-            iteration_count,                         // int iterations,
-            key_length,                              // int keylen,
-            unsigned_data (secret_key)                 // uchar out
+            wordlist.size (),                           // int password length,
+            (uchar *)salt.const_data (),                // const uchar salt,
+            salt.size (),                               // int saltlen,
+            iteration_count,                            // int iterations,
+            key_length,                                 // int keylen,
+            unsigned_data (secret_key)                  // uchar out
         );
 
         if (ret != 1) {
-            GLib.Info (lc_cse ()) << "Failed to generate encryption key";
+            GLib.info (lc_cse ()) << "Failed to generate encryption key";
             // Error out?
         }
 
-        GLib.Info (lc_cse ()) << "Encryption key generated!";
+        GLib.info (lc_cse ()) << "Encryption key generated!";
 
         return secret_key;
     }
@@ -121,13 +121,13 @@ namespace EncryptionHelper {
 
         // Create and initialise the context
         if (!context) {
-            GLib.Info (lc_cse ()) << "Error creating cipher";
+            GLib.info (lc_cse ()) << "Error creating cipher";
             handle_errors ();
         }
 
         // Initialise the decryption operation.
         if (!EVP_Encrypt_init_ex (context, EVP_aes_256_gcm (), null, null, null)) {
-            GLib.Info (lc_cse ()) << "Error initializing context with aes_256";
+            GLib.info (lc_cse ()) << "Error initializing context with aes_256";
             handle_errors ();
         }
 
@@ -136,13 +136,13 @@ namespace EncryptionHelper {
 
         // Set IV length.
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, iv.size (), null)) {
-            GLib.Info (lc_cse ()) << "Error setting iv length";
+            GLib.info (lc_cse ()) << "Error setting iv length";
             handle_errors ();
         }
 
         // Initialise key and IV
         if (!EVP_Encrypt_init_ex (context, null, null, (uchar *)key.const_data (), (uchar *)iv.const_data ())) {
-            GLib.Info (lc_cse ()) << "Error initialising key and iv";
+            GLib.info (lc_cse ()) << "Error initialising key and iv";
             handle_errors ();
         }
 
@@ -155,7 +155,7 @@ namespace EncryptionHelper {
         // Do the actual encryption
         int len = 0;
         if (!EVP_Encrypt_update (context, unsigned_data (ctext), len, (uchar *)private_key_b64.const_data (), private_key_b64.size ())) {
-            GLib.Info (lc_cse ()) << "Error encrypting";
+            GLib.info (lc_cse ()) << "Error encrypting";
             handle_errors ();
         }
 
@@ -167,7 +167,7 @@ namespace EncryptionHelper {
         this stage, but this does not occur in GCM mode
         ***********************************************************/
         if (1 != EVP_Encrypt_final_ex (context, unsigned_data (ctext) + len, len)) {
-            GLib.Info (lc_cse ()) << "Error finalizing encryption";
+            GLib.info (lc_cse ()) << "Error finalizing encryption";
             handle_errors ();
         }
         clen += len;
@@ -175,7 +175,7 @@ namespace EncryptionHelper {
         // Get the e2Ee_tag
         GLib.ByteArray e2Ee_tag (Occ.Constants.E2EE_TAG_SIZE, '\0');
         if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Occ.Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
-            GLib.Info (lc_cse ()) << "Error getting the e2Ee_tag";
+            GLib.info (lc_cse ()) << "Error getting the e2Ee_tag";
             handle_errors ();
         }
 
@@ -194,20 +194,20 @@ namespace EncryptionHelper {
     }
 
     GLib.ByteArray decrypt_private_key (GLib.ByteArray key, GLib.ByteArray data) {
-        GLib.Info (lc_cse ()) << "decrypt_string_symmetric key : " << key;
-        GLib.Info (lc_cse ()) << "decrypt_string_symmetric data : " << data;
+        GLib.info (lc_cse ()) << "decrypt_string_symmetric key : " << key;
+        GLib.info (lc_cse ()) << "decrypt_string_symmetric data : " << data;
 
         const var parts = split_cipher_parts (data);
         if (parts.size () < 2) {
-            GLib.Info (lc_cse ()) << "Not enough parts found";
+            GLib.info (lc_cse ()) << "Not enough parts found";
             return GLib.ByteArray ();
         }
 
         GLib.ByteArray cipher_t_xT64 = parts.at (0);
         GLib.ByteArray iv_b64 = parts.at (1);
 
-        GLib.Info (lc_cse ()) << "decrypt_string_symmetric cipher_t_xT : " << cipher_t_xT64;
-        GLib.Info (lc_cse ()) << "decrypt_string_symmetric IV : " << iv_b64;
+        GLib.info (lc_cse ()) << "decrypt_string_symmetric cipher_t_xT : " << cipher_t_xT64;
+        GLib.info (lc_cse ()) << "decrypt_string_symmetric IV : " << iv_b64;
 
         GLib.ByteArray cipher_t_xT = GLib.ByteArray.from_base64 (cipher_t_xT64);
         GLib.ByteArray iv = GLib.ByteArray.from_base64 (iv_b64);
@@ -220,25 +220,25 @@ namespace EncryptionHelper {
 
         // Create and initialise the context
         if (!context) {
-            GLib.Info (lc_cse ()) << "Error creating cipher";
+            GLib.info (lc_cse ()) << "Error creating cipher";
             return GLib.ByteArray ();
         }
 
         // Initialise the decryption operation.
         if (!EVP_Decrypt_init_ex (context, EVP_aes_256_gcm (), null, null, null)) {
-            GLib.Info (lc_cse ()) << "Error initialising context with aes 256";
+            GLib.info (lc_cse ()) << "Error initialising context with aes 256";
             return GLib.ByteArray ();
         }
 
         // Set IV length. Not necessary if this is 12 bytes (96 bits)
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, iv.size (), null)) {
-            GLib.Info (lc_cse ()) << "Error setting IV size";
+            GLib.info (lc_cse ()) << "Error setting IV size";
             return GLib.ByteArray ();
         }
 
         // Initialise key and IV
         if (!EVP_Decrypt_init_ex (context, null, null, (uchar *)key.const_data (), (uchar *)iv.const_data ())) {
-            GLib.Info (lc_cse ()) << "Error initialising key and iv";
+            GLib.info (lc_cse ()) << "Error initialising key and iv";
             return GLib.ByteArray ();
         }
 
@@ -251,13 +251,13 @@ namespace EncryptionHelper {
         EVP_Decrypt_update can be called multiple times if necessary
         ***********************************************************/
         if (!EVP_Decrypt_update (context, unsigned_data (ptext), plen, (uchar *)cipher_t_xT.const_data (), cipher_t_xT.size ())) {
-            GLib.Info (lc_cse ()) << "Could not decrypt";
+            GLib.info (lc_cse ()) << "Could not decrypt";
             return GLib.ByteArray ();
         }
 
         // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (uchar *)e2Ee_tag.const_data ())) {
-            GLib.Info (lc_cse ()) << "Could not set e2Ee_tag";
+            GLib.info (lc_cse ()) << "Could not set e2Ee_tag";
             return GLib.ByteArray ();
         }
 
@@ -268,7 +268,7 @@ namespace EncryptionHelper {
         ***********************************************************/
         int len = plen;
         if (EVP_Decrypt_final_ex (context, unsigned_data (ptext) + plen, len) == 0) {
-            GLib.Info (lc_cse ()) << "Tag did not match!";
+            GLib.info (lc_cse ()) << "Tag did not match!";
             return GLib.ByteArray ();
         }
 
@@ -279,7 +279,7 @@ namespace EncryptionHelper {
     GLib.ByteArray extract_private_key_salt (GLib.ByteArray data) {
         const var parts = split_cipher_parts (data);
         if (parts.size () < 3) {
-            GLib.Info (lc_cse ()) << "Not enough parts found";
+            GLib.info (lc_cse ()) << "Not enough parts found";
             return GLib.ByteArray ();
         }
 
@@ -287,20 +287,20 @@ namespace EncryptionHelper {
     }
 
     GLib.ByteArray decrypt_string_symmetric (GLib.ByteArray key, GLib.ByteArray data) {
-        GLib.Info (lc_cse ()) << "decrypt_string_symmetric key : " << key;
-        GLib.Info (lc_cse ()) << "decrypt_string_symmetric data : " << data;
+        GLib.info (lc_cse ()) << "decrypt_string_symmetric key : " << key;
+        GLib.info (lc_cse ()) << "decrypt_string_symmetric data : " << data;
 
         const var parts = split_cipher_parts (data);
         if (parts.size () < 2) {
-            GLib.Info (lc_cse ()) << "Not enough parts found";
+            GLib.info (lc_cse ()) << "Not enough parts found";
             return GLib.ByteArray ();
         }
 
         GLib.ByteArray cipher_t_xT64 = parts.at (0);
         GLib.ByteArray iv_b64 = parts.at (1);
 
-        GLib.Info (lc_cse ()) << "decrypt_string_symmetric cipher_t_xT : " << cipher_t_xT64;
-        GLib.Info (lc_cse ()) << "decrypt_string_symmetric IV : " << iv_b64;
+        GLib.info (lc_cse ()) << "decrypt_string_symmetric cipher_t_xT : " << cipher_t_xT64;
+        GLib.info (lc_cse ()) << "decrypt_string_symmetric IV : " << iv_b64;
 
         GLib.ByteArray cipher_t_xT = GLib.ByteArray.from_base64 (cipher_t_xT64);
         GLib.ByteArray iv = GLib.ByteArray.from_base64 (iv_b64);
@@ -313,25 +313,25 @@ namespace EncryptionHelper {
 
         // Create and initialise the context
         if (!context) {
-            GLib.Info (lc_cse ()) << "Error creating cipher";
+            GLib.info (lc_cse ()) << "Error creating cipher";
             return GLib.ByteArray ();
         }
 
         // Initialise the decryption operation.
         if (!EVP_Decrypt_init_ex (context, EVP_aes_128_gcm (), null, null, null)) {
-            GLib.Info (lc_cse ()) << "Error initialising context with aes 128";
+            GLib.info (lc_cse ()) << "Error initialising context with aes 128";
             return GLib.ByteArray ();
         }
 
         // Set IV length. Not necessary if this is 12 bytes (96 bits)
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, iv.size (), null)) {
-            GLib.Info (lc_cse ()) << "Error setting IV size";
+            GLib.info (lc_cse ()) << "Error setting IV size";
             return GLib.ByteArray ();
         }
 
         // Initialise key and IV
         if (!EVP_Decrypt_init_ex (context, null, null, (uchar *)key.const_data (), (uchar *)iv.const_data ())) {
-            GLib.Info (lc_cse ()) << "Error initialising key and iv";
+            GLib.info (lc_cse ()) << "Error initialising key and iv";
             return GLib.ByteArray ();
         }
 
@@ -344,13 +344,13 @@ namespace EncryptionHelper {
         EVP_Decrypt_update can be called multiple times if necessary
         ***********************************************************/
         if (!EVP_Decrypt_update (context, unsigned_data (ptext), plen, (uchar *)cipher_t_xT.const_data (), cipher_t_xT.size ())) {
-            GLib.Info (lc_cse ()) << "Could not decrypt";
+            GLib.info (lc_cse ()) << "Could not decrypt";
             return GLib.ByteArray ();
         }
 
         // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (uchar *)e2Ee_tag.const_data ())) {
-            GLib.Info (lc_cse ()) << "Could not set e2Ee_tag";
+            GLib.info (lc_cse ()) << "Could not set e2Ee_tag";
             return GLib.ByteArray ();
         }
 
@@ -359,7 +359,7 @@ namespace EncryptionHelper {
         ***********************************************************/
         int len = plen;
         if (EVP_Decrypt_final_ex (context, unsigned_data (ptext) + plen, len) == 0) {
-            GLib.Info (lc_cse ()) << "Tag did not match!";
+            GLib.info (lc_cse ()) << "Tag did not match!";
             return GLib.ByteArray ();
         }
 
@@ -385,14 +385,14 @@ namespace EncryptionHelper {
 
         // Create and initialise the context
         if (!context) {
-            GLib.Info (lc_cse ()) << "Error creating cipher";
+            GLib.info (lc_cse ()) << "Error creating cipher";
             handle_errors ();
             return {};
         }
 
         // Initialise the decryption operation.
         if (!EVP_Encrypt_init_ex (context, EVP_aes_128_gcm (), null, null, null)) {
-            GLib.Info (lc_cse ()) << "Error initializing context with aes_128";
+            GLib.info (lc_cse ()) << "Error initializing context with aes_128";
             handle_errors ();
             return {};
         }
@@ -402,14 +402,14 @@ namespace EncryptionHelper {
 
         // Set IV length.
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, iv.size (), null)) {
-            GLib.Info (lc_cse ()) << "Error setting iv length";
+            GLib.info (lc_cse ()) << "Error setting iv length";
             handle_errors ();
             return {};
         }
 
         // Initialise key and IV
         if (!EVP_Encrypt_init_ex (context, null, null, (uchar *)key.const_data (), (uchar *)iv.const_data ())) {
-            GLib.Info (lc_cse ()) << "Error initialising key and iv";
+            GLib.info (lc_cse ()) << "Error initialising key and iv";
             handle_errors ();
             return {};
         }
@@ -423,7 +423,7 @@ namespace EncryptionHelper {
         // Do the actual encryption
         int len = 0;
         if (!EVP_Encrypt_update (context, unsigned_data (ctext), len, (uchar *)data_b64.const_data (), data_b64.size ())) {
-            GLib.Info (lc_cse ()) << "Error encrypting";
+            GLib.info (lc_cse ()) << "Error encrypting";
             handle_errors ();
             return {};
         }
@@ -436,7 +436,7 @@ namespace EncryptionHelper {
         this stage, but this does not occur in GCM mode
         ***********************************************************/
         if (1 != EVP_Encrypt_final_ex (context, unsigned_data (ctext) + len, len)) {
-            GLib.Info (lc_cse ()) << "Error finalizing encryption";
+            GLib.info (lc_cse ()) << "Error finalizing encryption";
             handle_errors ();
             return {};
         }
@@ -445,7 +445,7 @@ namespace EncryptionHelper {
         // Get the e2Ee_tag
         GLib.ByteArray e2Ee_tag (Occ.Constants.E2EE_TAG_SIZE, '\0');
         if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Occ.Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
-            GLib.Info (lc_cse ()) << "Error getting the e2Ee_tag";
+            GLib.info (lc_cse ()) << "Error getting the e2Ee_tag";
             handle_errors ();
             return {};
         }
@@ -465,35 +465,35 @@ namespace EncryptionHelper {
     GLib.ByteArray decrypt_string_asymmetric (EVP_PKEY *private_key, GLib.ByteArray data) {
         int err = -1;
 
-        GLib.Info (lc_cse_decryption ()) << "Start to work the decryption.";
+        GLib.info (lc_cse_decryption ()) << "Start to work the decryption.";
         var context = PrivateKeyContext.for_key (private_key, ENGINE_get_default_RSA ());
         if (!context) {
-            GLib.Info (lc_cse_decryption ()) << "Could not create the PKEY context.";
+            GLib.info (lc_cse_decryption ()) << "Could not create the PKEY context.";
             handle_errors ();
             return {};
         }
 
         err = EVP_PKEY_decrypt_init (context);
         if (err <= 0) {
-            GLib.Info (lc_cse_decryption ()) << "Could not on_init the decryption of the metadata";
+            GLib.info (lc_cse_decryption ()) << "Could not on_init the decryption of the metadata";
             handle_errors ();
             return {};
         }
 
         if (EVP_PKEY_CTX_set_rsa_padding (context, RSA_PKCS1_OAEP_PADDING) <= 0) {
-            GLib.Info (lc_cse_decryption ()) << "Error setting the encryption padding.";
+            GLib.info (lc_cse_decryption ()) << "Error setting the encryption padding.";
             handle_errors ();
             return {};
         }
 
         if (EVP_PKEY_CTX_set_rsa_oaep_md (context, EVP_sha256 ()) <= 0) {
-            GLib.Info (lc_cse_decryption ()) << "Error setting OAEP SHA 256";
+            GLib.info (lc_cse_decryption ()) << "Error setting OAEP SHA 256";
             handle_errors ();
             return {};
         }
 
         if (EVP_PKEY_CTX_set_rsa_mgf1_md (context, EVP_sha256 ()) <= 0) {
-            GLib.Info (lc_cse_decryption ()) << "Error setting MGF1 padding";
+            GLib.info (lc_cse_decryption ()) << "Error setting MGF1 padding";
             handle_errors ();
             return {};
         }
@@ -501,12 +501,12 @@ namespace EncryptionHelper {
         size_t outlen = 0;
         err = EVP_PKEY_decrypt (context, null, outlen,  (uchar *)data.const_data (), data.size ());
         if (err <= 0) {
-            GLib.Info (lc_cse_decryption ()) << "Could not determine the buffer length";
+            GLib.info (lc_cse_decryption ()) << "Could not determine the buffer length";
             handle_errors ();
             return {};
         } else {
-            GLib.Info (lc_cse_decryption ()) << "Size of output is : " << outlen;
-            GLib.Info (lc_cse_decryption ()) << "Size of data is : " << data.size ();
+            GLib.info (lc_cse_decryption ()) << "Size of output is : " << outlen;
+            GLib.info (lc_cse_decryption ()) << "Size of data is : " << data.size ();
         }
 
         GLib.ByteArray out (static_cast<int> (outlen), '\0');
@@ -516,10 +516,10 @@ namespace EncryptionHelper {
             q_c_critical (lc_cse_decryption ()) << "Could not decrypt the data." << error;
             return {};
         } else {
-            GLib.Info (lc_cse_decryption ()) << "data decrypted successfully";
+            GLib.info (lc_cse_decryption ()) << "data decrypted successfully";
         }
 
-        GLib.Info (lc_cse ()) << out;
+        GLib.info (lc_cse ()) << out;
         return out;
     }
 
@@ -528,46 +528,46 @@ namespace EncryptionHelper {
 
         var context = PrivateKeyContext.for_key (public_key, ENGINE_get_default_RSA ());
         if (!context) {
-            GLib.Info (lc_cse ()) << "Could not initialize the pkey context.";
+            GLib.info (lc_cse ()) << "Could not initialize the pkey context.";
             exit (1);
         }
 
         if (EVP_PKEY_encrypt_init (context) != 1) {
-            GLib.Info (lc_cse ()) << "Error initilaizing the encryption.";
+            GLib.info (lc_cse ()) << "Error initilaizing the encryption.";
             exit (1);
         }
 
         if (EVP_PKEY_CTX_set_rsa_padding (context, RSA_PKCS1_OAEP_PADDING) <= 0) {
-            GLib.Info (lc_cse ()) << "Error setting the encryption padding.";
+            GLib.info (lc_cse ()) << "Error setting the encryption padding.";
             exit (1);
         }
 
         if (EVP_PKEY_CTX_set_rsa_oaep_md (context, EVP_sha256 ()) <= 0) {
-            GLib.Info (lc_cse ()) << "Error setting OAEP SHA 256";
+            GLib.info (lc_cse ()) << "Error setting OAEP SHA 256";
             exit (1);
         }
 
         if (EVP_PKEY_CTX_set_rsa_mgf1_md (context, EVP_sha256 ()) <= 0) {
-            GLib.Info (lc_cse ()) << "Error setting MGF1 padding";
+            GLib.info (lc_cse ()) << "Error setting MGF1 padding";
             exit (1);
         }
 
         size_t out_len = 0;
         if (EVP_PKEY_encrypt (context, null, out_len, (uchar *)data.const_data (), data.size ()) != 1) {
-            GLib.Info (lc_cse ()) << "Error retrieving the size of the encrypted data";
+            GLib.info (lc_cse ()) << "Error retrieving the size of the encrypted data";
             exit (1);
         } else {
-            GLib.Info (lc_cse ()) << "Encryption Length:" << out_len;
+            GLib.info (lc_cse ()) << "Encryption Length:" << out_len;
         }
 
         GLib.ByteArray out (static_cast<int> (out_len), '\0');
         if (EVP_PKEY_encrypt (context, unsigned_data (out), out_len, (uchar *)data.const_data (), data.size ()) != 1) {
-            GLib.Info (lc_cse ()) << "Could not encrypt key." << err;
+            GLib.info (lc_cse ()) << "Could not encrypt key." << err;
             exit (1);
         }
 
         // Transform the encrypted data into base64.
-        GLib.Info (lc_cse ()) << out.to_base64 ();
+        GLib.info (lc_cse ()) << out.to_base64 ();
         return out.to_base64 ();
     }
 
@@ -589,13 +589,13 @@ namespace EncryptionHelper {
 
         // Create and initialise the context
         if (!context) {
-            GLib.Info (lc_cse ()) << "Could not create context";
+            GLib.info (lc_cse ()) << "Could not create context";
             return false;
         }
 
         // Initialise the decryption operation.
         if (!EVP_Encrypt_init_ex (context, EVP_aes_128_gcm (), null, null, null)) {
-            GLib.Info (lc_cse ()) << "Could not on_init cipher";
+            GLib.info (lc_cse ()) << "Could not on_init cipher";
             return false;
         }
 
@@ -603,13 +603,13 @@ namespace EncryptionHelper {
 
         // Set IV length.
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, iv.size (), null)) {
-            GLib.Info (lc_cse ()) << "Could not set iv length";
+            GLib.info (lc_cse ()) << "Could not set iv length";
             return false;
         }
 
         // Initialise key and IV
         if (!EVP_Encrypt_init_ex (context, null, null, (uchar *)key.const_data (), (uchar *)iv.const_data ())) {
-            GLib.Info (lc_cse ()) << "Could not set key and iv";
+            GLib.info (lc_cse ()) << "Could not set key and iv";
             return false;
         }
 
@@ -622,12 +622,12 @@ namespace EncryptionHelper {
             const var data = input.read (BLOCK_SIZE);
 
             if (data.size () == 0) {
-                GLib.Info (lc_cse ()) << "Could not read data from file";
+                GLib.info (lc_cse ()) << "Could not read data from file";
                 return false;
             }
 
             if (!EVP_Encrypt_update (context, unsigned_data (out), len, (uchar *)data.const_data (), data.size ())) {
-                GLib.Info (lc_cse ()) << "Could not encrypt";
+                GLib.info (lc_cse ()) << "Could not encrypt";
                 return false;
             }
 
@@ -636,7 +636,7 @@ namespace EncryptionHelper {
         }
 
         if (1 != EVP_Encrypt_final_ex (context, unsigned_data (out), len)) {
-            GLib.Info (lc_cse ()) << "Could on_finalize encryption";
+            GLib.info (lc_cse ()) << "Could on_finalize encryption";
             return false;
         }
         output.write (out, len);
@@ -645,7 +645,7 @@ namespace EncryptionHelper {
         // Get the e2Ee_tag
         GLib.ByteArray e2Ee_tag (Occ.Constants.E2EE_TAG_SIZE, '\0');
         if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Occ.Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
-            GLib.Info (lc_cse ()) << "Could not get e2Ee_tag";
+            GLib.info (lc_cse ()) << "Could not get e2Ee_tag";
             return false;
         }
 
@@ -668,13 +668,13 @@ namespace EncryptionHelper {
 
         // Create and initialise the context
         if (!context) {
-            GLib.Info (lc_cse ()) << "Could not create context";
+            GLib.info (lc_cse ()) << "Could not create context";
             return false;
         }
 
         // Initialise the decryption operation.
         if (!EVP_Decrypt_init_ex (context, EVP_aes_128_gcm (), null, null, null)) {
-            GLib.Info (lc_cse ()) << "Could not on_init cipher";
+            GLib.info (lc_cse ()) << "Could not on_init cipher";
             return false;
         }
 
@@ -682,13 +682,13 @@ namespace EncryptionHelper {
 
         // Set IV length.
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN,  iv.size (), null)) {
-            GLib.Info (lc_cse ()) << "Could not set iv length";
+            GLib.info (lc_cse ()) << "Could not set iv length";
             return false;
         }
 
         // Initialise key and IV
         if (!EVP_Decrypt_init_ex (context, null, null, (uchar *) key.const_data (), (uchar *) iv.const_data ())) {
-            GLib.Info (lc_cse ()) << "Could not set key and iv";
+            GLib.info (lc_cse ()) << "Could not set key and iv";
             return false;
         }
 
@@ -697,9 +697,9 @@ namespace EncryptionHelper {
         GLib.ByteArray out (BLOCK_SIZE + Occ.Constants.E2EE_TAG_SIZE - 1, '\0');
         int len = 0;
 
-        while (input.pos () < size) {
+        while (input.position () < size) {
 
-            var to_read = size - input.pos ();
+            var to_read = size - input.position ();
             if (to_read > BLOCK_SIZE) {
                 to_read = BLOCK_SIZE;
             }
@@ -707,12 +707,12 @@ namespace EncryptionHelper {
             GLib.ByteArray data = input.read (to_read);
 
             if (data.size () == 0) {
-                GLib.Info (lc_cse ()) << "Could not read data from file";
+                GLib.info (lc_cse ()) << "Could not read data from file";
                 return false;
             }
 
             if (!EVP_Decrypt_update (context, unsigned_data (out), len, (uchar *)data.const_data (), data.size ())) {
-                GLib.Info (lc_cse ()) << "Could not decrypt";
+                GLib.info (lc_cse ()) << "Could not decrypt";
                 return false;
             }
 
@@ -723,12 +723,12 @@ namespace EncryptionHelper {
 
         // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (uchar *)e2Ee_tag.const_data ())) {
-            GLib.Info (lc_cse ()) << "Could not set expected e2Ee_tag";
+            GLib.info (lc_cse ()) << "Could not set expected e2Ee_tag";
             return false;
         }
 
         if (1 != EVP_Decrypt_final_ex (context, unsigned_data (out), len)) {
-            GLib.Info (lc_cse ()) << "Could on_finalize decryption";
+            GLib.info (lc_cse ()) << "Could on_finalize decryption";
             return false;
         }
         output.write (out, len);

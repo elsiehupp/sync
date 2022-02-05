@@ -54,7 +54,7 @@ void Web_view_page_url_scheme_handler.request_started (QWeb_engine_url_request_j
     if (!server.starts_with ("http://") && !server.starts_with ("https://")) {
         server = "https://" + server;
     }
-    GLib.Info (lc_wizard_webiew ()) << "Got user : " << user << ", server : " << server;
+    GLib.info (lc_wizard_webiew ()) << "Got user : " << user << ", server : " << server;
 
     /* emit */ url_catched (user, password, server);
 }

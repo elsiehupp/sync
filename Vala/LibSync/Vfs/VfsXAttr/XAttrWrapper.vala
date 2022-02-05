@@ -5,7 +5,6 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 ***********************************************************/
 
 //  #include <QLoggingCategory>
-//  #include
 //  #include <sys/xattr.h>
 
 //  #pragma once

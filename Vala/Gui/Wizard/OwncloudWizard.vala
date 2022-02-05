@@ -9,9 +9,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QtGui>
 //  #include <QMessageBox>
 //  #include <owncloudgui.h>
-//  #include
 //  #include <cstdlib>
-//  #include
 //  #include <QWizard>
 //  #include <QLoggingCategory>
 //  #include <QSslKey>
@@ -267,8 +265,8 @@ signals:
 
     void OwncloudWizard.center_window () {
         const var wizard_window = window ();
-        const var screen = QGuiApplication.screen_at (wizard_window.pos ())
-            ? QGuiApplication.screen_at (wizard_window.pos ())
+        const var screen = QGuiApplication.screen_at (wizard_window.position ())
+            ? QGuiApplication.screen_at (wizard_window.position ())
             : QGuiApplication.primary_screen ();
         const var screen_geometry = screen.geometry ();
         const var window_geometry = wizard_window.geometry ();

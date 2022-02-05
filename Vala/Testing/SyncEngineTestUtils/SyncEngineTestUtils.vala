@@ -6,9 +6,7 @@ implied, as to its usefulness for any purpose.
 //  #pragma once
 
 //  #include <QDir>
-//  #include
 //  #include <QtTest>
-//  #include
 //  #include <cstring>
 //  #include <memory>
 
@@ -21,9 +19,9 @@ TODO : In theory we should use QVERIFY instead of Q_ASSERT for testing, but this
 only works when directly called from a QTest :- (
 ***********************************************************/
 
-static const GLib.Uri sRootUrl ("owncloud://somehost/owncloud/remote.php/dav/");
-static const GLib.Uri sRootUrl2 ("owncloud://somehost/owncloud/remote.php/dav/files/admin/");
-static const GLib.Uri sUploadUrl ("owncloud://somehost/owncloud/remote.php/dav/uploads/admin/");
+const GLib.Uri sRootUrl ("owncloud://somehost/owncloud/remote.php/dav/");
+const GLib.Uri sRootUrl2 ("owncloud://somehost/owncloud/remote.php/dav/files/admin/");
+const GLib.Uri sUploadUrl ("owncloud://somehost/owncloud/remote.php/dav/uploads/admin/");
 
 inline string getFilePathFromUrl (GLib.Uri url) {
     string path = url.path ();
@@ -141,7 +139,6 @@ implied, as to its usefulness for any purpose.
 //  #include <QJsonArray>
 //  #include <QJsonObject>
 //  #include <QJsonValue>
-//  #include
 //  #include <memory>
 
 PathComponents.PathComponents (char path)

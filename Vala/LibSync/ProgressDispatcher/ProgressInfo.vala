@@ -519,21 +519,21 @@ class ProgressInfo : GLib.Object {
         case CSYNC_INSTRUCTION_NEW:
         case CSYNC_INSTRUCTION_TYPE_CHANGE:
             if (item.direction != SyncFileItem.Direction.UP)
-                return QCoreApplication.translate ("progress", "downloading");
+                return _("progress", "downloading");
             else
-                return QCoreApplication.translate ("progress", "uploading");
+                return _("progress", "uploading");
         case CSYNC_INSTRUCTION_REMOVE:
-            return QCoreApplication.translate ("progress", "deleting");
+            return _("progress", "deleting");
         case CSYNC_INSTRUCTION_EVAL_RENAME:
         case CSYNC_INSTRUCTION_RENAME:
-            return QCoreApplication.translate ("progress", "moving");
+            return _("progress", "moving");
         case CSYNC_INSTRUCTION_IGNORE:
-            return QCoreApplication.translate ("progress", "ignoring");
+            return _("progress", "ignoring");
         case CSYNC_INSTRUCTION_STAT_ERROR:
         case CSYNC_INSTRUCTION_ERROR:
-            return QCoreApplication.translate ("progress", "error");
+            return _("progress", "error");
         case CSYNC_INSTRUCTION_UPDATE_METADATA:
-            return QCoreApplication.translate ("progress", "updating local metadata");
+            return _("progress", "updating local metadata");
         case CSYNC_INSTRUCTION_NONE:
         case CSYNC_INSTRUCTION_EVAL:
             break;
@@ -549,35 +549,35 @@ class ProgressInfo : GLib.Object {
         case CSYNC_INSTRUCTION_TYPE_CHANGE:
             if (item.direction != SyncFileItem.Direction.UP) {
                 if (item.type == ItemTypeVirtualFile) {
-                    return QCoreApplication.translate ("progress", "Virtual file created");
+                    return _("progress", "Virtual file created");
                 } else if (item.type == ItemTypeVirtualFileDehydration) {
-                    return QCoreApplication.translate ("progress", "Replaced by virtual file");
+                    return _("progress", "Replaced by virtual file");
                 } else {
-                    return QCoreApplication.translate ("progress", "Downloaded");
+                    return _("progress", "Downloaded");
                 }
             } else {
-                return QCoreApplication.translate ("progress", "Uploaded");
+                return _("progress", "Uploaded");
             }
         case CSYNC_INSTRUCTION_CONFLICT:
-            return QCoreApplication.translate ("progress", "Server version downloaded, copied changed local file into conflict file");
+            return _("progress", "Server version downloaded, copied changed local file into conflict file");
         case CSYNC_INSTRUCTION_REMOVE:
-            return QCoreApplication.translate ("progress", "Deleted");
+            return _("progress", "Deleted");
         case CSYNC_INSTRUCTION_EVAL_RENAME:
         case CSYNC_INSTRUCTION_RENAME:
-            return QCoreApplication.translate ("progress", "Moved to %1").arg (item.rename_target);
+            return _("progress", "Moved to %1").arg (item.rename_target);
         case CSYNC_INSTRUCTION_IGNORE:
-            return QCoreApplication.translate ("progress", "Ignored");
+            return _("progress", "Ignored");
         case CSYNC_INSTRUCTION_STAT_ERROR:
-            return QCoreApplication.translate ("progress", "Filesystem access error");
+            return _("progress", "Filesystem access error");
         case CSYNC_INSTRUCTION_ERROR:
-            return QCoreApplication.translate ("progress", "Error");
+            return _("progress", "Error");
         case CSYNC_INSTRUCTION_UPDATE_METADATA:
-            return QCoreApplication.translate ("progress", "Updated local metadata");
+            return _("progress", "Updated local metadata");
         case CSYNC_INSTRUCTION_NONE:
         case CSYNC_INSTRUCTION_EVAL:
-            return QCoreApplication.translate ("progress", "Unknown");
+            return _("progress", "Unknown");
         }
-        return QCoreApplication.translate ("progress", "Unknown");
+        return _("progress", "Unknown");
     }
 
 

@@ -33,7 +33,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static const int searchResultsReplyDelay = 100;
+    public const int searchResultsReplyDelay = 100;
 
     /***********************************************************
     ***********************************************************/

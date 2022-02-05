@@ -218,7 +218,7 @@ class BulkPropagatorJob : PropagatorJob {
         SyncFileItemPtr item,
         SyncFileItem.Status status,
         string error_string) {
-        GLib.Info (lc_bulk_propagator_job ()) << status << error_string;
+        GLib.info (lc_bulk_propagator_job ()) << status << error_string;
         on_done (item, status, error_string);
     }
 
@@ -377,7 +377,7 @@ class BulkPropagatorJob : PropagatorJob {
                     remote_path, file_to_upload.path,
                     file_to_upload.size, current_headers};
 
-        GLib.Info (lc_bulk_propagator_job) << remote_path << "transmission checksum" << transmission_checksum_header << file_to_upload.path;
+        GLib.info (lc_bulk_propagator_job) << remote_path << "transmission checksum" << transmission_checksum_header << file_to_upload.path;
         this.files_to_upload.push_back (std.move (new_upload_file));
         this.pending_checksum_files.remove (item.file);
 
@@ -446,7 +446,7 @@ class BulkPropagatorJob : PropagatorJob {
                 return;
             }
 
-            GLib.Info (lc_bulk_propagator_job) << "final status" << this.final_status;
+            GLib.info (lc_bulk_propagator_job) << "final status" << this.final_status;
             /* emit */ finished (this.final_status);
             propagator ().schedule_next_job ();
         } else {
@@ -486,7 +486,7 @@ class BulkPropagatorJob : PropagatorJob {
         QJsonObject file_reply) {
         bool on_finished = false;
 
-        GLib.Info (lc_bulk_propagator_job ()) << single_file.item.file << "file headers" << file_reply;
+        GLib.info (lc_bulk_propagator_job ()) << single_file.item.file << "file headers" << file_reply;
 
         if (file_reply.contains ("error") && !file_reply[QStringLiteral ("error")].to_bool ()) {
             single_file.item.http_error_code = static_cast<uint16> (200);
@@ -577,7 +577,7 @@ class BulkPropagatorJob : PropagatorJob {
         item.status = status;
         item.error_string = error_string;
 
-        GLib.Info (lc_bulk_propagator_job) << "Item completed" << item.destination () << item.status << item.instruction << item.error_string;
+        GLib.info (lc_bulk_propagator_job) << "Item completed" << item.destination () << item.status << item.instruction << item.error_string;
 
         handle_file_restoration (item, error_string);
 
@@ -673,11 +673,11 @@ class BulkPropagatorJob : PropagatorJob {
             var upload_info = propagator ().journal.get_upload_info (item.file);
             upload_info.error_count += 1;
             if (upload_info.error_count > 3) {
-                GLib.Info (lc_bulk_propagator_job) << "Reset transfer of" << item.file
+                GLib.info (lc_bulk_propagator_job) << "Reset transfer of" << item.file
                                           << "due to repeated error" << item.http_error_code;
                 upload_info = SyncJournalDb.UploadInfo ();
             } else {
-                GLib.Info (lc_bulk_propagator_job) << "Error count for maybe-reset error" << item.http_error_code
+                GLib.info (lc_bulk_propagator_job) << "Error count for maybe-reset error" << item.http_error_code
                                           << "on file" << item.file
                                           << "is" << upload_info.error_count;
             }
@@ -792,7 +792,7 @@ class BulkPropagatorJob : PropagatorJob {
         if (item.has_error_status ()) {
             GLib.warn (lc_propagator) << "Could not complete propagation of" << item.destination () << "by" << this << "with status" << item.status << "and error:" << item.error_string;
         } else {
-            GLib.Info (lc_propagator) << "Completed propagation of" << item.destination () << "by" << this << "with status" << item.status;
+            GLib.info (lc_propagator) << "Completed propagation of" << item.destination () << "by" << this << "with status" << item.status;
         }
 
         if (item.status == SyncFileItem.Status.FATAL_ERROR) {
@@ -812,11 +812,11 @@ class BulkPropagatorJob : PropagatorJob {
         case SyncFileItem.Status.RESTORATION:
         case SyncFileItem.Status.SOFT_ERROR:
             this.final_status = SyncFileItem.Status.NORMAL_ERROR;
-            GLib.Info (lc_bulk_propagator_job) << "modify final status NormalError" << this.final_status << status;
+            GLib.info (lc_bulk_propagator_job) << "modify final status NormalError" << this.final_status << status;
             break;
         case SyncFileItem.Status.DETAIL_ERROR:
             this.final_status = SyncFileItem.Status.DETAIL_ERROR;
-            GLib.Info (lc_bulk_propagator_job) << "modify final status DetailError" << this.final_status << status;
+            GLib.info (lc_bulk_propagator_job) << "modify final status DetailError" << this.final_status << status;
             break;
         case SyncFileItem.Status.SUCCESS:
             break;

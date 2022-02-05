@@ -5,7 +5,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 //  #include <QtCore>
-//  #include
 //  #include <QtCore>
 //  #include <QIcon>
 

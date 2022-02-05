@@ -9,15 +9,13 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 //  #include <functional>
 //  #include <QBit_array>
 //  #include <QPointer>
-//  #include
 //  #include <QJsonDocument
 //  #include <QJsonOb
-//  #include
 //  #include <memory>
 //  #include <QTimer>
 
-#ifndef OWNCLOUD_TEST
-#endif
+//  #ifndef OWNCLOUD_TEST
+//  #endif
 
 //  #include <array>
 //  #include <QBit_array>
@@ -31,13 +29,11 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 //  #include <QMessageBox>
 //  #include <QInputDialog>
 //  #include <QFileDialog>
-//  #include
 //  #include <QAction>
 //  #include <QJsonArray>
 //  #include <QJsonDocumen
 //  #include <QJsonObject>
 //  #include <Gtk.Widget>
-//  #include
 //  #include <QClipboar
 //  #include <QDesktopServices>
 
@@ -224,7 +220,7 @@ signals:
     private void command_ASYNC_WAIT_FOR_WIDGET_SIGNAL (unowned<Socket_api_job> job);
     //  Q_INVOKABLE
     private void command_ASYNC_TRIGGER_MENU_ACTION (unowned<Socket_api_job> job);
-#endif
+//  #endif
 
     /***********************************************************
     ***********************************************************/
@@ -328,7 +324,7 @@ GLib.Object find_widget (string query_string, GLib.List<Gtk.Widget> widgets = QA
 
     return found_widget;
 }
-#endif
+//  #endif
 
 static inline string remove_trailing_slash (string path) {
     //  Q_ASSERT (path.ends_with ('/'));
@@ -395,7 +391,7 @@ SocketApi.SocketApi (GLib.Object parent) {
         // Example for developer builds (with ad-hoc signing identity) : "" "com.owncloud.desktopclient" ".socket_api"
         // Example for official signed packages : "9B5WD74GWJ." "com.owncloud.desktopclient" ".socket_api"
         socket_path = SOCKETAPI_TEAM_IDENTIFIER_PREFIX APPLICATION_REV_DOMAIN ".socket_api";
-    } else if (Utility.is_linux () || Utility.is_b_sD ()) {
+    } else if (Utility.is_linux () || Utility.is_bsd ()) {
         string runtime_dir;
         runtime_dir = QStandardPaths.writable_location (QStandardPaths.Runtime_location);
         socket_path = runtime_dir + "/" + Theme.instance ().app_name () + "/socket";
@@ -416,7 +412,7 @@ SocketApi.SocketApi (GLib.Object parent) {
     if (!this.local_server.listen (socket_path)) {
         GLib.warn (lc_socket_api) << "can't on_start server" << socket_path;
     } else {
-        GLib.Info (lc_socket_api) << "server started, listening at " << socket_path;
+        GLib.info (lc_socket_api) << "server started, listening at " << socket_path;
     }
 
     connect (&this.local_server, &Socket_api_server.new_connection, this, &SocketApi.on_new_connection);
@@ -429,7 +425,7 @@ SocketApi.~SocketApi () {
     GLib.debug (lc_socket_api) << "dtor";
     this.local_server.close ();
     // All remaining sockets will be destroyed with this.local_server, their parent
-    ASSERT (this.listeners.is_empty () || this.listeners.first ().socket.parent () == this.local_server)
+    //  ASSERT (this.listeners.is_empty () || this.listeners.first ().socket.parent () == this.local_server)
     this.listeners.clear ();
 }
 
@@ -441,29 +437,29 @@ void SocketApi.on_new_connection () {
     if (!socket) {
         return;
     }
-    GLib.Info (lc_socket_api) << "New connection" << socket;
+    GLib.info (lc_socket_api) << "New connection" << socket;
     connect (socket, &QIODevice.ready_read, this, &SocketApi.on_read_socket);
     connect (socket, SIGNAL (disconnected ()), this, SLOT (on_lost_connection ()));
     connect (socket, &GLib.Object.destroyed, this, &SocketApi.on_socket_destroyed);
-    ASSERT (socket.read_all ().is_empty ());
+    //  ASSERT (socket.read_all ().is_empty ());
 
     var listener = unowned<Socket_listener>.create (socket);
     this.listeners.insert (socket, listener);
     for (Folder f : FolderMan.instance ().map ()) {
         if (f.can_sync ()) {
             string message = build_register_path_message (remove_trailing_slash (f.path ()));
-            GLib.Info (lc_socket_api) << "Trying to send SocketApi Register Path Message -." << message << "to" << listener.socket;
+            GLib.info (lc_socket_api) << "Trying to send SocketApi Register Path Message -." << message << "to" << listener.socket;
             listener.on_send_message (message);
         }
     }
 }
 
 void SocketApi.on_lost_connection () {
-    GLib.Info (lc_socket_api) << "Lost connection " << sender ();
+    GLib.info (lc_socket_api) << "Lost connection " << sender ();
     sender ().delete_later ();
 
     var socket = qobject_cast<QIODevice> (sender ());
-    ASSERT (socket);
+    //  ASSERT (socket);
     this.listeners.remove (socket);
 }
 
@@ -474,7 +470,7 @@ void SocketApi.on_socket_destroyed (GLib.Object obj) {
 
 void SocketApi.on_read_socket () {
     var socket = qobject_cast<QIODevice> (sender ());
-    ASSERT (socket);
+    //  ASSERT (socket);
 
     // Find the Socket_listener
     //
@@ -488,7 +484,7 @@ void SocketApi.on_read_socket () {
         // Make sure to normalize the input from the socket to
         // make sure that the path will match, especially on OS X.
         const string line = string.from_utf8 (socket.read_line ().trimmed ()).normalized (string.Normalization_form_C);
-        GLib.Info (lc_socket_api) << "Received SocketApi message <--" << line << "from" << socket;
+        GLib.info (lc_socket_api) << "Received SocketApi message <--" << line << "from" << socket;
         const int arg_pos = line.index_of (':');
         const GLib.ByteArray command = line.mid_ref (0, arg_pos).to_utf8 ().to_upper ();
         const int index_of_method = [&] {
@@ -505,7 +501,7 @@ void SocketApi.on_read_socket () {
             if (out == -1) {
                 listener.send_error (QStringLiteral ("Function %1 not found").arg (string.from_utf8 (function_with_arguments)));
             }
-            ASSERT (out != -1)
+            //  ASSERT (out != -1)
             return out;
         } ();
 
@@ -553,7 +549,7 @@ void SocketApi.on_read_socket () {
         } else {
             if (index_of_method != -1) {
                 // to ensure that listener is still valid we need to call it with Qt.Direct_connection
-                ASSERT (thread () == QThread.current_thread ())
+                //  ASSERT (thread () == QThread.current_thread ())
                 static_meta_object.method (index_of_method)
                     .invoke (this, Qt.Direct_connection, Q_ARG (string, argument.to_string ()),
                         Q_ARG (Socket_listener *, listener.data ()));
@@ -571,7 +567,7 @@ void SocketApi.on_register_path (string alias) {
     if (f) {
         const string message = build_register_path_message (remove_trailing_slash (f.path ()));
         for (var listener : q_as_const (this.listeners)) {
-            GLib.Info (lc_socket_api) << "Trying to send SocketApi Register Path Message -." << message << "to" << listener.socket;
+            GLib.info (lc_socket_api) << "Trying to send SocketApi Register Path Message -." << message << "to" << listener.socket;
             listener.on_send_message (message);
         }
     }
@@ -665,7 +661,7 @@ void SocketApi.process_share_request (string local_file, Socket_listener listene
 }
 
 void SocketApi.on_broadcast_status_push_message (string system_path, SyncFileStatus file_status) {
-    string msg = build_message (QLatin1String ("STATUS"), system_path, file_status.to_socket_api_"");
+    string msg = build_message (QLatin1String ("STATUS"), system_path, file_status.to_socket_api_string ());
     //  Q_ASSERT (!system_path.ends_with ('/'));
     uint32 directory_hash = q_hash (system_path.left (system_path.last_index_of ('/')));
     for (var listener : q_as_const (this.listeners)) {
@@ -692,7 +688,7 @@ void SocketApi.command_RETRIEVE_FILE_STATUS (string argument, Socket_listener li
         listener.register_monitored_directory (q_hash (directory));
 
         SyncFileStatus file_status = file_data.sync_file_status ();
-        status_string = file_status.to_socket_api_"";
+        status_string = file_status.to_socket_api_string ();
     }
 
     const string message = QLatin1String ("STATUS:") % status_string % ':' % QDir.to_native_separators (argument);
@@ -914,7 +910,7 @@ void SocketApi.command_RESOLVE_CONFLICT (string local_file, Socket_listener *) {
 
     const var base_name = QFileInfo (base_path).filename ();
 
-#ifndef OWNCLOUD_TEST
+//  #ifndef OWNCLOUD_TEST
     ConflictDialog dialog;
     dialog.on_set_base_filename (base_name);
     dialog.on_set_local_version_filename (conflicted_path);
@@ -922,7 +918,7 @@ void SocketApi.command_RESOLVE_CONFLICT (string local_file, Socket_listener *) {
     if (dialog.exec () == ConflictDialog.Accepted) {
         file_data.folder.schedule_this_folder_soon ();
     }
-#endif
+//  #endif
 }
 
 void SocketApi.command_DELETE_ITEM (string local_file, Socket_listener *) {
@@ -1231,9 +1227,9 @@ void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener list
             var file_data = File_data.get (file);
             var availability = sync_folder.vfs ().availability (file_data.folder_relative_path);
             if (!availability) {
-                if (availability.error () == Vfs.AvailabilityError.DbError)
+                if (availability.error () == Vfs.AvailabilityError.DATABASE_ERROR)
                     availability = VfsItemAvailability.VfsItemAvailability.MIXED;
-                if (availability.error () == Vfs.AvailabilityError.NoSuchItem)
+                if (availability.error () == Vfs.AvailabilityError.NO_SUCH_ITEM)
                     continue;
             }
             if (!combined) {
@@ -1465,7 +1461,7 @@ void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned<Socket_api_job> job) 
         job.reject ("icon_name " + icon_name + " does not match : " + value.name ());
     }
 }
-#endif
+//  #endif
 
 string SocketApi.build_register_path_message (string path) {
     QFileInfo fi (path);

@@ -9,7 +9,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QLoggingCategory>
 //  #include <Soup.Request>
 //  #include <QNetworkAccessManager>
-//  #include
 //  #include <Soup.Request>
 //  #include <QSslConfigu
 //  #include <QSslCipher>

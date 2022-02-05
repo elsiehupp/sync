@@ -39,7 +39,7 @@ class EmojiCategoriesModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private static const GLib.Vector<Category> categories;
+    private const GLib.Vector<Category> categories;
 }
 
 

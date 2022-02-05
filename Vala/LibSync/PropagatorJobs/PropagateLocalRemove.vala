@@ -5,33 +5,73 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
+
 /***********************************************************
 @brief Declaration of the other propagation jobs
 @ingroup libsync
 ***********************************************************/
 class PropagateLocalRemove : PropagateItemJob {
 
+    private string error;
+    private bool move_to_trash;
+
     /***********************************************************
     ***********************************************************/
-    public PropagateLocalRemove (OwncloudPropagator propagator, SyncFileItemPtr item)
-        : PropagateItemJob (propagator, item) {
+    public PropagateLocalRemove (OwncloudPropagator propagator, SyncFileItemPtr item) {
+        base (propagator, item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override;
+    public void on_start () {
+        GLib.info (lc_propagate_local_remove) << "Start propagate local remove job";
+
+        this.move_to_trash = propagator ().sync_options ().move_files_to_trash;
+
+        if (propagator ().abort_requested)
+            return;
+
+        const string filename = propagator ().full_local_path (this.item.file);
+        GLib.info (lc_propagate_local_remove) << "Going to delete:" << filename;
+
+        if (propagator ().local_filename_clash (this.item.file)) {
+            on_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not remove %1 because of a local file name clash").arg (QDir.to_native_separators (filename)));
+            return;
+        }
+
+        string remove_error;
+        if (this.move_to_trash) {
+            if ( (QDir (filename).exists () || FileSystem.file_exists (filename))
+                && !FileSystem.move_to_trash (filename, remove_error)) {
+                on_done (SyncFileItem.Status.NORMAL_ERROR, remove_error);
+                return;
+            }
+        } else {
+            if (this.item.is_directory ()) {
+                if (QDir (filename).exists () && !remove_recursively ("")) {
+                    on_done (SyncFileItem.Status.NORMAL_ERROR, this.error);
+                    return;
+                }
+            } else {
+                if (FileSystem.file_exists (filename)
+                    && !FileSystem.remove (filename, remove_error)) {
+                    on_done (SyncFileItem.Status.NORMAL_ERROR, remove_error);
+                    return;
+                }
+            }
+        }
+        propagator ().report_progress (*this.item, 0);
+        propagator ().journal.delete_file_record (this.item.original_file, this.item.is_directory ());
+        propagator ().journal.commit ("Local remove");
+        on_done (SyncFileItem.Status.SUCCESS);
+    }
 
 
     /***********************************************************
     ***********************************************************/
     private bool remove_recursively (string path);
-    private string this.error;
-    private bool this.move_to_trash;
-}
-
-
-
     /***********************************************************
     The code will update the database in case of error.
     If everything goes well (no error, returns true), the caller is responsible for removing the entries
@@ -72,45 +112,6 @@ class PropagateLocalRemove : PropagateItemJob {
         return on_success;
     }
 
-    void PropagateLocalRemove.on_start () {
-        GLib.Info (lc_propagate_local_remove) << "Start propagate local remove job";
+} // class PropagateLocalRemove
 
-        this.move_to_trash = propagator ().sync_options ().move_files_to_trash;
-
-        if (propagator ().abort_requested)
-            return;
-
-        const string filename = propagator ().full_local_path (this.item.file);
-        GLib.Info (lc_propagate_local_remove) << "Going to delete:" << filename;
-
-        if (propagator ().local_filename_clash (this.item.file)) {
-            on_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not remove %1 because of a local file name clash").arg (QDir.to_native_separators (filename)));
-            return;
-        }
-
-        string remove_error;
-        if (this.move_to_trash) {
-            if ( (QDir (filename).exists () || FileSystem.file_exists (filename))
-                && !FileSystem.move_to_trash (filename, remove_error)) {
-                on_done (SyncFileItem.Status.NORMAL_ERROR, remove_error);
-                return;
-            }
-        } else {
-            if (this.item.is_directory ()) {
-                if (QDir (filename).exists () && !remove_recursively ("")) {
-                    on_done (SyncFileItem.Status.NORMAL_ERROR, this.error);
-                    return;
-                }
-            } else {
-                if (FileSystem.file_exists (filename)
-                    && !FileSystem.remove (filename, remove_error)) {
-                    on_done (SyncFileItem.Status.NORMAL_ERROR, remove_error);
-                    return;
-                }
-            }
-        }
-        propagator ().report_progress (*this.item, 0);
-        propagator ().journal.delete_file_record (this.item.original_file, this.item.is_directory ());
-        propagator ().journal.commit ("Local remove");
-        on_done (SyncFileItem.Status.SUCCESS);
-    }
+} // namespace Occ

@@ -406,7 +406,7 @@ signals:
         } else if (event.type () == QEvent.PaletteChange) {
             d.apply_style_sheet ();
         } else if (event.type () == QEvent.Show && !d.ignore_show_event_doing_animated_show) {
-            if ( (height () != d.content.height ()) || (d.content.pos ().y () != 0)) {
+            if ( (height () != d.content.height ()) || (d.content.position ().y () != 0)) {
                 d.content.move (0, 0);
                 set_fixed_height (d.content.height ());
             }
@@ -488,7 +488,7 @@ signals:
             return;
         }
 
-        if (is_visible () && (d.time_line.state () == QTime_line.Not_running) && (height () == d.best_content_height ()) && (d.content.pos ().y () == 0)) {
+        if (is_visible () && (d.time_line.state () == QTime_line.Not_running) && (height () == d.best_content_height ()) && (d.content.position ().y () == 0)) {
             /* emit */ show_animation_finished ();
             return;
         }

@@ -24,9 +24,9 @@ See http://burtleburtle.net/bob/hash/evahash.html
 
 //  #include <stdint.h> // NOLINT
 //  #include <QtCore/qglobal.h>
-#ifndef Q_FALLTHROUGH
+//  #ifndef Q_FALLTHROUGH
 const int Q_FALLTHROUGH () // Was added in Qt 5.8
-#endif
+//  #endif
 
 const int c_hashsize (n) ( (uint8_t) 1 << (n))
 const int c_hashmask (n) (xhashsize (n) - 1)

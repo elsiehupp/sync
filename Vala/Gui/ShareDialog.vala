@@ -109,7 +109,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    static const int thumbnail_size = 40;
+    const int thumbnail_size = 40;
 
     Share_dialog.Share_dialog (QPointer<AccountState> account_state,
         const string share_path,
@@ -275,7 +275,7 @@ signals:
         /* emit */ toggle_share_link_animation (true);
 
         const string version_string = this.account_state.account ().server_version ();
-        GLib.Info (lc_sharing) << version_string << "Fetched" << shares.count () << "shares";
+        GLib.info (lc_sharing) << version_string << "Fetched" << shares.count () << "shares";
         foreach (var share, shares) {
             if (share.get_share_type () != Share.Type_link || share.get_uid_owner () != share.account ().dav_user ()) {
                 continue;
@@ -313,15 +313,15 @@ signals:
         const GLib.Variant received_permissions = result["share-permissions"];
         if (!received_permissions.to_string ().is_empty ()) {
             this.max_sharing_permissions = static_cast<Share_permissions> (received_permissions.to_int ());
-            GLib.Info (lc_sharing) << "Received sharing permissions for" << this.share_path << this.max_sharing_permissions;
+            GLib.info (lc_sharing) << "Received sharing permissions for" << this.share_path << this.max_sharing_permissions;
         }
         var private_link_url = result["privatelink"].to_string ();
         var numeric_file_id = result["fileid"].to_byte_array ();
         if (!private_link_url.is_empty ()) {
-            GLib.Info (lc_sharing) << "Received private link url for" << this.share_path << private_link_url;
+            GLib.info (lc_sharing) << "Received private link url for" << this.share_path << private_link_url;
             this.private_link_url = private_link_url;
         } else if (!numeric_file_id.is_empty ()) {
-            GLib.Info (lc_sharing) << "Received numeric file identifier for" << this.share_path << numeric_file_id;
+            GLib.info (lc_sharing) << "Received numeric file identifier for" << this.share_path << numeric_file_id;
             this.private_link_url = this.account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded);
         }
 

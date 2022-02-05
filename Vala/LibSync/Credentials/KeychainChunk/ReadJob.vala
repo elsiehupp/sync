@@ -112,7 +112,7 @@ class ReadJob : KeychainChunk.Job {
                     // Could be that the backend was not yet available. Wait some extra seconds.
                     // (Issues #4274 and #6522)
                     // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
-                    GLib.Info (lc_keychain_chunk) << "Backend unavailable (yet?) Retrying in a few seconds." << read_job.error_string ();
+                    GLib.info (lc_keychain_chunk) << "Backend unavailable (yet?) Retrying in a few seconds." << read_job.error_string ();
                     QTimer.single_shot (10000, this, &ReadJob.on_start);
                     this.retry_on_key_chain_error = false;
                     read_job.delete_later ();

@@ -8,7 +8,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QNetworkCookie>
 //  #include <QDataStream>
 //  #include <QDir>
-//  #include
 //  #include <QNetworkCookieJar>
 
 namespace Occ {

@@ -5,7 +5,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 ***********************************************************/
 
 //  #include <csync_exclude.h>
-//  #include
 //  #include <QLoggingCa
 //  #include <QFileInfo>
 //  #include <QTextCodec>

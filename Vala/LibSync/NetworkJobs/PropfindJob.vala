@@ -50,8 +50,8 @@ class PropfindJob : AbstractNetworkJob {
         GLib.ByteArray prop_str;
         foreach (GLib.ByteArray prop, properties) {
             if (prop.contains (':')) {
-                int col_idx = prop.last_index_of (":");
-                prop_str += "    <" + prop.mid (col_idx + 1) + " xmlns=\"" + prop.left (col_idx) + "\" />\n";
+                int col_index = prop.last_index_of (":");
+                prop_str += "    <" + prop.mid (col_index + 1) + " xmlns=\"" + prop.left (col_index) + "\" />\n";
             } else {
                 prop_str += "    <d:" + prop + " />\n";
             }
@@ -94,7 +94,7 @@ class PropfindJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_finished () {
-        GLib.Info (lc_propfind_job) << "PROPFIND of" << reply ().request ().url () << "FINISHED WITH STATUS"
+        GLib.info (lc_propfind_job) << "PROPFIND of" << reply ().request ().url () << "FINISHED WITH STATUS"
                             << reply_status_string ();
 
         int http_result_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

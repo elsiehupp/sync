@@ -16,7 +16,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QPropertyAnimation>
 //  #include <QGraphics_pixmap_item>
 //  #include <QBuffer>
-//  #include
 //  #include <QWizard>
 
 #include "../addcertificatedialog.h"

@@ -7,7 +7,6 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 //  #include <QTreeView>
 //  #include <QHelp_event>
 //  #include <QToolTip>
-//  #include
 //  #include <QPoint>
 
 
@@ -86,7 +85,7 @@ void ToolTipUpdater.on_data_changed (QModelIndex top_left,
     }
 
     // Was it the item under the cursor that changed?
-    var index = this.tree_view.index_at (this.tree_view.map_from_global (QCursor.pos ()));
+    var index = this.tree_view.index_at (this.tree_view.map_from_global (QCursor.position ()));
     if (top_left == bottom_right && index != top_left) {
         return;
     }

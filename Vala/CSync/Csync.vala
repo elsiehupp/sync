@@ -30,7 +30,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
 //  #include <sys/stat.h>
-//  #include
 //  #include <cstdint>
 //  #include <sys/types.h>
 //  #include <config_csyn
@@ -48,7 +47,7 @@ const int BITFIELD (size)
 const int BITFIELD (size) : (size+1)
 #else
 const int BITFIELD (size) :size
-#endif
+//  #endif
 
 namespace CSync_enums {
 OCSYNC_EXPORT Q_NAMESPACE

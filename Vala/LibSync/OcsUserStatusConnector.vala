@@ -5,7 +5,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 ***********************************************************/
 
 //  #include <networkjobs.h>
-//  #include
 //  #include <QtGlobal>
 //  #include <QJsonDocume
 //  #include <QJsonValue>
@@ -126,7 +125,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         log_response ("user status fetched", json, status_code);
 
         if (status_code != 200) {
-            GLib.Info (lc_ocs_user_status_connector) << "Slot fetch UserStatus on_finished with status code" << status_code;
+            GLib.info (lc_ocs_user_status_connector) << "Slot fetch UserStatus on_finished with status code" << status_code;
             /* emit */ error (Error.CouldNotFetchUserStatus);
             return;
         }
@@ -142,7 +141,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         log_response ("predefined statuses", json, status_code);
 
         if (status_code != 200) {
-            GLib.Info (lc_ocs_user_status_connector) << "Slot predefined user statuses on_finished with status code" << status_code;
+            GLib.info (lc_ocs_user_status_connector) << "Slot predefined user statuses on_finished with status code" << status_code;
             /* emit */ error (Error.CouldNotFetchPredefinedUserStatuses);
             return;
         }

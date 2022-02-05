@@ -118,7 +118,7 @@ void PUTFile_job.on_start () {
 bool PUTFile_job.on_finished () {
     this.device.close ();
 
-    GLib.Info (lc_put_job) << "PUT of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
+    GLib.info (lc_put_job) << "PUT of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
                      << reply_status_string ()
                      << reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
                      << reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);

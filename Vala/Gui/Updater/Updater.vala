@@ -6,7 +6,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 //  #include <QUrlQuery>
 //  #include <QProcess>
-//  #include
 //  #include <QSysInfo>
 
 //  #include <QLoggingCategory>
@@ -87,7 +86,7 @@ class Updater : GLib.Object {
         string platform = QStringLiteral ("stranger");
         if (Utility.is_linux ()) {
             platform = QStringLiteral ("linux");
-        } else if (Utility.is_b_sD ()) {
+        } else if (Utility.is_bsd ()) {
             platform = QStringLiteral ("bsd");
         } else if (Utility.is_windows ()) {
             platform = QStringLiteral ("win32");

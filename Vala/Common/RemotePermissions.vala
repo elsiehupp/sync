@@ -26,11 +26,11 @@ class RemotePermissions {
     // The first bit tells if the value is set or not
     // The remaining bits correspond to know if the value is set
     private uint16 this.value = 0;
-    private static const int not_null_mask = 0x1;
+    private const int not_null_mask = 0x1;
 
     /***********************************************************
     ***********************************************************/
-    static const char letters[] = " WDNVCKRSMm";
+    const string letters = " WDNVCKRSMm";
 
     /***********************************************************
     ***********************************************************/

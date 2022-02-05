@@ -4,7 +4,6 @@
 //  #include <QQueue>
 //  #include <QAuthenticator>
 //  #include <QNetworkAccessManager>
-//  #include
 //  #include <QPointe
 //  #include <QTimer>
 //  #include <Gtk.Dialog>
@@ -12,7 +11,7 @@
 //  #include <QLabel>
 
 #ifdef WITH_WEBENGINE
-#endif // WITH_WEBENGINE
+//  #endif // WITH_WEBENGINE
 
 using namespace QKeychain;
 
@@ -116,7 +115,7 @@ class WebFlowCredentials : AbstractCredentials {
 
     Better than storing the count and relying on maybe-hacked values
     ***********************************************************/
-    private static const int this.client_ssl_ca_certificates_max_count = 10;
+    private const int this.client_ssl_ca_certificates_max_count = 10;
     private QQueue<QSslCertificate> this.client_ssl_ca_certificates_write_queue;
 
 
@@ -179,7 +178,7 @@ string WebFlowCredentials.password () {
 }
 
 QNetworkAccessManager *WebFlowCredentials.create_qnam () {
-    GLib.Info (lc_web_flow_credentials ()) << "Get QNAM";
+    GLib.info (lc_web_flow_credentials ()) << "Get QNAM";
     AccessManager qnam = new WebFlowCredentialsAccessManager (this);
 
     connect (qnam, &AccessManager.authentication_required, this, &WebFlowCredentials.on_authentication);
@@ -201,7 +200,7 @@ void WebFlowCredentials.fetch_from_keychain () {
     if (ready ()) {
         /* emit */ fetched ();
     } else {
-        GLib.Info (lc_web_flow_credentials ()) << "Fetch from keychain!";
+        GLib.info (lc_web_flow_credentials ()) << "Fetch from keychain!";
         fetch_from_keychain_helper ();
     }
 }
@@ -216,7 +215,7 @@ void WebFlowCredentials.ask_from_user () {
         bool use_flow2 = (type != DetermineAuthTypeJob.WEB_VIEW_FLOW);
 #else // WITH_WEBENGINE
         bool use_flow2 = true;
-#endif // WITH_WEBENGINE
+//  #endif // WITH_WEBENGINE
 
         this.ask_dialog = new WebFlowCredentialsDialog (this.account, use_flow2);
 
@@ -249,7 +248,7 @@ void WebFlowCredentials.on_ask_from_user_credentials_provided (string user, stri
     if (string.compare (this.user, user, Qt.CaseInsensitive) == 0) {
         this.user = user;
     } else {
-        GLib.Info (lc_web_flow_credentials ()) << "Authed with the wrong user!";
+        GLib.info (lc_web_flow_credentials ()) << "Authed with the wrong user!";
 
         string msg = _("Please login with the user : %1")
                 .arg (this.user);
@@ -265,7 +264,7 @@ void WebFlowCredentials.on_ask_from_user_credentials_provided (string user, stri
         return;
     }
 
-    GLib.Info (lc_web_flow_credentials ()) << "Obtained a new password";
+    GLib.info (lc_web_flow_credentials ()) << "Obtained a new password";
 
     this.password = pass;
     this.ready = true;
@@ -397,7 +396,7 @@ void WebFlowCredentials.on_write_client_ca_certificates_pem_job_done (KeychainCh
     var job = new WritePasswordJob (Theme.instance ().app_name (), this);
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
     add_settings_to_job (this.account, job);
-#endif
+//  #endif
     job.set_insecure_fallback (false);
     connect (job, &Job.on_finished, this, &WebFlowCredentials.on_write_job_done);
     job.set_key (keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ()));
@@ -482,7 +481,7 @@ void WebFlowCredentials.on_authentication (Soup.Reply reply, QAuthenticator auth
 }
 
 void WebFlowCredentials.on_finished (Soup.Reply reply) {
-    GLib.Info (lc_web_flow_credentials ()) << "request on_finished";
+    GLib.info (lc_web_flow_credentials ()) << "request on_finished";
 
     if (reply.error () == Soup.Reply.NoError) {
         this.credentials_valid = true;
@@ -594,7 +593,7 @@ void WebFlowCredentials.on_read_client_ca_certificates_pem_job_done (KeychainChu
     var job = new ReadPasswordJob (Theme.instance ().app_name (), this);
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
     add_settings_to_job (this.account, job);
-#endif
+//  #endif
     job.set_insecure_fallback (false);
     job.set_key (kck);
     connect (job, &Job.on_finished, this, &WebFlowCredentials.on_read_password_job_done);
@@ -630,7 +629,7 @@ void WebFlowCredentials.on_read_password_job_done (Job incoming_job) {
         this.keychain_migration = false;
         persist ();
         delete_keychain_entries (true); // true : delete old entries
-        GLib.Info (lc_web_flow_credentials) << "Migrated old keychain entries";
+        GLib.info (lc_web_flow_credentials) << "Migrated old keychain entries";
     }
 }
 

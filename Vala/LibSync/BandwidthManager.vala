@@ -331,7 +331,7 @@ class BandwidthManager : GLib.Object {
     public void on_switching_timer_expired () {
         int64 new_upload_limit = this.propagator.upload_limit;
         if (new_upload_limit != this.current_upload_limit) {
-            GLib.Info (lc_bandwidth_manager) << "Upload Bandwidth limit changed" << this.current_upload_limit << new_upload_limit;
+            GLib.info (lc_bandwidth_manager) << "Upload Bandwidth limit changed" << this.current_upload_limit << new_upload_limit;
             this.current_upload_limit = new_upload_limit;
             Q_FOREACH (UploadDevice ud, this.relative_upload_device_list) {
                 if (new_upload_limit == 0) {
@@ -348,7 +348,7 @@ class BandwidthManager : GLib.Object {
         }
         int64 new_download_limit = this.propagator.download_limit;
         if (new_download_limit != this.current_download_limit) {
-            GLib.Info (lc_bandwidth_manager) << "Download Bandwidth limit changed" << this.current_download_limit << new_download_limit;
+            GLib.info (lc_bandwidth_manager) << "Download Bandwidth limit changed" << this.current_download_limit << new_download_limit;
             this.current_download_limit = new_download_limit;
             Q_FOREACH (GETFileJob j, this.download_job_list) {
                 if (using_absolute_download_limit ()) {
@@ -451,7 +451,7 @@ class BandwidthManager : GLib.Object {
         var job_count = this.download_job_list.size ();
         int64 quota = relative_limit_progress_difference * (download_limit_percent / 100.0);
         if (quota > 20 * 1024) {
-            GLib.Info (lc_bandwidth_manager) << "ADJUSTING QUOTA FROM " << quota << " TO " << quota - 20 * 1024;
+            GLib.info (lc_bandwidth_manager) << "ADJUSTING QUOTA FROM " << quota << " TO " << quota - 20 * 1024;
             quota -= 20 * 1024;
         }
         int64 quota_per_job = quota / job_count + 1;

@@ -14,9 +14,7 @@ Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 //  #include <QText_edit>
 //  #include <QToolButton>
 //  #include <QPropertyAnimation>
-//  #include
 //  #include <Gtk.Dialog
-//  #include
 //  #include <GLib.List>
 //  #include <QToolBu
 //  #include <QHBox_layo
@@ -26,14 +24,7 @@ Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 
 
 namespace Occ {
-
-namespace {
-    const char password_is_set_placeholder = "●●●●●●●●";
-}
-
 namespace Ui {
-    class Share_link_widget;
-}
 
 
 
@@ -42,6 +33,8 @@ namespace Ui {
 @ingroup gui
 ***********************************************************/
 class Share_link_widget : Gtk.Widget {
+
+    const string password_is_set_placeholder = "●●●●●●●●";
 
     /***********************************************************
     ***********************************************************/
@@ -700,7 +693,7 @@ string Share_link_widget.share_name () {
 }
 
 void Share_link_widget.on_context_menu_button_clicked () {
-    this.link_context_menu.exec (QCursor.pos ());
+    this.link_context_menu.exec (QCursor.position ());
 }
 
 void Share_link_widget.on_link_context_menu_action_triggered (QAction action) {

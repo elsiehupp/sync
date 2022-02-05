@@ -18,17 +18,17 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
-#ifdef HAVE_ARGP_H
+//  #ifdef HAVE_ARGP_H
 //  #include <argp.h>
 
-const char argp_program_version = "csync test 0.2";
-const char argp_program_bug_address = "<csync-devel@csync.org>";
+const string argp_program_version = "csync test 0.2";
+const string argp_program_bug_address = "<csync-devel@csync.org>";
 
 static char **cmdline;
 
 /***********************************************************
 Program documentation. */
-static char doc[] = "csync test";
+static char doc = "csync test";
 
 /***********************************************************
 The options we understand. */
@@ -74,7 +74,7 @@ Our argp parser. */
 /***********************************************************
 static struct argp argp = {options, parse_opt, args_doc, doc, NULL, NULL, NULL}; */
 static struct argp argp = {options, parse_opt, NULL, doc, NULL, NULL, NULL};
-#endif /* HAVE_ARGP_H */
+//  #endif /* HAVE_ARGP_H */
 
 void torture_cmdline_parse (int argc, char **argv, struct argument_s arguments) {
   /***********************************************************
@@ -87,5 +87,5 @@ void torture_cmdline_parse (int argc, char **argv, struct argument_s arguments) 
   (void) argc;
   (void) argv;
   (void) arguments;
-#endif /* HAVE_ARGP_H */
+//  #endif /* HAVE_ARGP_H */
 }

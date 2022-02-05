@@ -68,7 +68,7 @@ class MoveJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public bool on_finished () {
-        GLib.Info (lc_move_job) << "MOVE of" << reply ().request ().url () << "FINISHED WITH STATUS"
+        GLib.info (lc_move_job) << "MOVE of" << reply ().request ().url () << "FINISHED WITH STATUS"
                         << reply_status_string ();
 
         /* emit */ finished_signal ();

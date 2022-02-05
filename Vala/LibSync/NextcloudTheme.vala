@@ -7,7 +7,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #ifndef TOKEN_AUTH_ONLY
 //  #include <QPixmap>
 //  #include <QIcon>
-//  #include
 //  #include <QCoreApplication>
 
 namespace Occ {

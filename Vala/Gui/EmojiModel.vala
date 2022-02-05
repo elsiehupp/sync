@@ -60,14 +60,14 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private static const QVariantList people;
-    private static const QVariantList nature;
-    private static const QVariantList food;
-    private static const QVariantList activity;
-    private static const QVariantList travel;
-    private static const QVariantList objects;
-    private static const QVariantList symbols;
-    private static const QVariantList flags;
+    private const QVariantList people;
+    private const QVariantList nature;
+    private const QVariantList food;
+    private const QVariantList activity;
+    private const QVariantList travel;
+    private const QVariantList objects;
+    private const QVariantList symbols;
+    private const QVariantList flags;
 
     /***********************************************************
     ***********************************************************/

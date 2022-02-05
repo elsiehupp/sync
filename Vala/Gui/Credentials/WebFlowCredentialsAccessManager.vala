@@ -1,14 +1,11 @@
 
 
 
-namespace {
-    const char USER_C[] = "user";
-    const char CLIENT_CERTIFICATE_PEM_C[] = "this.client_certificate_pem";
-    const char CLIENT_KEY_PEM_C[] = "this.client_key_pem";
-    const char client_ca_certificate_pemC[] = "this.client_ca_certificate_pem";
-} // ns
-
 class WebFlowCredentialsAccessManager : AccessManager {
+    const string USER_C = "user";
+    const string CLIENT_CERTIFICATE_PEM_C = "this.client_certificate_pem";
+    const string CLIENT_KEY_PEM_C = "this.client_key_pem";
+    const string client_ca_certificate_pemC = "this.client_ca_certificate_pem";
 
     /***********************************************************
     ***********************************************************/
@@ -57,4 +54,4 @@ static void add_settings_to_job (Account account, QKeychain.Job job) {
     settings.set_parent (job); // make the job parent to make setting deleted properly
     job.set_settings (settings.release ());
 }
-#endif
+//  #endif

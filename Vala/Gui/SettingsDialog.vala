@@ -18,7 +18,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QWidget_action>
 //  #include <QPainter>
 //  #include <QPainterPath>
-//  #include
 //  #include <Gtk.Dialog>
 //  #include <QStyled_item_delegate>
 

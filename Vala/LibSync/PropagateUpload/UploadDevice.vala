@@ -12,92 +12,84 @@ namespace Occ {
 class UploadDevice : QIODevice {
 
     /***********************************************************
+    The local file to read data from
     ***********************************************************/
-    public UploadDevice (string filename, int64 on_start, int64 size, BandwidthManager bwm);
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void close () override;
-
-    public int64 write_data (char *, int64) override;
-    public int64 read_data (char data, int64 maxlen) override;
-    public bool at_end () override;
-    public int64 size () override;
-    public int64 bytes_available () override;
-    public bool is_sequential () override;
-    public bool seek (int64 pos) override;
-
-    /***********************************************************
-    ***********************************************************/
-    public void set_bandwidth_limited (bool);
-
-    /***********************************************************
-    ***********************************************************/
-    public bool is_bandwidth_limited () {
-        return this.bandwidth_limited;
-    }
+    private GLib.File file;
 
 
     /***********************************************************
+    Start of the file data to use
     ***********************************************************/
-    public void set_choked (bool);
-
-    /***********************************************************
-    ***********************************************************/
-    public bool is_choked () {
-        return this.choked;
-    }
+    private int64 start = 0;
 
 
     /***********************************************************
+    Amount of file data after this.start to use
     ***********************************************************/
-    public void give_bandwidth_quota (int64 bwq);
+    private int64 size = 0;
 
 
-    /// The local file to read data from
-    private GLib.File this.file;
+    /***********************************************************
+    Position between this.start and this.start+this.size
+    ***********************************************************/
+    private int64 read = 0;
 
-    /// Start of the file data to use
-    private int64 this.start = 0;
-    /// Amount of file data after this.start to use
-    private int64 this.size = 0;
-    /// Position between this.start and this.start+this.size
-    private int64 this.read = 0;
 
-    // Bandwidth manager related
-    private QPointer<BandwidthManager> this.bandwidth_manager;
-    private int64 this.bandwidth_quota = 0;
-    private int64 this.read_with_progress = 0;
-    private bool this.bandwidth_limited = false; // if this.bandwidth_quota will be used
-    private bool this.choked = false; // if upload is paused (read_data () will return 0)
+    /***********************************************************
+    Bandwidth manager related
+    ***********************************************************/
+    private QPointer<BandwidthManager> bandwidth_manager;
+
+
+    /***********************************************************
+    Bandwidth manager related
+    ***********************************************************/
+    private int64 bandwidth_quota = 0;
+
+
+    /***********************************************************
+    Bandwidth manager related
+    ***********************************************************/
+    private int64 read_with_progress = 0;
+
+
+    /***********************************************************
+    Bandwidth manager related
+    If this.bandwidth_quota will be used
+    ***********************************************************/
+    private bool bandwidth_limited = false;
+
+
+    /***********************************************************
+    Bandwidth manager related
+    If upload is paused (read_data () will return 0)
+    ***********************************************************/
+    private bool choked = false; 
+
     private friend class BandwidthManager;
 
     /***********************************************************
     ***********************************************************/
-    public void on_job_upload_progress (int64 sent, int64 t);
-}
-
-
-
-
-    UploadDevice.UploadDevice (string filename, int64 on_start, int64 size, BandwidthManager bwm)
-        : this.file (filename)
-        this.start (on_start)
-        this.size (size)
-        this.bandwidth_manager (bwm) {
+    public UploadDevice (string filename, int64 start, int64 size, BandwidthManager bandwidth_manager) {
+        this.file = filename;
+        this.start = start;
+        this.size = size;
+        this.bandwidth_manager = bandwidth_manager;
         this.bandwidth_manager.on_register_upload_device (this);
     }
 
-    UploadDevice.~UploadDevice () {
+
+    ~UploadDevice () {
         if (this.bandwidth_manager) {
             this.bandwidth_manager.on_unregister_upload_device (this);
         }
     }
 
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
     bool UploadDevice.open (QIODevice.Open_mode mode) {
         if (mode & QIODevice.WriteOnly)
             return false;
@@ -118,17 +110,27 @@ class UploadDevice : QIODevice {
         return QIODevice.open (mode);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
+    public void close () override;
     void UploadDevice.close () {
         this.file.close ();
         QIODevice.close ();
     }
 
-    int64 UploadDevice.write_data (char *, int64) {
-        ASSERT (false, "write to read only device");
+
+    /***********************************************************
+    ***********************************************************/
+    public int64 write_data (string unused_string, int64 unused_int64) {
+        //  ASSERT (false, "write to read only device");
         return 0;
     }
 
-    int64 UploadDevice.read_data (char data, int64 maxlen) {
+
+    /***********************************************************
+    ***********************************************************/
+    public int64 read_data (char data, int64 maxlen) {
         if (this.size - this.read <= 0) {
             // at end
             if (this.bandwidth_manager) {
@@ -160,41 +162,106 @@ class UploadDevice : QIODevice {
         return c;
     }
 
+
+    /***********************************************************
+    ***********************************************************/
+    public bool at_end () override;
+    bool UploadDevice.at_end () {
+        return this.read >= this.size;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public int64 size () override;
+    int64 UploadDevice.size () {
+        return this.size;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public int64 bytes_available () override;
+    int64 UploadDevice.bytes_available () {
+        return this.size - this.read + QIODevice.bytes_available ();
+    }
+
+
+    /***********************************************************
+    Random access, we can seek
+    ***********************************************************/
+    public bool is_sequential () {
+        return false;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool seek (int64 position) {
+        if (!QIODevice.seek (position)) {
+            return false;
+        }
+        if (position < 0 || position > this.size) {
+            return false;
+        }
+        this.read = position;
+        this.file.seek (this.start + position);
+        return true;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void set_bandwidth_limited (bool);
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool is_bandwidth_limited () {
+        return this.bandwidth_limited;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void set_choked (bool);
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool is_choked () {
+        return this.choked;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void give_bandwidth_quota (int64 bwq);
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_job_upload_progress (int64 sent, int64 t);
     void UploadDevice.on_job_upload_progress (int64 sent, int64 t) {
         if (sent == 0 || t == 0) {
             return;
         }
         this.read_with_progress = sent;
     }
+}
 
-    bool UploadDevice.at_end () {
-        return this.read >= this.size;
-    }
 
-    int64 UploadDevice.size () {
-        return this.size;
-    }
 
-    int64 UploadDevice.bytes_available () {
-        return this.size - this.read + QIODevice.bytes_available ();
-    }
 
-    // random access, we can seek
-    bool UploadDevice.is_sequential () {
-        return false;
-    }
 
-    bool UploadDevice.seek (int64 pos) {
-        if (!QIODevice.seek (pos)) {
-            return false;
-        }
-        if (pos < 0 || pos > this.size) {
-            return false;
-        }
-        this.read = pos;
-        this.file.seek (this.start + pos);
-        return true;
-    }
+
+
+
+
+
+
+
+
 
     void UploadDevice.give_bandwidth_quota (int64 bwq) {
         if (!at_end ()) {
