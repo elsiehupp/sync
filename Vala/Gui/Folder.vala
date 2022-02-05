@@ -458,7 +458,7 @@ signals:
     /***********************************************************
     Adds a error message that's not tied to a specific item.
     ***********************************************************/
-    private void on_sync_error (string message, ErrorCategory category = ErrorCategory.Normal);
+    private void on_sync_error (string message, ErrorCategory category = ErrorCategory.NORMAL);
 
     /***********************************************************
     ***********************************************************/
@@ -732,7 +732,7 @@ Folder.Folder (FolderDefinition definition,
     connect (&this.schedule_self_timer, &QTimer.timeout,
         this, &Folder.on_schedule_this_folder);
 
-    connect (Progress_dispatcher.instance (), &Progress_dispatcher.folder_conflicts,
+    connect (ProgressDispatcher.instance (), &ProgressDispatcher.folder_conflicts,
         this, &Folder.on_folder_conflicts);
 
     this.local_discovery_tracker.on_reset (new LocalDiscoveryTracker);
@@ -1386,7 +1386,7 @@ bool Folder.reload_excludes () {
 }
 
 void Folder.on_start_sync (string[] path_list) {
-    Q_UNUSED (path_list)
+    //  Q_UNUSED (path_list)
 
     if (is_busy ()) {
         q_c_critical (lc_folder) << "ERROR csync is still running and new sync requested.";
@@ -1506,11 +1506,11 @@ void Folder.set_dirty_network_limits () {
 
 void Folder.on_sync_error (string message, ErrorCategory category) {
     this.sync_result.append_error_string (message);
-    /* emit */ Progress_dispatcher.instance ().sync_error (alias (), message, category);
+    /* emit */ ProgressDispatcher.instance ().sync_error (alias (), message, category);
 }
 
 void Folder.on_add_error_to_gui (SyncFileItem.Status status, string error_message, string subject) {
-    /* emit */ Progress_dispatcher.instance ().add_error_to_gui (alias (), status, error_message, subject);
+    /* emit */ ProgressDispatcher.instance ().add_error_to_gui (alias (), status, error_message, subject);
 }
 
 void Folder.on_sync_started () {
@@ -1619,10 +1619,10 @@ void Folder.on_emit_finished_delayed () {
 // and hand the result over to the progress dispatcher.
 void Folder.on_transmission_progress (ProgressInfo pi) {
     /* emit */ progress_info (pi);
-    Progress_dispatcher.instance ().set_progress_info (alias (), pi);
+    ProgressDispatcher.instance ().set_progress_info (alias (), pi);
 }
 
-// a item is completed : count the errors and forward to the Progress_dispatcher
+// a item is completed : count the errors and forward to the ProgressDispatcher
 void Folder.on_item_completed (SyncFileItemPtr item) {
     if (item.instruction == CSYNC_INSTRUCTION_NONE || item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA) {
         // We only care about the updates that deserve to be shown in the UI
@@ -1632,7 +1632,7 @@ void Folder.on_item_completed (SyncFileItemPtr item) {
     this.sync_result.process_completed_item (item);
 
     this.file_log.log_item (*item);
-    /* emit */ Progress_dispatcher.instance ().item_completed (alias (), item);
+    /* emit */ ProgressDispatcher.instance ().item_completed (alias (), item);
 }
 
 void Folder.on_new_big_folder_discovered (string new_f, bool is_external) {

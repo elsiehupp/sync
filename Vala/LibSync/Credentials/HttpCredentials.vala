@@ -465,7 +465,7 @@ class HttpCredentials : AbstractCredentials {
     private void on_authentication (Soup.Reply reply, QAuthenticator authenticator) {
         if (!this.ready)
             return;
-        Q_UNUSED (authenticator)
+        //  Q_UNUSED (authenticator)
         // Because of issue #4326, we need to set the login and password manually at every requests
         // Thus, if we reach this signal, those credentials were invalid and we terminate.
         GLib.warn (lc_http_credentials) << "Stop request : Authentication failed for " << reply.url ().to_string ();
@@ -804,7 +804,7 @@ class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private static void add_settings_to_job (Account account, QKeychain.Job job) {
-        Q_UNUSED (account);
+        //  Q_UNUSED (account);
         var settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
         settings.set_parent (job); // make the job parent to make setting deleted properly
         job.set_settings (settings.release ());

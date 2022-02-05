@@ -443,7 +443,7 @@ GLib.ByteArray Utility.friendly_user_agent_"" {
 }
 
 bool Utility.has_system_launch_on_startup (string app_name) {
-    Q_UNUSED (app_name)
+    //  Q_UNUSED (app_name)
     return false;
 }
 
@@ -876,7 +876,7 @@ GLib.ByteArray Utility.conflict_file_base_name_from_pattern (GLib.ByteArray conf
 }
 
 bool Utility.is_path_windows_drive_partition_root (string path) {
-    Q_UNUSED (path)
+    //  Q_UNUSED (path)
     return false;
 }
 
@@ -916,7 +916,7 @@ string Utility.sanitize_for_filename (string name) {
     /***********************************************************
     ***********************************************************/
     static void remove_fav_link_private (string folder) {
-        Q_UNUSED (folder)
+        //  Q_UNUSED (folder)
     }
 
     // returns the autostart directory the linux way
@@ -928,7 +928,7 @@ string Utility.sanitize_for_filename (string name) {
     }
 
     bool has_launch_on_startup_private (string app_name) {
-        Q_UNUSED (app_name)
+        //  Q_UNUSED (app_name)
         string desktop_file_location = get_user_autostart_dir_private ()
                                         + QLatin1String (LINUX_APPLICATION_ID)
                                         + QLatin1String (".desktop");
@@ -936,7 +936,7 @@ string Utility.sanitize_for_filename (string name) {
     }
 
     void set_launch_on_startup_private (string app_name, string gui_name, bool enable) {
-        Q_UNUSED (app_name)
+        //  Q_UNUSED (app_name)
         string user_auto_start_path = get_user_autostart_dir_private ();
         string desktop_file_location = user_auto_start_path
                                         + QLatin1String (LINUX_APPLICATION_ID)

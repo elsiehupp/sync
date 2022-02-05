@@ -206,6 +206,7 @@ class DiscoveryPhase : GLib.Object {
         return this.renamed_items_local.contains (p) || this.renamed_items_remote.contains (p);
     }
 
+
     /***********************************************************
     ***********************************************************/
     void schedule_more_jobs () {
@@ -411,6 +412,7 @@ class DiscoveryPhase : GLib.Object {
         job.on_start ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void set_selective_sync_block_list (string[] list) {
@@ -425,6 +427,7 @@ class DiscoveryPhase : GLib.Object {
         this.selective_sync_allow_list = list;
         std.sort (this.selective_sync_allow_list.begin (), this.selective_sync_allow_list.end ());
     }
+
 
     /***********************************************************
     Given a sorted list of paths ending with '/', return whether

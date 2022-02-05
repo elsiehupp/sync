@@ -31,6 +31,7 @@ class SystemProxyRunnable : GLib.Object, QRunnable {
         this.url = url;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void run () {

@@ -132,7 +132,7 @@ class TestDownload : GLib.Object {
         var transProgress = connect (&fakeFolder.syncEngine (), &SyncEngine.transmissionProgress,
                                      [&] (ProgressInfo pi) {
             var propagator = fakeFolder.syncEngine ().getPropagator ();
-            if (pi.status () != ProgressInfo.Propagation || propConnected || !propagator)
+            if (pi.status () != ProgressInfo.Status.PROPAGATION || propConnected || !propagator)
                 return;
             propConnected = true;
             connect (propagator.data (), &OwncloudPropagator.touchedFile, [&] (string s) {

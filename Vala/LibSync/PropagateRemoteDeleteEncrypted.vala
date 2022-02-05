@@ -91,7 +91,7 @@ void Propagate_remote_delete_encrypted.on_folder_encrypted_metadata_received (QJ
 
     var job = new UpdateMetadataApiJob (this.propagator.account (), this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
     connect (job, &UpdateMetadataApiJob.on_success, this, [this] (GLib.ByteArray file_identifier) {
-        Q_UNUSED (file_identifier);
+        //  Q_UNUSED (file_identifier);
         delete_remote_item (this.item.encrypted_filename);
     });
     connect (job, &UpdateMetadataApiJob.error, this, &Propagate_remote_delete_encrypted.task_failed);

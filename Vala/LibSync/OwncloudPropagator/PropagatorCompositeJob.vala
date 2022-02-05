@@ -48,6 +48,7 @@ class PropagatorCompositeJob : PropagatorJob {
         this.jobs_to_do.append (job);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void append_task (SyncFileItemPtr item) {

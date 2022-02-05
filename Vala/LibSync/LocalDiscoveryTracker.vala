@@ -33,6 +33,7 @@ class LocalDiscoveryTracker : GLib.Object {
 
     struct SyncFileItemPtr : unowned SyncFileItem { }
 
+
     /***********************************************************
     The paths that should be checked by the next local discovery.
 

@@ -263,7 +263,7 @@ protected slots:
     }
 
     void ConnectionValidator.on_job_timeout (GLib.Uri url) {
-        Q_UNUSED (url);
+        //  Q_UNUSED (url);
         //this.errors.append (_("Unable to connect to %1").arg (url.to_string ()));
         this.errors.append (_("Timeout"));
         report_result (Timeout);

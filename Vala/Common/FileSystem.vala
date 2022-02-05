@@ -39,8 +39,8 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     void set_file_hidden (string filename, bool hidden) {
-        Q_UNUSED (filename);
-        Q_UNUSED (hidden);
+        //  Q_UNUSED (filename);
+        //  Q_UNUSED (hidden);
     }
 
 
@@ -98,7 +98,7 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     void set_folder_minimum_permissions (string filename) {
-        Q_UNUSED (filename);
+        //  Q_UNUSED (filename);
     }
 
 
@@ -330,7 +330,7 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     bool is_file_locked (string filename) {
-        Q_UNUSED (filename);
+        //  Q_UNUSED (filename);
         return false;
     }
 
@@ -364,7 +364,7 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     bool is_junction (string filename) {
-        Q_UNUSED (filename);
+        //  Q_UNUSED (filename);
         return false;
     }
 

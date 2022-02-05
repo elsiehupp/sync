@@ -9,44 +9,24 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 namespace Occ {
 
-
 /***********************************************************
 @brief The PropagateRemoteMove class
 @ingroup libsync
 ***********************************************************/
 class PropagateRemoteMove : PropagateItemJob {
-    QPointer<Move_job> this.job;
+
+    QPointer<MoveJob> job;
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteMove (OwncloudPropagator propagator, SyncFileItemPtr item)
-        : PropagateItemJob (propagator, item) {
+    public PropagateRemoteMove (OwncloudPropagator propagator, SyncFileItemPtr item) {
+        base (propagator, item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override;
-    public void on_abort (PropagatorJob.AbortType abort_type) override;
-    public JobParallelism parallelism () override {
-        return this.item.is_directory () ? JobParallelism.WAIT_FOR_FINISHED : JobParallelism.FULL_PARALLELISM;
-    }
-
-
-    /***********************************************************
-    Rename the directory in the selective sync list
-    ***********************************************************/
-    public static bool adjust_selective_sync (SyncJournalDb journal, string from, string to);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_move_job_finished ();
-    private void on_finalize ();
-}
-
-
-    void PropagateRemoteMove.on_start () {
+    public void on_start () {
         if (propagator ().abort_requested)
             return;
 
@@ -149,13 +129,16 @@ class PropagateRemoteMove : PropagateItemJob {
         }
         GLib.debug (lc_propagate_remote_move) << remote_source << remote_destination;
 
-        this.job = new Move_job (propagator ().account (), remote_source, remote_destination, this);
-        connect (this.job.data (), &Move_job.finished_signal, this, &PropagateRemoteMove.on_move_job_finished);
+        this.job = new MoveJob (propagator ().account (), remote_source, remote_destination, this);
+        connect (this.job.data (), &MoveJob.finished_signal, this, &PropagateRemoteMove.on_move_job_finished);
         propagator ().active_job_list.append (this);
         this.job.on_start ();
     }
 
-    void PropagateRemoteMove.on_abort (PropagatorJob.AbortType abort_type) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_abort (PropagatorJob.AbortType abort_type) {
         if (this.job && this.job.reply ())
             this.job.reply ().on_abort ();
 
@@ -164,7 +147,48 @@ class PropagateRemoteMove : PropagateItemJob {
         }
     }
 
-    void PropagateRemoteMove.on_move_job_finished () {
+
+    /***********************************************************
+    ***********************************************************/
+    public JobParallelism parallelism () {
+        return this.item.is_directory () ? JobParallelism.WAIT_FOR_FINISHED : JobParallelism.FULL_PARALLELISM;
+    }
+
+
+    /***********************************************************
+    Rename the directory in the selective sync list
+    ***********************************************************/
+    public static bool adjust_selective_sync (SyncJournalDb journal, string from_, string to_) {
+        bool ok = false;
+        // We only care about preserving the blocklist.   The allow list should anyway be empty.
+        // And the undecided list will be repopulated on the next sync, if there is anything too big.
+        string[] list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        if (!ok)
+            return false;
+
+        bool changed = false;
+        ASSERT (!from_.ends_with (QLatin1String ("/")));
+        ASSERT (!to_.ends_with (QLatin1String ("/")));
+        string from = from_ + QLatin1String ("/");
+        string to = to_ + QLatin1String ("/");
+
+        for (var s : list) {
+            if (s.starts_with (from)) {
+                s = s.replace (0, from.size (), to);
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            journal.set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, list);
+        }
+        return true;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_move_job_finished () {
         propagator ().active_job_list.remove_one (this);
 
         ASSERT (this.job);
@@ -195,7 +219,10 @@ class PropagateRemoteMove : PropagateItemJob {
         on_finalize ();
     }
 
-    void PropagateRemoteMove.on_finalize () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_finalize () {
         // Retrieve old database data.
         // if reading from database failed still continue hoping that delete_file_record
         // reopens the database successfully.
@@ -249,31 +276,6 @@ class PropagateRemoteMove : PropagateItemJob {
         on_done (SyncFileItem.Status.SUCCESS);
     }
 
-    bool PropagateRemoteMove.adjust_selective_sync (SyncJournalDb journal, string from_, string to_) {
-        bool ok = false;
-        // We only care about preserving the blocklist.   The allow list should anyway be empty.
-        // And the undecided list will be repopulated on the next sync, if there is anything too big.
-        string[] list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
-        if (!ok)
-            return false;
+} // class PropagateRemoteMove
 
-        bool changed = false;
-        ASSERT (!from_.ends_with (QLatin1String ("/")));
-        ASSERT (!to_.ends_with (QLatin1String ("/")));
-        string from = from_ + QLatin1String ("/");
-        string to = to_ + QLatin1String ("/");
-
-        for (var s : list) {
-            if (s.starts_with (from)) {
-                s = s.replace (0, from.size (), to);
-                changed = true;
-            }
-        }
-
-        if (changed) {
-            journal.set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, list);
-        }
-        return true;
-    }
-    }
-    
+} // namespace Occ

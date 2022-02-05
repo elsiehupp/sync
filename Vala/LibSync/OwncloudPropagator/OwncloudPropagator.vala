@@ -552,7 +552,7 @@ signals:
         }
 
         if (item.http_error_code == 507) {
-            entry.error_category = SyncJournalErrorBlocklistRecord.InsufficientRemoteStorage;
+            entry.error_category = SyncJournalErrorBlocklistRecord.INSUFFICIENT_REMOTE_STORAGE;
         }
 
         return entry;
@@ -901,7 +901,7 @@ signals:
     }
 
     bool OwncloudPropagator.has_case_clash_accessibility_problem (string relfile) {
-        Q_UNUSED (relfile);
+        //  Q_UNUSED (relfile);
         return false;
     }
 

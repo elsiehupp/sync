@@ -704,7 +704,7 @@ void SocketApi.command_SHARE (string local_file, Socket_listener listener) {
 }
 
 void SocketApi.command_ACTIVITY (string local_file, Socket_listener listener) {
-    Q_UNUSED (listener);
+    //  Q_UNUSED (listener);
 
     process_file_activity_request (local_file);
 }
@@ -723,7 +723,7 @@ void SocketApi.command_SHARE_MENU_TITLE (string , Socket_listener listener) {
 }
 
 void SocketApi.command_EDIT (string local_file, Socket_listener listener) {
-    Q_UNUSED (listener)
+    //  Q_UNUSED (listener)
     var file_data = File_data.get (local_file);
     if (!file_data.folder) {
         GLib.warn (lc_socket_api) << "Unknown path" << local_file;

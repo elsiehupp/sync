@@ -288,10 +288,10 @@ void PropagateUploadFileNG.on_start_next_chunk () {
         }
         headers[QByteArrayLiteral ("OC-Total-Length")] = GLib.ByteArray.number (file_size);
 
-        var job = new Move_job (propagator ().account (), Utility.concat_url_path (chunk_url (), "/.file"),
+        var job = new MoveJob (propagator ().account (), Utility.concat_url_path (chunk_url (), "/.file"),
             destination, headers, this);
         this.jobs.append (job);
-        connect (job, &Move_job.finished_signal, this, &PropagateUploadFileNG.on_move_job_finished);
+        connect (job, &MoveJob.finished_signal, this, &PropagateUploadFileNG.on_move_job_finished);
         connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_job_destroyed);
         propagator ().active_job_list.append (this);
         adjust_last_job_timeout (job, file_size);
@@ -433,7 +433,7 @@ void PropagateUploadFileNG.on_put_finished () {
 
 void PropagateUploadFileNG.on_move_job_finished () {
     propagator ().active_job_list.remove_one (this);
-    var job = qobject_cast<Move_job> (sender ());
+    var job = qobject_cast<MoveJob> (sender ());
     on_job_destroyed (job); // remove it from the this.jobs list
     Soup.Reply.NetworkError err = job.reply ().error ();
     this.item.http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
@@ -499,7 +499,7 @@ void PropagateUploadFileNG.on_abort (PropagatorJob.AbortType abort_type) {
     abort_network_jobs (
         abort_type,
         [abort_type] (AbstractNetworkJob job) {
-            return abort_type != AbortType.ASYNCHRONOUS || !qobject_cast<Move_job> (job);
+            return abort_type != AbortType.ASYNCHRONOUS || !qobject_cast<MoveJob> (job);
         });
 }
 

@@ -242,7 +242,7 @@ void WebFlowCredentials.ask_from_user () {
 }
 
 void WebFlowCredentials.on_ask_from_user_credentials_provided (string user, string pass, string host) {
-    Q_UNUSED (host)
+    //  Q_UNUSED (host)
 
     // Compare the re-entered username case-insensitive and save the new value (avoid breaking the account)
     // See issue : https://github.com/nextcloud/desktop/issues/1741
@@ -319,7 +319,7 @@ void WebFlowCredentials.persist () {
 }
 
 void WebFlowCredentials.on_write_client_cert_pem_job_done (KeychainChunk.WriteJob write_job) {
-    Q_UNUSED (write_job)
+    //  Q_UNUSED (write_job)
     // write ssl key if there is one
     if (!this.client_ssl_key.is_null ()) {
         var job = new KeychainChunk.WriteJob (this.account,
@@ -364,7 +364,7 @@ void WebFlowCredentials.write_single_client_ca_cert_pem () {
 }
 
 void WebFlowCredentials.on_write_client_key_pem_job_done (KeychainChunk.WriteJob write_job) {
-    Q_UNUSED (write_job)
+    //  Q_UNUSED (write_job)
     this.client_ssl_ca_certificates_write_queue.clear ();
 
     // write ca certificates if there are any
@@ -464,7 +464,7 @@ string WebFlowCredentials.fetch_user () {
 }
 
 void WebFlowCredentials.on_authentication (Soup.Reply reply, QAuthenticator authenticator) {
-    Q_UNUSED (reply)
+    //  Q_UNUSED (reply)
 
     if (!this.ready) {
         return;

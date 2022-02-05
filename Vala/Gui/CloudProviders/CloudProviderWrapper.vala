@@ -123,7 +123,7 @@ CloudProviderWrapper.CloudProviderWrapper (GLib.Object parent, Folder folder, in
     action_group = get_action_group ();
     cloud_providers_account_exporter_set_action_group (this.cloud_provider_account, action_group);
 
-    connect (Progress_dispatcher.instance (), SIGNAL (progress_info (string, ProgressInfo)), this, SLOT (on_update_progress (string, ProgressInfo)));
+    connect (ProgressDispatcher.instance (), SIGNAL (progress_info (string, ProgressInfo)), this, SLOT (on_update_progress (string, ProgressInfo)));
     connect (this.folder, SIGNAL (sync_started ()), this, SLOT (on_sync_started ()));
     connect (this.folder, SIGNAL (sync_finished (SyncResult)), this, SLOT (on_sync_finished (SyncResult)));
     connect (this.folder, SIGNAL (sync_paused_changed (Folder*,bool)), this, SLOT (on_sync_paused_changed (Folder*, bool)));
@@ -322,7 +322,7 @@ GMenu_model* CloudProviderWrapper.get_menu_model () {
 
 static void
 activate_action_open (GSimple_action action, GVariant parameter, gpointer user_data) {
-    Q_UNUSED (parameter);
+    //  Q_UNUSED (parameter);
     const gchar name = g_action_get_name (G_ACTION (action));
     var self = static_cast<CloudProviderWrapper> (user_data);
     var gui = dynamic_cast<OwncloudGui> (self.parent ().parent ());
@@ -360,8 +360,8 @@ activate_action_open (GSimple_action action, GVariant parameter, gpointer user_d
 
 static void
 activate_action_openrecentfile (GSimple_action action, GVariant parameter, gpointer user_data) {
-    Q_UNUSED (action);
-    Q_UNUSED (parameter);
+    //  Q_UNUSED (action);
+    //  Q_UNUSED (parameter);
     var self = static_cast<CloudProviderWrapper> (user_data);
     QDesktopServices.open_url (self.folder ().account_state ().account ().url ());
 }
@@ -370,7 +370,7 @@ static void
 activate_action_pause (GSimple_action action,
                        GVariant      *parameter,
                        gpointer       user_data) {
-    Q_UNUSED (parameter);
+    //  Q_UNUSED (parameter);
     var self = static_cast<CloudProviderWrapper> (user_data);
     GVariant old_state, *new_state;
 
@@ -467,7 +467,7 @@ GAction_group* CloudProviderWrapper.get_action_group () {
 }
 
 void CloudProviderWrapper.on_sync_paused_changed (Folder folder, bool state) {
-    Q_UNUSED (folder);
+    //  Q_UNUSED (folder);
     this.paused = state;
     GAction pause = g_action_map_lookup_action (G_ACTION_MAP (action_group), "pause");
     g_simple_action_set_state (G_SIMPLE_ACTION (pause), g_variant_new_boolean (state));

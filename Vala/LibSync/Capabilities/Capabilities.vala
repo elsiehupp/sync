@@ -100,6 +100,7 @@ class Capabilities {
         return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["password"].to_map ()["ask_for_optional_password"].to_bool ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public bool share_public_link_supports_upload_only () {

@@ -19,20 +19,20 @@ namespace Progress {
 @file progressdispatcher.h
 @brief A singleton class to provide sync progress information to other gui classes.
 
-How to use the Progress_dispatcher:
+How to use the ProgressDispatcher:
 Just connect to the two signals either to progress for every individual file
 or the overall sync progress.
 
 ***********************************************************/
-class Progress_dispatcher : GLib.Object {
+class ProgressDispatcher : GLib.Object {
 
-    friend class Folder; // only allow Folder class to access the setting slots.
+    //  friend class Folder; // only allow Folder class to access the setting slots.
 
 
     /***********************************************************
     ***********************************************************/
     private QElapsedTimer timer;
-    private static Progress_dispatcher instance = null;
+    private static ProgressDispatcher instance = null;
 
 
     /***********************************************************
@@ -75,16 +75,16 @@ class Progress_dispatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private Progress_dispatcher (GLib.Object parent = new GLib.Object ()) {
+    private ProgressDispatcher (GLib.Object parent = new GLib.Object ()) {
         base (parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public static Progress_dispatcher instance () {
+    public static ProgressDispatcher instance () {
         if (!this.instance) {
-            this.instance = new Progress_dispatcher ();
+            this.instance = new ProgressDispatcher ();
         }
         return this.instance;
     }
@@ -118,7 +118,8 @@ class Progress_dispatcher : GLib.Object {
 
         return true;
     }
-}
+
+} // class ProgressDispatcher
 
 } // namespace Progress
 } // namespace Occ

@@ -168,7 +168,7 @@ class BulkPropagatorJob : PropagatorJob {
 
         if (!FileSystem.file_exists (full_file_path)) {
             this.pending_checksum_files.remove (item.file);
-            on_on_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("File Removed (on_start upload) %1").arg (full_file_path));
+            on_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("File Removed (on_start upload) %1").arg (full_file_path));
             check_propagation_is_done ();
             return;
         }
@@ -179,15 +179,15 @@ class BulkPropagatorJob : PropagatorJob {
         item.modtime = FileSystem.get_mod_time (original_file_path);
         if (item.modtime <= 0) {
             this.pending_checksum_files.remove (item.file);
-            on_on_error_start_folder_unlock (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (item.file)));
+            on_error_start_folder_unlock (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (item.file)));
             check_propagation_is_done ();
             return;
         }
         if (prev_modtime != item.modtime) {
             propagator ().another_sync_needed = true;
             this.pending_checksum_files.remove (item.file);
-            q_debug () << "trigger another sync after checking modified time of item" << item.file << "prev_modtime" << prev_modtime << "Curr" << item.modtime;
-            on_on_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("Local file changed during syncing. It will be resumed."));
+            GLib.debug () << "trigger another sync after checking modified time of item" << item.file << "prev_modtime" << prev_modtime << "Curr" << item.modtime;
+            on_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("Local file changed during syncing. It will be resumed."));
             check_propagation_is_done ();
             return;
         }
@@ -201,7 +201,7 @@ class BulkPropagatorJob : PropagatorJob {
         if (file_is_still_changing (*item)) {
             propagator ().another_sync_needed = true;
             this.pending_checksum_files.remove (item.file);
-            on_on_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("Local file changed during sync."));
+            on_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("Local file changed during sync."));
             check_propagation_is_done ();
             return;
         }
@@ -214,7 +214,7 @@ class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     Invoked on internal error to unlock a folder and faile
     ***********************************************************/
-    private void on_on_error_start_folder_unlock (
+    private void on_error_start_folder_unlock (
         SyncFileItemPtr item,
         SyncFileItem.Status status,
         string error_string) {
@@ -245,6 +245,7 @@ class BulkPropagatorJob : PropagatorJob {
 
         finalize (full_reply_object);
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -362,7 +363,7 @@ class BulkPropagatorJob : PropagatorJob {
             item.modtime = FileSystem.get_mod_time (new_file_path_absolute);
             if (item.modtime <= 0) {
                 this.pending_checksum_files.remove (item.file);
-                on_on_error_start_folder_unlock (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (item.file)));
+                on_error_start_folder_unlock (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (item.file)));
                 check_propagation_is_done ();
                 return;
             }
@@ -752,6 +753,7 @@ class BulkPropagatorJob : PropagatorJob {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     private void handle_file_restoration (
@@ -771,6 +773,7 @@ class BulkPropagatorJob : PropagatorJob {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
 
@@ -779,6 +782,7 @@ class BulkPropagatorJob : PropagatorJob {
     private void handle_bulk_upload_block_list (SyncFileItemPtr item) {
         propagator ().add_to_bulk_upload_block_list (item.file);
     }
+
 
     /***********************************************************
     ***********************************************************/

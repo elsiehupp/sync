@@ -31,6 +31,7 @@ class OcsProfileConnector : GLib.Object {
         this.account (account) {
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void fetch_hovercard (string user_id);
@@ -46,6 +47,7 @@ class OcsProfileConnector : GLib.Object {
         connect (job, &JsonApiJob.json_received, this, &OcsProfileConnector.on_hovercard_fetched);
         job.on_start ();
     }
+
 
     /***********************************************************
     ***********************************************************/

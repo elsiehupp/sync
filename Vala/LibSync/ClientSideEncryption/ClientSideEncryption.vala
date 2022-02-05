@@ -255,7 +255,7 @@ class ClientSideEncryption : GLib.Object {
         var job = new StorePrivateKeyApiJob (account, E2EE_BASE_URL + "private-key", this);
         job.set_private_key (crypted_text);
         connect (job, &StorePrivateKeyApiJob.json_received, [this, account] (QJsonDocument& doc, int return_code) {
-            Q_UNUSED (doc);
+            //  Q_UNUSED (doc);
             switch (return_code) {
                 case 200:
                     GLib.Info (lc_cse ()) << "Private key stored encrypted on server.";
@@ -634,7 +634,7 @@ class ClientSideEncryption : GLib.Object {
         job.set_key (kck);
         job.set_binary_data (this.private_key);
         connect (job, &WritePasswordJob.on_finished, [] (Job incoming) {
-            Q_UNUSED (incoming);
+            //  Q_UNUSED (incoming);
             GLib.Info (lc_cse ()) << "Private key stored in keychain";
         });
         job.on_start ();
@@ -655,7 +655,7 @@ class ClientSideEncryption : GLib.Object {
         job.set_key (kck);
         job.set_binary_data (this.certificate.to_pem ());
         connect (job, &WritePasswordJob.on_finished, [] (Job incoming) {
-            Q_UNUSED (incoming);
+            //  Q_UNUSED (incoming);
             GLib.Info (lc_cse ()) << "Certificate stored in keychain";
         });
         job.on_start ();
@@ -676,7 +676,7 @@ class ClientSideEncryption : GLib.Object {
         job.set_key (kck);
         job.set_text_data (this.mnemonic);
         connect (job, &WritePasswordJob.on_finished, [] (Job incoming) {
-            Q_UNUSED (incoming);
+            //  Q_UNUSED (incoming);
             GLib.Info (lc_cse ()) << "Mnemonic stored in keychain";
         });
         job.on_start ();

@@ -1697,7 +1697,7 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     static GLib.ByteArray default_journal_mode (string db_path) {
-        Q_UNUSED (db_path)
+        //  Q_UNUSED (db_path)
         return "WAL";
     }
 

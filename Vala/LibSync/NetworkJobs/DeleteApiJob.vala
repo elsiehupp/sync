@@ -24,6 +24,7 @@ class DeleteApiJob : AbstractNetworkJob {
         base (account, path, parent);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void on_start () {

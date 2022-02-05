@@ -103,8 +103,8 @@ class Vfs : GLib.Object {
     ***********************************************************/
     public static Result<bool, string> check_availability (string path) {
         const var mode = best_available_vfs_mode ();
-        Q_UNUSED (mode)
-        Q_UNUSED (path)
+        //  Q_UNUSED (mode)
+        //  Q_UNUSED (path)
         return true;
     }
 

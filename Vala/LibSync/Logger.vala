@@ -169,7 +169,7 @@ class Logger : GLib.Object {
         }
 
         if (!open_succeeded) {
-            locker.unlock (); // Just in case post_gui_message has a q_debug ()
+            locker.unlock (); // Just in case post_gui_message has a GLib.debug ()
             post_gui_message (_("Error"),
                 string (_("<nobr>File \"%1\"<br/>cannot be opened for writing.<br/><br/>"
                         "The log output <b>cannot</b> be saved!</nobr>"))
@@ -202,11 +202,13 @@ class Logger : GLib.Object {
         this.log_directory = dir;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void set_log_flush (bool flush) {
         this.do_file_flush = flush;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -292,7 +294,7 @@ class Logger : GLib.Object {
         for (var p : rules) {
             out << p << '\n';
         }
-        q_debug () << tmp;
+        GLib.debug () << tmp;
         QLoggingCategory.set_filter_rules (tmp);
     }
 
@@ -348,6 +350,7 @@ class Logger : GLib.Object {
             }
         }
     }
+
 
     /***********************************************************
     ***********************************************************/

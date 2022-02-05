@@ -62,6 +62,7 @@ class AbstractNetworkJob : GLib.Object {
         }
     }
 
+
     /***********************************************************
     // If not set, it is overwritten by the Application constructor with the value from the config
     ***********************************************************/
@@ -183,11 +184,13 @@ class AbstractNetworkJob : GLib.Object {
         GLib.Info (lc_network_job) << meta_object ().class_name () << "created for" << display_url << "+" << path () << parent_meta_object_name;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public AccountPointer account () {
         return this.account;
     }
+
 
     /***********************************************************
     ***********************************************************/

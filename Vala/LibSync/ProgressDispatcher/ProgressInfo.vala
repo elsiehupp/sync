@@ -14,40 +14,30 @@ namespace Progress {
 class ProgressInfo : GLib.Object {
 
     /***********************************************************
-    ***********************************************************/
-    public ProgressInfo ();
-
-
-    /***********************************************************
-    Resets for a new sync run.
-    ***********************************************************/
-    public void on_reset ();
-
-
-    /***********************************************************
     Records the status of the sync run
     ***********************************************************/
     public enum Status {
+
         /***********************************************************
+        Emitted once at on_start
         ***********************************************************/
-        /// Emitted once at on_start
-        Starting,
+        STARTING,
 
         /***********************************************************
         Emitted once without this.current_discovered_folder when it starts,
         then for each folder.
         ***********************************************************/
-        Discovery,
+        DISCOVERY,
 
         /***********************************************************
+        Emitted once when reconcile starts
         ***********************************************************/
-        /// Emitted once when reconcile starts
-        Reconcile,
+        RECONCILE,
 
         /***********************************************************
+        Emitted during propagation, with progress data
         ***********************************************************/
-        /// Emitted during propagation, with progress data
-        Propagation,
+        PROPAGATION,
 
         /***********************************************************
         Emitted once when done
@@ -55,72 +45,7 @@ class ProgressInfo : GLib.Object {
         Except when SyncEngine jumps directly to on_finalize () without going
         through on_propagation_finished ().
         ***********************************************************/
-        Done
-    };
-
-    Status status ();
-
-
-    /***********************************************************
-    Called when propagation starts.
-
-    is_updating_estimates () will return true afterwards.
-    ***********************************************************/
-    public void start_estimate_updates ();
-
-
-    /***********************************************************
-    Returns true when start_estimate_updates () was called.
-
-    This is used when the SyncEngine wants to indicate a new sync
-    is about to on_start via the transmission_progress () signal. The
-    first ProgressInfo will have is_updating_estimates () == false.
-    ***********************************************************/
-    public bool is_updating_estimates ();
-
-
-    /***********************************************************
-    Increase the file and size totals by the amount indicated in item.
-    ***********************************************************/
-    public void adjust_totals_for_file (SyncFileItem item);
-
-    /***********************************************************
-    ***********************************************************/
-    public int64 total_files ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    public int64 completed_size ();
-
-
-    /***********************************************************
-    Number of a file that is currently in progress.
-    ***********************************************************/
-    public int64 current_file ();
-
-
-    /***********************************************************
-    Return true if the size needs to be taken in account in the
-    total amount of time
-    ***********************************************************/
-    public static inline bool is_size_dependent (SyncFileItem item) {
-        return !item.is_directory ()
-            && (item.instruction == CSYNC_INSTRUCTION_CONFLICT
-                || item.instruction == CSYNC_INSTRUCTION_SYNC
-                || item.instruction == CSYNC_INSTRUCTION_NEW
-                || item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE)
-            && ! (item.type == ItemTypeVirtualFile
-                 || item.type == ItemTypeVirtualFileDehydration);
+        DONE
     }
 
 
@@ -128,16 +53,17 @@ class ProgressInfo : GLib.Object {
     Holds estimates about progress, returned to the user.
     ***********************************************************/
     public struct Estimates {
+
         /***********************************************************
+        Estimated completion amount per second. (of bytes or files)
         ***********************************************************/
-        /// Estimated completion amount per second. (of bytes or files)
         int64 estimated_bandwidth;
 
         /***********************************************************
+        Estimated time remaining in milliseconds.
         ***********************************************************/
-        /// Estimated time remaining in milliseconds.
         uint64 estimated_eta;
-    };
+    }
 
 
     /***********************************************************
@@ -145,121 +71,39 @@ class ProgressInfo : GLib.Object {
     estimate of the current progress per second.
     ***********************************************************/
     public class Progress {
+
+        /***********************************************************
+        Updated by update ()
+        ***********************************************************/
+        private double progress_per_sec = 0;
+
+        /***********************************************************
+        Updated by update ()
+        ***********************************************************/
+        private int64 prev_completed = 0;
+
+        /***********************************************************
+        Used to get to a good value faster when progress measurement
+        stats. See update ().
+        ***********************************************************/
+        private double initial_smoothing = 1.0;
+
+        /***********************************************************
+        Set and updated by ProgressInfo
+        ***********************************************************/
+        private int64 completed = 0;
+
+        /***********************************************************
+        Set and updated by ProgressInfo
+        ***********************************************************/
+        private int64 total = 0;
+
+        //  private friend class ProgressInfo;
+
         /***********************************************************
         Returns the estimates about progress per second and eta.
         ***********************************************************/
-        Estimates estimates ();
-
-        int64 completed ();
-        int64 remaining ();
-
-
-        /***********************************************************
-        Update the exponential moving average estimate of this.progress_per_sec.
-        ***********************************************************/
-        private void update ();
-
-        /***********************************************************
-        Changes the this.completed value and does sanity checks on
-        this.prev_completed and this.total.
-        ***********************************************************/
-        private void set_completed (int64 completed);
-
-        // Updated by update ()
-        private double this.progress_per_sec = 0;
-        private int64 this.prev_completed = 0;
-
-        // Used to get to a good value faster when
-        // progress measurement stats. See update ().
-        private double this.initial_smoothing = 1.0;
-
-        // Set and updated by ProgressInfo
-        private int64 this.completed = 0;
-        private int64 this.total = 0;
-
-        private friend class ProgressInfo;
-        string Progress.as_result_string (SyncFileItem item) {
-            switch (item.instruction) {
-            case CSYNC_INSTRUCTION_SYNC:
-            case CSYNC_INSTRUCTION_NEW:
-            case CSYNC_INSTRUCTION_TYPE_CHANGE:
-                if (item.direction != SyncFileItem.Direction.UP) {
-                    if (item.type == ItemTypeVirtualFile) {
-                        return QCoreApplication.translate ("progress", "Virtual file created");
-                    } else if (item.type == ItemTypeVirtualFileDehydration) {
-                        return QCoreApplication.translate ("progress", "Replaced by virtual file");
-                    } else {
-                        return QCoreApplication.translate ("progress", "Downloaded");
-                    }
-                } else {
-                    return QCoreApplication.translate ("progress", "Uploaded");
-                }
-            case CSYNC_INSTRUCTION_CONFLICT:
-                return QCoreApplication.translate ("progress", "Server version downloaded, copied changed local file into conflict file");
-            case CSYNC_INSTRUCTION_REMOVE:
-                return QCoreApplication.translate ("progress", "Deleted");
-            case CSYNC_INSTRUCTION_EVAL_RENAME:
-            case CSYNC_INSTRUCTION_RENAME:
-                return QCoreApplication.translate ("progress", "Moved to %1").arg (item.rename_target);
-            case CSYNC_INSTRUCTION_IGNORE:
-                return QCoreApplication.translate ("progress", "Ignored");
-            case CSYNC_INSTRUCTION_STAT_ERROR:
-                return QCoreApplication.translate ("progress", "Filesystem access error");
-            case CSYNC_INSTRUCTION_ERROR:
-                return QCoreApplication.translate ("progress", "Error");
-            case CSYNC_INSTRUCTION_UPDATE_METADATA:
-                return QCoreApplication.translate ("progress", "Updated local metadata");
-            case CSYNC_INSTRUCTION_NONE:
-            case CSYNC_INSTRUCTION_EVAL:
-                return QCoreApplication.translate ("progress", "Unknown");
-            }
-            return QCoreApplication.translate ("progress", "Unknown");
-        }
-
-        string Progress.as_action_string (SyncFileItem item) {
-            switch (item.instruction) {
-            case CSYNC_INSTRUCTION_CONFLICT:
-            case CSYNC_INSTRUCTION_SYNC:
-            case CSYNC_INSTRUCTION_NEW:
-            case CSYNC_INSTRUCTION_TYPE_CHANGE:
-                if (item.direction != SyncFileItem.Direction.UP)
-                    return QCoreApplication.translate ("progress", "downloading");
-                else
-                    return QCoreApplication.translate ("progress", "uploading");
-            case CSYNC_INSTRUCTION_REMOVE:
-                return QCoreApplication.translate ("progress", "deleting");
-            case CSYNC_INSTRUCTION_EVAL_RENAME:
-            case CSYNC_INSTRUCTION_RENAME:
-                return QCoreApplication.translate ("progress", "moving");
-            case CSYNC_INSTRUCTION_IGNORE:
-                return QCoreApplication.translate ("progress", "ignoring");
-            case CSYNC_INSTRUCTION_STAT_ERROR:
-            case CSYNC_INSTRUCTION_ERROR:
-                return QCoreApplication.translate ("progress", "error");
-            case CSYNC_INSTRUCTION_UPDATE_METADATA:
-                return QCoreApplication.translate ("progress", "updating local metadata");
-            case CSYNC_INSTRUCTION_NONE:
-            case CSYNC_INSTRUCTION_EVAL:
-                break;
-            }
-            return "";
-        }
-
-        bool Progress.is_warning_kind (SyncFileItem.Status kind) {
-            return kind == SyncFileItem.Status.SOFT_ERROR || kind == SyncFileItem.Status.NORMAL_ERROR
-                || kind == SyncFileItem.Status.FATAL_ERROR || kind == SyncFileItem.Status.FILE_IGNORED
-                || kind == SyncFileItem.Status.CONFLICT || kind == SyncFileItem.Status.RESTORATION
-                || kind == SyncFileItem.Status.DETAIL_ERROR || kind == SyncFileItem.Status.BLOCKLISTED_ERROR
-                || kind == SyncFileItem.Status.FILE_LOCKED;
-        }
-
-        bool Progress.is_ignored_kind (SyncFileItem.Status kind) {
-            return kind == SyncFileItem.Status.FILE_IGNORED;
-        }
-
-
-
-        ProgressInfo.Estimates ProgressInfo.Progress.estimates () {
+        Estimates estimates () {
             Estimates est;
             est.estimated_bandwidth = this.progress_per_sec;
             if (this.progress_per_sec != 0) {
@@ -269,16 +113,26 @@ class ProgressInfo : GLib.Object {
             }
             return est;
         }
-    
-        int64 ProgressInfo.Progress.completed () {
+
+
+        /***********************************************************
+        ***********************************************************/
+        int64 completed () {
             return this.completed;
         }
-    
-        int64 ProgressInfo.Progress.remaining () {
+
+
+        /***********************************************************
+        ***********************************************************/
+        int64 remaining () {
             return this.total - this.completed;
         }
-    
-        void ProgressInfo.Progress.update () {
+
+
+        /***********************************************************
+        Update the exponential moving average estimate of this.progress_per_sec.
+        ***********************************************************/
+        private void update () {
             // A good way to think about the smoothing factor:
             // If we make progress P per sec and then stop making progress at all,
             // after N calls to this function (and thus seconds) the this.progress_per_sec
@@ -292,96 +146,90 @@ class ProgressInfo : GLib.Object {
             this.progress_per_sec = smoothing * this.progress_per_sec + (1.0 - smoothing) * static_cast<double> (this.completed - this.prev_completed);
             this.prev_completed = this.completed;
         }
-    
-        void ProgressInfo.Progress.set_completed (int64 completed) {
+
+
+        /***********************************************************
+        Changes the this.completed value and does sanity checks on
+        this.prev_completed and this.total.
+        ***********************************************************/
+        private void set_completed (int64 completed) {
             this.completed = q_min (completed, this.total);
             this.prev_completed = q_min (this.prev_completed, this.completed);
         }
-    };
 
-    Status this.status;
 
-    struct Progress_item {
-        SyncFileItem this.item;
-        Progress this.progress;
-    };
-    GLib.HashMap<string, Progress_item> this.current_items;
-
-    SyncFileItem this.last_completed_item;
-
-    // Used during local and remote update phase
-    string this.current_discovered_remote_folder;
-    string this.current_discovered_local_folder;
-
-    void set_progress_complete (SyncFileItem item);
-
-    void set_progress_item (SyncFileItem item, int64 completed);
+    }
 
 
     /***********************************************************
-    Get the total completion estimate
     ***********************************************************/
-    Estimates total_progress ();
+    struct ProgressItem {
+        SyncFileItem item;
+        Progress progress;
+    }
 
 
     /***********************************************************
-    Get the optimistic eta.
-
-    This value is based on the highest observed transfer bandwidth
-    and files-per-second speed.
     ***********************************************************/
-    uint64 optimistic_eta ();
-
+    Status status;
 
     /***********************************************************
-    Whether the remaining-time estimate is trusted.
-
-    We don't trust it if it is hugely above the optimistic estimate.
-    See #5046.
+    Triggers the update () slot every second once propagation
+    started.
     ***********************************************************/
-    bool trust_eta ();
-
-
-    /***********************************************************
-    Get the current file completion estimate structure
-    ***********************************************************/
-    Estimates file_progress (SyncFileItem item);
-
-
-    /***********************************************************
-    Called every second once started, this function updates the
-    estimates.
-    ***********************************************************/
-    private void on_update_estimates ();
-
-
-    // Sets the completed size by summing on_finished jobs with the progress
-    // of active ones.
-    private void recompute_completed_size ();
-
-    // Triggers the update () slot every second once propagation started.
-    private QTimer this.update_estimates_timer;
+    private QTimer update_estimates_timer;
 
     /***********************************************************
     ***********************************************************/
-    private Progress this.size_progress;
-    private Progress this.file_progress;
+    private Progress size_progress;
+    private Progress file_progress;
 
-    // All size from completed jobs only.
-    private int64 this.total_size_of_completed_jobs;
+    /***********************************************************
+    All size from completed jobs only.
+    ***********************************************************/
+    private int64 total_size_of_completed_jobs;
 
-    // The fastest observed rate of files per second in this sync.
-    private double this.max_files_per_second;
-    private double this.max_bytes_per_second;
+    /***********************************************************
+    The fastest observed rate of files per second in this sync.
+    ***********************************************************/
+    private double max_files_per_second;
+
+    /***********************************************************
+    The fastest observed rate of files per second in this sync.
+    ***********************************************************/
+    private double max_bytes_per_second;
+
+    /***********************************************************
+    ***********************************************************/
+    GLib.HashMap<string, ProgressItem> current_items;
+
+    /***********************************************************
+    ***********************************************************/
+    SyncFileItem last_completed_item;
+
+    /***********************************************************
+    Used during local and remote update phase
+    ***********************************************************/
+    string current_discovered_remote_folder;
+
+    /***********************************************************
+    Used during local and remote update phase
+    ***********************************************************/
+    string current_discovered_local_folder;
 
 
-
-    ProgressInfo.ProgressInfo () {
+    /***********************************************************
+    ***********************************************************/
+    public ProgressInfo () {
         connect (&this.update_estimates_timer, &QTimer.timeout, this, &ProgressInfo.on_update_estimates);
         on_reset ();
     }
 
-    void ProgressInfo.on_reset () {
+
+    /***********************************************************
+    Resets for a new sync run.
+    ***********************************************************/
+    public void on_reset () {
         this.status = Starting;
 
         this.current_items.clear ();
@@ -400,20 +248,41 @@ class ProgressInfo : GLib.Object {
         this.last_completed_item = SyncFileItem ();
     }
 
-    ProgressInfo.Status ProgressInfo.status () {
+
+    /***********************************************************
+    ***********************************************************/
+    Status status () {
         return this.status;
     }
 
-    void ProgressInfo.start_estimate_updates () {
+
+    /***********************************************************
+    Called when propagation starts.
+
+    is_updating_estimates () will return true afterwards.
+    ***********************************************************/
+    public void start_estimate_updates () {
         this.update_estimates_timer.on_start (1000);
     }
 
-    bool ProgressInfo.is_updating_estimates () {
+
+    /***********************************************************
+    Returns true when start_estimate_updates () was called.
+
+    This is used when the SyncEngine wants to indicate a new sync
+    is about to on_start via the transmission_progress () signal. The
+    first ProgressInfo will have is_updating_estimates () == false.
+    ***********************************************************/
+    public bool is_updating_estimates () {
         return this.update_estimates_timer.is_active ();
     }
 
 
-    void ProgressInfo.adjust_totals_for_file (SyncFileItem item) {
+    /***********************************************************
+    Increase the file and size totals by the amount indicated
+    in item.
+    ***********************************************************/
+    public void adjust_totals_for_file (SyncFileItem item) {
         if (!should_count_progress (item)) {
             return;
         }
@@ -424,27 +293,61 @@ class ProgressInfo : GLib.Object {
         }
     }
 
-    int64 ProgressInfo.total_files () {
+
+    /***********************************************************
+    ***********************************************************/
+    public int64 total_files () {
         return this.file_progress.total;
     }
 
-    int64 ProgressInfo.completed_files () {
+
+    /***********************************************************
+    ***********************************************************/
+    public int64 completed_files () {
         return this.file_progress.completed;
     }
 
-    int64 ProgressInfo.current_file () {
-        return completed_files () + this.current_items.size ();
-    }
 
-    int64 ProgressInfo.total_size () {
+    /***********************************************************
+    ***********************************************************/
+    public int64 total_size () {
         return this.size_progress.total;
     }
 
-    int64 ProgressInfo.completed_size () {
+
+    /***********************************************************
+    ***********************************************************/
+    public int64 completed_size () {
         return this.size_progress.completed;
     }
 
-    void ProgressInfo.set_progress_complete (SyncFileItem item) {
+
+    /***********************************************************
+    Number of a file that is currently in progress.
+    ***********************************************************/
+    public int64 current_file () {
+        return completed_files () + this.current_items.size ();
+    }
+
+
+    /***********************************************************
+    Return true if the size needs to be taken in account in the
+    total amount of time
+    ***********************************************************/
+    public static inline bool is_size_dependent (SyncFileItem item) {
+        return !item.is_directory ()
+            && (item.instruction == CSYNC_INSTRUCTION_CONFLICT
+                || item.instruction == CSYNC_INSTRUCTION_SYNC
+                || item.instruction == CSYNC_INSTRUCTION_NEW
+                || item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE)
+            && ! (item.type == ItemTypeVirtualFile
+                 || item.type == ItemTypeVirtualFileDehydration);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    void set_progress_complete (SyncFileItem item) {
         if (!should_count_progress (item)) {
             return;
         }
@@ -458,7 +361,10 @@ class ProgressInfo : GLib.Object {
         this.last_completed_item = item;
     }
 
-    void ProgressInfo.set_progress_item (SyncFileItem item, int64 completed) {
+
+    /***********************************************************
+    ***********************************************************/
+    void set_progress_item (SyncFileItem item, int64 completed) {
         if (!should_count_progress (item)) {
             return;
         }
@@ -472,7 +378,11 @@ class ProgressInfo : GLib.Object {
         this.last_completed_item = SyncFileItem ();
     }
 
-    ProgressInfo.Estimates ProgressInfo.total_progress () {
+
+    /***********************************************************
+    Get the total completion estimate
+    ***********************************************************/
+    Estimates total_progress () {
         Estimates file = this.file_progress.estimates ();
         if (this.size_progress.total == 0) {
             return file;
@@ -531,7 +441,14 @@ class ProgressInfo : GLib.Object {
         return size;
     }
 
-    uint64 ProgressInfo.optimistic_eta () {
+
+    /***********************************************************
+    Get the optimistic eta.
+
+    This value is based on the highest observed transfer bandwidth
+    and files-per-second speed.
+    ***********************************************************/
+    uint64 optimistic_eta () {
         // This assumes files and transfers finish as quickly as possible
         // *but* note that max_per_second could be serious underestimate
         // (if we never got to fully excercise transfer or files/second)
@@ -540,20 +457,36 @@ class ProgressInfo : GLib.Object {
             + this.size_progress.remaining () / this.max_bytes_per_second * 1000;
     }
 
-    bool ProgressInfo.trust_eta () {
+
+    /***********************************************************
+    Whether the remaining-time estimate is trusted.
+
+    We don't trust it if it is hugely above the optimistic estimate.
+    See #5046.
+    ***********************************************************/
+    bool trust_eta () {
         return total_progress ().estimated_eta < 100 * optimistic_eta ();
     }
 
-    ProgressInfo.Estimates ProgressInfo.file_progress (SyncFileItem item) {
+
+    /***********************************************************
+    Get the current file completion estimate structure
+    ***********************************************************/
+    Estimates file_progress (SyncFileItem item) {
         return this.current_items[item.file].progress.estimates ();
     }
 
-    void ProgressInfo.on_update_estimates () {
+
+    /***********************************************************
+    Called every second once started, this function updates the
+    estimates.
+    ***********************************************************/
+    private void on_update_estimates () {
         this.size_progress.update ();
         this.file_progress.update ();
 
         // Update progress of all running items.
-        QMutable_hash_iterator<string, Progress_item> it (this.current_items);
+        QMutable_hash_iterator<string, ProgressItem> it (this.current_items);
         while (it.has_next ()) {
             it.next ();
             it.value ().progress.update ();
@@ -565,23 +498,103 @@ class ProgressInfo : GLib.Object {
             this.max_bytes_per_second);
     }
 
-    void ProgressInfo.recompute_completed_size () {
+
+    /***********************************************************
+    Sets the completed size by summing on_finished jobs with the
+    progress of active ones.
+    ***********************************************************/
+    private void recompute_completed_size () {
         int64 r = this.total_size_of_completed_jobs;
-        foreach (Progress_item i, this.current_items) {
+        foreach (ProgressItem i, this.current_items) {
             if (is_size_dependent (i.item))
                 r += i.progress.completed;
         }
         this.size_progress.set_completed (r);
     }
 
+    static string as_action_string (SyncFileItem item) {
+        switch (item.instruction) {
+        case CSYNC_INSTRUCTION_CONFLICT:
+        case CSYNC_INSTRUCTION_SYNC:
+        case CSYNC_INSTRUCTION_NEW:
+        case CSYNC_INSTRUCTION_TYPE_CHANGE:
+            if (item.direction != SyncFileItem.Direction.UP)
+                return QCoreApplication.translate ("progress", "downloading");
+            else
+                return QCoreApplication.translate ("progress", "uploading");
+        case CSYNC_INSTRUCTION_REMOVE:
+            return QCoreApplication.translate ("progress", "deleting");
+        case CSYNC_INSTRUCTION_EVAL_RENAME:
+        case CSYNC_INSTRUCTION_RENAME:
+            return QCoreApplication.translate ("progress", "moving");
+        case CSYNC_INSTRUCTION_IGNORE:
+            return QCoreApplication.translate ("progress", "ignoring");
+        case CSYNC_INSTRUCTION_STAT_ERROR:
+        case CSYNC_INSTRUCTION_ERROR:
+            return QCoreApplication.translate ("progress", "error");
+        case CSYNC_INSTRUCTION_UPDATE_METADATA:
+            return QCoreApplication.translate ("progress", "updating local metadata");
+        case CSYNC_INSTRUCTION_NONE:
+        case CSYNC_INSTRUCTION_EVAL:
+            break;
+        }
+        return "";
+    }
 
-    string as_action_string (SyncFileItem item);
-    string as_result_string (SyncFileItem item);
 
-    bool is_warning_kind (SyncFileItem.Status);
-    bool is_ignored_kind (SyncFileItem.Status);
-}
-}
+    static string as_result_string (SyncFileItem item) {
+        switch (item.instruction) {
+        case CSYNC_INSTRUCTION_SYNC:
+        case CSYNC_INSTRUCTION_NEW:
+        case CSYNC_INSTRUCTION_TYPE_CHANGE:
+            if (item.direction != SyncFileItem.Direction.UP) {
+                if (item.type == ItemTypeVirtualFile) {
+                    return QCoreApplication.translate ("progress", "Virtual file created");
+                } else if (item.type == ItemTypeVirtualFileDehydration) {
+                    return QCoreApplication.translate ("progress", "Replaced by virtual file");
+                } else {
+                    return QCoreApplication.translate ("progress", "Downloaded");
+                }
+            } else {
+                return QCoreApplication.translate ("progress", "Uploaded");
+            }
+        case CSYNC_INSTRUCTION_CONFLICT:
+            return QCoreApplication.translate ("progress", "Server version downloaded, copied changed local file into conflict file");
+        case CSYNC_INSTRUCTION_REMOVE:
+            return QCoreApplication.translate ("progress", "Deleted");
+        case CSYNC_INSTRUCTION_EVAL_RENAME:
+        case CSYNC_INSTRUCTION_RENAME:
+            return QCoreApplication.translate ("progress", "Moved to %1").arg (item.rename_target);
+        case CSYNC_INSTRUCTION_IGNORE:
+            return QCoreApplication.translate ("progress", "Ignored");
+        case CSYNC_INSTRUCTION_STAT_ERROR:
+            return QCoreApplication.translate ("progress", "Filesystem access error");
+        case CSYNC_INSTRUCTION_ERROR:
+            return QCoreApplication.translate ("progress", "Error");
+        case CSYNC_INSTRUCTION_UPDATE_METADATA:
+            return QCoreApplication.translate ("progress", "Updated local metadata");
+        case CSYNC_INSTRUCTION_NONE:
+        case CSYNC_INSTRUCTION_EVAL:
+            return QCoreApplication.translate ("progress", "Unknown");
+        }
+        return QCoreApplication.translate ("progress", "Unknown");
+    }
+
+
+    static bool is_warning_kind (SyncFileItem.Status kind) {
+        return kind == SyncFileItem.Status.SOFT_ERROR || kind == SyncFileItem.Status.NORMAL_ERROR
+            || kind == SyncFileItem.Status.FATAL_ERROR || kind == SyncFileItem.Status.FILE_IGNORED
+            || kind == SyncFileItem.Status.CONFLICT || kind == SyncFileItem.Status.RESTORATION
+            || kind == SyncFileItem.Status.DETAIL_ERROR || kind == SyncFileItem.Status.BLOCKLISTED_ERROR
+            || kind == SyncFileItem.Status.FILE_LOCKED;
+    }
+
+
+    static bool is_ignored_kind (SyncFileItem.Status kind) {
+        return kind == SyncFileItem.Status.FILE_IGNORED;
+    }
+
+} // class ProgressInfo
 
 } // namespace Progress
 } // namespace Occ

@@ -23,6 +23,7 @@ class FolderMetadata {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     public GLib.ByteArray decrypt_metadata_key (GLib.ByteArray encrypted_metadata) {
@@ -137,6 +138,7 @@ class FolderMetadata {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void remove_all_encrypted_files () {
@@ -165,6 +167,7 @@ class FolderMetadata {
 
         this.sharing.append ({display_name, public_key});
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -275,12 +278,14 @@ class FolderMetadata {
         return EncryptionHelper.encrypt_string_asymmetric (public_key, data.to_base64 ());
     }
 
+
     /***********************************************************
     AES/GCM/No_padding (128 bit key size)
     ***********************************************************/
     private GLib.ByteArray encrypt_json_object (GLib.ByteArray obj, GLib.ByteArray pass) {
         return EncryptionHelper.encrypt_string_symmetric (pass, obj);
     }
+
 
     /***********************************************************
     ***********************************************************/

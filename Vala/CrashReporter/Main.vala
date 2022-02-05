@@ -16,7 +16,7 @@ int main (int argc, char argv[]) {
     QApplication app (argc, argv);
 
     if (app.arguments ().size () != 2) {
-        q_debug () << "You need to pass the .dmp file path as only argument";
+        GLib.debug () << "You need to pass the .dmp file path as only argument";
         return 1;
     }
 

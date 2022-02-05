@@ -114,7 +114,7 @@ signals:
     }
 
     void Flow2Auth_creds_page.on_flow_2_auth_result (Flow2Auth.Result r, string error_string, string user, string app_password) {
-        Q_UNUSED (error_string)
+        //  Q_UNUSED (error_string)
         switch (r) {
         case Flow2Auth.NotSupported: {
             /* Flow2Auth not supported (can't open browser) */

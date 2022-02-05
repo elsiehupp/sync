@@ -153,7 +153,7 @@ class TokenCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_authentication (Soup.Reply reply, QAuthenticator authenticator) {
-        Q_UNUSED (authenticator)
+        //  Q_UNUSED (authenticator)
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,
         // those credentials were invalid and we terminate.

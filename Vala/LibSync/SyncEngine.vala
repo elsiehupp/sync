@@ -234,7 +234,7 @@ signals:
     void transmission_progress (ProgressInfo progress);
 
     /// We've produced a new sync error of a type.
-    void sync_error (string message, ErrorCategory category = ErrorCategory.Normal);
+    void sync_error (string message, ErrorCategory category = ErrorCategory.NORMAL);
 
     void add_error_to_gui (SyncFileItem.Status status, string error_message, string subject);
 
@@ -564,7 +564,7 @@ signals:
         var wait_seconds_str = Utility.duration_to_descriptive_string1 (1000 * wait_seconds);
         item.error_string = _("%1 (skipped due to earlier error, trying again in %2)").arg (entry.error_string, wait_seconds_str);
 
-        if (entry.error_category == SyncJournalErrorBlocklistRecord.InsufficientRemoteStorage) {
+        if (entry.error_category == SyncJournalErrorBlocklistRecord.INSUFFICIENT_REMOTE_STORAGE) {
             on_insufficient_remote_storage ();
         }
 
@@ -904,13 +904,13 @@ signals:
         }
 
         this.stop_watch.on_start ();
-        this.progress_info.status = ProgressInfo.Starting;
+        this.progress_info.status = ProgressInfo.Status.STARTING;
         /* emit */ transmission_progress (*this.progress_info);
 
         GLib.Info (lc_engine) << "#### Discovery on_start ####################################################";
         GLib.Info (lc_engine) << "Server" << account ().server_version ()
                          << (account ().is_http2Supported () ? "Using HTTP/2" : "");
-        this.progress_info.status = ProgressInfo.Discovery;
+        this.progress_info.status = ProgressInfo.Status.DISCOVERY;
         /* emit */ transmission_progress (*this.progress_info);
 
         this.discovery_phase.on_reset (new DiscoveryPhase);
@@ -1025,7 +1025,7 @@ signals:
 
         this.progress_info.current_discovered_remote_folder.clear ();
         this.progress_info.current_discovered_local_folder.clear ();
-        this.progress_info.status = ProgressInfo.Reconcile;
+        this.progress_info.status = ProgressInfo.Status.RECONCILE;
         /* emit */ transmission_progress (*this.progress_info);
 
         //    GLib.Info (lc_engine) << "Permissions of the root folder : " << this.csync_ctx.remote.root_perms.to_string ();
@@ -1055,7 +1055,7 @@ signals:
             GLib.Info (lc_engine) << "#### Reconcile (about_to_propagate OK) #################################################### "<< this.stop_watch.add_lap_time (QStringLiteral ("Reconcile (about_to_propagate OK)")) << "ms";
 
             // it's important to do this before ProgressInfo.on_start (), to announce on_start of new sync
-            this.progress_info.status = ProgressInfo.Propagation;
+            this.progress_info.status = ProgressInfo.Status.PROPAGATION;
             /* emit */ transmission_progress (*this.progress_info);
             this.progress_info.start_estimate_updates ();
 
@@ -1186,7 +1186,7 @@ signals:
         // files needed propagation, but clear the last_completed_item
         // so we don't count this twice (like Recent Files)
         this.progress_info.last_completed_item = SyncFileItem ();
-        this.progress_info.status = ProgressInfo.Done;
+        this.progress_info.status = ProgressInfo.Status.DONE;
         /* emit */ transmission_progress (*this.progress_info);
 
         on_finalize (on_success);
@@ -1419,7 +1419,7 @@ signals:
             return;
 
         this.unique_errors.insert (message);
-        /* emit */ sync_error (message, ErrorCategory.Normal);
+        /* emit */ sync_error (message, ErrorCategory.NORMAL);
     }
 
     void SyncEngine.on_insufficient_local_storage () {
@@ -1435,7 +1435,7 @@ signals:
             return;
 
         this.unique_errors.insert (msg);
-        /* emit */ sync_error (msg, ErrorCategory.InsufficientRemoteStorage);
+        /* emit */ sync_error (msg, ErrorCategory.INSUFFICIENT_REMOTE_STORAGE);
     }
 
     } // namespace Occ

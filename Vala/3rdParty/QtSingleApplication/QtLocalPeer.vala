@@ -186,12 +186,12 @@ void QtLocalPeer.receive_connection () {
     u_msg.resize (remaining);
     int got = 0;
     char* u_msg_buf = u_msg.data ();
-    //q_debug () << "RCV : remaining" << remaining;
+    //GLib.debug () << "RCV : remaining" << remaining;
     do {
         got = ds.read_raw_data (u_msg_buf, remaining);
         remaining -= got;
         u_msg_buf += got;
-        //q_debug () << "RCV : got" << got << "remaining" << remaining;
+        //GLib.debug () << "RCV : got" << got << "remaining" << remaining;
     } while (remaining && got >= 0 && socket.wait_for_ready_read (2000));
     //### error check : got<0
     if (got < 0) {

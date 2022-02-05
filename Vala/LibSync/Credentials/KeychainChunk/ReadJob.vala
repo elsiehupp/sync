@@ -33,6 +33,7 @@ class ReadJob : KeychainChunk.Job {
         this.chunk_buffer.clear ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public ReadJob (string key, GLib.Object parent = new GLib.Object ()) {

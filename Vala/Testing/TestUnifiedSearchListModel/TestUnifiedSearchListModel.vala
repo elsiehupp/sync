@@ -46,7 +46,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
         accountState.on_reset (new Occ.AccountState (account));
 
         fakeQnam.setOverride ([this] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice device) {
-            Q_UNUSED (device);
+            //  Q_UNUSED (device);
             Soup.Reply reply = null;
 
             const var urlQuery = QUrlQuery (req.url ());

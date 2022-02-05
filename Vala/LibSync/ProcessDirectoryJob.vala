@@ -160,6 +160,7 @@ class ProcessDirectoryJob : GLib.Object {
         bool destination_new_ok = false;
     }
 
+
     /***********************************************************
     ***********************************************************/
     private int64 last_sync_timestamp = 0;
@@ -286,6 +287,7 @@ class ProcessDirectoryJob : GLib.Object {
         this.discovery_data = data;
         compute_pin_state (base_pin_state);
     }
+
 
     /***********************************************************
     For creating subjobs

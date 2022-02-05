@@ -1114,7 +1114,7 @@ void FolderStatusModel.on_set_progress (ProgressInfo progress) {
           << FolderStatusDelegate.Warning_count
           << Qt.ToolTipRole;
 
-    if (progress.status () == ProgressInfo.Discovery) {
+    if (progress.status () == ProgressInfo.Status.DISCOVERY) {
         if (!progress.current_discovered_remote_folder.is_empty ()) {
             pi.overall_sync_string = _("Checking for changes in remote \"%1\"").arg (progress.current_discovered_remote_folder);
             /* emit */ data_changed (index (folder_index), index (folder_index), roles);
@@ -1126,7 +1126,7 @@ void FolderStatusModel.on_set_progress (ProgressInfo progress) {
         }
     }
 
-    if (progress.status () == ProgressInfo.Reconcile) {
+    if (progress.status () == ProgressInfo.Status.RECONCILE) {
         pi.overall_sync_string = _("Reconciling changes");
         /* emit */ data_changed (index (folder_index), index (folder_index), roles);
         return;
@@ -1147,7 +1147,7 @@ void FolderStatusModel.on_set_progress (ProgressInfo progress) {
     uint64 estimated_up_bw = 0;
     uint64 estimated_down_bw = 0;
     string all_filenames;
-    foreach (ProgressInfo.Progress_item citm, progress.current_items) {
+    foreach (ProgressInfo.ProgressItem citm, progress.current_items) {
         if (cur_item_progress == -1 || (ProgressInfo.is_size_dependent (citm.item)
                                          && bigger_item_size < citm.item.size)) {
             cur_item_progress = citm.progress.completed ();

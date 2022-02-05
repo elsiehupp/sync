@@ -96,7 +96,7 @@ class NetrcParser {
             }
 
             if (!tokenizer.has_next ()) {
-                q_debug () << "error fetching value for" << key;
+                GLib.debug () << "error fetching value for" << key;
                 return false;
             }
             string value = tokenizer.next ();

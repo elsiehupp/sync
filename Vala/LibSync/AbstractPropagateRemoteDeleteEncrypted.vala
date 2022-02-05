@@ -168,7 +168,7 @@ class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected virtual void on_folder_unlocked_successfully (GLib.ByteArray folder_identifier) {
-        Q_UNUSED (folder_identifier);
+        //  Q_UNUSED (folder_identifier);
         GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder identifier" << folder_identifier << "successfully unlocked";
         this.folder_locked = false;
         this.folder_token = "";
@@ -257,7 +257,7 @@ class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
         connect (unlock_job, &UnlockEncryptFolderApiJob.on_success, this, &AbstractPropagateRemoteDeleteEncrypted.on_folder_unlocked_successfully);
         connect (unlock_job, &UnlockEncryptFolderApiJob.error, this, [this] (GLib.ByteArray file_identifier, int http_return_code) {
-            Q_UNUSED (file_identifier);
+            //  Q_UNUSED (file_identifier);
             this.folder_locked = false;
             this.folder_token = "";
             this.item.http_error_code = http_return_code;

@@ -61,7 +61,7 @@ class EmojiCategoriesModel : QAbstractListModel {
     }
 
     int EmojiCategoriesModel.row_count (QModelIndex parent) {
-        Q_UNUSED (parent);
+        //  Q_UNUSED (parent);
         return static_cast<int> (categories.size ());
     }
 

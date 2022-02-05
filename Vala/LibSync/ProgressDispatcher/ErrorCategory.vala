@@ -10,12 +10,12 @@ namespace Progress {
 /***********************************************************
 Type of error
 
-Used for Progress_dispatcher.sync_error. May trigger error interactivity
+Used for ProgressDispatcher.sync_error. May trigger error interactivity
 in IssuesWidget.
 ***********************************************************/
 enum ErrorCategory {
-    Normal,
-    InsufficientRemoteStorage,
+    NORMAL,
+    INSUFFICIENT_REMOTE_STORAGE,
 }
 
 } // namespace Progress

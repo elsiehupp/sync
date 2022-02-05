@@ -85,7 +85,7 @@ void User_apps_model.on_open_app_url (GLib.Uri url) {
 }
 
 int User_apps_model.row_count (QModelIndex parent) {
-    Q_UNUSED (parent);
+    //  Q_UNUSED (parent);
     return this.apps.count ();
 }
 

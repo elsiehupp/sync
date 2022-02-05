@@ -169,6 +169,7 @@ class ConfigFile {
         return config_path () + Theme.instance ().config_filename ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public 
@@ -441,6 +442,7 @@ class ConfigFile {
         settings.set_value (QLatin1String (PROMPT_DELETE_C), prompt_delete_files);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public 
@@ -483,6 +485,7 @@ class ConfigFile {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.set_value (QLatin1String (LOG_DIR_C), dir);
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -995,6 +998,7 @@ class ConfigFile {
         return settings.value (QLatin1String (MAX_CHUNK_SIZE_C), 1000 * 1000 * 1000).to_long_long (); // default to 1000 MB
     }
 
+
     /***********************************************************
     ***********************************************************/
     public 
@@ -1212,6 +1216,7 @@ class ConfigFile {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.set_value (QLatin1String (UPDATE_CHANNEL_C), channel);
     }
+
 
     /***********************************************************
     ***********************************************************/

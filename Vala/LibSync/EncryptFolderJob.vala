@@ -82,7 +82,7 @@ class EncryptFolderJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_encryption_flag_error (GLib.ByteArray file_identifier, int http_error_code) {
-        q_debug () << "Error on the encryption flag of" << file_identifier << "HTTP code:" << http_error_code;
+        GLib.debug () << "Error on the encryption flag of" << file_identifier << "HTTP code:" << http_error_code;
         /* emit */ finished (Error);
     }
 
@@ -150,7 +150,7 @@ class EncryptFolderJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_update_metadata_error (GLib.ByteArray folder_identifier, int http_return_code) {
-        Q_UNUSED (http_return_code);
+        //  Q_UNUSED (http_return_code);
 
         var unlock_job = new UnlockEncryptFolderApiJob (this.account, folder_identifier, this.folder_token, this);
         connect (unlock_job, &UnlockEncryptFolderApiJob.on_success,

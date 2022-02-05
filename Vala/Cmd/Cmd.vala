@@ -350,7 +350,7 @@ int main (int argc, char **argv) {
     var job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/capabilities"));
     GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument json) {
         var capabilities = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
-        q_debug () << "Server capabilities" << capabilities;
+        GLib.debug () << "Server capabilities" << capabilities;
         account.set_capabilities (capabilities.to_variant_map ());
         account.set_server_version (capabilities["core"].to_object ()["status"].to_object ()["version"].to_string ());
         loop.quit ();
@@ -449,7 +449,7 @@ restart_sync:
     if (engine.is_another_sync_needed () != No_follow_up_sync) {
         if (restart_count < options.restart_times) {
             restart_count++;
-            q_debug () << "Restarting Sync, because another sync is needed" << restart_count;
+            GLib.debug () << "Restarting Sync, because another sync is needed" << restart_count;
             goto restart_sync;
         }
         q_warning () << "Another sync is needed, but not done because restart count is exceeded" << restart_count;

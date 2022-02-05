@@ -52,7 +52,7 @@ class DummyCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public bool still_valid (Soup.Reply reply) {
-        Q_UNUSED (reply)
+        //  Q_UNUSED (reply)
         return true;
     }
 

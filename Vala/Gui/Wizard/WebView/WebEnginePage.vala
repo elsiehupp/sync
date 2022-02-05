@@ -32,7 +32,7 @@ Web_engine_page.Web_engine_page (QWeb_engine_profile profile, GLib.Object parent
 }
 
 QWeb_engine_page * Web_engine_page.create_window (QWeb_engine_page.Web_window_type type) {
-    Q_UNUSED (type);
+    //  Q_UNUSED (type);
     var view = new External_web_engine_page (this.profile ());
     return view;
 }
@@ -63,8 +63,8 @@ bool Web_engine_page.certificate_error (QWeb_engine_certificate_error certificat
 }
 
 bool Web_engine_page.accept_navigation_request (GLib.Uri url, QWeb_engine_page.Navigation_type type, bool is_main_frame) {
-    Q_UNUSED (type);
-    Q_UNUSED (is_main_frame);
+    //  Q_UNUSED (type);
+    //  Q_UNUSED (is_main_frame);
 
     if (this.enforce_https && url.scheme () != QStringLiteral ("https") && url.scheme () != QStringLiteral ("nc")) {
         QMessageBox.warning (null, "Security warning", "Can not follow non https link on a https website. This might be a security issue. Please contact your administrator");

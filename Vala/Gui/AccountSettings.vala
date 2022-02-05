@@ -535,7 +535,7 @@ protected slots:
     }
 
     void AccountSettings.on_subfolder_context_menu_requested (QModelIndex& index, QPoint& pos) {
-        Q_UNUSED (pos);
+        //  Q_UNUSED (pos);
 
         QMenu menu;
         var ac = menu.add_action (_("Open folder"));
@@ -1316,7 +1316,7 @@ protected slots:
     void AccountSettings.on_selective_sync_changed (QModelIndex top_left,
                                                    const QModelIndex bottom_right,
                                                    const GLib.Vector<int> roles) {
-        Q_UNUSED (bottom_right);
+        //  Q_UNUSED (bottom_right);
         if (!roles.contains (Qt.CheckStateRole)) {
             return;
         }

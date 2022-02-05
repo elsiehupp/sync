@@ -390,7 +390,7 @@ std.shared_ptr<Occ.UserStatusConnector> User_model.user_status_connector (int id
 }
 
 int User_model.row_count (QModelIndex parent) {
-    Q_UNUSED (parent);
+    //  Q_UNUSED (parent);
     return this.users.count ();
 }
 
@@ -489,8 +489,8 @@ Image_provider.Image_provider ()
 }
 
 QImage Image_provider.request_image (string identifier, QSize size, QSize requested_size) {
-    Q_UNUSED (size)
-    Q_UNUSED (requested_size)
+    //  Q_UNUSED (size)
+    //  Q_UNUSED (requested_size)
 
     const var make_icon = [] (string path) {
         QImage image (128, 128, QImage.Format_ARGB32);

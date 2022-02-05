@@ -184,7 +184,7 @@ class Invalid_filename_dialog : Gtk.Dialog {
     }
 
     void Invalid_filename_dialog.on_move_job_finished () {
-        const var job = qobject_cast<Move_job> (sender ());
+        const var job = qobject_cast<MoveJob> (sender ());
         const var error = job.reply ().error ();
 
         if (error != Soup.Reply.NoError) {
@@ -196,20 +196,20 @@ class Invalid_filename_dialog : Gtk.Dialog {
     }
 
     void Invalid_filename_dialog.on_remote_file_already_exists (QVariantMap values) {
-        Q_UNUSED (values);
+        //  Q_UNUSED (values);
 
         this.ui.error_label.on_set_text (_("Cannot rename file because a file with the same name does already exist on the server. Please pick another name."));
         this.ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
     }
 
     void Invalid_filename_dialog.on_remote_file_does_not_exist (Soup.Reply reply) {
-        Q_UNUSED (reply);
+        //  Q_UNUSED (reply);
 
         // File does not exist. We can rename it.
         const var remote_source = QDir.clean_path (this.folder.remote_path () + this.original_filename);
         const var remote_destionation = QDir.clean_path (this.account.dav_url ().path () + this.folder.remote_path () + this.new_filename);
-        const var move_job = new Move_job (this.account, remote_source, remote_destionation, this);
-        connect (move_job, &Move_job.finished_signal, this, &Invalid_filename_dialog.on_move_job_finished);
+        const var move_job = new MoveJob (this.account, remote_source, remote_destionation, this);
+        connect (move_job, &MoveJob.finished_signal, this, &Invalid_filename_dialog.on_move_job_finished);
         move_job.on_start ();
     }
     }

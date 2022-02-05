@@ -527,7 +527,7 @@ class TestSyncEngine : GLib.Object {
         int n507 = 0, nPUT = 0;
         GLib.Object parent;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice outgoingData) . Soup.Reply * {
-            Q_UNUSED (outgoingData)
+            //  Q_UNUSED (outgoingData)
 
             if (op == QNetworkAccessManager.PutOperation) {
                 nPUT++;

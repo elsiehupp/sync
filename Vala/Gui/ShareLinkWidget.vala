@@ -503,7 +503,7 @@ void Share_link_widget.on_note_set () {
 }
 
 void Share_link_widget.on_copy_link_share (bool clicked) {
-    Q_UNUSED (clicked);
+    //  Q_UNUSED (clicked);
 
     QApplication.clipboard ().on_set_text (this.link_share.get_link ().to_string ());
 }
@@ -533,7 +533,7 @@ void Share_link_widget.on_create_password () {
 }
 
 void Share_link_widget.on_create_share_link (bool clicked) {
-    Q_UNUSED (clicked);
+    //  Q_UNUSED (clicked);
     on_toggle_share_link_animation (true);
     /* emit */ create_link_share ();
 }

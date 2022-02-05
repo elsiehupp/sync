@@ -20,7 +20,7 @@ class SyncJournalErrorBlocklistRecord {
         /***********************************************************
         These get a special summary message
         ***********************************************************/
-        InsufficientRemoteStorage
+        INSUFFICIENT_REMOTE_STORAGE
     };
 
 

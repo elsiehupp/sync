@@ -307,13 +307,13 @@ User.User (AccountStatePtr account, bool is_current, GLib.Object parent)
     this.activity_model (new ActivityListModel (this.account.data (), this))
     this.unified_search_results_model (new Unified_search_results_list_model (this.account.data (), this))
     this.notification_requests_running (0) {
-    connect (Progress_dispatcher.instance (), &Progress_dispatcher.progress_info,
+    connect (ProgressDispatcher.instance (), &ProgressDispatcher.progress_info,
         this, &User.on_progress_info);
-    connect (Progress_dispatcher.instance (), &Progress_dispatcher.item_completed,
+    connect (ProgressDispatcher.instance (), &ProgressDispatcher.item_completed,
         this, &User.on_item_completed);
-    connect (Progress_dispatcher.instance (), &Progress_dispatcher.sync_error,
+    connect (ProgressDispatcher.instance (), &ProgressDispatcher.sync_error,
         this, &User.on_add_error);
-    connect (Progress_dispatcher.instance (), &Progress_dispatcher.add_error_to_gui,
+    connect (ProgressDispatcher.instance (), &ProgressDispatcher.add_error_to_gui,
         this, &User.on_add_error_to_gui);
 
     connect (&this.notification_check_timer, &QTimer.timeout,
@@ -597,7 +597,7 @@ void User.on_notify_server_finished (string reply, int reply_code) {
 }
 
 void User.on_progress_info (string folder, ProgressInfo progress) {
-    if (progress.status () == ProgressInfo.Reconcile) {
+    if (progress.status () == ProgressInfo.Status.RECONCILE) {
         // Wipe all non-persistent entries - as well as the persistent ones
         // in cases where a local discovery was done.
         var f = FolderMan.instance ().folder (folder);
@@ -648,7 +648,7 @@ void User.on_progress_info (string folder, ProgressInfo progress) {
         }
     }
 
-    if (progress.status () == ProgressInfo.Done) {
+    if (progress.status () == ProgressInfo.Status.DONE) {
         // We keep track very well of pending conflicts.
         // Inform other components about them.
         string[] conflicts;
@@ -659,7 +659,7 @@ void User.on_progress_info (string folder, ProgressInfo progress) {
             }
         }
 
-        /* emit */ Progress_dispatcher.instance ().folder_conflicts (folder, conflicts);
+        /* emit */ ProgressDispatcher.instance ().folder_conflicts (folder, conflicts);
     }
 }
 
@@ -681,7 +681,7 @@ void User.on_add_error (string folder_alias, string message, ErrorCategory categ
         activity.acc_name = folder_instance.account_state ().account ().display_name ();
         activity.folder = folder_alias;
 
-        if (category == ErrorCategory.InsufficientRemoteStorage) {
+        if (category == ErrorCategory.INSUFFICIENT_REMOTE_STORAGE) {
             Activity_link link;
             link.label = _("Retry all uploads");
             link.link = folder_instance.path ();

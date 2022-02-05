@@ -141,7 +141,7 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flo
 }
 
 void WebFlowCredentialsDialog.close_event (QCloseEvent* e) {
-    Q_UNUSED (e)
+    //  Q_UNUSED (e)
 
 #ifdef WITH_WEBENGINE
     if (this.web_view) {
@@ -166,7 +166,7 @@ void WebFlowCredentialsDialog.set_url (GLib.Uri url) {
     if (this.web_view)
         this.web_view.set_url (url);
 #else // WITH_WEBENGINE
-    Q_UNUSED (url);
+    //  Q_UNUSED (url);
 #endif // WITH_WEBENGINE
 }
 
@@ -224,7 +224,7 @@ void WebFlowCredentialsDialog.on_show_settings_dialog () {
 }
 
 void WebFlowCredentialsDialog.on_flow_2_auth_result (Flow2Auth.Result r, string error_string, string user, string app_password) {
-    Q_UNUSED (error_string)
+    //  Q_UNUSED (error_string)
     if (r == Flow2Auth.LoggedIn) {
         /* emit */ url_catched (user, app_password, "");
     } else {

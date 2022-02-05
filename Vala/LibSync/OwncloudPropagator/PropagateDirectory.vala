@@ -40,6 +40,7 @@ class PropagateDirectory : PropagatorJob {
         connect (&this.sub_jobs, &PropagatorJob.on_finished, this, &PropagateDirectory.on_sub_jobs_finished);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void append_job (PropagatorJob job) {

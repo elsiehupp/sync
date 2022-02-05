@@ -42,7 +42,7 @@ class CloudProviderManager : GLib.Object {
 
 
 void on_name_acquired (GDBusConnection connection, gchar name, gpointer user_data) {
-    Q_UNUSED (name);
+    //  Q_UNUSED (name);
     CloudProviderManager self;
     self = static_cast<CloudProviderManager> (user_data);
     this.provider_exporter = cloud_providers_provider_exporter_new (connection, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, LIBCLOUDPROVIDERS_DBUS_OBJECT_PATH);
@@ -51,9 +51,9 @@ void on_name_acquired (GDBusConnection connection, gchar name, gpointer user_dat
 }
 
 void on_name_lost (GDBusConnection connection, gchar name, gpointer user_data) {
-    Q_UNUSED (connection);
-    Q_UNUSED (name);
-    Q_UNUSED (user_data);
+    //  Q_UNUSED (connection);
+    //  Q_UNUSED (name);
+    //  Q_UNUSED (user_data);
     g_clear_object (&this.provider_exporter);
 }
 

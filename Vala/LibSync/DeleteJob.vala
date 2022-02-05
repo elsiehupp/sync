@@ -35,6 +35,7 @@ class DeleteJob : AbstractNetworkJob {
         base (account, path, parent);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public DeleteJob (AccountPointer account, GLib.Uri url, GLib.Object parent)

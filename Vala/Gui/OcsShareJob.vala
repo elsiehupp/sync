@@ -275,7 +275,7 @@ signals:
         const string share_with,
         const Share.Permissions permissions,
         const string password) {
-        Q_UNUSED (permissions)
+        //  Q_UNUSED (permissions)
         set_verb ("POST");
 
         add_param (string.from_latin1 ("path"), path);

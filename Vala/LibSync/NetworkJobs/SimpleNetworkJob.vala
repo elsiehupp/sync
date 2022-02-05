@@ -24,6 +24,7 @@ class SimpleNetworkJob : AbstractNetworkJob {
         base (account, "", parent);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public Soup.Reply start_request (GLib.ByteArray verb, GLib.Uri url,

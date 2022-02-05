@@ -34,6 +34,7 @@ class LsColJob : AbstractNetworkJob {
         base (account, path, parent);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public LsColJob (AccountPointer account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {

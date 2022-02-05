@@ -281,8 +281,8 @@ OwncloudGui.OwncloudGui (Application parent)
                 on_show_share_dialog (share_path, local_path, Share_dialog_start_page.Users_and_groups);
             });
 
-    Progress_dispatcher pd = Progress_dispatcher.instance ();
-    connect (pd, &Progress_dispatcher.progress_info, this,
+    ProgressDispatcher pd = ProgressDispatcher.instance ();
+    connect (pd, &ProgressDispatcher.progress_info, this,
         &OwncloudGui.on_update_progress);
 
     FolderMan folder_man = FolderMan.instance ();
@@ -416,7 +416,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
     GLib.Vector<AccountStatePtr> problem_accounts;
     var set_status_text = [&] (string text) {
         // FIXME : So this doesn't do anything? Needs to be revisited
-        Q_UNUSED (text)
+        //  Q_UNUSED (text)
         // Don't overwrite the status if we're currently syncing
         if (FolderMan.instance ().is_any_sync_running ())
             return;
@@ -557,10 +557,10 @@ void OwncloudGui.on_folder_open_action (string alias) {
 }
 
 void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
-    Q_UNUSED (folder);
+    //  Q_UNUSED (folder);
 
     // FIXME : Lots of messages computed for nothing in this method, needs revisiting
-    if (progress.status () == ProgressInfo.Discovery) {
+    if (progress.status () == ProgressInfo.Status.DISCOVERY) {
 #if 0
         if (!progress.current_discovered_remote_folder.is_empty ()) {
             this.action_status.on_set_text (_("Checking for changes in remote \"%1\"")
@@ -570,10 +570,10 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
                                        .arg (progress.current_discovered_local_folder));
         }
 #endif
-    } else if (progress.status () == ProgressInfo.Done) {
+    } else if (progress.status () == ProgressInfo.Status.DONE) {
         QTimer.single_shot (2000, this, &OwncloudGui.on_compute_overall_sync_status);
     }
-    if (progress.status () != ProgressInfo.Propagation) {
+    if (progress.status () != ProgressInfo.Status.PROPAGATION) {
         return;
     }
 

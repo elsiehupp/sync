@@ -9,46 +9,25 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 namespace Occ {
 
-
-
 /***********************************************************
 @brief The PropagateRemoteDelete class
 @ingroup libsync
 ***********************************************************/
 class PropagateRemoteDelete : PropagateItemJob {
-    QPointer<DeleteJob> this.job;
-    AbstractPropagateRemoteDeleteEncrypted this.delete_encrypted_helper = null;
+
+    QPointer<DeleteJob> job;
+    AbstractPropagateRemoteDeleteEncrypted delete_encrypted_helper = null;
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteDelete (OwncloudPropagator propagator, SyncFileItemPtr item)
-        : PropagateItemJob (propagator, item) {
+    public PropagateRemoteDelete (OwncloudPropagator propagator, SyncFileItemPtr item) {
+        base (propagator, item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override;
-    public void create_delete_job (string filename);
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_abort (PropagatorJob.AbortType abort_type) override;
-
-    /***********************************************************
-    ***********************************************************/
-    public bool is_likely_finished_quickly () override {
-        return !this.item.is_directory ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_delete_job_finished ();
-}
-
-    void PropagateRemoteDelete.on_start () {
+    public void on_start () {
         GLib.Info (lc_propagate_remote_delete) << "Start propagate remote delete job for" << this.item.file;
 
         if (propagator ().abort_requested)
@@ -58,7 +37,7 @@ class PropagateRemoteDelete : PropagateItemJob {
             if (!this.item.encrypted_filename.is_empty ()) {
                 this.delete_encrypted_helper = new Propagate_remote_delete_encrypted (propagator (), this.item, this);
             } else {
-                this.delete_encrypted_helper = new Propagate_remote_delete_encrypted_root_folder (propagator (), this.item, this);
+                this.delete_encrypted_helper = new PropagateRemoteDeleteEncryptedRootFolder (propagator (), this.item, this);
             }
             connect (this.delete_encrypted_helper, &AbstractPropagateRemoteDeleteEncrypted.on_finished, this, [this] (bool on_success) {
                 if (!on_success) {
@@ -77,7 +56,10 @@ class PropagateRemoteDelete : PropagateItemJob {
         }
     }
 
-    void PropagateRemoteDelete.create_delete_job (string filename) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void create_delete_job (string filename) {
         GLib.Info (lc_propagate_remote_delete) << "Deleting file, local" << this.item.file << "remote" << filename;
 
         this.job = new DeleteJob (propagator ().account (),
@@ -89,7 +71,10 @@ class PropagateRemoteDelete : PropagateItemJob {
         this.job.on_start ();
     }
 
-    void PropagateRemoteDelete.on_abort (PropagatorJob.AbortType abort_type) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_abort (PropagatorJob.AbortType abort_type) {
         if (this.job && this.job.reply ())
             this.job.reply ().on_abort ();
 
@@ -98,7 +83,17 @@ class PropagateRemoteDelete : PropagateItemJob {
         }
     }
 
-    void PropagateRemoteDelete.on_delete_job_finished () {
+
+    /***********************************************************
+    ***********************************************************/
+    public bool is_likely_finished_quickly () {
+        return !this.item.is_directory ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_delete_job_finished () {
         propagator ().active_job_list.remove_one (this);
 
         ASSERT (this.job);
@@ -136,5 +131,7 @@ class PropagateRemoteDelete : PropagateItemJob {
 
         on_done (SyncFileItem.Status.SUCCESS);
     }
-    }
-    
+
+} // class PropagateRemoteDelete
+
+} // namespace Occ

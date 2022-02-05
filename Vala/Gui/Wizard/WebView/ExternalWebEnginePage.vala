@@ -22,8 +22,8 @@ External_web_engine_page.External_web_engine_page (QWeb_engine_profile profile, 
 }
 
 bool External_web_engine_page.accept_navigation_request (GLib.Uri url, QWeb_engine_page.Navigation_type type, bool is_main_frame) {
-    Q_UNUSED (type);
-    Q_UNUSED (is_main_frame);
+    //  Q_UNUSED (type);
+    //  Q_UNUSED (is_main_frame);
     Utility.open_browser (url);
     return false;
 }

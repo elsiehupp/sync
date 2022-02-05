@@ -35,6 +35,7 @@ class JsonApiJob : AbstractNetworkJob {
         DELETE = "DELETE"
     }
 
+
     /***********************************************************
     ***********************************************************/
     private GLib.ByteArray body;
