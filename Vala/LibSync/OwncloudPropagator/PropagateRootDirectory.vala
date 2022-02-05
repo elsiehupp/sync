@@ -75,7 +75,7 @@ class PropagateRootDirectory : PropagateDirectory {
             struct AbortsFinished {
                 bool sub_jobs_finished = false;
                 bool dir_deletion_finished = false;
-            };
+            }
             var abort_status = unowned<AbortsFinished> (new AbortsFinished);
 
             connect (&this.sub_jobs, &PropagatorCompositeJob.abort_finished, this, [this, abort_status] () {

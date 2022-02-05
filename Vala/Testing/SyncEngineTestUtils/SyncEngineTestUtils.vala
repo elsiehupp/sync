@@ -419,7 +419,7 @@ FakePropfindReply.FakePropfindReply (FileInfo remoteRootFileInfo, QNetworkAccess
         xml.writeTextElement (davUri, QStringLiteral ("status"), QStringLiteral ("HTTP/1.1 200 OK"));
         xml.writeEndElement (); // propstat
         xml.writeEndElement (); // response
-    };
+    }
 
     writeFileResponse (*fileInfo);
     foreach (FileInfo childFileInfo, fileInfo.children)

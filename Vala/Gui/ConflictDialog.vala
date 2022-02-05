@@ -91,7 +91,7 @@ namespace {
         : Gtk.Dialog (parent)
         this.ui (new Ui.ConflictDialog)
         this.solver (new ConflictSolver (this)) {
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
         force_header_font (this.ui.conflict_message);
         this.ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
         this.ui.button_box.button (QDialogButtonBox.Ok).on_set_text (_("Keep selected version"));
@@ -175,7 +175,7 @@ namespace {
             } else {
                 button.set_icon (QIcon (":/qt-project.org/styles/commonstyle/images/file-128.png"));
             }
-        };
+        }
 
         const var local_version = this.solver.local_version_filename ();
         update_group (local_version,

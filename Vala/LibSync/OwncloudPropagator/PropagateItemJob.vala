@@ -58,9 +58,9 @@ class PropagateItemJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    protected void set_restore_job_msg (string msg = "") {
+    protected void set_restore_job_msg (string message = "") {
         this.item.is_restoration = true;
-        this.item.error_string = msg;
+        this.item.error_string = message;
     }
 
 
@@ -92,17 +92,17 @@ class PropagateItemJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     protected void on_restore_job_finished (SyncFileItem.Status status) {
-        string msg;
+        string message;
         if (this.restore_job) {
-            msg = this.restore_job.restore_job_msg ();
+            message = this.restore_job.restore_job_msg ();
             this.restore_job.set_restore_job_msg ();
         }
 
         if (status == SyncFileItem.Status.SUCCESS || status == SyncFileItem.Status.CONFLICT
             || status == SyncFileItem.Status.RESTORATION) {
-            on_done (SyncFileItem.Status.SOFT_ERROR, msg);
+            on_done (SyncFileItem.Status.SOFT_ERROR, message);
         } else {
-            on_done (status, _("A file or folder was removed from a read only share, but restoring failed : %1").arg (msg));
+            on_done (status, _("A file or folder was removed from a read only share, but restoring failed : %1").arg (message));
         }
     }
 

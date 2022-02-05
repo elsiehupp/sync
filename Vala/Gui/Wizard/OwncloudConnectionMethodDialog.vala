@@ -28,7 +28,7 @@ class Owncloud_connection_method_dialog : Gtk.Dialog {
         No_TLS,
         Client_Side_TLS,
         Back
-    };
+    }
 
     // The URL that was tried
     public void set_url (GLib.Uri );
@@ -57,7 +57,7 @@ class Owncloud_connection_method_dialog : Gtk.Dialog {
     Owncloud_connection_method_dialog.Owncloud_connection_method_dialog (Gtk.Widget parent)
         : Gtk.Dialog (parent, Qt.Customize_window_hint | Qt.Window_title_hint | Qt.Window_close_button_hint | Qt.MSWindows_fixed_size_dialog_hint)
         , ui (new Ui.Owncloud_connection_method_dialog) {
-        ui.setup_ui (this);
+        ui.set_up_ui (this);
 
         connect (ui.btn_no_tLS, &QAbstractButton.clicked, this, &Owncloud_connection_method_dialog.on_return_no_tls);
         connect (ui.btn_client_side_tLS, &QAbstractButton.clicked, this, &Owncloud_connection_method_dialog.on_return_client_side_tls);

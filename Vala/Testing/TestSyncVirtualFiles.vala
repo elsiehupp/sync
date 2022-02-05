@@ -81,7 +81,7 @@ class TestSyncVirtualFiles : GLib.Object {
             completeSpy.clear ();
             if (!doLocalDiscovery)
                 fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
-        };
+        }
         on_cleanup ();
 
         // Create a virtual file for a new remote file
@@ -202,7 +202,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         // Create a virtual file for a new remote file
@@ -275,7 +275,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         // No effect sync
@@ -313,7 +313,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         // Create a virtual file for remote files
@@ -431,7 +431,7 @@ class TestSyncVirtualFiles : GLib.Object {
         var on_cleanup = [&] () {
             completeSpy.clear ();
             fakeFolder.syncJournal ().wipeErrorBlocklist ();
-        };
+        }
         on_cleanup ();
 
         // Create a virtual file for remote files
@@ -593,7 +593,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         // If a file is renamed to <name>.owncloud, it becomes virtual
@@ -636,7 +636,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         fakeFolder.remoteModifier ().insert ("file1", 128, 'C');
@@ -692,7 +692,7 @@ class TestSyncVirtualFiles : GLib.Object {
         ItemCompletedSpy completeSpy (fakeFolder);
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         fakeFolder.remoteModifier ().insert ("case3", 128, 'C');
@@ -782,7 +782,7 @@ class TestSyncVirtualFiles : GLib.Object {
         ItemCompletedSpy completeSpy (fakeFolder);
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         //
@@ -819,13 +819,13 @@ class TestSyncVirtualFiles : GLib.Object {
             string placeholder = path + DVSUFFIX;
             return !fakeFolder.currentLocalState ().find (path)
                 && fakeFolder.currentLocalState ().find (placeholder);
-        };
+        }
         var hasDehydratedDbEntries = [&] (string path) {
             SyncJournalFileRecord normal, suffix;
             fakeFolder.syncJournal ().getFileRecord (path, normal);
             fakeFolder.syncJournal ().getFileRecord (path + DVSUFFIX, suffix);
             return !normal.isValid () && suffix.isValid () && suffix.type == ItemTypeVirtualFile;
-        };
+        }
 
         QVERIFY (isDehydrated ("A/a1"));
         QVERIFY (hasDehydratedDbEntries ("A/a1"));
@@ -920,7 +920,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
         var setPin = [&] (GLib.ByteArray path, PinState state) {
             fakeFolder.syncJournal ().internalPinStates ().setForPath (path, state);
-        };
+        }
 
         fakeFolder.remoteModifier ().mkdir ("local");
         fakeFolder.remoteModifier ().mkdir ("online");
@@ -997,7 +997,7 @@ class TestSyncVirtualFiles : GLib.Object {
         ItemCompletedSpy completeSpy (fakeFolder);
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         // suffixed files are happily synced with Vfs.Off
@@ -1118,7 +1118,7 @@ class TestSyncVirtualFiles : GLib.Object {
         ItemCompletedSpy completeSpy (fakeFolder);
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         // create a bunch of local virtual files, in some instances
@@ -1176,7 +1176,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
         var setPin = [&] (GLib.ByteArray path, PinState state) {
             fakeFolder.syncJournal ().internalPinStates ().setForPath (path, state);
-        };
+        }
 
         fakeFolder.remoteModifier ().mkdir ("local");
         fakeFolder.remoteModifier ().mkdir ("local/sub");
@@ -1244,7 +1244,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
         var setPin = [&] (GLib.ByteArray path, PinState state) {
             fakeFolder.syncJournal ().internalPinStates ().setForPath (path, state);
-        };
+        }
 
         fakeFolder.remoteModifier ().mkdir ("local");
         fakeFolder.remoteModifier ().mkdir ("online");
@@ -1328,7 +1328,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
         var setPin = [&] (GLib.ByteArray path, PinState state) {
             fakeFolder.syncJournal ().internalPinStates ().setForPath (path, state);
-        };
+        }
 
         fakeFolder.remoteModifier ().mkdir ("local");
         fakeFolder.remoteModifier ().mkdir ("online");

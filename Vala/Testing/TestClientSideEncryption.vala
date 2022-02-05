@@ -174,7 +174,7 @@ class TestClientSideEncryption : GLib.Object {
             QCryptographicHash hash (QCryptographicHash.Sha1);
             hash.addData (data);
             return hash.result ();
-        };
+        }
 
         const GLib.ByteArray originalFileHash = generateHash (dummyFileRandomContents);
 

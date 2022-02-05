@@ -11,7 +11,7 @@ class Sharee_model : QAbstractListModel {
     public enum Lookup_mode {
         Local_search = 0,
         Global_search = 1
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -95,7 +95,7 @@ signals:
                         out.append (parse_sharee (sharee.to_object ()));
                     }
                 }
-            };
+            }
 
             append_sharees (reply.object ().value ("ocs").to_object ().value ("data").to_object (), new_sharees);
             append_sharees (reply.object ().value ("ocs").to_object ().value ("data").to_object ().value ("exact").to_object (), new_sharees);
@@ -143,7 +143,7 @@ signals:
         bool operator () (unowned<Sharee> s2) {
             return s2.format () == sharee.format () && s2.display_name () == sharee.format ();
         }
-    };
+    }
 
     /* Set the new sharee
 
@@ -165,7 +165,7 @@ signals:
         foreach (unowned<Sharee> sharee, old_persistant_sharee) {
             Find_sharee_helper helper = {
                 sharee
-            };
+            }
             var it = std.find_if (this.sharees.const_begin (), this.sharees.const_end (), helper);
             if (it == this.sharees.const_end ()) {
                 new_persistant << QModelIndex ();

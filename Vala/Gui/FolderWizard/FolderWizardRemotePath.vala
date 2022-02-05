@@ -69,7 +69,7 @@ protected slots:
         this.warn_was_visible (false)
         this.account (account)
      {
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
         this.ui.warn_frame.hide ();
 
         this.ui.folder_tree_widget.set_sorting_enabled (true);
@@ -391,12 +391,12 @@ protected slots:
         on_refresh_folders ();
     }
 
-    void Folder_wizard_remote_path.show_warn (string msg) {
-        if (msg.is_empty ()) {
+    void Folder_wizard_remote_path.show_warn (string message) {
+        if (message.is_empty ()) {
             this.ui.warn_frame.hide ();
 
         } else {
             this.ui.warn_frame.show ();
-            this.ui.warn_label.on_set_text (msg);
+            this.ui.warn_label.on_set_text (message);
         }
     }

@@ -170,8 +170,8 @@ void WebFlowCredentialsDialog.set_url (GLib.Uri url) {
 //  #endif // WITH_WEBENGINE
 }
 
-void WebFlowCredentialsDialog.set_info (string msg) {
-    this.info_label.on_set_text (msg);
+void WebFlowCredentialsDialog.set_info (string message) {
+    this.info_label.on_set_text (message);
 }
 
 void WebFlowCredentialsDialog.set_error (string error) {

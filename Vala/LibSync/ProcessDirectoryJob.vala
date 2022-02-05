@@ -79,7 +79,7 @@ class ProcessDirectoryJob : GLib.Object {
         SyncJournalFileRecord db_entry;
         RemoteInfo server_entry;
         LocalInfo local_entry;
-    };
+    }
 
 
     /***********************************************************
@@ -131,7 +131,7 @@ class ProcessDirectoryJob : GLib.Object {
             var build_string = [&] (string other) {
                 // Optimize by trying to keep all string implicitly shared if they are the same (common case)
                 return other == this.original ? result.original : path_append (other, name);
-            };
+            }
             result.target = build_string (this.target);
             result.server = build_string (this.server);
             result.local = build_string (this.local);
@@ -912,7 +912,7 @@ class ProcessDirectoryJob : GLib.Object {
                                 // just a virtual file, so, the size must contain Constants.E2EE_TAG_SIZE if it was not corrected already
                                 local_folder_size += record.file_size;
                             }
-                        };
+                        }
 
                         const bool list_files_succeeded = this.discovery_data.statedatabase.list_files_in_path (db_entry.path ().to_utf8 (), list_files_callback);
 
@@ -974,7 +974,7 @@ class ProcessDirectoryJob : GLib.Object {
                 item.size = server_entry.size - Constants.E2EE_TAG_SIZE;
             }
             process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, this.query_server);
-        };
+        }
 
         // Potential NEW/NEW conflict is handled in Analyze_local
         if (local_entry.is_valid ()) {
@@ -1082,7 +1082,7 @@ class ProcessDirectoryJob : GLib.Object {
                 path.original = original_path;
                 path.local = adjusted_original_path;
                 GLib.info (lc_disco) << "Rename detected (down) " << item.file << " . " << item.rename_target;
-            };
+            }
 
             if (was_deleted_on_server) {
                 post_process_rename (path);
@@ -1114,7 +1114,7 @@ class ProcessDirectoryJob : GLib.Object {
                 done = true; // Ideally, if the origin still exist on the server, we should continue searching...  but that'd be difficult
                 async = true;
             }
-        };
+        }
         if (!this.discovery_data.statedatabase.get_file_records_by_file_id (server_entry.file_identifier, rename_candidate_processing)) {
             db_error ();
             return;
@@ -1172,7 +1172,7 @@ class ProcessDirectoryJob : GLib.Object {
 
             var recurse_query_local = this.query_local == PARENT_NOT_CHANGED ? PARENT_NOT_CHANGED : local_entry.is_directory || item.instruction == CSYNC_INSTRUCTION_RENAME ? NORMAL_QUERY : PARENT_DOES_NOT_EXIST;
             process_file_finalize (item, path, recurse, recurse_query_local, recurse_query_server);
-        };
+        }
 
         if (!local_entry.is_valid ()) {
             if (this.query_local == PARENT_NOT_CHANGED && db_entry.is_valid ()) {
@@ -1425,7 +1425,7 @@ class ProcessDirectoryJob : GLib.Object {
             item.direction = SyncFileItem.Direction.DOWN;
             // this flag needs to be unset, otherwise a folder would get marked as new in the process_sub_jobs
             this.child_modified = false;
-        };
+        }
 
         // Check if it is a move
         Occ.SyncJournalFileRecord base;
@@ -1487,7 +1487,7 @@ class ProcessDirectoryJob : GLib.Object {
             }
 
             return true;
-        };
+        }
 
         // If it's not a move it's just a local-NEW
         if (!move_check ()) {
@@ -1565,7 +1565,7 @@ class ProcessDirectoryJob : GLib.Object {
                 item.type = ItemTypeFile;
 
             GLib.info (lc_disco) << "Rename detected (up) " << item.file << " . " << item.rename_target;
-        };
+        }
         if (was_deleted_on_client.first) {
             recurse_query_server = was_deleted_on_client.second == base.etag ? PARENT_NOT_CHANGED : NORMAL_QUERY;
             process_rename (path);
@@ -2034,26 +2034,26 @@ class ProcessDirectoryJob : GLib.Object {
             this.child_ignored = b;
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_fatal_error, this, [this] (string msg) {
+        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_fatal_error, this, [this] (string message) {
             this.discovery_data.currently_active_jobs--;
             this.pending_async_jobs--;
             if (this.server_job)
                 this.server_job.on_abort ();
 
-            /* emit */ this.discovery_data.fatal_error (msg);
+            /* emit */ this.discovery_data.fatal_error (message);
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_non_fatal_error, this, [this] (string msg) {
+        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_non_fatal_error, this, [this] (string message) {
             this.discovery_data.currently_active_jobs--;
             this.pending_async_jobs--;
 
             if (this.dir_item) {
                 this.dir_item.instruction = CSYNC_INSTRUCTION_IGNORE;
-                this.dir_item.error_string = msg;
+                this.dir_item.error_string = message;
                 /* emit */ this.on_finished ();
             } else {
                 // Fatal for the root job since it has no SyncFileItem
-                /* emit */ this.discovery_data.fatal_error (msg);
+                /* emit */ this.discovery_data.fatal_error (message);
             }
         });
 

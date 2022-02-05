@@ -23,7 +23,7 @@ class Updater : GLib.Object {
         static int64 string_version_to_int (string version);
         static int64 current_version_to_int ();
         static int64 version_to_int (int64 major, int64 minor, int64 patch, int64 build);
-    };
+    }
 
     /***********************************************************
     ***********************************************************/

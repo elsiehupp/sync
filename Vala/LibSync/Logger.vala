@@ -89,13 +89,13 @@ class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void do_log (QtMsgType type, QMessageLogContext context, string message) {
-        const string msg = q_format_log_message (type, context, message);
+        const string message = q_format_log_message (type, context, message);
         {
             QMutexLocker lock (&this.mutex);
             this.crash_log_index = (this.crash_log_index + 1) % CRASH_LOG_SIZE;
-            this.crash_log[this.crash_log_index] = msg;
+            this.crash_log[this.crash_log_index] = message;
             if (this.logstream) {
-                (*this.logstream) << msg << Qt.endl;
+                (*this.logstream) << message << Qt.endl;
                 if (this.do_file_flush)
                     this.logstream.flush ();
             }
@@ -103,7 +103,7 @@ class Logger : GLib.Object {
                 close ();
             }
         }
-        /* emit */ log_window_log (msg);
+        /* emit */ log_window_log (message);
     }
 
 

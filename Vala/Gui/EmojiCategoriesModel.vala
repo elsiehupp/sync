@@ -28,14 +28,14 @@ class EmojiCategoriesModel : QAbstractListModel {
     private enum Roles {
         EmojiRole = 0,
         LabelRole
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
     private struct Category {
         string emoji;
         string label;
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -109,4 +109,4 @@ class EmojiCategoriesModel : QAbstractListModel {
             "🏁",
             "flags"
         },
-    };
+    }

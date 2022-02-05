@@ -25,7 +25,7 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
     public enum FlagAction {
         Clear = 0,
         Set = 1
-    };
+    }
 
     /***********************************************************
     ***********************************************************/

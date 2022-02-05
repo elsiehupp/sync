@@ -49,7 +49,7 @@ struct QTokenizerPrivate {
         bool in_quote = false;
         bool in_escape = false;
         char_type quote_char = '\0';
-    };
+    }
 
     QTokenizerPrivate (T& this.string, T& this.delims) :
         string (this.string)

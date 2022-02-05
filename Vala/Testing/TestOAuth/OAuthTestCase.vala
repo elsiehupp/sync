@@ -94,7 +94,7 @@ class OAuthTestCase : GLib.Object {
         browserReply.deleteLater ();
         QCOMPARE (browserReply.rawHeader ("Location"), GLib.ByteArray ("owncloud://on_success"));
         replyToBrowserOk = true;
-    };
+    }
 
     /***********************************************************
     ***********************************************************/

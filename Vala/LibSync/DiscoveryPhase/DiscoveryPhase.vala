@@ -383,7 +383,7 @@ class DiscoveryPhase : GLib.Object {
         }
         return {
             result, old_etag
-        };
+        }
     }
 
 

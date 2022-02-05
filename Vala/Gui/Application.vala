@@ -552,8 +552,8 @@ void Application.on_check_connection () {
         // when the error is permanent.
         const var push_notifications = account_state.account ().push_notifications ();
         const var push_notifications_available = (push_notifications && push_notifications.is_ready ());
-        if (state != AccountState.SignedOut && state != AccountState.ConfigurationError
-            && state != AccountState.AskingCredentials && !push_notifications_available) {
+        if (state != AccountState.State.SIGNED_OUT && state != AccountState.State.CONFIGURATION_ERROR
+            && state != AccountState.State.ASKING_CREDENTIALS && !push_notifications_available) {
             account_state.on_check_connectivity ();
         }
     }
@@ -623,10 +623,10 @@ void Application.on_use_mono_icons_changed (bool) {
     this.gui.on_compute_overall_sync_status ();
 }
 
-void Application.on_parse_message (string msg, GLib.Object *) {
-    if (msg.starts_with ("MSG_PARSEOPTIONS:")) {
+void Application.on_parse_message (string message, GLib.Object *) {
+    if (message.starts_with ("MSG_PARSEOPTIONS:")) {
         const int length_of_msg_prefix = 17;
-        string[] options = msg.mid (length_of_msg_prefix).split ('|');
+        string[] options = message.mid (length_of_msg_prefix).split ('|');
         this.show_log_window = false;
         parse_options (options);
         setup_logging ();
@@ -637,7 +637,7 @@ void Application.on_parse_message (string msg, GLib.Object *) {
             Gtk.Application.quit ();
         }
 
-    } else if (msg.starts_with (QLatin1String ("MSG_SHOWMAINDIALOG"))) {
+    } else if (message.starts_with (QLatin1String ("MSG_SHOWMAINDIALOG"))) {
         GLib.info (lc_application) << "Running for" << this.started_at.elapsed () / 1000.0 << "sec";
         if (this.started_at.elapsed () < 10 * 1000) {
             // This call is mirrored with the one in int main ()

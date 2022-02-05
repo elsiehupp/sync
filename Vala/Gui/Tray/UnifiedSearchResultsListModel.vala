@@ -36,7 +36,7 @@ class Unified_search_results_list_model : QAbstractListModel {
         int32 this.page_size = -1; // how many max items per step of pagination
         bool this.is_paginated = false;
         int32 this.order = std.numeric_limits<int32>.max (); // sorting order (smaller number has bigger priority)
-    };
+    }
 
 
     /***********************************************************
@@ -52,7 +52,7 @@ class Unified_search_results_list_model : QAbstractListModel {
         Rounded_role,
         Type_role,
         Type_as_string_role,
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -681,7 +681,7 @@ namespace {
                 final_resurce_url.set_path (resource_url);
             }
             return final_resurce_url;
-        };
+        }
 
         for (var entry : entries) {
             const var entry_map = entry.to_map ();

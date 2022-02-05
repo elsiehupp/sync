@@ -17,9 +17,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 namespace Occ {
 
-namespace {
-    }
-
 /***********************************************************
 @brief The AccountManager class
 @ingroup gui
@@ -36,9 +33,11 @@ class AccountManager : GLib.Object {
     const string VERSION_C = "version";
     const string SERVER_VERSION_C = "server_version";
 
+    /***********************************************************
+    ***********************************************************/
     // The maximum versions that this client can read
-    const int max_accounts_version = 2;
-    const int max_account_version = 1;
+    const int MAX_ACCOUNTS_VERSION = 2;
+    const int MAX_ACCOUNT_VERSION = 1;
 
 
     /***********************************************************
@@ -47,10 +46,12 @@ class AccountManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<AccountStatePtr> this.accounts;
+    private GLib.List<AccountStatePtr> accounts;
 
-    /// Account ids from settings that weren't read
-    private GLib.Set<string> this.additional_blocked_account_ids;
+    /***********************************************************
+    Account ids from settings that weren't read
+    ***********************************************************/
+    private GLib.Set<string> additional_blocked_account_ids;
 
 
     signal void on_account_added (AccountState account);
@@ -77,7 +78,7 @@ class AccountManager : GLib.Object {
     ***********************************************************/
     public void save (bool save_credentials = true) {
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
-        settings.set_value (QLatin1String (VERSION_C), max_accounts_version);
+        settings.set_value (QLatin1String (VERSION_C), MAX_ACCOUNTS_VERSION);
         for (var acc : q_as_const (this.accounts)) {
             settings.begin_group (acc.account ().identifier ());
             save_account_helper (acc.account ().data (), *settings, save_credentials);
@@ -236,11 +237,11 @@ class AccountManager : GLib.Object {
     public static void backward_migration_settings_keys (string[] delete_keys, string[] ignore_keys) {
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
         const int accounts_version = settings.value (QLatin1String (VERSION_C)).to_int ();
-        if (accounts_version <= max_accounts_version) {
+        if (accounts_version <= MAX_ACCOUNTS_VERSION) {
             foreach (var account_id in settings.child_groups ()) {
                 settings.begin_group (account_id);
                 const int account_version = settings.value (QLatin1String (VERSION_C), 1).to_int ();
-                if (account_version > max_account_version) {
+                if (account_version > MAX_ACCOUNT_VERSION) {
                     ignore_keys.append (settings.group ());
                 }
                 settings.end_group ();
@@ -251,9 +252,11 @@ class AccountManager : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // saving and loading Account to settings
     private void save_account_helper (Account account, QSettings settings, bool save_credentials = true) {
-        settings.set_value (QLatin1String (VERSION_C), max_account_version);
+        settings.set_value (QLatin1String (VERSION_C), MAX_ACCOUNT_VERSION);
         settings.set_value (QLatin1String (URL_C), acc.url.to_string ());
         settings.set_value (QLatin1String (DAV_USER_C), acc.dav_user);
         settings.set_value (QLatin1String (SERVER_VERSION_C), acc.server_version);
@@ -441,15 +444,18 @@ class AccountManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private 
     private string generate_free_account_id ();
 
 
-    // Adds an account to the tracked list, emitting on_account_added ()
+    /***********************************************************
+    Adds an account to the tracked list, emitting on_account_added ()
+    ***********************************************************/
     private void add_account_state (AccountState account_state);
 
 
-    /// Saves account data, not including the credentials
+    /***********************************************************
+    Saves account data, not including the credentials
+    ***********************************************************/
     public void on_save_account (Account a) {
         GLib.debug (lc_account_manager) << "Saving account" << a.url ().to_string ();
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
@@ -462,7 +468,9 @@ class AccountManager : GLib.Object {
     }
 
 
-    /// Saves account state data, not including the account
+    /***********************************************************
+    Saves account state data, not including the account
+    ***********************************************************/
     public void on_save_account_state (AccountState a) {
         GLib.debug (lc_account_manager) << "Saving account state" << a.account ().url ().to_string ();
         var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
@@ -474,7 +482,10 @@ class AccountManager : GLib.Object {
         GLib.debug (lc_account_manager) << "Saved account state settings, status:" << settings.status ();
     }
 
-    /// Display a Box with the mnemonic so the user can copy it to a safe place.
+    /***********************************************************
+    Display a Box with the mnemonic so the user can copy it to a
+    safe place.
+    ***********************************************************/
     public static void on_display_mnemonic (string mnemonic);
 
 
@@ -498,7 +509,7 @@ class AccountManager : GLib.Object {
     void AccountManager.on_display_mnemonic (string mnemonic) {
         var widget = new Gtk.Dialog;
         Ui_Dialog ui;
-        ui.setup_ui (widget);
+        ui.set_up_ui (widget);
         widget.set_window_title (_("End to end encryption mnemonic"));
         ui.label.on_set_text (_("To protect your Cryptographic Identity, we encrypt it with a mnemonic of 12 dictionary words. "
                              "Please note these down and keep them safe. "

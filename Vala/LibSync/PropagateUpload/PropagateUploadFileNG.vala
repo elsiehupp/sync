@@ -27,7 +27,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     private struct Server_chunk_info {
         int64 size;
         string original_name;
-    };
+    }
     private GLib.HashMap<int64, Server_chunk_info> this.server_chunks;
 
 

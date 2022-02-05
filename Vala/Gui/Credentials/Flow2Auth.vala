@@ -32,13 +32,13 @@ class Flow2Auth : GLib.Object {
     public enum TokenAction {
         action_open_browser = 1,
         action_copy_link_to_clipboard
-    };
+    }
     public enum PollStatus {
         status_poll_countdown = 1,
         status_poll_now,
         status_fetch_token,
         status_copy_link_to_clipboard
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -50,7 +50,7 @@ class Flow2Auth : GLib.Object {
         NotSupported,
         LoggedIn,
         Error
-    };
+    }
 
     /***********************************************************
     ***********************************************************/

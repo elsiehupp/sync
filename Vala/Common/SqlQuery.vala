@@ -239,7 +239,7 @@ class SqlQuery {
     public struct NextResult {
         bool ok = false;
         bool has_data = false;
-    };
+    }
 
 
     /***********************************************************

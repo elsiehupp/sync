@@ -99,7 +99,7 @@ void PropagateUploadFileNG.on_propfind_iterate (string name, GLib.HashMap<string
         Server_chunk_info chunkinfo = {
             properties["getcontentlength"].to_long_long (),
             chunk_name
-        };
+        }
         this.server_chunks[chunk_id] = chunkinfo;
     }
 }

@@ -66,7 +66,7 @@ class RemotePermissions {
         // Note: when adding support for more permissions, we need to invalid the cache in the database.
         // (by setting force_remote_discovery in SyncJournalDb.check_connect)
         PermissionsCount = IsMountedSub
-    };
+    }
 
 
     /***********************************************************

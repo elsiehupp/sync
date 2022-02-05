@@ -183,33 +183,33 @@ void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo progre
     }
 
     // Build status details text
-    string msg;
+    string message;
     if (!progress.current_discovered_remote_folder.is_empty ()) {
-        msg =  _("Checking for changes in \"%1\"").arg (progress.current_discovered_remote_folder);
+        message =  _("Checking for changes in \"%1\"").arg (progress.current_discovered_remote_folder);
     } else if (progress.total_size () == 0) {
         int64 current_file = progress.current_file ();
         int64 total_file_count = q_max (progress.total_files (), current_file);
         if (progress.trust_eta ()) {
-            msg = _("Syncing %1 of %2  (%3 left)")
+            message = _("Syncing %1 of %2  (%3 left)")
                     .arg (current_file)
                     .arg (total_file_count)
                     .arg (Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
         } else {
-            msg = _("Syncing %1 of %2")
+            message = _("Syncing %1 of %2")
                     .arg (current_file)
                     .arg (total_file_count);
         }
     } else {
         string total_size_str = Utility.octets_to_string (progress.total_size ());
         if (progress.trust_eta ()) {
-            msg = _("Syncing %1 (%2 left)")
+            message = _("Syncing %1 (%2 left)")
                     .arg (total_size_str, Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
         } else {
-            msg = _("Syncing %1")
+            message = _("Syncing %1")
                     .arg (total_size_str);
         }
     }
-    update_status_text (msg);
+    update_status_text (message);
 
     if (!progress.last_completed_item.is_empty ()
             && should_show_in_recents_menu (progress.last_completed_item)) {

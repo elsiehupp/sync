@@ -453,7 +453,7 @@ class SyncEngine : GLib.Object {
         this.discovery_phase.sync_options = this.sync_options;
         this.discovery_phase.should_discover_localy = [this] (string s) {
             return should_discover_locally (s);
-        };
+        }
         this.discovery_phase.set_selective_sync_block_list (selective_sync_block_list);
         this.discovery_phase.set_selective_sync_allow_list (this.journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok));
         if (!ok) {
@@ -1052,7 +1052,7 @@ class SyncEngine : GLib.Object {
             this.propagator.on_start (std.move (this.sync_items));
 
             GLib.info (lc_engine) << "#### Post-Reconcile end #################################################### " << this.stop_watch.add_lap_time (QStringLiteral ("Post-Reconcile Finished")) << "ms";
-        };
+        }
 
         if (!this.has_none_files && this.has_remove_file) {
             GLib.info (lc_engine) << "All the files are going to be changed, asking the user";
@@ -1079,7 +1079,7 @@ class SyncEngine : GLib.Object {
                 } else {
                     finish ();
                 }
-            };
+            }
             /* emit */ about_to_remove_all_files (side >= 0 ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP, callback);
             return;
         }
@@ -1192,12 +1192,12 @@ class SyncEngine : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_insufficient_remote_storage () {
-        var msg = _("There is insufficient space available on the server for some uploads.");
-        if (this.unique_errors.contains (msg))
+        var message = _("There is insufficient space available on the server for some uploads.");
+        if (this.unique_errors.contains (message))
             return;
 
-        this.unique_errors.insert (msg);
-        /* emit */ sync_error (msg, ErrorCategory.INSUFFICIENT_REMOTE_STORAGE);
+        this.unique_errors.insert (message);
+        /* emit */ sync_error (message, ErrorCategory.INSUFFICIENT_REMOTE_STORAGE);
     }
 
 

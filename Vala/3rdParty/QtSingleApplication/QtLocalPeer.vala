@@ -150,7 +150,7 @@ bool QtLocalPeer.on_send_message (string message, int timeout, bool block) {
         int ms = 250;
         struct timespec ts = {
             ms / 1000, (ms % 1000) * 1000 * 1000
-        };
+        }
         nanosleep (&ts, null);
     }
     if (!conn_ok)

@@ -63,7 +63,7 @@ signals:
         this.ui ()
         this.connected (false)
         this.progress_indi (new QProgress_indicator (this)) {
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
 
         if (parent) {
             this.oc_wizard = qobject_cast<OwncloudWizard> (parent);

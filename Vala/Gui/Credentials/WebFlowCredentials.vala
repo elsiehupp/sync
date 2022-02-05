@@ -226,9 +226,9 @@ void WebFlowCredentials.ask_from_user () {
             this.ask_dialog.set_url (url);
         }
 
-        string msg = _("You have been logged out of %1 as user %2. Please login again.")
+        string message = _("You have been logged out of %1 as user %2. Please login again.")
                           .arg (this.account.display_name (), this.user);
-        this.ask_dialog.set_info (msg);
+        this.ask_dialog.set_info (message);
 
         this.ask_dialog.show ();
 
@@ -250,9 +250,9 @@ void WebFlowCredentials.on_ask_from_user_credentials_provided (string user, stri
     } else {
         GLib.info (lc_web_flow_credentials ()) << "Authed with the wrong user!";
 
-        string msg = _("Please login with the user : %1")
+        string message = _("Please login with the user : %1")
                 .arg (this.user);
-        this.ask_dialog.set_error (msg);
+        this.ask_dialog.set_error (message);
 
         if (!this.ask_dialog.is_using_flow2 ()) {
             GLib.Uri url = this.account.url ();
@@ -637,7 +637,7 @@ void WebFlowCredentials.delete_keychain_entries (bool old_keychain_entries) {
     var start_delete_job = [this, old_keychain_entries] (string key) {
         var job = new KeychainChunk.DeleteJob (this.account, key, old_keychain_entries, this);
         job.on_start ();
-    };
+    }
 
     start_delete_job (this.user);
 

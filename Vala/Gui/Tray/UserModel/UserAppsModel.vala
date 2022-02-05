@@ -19,7 +19,7 @@ class User_apps_model : QAbstractListModel {
         Name_role = Qt.User_role + 1,
         Url_role,
         Icon_url_role
-    };
+    }
 
     /***********************************************************
     ***********************************************************/

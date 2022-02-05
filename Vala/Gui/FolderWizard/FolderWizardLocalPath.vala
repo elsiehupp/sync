@@ -47,7 +47,7 @@ protected slots:
     Folder_wizard_local_path.Folder_wizard_local_path (AccountPointer account)
         : Format_warnings_wizard_page ()
         this.account (account) {
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
         register_field (QLatin1String ("source_folder*"), this.ui.local_folder_line_edit);
         connect (this.ui.local_folder_choose_btn, &QAbstractButton.clicked, this, &Folder_wizard_local_path.on_choose_local_folder);
         this.ui.local_folder_choose_btn.set_tool_tip (_("Click to select a local folder to sync."));

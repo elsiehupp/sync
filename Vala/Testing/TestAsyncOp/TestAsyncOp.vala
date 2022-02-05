@@ -32,7 +32,7 @@ class TestAsyncOp : GLib.Object {
             using PollRequest_t = std.function<Soup.Reply * (TestCase *, QNetworkRequest request)>;
             PollRequest_t pollRequest;
             std.function<FileInfo * ()> perform = null;
-        };
+        }
         GLib.HashMap<string, TestCase> testCases;
 
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice outgoingData) . Soup.Reply * {
@@ -54,7 +54,7 @@ class TestAsyncOp : GLib.Object {
                 var putPayload = outgoingData.readAll ();
                 testCase.perform = [putPayload, request, fakeFolder] {
                     return FakePutReply.perform (fakeFolder.remoteModifier (), request, putPayload);
-                };
+                }
                 return new FakeAsyncReply ("/async-poll/" + file.toUtf8 (), op, request, fakeFolder.syncEngine ());
             } else if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
                 string file = getFilePathFromUrl (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
@@ -63,7 +63,7 @@ class TestAsyncOp : GLib.Object {
                 //  Q_ASSERT (!testCase.perform);
                 testCase.perform = [request, fakeFolder] {
                     return FakeChunkMoveReply.perform (fakeFolder.uploadState (), fakeFolder.remoteModifier (), request);
-                };
+                }
                 return new FakeAsyncReply ("/async-poll/" + file.toUtf8 (), op, request, fakeFolder.syncEngine ());
             } else if (op == QNetworkAccessManager.GetOperation) {
                 nGET++;
@@ -77,18 +77,18 @@ class TestAsyncOp : GLib.Object {
             FileInfo info = tc.perform ();
             GLib.ByteArray body = R" ({ "status":"on_finished", "ETag":"\")" + info.etag + R" (\"", "fileId":")" + info.fileId + "\"}\n";
             return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, null);
-        };
+        }
         // Callback that never finishes
         var waitForeverCallback = [] (TestCase *, QNetworkRequest request) {
             GLib.ByteArray body = "{\"status\":\"started\"}\n";
             return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, null);
-        };
+        }
         // Callback that simulate an error.
         var errorCallback = [] (TestCase tc, QNetworkRequest request) {
             tc.pollRequest = [] (TestCase *, QNetworkRequest &) . Soup.Reply * { std.on_abort (); }; // shall no longer be called;
             GLib.ByteArray body = "{\"status\":\"error\",\"errorCode\":500,\"errorMessage\":\"TestingErrors\"}\n";
             return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, null);
-        };
+        }
         // This lambda takes another functor as a parameter, and returns a callback that will
         // tell the client needs to poll again, and further call to the poll url will call the
         // given callback
@@ -97,14 +97,14 @@ class TestAsyncOp : GLib.Object {
                 tc.pollRequest = chain;
                 GLib.ByteArray body = "{\"status\":\"started\"}\n";
                 return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, null);
-            };
-        };
+            }
+        }
 
         // Create a testcase by creating a file of a given size locally and assigning it a callback
         var insertFile = [&] (string file, int64 size, TestCase.PollRequest_t cb) {
             fakeFolder.localModifier ().insert (file, size);
             testCases[file] = { std.move (cb) };
-        };
+        }
         fakeFolder.localModifier ().mkdir ("on_success");
         insertFile ("on_success/chunked_success", options.maxChunkSize * 3, successCallback);
         insertFile ("on_success/single_success", 300, successCallback);
@@ -159,7 +159,7 @@ class TestAsyncOp : GLib.Object {
                 // next sync
                 remoteModifier.appendByte ("waiting/willNotConflict");
                 return reply;
-            };
+            }
 
         int nPUT = 0;
         int nMOVE = 0;

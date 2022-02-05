@@ -90,7 +90,7 @@ class FolderMetadata {
             {"metadata_keys", metadata_keys},
             {"sharing", sharing_encrypted},
             {"version", 1}
-        };
+        }
 
         QJsonObject files;
         for (var it = this.files.const_begin (), end = this.files.const_end (); it != end; it++) {
@@ -119,7 +119,7 @@ class FolderMetadata {
         QJsonObject meta_object = {
             {"metadata", metadata},
             {"files", files}
-        };
+        }
 
         QJsonDocument internal_metadata;
         internal_metadata.set_object (meta_object);

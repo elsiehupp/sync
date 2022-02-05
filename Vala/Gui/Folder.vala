@@ -34,7 +34,7 @@ class Folder : GLib.Object {
     public enum ChangeReason {
         Other,
         UnLock
-    };
+    }
 
 
     /***********************************************************
@@ -559,7 +559,7 @@ signals:
         Log_status_conflict,
         Log_status_updated,
         Log_status_file_locked
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -953,12 +953,12 @@ void Folder.on_etag_retrieved (GLib.ByteArray etag, GLib.DateTime tp) {
         on_schedule_this_folder ();
     }
 
-    this.account_state.tag_last_successfull_e_tag_request (tp);
+    this.account_state.tag_last_successful_etag_request (tp);
 }
 
 void Folder.on_etag_retrieved_from_sync_engine (GLib.ByteArray etag, GLib.DateTime time) {
     GLib.info (lc_folder) << "Root etag from during sync:" << etag;
-    account_state ().tag_last_successfull_e_tag_request (time);
+    account_state ().tag_last_successful_etag_request (time);
     this.last_etag = etag;
 }
 
@@ -1800,7 +1800,7 @@ void Folder.on_about_to_remove_all_files (SyncFileItem.Direction dir, std.functi
         return;
     }
 
-    const string msg = dir == SyncFileItem.Direction.DOWN ? _("All files in the sync folder \"%1\" folder were deleted on the server.\n"
+    const string message = dir == SyncFileItem.Direction.DOWN ? _("All files in the sync folder \"%1\" folder were deleted on the server.\n"
                                                  "These deletes will be synchronized to your local sync folder, making such files "
                                                  "unavailable unless you have a right to restore. \n"
                                                  "If you decide to restore the files, they will be re-synced with the server if you have rights to do so.\n"
@@ -1810,7 +1810,7 @@ void Folder.on_about_to_remove_all_files (SyncFileItem.Direction dir, std.functi
                                                  "Are you sure you want to sync those actions with the server?\n"
                                                  "If this was an accident and you decide to keep your files, they will be re-synced from the server.");
     var msg_box = new QMessageBox (QMessageBox.Warning, _("Remove All Files?"),
-        msg.arg (short_gui_local_path ()), QMessageBox.NoButton);
+        message.arg (short_gui_local_path ()), QMessageBox.NoButton);
     msg_box.set_attribute (Qt.WA_DeleteOnClose);
     msg_box.set_window_flags (msg_box.window_flags () | Qt.Window_stays_on_top_hint);
     msg_box.add_button (_("Remove all files"), QMessageBox.DestructiveRole);

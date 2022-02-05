@@ -17,7 +17,7 @@ class FakeSearchResultsStorage { {lass Provider {
             public string this.resourceUrl;
             public string this.icon;
             public bool this.rounded;
-        };
+        }
 
         string this.identifier;
         string this.name;
@@ -25,7 +25,7 @@ class FakeSearchResultsStorage { {lass Provider {
         int32 this.cursor = 0;
         bool this.isPaginated = false;
         GLib.Vector<SearchResult> this.results;
-    };
+    }
 
     FakeSearchResultsStorage () = default;
 
@@ -39,7 +39,7 @@ class FakeSearchResultsStorage { {lass Provider {
         }
 
         return this.instance;
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -76,7 +76,7 @@ class FakeSearchResultsStorage { {lass Provider {
         }
 
         const QVariantMap ocsMap = { {QStringLiteral ("meta"), this.metaSuccess}, {QStringLiteral ("data"), providersList}
-        };
+        }
 
         this.providersResponse =
             QJsonDocument.fromVariant (QVariantMap{{QStringLiteral ("ocs"), ocsMap}}).toJson (QJsonDocument.Compact);

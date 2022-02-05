@@ -18,7 +18,7 @@ class Share : GLib.Object {
         Type_remote = Sharee.Federated,
         Type_circle = Sharee.Circle,
         Type_room = Sharee.Room
-    };
+    }
 
     /***********************************************************
     ***********************************************************/

@@ -81,8 +81,8 @@ static class HttpLogger {
     static void log_http (GLib.ByteArray verb, string url, GLib.ByteArray identifier, string content_type, GLib.List<Soup.Reply.RawHeaderPair> header, QIODevice device) {
         const var reply = qobject_cast<Soup.Reply> (device);
         const var content_length = device ? device.size () : 0;
-        string msg;
-        QTextStream stream (&msg);
+        string message;
+        QTextStream stream (&message);
         stream << identifier << " : ";
         if (!reply) {
             stream << "Request : ";
@@ -122,7 +122,7 @@ static class HttpLogger {
             }
         }
         stream << "]";
-        GLib.info (lc_network_http) << msg;
+        GLib.info (lc_network_http) << message;
     }
 
 } // static class HttpLogger

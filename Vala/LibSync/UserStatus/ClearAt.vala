@@ -12,7 +12,7 @@ struct ClearAt {
         Period,
         EndOf,
         Timestamp
-    };
+    }
 
     ClearAtType this.type = ClearAtType.Period;
 

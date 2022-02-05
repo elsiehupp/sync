@@ -747,7 +747,7 @@ class HttpCredentials : AbstractCredentials {
             job.set_insecure_fallback (true);
             job.set_key (keychain_key (this.account.url ().to_string (), user, ""));
             job.on_start ();
-        };
+        }
 
         start_delete_job (this.user);
         start_delete_job (this.user + CLIENT_KEY_PEM_C);

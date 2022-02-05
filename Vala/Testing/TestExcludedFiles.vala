@@ -514,7 +514,7 @@ private on_ void check_csync_regex_translation () {
     var translate = [&storage] (char pattern) {
         storage = ExcludedFiles.convertToRegexpSyntax (pattern, false).toUtf8 ();
         return storage.constData ();
-    };
+    }
 
     QCOMPARE (translate (""), "");
     QCOMPARE (translate ("abc"), "abc");
@@ -535,7 +535,7 @@ private on_ void check_csync_bname_trigger () {
     var translate = [&storage, wildcardsMatchSlash] (char pattern) {
         storage = ExcludedFiles.extractBnameTrigger (pattern, wildcardsMatchSlash).toUtf8 ();
         return storage.constData ();
-    };
+    }
 
     QCOMPARE (translate (""), "");
     QCOMPARE (translate ("a/b/"), "");
@@ -564,7 +564,7 @@ private on_ void check_csync_is_windows_reserved_word () {
         string s = string.fromLatin1 (fn);
         extern bool csync_is_windows_reserved_word (QStringRef filename);
         return csync_is_windows_reserved_word (&s);
-    };
+    }
 
     QVERIFY (csync_is_windows_reserved_word ("CON"));
     QVERIFY (csync_is_windows_reserved_word ("con"));
@@ -658,7 +658,7 @@ private on_ void check_csync_is_windows_reserved_word () {
         excludes.setClientVersion (ExcludedFiles.Version (2, 5, 0));
 
         GLib.Vector<std.pair<const char *, bool>> tests = { { "#!version == 2.5.0", true }, { "#!version == 2.6.0", false }, { "#!version < 2.6.0", true }, { "#!version <= 2.6.0", true }, { "#!version > 2.6.0", false }, { "#!version >= 2.6.0", false }, { "#!version < 2.4.0", false }, { "#!version <= 2.4.0", false }, { "#!version > 2.4.0", true }, { "#!version >= 2.4.0", true }, { "#!version < 2.5.0", false }, { "#!version <= 2.5.0", true }, { "#!version > 2.5.0", false }, { "#!version >= 2.5.0", true },
-        };
+        }
         for (var test : tests) {
             QVERIFY (excludes.versionDirectiveKeepNextLine (test.first) == test.second);
         }

@@ -415,7 +415,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         if (this.uploading_encrypted) {
             this.upload_status = {
                 status, error_string
-            };
+            }
             connect (this.upload_encrypted_helper, &PropagateUploadEncrypted.folder_unlocked, this, &PropagateUploadFileCommon.on_folder_unlocked);
             this.upload_encrypted_helper.unlock_folder ();
         } else {
@@ -531,7 +531,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         if (this.uploading_encrypted) {
             this.upload_status = {
                 SyncFileItem.Status.SUCCESS, ""
-            };
+            }
             connect (this.upload_encrypted_helper, &PropagateUploadEncrypted.folder_unlocked, this, &PropagateUploadFileCommon.on_folder_unlocked);
             this.upload_encrypted_helper.unlock_folder ();
         } else {
@@ -567,7 +567,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             if (*running_count == 0) {
                 /* emit */ this.abort_finished ();
             }
-        };
+        }
 
         // Abort all running jobs, except for explicitly excluded ones
         foreach (AbstractNetworkJob job, this.jobs) {

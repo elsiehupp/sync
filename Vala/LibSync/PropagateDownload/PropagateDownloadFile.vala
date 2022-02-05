@@ -862,7 +862,7 @@ class PropagateDownloadFile : PropagateItemJob {
         const var csync_is_collision_safe_hash = [] (GLib.ByteArray checksum_header) {
             return checksum_header.starts_with ("SHA")
                 || checksum_header.starts_with ("MD5:");
-        };
+        }
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
             GLib.warn (lc_propagate_download ()) << "invalid modified time" << this.item.file << this.item.modtime;

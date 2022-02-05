@@ -49,7 +49,7 @@ class Proxy_auth_dialog : Gtk.Dialog {
     Proxy_auth_dialog.Proxy_auth_dialog (Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.Proxy_auth_dialog) {
-        ui.setup_ui (this);
+        ui.set_up_ui (this);
     }
 
     Proxy_auth_dialog.~Proxy_auth_dialog () {

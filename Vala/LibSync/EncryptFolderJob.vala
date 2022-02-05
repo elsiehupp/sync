@@ -16,7 +16,7 @@ class EncryptFolderJob : GLib.Object {
     public enum Status {
         SUCCESS = 0,
         ERROR,
-    };
+    }
 
 
     /***********************************************************

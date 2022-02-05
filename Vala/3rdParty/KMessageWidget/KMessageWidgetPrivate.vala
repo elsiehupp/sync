@@ -171,7 +171,7 @@ class KMessageWidgetPrivate {
             }
 
             layout.add_widget (close_button);
-        };
+        }
 
         if (q.is_visible ()) {
             q.set_fixed_height (content.size_hint ().height ());

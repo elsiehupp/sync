@@ -56,7 +56,7 @@ class Network_settings : Gtk.Widget {
     Network_settings.Network_settings (Gtk.Widget parent)
         : Gtk.Widget (parent)
         this.ui (new Ui.Network_settings) {
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
 
         this.ui.host_line_edit.set_placeholder_text (_("Hostname of proxy server"));
         this.ui.user_line_edit.set_placeholder_text (_("Username for proxy server"));
@@ -117,7 +117,7 @@ class Network_settings : Gtk.Widget {
         return {
             OwncloudGui.settings_dialog_size ().width (),
             Gtk.Widget.size_hint ().height ()
-        };
+        }
     }
 
     void Network_settings.load_proxy_settings () {

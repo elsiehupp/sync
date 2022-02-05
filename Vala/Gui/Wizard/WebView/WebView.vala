@@ -55,7 +55,7 @@ signals:
 WebView.WebView (Gtk.Widget parent)
     : Gtk.Widget (parent),
       this.ui () {
-    this.ui.setup_ui (this);
+    this.ui.set_up_ui (this);
 #if QT_VERSION >= 0x051200
     QWeb_engine_url_scheme this.ncsheme ("nc");
     QWeb_engine_url_scheme.register_scheme (this.ncsheme);

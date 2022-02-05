@@ -51,7 +51,7 @@ class ActivityListModel : QAbstractListModel {
         Sync_file_status_role,
         Display_actions,
         Shareable_role,
-    };
+    }
 
     /***********************************************************
     ***********************************************************/

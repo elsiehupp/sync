@@ -161,7 +161,7 @@ signals:
         this.is_file (is_file)
         this.profile_page_menu (account, share.get_share_with ().share_with ()) {
         //  Q_ASSERT (this.share);
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
 
         this.ui.shared_with.set_elide_mode (Qt.Elide_right);
         this.ui.shared_with.on_set_text (share.get_share_with ().format ());
@@ -643,7 +643,7 @@ signals:
             }
             const double hue = static_cast<uint8> (hash[0]) / 255.;
             return Gtk.Color.from_hsl_f (hue, 0.7, 0.68);
-        };
+        }
 
         return calculate_background_based_on_text ();
     }

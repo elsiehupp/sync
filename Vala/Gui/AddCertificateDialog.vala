@@ -57,7 +57,7 @@ class AddCertificateDialog : Gtk.Dialog {
     AddCertificateDialog.AddCertificateDialog (Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.AddCertificateDialog) {
-        ui.setup_ui (this);
+        ui.set_up_ui (this);
         ui.label_error_certif.on_set_text ("");
     }
 

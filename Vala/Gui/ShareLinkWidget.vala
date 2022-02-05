@@ -227,7 +227,7 @@ Share_link_widget.Share_link_widget (AccountPointer account,
     this.expiration_date_link_action (null)
     this.unshare_link_action (null)
     this.note_link_action (null) {
-    this.ui.setup_ui (this);
+    this.ui.set_up_ui (this);
 
     this.ui.share_link_tool_button.hide ();
 

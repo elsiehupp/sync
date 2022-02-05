@@ -69,14 +69,14 @@ class OCUpdater : Updater {
         Download_failed,
         Download_timed_out,
         Update_only_available_through_system
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
     public enum Update_status_string_format {
         PlainText,
         Html,
-    };
+    }
     public OCUpdater (GLib.Uri url);
 
     /***********************************************************
@@ -284,7 +284,7 @@ protected slots:
                 path.replace ("'", "''");
 
                 return QDir.to_native_separators (path);
-            };
+            }
 
             string msi_log_file = config.config_path () + "msi.log";
             string command = string ("&{msiexec /promptrestart /passive /i '%1' /L*V '%2'| Out-Null ; &'%3'}")

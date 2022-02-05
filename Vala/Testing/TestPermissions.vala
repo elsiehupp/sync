@@ -77,7 +77,7 @@ class TestPermissions : GLib.Object {
             fakeFolder.remoteModifier ().insert (dir + "canBeRemoved_PERM_D_.data", 102 );
             fakeFolder.remoteModifier ().insert (dir + "cannotBeModified_PERM_DVN_.data", cannotBeModifiedSize , 'A');
             fakeFolder.remoteModifier ().insert (dir + "canBeModified_PERM_W_.data", canBeModifiedSize );
-        };
+        }
 
         //put them in some directories
         fakeFolder.remoteModifier ().mkdir ("normalDirectory_PERM_CKDNV_");
@@ -105,7 +105,7 @@ class TestPermissions : GLib.Object {
             QVERIFY (!QFileInfo (fakeFolder.localPath () + file).permission (GLib.File.WriteOwner));
             GLib.File (fakeFolder.localPath () + file).setPermissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
             fakeFolder.localModifier ().remove (file);
-        };
+        }
         removeReadOnly ("normalDirectory_PERM_CKDNV_/canBeRemoved_PERM_D_.data");
         removeReadOnly ("readonlyDirectory_PERM_M_/canBeRemoved_PERM_D_.data");
 
@@ -115,7 +115,7 @@ class TestPermissions : GLib.Object {
             QVERIFY (!QFileInfo (fakeFolder.localPath () + file).permission (GLib.File.WriteOwner));
             GLib.File (fakeFolder.localPath () + file).setPermissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
             fakeFolder.localModifier ().appendByte (file);
-        };
+        }
         editReadOnly ("normalDirectory_PERM_CKDNV_/cannotBeModified_PERM_DVN_.data");
         editReadOnly ("readonlyDirectory_PERM_M_/cannotBeModified_PERM_DVN_.data");
 

@@ -178,7 +178,7 @@ signals:
         Four_hour,
         Today,
         Week
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -221,7 +221,7 @@ signals:
         Clear_stage_type.Four_hour,
         Clear_stage_type.Today,
         Clear_stage_type.Week
-    };
+    }
 }
 
     User_status_selector_model.User_status_selector_model (GLib.Object parent)

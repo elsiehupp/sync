@@ -1027,7 +1027,7 @@ class Theme : GLib.Object {
     public static Gtk.Color get_background_aware_link_color (Gtk.Color background_color = QGuiApplication.palette ().base ().color ()) {
         return {
             (is_dark_color (background_color) ? Gtk.Color ("#6193dc") : QGuiApplication.palette ().color (QPalette.Link))
-        };
+        }
     }
 
 
@@ -1202,12 +1202,12 @@ class Theme : GLib.Object {
                 QPainter img_painter (&img);
                 renderer.render (&img_painter);
                 return QPixmap.from_image (img);
-            };
+            }
 
             const var load_pixmap = [flavor, name] (int size) {
                 const string pixmap_name = string (Theme.theme_prefix) + string.from_latin1 ("%1/%2-%3.png").arg (flavor).arg (name).arg (size);
                 return QPixmap (pixmap_name);
-            };
+            }
 
             const var use_svg = should_prefer_svg ();
             const var sizes = use_svg

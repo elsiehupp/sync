@@ -53,7 +53,7 @@ class TestBlocklist : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
 
         var initialEtag = journalRecord (fakeFolder, "A").etag;
         QVERIFY (!initialEtag.isEmpty ());

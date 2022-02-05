@@ -26,7 +26,7 @@ class UserStatusConnector : GLib.Object {
         EmojisNotSupported,
         CouldNotSetUserStatus,
         CouldNotClearMessage
-    };
+    }
 
     /***********************************************************
     ***********************************************************/

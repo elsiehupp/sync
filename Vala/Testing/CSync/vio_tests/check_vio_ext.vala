@@ -339,7 +339,7 @@ int torture_run_tests (void) {
         cmocka_unit_test_setup_teardown (check_readdir_with_content, setup_testenv, teardown),
         cmocka_unit_test_setup_teardown (check_readdir_longtree, setup_testenv, teardown),
         cmocka_unit_test_setup_teardown (check_readdir_bigunicode, setup_testenv, teardown),
-    };
+    }
 
     return cmocka_run_group_tests (tests, null, null);
 }

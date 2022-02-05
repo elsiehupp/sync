@@ -65,7 +65,7 @@ class Systray
         Left,
         Top,
         Right
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -494,22 +494,22 @@ QPoint Systray.compute_window_reference_point () {
         return {
             tray_icon_center.x (),
             screen_rect.bottom () - taskbar_rect.height () - spacing
-        };
+        }
     case Task_bar_position.Left:
         return {
             screen_rect.left () + taskbar_rect.width () + spacing,
             tray_icon_center.y ()
-        };
+        }
     case Task_bar_position.Top:
         return {
             tray_icon_center.x (),
             screen_rect.top () + taskbar_rect.height () + spacing
-        };
+        }
     case Task_bar_position.Right:
         return {
             screen_rect.right () - taskbar_rect.width () - spacing,
             tray_icon_center.y ()
-        };
+        }
     }
     Q_UNREACHABLE ();
 }

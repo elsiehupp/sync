@@ -401,7 +401,7 @@ class TestSyncConflict : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         // 1) a NEW/NEW conflict

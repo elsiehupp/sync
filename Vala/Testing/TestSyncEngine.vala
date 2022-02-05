@@ -178,7 +178,7 @@ class TestSyncEngine : GLib.Object {
             SyncJournalFileRecord record;
             fakeFolder.syncJournal ().getFileRecord (path, record);
             return record.checksumHeader;
-        };
+        }
 
         // printf 'A%.0s' {1..64} | sha1sum -
         GLib.ByteArray referenceChecksum ("SHA1:30b86e44e6001403827a62c58b08893e77cf121f");
@@ -238,7 +238,7 @@ class TestSyncEngine : GLib.Object {
             SyncJournalFileRecord record;
             fakeFolder.syncJournal ().getFileRecord (file, record);
             return record.etag;
-        };
+        }
         QVERIFY (getEtag ("parentFolder") == "this.invalid_");
         QVERIFY (getEtag ("parentFolder/subFolderA") == "this.invalid_");
         QVERIFY (getEtag ("parentFolder/subFolderA/subsubFolder") != "this.invalid_");
@@ -668,7 +668,7 @@ class TestSyncEngine : GLib.Object {
         // it should rightfully skip things like download temporaries
         var localFileExists = [&] (string name) {
             return QFileInfo (fakeFolder.localPath () + name).exists ();
-        };
+        }
 
         fakeFolder.syncEngine ().setIgnoreHiddenFiles (true);
         fakeFolder.remoteModifier ().insert ("A/.hidden");

@@ -311,7 +311,7 @@ int torture_run_tests (void) {
             cmocka_unit_test (check_c_jhash64_trials),
             cmocka_unit_test (check_c_jhash64_alignment_problems),
             cmocka_unit_test (check_c_jhash64_null_strings),
-    };
+    }
 
     return cmocka_run_group_tests (tests, NULL, NULL);
 }

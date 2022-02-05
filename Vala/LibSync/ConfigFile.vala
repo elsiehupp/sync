@@ -227,7 +227,7 @@ class ConfigFile {
                         if (in_mount_dir.exists ()) {
                             fi = in_mount_dir;
                         }
-                    };
+                    }
                 }
             }
         }

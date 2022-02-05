@@ -327,11 +327,11 @@ signals:
         var job = qobject_cast<CheckServerJob> (sender ());
 
         // Do this early because reply might be deleted in message box event loop
-        string msg;
+        string message;
         if (!this.oc_wizard.account ().url ().is_valid ()) {
-            msg = _("Invalid URL");
+            message = _("Invalid URL");
         } else {
-            msg = _("Failed to connect to %1 at %2:<br/>%3")
+            message = _("Failed to connect to %1 at %2:<br/>%3")
                       .arg (Utility.escape (Theme.instance ().app_name_gui ()),
                           Utility.escape (this.oc_wizard.account ().url ().to_string ()),
                           Utility.escape (job.error_string ()));
@@ -339,7 +339,7 @@ signals:
         bool is_downgrade_advised = check_downgrade_advised (reply);
 
         // Displays message inside wizard and possibly also another message box
-        this.oc_wizard.on_display_error (msg, is_downgrade_advised);
+        this.oc_wizard.on_display_error (message, is_downgrade_advised);
 
         // Allow the credentials dialog to pop up again for the same URL.
         // Maybe the user just clicked 'Cancel' by accident or changed his mind.

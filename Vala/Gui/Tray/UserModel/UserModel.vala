@@ -142,7 +142,7 @@ class User_model : QAbstractListModel {
         Is_current_user_role,
         Is_connected_role,
         Id_role
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -497,7 +497,7 @@ QImage Image_provider.request_image (string identifier, QSize size, QSize reques
         QSvgRenderer renderer (path);
         renderer.render (&painter);
         return image;
-    };
+    }
 
     if (identifier == QLatin1String ("fallback_white")) {
         return make_icon (QStringLiteral (":/client/theme/white/user.svg"));

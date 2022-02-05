@@ -121,7 +121,7 @@ class TestSyncCfApi : GLib.Object {
             completeSpy.clear ();
             if (!doLocalDiscovery)
                 fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
-        };
+        }
         on_cleanup ();
 
         // Create a virtual file for a new remote file
@@ -250,7 +250,7 @@ class TestSyncCfApi : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         // Create a virtual file for a new remote file
@@ -311,7 +311,7 @@ class TestSyncCfApi : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         // No effect sync
@@ -348,7 +348,7 @@ class TestSyncCfApi : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         // Create a virtual file for remote files
@@ -453,7 +453,7 @@ class TestSyncCfApi : GLib.Object {
         var on_cleanup = [&] () {
             completeSpy.clear ();
             fakeFolder.syncJournal ().wipeErrorBlocklist ();
-        };
+        }
         on_cleanup ();
 
         // Create a virtual file for remote files
@@ -589,7 +589,7 @@ class TestSyncCfApi : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         fakeFolder.remoteModifier ().insert ("file1", 128, 'C');
@@ -638,7 +638,7 @@ class TestSyncCfApi : GLib.Object {
         ItemCompletedSpy completeSpy (fakeFolder);
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         fakeFolder.remoteModifier ().insert ("case3", 128, 'C');
@@ -692,7 +692,7 @@ class TestSyncCfApi : GLib.Object {
         ItemCompletedSpy completeSpy (fakeFolder);
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         //
@@ -728,12 +728,12 @@ class TestSyncCfApi : GLib.Object {
         var isDehydrated = [&] (string path) {
             return cfapi.isSparseFile (fakeFolder.localPath () + path)
                 && QFileInfo (fakeFolder.localPath () + path).exists ();
-        };
+        }
         var hasDehydratedDbEntries = [&] (string path) {
             SyncJournalFileRecord record;
             fakeFolder.syncJournal ().getFileRecord (path, record);
             return record.isValid () && record.type == ItemTypeVirtualFile;
-        };
+        }
 
         QVERIFY (isDehydrated ("A/a1"));
         QVERIFY (hasDehydratedDbEntries ("A/a1"));
@@ -1089,7 +1089,7 @@ class TestSyncCfApi : GLib.Object {
 
         var on_cleanup = [&] () {
             completeSpy.clear ();
-        };
+        }
         on_cleanup ();
 
         // VfsItemAvailability.ONLINE_ONLY forced on the root

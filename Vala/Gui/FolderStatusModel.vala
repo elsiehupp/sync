@@ -643,7 +643,7 @@ class FolderStatusModel : QAbstractItemModel {
         if (!this.account_state) {
             return false;
         }
-        if (this.account_state.state () != AccountState.Connected) {
+        if (this.account_state.state () != AccountState.State.CONNECTED) {
             return false;
         }
         var info = info_for_index (parent);

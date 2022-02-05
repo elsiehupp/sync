@@ -29,7 +29,7 @@ class SyncFileItem {
         NONE = 0,
         UP,
         DOWN
-    };
+    }
 
     /***********************************************************
     Stored in 4 bits

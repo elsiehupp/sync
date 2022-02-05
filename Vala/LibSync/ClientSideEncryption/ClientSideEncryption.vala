@@ -175,7 +175,7 @@ class ClientSideEncryption : GLib.Object {
             {"L", "Stuttgart"},
             {"O","Nextcloud"},
             {"CN", cn_array.const_data ()}
-        };
+        }
 
         int ret = 0;
         int n_version = 1;
@@ -285,7 +285,7 @@ class ClientSideEncryption : GLib.Object {
             job.set_insecure_fallback (false);
             job.set_key (AbstractCredentials.keychain_key (account.url ().to_string (), user, account.identifier ()));
             job.on_start ();
-        };
+        }
 
         var user = account.credentials ().user ();
         start_delete_job (user + E2E_PRIVATE);
@@ -491,7 +491,7 @@ class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void decrypt_private_key (AccountPointer account, GLib.ByteArray key) {
-        string msg = _("Please enter your end to end encryption passphrase:<br>"
+        string message = _("Please enter your end to end encryption passphrase:<br>"
                         "<br>"
                         "User : %2<br>"
                         "Account : %3<br>")
@@ -500,7 +500,7 @@ class ClientSideEncryption : GLib.Object {
 
         QInputDialog dialog;
         dialog.set_window_title (_("Enter E2E passphrase"));
-        dialog.set_label_text (msg);
+        dialog.set_label_text (message);
         dialog.set_text_echo_mode (QLineEdit.Normal);
 
         string prev;

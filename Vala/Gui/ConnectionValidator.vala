@@ -87,12 +87,12 @@ class ConnectionValidator : GLib.Object {
         ServiceUnavailable, // 503 on authed request
         MaintenanceMode, // maintenance enabled in status.php
         Timeout // actually also used for other errors on the authed request
-    };
+    }
 
     // How often should the Application ask this object to check for the connection?
     public enum {
         DefaultCallingIntervalMsec = 62 * 1000
-    };
+    }
 
 
     /// Checks the server and the authentication.

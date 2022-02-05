@@ -28,7 +28,7 @@ struct OperationCounter {
             if (req.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE")
                 ++nMOVE;
             return null;
-        };
+        }
     }
 }
 
@@ -900,7 +900,7 @@ class TestSyncMove : GLib.Object {
                 return QStringLiteral ("%1" APPLICATION_DOTVIRTUALFILE_SUFFIX).arg (s);
             }
             return s;
-        };
+        }
         const string src = "folder/folderA/file.txt";
         const string dest = "folder/folderB/file.txt";
         FakeFolder fakeFolder{ FileInfo{ "", { FileInfo{ QStringLiteral ("folder"), { FileInfo{ QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };

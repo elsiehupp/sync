@@ -63,7 +63,7 @@ class IgnoreListTableWidget : Gtk.Widget {
         : Gtk.Widget (parent)
         , ui (new Ui.IgnoreListTableWidget) {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
-        ui.setup_ui (this);
+        ui.set_up_ui (this);
 
         ui.description_label.on_set_text (_("Files or folders matching a pattern will not be synchronized.\n\n"
                                          "Items where deletion is allowed will be deleted if they prevent a "

@@ -90,7 +90,7 @@ Zip_entry file_info_to_zip_entry (QFileInfo info) {
     return {
         info.absolute_file_path (),
         info.filename ()
-    };
+    }
 }
 
 Zip_entry file_info_to_log_zip_entry (QFileInfo info) {
@@ -159,7 +159,7 @@ void create_debug_archive (string filename) {
 General_settings.General_settings (Gtk.Widget parent)
     : Gtk.Widget (parent)
     this.ui (new Ui.General_settings) {
-    this.ui.setup_ui (this);
+    this.ui.set_up_ui (this);
 
     connect (this.ui.server_notifications_check_box, &QAbstractButton.toggled,
         this, &General_settings.on_toggle_optional_server_notifications);
@@ -239,7 +239,7 @@ QSize General_settings.size_hint () {
     return {
         OwncloudGui.settings_dialog_size ().width (),
         Gtk.Widget.size_hint ().height ()
-    };
+    }
 }
 
 void General_settings.on_load_misc_settings () {

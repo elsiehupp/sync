@@ -26,7 +26,7 @@ namespace WizardCommon {
     enum Sync_mode {
         Selective_mode,
         Box_mode
-    };
+    }
 
     enum Pages {
         Page_Welcome,
@@ -38,7 +38,7 @@ namespace WizardCommon {
         Page_Web_view,
 //  #endif // WITH_WEBENGINE
         Page_Advanced_setup,
-    };
+    }
 
     void setup_custom_media (GLib.Variant variant, QLabel label) {
         if (!label)

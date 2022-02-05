@@ -598,7 +598,7 @@ int FolderMan.setup_folders () {
                 setup_folders_helper (*settings, account, skip_settings_keys, backwards_compatible, folders_with_placeholders);
             }
             settings.end_group ();
-        };
+        }
 
         process (QStringLiteral ("Folders"), true, false);
 
@@ -779,7 +779,7 @@ void FolderMan.backward_migration_settings_keys (string[] *delete_keys, string[]
             delete_keys.append (settings.group ());
         }
         settings.end_group ();
-    };
+    }
 
     for (var account_id : settings.child_groups ()) {
         settings.begin_group (account_id);

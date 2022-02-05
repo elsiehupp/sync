@@ -139,7 +139,7 @@ signals:
         : QWizard_page ()
         this.progress_indi (new QProgress_indicator (this))
         this.oc_wizard (qobject_cast<OwncloudWizard> (parent)) {
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
 
         setup_server_address_description_label ();
 

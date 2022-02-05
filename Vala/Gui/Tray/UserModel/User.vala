@@ -359,7 +359,7 @@ void User.show_desktop_notification (string title, string message) {
     const Notification_cache.Notification notification {
         title,
         message
-    };
+    }
     if (this.notification_cache.contains (notification)) {
         return;
     }

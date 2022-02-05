@@ -28,7 +28,7 @@ class Welcome_page : QWizard_page {
 
     /***********************************************************
     ***********************************************************/
-    private void setup_ui ();
+    private void set_up_ui ();
     private void customize_style ();
     private void style_slide_show ();
     private void setup_slide_show ();
@@ -51,13 +51,13 @@ class Welcome_page : QWizard_page {
         : QWizard_page ()
         this.ui (new Ui.Welcome_page)
         this.oc_wizard (oc_wizard) {
-        setup_ui ();
+        set_up_ui ();
     }
 
     Welcome_page.~Welcome_page () = default;
 
-    void Welcome_page.setup_ui () {
-        this.ui.setup_ui (this);
+    void Welcome_page.set_up_ui () {
+        this.ui.set_up_ui (this);
         setup_slide_show ();
         setup_login_button ();
         setup_create_account_button ();

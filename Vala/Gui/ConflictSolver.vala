@@ -19,7 +19,7 @@ class ConflictSolver : GLib.Object {
         KeepLocalVersion,
         KeepRemoteVersion,
         KeepBothVersions
-    };
+    }
 
     /***********************************************************
     ***********************************************************/

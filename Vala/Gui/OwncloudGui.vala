@@ -420,7 +420,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
         if (FolderMan.instance ().is_any_sync_running ())
             return;
         //this.action_status.on_set_text (text);
-    };
+    }
 
     foreach (var a, AccountManager.instance ().accounts ()) {
         if (!a.is_signed_out ()) {
@@ -532,15 +532,15 @@ void OwncloudGui.hide_and_show_tray () {
     this.tray.show ();
 }
 
-void OwncloudGui.on_show_tray_message (string title, string msg) {
+void OwncloudGui.on_show_tray_message (string title, string message) {
     if (this.tray)
-        this.tray.show_message (title, msg);
+        this.tray.show_message (title, message);
     else
-        GLib.warn (lc_application) << "Tray not ready : " << msg;
+        GLib.warn (lc_application) << "Tray not ready : " << message;
 }
 
-void OwncloudGui.on_show_optional_tray_message (string title, string msg) {
-    on_show_tray_message (title, msg);
+void OwncloudGui.on_show_optional_tray_message (string title, string message) {
+    on_show_tray_message (title, message);
 }
 
 /***********************************************************
@@ -579,29 +579,29 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
     if (progress.total_size () == 0) {
         int64 current_file = progress.current_file ();
         int64 total_file_count = q_max (progress.total_files (), current_file);
-        string msg;
+        string message;
         if (progress.trust_eta ()) {
-            msg = _("Syncing %1 of %2 (%3 left)")
+            message = _("Syncing %1 of %2 (%3 left)")
                       .arg (current_file)
                       .arg (total_file_count)
                       .arg (Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
         } else {
-            msg = _("Syncing %1 of %2")
+            message = _("Syncing %1 of %2")
                       .arg (current_file)
                       .arg (total_file_count);
         }
-        //this.action_status.on_set_text (msg);
+        //this.action_status.on_set_text (message);
     } else {
         string total_size_str = Utility.octets_to_string (progress.total_size ());
-        string msg;
+        string message;
         if (progress.trust_eta ()) {
-            msg = _("Syncing %1 (%2 left)")
+            message = _("Syncing %1 (%2 left)")
                       .arg (total_size_str, Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
         } else {
-            msg = _("Syncing %1")
+            message = _("Syncing %1")
                       .arg (total_size_str);
         }
-        //this.action_status.on_set_text (msg);
+        //this.action_status.on_set_text (message);
     }
 
     if (!progress.last_completed_item.is_empty ()) {

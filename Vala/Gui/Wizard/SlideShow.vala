@@ -186,7 +186,7 @@ QSize Slide_show.size_hint () {
     return {
         std.max (label_size.width (), pixmap_size.width ()),
         label_size.height () + Spacing + pixmap_size.height ()
-    };
+    }
 }
 
 void Slide_show.on_start_show (int interval) {

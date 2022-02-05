@@ -22,7 +22,7 @@ namespace {
 
         const var add_first_letter = [] (string current, string next) . string {
             return current + next.at (0);
-        };
+        }
 
         return std.accumulate (std.cbegin (words), std.cend (words), "", add_first_letter);
     }
@@ -130,7 +130,7 @@ signals:
         set_attribute (Qt.WA_DeleteOnClose);
         set_object_name ("Sharing_dialog"); // required as group for save_geometry call
 
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
 
         // We want to act on account state changes
         connect (this.account_state.data (), &AccountState.state_changed, this, &Share_dialog.on_account_state_changed);

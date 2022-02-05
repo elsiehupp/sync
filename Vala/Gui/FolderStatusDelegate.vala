@@ -247,7 +247,7 @@ class FolderStatusDelegate : QStyledItemDelegate {
             painter.restore ();
 
             h = rect.bottom () + margin;
-        };
+        }
 
         if (!conflict_texts.is_empty ())
             draw_text_box (conflict_texts, Gtk.Color (0xba, 0xba, 0x4d));

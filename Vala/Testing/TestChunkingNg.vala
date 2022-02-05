@@ -269,7 +269,7 @@ class TestChunkingNG : GLib.Object {
             SyncJournalFileRecord record;
             QVERIFY (fakeFolder.syncJournal ().getFileRecord (GLib.ByteArray ("A/a0"), record));
             QCOMPARE (record.etag, fakeFolder.remoteModifier ().find ("A/a0").etag);
-        };
+        }
         var connection = connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToPropagate, checkEtagUpdated);
         QVERIFY (fakeFolder.syncOnce ());
         disconnect (connection);

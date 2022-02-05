@@ -58,7 +58,7 @@ class PreparedSqlQueryManager {
         Wipe_pin_state_query,
 
         Prepared_query_count
-    };
+    }
 
 
     /***********************************************************
@@ -75,7 +75,7 @@ class PreparedSqlQueryManager {
         //  Q_ASSERT (!Sqlite3Stmt_busy (query.stmt));
         return {
             query
-        };
+        }
     }
 
 
@@ -91,11 +91,11 @@ class PreparedSqlQueryManager {
             query.db = database.sqlite_db ();
             return {
                 query, query.prepare (sql) == 0
-            };
+            }
         }
         return {
             query
-        };
+        }
     }
 
 

@@ -342,7 +342,7 @@ class OcsUserStatusConnector : UserStatusConnector {
             {
                 "invisible", Occ.UserStatus.OnlineStatus.Invisible
             }
-        };
+        }
 
         // api should return invisible, dnd,... to_lower () it is to make sure
         // it matches this.pre_defined_status, otherwise the default is online (0)
@@ -409,7 +409,7 @@ class OcsUserStatusConnector : UserStatusConnector {
             {
                 "status_is_user_defined", "false"
             }
-        };
+        }
         const var retrieved_data = json.object ().value ("ocs").to_object ().value ("data").to_object (default_values);
         return json_extract_user_status (retrieved_data);
     }

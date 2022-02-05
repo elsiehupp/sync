@@ -114,7 +114,7 @@ class Invalid_filename_dialog : Gtk.Dialog {
 
         this.original_filename = this.relative_file_path + file_path_file_info.filename ();
 
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
         this.ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
         this.ui.button_box.button (QDialogButtonBox.Ok).on_set_text (_("Rename file"));
 

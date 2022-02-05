@@ -70,7 +70,7 @@ bool Utility.open_browser (GLib.Uri url, Gtk.Widget error_widget_parent) {
         "http",
         "https",
         "oauthtest"
-    };
+    }
 
     if (!allowed_url_schemes.contains (url.scheme ())) {
         GLib.warn (lc_utility) << "URL format is not supported, or it has been compromised for:" << url.to_string ();

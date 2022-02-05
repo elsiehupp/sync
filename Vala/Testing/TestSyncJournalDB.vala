@@ -225,12 +225,12 @@ class TestSyncJournalDB : GLib.Object {
             record.etag = initialEtag;
             record.remotePerm = RemotePermissions.fromDbValue ("RW");
             this.database.setFileRecord (record);
-        };
+        }
         var getEtag = [&] (GLib.ByteArray path) {
             SyncJournalFileRecord record;
             this.database.getFileRecord (path, record);
             return record.etag;
-        };
+        }
 
         makeEntry ("foodir", ItemTypeDirectory);
         makeEntry ("otherdir", ItemTypeDirectory);
@@ -289,7 +289,7 @@ class TestSyncJournalDB : GLib.Object {
             record.path = path;
             record.remotePerm = RemotePermissions.fromDbValue ("RW");
             this.database.setFileRecord (record);
-        };
+        }
 
         QByteArrayList elements;
         elements
@@ -316,7 +316,7 @@ class TestSyncJournalDB : GLib.Object {
                 }
             }
             return ok;
-        };
+        }
 
         this.database.deleteFileRecord ("moo", true);
         elements.removeAll ("moo");
@@ -342,7 +342,7 @@ class TestSyncJournalDB : GLib.Object {
             var pinState = this.database.internalPinStates ().rawForPath (path);
             QVERIFY (pinState);
             QCOMPARE (*pinState, state);
-        };
+        }
         var get = [&] (GLib.ByteArray path) . PinState {
             var state = this.database.internalPinStates ().effectiveForPath (path);
             if (!state) {
@@ -350,7 +350,7 @@ class TestSyncJournalDB : GLib.Object {
                 return PinState.PinState.INHERITED;
             }
             return state;
-        };
+        }
         var getRecursive = [&] (GLib.ByteArray path) . PinState {
             var state = this.database.internalPinStates ().effectiveForPathRecursive (path);
             if (!state) {
@@ -358,7 +358,7 @@ class TestSyncJournalDB : GLib.Object {
                 return PinState.PinState.INHERITED;
             }
             return state;
-        };
+        }
         var getRaw = [&] (GLib.ByteArray path) . PinState {
             var state = this.database.internalPinStates ().rawForPath (path);
             if (!state) {
@@ -366,7 +366,7 @@ class TestSyncJournalDB : GLib.Object {
                 return PinState.PinState.INHERITED;
             }
             return state;
-        };
+        }
 
         this.database.internalPinStates ().wipeForPathAndBelow ("");
         var list = this.database.internalPinStates ().rawList ();

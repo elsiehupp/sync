@@ -134,7 +134,7 @@ signals:
         : QWizard_page ()
         this.progress_indi (new QProgress_indicator (this))
         this.oc_wizard (wizard) {
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
 
         setup_resoultion_widget ();
 
@@ -428,9 +428,9 @@ signals:
         if (use_virtual_file_sync ()) {
             const var availability = Vfs.check_availability (local_folder ());
             if (!availability) {
-                var msg = new QMessageBox (QMessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error (), QMessageBox.Ok, this);
-                msg.set_attribute (Qt.WA_DeleteOnClose);
-                msg.open ();
+                var message = new QMessageBox (QMessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error (), QMessageBox.Ok, this);
+                message.set_attribute (Qt.WA_DeleteOnClose);
+                message.open ();
                 return false;
             }
         }

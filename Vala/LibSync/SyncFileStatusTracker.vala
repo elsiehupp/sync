@@ -26,7 +26,7 @@ class SyncFileStatusTracker : GLib.Object {
             // This will make sure that the std.map is ordered and queried case-insensitively on macOS and Windows.
             return path_compare (lhs, rhs) < 0;
         }
-    };
+    }
 
 
     /***********************************************************

@@ -47,7 +47,7 @@ class FakeFolder {
         FakeQNAM this.qnam;
         void append (string path, int error = 500) { this.qnam.errorPaths ().insert (path, error); }
         void clear () { this.qnam.errorPaths ().clear (); }
-    };
+    }
     public ErrorList serverErrorPaths () { return {this.fakeQnam}; }
     public void setServerOverride (FakeQNAM.Override override) { this.fakeQnam.setOverride (override); }
     public QJsonObject forEachReplyPart (QIODevice outgoingData,

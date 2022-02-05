@@ -160,7 +160,7 @@ signals:
         set_attribute (Qt.WA_DeleteOnClose);
         set_object_name ("Sharing_dialog_uG"); // required as group for save_geometry call
 
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
 
         //Is this a file or folder?
         this.is_file = QFileInfo (local_path).is_file ();

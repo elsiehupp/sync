@@ -11,7 +11,7 @@ class UpdaterScheduler : GLib.Object {
     public UpdaterScheduler (GLib.Object parent);
 
 signals:
-    void updater_announcement (string title, string msg);
+    void updater_announcement (string title, string message);
     void request_restart ();
 
 

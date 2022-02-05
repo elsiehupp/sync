@@ -30,7 +30,7 @@ class OwncloudWizard : QWizard {
     public enum Log_type {
         Log_plain,
         Log_paragraph
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -409,7 +409,7 @@ signals:
             if (next_button) {
                 next_button.set_default (true);
             }
-        };
+        }
 
         if (identifier == WizardCommon.Page_Welcome) {
             // Set next button to just hidden so it retains it's layout
@@ -453,25 +453,25 @@ signals:
         }
     }
 
-    void OwncloudWizard.on_display_error (string msg, bool retry_http_only) {
+    void OwncloudWizard.on_display_error (string message, bool retry_http_only) {
         switch (current_id ()) {
         case WizardCommon.Page_Server_setup:
-            this.setup_page.on_set_error_string (msg, retry_http_only);
+            this.setup_page.on_set_error_string (message, retry_http_only);
             break;
 
         case WizardCommon.Page_Http_creds:
-            this.http_creds_page.on_set_error_string (msg);
+            this.http_creds_page.on_set_error_string (message);
             break;
 
         case WizardCommon.Page_Advanced_setup:
-            this.advanced_setup_page.on_set_error_string (msg);
+            this.advanced_setup_page.on_set_error_string (message);
             break;
         }
     }
 
-    void OwncloudWizard.on_append_to_configuration_log (string msg, Log_type /*type*/) {
-        this.setup_log << msg;
-        GLib.debug (lc_wizard) << "Setup-Log : " << msg;
+    void OwncloudWizard.on_append_to_configuration_log (string message, Log_type /*type*/) {
+        this.setup_log << message;
+        GLib.debug (lc_wizard) << "Setup-Log : " << message;
     }
 
     void OwncloudWizard.set_oCUrl (string url) {

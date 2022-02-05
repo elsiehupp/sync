@@ -47,7 +47,7 @@ class FolderCreationDialog : Gtk.Dialog {
         : Gtk.Dialog (parent)
         , ui (new Ui.FolderCreationDialog)
         this.destination (destination) {
-        ui.setup_ui (this);
+        ui.set_up_ui (this);
 
         ui.label_error_message.set_visible (false);
 

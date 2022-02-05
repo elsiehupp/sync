@@ -276,7 +276,7 @@ class OwncloudPropagator : GLib.Object {
         DiskSpaceOk,
         DiskSpaceFailure,
         DiskSpaceCritical
-    };
+    }
 
 
     /***********************************************************

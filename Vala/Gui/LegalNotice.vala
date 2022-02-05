@@ -39,7 +39,7 @@ class Legal_notice : Gtk.Dialog {
     Legal_notice.Legal_notice (Gtk.Dialog parent)
         : Gtk.Dialog (parent)
         this.ui (new Ui.Legal_notice) {
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
 
         connect (this.ui.close_button, &QPushButton.clicked, this, &Legal_notice.accept);
 

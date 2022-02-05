@@ -53,7 +53,7 @@ static class FileSystem {
             if (buffer1 != buffer2) {
                 return false;
             }
-        };
+        }
         return true;
     }
 

@@ -124,8 +124,8 @@ int main (int argc, char **argv) {
 
         string[] args = app.arguments ();
         if (args.size () > 1) {
-            string msg = args.join (QLatin1String ("|"));
-            if (!app.on_send_message (QLatin1String ("MSG_PARSEOPTIONS:") + msg))
+            string message = args.join (QLatin1String ("|"));
+            if (!app.on_send_message (QLatin1String ("MSG_PARSEOPTIONS:") + message))
                 return -1;
         } else if (!app.background_mode () && !app.on_send_message (QLatin1String ("MSG_SHOWMAINDIALOG"))) {
             return -1;

@@ -67,7 +67,7 @@ class Account : GLib.Object {
     class AbstractSslErrorHandler {
         public virtual ~AbstractSslErrorHandler () = default;
         public virtual bool handle_errors (GLib.List<QSslError>, QSslConfiguration conf, GLib.List<QSslCertificate> *, AccountPointer);
-    };
+    }
 
 
     //  Q_PROPERTY (string identifier MEMBER identifier)
@@ -879,7 +879,7 @@ class Account : GLib.Object {
                     if (!this.push_notifications_reconnect_timer.is_active ()) {
                         this.push_notifications_reconnect_timer.on_start ();
                     }
-                };
+                }
 
                 connect (this.push_notifications, &PushNotifications.connection_lost, this, disable_push_notifications);
                 connect (this.push_notifications, &PushNotifications.authentication_failed, this, disable_push_notifications);

@@ -193,7 +193,7 @@ class ExcludedFiles : GLib.Object {
             : string (other) {
             //  Q_ASSERT (ends_with ('/'));
         }
-    };
+    }
 
 
     /***********************************************************
@@ -840,7 +840,7 @@ string ExcludedFiles.convert_to_regexp_syntax (string exclude, bool wildcards_ma
     var flush = [&] () {
         regex.append (QRegularExpression.escape (exclude.mid (i - chars_to_escape, chars_to_escape)));
         chars_to_escape = 0;
-    };
+    }
     var len = exclude.size ();
     for (; i < len; ++i) {
         switch (exclude[i].unicode ()) {
@@ -931,7 +931,7 @@ string ExcludedFiles.extract_bname_trigger (string exclude, bool wildcards_match
 
     var is_wildcard = [] (char c) {
         return c == '*' || c == '?';
-    };
+    }
 
     // First, skip wildcards on the very right of the pattern
     int i = pattern.size () - 1;
@@ -1010,7 +1010,7 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
             pattern.append ('|');
         }
         pattern.append (append_me);
-    };
+    }
 
     for (var exclude : this.all_excludes.value (base_path)) {
         if (exclude[0] == '\n') {
@@ -1064,7 +1064,7 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
     var empty_match_nothing = [] (string pattern) {
         if (pattern.is_empty ())
             pattern = QStringLiteral ("a^");
-    };
+    }
     empty_match_nothing (full_file_dir_keep);
     empty_match_nothing (full_file_dir_remove);
     empty_match_nothing (full_dir_keep);

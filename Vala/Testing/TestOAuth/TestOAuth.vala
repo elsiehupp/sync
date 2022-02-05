@@ -66,7 +66,7 @@ class TestOAuth : public GLib.Object {
                         GLib.ByteArray ("GET \0\0\0 \n\n\n\n\n\0", 14),
                         GLib.ByteArray ("GET /?code=éléphant\xa5 HTTP\n"),
                         GLib.ByteArray ("\n\n\n\n"),
-                    };
+                    }
                     foreach (var x, payloads) {
                         var socket = new QTcpSocket (this);
                         socket.connectToHost ("localhost", port);

@@ -122,11 +122,11 @@ signals:
         string folder_relative_path;
         // Path of the file on the server (In case of virtual file, it points to the actual file)
         string server_relative_path;
-    };
+    }
 
     /***********************************************************
     ***********************************************************/
-    private void broadcast_message (string msg, bool do_wait = false);
+    private void broadcast_message (string message, bool do_wait = false);
 
     // opens share dialog, sends reply
     private void process_share_request (string local_file, Socket_listener listener, Share_dialog_start_page start_page);
@@ -333,18 +333,18 @@ static inline string remove_trailing_slash (string path) {
 }
 
 static string build_message (string verb, string path, string status = "") {
-    string msg (verb);
+    string message (verb);
 
     if (!status.is_empty ()) {
-        msg.append (':');
-        msg.append (status);
+        message.append (':');
+        message.append (status);
     }
     if (!path.is_empty ()) {
-        msg.append (':');
+        message.append (':');
         QFileInfo fi (path);
-        msg.append (QDir.to_native_separators (fi.absolute_file_path ()));
+        message.append (QDir.to_native_separators (fi.absolute_file_path ()));
     }
-    return msg;
+    return message;
 }
 
 void Socket_listener.on_send_message (string message, bool do_wait) {
@@ -609,9 +609,9 @@ void SocketApi.on_update_folder_view (Folder f) {
     }
 }
 
-void SocketApi.broadcast_message (string msg, bool do_wait) {
+void SocketApi.broadcast_message (string message, bool do_wait) {
     for (var listener : q_as_const (this.listeners)) {
-        listener.on_send_message (msg, do_wait);
+        listener.on_send_message (message, do_wait);
     }
 }
 
@@ -661,11 +661,11 @@ void SocketApi.process_share_request (string local_file, Socket_listener listene
 }
 
 void SocketApi.on_broadcast_status_push_message (string system_path, SyncFileStatus file_status) {
-    string msg = build_message (QLatin1String ("STATUS"), system_path, file_status.to_socket_api_string ());
+    string message = build_message (QLatin1String ("STATUS"), system_path, file_status.to_socket_api_string ());
     //  Q_ASSERT (!system_path.ends_with ('/'));
     uint32 directory_hash = q_hash (system_path.left (system_path.last_index_of ('/')));
     for (var listener : q_as_const (this.listeners)) {
-        listener.send_message_if_directory_monitored (msg, directory_hash);
+        listener.send_message_if_directory_monitored (message, directory_hash);
     }
 }
 
@@ -1222,7 +1222,7 @@ void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener list
             if (lhs == VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED && rhs == VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY)
                 return VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED;
             return VfsItemAvailability.VfsItemAvailability.MIXED;
-        };
+        }
         for (var file : files) {
             var file_data = File_data.get (file);
             var availability = sync_folder.vfs ().availability (file_data.folder_relative_path);
@@ -1251,7 +1251,7 @@ void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener list
             listener.on_send_message (QLatin1String ("MENU_ITEM:MAKE_ONLINE_ONLY:")
                 + (free_space ? QLatin1String (":") : QLatin1String ("d:"))
                 + Utility.vfs_free_space_action_text ());
-        };
+        }
 
         if (combined) {
             switch (*combined) {
@@ -1430,7 +1430,7 @@ void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned<Socket_api_job> job) 
         return;
     }
 
-    var property_name = job.arguments ()[QLatin1String ("property_path")].to_string ();
+    var property_name = job.arguments ()[QLatin1String ("PROPERTY_PATH")].to_string ();
 
     var segments = property_name.split ('.');
 

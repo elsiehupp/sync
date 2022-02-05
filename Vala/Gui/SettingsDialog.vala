@@ -162,7 +162,7 @@ signals:
         this.gui (gui) {
         ConfigFile config;
 
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
         this.tool_bar = new QTool_bar;
         this.tool_bar.set_icon_size (QSize (32, 32));
         this.tool_bar.set_tool_button_style (Qt.Tool_button_text_under_icon);

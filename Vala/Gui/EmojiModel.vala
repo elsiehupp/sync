@@ -759,7 +759,7 @@ signals:
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x92\xbc"), ":briefcase:" }),
-    };
+    }
 
     const QVariantList EmojiModel.nature = {
         GLib.Variant.from_value (Emoji {
@@ -1241,7 +1241,7 @@ signals:
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x8e\x8d"), ":bamboo:" }),
-    };
+    }
 
     const QVariantList EmojiModel.food = {
         GLib.Variant.from_value (Emoji {
@@ -1498,7 +1498,7 @@ signals:
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\xa5\x84"), ":spoon:" }),
-    };
+    }
 
     const QVariantList EmojiModel.activity = {
         GLib.Variant.from_value (Emoji {
@@ -1917,7 +1917,7 @@ signals:
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x8f\xb9"), ":bow_and_arrow:" }),
-    };
+    }
 
     const QVariantList EmojiModel.travel = {
         GLib.Variant.from_value (Emoji {
@@ -2273,7 +2273,7 @@ signals:
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x8f\x81"), ":checkered_flag:" }),
-    };
+    }
 
     const QVariantList EmojiModel.objects = {
         GLib.Variant.from_value (Emoji {
@@ -2815,7 +2815,7 @@ signals:
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x8f\xb3\xf0\x9f\x8c\x88"), ":rainbow_flag:" }),
-    };
+    }
 
     const QVariantList EmojiModel.symbols = {
         GLib.Variant.from_value (Emoji {
@@ -3642,7 +3642,7 @@ signals:
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x94\xb5"), ":blue_circle:" }),
-    };
+    }
 
     const QVariantList EmojiModel.flags = {
         GLib.Variant.from_value (Emoji {
@@ -4415,6 +4415,6 @@ signals:
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x87\xbf\xf0\x9f\x87\xbc"), ":flag_zw:" }),
-    };
+    }
     }
     

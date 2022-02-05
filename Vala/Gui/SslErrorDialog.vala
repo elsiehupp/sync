@@ -97,7 +97,7 @@ class Ssl_error_dialog : Gtk.Dialog {
         this.ui (new Ui.Ssl_error_dialog)
         this.account (account) {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
         set_window_title (_("Untrusted Certificate"));
         QPushButton ok_button =
             this.ui.dialog_button_box.button (QDialogButtonBox.Ok);
@@ -162,45 +162,45 @@ class Ssl_error_dialog : Gtk.Dialog {
             return true;
         }
 
-        string msg = QL ("<html><head>");
-        msg += QL ("<link rel='stylesheet' type='text/css' href='format.css'>");
-        msg += QL ("</head><body>");
+        string message = QL ("<html><head>");
+        message += QL ("<link rel='stylesheet' type='text/css' href='format.css'>");
+        message += QL ("</head><body>");
 
         var host = this.account.url ().host ();
-        msg += QL ("<h3>") + _("Cannot connect securely to <i>%1</i>:").arg (host) + QL ("</h3>");
+        message += QL ("<h3>") + _("Cannot connect securely to <i>%1</i>:").arg (host) + QL ("</h3>");
         // loop over the unknown certificates and line up their errors.
-        msg += QL ("<div identifier=\"ca_errors\">");
+        message += QL ("<div identifier=\"ca_errors\">");
         foreach (QSslCertificate cert, this.unknown_certificates) {
-            msg += QL ("<div identifier=\"ca_error\">");
+            message += QL ("<div identifier=\"ca_error\">");
             // add the errors for this cert
             foreach (QSslError err, errors) {
                 if (err.certificate () == cert) {
-                    msg += QL ("<p>") + err.error_string () + QL ("</p>");
+                    message += QL ("<p>") + err.error_string () + QL ("</p>");
                 }
             }
-            msg += QL ("</div>");
-            msg += cert_div (cert);
+            message += QL ("</div>");
+            message += cert_div (cert);
             if (this.unknown_certificates.count () > 1) {
-                msg += QL ("<hr/>");
+                message += QL ("<hr/>");
             }
         }
 
         if (!additional_error_strings.is_empty ()) {
-            msg += QL ("<h4>") + _("Additional errors:") + QL ("</h4>");
+            message += QL ("<h4>") + _("Additional errors:") + QL ("</h4>");
 
             for (var error_string : additional_error_strings) {
-                msg += QL ("<div identifier=\"ca_error\">");
-                msg += QL ("<p>") + error_string + QL ("</p>");
-                msg += QL ("</div>");
+                message += QL ("<div identifier=\"ca_error\">");
+                message += QL ("<p>") + error_string + QL ("</p>");
+                message += QL ("</div>");
             }
         }
 
-        msg += QL ("</div></body></html>");
+        message += QL ("</div></body></html>");
 
         var doc = new QText_document (null);
         string style = style_sheet ();
         doc.add_resource (QText_document.Style_sheet_resource, GLib.Uri (QL ("format.css")), style);
-        doc.set_html (msg);
+        doc.set_html (message);
 
         this.ui.tb_errors.set_document (doc);
         this.ui.tb_errors.show ();
@@ -209,11 +209,11 @@ class Ssl_error_dialog : Gtk.Dialog {
     }
 
     string Ssl_error_dialog.cert_div (QSslCertificate cert) {
-        string msg;
-        msg += QL ("<div identifier=\"cert\">");
-        msg += QL ("<h3>") + _("with Certificate %1").arg (Utility.escape (cert.subject_info (QSslCertificate.Common_name))) + QL ("</h3>");
+        string message;
+        message += QL ("<div identifier=\"cert\">");
+        message += QL ("<h3>") + _("with Certificate %1").arg (Utility.escape (cert.subject_info (QSslCertificate.Common_name))) + QL ("</h3>");
 
-        msg += QL ("<div identifier=\"ccert\">");
+        message += QL ("<div identifier=\"ccert\">");
         string[] li;
 
         string org = Utility.escape (cert.subject_info (QSslCertificate.Organization));
@@ -228,36 +228,36 @@ class Ssl_error_dialog : Gtk.Dialog {
         li << _("Organization : %1").arg (org);
         li << _("Unit : %1").arg (unit);
         li << _("Country : %1").arg (country);
-        msg += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
+        message += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
 
-        msg += QL ("<p>");
+        message += QL ("<p>");
 
         if (cert.effective_date () < GLib.DateTime (QDate (2016, 1, 1), QTime (), Qt.UTC)) {
         string sha1sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha1).to_hex ());
-            msg += _("Fingerprint (SHA1) : <tt>%1</tt>").arg (sha1sum) + QL ("<br/>");
+            message += _("Fingerprint (SHA1) : <tt>%1</tt>").arg (sha1sum) + QL ("<br/>");
         }
 
         string sha256sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha256).to_hex ());
         string sha512sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha512).to_hex ());
-        msg += _("Fingerprint (SHA-256) : <tt>%1</tt>").arg (sha256sum) + QL ("<br/>");
-        msg += _("Fingerprint (SHA-512) : <tt>%1</tt>").arg (sha512sum) + QL ("<br/>");
-        msg += QL ("<br/>");
-        msg += _("Effective Date : %1").arg (cert.effective_date ().to_string ()) + QL ("<br/>");
-        msg += _("Expiration Date : %1").arg (cert.expiry_date ().to_string ()) + QL ("</p>");
+        message += _("Fingerprint (SHA-256) : <tt>%1</tt>").arg (sha256sum) + QL ("<br/>");
+        message += _("Fingerprint (SHA-512) : <tt>%1</tt>").arg (sha512sum) + QL ("<br/>");
+        message += QL ("<br/>");
+        message += _("Effective Date : %1").arg (cert.effective_date ().to_string ()) + QL ("<br/>");
+        message += _("Expiration Date : %1").arg (cert.expiry_date ().to_string ()) + QL ("</p>");
 
-        msg += QL ("</div>");
+        message += QL ("</div>");
 
-        msg += QL ("<h3>") + _("Issuer : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Common_name))) + QL ("</h3>");
-        msg += QL ("<div identifier=\"issuer\">");
+        message += QL ("<h3>") + _("Issuer : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Common_name))) + QL ("</h3>");
+        message += QL ("<div identifier=\"issuer\">");
         li.clear ();
         li << _("Organization : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organization)));
         li << _("Unit : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organizational_unit_name)));
         li << _("Country : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Country_name)));
-        msg += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
-        msg += QL ("</div>");
-        msg += QL ("</div>");
+        message += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
+        message += QL ("</div>");
+        message += QL ("</div>");
 
-        return msg;
+        return message;
     }
 
     bool Ssl_error_dialog.trust_connection () {

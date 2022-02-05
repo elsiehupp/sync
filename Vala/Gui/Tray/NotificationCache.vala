@@ -10,7 +10,7 @@ class Notification_cache {
     public struct Notification {
         string title;
         string message;
-    };
+    }
 
     /***********************************************************
     ***********************************************************/

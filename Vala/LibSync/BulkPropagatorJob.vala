@@ -44,7 +44,7 @@ class BulkPropagatorJob : PropagatorJob {
         string file; /// I'm still unsure if I should use a SyncFilePtr here.
         string path; /// the full path on disk.
         int64 size;
-    };
+    }
 
     struct BulkUploadItem {
         AccountPointer account;
@@ -54,7 +54,7 @@ class BulkPropagatorJob : PropagatorJob {
         string local_path;
         int64 file_size;
         GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
-    };
+    }
 
 
     /***********************************************************

@@ -97,7 +97,7 @@ class KMessageWidget : QFrame {
         Information,
         Warning,
         Error
-    };
+    }
 
 
     /***********************************************************

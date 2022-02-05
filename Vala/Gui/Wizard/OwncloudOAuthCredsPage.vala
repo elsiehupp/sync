@@ -61,7 +61,7 @@ protected slots:
 
     Owncloud_oauth_creds_page.Owncloud_oauth_creds_page ()
         : Abstract_credentials_wizard_page () {
-        this.ui.setup_ui (this);
+        this.ui.set_up_ui (this);
 
         Theme theme = Theme.instance ();
         this.ui.top_label.hide ();

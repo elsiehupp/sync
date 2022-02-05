@@ -103,9 +103,9 @@ class Folder_wizard_selective_sync : QWizard_page {
         if (use_virtual_files) {
             const var availability = Vfs.check_availability (wizard ().field (QStringLiteral ("source_folder")).to_string ());
             if (!availability) {
-                var msg = new QMessageBox (QMessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error (), QMessageBox.Ok, this);
-                msg.set_attribute (Qt.WA_DeleteOnClose);
-                msg.open ();
+                var message = new QMessageBox (QMessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error (), QMessageBox.Ok, this);
+                message.set_attribute (Qt.WA_DeleteOnClose);
+                message.open ();
                 return false;
             }
         }

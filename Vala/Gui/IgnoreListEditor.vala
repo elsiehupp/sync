@@ -50,7 +50,7 @@ class Ignore_list_editor : Gtk.Dialog {
         : Gtk.Dialog (parent)
         , ui (new Ui.Ignore_list_editor) {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
-        ui.setup_ui (this);
+        ui.set_up_ui (this);
 
         ConfigFile cfg_file;
         //FIXME This is not true. The entries are hardcoded below in setup_table_read_only_items

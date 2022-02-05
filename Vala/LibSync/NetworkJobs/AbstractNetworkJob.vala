@@ -691,12 +691,12 @@ class AbstractNetworkJob : GLib.Object {
     Builds a error message based on the error and the reply body.
     ***********************************************************/
     string error_message (string base_error, GLib.ByteArray body) {
-        string msg = base_error;
+        string message = base_error;
         string extra = extract_error_message (body);
         if (!extra.is_empty ()) {
-            msg += string.from_latin1 (" (%1)").arg (extra);
+            message += string.from_latin1 (" (%1)").arg (extra);
         }
-        return msg;
+        return message;
     }
 
 

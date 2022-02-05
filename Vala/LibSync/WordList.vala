@@ -2074,7 +2074,7 @@ namespace Occ {
             "zero",
             "zone",
             "zoo"
-        };
+        }
 
         string[] random_words;
         while (random_words.size () != nr) {

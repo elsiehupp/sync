@@ -16,7 +16,7 @@ class Result {
     union {
         T this.result;
         Error this.error;
-    };
+    }
     bool this.is_error;
 
     /***********************************************************

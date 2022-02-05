@@ -115,7 +115,7 @@ class TestLocalDiscovery : GLib.Object {
         connect (&fakeFolder.syncEngine (), &SyncEngine.on_finished, tracker, &LocalDiscoveryTracker.slotSyncFinished);
         var trackerContains = [&] (char path) {
             return tracker.localDiscoveryPaths ().find (path) != tracker.localDiscoveryPaths ().end ();
-        };
+        }
 
         tracker.addTouchedPath ("A/spurious");
 

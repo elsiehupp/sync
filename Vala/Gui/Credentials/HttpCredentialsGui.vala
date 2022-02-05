@@ -141,7 +141,7 @@ void HttpCredentialsGui.on_async_auth_result (OAuth.Result r, string user,
 }
 
 void HttpCredentialsGui.on_show_dialog () {
-    string msg = _("Please enter %1 password:<br>"
+    string message = _("Please enter %1 password:<br>"
                      "<br>"
                      "User : %2<br>"
                      "Account : %3<br>")
@@ -151,10 +151,10 @@ void HttpCredentialsGui.on_show_dialog () {
 
     string req_txt = request_app_password_text (this.account);
     if (!req_txt.is_empty ()) {
-        msg += QLatin1String ("<br>") + req_txt + QLatin1String ("<br>");
+        message += QLatin1String ("<br>") + req_txt + QLatin1String ("<br>");
     }
     if (!this.fetch_error_string.is_empty ()) {
-        msg += QLatin1String ("<br>")
+        message += QLatin1String ("<br>")
             + _("Reading from keychain failed with error : \"%1\"")
                   .arg (Utility.escape (this.fetch_error_string))
             + QLatin1String ("<br>");
@@ -163,7 +163,7 @@ void HttpCredentialsGui.on_show_dialog () {
     var dialog = new QInputDialog ();
     dialog.set_attribute (Qt.WA_DeleteOnClose, true);
     dialog.set_window_title (_("Enter Password"));
-    dialog.set_label_text (msg);
+    dialog.set_label_text (message);
     dialog.set_text_value (this.previous_password);
     dialog.set_text_echo_mode (QLineEdit.Password);
     if (var dialog_label = dialog.find_child<QLabel> ()) {

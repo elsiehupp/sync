@@ -131,7 +131,7 @@ namespace {
         string[] this.image_paths;
         QSize this.requested_image_size;
         int this.index = 0;
-    };
+    }
 
 
     QQuick_image_response *Unified_search_result_image_provider.request_image_response (string identifier, QSize requested_size) {
