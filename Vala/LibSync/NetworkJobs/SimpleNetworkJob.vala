@@ -28,9 +28,9 @@ class SimpleNetworkJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public Soup.Reply start_request (GLib.ByteArray verb, GLib.Uri url,
-        Soup.Request req = Soup.Request (),
+        Soup.Request reques = Soup.Request (),
         QIODevice request_body = null) {
-        var reply = send_request (verb, url, req, request_body);
+        var reply = send_request (verb, url, reques, request_body);
         on_signal_start ();
         return reply;
     }

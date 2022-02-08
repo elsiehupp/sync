@@ -14,7 +14,7 @@ class GETEncryptedFileJob : GETFileJob {
 
     /***********************************************************
     ***********************************************************/
-    private unowned<EncryptionHelper.StreamingDecryptor> decryptor;
+    private unowned EncryptionHelper.StreamingDecryptor decryptor;
     private EncryptedFile encrypted_file_info = {};
     private GLib.ByteArray pending_bytes;
     private int64 processed_so_far = 0;
@@ -54,7 +54,7 @@ class GETEncryptedFileJob : GETFileJob {
             return -1;
         }
 
-        const var bytes_remaining = this.content_length - this.processed_so_far - data.length ();
+        var bytes_remaining = this.content_length - this.processed_so_far - data.length ();
 
         if (bytes_remaining != 0 && bytes_remaining < Occ.Constants.E2EE_TAG_SIZE) {
             // decryption is going to fail if last chunk does not include or does not equal to Occ.Constants.E2EE_TAG_SIZE bytes tag
@@ -69,10 +69,10 @@ class GETEncryptedFileJob : GETFileJob {
         }
 
         if (!this.pending_bytes.is_empty ()) {
-            const var decrypted_chunk = this.decryptor.chunk_decryption (this.pending_bytes.const_data (), this.pending_bytes.size ());
+            var decrypted_chunk = this.decryptor.chunk_decryption (this.pending_bytes.const_data (), this.pending_bytes.size ());
 
             if (decrypted_chunk.is_empty ()) {
-                GLib.critical ("Decryption failed!";
+                GLib.critical ("Decryption failed!");
                 return -1;
             }
 
@@ -81,10 +81,10 @@ class GETEncryptedFileJob : GETFileJob {
             return data.length ();
         }
 
-        const var decrypted_chunk = this.decryptor.chunk_decryption (data.const_data (), data.length ());
+        var decrypted_chunk = this.decryptor.chunk_decryption (data.const_data (), data.length ());
 
         if (decrypted_chunk.is_empty ()) {
-            GLib.critical ("Decryption failed!";
+            GLib.critical ("Decryption failed!");
             return -1;
         }
 

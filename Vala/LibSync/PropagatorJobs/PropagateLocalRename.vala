@@ -68,14 +68,14 @@ class PropagateLocalRename : PropagateItemJob {
             GLib.warn ("Could not set pin state of" + this.item.original_file + "to inherited";
         }
 
-        const var old_file = this.item.file;
+        var old_file = this.item.file;
 
         if (!this.item.is_directory ()) { // Directories are saved at the end
             SyncFileItem new_item (*this.item);
             if (old_record.is_valid ()) {
                 new_item.checksum_header = old_record.checksum_header;
             }
-            const var result = propagator ().update_metadata (new_item);
+            var result = propagator ().update_metadata (new_item);
             if (!result) {
                 on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
                 return;

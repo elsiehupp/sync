@@ -105,7 +105,7 @@ class ProgressDispatcher : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static bool should_count_progress (SyncFileItem item) {
-        const var instruction = item.instruction;
+        var instruction = item.instruction;
 
         // Skip any ignored, error or non-propagated files and directories.
         if (instruction == CSYNC_INSTRUCTION_NONE

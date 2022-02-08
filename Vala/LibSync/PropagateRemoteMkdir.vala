@@ -26,9 +26,9 @@ class PropagateRemoteMkdir : PropagateItemJob {
         base (propagator, item);
         this.delete_existing = false;
         this.upload_encrypted_helper = null;
-        const var path = this.item.file;
-        const var slash_position = path.last_index_of ('/');
-        const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+        var path = this.item.file;
+        var slash_position = path.last_index_of ('/');
+        var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
         SyncJournalFileRecord parent_rec;
         bool ok = propagator.journal.get_file_record (parent_path, parent_rec);
@@ -44,7 +44,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         if (propagator ().abort_requested)
             return;
 
-        GLib.debug () + this.item.file;
+        GLib.debug (this.item.file;
 
         propagator ().active_job_list.append (this);
 
@@ -95,9 +95,9 @@ class PropagateRemoteMkdir : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_mkdir () {
-        const var path = this.item.file;
-        const var slash_position = path.last_index_of ('/');
-        const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+        var path = this.item.file;
+        var slash_position = path.last_index_of ('/');
+        var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
         SyncJournalFileRecord parent_rec;
         bool ok = propagator ().journal.get_file_record (parent_path, parent_rec);
@@ -112,7 +112,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         }
 
         // We should be encrypted as well since our parent is
-        const var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
+        var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
         this.upload_encrypted_helper = new PropagateUploadEncrypted (propagator (), remote_parent_path, this.item, this);
         connect (this.upload_encrypted_helper, &PropagateUploadEncrypted.finalized,
             this, &PropagateRemoteMkdir.on_signal_start_encrypted_mkcol_job);
@@ -130,7 +130,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         if (propagator ().abort_requested)
             return;
 
-        GLib.debug () + this.item.file;
+        GLib.debug (this.item.file;
 
         this.job = new MkColJob (propagator ().account (),
             propagator ().full_remote_path (this.item.file),
@@ -150,8 +150,8 @@ class PropagateRemoteMkdir : PropagateItemJob {
         if (propagator ().abort_requested)
             return;
 
-        GLib.debug () + filename;
-        GLib.debug () + filename;
+        GLib.debug (filename;
+        GLib.debug (filename;
 
         var job = new MkColJob (propagator ().account (),
                                 propagator ().full_remote_path (filename), {{"e2e-token", this.upload_encrypted_helper.folder_token () }},
@@ -179,9 +179,9 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
         this.item.error_string = this.job.error_string ();
 
-        const var job_http_reason_phrase_string = this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();
+        var job_http_reason_phrase_string = this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();
 
-        const var job_path = this.job.path ();
+        var job_path = this.job.path ();
 
         if (this.upload_encrypted_helper && this.upload_encrypted_helper.is_folder_locked () && !this.upload_encrypted_helper.is_unlock_running ()) {
             // since we are done, we need to unlock a folder in case it was locked
@@ -214,7 +214,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         item_copy.etag.clear ();
 
         // save the file identifier already so we can detect rename or remove
-        const var result = propagator ().update_metadata (item_copy);
+        var result = propagator ().update_metadata (item_copy);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database : %1").arg (result.error ()));
             return;

@@ -47,7 +47,7 @@ class Job : GLib.Object {
         this.service_name = Theme.instance ().app_name ();
     }
 
-    ~Job () override {
+    ~Job () {
         this.chunk_count = 0;
         this.chunk_buffer.clear ();
     }

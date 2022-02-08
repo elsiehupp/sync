@@ -59,7 +59,7 @@ void PropagateUploadFileNG.do_start_upload () {
     const SyncJournalDb.UploadInfo progress_info = propagator ().journal.get_upload_info (this.item.file);
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
     }
     if (progress_info.valid && progress_info.is_chunked () && progress_info.modtime == this.item.modtime
             && progress_info.size == this.item.size) {
@@ -136,14 +136,14 @@ void PropagateUploadFileNG.on_signal_propfind_finished () {
     GLib.info ("Resuming " + this.item.file + " from chunk " + this.current_chunk + "; sent =" + this.sent;
 
     if (!this.server_chunks.is_empty ()) {
-        GLib.info ("To Delete" + this.server_chunks.keys ();
+        GLib.info ("To Delete" + this.server_chunks.keys ());
         propagator ().active_job_list.append (this);
         this.remove_job_error = false;
 
         // Make sure that if there is a "hole" and then a few more chunks, on the server
         // we should remove the later chunks. Otherwise when we do dynamic chunk sizing, we may end up
         // with corruptions if there are too many chunks, or if we on_signal_abort and there are still stale chunks.
-        for (var server_chunk : q_as_const (this.server_chunks)) {
+        foreach (var server_chunk in q_as_const (this.server_chunks)) {
             var job = new DeleteJob (propagator ().account (), Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
             GLib.Object.connect (job, &DeleteJob.finished_signal, this, &PropagateUploadFileNG.on_signal_delete_job_finished);
             this.jobs.append (job);
@@ -206,7 +206,7 @@ void PropagateUploadFileNG.start_new_upload () {
     //  ASSERT (propagator ().active_job_list.count (this) == 1);
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
     }
     this.transfer_id = uint32 (Utility.rand () ^ uint32 (this.item.modtime) ^ (uint32 (this.file_to_upload.size) << 16) ^ q_hash (this.file_to_upload.file));
     this.sent = 0;
@@ -219,7 +219,7 @@ void PropagateUploadFileNG.start_new_upload () {
     pi.transferid = this.transfer_id;
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
     }
     pi.modtime = this.item.modtime;
     pi.content_checksum = this.item.checksum_header;
@@ -405,7 +405,7 @@ void PropagateUploadFileNG.on_signal_put_finished () {
     // Check whether the file changed since discovery - this acts on the original file.
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
     }
     if (!FileSystem.verify_file_unchanged (full_file_path, this.item.size, this.item.modtime)) {
         propagator ().another_sync_needed = true;

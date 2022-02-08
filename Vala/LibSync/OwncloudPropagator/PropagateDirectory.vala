@@ -95,7 +95,7 @@ class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort (PropagatorJob.AbortType abort_type) override {
+    public void on_signal_abort (PropagatorJob.AbortType abort_type) {
         if (this.first_job)
             // Force first job to on_signal_abort synchronously
             // even if caller allows async on_signal_abort (async_abort)
@@ -117,7 +117,7 @@ class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public int64 committed_disk_space () override {
+    public int64 committed_disk_space () {
         return this.sub_jobs.committed_disk_space ();
     }
 
@@ -174,7 +174,7 @@ class PropagateDirectory : PropagatorJob {
             if (this.item.instruction == CSYNC_INSTRUCTION_RENAME
                 || this.item.instruction == CSYNC_INSTRUCTION_NEW
                 || this.item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA) {
-                const var result = propagator ().update_metadata (*this.item);
+                var result = propagator ().update_metadata (*this.item);
                 if (!result) {
                     status = this.item.status = SyncFileItem.Status.FATAL_ERROR;
                     this.item.error_string = _("Error updating metadata : %1").arg (result.error ());

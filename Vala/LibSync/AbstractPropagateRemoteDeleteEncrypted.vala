@@ -192,7 +192,7 @@ class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
             return;
         }
 
-        const var err = delete_job.reply ().error ();
+        var err = delete_job.reply ().error ();
 
         this.item.http_error_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.response_time_stamp = delete_job.response_timestamp ();

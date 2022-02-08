@@ -31,7 +31,7 @@ class UserStatusConnector : GLib.Object {
     ***********************************************************/
     public UserStatusConnector (GLib.Object parent = new GLib.Object ());
 
-    ~UserStatusConnector () override;
+    ~UserStatusConnector ();
 
     /***********************************************************
     ***********************************************************/

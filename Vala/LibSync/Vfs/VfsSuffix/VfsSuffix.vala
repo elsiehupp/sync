@@ -13,126 +13,69 @@ class Vfs_suffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public Vfs_suffix (GLib.Object parent = new GLib.Object ());
+    public Vfs_suffix (GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    public Vfs.Mode mode () {
+        return WithSuffix;
+    }
 
     /***********************************************************
     ***********************************************************/
-    public string file_suffix () override;
+    public string file_suffix () {
+        return QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
+    }
 
     /***********************************************************
     ***********************************************************/
-    public void stop () override;
-    public void unregister_folder () override;
+    public void stop () {
+        return;
+    }
 
-    public bool socket_api_pin_state_actions_shown () override {
+
+    /***********************************************************
+    ***********************************************************/
+    public void unregister_folder () {
+        return;
+    }
+
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool socket_api_pin_state_actions_shown () {
         return true;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool is_hydrating () override;
-
-    /***********************************************************
-    ***********************************************************/
-    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_identifier) override;
-
-    /***********************************************************
-    ***********************************************************/
-    public Result<void, string> create_placeholder (SyncFileItem item) override;
-    public Result<void, string> dehydrate_placeholder (SyncFileItem item) override;
-    public Result<Vfs.ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem item, string ) override;
-
-    /***********************************************************
-    ***********************************************************/
-    public bool needs_metadata_update (SyncFileItem &) override {
+    public bool is_hydrating () {
         return false;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool is_dehydrated_placeholder (string file_path) override;
-
-    /***********************************************************
-    ***********************************************************/
-    public bool pin_state (string folder_path, PinState state) override {
-        return pin_state_in_database (folder_path, state);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public Optional<PinState> pin_state (string folder_path) override {
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public AvailabilityResult availability (string folder_path) override;
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_signal_file_status_changed (string , SyncFileStatus) override {}
-
-    protected void start_impl (VfsSetupParams parameters) override;
-}
-
-
-    Vfs_suffix.Vfs_suffix (GLib.Object parent)
-        : Vfs (parent) {
-    }
-
-    Vfs_suffix.~Vfs_suffix () = default;
-
-    Vfs.Mode Vfs_suffix.mode () {
-        return WithSuffix;
-    }
-
-    string Vfs_suffix.file_suffix () {
-        return QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
-    }
-
-    void Vfs_suffix.start_impl (VfsSetupParams parameters) {
-        // It is unsafe for the database to contain any ".owncloud" file entries
-        // that are not marked as a virtual file. These could be real .owncloud
-        // files that were synced before vfs was enabled.
-        QByte_array_list to_wipe;
-        parameters.journal.get_files_below_path ("", [&to_wipe] (SyncJournalFileRecord record) {
-            if (!record.is_virtual_file () && record.path.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX))
-                to_wipe.append (record.path);
-        });
-        for (var path : to_wipe)
-            parameters.journal.delete_file_record (path);
-    }
-
-    void Vfs_suffix.stop () {
-    }
-
-    void Vfs_suffix.unregister_folder () {
-    }
-
-    bool Vfs_suffix.is_hydrating () {
-        return false;
-    }
-
-    Result<void, string> Vfs_suffix.update_metadata (string file_path, time_t modtime, int64, GLib.ByteArray ) {
+    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_identifier) {
         if (modtime <= 0) {
-            return {_("Error updating metadata due to invalid modified time")};
+            return new Result<void, string>.from_error(_("Error updating metadata due to invalid modified time"));
         }
 
         FileSystem.mod_time (file_path, modtime);
-        return {};
+        return new Result<void, string> ();
     }
 
-    Result<void, string> Vfs_suffix.create_placeholder (SyncFileItem item) {
+
+    /***********************************************************
+    ***********************************************************/
+    public Result<void, string> create_placeholder (SyncFileItem item) {
         if (item.modtime <= 0) {
-            return {_("Error updating metadata due to invalid modified time")};
+            return new Result<void, string>.from_error(_("Error updating metadata due to invalid modified time"));
         }
 
         // The concrete shape of the placeholder is also used in is_dehydrated_placeholder () below
@@ -157,7 +100,10 @@ class Vfs_suffix : Vfs {
         return {};
     }
 
-    Result<void, string> Vfs_suffix.dehydrate_placeholder (SyncFileItem item) {
+
+    /***********************************************************
+    ***********************************************************/
+    public Result<void, string> dehydrate_placeholder (SyncFileItem item) {
         SyncFileItem virtual_item (item);
         virtual_item.file = item.rename_target;
         var r = create_placeholder (virtual_item);
@@ -182,19 +128,34 @@ class Vfs_suffix : Vfs {
         return {};
     }
 
-    Result<Vfs.ConvertToPlaceholderResult, string> Vfs_suffix.convert_to_placeholder (string , SyncFileItem &, string ) {
+
+    /***********************************************************
+    ***********************************************************/
+    public Result<Vfs.ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem item, string value) {
         // Nothing necessary
         return Vfs.ConvertToPlaceholderResult.Ok;
     }
 
-    bool Vfs_suffix.is_dehydrated_placeholder (string file_path) {
-        if (!file_path.ends_with (file_suffix ()))
-            return false;
-        QFileInfo fi (file_path);
-        return fi.exists () && fi.size () == 1;
+    /***********************************************************
+    ***********************************************************/
+    public bool needs_metadata_update (SyncFileItem item) {
+        return false;
     }
 
-    bool Vfs_suffix.stat_type_virtual_file (csync_file_stat_t stat, void *) {
+
+    /***********************************************************
+    ***********************************************************/
+    public bool is_dehydrated_placeholder (string file_path) {
+        if (!file_path.ends_with (file_suffix ()))
+            return false;
+        QFileInfo file_info = new QFileInfo (file_path);
+        return file_info.exists () && file_info.size () == 1;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool stat_type_virtual_file (csync_file_stat_t stat, void stat_data) {
         if (stat.path.ends_with (file_suffix ().to_utf8 ())) {
             stat.type = ItemTypeVirtualFile;
             return true;
@@ -202,9 +163,50 @@ class Vfs_suffix : Vfs {
         return false;
     }
 
-    Vfs.AvailabilityResult Vfs_suffix.availability (string folder_path) {
+
+    /***********************************************************
+    ***********************************************************/
+    //  public bool pin_state (string folder_path, PinState state) {
+    //      return pin_state_in_database (folder_path, state);
+    //  }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public Optional<PinState> pin_state (string folder_path) {
+        return new Optional<PinState> (null);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public AvailabilityResult availability (string folder_path) {
         return availability_in_database (folder_path);
     }
 
-    } // namespace Occ
-    
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_file_status_changed ((string system_filename, SyncFileStatus file_status) {
+        return;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    protected void start_impl (VfsSetupParams parameters) {
+        // It is unsafe for the database to contain any ".owncloud" file entries
+        // that are not marked as a virtual file. These could be real .owncloud
+        // files that were synced before vfs was enabled.
+        QByte_array_list to_wipe;
+        parameters.journal.get_files_below_path ("", [&to_wipe] (SyncJournalFileRecord record) {
+            if (!record.is_virtual_file () && record.path.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX))
+                to_wipe.append (record.path);
+        });
+        foreach (var path in to_wipe)
+            parameters.journal.delete_file_record (path);
+    }
+
+} // class Vfs_suffix
+
+} // namespace Occ

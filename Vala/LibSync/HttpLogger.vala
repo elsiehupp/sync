@@ -19,14 +19,14 @@ static class HttpLogger {
     const string X_REQUEST_ID = "X-Request-ID";
 
     static void log_request (Soup.Reply reply, QNetworkAccessManager.Operation operation, QIODevice device) {
-        const var request = reply.request ();
+        var request = reply.request ();
         if (!lc_network_http ().is_info_enabled ()) {
             return;
         }
-        const var keys = request.raw_header_list ();
+        var keys = request.raw_header_list ();
         GLib.List<Soup.Reply.RawHeaderPair> header;
         header.reserve (keys.size ());
-        for (var key : keys) {
+        foreach (var key in keys) {
             header + q_make_pair (key, request.raw_header (key));
         }
         log_http (request_verb (operation, request),
@@ -78,26 +78,26 @@ static class HttpLogger {
 
 
     static void log_http (GLib.ByteArray verb, string url, GLib.ByteArray identifier, string content_type, GLib.List<Soup.Reply.RawHeaderPair> header, QIODevice device) {
-        const var reply = qobject_cast<Soup.Reply> (device);
-        const var content_length = device ? device.size () : 0;
+        var reply = qobject_cast<Soup.Reply> (device);
+        var content_length = device ? device.size () : 0;
         string message;
-        QTextStream stream (&message);
-        stream + identifier + " : ";
+        QTextStream stream = new QTextStream (&message);
+        stream += identifier + " : ";
         if (!reply) {
-            stream + "Request : ";
+            stream += "Request : ";
         } else {
-            stream + "Response : ";
+            stream += "Response : ";
         }
-        stream + verb;
+        stream += verb;
         if (reply) {
-            stream + " " + reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+            stream += " " + reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         }
-        stream + " " + url + " Header: { ";
-        for (var it : header) {
+        stream += " " + url + " Header: { ";
+        foreach (var it  header) {
             stream + it.first + " : ";
             if (it.first == "Authorization") {
-                stream + (it.second.starts_with ("Bearer ") ? "Bearer" : "Basic");
-                stream + " [redacted]";
+                stream += (it.second.starts_with ("Bearer ") ? "Bearer" : "Basic");
+                stream += " [redacted]";
             } else {
                 stream + it.second;
             }

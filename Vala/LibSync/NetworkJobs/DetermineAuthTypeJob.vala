@@ -70,19 +70,19 @@ class DetermineAuthTypeJob : GLib.Object {
     public void on_signal_start () {
         GLib.info ("Determining auth type for" + this.account.dav_url ();
 
-        Soup.Request req;
+        Soup.Request reques;
         // Prevent HttpCredentialsAccessManager from setting an Authorization header.
-        req.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
+        reques.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
         // Don't reuse previous auth credentials
-        req.attribute (Soup.Request.AuthenticationReuseAttribute, Soup.Request.Manual);
+        reques.attribute (Soup.Request.AuthenticationReuseAttribute, Soup.Request.Manual);
 
         // Start three parallel requests
 
         // 1. determines whether it's a basic auth server
-        var get = this.account.send_request ("GET", this.account.url (), req);
+        var get = this.account.send_request ("GET", this.account.url (), reques);
 
         // 2. checks the HTTP auth method.
-        var propfind = this.account.send_request ("PROPFIND", this.account.dav_url (), req);
+        var propfind = this.account.send_request ("PROPFIND", this.account.dav_url (), reques);
 
         // 3. Determines if the old flow has to be used (GS for now)
         var old_flow_required = new JsonApiJob (this.account, "/ocs/v2.php/cloud/capabilities", this);
@@ -95,8 +95,8 @@ class DetermineAuthTypeJob : GLib.Object {
         old_flow_required.ignore_credential_failure (true);
 
         connect (get, &SimpleNetworkJob.finished_signal, this, [this, get] () {
-            const var reply = get.reply ();
-            const var www_authenticate_header = reply.raw_header ("WWW-Authenticate");
+            var reply = get.reply ();
+            var www_authenticate_header = reply.raw_header ("WWW-Authenticate");
             if (reply.error () == Soup.Reply.AuthenticationRequiredError
                 && (www_authenticate_header.starts_with ("Basic") || www_authenticate_header.starts_with ("Bearer"))) {
                 this.result_get = Basic;
@@ -131,11 +131,11 @@ class DetermineAuthTypeJob : GLib.Object {
                     var flow = gs.to_object ().value ("desktoplogin");
                     if (flow != QJsonValue.Undefined) {
                         if (flow.to_int () == 1) {
-    #ifdef WITH_WEBENGINE
+    // #ifdef WITH_WEBENGINE
                             this.result_old_flow = WEB_VIEW_FLOW;
-    #else // WITH_WEBENGINE
+    // #else // WITH_WEBENGINE
                             GLib.warn ("Server does only support flow1, but this client was compiled without support for flow1";
-    #endif // WITH_WEBENGINE
+    // #endif // WITH_WEBENGINE
                         }
                     }
                 }
@@ -164,24 +164,24 @@ class DetermineAuthTypeJob : GLib.Object {
 
         var result = this.result_propfind;
 
-    #ifdef WITH_WEBENGINE
+    // #ifdef WITH_WEBENGINE
         // WEB_VIEW_FLOW > OAuth > Basic
         if (this.account.server_version_int () >= Account.make_server_version (12, 0, 0)) {
             result = WEB_VIEW_FLOW;
         }
-    #endif // WITH_WEBENGINE
+    // #endif // WITH_WEBENGINE
 
         // LoginFlowV2 > WEB_VIEW_FLOW > OAuth > Basic
         if (this.account.server_version_int () >= Account.make_server_version (16, 0, 0)) {
             result = LoginFlowV2;
         }
 
-    #ifdef WITH_WEBENGINE
+    // #ifdef WITH_WEBENGINE
         // If we determined that we need the webview flow (GS for example) then we switch to that
         if (this.result_old_flow == WEB_VIEW_FLOW) {
             result = WEB_VIEW_FLOW;
         }
-    #endif // WITH_WEBENGINE
+    // #endif // WITH_WEBENGINE
 
         // If we determined that a simple get gave us an authentication required error
         // then the server enforces basic auth and we got no choice but to use this

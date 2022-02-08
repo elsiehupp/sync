@@ -46,15 +46,15 @@ class MoveJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request req;
-        req.raw_header ("Destination", GLib.Uri.to_percent_encoding (this.destination, "/"));
+        Soup.Request reques;
+        reques.raw_header ("Destination", GLib.Uri.to_percent_encoding (this.destination, "/"));
         for (var it = this.extra_headers.const_begin (); it != this.extra_headers.const_end (); ++it) {
-            req.raw_header (it.key (), it.value ());
+            reques.raw_header (it.key (), it.value ());
         }
         if (this.url.is_valid ()) {
-            send_request ("MOVE", this.url, req);
+            send_request ("MOVE", this.url, reques);
         } else {
-            send_request ("MOVE", make_dav_url (path ()), req);
+            send_request ("MOVE", make_dav_url (path ()), reques);
         }
 
         if (reply ().error () != Soup.Reply.NoError) {

@@ -69,7 +69,7 @@ set(libsync_SRCS
 )
 
 if (WIN32)
-    # to fix warnings from ntstatus.h
+    // # to fix warnings from ntstatus.h
     add_definitions(-DUMDF_USING_NTSTATUS)
 endif()
 

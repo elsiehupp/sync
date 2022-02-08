@@ -467,7 +467,7 @@ class DiscoveryPhase : GLib.Object {
             if (property == QLatin1String ("resourcetype")) {
                 result.is_directory = value.contains (QLatin1String ("collection"));
             } else if (property == QLatin1String ("getlastmodified")) {
-                const var date = GLib.DateTime.from_string (value, Qt.RFC2822Date);
+                var date = GLib.DateTime.from_string (value, Qt.RFC2822Date);
                 //  Q_ASSERT (date.is_valid ());
                 result.modtime = date.to_time_t ();
             } else if (property == QLatin1String ("getcontentlength")) {

@@ -38,7 +38,7 @@ namespace {
     has passed, we should accept the file for upload here.
     ***********************************************************/
     inline bool file_is_still_changing (Occ.SyncFileItem item) {
-        const var modtime = Occ.Utility.q_date_time_from_time_t (item.modtime);
+        var modtime = Occ.Utility.q_date_time_from_time_t (item.modtime);
         const int64 ms_since_mod = modtime.msecs_to (GLib.DateTime.current_date_time_utc ());
 
         return std.chrono.milliseconds (ms_since_mod) < Occ.SyncEngine.minimum_file_age_for_upload
@@ -92,7 +92,7 @@ class OwncloudPropagator : GLib.Object {
         q_register_meta_type<PropagatorJob.AbortType> ("PropagatorJob.AbortType");
     }
 
-    ~OwncloudPropagator () override;
+    ~OwncloudPropagator ();
 
     /***********************************************************
     ***********************************************************/
@@ -698,10 +698,10 @@ signals:
         // In order to do that we loop over the items. (which are sorted by destination)
         // When we enter a directory, we can create the directory job and push it on the stack.
 
-        const var regex = sync_options ().file_regex ();
+        var regex = sync_options ().file_regex ();
         if (regex.is_valid ()) {
             GLib.Set<QStringRef> names;
-            for (var i : items) {
+            foreach (var i in items) {
                 if (regex.match (i.file).has_match ()) {
                     int index = -1;
                     QStringRef ref;
@@ -727,12 +727,12 @@ signals:
         GLib.Vector<PropagatorJob> directories_to_remove;
         string removed_directory;
         string maybe_conflict_directory;
-        foreach (SyncFileItemPtr item, items) {
+        foreach (SyncFileItemPtr item in items) {
             if (!removed_directory.is_empty () && item.file.starts_with (removed_directory)) {
                 // this is an item in a directory which is going to be removed.
                 var del_dir_job = qobject_cast<PropagateDirectory> (directories_to_remove.first ());
 
-                const var is_new_directory = item.is_directory () &&
+                var is_new_directory = item.is_directory () &&
                         (item.instruction == CSYNC_INSTRUCTION_NEW || item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE);
 
                 if (item.instruction == CSYNC_INSTRUCTION_REMOVE || is_new_directory) {
@@ -790,7 +790,7 @@ signals:
             }
         }
 
-        foreach (PropagatorJob it, directories_to_remove) {
+        foreach (PropagatorJob it in directories_to_remove) {
             this.root_job.dir_deletion_jobs.append_job (it);
         }
 
@@ -814,7 +814,7 @@ signals:
             // check_for_permissions () has already run and used the permissions
             // of the file we're about to delete to decide whether uploading
             // to the new dir is ok...
-            foreach (SyncFileItemPtr dir_item, items) {
+            foreach (SyncFileItemPtr dir_item in items) {
                 if (dir_item.destination ().starts_with (item.destination () + "/")) {
                     dir_item.instruction = CSYNC_INSTRUCTION_NONE;
                     this.another_sync_needed = true;
@@ -838,7 +838,7 @@ signals:
                 }
             }
         } else {
-            const var current_dir_job = directories.top ().second;
+            var current_dir_job = directories.top ().second;
             current_dir_job.append_job (directory_propagation_job.get ());
         }
         directories.push (q_make_pair (item.destination () + "/", directory_propagation_job.release ()));
@@ -884,7 +884,7 @@ signals:
             GLib.debug ("CaseClashCheck for " + file;
             // On Linux, the file system is case sensitive, but this code is useful for testing.
             // Just check that there is no other file with the same name and different casing.
-            QFileInfo file_info (file);
+            QFileInfo file_info = new QFileInfo (file);
             const string fn = file_info.filename ();
             const string[] list = file_info.dir ().entry_list ({
                 fn
@@ -1055,14 +1055,14 @@ signals:
     Result<Vfs.ConvertToPlaceholderResult, string> OwncloudPropagator.static_update_metadata (SyncFileItem item, string local_dir,
                                                                                               Vfs vfs, SyncJournalDb const journal) {
         const string fs_path = local_dir + item.destination ();
-        const var result = vfs.convert_to_placeholder (fs_path, item);
+        var result = vfs.convert_to_placeholder (fs_path, item);
         if (!result) {
             return result.error ();
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
             return Vfs.ConvertToPlaceholderResult.Locked;
         }
         var record = item.to_sync_journal_file_record_with_inode (fs_path);
-        const var d_bresult = journal.file_record (record);
+        var d_bresult = journal.file_record (record);
         if (!d_bresult) {
             return d_bresult.error ();
         }

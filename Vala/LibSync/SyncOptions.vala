@@ -42,7 +42,7 @@ class SyncOptions {
     Create a virtual file for new files instead of downloading.
     May not be null
     ***********************************************************/
-    public unowned<Vfs> vfs;
+    public unowned Vfs vfs;
 
 
     /***********************************************************

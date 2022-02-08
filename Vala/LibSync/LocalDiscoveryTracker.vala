@@ -86,7 +86,7 @@ class LocalDiscoveryTracker : GLib.Object {
     public void start_sync_partial_discovery () {
         if ().is_debug_enabled ()) {
             string[] paths;
-            for (var path : this.local_discovery_paths)
+            foreach (var path in this.local_discovery_paths)
                 paths.append (path);
             GLib.debug ("partial discovery with paths : " + paths;
         }

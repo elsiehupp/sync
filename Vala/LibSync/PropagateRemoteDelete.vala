@@ -27,7 +27,7 @@ class PropagateRemoteDelete : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        GLib.info ("Start propagate remote delete job for" + this.item.file;
+        GLib.info ("Start propagate remote delete job for" + this.item.file);
 
         if (propagator ().abort_requested)
             return;
@@ -59,7 +59,7 @@ class PropagateRemoteDelete : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public void create_delete_job (string filename) {
-        GLib.info ("Deleting file, local" + this.item.file + "remote" + filename;
+        GLib.info ("Deleting file, local" + this.item.file + "remote" + filename);
 
         this.job = new DeleteJob (propagator ().account (),
             propagator ().full_remote_path (filename),

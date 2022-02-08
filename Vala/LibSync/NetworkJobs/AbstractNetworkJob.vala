@@ -344,8 +344,8 @@ class AbstractNetworkJob : GLib.Object {
     ***********************************************************/
     public void retry () {
         ENFORCE (this.reply);
-        var req = this.reply.request ();
-        GLib.Uri requested_url = req.url ();
+        var reques = this.reply.request ();
+        GLib.Uri requested_url = reques.url ();
         GLib.ByteArray verb = HttpLogger.request_verb (*this.reply);
         GLib.info ("Restarting" + verb + requested_url;
         on_signal_reset_timeout ();
@@ -353,8 +353,8 @@ class AbstractNetworkJob : GLib.Object {
             this.request_body.seek (0);
         }
         // The cookie will be added automatically, we don't want AccessManager.create_request to duplicate them
-        req.raw_header ("cookie", GLib.ByteArray ());
-        send_request (verb, requested_url, req, this.request_body);
+        reques.raw_header ("cookie", GLib.ByteArray ());
+        send_request (verb, requested_url, reques, this.request_body);
     }
 
 
@@ -384,9 +384,9 @@ class AbstractNetworkJob : GLib.Object {
     protected Soup.Reply send_request (
         GLib.ByteArray verb,
         GLib.Uri url,
-        Soup.Request req = Soup.Request (),
+        Soup.Request reques = Soup.Request (),
         QIODevice request_body = null) {
-        var reply = this.account.send_raw_request (verb, url, req, request_body);
+        var reply = this.account.send_raw_request (verb, url, reques, request_body);
         this.request_body = null;
         adopt_request (reply);
         return reply;
@@ -396,9 +396,9 @@ class AbstractNetworkJob : GLib.Object {
     protected Soup.Reply send_request (
         GLib.ByteArray verb,
         GLib.Uri url,
-        Soup.Request req,
+        Soup.Request reques,
         QHttpMultiPart request_body) {
-        var reply = this.account.send_raw_request (verb, url, req, request_body);
+        var reply = this.account.send_raw_request (verb, url, reques, request_body);
         this.request_body = null;
         adopt_request (reply);
         return reply;
@@ -413,9 +413,9 @@ class AbstractNetworkJob : GLib.Object {
     protected Soup.Reply send_request (
         GLib.ByteArray verb,
         string relative_path,
-        Soup.Request req = Soup.Request (),
+        Soup.Request reques = Soup.Request (),
         QIODevice request_body = null) {
-        var reply = this.account.send_raw_request (verb, url, req, request_body);
+        var reply = this.account.send_raw_request (verb, url, reques, request_body);
         this.request_body = request_body;
         if (this.request_body) {
             this.request_body.parent (reply);
@@ -529,7 +529,7 @@ class AbstractNetworkJob : GLib.Object {
             GLib.warn ("SslHandshakeFailedError : " + error_string (" : can be caused by a webserver wanting SSL client certificates";
         }
         // Qt doesn't yet transparently resend HTTP2 requests, do so here
-        const var max_http2Resends = 3;
+        var max_http2Resends = 3;
         GLib.ByteArray verb = HttpLogger.request_verb (*reply ());
         if (this.reply.error () == Soup.Reply.ContentReSendError
             && this.reply.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()) {

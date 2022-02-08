@@ -180,7 +180,7 @@ class ClientSideEncryption : GLib.Object {
         int ret = 0;
         int n_version = 1;
 
-        // 2. set version of x509 req
+        // 2. set version of x509 reques
         X509_REQ *x509_req = X509_REQ_new ();
         var release_on_signal_exit_x509_req = q_scope_guard ([&] {
                     X509_REQ_free (x509_req);
@@ -188,10 +188,10 @@ class ClientSideEncryption : GLib.Object {
 
         ret = X509_REQ_version (x509_req, n_version);
 
-        // 3. set subject of x509 req
+        // 3. set subject of x509 reques
         var x509_name = X509_REQ_get_subject_name (x509_req);
 
-        for (var& v : cert_params) {
+        foreach (var& v in cert_params) {
             ret = X509_NAME_add_entry_by_txt (x509_name, v.first,  MBSTRING_ASC, (uchar) v.second, -1, -1, 0);
             if (ret != 1) {
                 GLib.info ()) + "Error Generating the Certificate while adding" + v.first + v.second;
@@ -462,7 +462,7 @@ class ClientSideEncryption : GLib.Object {
         var job = new JsonApiJob (account, E2EE_BASE_URL + "server-key", this);
         connect (job, &JsonApiJob.json_received, [this, account] (QJsonDocument& doc, int return_code) {
             if (return_code == 200) {
-                const var server_public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-key"].to_string ().to_latin1 ();
+                var server_public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-key"].to_string ().to_latin1 ();
                 GLib.info ()) + "Found Server Public key, checking it. Server public key:" + server_public_key;
                 if (check_server_public_key_validity (server_public_key)) {
                     if (this.private_key.is_empty ()) {
@@ -519,7 +519,7 @@ class ClientSideEncryption : GLib.Object {
                 GLib.info ()) + "mnemonic:" + mnemonic;
 
                 // split off salt
-                const var salt = EncryptionHelper.extract_private_key_salt (key);
+                var salt = EncryptionHelper.extract_private_key_salt (key);
 
                 var pass = EncryptionHelper.generate_password (mnemonic, salt);
                 GLib.info ()) + "Generated key:" + pass;
@@ -599,12 +599,12 @@ class ClientSideEncryption : GLib.Object {
     private bool check_server_public_key_validity (GLib.ByteArray server_public_key_string) {
         Biometric server_public_key_bio;
         BIO_write (server_public_key_bio, server_public_key_string.const_data (), server_public_key_string.size ());
-        const var server_public_key = PrivateKey.read_private_key (server_public_key_bio);
+        var server_public_key = PrivateKey.read_private_key (server_public_key_bio);
 
         Biometric certificate_bio;
-        const var certificate_pem = this.certificate.to_pem ();
+        var certificate_pem = this.certificate.to_pem ();
         BIO_write (certificate_bio, certificate_pem.const_data (), certificate_pem.size ());
-        const var x509Certificate = X509Certificate.read_certificate (certificate_bio);
+        var x509Certificate = X509Certificate.read_certificate (certificate_bio);
         if (!x509Certificate) {
             GLib.info ()) + "Client certificate is invalid. Could not check it against the server public key";
             return false;
@@ -683,7 +683,7 @@ class ClientSideEncryption : GLib.Object {
     }
 
     GLib.List<GLib.ByteArray> old_cipher_format_split (GLib.ByteArray cipher) {
-        const var separator = QByteArrayLiteral ("f_a=="); // BASE64 encoded '|'
+        var separator = QByteArrayLiteral ("f_a=="); // BASE64 encoded '|'
         var result = GLib.List<GLib.ByteArray> ();
 
         var data = cipher;
@@ -699,8 +699,8 @@ class ClientSideEncryption : GLib.Object {
     }
 
     GLib.List<GLib.ByteArray> split_cipher_parts (GLib.ByteArray data) {
-        const var is_old_format = !data.contains ('|');
-        const var parts = is_old_format ? old_cipher_format_split (data) : data.split ('|');
+        var is_old_format = !data.contains ('|');
+        var parts = is_old_format ? old_cipher_format_split (data) : data.split ('|');
         GLib.info ()) + "found parts:" + parts + "old format?" + is_old_format;
         return parts;
     }

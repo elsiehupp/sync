@@ -134,9 +134,9 @@ signals:
                 ) : key_with_index;
 
             var job = new QKeychain.WritePasswordJob (this.service_name, this);
-    #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
+    // #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
             add_settings_to_job (this.account, job);
-    #endif
+    // #endif
             job.insecure_fallback (this.insecure_fallback);
             connect (job, &QKeychain.Job.on_signal_finished, this, &KeychainChunk.WriteJob.on_signal_write_job_done);
             // only add the key's (sub)"index" after the first element, to stay compatible with older versions and non-Windows

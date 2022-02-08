@@ -28,10 +28,10 @@ class DeleteApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request req;
-        req.raw_header ("OCS-APIREQUEST", "true");
+        Soup.Request reques;
+        reques.raw_header ("OCS-APIREQUEST", "true");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
-        send_request ("DELETE", url, req);
+        send_request ("DELETE", url, reques);
         AbstractNetworkJob.on_signal_start ();
     }
 
@@ -51,7 +51,7 @@ class DeleteApiJob : AbstractNetworkJob {
             return true;
         }
 
-        const var reply_data = string.from_utf8 (reply ().read_all ());
+        var reply_data = string.from_utf8 (reply ().read_all ());
         GLib.info ()) + "TMX Delete Job" + reply_data;
         /* emit */ signal_result (http_status);
         return true;

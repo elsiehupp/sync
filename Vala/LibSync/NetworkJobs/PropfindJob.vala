@@ -41,14 +41,14 @@ class PropfindJob : AbstractNetworkJob {
         if (properties.is_empty ()) {
             GLib.warn ("Propfind with no properties!";
         }
-        Soup.Request req;
+        Soup.Request reques;
         // Always have a higher priority than the propagator because we use this from the UI
         // and really want this to be done first (no matter what internal scheduling QNAM uses).
         // Also possibly useful for avoiding false timeouts.
-        req.priority (Soup.Request.HighPriority);
-        req.raw_header ("Depth", "0");
+        reques.priority (Soup.Request.HighPriority);
+        reques.raw_header ("Depth", "0");
         GLib.ByteArray prop_str;
-        foreach (GLib.ByteArray prop, properties) {
+        foreach (GLib.ByteArray prop in properties) {
             if (prop.contains (':')) {
                 int col_index = prop.last_index_of (":");
                 prop_str += "    <" + prop.mid (col_index + 1) + " xmlns=\"" + prop.left (col_index) + "\" />\n";
@@ -65,7 +65,7 @@ class PropfindJob : AbstractNetworkJob {
         var buf = new Soup.Buffer (this);
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
-        send_request ("PROPFIND", make_dav_url (path ()), req, buf);
+        send_request ("PROPFIND", make_dav_url (path ()), reques, buf);
 
         AbstractNetworkJob.on_signal_start ();
     }

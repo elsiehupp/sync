@@ -197,7 +197,7 @@ namespace EncryptionHelper {
         GLib.info ()) + "decrypt_string_symmetric key : " + key;
         GLib.info ()) + "decrypt_string_symmetric data : " + data;
 
-        const var parts = split_cipher_parts (data);
+        var parts = split_cipher_parts (data);
         if (parts.size () < 2) {
             GLib.info ()) + "Not enough parts found";
             return GLib.ByteArray ();
@@ -277,7 +277,7 @@ namespace EncryptionHelper {
     }
 
     GLib.ByteArray extract_private_key_salt (GLib.ByteArray data) {
-        const var parts = split_cipher_parts (data);
+        var parts = split_cipher_parts (data);
         if (parts.size () < 3) {
             GLib.info ()) + "Not enough parts found";
             return GLib.ByteArray ();
@@ -290,7 +290,7 @@ namespace EncryptionHelper {
         GLib.info ()) + "decrypt_string_symmetric key : " + key;
         GLib.info ()) + "decrypt_string_symmetric data : " + data;
 
-        const var parts = split_cipher_parts (data);
+        var parts = split_cipher_parts (data);
         if (parts.size () < 2) {
             GLib.info ()) + "Not enough parts found";
             return GLib.ByteArray ();
@@ -512,7 +512,7 @@ namespace EncryptionHelper {
         GLib.ByteArray out (static_cast<int> (outlen), '\0');
 
         if (EVP_PKEY_decrypt (context, unsigned_data (out), outlen, (uchar *)data.const_data (), data.size ()) <= 0) {
-            const var error = handle_errors ();
+            var error = handle_errors ();
             GLib.critical ()) + "Could not decrypt the data." + error;
             return {};
         } else {
@@ -619,7 +619,7 @@ namespace EncryptionHelper {
 
         GLib.debug ("Starting to encrypt the file" + input.filename () + input.at_end ();
         while (!input.at_end ()) {
-            const var data = input.read (BLOCK_SIZE);
+            var data = input.read (BLOCK_SIZE);
 
             if (data.size () == 0) {
                 GLib.info ()) + "Could not read data from file";
@@ -842,7 +842,7 @@ namespace EncryptionHelper {
                 return GLib.ByteArray ();
             }
 
-            const var written_to_output = buffer.write (decrypted_block, out_len);
+            var written_to_output = buffer.write (decrypted_block, out_len);
 
             //  Q_ASSERT (written_to_output == out_len);
             if (written_to_output != out_len) {
@@ -882,7 +882,7 @@ namespace EncryptionHelper {
                 return GLib.ByteArray ();
             }
 
-            const var written_to_output = buffer.write (decrypted_block, out_len);
+            var written_to_output = buffer.write (decrypted_block, out_len);
 
             //  Q_ASSERT (written_to_output == out_len);
             if (written_to_output != out_len) {

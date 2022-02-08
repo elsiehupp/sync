@@ -266,7 +266,7 @@ class Theme : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static string hidpi_filename (string icon_name, Gtk.Color background_color, QPaint_device dev = null) {
-        const var is_dark_background = Theme.is_dark_color (background_color);
+        var is_dark_background = Theme.is_dark_color (background_color);
 
         const string icon_path = string (Theme.theme_prefix) + (is_dark_background ? "white/" : "black/") + icon_name;
 
@@ -277,7 +277,7 @@ class Theme : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static bool is_hidpi (QPaint_device dev = null) {
-        const var device_pixel_ratio = dev ? dev.device_pixel_ratio () : Gtk.Application.primary_screen ().device_pixel_ratio ();
+        var device_pixel_ratio = dev ? dev.device_pixel_ratio () : Gtk.Application.primary_screen ().device_pixel_ratio ();
         return device_pixel_ratio > 1;
     }
 
@@ -586,22 +586,22 @@ class Theme : GLib.Object {
         if (!Theme.is_branded ()) {
             return QPixmap (Theme.hidpi_filename (string (Theme.theme_prefix) + "colored/wizard-nextcloud.png"));
         }
-    #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
-        const var use_svg = should_prefer_svg ();
+    // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
+        var use_svg = should_prefer_svg ();
         const string logo_base_path = string (Theme.theme_prefix) + "colored/wizard_logo";
         if (use_svg) {
-            const var max_height = Theme.is_hidpi () ? 200 : 100;
-            const var max_width = 2 * max_height;
-            const var icon = new Gtk.Icon (logo_base_path + ".svg");
-            const var size = icon.actual_size (QSize (max_width, max_height));
+            var max_height = Theme.is_hidpi () ? 200 : 100;
+            var max_width = 2 * max_height;
+            var icon = new Gtk.Icon (logo_base_path + ".svg");
+            var size = icon.actual_size (QSize (max_width, max_height));
             return icon.pixmap (size);
         } else {
             return QPixmap (hidpi_filename (logo_base_path + ".png"));
         }
-    #else
-        const var size = Theme.is_hidpi () ? : 200 : 100;
+    // #else
+        var size = Theme.is_hidpi () ? : 200 : 100;
         return application_icon ().pixmap (size);
-    #endif
+    // #endif
     }
 
 
@@ -609,21 +609,21 @@ class Theme : GLib.Object {
     @return logo for the setup wizard.
     ***********************************************************/
     public QPixmap wizard_header_logo () {
-    #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
-        const var use_svg = should_prefer_svg ();
+    // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
+        var use_svg = should_prefer_svg ();
         const string logo_base_path = string (Theme.theme_prefix) + "colored/wizard_logo";
         if (use_svg) {
-            const var max_height = 64;
-            const var max_width = 2 * max_height;
-            const var icon = new Gtk.Icon (logo_base_path + ".svg");
-            const var size = icon.actual_size (QSize (max_width, max_height));
+            var max_height = 64;
+            var max_width = 2 * max_height;
+            var icon = new Gtk.Icon (logo_base_path + ".svg");
+            var size = icon.actual_size (QSize (max_width, max_height));
             return icon.pixmap (size);
         } else {
             return QPixmap (hidpi_filename (logo_base_path + ".png"));
         }
-    #else
+    // #else
         return application_icon ().pixmap (64);
-    #endif
+    // #endif
     }
 
 
@@ -658,7 +658,7 @@ class Theme : GLib.Object {
     ***********************************************************/
     public string git_sha1 () {
         string dev_string;
-    #ifdef GIT_SHA1
+    // #ifdef GIT_SHA1
         const string github_prefix =
             "https://github.com/nextcloud/desktop/commit/";
         const string git_sha1 = GIT_SHA1;
@@ -670,8 +670,8 @@ class Theme : GLib.Object {
                         .arg (__DATE__)
                         .arg (__TIME__)
                         .arg (q_version ())
-                        .arg (QSslSocket.ssl_library_version_"");
-    #endif
+                        .arg (QSslSocket.ssl_library_version_string ());
+    // #endif
         return dev_string;
     }
 
@@ -941,15 +941,15 @@ class Theme : GLib.Object {
         stream + app_name ()
             + " version "
             + version () + Qt.endl;
-    #ifdef GIT_SHA1
+    // #ifdef GIT_SHA1
         stream + "Git revision " + GIT_SHA1 + Qt.endl;
-    #endif
+    // #endif
         stream + "Using Qt " + q_version (", built against Qt " + QT_VERSION_STR + Qt.endl;
 
         if (!QGuiApplication.platform_name ().is_empty ())
             stream + "Using Qt platform plugin '" + QGuiApplication.platform_name ("'" + Qt.endl;
 
-        stream + "Using '" + QSslSocket.ssl_library_version_"" + "'" + Qt.endl;
+        stream + "Using '" + QSslSocket.ssl_library_version_string () + "'" + Qt.endl;
         stream + "Running on " + Utility.platform_name (", " + QSysInfo.current_cpu_architecture () + Qt.endl;
         return help_text;
     }
@@ -1108,7 +1108,7 @@ class Theme : GLib.Object {
     options are manually enabled in the configuration file.
     ***********************************************************/
     public bool show_virtual_files_option () {
-        const var vfs_mode = best_available_vfs_mode ();
+        var vfs_mode = best_available_vfs_mode ();
         return ConfigFile ().show_experimental_options () || vfs_mode == Vfs.WindowsCfApi;
     }
 
@@ -1116,7 +1116,7 @@ class Theme : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool enforce_virtual_files_sync_folder () {
-        const var vfs_mode = best_available_vfs_mode ();
+        var vfs_mode = best_available_vfs_mode ();
         return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && vfs_mode != Occ.Vfs.Off;
     }
 
@@ -1174,7 +1174,7 @@ class Theme : GLib.Object {
 
             const string svg_name = string (Theme.theme_prefix) + string.from_latin1 ("%1/%2.svg").arg (flavor).arg (name);
             QSvgRenderer renderer (svg_name);
-            const var create_pixmap_from_svg = [&renderer] (int size) {
+            var create_pixmap_from_svg = [&renderer] (int size) {
                 Gtk.Image img (size, size, Gtk.Image.Format_ARGB32);
                 img.fill (Qt.Global_color.transparent);
                 QPainter img_painter (&img);
@@ -1182,18 +1182,18 @@ class Theme : GLib.Object {
                 return QPixmap.from_image (img);
             }
 
-            const var load_pixmap = [flavor, name] (int size) {
+            var load_pixmap = [flavor, name] (int size) {
                 const string pixmap_name = string (Theme.theme_prefix) + string.from_latin1 ("%1/%2-%3.png").arg (flavor).arg (name).arg (size);
                 return QPixmap (pixmap_name);
             }
 
-            const var use_svg = should_prefer_svg ();
-            const var sizes = use_svg
+            var use_svg = should_prefer_svg ();
+            var sizes = use_svg
                 ? GLib.Vector<int> {
                     16, 32, 64, 128, 256 }
                 : GLib.Vector<int> {
                     16, 22, 32, 48, 64, 128, 256, 512, 1024 };
-            for (int size : sizes) {
+            foreach (int size in sizes) {
                 var px = use_svg ? create_pixmap_from_svg (size) : load_pixmap (size);
                 if (px.is_null ()) {
                     continue;
@@ -1221,8 +1221,8 @@ class Theme : GLib.Object {
     @return string image path in the resources
     ***********************************************************/
     protected string theme_image_path (string name, int size = -1, bool sys_tray = false) {
-        const var flavor = (!is_branded () && sys_tray) ? systray_icon_flavor (this.mono) : "colored";
-        const var use_svg = should_prefer_svg ();
+        var flavor = (!is_branded () && sys_tray) ? systray_icon_flavor (this.mono) : "colored";
+        var use_svg = should_prefer_svg ();
 
         // branded client may have several sizes of the same icon
         const string file_path = (use_svg || size <= 0)

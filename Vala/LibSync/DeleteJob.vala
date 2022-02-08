@@ -46,15 +46,15 @@ class DeleteJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request req;
+        Soup.Request reques;
         if (!this.folder_token.is_empty ()) {
-            req.raw_header ("e2e-token", this.folder_token);
+            reques.raw_header ("e2e-token", this.folder_token);
         }
 
         if (this.url.is_valid ()) {
-            send_request ("DELETE", this.url, req);
+            send_request ("DELETE", this.url, reques);
         } else {
-            send_request ("DELETE", make_dav_url (path ()), req);
+            send_request ("DELETE", make_dav_url (path ()), reques);
         }
 
         if (reply ().error () != Soup.Reply.NoError) {

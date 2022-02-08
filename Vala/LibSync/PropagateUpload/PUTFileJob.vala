@@ -43,7 +43,7 @@ class PUTFile_job : AbstractNetworkJob {
         this.chunk (chunk) {
         this.device.parent (this);
     }
-    ~PUTFile_job () override;
+    ~PUTFile_job ();
 
     /***********************************************************
     ***********************************************************/
@@ -51,11 +51,11 @@ class PUTFile_job : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () override;
+    public void on_signal_start ();
 
     /***********************************************************
     ***********************************************************/
-    public bool on_signal_finished () override;
+    public bool on_signal_finished ();
 
     /***********************************************************
     ***********************************************************/
@@ -66,7 +66,7 @@ class PUTFile_job : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public string error_string () override {
+    public string error_string () {
         return this.error_string.is_empty () ? AbstractNetworkJob.error_string () : this.error_string;
     }
 
@@ -92,17 +92,17 @@ PUTFile_job.~PUTFile_job () {
 }
 
 void PUTFile_job.on_signal_start () {
-    Soup.Request req;
+    Soup.Request reques;
     for (GLib.HashMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = this.headers.begin (); it != this.headers.end (); ++it) {
-        req.raw_header (it.key (), it.value ());
+        reques.raw_header (it.key (), it.value ());
     }
 
-    req.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
+    reques.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
 
     if (this.url.is_valid ()) {
-        send_request ("PUT", this.url, req, this.device);
+        send_request ("PUT", this.url, reques, this.device);
     } else {
-        send_request ("PUT", make_dav_url (path ()), req, this.device);
+        send_request ("PUT", make_dav_url (path ()), reques, this.device);
     }
 
     if (reply ().error () != Soup.Reply.NoError) {
@@ -118,7 +118,7 @@ void PUTFile_job.on_signal_start () {
 bool PUTFile_job.on_signal_finished () {
     this.device.close ();
 
-    GLib.info ("PUT of" + reply ().request ().url ().to_string ("FINISHED WITH STATUS"
+    GLib.info ("PUT of" + reply ().request ().url ().to_string () + "FINISHED WITH STATUS"
                      + reply_status_string ()
                      + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
                      + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);

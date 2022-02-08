@@ -55,17 +55,17 @@ class MkColJob : AbstractNetworkJob {
     ***********************************************************/
     public void on_signal_start () {
         // add 'Content-Length : 0' header (see https://github.com/owncloud/client/issues/3256)
-        Soup.Request req;
-        req.raw_header ("Content-Length", "0");
+        Soup.Request reques;
+        reques.raw_header ("Content-Length", "0");
         for (var it = this.extra_headers.const_begin (); it != this.extra_headers.const_end (); ++it) {
-            req.raw_header (it.key (), it.value ());
+            reques.raw_header (it.key (), it.value ());
         }
 
         // assumes ownership
         if (this.url.is_valid ()) {
-            send_request ("MKCOL", this.url, req);
+            send_request ("MKCOL", this.url, reques);
         } else {
-            send_request ("MKCOL", make_dav_url (path ()), req);
+            send_request ("MKCOL", make_dav_url (path ()), reques);
         }
         AbstractNetworkJob.on_signal_start ();
     }

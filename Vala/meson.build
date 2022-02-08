@@ -1,12 +1,4 @@
 
-
-
-
-
-
-
-
-
 subdir('3rdParty')
 subdir('Cmd')
 subdir('Common')

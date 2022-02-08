@@ -55,7 +55,7 @@ class CookieJar : QNetworkCookieJar {
     ***********************************************************/
     public GLib.List<QNetworkCookie> cookies_for_url (GLib.Uri url) {
         GLib.List<QNetworkCookie> cookies = QNetworkCookieJar.cookies_for_url (url);
-        GLib.debug () + url + "requests:" + cookies;
+        GLib.debug (url + "requests:" + cookies;
         return cookies;
     }
 
@@ -75,7 +75,7 @@ class CookieJar : QNetworkCookieJar {
             info.dir ().mkpath (".");
         }
 
-        GLib.debug () + filename;
+        GLib.debug (filename;
         GLib.File file = new GLib.File (filename);
         if (!file.open (QIODevice.WriteOnly)) {
             return false;
@@ -112,7 +112,7 @@ class CookieJar : QNetworkCookieJar {
     ***********************************************************/
     private GLib.List<QNetworkCookie> remove_expired (GLib.List<QNetworkCookie> cookies) {
         GLib.List<QNetworkCookie> updated_list;
-        foreach (QNetworkCookie cookie, cookies) {
+        foreach (QNetworkCookie cookie in cookies) {
             if (cookie.expiration_date () > GLib.DateTime.current_date_time_utc () && !cookie.is_session_cookie ()) {
                 updated_list + cookie;
             }
@@ -124,7 +124,7 @@ class CookieJar : QNetworkCookieJar {
     //  QDataStream operator<< (QDataStream stream, GLib.List<QNetworkCookie> list) {
     //      stream + JAR_VERSION;
     //      stream + uint32 (list.size ());
-    //      for (var cookie : list)
+    //      foreach (var cookie in list)
     //          stream + cookie.to_raw_form ();
     //      return stream;
     //  }

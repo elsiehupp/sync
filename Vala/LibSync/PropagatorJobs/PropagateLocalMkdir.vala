@@ -49,13 +49,13 @@ class PropagateLocalMkdir : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void start_local_mkdir () {
-        QDir new_dir (propagator ().full_local_path (this.item.file));
+        QDir new_dir = new QDir (propagator ().full_local_path (this.item.file));
         string new_dir_str = QDir.to_native_separators (new_dir.path ());
 
         // When turning something that used to be a file into a directory
         // we need to delete the file first.
-        QFileInfo fi (new_dir_str);
-        if (fi.exists () && fi.is_file ()) {
+        QFileInfo file_info = new QFileInfo (new_dir_str);
+        if (file_info.exists () && file_info.is_file ()) {
             if (this.delete_existing_file) {
                 string remove_error;
                 if (!FileSystem.remove (new_dir_str, remove_error)) {
@@ -74,12 +74,12 @@ class PropagateLocalMkdir : PropagateItemJob {
         }
 
         if (Utility.fs_case_preserving () && propagator ().local_filename_clash (this.item.file)) {
-            GLib.warn ("New folder to create locally already exists with different case:" + this.item.file;
+            GLib.warn ("New folder to create locally already exists with different case:" + this.item.file);
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Attention, possible case sensitivity clash with %1").arg (new_dir_str));
             return;
         }
         /* emit */ propagator ().touched_file (new_dir_str);
-        QDir local_dir (propagator ().local_path ());
+        QDir local_dir = new QDir (propagator ().local_path ());
         if (!local_dir.mkpath (this.item.file)) {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not create folder %1").arg (new_dir_str));
             return;
@@ -90,9 +90,9 @@ class PropagateLocalMkdir : PropagateItemJob {
         // Adding an entry with a dummy etag to the database still makes sense here
         // so the database is aware that this folder exists even if the sync is aborted
         // before the correct etag is stored.
-        SyncFileItem new_item (*this.item);
+        SyncFileItem new_item = new SyncFileItem (this.item);
         new_item.etag = "this.invalid_";
-        const var result = propagator ().update_metadata (new_item);
+        var result = propagator ().update_metadata (new_item);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
             return;

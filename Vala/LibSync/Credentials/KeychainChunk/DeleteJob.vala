@@ -51,9 +51,9 @@ class DeleteJob : KeychainChunk.Job {
             ) : this.key;
 
         var job = new QKeychain.DeletePasswordJob (this.service_name, this);
-    #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
+    // #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
         add_settings_to_job (this.account, job);
-    #endif
+    // #endif
         job.insecure_fallback (this.insecure_fallback);
         job.key (kck);
         connect (job, &QKeychain.Job.on_signal_finished, this, &KeychainChunk.DeleteJob.on_signal_delete_job_done);

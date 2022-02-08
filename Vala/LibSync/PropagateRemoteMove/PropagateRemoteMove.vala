@@ -30,7 +30,7 @@ class PropagateRemoteMove : PropagateItemJob {
             return;
 
         string origin = propagator ().adjust_renamed_path (this.item.file);
-        GLib.debug () + origin + this.item.rename_target;
+        GLib.debug (origin + this.item.rename_target;
 
         string target_file (propagator ().full_local_path (this.item.rename_target));
 
@@ -43,9 +43,9 @@ class PropagateRemoteMove : PropagateItemJob {
                 // we are fixing it by modifying the "this.encrypted_filename" in such a way so it will have a renamed root path at the beginning of it as expected
                 // corrected "this.encrypted_filename" is later used in propagator ().update_metadata () call that will update the record in the Sync journal DB
 
-                const var path = this.item.file;
-                const var slash_position = path.last_index_of ('/');
-                const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+                var path = this.item.file;
+                var slash_position = path.last_index_of ('/');
+                var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
                 SyncJournalFileRecord parent_rec;
                 bool ok = propagator ().journal.get_file_record (parent_path, parent_rec);
@@ -54,10 +54,10 @@ class PropagateRemoteMove : PropagateItemJob {
                     return;
                 }
 
-                const var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
+                var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
 
-                const var last_slash_position = this.item.encrypted_filename.last_index_of ('/');
-                const var encrypted_name = last_slash_position >= 0 ? this.item.encrypted_filename.mid (last_slash_position + 1) : "";
+                var last_slash_position = this.item.encrypted_filename.last_index_of ('/');
+                var encrypted_name = last_slash_position >= 0 ? this.item.encrypted_filename.mid (last_slash_position + 1) : "";
 
                 if (!encrypted_name.is_empty ()) {
                     this.item.encrypted_filename = remote_parent_path + "/" + encrypted_name;
@@ -75,7 +75,7 @@ class PropagateRemoteMove : PropagateItemJob {
         var itype = this.item.type;
         //  ASSERT (itype != ItemTypeVirtualFileDownload && itype != ItemTypeVirtualFileDehydration);
         if (vfs.mode () == Vfs.WithSuffix && itype != ItemTypeDirectory) {
-            const var suffix = vfs.file_suffix ();
+            var suffix = vfs.file_suffix ();
             bool source_had_suffix = remote_source.ends_with (suffix);
             bool destination_had_suffix = remote_destination.ends_with (suffix);
 
@@ -126,7 +126,7 @@ class PropagateRemoteMove : PropagateItemJob {
                                               + folder_target_alt + "to" + folder_target;
             }
         }
-        GLib.debug () + remote_source + remote_destination;
+        GLib.debug (remote_source + remote_destination;
 
         this.job = new MoveJob (propagator ().account (), remote_source, remote_destination, this);
         connect (this.job.data (), &MoveJob.finished_signal, this, &PropagateRemoteMove.on_signal_move_job_finished);
@@ -166,12 +166,12 @@ class PropagateRemoteMove : PropagateItemJob {
             return false;
 
         bool changed = false;
-        //  ASSERT (!from_.ends_with (QLatin1String ("/")));
-        //  ASSERT (!to_.ends_with (QLatin1String ("/")));
-        string from = from_ + QLatin1String ("/");
-        string to = to_ + QLatin1String ("/");
+        //  ASSERT (!from_.ends_with ("/"));
+        //  ASSERT (!to_.ends_with ("/"));
+        string from = from_ + "/";
+        string to = to_ + "/";
 
-        for (var s : list) {
+        foreach (var s in list) {
             if (s.starts_with (from)) {
                 s = s.replace (0, from.size (), to);
                 changed = true;
@@ -249,7 +249,7 @@ class PropagateRemoteMove : PropagateItemJob {
                 new_item.size = old_record.file_size;
             }
         }
-        const var result = propagator ().update_metadata (new_item);
+        var result = propagator ().update_metadata (new_item);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
             return;

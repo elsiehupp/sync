@@ -45,7 +45,90 @@ class ProgressInfo : GLib.Object {
         Except when SyncEngine jumps directly to on_signal_finalize () without going
         through on_signal_propagation_finished ().
         ***********************************************************/
-        DONE
+        DONE;
+
+    
+        static string as_action_string (SyncFileItem item) {
+            switch (item.instruction) {
+            case CSYNC_INSTRUCTION_CONFLICT:
+            case CSYNC_INSTRUCTION_SYNC:
+            case CSYNC_INSTRUCTION_NEW:
+            case CSYNC_INSTRUCTION_TYPE_CHANGE:
+                if (item.direction != SyncFileItem.Direction.UP)
+                    return _("progress", "downloading");
+                else
+                    return _("progress", "uploading");
+            case CSYNC_INSTRUCTION_REMOVE:
+                return _("progress", "deleting");
+            case CSYNC_INSTRUCTION_EVAL_RENAME:
+            case CSYNC_INSTRUCTION_RENAME:
+                return _("progress", "moving");
+            case CSYNC_INSTRUCTION_IGNORE:
+                return _("progress", "ignoring");
+            case CSYNC_INSTRUCTION_STAT_ERROR:
+            case CSYNC_INSTRUCTION_ERROR:
+                return _("progress", "error");
+            case CSYNC_INSTRUCTION_UPDATE_METADATA:
+                return _("progress", "updating local metadata");
+            case CSYNC_INSTRUCTION_NONE:
+            case CSYNC_INSTRUCTION_EVAL:
+                break;
+            }
+            return "";
+        }
+
+
+        static string as_result_string (SyncFileItem item) {
+            switch (item.instruction) {
+            case CSYNC_INSTRUCTION_SYNC:
+            case CSYNC_INSTRUCTION_NEW:
+            case CSYNC_INSTRUCTION_TYPE_CHANGE:
+                if (item.direction != SyncFileItem.Direction.UP) {
+                    if (item.type == ItemTypeVirtualFile) {
+                        return _("progress", "Virtual file created");
+                    } else if (item.type == ItemTypeVirtualFileDehydration) {
+                        return _("progress", "Replaced by virtual file");
+                    } else {
+                        return _("progress", "Downloaded");
+                    }
+                } else {
+                    return _("progress", "Uploaded");
+                }
+            case CSYNC_INSTRUCTION_CONFLICT:
+                return _("progress", "Server version downloaded, copied changed local file into conflict file");
+            case CSYNC_INSTRUCTION_REMOVE:
+                return _("progress", "Deleted");
+            case CSYNC_INSTRUCTION_EVAL_RENAME:
+            case CSYNC_INSTRUCTION_RENAME:
+                return _("progress", "Moved to %1").arg (item.rename_target);
+            case CSYNC_INSTRUCTION_IGNORE:
+                return _("progress", "Ignored");
+            case CSYNC_INSTRUCTION_STAT_ERROR:
+                return _("progress", "Filesystem access error");
+            case CSYNC_INSTRUCTION_ERROR:
+                return _("progress", "Error");
+            case CSYNC_INSTRUCTION_UPDATE_METADATA:
+                return _("progress", "Updated local metadata");
+            case CSYNC_INSTRUCTION_NONE:
+            case CSYNC_INSTRUCTION_EVAL:
+                return _("progress", "Unknown");
+            }
+            return _("progress", "Unknown");
+        }
+
+
+        static bool is_warning_kind (SyncFileItem.Status kind) {
+            return kind == SyncFileItem.Status.SOFT_ERROR || kind == SyncFileItem.Status.NORMAL_ERROR
+                || kind == SyncFileItem.Status.FATAL_ERROR || kind == SyncFileItem.Status.FILE_IGNORED
+                || kind == SyncFileItem.Status.CONFLICT || kind == SyncFileItem.Status.RESTORATION
+                || kind == SyncFileItem.Status.DETAIL_ERROR || kind == SyncFileItem.Status.BLOCKLISTED_ERROR
+                || kind == SyncFileItem.Status.FILE_LOCKED;
+        }
+
+
+        static bool is_ignored_kind (SyncFileItem.Status kind) {
+            return kind == SyncFileItem.Status.FILE_IGNORED;
+        }
     }
 
 
@@ -91,7 +174,19 @@ class ProgressInfo : GLib.Object {
         /***********************************************************
         Set and updated by ProgressInfo
         ***********************************************************/
-        private int64 completed = 0;
+        int64 completed {
+            public get {
+                return this.completed; // = 0
+            }
+            /***********************************************************
+            Changes the this.completed value and does sanity checks on
+            this.prev_completed and this.total.
+            ***********************************************************/
+            private set {
+                this.completed = q_min (value, this.total);
+                this.prev_completed = q_min (this.prev_completed, this.completed);
+            }
+        }
 
         /***********************************************************
         Set and updated by ProgressInfo
@@ -117,20 +212,14 @@ class ProgressInfo : GLib.Object {
 
         /***********************************************************
         ***********************************************************/
-        int64 completed () {
-            return this.completed;
-        }
-
-
-        /***********************************************************
-        ***********************************************************/
         int64 remaining () {
             return this.total - this.completed;
         }
 
 
         /***********************************************************
-        Update the exponential moving average estimate of this.progress_per_sec.
+        Update the exponential moving average estimate of
+        this.progress_per_sec.
         ***********************************************************/
         private void update () {
             // A good way to think about the smoothing factor:
@@ -146,17 +235,6 @@ class ProgressInfo : GLib.Object {
             this.progress_per_sec = smoothing * this.progress_per_sec + (1.0 - smoothing) * static_cast<double> (this.completed - this.prev_completed);
             this.prev_completed = this.completed;
         }
-
-
-        /***********************************************************
-        Changes the this.completed value and does sanity checks on
-        this.prev_completed and this.total.
-        ***********************************************************/
-        private void completed (int64 completed) {
-            this.completed = q_min (completed, this.total);
-            this.prev_completed = q_min (this.prev_completed, this.completed);
-        }
-
 
     }
 
@@ -486,7 +564,7 @@ class ProgressInfo : GLib.Object {
         this.file_progress.update ();
 
         // Update progress of all running items.
-        QMutable_hash_iterator<string, ProgressItem> it (this.current_items);
+        QMutable_hash_iterator<string, ProgressItem> it = new QMutable_hash_iterator (this.current_items);
         while (it.has_next ()) {
             it.next ();
             it.value ().progress.update ();
@@ -505,94 +583,14 @@ class ProgressInfo : GLib.Object {
     ***********************************************************/
     private void recompute_completed_size () {
         int64 r = this.total_size_of_completed_jobs;
-        foreach (ProgressItem i, this.current_items) {
+        foreach (ProgressItem i in this.current_items) {
             if (is_size_dependent (i.item))
                 r += i.progress.completed;
         }
         this.size_progress.completed (r);
     }
 
-    static string as_action_string (SyncFileItem item) {
-        switch (item.instruction) {
-        case CSYNC_INSTRUCTION_CONFLICT:
-        case CSYNC_INSTRUCTION_SYNC:
-        case CSYNC_INSTRUCTION_NEW:
-        case CSYNC_INSTRUCTION_TYPE_CHANGE:
-            if (item.direction != SyncFileItem.Direction.UP)
-                return _("progress", "downloading");
-            else
-                return _("progress", "uploading");
-        case CSYNC_INSTRUCTION_REMOVE:
-            return _("progress", "deleting");
-        case CSYNC_INSTRUCTION_EVAL_RENAME:
-        case CSYNC_INSTRUCTION_RENAME:
-            return _("progress", "moving");
-        case CSYNC_INSTRUCTION_IGNORE:
-            return _("progress", "ignoring");
-        case CSYNC_INSTRUCTION_STAT_ERROR:
-        case CSYNC_INSTRUCTION_ERROR:
-            return _("progress", "error");
-        case CSYNC_INSTRUCTION_UPDATE_METADATA:
-            return _("progress", "updating local metadata");
-        case CSYNC_INSTRUCTION_NONE:
-        case CSYNC_INSTRUCTION_EVAL:
-            break;
-        }
-        return "";
-    }
 
-
-    static string as_result_string (SyncFileItem item) {
-        switch (item.instruction) {
-        case CSYNC_INSTRUCTION_SYNC:
-        case CSYNC_INSTRUCTION_NEW:
-        case CSYNC_INSTRUCTION_TYPE_CHANGE:
-            if (item.direction != SyncFileItem.Direction.UP) {
-                if (item.type == ItemTypeVirtualFile) {
-                    return _("progress", "Virtual file created");
-                } else if (item.type == ItemTypeVirtualFileDehydration) {
-                    return _("progress", "Replaced by virtual file");
-                } else {
-                    return _("progress", "Downloaded");
-                }
-            } else {
-                return _("progress", "Uploaded");
-            }
-        case CSYNC_INSTRUCTION_CONFLICT:
-            return _("progress", "Server version downloaded, copied changed local file into conflict file");
-        case CSYNC_INSTRUCTION_REMOVE:
-            return _("progress", "Deleted");
-        case CSYNC_INSTRUCTION_EVAL_RENAME:
-        case CSYNC_INSTRUCTION_RENAME:
-            return _("progress", "Moved to %1").arg (item.rename_target);
-        case CSYNC_INSTRUCTION_IGNORE:
-            return _("progress", "Ignored");
-        case CSYNC_INSTRUCTION_STAT_ERROR:
-            return _("progress", "Filesystem access error");
-        case CSYNC_INSTRUCTION_ERROR:
-            return _("progress", "Error");
-        case CSYNC_INSTRUCTION_UPDATE_METADATA:
-            return _("progress", "Updated local metadata");
-        case CSYNC_INSTRUCTION_NONE:
-        case CSYNC_INSTRUCTION_EVAL:
-            return _("progress", "Unknown");
-        }
-        return _("progress", "Unknown");
-    }
-
-
-    static bool is_warning_kind (SyncFileItem.Status kind) {
-        return kind == SyncFileItem.Status.SOFT_ERROR || kind == SyncFileItem.Status.NORMAL_ERROR
-            || kind == SyncFileItem.Status.FATAL_ERROR || kind == SyncFileItem.Status.FILE_IGNORED
-            || kind == SyncFileItem.Status.CONFLICT || kind == SyncFileItem.Status.RESTORATION
-            || kind == SyncFileItem.Status.DETAIL_ERROR || kind == SyncFileItem.Status.BLOCKLISTED_ERROR
-            || kind == SyncFileItem.Status.FILE_LOCKED;
-    }
-
-
-    static bool is_ignored_kind (SyncFileItem.Status kind) {
-        return kind == SyncFileItem.Status.FILE_IGNORED;
-    }
 
 } // class ProgressInfo
 

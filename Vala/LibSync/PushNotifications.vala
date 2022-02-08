@@ -233,8 +233,8 @@ class PushNotifications : GLib.Object {
     ***********************************************************/
     private void open_web_socket () {
         // Open websocket
-        const var capabilities = this.account.capabilities ();
-        const var web_socket_url = capabilities.push_notifications_web_socket_url ();
+        var capabilities = this.account.capabilities ();
+        var web_socket_url = capabilities.push_notifications_web_socket_url ();
 
         GLib.info ("Open connection to websocket on" + web_socket_url + "for account" + this.account.url ();
         connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, &PushNotifications.on_signal_web_socket_error);
@@ -275,9 +275,9 @@ class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void authenticate_on_signal_web_socket () {
-        const var credentials = this.account.credentials ();
-        const var username = credentials.user ();
-        const var password = credentials.password ();
+        var credentials = this.account.credentials ();
+        var username = credentials.user ();
+        var password = credentials.password ();
 
         // Authenticate
         this.web_socket.send_text_message (username);

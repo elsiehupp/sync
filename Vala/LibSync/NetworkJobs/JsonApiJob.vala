@@ -153,7 +153,7 @@ class JsonApiJob : AbstractNetworkJob {
         string json_str = string.from_utf8 (reply ().read_all ());
         if (json_str.contains ("<?xml version=\"1.0\"?>")) {
             const QRegularExpression rex ("<statuscode> (\\d+)</statuscode>");
-            const var rex_match = rex.match (json_str);
+            var rex_match = rex.match (json_str);
             if (rex_match.has_match ()) {
                 // this is a error message coming back from ocs.
                 status_code = rex_match.captured (1).to_int ();
@@ -164,7 +164,7 @@ class JsonApiJob : AbstractNetworkJob {
         } else {
             const QRegularExpression rex (R" ("statuscode" : (\d+))");
             // example : "{"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"version":{"major":8,"minor":"... (504)
-            const var rx_match = rex.match (json_str);
+            var rx_match = rex.match (json_str);
             if (rx_match.has_match ()) {
                 status_code = rx_match.captured (1).to_int ();
             }
@@ -174,7 +174,7 @@ class JsonApiJob : AbstractNetworkJob {
         if (reply ().raw_header_list ().contains ("ETag"))
             /* emit */ etag_response_header_received (reply ().raw_header ("ETag"), status_code);
 
-        const var desktop_notifications_allowed = reply ().raw_header (GLib.ByteArray ("X-Nextcloud-User-Status"));
+        var desktop_notifications_allowed = reply ().raw_header (GLib.ByteArray ("X-Nextcloud-User-Status"));
         if (!desktop_notifications_allowed.is_empty ()) {
             /* emit */ allow_desktop_notifications_changed (desktop_notifications_allowed == "online");
         }

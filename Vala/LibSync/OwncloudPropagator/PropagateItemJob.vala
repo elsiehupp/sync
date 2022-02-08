@@ -71,9 +71,9 @@ class PropagateItemJob : PropagatorJob {
             return false;
         }
 
-        const var path = this.item.file;
-        const var slash_position = path.last_index_of ('/');
-        const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+        var path = this.item.file;
+        var slash_position = path.last_index_of ('/');
+        var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
         var path_components = parent_path.split ('/');
         while (!path_components.is_empty ()) {
@@ -109,7 +109,7 @@ class PropagateItemJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public bool on_signal_schedule_self_or_child () override {
+    public bool on_signal_schedule_self_or_child () {
         if (this.state != NotYetStarted) {
             return false;
         }
@@ -123,7 +123,7 @@ class PropagateItemJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public JobParallelism parallelism () override {
+    public JobParallelism parallelism () {
         return this.parallelism;
     }
 

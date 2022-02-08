@@ -47,7 +47,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    public void do_start_upload () override;
+    public void do_start_upload ();
 
 
     /***********************************************************
@@ -57,7 +57,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort (AbortType abort_type) override;
+    public void on_signal_abort (AbortType abort_type);
 
     /***********************************************************
     ***********************************************************/

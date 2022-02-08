@@ -366,7 +366,7 @@ class ProcessDirectoryJob : GLib.Object {
         }
 
         int started = 0;
-        foreach (var rj, this.running_jobs) {
+        foreach (var rj in this.running_jobs) {
             started += rj.process_sub_jobs (number_of_jobs - started);
             if (started >= number_of_jobs)
                 return started;
@@ -400,17 +400,17 @@ class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool check_for_invalid_filename (PathTuple path, GLib.HashMap<string, Entries> entries, Entries entry) {
-        const var original_filename = entry.local_entry.name;
-        const var new_filename = original_filename.trimmed ();
+        var original_filename = entry.local_entry.name;
+        var new_filename = original_filename.trimmed ();
 
         if (original_filename == new_filename) {
             return true;
         }
 
-        const var entries_iter = entries.find (new_filename);
+        var entries_iter = entries.find (new_filename);
         if (entries_iter != entries.end ()) {
             string error_message;
-            const var new_filename_entry = entries_iter.second;
+            var new_filename_entry = entries_iter.second;
             if (new_filename_entry.server_entry.is_valid ()) {
                 error_message = _("File contains trailing spaces and could not be renamed, because a file with the same name already exists on the server.");
             }
@@ -458,7 +458,7 @@ class ProcessDirectoryJob : GLib.Object {
         // with local, database, server entries and "foo.owncloud" with only a local
         // entry.
         GLib.HashMap<string, Entries> entries;
-        for (var e : this.server_normal_query_entries) {
+        foreach (var e in this.server_normal_query_entries) {
             entries[e.name].server_entry = std.move (e);
         }
         this.server_normal_query_entries.clear ();
@@ -477,7 +477,7 @@ class ProcessDirectoryJob : GLib.Object {
             return;
         }
 
-        for (var e : this.local_normal_query_entries) {
+        foreach (var e in this.local_normal_query_entries) {
             entries[e.name].local_entry = e;
         }
         if (is_vfs_with_suffix ()) {
@@ -486,7 +486,7 @@ class ProcessDirectoryJob : GLib.Object {
             // other data about the suffixed file.
             // This is done in a second path in order to not depend on the order of
             // this.local_normal_query_entries.
-            for (var e : this.local_normal_query_entries) {
+            foreach (var e in this.local_normal_query_entries) {
                 if (!e.is_virtual_file)
                     continue;
                 var suffixed_entry = entries[e.name];
@@ -514,7 +514,7 @@ class ProcessDirectoryJob : GLib.Object {
         //
         // Iterate over entries and process them
         //
-        for (var f : entries) {
+        foreach (var f in entries) {
             var e = f.second;
 
             PathTuple path;
@@ -544,7 +544,7 @@ class ProcessDirectoryJob : GLib.Object {
                 //  Q_ASSERT (this.discovery_data.remote_folder.starts_with ('/'));
                 //  Q_ASSERT (this.discovery_data.remote_folder.ends_with ('/'));
 
-                const var root_path = this.discovery_data.remote_folder.mid (1);
+                var root_path = this.discovery_data.remote_folder.mid (1);
                 //  Q_ASSERT (e.server_entry.e2e_mangled_name.starts_with (root_path));
 
                 path.server = e.server_entry.e2e_mangled_name.mid (root_path.length ());
@@ -643,7 +643,7 @@ class ProcessDirectoryJob : GLib.Object {
                     item.error_string = _("File names ending with a period are not supported on this file system.");
                 } else {
                     char invalid = '\0';
-                    foreach (char x, GLib.ByteArray ("\\:?*\"<>|")) {
+                    foreach (char x in GLib.ByteArray ("\\:?*\"<>|")) {
                         if (item.file.contains (x)) {
                             invalid = x;
                             break;
@@ -815,7 +815,7 @@ class ProcessDirectoryJob : GLib.Object {
             //  Q_ASSERT (this.discovery_data.remote_folder.starts_with ('/'));
             //  Q_ASSERT (this.discovery_data.remote_folder.ends_with ('/'));
 
-            const var root_path = this.discovery_data.remote_folder.mid (1);
+            var root_path = this.discovery_data.remote_folder.mid (1);
             //  Q_ASSERT (server_entry.e2e_mangled_name.starts_with (root_path));
             return server_entry.e2e_mangled_name.mid (root_path.length ());
         } ();
@@ -903,7 +903,7 @@ class ProcessDirectoryJob : GLib.Object {
                     const bool is_vfs_mode_on = this.discovery_data && this.discovery_data.sync_options.vfs && this.discovery_data.sync_options.vfs.mode () != Vfs.Off;
                     if (is_vfs_mode_on && db_entry.is_directory () && db_entry.is_e2e_encrypted) {
                         int64 local_folder_size = 0;
-                        const var list_files_callback = [&local_folder_size] (Occ.SyncJournalFileRecord record) {
+                        var list_files_callback = [&local_folder_size] (Occ.SyncJournalFileRecord record) {
                             if (record.is_file ()) {
                                 // add Constants.E2EE_TAG_SIZE so we will know the size of E2EE file on the server
                                 local_folder_size += record.file_size + Constants.E2EE_TAG_SIZE;
@@ -1376,21 +1376,21 @@ class ProcessDirectoryJob : GLib.Object {
             const bool is_file_place_holder = !local_entry.is_directory && this.discovery_data.sync_options.vfs.is_dehydrated_placeholder (this.discovery_data.local_dir + path.local);
 
             // either correct availability, or a result with error if the folder is new or otherwise has no availability set yet
-            const var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : Vfs.AvailabilityResult (Vfs.AvailabilityError.NO_SUCH_ITEM);
+            var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : Vfs.AvailabilityResult (Vfs.AvailabilityError.NO_SUCH_ITEM);
 
-            const var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Optional<PinStateEnums.PinState> (PinState.PinState.UNSPECIFIED);
+            var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Optional<PinStateEnums.PinState> (PinState.PinState.UNSPECIFIED);
 
             if (!is_file_place_holder && !folder_place_holder_availability.is_valid () && !folder_pin_state.is_valid ()) {
                 // not a file placeholder and not a synced folder placeholder (new local folder)
                 return;
             }
 
-            const var is_folder_pin_state_online_only = (folder_pin_state.is_valid () && *folder_pin_state == PinState.VfsItemAvailability.ONLINE_ONLY);
+            var is_folder_pin_state_online_only = (folder_pin_state.is_valid () && *folder_pin_state == PinState.VfsItemAvailability.ONLINE_ONLY);
 
-            const var isfolder_place_holder_availability_online_only = (folder_place_holder_availability.is_valid () && *folder_place_holder_availability == VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY);
+            var isfolder_place_holder_availability_online_only = (folder_place_holder_availability.is_valid () && *folder_place_holder_availability == VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY);
 
             // a folder is considered online-only if : no files are hydrated, or, if it's an empty folder
-            const var is_online_only_folder = isfolder_place_holder_availability_online_only || (!folder_place_holder_availability && is_folder_pin_state_online_only);
+            var is_online_only_folder = isfolder_place_holder_availability_online_only || (!folder_place_holder_availability && is_folder_pin_state_online_only);
 
             if (!is_file_place_holder && !is_online_only_folder) {
                 if (local_entry.is_directory && folder_place_holder_availability.is_valid () && !is_online_only_folder) {
@@ -1432,7 +1432,7 @@ class ProcessDirectoryJob : GLib.Object {
             db_error ();
             return;
         }
-        const var original_path = base.path ();
+        var original_path = base.path ();
 
         // Function to gradually check conditions for accepting a move-candidate
         var move_check = [&] () {
@@ -1752,7 +1752,7 @@ class ProcessDirectoryJob : GLib.Object {
         switch (item.instruction) {
         case CSYNC_INSTRUCTION_TYPE_CHANGE:
         case CSYNC_INSTRUCTION_NEW: {
-            const var perms = !this.root_permissions.is_null () ? this.root_permissions
+            var perms = !this.root_permissions.is_null () ? this.root_permissions
                                                           : this.dir_item ? this.dir_item.remote_perm : this.root_permissions;
             if (perms.is_null ()) {
                 // No permissions set
@@ -1771,7 +1771,7 @@ class ProcessDirectoryJob : GLib.Object {
             break;
         }
         case CSYNC_INSTRUCTION_SYNC: {
-            const var perms = item.remote_perm;
+            var perms = item.remote_perm;
             if (perms.is_null ()) {
                 // No permissions set
                 return true;
@@ -1804,7 +1804,7 @@ class ProcessDirectoryJob : GLib.Object {
                 GLib.warn ("check_for_permission : RESTORING" + item.file + item.error_string;
                 return true; // restore sub items
             }
-            const var perms = item.remote_perm;
+            var perms = item.remote_perm;
             if (perms.is_null ()) {
                 // No permissions set
                 return true;

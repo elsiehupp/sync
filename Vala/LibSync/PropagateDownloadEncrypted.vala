@@ -34,17 +34,17 @@ class PropagateDownloadEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-            const var root_path = [=] () {
-                    const var result = this.propagator.remote_path ();
+            var root_path = [=] () {
+                    var result = this.propagator.remote_path ();
                     if (result.starts_with ('/')) {
                             return result.mid (1);
                     } else {
                             return result;
                     }
             } ();
-            const var remote_filename = this.item.encrypted_filename.is_empty () ? this.item.file : this.item.encrypted_filename;
-            const var remote_path = string (root_path + remote_filename);
-            const var remote_parent_path = remote_path.left (remote_path.last_index_of ('/'));
+            var remote_filename = this.item.encrypted_filename.is_empty () ? this.item.file : this.item.encrypted_filename;
+            var remote_path = string (root_path + remote_filename);
+            var remote_parent_path = remote_path.left (remote_path.last_index_of ('/'));
 
             // Is encrypted Now we need the folder-identifier
             var job = new LsColJob (this.propagator.account (), remote_parent_path, this);
@@ -66,24 +66,24 @@ class PropagateDownloadEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool decrypt_file (GLib.File tmp_file) {
-            const string tmp_filename = create_download_tmp_filename (this.item.file + QLatin1String ("this.dec"));
-            GLib.debug ("Content Checksum Computed starting decryption" + tmp_filename;
+            const string tmp_filename = create_download_tmp_filename (this.item.file + "_dec");
+            GLib.debug ("Content Checksum Computed starting decryption" + tmp_filename);
 
             tmp_file.close ();
-            GLib.File this.tmp_output (this.propagator.full_local_path (tmp_filename), this);
+            GLib.File tmp_output = new GLib.File (this.propagator.full_local_path (tmp_filename), this);
             EncryptionHelper.file_decryption (this.encrypted_info.encryption_key,
                                                                             this.encrypted_info.initialization_vector,
                                                                             tmp_file,
                                                                             this.tmp_output);
 
-            GLib.debug ("Decryption on_signal_finished" + tmp_file.filename () + this.tmp_output.filename ();
+            GLib.debug ("Decryption on_signal_finished" + tmp_file.filename () + tmp_output.filename ());
 
             tmp_file.close ();
             this.tmp_output.close ();
 
             // we decripted the temporary into another temporary, so good bye old one
             if (!tmp_file.remove ()) {
-                    GLib.debug ("Failed to remove temporary file" + tmp_file.error_string ();
+                    GLib.debug ("Failed to remove temporary file" + tmp_file.error_string ());
                     this.error_string = tmp_file.error_string ();
                     return false;
             }
@@ -107,7 +107,7 @@ class PropagateDownloadEncrypted : GLib.Object {
     public void on_signal_check_folder_id (string[] list) {
         var job = qobject_cast<LsColJob> (sender ());
         const string folder_identifier = list.first ();
-        GLib.debug ("Received identifier of folder" + folder_identifier;
+        GLib.debug ("Received identifier of folder" + folder_identifier);
 
         const ExtraFolderInfo folder_info = job.folder_infos.value (folder_identifier);
 
@@ -125,39 +125,41 @@ class PropagateDownloadEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_check_folder_encrypted_metadata (QJsonDocument json) {
-        GLib.debug ("Metadata Received reading"
-                                                                                    + this.item.instruction + this.item.file + this.item.encrypted_filename;
+        GLib.debug ("Metadata Received reading: "
+                   + this.item.instruction
+                   + this.item.file
+                   + this.item.encrypted_filename);
         const string filename = this.info.filename ();
         var meta = new FolderMetadata (this.propagator.account (), json.to_json (QJsonDocument.Compact));
         const GLib.Vector<EncryptedFile> files = meta.files ();
 
         const string encrypted_filename = this.item.encrypted_filename.section ('/', -1);
-        for (EncryptedFile file : files) {
+        foreach (EncryptedFile file in files) {
             if (encrypted_filename == file.encrypted_filename) {
                 this.encrypted_info = file;
 
-                GLib.debug ("Found matching encrypted metadata for file, starting download";
+                GLib.debug ("Found matching encrypted metadata for file, starting download.");
                 /* emit */ file_metadata_found ();
                 return;
             }
         }
 
         /* emit */ failed ();
-        GLib.critical ("Failed to find encrypted metadata information of remote file" + filename;
+        GLib.critical ("Failed to find encrypted metadata information of remote file " + filename);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void on_signal_folder_id_error () {
-        GLib.debug ("Failed to get encrypted metadata of folder";
+        GLib.debug ("Failed to get encrypted metadata of folder.");
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void on_signal_folder_encrypted_metadata_error (GLib.ByteArray file_identifier, int http_return_code) {
-            GLib.critical ("Failed to find encrypted metadata information of remote file" + this.info.filename ();
+            GLib.critical ("Failed to find encrypted metadata information of remote file " + this.info.filename ());
             /* emit */ failed ();
     }
 

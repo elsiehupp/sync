@@ -42,9 +42,9 @@ class AvatarJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () override {
-        Soup.Request req;
-        send_request ("GET", this.avatar_url, req);
+    public void on_signal_start () {
+        Soup.Request reques;
+        send_request ("GET", this.avatar_url, reques);
         AbstractNetworkJob.on_signal_start ();
     }
 
@@ -79,7 +79,7 @@ class AvatarJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private bool on_signal_finished () override {
+    private bool on_signal_finished () {
         int http_result_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
         Gtk.Image av_image;

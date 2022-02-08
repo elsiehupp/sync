@@ -123,7 +123,7 @@ class SyncFileStatusTracker : GLib.Object {
         ProblemsMap old_problems;
         std.swap (this.sync_problems, old_problems);
 
-        foreach (SyncFileItemPtr item, items) {
+        foreach (SyncFileItemPtr item in items) {
             GLib.debug ("Investigating" + item.destination () + item.status + item.instruction;
             this.dirty_paths.remove (item.destination ());
 
@@ -151,14 +151,14 @@ class SyncFileStatusTracker : GLib.Object {
         // Swap into a copy since file_status () reads this.dirty_paths to determine the status
         GLib.Set<string> old_dirty_paths;
         std.swap (this.dirty_paths, old_dirty_paths);
-        for (var old_dirty_path : q_as_const (old_dirty_paths))
+        foreach (var old_dirty_path in q_as_const (old_dirty_paths))
             /* emit */ file_status_changed (get_system_destination (old_dirty_path), file_status (old_dirty_path));
 
         // Make sure to push any status that might have been resolved indirectly since the last sync
         // (like an error file being deleted from disk)
-        for (var sync_problem : this.sync_problems)
+        foreach (var sync_problem in this.sync_problems)
             old_problems.erase (sync_problem.first);
-        for (var old_problem : old_problems) {
+        foreach (var old_problem in old_problems) {
             const string path = old_problem.first;
             SyncFileStatus.SyncFileStatusTag severity = old_problem.second;
             if (severity == SyncFileStatus.SyncFileStatusTag.STATUS_ERROR)
@@ -406,7 +406,7 @@ class SyncFileStatusTracker : GLib.Object {
     likely going to resolve itself quickly and automatically.
     ***********************************************************/
     private static bool has_error_status (SyncFileItem item) {
-        const var status = item.status;
+        var status = item.status;
         return item.instruction == CSYNC_INSTRUCTION_ERROR
             || status == SyncFileItem.Status.NORMAL_ERROR
             || status == SyncFileItem.Status.FATAL_ERROR
@@ -419,7 +419,7 @@ class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static bool has_excluded_status (SyncFileItem item) {
-        const var status = item.status;
+        var status = item.status;
         return item.instruction == CSYNC_INSTRUCTION_IGNORE
             || status == SyncFileItem.Status.FILE_IGNORED
             || status == SyncFileItem.Status.CONFLICT

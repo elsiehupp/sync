@@ -69,7 +69,7 @@ class PropagatorCompositeJob : PropagatorJob {
         }
 
         // Ask all the running composite jobs if they have something new to schedule.
-        for (var running_job : q_as_const (this.running_jobs)) {
+        foreach (var running_job in q_as_const (this.running_jobs)) {
             //  ASSERT (running_job.state == Running);
 
             if (on_signal_possibly_run_next_job (running_job)) {
@@ -134,10 +134,10 @@ class PropagatorCompositeJob : PropagatorJob {
     require to be on_signal_finished without immediete on_signal_abort (on_signal_abort on job might
     cause conflicts/duplicated files - owncloud/client/issues/5949)
     ***********************************************************/
-    public void on_signal_abort (PropagatorJob.AbortType abort_type) override {
+    public void on_signal_abort (PropagatorJob.AbortType abort_type) {
         if (!this.running_jobs.empty ()) {
             this.aborts_count = this.running_jobs.size ();
-            foreach (PropagatorJob j, this.running_jobs) {
+            foreach (PropagatorJob j in this.running_jobs) {
                 if (abort_type == AbortType.ASYNCHRONOUS) {
                     connect (j, &PropagatorJob.abort_finished,
                             this, &PropagatorCompositeJob.on_signal_sub_job_abort_finished);
@@ -154,7 +154,7 @@ class PropagatorCompositeJob : PropagatorJob {
     ***********************************************************/
     public int64 committed_disk_space () {
         int64 needed = 0;
-        foreach (PropagatorJob job, this.running_jobs) {
+        foreach (PropagatorJob job in this.running_jobs) {
             needed += job.committed_disk_space ();
         }
         return needed;

@@ -166,11 +166,11 @@ static class FileSystem {
 
         while (di.has_next ()) {
             di.next ();
-            const QFileInfo fi = di.file_info ();
+            const QFileInfo file_info = di.file_info ();
             bool remove_ok = false;
             // The use of is_sym_link here is okay:
             // we never want to go into this branch for .lnk files
-            bool is_dir = fi.is_dir () && !fi.is_sym_link () && !FileSystem.is_junction (fi.absolute_file_path ());
+            bool is_dir = file_info.is_dir () && !file_info.is_sym_link () && !FileSystem.is_junction (file_info.absolute_file_path ());
             if (is_dir) {
                 remove_ok = remove_recursively (path + '/' + di.filename (), on_signal_deleted, errors); // recursive
             } else {

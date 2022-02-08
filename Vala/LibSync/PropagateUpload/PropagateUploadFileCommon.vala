@@ -97,9 +97,9 @@ class PropagateUploadFileCommon : PropagateItemJob {
         this.aborting = false;
         this.upload_encrypted_helper = null;
         this.uploading_encrypted = false;
-        const var path = this.item.file;
-        const var slash_position = path.last_index_of ('/');
-        const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+        var path = this.item.file;
+        var slash_position = path.last_index_of ('/');
+        var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
         SyncJournalFileRecord parent_rec;
         bool ok = propagator.journal.get_file_record (parent_path, parent_rec);
@@ -124,15 +124,15 @@ class PropagateUploadFileCommon : PropagateItemJob {
     on_signal_start should set up the file, path and size that will be send to the server
     ***********************************************************/
     public void on_signal_start () {
-        const var path = this.item.file;
-        const var slash_position = path.last_index_of ('/');
-        const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+        var path = this.item.file;
+        var slash_position = path.last_index_of ('/');
+        var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
         if (!this.item.rename_target.is_empty () && this.item.file != this.item.rename_target) {
             // Try to rename the file
-            const var original_file_path_absolute = propagator ().full_local_path (this.item.file);
-            const var new_file_path_absolute = propagator ().full_local_path (this.item.rename_target);
-            const var rename_success = GLib.File.rename (original_file_path_absolute, new_file_path_absolute);
+            var original_file_path_absolute = propagator ().full_local_path (this.item.file);
+            var new_file_path_absolute = propagator ().full_local_path (this.item.rename_target);
+            var rename_success = GLib.File.rename (original_file_path_absolute, new_file_path_absolute);
             if (!rename_success) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, "File contains trailing spaces and couldn't be renamed");
                 return;
@@ -141,7 +141,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             this.item.modtime = FileSystem.get_mod_time (new_file_path_absolute);
             //  Q_ASSERT (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+                GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
                 on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (this.item.file)));
                 return;
             }
@@ -154,7 +154,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             return;
         }
 
-        const var account = propagator ().account ();
+        var account = propagator ().account ();
 
         if (!account.capabilities ().client_side_encryption_available () ||
             !parent_rec.is_valid () ||
@@ -163,7 +163,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             return;
         }
 
-        const var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
+        var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
         this.upload_encrypted_helper = new PropagateUploadEncrypted (propagator (), remote_parent_path, this.item, this);
         connect (this.upload_encrypted_helper, &PropagateUploadEncrypted.finalized,
                 this, &PropagateUploadFileCommon.setup_encrypted_file);
@@ -307,7 +307,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         this.item.checksum_header = make_checksum_header (content_checksum_type, content_checksum);
 
         // Reuse the content checksum as the transmission checksum if possible
-        const var supported_transmission_checksums =
+        var supported_transmission_checksums =
             propagator ().account ().capabilities ().supported_checksum_types ();
         if (supported_transmission_checksums.contains (content_checksum_type)) {
             on_signal_start_upload (content_checksum_type, content_checksum);
@@ -357,7 +357,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         }
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
         }
         time_t prev_modtime = this.item.modtime; // the this.item value was set in PropagateUploadFile.on_signal_start ()
         // but a potential checksum calculation could have taken some time during which the file could
@@ -370,7 +370,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         }
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
         }
         if (prev_modtime != this.item.modtime) {
             propagator ().another_sync_needed = true;
@@ -439,7 +439,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         info.modtime = this.item.modtime;
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
         }
         info.file_size = this.item.size;
         propagator ().journal.poll_info (info);
@@ -500,7 +500,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             quota_it.value () -= this.file_to_upload.size;
 
         // Update the database entry
-        const var result = propagator ().update_metadata (*this.item);
+        var result = propagator ().update_metadata (*this.item);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
             return;
@@ -514,7 +514,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         if (this.item.instruction == CSYNC_INSTRUCTION_NEW
             || this.item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE) {
             var vfs = propagator ().sync_options ().vfs;
-            const var pin = vfs.pin_state (this.item.file);
+            var pin = vfs.pin_state (this.item.file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
                 if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
                     GLib.warn ("Could not set pin state of" + this.item.file + "to unspecified";
@@ -559,7 +559,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
 
         // Count the number of jobs that need aborting, and emit the overall
         // on_signal_abort signal when they're all done.
-        unowned<int> running_count (new int (0));
+        unowned int running_count = 0;
         var one_abort_finished = [this, running_count] () {
             (*running_count)--;
             if (*running_count == 0) {
@@ -568,7 +568,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         }
 
         // Abort all running jobs, except for explicitly excluded ones
-        foreach (AbstractNetworkJob job, this.jobs) {
+        foreach (AbstractNetworkJob job in this.jobs) {
             var reply = job.reply ();
             if (!reply || !reply.is_running ())
                 continue;
@@ -627,7 +627,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
     protected void common_error_handling (AbstractNetworkJob job) {
         GLib.ByteArray reply_content;
         string error_string = job.error_string_parsing_body (&reply_content);
-        GLib.debug () + reply_content; // display the XML error in the debug
+        GLib.debug (reply_content; // display the XML error in the debug
 
         if (this.item.http_error_code == 412) {
             // Precondition Failed : Either an etag or a checksum mismatch.
@@ -650,7 +650,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             // store the quota for the real local file using the information
             // on the file to upload, that could have been modified by
             // filters or something.
-            const var path = QFileInfo (this.item.file).path ();
+            var path = QFileInfo (this.item.file).path ();
             var quota_it = propagator ().folder_quota.find (path);
             if (quota_it != propagator ().folder_quota.end ()) {
                 quota_it.value () = q_min (quota_it.value (), this.file_to_upload.size - 1);
@@ -697,7 +697,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         headers[QByteArrayLiteral ("Content-Type")] = QByteArrayLiteral ("application/octet-stream");
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
         }
         headers[QByteArrayLiteral ("X-OC-Mtime")] = GLib.ByteArray.number (int64 (this.item.modtime));
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS"))

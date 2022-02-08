@@ -183,7 +183,7 @@ class Capabilities {
     /***********************************************************
     ***********************************************************/
     public bool chunking_ng () {
-        const var chunkng = qgetenv ("OWNCLOUD_CHUNKING_NG");
+        var chunkng = qgetenv ("OWNCLOUD_CHUNKING_NG");
         if (chunkng == "0")
             return false;
         if (chunkng == "1")
@@ -205,7 +205,7 @@ class Capabilities {
         if (!this.capabilities.contains ("user_status")) {
             return false;
         }
-        const var user_status_map = this.capabilities["user_status"].to_map ();
+        var user_status_map = this.capabilities["user_status"].to_map ();
         return user_status_map.value ("enabled", false).to_bool ();
     }
 
@@ -216,7 +216,7 @@ class Capabilities {
         if (!user_status ()) {
             return false;
         }
-        const var user_status_map = this.capabilities["user_status"].to_map ();
+        var user_status_map = this.capabilities["user_status"].to_map ();
         return user_status_map.value ("supports_emoji", false).to_bool ();
     }
 
@@ -229,7 +229,7 @@ class Capabilities {
             return PushNotificationType.NONE;
         }
 
-        const var types = this.capabilities["notify_push"].to_map ()["type"].to_string_list ();
+        var types = this.capabilities["notify_push"].to_map ()["type"].to_string_list ();
         PushNotificationTypes push_notification_types;
 
         if (types.contains ("files")) {
@@ -252,7 +252,7 @@ class Capabilities {
     Websocket url for files push notifications if available
     ***********************************************************/
     public GLib.Uri push_notifications_web_socket_url () {
-        const var websocket = this.capabilities["notify_push"].to_map ()["endpoints"].to_map ()["websocket"].to_string ();
+        var websocket = this.capabilities["notify_push"].to_map ()["endpoints"].to_map ()["websocket"].to_string ();
         return GLib.Uri (websocket);
     }
 
@@ -291,25 +291,25 @@ class Capabilities {
             return false;
         }
 
-        const var properties = (*it).to_map ();
-        const var enabled = properties.value (QStringLiteral ("enabled"), false).to_bool ();
+        var properties = (*it).to_map ();
+        var enabled = properties.value (QStringLiteral ("enabled"), false).to_bool ();
         if (!enabled) {
             return false;
         }
 
-        const var version = properties.value (QStringLiteral ("api-version"), "1.0").to_byte_array ();
+        var version = properties.value (QStringLiteral ("api-version"), "1.0").to_byte_array ();
         GLib.info ("E2EE API version:" + version;
-        const var splitted_version = version.split ('.');
+        var splitted_version = version.split ('.');
 
         bool ok = false;
-        const var major = !splitted_version.is_empty () ? splitted_version.at (0).to_int (&ok) : 0;
+        var major = !splitted_version.is_empty () ? splitted_version.at (0).to_int (&ok) : 0;
         if (!ok) {
             GLib.warn ("Didn't understand version scheme (major), E2EE disabled";
             return false;
         }
 
         ok = false;
-        const var minor = splitted_version.size () > 1 ? splitted_version.at (1).to_int (&ok) : 0;
+        var minor = splitted_version.size () > 1 ? splitted_version.at (1).to_int (&ok) : 0;
         if (!ok) {
             GLib.warn ("Didn't understand version scheme (minor), E2EE disabled";
             return false;
@@ -348,7 +348,7 @@ class Capabilities {
     ***********************************************************/
     public GLib.List<GLib.ByteArray> supported_checksum_types () {
         GLib.List<GLib.ByteArray> list;
-        foreach (var t, this.capabilities["checksums"].to_map ()["supported_types"].to_list ()) {
+        foreach (var t in this.capabilities["checksums"].to_map ()["supported_types"].to_list ()) {
             list.push_back (t.to_byte_array ());
         }
         return list;
@@ -406,7 +406,7 @@ class Capabilities {
     ***********************************************************/
     public GLib.List<int> http_error_codes_that_reset_failing_chunked_uploads () {
         GLib.List<int> list;
-        foreach (var t, this.capabilities["dav"].to_map ()["http_error_codes_that_reset_failing_chunked_uploads"].to_list ()) {
+        foreach (var t in this.capabilities["dav"].to_map ()["http_error_codes_that_reset_failing_chunked_uploads"].to_list ()) {
             list.push_back (t.to_int ());
         }
         return list;

@@ -37,13 +37,13 @@ class OcsProfileConnector : GLib.Object {
     public void fetch_hovercard (string user_id);
     void OcsProfileConnector.fetch_hovercard (string user_id) {
         if (this.account.server_version_int () < Account.make_server_version (23, 0, 0)) {
-            q_info ("Server version" + this.account.server_version ()
+            GLib.info ("Server version" + this.account.server_version ()
                                          + "does not support profile page";
             /* emit */ error ();
             return;
         }
         const string url = QStringLiteral ("/ocs/v2.php/hovercard/v1/%1").arg (user_id);
-        const var job = new JsonApiJob (this.account, url, this);
+        var job = new JsonApiJob (this.account, url, this);
         connect (job, &JsonApiJob.json_received, this, &OcsProfileConnector.on_signal_hovercard_fetched);
         job.on_signal_start ();
     }
@@ -65,7 +65,7 @@ class OcsProfileConnector : GLib.Object {
             GLib.info ("Fetching of hovercard on_signal_finished with status code" + status_code;
             return;
         }
-        const var json_data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("actions");
+        var json_data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("actions");
         //  Q_ASSERT (json_data.is_array ());
         this.current_hovercard = json_to_hovercard (json_data.to_array ());
         fetch_icons ();
@@ -86,8 +86,8 @@ class OcsProfileConnector : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void start_fetch_icon_job (size_t hovercard_action_index) {
-        const var hovercard_action = this.current_hovercard.actions[hovercard_action_index];
-        const var icon_job = new IconJob{this.account, hovercard_action.icon_url, this};
+        var hovercard_action = this.current_hovercard.actions[hovercard_action_index];
+        var icon_job = new IconJob{this.account, hovercard_action.icon_url, this};
         connect (icon_job, &IconJob.job_finished,
             [this, hovercard_action_index] (GLib.ByteArray icon_data) {
                 load_hovercard_action_icon (hovercard_action_index, icon_data);
@@ -115,7 +115,7 @@ class OcsProfileConnector : GLib.Object {
             // Note: Probably could do more checking, like checking if the url is still the same.
             return;
         }
-        const var icon = icon_data_to_pixmap (icon_data);
+        var icon = icon_data_to_pixmap (icon_data);
         if (icon.is_valid ()) {
             hovercard_action_icon (hovercard_action_index, icon.get ());
             return;
@@ -125,7 +125,7 @@ class OcsProfileConnector : GLib.Object {
 
 
     private static Occ.HovercardAction json_to_action (QJsonObject json_action_object) {
-        const var icon_url = json_action_object.value (QStringLiteral ("icon")).to_string (QStringLiteral ("no-icon"));
+        var icon_url = json_action_object.value (QStringLiteral ("icon")).to_string (QStringLiteral ("no-icon"));
         QPixmap icon_pixmap;
         Occ.HovercardAction hovercard_action{
             json_action_object.value (QStringLiteral ("title")).to_string (QStringLiteral ("No title")), icon_url,
@@ -140,7 +140,7 @@ class OcsProfileConnector : GLib.Object {
     private static Occ.Hovercard json_to_hovercard (QJsonArray json_data_array) {
         Occ.Hovercard hovercard;
         hovercard.actions.reserve (json_data_array.size ());
-        for (var json_entry : json_data_array) {
+        foreach (var json_entry in json_data_array) {
             //  Q_ASSERT (json_entry.is_object ());
             if (!json_entry.is_object ()) {
                 continue;

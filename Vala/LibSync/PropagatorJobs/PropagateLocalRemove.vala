@@ -26,7 +26,7 @@ class PropagateLocalRemove : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        GLib.info ("Start propagate local remove job";
+        GLib.info ("Start propagate local remove job");
 
         this.move_to_trash = propagator ().sync_options ().move_files_to_trash;
 
@@ -34,7 +34,7 @@ class PropagateLocalRemove : PropagateItemJob {
             return;
 
         const string filename = propagator ().full_local_path (this.item.file);
-        GLib.info ("Going to delete:" + filename;
+        GLib.info ("Going to delete:" + filename);
 
         if (propagator ().local_filename_clash (this.item.file)) {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not remove %1 because of a local file name clash").arg (QDir.to_native_separators (filename)));
@@ -96,7 +96,7 @@ class PropagateLocalRemove : PropagateItemJob {
             // We need to delete the entries from the database now from the deleted vector.
             // Do it while avoiding redundant delete calls to the journal.
             string deleted_dir;
-            foreach (var it, deleted) {
+            foreach (var it in deleted) {
                 if (!it.first.starts_with (propagator ().local_path ()))
                     continue;
                 if (!deleted_dir.is_empty () && it.first.starts_with (deleted_dir))

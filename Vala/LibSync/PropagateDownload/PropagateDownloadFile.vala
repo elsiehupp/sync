@@ -100,16 +100,16 @@ class PropagateDownloadFile : PropagateItemJob {
             return;
         this.is_encrypted = false;
 
-        GLib.debug () + this.item.file + propagator ().active_job_list.count ();
+        GLib.debug (this.item.file + propagator ().active_job_list.count ());
 
-        const var path = this.item.file;
-        const var slash_position = path.last_index_of ('/');
-        const var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+        var path = this.item.file;
+        var slash_position = path.last_index_of ('/');
+        var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
 
         SyncJournalFileRecord parent_rec;
         propagator ().journal.get_file_record (parent_path, parent_rec);
 
-        const var account = propagator ().account ();
+        var account = propagator ().account ();
         if (!account.capabilities ().client_side_encryption_available () ||
             !parent_rec.is_valid () ||
             !parent_rec.is_e2e_encrypted) {
@@ -117,12 +117,12 @@ class PropagateDownloadFile : PropagateItemJob {
         } else {
             this.download_encrypted_helper = new PropagateDownloadEncrypted (propagator (), parent_path, this.item, this);
             connect (this.download_encrypted_helper, &PropagateDownloadEncrypted.file_metadata_found, [this] {
-            this.is_encrypted = true;
-            start_after_is_encrypted_is_checked ();
+                this.is_encrypted = true;
+                start_after_is_encrypted_is_checked ();
             });
             connect (this.download_encrypted_helper, &PropagateDownloadEncrypted.failed, [this] {
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
-                _("File %1 cannot be downloaded because encryption information is missing.").arg (QDir.to_native_separators (this.item.file)));
+                on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
+                    _("File %1 cannot be downloaded because encryption information is missing.").arg (QDir.to_native_separators (this.item.file)));
             });
             this.download_encrypted_helper.on_signal_start ();
         }
@@ -142,7 +142,7 @@ class PropagateDownloadFile : PropagateItemJob {
     /***********************************************************
     We think it might finish quickly because it is a small file.
     ***********************************************************/
-    public bool is_likely_finished_quickly () override {
+    public bool is_likely_finished_quickly () {
         return this.item.size < propagator ().small_file_size ();
     }
 
@@ -156,7 +156,7 @@ class PropagateDownloadFile : PropagateItemJob {
         }
 
         // Delete the directory if it is empty!
-        QDir dir (existing_dir);
+        QDir dir = new QDir (existing_dir);
         if (dir.entry_list (QDir.NoDotAndDotDot | QDir.AllEntries).count () == 0) {
             if (dir.rmdir (existing_dir)) {
                 return;
@@ -194,14 +194,14 @@ class PropagateDownloadFile : PropagateItemJob {
         propagator ().active_job_list.remove_one (this);
         if (make_checksum_header (checksum_type, checksum) == this.item.checksum_header) {
             // No download necessary, just update fs and journal metadata
-            GLib.debug () + this.item.file + "remote and local checksum match";
+            GLib.debug (this.item.file + "remote and local checksum match");
 
             // Apply the server mtime locally if necessary, ensuring the journal
             // and local mtimes end up identical
             var fn = propagator ().full_local_path (this.item.file);
             //  Q_ASSERT (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+                GLib.warn ("invalid modified time" + this.item.file + this.item.modtime);
                 return;
             }
             if (this.item.modtime != this.item.previous_modtime) {
@@ -212,7 +212,7 @@ class PropagateDownloadFile : PropagateItemJob {
             this.item.modtime = FileSystem.get_mod_time (fn);
             //  Q_ASSERT (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+                GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
                 return;
             }
             update_metadata (/*is_conflict=*/false);
@@ -258,7 +258,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
         this.resume_start = this.tmp_file.size ();
         if (this.resume_start > 0 && this.resume_start == this.item.size) {
-            GLib.info ("File is already complete, no need to download";
+            GLib.info ("File is already complete, no need to download");
             on_signal_download_finished ();
             return;
         }
@@ -268,7 +268,7 @@ class PropagateDownloadFile : PropagateItemJob {
         if (this.tmp_file.exists ())
             FileSystem.file_read_only (this.tmp_file.filename (), false);
         if (!this.tmp_file.open (QIODevice.Append | QIODevice.Unbuffered)) {
-            GLib.warn ("could not open temporary file" + this.tmp_file.filename ();
+            GLib.warn ("could not open temporary file" + this.tmp_file.filename ());
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, this.tmp_file.error_string ());
             return;
         }
@@ -276,7 +276,7 @@ class PropagateDownloadFile : PropagateItemJob {
         FileSystem.file_hidden (this.tmp_file.filename (), true);
 
         // If there's not enough space to fully download this file, stop.
-        const var disk_space_result = propagator ().disk_space_check ();
+        var disk_space_result = propagator ().disk_space_check ();
         if (disk_space_result != OwncloudPropagator.DiskSpaceOk) {
             if (disk_space_result == OwncloudPropagator.DiskSpaceFailure) {
                 // Using DetailError here will make the error not pop up in the account
@@ -315,7 +315,7 @@ class PropagateDownloadFile : PropagateItemJob {
                 this.tmp_file, headers, expected_etag_for_resume, this.resume_start, this);
         } else {
             // We were provided a direct URL, use that one
-            GLib.info ("direct_download_url given for " + this.item.file + this.item.direct_download_url;
+            GLib.info ("direct_download_url given for " + this.item.file + this.item.direct_download_url);
 
             if (!this.item.direct_download_cookies.is_empty ()) {
                 headers["Cookie"] = this.item.direct_download_cookies.to_utf8 ();
@@ -352,20 +352,20 @@ class PropagateDownloadFile : PropagateItemJob {
             // without the header.
             const bool bad_range_header = job.resume_start () > 0 && this.item.http_error_code == 416;
             if (bad_range_header) {
-                GLib.warn ("server replied 416 to our range request, trying again without";
+                GLib.warn ("Server replied 416 to our range request, trying again without.");
                 propagator ().another_sync_needed = true;
             }
 
             // Getting a 404 probably means that the file was deleted on the server.
             const bool file_not_found = this.item.http_error_code == 404;
             if (file_not_found) {
-                GLib.warn ("server replied 404, assuming file was deleted";
+                GLib.warn ("Server replied 404, assuming file was deleted.");
             }
 
             // Getting a 423 means that the file is locked
             const bool file_locked = this.item.http_error_code == 423;
             if (file_locked) {
-                GLib.warn ("server replied 423, file is Locked";
+                GLib.warn ("Server replied 423, file is locked.");
             }
 
             // Don't keep the temporary file if it is empty or we
@@ -378,7 +378,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
             if (!this.item.direct_download_url.is_empty () && err != Soup.Reply.OperationCanceledError) {
                 // If this was with a direct download, retry without direct download
-                GLib.warn ("Direct download of" + this.item.direct_download_url + "failed. Retrying through owncloud.";
+                GLib.warn ("Direct download of" + this.item.direct_download_url + " failed. Retrying through owncloud.");
                 this.item.direct_download_url.clear ();
                 on_signal_start ();
                 return;
@@ -431,7 +431,7 @@ class PropagateDownloadFile : PropagateItemJob {
             this.item.modtime = job.last_modified ();
             //  Q_ASSERT (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+                GLib.warn ("Invalid modified time: " + this.item.file + this.item.modtime);
             }
         }
 
@@ -449,7 +449,7 @@ class PropagateDownloadFile : PropagateItemJob {
         // Qt removes the content-length header for transparently decompressed HTTP1 replies
         // but not for HTTP2 or SPDY replies. For these it remains and contains the size
         // of the compressed data. See QTBUG-73364.
-        const var content_encoding = job.reply ().raw_header ("content-encoding").to_lower ();
+        var content_encoding = job.reply ().raw_header ("content-encoding").to_lower ();
         if ( (content_encoding == "gzip" || content_encoding == "deflate")
             && (job.reply ().attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()
             || job.reply ().attribute (Soup.Request.Spdy_was_used_attribute).to_bool ())) {
@@ -460,14 +460,14 @@ class PropagateDownloadFile : PropagateItemJob {
         if (has_size_header && this.tmp_file.size () > 0 && body_size == 0) {
             // Strange bug with broken webserver or webfirewall https://github.com/owncloud/client/issues/3373#issuecomment-122672322
             // This happened when trying to resume a file. The Content-Range header was files, Content-Length was == 0
-            GLib.debug () + body_size + this.item.size + this.tmp_file.size () + job.resume_start ();
+            GLib.debug (body_size + this.item.size + this.tmp_file.size () + job.resume_start ());
             FileSystem.remove (this.tmp_file.filename ());
-            on_signal_done (SyncFileItem.Status.SOFT_ERROR, QLatin1String ("Broken webserver returning empty content length for non-empty file on resume"));
+            on_signal_done (SyncFileItem.Status.SOFT_ERROR, "Broken webserver returning empty content length for non-empty file on resume");
             return;
         }
 
         if (body_size > 0 && body_size != this.tmp_file.size () - job.resume_start ()) {
-            GLib.debug () + body_size + this.tmp_file.size () + job.resume_start ();
+            GLib.debug (body_size + this.tmp_file.size () + job.resume_start ();
             propagator ().another_sync_needed = true;
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file could not be downloaded completely."));
             return;
@@ -581,7 +581,7 @@ class PropagateDownloadFile : PropagateItemJob {
         }
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warn ("Invalid modified time: " + this.item.file + this.item.modtime);
         }
         FileSystem.mod_time (this.tmp_file.filename (), this.item.modtime);
         // We need to fetch the time again because some file systems such as FAT have worse than a second
@@ -594,20 +594,20 @@ class PropagateDownloadFile : PropagateItemJob {
         }
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warn ("Invalid modified time: " + this.item.file + this.item.modtime);
         }
 
         bool previous_file_exists = FileSystem.file_exists (fn);
         if (previous_file_exists) {
             // Preserve the existing file permissions.
-            QFileInfo existing_file (fn);
+            QFileInfo existing_file = new QFileInfo (fn);
             if (existing_file.permissions () != this.tmp_file.permissions ()) {
                 this.tmp_file.permissions (existing_file.permissions ());
             }
             preserve_group_ownership (this.tmp_file.filename (), existing_file);
 
             // Make the file a hydrated placeholder if possible
-            const var result = propagator ().sync_options ().vfs.convert_to_placeholder (this.tmp_file.filename (), this.item, fn);
+            var result = propagator ().sync_options ().vfs.convert_to_placeholder (this.tmp_file.filename (), this.item, fn);
             if (!result) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, result.error ());
                 return;
@@ -628,12 +628,12 @@ class PropagateDownloadFile : PropagateItemJob {
             previous_file_exists = false;
         }
 
-        const var vfs = propagator ().sync_options ().vfs;
+        var vfs = propagator ().sync_options ().vfs;
 
         // In the case of an hydration, this size is likely to change for placeholders
         // (except with the cfapi backend)
-        const var is_virtual_download = this.item.type == ItemTypeVirtualFileDownload;
-        const var is_cf_api_vfs = vfs && vfs.mode () == Vfs.WindowsCfApi;
+        var is_virtual_download = this.item.type == ItemTypeVirtualFileDownload;
+        var is_cf_api_vfs = vfs && vfs.mode () == Vfs.WindowsCfApi;
         if (previous_file_exists && (is_cf_api_vfs || !is_virtual_download)) {
             // Check whether the existing file has changed since the discovery
             // phase by comparing size and mtime to the previous values. This
@@ -682,7 +682,7 @@ class PropagateDownloadFile : PropagateItemJob {
             if (this.item.type == ItemTypeVirtualFileDownload) {
                 string virtual_file = this.item.file + vfs.file_suffix ();
                 var fn = propagator ().full_local_path (virtual_file);
-                GLib.debug ("Download of previous virtual file on_signal_finished" + fn;
+                GLib.debug ("Download of previous virtual file finished: " + fn);
                 GLib.File.remove (fn);
                 propagator ().journal.delete_file_record (virtual_file);
 
@@ -690,10 +690,10 @@ class PropagateDownloadFile : PropagateItemJob {
                 var pin = propagator ().journal.internal_pin_states ().raw_for_path (virtual_file.to_utf8 ());
                 if (pin && *pin != PinState.PinState.INHERITED) {
                     if (!vfs.pin_state (this.item.file, *pin)) {
-                        GLib.warn ("Could not set pin state of" + this.item.file;
+                        GLib.warn ("Could not set pin state of " + this.item.file);
                     }
                     if (!vfs.pin_state (virtual_file, PinState.PinState.INHERITED)) {
-                        GLib.warn ("Could not set pin state of" + virtual_file + " to inherited";
+                        GLib.warn ("Could not set pin state of " + virtual_file + " to inherited.");
                     }
                 }
             }
@@ -702,7 +702,7 @@ class PropagateDownloadFile : PropagateItemJob {
             var pin = vfs.pin_state (this.item.file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY)
                 if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
-                    GLib.warn ("Could not set pin state of" + this.item.file + "to unspecified";
+                    GLib.warn ("Could not set pin state of " + this.item.file + " to unspecified.");
                 }
         }
 
@@ -715,7 +715,7 @@ class PropagateDownloadFile : PropagateItemJob {
     ***********************************************************/
     private void update_metadata (bool is_conflict) {
         const string fn = propagator ().full_local_path (this.item.file);
-        const var result = propagator ().update_metadata (*this.item);
+        var result = propagator ().update_metadata (*this.item);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
             return;
@@ -743,7 +743,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
         int64 duration = this.stopwatch.elapsed ();
         if (is_likely_finished_quickly () && duration > 5 * 1000) {
-            GLib.warn ("WARNING : Unexpectedly slow connection, took" + duration + "msec for" + this.item.size - this.resume_start + "bytes for" + this.item.file;
+            GLib.warn ("WARNING: Unexpectedly slow connection, took" + duration + "msec for " + this.item.size - this.resume_start + " bytes for " + this.item.file);
         }
     }
 
@@ -796,7 +796,7 @@ class PropagateDownloadFile : PropagateItemJob {
                 return;
             }
 
-            GLib.debug ("dehydrating file" + this.item.file;
+            GLib.debug ("Dehydrating file " + this.item.file);
             var r = vfs.dehydrate_placeholder (*this.item);
             if (!r) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, r.error ());
@@ -813,7 +813,7 @@ class PropagateDownloadFile : PropagateItemJob {
             return;
         }
         if (vfs.mode () == Vfs.Off && this.item.type == ItemTypeVirtualFile) {
-            GLib.warn ("ignored virtual file type of" + this.item.file;
+            GLib.warn ("Ignored virtual file type of " + this.item.file);
             this.item.type = ItemTypeFile;
         }
         if (this.item.type == ItemTypeVirtualFile) {
@@ -822,7 +822,7 @@ class PropagateDownloadFile : PropagateItemJob {
                 return;
             }
 
-            GLib.debug ("creating virtual file" + this.item.file;
+            GLib.debug ("Creating virtual file " + this.item.file);
             // do a klaas' case clash check.
             if (propagator ().local_filename_clash (this.item.file)) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 can not be downloaded because of a local file name clash!").arg (QDir.to_native_separators (this.item.file)));
@@ -858,20 +858,20 @@ class PropagateDownloadFile : PropagateItemJob {
         // If the hashes are collision safe and identical, we assume the content is too.
         // For weak checksums, we only do that if the mtimes are also identical.
 
-        const var csync_is_collision_safe_hash = [] (GLib.ByteArray checksum_header) {
+        var csync_is_collision_safe_hash = [] (GLib.ByteArray checksum_header) {
             return checksum_header.starts_with ("SHA")
                 || checksum_header.starts_with ("MD5:");
         }
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
         }
         if (this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
             && this.item.size == this.item.previous_size
             && !this.item.checksum_header.is_empty ()
             && (csync_is_collision_safe_hash (this.item.checksum_header)
                 || this.item.modtime == this.item.previous_modtime)) {
-            GLib.debug () + this.item.file + "may not need download, computing checksum";
+            GLib.debug (this.item.file + "may not need download, computing checksum";
             var compute_checksum = new ComputeChecksum (this);
             compute_checksum.checksum_type (parse_checksum_header_type (this.item.checksum_header));
             connect (compute_checksum, &ComputeChecksum.done,
@@ -916,7 +916,7 @@ class PropagateDownloadFile : PropagateItemJob {
     Anonymous namespace for the recall feature
     ***********************************************************/
     static string make_recall_filename (string fn) {
-        string recall_filename (fn);
+        string recall_filename = fn;
         // Add this.recall-XXXX  before the extension.
         int dot_location = recall_filename.last_index_of ('.');
         // If no extension, add it at the end  (take care of cases like foo/.hidden or foo.bar/file)
@@ -924,7 +924,7 @@ class PropagateDownloadFile : PropagateItemJob {
             dot_location = recall_filename.size ();
         }
 
-        string time_string = GLib.DateTime.current_date_time_utc ().to_string ("yyyy_mMdd-hhmmss");
+        string time_string = GLib.DateTime.current_date_time_utc ().to_string () + "yyyy_mMdd-hhmmss");
         recall_filename.insert (dot_location, "this..sys.admin#recall#-" + time_string);
 
         return recall_filename;
@@ -935,16 +935,16 @@ class PropagateDownloadFile : PropagateItemJob {
     Anonymous namespace for the recall feature
     ***********************************************************/
     static void handle_recall_file (string file_path, string folder_path, SyncJournalDb journal) {
-        GLib.debug ("handle_recall_file : " + file_path;
+        GLib.debug ("Handling recall file: " + file_path);
 
         FileSystem.file_hidden (file_path, true);
 
         GLib.File file = new GLib.File (file_path);
         if (!file.open (QIODevice.ReadOnly)) {
-            GLib.warn ("Could not open recall file" + file.error_string ();
+            GLib.warn ("Could not open recall file: " + file.error_string ());
             return;
         }
-        QFileInfo existing_file (file_path);
+        QFileInfo existing_file = new QFileInfo (file_path);
         QDir base_dir = existing_file.dir ();
 
         while (!file.at_end ()) {
@@ -953,7 +953,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
             string recalled_file = QDir.clean_path (base_dir.file_path (line));
             if (!recalled_file.starts_with (folder_path) || !recalled_file.starts_with (base_dir.path ())) {
-                GLib.warn ("Ignoring recall of " + recalled_file;
+                GLib.warn ("Ignoring recall of " + recalled_file);
                 continue;
             }
 
@@ -962,15 +962,15 @@ class PropagateDownloadFile : PropagateItemJob {
 
             SyncJournalFileRecord record;
             if (!journal.get_file_record (local_recalled_file, record) || !record.is_valid ()) {
-                GLib.warn ("No database entry for recall of" + local_recalled_file;
+                GLib.warn ("No database entry for recall of " + local_recalled_file);
                 continue;
             }
 
-            GLib.info ("Recalling" + local_recalled_file + "Checksum:" + record.checksum_header;
+            GLib.info ("Recalling " + local_recalled_file + " Checksum: " + record.checksum_header);
 
             string target_path = make_recall_filename (recalled_file);
 
-            GLib.debug ("Copy recall file : " + recalled_file + " . " + target_path;
+            GLib.debug ("Copying recall file from " + recalled_file + " to " + target_path);
             // Remove the target first, GLib.File.copy will not overwrite it.
             FileSystem.remove (target_path);
             GLib.File.copy (recalled_file, target_path);
@@ -981,16 +981,16 @@ class PropagateDownloadFile : PropagateItemJob {
     /***********************************************************
     Anonymous namespace for the recall feature
     ***********************************************************/
-    static void preserve_group_ownership (string filename, QFileInfo fi) {
-#ifdef Q_OS_UNIX
-        int chown_err = chown (filename.to_local8Bit ().const_data (), -1, fi.group_id ());
+    static void preserve_group_ownership (string filename, QFileInfo file_info) {
+//  #ifdef Q_OS_UNIX
+        int chown_err = chown (filename.to_local8Bit ().const_data (), -1, file_info.group_id ());
         if (chown_err) {
             // TODO : Consider further error handling!
-            GLib.warn () + string ("preserve_group_ownership : chown error %1 : setting group %2 failed on file %3").arg (chown_err).arg (fi.group_id ()).arg (filename);
+            GLib.warn () + string ("preserve_group_ownership : chown error %1 : setting group %2 failed on file %3").arg (chown_err).arg (file_info.group_id ()).arg (filename);
         }
-#else
+//  #else
         //  Q_UNUSED (filename);
-        //  Q_UNUSED (fi);
+        //  Q_UNUSED (file_info);
 //  #endif
     }
 

@@ -113,7 +113,7 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public void close () override;
+    public void close ();
     void UploadDevice.close () {
         this.file.close ();
         QIODevice.close ();
@@ -165,7 +165,7 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public bool at_end () override;
+    public bool at_end ();
     bool UploadDevice.at_end () {
         return this.read >= this.size;
     }
@@ -173,7 +173,7 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public int64 size () override;
+    public int64 size ();
     int64 UploadDevice.size () {
         return this.size;
     }
@@ -181,7 +181,7 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public int64 bytes_available () override;
+    public int64 bytes_available ();
     int64 UploadDevice.bytes_available () {
         return this.size - this.read + QIODevice.bytes_available ();
     }

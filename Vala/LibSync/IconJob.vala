@@ -25,10 +25,10 @@ class IconJob : GLib.Object {
     public IconJob (AccountPointer account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         Soup.Request request (url);
-    #if (QT_VERSION >= 0x050600)
+    // #if (QT_VERSION >= 0x050600)
         request.attribute (Soup.Request.FollowRedirectsAttribute, true);
-    #endif
-        const var reply = account.send_raw_request (QByteArrayLiteral ("GET"), url, request);
+    // #endif
+        var reply = account.send_raw_request (QByteArrayLiteral ("GET"), url, request);
         connect (reply, &Soup.Reply.on_signal_finished, this, &IconJob.on_signal_finished);
     }
 
@@ -36,13 +36,13 @@ class IconJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_finished () {
-        const var reply = qobject_cast<Soup.Reply> (sender ());
+        var reply = qobject_cast<Soup.Reply> (sender ());
         if (!reply) {
             return;
         }
         delete_later ();
 
-        const var network_error = reply.error ();
+        var network_error = reply.error ();
         if (network_error != Soup.Reply.NoError) {
             /* emit */ error (network_error);
             return;

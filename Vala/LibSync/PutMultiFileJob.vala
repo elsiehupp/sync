@@ -46,7 +46,7 @@ class PutMultiFileJob : AbstractNetworkJob {
         this.devices = std.move (devices);
         this.url = url;
         this.body.content_type (QHttpMultiPart.Related_type);
-        for (var single_device : this.devices) {
+        foreach (var single_device in this.devices) {
             single_device.device.parent (this);
             connect (this, &PutMultiFileJob.upload_progress,
                     single_device.device.get (), &UploadDevice.on_signal_job_upload_progress);
@@ -58,9 +58,9 @@ class PutMultiFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request req;
+        Soup.Request reques;
 
-        for (var one_device : this.devices) {
+        foreach (var one_device in this.devices) {
             var one_part = QHttp_part{};
 
             one_part.body_device (one_device.device.get ());
@@ -69,12 +69,12 @@ class PutMultiFileJob : AbstractNetworkJob {
                 one_part.raw_header (it.key (), it.value ());
             }
 
-            req.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
+            reques.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
 
             this.body.append (one_part);
         }
 
-        send_request ("POST", this.url, req, this.body);
+        send_request ("POST", this.url, reques, this.body);
 
         if (reply ().error () != Soup.Reply.NoError) {
             GLib.warn (" Network error : " + reply ().error_string ();
@@ -90,7 +90,7 @@ class PutMultiFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public bool on_signal_finished () {
-        for (var one_device : this.devices) {
+        foreach (var one_device in this.devices) {
             one_device.device.close ();
         }
 
@@ -106,7 +106,7 @@ class PutMultiFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public string error_string () override {
+    public string error_string () {
         return this.error_string.is_empty () ? AbstractNetworkJob.error_string () : this.error_string;
     }
 

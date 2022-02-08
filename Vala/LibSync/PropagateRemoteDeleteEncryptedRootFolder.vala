@@ -110,7 +110,7 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
         const string encrypted_filename = delete_job.property (ENCRYPTED_FILENAME_PROPERTY_KEY).to_string ();
 
         if (!encrypted_filename.is_empty ()) {
-            const var nested_item = this.nested_items.take (encrypted_filename);
+            var nested_item = this.nested_items.take (encrypted_filename);
 
             if (nested_item.is_valid ()) {
                 this.propagator.journal.delete_file_record (nested_item.path, nested_item.type == ItemTypeDirectory);
@@ -120,7 +120,7 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
 
         Soup.Reply.NetworkError err = delete_job.reply ().error ();
 
-        const var http_error_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        var http_error_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.response_time_stamp = delete_job.response_timestamp ();
         this.item.request_id = delete_job.request_id ();
 

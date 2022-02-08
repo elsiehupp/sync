@@ -17,7 +17,7 @@ void PropagateUploadFileV1.do_start_upload () {
     this.start_chunk = 0;
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
     }
     this.transfer_id = uint32 (Utility.rand ()) ^ uint32 (this.item.modtime) ^ (uint32 (this.file_to_upload.size) << 16);
 
@@ -25,7 +25,7 @@ void PropagateUploadFileV1.do_start_upload () {
 
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
     }
     if (progress_info.valid && progress_info.is_chunked () && progress_info.modtime == this.item.modtime && progress_info.size == this.item.size
         && (progress_info.content_checksum == this.item.checksum_header || progress_info.content_checksum.is_empty () || this.item.checksum_header.is_empty ())) {
@@ -42,7 +42,7 @@ void PropagateUploadFileV1.do_start_upload () {
         pi.transferid = 0; // We set a null transfer identifier because it is not chunked.
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
         }
         pi.modtime = this.item.modtime;
         pi.error_count = 0;
@@ -102,7 +102,7 @@ void PropagateUploadFileV1.on_signal_start_next_chunk () {
         // if there's only one chunk, it's the final one
         is_final_chunk = true;
     }
-    GLib.debug () + this.chunk_count + is_final_chunk + chunk_start + current_chunk_size;
+    GLib.debug (this.chunk_count + is_final_chunk + chunk_start + current_chunk_size;
 
     if (is_final_chunk && !this.transmission_checksum_header.is_empty ()) {
         GLib.info () + propagator ().full_remote_path (path) + this.transmission_checksum_header;
@@ -233,7 +233,7 @@ void PropagateUploadFileV1.on_signal_put_finished () {
     // Check whether the file changed since discovery. the file check here is the original and not the temprary.
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
     }
     if (!FileSystem.verify_file_unchanged (full_file_path, this.item.size, this.item.modtime)) {
         propagator ().another_sync_needed = true;
@@ -265,7 +265,7 @@ void PropagateUploadFileV1.on_signal_put_finished () {
         SyncJournalDb.UploadInfo pi;
         pi.valid = true;
         var current_chunk = job.chunk;
-        foreach (var job, this.jobs) {
+        foreach (var job in this.jobs) {
             // Take the minimum on_signal_finished one
             if (var put_job = qobject_cast<PUTFile_job> (job)) {
                 current_chunk = q_min (current_chunk, put_job.chunk - 1);
@@ -275,7 +275,7 @@ void PropagateUploadFileV1.on_signal_put_finished () {
         pi.transferid = this.transfer_id;
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
         }
         pi.modtime = this.item.modtime;
         pi.error_count = 0; // successful chunk upload resets
@@ -331,7 +331,7 @@ void PropagateUploadFileV1.on_signal_upload_progress (int64 sent, int64 total) {
     sender ().property ("byte_written", sent);
     if (this.jobs.count () > 1) {
         amount -= (this.jobs.count () - 1) * chunk_size ();
-        foreach (GLib.Object j, this.jobs) {
+        foreach (GLib.Object j in this.jobs) {
             amount += j.property ("byte_written").to_uLong_long ();
         }
     } else {

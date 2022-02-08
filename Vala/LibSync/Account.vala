@@ -53,7 +53,7 @@ about credentials, SSL errors and certificates.
 ***********************************************************/
 class Account : GLib.Object {
 
-    class AccountPointer : unowned<Account> { }
+    class AccountPointer : unowned Account { }
 
     const string app_password = "app-password";
 
@@ -152,7 +152,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private unowned<QNetworkAccessManager> access_manager;
+    private unowned QNetworkAccessManager access_manager;
 
     /***********************************************************
     ***********************************************************/
@@ -234,7 +234,7 @@ class Account : GLib.Object {
     /***********************************************************
     Forwards from QNetworkAccessManager.proxy_authentication_required ().
     ***********************************************************/
-    signal void proxy_authentication_required (QNetworkProxy &, QAuthenticator *);
+    signal void proxy_authentication_required (QNetworkProxy proxy, QAuthenticator authenticator);
 
 
 
@@ -486,7 +486,7 @@ class Account : GLib.Object {
             // Remember proxy (issue #2108)
             proxy = this.access_manager.proxy ();
 
-            this.access_manager = unowned<QNetworkAccessManager> ();
+            this.access_manager = new unowned QNetworkAccessManager ();
         }
 
         // The order for these two is important! Reading the credential's
@@ -497,7 +497,7 @@ class Account : GLib.Object {
         // Note: This way the QNAM can outlive the Account and Credentials.
         // This is necessary to avoid issues with the QNAM being deleted while
         // processing on_signal_handle_ssl_errors ().
-        this.access_manager = unowned<QNetworkAccessManager> (this.credentials.create_qnam (), &GLib.Object.delete_later);
+        this.access_manager = new unowned QNetworkAccessManager (this.credentials.create_qnam (), &GLib.Object.delete_later);
 
         if (jar) {
             this.access_manager.cookie_jar (jar);
@@ -526,59 +526,59 @@ class Account : GLib.Object {
     send_request ().
     ***********************************************************/
     public Soup.Reply send_raw_request (GLib.ByteArray verb,
-        const GLib.Uri url,
-        Soup.Request req = Soup.Request (),
+        GLib.Uri url,
+        Soup.Request reques = Soup.Request (),
         QIODevice data = null) {
-        req.url (url);
-        req.ssl_configuration (this.get_or_create_ssl_config ());
+        reques.url (url);
+        reques.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "HEAD" && !data) {
-            return this.access_manager.head (req);
+            return this.access_manager.head (reques);
         } else if (verb == "GET" && !data) {
-            return this.access_manager.get (req);
+            return this.access_manager.get (reques);
         } else if (verb == "POST") {
-            return this.access_manager.post (req, data);
+            return this.access_manager.post (reques, data);
         } else if (verb == "PUT") {
-            return this.access_manager.put (req, data);
+            return this.access_manager.put (reques, data);
         } else if (verb == "DELETE" && !data) {
-            return this.access_manager.delete_resource (req);
+            return this.access_manager.delete_resource (reques);
         }
-        return this.access_manager.send_custom_request (req, verb, data);
+        return this.access_manager.send_custom_request (reques, verb, data);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public Soup.Reply send_raw_request (GLib.ByteArray verb,
-        GLib.Uri url, Soup.Request req, GLib.ByteArray data)  {
-        req.url (url);
-        req.ssl_configuration (this.get_or_create_ssl_config ());
+        GLib.Uri url, Soup.Request reques, GLib.ByteArray data)  {
+        reques.url (url);
+        reques.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "HEAD" && data.is_empty ()) {
-            return this.access_manager.head (req);
+            return this.access_manager.head (reques);
         } else if (verb == "GET" && data.is_empty ()) {
-            return this.access_manager.get (req);
+            return this.access_manager.get (reques);
         } else if (verb == "POST") {
-            return this.access_manager.post (req, data);
+            return this.access_manager.post (reques, data);
         } else if (verb == "PUT") {
-            return this.access_manager.put (req, data);
+            return this.access_manager.put (reques, data);
         } else if (verb == "DELETE" && data.is_empty ()) {
-            return this.access_manager.delete_resource (req);
+            return this.access_manager.delete_resource (reques);
         }
-        return this.access_manager.send_custom_request (req, verb, data);
+        return this.access_manager.send_custom_request (reques, verb, data);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public Soup.Reply send_raw_request (GLib.ByteArray verb,
-        GLib.Uri url, Soup.Request req, QHttpMultiPart data) {
-        req.url (url);
-        req.ssl_configuration (this.get_or_create_ssl_config ());
+        GLib.Uri url, Soup.Request reques, QHttpMultiPart data) {
+        reques.url (url);
+        reques.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "PUT") {
-            return this.access_manager.put (req, data);
+            return this.access_manager.put (reques, data);
         } else if (verb == "POST") {
-            return this.access_manager.post (req, data);
+            return this.access_manager.post (reques, data);
         }
-        return this.access_manager.send_custom_request (req, verb, data);
+        return this.access_manager.send_custom_request (reques, verb, data);
     }
 
 
@@ -590,10 +590,10 @@ class Account : GLib.Object {
     ***********************************************************/
     public SimpleNetworkJob send_request (GLib.ByteArray verb,
         GLib.Uri url,
-        Soup.Request req = Soup.Request (),
+        Soup.Request reques = Soup.Request (),
         QIODevice data = null) {
         var job = new SimpleNetworkJob (shared_from_this ());
-        job.start_request (verb, url, req, data);
+        job.start_request (verb, url, reques, data);
         return job;
     }
 
@@ -852,7 +852,7 @@ class Account : GLib.Object {
         this.push_notifications_reconnect_timer.stop ();
 
         if (this.capabilities.available_push_notifications () != PushNotificationType.NONE) {
-            GLib.info ("Try to setup push notifications";
+            GLib.info ("Try to setup push notifications");
 
             if (!this.push_notifications) {
                 this.push_notifications = new PushNotifications (this, this);
@@ -862,7 +862,7 @@ class Account : GLib.Object {
                     /* emit */ push_notifications_ready (this);
                 });
 
-                const var disable_push_notifications = [this] () {
+                var disable_push_notifications = [this] () {
                     GLib.info ("Disable push notifications object because authentication failed or connection lost";
                     if (!this.push_notifications) {
                         return;
@@ -894,7 +894,7 @@ class Account : GLib.Object {
         );
 
         if (kck.is_empty ()) {
-            GLib.debug ("app_password is empty";
+            GLib.debug ("app_password is empty");
             return;
         }
 
@@ -904,9 +904,9 @@ class Account : GLib.Object {
         connect (job, &DeletePasswordJob.on_signal_finished, [this] (Job incoming) {
             var delete_job = static_cast<DeletePasswordJob> (incoming);
             if (delete_job.error () == NoError)
-                GLib.info ("app_password deleted from keychain";
+                GLib.info ("app_password deleted from keychain");
             else
-                GLib.warn ("Unable to delete app_password from keychain" + delete_job.error_string ();
+                GLib.warn ("Unable to delete app_password from keychain" + delete_job.error_string ());
 
             // Allow storing a new app password on re-login
             this.wrote_app_password = false;
@@ -929,13 +929,13 @@ class Account : GLib.Object {
             return;
         }
 
-        GLib.debug ("Resetting QNAM";
+        GLib.debug ("Resetting QNAM");
         QNetworkCookieJar jar = this.access_manager.cookie_jar ();
         QNetworkProxy proxy = this.access_manager.proxy ();
 
         // Use a unowned to allow locking the life of the QNAM on the stack.
         // Make it call delete_later to make sure that we can return to any QNAM stack frames safely.
-        this.access_manager = unowned<QNetworkAccessManager> (this.credentials.create_qnam (), &GLib.Object.delete_later);
+        this.access_manager = new unowned QNetworkAccessManager (this.credentials.create_qnam (), &GLib.Object.delete_later);
 
         this.access_manager.cookie_jar (jar); // takes ownership of the old cookie jar
         this.access_manager.proxy (proxy);   // Remember proxy (issue #2108)
@@ -1036,9 +1036,9 @@ class Account : GLib.Object {
         connect (job, &WritePasswordJob.on_signal_finished, [this] (Job incoming) {
             var write_job = static_cast<WritePasswordJob> (incoming);
             if (write_job.error () == NoError)
-                GLib.info ("app_password stored in keychain";
+                GLib.info ("app_password stored in keychain");
             else
-                GLib.warn ("Unable to store app_password in keychain" + write_job.error_string ();
+                GLib.warn ("Unable to store app_password in keychain" + write_job.error_string ());
 
             // We don't try this again on error, to not raise CPU consumption
             this.wrote_app_password = true;
@@ -1050,14 +1050,15 @@ class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void delete_app_token () {
-        const var delete_app_token_job = new DeleteJob (shared_from_this (), QStringLiteral ("/ocs/v2.php/core/apppassword"));
+        var delete_app_token_job = new DeleteJob (shared_from_this (), QStringLiteral ("/ocs/v2.php/core/apppassword"));
         connect (delete_app_token_job, &DeleteJob.finished_signal, this, [this] () {
-            if (var delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ())) {
-                const var http_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+            var delete_job = (DeleteJob)GLib.Object.sender ();
+            if (delete_job) {
+                var http_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
                 if (http_code != 200) {
-                    GLib.warn ("AppToken remove failed for user : " + display_name (" with code : " + http_code;
+                    GLib.warn ("AppToken remove failed for user : " + display_name () + " with code : " + http_code));
                 } else {
-                    GLib.info ("AppToken for user : " + display_name (" has been removed.";
+                    GLib.info ("AppToken for user : " + display_name () + " has been removed.");
                 }
             } else {
                 //  Q_ASSERT (false);
@@ -1134,20 +1135,20 @@ class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_handle_ssl_errors (Soup.Reply reply, GLib.List<QSslError> errors) {
-        NetworkJobTimeoutPauser pauser (reply);
+        NetworkJobTimeoutPauser pauser = new NetworkJobTimeoutPauser (reply);
         string out;
         QDebug (&out) + "SSL-Errors happened for url " + reply.url ().to_string ();
-        foreach (QSslError error, errors) {
+        foreach (QSslError error in errors) {
             QDebug (&out) + "\t_error in " + error.certificate (":"
                         + error.error_string (" (" + error.error (")"
                         + "\n";
         }
 
-        GLib.info ()) + "ssl errors" + out;
-        GLib.info ()) + reply.ssl_configuration ().peer_certificate_chain ();
+        GLib.info ("ssl errors" + out);
+        GLib.info (reply.ssl_configuration ().peer_certificate_chain ());
 
         bool all_previously_rejected = true;
-        foreach (QSslError error, errors) {
+        foreach (QSslError error in errors) {
             if (!this.rejected_certificates.contains (error.certificate ())) {
                 all_previously_rejected = false;
             }
@@ -1169,7 +1170,7 @@ class Account : GLib.Object {
         // the delete_later () of the QNAM before we have the chance of unwinding our stack.
         // Keep a ref here on our stackframe to make sure that it doesn't get deleted before
         // handle_errors returns.
-        unowned<QNetworkAccessManager> qnam_lock = this.access_manager;
+        unowned QNetworkAccessManager qnam_lock = this.access_manager;
         QPointer<GLib.Object> guard = reply;
 
         if (this.ssl_error_handler.handle_errors (errors, reply.ssl_configuration (), approved_certificates, shared_from_this ())) {
@@ -1194,7 +1195,7 @@ class Account : GLib.Object {
                 return;
 
             // Mark all involved certificates as rejected, so we don't ask the user again.
-            foreach (QSslError error, errors) {
+            foreach (QSslError error in errors) {
                 if (!this.rejected_certificates.contains (error.certificate ())) {
                     this.rejected_certificates.append (error.certificate ());
                 }
@@ -1210,18 +1211,18 @@ class Account : GLib.Object {
     ***********************************************************/
     protected void on_signal_credentials_fetched () {
         if (this.dav_user.is_empty ()) {
-            GLib.debug ("User identifier not set. Fetch it.";
-            const var fetch_user_name_job = new JsonApiJob (shared_from_this (), QStringLiteral ("/ocs/v1.php/cloud/user"));
+            GLib.debug ("User identifier not set. Fetch it.");
+            var fetch_user_name_job = new JsonApiJob (shared_from_this (), QStringLiteral ("/ocs/v1.php/cloud/user"));
             connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, fetch_user_name_job] (QJsonDocument json, int status_code) {
                 fetch_user_name_job.delete_later ();
                 if (status_code != 100) {
-                    GLib.warn ("Could not fetch user identifier. Login will probably not work.";
+                    GLib.warn ("Could not fetch user identifier. Login will probably not work.");
                     /* emit */ credentials_fetched (this.credentials.data ());
                     return;
                 }
 
-                const var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-                const var user_id = obj_data.value ("identifier").to_string ("");
+                var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
+                var user_id = obj_data.value ("identifier").to_string () + "");
                 dav_user (user_id);
                 /* emit */ credentials_fetched (this.credentials.data ());
             });
@@ -1246,7 +1247,7 @@ class Account : GLib.Object {
         var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         var editors = data.value ("editors").to_object ();
 
-        foreach (var editor_key, editors.keys ()) {
+        foreach (var editor_key in editors.keys ()) {
             var editor = editors.value (editor_key).to_object ();
 
             const string identifier = editor.value ("identifier").to_string ();
@@ -1258,11 +1259,11 @@ class Account : GLib.Object {
 
                 var direct_editor = new DirectEditor (identifier, name);
 
-                foreach (var mime_type, mime_types) {
+                foreach (var mime_type in mime_types) {
                     direct_editor.add_mimetype (mime_type.to_string ().to_latin1 ());
                 }
 
-                foreach (var optional_mime_type, optional_mime_types) {
+                foreach (var optional_mime_type in optional_mime_types) {
                     direct_editor.add_optional_mimetype (optional_mime_type.to_string ().to_latin1 ());
                 }
 

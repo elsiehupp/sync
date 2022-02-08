@@ -15,7 +15,7 @@ namespace Occ {
 
         uint32 num = 0;
 
-        for (uchar c : d) {
+        foreach (uchar c in d) {
             num = num << 8;
             num += c;
         }
@@ -2087,7 +2087,7 @@ namespace Occ {
 
     string get_unified_string (string[]& w_list) {
         string ret;
-        for (var& string_value : w_list) {
+        foreach (var& string_value in w_list) {
             ret += string_value;
         }
         return ret;

@@ -84,15 +84,15 @@ class PropagateUploadEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        const var root_path = [=] () {
-            const var result = this.propagator.remote_path ();
+        var root_path = [=] () {
+            var result = this.propagator.remote_path ();
             if (result.starts_with ('/')) {
                 return result.mid (1);
             } else {
                 return result;
             }
         } ();
-        const var absolute_remote_parent_path = [=]{
+        var absolute_remote_parent_path = [=]{
             var path = string (root_path + this.remote_parent_path);
             if (path.ends_with ('/')) {
                 path.chop (1);
@@ -185,7 +185,7 @@ class PropagateUploadEncrypted : GLib.Object {
     private void on_signal_folder_encrypted_id_received (string[] list) {
         GLib.debug ("Received identifier of folder, trying to lock it so we can prepare the metadata";
         var job = qobject_cast<LsColJob> (sender ());
-        const var& folder_info = job.folder_infos.value (list.first ());
+        var& folder_info = job.folder_infos.value (list.first ());
         this.folder_lock_first_try.on_signal_start ();
         on_signal_try_lock (folder_info.file_identifier);
     }
@@ -271,7 +271,7 @@ class PropagateUploadEncrypted : GLib.Object {
         EncryptedFile encrypted_file;
         const GLib.Vector<EncryptedFile> files = this.metadata.files ();
 
-        for (EncryptedFile file : files) {
+        foreach (EncryptedFile file in files) {
             if (file.original_filename == filename) {
                 encrypted_file = file;
                 found = true;

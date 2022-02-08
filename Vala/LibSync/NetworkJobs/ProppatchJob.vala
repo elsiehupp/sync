@@ -38,7 +38,7 @@ class ProppatchJob : AbstractNetworkJob {
         if (this.properties.is_empty ()) {
             GLib.warn ("Proppatch with no properties!";
         }
-        Soup.Request req;
+        Soup.Request reques;
 
         GLib.ByteArray prop_str;
         QMapIterator<GLib.ByteArray, GLib.ByteArray> it (this.properties);
@@ -69,7 +69,7 @@ class ProppatchJob : AbstractNetworkJob {
         var buf = new Soup.Buffer (this);
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
-        send_request ("PROPPATCH", make_dav_url (path ()), req, buf);
+        send_request ("PROPPATCH", make_dav_url (path ()), reques, buf);
         AbstractNetworkJob.on_signal_start ();
     }
 

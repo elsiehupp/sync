@@ -52,7 +52,7 @@ class LsColJob : AbstractNetworkJob {
             GLib.warn ("Propfind with no properties!";
         }
         GLib.ByteArray prop_str;
-        foreach (GLib.ByteArray prop, properties) {
+        foreach (GLib.ByteArray prop in properties) {
             if (prop.contains (':')) {
                 int col_index = prop.last_index_of (":");
                 var ns = prop.left (col_index);
@@ -66,8 +66,8 @@ class LsColJob : AbstractNetworkJob {
             }
         }
 
-        Soup.Request req;
-        req.raw_header ("Depth", "1");
+        Soup.Request reques;
+        reques.raw_header ("Depth", "1");
         GLib.ByteArray xml ("<?xml version=\"1.0\" ?>\n"
                     "<d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\">\n"
                     "  <d:prop>\n"
@@ -77,9 +77,9 @@ class LsColJob : AbstractNetworkJob {
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
         if (this.url.is_valid ()) {
-            send_request ("PROPFIND", this.url, req, buf);
+            send_request ("PROPFIND", this.url, reques, buf);
         } else {
-            send_request ("PROPFIND", make_dav_url (path ()), req, buf);
+            send_request ("PROPFIND", make_dav_url (path ()), reques, buf);
         }
         AbstractNetworkJob.on_signal_start ();
     }

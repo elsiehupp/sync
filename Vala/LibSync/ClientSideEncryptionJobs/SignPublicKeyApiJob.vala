@@ -35,9 +35,9 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () override;
+    public void on_signal_start ();
 
-    protected bool on_signal_finished () override;
+    protected bool on_signal_finished ();
 
 
     /***********************************************************
@@ -66,16 +66,16 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
     }
 
     void SignPublicKeyApiJob.on_signal_start () {
-        Soup.Request req;
-        req.raw_header ("OCS-APIREQUEST", "true");
-        req.header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
+        Soup.Request reques;
+        reques.raw_header ("OCS-APIREQUEST", "true");
+        reques.header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
         QUrlQuery query;
         query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (query);
 
         GLib.info ("Sending the CSR" + this.csr.data ();
-        send_request ("POST", url, req, this.csr);
+        send_request ("POST", url, reques, this.csr);
         AbstractNetworkJob.on_signal_start ();
     }
 

@@ -55,18 +55,18 @@ class Logger : GLib.Object {
         q_message_pattern (QStringLiteral ("%{time yyyy-MM-dd hh:mm:ss:zzz} [ %{type} %{category} %{file}:%{line} "
                                         "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}"));
         this.crash_log.resize (CRASH_LOG_SIZE);
-    #ifndef NO_MSG_HANDLER
+    // #ifndef NO_MSG_HANDLER
         q_install_message_handler ([] (QtMsgType type, QMessageLogContext context, string message) {
                 Logger.instance ().do_log (type, context, message);
             });
-    #endif
+    // #endif
     }
 
 
     ~Logger () {
-    #ifndef NO_MSG_HANDLER
+    // #ifndef NO_MSG_HANDLER
         q_install_message_handler (null);
-    #endif
+    // #endif
     }
 
 
@@ -291,10 +291,10 @@ class Logger : GLib.Object {
         this.log_rules = rules;
         string tmp;
         QTextStream out (&tmp);
-        for (var p : rules) {
+        foreach (var p in rules) {
             out + p + '\n';
         }
-        GLib.debug () + tmp;
+        GLib.debug (tmp);
         QLoggingCategory.filter_rules (tmp);
     }
 
@@ -311,21 +311,21 @@ class Logger : GLib.Object {
 
             // Tentative new log name, will be adjusted if one like this already exists
             GLib.DateTime now = GLib.DateTime.current_date_time ();
-            string new_log_name = now.to_string ("yyyy_mMdd_HHmm") + "this.owncloud.log";
+            string new_log_name = now.to_string () + "yyyy_mMdd_HHmm") + "this.owncloud.log";
 
             // Expire old log files and deal with conflicts
             string[] files = dir.entry_list (string[] ("*owncloud.log.*"),
                 QDir.Files, QDir.Name);
             const QRegularExpression rx (QRegularExpression.anchored_pattern (R" (.*owncloud\.log\. (\d+).*)"));
             int max_number = -1;
-            foreach (string s, files) {
+            foreach (string s in files) {
                 if (this.log_expire > 0) {
-                    QFileInfo file_info (dir.absolute_file_path (s));
+                    QFileInfo file_info = new QFileInfo (dir.absolute_file_path (s));
                     if (file_info.last_modified ().add_secs (60 * 60 * this.log_expire) < now) {
                         dir.remove (s);
                     }
                 }
-                const var rx_match = rx.match (s);
+                var rx_match = rx.match (s);
                 if (s.starts_with (new_log_name) && rx_match.has_match ()) {
                     max_number = q_max (max_number, rx_match.captured (1).to_int ());
                 }
@@ -355,7 +355,7 @@ class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static bool compress_log (string original_name, string target_name) {
-    #ifdef ZLIB_FOUND
+    // #ifdef ZLIB_FOUND
         GLib.File original (original_name);
         if (!original.open (QIODevice.ReadOnly))
             return false;
@@ -374,9 +374,9 @@ class Logger : GLib.Object {
         }
         gzclose (compressed);
         return true;
-    #else
+    // #else
         return false;
-    #endif
+    // #endif
     }
 
 

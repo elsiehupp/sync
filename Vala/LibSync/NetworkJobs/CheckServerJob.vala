@@ -122,7 +122,7 @@ class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private bool on_signal_finished () override {
+    private bool on_signal_finished () {
         if (reply ().request ().url ().scheme () == QLatin1String ("https")
             && reply ().ssl_configuration ().session_ticket ().is_empty ()
             && reply ().error () == Soup.Reply.NoError) {

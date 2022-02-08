@@ -181,19 +181,19 @@ class ConfigFile {
     directories.
     ***********************************************************/
     public string exclude_file (Scope scope) {
-        QFileInfo fi;
+        QFileInfo file_info;
 
         switch (scope) {
         case USER_SCOPE:
-            fi.file (config_path (), EXCL_FILE);
+            file_info.file (config_path (), EXCL_FILE);
 
-            if (!fi.is_readable ()) {
-                fi.file (config_path (), QLatin1String ("exclude.lst"));
+            if (!file_info.is_readable ()) {
+                file_info.file (config_path (), QLatin1String ("exclude.lst"));
             }
-            if (!fi.is_readable ()) {
-                fi.file (config_path (), EXCL_FILE);
+            if (!file_info.is_readable ()) {
+                file_info.file (config_path (), EXCL_FILE);
             }
-            return fi.absolute_file_path ();
+            return file_info.absolute_file_path ();
         case SYSTEM_SCOPE:
             return ConfigFile.exclude_file_from_system ();
         }
@@ -208,14 +208,14 @@ class ConfigFile {
     Doesn't access config dir
     ***********************************************************/
     public static string exclude_file_from_system () {
-        QFileInfo fi;
-        fi.file (string (SYSCONFDIR "/" + Theme.instance ().app_name ()), EXCL_FILE);
-        if (!fi.exists ()) {
+        QFileInfo file_info;
+        file_info.file (string (SYSCONFDIR "/" + Theme.instance ().app_name ()), EXCL_FILE);
+        if (!file_info.exists ()) {
             // Prefer to return the preferred path! Only use the fallback location
             // if the other path does not exist and the fallback is valid.
             QFileInfo next_to_binary (QCoreApplication.application_dir_path (), EXCL_FILE);
             if (next_to_binary.exists ()) {
-                fi = next_to_binary;
+                file_info = next_to_binary;
             } else {
                 // For AppImage, the file might reside under a temporary mount path
                 QDir d (QCoreApplication.application_dir_path ()); // supposed to be /tmp/mount.xyz/usr/bin
@@ -225,14 +225,14 @@ class ConfigFile {
                     if (d.cd ("etc") && d.cd (Theme.instance ().app_name ())) {
                         QFileInfo in_mount_dir (d, EXCL_FILE);
                         if (in_mount_dir.exists ()) {
-                            fi = in_mount_dir;
+                            file_info = in_mount_dir;
                         }
                     }
                 }
             }
         }
 
-        return fi.absolute_file_path ();
+        return file_info.absolute_file_path ();
     }
 
 
@@ -249,7 +249,7 @@ class ConfigFile {
         string backup_file =
             string ("%1.backup_%2%3")
                 .arg (base_file)
-                .arg (GLib.DateTime.current_date_time ().to_string ("yyyy_mMdd_HHmmss"))
+                .arg (GLib.DateTime.current_date_time ().to_string () + "yyyy_mMdd_HHmmss"))
                 .arg (version_string);
 
         // If this exact file already exists it's most likely that a backup was
@@ -413,7 +413,7 @@ class ConfigFile {
     ***********************************************************/
     public bool crash_reporter () {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
-        const var fallback = settings.value (QLatin1String (CRASH_REPORTER_C), true);
+        var fallback = settings.value (QLatin1String (CRASH_REPORTER_C), true);
         return get_policy_setting (QLatin1String (CRASH_REPORTER_C), fallback).to_bool ();
     }
 
@@ -473,7 +473,7 @@ class ConfigFile {
     /***********************************************************
     ***********************************************************/
     public string log_dir () {
-        const var default_log_dir = string (config_path () + QStringLiteral ("/logs"));
+        var default_log_dir = string (config_path () + QStringLiteral ("/logs"));
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         return settings.value (QLatin1String (LOG_DIR_C), default_log_dir).to_string ();
     }
@@ -660,7 +660,7 @@ class ConfigFile {
         var pass = string.from_utf8 (GLib.ByteArray.from_base64 (pass_encoded));
         pass_encoded.clear ();
 
-        const var key = KEYCHAIN_PROXY_PASSWORD_KEY ();
+        var key = KEYCHAIN_PROXY_PASSWORD_KEY ();
 
         if (!pass.is_empty ()) {
             // Security : Migrate password from config file to keychain
@@ -767,8 +767,8 @@ class ConfigFile {
     public QPair<bool, int64> new_big_folder_size_limit ();
     QPair<bool, int64> ConfigFile.new_big_folder_size_limit () {
         var default_value = Theme.instance ().new_big_folder_size_limit ();
-        const var fallback = get_value (NEW_BIG_FOLDER_SIZE_LIMIT_C, "", default_value).to_long_long ();
-        const var value = get_policy_setting (QLatin1String (NEW_BIG_FOLDER_SIZE_LIMIT_C), fallback).to_long_long ();
+        var fallback = get_value (NEW_BIG_FOLDER_SIZE_LIMIT_C, "", default_value).to_long_long ();
+        var value = get_policy_setting (QLatin1String (NEW_BIG_FOLDER_SIZE_LIMIT_C), fallback).to_long_long ();
         const bool use = value >= 0 && use_new_big_folder_size_limit ();
         return q_make_pair (use, q_max<int64> (0, value));
     }
@@ -792,7 +792,7 @@ class ConfigFile {
     ***********************************************************/
     public bool confirm_external_storage ();
     bool ConfigFile.confirm_external_storage () {
-        const var fallback = get_value (CONFIRM_EXTERNAL_STORAGE_C, "", true);
+        var fallback = get_value (CONFIRM_EXTERNAL_STORAGE_C, "", true);
         return get_policy_setting (QLatin1String (CONFIRM_EXTERNAL_STORAGE_C), fallback).to_bool ();
     }
 
@@ -809,7 +809,7 @@ class ConfigFile {
     ***********************************************************/
     public 
     bool ConfigFile.use_new_big_folder_size_limit () {
-        const var fallback = get_value (USE_NEW_BIG_FOLDER_SIZE_LIMIT_C, "", true);
+        var fallback = get_value (USE_NEW_BIG_FOLDER_SIZE_LIMIT_C, "", true);
         return get_policy_setting (QLatin1String (USE_NEW_BIG_FOLDER_SIZE_LIMIT_C), fallback).to_bool ();
     }
 
@@ -874,7 +874,7 @@ class ConfigFile {
         from_dir += QDir.separator ();
         to_dir += QDir.separator ();
 
-        foreach (string copy_file, dir.entry_list (QDir.Files)) {
+        foreach (string copy_file in dir.entry_list (QDir.Files)) {
             string from = from_dir + copy_file;
             string to = to_dir + copy_file;
 
@@ -883,7 +883,7 @@ class ConfigFile {
             }
         }
 
-        foreach (string copy_dir, dir.entry_list (QDir.Dirs | QDir.NoDotAndDotDot)) {
+        foreach (string copy_dir in dir.entry_list (QDir.Dirs | QDir.NoDotAndDotDot)) {
             string from = from_dir + copy_dir;
             string to = to_dir + copy_dir;
 
@@ -918,13 +918,13 @@ class ConfigFile {
         if (dir_path.is_empty ())
             return false;
 
-        QFileInfo fi (dir_path);
-        if (!fi.exists ()) {
+        QFileInfo file_info = new QFileInfo (dir_path);
+        if (!file_info.exists ()) {
             QDir ().mkpath (dir_path);
-            fi.file (dir_path);
+            file_info.file (dir_path);
         }
-        if (fi.exists () && fi.is_dir ()) {
-            dir_path = fi.absolute_file_path ();
+        if (file_info.exists () && file_info.is_dir ()) {
+            dir_path = file_info.absolute_file_path ();
             GLib.info ("Using custom config dir " + dir_path;
             this.conf_dir = dir_path;
             return true;
@@ -1028,13 +1028,13 @@ class ConfigFile {
     /***********************************************************
     ***********************************************************/
     public void save_geometry (Gtk.Widget w) {
-    #ifndef TOKEN_AUTH_ONLY
+    // #ifndef TOKEN_AUTH_ONLY
         //  ASSERT (!w.object_name ().is_null ());
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.begin_group (w.object_name ());
         settings.value (QLatin1String (GEOMETRY_C), w.save_geometry ());
         settings.sync ();
-    #endif
+    // #endif
     }
 
 
@@ -1042,16 +1042,16 @@ class ConfigFile {
     /***********************************************************
     ***********************************************************/
     public void restore_geometry (Gtk.Widget w) {
-    #ifndef TOKEN_AUTH_ONLY
+    // #ifndef TOKEN_AUTH_ONLY
         w.restore_geometry (get_value (GEOMETRY_C, w.object_name ()).to_byte_array ());
-    #endif
+    // #endif
     }
 
 
     /***********************************************************
     ***********************************************************/
     void ConfigFile.save_geometry_header (QHeaderView header) {
-    #ifndef TOKEN_AUTH_ONLY
+    // #ifndef TOKEN_AUTH_ONLY
         if (!header)
             return;
         //  ASSERT (!header.object_name ().is_empty ());
@@ -1060,14 +1060,14 @@ class ConfigFile {
         settings.begin_group (header.object_name ());
         settings.value (QLatin1String (GEOMETRY_C), header.save_state ());
         settings.sync ();
-    #endif
+    // #endif
     }
 
 
     /***********************************************************
     ***********************************************************/
     void ConfigFile.restore_geometry_header (QHeaderView header) {
-    #ifndef TOKEN_AUTH_ONLY
+    // #ifndef TOKEN_AUTH_ONLY
         if (!header)
             return;
         //  ASSERT (!header.object_name ().is_null ());
@@ -1075,7 +1075,7 @@ class ConfigFile {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.begin_group (header.object_name ());
         header.restore_state (settings.value (GEOMETRY_C).to_byte_array ());
-    #endif
+    // #endif
     }
 
 

@@ -25,8 +25,8 @@ class RequestEtagJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request req;
-        req.raw_header ("Depth", "0");
+        Soup.Request reques;
+        reques.raw_header ("Depth", "0");
 
         GLib.ByteArray xml ("<?xml version=\"1.0\" ?>\n"
                     "<d:propfind xmlns:d=\"DAV:\">\n"
@@ -38,7 +38,7 @@ class RequestEtagJob : AbstractNetworkJob {
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
         // assumes ownership
-        send_request ("PROPFIND", make_dav_url (path ()), req, buf);
+        send_request ("PROPFIND", make_dav_url (path ()), reques, buf);
 
         if (reply ().error () != Soup.Reply.NoError) {
             GLib.warn ("request network error : " + reply ().error_string ();

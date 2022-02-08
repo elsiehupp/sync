@@ -44,7 +44,7 @@ class AccessManager : QNetworkAccessManager {
     /***********************************************************
     ***********************************************************/
     protected Soup.Reply create_request (QNetworkAccessManager.Operation op, Soup.Request request, QIODevice outgoing_data = null) {
-        Soup.Request new_request (request);
+        Soup.Request new_request = new Soup.Request (request);
 
         // Respect request specific user agent if any
         if (!new_request.header (Soup.Request.UserAgentHeader).is_valid ()) {
@@ -63,10 +63,10 @@ class AccessManager : QNetworkAccessManager {
 
         // Generate a new request identifier
         GLib.ByteArray request_id = generate_request_id ();
-        q_info () + op + verb + new_request.url ().to_string ("has X-Request-ID" + request_id;
+        GLib.info (op + verb + new_request.url ().to_string () + "has X-Request-ID " + request_id);
         new_request.raw_header ("X-Request-ID", request_id);
 
-    #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 4)
+    // #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 4)
         // only enable HTTP2 with Qt 5.9.4 because old Qt have too many bugs (e.g. QTBUG-64359 is fixed in >= Qt 5.9.4)
         if (new_request.url ().scheme () == "https") { // Not for "http" : QTBUG-61397
             // http2 seems to cause issues, as with our recommended server setup we don't support http2, disable it by default for now
@@ -74,9 +74,9 @@ class AccessManager : QNetworkAccessManager {
 
             new_request.attribute (Soup.Request.HTTP2AllowedAttribute, http2_enabled_env);
         }
-    #endif
+    // #endif
 
-        const var reply = QNetworkAccessManager.create_request (op, new_request, outgoing_data);
+        var reply = QNetworkAccessManager.create_request (op, new_request, outgoing_data);
         HttpLogger.log_request (reply, op, outgoing_data);
         return reply;
     }

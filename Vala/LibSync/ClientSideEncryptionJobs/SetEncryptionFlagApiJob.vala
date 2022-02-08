@@ -33,9 +33,9 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () override;
+    public void on_signal_start ();
 
-    protected bool on_signal_finished () override;
+    protected bool on_signal_finished ();
 
 
     signal void success (GLib.ByteArray file_identifier);
@@ -54,13 +54,13 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
     }
 
     void SetEncryptionFlagApiJob.on_signal_start () {
-        Soup.Request req;
-        req.raw_header ("OCS-APIREQUEST", "true");
+        Soup.Request reques;
+        reques.raw_header ("OCS-APIREQUEST", "true");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
 
         GLib.info ()) + "marking the file with identifier" + this.file_identifier + "as" + (this.flag_action == Set ? "encrypted" : "non-encrypted") + ".";
 
-        send_request (this.flag_action == Set ? "PUT" : "DELETE", url, req);
+        send_request (this.flag_action == Set ? "PUT" : "DELETE", url, reques);
 
         AbstractNetworkJob.on_signal_start ();
     }

@@ -28,7 +28,7 @@ Occ.Optional<GLib.ByteArray> xattr_get (GLib.ByteArray path, GLib.ByteArray name
     constexpr var buffer_size = 256;
     GLib.ByteArray result;
     result.resize (buffer_size);
-    const var count = getxattr (path.const_data (), name.const_data (), result.data (), buffer_size);
+    var count = getxattr (path.const_data (), name.const_data (), result.data (), buffer_size);
     if (count >= 0) {
         result.resize (static_cast<int> (count) - 1);
         return result;
@@ -38,14 +38,14 @@ Occ.Optional<GLib.ByteArray> xattr_get (GLib.ByteArray path, GLib.ByteArray name
 }
 
 bool xattr_set (GLib.ByteArray path, GLib.ByteArray name, GLib.ByteArray value) {
-    const var return_code = setxattr (path.const_data (), name.const_data (), value.const_data (), value.size () + 1, 0);
+    var return_code = setxattr (path.const_data (), name.const_data (), value.const_data (), value.size () + 1, 0);
     return return_code == 0;
 }
 
 }
 
 bool Occ.XAttr_wrapper.has_nextcloud_placeholder_attributes (string path) {
-    const var value = xattr_get (path.to_utf8 (), hydrate_exec_attribute_name);
+    var value = xattr_get (path.to_utf8 (), hydrate_exec_attribute_name);
     if (value) {
         return value == QByteArrayLiteral (APPLICATION_EXECUTABLE);
     } else {
@@ -54,7 +54,7 @@ bool Occ.XAttr_wrapper.has_nextcloud_placeholder_attributes (string path) {
 }
 
 Occ.Result<void, string> Occ.XAttr_wrapper.add_nextcloud_placeholder_attributes (string path) {
-    const var on_signal_success = xattr_set (path.to_utf8 (), hydrate_exec_attribute_name, APPLICATION_EXECUTABLE);
+    var on_signal_success = xattr_set (path.to_utf8 (), hydrate_exec_attribute_name, APPLICATION_EXECUTABLE);
     if (!on_signal_success) {
         return QStringLiteral ("Failed to set the extended attribute");
     } else {

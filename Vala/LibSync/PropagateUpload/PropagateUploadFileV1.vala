@@ -48,11 +48,11 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    public void do_start_upload () override;
+    public void do_start_upload ();
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort (PropagatorJob.AbortType abort_type) override;
+    public void on_signal_abort (PropagatorJob.AbortType abort_type);
 
     /***********************************************************
     ***********************************************************/

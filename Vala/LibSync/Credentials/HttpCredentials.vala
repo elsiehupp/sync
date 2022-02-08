@@ -294,7 +294,7 @@ class HttpCredentials : AbstractCredentials {
     /***********************************************************
     The password or token
     ***********************************************************/
-    public string password () override;
+    public string password ();
     string HttpCredentials.password () {
         return this.password;
     }
@@ -377,19 +377,19 @@ class HttpCredentials : AbstractCredentials {
             return false;
 
         GLib.Uri request_token = Utility.concat_url_path (this.account.url (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
-        Soup.Request req;
-        req.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
+        Soup.Request reques;
+        reques.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         string basic_auth = string ("%1:%2").arg (
             Theme.instance ().oauth_client_id (), Theme.instance ().oauth_client_secret ());
-        req.raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
-        req.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
+        reques.raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
+        reques.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
 
         var request_body = new Soup.Buffer;
         QUrlQuery arguments (string ("grant_type=refresh_token&refresh_token=%1").arg (this.refresh_token));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
-        var job = this.account.send_request ("POST", request_token, req, request_body);
+        var job = this.account.send_request ("POST", request_token, reques, request_body);
         job.on_signal_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
         GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (Soup.Reply reply) {
             var json_data = reply.read_all ();
@@ -411,7 +411,7 @@ class HttpCredentials : AbstractCredentials {
                 persist ();
             }
             this.is_renewing_oauth_token = false;
-            for (var job : this.retry_queue) {
+            foreach (var job in this.retry_queue) {
                 if (job)
                     job.retry ();
             }
