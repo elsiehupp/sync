@@ -532,11 +532,11 @@ signals:
         entry.ignore_duration = old.ignore_duration * 5;
 
         if (item.http_error_code == 403) {
-            GLib.warn ("Probably firewall error : " + item.http_error_code + ", blocklisting up to 1h only";
+            GLib.warning ("Probably firewall error : " + item.http_error_code + ", blocklisting up to 1h only";
             entry.ignore_duration = q_min (entry.ignore_duration, int64 (60 * 60));
 
         } else if (item.http_error_code == 413 || item.http_error_code == 415) {
-            GLib.warn ("Fatal Error condition" + item.http_error_code + ", maximum blocklist ignore time!";
+            GLib.warning ("Fatal Error condition" + item.http_error_code + ", maximum blocklist ignore time!";
             entry.ignore_duration = max_blocklist_time;
         }
 
@@ -598,7 +598,7 @@ signals:
         // Some soft errors might become louder on repeat occurrence
         if (item.status == SyncFileItem.Status.SOFT_ERROR
             && new_entry.retry_count > 1) {
-            GLib.warn ("escalating soft error on " + item.file
+            GLib.warning ("escalating soft error on " + item.file
                                     + " to normal error, " + item.http_error_code;
             item.status = SyncFileItem.Status.NORMAL_ERROR;
             return;
@@ -752,7 +752,7 @@ signals:
                 } else if (item.instruction == CSYNC_INSTRUCTION_RENAME) {
                     // all is good, the rename will be executed before the directory deletion
                 } else {
-                    GLib.warn ("WARNING :  Job within a removed directory?  This should not happen!"
+                    GLib.warning ("WARNING :  Job within a removed directory?  This should not happen!"
                                             + item.file + item.instruction;
                 }
             }
@@ -1123,7 +1123,7 @@ signals:
     Given an error from the network, map to a SyncFileItem.Status error
     ***********************************************************/
     inline SyncFileItem.Status classify_error (Soup.Reply.NetworkError nerror,
-        int http_code, bool another_sync_needed = null, GLib.ByteArray error_body = GLib.ByteArray ()) {
+        int http_code, bool another_sync_needed = null, GLib.ByteArray error_body = new GLib.ByteArray ()) {
         //  Q_ASSERT (nerror != Soup.Reply.NoError); // we should only be called when there is an error
 
         if (nerror == Soup.Reply.RemoteHostClosedError) {

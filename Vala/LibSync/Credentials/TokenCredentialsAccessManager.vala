@@ -13,12 +13,12 @@ class TokenCredentialsAccessManager : AccessManager {
 
     protected Soup.Reply create_request (Operation op, Soup.Request request, QIODevice outgoing_data) {
         if (this.credentials.user ().is_empty () || this.credentials.password ().is_empty ()) {
-            GLib.warn ("Empty user/password provided!";
+            GLib.warning ("Empty user/password provided!";
         }
 
         Soup.Request reques (request);
 
-        GLib.ByteArray cred_hash = GLib.ByteArray (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
+        GLib.ByteArray cred_hash = new GLib.ByteArray (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
         reques.raw_header (GLib.ByteArray ("Authorization"), GLib.ByteArray ("Basic ") + cred_hash);
 
         // A pre-authenticated cookie

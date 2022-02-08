@@ -308,7 +308,7 @@ class ConfigFile {
         var default_poll_interval = chrono.milliseconds (DEFAULT_REMOTE_POLL_INTERVAL);
         var remote_interval = milliseconds_value (settings, REMOTE_POLL_INTERVAL_C, default_poll_interval);
         if (remote_interval < chrono.seconds (5)) {
-            GLib.warn ("Remote Interval is less than 5 seconds, reverting to" + DEFAULT_REMOTE_POLL_INTERVAL;
+            GLib.warning ("Remote Interval is less than 5 seconds, reverting to" + DEFAULT_REMOTE_POLL_INTERVAL;
             remote_interval = default_poll_interval;
         }
         return remote_interval;
@@ -326,7 +326,7 @@ class ConfigFile {
             con = default_connection ();
 
         if (interval < chrono.seconds (5)) {
-            GLib.warn ("Remote Poll interval of " + interval.count (" is below five seconds.";
+            GLib.warning ("Remote Poll interval of " + interval.count (" is below five seconds.";
             return;
         }
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
@@ -349,7 +349,7 @@ class ConfigFile {
         var default_interval = chrono.minutes (5);
         var interval = milliseconds_value (settings, NOTIFICATION_REFRESH_INTERVAL_C, default_interval);
         if (interval < chrono.minutes (1)) {
-            GLib.warn ("Notification refresh interval smaller than one minute, setting to one minute";
+            GLib.warning ("Notification refresh interval smaller than one minute, setting to one minute";
             interval = chrono.minutes (1);
         }
         return interval;
@@ -371,7 +371,7 @@ class ConfigFile {
         var default_interval = chrono.hours (2);
         var interval = milliseconds_value (settings, FORCE_SYNC_INTERVAL_C, default_interval);
         if (interval < poll_interval) {
-            GLib.warn ("Force sync interval is less than the remote poll inteval, reverting to" + poll_interval.count ();
+            GLib.warning ("Force sync interval is less than the remote poll inteval, reverting to" + poll_interval.count ();
             interval = poll_interval;
         }
         return interval;
@@ -668,7 +668,7 @@ class ConfigFile {
             if (job.exec ()) {
                 QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
                 settings.remove (QLatin1String (PROXY_PASS_C));
-                GLib.info ()) + "Migrated proxy password to keychain";
+                GLib.info ("Migrated proxy password to keychain";
             }
         } else {
             // Read password from keychain
@@ -1095,7 +1095,7 @@ class ConfigFile {
 
         var min_interval = chrono.minutes (5);
         if (interval < min_interval) {
-            GLib.warn ("Update check interval less than five minutes, resetting to 5 minutes";
+            GLib.warning ("Update check interval less than five minutes, resetting to 5 minutes";
             interval = min_interval;
         }
         return interval;

@@ -49,7 +49,7 @@ class LsColJob : AbstractNetworkJob {
         GLib.List<GLib.ByteArray> properties = this.properties;
 
         if (properties.is_empty ()) {
-            GLib.warn ("Propfind with no properties!";
+            GLib.warning ("Propfind with no properties!";
         }
         GLib.ByteArray prop_str;
         foreach (GLib.ByteArray prop in properties) {

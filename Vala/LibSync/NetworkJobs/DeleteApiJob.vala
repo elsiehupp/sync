@@ -46,13 +46,13 @@ class DeleteApiJob : AbstractNetworkJob {
         int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warn ("Network error : " + path () + error_string () + http_status;
+            GLib.warning ("Network error : " + path () + error_string () + http_status;
             /* emit */ signal_result (http_status);
             return true;
         }
 
         var reply_data = string.from_utf8 (reply ().read_all ());
-        GLib.info ()) + "TMX Delete Job" + reply_data;
+        GLib.info ("TMX Delete Job" + reply_data;
         /* emit */ signal_result (http_status);
         return true;
     }

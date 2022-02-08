@@ -80,7 +80,7 @@ class DeleteJob : KeychainChunk.Job {
 
         this.chunk_count = 0;
         if (error () != EntryNotFound) {
-            GLib.warn ("DeletePasswordJob failed with" + error_string ();
+            GLib.warning ("DeletePasswordJob failed with" + error_string ();
         }
         return false;
     }
@@ -100,7 +100,7 @@ class DeleteJob : KeychainChunk.Job {
                 ( (delete_job.error () == QKeychain.EntryNotFound) && this.chunk_count == 0)) {
                 this.error = delete_job.error ();
                 this.error_string = delete_job.error_string ();
-                GLib.warn ("Unable to delete" + delete_job.key ("chunk" + string.number (this.chunk_count) + delete_job.error_string ();
+                GLib.warning ("Unable to delete" + delete_job.key ("chunk" + string.number (this.chunk_count) + delete_job.error_string ();
             }
         }
 

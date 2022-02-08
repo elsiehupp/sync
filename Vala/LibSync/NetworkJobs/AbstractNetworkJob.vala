@@ -178,7 +178,7 @@ class AbstractNetworkJob : GLib.Object {
         const string display_url = string ("%1://%2%3").arg (url.scheme ()).arg (url.host ()).arg (url.path ());
 
         string parent_meta_object_name = parent () ? parent ().meta_object ().class_name () : "";
-        GLib.info () + meta_object ().class_name ("created for" + display_url + "+" + path () + parent_meta_object_name;
+        GLib.info (meta_object ().class_name ("created for" + display_url + "+" + path () + parent_meta_object_name;
     }
 
 
@@ -526,7 +526,7 @@ class AbstractNetworkJob : GLib.Object {
         this.timer.stop ();
 
         if (this.reply.error () == Soup.Reply.SslHandshakeFailedError) {
-            GLib.warn ("SslHandshakeFailedError : " + error_string (" : can be caused by a webserver wanting SSL client certificates";
+            GLib.warning ("SslHandshakeFailedError : " + error_string (" : can be caused by a webserver wanting SSL client certificates";
         }
         // Qt doesn't yet transparently resend HTTP2 requests, do so here
         var max_http2Resends = 3;
@@ -535,10 +535,10 @@ class AbstractNetworkJob : GLib.Object {
             && this.reply.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()) {
 
             if ( (this.request_body && !this.request_body.is_sequential ()) || verb.is_empty ()) {
-                GLib.warn ("Can't resend HTTP2 request, verb or body not suitable"
+                GLib.warning ("Can't resend HTTP2 request, verb or body not suitable"
                                         + this.reply.request ().url () + verb + this.request_body;
             } else if (this.http2_resend_count >= max_http2Resends) {
-                GLib.warn ("Not resending HTTP2 request, number of resends exhausted"
+                GLib.warning ("Not resending HTTP2 request, number of resends exhausted"
                                         + this.reply.request ().url () + this.http2_resend_count;
             } else {
                 GLib.info ("HTTP2 resending" + this.reply.request ().url ();
@@ -565,10 +565,10 @@ class AbstractNetworkJob : GLib.Object {
                 return;
 
             if (!this.ignore_credential_failure || this.reply.error () != Soup.Reply.AuthenticationRequiredError) {
-                GLib.warn () + this.reply.error () + error_string ()
+                GLib.warning () + this.reply.error () + error_string ()
                                         + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute);
                 if (this.reply.error () == Soup.Reply.ProxyAuthenticationRequiredError) {
-                    GLib.warn () + this.reply.raw_header ("Proxy-Authenticate");
+                    GLib.warning () + this.reply.raw_header ("Proxy-Authenticate");
                 }
             }
             /* emit */ network_error (this.reply);
@@ -592,19 +592,19 @@ class AbstractNetworkJob : GLib.Object {
                 && requested_url.has_query ()
                 && !redirect_url.has_query ()
                 && !this.request_body) {
-                GLib.warn ("Redirecting a POST request with an implicit body loses that body";
+                GLib.warning ("Redirecting a POST request with an implicit body loses that body";
             }
 
             // ### some of the q_warnings here should be exported via display_errors () so they
             // ### can be presented to the user if the job executor has a GUI
             if (requested_url.scheme () == QLatin1String ("https") && redirect_url.scheme () == QLatin1String ("http")) {
-                GLib.warn () + this + "HTTPS.HTTP downgrade detected!";
+                GLib.warning () + this + "HTTPS.HTTP downgrade detected!";
             } else if (requested_url == redirect_url || this.redirect_count + 1 >= max_redirects ()) {
-                GLib.warn () + this + "Redirect loop detected!";
+                GLib.warning () + this + "Redirect loop detected!";
             } else if (this.request_body && this.request_body.is_sequential ()) {
-                GLib.warn () + this + "cannot redirect request with sequential body";
+                GLib.warning () + this + "cannot redirect request with sequential body";
             } else if (verb.is_empty ()) {
-                GLib.warn () + this + "cannot redirect request : could not detect original verb";
+                GLib.warning () + this + "cannot redirect request : could not detect original verb";
             } else {
                 /* emit */ redirected (this.reply, redirect_url, this.redirect_count);
 
@@ -647,7 +647,7 @@ class AbstractNetworkJob : GLib.Object {
 
     private void on_signal_timeout () {
         this.timedout = true;
-        GLib.warn ("Network job timeout" + (reply () ? reply ().request ().url () : path ());
+        GLib.warning ("Network job timeout" + (reply () ? reply ().request ().url () : path ());
         on_signal_timed_out ();
     }
 

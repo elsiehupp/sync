@@ -34,7 +34,7 @@ static class FileSystem {
         GLib.File f1 (fn1);
         GLib.File f2 (fn2);
         if (!f1.open (QIODevice.ReadOnly) || !f2.open (QIODevice.ReadOnly)) {
-            GLib.warn ("file_equals : Failed to open " + fn1 + "or" + fn2;
+            GLib.warning ("file_equals : Failed to open " + fn1 + "or" + fn2;
             return false;
         }
 
@@ -71,7 +71,7 @@ static class FileSystem {
             result = stat.modtime;
         } else {
             result = Utility.q_date_time_to_time_t (QFileInfo (filename).last_modified ());
-            GLib.warn ("Could not get modification time for" + filename
+            GLib.warning ("Could not get modification time for" + filename
                                     + "with csync, using QFileInfo:" + result;
         }
         return result;
@@ -84,7 +84,7 @@ static class FileSystem {
         times[0].tv_usec = times[1].tv_usec = 0;
         int rc = c_utimes (filename, times);
         if (rc != 0) {
-            GLib.warn ("Error setting mtime for" + filename
+            GLib.warning ("Error setting mtime for" + filename
                                     + "failed : rc" + rc + ", errno:" + errno;
             return false;
         }
@@ -184,7 +184,7 @@ static class FileSystem {
                         errors.append (_("FileSystem", "Error removing \"%1\" : %2")
                                             .arg (QDir.to_native_separators (di.file_path ()), remove_error));
                     }
-                    GLib.warn ("Error removing " + di.file_path () + ':' + remove_error;
+                    GLib.warning ("Error removing " + di.file_path () + ':' + remove_error;
                 }
             }
             if (!remove_ok)
@@ -200,7 +200,7 @@ static class FileSystem {
                     errors.append (_("FileSystem", "Could not remove folder \"%1\"")
                                         .arg (QDir.to_native_separators (path)));
                 }
-                GLib.warn ("Error removing folder" + path;
+                GLib.warning ("Error removing folder" + path;
             }
         }
         return all_removed;

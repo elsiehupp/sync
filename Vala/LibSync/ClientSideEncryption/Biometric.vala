@@ -11,7 +11,7 @@ class Biometric {
     private BIO bio;
 
     public Biometric () {
-        this.bio = BIO_new (BIO_s_mem ()));
+        this.bio = new BIO_new (BIO_s_mem ());
     }
 
 

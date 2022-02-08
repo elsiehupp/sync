@@ -141,7 +141,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             this.item.modtime = FileSystem.get_mod_time (new_file_path_absolute);
             //  Q_ASSERT (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+                GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
                 on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (this.item.file)));
                 return;
             }
@@ -167,7 +167,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         this.upload_encrypted_helper = new PropagateUploadEncrypted (propagator (), remote_parent_path, this.item, this);
         connect (this.upload_encrypted_helper, &PropagateUploadEncrypted.finalized,
                 this, &PropagateUploadFileCommon.setup_encrypted_file);
-        connect (this.upload_encrypted_helper, &PropagateUploadEncrypted.error, [this] {
+        connect (this.upload_encrypted_helper, &PropagateUploadEncrypted.error, {
             GLib.debug ("Error setting up encryption.";
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Failed to upload encrypted file."));
         });
@@ -357,7 +357,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         }
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
         }
         time_t prev_modtime = this.item.modtime; // the this.item value was set in PropagateUploadFile.on_signal_start ()
         // but a potential checksum calculation could have taken some time during which the file could
@@ -370,7 +370,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         }
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
         }
         if (prev_modtime != this.item.modtime) {
             propagator ().another_sync_needed = true;
@@ -439,7 +439,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         info.modtime = this.item.modtime;
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
         }
         info.file_size = this.item.size;
         propagator ().journal.poll_info (info);
@@ -517,7 +517,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             var pin = vfs.pin_state (this.item.file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
                 if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
-                    GLib.warn ("Could not set pin state of" + this.item.file + "to unspecified";
+                    GLib.warning ("Could not set pin state of" + this.item.file + "to unspecified";
                 }
             }
         }
@@ -697,9 +697,9 @@ class PropagateUploadFileCommon : PropagateItemJob {
         headers[QByteArrayLiteral ("Content-Type")] = QByteArrayLiteral ("application/octet-stream");
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
         }
-        headers[QByteArrayLiteral ("X-OC-Mtime")] = GLib.ByteArray.number (int64 (this.item.modtime));
+        headers[QByteArrayLiteral ("X-OC-Mtime")] = new GLib.ByteArray.number (int64 (this.item.modtime));
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS"))
             headers[QByteArrayLiteral ("OC-LazyOps")] = QByteArrayLiteral ("true");
 
@@ -732,7 +732,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             if (!conflict_record.base_file_id.is_empty ())
                 headers[QByteArrayLiteral ("OC-ConflictBaseFileId")] = conflict_record.base_file_id;
             if (conflict_record.base_modtime != -1)
-                headers[QByteArrayLiteral ("OC-ConflictBaseMtime")] = GLib.ByteArray.number (conflict_record.base_modtime);
+                headers[QByteArrayLiteral ("OC-ConflictBaseMtime")] = new GLib.ByteArray.number (conflict_record.base_modtime);
             if (!conflict_record.base_etag.is_empty ())
                 headers[QByteArrayLiteral ("OC-ConflictBaseEtag")] = conflict_record.base_etag;
         }

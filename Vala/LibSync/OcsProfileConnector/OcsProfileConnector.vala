@@ -93,7 +93,7 @@ class OcsProfileConnector : GLib.Object {
                 load_hovercard_action_icon (hovercard_action_index, icon_data);
             });
         connect (icon_job, &IconJob.error, this, [] (Soup.Reply.NetworkError error_type) {
-            GLib.warn ("Could not fetch icon:" + error_type;
+            GLib.warning ("Could not fetch icon:" + error_type;
         });
     }
 
@@ -120,7 +120,7 @@ class OcsProfileConnector : GLib.Object {
             hovercard_action_icon (hovercard_action_index, icon.get ());
             return;
         }
-        GLib.warn ("Could not load Svg icon from data" + icon_data;
+        GLib.warning ("Could not load Svg icon from data" + icon_data;
     }
 
 

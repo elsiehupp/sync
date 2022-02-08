@@ -61,7 +61,7 @@ class GETEncryptedFileJob : GETFileJob {
             // we may end up receiving packets beyond Occ.Constants.E2EE_TAG_SIZE bytes tag at the end
             // in that case, we don't want to try and decrypt less than Occ.Constants.E2EE_TAG_SIZE ending bytes of tag, we will accumulate all the incoming data till the end
             // and then, we are going to decrypt the entire chunk containing Occ.Constants.E2EE_TAG_SIZE bytes at the end
-            this.pending_bytes += GLib.ByteArray (data.const_data (), data.length ());
+            this.pending_bytes += new GLib.ByteArray (data.const_data (), data.length ());
             this.processed_so_far += data.length ();
             if (this.processed_so_far != this.content_length) {
                 return data.length ();

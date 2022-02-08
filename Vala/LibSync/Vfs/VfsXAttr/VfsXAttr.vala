@@ -150,7 +150,7 @@ class Vfs_xAttr : Vfs {
         //  Q_ASSERT (!parent_path.ends_with ('/'));
         //  Q_ASSERT (!stat.path.starts_with ('/'));
 
-        var path = GLib.ByteArray (*parent_path + '/' + stat.path);
+        var path = new GLib.ByteArray (*parent_path + '/' + stat.path);
         var pin = [=] {
             var absolute_path = string.from_utf8 (path);
             //  Q_ASSERT (absolute_path.starts_with (parameters ().filesystem_path.to_utf8 ()));

@@ -28,7 +28,7 @@ class HttpCredentialsAccessManager : AccessManager {
                 if (this.credentials.is_using_oauth ()) {
                     reques.raw_header ("Authorization", "Bearer " + this.credentials.password ().to_utf8 ());
                 } else {
-                    GLib.ByteArray cred_hash = GLib.ByteArray (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
+                    GLib.ByteArray cred_hash = new GLib.ByteArray (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
                     reques.raw_header ("Authorization", "Basic " + cred_hash);
                 }
             } else if (!request.url ().password ().is_empty ()) {

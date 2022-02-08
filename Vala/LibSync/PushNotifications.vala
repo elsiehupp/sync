@@ -189,7 +189,7 @@ class PushNotifications : GLib.Object {
             return;
         }
 
-        GLib.warn ("Websocket error on with account" + this.account.url () + error;
+        GLib.warning ("Websocket error on with account" + this.account.url () + error;
         close_web_socket ();
         /* emit */ connection_lost ();
     }
@@ -198,7 +198,7 @@ class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_web_socket_ssl_errors (GLib.List<QSslError> errors) {
-        GLib.warn ("Websocket ssl errors on with account" + this.account.url () + errors;
+        GLib.warning ("Websocket ssl errors on with account" + this.account.url () + errors;
         close_web_socket ();
         /* emit */ authentication_failed ();
     }
@@ -300,7 +300,7 @@ class PushNotifications : GLib.Object {
 
         this.reconnect_timer.interval (this.reconnect_timer_interval);
         this.reconnect_timer.single_shot (true);
-        connect (this.reconnect_timer, &QTimer.timeout, [this] () {
+        connect (this.reconnect_timer, &QTimer.timeout, () {
             reconnect_to_web_socket ();
         });
         this.reconnect_timer.on_signal_start ();

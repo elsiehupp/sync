@@ -111,12 +111,12 @@ class ClientProxy : GLib.Object {
 
         switch (proxy_type) {
             case QNetworkProxy.NoProxy:
-                GLib.info ("Set proxy configuration to use NO proxy";
+                GLib.info ("Set proxy configuration to use NO proxy.");
                 QNetworkProxyFactory.use_system_configuration (false);
                 QNetworkProxy.application_proxy (QNetworkProxy.NoProxy);
                 break;
             case QNetworkProxy.DefaultProxy:
-                GLib.info ("Set proxy configuration to use the preferred system proxy for http tcp connections"; {
+                GLib.info ("Set proxy configuration to use the preferred system proxy for http tcp connections."); {
                     QNetworkProxyQuery query;
                     query.protocol_tag ("http");
                     query.query_type (QNetworkProxyQuery.TcpSocket);
@@ -128,13 +128,13 @@ class ClientProxy : GLib.Object {
                 break;
             case QNetworkProxy.Socks5Proxy:
                 proxy.type (QNetworkProxy.Socks5Proxy);
-                GLib.info ("Set proxy configuration to SOCKS5" + print_q_network_proxy (proxy);
+                GLib.info ("Set proxy configuration to SOCKS5 " + print_q_network_proxy (proxy));
                 QNetworkProxyFactory.use_system_configuration (false);
                 QNetworkProxy.application_proxy (proxy);
                 break;
             case QNetworkProxy.HttpProxy:
                 proxy.type (QNetworkProxy.HttpProxy);
-                GLib.info ("Set proxy configuration to HTTP" + print_q_network_proxy (proxy);
+                GLib.info ("Set proxy configuration to HTTP " + print_q_network_proxy (proxy));
                 QNetworkProxyFactory.use_system_configuration (false);
                 QNetworkProxy.application_proxy (proxy);
                 break;

@@ -609,7 +609,7 @@ class ProcessDirectoryJob : GLib.Object {
             // https://bugreports.qt.io/browse/QTBUG-6925.
             QText_encoder encoder (local_codec, QTextCodec.Convert_invalid_to_null);
             if (encoder.from_unicode (path).contains ('\0')) {
-                GLib.warn ("Cannot encode " + path + " to local encoding " + local_codec.name ();
+                GLib.warning ("Cannot encode " + path + " to local encoding " + local_codec.name ();
                 excluded = CSYNC_FILE_EXCLUDE_CANNOT_ENCODE;
             }
         }
@@ -722,7 +722,7 @@ class ProcessDirectoryJob : GLib.Object {
             && !server_entry.is_valid ()
             && !db_entry.is_valid ()
             && local_entry.modtime < this.last_sync_timestamp) {
-            GLib.warn ("File" + path.original + "was modified before the last sync run and is not in the sync journal and server";
+            GLib.warning ("File" + path.original + "was modified before the last sync run and is not in the sync journal and server";
         }
 
         if (this.discovery_data.is_renamed (path.original)) {
@@ -1035,7 +1035,7 @@ class ProcessDirectoryJob : GLib.Object {
             // A remote rename can also mean Encryption Mangled Name.
             // if we find one of those in the database, we ignore it.
             if (!base.e2e_mangled_name.is_empty ()) {
-                GLib.warn ();
+                GLib.warning ();
                 done = true;
                 return;
             }
@@ -1368,7 +1368,7 @@ class ProcessDirectoryJob : GLib.Object {
 
             //  Q_ASSERT (item.instruction == CSYNC_INSTRUCTION_NEW);
             if (item.instruction != CSYNC_INSTRUCTION_NEW) {
-                GLib.warn ("Trying to wipe a virtual item" + path.local + " with item.instruction" + item.instruction;
+                GLib.warning ("Trying to wipe a virtual item" + path.local + " with item.instruction" + item.instruction;
                 return;
             }
 
@@ -1399,7 +1399,7 @@ class ProcessDirectoryJob : GLib.Object {
                     /* emit */ this.discovery_data.add_error_to_gui (SyncFileItem.Status.SOFT_ERROR, _("Conflict when uploading some files to a folder. Those, conflicted, are going to get cleared!"), path.local);
                     return;
                 }
-                GLib.warn ("Virtual file without database entry for" + path.local
+                GLib.warning ("Virtual file without database entry for" + path.local
                                    + "but looks odd, keeping";
                 item.instruction = CSYNC_INSTRUCTION_IGNORE;
 
@@ -1758,12 +1758,12 @@ class ProcessDirectoryJob : GLib.Object {
                 // No permissions set
                 return true;
             } else if (item.is_directory () && !perms.has_permission (RemotePermissions.Can_add_sub_directories)) {
-                GLib.warn ("check_for_permission : ERROR" + item.file;
+                GLib.warning ("check_for_permission : ERROR" + item.file;
                 item.instruction = CSYNC_INSTRUCTION_ERROR;
                 item.error_string = _("Not allowed because you don't have permission to add subfolders to that folder");
                 return false;
             } else if (!item.is_directory () && !perms.has_permission (RemotePermissions.Can_add_file)) {
-                GLib.warn ("check_for_permission : ERROR" + item.file;
+                GLib.warning ("check_for_permission : ERROR" + item.file;
                 item.instruction = CSYNC_INSTRUCTION_ERROR;
                 item.error_string = _("Not allowed because you don't have permission to add files in that folder");
                 return false;
@@ -1781,7 +1781,7 @@ class ProcessDirectoryJob : GLib.Object {
                 item.error_string = _("Not allowed to upload this file because it is read-only on the server, restoring");
                 item.direction = SyncFileItem.Direction.DOWN;
                 item.is_restoration = true;
-                GLib.warn ("check_for_permission : RESTORING" + item.file + item.error_string;
+                GLib.warning ("check_for_permission : RESTORING" + item.file + item.error_string;
                 // Take the things to write to the database from the "other" node (i.e : info from server).
                 // Do a lookup into the csync remote tree to get the metadata we need to restore.
                 q_swap (item.size, item.previous_size);
@@ -1801,7 +1801,7 @@ class ProcessDirectoryJob : GLib.Object {
                 item.direction = SyncFileItem.Direction.DOWN;
                 item.is_restoration = true;
                 item.error_string = _("Moved to invalid target, restoring");
-                GLib.warn ("check_for_permission : RESTORING" + item.file + item.error_string;
+                GLib.warning ("check_for_permission : RESTORING" + item.file + item.error_string;
                 return true; // restore sub items
             }
             var perms = item.remote_perm;
@@ -1814,7 +1814,7 @@ class ProcessDirectoryJob : GLib.Object {
                 item.direction = SyncFileItem.Direction.DOWN;
                 item.is_restoration = true;
                 item.error_string = _("Not allowed to remove, restoring");
-                GLib.warn ("check_for_permission : RESTORING" + item.file + item.error_string;
+                GLib.warning ("check_for_permission : RESTORING" + item.file + item.error_string;
                 return true; // (we need to recurse to restore sub items)
             }
             break;
@@ -1986,7 +1986,7 @@ class ProcessDirectoryJob : GLib.Object {
                     this.process ();
             } else {
                 var code = results.error ().code;
-                GLib.warn ("Server error in directory" + this.current_folder.server + code;
+                GLib.warning ("Server error in directory" + this.current_folder.server + code;
                 if (this.dir_item && code >= 403) {
                     // In case of an HTTP error, we ignore that directory
                     // 403 Forbidden can be sent by the server if the file firewall is active.
@@ -2029,11 +2029,11 @@ class ProcessDirectoryJob : GLib.Object {
 
         connect (local_job, &DiscoverySingleLocalDirectoryJob.item_discovered, this.discovery_data, &DiscoveryPhase.item_discovered);
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.child_ignored, this, [this] (bool b) {
+        connect (local_job, &DiscoverySingleLocalDirectoryJob.child_ignored, this, (bool b) {
             this.child_ignored = b;
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_fatal_error, this, [this] (string message) {
+        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_fatal_error, this, (string message) {
             this.discovery_data.currently_active_jobs--;
             this.pending_async_jobs--;
             if (this.server_job)
@@ -2042,7 +2042,7 @@ class ProcessDirectoryJob : GLib.Object {
             /* emit */ this.discovery_data.fatal_error (message);
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_non_fatal_error, this, [this] (string message) {
+        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_non_fatal_error, this, (string message) {
             this.discovery_data.currently_active_jobs--;
             this.pending_async_jobs--;
 
@@ -2056,7 +2056,7 @@ class ProcessDirectoryJob : GLib.Object {
             }
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.on_signal_finished, this, [this] (var results) {
+        connect (local_job, &DiscoverySingleLocalDirectoryJob.on_signal_finished, this, (var results) {
             this.discovery_data.currently_active_jobs--;
             this.pending_async_jobs--;
 

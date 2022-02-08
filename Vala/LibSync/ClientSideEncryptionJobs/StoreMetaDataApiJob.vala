@@ -43,11 +43,11 @@ class StoreMetaDataApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (query);
 
-        GLib.ByteArray data = GLib.ByteArray ("meta_data=") + GLib.Uri.to_percent_encoding (this.b64_metadata);
+        GLib.ByteArray data = new GLib.ByteArray ("meta_data=") + GLib.Uri.to_percent_encoding (this.b64_metadata);
         var buffer = new Soup.Buffer (this);
         buffer.data (data);
 
-        GLib.info ()) + "sending the metadata for the file_identifier" + this.file_identifier + "as encrypted";
+        GLib.info ("sending the metadata for the file_identifier" + this.file_identifier + "as encrypted";
         send_request ("POST", url, reques, buffer);
         AbstractNetworkJob.on_signal_start ();
     }
@@ -58,11 +58,11 @@ class StoreMetaDataApiJob : AbstractNetworkJob {
     protected bool on_signal_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (return_code != 200) {
-                GLib.info ()) + "error sending the metadata" + path () + error_string () + return_code;
+                GLib.info ("error sending the metadata" + path () + error_string () + return_code;
                 emit error (this.file_identifier, return_code);
             }
 
-            GLib.info ()) + "Metadata submited to the server successfully";
+            GLib.info ("Metadata submited to the server successfully";
             emit success (this.file_identifier);
         return true;
     }

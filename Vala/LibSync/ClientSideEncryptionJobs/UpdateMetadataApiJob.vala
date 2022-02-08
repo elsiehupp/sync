@@ -57,7 +57,7 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
         var buffer = new Soup.Buffer (this);
         buffer.data (data);
 
-        GLib.info ()) + "updating the metadata for the file_identifier" + this.file_identifier + "as encrypted";
+        GLib.info ("updating the metadata for the file_identifier" + this.file_identifier + "as encrypted";
         send_request ("PUT", url, reques, buffer);
         AbstractNetworkJob.on_signal_start ();
     }
@@ -66,11 +66,11 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
     protected bool on_signal_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (return_code != 200) {
-                GLib.info ()) + "error updating the metadata" + path () + error_string () + return_code;
+                GLib.info ("error updating the metadata" + path () + error_string () + return_code;
                 emit error (this.file_identifier, return_code);
             }
 
-            GLib.info ()) + "Metadata submited to the server successfully";
+            GLib.info ("Metadata submited to the server successfully";
             emit success (this.file_identifier);
         return true;
     }

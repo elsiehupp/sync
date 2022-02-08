@@ -106,22 +106,22 @@ class DetermineAuthTypeJob : GLib.Object {
             this.get_done = true;
             check_all_done ();
         });
-        connect (propfind, &SimpleNetworkJob.finished_signal, this, [this] (Soup.Reply reply) {
+        connect (propfind, &SimpleNetworkJob.finished_signal, this, (Soup.Reply reply) {
             var auth_challenge = reply.raw_header ("WWW-Authenticate").to_lower ();
             if (auth_challenge.contains ("bearer ")) {
                 this.result_propfind = OAuth;
             } else {
                 if (auth_challenge.is_empty ()) {
-                    GLib.warn ("Did not receive WWW-Authenticate reply to auth-test PROPFIND";
+                    GLib.warning ("Did not receive WWW-Authenticate reply to auth-test PROPFIND";
                 } else {
-                    GLib.warn ("Unknown WWW-Authenticate reply to auth-test PROPFIND:" + auth_challenge;
+                    GLib.warning ("Unknown WWW-Authenticate reply to auth-test PROPFIND:" + auth_challenge;
                 }
                 this.result_propfind = Basic;
             }
             this.propfind_done = true;
             check_all_done ();
         });
-        connect (old_flow_required, &JsonApiJob.json_received, this, [this] (QJsonDocument json, int status_code) {
+        connect (old_flow_required, &JsonApiJob.json_received, this, (QJsonDocument json, int status_code) {
             if (status_code == 200) {
                 this.result_old_flow = LoginFlowV2;
 
@@ -134,7 +134,7 @@ class DetermineAuthTypeJob : GLib.Object {
     // #ifdef WITH_WEBENGINE
                             this.result_old_flow = WEB_VIEW_FLOW;
     // #else // WITH_WEBENGINE
-                            GLib.warn ("Server does only support flow1, but this client was compiled without support for flow1";
+                            GLib.warning ("Server does only support flow1, but this client was compiled without support for flow1";
     // #endif // WITH_WEBENGINE
                         }
                     }

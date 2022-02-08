@@ -69,10 +69,10 @@ class CleanupPollsJob : GLib.Object {
             delete_later ();
             return;
         } else if (job.item.status != SyncFileItem.Status.SUCCESS) {
-            GLib.warn ("There was an error with file " + job.item.file + job.item.error_string;
+            GLib.warning ("There was an error with file " + job.item.file + job.item.error_string;
         } else {
             if (!OwncloudPropagator.static_update_metadata (*job.item, this.local_path, this.vfs.data (), this.journal)) {
-                GLib.warn ("database error";
+                GLib.warning ("database error";
                 job.item.status = SyncFileItem.Status.FATAL_ERROR;
                 job.item.error_string = _("Error writing metadata to the database");
                 /* emit */ aborted (job.item.error_string);

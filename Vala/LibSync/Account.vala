@@ -709,7 +709,7 @@ class Account : GLib.Object {
     /***********************************************************
     Assign a client certificate
     ***********************************************************/
-    public void certificate (GLib.ByteArray certficate = GLib.ByteArray (), string private_key = "");
+    public void certificate (GLib.ByteArray certficate = new GLib.ByteArray (), string private_key = "");
 
 
     /***********************************************************
@@ -857,7 +857,7 @@ class Account : GLib.Object {
             if (!this.push_notifications) {
                 this.push_notifications = new PushNotifications (this, this);
 
-                connect (this.push_notifications, &PushNotifications.ready, this, [this] () {
+                connect (this.push_notifications, &PushNotifications.ready, this, () => {
                     this.push_notifications_reconnect_timer.stop ();
                     /* emit */ push_notifications_ready (this);
                 });
@@ -888,9 +888,9 @@ class Account : GLib.Object {
     ***********************************************************/
     public void delete_app_password () {
         const string kck = AbstractCredentials.keychain_key (
-                    url ().to_string (),
-                    credentials ().user () + app_password,
-                    identifier ()
+            url ().to_string (),
+            credentials ().user () + app_password,
+            identifier ()
         );
 
         if (kck.is_empty ()) {
@@ -901,12 +901,12 @@ class Account : GLib.Object {
         var job = new DeletePasswordJob (Theme.instance ().app_name ());
         job.insecure_fallback (false);
         job.key (kck);
-        connect (job, &DeletePasswordJob.on_signal_finished, [this] (Job incoming) {
+        connect (job, &DeletePasswordJob.on_signal_finished, (Job incoming) => {
             var delete_job = static_cast<DeletePasswordJob> (incoming);
             if (delete_job.error () == NoError)
                 GLib.info ("app_password deleted from keychain");
             else
-                GLib.warn ("Unable to delete app_password from keychain" + delete_job.error_string ());
+                GLib.warning ("Unable to delete app_password from keychain" + delete_job.error_string ());
 
             // Allow storing a new app password on re-login
             this.wrote_app_password = false;
@@ -994,7 +994,7 @@ class Account : GLib.Object {
         var job = new ReadPasswordJob (Theme.instance ().app_name ());
         job.insecure_fallback (false);
         job.key (kck);
-        connect (job, &ReadPasswordJob.on_signal_finished, [this] (Job incoming) {
+        connect (job, &ReadPasswordJob.on_signal_finished, (Job incoming) => {
             var read_job = static_cast<ReadPasswordJob> (incoming);
             string pwd ("");
             // Error or no valid public key error out
@@ -1033,12 +1033,12 @@ class Account : GLib.Object {
         job.insecure_fallback (false);
         job.key (kck);
         job.binary_data (app_password.to_latin1 ());
-        connect (job, &WritePasswordJob.on_signal_finished, [this] (Job incoming) {
+        connect (job, &WritePasswordJob.on_signal_finished, (Job incoming) => {
             var write_job = static_cast<WritePasswordJob> (incoming);
             if (write_job.error () == NoError)
                 GLib.info ("app_password stored in keychain");
             else
-                GLib.warn ("Unable to store app_password in keychain" + write_job.error_string ());
+                GLib.warning ("Unable to store app_password in keychain" + write_job.error_string ());
 
             // We don't try this again on error, to not raise CPU consumption
             this.wrote_app_password = true;
@@ -1051,18 +1051,18 @@ class Account : GLib.Object {
     ***********************************************************/
     public void delete_app_token () {
         var delete_app_token_job = new DeleteJob (shared_from_this (), QStringLiteral ("/ocs/v2.php/core/apppassword"));
-        connect (delete_app_token_job, &DeleteJob.finished_signal, this, [this] () {
+        connect (delete_app_token_job, &DeleteJob.finished_signal, this, () => {
             var delete_job = (DeleteJob)GLib.Object.sender ();
             if (delete_job) {
                 var http_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
                 if (http_code != 200) {
-                    GLib.warn ("AppToken remove failed for user : " + display_name () + " with code : " + http_code));
+                    GLib.warning ("AppToken remove failed for user : " + display_name () + " with code : " + http_code));
                 } else {
                     GLib.info ("AppToken for user : " + display_name () + " has been removed.");
                 }
             } else {
                 //  Q_ASSERT (false);
-                GLib.warn ("The sender is not a DeleteJob instance.";
+                GLib.warning ("The sender is not a DeleteJob instance.";
             }
         });
         delete_app_token_job.on_signal_start ();
@@ -1093,10 +1093,10 @@ class Account : GLib.Object {
     ***********************************************************/
     public void setup_user_status_connector () {
         this.user_status_connector = std.make_shared<OcsUserStatusConnector> (shared_from_this ());
-        connect (this.user_status_connector.get (), &UserStatusConnector.user_status_fetched, this, [this] (UserStatus &) {
+        connect (this.user_status_connector.get (), &UserStatusConnector.user_status_fetched, this, (UserStatus &) {
             /* emit */ user_status_changed ();
         });
-        connect (this.user_status_connector.get (), &UserStatusConnector.message_cleared, this, [this] {
+        connect (this.user_status_connector.get (), &UserStatusConnector.message_cleared, this, {
             /* emit */ user_status_changed ();
         });
     }
@@ -1136,16 +1136,15 @@ class Account : GLib.Object {
     ***********************************************************/
     public void on_signal_handle_ssl_errors (Soup.Reply reply, GLib.List<QSslError> errors) {
         NetworkJobTimeoutPauser pauser = new NetworkJobTimeoutPauser (reply);
-        string out;
-        QDebug (&out) + "SSL-Errors happened for url " + reply.url ().to_string ();
+        GLib.debug ("SSL-Errors happened for url " + reply.url ().to_string ());
         foreach (QSslError error in errors) {
-            QDebug (&out) + "\t_error in " + error.certificate (":"
-                        + error.error_string (" (" + error.error (")"
-                        + "\n";
+            GLib.debug ("\t_error in " + error.certificate () + ":"
+                        + error.error_string () + " (" + error.error () + ")"
+                        + "\n");
         }
 
-        GLib.info ("ssl errors" + out);
-        GLib.info (reply.ssl_configuration ().peer_certificate_chain ());
+        //  GLib.info ("ssl errors" + out);
+        GLib.info (reply.ssl_configuration ().peer_certificate_chain ()));
 
         bool all_previously_rejected = true;
         foreach (QSslError error in errors) {
@@ -1156,13 +1155,13 @@ class Account : GLib.Object {
 
         // If all certificates have previously been rejected by the user, don't ask again.
         if (all_previously_rejected) {
-            GLib.info () + out + "Certs not trusted by user decision, returning.";
+            GLib.info (out + "Certs not trusted by user decision, returning.";
             return;
         }
 
         GLib.List<QSslCertificate> approved_certificates;
         if (this.ssl_error_handler.is_null ()) {
-            GLib.warn () + out + "called without valid SSL error handler for account" + url ();
+            GLib.warning () + out + "called without valid SSL error handler for account" + url ();
             return;
         }
 
@@ -1183,7 +1182,7 @@ class Account : GLib.Object {
                 /* emit */ wants_account_saved (this);
 
                 // all ssl certificates are known and accepted. We can ignore the problems right away.
-                GLib.info () + out + "Certs are known and trusted! This is not an actual error.";
+                GLib.info (out + "Certs are known and trusted! This is not an actual error.";
             }
 
             // Warning : Do not* use ignore_ssl_errors () (without args) here:
@@ -1213,16 +1212,16 @@ class Account : GLib.Object {
         if (this.dav_user.is_empty ()) {
             GLib.debug ("User identifier not set. Fetch it.");
             var fetch_user_name_job = new JsonApiJob (shared_from_this (), QStringLiteral ("/ocs/v1.php/cloud/user"));
-            connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, fetch_user_name_job] (QJsonDocument json, int status_code) {
+            connect (fetch_user_name_job, &JsonApiJob.json_received, this, /*[this, fetch_user_name_job]*/ (QJsonDocument json, int status_code) => {
                 fetch_user_name_job.delete_later ();
                 if (status_code != 100) {
-                    GLib.warn ("Could not fetch user identifier. Login will probably not work.");
+                    GLib.warning ("Could not fetch user identifier. Login will probably not work.");
                     /* emit */ credentials_fetched (this.credentials.data ());
                     return;
                 }
 
                 var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-                var user_id = obj_data.value ("identifier").to_string () + "");
+                var user_id = obj_data.value ("identifier").to_string ();
                 dav_user (user_id);
                 /* emit */ credentials_fetched (this.credentials.data ());
             });

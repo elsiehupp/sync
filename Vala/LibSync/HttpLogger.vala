@@ -121,7 +121,7 @@ static class HttpLogger {
             }
         }
         stream + "]";
-        GLib.info () + message;
+        GLib.info (message;
     }
 
 } // static class HttpLogger

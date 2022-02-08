@@ -32,7 +32,7 @@ class PropagateRootDirectory : PropagateDirectory {
     /***********************************************************
     ***********************************************************/
     public bool on_signal_schedule_self_or_child () {
-        GLib.info ()) + "on_signal_schedule_self_or_child" + this.state + "pending uploads" + propagator ().delayed_tasks ().size ("subjobs state" + this.sub_jobs.state;
+        GLib.info ("on_signal_schedule_self_or_child" + this.state + "pending uploads" + propagator ().delayed_tasks ().size ("subjobs state" + this.sub_jobs.state;
 
         if (this.state == Finished) {
             return false;
@@ -113,7 +113,7 @@ class PropagateRootDirectory : PropagateDirectory {
     /***********************************************************
     ***********************************************************/
     private void on_signal_sub_jobs_finished (SyncFileItem.Status status) {
-        GLib.info ()) + status + "on_signal_sub_jobs_finished" + this.state + "pending uploads" + propagator ().delayed_tasks ().size ("subjobs state" + this.sub_jobs.state;
+        GLib.info (status + "on_signal_sub_jobs_finished" + this.state + "pending uploads" + propagator ().delayed_tasks ().size ("subjobs state" + this.sub_jobs.state;
 
         if (!propagator ().delayed_tasks ().empty ()) {
             schedule_delayed_jobs ();

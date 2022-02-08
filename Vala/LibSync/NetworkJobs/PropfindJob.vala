@@ -39,7 +39,7 @@ class PropfindJob : AbstractNetworkJob {
         GLib.List<GLib.ByteArray> properties = this.properties;
 
         if (properties.is_empty ()) {
-            GLib.warn ("Propfind with no properties!";
+            GLib.warning ("Propfind with no properties!";
         }
         Soup.Request reques;
         // Always have a higher priority than the propagator because we use this from the UI
@@ -124,13 +124,13 @@ class PropfindJob : AbstractNetworkJob {
                 }
             }
             if (reader.has_error ()) {
-                GLib.warn ("XML parser error : " + reader.error_string ();
+                GLib.warning ("XML parser error : " + reader.error_string ();
                 /* emit */ finished_with_error (reply ());
             } else {
                 /* emit */ signal_result (items);
             }
         } else {
-            GLib.warn ("*not* successful, http result code is" + http_result_code
+            GLib.warning ("*not* successful, http result code is" + http_result_code
                                     + (http_result_code == 302 ? reply ().header (Soup.Request.LocationHeader).to_string () : QLatin1String (""));
             /* emit */ finished_with_error (reply ());
         }

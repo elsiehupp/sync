@@ -156,7 +156,7 @@ class TokenCredentials : AbstractCredentials {
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,
         // those credentials were invalid and we terminate.
-        GLib.warn ("Stop request : Authentication failed for " + reply.url ().to_string ();
+        GLib.warning ("Stop request : Authentication failed for " + reply.url ().to_string ();
         reply.property (AUTHENTICATION_FAILED_C, true);
         reply.close ();
     }

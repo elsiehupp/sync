@@ -106,7 +106,7 @@ void PUTFile_job.on_signal_start () {
     }
 
     if (reply ().error () != Soup.Reply.NoError) {
-        GLib.warn (" Network error : " + reply ().error_string ();
+        GLib.warning (" Network error : " + reply ().error_string ();
     }
 
     connect (reply (), &Soup.Reply.upload_progress, this, &PUTFile_job.upload_progress);

@@ -275,7 +275,7 @@ class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_timed_out () {
-        GLib.warn ("Timeout" + reply () ? reply ().request ().url () : path ());
+        GLib.warning ("Timeout" + reply () ? reply ().request ().url () : path ());
         if (!reply ())
             return;
         this.error_string = _("Connection Timeout");
@@ -343,14 +343,14 @@ class GETFileJob : AbstractNetworkJob {
 
         while (reply ().bytes_available () > 0 && this.save_body_to_file) {
             if (this.bandwidth_choked) {
-                GLib.warn ("Download choked.");
+                GLib.warning ("Download choked.");
                 break;
             }
             int64 to_read = buffer_size;
             if (this.bandwidth_limited) {
                 to_read = q_min (int64 (buffer_size), this.bandwidth_quota);
                 if (to_read == 0) {
-                    GLib.warn ("Out of quota.");
+                    GLib.warning ("Out of quota.");
                     break;
                 }
                 this.bandwidth_quota -= to_read;
@@ -360,7 +360,7 @@ class GETFileJob : AbstractNetworkJob {
             if (read_bytes < 0) {
                 this.error_string = network_reply_error_string (*reply ());
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
-                GLib.warn ("Error while reading from device: " + this.error_string);
+                GLib.warning ("Error while reading from device: " + this.error_string);
                 reply ().on_signal_abort ();
                 return;
             }
@@ -369,7 +369,7 @@ class GETFileJob : AbstractNetworkJob {
             if (written_bytes != read_bytes) {
                 this.error_string = this.device.error_string ();
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
-                GLib.warn ("Error while writing to file " + written_bytes + read_bytes + this.error_string);
+                GLib.warning ("Error while writing to file " + written_bytes + read_bytes + this.error_string);
                 reply ().on_signal_abort ();
                 return;
             }
@@ -428,17 +428,17 @@ class GETFileJob : AbstractNetworkJob {
 
         if (!this.direct_download_url.is_empty () && !this.etag.is_empty ()) {
             GLib.info ("Direct download used, ignoring server ETag " + this.etag);
-            this.etag = GLib.ByteArray (); // reset received ETag
+            this.etag = new GLib.ByteArray (); // reset received ETag
         } else if (!this.direct_download_url.is_empty ()) {
             // All fine, ETag empty and direct_download_url used
         } else if (this.etag.is_empty ()) {
-            GLib.warn ("No E-Tag reply by server, considering it invalid.");
+            GLib.warning ("No E-Tag reply by server, considering it invalid.");
             this.error_string = _("No E-Tag received from server, check Proxy/Gateway.");
             this.error_status = SyncFileItem.Status.NORMAL_ERROR;
             reply ().on_signal_abort ();
             return;
         } else if (!this.expected_etag_for_resume.is_empty () && this.expected_etag_for_resume != this.etag) {
-            GLib.warn ("We received a different E-Tag for resuming!"
+            GLib.warning ("We received a different E-Tag for resuming!"
                         + this.expected_etag_for_resume + " vs " + this.etag);
             this.error_string = _("We received a different E-Tag for resuming. Retrying next time.");
             this.error_status = SyncFileItem.Status.NORMAL_ERROR;
@@ -449,7 +449,7 @@ class GETFileJob : AbstractNetworkJob {
         bool ok = false;
         this.content_length = reply ().header (Soup.Request.ContentLengthHeader).to_long_long (&ok);
         if (ok && this.expected_content_length != -1 && this.content_length != this.expected_content_length) {
-            GLib.warn ("We received a different content length than expected! "
+            GLib.warning ("We received a different content length than expected! "
                     + this.expected_content_length + " vs " + this.content_length);
             this.error_string = _("We received an unexpected download Content-Length.");
             this.error_status = SyncFileItem.Status.NORMAL_ERROR;
@@ -467,7 +467,7 @@ class GETFileJob : AbstractNetworkJob {
             }
         }
         if (on_signal_start != this.resume_start) {
-            GLib.warn ("Wrong content-range: " + ranges + " while expecting start was " + this.resume_start);
+            GLib.warning ("Wrong content-range: " + ranges + " while expecting start was " + this.resume_start);
             if (ranges.is_empty ()) {
                 // device doesn't support range, just try again from scratch
                 this.device.close ();

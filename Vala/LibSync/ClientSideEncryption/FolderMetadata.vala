@@ -12,13 +12,13 @@ class FolderMetadata {
 
     /***********************************************************
     ***********************************************************/
-    public FolderMetadata (AccountPointer account, GLib.ByteArray metadata = GLib.ByteArray (), int status_code = -1) {
+    public FolderMetadata (AccountPointer account, GLib.ByteArray metadata = new GLib.ByteArray (), int status_code = -1) {
         this.account = account;
         if (metadata.is_empty () || status_code == 404) {
-            GLib.info ()) + "Setupping Empty Metadata";
+            GLib.info ("Setupping Empty Metadata";
             up_empty_metadata ();
         } else {
-            GLib.info ()) + "Setting up existing metadata";
+            GLib.info ("Setting up existing metadata";
             up_existing_metadata (metadata);
         }
     }
@@ -37,7 +37,7 @@ class FolderMetadata {
                         key, GLib.ByteArray.from_base64 (encrypted_metadata));
 
         if (decrypt_result.is_empty ()) {
-        GLib.debug ()) + "ERROR. Could not decrypt the metadata key";
+        GLib.debug ("ERROR. Could not decrypt the metadata key";
         return {};
         }
         return GLib.ByteArray.from_base64 (decrypt_result);
@@ -177,7 +177,7 @@ class FolderMetadata {
         * ocs and data.
         */
         QJsonDocument doc = QJsonDocument.from_json (metadata);
-        GLib.info ()) + doc.to_json (QJsonDocument.Compact);
+        GLib.info (doc.to_json (QJsonDocument.Compact);
 
         // The metadata is being retrieved as a string stored in a json.
         // This seems* to be broken but the RFC doesn't explicits how it wants.
@@ -210,11 +210,11 @@ class FolderMetadata {
             ***********************************************************/
             GLib.ByteArray b64Decrypted_key = decrypt_metadata_key (curr_b64Pass);
             if (b64Decrypted_key.is_empty ()) {
-            GLib.debug ()) + "Could not decrypt metadata for key" + it.key ();
+            GLib.debug ("Could not decrypt metadata for key" + it.key ();
             continue;
             }
 
-            GLib.ByteArray decrypted_key = GLib.ByteArray.from_base64 (b64Decrypted_key);
+            GLib.ByteArray decrypted_key = new GLib.ByteArray.from_base64 (b64Decrypted_key);
             this.metadata_keys.insert (it.key ().to_int (), decrypted_key);
         }
 
@@ -240,8 +240,8 @@ class FolderMetadata {
 
             var file_obj = it.value ().to_object ();
             file.metadata_key = file_obj["metadata_key"].to_int ();
-            file.authentication_tag = GLib.ByteArray.from_base64 (file_obj["authentication_tag"].to_string ().to_local8Bit ());
-            file.initialization_vector = GLib.ByteArray.from_base64 (file_obj["initialization_vector"].to_string ().to_local8Bit ());
+            file.authentication_tag = new GLib.ByteArray.from_base64 (file_obj["authentication_tag"].to_string ().to_local8Bit ());
+            file.initialization_vector = new GLib.ByteArray.from_base64 (file_obj["initialization_vector"].to_string ().to_local8Bit ());
 
             //Decrypt encrypted part
             GLib.ByteArray key = this.metadata_keys[file.metadata_key];
@@ -251,7 +251,7 @@ class FolderMetadata {
             var decrypted_file_obj = decrypted_file_doc.object ();
 
             file.original_filename = decrypted_file_obj["filename"].to_string ();
-            file.encryption_key = GLib.ByteArray.from_base64 (decrypted_file_obj["key"].to_string ().to_local8Bit ());
+            file.encryption_key = new GLib.ByteArray.from_base64 (decrypted_file_obj["key"].to_string ().to_local8Bit ());
             file.mimetype = decrypted_file_obj["mimetype"].to_string ().to_local8Bit ();
             file.file_version = decrypted_file_obj["version"].to_int ();
 

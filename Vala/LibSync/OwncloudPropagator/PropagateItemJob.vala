@@ -194,7 +194,7 @@ class PropagateItemJob : PropagatorJob {
         }
 
         if (this.item.has_error_status ())
-            GLib.warn ("Could not complete propagation of" + this.item.destination ("by" + this + "with status" + this.item.status + "and error:" + this.item.error_string;
+            GLib.warning ("Could not complete propagation of" + this.item.destination ("by" + this + "with status" + this.item.status + "and error:" + this.item.error_string;
         else
             GLib.info ("Completed propagation of" + this.item.destination ("by" + this + "with status" + this.item.status;
         /* emit */ propagator ().item_completed (this.item);

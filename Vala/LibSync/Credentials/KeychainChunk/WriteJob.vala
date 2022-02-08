@@ -80,7 +80,7 @@ signals:
         wait_loop.exec ();
 
         if (error () != NoError) {
-            GLib.warn ("WritePasswordJob failed with" + error_string ();
+            GLib.warning ("WritePasswordJob failed with" + error_string ();
             return false;
         }
 
@@ -96,7 +96,7 @@ signals:
             this.error_string = write_job.error_string ();
 
             if (write_job.error () != NoError) {
-                GLib.warn ("Error while writing" + write_job.key ("chunk" + write_job.error_string ();
+                GLib.warning ("Error while writing" + write_job.key ("chunk" + write_job.error_string ();
                 this.chunk_buffer.clear ();
             }
         }
@@ -112,7 +112,7 @@ signals:
 
             // keep the limit
             if (this.chunk_count > KeychainChunk.MaxChunks) {
-                GLib.warn ("Maximum chunk count exceeded while writing" + write_job.key ("chunk" + string.number (index) + "cutting off after" + string.number (KeychainChunk.MaxChunks) + "chunks";
+                GLib.warning ("Maximum chunk count exceeded while writing" + write_job.key ("chunk" + string.number (index) + "cutting off after" + string.number (KeychainChunk.MaxChunks) + "chunks";
 
                 write_job.delete_later ();
 

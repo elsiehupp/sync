@@ -162,7 +162,7 @@ class PropagateDirectory : PropagatorJob {
                 if (this.item.modtime <= 0) {
                     status = this.item.status = SyncFileItem.Status.NORMAL_ERROR;
                     this.item.error_string = _("Error updating metadata due to invalid modified time");
-                    GLib.warn ("Error writing to the database for file" + this.item.file;
+                    GLib.warning ("Error writing to the database for file" + this.item.file;
                 }
 
                 FileSystem.mod_time (propagator ().full_local_path (this.item.destination ()), this.item.modtime);
@@ -178,7 +178,7 @@ class PropagateDirectory : PropagatorJob {
                 if (!result) {
                     status = this.item.status = SyncFileItem.Status.FATAL_ERROR;
                     this.item.error_string = _("Error updating metadata : %1").arg (result.error ());
-                    GLib.warn ("Error writing to the database for file" + this.item.file + "with" + result.error ();
+                    GLib.warning ("Error writing to the database for file" + this.item.file + "with" + result.error ();
                 } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
                     this.item.status = SyncFileItem.Status.SOFT_ERROR;
                     this.item.error_string = _("File is currently in use");

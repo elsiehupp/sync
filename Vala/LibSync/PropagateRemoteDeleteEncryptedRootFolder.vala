@@ -42,7 +42,7 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
     public void on_signal_start () {
         //  Q_ASSERT (this.item.is_encrypted);
 
-        const bool list_files_result = this.propagator.journal.list_files_in_path (this.item.file.to_utf8 (), [this] (Occ.SyncJournalFileRecord record) {
+        const bool list_files_result = this.propagator.journal.list_files_in_path (this.item.file.to_utf8 (), (Occ.SyncJournalFileRecord record) {
             this.nested_items[record.e2e_mangled_name] = record;
         });
 
@@ -85,7 +85,7 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Metadata updated, sending to the server.";
 
         var job = new UpdateMetadataApiJob (this.propagator.account (), this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
-        connect (job, &UpdateMetadataApiJob.on_signal_success, this, [this] (GLib.ByteArray file_identifier) {
+        connect (job, &UpdateMetadataApiJob.on_signal_success, this, (GLib.ByteArray file_identifier) {
             //  Q_UNUSED (file_identifier);
             for (var it = this.nested_items.const_begin (); it != this.nested_items.const_end (); ++it) {
                 delete_nested_remote_item (it.key ());
@@ -127,7 +127,7 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
         if (err != Soup.Reply.NoError && err != Soup.Reply.ContentNotFoundError) {
             store_first_error (err);
             store_first_error_string (delete_job.error_string ());
-            GLib.warn (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Delete nested item on_signal_finished with error" + err + ".";
+            GLib.warning (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Delete nested item on_signal_finished with error" + err + ".";
         } else if (http_error_code != 204 && http_error_code != 404) {
             // A 404 reply is also considered a on_signal_success here : We want to make sure
             // a file is gone from the server. It not being there in the first place
@@ -144,7 +144,7 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
                 this.item.http_error_code = http_error_code;
             }
 
-            GLib.warn (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Delete nested item on_signal_finished with error" + http_error_code + ".";
+            GLib.warning (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Delete nested item on_signal_finished with error" + http_error_code + ".";
         }
 
         if (this.nested_items.size () == 0) {
@@ -164,11 +164,11 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
     ***********************************************************/
     private void decrypt_and_remote_delete () {
         var job = new Occ.SetEncryptionFlagApiJob (this.propagator.account (), this.item.file_id, Occ.SetEncryptionFlagApiJob.Clear, this);
-        connect (job, &Occ.SetEncryptionFlagApiJob.on_signal_success, this, [this] (GLib.ByteArray file_identifier) {
+        connect (job, &Occ.SetEncryptionFlagApiJob.on_signal_success, this, (GLib.ByteArray file_identifier) {
             //  Q_UNUSED (file_identifier);
             delete_remote_item (this.item.file);
         });
-        connect (job, &Occ.SetEncryptionFlagApiJob.error, this, [this] (GLib.ByteArray file_identifier, int http_return_code) {
+        connect (job, &Occ.SetEncryptionFlagApiJob.error, this, (GLib.ByteArray file_identifier, int http_return_code) {
             //  Q_UNUSED (file_identifier);
             this.item.http_error_code = http_return_code;
             task_failed ();

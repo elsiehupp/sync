@@ -17,7 +17,7 @@ void PropagateUploadFileV1.do_start_upload () {
     this.start_chunk = 0;
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
     }
     this.transfer_id = uint32 (Utility.rand ()) ^ uint32 (this.item.modtime) ^ (uint32 (this.file_to_upload.size) << 16);
 
@@ -25,13 +25,13 @@ void PropagateUploadFileV1.do_start_upload () {
 
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
     }
     if (progress_info.valid && progress_info.is_chunked () && progress_info.modtime == this.item.modtime && progress_info.size == this.item.size
         && (progress_info.content_checksum == this.item.checksum_header || progress_info.content_checksum.is_empty () || this.item.checksum_header.is_empty ())) {
         this.start_chunk = progress_info.chunk;
         this.transfer_id = progress_info.transferid;
-        GLib.info () + this.item.file + " : Resuming from chunk " + this.start_chunk;
+        GLib.info (this.item.file + " : Resuming from chunk " + this.start_chunk;
     } else if (this.chunk_count <= 1 && !this.item.checksum_header.is_empty ()) {
         // If there is only one chunk, write the checksum in the database, so if the PUT is sent
         // to the server, but the connection drops before we get the etag, we can check the checksum
@@ -42,7 +42,7 @@ void PropagateUploadFileV1.do_start_upload () {
         pi.transferid = 0; // We set a null transfer identifier because it is not chunked.
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
         }
         pi.modtime = this.item.modtime;
         pi.error_count = 0;
@@ -72,8 +72,8 @@ void PropagateUploadFileV1.on_signal_start_next_chunk () {
     }
     int64 file_size = this.file_to_upload.size;
     var headers = PropagateUploadFileCommon.headers ();
-    headers[QByteArrayLiteral ("OC-Total-Length")] = GLib.ByteArray.number (file_size);
-    headers[QByteArrayLiteral ("OC-Chunk-Size")] = GLib.ByteArray.number (chunk_size ());
+    headers[QByteArrayLiteral ("OC-Total-Length")] = new GLib.ByteArray.number (file_size);
+    headers[QByteArrayLiteral ("OC-Chunk-Size")] = new GLib.ByteArray.number (chunk_size ());
 
     string path = this.file_to_upload.file;
 
@@ -105,7 +105,7 @@ void PropagateUploadFileV1.on_signal_start_next_chunk () {
     GLib.debug (this.chunk_count + is_final_chunk + chunk_start + current_chunk_size;
 
     if (is_final_chunk && !this.transmission_checksum_header.is_empty ()) {
-        GLib.info () + propagator ().full_remote_path (path) + this.transmission_checksum_header;
+        GLib.info (propagator ().full_remote_path (path) + this.transmission_checksum_header;
         headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
     }
 
@@ -113,7 +113,7 @@ void PropagateUploadFileV1.on_signal_start_next_chunk () {
     var device = std.make_unique<UploadDevice> (
             filename, chunk_start, current_chunk_size, propagator ().bandwidth_manager);
     if (!device.open (QIODevice.ReadOnly)) {
-        GLib.warn ("Could not prepare upload device : " + device.error_string ();
+        GLib.warning ("Could not prepare upload device : " + device.error_string ();
 
         // If the file is currently locked, we want to retry the sync
         // when it becomes available again.
@@ -233,7 +233,7 @@ void PropagateUploadFileV1.on_signal_put_finished () {
     // Check whether the file changed since discovery. the file check here is the original and not the temprary.
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
     }
     if (!FileSystem.verify_file_unchanged (full_file_path, this.item.size, this.item.modtime)) {
         propagator ().another_sync_needed = true;
@@ -275,7 +275,7 @@ void PropagateUploadFileV1.on_signal_put_finished () {
         pi.transferid = this.transfer_id;
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
         }
         pi.modtime = this.item.modtime;
         pi.error_count = 0; // successful chunk upload resets
@@ -292,7 +292,7 @@ void PropagateUploadFileV1.on_signal_put_finished () {
     GLib.ByteArray fid = job.reply ().raw_header ("OC-FileID");
     if (!fid.is_empty ()) {
         if (!this.item.file_id.is_empty () && this.item.file_id != fid) {
-            GLib.warn ("File ID changed!" + this.item.file_id + fid;
+            GLib.warning ("File ID changed!" + this.item.file_id + fid;
         }
         this.item.file_id = fid;
     }
@@ -302,7 +302,7 @@ void PropagateUploadFileV1.on_signal_put_finished () {
     if (job.reply ().raw_header ("X-OC-MTime") != "accepted") {
         // X-OC-MTime is supported since owncloud 5.0.   But not when chunking.
         // Normally Owncloud 6 always puts X-OC-MTime
-        GLib.warn ("Server does not support X-OC-MTime" + job.reply ().raw_header ("X-OC-MTime");
+        GLib.warning ("Server does not support X-OC-MTime" + job.reply ().raw_header ("X-OC-MTime");
         // Well, the mtime was not set
     }
 

@@ -38,7 +38,7 @@ class PropagateRemoteDelete : PropagateItemJob {
             } else {
                 this.delete_encrypted_helper = new PropagateRemoteDeleteEncryptedRootFolder (propagator (), this.item, this);
             }
-            connect (this.delete_encrypted_helper, &AbstractPropagateRemoteDeleteEncrypted.on_signal_finished, this, [this] (bool on_signal_success) {
+            connect (this.delete_encrypted_helper, &AbstractPropagateRemoteDeleteEncrypted.on_signal_finished, this, (bool on_signal_success) {
                 if (!on_signal_success) {
                     SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR;
                     if (this.delete_encrypted_helper.network_error () != Soup.Reply.NoError && this.delete_encrypted_helper.network_error () != Soup.Reply.ContentNotFoundError) {

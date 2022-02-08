@@ -356,15 +356,15 @@ class DiscoveryPhase : GLib.Object {
                         // re-creation of virtual files count as a delete
                         || ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)
                         || ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW))) {
-                    GLib.warn ("ENFORCE (FAILING)" + original_path;
-                    GLib.warn ("instruction == CSYNC_INSTRUCTION_REMOVE" + (instruction == CSYNC_INSTRUCTION_REMOVE);
-                    GLib.warn (" ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)"
+                    GLib.warning ("ENFORCE (FAILING)" + original_path;
+                    GLib.warning ("instruction == CSYNC_INSTRUCTION_REMOVE" + (instruction == CSYNC_INSTRUCTION_REMOVE);
+                    GLib.warning (" ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)"
                                            + ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW);
-                    GLib.warn (" ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW))"
+                    GLib.warning (" ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW))"
                                            + ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW);
-                    GLib.warn ("instruction" + instruction;
-                    GLib.warn (" (*it).type" + (*it).type;
-                    GLib.warn (" (*it).is_restoration " + (*it).is_restoration;
+                    GLib.warning ("instruction" + instruction;
+                    GLib.warning (" (*it).type" + (*it).type;
+                    GLib.warning (" (*it).is_restoration " + (*it).is_restoration;
                     //  Q_ASSERT (false);
                     add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
                     /* emit */ fatal_error (_("Error while canceling delete of %1").arg (original_path));

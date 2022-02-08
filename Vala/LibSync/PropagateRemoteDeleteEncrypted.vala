@@ -72,7 +72,7 @@ class Propagate_remote_delete_encrypted : AbstractPropagateRemoteDeleteEncrypted
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED + "Metadata updated, sending to the server.");
 
         var job = new UpdateMetadataApiJob (this.propagator.account (), this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
-        connect (job, &UpdateMetadataApiJob.on_signal_success, this, [this] (GLib.ByteArray file_identifier) {
+        connect (job, &UpdateMetadataApiJob.on_signal_success, this, (GLib.ByteArray file_identifier) {
             //  Q_UNUSED (file_identifier);
             delete_remote_item (this.item.encrypted_filename);
         });

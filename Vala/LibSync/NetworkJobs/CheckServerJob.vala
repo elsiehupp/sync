@@ -89,11 +89,11 @@ class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_timed_out () {
-        GLib.warn ("TIMEOUT";
+        GLib.warning ("TIMEOUT";
         if (reply () && reply ().is_running ()) {
             /* emit */ timeout (reply ().url ());
         } else if (!reply ()) {
-            GLib.warn ("Timeout even there was no reply?";
+            GLib.warning ("Timeout even there was no reply?";
         }
         delete_later ();
     }
@@ -126,7 +126,7 @@ class CheckServerJob : AbstractNetworkJob {
         if (reply ().request ().url ().scheme () == QLatin1String ("https")
             && reply ().ssl_configuration ().session_ticket ().is_empty ()
             && reply ().error () == Soup.Reply.NoError) {
-            GLib.warn ("No SSL session identifier / session ticket is used, this might impact sync performance negatively.";
+            GLib.warning ("No SSL session identifier / session ticket is used, this might impact sync performance negatively.";
         }
 
         merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account ());
@@ -144,21 +144,21 @@ class CheckServerJob : AbstractNetworkJob {
         GLib.ByteArray body = reply ().peek (4 * 1024);
         int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (body.is_empty () || http_status != 200) {
-            GLib.warn ("error : status.php replied " + http_status + body;
+            GLib.warning ("error : status.php replied " + http_status + body;
             /* emit */ instance_not_found (reply ());
         } else {
             QJsonParseError error;
             var status = QJsonDocument.from_json (body, error);
             // empty or invalid response
             if (error.error != QJsonParseError.NoError || status.is_null ()) {
-                GLib.warn ("status.php from server is not valid JSON!" + body + reply ().request ().url () + error.error_string ();
+                GLib.warning ("status.php from server is not valid JSON!" + body + reply ().request ().url () + error.error_string ();
             }
 
             GLib.info ("status.php returns : " + status + " " + reply ().error (" Reply : " + reply ();
             if (status.object ().contains ("installed")) {
                 /* emit */ instance_found (this.server_url, status.object ());
             } else {
-                GLib.warn ("No proper answer on " + reply ().url ();
+                GLib.warning ("No proper answer on " + reply ().url ();
                 /* emit */ instance_not_found (reply ());
             }
         }

@@ -292,26 +292,26 @@ class Capabilities {
         }
 
         var properties = (*it).to_map ();
-        var enabled = properties.value (QStringLiteral ("enabled"), false).to_bool ();
+        var enabled = properties.value ("enabled", false).to_bool ();
         if (!enabled) {
             return false;
         }
 
-        var version = properties.value (QStringLiteral ("api-version"), "1.0").to_byte_array ();
-        GLib.info ("E2EE API version:" + version;
+        var version = properties.value ("api-version", "1.0").to_byte_array ();
+        GLib.info ("E2EE API version: " + version);
         var splitted_version = version.split ('.');
 
         bool ok = false;
         var major = !splitted_version.is_empty () ? splitted_version.at (0).to_int (&ok) : 0;
         if (!ok) {
-            GLib.warn ("Didn't understand version scheme (major), E2EE disabled";
+            GLib.warning ("Didn't understand version scheme (major), E2EE disabled.");
             return false;
         }
 
         ok = false;
         var minor = splitted_version.size () > 1 ? splitted_version.at (1).to_int (&ok) : 0;
         if (!ok) {
-            GLib.warn ("Didn't understand version scheme (minor), E2EE disabled";
+            GLib.warning ("Didn't understand version scheme (minor), E2EE disabled.");
             return false;
         }
 
@@ -445,7 +445,7 @@ class Capabilities {
         if (env_is_set)
             return env_value != 0;
 
-        return this.capabilities[QStringLiteral ("upload_conflict_files")].to_bool ();
+        return this.capabilities["upload_conflict_files"].to_bool ();
     }
 
 

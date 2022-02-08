@@ -44,7 +44,7 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
         send_request ("DELETE", url, reques);
 
         AbstractNetworkJob.on_signal_start ();
-        GLib.info ()) + "Starting the request to unlock.";
+        GLib.info ("Starting the request to unlock.";
     }
 
 
@@ -53,8 +53,8 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
     protected bool on_signal_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
-            GLib.info ()) + "error unlocking file" + path () + error_string () + return_code;
-            GLib.info ()) + "Full Error Log" + reply ().read_all ();
+            GLib.info ("error unlocking file" + path () + error_string () + return_code;
+            GLib.info ("Full Error Log" + reply ().read_all ();
             /* emit */ error (this.file_identifier, return_code);
             return true;
         }

@@ -89,7 +89,7 @@ class ReadJob : KeychainChunk.Job {
         this.chunk_count = 0;
         this.chunk_buffer.clear ();
         if (error () != EntryNotFound) {
-            GLib.warn ("ReadPasswordJob failed with" + error_string ();
+            GLib.warning ("ReadPasswordJob failed with" + error_string ();
         }
         return false;
     }
@@ -124,7 +124,7 @@ class ReadJob : KeychainChunk.Job {
                 ( (read_job.error () == QKeychain.EntryNotFound) && this.chunk_count == 0)) {
                 this.error = read_job.error ();
                 this.error_string = read_job.error_string ();
-                GLib.warn ("Unable to read" + read_job.key ("chunk" + string.number (this.chunk_count) + read_job.error_string ();
+                GLib.warning ("Unable to read" + read_job.key ("chunk" + string.number (this.chunk_count) + read_job.error_string ();
             }
         }
 

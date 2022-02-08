@@ -12,7 +12,7 @@ class CipherContext {
     /***********************************************************
     ***********************************************************/
     public CipherContext () {
-        this.context = EVP_CIPHER_CTX_new ());
+        this.context = new EVP_CIPHER_CTX_new ();
     }
 
     ~CipherContext () {

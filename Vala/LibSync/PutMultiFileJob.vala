@@ -77,7 +77,7 @@ class PutMultiFileJob : AbstractNetworkJob {
         send_request ("POST", this.url, reques, this.body);
 
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warn (" Network error : " + reply ().error_string ();
+            GLib.warning (" Network error : " + reply ().error_string ();
         }
 
         connect (reply (), &Soup.Reply.upload_progress, this, &PutMultiFileJob.upload_progress);

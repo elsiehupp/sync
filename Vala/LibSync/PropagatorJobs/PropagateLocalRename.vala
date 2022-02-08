@@ -65,7 +65,7 @@ class PropagateLocalRename : PropagateItemJob {
         var vfs = propagator ().sync_options ().vfs;
         var pin_state = vfs.pin_state (this.item.original_file);
         if (!vfs.pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
-            GLib.warn ("Could not set pin state of" + this.item.original_file + "to inherited";
+            GLib.warning ("Could not set pin state of" + this.item.original_file + "to inherited";
         }
 
         var old_file = this.item.file;

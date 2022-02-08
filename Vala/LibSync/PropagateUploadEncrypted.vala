@@ -135,7 +135,7 @@ class PropagateUploadEncrypted : GLib.Object {
         var unlock_job = new UnlockEncryptFolderApiJob (this.propagator.account (),
             this.folder_identifier, this.folder_token, this);
 
-        connect (unlock_job, &UnlockEncryptFolderApiJob.on_signal_success, [this] (GLib.ByteArray folder_identifier) {
+        connect (unlock_job, &UnlockEncryptFolderApiJob.on_signal_success, (GLib.ByteArray folder_identifier) {
             GLib.debug ("Successfully Unlocked";
             this.folder_token = "";
             this.folder_identifier = "";
@@ -144,7 +144,7 @@ class PropagateUploadEncrypted : GLib.Object {
             /* emit */ folder_unlocked (folder_identifier, 200);
             this.is_unlock_running = false;
         });
-        connect (unlock_job, &UnlockEncryptFolderApiJob.error, [this] (GLib.ByteArray folder_identifier, int http_status) {
+        connect (unlock_job, &UnlockEncryptFolderApiJob.error, (GLib.ByteArray folder_identifier, int http_status) {
             GLib.debug ("Unlock Error";
 
             /* emit */ folder_unlocked (folder_identifier, http_status);
@@ -315,7 +315,7 @@ class PropagateUploadEncrypted : GLib.Object {
                 input, output, tag);
 
             if (!encryption_result) {
-                GLib.debug ()) + "There was an error encrypting the file, aborting upload.";
+                GLib.debug ("There was an error encrypting the file, aborting upload.";
                 connect (this, &PropagateUploadEncrypted.folder_unlocked, this, &PropagateUploadEncrypted.error);
                 unlock_folder ();
                 return;
@@ -357,7 +357,7 @@ class PropagateUploadEncrypted : GLib.Object {
     private void on_signal_folder_encrypted_metadata_error (GLib.ByteArray file_identifier, int http_return_code) {
         //  Q_UNUSED (file_identifier);
         //  Q_UNUSED (http_return_code);
-        GLib.debug ()) + "Error Getting the encrypted metadata. Pretend we got empty metadata.";
+        GLib.debug ("Error Getting the encrypted metadata. Pretend we got empty metadata.";
         FolderMetadata empty_metadata (this.propagator.account ());
         empty_metadata.encrypted_metadata ();
         var json = QJsonDocument.from_json (empty_metadata.encrypted_metadata ());
@@ -384,7 +384,7 @@ class PropagateUploadEncrypted : GLib.Object {
     ***********************************************************/
     private void on_signal_update_metadata_error (GLib.ByteArray file_identifier, int http_error_response) {
         GLib.debug ("Update metadata error for folder" + file_identifier + "with error" + http_error_response;
-        GLib.debug ()) + "Unlocking the folder.";
+        GLib.debug ("Unlocking the folder.";
         connect (this, &PropagateUploadEncrypted.folder_unlocked, this, &PropagateUploadEncrypted.error);
         unlock_folder ();
     }

@@ -235,7 +235,7 @@ class PropagateRemoteMove : PropagateItemJob {
         // Delete old database data.
         propagator ().journal.delete_file_record (this.item.original_file);
         if (!vfs.pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
-            GLib.warn ("Could not set pin state of" + this.item.original_file + "to inherited";
+            GLib.warning ("Could not set pin state of" + this.item.original_file + "to inherited";
         }
 
         SyncFileItem new_item (*this.item);
@@ -243,7 +243,7 @@ class PropagateRemoteMove : PropagateItemJob {
         if (old_record.is_valid ()) {
             new_item.checksum_header = old_record.checksum_header;
             if (new_item.size != old_record.file_size) {
-                GLib.warn ("File sizes differ on server vs sync journal : " + new_item.size + old_record.file_size;
+                GLib.warning ("File sizes differ on server vs sync journal : " + new_item.size + old_record.file_size;
 
                 // the server might have claimed a different size, we take the old one from the DB
                 new_item.size = old_record.file_size;

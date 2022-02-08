@@ -144,7 +144,7 @@ class JsonApiJob : AbstractNetworkJob {
         int status_code = 0;
         int http_status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warn ("Network error : " + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute);
+            GLib.warning ("Network error : " + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute);
             status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             /* emit */ json_received (QJsonDocument (), status_code);
             return true;
@@ -159,7 +159,7 @@ class JsonApiJob : AbstractNetworkJob {
                 status_code = rex_match.captured (1).to_int ();
             }
         } else if (json_str.is_empty () && http_status_code == NOT_MODIFIED_STATUS_CODE) {
-            GLib.warn ("Nothing changed so nothing to retrieve - status code : " + http_status_code;
+            GLib.warning ("Nothing changed so nothing to retrieve - status code : " + http_status_code;
             status_code = http_status_code;
         } else {
             const QRegularExpression rex (R" ("statuscode" : (\d+))");
@@ -183,7 +183,7 @@ class JsonApiJob : AbstractNetworkJob {
         var json = QJsonDocument.from_json (json_str.to_utf8 (), error);
         // empty or invalid response and status code is != 304 because json_str is expected to be empty
         if ( (error.error != QJsonParseError.NoError || json.is_null ()) && http_status_code != NOT_MODIFIED_STATUS_CODE) {
-            GLib.warn ("invalid JSON!" + json_str + error.error_string ();
+            GLib.warning ("invalid JSON!" + json_str + error.error_string ();
             /* emit */ json_received (json, status_code);
             return true;
         }

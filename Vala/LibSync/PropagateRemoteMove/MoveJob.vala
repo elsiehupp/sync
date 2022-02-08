@@ -58,7 +58,7 @@ class MoveJob : AbstractNetworkJob {
         }
 
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warn (" Network error : " + reply ().error_string ();
+            GLib.warning (" Network error : " + reply ().error_string ();
         }
         AbstractNetworkJob.on_signal_start ();
     }

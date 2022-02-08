@@ -80,7 +80,7 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
     }
 
     bool SignPublicKeyApiJob.on_signal_finished () {
-        GLib.info ()) + "Sending CSR ended with"  + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute);
+        GLib.info ("Sending CSR ended with"  + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute);
 
         QJsonParseError error;
         var json = QJsonDocument.from_json (reply ().read_all (), error);

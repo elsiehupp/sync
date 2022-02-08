@@ -36,7 +36,7 @@ class ProppatchJob : AbstractNetworkJob {
     ***********************************************************/
     public void on_signal_start () {
         if (this.properties.is_empty ()) {
-            GLib.warn ("Proppatch with no properties!";
+            GLib.warning ("Proppatch with no properties!";
         }
         Soup.Request reques;
 
@@ -106,7 +106,7 @@ class ProppatchJob : AbstractNetworkJob {
         if (http_result_code == 207) {
             /* emit */ success ();
         } else {
-            GLib.warn ("*not* successful, http result code is" + http_result_code
+            GLib.warning ("*not* successful, http result code is" + http_result_code
                                     + (http_result_code == 302 ? reply ().header (Soup.Request.LocationHeader).to_string () : QLatin1String (""));
             /* emit */ finished_with_error ();
         }

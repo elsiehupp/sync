@@ -356,7 +356,7 @@ class SyncFileItem {
             // filesystem stat fails. That can happen if the the file was removed
             // or renamed meanwhile. For the rename case we still need the inode to
             // detect the rename though.
-            GLib.warn ("Failed to query the 'inode' for file " + local_filename;
+            GLib.warning ("Failed to query the 'inode' for file " + local_filename;
         }
         return record;
     }

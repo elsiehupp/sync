@@ -59,7 +59,7 @@ void PropagateUploadFileNG.do_start_upload () {
     const SyncJournalDb.UploadInfo progress_info = propagator ().journal.get_upload_info (this.item.file);
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
     }
     if (progress_info.valid && progress_info.is_chunked () && progress_info.modtime == this.item.modtime
             && progress_info.size == this.item.size) {
@@ -185,7 +185,7 @@ void PropagateUploadFileNG.on_signal_delete_job_finished () {
             abort_with_error (status, job.error_string ());
             return;
         } else {
-            GLib.warn ("DeleteJob errored out" + job.error_string () + job.reply ().url ();
+            GLib.warning ("DeleteJob errored out" + job.error_string () + job.reply ().url ();
             this.remove_job_error = true;
             // Let the other jobs finish
         }
@@ -206,7 +206,7 @@ void PropagateUploadFileNG.start_new_upload () {
     //  ASSERT (propagator ().active_job_list.count (this) == 1);
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
     }
     this.transfer_id = uint32 (Utility.rand () ^ uint32 (this.item.modtime) ^ (uint32 (this.file_to_upload.size) << 16) ^ q_hash (this.file_to_upload.file));
     this.sent = 0;
@@ -219,7 +219,7 @@ void PropagateUploadFileNG.start_new_upload () {
     pi.transferid = this.transfer_id;
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
     }
     pi.modtime = this.item.modtime;
     pi.content_checksum = this.item.checksum_header;
@@ -229,7 +229,7 @@ void PropagateUploadFileNG.start_new_upload () {
     GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
 
     // But we should send the temporary (or something) one.
-    headers["OC-Total-Length"] = GLib.ByteArray.number (this.file_to_upload.size);
+    headers["OC-Total-Length"] = new GLib.ByteArray.number (this.file_to_upload.size);
     var job = new MkColJob (propagator ().account (), chunk_url (), headers, this);
 
     connect (job, &MkColJob.finished_with_error,
@@ -283,10 +283,10 @@ void PropagateUploadFileNG.on_signal_start_next_chunk () {
             headers[QByteArrayLiteral ("If")] = "<" + GLib.Uri.to_percent_encoding (destination, "/") + "> ([" + if_match + "])";
         }
         if (!this.transmission_checksum_header.is_empty ()) {
-            GLib.info () + destination + this.transmission_checksum_header;
+            GLib.info (destination + this.transmission_checksum_header;
             headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
         }
-        headers[QByteArrayLiteral ("OC-Total-Length")] = GLib.ByteArray.number (file_size);
+        headers[QByteArrayLiteral ("OC-Total-Length")] = new GLib.ByteArray.number (file_size);
 
         var job = new MoveJob (propagator ().account (), Utility.concat_url_path (chunk_url (), "/.file"),
             destination, headers, this);
@@ -303,7 +303,7 @@ void PropagateUploadFileNG.on_signal_start_next_chunk () {
     var device = std.make_unique<UploadDevice> (
             filename, this.sent, this.current_chunk_size, propagator ().bandwidth_manager);
     if (!device.open (QIODevice.ReadOnly)) {
-        GLib.warn ("Could not prepare upload device : " + device.error_string ();
+        GLib.warning ("Could not prepare upload device : " + device.error_string ();
 
         // If the file is currently locked, we want to retry the sync
         // when it becomes available again.
@@ -316,7 +316,7 @@ void PropagateUploadFileNG.on_signal_start_next_chunk () {
     }
 
     GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
-    headers["OC-Chunk-Offset"] = GLib.ByteArray.number (this.sent);
+    headers["OC-Chunk-Offset"] = new GLib.ByteArray.number (this.sent);
 
     this.sent += this.current_chunk_size;
     GLib.Uri url = chunk_url (this.current_chunk);
@@ -405,7 +405,7 @@ void PropagateUploadFileNG.on_signal_put_finished () {
     // Check whether the file changed since discovery - this acts on the original file.
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+        GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
     }
     if (!FileSystem.verify_file_unchanged (full_file_path, this.item.size, this.item.modtime)) {
         propagator ().another_sync_needed = true;
@@ -463,13 +463,13 @@ void PropagateUploadFileNG.on_signal_move_job_finished () {
 
     GLib.ByteArray fid = job.reply ().raw_header ("OC-FileID");
     if (fid.is_empty ()) {
-        GLib.warn ("Server did not return a OC-FileID" + this.item.file;
+        GLib.warning ("Server did not return a OC-FileID" + this.item.file;
         abort_with_error (SyncFileItem.Status.NORMAL_ERROR, _("Missing File ID from server"));
         return;
     } else {
         // the old file identifier should only be empty for new files uploaded
         if (!this.item.file_id.is_empty () && this.item.file_id != fid) {
-            GLib.warn ("File ID changed!" + this.item.file_id + fid;
+            GLib.warning ("File ID changed!" + this.item.file_id + fid;
         }
         this.item.file_id = fid;
     }
@@ -477,7 +477,7 @@ void PropagateUploadFileNG.on_signal_move_job_finished () {
     this.item.etag = get_etag_from_reply (job.reply ());
     ;
     if (this.item.etag.is_empty ()) {
-        GLib.warn ("Server did not return an ETAG" + this.item.file;
+        GLib.warning ("Server did not return an ETAG" + this.item.file;
         abort_with_error (SyncFileItem.Status.NORMAL_ERROR, _("Missing ETag from server"));
         return;
     }

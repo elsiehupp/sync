@@ -106,7 +106,7 @@ class DiscoverySingleLocalDirectoryJob : GLib.Object, QRunnable {
             csync_vio_local_closedir (dh);
 
             // Note: Windows vio converts any error into EACCES
-            GLib.warn ("readdir failed for file in " + local_path + " - errno : " + errno;
+            GLib.warning ("readdir failed for file in " + local_path + " - errno : " + errno;
             /* emit */ finished_fatal_error (_("Error while reading directory %1").arg (local_path));
             return;
         }
@@ -114,7 +114,7 @@ class DiscoverySingleLocalDirectoryJob : GLib.Object, QRunnable {
         errno = 0;
         csync_vio_local_closedir (dh);
         if (errno != 0) {
-            GLib.warn ("closedir failed for file in " + local_path + " - errno : " + errno;
+            GLib.warning ("closedir failed for file in " + local_path + " - errno : " + errno;
         }
 
         /* emit */ finished (results);

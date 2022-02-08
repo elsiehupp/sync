@@ -116,11 +116,11 @@ class PropagateDownloadFile : PropagateItemJob {
             start_after_is_encrypted_is_checked ();
         } else {
             this.download_encrypted_helper = new PropagateDownloadEncrypted (propagator (), parent_path, this.item, this);
-            connect (this.download_encrypted_helper, &PropagateDownloadEncrypted.file_metadata_found, [this] {
+            connect (this.download_encrypted_helper, &PropagateDownloadEncrypted.file_metadata_found, {
                 this.is_encrypted = true;
                 start_after_is_encrypted_is_checked ();
             });
-            connect (this.download_encrypted_helper, &PropagateDownloadEncrypted.failed, [this] {
+            connect (this.download_encrypted_helper, &PropagateDownloadEncrypted.failed, {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                     _("File %1 cannot be downloaded because encryption information is missing.").arg (QDir.to_native_separators (this.item.file)));
             });
@@ -201,7 +201,7 @@ class PropagateDownloadFile : PropagateItemJob {
             var fn = propagator ().full_local_path (this.item.file);
             //  Q_ASSERT (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warn ("invalid modified time" + this.item.file + this.item.modtime);
+                GLib.warning ("invalid modified time" + this.item.file + this.item.modtime);
                 return;
             }
             if (this.item.modtime != this.item.previous_modtime) {
@@ -212,7 +212,7 @@ class PropagateDownloadFile : PropagateItemJob {
             this.item.modtime = FileSystem.get_mod_time (fn);
             //  Q_ASSERT (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+                GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
                 return;
             }
             update_metadata (/*is_conflict=*/false);
@@ -268,7 +268,7 @@ class PropagateDownloadFile : PropagateItemJob {
         if (this.tmp_file.exists ())
             FileSystem.file_read_only (this.tmp_file.filename (), false);
         if (!this.tmp_file.open (QIODevice.Append | QIODevice.Unbuffered)) {
-            GLib.warn ("could not open temporary file" + this.tmp_file.filename ());
+            GLib.warning ("could not open temporary file" + this.tmp_file.filename ());
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, this.tmp_file.error_string ());
             return;
         }
@@ -352,20 +352,20 @@ class PropagateDownloadFile : PropagateItemJob {
             // without the header.
             const bool bad_range_header = job.resume_start () > 0 && this.item.http_error_code == 416;
             if (bad_range_header) {
-                GLib.warn ("Server replied 416 to our range request, trying again without.");
+                GLib.warning ("Server replied 416 to our range request, trying again without.");
                 propagator ().another_sync_needed = true;
             }
 
             // Getting a 404 probably means that the file was deleted on the server.
             const bool file_not_found = this.item.http_error_code == 404;
             if (file_not_found) {
-                GLib.warn ("Server replied 404, assuming file was deleted.");
+                GLib.warning ("Server replied 404, assuming file was deleted.");
             }
 
             // Getting a 423 means that the file is locked
             const bool file_locked = this.item.http_error_code == 423;
             if (file_locked) {
-                GLib.warn ("Server replied 423, file is locked.");
+                GLib.warning ("Server replied 423, file is locked.");
             }
 
             // Don't keep the temporary file if it is empty or we
@@ -378,7 +378,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
             if (!this.item.direct_download_url.is_empty () && err != Soup.Reply.OperationCanceledError) {
                 // If this was with a direct download, retry without direct download
-                GLib.warn ("Direct download of" + this.item.direct_download_url + " failed. Retrying through owncloud.");
+                GLib.warning ("Direct download of" + this.item.direct_download_url + " failed. Retrying through owncloud.");
                 this.item.direct_download_url.clear ();
                 on_signal_start ();
                 return;
@@ -431,7 +431,7 @@ class PropagateDownloadFile : PropagateItemJob {
             this.item.modtime = job.last_modified ();
             //  Q_ASSERT (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warn ("Invalid modified time: " + this.item.file + this.item.modtime);
+                GLib.warning ("Invalid modified time: " + this.item.file + this.item.modtime);
             }
         }
 
@@ -581,7 +581,7 @@ class PropagateDownloadFile : PropagateItemJob {
         }
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ("Invalid modified time: " + this.item.file + this.item.modtime);
+            GLib.warning ("Invalid modified time: " + this.item.file + this.item.modtime);
         }
         FileSystem.mod_time (this.tmp_file.filename (), this.item.modtime);
         // We need to fetch the time again because some file systems such as FAT have worse than a second
@@ -594,7 +594,7 @@ class PropagateDownloadFile : PropagateItemJob {
         }
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ("Invalid modified time: " + this.item.file + this.item.modtime);
+            GLib.warning ("Invalid modified time: " + this.item.file + this.item.modtime);
         }
 
         bool previous_file_exists = FileSystem.file_exists (fn);
@@ -652,7 +652,7 @@ class PropagateDownloadFile : PropagateItemJob {
         /* emit */ propagator ().touched_file (fn);
         // The file_changed () check is done above to generate better error messages.
         if (!FileSystem.unchecked_rename_replace (this.tmp_file.filename (), fn, error)) {
-            GLib.warn () + string ("Rename failed : %1 => %2").arg (this.tmp_file.filename ()).arg (fn);
+            GLib.warning () + string ("Rename failed : %1 => %2").arg (this.tmp_file.filename ()).arg (fn);
             // If the file is locked, we want to retry this sync when it
             // becomes available again, otherwise try again directly
             if (FileSystem.is_file_locked (fn)) {
@@ -690,10 +690,10 @@ class PropagateDownloadFile : PropagateItemJob {
                 var pin = propagator ().journal.internal_pin_states ().raw_for_path (virtual_file.to_utf8 ());
                 if (pin && *pin != PinState.PinState.INHERITED) {
                     if (!vfs.pin_state (this.item.file, *pin)) {
-                        GLib.warn ("Could not set pin state of " + this.item.file);
+                        GLib.warning ("Could not set pin state of " + this.item.file);
                     }
                     if (!vfs.pin_state (virtual_file, PinState.PinState.INHERITED)) {
-                        GLib.warn ("Could not set pin state of " + virtual_file + " to inherited.");
+                        GLib.warning ("Could not set pin state of " + virtual_file + " to inherited.");
                     }
                 }
             }
@@ -702,7 +702,7 @@ class PropagateDownloadFile : PropagateItemJob {
             var pin = vfs.pin_state (this.item.file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY)
                 if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
-                    GLib.warn ("Could not set pin state of " + this.item.file + " to unspecified.");
+                    GLib.warning ("Could not set pin state of " + this.item.file + " to unspecified.");
                 }
         }
 
@@ -743,7 +743,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
         int64 duration = this.stopwatch.elapsed ();
         if (is_likely_finished_quickly () && duration > 5 * 1000) {
-            GLib.warn ("WARNING: Unexpectedly slow connection, took" + duration + "msec for " + this.item.size - this.resume_start + " bytes for " + this.item.file);
+            GLib.warning ("WARNING: Unexpectedly slow connection, took" + duration + "msec for " + this.item.size - this.resume_start + " bytes for " + this.item.file);
         }
     }
 
@@ -813,7 +813,7 @@ class PropagateDownloadFile : PropagateItemJob {
             return;
         }
         if (vfs.mode () == Vfs.Off && this.item.type == ItemTypeVirtualFile) {
-            GLib.warn ("Ignored virtual file type of " + this.item.file);
+            GLib.warning ("Ignored virtual file type of " + this.item.file);
             this.item.type = ItemTypeFile;
         }
         if (this.item.type == ItemTypeVirtualFile) {
@@ -864,7 +864,7 @@ class PropagateDownloadFile : PropagateItemJob {
         }
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
         }
         if (this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
             && this.item.size == this.item.previous_size
@@ -941,7 +941,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
         GLib.File file = new GLib.File (file_path);
         if (!file.open (QIODevice.ReadOnly)) {
-            GLib.warn ("Could not open recall file: " + file.error_string ());
+            GLib.warning ("Could not open recall file: " + file.error_string ());
             return;
         }
         QFileInfo existing_file = new QFileInfo (file_path);
@@ -953,7 +953,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
             string recalled_file = QDir.clean_path (base_dir.file_path (line));
             if (!recalled_file.starts_with (folder_path) || !recalled_file.starts_with (base_dir.path ())) {
-                GLib.warn ("Ignoring recall of " + recalled_file);
+                GLib.warning ("Ignoring recall of " + recalled_file);
                 continue;
             }
 
@@ -962,7 +962,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
             SyncJournalFileRecord record;
             if (!journal.get_file_record (local_recalled_file, record) || !record.is_valid ()) {
-                GLib.warn ("No database entry for recall of " + local_recalled_file);
+                GLib.warning ("No database entry for recall of " + local_recalled_file);
                 continue;
             }
 
@@ -986,7 +986,7 @@ class PropagateDownloadFile : PropagateItemJob {
         int chown_err = chown (filename.to_local8Bit ().const_data (), -1, file_info.group_id ());
         if (chown_err) {
             // TODO : Consider further error handling!
-            GLib.warn () + string ("preserve_group_ownership : chown error %1 : setting group %2 failed on file %3").arg (chown_err).arg (file_info.group_id ()).arg (filename);
+            GLib.warning () + string ("preserve_group_ownership : chown error %1 : setting group %2 failed on file %3").arg (chown_err).arg (file_info.group_id ()).arg (filename);
         }
 //  #else
         //  Q_UNUSED (filename);

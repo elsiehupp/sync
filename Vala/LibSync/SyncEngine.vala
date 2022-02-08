@@ -299,7 +299,7 @@ class SyncEngine : GLib.Object {
         this.clear_touched_files_timer.single_shot (true);
         this.clear_touched_files_timer.interval (30 * 1000);
         connect (&this.clear_touched_files_timer, &QTimer.timeout, this, &SyncEngine.on_signal_clear_touched_files);
-        connect (this, &SyncEngine.on_signal_finished, [this] (bool /* on_signal_finished */) {
+        connect (this, &SyncEngine.on_signal_finished, (bool /* on_signal_finished */) {
             this.journal.key_value_store_set ("last_sync", GLib.DateTime.current_secs_since_epoch ());
         });
     }
@@ -356,7 +356,7 @@ class SyncEngine : GLib.Object {
         const int64 free_bytes = Utility.free_disk_space (this.local_path);
         if (free_bytes >= 0) {
             if (free_bytes < min_free) {
-                GLib.warn ("Too little space available at" + this.local_path + ". Have"
+                GLib.warning ("Too little space available at" + this.local_path + ". Have"
                             + free_bytes + "bytes and require at least" + min_free + "bytes");
                 this.another_sync_needed = AnotherSyncNeeded.DELAYED_FOLLOW_UP;
                 /* Q_EMIT */ sync_error (_("Only %1 are available, need at least %2 to on_signal_start",
@@ -370,7 +370,7 @@ class SyncEngine : GLib.Object {
                 GLib.info ("There are" + free_bytes + "bytes available at" + this.local_path);
             }
         } else {
-            GLib.warn ("Could not determine free space available at" + this.local_path);
+            GLib.warning ("Could not determine free space available at" + this.local_path);
         }
 
         this.sync_items.clear ();
@@ -391,7 +391,7 @@ class SyncEngine : GLib.Object {
 
         // This creates the DB if it does not exist yet.
         if (!this.journal.open ()) {
-            GLib.warn ("No way to create a sync journal!");
+            GLib.warning ("No way to create a sync journal!");
             /* Q_EMIT */ sync_error (_("Unable to open or create the local sync database. Make sure you have write access in the sync folder."));
             on_signal_finalize (false);
             return;
@@ -419,7 +419,7 @@ class SyncEngine : GLib.Object {
             bool using_selective_sync = (!selective_sync_block_list.is_empty ());
             GLib.info (using_selective_sync ? "Using Selective Sync" : "NOT Using Selective Sync");
         } else {
-            GLib.warn ("Could not retrieve selective sync list from DB");
+            GLib.warning ("Could not retrieve selective sync list from DB");
             /* Q_EMIT */ sync_error (_("Unable to read the blocklist from the local database"));
             on_signal_finalize (false);
             return;
@@ -457,7 +457,7 @@ class SyncEngine : GLib.Object {
         this.discovery_phase.selective_sync_block_list (selective_sync_block_list);
         this.discovery_phase.selective_sync_allow_list (this.journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok));
         if (!ok) {
-            GLib.warn ("Unable to read selective sync list, aborting.";
+            GLib.warning ("Unable to read selective sync list, aborting.";
             /* Q_EMIT */ sync_error (_("Unable to read from the sync journal."));
             on_signal_finalize (false);
             return;
@@ -481,7 +481,7 @@ class SyncEngine : GLib.Object {
 
         connect (this.discovery_phase.data (), &DiscoveryPhase.item_discovered, this, &SyncEngine.on_signal_item_discovered);
         connect (this.discovery_phase.data (), &DiscoveryPhase.new_big_folder, this, &SyncEngine.new_big_folder);
-        connect (this.discovery_phase.data (), &DiscoveryPhase.fatal_error, this, [this] (string error_string) {
+        connect (this.discovery_phase.data (), &DiscoveryPhase.fatal_error, this, (string error_string) {
             /* Q_EMIT */ sync_error (error_string);
             on_signal_finalize (false);
         });
@@ -768,7 +768,7 @@ class SyncEngine : GLib.Object {
             string local_file = local_path + path;
             var result = vfs.convert_to_placeholder (local_file, item, local_file);
             if (!result.is_valid ()) {
-                GLib.warn ("Could not convert file to placeholder" + result.error ());
+                GLib.warning ("Could not convert file to placeholder" + result.error ());
             }
         });
     }
@@ -959,7 +959,7 @@ class SyncEngine : GLib.Object {
 
         // Sanity check
         if (!this.journal.open ()) {
-            GLib.warn ("Bailing out, DB failure");
+            GLib.warning ("Bailing out, DB failure");
             /* Q_EMIT */ sync_error (_("Cannot open the sync journal"));
             on_signal_finalize (false);
             return;
@@ -1016,7 +1016,7 @@ class SyncEngine : GLib.Object {
                     QProcess.execute (script_executable, script_args);
                 }
         // #else
-                GLib.warn ("**** Attention : POST_UPDATE_SCRIPT installed, but not executed because compiled with NDEBUG");
+                GLib.warning ("**** Attention : POST_UPDATE_SCRIPT installed, but not executed because compiled with NDEBUG");
         // #endif
             }
 
@@ -1236,19 +1236,19 @@ class SyncEngine : GLib.Object {
             if (item.modtime == 0 || entry.last_try_modtime == 0) {
                 return false;
             } else if (item.modtime != entry.last_try_modtime) {
-                GLib.info () + item.file + " is blocklisted, but has changed mtime!";
+                GLib.info (item.file + " is blocklisted, but has changed mtime!";
                 return false;
             } else if (item.rename_target != entry.rename_target) {
-                GLib.info () + item.file + " is blocklisted, but rename target changed from" + entry.rename_target;
+                GLib.info (item.file + " is blocklisted, but rename target changed from" + entry.rename_target;
                 return false;
             }
         } else if (item.direction == SyncFileItem.Direction.DOWN) {
             // download, check the etag.
             if (item.etag.is_empty () || entry.last_try_etag.is_empty ()) {
-                GLib.info () + item.file + "one ETag is empty, no blocklisting";
+                GLib.info (item.file + "one ETag is empty, no blocklisting";
                 return false;
             } else if (item.etag != entry.last_try_etag) {
-                GLib.info () + item.file + " is blocklisted, but has changed etag!";
+                GLib.info (item.file + " is blocklisted, but has changed etag!";
                 return false;
             }
         }
@@ -1451,11 +1451,11 @@ class SyncEngine : GLib.Object {
 
             switch (sync_item.instruction) {
             case CSYNC_INSTRUCTION_SYNC:
-                GLib.warn ("restore_old_files : RESTORING" + sync_item.file;
+                GLib.warning ("restore_old_files : RESTORING" + sync_item.file;
                 sync_item.instruction = CSYNC_INSTRUCTION_CONFLICT;
                 break;
             case CSYNC_INSTRUCTION_REMOVE:
-                GLib.warn ("restore_old_files : RESTORING" + sync_item.file;
+                GLib.warning ("restore_old_files : RESTORING" + sync_item.file;
                 sync_item.instruction = CSYNC_INSTRUCTION_NEW;
                 sync_item.direction = SyncFileItem.Direction.UP;
                 break;

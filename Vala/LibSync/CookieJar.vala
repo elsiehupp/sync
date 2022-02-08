@@ -146,7 +146,7 @@ class CookieJar : QNetworkCookieJar {
     //          stream >> value;
     //          GLib.List<QNetworkCookie> new_cookies = QNetworkCookie.parse_cookies (value);
     //          if (new_cookies.count () == 0 && value.length () != 0) {
-    //              GLib.warn ("CookieJar : Unable to parse saved cookie:" + value;
+    //              GLib.warning ("CookieJar : Unable to parse saved cookie:" + value;
     //          }
     //          for (int j = 0; j < new_cookies.count (); ++j)
     //              list.append (new_cookies.at (j));

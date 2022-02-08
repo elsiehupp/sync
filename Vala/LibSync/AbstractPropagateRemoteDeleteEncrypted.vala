@@ -255,7 +255,7 @@ class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
         var unlock_job = new UnlockEncryptFolderApiJob (this.propagator.account (), this.folder_identifier, this.folder_token, this);
 
         connect (unlock_job, &UnlockEncryptFolderApiJob.on_signal_success, this, &AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_unlocked_successfully);
-        connect (unlock_job, &UnlockEncryptFolderApiJob.error, this, [this] (GLib.ByteArray file_identifier, int http_return_code) {
+        connect (unlock_job, &UnlockEncryptFolderApiJob.error, this, (GLib.ByteArray file_identifier, int http_return_code) => {
             //  Q_UNUSED (file_identifier);
             this.folder_locked = false;
             this.folder_token = "";

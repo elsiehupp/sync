@@ -80,7 +80,7 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
     bool StorePrivateKeyApiJob.on_signal_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200)
-            GLib.info ()) + "Sending private key ended with"  + path () + error_string () + return_code;
+            GLib.info ("Sending private key ended with"  + path () + error_string () + return_code;
 
         QJsonParseError error;
         var json = QJsonDocument.from_json (reply ().read_all (), error);
