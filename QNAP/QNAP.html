@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta itemprop="application" content="Evernote">
+		<meta itemprop="export-data" content="20220202T071503Z">
+		<meta itemprop="version" content="10.22.3">
+		<title></title>
+	</head>
+	<body>
+		<h1>
+			QNetworkAccessManager Class
+		</h1>
+		<p>
+			<b>Clip source:</b> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code> Class</a>
+		</p>
+		<h1>
+			<code>QNetworkAccessManager</code> Class
+		</h1>
+		<p>
+			The <code>QNetworkAccessManager</code> class allows the application to send network requests and receive replies. <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#details"><code>More...</code></a>
+		</p>
+		<p>
+			Header: <code>#include &lt;QNetworkAccessManager&gt;</code>
+		</p>
+		<p>
+			qmake: <code>QT += network</code>
+		</p>
+		<p>
+			&gt;Since: Qt 4.4
+		</p>
+		<p>
+			Inherits: <a href="https://doc.qt.io/qt-5/qobject.html"><code>QObject</code></a>
+		</p>
+		<p>
+			This class was introduced in Qt 4.4.
+		</p>
+		<ul>
+			<li>
+				<a href="https://doc.qt.io/qt-5/qnetworkaccessmanager-members.html">List of all members, including inherited members</a>
+			</li>
+			<li>
+				<a href="https://doc.qt.io/qt-5/qnetworkaccessmanager-obsolete.html">Obsolete members</a>
+			</li>
+		</ul>
+		<p>
+			Note: All functions in this class are <a href="https://doc.qt.io/qt-5/threads-reentrancy.html"><code>reentrant</code></a>.
+		</p>
+		<h2>
+			Public Types <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#public-types">¶</a>
+		</h2>
+		<p>
+			<code>enum</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#Operation-enum"><code>Operation</code></a> <code>{ HeadOperation, GetOperation, PutOperation, PostOperation, DeleteOperation, CustomOperation }</code>
+		</p>
+		<h2>
+			Public Functions <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#public-functions">¶</a>
+		</h2>
+		<p>
+			<a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#QNetworkAccessManager"><code>QNetworkAccessManager</code></a><code>(QObject *<i>parent</i> = nullptr)</code>
+		</p>
+		<p>
+			<code>virtual</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#dtor.QNetworkAccessManager"><code>~QNetworkAccessManager()</code></a>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#addStrictTransportSecurityHosts"><code>addStrictTransportSecurityHosts</code></a><code>(const QVector&lt;QHstsPolicy&gt; &<i>knownHosts</i>)</code>
+		</p>
+		<p>
+			<code>bool</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#autoDeleteReplies"><code>autoDeleteReplies()</code></a> <code>const</code>
+		</p>
+		<p>
+			<code>QAbstractNetworkCache *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#cache"><code>cache()</code></a> <code>const</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#clearAccessCache"><code>clearAccessCache()</code></a>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#clearConnectionCache"><code>clearConnectionCache()</code></a>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#connectToHost"><code>connectToHost</code></a><code>(const QString &<i>hostName</i>, quint16 <i>port</i> = 80)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#connectToHostEncrypted"><code>connectToHostEncrypted</code></a><code>(const QString &<i>hostName</i>, quint16 <i>port</i> = 443, const QSslConfiguration &<i>sslConfiguration</i> = QSslConfiguration::defaultConfiguration())</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#connectToHostEncrypted-1"><code>connectToHostEncrypted</code></a><code>(const QString &<i>hostName</i>, quint16 <i>port</i>, const QSslConfiguration &<i>sslConfiguration</i>, const QString &<i>peerName</i>)</code>
+		</p>
+		<p>
+			<code>QNetworkCookieJar *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#cookieJar"><code>cookieJar()</code></a> <code>const</code>
+		</p>
+		<p>
+			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#deleteResource"><code>deleteResource</code></a><code>(const QNetworkRequest &<i>request</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#enableStrictTransportSecurityStore"><code>enableStrictTransportSecurityStore</code></a><code>(bool <i>enabled</i>, const QString &<i>storeDir</i> = QString())</code>
+		</p>
+		<p>
+			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#get"><code>get</code></a><code>(const QNetworkRequest &<i>request</i>)</code>
+		</p>
+		<p>
+			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#head"><code>head</code></a><code>(const QNetworkRequest &<i>request</i>)</code>
+		</p>
+		<p>
+			<code>bool</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#isStrictTransportSecurityEnabled"><code>isStrictTransportSecurityEnabled()</code></a> <code>const</code>
+		</p>
+		<p>
+			<code>bool</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#isStrictTransportSecurityStoreEnabled"><code>isStrictTransportSecurityStoreEnabled()</code></a> <code>const</code>
+		</p>
+		<p>
+			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post"><code>post</code></a><code>(const QNetworkRequest &<i>request</i>, QIODevice *<i>data</i>)</code>
+		</p>
+		<p>
+			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post-1"><code>post</code></a><code>(const QNetworkRequest &<i>request</i>, const QByteArray &<i>data</i>)</code>
+		</p>
+		<p>
+			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post-2"><code>post</code></a><code>(const QNetworkRequest &<i>request</i>, QHttpMultiPart *<i>multiPart</i>)</code>
+		</p>
+		<p>
+			<code>QNetworkProxy</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxy"><code>proxy()</code></a> <code>const</code>
+		</p>
+		<p>
+			<code>QNetworkProxyFactory *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyFactory"><code>proxyFactory()</code></a> <code>const</code>
+		</p>
+		<p>
+			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put</code></a><code>(const QNetworkRequest &<i>request</i>, QIODevice *<i>data</i>)</code>
+		</p>
+		<p>
+			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put-1"><code>put</code></a><code>(const QNetworkRequest &<i>request</i>, const QByteArray &<i>data</i>)</code>
+		</p>
+		<p>
+			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put-2"><code>put</code></a><code>(const QNetworkRequest &<i>request</i>, QHttpMultiPart *<i>multiPart</i>)</code>
+		</p>
+		<p>
+			<code>QNetworkRequest::RedirectPolicy</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#redirectPolicy"><code>redirectPolicy()</code></a> <code>const</code>
+		</p>
+		<p>
+			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sendCustomRequest"><code>sendCustomRequest</code></a><code>(const QNetworkRequest &<i>request</i>, const QByteArray &<i>verb</i>, QIODevice *<i>data</i> = nullptr)</code>
+		</p>
+		<p>
+			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sendCustomRequest-1"><code>sendCustomRequest</code></a><code>(const QNetworkRequest &<i>request</i>, const QByteArray &<i>verb</i>, const QByteArray &<i>data</i>)</code>
+		</p>
+		<p>
+			<code>QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sendCustomRequest-2"><code>sendCustomRequest</code></a><code>(const QNetworkRequest &<i>request</i>, const QByteArray &<i>verb</i>, QHttpMultiPart *<i>multiPart</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setAutoDeleteReplies"><code>setAutoDeleteReplies</code></a><code>(bool <i>shouldAutoDelete</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setCache"><code>setCache</code></a><code>(QAbstractNetworkCache *<i>cache</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setCookieJar"><code>setCookieJar</code></a><code>(QNetworkCookieJar *<i>cookieJar</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxy"><code>setProxy</code></a><code>(const QNetworkProxy &<i>proxy</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxyFactory"><code>setProxyFactory</code></a><code>(QNetworkProxyFactory *<i>factory</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setRedirectPolicy"><code>setRedirectPolicy</code></a><code>(QNetworkRequest::RedirectPolicy <i>policy</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setStrictTransportSecurityEnabled"><code>setStrictTransportSecurityEnabled</code></a><code>(bool <i>enabled</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setTransferTimeout"><code>setTransferTimeout</code></a><code>(int <i>timeout</i> = QNetworkRequest::DefaultTransferTimeoutConstant)</code>
+		</p>
+		<p>
+			<code>QVector&lt;QHstsPolicy&gt;</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#strictTransportSecurityHosts"><code>strictTransportSecurityHosts()</code></a> <code>const</code>
+		</p>
+		<p>
+			<code>QStringList</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#supportedSchemes"><code>supportedSchemes()</code></a> <code>const</code>
+		</p>
+		<p>
+			<code>int</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#transferTimeout"><code>transferTimeout()</code></a> <code>const</code>
+		</p>
+		<h2>
+			Signals <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#signals">¶</a>
+		</h2>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#authenticationRequired"><code>authenticationRequired</code></a><code>(QNetworkReply *<i>reply</i>, QAuthenticator *<i>authenticator</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#encrypted"><code>encrypted</code></a><code>(QNetworkReply *<i>reply</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#finished"><code>finished</code></a><code>(QNetworkReply *<i>reply</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#preSharedKeyAuthenticationRequired"><code>preSharedKeyAuthenticationRequired</code></a><code>(QNetworkReply *<i>reply</i>, QSslPreSharedKeyAuthenticator *<i>authenticator</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired"><code>proxyAuthenticationRequired</code></a><code>(const QNetworkProxy &<i>proxy</i>, QAuthenticator *<i>authenticator</i>)</code>
+		</p>
+		<p>
+			<code>void</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sslErrors"><code>sslErrors</code></a><code>(QNetworkReply *<i>reply</i>, const QList&lt;QSslError&gt; &<i>errors</i>)</code>
+		</p>
+		<h2>
+			Protected Functions <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#protected-functions">¶</a>
+		</h2>
+		<p>
+			<code>virtual QNetworkReply *</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#createRequest"><code>createRequest</code></a><code>(QNetworkAccessManager::Operation <i>op</i>, const QNetworkRequest &<i>originalReq</i>, QIODevice *<i>outgoingData</i> = nullptr)</code>
+		</p>
+		<h2>
+			Protected Slots <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#protected-slots">¶</a>
+		</h2>
+		<p>
+			<code>QStringList</code> <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#supportedSchemesImplementation"><code>supportedSchemesImplementation()</code></a> <code>const</code>
+		</p>
+		<h2>
+			Detailed Description <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#details">¶</a>
+		</h2>
+		<p>
+			The Network Access API is constructed around one <code>QNetworkAccessManager</code> object, which holds the common configuration and settings for the requests it sends. It contains the proxy and cache configuration, as well as the signals related to such issues, and reply signals that can be used to monitor the progress of a network operation. One <code>QNetworkAccessManager</code> instance should be enough for the whole Qt application. Since <code>QNetworkAccessManager</code> is based on <a href="https://doc.qt.io/qt-5/qobject.html"><code>QObject</code></a>, it can only be used from the thread it belongs to.
+		</p>
+		<p>
+			Once a <code>QNetworkAccessManager</code> object has been created, the application can use it to send requests over the network. A group of standard functions are supplied that take a request and optional data, and each return a <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> object. The returned object is used to obtain any data returned in response to the corresponding request.
+		</p>
+		<p>
+			A simple download off the network could be accomplished with:
+		</p>
+		<pre><code>
+QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+connect(manager, &amp;QNetworkAccessManager::finished,
+	this, &amp;MyClass::replyFinished);
+
+manager-&gt;get(QNetworkRequest(QUrl("http://qt-project.org")));
+		</code></pre>
+		<p>
+			QNetworkAccessManager has an asynchronous API. When the replyFinished slot above is called, the parameter it takes is the <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> object containing the downloaded data as well as meta-data (headers, etc.).
+		</p>
+		<p>
+			Note: After the request has finished, it is the responsibility of the user to delete the <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> object at an appropriate time. Do not directly delete it inside the slot connected to <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#finished"><code>finished</code></a><code>()</code>. You can use the <a href="https://doc.qt.io/qt-5/qobject.html#deleteLater"><code>deleteLater()</code></a> function.
+		</p>
+		<p>
+			Note: <code>QNetworkAccessManager</code> queues the requests it receives. The number of requests executed in parallel is dependent on the protocol. Currently, for the HTTP protocol on desktop platforms, 6 requests are executed in parallel for one host/port combination.
+		</p>
+		<p>
+			A more involved example, assuming the manager is already existent, can be:
+		</p>
+		<pre>			
+QNetworkRequest request;
+request.setUrl(QUrl("http://qt-project.org"));
+request.setRawHeader("User-Agent", "MyOwnBrowser 1.0");
+
+QNetworkReply *reply = manager-&gt;get(request);
+connect(reply, &amp;QIODevice::readyRead, this, &amp;MyClass::slotReadyRead);
+connect(reply, &amp;QNetworkReply::errorOccurred,
+	this, &amp;MyClass::slotError);
+connect(reply, &amp;QNetworkReply::sslErrors,
+	this, &amp;MyClass::slotSslErrors);
+		</pre>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a>, <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a>, and <a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>QNetworkProxy</code></a>.
+		</p>
+		<h2>
+			Member Type Documentation
+		</h2>
+		<h3>
+			<code>enum QNetworkAccessManager::Operation <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#Operation-enum">¶</a></code>
+		</h3>
+		<p>
+			<code><code>Indicates the operation this reply is processing.</code></code>
+		</p>
+		<table>
+			<tr>
+				<th>
+					Constant
+				</th>
+				<th>
+					Value
+				</th>
+				<th>
+					Description
+				</th>
+			</tr>
+			<tr>
+				<td>
+					<code>QNetworkAccessManager::HeadOperation</code>
+				</td>
+				<td>
+					<code>1</code>
+				</td>
+				<td>
+					retrieve headers operation (created with <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#head"><code>head()</code></a>)
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<code>QNetworkAccessManager::GetOperation</code>
+				</td>
+				<td>
+					<code>2</code>
+				</td>
+				<td>
+					retrieve headers and download contents (created with <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#get"><code>get()</code></a>)
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<code>QNetworkAccessManager::PutOperation</code>
+				</td>
+				<td>
+					<code>3</code>
+				</td>
+				<td>
+					upload contents operation (created with <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put()</code></a>)
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<code>QNetworkAccessManager::PostOperation</code>
+				</td>
+				<td>
+					<code>4</code>
+				</td>
+				<td>
+					send the contents of an HTML form for processing via HTTP POST (created with <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post"><code>post()</code></a>)
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<code>QNetworkAccessManager::DeleteOperation</code>
+				</td>
+				<td>
+					<code>5</code>
+				</td>
+				<td>
+					delete contents operation (created with <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#deleteResource"><code>deleteResource()</code></a>)
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<code>QNetworkAccessManager::CustomOperation</code>
+				</td>
+				<td>
+					<code>6</code>
+				</td>
+				<td>
+					custom operation (created with <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sendCustomRequest"><code>sendCustomRequest()</code></a>)
+				</td>
+			</tr>
+		</table>
+		<p>
+			This enum was introduced or modified in Qt 4.7.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkreply.html#operation"><code>QNetworkReply::operation</code></a><code>()</code>.
+		</p>
+		<h2>
+			Member Function Documentation
+		</h2>
+		<h3>
+			<code>QNetworkAccessManager::QNetworkAccessManager(</code><a href="https://doc.qt.io/qt-5/qobject.html#QObject"><code>QObject</code></a> <code>*<i>parent</i> = nullptr)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#QNetworkAccessManager">¶</a>
+		</h3>
+		<p>
+			Constructs a <code>QNetworkAccessManager</code> object that is the center of the Network Access API and sets <i>parent</i> as the parent object.
+		</p>
+		<h3>
+			<code>[signal] void QNetworkAccessManager::authenticationRequired(</code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> *<i>reply</i>, <a href="https://doc.qt.io/qt-5/qauthenticator.html"><code>QAuthenticator</code></a> *<i>authenticator</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#authenticationRequired">¶</a>
+		</h3>
+		<p>
+			This signal is emitted whenever a final server requests authentication before it delivers the requested contents. The slot connected to this signal should fill the credentials for the contents (which can be determined by inspecting the <i>reply</i> object) in the <i>authenticator</i> object.
+		</p>
+		<p>
+			<a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> will cache the credentials internally and will send the same values if the server requires authentication again, without emitting the authenticationRequired() signal. If it rejects the credentials, this signal will be emitted again.
+		</p>
+		<p>
+			Note: To have the request not send credentials you must not call setUser() or setPassword() on the <i>authenticator</i> object. This will result in the <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#finished"><code>finished()</code></a> signal being emitted with a <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> with error <a href="https://doc.qt.io/qt-5/qnetworkreply.html#NetworkError-enum"><code>AuthenticationRequiredError</code></a>.
+		</p>
+		<p>
+			Note: It is not possible to use a QueuedConnection to connect to this signal, as the connection will fail if the authenticator has not been filled in with new information when the signal returns.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired"><code>proxyAuthenticationRequired</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qauthenticator.html#setUser"><code>QAuthenticator::setUser</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qauthenticator.html#setPassword"><code>QAuthenticator::setPassword</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>[signal] void QNetworkAccessManager::encrypted(</code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> *<i>reply</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#encrypted">¶</a>
+		</h3>
+		<p>
+			This signal is emitted when an SSL/TLS session has successfully completed the initial handshake. At this point, no user data has been transmitted. The signal can be used to perform additional checks on the certificate chain, for example to notify users when the certificate for a website has changed. The <i>reply</i> parameter specifies which network reply is responsible. If the reply does not match the expected criteria then it should be aborted by calling <a href="https://doc.qt.io/qt-5/qnetworkreply.html#abort"><code>QNetworkReply::abort()</code></a> by a slot connected to this signal. The SSL configuration in use can be inspected using the <a href="https://doc.qt.io/qt-5/qnetworkreply.html#sslConfiguration"><code>QNetworkReply::sslConfiguration()</code></a> method.
+		</p>
+		<p>
+			Internally, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> may open multiple connections to a server, in order to allow it process requests in parallel. These connections may be reused, which means that the encrypted() signal would not be emitted. This means that you are only guaranteed to receive this signal for the first connection to a site in the lifespan of the <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a>.
+		</p>
+		<p>
+			This function was introduced in Qt 5.1.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qsslsocket.html#encrypted"><code>QSslSocket::encrypted()</code></a> and <a href="https://doc.qt.io/qt-5/qnetworkreply.html#encrypted"><code>QNetworkReply::encrypted</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>[signal] void QNetworkAccessManager::finished(</code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> *<i>reply</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#finished">¶</a>
+		</h3>
+		<p>
+			This signal is emitted whenever a pending network reply is finished. The <i>reply</i> parameter will contain a pointer to the reply that has just finished. This signal is emitted in tandem with the <a href="https://doc.qt.io/qt-5/qnetworkreply.html#finished"><code>QNetworkReply::finished()</code></a> signal.
+		</p>
+		<p>
+			See <a href="https://doc.qt.io/qt-5/qnetworkreply.html#finished"><code>QNetworkReply::finished()</code></a> for information on the status that the object will be in.
+		</p>
+		<p>
+			Note: Do not delete the <i>reply</i> object in the slot connected to this signal. Use <a href="https://doc.qt.io/qt-5/qobject.html#deleteLater"><code>deleteLater</code></a><code>()</code>.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkreply.html#finished"><code>QNetworkReply::finished()</code></a> and <a href="https://doc.qt.io/qt-5/qnetworkreply.html#error"><code>QNetworkReply::error</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>[signal] void QNetworkAccessManager::preSharedKeyAuthenticationRequired(</code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> *<i>reply</i>, <a href="https://doc.qt.io/qt-5/qsslpresharedkeyauthenticator.html"><code>QSslPreSharedKeyAuthenticator</code></a> *<i>authenticator</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#preSharedKeyAuthenticationRequired">¶</a>
+		</h3>
+		<p>
+			This signal is emitted if the SSL/TLS handshake negotiates a PSK ciphersuite, and therefore a PSK authentication is then required. The <i>reply</i> object is the <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> that is negotiating such ciphersuites.
+		</p>
+		<p>
+			When using PSK, the client must send to the server a valid identity and a valid pre shared key, in order for the SSL handshake to continue. Applications can provide this information in a slot connected to this signal, by filling in the passed <i>authenticator</i> object according to their needs.
+		</p>
+		<p>
+			Note: Ignoring this signal, or failing to provide the required credentials, will cause the handshake to fail, and therefore the connection to be aborted.
+		</p>
+		<p>
+			Note: The <i>authenticator</i> object is owned by the reply and must not be deleted by the application.
+		</p>
+		<p>
+			This function was introduced in Qt 5.5.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qsslpresharedkeyauthenticator.html"><code>QSslPreSharedKeyAuthenticator</code></a>.
+		</p>
+		<h3>
+			<code>[signal] void QNetworkAccessManager::proxyAuthenticationRequired(const</code> <a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>QNetworkProxy</code></a> <code>&<i>proxy</i>,</code> <a href="https://doc.qt.io/qt-5/qauthenticator.html"><code>QAuthenticator</code></a> <code>*<i>authenticator</i>)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired">¶</a>
+		</h3>
+		<p>
+			This signal is emitted whenever a proxy requests authentication and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> cannot find a valid, cached credential. The slot connected to this signal should fill in the credentials for the proxy <i>proxy</i> in the <i>authenticator</i> object.
+		</p>
+		<p>
+			<a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> will cache the credentials internally. The next time the proxy requests authentication, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> will automatically send the same credential without emitting the proxyAuthenticationRequired signal again.
+		</p>
+		<p>
+			If the proxy rejects the credentials, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> will emit the signal again.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxy"><code>proxy</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxy"><code>setProxy</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#authenticationRequired"><code>authenticationRequired</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>[signal] void QNetworkAccessManager::sslErrors(</code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> *<i>reply</i>, const <a href="https://doc.qt.io/qt-5/qlist.html"><code>QList</code></a>&lt;<a href="https://doc.qt.io/qt-5/qsslerror.html"><code>QSslError</code></a>&gt; &<i>errors</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sslErrors">¶</a>
+		</h3>
+		<p>
+			This signal is emitted if the SSL/TLS session encountered errors during the set up, including certificate verification errors. The <i>errors</i> parameter contains the list of errors and <i>reply</i> is the <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> that is encountering these errors.
+		</p>
+		<p>
+			To indicate that the errors are not fatal and that the connection should proceed, the <a href="https://doc.qt.io/qt-5/qnetworkreply.html#ignoreSslErrors"><code>QNetworkReply::ignoreSslErrors()</code></a> function should be called from the slot connected to this signal. If it is not called, the SSL session will be torn down before any data is exchanged (including the URL).
+		</p>
+		<p>
+			This signal can be used to display an error message to the user indicating that security may be compromised and display the SSL settings (see sslConfiguration() to obtain it). If the user decides to proceed after analyzing the remote certificate, the slot should call ignoreSslErrors().
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qsslsocket-obsolete.html#sslErrors"><code>QSslSocket::sslErrors</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkreply.html#sslErrors"><code>QNetworkReply::sslErrors</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkreply.html#sslConfiguration"><code>QNetworkReply::sslConfiguration</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkreply.html#ignoreSslErrors"><code>QNetworkReply::ignoreSslErrors</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>[protected slot]</code> <a href="https://doc.qt.io/qt-5/qstringlist.html"><code>QStringList</code></a> <code>QNetworkAccessManager::supportedSchemesImplementation() const</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#supportedSchemesImplementation">¶</a>
+		</h3>
+		<p>
+			Lists all the URL schemes supported by the access manager.
+		</p>
+		<p>
+			You should not call this function directly; use <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#supportedSchemes"><code>QNetworkAccessManager::supportedSchemes()</code></a> instead.
+		</p>
+		<p>
+			Reimplement this slot to provide your own supported schemes in a <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> subclass. It is for instance necessary when your subclass provides support for new protocols.
+		</p>
+		<p>
+			Because of binary compatibility constraints, the <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#supportedSchemes"><code>supportedSchemes()</code></a> method (introduced in Qt 5.2) is not virtual. Instead, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#supportedSchemes"><code>supportedSchemes()</code></a> will dynamically detect and call this slot.
+		</p>
+		<p>
+			This function was introduced in Qt 5.2.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#supportedSchemes"><code>supportedSchemes</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>[virtual] QNetworkAccessManager::~QNetworkAccessManager()</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#dtor.QNetworkAccessManager">¶</a>
+		</h3>
+		<p>
+			Destroys the <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> object and frees up any resources. Note that <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> objects that are returned from this class have this object set as their parents, which means that they will be deleted along with it if you don't call <a href="https://doc.qt.io/qt-5/qobject.html#setParent"><code>QObject::setParent()</code></a> on them.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::addStrictTransportSecurityHosts(const</code> <a href="https://doc.qt.io/qt-5/qvector.html"><code>QVector</code></a>&lt;<a href="https://doc.qt.io/qt-5/qhstspolicy.html"><code>QHstsPolicy</code></a>&gt; &<i>knownHosts</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#addStrictTransportSecurityHosts">¶</a>
+		</h3>
+		<p>
+			Adds HTTP Strict Transport Security policies into HSTS cache. <i>knownHosts</i> contains the known hosts that have <a href="https://doc.qt.io/qt-5/qhstspolicy.html"><code>QHstsPolicy</code></a> information.
+		</p>
+		<p>
+			Note: An expired policy will remove a known host from the cache, if previously present.
+		</p>
+		<p>
+			Note: While processing HTTP responses, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> can also update the HSTS cache, removing or updating exitsting policies or introducing new <i>knownHosts</i>. The current implementation thus is server-driven, client code can provide <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> with previously known or discovered policies, but this information can be overridden by "Strict-Transport-Security" response headers.
+		</p>
+		<p>
+			This function was introduced in Qt 5.9.
+		</p>
+		<p>
+			See also addStrictTransportSecurityHosts(), <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#enableStrictTransportSecurityStore"><code>enableStrictTransportSecurityStore</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qhstspolicy.html"><code>QHstsPolicy</code></a>.
+		</p>
+		<h3>
+			<code>bool QNetworkAccessManager::autoDeleteReplies() const</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#autoDeleteReplies">¶</a>
+		</h3>
+		<p>
+			Returns the true if <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> is currently configured to automatically delete QNetworkReplies, false otherwise.
+		</p>
+		<p>
+			This function was introduced in Qt 5.14.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setAutoDeleteReplies"><code>setAutoDeleteReplies</code></a> and <a href="https://doc.qt.io/qt-5/qnetworkrequest.html#Attribute-enum"><code>QNetworkRequest::AutoDeleteReplyOnFinishAttribute</code></a>.
+		</p>
+		<h3>
+			<code><a href="https://doc.qt.io/qt-5/qabstractnetworkcache.html"><code>QAbstractNetworkCache</code></a> <code>*QNetworkAccessManager::cache() const</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#cache">¶</a></code>
+		</h3>
+		<p>
+			Returns the cache that is used to store data obtained from the network.
+		</p>
+		<p>
+			This function was introduced in Qt 4.5.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setCache"><code>setCache</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::clearAccessCache()</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#clearAccessCache">¶</a>
+		</h3>
+		<p>
+			Flushes the internal cache of authentication data and network connections.
+		</p>
+		<p>
+			This function is useful for doing auto tests.
+		</p>
+		<p>
+			This function was introduced in Qt 5.0.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#clearConnectionCache"><code>clearConnectionCache</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::clearConnectionCache() <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#clearConnectionCache">¶</a></code>
+		</h3>
+		<p>
+			<code><code>Flushes the internal cache of network connections. In contrast to <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#clearAccessCache"><code>clearAccessCache()</code></a> the authentication data is preserved.</code></code>
+		</p>
+		<p>
+			This function was introduced in Qt 5.9.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#clearAccessCache"><code>clearAccessCache</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::connectToHost(const</code> <a href="https://doc.qt.io/qt-5/qstring.html"><code>QString</code></a> <code>&<i>hostName</i>,</code> <a href="https://doc.qt.io/qt-5/qtglobal.html#quint16-typedef"><code>quint16</code></a> <code><i>port</i> = 80)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#connectToHost">¶</a>
+		</h3>
+		<p>
+			Initiates a connection to the host given by <i>hostName</i> at port <i>port</i>. This function is useful to complete the TCP handshake to a host before the HTTP request is made, resulting in a lower network latency.
+		</p>
+		<p>
+			Note: This function has no possibility to report errors.
+		</p>
+		<p>
+			This function was introduced in Qt 5.2.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#connectToHostEncrypted"><code>connectToHostEncrypted</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#get"><code>get</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post"><code>post</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#deleteResource"><code>deleteResource</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::connectToHostEncrypted(const</code> <a href="https://doc.qt.io/qt-5/qstring.html"><code>QString</code></a> <code>&<i>hostName</i>,</code> <a href="https://doc.qt.io/qt-5/qtglobal.html#quint16-typedef"><code>quint16</code></a> <code><i>port</i> = 443, const</code> <a href="https://doc.qt.io/qt-5/qsslconfiguration.html"><code>QSslConfiguration</code></a> <code>&<i>sslConfiguration</i> = QSslConfiguration::defaultConfiguration())</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#connectToHostEncrypted">¶</a>
+		</h3>
+		<p>
+			Initiates a connection to the host given by <i>hostName</i> at port <i>port</i>, using <i>sslConfiguration</i>. This function is useful to complete the TCP and SSL handshake to a host before the HTTPS request is made, resulting in a lower network latency.
+		</p>
+		<p>
+			Note: Preconnecting a SPDY connection can be done by calling setAllowedNextProtocols() on <i>sslConfiguration</i> with <a href="https://doc.qt.io/qt-5/qsslconfiguration.html#NextProtocolSpdy3_0-var"><code>QSslConfiguration::NextProtocolSpdy3_0</code></a> contained in the list of allowed protocols. When using SPDY, one single connection per host is enough, i.e. calling this method multiple times per host will not result in faster network transactions.
+		</p>
+		<p>
+			Note: This function has no possibility to report errors.
+		</p>
+		<p>
+			This function was introduced in Qt 5.2.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#connectToHost"><code>connectToHost</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#get"><code>get</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post"><code>post</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#deleteResource"><code>deleteResource</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::connectToHostEncrypted(const</code> <a href="https://doc.qt.io/qt-5/qstring.html"><code>QString</code></a> <code>&<i>hostName</i>,</code> <a href="https://doc.qt.io/qt-5/qtglobal.html#quint16-typedef"><code>quint16</code></a> <code><i>port</i>, const</code> <a href="https://doc.qt.io/qt-5/qsslconfiguration.html"><code>QSslConfiguration</code></a> <code>&<i>sslConfiguration</i>, const</code> <a href="https://doc.qt.io/qt-5/qstring.html"><code>QString</code></a> <code>&<i>peerName</i>)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#connectToHostEncrypted-1">¶</a>
+		</h3>
+		<p>
+			This is an overloaded function.
+		</p>
+		<p>
+			Initiates a connection to the host given by <i>hostName</i> at port <i>port</i>, using <i>sslConfiguration</i> with <i>peerName</i> set to be the hostName used for certificate validation. This function is useful to complete the TCP and SSL handshake to a host before the HTTPS request is made, resulting in a lower network latency.
+		</p>
+		<p>
+			Note: Preconnecting a SPDY connection can be done by calling setAllowedNextProtocols() on <i>sslConfiguration</i> with <a href="https://doc.qt.io/qt-5/qsslconfiguration.html#NextProtocolSpdy3_0-var"><code>QSslConfiguration::NextProtocolSpdy3_0</code></a> contained in the list of allowed protocols. When using SPDY, one single connection per host is enough, i.e. calling this method multiple times per host will not result in faster network transactions.
+		</p>
+		<p>
+			Note: This function has no possibility to report errors.
+		</p>
+		<p>
+			This function was introduced in Qt 5.13.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#connectToHost"><code>connectToHost</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#get"><code>get</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post"><code>post</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#deleteResource"><code>deleteResource</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code><a href="https://doc.qt.io/qt-5/qnetworkcookiejar.html"><code>QNetworkCookieJar</code></a> <code>*QNetworkAccessManager::cookieJar() const</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#cookieJar">¶</a></code>
+		</h3>
+		<p>
+			Returns the <a href="https://doc.qt.io/qt-5/qnetworkcookiejar.html"><code>QNetworkCookieJar</code></a> that is used to store cookies obtained from the network as well as cookies that are about to be sent.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setCookieJar"><code>setCookieJar</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>[virtual protected] <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> <code>*QNetworkAccessManager::createRequest(</code><a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#Operation-enum"><code>QNetworkAccessManager::Operation</code></a> <code><i>op</i>, const</code> <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> <code>&<i>originalReq</i>,</code> <a href="https://doc.qt.io/qt-5/qiodevice.html"><code>QIODevice</code></a> <code>*<i>outgoingData</i> = nullptr)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#createRequest">¶</a></code>
+		</h3>
+		<p>
+			Returns a new <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> object to handle the operation <i>op</i> and request <i>originalReq</i>. The device <i>outgoingData</i> is always 0 for Get and Head requests, but is the value passed to <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post"><code>post()</code></a> and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put()</code></a> in those operations (the <a href="https://doc.qt.io/qt-5/qbytearray.html"><code>QByteArray</code></a> variants will pass a <a href="https://doc.qt.io/qt-5/qbuffer.html"><code>QBuffer</code></a> object).
+		</p>
+		<p>
+			The default implementation calls <a href="https://doc.qt.io/qt-5/qnetworkcookiejar.html#cookiesForUrl"><code>QNetworkCookieJar::cookiesForUrl()</code></a> on the cookie jar set with <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setCookieJar"><code>setCookieJar()</code></a> to obtain the cookies to be sent to the remote server.
+		</p>
+		<p>
+			The returned object must be in an open state.
+		</p>
+		<h3>
+			<a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> *QNetworkAccessManager::deleteResource(const <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> &<i>request</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#deleteResource">¶</a>
+		</h3>
+		<p>
+			Sends a request to delete the resource identified by the URL of <i>request</i>.
+		</p>
+		<p>
+			Note: This feature is currently available for HTTP only, performing an HTTP DELETE request.
+		</p>
+		<p>
+			This function was introduced in Qt 4.6.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#get"><code>get</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post"><code>post</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sendCustomRequest"><code>sendCustomRequest</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::enableStrictTransportSecurityStore(bool<i>enabled</i>, const</code> <a href="https://doc.qt.io/qt-5/qstring.html"><code>QString</code></a> <code>&<i>storeDir</i> = QString())</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#enableStrictTransportSecurityStore">¶</a>
+		</h3>
+		<p>
+			If <i>enabled</i> is true, the internal HSTS cache will use a persistent store to read and write HSTS policies. <i>storeDir</i> defines where this store will be located. The default location is defined by <a href="https://doc.qt.io/qt-5/qstandardpaths.html#StandardLocation-enum"><code>QStandardPaths::CacheLocation</code></a>. If there is no writable <code>QStandartPaths::CacheLocation</code> and <i>storeDir</i> is an empty string, the store will be located in the program's working directory.
+		</p>
+		<p>
+			Note: If HSTS cache already contains HSTS policies by the time persistent store is enabled, these policies will be preserved in the store. In case both cache and store contain the same known hosts, policies from cache are considered to be more up-to-date (and thus will overwrite the previous values in the store). If this behavior is undesired, enable HSTS store before enabling Strict Tranport Security. By default, the persistent store of HSTS policies is disabled.
+		</p>
+		<p>
+			This function was introduced in Qt 5.10.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#isStrictTransportSecurityStoreEnabled"><code>isStrictTransportSecurityStoreEnabled</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setStrictTransportSecurityEnabled"><code>setStrictTransportSecurityEnabled</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qstandardpaths.html#standardLocations"><code>QStandardPaths::standardLocations</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> <code>*QNetworkAccessManager::get(const</code> <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> &<i>request</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#get">¶</a></code>
+		</h3>
+		<p>
+			Posts a request to obtain the contents of the target <i>request</i> and returns a new <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> object opened for reading which emits the <a href="https://doc.qt.io/qt-5/qiodevice.html#readyRead"><code>readyRead()</code></a> signal whenever new data arrives.
+		</p>
+		<p>
+			The contents as well as associated headers will be downloaded.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post"><code>post</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#deleteResource"><code>deleteResource</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sendCustomRequest"><code>sendCustomRequest</code></a><code>()</code>.
+		</p>
+		<h3>
+			<a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> *QNetworkAccessManager::head(const <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> &<i>request</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#head">¶</a>
+		</h3>
+		<p>
+			Posts a request to obtain the network headers for <i>request</i> and returns a new <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> object which will contain such headers.
+		</p>
+		<p>
+			The function is named after the HTTP request associated (HEAD).
+		</p>
+		<h3>
+			<code>bool QNetworkAccessManager::isStrictTransportSecurityEnabled() const</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#isStrictTransportSecurityEnabled">¶</a>
+		</h3>
+		<p>
+			Returns true if HTTP Strict Transport Security (HSTS) was enabled. By default HSTS is disabled.
+		</p>
+		<p>
+			This function was introduced in Qt 5.9.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setStrictTransportSecurityEnabled"><code>setStrictTransportSecurityEnabled</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>bool QNetworkAccessManager::isStrictTransportSecurityStoreEnabled() const</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#isStrictTransportSecurityStoreEnabled">¶</a>
+		</h3>
+		<p>
+			Returns true if HSTS cache uses a permanent store to load and store HSTS policies.
+		</p>
+		<p>
+			This function was introduced in Qt 5.10.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#enableStrictTransportSecurityStore"><code>enableStrictTransportSecurityStore</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> <code>*QNetworkAccessManager::post(const</code> <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> <code>&<i>request</i>,</code> <a href="https://doc.qt.io/qt-5/qiodevice.html"><code>QIODevice</code></a> <code>*<i>data</i>)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post">¶</a></code>
+		</h3>
+		<p>
+			Sends an HTTP POST request to the destination specified by <i>request</i> and returns a new <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> object opened for reading that will contain the reply sent by the server. The contents of the <i>data</i> device will be uploaded to the server.
+		</p>
+		<p>
+			<i>data</i> must be open for reading and must remain valid until the <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#finished"><code>finished()</code></a> signal is emitted for this reply.
+		</p>
+		<p>
+			Note: Sending a POST request on protocols other than HTTP and HTTPS is undefined and will probably fail.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#get"><code>get</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#deleteResource"><code>deleteResource</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sendCustomRequest"><code>sendCustomRequest</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> <code>*QNetworkAccessManager::post(const</code> <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> <code>&<i>request</i>, const</code> <a href="https://doc.qt.io/qt-5/qbytearray.html"><code>QByteArray</code></a> <code>&<i>data</i>)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post-1">¶</a></code>
+		</h3>
+		<p>
+			This is an overloaded function.
+		</p>
+		<p>
+			Sends the contents of the <i>data</i> byte array to the destination specified by <i>request</i>.
+		</p>
+		<h3>
+			<code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> <code>*QNetworkAccessManager::post(const</code> <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> <code>&<i>request</i>,</code> <a href="https://doc.qt.io/qt-5/qhttpmultipart.html"><code>QHttpMultiPart</code></a> <code>*<i>multiPart</i>)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post-2">¶</a></code>
+		</h3>
+		<p>
+			This is an overloaded function.
+		</p>
+		<p>
+			Sends the contents of the <i>multiPart</i> message to the destination specified by <i>request</i>.
+		</p>
+		<p>
+			This can be used for sending MIME multipart messages over HTTP.
+		</p>
+		<p>
+			This function was introduced in Qt 4.8.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qhttpmultipart.html"><code>QHttpMultiPart</code></a>, <a href="https://doc.qt.io/qt-5/qhttppart.html"><code>QHttpPart</code></a>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put</code></a><code>()</code>.
+		</p>
+		<h3>
+			<a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>QNetworkProxy</code></a> QNetworkAccessManager::proxy() const <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxy">¶</a>
+		</h3>
+		<p>
+			Returns the <a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>QNetworkProxy</code></a> that the requests sent using this <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> object will use. The default value for the proxy is <a href="https://doc.qt.io/qt-5/qnetworkproxy.html#ProxyType-enum"><code>QNetworkProxy::DefaultProxy</code></a>.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxy"><code>setProxy</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxyFactory"><code>setProxyFactory</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired"><code>proxyAuthenticationRequired</code></a><code>()</code>.
+		</p>
+		<h3>
+			<a href="https://doc.qt.io/qt-5/qnetworkproxyfactory.html"><code>QNetworkProxyFactory</code></a> *QNetworkAccessManager::proxyFactory() const <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyFactory">¶</a>
+		</h3>
+		<p>
+			Returns the proxy factory that this <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> object is using to determine the proxies to be used for requests.
+		</p>
+		<p>
+			Note that the pointer returned by this function is managed by <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> and could be deleted at any time.
+		</p>
+		<p>
+			This function was introduced in Qt 4.5.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxyFactory"><code>setProxyFactory()</code></a> and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxy"><code>proxy</code></a><code>()</code>.
+		</p>
+		<h3>
+			<a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> *QNetworkAccessManager::put(const <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> &<i>request</i>, <a href="https://doc.qt.io/qt-5/qiodevice.html"><code>QIODevice</code></a> *<i>data</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put">¶</a>
+		</h3>
+		<p>
+			Uploads the contents of <i>data</i> to the destination <i>request</i> and returns a new <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> object that will be open for reply.
+		</p>
+		<p>
+			<i>data</i> must be opened for reading when this function is called and must remain valid until the <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#finished"><code>finished()</code></a> signal is emitted for this reply.
+		</p>
+		<p>
+			Whether anything will be available for reading from the returned object is protocol dependent. For HTTP, the server may send a small HTML page indicating the upload was successful (or not). Other protocols will probably have content in their replies.
+		</p>
+		<p>
+			Note: For HTTP, this request will send a PUT request, which most servers do not allow. Form upload mechanisms, including that of uploading files through HTML forms, use the POST mechanism.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#get"><code>get</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post"><code>post</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#deleteResource"><code>deleteResource</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sendCustomRequest"><code>sendCustomRequest</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> <code>*QNetworkAccessManager::put(const</code> <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> <code>&<i>request</i>, const</code> <a href="https://doc.qt.io/qt-5/qbytearray.html"><code>QByteArray</code></a> <code>&<i>data</i>)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put-1">¶</a></code>
+		</h3>
+		<p>
+			This is an overloaded function.
+		</p>
+		<p>
+			Sends the contents of the <i>data</i> byte array to the destination specified by <i>request</i>.
+		</p>
+		<h3>
+			<code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> <code>*QNetworkAccessManager::put(const</code> <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> <code>&<i>request</i>,</code> <a href="https://doc.qt.io/qt-5/qhttpmultipart.html"><code>QHttpMultiPart</code></a> <code>*<i>multiPart</i>)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put-2">¶</a></code>
+		</h3>
+		<p>
+			This is an overloaded function.
+		</p>
+		<p>
+			Sends the contents of the <i>multiPart</i> message to the destination specified by <i>request</i>.
+		</p>
+		<p>
+			This can be used for sending MIME multipart messages over HTTP.
+		</p>
+		<p>
+			This function was introduced in Qt 4.8.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qhttpmultipart.html"><code>QHttpMultiPart</code></a>, <a href="https://doc.qt.io/qt-5/qhttppart.html"><code>QHttpPart</code></a>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post"><code>post</code></a><code>()</code>.
+		</p>
+		<h3>
+			<a href="https://doc.qt.io/qt-5/qnetworkrequest.html#RedirectPolicy-enum"><code>QNetworkRequest::RedirectPolicy</code></a> QNetworkAccessManager::redirectPolicy() const <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#redirectPolicy">¶</a>
+		</h3>
+		<p>
+			Returns the redirect policy that is used when creating new requests.
+		</p>
+		<p>
+			This function was introduced in Qt 5.9.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setRedirectPolicy"><code>setRedirectPolicy()</code></a> and <a href="https://doc.qt.io/qt-5/qnetworkrequest.html#RedirectPolicy-enum"><code>QNetworkRequest::RedirectPolicy</code></a>.
+		</p>
+		<h3>
+			<a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> *QNetworkAccessManager::sendCustomRequest(const <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> &<i>request</i>, const <a href="https://doc.qt.io/qt-5/qbytearray.html"><code>QByteArray</code></a> &<i>verb</i>, <a href="https://doc.qt.io/qt-5/qiodevice.html"><code>QIODevice</code></a> *<i>data</i> = nullptr) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sendCustomRequest">¶</a>
+		</h3>
+		<p>
+			Sends a custom request to the server identified by the URL of <i>request</i>.
+		</p>
+		<p>
+			It is the user's responsibility to send a <i>verb</i> to the server that is valid according to the HTTP specification.
+		</p>
+		<p>
+			This method provides means to send verbs other than the common ones provided via <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#get"><code>get()</code></a> or <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post"><code>post()</code></a> etc., for instance sending an HTTP OPTIONS command.
+		</p>
+		<p>
+			If <i>data</i> is not empty, the contents of the <i>data</i> device will be uploaded to the server; in that case, data must be open for reading and must remain valid until the <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#finished"><code>finished()</code></a> signal is emitted for this reply.
+		</p>
+		<p>
+			Note: This feature is currently available for HTTP(S) only.
+		</p>
+		<p>
+			This function was introduced in Qt 4.7.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#get"><code>get</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#post"><code>post</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#deleteResource"><code>deleteResource</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> <code>*QNetworkAccessManager::sendCustomRequest(const</code> <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> <code>&<i>request</i>, const</code> <a href="https://doc.qt.io/qt-5/qbytearray.html"><code>QByteArray</code></a> <code>&<i>verb</i>, const</code> <a href="https://doc.qt.io/qt-5/qbytearray.html"><code>QByteArray</code></a> <code>&<i>data</i>)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sendCustomRequest-1">¶</a></code>
+		</h3>
+		<p>
+			This is an overloaded function.
+		</p>
+		<p>
+			Sends the contents of the <i>data</i> byte array to the destination specified by <i>request</i>.
+		</p>
+		<p>
+			This function was introduced in Qt 5.8.
+		</p>
+		<h3>
+			<code><a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReply</code></a> <code>*QNetworkAccessManager::sendCustomRequest(const</code> <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a> <code>&<i>request</i>, const</code> <a href="https://doc.qt.io/qt-5/qbytearray.html"><code>QByteArray</code></a> <code>&<i>verb</i>,</code> <a href="https://doc.qt.io/qt-5/qhttpmultipart.html"><code>QHttpMultiPart</code></a> <code>*<i>multiPart</i>)</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#sendCustomRequest-2">¶</a></code>
+		</h3>
+		<p>
+			This is an overloaded function.
+		</p>
+		<p>
+			Sends a custom request to the server identified by the URL of <i>request</i>.
+		</p>
+		<p>
+			Sends the contents of the <i>multiPart</i> message to the destination specified by <i>request</i>.
+		</p>
+		<p>
+			This can be used for sending MIME multipart messages for custom verbs.
+		</p>
+		<p>
+			This function was introduced in Qt 5.8.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qhttpmultipart.html"><code>QHttpMultiPart</code></a>, <a href="https://doc.qt.io/qt-5/qhttppart.html"><code>QHttpPart</code></a>, and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#put"><code>put</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::setAutoDeleteReplies(bool<i>shouldAutoDelete</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setAutoDeleteReplies">¶</a></code>
+		</h3>
+		<p>
+			<code><code>Enables or disables automatic deletion of <a href="https://doc.qt.io/qt-5/qnetworkreply.html"><code>QNetworkReplies</code></a>.</code></code>
+		</p>
+		<p>
+			Setting <i>shouldAutoDelete</i> to true is the same as setting the <a href="https://doc.qt.io/qt-5/qnetworkrequest.html#Attribute-enum"><code>QNetworkRequest::AutoDeleteReplyOnFinishAttribute</code></a> attribute to true on all <i>future</i> <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequests</code></a> passed to this instance of <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> unless the attribute was already explicitly set on the <a href="https://doc.qt.io/qt-5/qnetworkrequest.html"><code>QNetworkRequest</code></a>.
+		</p>
+		<p>
+			This function was introduced in Qt 5.14.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#autoDeleteReplies"><code>autoDeleteReplies</code></a> and <a href="https://doc.qt.io/qt-5/qnetworkrequest.html#Attribute-enum"><code>QNetworkRequest::AutoDeleteReplyOnFinishAttribute</code></a>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::setCache(</code><a href="https://doc.qt.io/qt-5/qabstractnetworkcache.html"><code>QAbstractNetworkCache</code></a> *<i>cache</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setCache">¶</a>
+		</h3>
+		<p>
+			Sets the manager's network cache to be the <i>cache</i> specified. The cache is used for all requests dispatched by the manager.
+		</p>
+		<p>
+			Use this function to set the network cache object to a class that implements additional features, like saving the cookies to permanent storage.
+		</p>
+		<p>
+			Note: <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> takes ownership of the <i>cache</i> object.
+		</p>
+		<p>
+			<a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> by default does not have a set cache. Qt provides a simple disk cache, <a href="https://doc.qt.io/qt-5/qnetworkdiskcache.html"><code>QNetworkDiskCache</code></a>, which can be used.
+		</p>
+		<p>
+			This function was introduced in Qt 4.5.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#cache"><code>cache()</code></a> and <a href="https://doc.qt.io/qt-5/qnetworkrequest.html#CacheLoadControl-enum"><code>QNetworkRequest::CacheLoadControl</code></a>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::setCookieJar(</code><a href="https://doc.qt.io/qt-5/qnetworkcookiejar.html"><code>QNetworkCookieJar</code></a> *<i>cookieJar</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setCookieJar">¶</a>
+		</h3>
+		<p>
+			Sets the manager's cookie jar to be the <i>cookieJar</i> specified. The cookie jar is used by all requests dispatched by the manager.
+		</p>
+		<p>
+			Use this function to set the cookie jar object to a class that implements additional features, like saving the cookies to permanent storage.
+		</p>
+		<p>
+			Note: <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> takes ownership of the <i>cookieJar</i> object.
+		</p>
+		<p>
+			If <i>cookieJar</i> is in the same thread as this <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a>, it will set the parent of the <i>cookieJar</i> so that the cookie jar is deleted when this object is deleted as well. If you want to share cookie jars between different <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> objects, you may want to set the cookie jar's parent to 0 after calling this function.
+		</p>
+		<p>
+			<a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> by default does not implement any cookie policy of its own: it accepts all cookies sent by the server, as long as they are well formed and meet the minimum security requirements (cookie domain matches the request's and cookie path matches the request's). In order to implement your own security policy, override the <a href="https://doc.qt.io/qt-5/qnetworkcookiejar.html#cookiesForUrl"><code>QNetworkCookieJar::cookiesForUrl()</code></a> and <a href="https://doc.qt.io/qt-5/qnetworkcookiejar.html#setCookiesFromUrl"><code>QNetworkCookieJar::setCookiesFromUrl()</code></a> virtual functions. Those functions are called by <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> when it detects a new cookie.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#cookieJar"><code>cookieJar</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkcookiejar.html#cookiesForUrl"><code>QNetworkCookieJar::cookiesForUrl</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkcookiejar.html#setCookiesFromUrl"><code>QNetworkCookieJar::setCookiesFromUrl</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::setProxy(const</code> <a href="https://doc.qt.io/qt-5/qnetworkproxy.html"><code>QNetworkProxy</code></a> <code>&<i>proxy</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxy">¶</a></code>
+		</h3>
+		<p>
+			<code>Sets the proxy to be used in future requests to be <i>proxy</i>. This does not affect requests that have already been sent. The <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired"><code>proxyAuthenticationRequired()</code></a> signal will be emitted if the proxy requests authentication.</code>
+		</p>
+		<p>
+			A proxy set with this function will be used for all requests issued by <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a>. In some cases, it might be necessary to select different proxies depending on the type of request being sent or the destination host. If that's the case, you should consider using <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxyFactory"><code>setProxyFactory</code></a><code>()</code>.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxy"><code>proxy()</code></a> and <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyAuthenticationRequired"><code>proxyAuthenticationRequired</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::setProxyFactory(</code><a href="https://doc.qt.io/qt-5/qnetworkproxyfactory.html"><code>QNetworkProxyFactory</code></a> *<i>factory</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxyFactory">¶</a>
+		</h3>
+		<p>
+			Sets the proxy factory for this class to be <i>factory</i>. A proxy factory is used to determine a more specific list of proxies to be used for a given request, instead of trying to use the same proxy value for all requests.
+		</p>
+		<p>
+			All queries sent by <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> will have type <a href="https://doc.qt.io/qt-5/qnetworkproxyquery.html#QueryType-enum"><code>QNetworkProxyQuery::UrlRequest</code></a>.
+		</p>
+		<p>
+			For example, a proxy factory could apply the following rules:
+		</p>
+		<ul>
+			<li>if the target address is in the local network (for example, if the hostname contains no dots or if it's an IP address in the organization's range), return <a href="https://doc.qt.io/qt-5/qnetworkproxy.html#ProxyType-enum"><code>QNetworkProxy::NoProxy</code></a>
+			</li>
+			<li>if the request is FTP, return an FTP proxy
+			</li>
+			<li>if the request is HTTP or HTTPS, then return an HTTP proxy
+			</li>
+			<li>otherwise, return a SOCKSv5 proxy server
+			</li>
+		</ul>
+		<p>
+			The lifetime of the object <i>factory</i> will be managed by <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a>. It will delete the object when necessary.
+		</p>
+		<p>
+			Note: If a specific proxy is set with <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxy"><code>setProxy</code></a><code>()</code>, the factory will not be used.
+		</p>
+		<p>
+			This function was introduced in Qt 4.5.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#proxyFactory"><code>proxyFactory</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setProxy"><code>setProxy</code></a><code>()</code>, and <a href="https://doc.qt.io/qt-5/qnetworkproxyquery.html"><code>QNetworkProxyQuery</code></a>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::setRedirectPolicy(</code><a href="https://doc.qt.io/qt-5/qnetworkrequest.html#RedirectPolicy-enum"><code>QNetworkRequest::RedirectPolicy</code></a> <i>policy</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setRedirectPolicy">¶</a>
+		</h3>
+		<p>
+			Sets the manager's redirect policy to be the <i>policy</i> specified. This policy will affect all subsequent requests created by the manager.
+		</p>
+		<p>
+			Use this function to enable or disable HTTP redirects on the manager's level.
+		</p>
+		<p>
+			Note: When creating a request QNetworkRequest::RedirectAttributePolicy has the highest priority, next by priority is <a href="https://doc.qt.io/qt-5/qnetworkrequest.html#Attribute-enum"><code>QNetworkRequest::FollowRedirectsAttribute</code></a>. Finally, the manager's policy has the lowest priority.
+		</p>
+		<p>
+			For backwards compatibility the default value is <a href="https://doc.qt.io/qt-5/qnetworkrequest.html#RedirectPolicy-enum"><code>QNetworkRequest::ManualRedirectPolicy</code></a>. This may change in the future and some type of auto-redirect policy will become the default; clients relying on manual redirect handling are encouraged to set this policy explicitly in their code.
+		</p>
+		<p>
+			This function was introduced in Qt 5.9.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#redirectPolicy"><code>redirectPolicy</code></a><code>()</code>, <a href="https://doc.qt.io/qt-5/qnetworkrequest.html#RedirectPolicy-enum"><code>QNetworkRequest::RedirectPolicy</code></a>, and <a href="https://doc.qt.io/qt-5/qnetworkrequest.html#Attribute-enum"><code>QNetworkRequest::FollowRedirectsAttribute</code></a>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::setStrictTransportSecurityEnabled(bool<i>enabled</i>) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setStrictTransportSecurityEnabled">¶</a></code>
+		</h3>
+		<p>
+			<code><code>If <i>enabled</i> is true, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> follows the HTTP Strict Transport Security policy (HSTS, RFC6797). When processing a request, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> automatically replaces the "http" scheme with "https" and uses a secure transport for HSTS hosts. If it's set explicitly, port 80 is replaced by port 443.</code></code>
+		</p>
+		<p>
+			When HSTS is enabled, for each HTTP response containing HSTS header and received over a secure transport, <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> will update its HSTS cache, either remembering a host with a valid policy or removing a host with an expired or disabled HSTS policy.
+		</p>
+		<p>
+			This function was introduced in Qt 5.9.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#isStrictTransportSecurityEnabled"><code>isStrictTransportSecurityEnabled</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>void QNetworkAccessManager::setTransferTimeout(int<i>timeout</i> = QNetworkRequest::DefaultTransferTimeoutConstant) <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setTransferTimeout">¶</a></code>
+		</h3>
+		<p>
+			<code><code>Sets <i>timeout</i> as the transfer timeout in milliseconds.</code></code>
+		</p>
+		<p>
+			<code>Transfers are aborted if no bytes are transferred before the timeout expires. Zero means no timer is set. If no argument is provided, the timeout is <a href="https://doc.qt.io/qt-5/qnetworkrequest.html#TransferTimeoutConstant-enum"><code>QNetworkRequest::DefaultTransferTimeoutConstant</code></a>. If this function is not called, the timeout is disabled and has the value zero. The request-specific non-zero timeouts set for the requests that are executed override this value. This means that if <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html"><code>QNetworkAccessManager</code></a> has an enabled timeout, it needs to be disabled to execute a request without a timeout.</code>
+		</p>
+		<p>
+			This function was introduced in Qt 5.15.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#transferTimeout"><code>transferTimeout</code></a><code>()</code>.
+		</p>
+		<h3>
+			<a href="https://doc.qt.io/qt-5/qvector.html"><code>QVector</code></a>&lt;<a href="https://doc.qt.io/qt-5/qhstspolicy.html"><code>QHstsPolicy</code></a>&gt; QNetworkAccessManager::strictTransportSecurityHosts() const <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#strictTransportSecurityHosts">¶</a>
+		</h3>
+		<p>
+			Returns the list of HTTP Strict Transport Security policies. This list can differ from what was initially set via <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#addStrictTransportSecurityHosts"><code>addStrictTransportSecurityHosts()</code></a> if HSTS cache was updated from a "Strict-Transport-Security" response header.
+		</p>
+		<p>
+			This function was introduced in Qt 5.9.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#addStrictTransportSecurityHosts"><code>addStrictTransportSecurityHosts()</code></a> and <a href="https://doc.qt.io/qt-5/qhstspolicy.html"><code>QHstsPolicy</code></a>.
+		</p>
+		<h3>
+			<code><a href="https://doc.qt.io/qt-5/qstringlist.html"><code>QStringList</code></a> <code>QNetworkAccessManager::supportedSchemes() const</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#supportedSchemes">¶</a></code>
+		</h3>
+		<p>
+			Lists all the URL schemes supported by the access manager.
+		</p>
+		<p>
+			This function was introduced in Qt 5.2.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#supportedSchemesImplementation"><code>supportedSchemesImplementation</code></a><code>()</code>.
+		</p>
+		<h3>
+			<code>int QNetworkAccessManager::transferTimeout() const</code> <a title="Direct link to this headline" href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#transferTimeout">¶</a>
+		</h3>
+		<p>
+			Returns the timeout used for transfers, in milliseconds.
+		</p>
+		<p>
+			This timeout is zero if <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setTransferTimeout"><code>setTransferTimeout()</code></a> hasn't been called, which means that the timeout is not used.
+		</p>
+		<p>
+			This function was introduced in Qt 5.15.
+		</p>
+		<p>
+			See also <a href="https://doc.qt.io/qt-5/qnetworkaccessmanager.html#setTransferTimeout"><code>setTransferTimeout</code></a><code>()</code>.
+		</p>
+	</body>
+</html>
