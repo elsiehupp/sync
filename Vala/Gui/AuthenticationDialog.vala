@@ -4,7 +4,7 @@ Copyright (C) 2014 by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QLabel>
+//  #include <Gtk.Label>
 //  #include <QLineEdit>
 //  #include <QVBoxLayout>
 //  #include <QFormLayout>
@@ -48,7 +48,7 @@ class AuthenticationDialog : Gtk.Dialog {
         this.password (new QLineEdit) {
         window_title (_("Authentication Required"));
         var lay = new QVBoxLayout (this);
-        var label = new QLabel (_("Enter username and password for \"%1\" at %2.").arg (realm, domain));
+        var label = new Gtk.Label (_("Enter username and password for \"%1\" at %2.").arg (realm, domain));
         label.text_format (Qt.PlainText);
         lay.add_widget (label);
 

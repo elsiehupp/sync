@@ -6,86 +6,69 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 ***********************************************************/
 
 //  #include <QVBoxLayout>
-
-
 //  #include <QNetworkCookie>
 //  #include <QPointer>
 
 namespace Occ {
 namespace Ui {
 
-class Flow2Auth_creds_page : Abstract_credentials_wizard_page {
-
-    /***********************************************************
-    ***********************************************************/
-    public Flow2Auth_creds_page ();
-
-    /***********************************************************
-    ***********************************************************/
-    public AbstractCredentials get_credentials () override;
-
-    /***********************************************************
-    ***********************************************************/
-    public void initialize_page () override;
-    public void cleanup_page () override;
-    public int next_id () override;
-    public void connected ();
+class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
 
 
     /***********************************************************
     ***********************************************************/
-    public bool is_complete () override;
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_poll_now ();
-
-
-    public void on_style_changed ();
-
-signals:
-    void connect_to_oc_url (string );
-    void poll_now ();
-    void style_changed ();
+    public string user;
+    public string app_password;
 
 
     /***********************************************************
     ***********************************************************/
-    public string this.user;
-    public string this.app_password;
+    private Flow2AuthWidget flow_2_auth_widget = null;
+    private QVBoxLayout layout = null;
+
+
+    signal void connect_to_oc_url (string value);
+    signal void poll_now ();
+    signal void style_changed ();
 
 
     /***********************************************************
     ***********************************************************/
-    private Flow2AuthWidget this.flow_2_auth_widget = null;
-    private QVBoxLayout this.layout = null;
-}
-
-    Flow2Auth_creds_page.Flow2Auth_creds_page ()
-        : Abstract_credentials_wizard_page () {
+    public Flow2AuthCredsPage () {
+        base ();
         this.layout = new QVBoxLayout (this);
 
         this.flow_2_auth_widget = new Flow2AuthWidget ();
         this.layout.add_widget (this.flow_2_auth_widget);
 
-        connect (this.flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &Flow2Auth_creds_page.on_flow_2_auth_result);
+        connect (this.flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &Flow2AuthCredsPage.on_flow_2_auth_result);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &Flow2Auth_creds_page.style_changed, this.flow_2_auth_widget, &Flow2AuthWidget.on_style_changed);
+        connect (this, &Flow2AuthCredsPage.style_changed, this.flow_2_auth_widget, &Flow2AuthWidget.on_style_changed);
 
         // allow Flow2 page to poll on window activation
-        connect (this, &Flow2Auth_creds_page.poll_now, this.flow_2_auth_widget, &Flow2AuthWidget.on_poll_now);
+        connect (this, &Flow2AuthCredsPage.poll_now, this.flow_2_auth_widget, &Flow2AuthWidget.on_poll_now);
     }
 
-    void Flow2Auth_creds_page.initialize_page () {
+
+    /***********************************************************
+    ***********************************************************/
+    public AbstractCredentials get_credentials () {
+        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+        //  Q_ASSERT (oc_wizard);
+        return new WebFlowCredentials (
+                    this.user,
+                    this.app_password,
+                    oc_wizard.client_ssl_certificate,
+                    oc_wizard.client_ssl_key,
+                    oc_wizard.client_ssl_ca_certificates
+        );
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void initialize_page () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         //  Q_ASSERT (oc_wizard);
         oc_wizard.account ().credentials (CredentialsFactory.create ("http"));
@@ -99,7 +82,10 @@ signals:
         this.flow_2_auth_widget.on_style_changed ();
     }
 
-    void Occ.Flow2Auth_creds_page.cleanup_page () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void clean_up_page () {
         // The next or back button was activated, show the wizard again
         wizard ().show ();
         if (this.flow_2_auth_widget)
@@ -110,9 +96,36 @@ signals:
         this.user.clear ();
     }
 
-    void Flow2Auth_creds_page.on_flow_2_auth_result (Flow2Auth.Result r, string error_string, string user, string app_password) {
+
+    /***********************************************************
+    ***********************************************************/
+    public int next_id () {
+        return WizardCommon.Pages.PAGE_ADVANCED_SETUP;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void connected () {
+        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+        //  Q_ASSERT (oc_wizard);
+
+        // bring wizard to top
+        oc_wizard.bring_to_top ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool is_complete () {
+        return false; /* We can never go forward manually */
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_flow_2_auth_result (Flow2Auth.Result result, string error_string, string user, string app_password) {
         //  Q_UNUSED (error_string)
-        switch (r) {
+        switch (result) {
         case Flow2Auth.NotSupported: {
             /* Flow2Auth not supported (can't open browser) */
             wizard ().show ();
@@ -139,41 +152,20 @@ signals:
         }
     }
 
-    int Flow2Auth_creds_page.next_id () {
-        return WizardCommon.Page_Advanced_setup;
-    }
-
-    void Flow2Auth_creds_page.connected () {
-        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-        //  Q_ASSERT (oc_wizard);
-
-        // bring wizard to top
-        oc_wizard.bring_to_top ();
-    }
-
-    AbstractCredentials *Flow2Auth_creds_page.get_credentials () {
-        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-        //  Q_ASSERT (oc_wizard);
-        return new WebFlowCredentials (
-                    this.user,
-                    this.app_password,
-                    oc_wizard.client_ssl_certificate,
-                    oc_wizard.client_ssl_key,
-                    oc_wizard.client_ssl_ca_certificates
-        );
-    }
-
-    bool Flow2Auth_creds_page.is_complete () {
-        return false; /* We can never go forward manually */
-    }
-
-    void Flow2Auth_creds_page.on_poll_now () {
+    /***********************************************************
+    ***********************************************************/
+    public void on_poll_now () {
         /* emit */ poll_now ();
     }
 
-    void Flow2Auth_creds_page.on_style_changed () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_style_changed () {
         /* emit */ style_changed ();
     }
 
-    } // namespace Occ
-    
+} // class Flow2AuthCredsPage
+
+} // namespace Ui
+} // namespace Occ

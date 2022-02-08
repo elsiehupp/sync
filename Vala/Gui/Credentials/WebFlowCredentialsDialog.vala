@@ -1,7 +1,7 @@
 
 //  #include <Gtk.Dialog>
 //  #include <QVBoxLayout>
-//  #include <QLabel>
+//  #include <Gtk.Label>
 
 namespace Occ {
 namespace Ui {
@@ -67,8 +67,8 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private QLabel this.error_label;
-    private QLabel this.info_label;
+    private Gtk.Label this.error_label;
+    private Gtk.Label this.info_label;
     private QVBoxLayout this.layout;
     private QVBoxLayout this.container_layout;
     private HeaderBanner this.header_banner;
@@ -93,7 +93,7 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flo
     this.container_layout.spacing (spacing);
     this.container_layout.margin (margin);
 
-    this.info_label = new QLabel ();
+    this.info_label = new Gtk.Label ();
     this.info_label.alignment (Qt.AlignCenter);
     this.container_layout.add_widget (this.info_label);
 
@@ -122,7 +122,7 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flo
     var app = static_cast<Application> (Gtk.Application);
     connect (app, &Application.is_showing_settings_dialog, this, &WebFlowCredentialsDialog.on_show_settings_dialog);
 
-    this.error_label = new QLabel ();
+    this.error_label = new Gtk.Label ();
     this.error_label.hide ();
     this.container_layout.add_widget (this.error_label);
 

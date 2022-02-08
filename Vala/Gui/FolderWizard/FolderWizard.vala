@@ -11,7 +11,7 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 //  #include <QFile_icon_provider>
 //  #include <QInputDialog>
 //  #include <QValidator>
-//  #include <QWizard_page>
+//  #include <QWizardPage>
 //  #include <QTree_widget>
 //  #include <QVBoxLayout>
 //  #include <QEvent>

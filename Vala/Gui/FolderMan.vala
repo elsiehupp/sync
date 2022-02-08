@@ -909,7 +909,7 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
         return null;
     }
 
-    // cut off the leading slash, o_c_url always has a trailing.
+    // cut off the leading slash, oc_url always has a trailing.
     if (target_path.starts_with ('/')) {
         target_path.remove (0, 1);
     }

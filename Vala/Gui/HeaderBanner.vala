@@ -95,7 +95,7 @@ https://www.gnu.org/licenses/gpl-3.0.html.
 
 //  #include <Gtk.Widget>
 //  #include <QVBoxLayout>
-//  #include <QLabel>
+//  #include <Gtk.Label>
 //  #include <QPainte
 //  #include <QStyle>
 //  #include <QGuiApplication>
@@ -115,13 +115,13 @@ class HeaderBanner : Gtk.Widget {
                const Qt.Text_format title_format, string style_sheet);
 
 
-    protected void paint_event (QPaint_event event) override;
+    protected void paint_event (QPaintEvent event) override;
 
 
     /***********************************************************
     ***********************************************************/
-    private QLabel title_label;
-    private QLabel logo_label;
+    private Gtk.Label title_label;
+    private Gtk.Label logo_label;
     private QGrid_layout layout;
     private QPixmap banner_pixmap;
 }
@@ -134,11 +134,11 @@ class HeaderBanner : Gtk.Widget {
 
     HeaderBanner.HeaderBanner (Gtk.Widget parent)
         : Gtk.Widget (parent) {
-        size_policy (QSize_policy.Expanding, QSize_policy.Fixed);
+        size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
         background_role (QPalette.Base);
-        title_label = new QLabel (this);
+        title_label = new Gtk.Label (this);
         title_label.background_role (QPalette.Base);
-        logo_label = new QLabel (this);
+        logo_label = new Gtk.Label (this);
         QFont font = title_label.font ();
         font.bold (true);
         title_label.font (font);
@@ -186,7 +186,7 @@ class HeaderBanner : Gtk.Widget {
         update_geometry ();
     }
 
-    void HeaderBanner.paint_event (QPaint_event * /* event */) {
+    void HeaderBanner.paint_event (QPaintEvent * /* event */) {
         QPainter painter (this);
         painter.draw_pixmap (0, 0, width (), banner_pixmap.height (), banner_pixmap);
         int x = width () - 2;

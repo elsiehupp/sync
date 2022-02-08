@@ -13,7 +13,7 @@ namespace Ui {
 @brief The Folder_wizard_selective_sync class
 @ingroup gui
 ***********************************************************/
-class Folder_wizard_selective_sync : QWizard_page {
+class Folder_wizard_selective_sync : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
@@ -26,7 +26,7 @@ class Folder_wizard_selective_sync : QWizard_page {
     /***********************************************************
     ***********************************************************/
     public void initialize_page () override;
-    public void cleanup_page () override;
+    public void clean_up_page () override;
 
 
     /***********************************************************
@@ -96,7 +96,7 @@ class Folder_wizard_selective_sync : QWizard_page {
             //
         }
 
-        QWizard_page.initialize_page ();
+        QWizardPage.initialize_page ();
     }
 
     bool Folder_wizard_selective_sync.validate_page () {
@@ -115,13 +115,13 @@ class Folder_wizard_selective_sync : QWizard_page {
         return true;
     }
 
-    void Folder_wizard_selective_sync.cleanup_page () {
+    void Folder_wizard_selective_sync.clean_up_page () {
         string target_path = wizard ().property ("target_path").to_string ();
         string alias = QFileInfo (target_path).filename ();
         if (alias.is_empty ())
             alias = Theme.instance ().app_name ();
         this.selective_sync.folder_info (target_path, alias);
-        QWizard_page.cleanup_page ();
+        QWizardPage.clean_up_page ();
     }
 
     void Folder_wizard_selective_sync.on_virtual_files_checkbox_clicked () {

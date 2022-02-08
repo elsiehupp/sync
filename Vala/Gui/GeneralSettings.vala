@@ -275,7 +275,7 @@ void General_settings.on_update_info () {
         Theme.replace_link_color_string_background_aware (status);
 
         this.ui.update_state_label.open_external_links (false);
-        connect (this.ui.update_state_label, &QLabel.link_activated, this, [] (string link) {
+        connect (this.ui.update_state_label, &Gtk.Label.link_activated, this, [] (string link) {
             Utility.open_browser (GLib.Uri (link));
         });
         this.ui.update_state_label.on_text (status);

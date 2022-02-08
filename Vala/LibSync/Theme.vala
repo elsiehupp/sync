@@ -1008,10 +1008,10 @@ class Theme : GLib.Object {
 
     /***********************************************************
     @brief Return the colour to be used for HTML links (e.g.
-    used in QLabel), based on the current app palette or given
+    used in Gtk.Label), based on the current app palette or given
     colour (Dark-/Light-Mode switching).
     @brief Return the colour to be used for HTML links (e.g.
-    used in QLabel), based on the current app palette
+    used in Gtk.Label), based on the current app palette
     (Dark-/Light-Mode switching).
 
     @return Background-aware colour for HTML links, based on

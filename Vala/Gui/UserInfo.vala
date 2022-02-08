@@ -23,7 +23,7 @@ It is typically owned by the Account_setting page.
 The user info and quota is r
  - This object is active via active () (typically if the settings page is visible.)
  - The account is connected.
- - Every 30 seconds (default_interval_t) or 5 seconds in case of failure (fail_interval_t)
+ - Every 30 seconds (DEFAULT_INTERVAL_T) or 5 seconds in case of failure (FAIL_INTERVAL_T)
 
 We only request the info when the UI is visible otherwise this might slow down the server with
 too many requests.
@@ -55,9 +55,54 @@ Here follows the state machine
 ***********************************************************/
 class UserInfo : GLib.Object {
 
+    const int DEFAULT_INTERVAL_T = 30 * 1000;
+    const int FAIL_INTERVAL_T = 5 * 1000;
+
     /***********************************************************
     ***********************************************************/
-    public UserInfo (Occ.AccountState account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object parent = new GLib.Object ());
+    private QPointer<AccountState> this.account_state;
+    private bool this.allow_disconnected_account_state;
+    private bool this.fetch_avatar_image;
+
+    /***********************************************************
+    ***********************************************************/
+    private int64 this.last_quota_total_bytes;
+    private int64 this.last_quota_used_bytes;
+    private QTimer this.job_restart_timer;
+    /***********************************************************
+    The time at which the user info and quota was received last
+    ***********************************************************/
+    private GLib.DateTime this.last_info_received;
+    /***********************************************************
+    If we should check at regular interval (when the UI is visible)
+    ***********************************************************/
+    private bool this.active;
+    /***********************************************************
+    The currently running job
+    ***********************************************************/
+    private QPointer<JsonApiJob> this.job;
+
+
+    signal void quota_updated (int64 total, int64 used);
+    signal void fetched_last_info (UserInfo user_info);
+
+
+    /***********************************************************
+    ***********************************************************/
+    public UserInfo (Occ.AccountState account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        this.account_state = account_state;
+        this.allow_disconnected_account_state = allow_disconnected_account_state;
+        this.fetch_avatar_image = fetch_avatar_image;
+        this.last_quota_total_bytes = 0;
+        this.last_quota_used_bytes = 0;
+        this.active = false;
+        connect (account_state, &AccountState.state_changed,
+            this, &UserInfo.on_account_state_changed);
+        connect (&this.job_restart_timer, &QTimer.timeout, this, &UserInfo.on_fetch_info);
+        this.job_restart_timer.single_shot (true);
+    }
+
 
     /***********************************************************
     ***********************************************************/
@@ -78,104 +123,15 @@ class UserInfo : GLib.Object {
     When setting it to active it will request the quota immediately if the last time
     the quota was requested was more than the interval
     ***********************************************************/
-    public void active (bool active);
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_fetch_info ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_update_last_info (QJsonDocument json);
-    private void on_account_state_changed ();
-    private void on_request_failed ();
-    private void on_avatar_image (QImage img);
-
-signals:
-    void quota_updated (int64 total, int64 used);
-    void fetched_last_info (UserInfo user_info);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private bool can_get_info ();
-
-    /***********************************************************
-    ***********************************************************/
-    private QPointer<AccountState> this.account_state;
-    private bool this.allow_disconnected_account_state;
-    private bool this.fetch_avatar_image;
-
-    /***********************************************************
-    ***********************************************************/
-    private int64 this.last_quota_total_bytes;
-    private int64 this.last_quota_used_bytes;
-    private QTimer this.job_restart_timer;
-    private GLib.DateTime this.last_info_received; // the time at which the user info and quota was received last
-    private bool this.active; // if we should check at regular interval (when the UI is visible)
-    private QPointer<JsonApiJob> this.job; // the currently running job
-}
-
-
-
-    namespace {
-        const int default_interval_t = 30 * 1000;
-        const int fail_interval_t = 5 * 1000;
-    }
-
-    UserInfo.UserInfo (AccountState account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object parent)
-        : GLib.Object (parent)
-        this.account_state (account_state)
-        this.allow_disconnected_account_state (allow_disconnected_account_state)
-        this.fetch_avatar_image (fetch_avatar_image)
-        this.last_quota_total_bytes (0)
-        this.last_quota_used_bytes (0)
-        this.active (false) {
-        connect (account_state, &AccountState.state_changed,
-            this, &UserInfo.on_account_state_changed);
-        connect (&this.job_restart_timer, &QTimer.timeout, this, &UserInfo.on_fetch_info);
-        this.job_restart_timer.single_shot (true);
-    }
-
-    void UserInfo.active (bool active) {
+    public void active (bool active) {
         this.active = active;
         on_account_state_changed ();
     }
 
-    void UserInfo.on_account_state_changed () {
-        if (can_get_info ()) {
-            // Obviously assumes there will never be more than thousand of hours between last info
-            // received and now, hence why we static_cast
-            var elapsed = static_cast<int> (this.last_info_received.msecs_to (GLib.DateTime.current_date_time ()));
-            if (this.last_info_received.is_null () || elapsed >= default_interval_t) {
-                on_fetch_info ();
-            } else {
-                this.job_restart_timer.on_start (default_interval_t - elapsed);
-            }
-        } else {
-            this.job_restart_timer.stop ();
-        }
-    }
 
-    void UserInfo.on_request_failed () {
-        this.last_quota_total_bytes = 0;
-        this.last_quota_used_bytes = 0;
-        this.job_restart_timer.on_start (fail_interval_t);
-    }
-
-    bool UserInfo.can_get_info () {
-        if (!this.account_state || !this.active) {
-            return false;
-        }
-        AccountPointer account = this.account_state.account ();
-        return (this.account_state.is_connected () || this.allow_disconnected_account_state)
-            && account.credentials ()
-            && account.credentials ().ready ();
-    }
-
-    void UserInfo.on_fetch_info () {
+    /***********************************************************
+    ***********************************************************/
+    public void on_fetch_info () {
         if (!can_get_info ()) {
             return;
         }
@@ -193,7 +149,10 @@ signals:
         this.job.on_start ();
     }
 
-    void UserInfo.on_update_last_info (QJsonDocument json) {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_update_last_info (QJsonDocument json) {
         var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
 
         AccountPointer account = this.account_state.account ();
@@ -219,7 +178,7 @@ signals:
             /* emit */ quota_updated (this.last_quota_total_bytes, this.last_quota_used_bytes);
         }
 
-        this.job_restart_timer.on_start (default_interval_t);
+        this.job_restart_timer.on_start (DEFAULT_INTERVAL_T);
         this.last_info_received = GLib.DateTime.current_date_time ();
 
         // Avatar Image
@@ -233,11 +192,57 @@ signals:
             /* emit */ fetched_last_info (this);
     }
 
-    void UserInfo.on_avatar_image (QImage img) {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_account_state_changed () {
+        if (can_get_info ()) {
+            // Obviously assumes there will never be more than thousand of hours between last info
+            // received and now, hence why we static_cast
+            var elapsed = static_cast<int> (this.last_info_received.msecs_to (GLib.DateTime.current_date_time ()));
+            if (this.last_info_received.is_null () || elapsed >= DEFAULT_INTERVAL_T) {
+                on_fetch_info ();
+            } else {
+                this.job_restart_timer.on_start (DEFAULT_INTERVAL_T - elapsed);
+            }
+        } else {
+            this.job_restart_timer.stop ();
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_request_failed () {
+        this.last_quota_total_bytes = 0;
+        this.last_quota_used_bytes = 0;
+        this.job_restart_timer.on_start (FAIL_INTERVAL_T);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_avatar_image (QImage img) {
         this.account_state.account ().avatar (img);
 
         /* emit */ fetched_last_info (this);
     }
 
-    } // namespace Occ
+
+    /***********************************************************
+    ***********************************************************/
+    private bool can_get_info () {
+        if (!this.account_state || !this.active) {
+            return false;
+        }
+        AccountPointer account = this.account_state.account ();
+        return (this.account_state.is_connected () || this.allow_disconnected_account_state)
+            && account.credentials ()
+            && account.credentials ().ready ();
+    }
+
+} // class UserInfo
+
+} // namespace Ui
+} // namespace Occ
     

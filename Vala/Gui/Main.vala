@@ -42,7 +42,7 @@ int main (int argc, char **argv) {
 
     qml_register_type<Sync_status_summary> ("com.nextcloud.desktopclient", 1, 0, "Sync_status_summary");
     qml_register_type<EmojiModel> ("com.nextcloud.desktopclient", 1, 0, "EmojiModel");
-    qml_register_type<User_status_selector_model> ("com.nextcloud.desktopclient", 1, 0, "User_status_selector_model");
+    qml_register_type<UserStatusSelectorModel> ("com.nextcloud.desktopclient", 1, 0, "UserStatusSelectorModel");
     qml_register_type<Occ.ActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "ActivityListModel");
     qml_register_type<Occ.FileActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "FileActivityListModel");
     qml_register_uncreatable_type<Occ.Unified_search_results_list_model> (

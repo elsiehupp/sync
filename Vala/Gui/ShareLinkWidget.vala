@@ -17,7 +17,7 @@ Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 //  #include <Gtk.Dialog
 //  #include <QToolBu
 //  #include <QHBox_layo
-//  #include <QLabel>
+//  #include <Gtk.Label>
 //  #include <QLineEdit>
 //  #include <QWidget_action>
 
@@ -144,7 +144,7 @@ signals:
     private void toggle_password_options (bool enable = true);
     private void toggle_note_options (bool enable = true);
     private void toggle_expire_date_options (bool enable = true);
-    private void toggle_button_animation (QToolButton button, QProgress_indicator progress_indicator, QAction checked_action);
+    private void toggle_button_animation (QToolButton button, QProgressIndicator progress_indicator, QAction checked_action);
 
 
     /***********************************************************
@@ -189,11 +189,11 @@ signals:
     QAction this.add_another_link_action;
     QAction this.note_link_action;
     QHBox_layout this.share_link_layout{};
-    QLabel this.share_link_label{};
+    Gtk.Label this.share_link_label{};
     ElidedLabel this.share_link_elided_label{};
     QLineEdit this.share_link_edit{};
     QToolButton this.share_link_button{};
-    QProgress_indicator this.share_link_progress_indicator{};
+    QProgressIndicator this.share_link_progress_indicator{};
     Gtk.Widget this.share_link_default_widget{};
     QWidget_action this.share_link_widget_action{};
 }
@@ -288,7 +288,7 @@ void Share_link_widget.on_toggle_share_link_animation (bool on_start) {
     }
 }
 
-void Share_link_widget.toggle_button_animation (QToolButton button, QProgress_indicator progress_indicator, QAction checked_action) {
+void Share_link_widget.toggle_button_animation (QToolButton button, QProgressIndicator progress_indicator, QAction checked_action) {
     var on_start_animation = false;
     const var action_is_checked = checked_action.is_checked ();
     if (!progress_indicator.is_animated () && action_is_checked) {
@@ -363,7 +363,7 @@ void Share_link_widget.setup_ui_options () {
 
     this.share_link_layout = new QHBox_layout (this);
 
-    this.share_link_label = new QLabel (this);
+    this.share_link_label = new Gtk.Label (this);
     this.share_link_label.pixmap (string (":/client/theme/black/edit.svg"));
     this.share_link_layout.add_widget (this.share_link_label);
 
@@ -379,7 +379,7 @@ void Share_link_widget.setup_ui_options () {
     this.share_link_button.tool_button_style (Qt.Tool_button_icon_only);
     this.share_link_layout.add_widget (this.share_link_button);
 
-    this.share_link_progress_indicator = new QProgress_indicator (this);
+    this.share_link_progress_indicator = new QProgressIndicator (this);
     this.share_link_progress_indicator.visible (false);
     this.share_link_layout.add_widget (this.share_link_progress_indicator);
 
@@ -561,7 +561,7 @@ void Share_link_widget.on_start_animation (int on_start, int end) {
     connect (animation, &QAbstractAnimation.on_finished, this, &Share_link_widget.on_animation_finished);
     if (end < on_start) // that is to remove the widget, not to show it
         connect (animation, &QAbstractAnimation.on_finished, this, &Share_link_widget.on_delete_animation_finished);
-    connect (animation, &QVariant_animation.value_changed, this, &Share_link_widget.resize_requested);
+    connect (animation, &QVariantAnimation.value_changed, this, &Share_link_widget.resize_requested);
 
     animation.on_start ();
 }

@@ -150,7 +150,7 @@ class AccountSettings : Gtk.Widget {
             this, &AccountSettings.on_folder_list_clicked);
         connect (this.ui.folder_list, &QTreeView.expanded, this, &AccountSettings.on_refresh_selective_sync_status);
         connect (this.ui.folder_list, &QTreeView.collapsed, this, &AccountSettings.on_refresh_selective_sync_status);
-        connect (this.ui.selective_sync_notification, &QLabel.link_activated,
+        connect (this.ui.selective_sync_notification, &Gtk.Label.link_activated,
             this, &AccountSettings.on_link_activated);
         connect (this.model, &FolderStatusModel.suggest_expand, this.ui.folder_list, &QTreeView.expand);
         connect (this.model, &FolderStatusModel.dirty_changed, this, &AccountSettings.on_refresh_selective_sync_status);

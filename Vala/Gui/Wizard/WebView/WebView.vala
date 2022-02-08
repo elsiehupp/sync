@@ -1,19 +1,19 @@
 
 
 //  #include <Gtk.Widget>
-//  #include <QWeb_engine_page>
-//  #include <QWeb_engine_profile>
-//  #include <QWeb_engine_url_request_interceptor>
-//  #include <QWeb_engine_url_request_job>
+//  #include <QWebEnginePage>
+//  #include <QWebEngineProfile>
+//  #include <QWebEngineUrlRequestInterceptor>
+//  #include <QWebEngineUrlRequestJob>
 //  #includeVERSION >= 0x051200
-//  #include <QWeb_engine_url_scheme>
+//  #include <QWebEngineUrlScheme>
 //  #include <QWeb_engine_url_s
 //  #include <QWeb_engine_v
 //  #include <QDesktopServices>
 //  #include <QProgres
 //  #include <QLoggingCategory>
 //  #include <QLocale>
-//  #include <QWeb_engine_certificate_error>
+//  #include <QWebEngineCertificateError>
 //  #include <QMessageBox>
 
 namespace Occ {
@@ -23,96 +23,91 @@ class WebView : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public WebView (Gtk.Widget parent = null);
-    ~WebView () override;
-    public void url (GLib.Uri url);
-
-signals:
-    void on_url_catched (string user, string pass, string host);
-
+    private UiWebView ui;
 
     /***********************************************************
     ***********************************************************/
-    private Ui_Web_view this.ui;
+    private QWebEngineView webview;
+    private QWebEngineProfile profile;
+    private WebEnginePage page;
 
     /***********************************************************
     ***********************************************************/
-    private QWeb_engine_view this.webview;
-    private QWeb_engine_profile this.profile;
-    private Web_engine_page this.page;
+    private WebViewPageUrlRequestInterceptor interceptor;
+    private WebViewPageUrlSchemeHandler scheme_handler;
+
+    signal void on_url_catched (string user, string pass, string host);
 
     /***********************************************************
     ***********************************************************/
-    private Web_view_page_url_request_interceptor this.interceptor;
-    private Web_view_page_url_scheme_handler this.scheme_handler;
-}
+    public WebView (Gtk.Widget parent = null) {
+        base (parent);
+        this.ui ();
+        this.ui.up_ui (this);
+    //  #if QT_VERSION >= 0x051200
+        QWebEngineUrlScheme this.ncsheme ("nc");
+        QWebEngineUrlScheme.register_scheme (this.ncsheme);
+    //  #endif
+        this.webview = new QWebEngineView (this);
+        this.profile = new QWebEngineProfile (this);
+        this.page = new WebEnginePage (this.profile);
+        this.interceptor = new WebViewPageUrlRequestInterceptor (this);
+        this.scheme_handler = new WebViewPageUrlSchemeHandler (this);
+
+        const string user_agent (Utility.user_agent_string ());
+        this.profile.http_user_agent (user_agent);
+        QWebEngineProfile.default_profile ().http_user_agent (user_agent);
+        this.profile.request_interceptor (this.interceptor);
+        this.profile.install_url_scheme_handler ("nc", this.scheme_handler);
 
 
-
-
-
-WebView.WebView (Gtk.Widget parent)
-    : Gtk.Widget (parent),
-      this.ui () {
-    this.ui.up_ui (this);
-#if QT_VERSION >= 0x051200
-    QWeb_engine_url_scheme this.ncsheme ("nc");
-    QWeb_engine_url_scheme.register_scheme (this.ncsheme);
-//  #endif
-    this.webview = new QWeb_engine_view (this);
-    this.profile = new QWeb_engine_profile (this);
-    this.page = new Web_engine_page (this.profile);
-    this.interceptor = new Web_view_page_url_request_interceptor (this);
-    this.scheme_handler = new Web_view_page_url_scheme_handler (this);
-
-    const string user_agent (Utility.user_agent_string ());
-    this.profile.http_user_agent (user_agent);
-    QWeb_engine_profile.default_profile ().http_user_agent (user_agent);
-    this.profile.request_interceptor (this.interceptor);
-    this.profile.install_url_scheme_handler ("nc", this.scheme_handler);
-
-
-    /***********************************************************
-    Set a proper accept langauge to the language of the client
-    code from : http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection
-    ***********************************************************/ {
-        string system_locale = QLocale.system ().name ().replace (char.from_latin1 ('_'),char.from_latin1 ('-'));
-        string accept_language;
-        if (system_locale == QLatin1String ("C")) {
-            accept_language = string.from_latin1 ("en,*");
-        } else if (system_locale.starts_with (QLatin1String ("en-"))) {
-            accept_language = system_locale + QLatin1String (",*");
-        } else {
-            accept_language = system_locale + QLatin1String (",en,*");
+        /***********************************************************
+        Set a proper accept langauge to the language of the client
+        code from : http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection
+        ***********************************************************/ {
+            string system_locale = QLocale.system ().name ().replace (char.from_latin1 ('_'),char.from_latin1 ('-'));
+            string accept_language;
+            if (system_locale == QLatin1String ("C")) {
+                accept_language = string.from_latin1 ("en,*");
+            } else if (system_locale.starts_with (QLatin1String ("en-"))) {
+                accept_language = system_locale + QLatin1String (",*");
+            } else {
+                accept_language = system_locale + QLatin1String (",en,*");
+            }
+            this.profile.http_accept_language (accept_language);
         }
-        this.profile.http_accept_language (accept_language);
+
+        this.webview.page (this.page);
+        this.ui.vertical_layout.add_widget (this.webview);
+
+        connect (this.webview, &QWebEngineView.load_progress, this.ui.progress_bar, &QProgressBar.value);
+        connect (this.scheme_handler, &WebViewPageUrlSchemeHandler.on_url_catched, this, &WebView.on_url_catched);
     }
 
-    this.webview.page (this.page);
-    this.ui.vertical_layout.add_widget (this.webview);
 
-    connect (this.webview, &QWeb_engine_view.load_progress, this.ui.progress_bar, &QProgressBar.value);
-    connect (this.scheme_handler, &Web_view_page_url_scheme_handler.on_url_catched, this, &WebView.on_url_catched);
-}
-
-void WebView.url (GLib.Uri url) {
-    this.page.url (url);
-}
-
-WebView.~WebView () {
     /***********************************************************
-    The Qt implmentation deletes children in the order they are added to the
-    object tree, so in this case this.page is deleted after this.profile, which
-    violates the assumption that this.profile should exist longer than
-    this.page [1]. Here I delete this.page manually so that this.profile can be safely
-    deleted later.
-
-    [1] https://doc.qt.io/qt-5/qwebenginepage.html#QWeb_engine_page-1
     ***********************************************************/
-    delete this.page;
-}
+    ~WebView () {
+        /***********************************************************
+        The Qt implmentation deletes children in the order they are added to the
+        object tree, so in this case this.page is deleted after this.profile, which
+        violates the assumption that this.profile should exist longer than
+        this.page [1]. Here I delete this.page manually so that this.profile can be safely
+        deleted later.
+
+        [1] https://doc.qt.io/qt-5/qwebenginepage.html#QWebEnginePage-1
+        ***********************************************************/
+        delete this.page;
+    }
 
 
-}
+    /***********************************************************
+    ***********************************************************/
+    public void url (GLib.Uri url) {
+        this.page.url (url);
+    }
 
-#include "webview.moc"
+} // class WebView
+
+} // namespace Ui
+} // namespace Occ

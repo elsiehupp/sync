@@ -8,7 +8,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <Qt_network>
 //  #include <QSslConfiguration>
 //  #include <QWidget_action>
-//  #include <QLabel>
+//  #include <Gtk.Label>
 //  #include <QToolButt
 //  #include <QPointer>
 //  #include <QSsl>
@@ -157,8 +157,8 @@ class Ssl_button : QToolButton {
         }
 
         // create label first
-        var label = new QLabel (parent);
-        label.style_sheet (QLatin1String ("QLabel { padding : 8px; }"));
+        var label = new Gtk.Label (parent);
+        label.style_sheet (QLatin1String ("Gtk.Label { padding : 8px; }"));
         label.text_format (Qt.RichText);
         label.on_text (details);
 

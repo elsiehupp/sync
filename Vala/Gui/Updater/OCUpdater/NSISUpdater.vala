@@ -154,10 +154,10 @@ class NSISUpdater : OCUpdater {
 
         msg_box.window_title (_("New Version Available"));
 
-        var ico = new QLabel;
+        var ico = new Gtk.Label;
         ico.fixed_size (icon_size, icon_size);
         ico.pixmap (info_icon.pixmap (icon_size));
-        var lbl = new QLabel;
+        var lbl = new Gtk.Label;
         string txt = _("<p>A new version of the %1 Client is available.</p>"
                          "<p><b>%2</b> is available for download. The installed version is %3.</p>")
                           .arg (Utility.escape (Theme.instance ().app_name_gui ()),
@@ -203,10 +203,10 @@ class NSISUpdater : OCUpdater {
 
         msg_box.window_title (_("Update Failed"));
 
-        var ico = new QLabel;
+        var ico = new Gtk.Label;
         ico.fixed_size (icon_size, icon_size);
         ico.pixmap (info_icon.pixmap (icon_size));
-        var lbl = new QLabel;
+        var lbl = new Gtk.Label;
         string txt = _("<p>A new version of the %1 Client is available but the updating process failed.</p>"
                          "<p><b>%2</b> has been downloaded. The installed version is %3. If you confirm restart and update, your computer may reboot to complete the installation.</p>")
                           .arg (Utility.escape (Theme.instance ().app_name_gui ()),

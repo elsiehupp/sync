@@ -8,7 +8,7 @@
 //  #include <QTimer>
 //  #include <Gtk.Dialog>
 //  #include <QVBoxLayout>
-//  #include <QLabel>
+//  #include <Gtk.Label>
 
 #ifdef WITH_WEBENGINE
 //  #endif // WITH_WEBENGINE

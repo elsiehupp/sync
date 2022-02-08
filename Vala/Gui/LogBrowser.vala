@@ -23,7 +23,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <Gtk.Dialog>
 //  #include <QLineEdit>
 //  #include <QPushButton>
-//  #include <QLabel>
+//  #include <Gtk.Label>
 
 namespace Occ {
 namespace Ui {
@@ -56,7 +56,7 @@ protected slots:
 
         var main_layout = new QVBoxLayout;
 
-        var label = new QLabel (
+        var label = new Gtk.Label (
             _("The client can write debug logs to a temporary folder. "
                "These logs are very helpful for diagnosing problems.\n"
                "Since log files can get large, the client will on_start a new one for each sync "
@@ -66,7 +66,7 @@ protected slots:
             .arg (Logger.instance ().temporary_folder_log_dir_path ()));
         label.word_wrap (true);
         label.text_interaction_flags (Qt.Text_selectable_by_mouse);
-        label.size_policy (QSize_policy.Expanding, QSize_policy.Minimum_expanding);
+        label.size_policy (QSizePolicy.Expanding, QSizePolicy.Minimum_expanding);
         main_layout.add_widget (label);
 
         // button to permanently save logs
@@ -76,11 +76,11 @@ protected slots:
         connect (enable_logging_button, &QCheckBox.toggled, this, &Log_browser.toggle_permanent_logging);
         main_layout.add_widget (enable_logging_button);
 
-        label = new QLabel (
+        label = new Gtk.Label (
             _("This setting persists across client restarts.\n"
                "Note that using any logging command line options will override this setting."));
         label.word_wrap (true);
-        label.size_policy (QSize_policy.Expanding, QSize_policy.Minimum_expanding);
+        label.size_policy (QSizePolicy.Expanding, QSizePolicy.Minimum_expanding);
         main_layout.add_widget (label);
 
         var open_folder_button = new QPushButton;

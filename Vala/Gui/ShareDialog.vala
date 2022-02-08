@@ -85,7 +85,7 @@ signals:
     private GLib.List<Share_link_widget> this.link_widget_list;
     private Share_link_widget* this.empty_share_link_widget = null;
     private Share_user_group_widget this.user_group_widget = null;
-    private QProgress_indicator this.progress_indicator = null;
+    private QProgressIndicator this.progress_indicator = null;
 }
 
 
@@ -326,7 +326,7 @@ signals:
         bool can_reshare = this.max_sharing_permissions & Share_permission_share;
 
         if (!can_reshare) {
-            var label = new QLabel (this);
+            var label = new Gtk.Label (this);
             label.on_text (_("The file cannot be shared because it does not have sharing permission."));
             label.word_wrap (true);
             this.ui.vertical_layout.insert_widget (1, label);

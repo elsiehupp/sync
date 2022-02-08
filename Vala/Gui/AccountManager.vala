@@ -410,16 +410,16 @@ class AccountManager : GLib.Object {
                     if (override_url.ends_with ('/')) {
                         override_url.chop (1);
                     }
-                    string o_c_url = o_c_settings.value (QLatin1String (URL_C)).to_string ();
-                    if (o_c_url.ends_with ('/')) {
-                        o_c_url.chop (1);
+                    string oc_url = o_c_settings.value (QLatin1String (URL_C)).to_string ();
+                    if (oc_url.ends_with ('/')) {
+                        oc_url.chop (1);
                     }
 
                     // in case the urls are equal reset the settings object to read from
                     // the own_cloud settings object
-                    GLib.info (lc_account_manager) << "Migrate o_c config if " << o_c_url << " == " << override_url << ":"
-                                             << (o_c_url == override_url ? "Yes" : "No");
-                    if (o_c_url == override_url) {
+                    GLib.info (lc_account_manager) << "Migrate o_c config if " << oc_url << " == " << override_url << ":"
+                                             << (oc_url == override_url ? "Yes" : "No");
+                    if (oc_url == override_url) {
                         settings = std.move (o_c_settings);
                     }
                 }

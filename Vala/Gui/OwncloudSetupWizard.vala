@@ -145,7 +145,7 @@ signals:
         account.credentials (CredentialsFactory.create ("dummy"));
         account.url (Theme.instance ().override_server_url ());
         this.oc_wizard.account (account);
-        this.oc_wizard.oCUrl (account.url ().to_string ());
+        this.oc_wizard.oc_url (account.url ().to_string ());
 
         this.remote_folder = Theme.instance ().default_server_folder ();
         // remote_folder may be empty, which means /
@@ -170,9 +170,9 @@ signals:
         this.oc_wizard.on_remote_folder (this.remote_folder);
 
     #ifdef WITH_PROVIDERS
-        const var start_page = WizardCommon.Page_Welcome;
+        const var start_page = WizardCommon.Pages.PAGE_WELCOME;
     #else // WITH_PROVIDERS
-        const var start_page = WizardCommon.Page_Server_setup;
+        const var start_page = WizardCommon.Pages.PAGE_SERVER_SETUP;
     #endif // WITH_PROVIDERS
         this.oc_wizard.start_id (start_page);
 
@@ -457,10 +457,10 @@ signals:
 
         // bring wizard to top
         this.oc_wizard.bring_to_top ();
-        if (this.oc_wizard.current_id () == WizardCommon.Page_OAuth_creds || this.oc_wizard.current_id () == WizardCommon.Page_Flow2Auth_creds) {
+        if (this.oc_wizard.current_id () == WizardCommon.Pages.PAGE_OAUTH_CREDS || this.oc_wizard.current_id () == WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS) {
             this.oc_wizard.back ();
         }
-        this.oc_wizard.on_display_error (error_msg, this.oc_wizard.current_id () == WizardCommon.Page_Server_setup && check_downgrade_advised (reply));
+        this.oc_wizard.on_display_error (error_msg, this.oc_wizard.current_id () == WizardCommon.Pages.PAGE_SERVER_SETUP && check_downgrade_advised (reply));
     }
 
     bool OwncloudSetupWizard.check_downgrade_advised (Soup.Reply reply) {
@@ -733,7 +733,7 @@ signals:
         // Detach the account that is going to be saved from the
         // wizard to ensure it doesn't accidentally get modified
         // later (such as from running on_cleanup such as
-        // Abstract_credentials_wizard_page.cleanup_page ())
+        // AbstractCredentialsWizardPage.clean_up_page ())
         this.oc_wizard.account (AccountManager.create_account ());
 
         var manager = AccountManager.instance ();

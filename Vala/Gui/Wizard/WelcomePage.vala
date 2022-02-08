@@ -4,70 +4,78 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QWizard_page>
+//  #include <QWizardPage>
 
 namespace Occ {
 namespace Ui {
 
-class Welcome_page : QWizard_page {
+class WelcomePage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public Welcome_page (OwncloudWizard oc_wizard);
-    ~Welcome_page () override;
-    public int next_id () override;
-    public void initialize_page () override;
-    public void login_button_default ();
-
+    private QScopedPointer<Ui.WelcomePage> ui;
 
     /***********************************************************
     ***********************************************************/
-    private void up_ui ();
-    private void customize_style ();
-    private void style_slide_show ();
-    private void setup_slide_show ();
-    private void setup_login_button ();
-    private void setup_create_account_button ();
-    private void setup_host_your_own_server_label ();
+    private OwncloudWizard oc_wizard;
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<Ui.Welcome_page> this.ui;
+    private WizardCommon.Pages next_page = WizardCommon.Pages.PAGE_SERVER_SETUP;
 
     /***********************************************************
     ***********************************************************/
-    private OwncloudWizard this.oc_wizard;
-    private WizardCommon.Pages this.next_page = WizardCommon.Page_Server_setup;
-}
-
-
-    Welcome_page.Welcome_page (OwncloudWizard oc_wizard)
-        : QWizard_page ()
-        this.ui (new Ui.Welcome_page)
-        this.oc_wizard (oc_wizard) {
-        up_ui ();
+    public WelcomePage (OwncloudWizard oc_wizard) {
+        base ();
+        this.ui = new Ui.WelcomePage ()
+        this.oc_wizard = oc_wizard;
+        this.up_ui ();
     }
 
-    Welcome_page.~Welcome_page () = default;
 
-    void Welcome_page.up_ui () {
-        this.ui.up_ui (this);
-        setup_slide_show ();
-        setup_login_button ();
-        setup_create_account_button ();
-        setup_host_your_own_server_label ();
+    /***********************************************************
+    ***********************************************************/
+    public int next_id () {
+        return this.next_page;
     }
 
-    void Welcome_page.initialize_page () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void initialize_page () {
         customize_style ();
     }
 
-    void Welcome_page.login_button_default () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void login_button_default () {
         this.ui.login_button.default (true);
         this.ui.login_button.focus ();
     }
 
-    void Welcome_page.style_slide_show () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void up_ui () {
+        this.ui.up_ui (this);
+        set_up_slide_show ();
+        set_up_login_button ();
+        set_up_create_account_button ();
+        set_up_host_your_own_server_label ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void customize_style () {
+        style_slide_show ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void style_slide_show () {
         const var theme = Theme.instance ();
         const var background_color = palette ().window ().color ();
 
@@ -90,27 +98,36 @@ class Welcome_page : QWizard_page {
         this.ui.slide_show_previous_button.icon (theme.ui_theme_icon (string ("control-prev.svg"), is_dark_background));
     }
 
-    void Welcome_page.setup_slide_show () {
-        connect (this.ui.slide_show, &Slide_show.clicked, this.ui.slide_show, &Slide_show.on_stop_show);
-        connect (this.ui.slide_show_next_button, &QPushButton.clicked, this.ui.slide_show, &Slide_show.on_next_slide);
-        connect (this.ui.slide_show_previous_button, &QPushButton.clicked, this.ui.slide_show, &Slide_show.on_prev_slide);
+
+    /***********************************************************
+    ***********************************************************/
+    private void set_up_slide_show () {
+        connect (this.ui.slide_show, &SlideShow.clicked, this.ui.slide_show, &SlideShow.on_stop_show);
+        connect (this.ui.slide_show_next_button, &QPushButton.clicked, this.ui.slide_show, &SlideShow.on_next_slide);
+        connect (this.ui.slide_show_previous_button, &QPushButton.clicked, this.ui.slide_show, &SlideShow.on_prev_slide);
     }
 
-    void Welcome_page.setup_login_button () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void set_up_login_button () {
         const var app_name = Theme.instance ().app_name_gui ();
 
         this.ui.login_button.on_text (_("Log in to your %1").arg (app_name));
         connect (this.ui.login_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
-            this.next_page = WizardCommon.Page_Server_setup;
+            this.next_page = WizardCommon.Pages.PAGE_SERVER_SETUP;
             this.oc_wizard.next ();
         });
     }
 
-    void Welcome_page.setup_create_account_button () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void set_up_create_account_button () {
     #ifdef WITH_WEBENGINE
         connect (this.ui.create_account_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
             this.oc_wizard.registration (true);
-            this.next_page = WizardCommon.Page_Web_view;
+            this.next_page = WizardCommon.Pages.PAGE_WEB_VIEW;
             this.oc_wizard.next ();
         });
     #else // WITH_WEBENGINE
@@ -121,18 +138,16 @@ class Welcome_page : QWizard_page {
     #endif // WITH_WEBENGINE
     }
 
-    void Welcome_page.setup_host_your_own_server_label () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void set_up_host_your_own_server_label () {
         this.ui.host_your_own_server_label.on_text (_("Host your own server"));
         this.ui.host_your_own_server_label.alignment (Qt.AlignCenter);
         this.ui.host_your_own_server_label.url (GLib.Uri ("https://docs.nextcloud.com/server/latest/admin_manual/installation/#installation"));
     }
 
-    int Welcome_page.next_id () {
-        return this.next_page;
-    }
+} // class WelcomePage
 
-    void Welcome_page.customize_style () {
-        style_slide_show ();
-    }
-    }
-    
+} // namespace Ui
+} // namespace Occ

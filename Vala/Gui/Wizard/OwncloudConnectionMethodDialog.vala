@@ -11,74 +11,77 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Owncloud_connection_method_dialog class
+@brief The OwncloudConnectionMethodDialog class
 @ingroup gui
 ***********************************************************/
-class Owncloud_connection_method_dialog : Gtk.Dialog {
+class OwncloudConnectionMethodDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public Owncloud_connection_method_dialog (Gtk.Widget parent = null);
-    ~Owncloud_connection_method_dialog () override;
-    public enum {
+    public enum Method {
         Closed = 0,
         No_TLS,
         Client_Side_TLS,
         Back
     }
 
-    // The URL that was tried
-    public void url (GLib.Uri );
+
+    /***********************************************************
+    ***********************************************************/
+    private Ui.OwncloudConnectionMethodDialog ui;
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_return_no_tls ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    public void return_back ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private Ui.Owncloud_connection_method_dialog ui;
-}
-
-    Owncloud_connection_method_dialog.Owncloud_connection_method_dialog (Gtk.Widget parent)
-        : Gtk.Dialog (parent, Qt.Customize_window_hint | Qt.Window_title_hint | Qt.Window_close_button_hint | Qt.MSWindows_fixed_size_dialog_hint)
-        , ui (new Ui.Owncloud_connection_method_dialog) {
+    public OwncloudConnectionMethodDialog (Gtk.Widget parent = null) {
+        base (parent, Qt.Customize_window_hint | Qt.Window_title_hint | Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint);
+        , ui (new Ui.OwncloudConnectionMethodDialog) {
         ui.up_ui (this);
 
-        connect (ui.btn_no_tLS, &QAbstractButton.clicked, this, &Owncloud_connection_method_dialog.on_return_no_tls);
-        connect (ui.btn_client_side_tLS, &QAbstractButton.clicked, this, &Owncloud_connection_method_dialog.on_return_client_side_tls);
-        connect (ui.btn_back, &QAbstractButton.clicked, this, &Owncloud_connection_method_dialog.return_back);
+        connect (ui.btn_no_tLS, &QAbstractButton.clicked, this, &OwncloudConnectionMethodDialog.on_return_no_tls);
+        connect (ui.btn_client_side_tLS, &QAbstractButton.clicked, this, &OwncloudConnectionMethodDialog.on_return_client_side_tls);
+        connect (ui.btn_back, &QAbstractButton.clicked, this, &OwncloudConnectionMethodDialog.return_back);
     }
 
-    void Owncloud_connection_method_dialog.url (GLib.Uri url) {
+
+    /***********************************************************
+    ***********************************************************/
+    ~OwncloudConnectionMethodDialog () {
+        delete ui;
+    }
+
+
+    /***********************************************************
+    The URL that was tried
+    ***********************************************************/
+    public void url (GLib.Uri url) {
         ui.label.on_text (_("<html><head/><body><p>Failed to connect to the secure server address <em>%1</em>. How do you wish to proceed?</p></body></html>").arg (url.to_display_"".to_html_escaped ()));
     }
 
-    void Owncloud_connection_method_dialog.on_return_no_tls () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_return_no_tls () {
         on_done (No_TLS);
     }
 
-    void Owncloud_connection_method_dialog.on_return_client_side_tls () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_return_client_side_tls () {
         on_done (Client_Side_TLS);
     }
 
-    void Owncloud_connection_method_dialog.return_back () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void return_back () {
         on_done (Back);
     }
 
-    Owncloud_connection_method_dialog.~Owncloud_connection_method_dialog () {
-        delete ui;
-    }
-    }
+} // class OwncloudConnectionMethodDialog
+
+} // namespace Ui
+} // namespace Occ
+
     

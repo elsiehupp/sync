@@ -1,7 +1,7 @@
 
 
 //  #include <QBox_layout>
-//  #include <QLabel>
+//  #include <Gtk.Label>
 //  #include <account.h>
 //  #include <QMenu>
 //  #include <cstddef>

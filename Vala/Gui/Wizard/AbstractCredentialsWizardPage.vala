@@ -6,24 +6,20 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 //  #include <accountmanager.h>
-//  #include <QWizard_page>
+//  #include <QWizardPage>
 
 namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Abstract_credentials_wizard_page class
+@brief The AbstractCredentialsWizardPage class
 @ingroup gui
 ***********************************************************/
-class Abstract_credentials_wizard_page : QWizard_page {
+class AbstractCredentialsWizardPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public void cleanup_page () override;
-    public virtual AbstractCredentials get_credentials ();
-}
-
-    void Abstract_credentials_wizard_page.cleanup_page () {
+    public void clean_up_page () {
         // Reset the credentials when the 'Back' button is used.
 
         AccountPointer account = static_cast<OwncloudWizard> (wizard ()).account ();
@@ -34,5 +30,12 @@ class Abstract_credentials_wizard_page : QWizard_page {
             }
         }
     }
-}
-    
+
+    /***********************************************************
+    ***********************************************************/
+    public virtual AbstractCredentials get_credentials ();
+
+} // class AbstractCredentialsWizardPage
+
+} // namespace Ui
+} // namespace Occ

@@ -13,7 +13,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QSettings>
 //  #include <QScoped_value_rollback>
 //  #include <QTree_widget_item>
-//  #include <QLabel>
+//  #include <Gtk.Label>
 //  #include <QVBoxLayout>
 
 //  #include <Gtk.Dialog>

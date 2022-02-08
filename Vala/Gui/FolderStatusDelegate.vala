@@ -10,7 +10,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QFile_ico
 //  #include <QPainter>
 //  #include <QApplication>
-//  #include <QMouse_event>
+//  #include <QMouseEvent>
 //  #include <QStyled_item_delegate>
 
 namespace Occ {
@@ -365,7 +365,7 @@ class FolderStatusDelegate : QStyledItemDelegate {
         case QEvent.Mouse_button_press:
         case QEvent.Mouse_move:
             if (var view = qobject_cast<const QAbstractItemView> (option.widget)) {
-                var me = static_cast<QMouse_event> (event);
+                var me = static_cast<QMouseEvent> (event);
                 QModelIndex index;
                 if (me.buttons ()) {
                     index = view.index_at (me.position ());

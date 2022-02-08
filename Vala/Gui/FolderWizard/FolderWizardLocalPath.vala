@@ -23,7 +23,7 @@ class Folder_wizard_local_path : Format_warnings_wizard_page {
     ***********************************************************/
     public bool is_complete () override;
     public void initialize_page () override;
-    public void cleanup_page () override;
+    public void clean_up_page () override;
 
     /***********************************************************
     ***********************************************************/
@@ -70,7 +70,7 @@ protected slots:
         this.ui.warn_label.hide ();
     }
 
-    void Folder_wizard_local_path.cleanup_page () {
+    void Folder_wizard_local_path.clean_up_page () {
         this.ui.warn_label.hide ();
     }
 

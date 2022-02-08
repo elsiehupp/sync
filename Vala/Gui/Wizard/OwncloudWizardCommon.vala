@@ -5,9 +5,9 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QLabel>
+//  #include <Gtk.Label>
 //  #include <QPixmap>
-//  #include <QRadio_button>
+//  #include <QRadioButton>
 //  #include <QAbstractButton>
 //  #include <QCheckBox>
 //  #include <QSpin_box>
@@ -15,32 +15,11 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 namespace Occ {
 namespace Ui {
 
-namespace WizardCommon {
+class WizardCommon {
 
-    void setup_custom_media (GLib.Variant variant, QLabel label);
-    string title_template ();
-    string sub_title_template ();
-    void init_error_label (QLabel error_label);
-    void customize_hint_label (QLabel label);
-
-    enum Sync_mode {
-        Selective_mode,
-        Box_mode
-    }
-
-    enum Pages {
-        Page_Welcome,
-        Page_Server_setup,
-        Page_Http_creds,
-        Page_OAuth_creds,
-        Page_Flow2Auth_creds,
-#ifdef WITH_WEBENGINE
-        Page_Web_view,
-//  #endif // WITH_WEBENGINE
-        Page_Advanced_setup,
-    }
-
-    void setup_custom_media (GLib.Variant variant, QLabel label) {
+    /***********************************************************
+    ***********************************************************/
+    public static void set_up_custom_media (GLib.Variant variant, Gtk.Label label) {
         if (!label)
             return;
 
@@ -60,17 +39,26 @@ namespace WizardCommon {
         }
     }
 
-    string title_template () {
-        return string.from_latin1 (R" (<font color="%1" size="5">)").arg (Theme.instance ().wizard_header_title_color ().name ()) + string.from_latin1 ("%1</font>");
+
+    /***********************************************************
+    ***********************************************************/
+    public static string title_template () {
+        return " (<font color="%1" size="5">)".arg (Theme.instance ().wizard_header_title_color ().name ()) + "%1</font>";
     }
 
-    string sub_title_template () {
-        return string.from_latin1 ("<font color=\"%1\">").arg (Theme.instance ().wizard_header_title_color ().name ()) + string.from_latin1 ("%1</font>");
+
+    /***********************************************************
+    ***********************************************************/
+    public static string sub_title_template () {
+        return "<font color=\"%1\">".arg (Theme.instance ().wizard_header_title_color ().name ()) + "%1</font>";
     }
 
-    void init_error_label (QLabel error_label) {
-        string style = QLatin1String ("border : 1px solid #eed3d7; border-radius : 5px; padding : 3px;"
-                                        "background-color : #f2dede; color : #b94a48;");
+
+    /***********************************************************
+    ***********************************************************/
+    public static void init_error_label (Gtk.Label error_label) {
+        string style = "border : 1px solid #eed3d7; border-radius : 5px; padding : 3px;"
+                     + "background-color : #f2dede; color : #b94a48;";
 
         error_label.style_sheet (style);
         error_label.word_wrap (true);
@@ -80,7 +68,10 @@ namespace WizardCommon {
         error_label.visible (false);
     }
 
-    void customize_hint_label (QLabel label) {
+
+    /***********************************************************
+    ***********************************************************/
+    public static void customize_hint_label (Gtk.Label label) {
         var palette = label.palette ();
         Gtk.Color text_color = palette.color (QPalette.Text);
         text_color.alpha (128);
@@ -88,6 +79,30 @@ namespace WizardCommon {
         label.palette (palette);
     }
 
-} // namespace WizardCommon
 
+    /***********************************************************
+    ***********************************************************/
+    public enum SyncMode {
+        SELECTIVE_MODE,
+        BOX_MODE
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public enum Pages {
+        PAGE_WELCOME,
+        PAGE_SERVER_SETUP,
+        PAGE_HTTP_CREDS,
+        PAGE_OAUTH_CREDS,
+        PAGE_FLOW2AUTH_CREDS,
+//  #ifdef WITH_WEBENGINE
+        PAGE_WEB_VIEW,
+//  #endif WITH_WEBENGINE
+        PAGE_ADVANCED_SETUP,
+    }
+
+} // class WizardCommon
+
+} // namespace Ui
 } // namespace Occ

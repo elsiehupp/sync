@@ -159,7 +159,7 @@ namespace {
     void ConflictDialog.update_widgets () {
         QMimeDatabase mime_database;
 
-        const var update_group = [this, mime_database] (string filename, QLabel link_label, string link_text, QLabel mtime_label, QLabel size_label, QToolButton button) {
+        const var update_group = [this, mime_database] (string filename, Gtk.Label link_label, string link_text, Gtk.Label mtime_label, Gtk.Label size_label, QToolButton button) {
             const var file_url = GLib.Uri.from_local_file (filename).to_string ();
             link_label.on_text ("<a href='%1'>%2</a>".arg (file_url).arg (link_text));
 

@@ -4,7 +4,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QLabel>
+//  #include <Gtk.Label>
 //  #include <QStandard_item_model>
 //  #include <QStacked_widget>
 //  #include <QPushButton>
@@ -181,7 +181,7 @@ signals:
         // Adds space between users + activities and general + network actions
         var spacer = new Gtk.Widget ();
         spacer.minimum_width (10);
-        spacer.size_policy (QSize_policy.Minimum_expanding, QSize_policy.Minimum);
+        spacer.size_policy (QSizePolicy.Minimum_expanding, QSizePolicy.Minimum);
         this.tool_bar.add_widget (spacer);
 
         QAction general_action = create_color_aware_action (QLatin1String (":/client/theme/settings.svg"), _("General"));
@@ -430,7 +430,7 @@ signals:
 
             btn.default_action (this);
             btn.tool_button_style (Qt.Tool_button_text_under_icon);
-            btn.size_policy (QSize_policy.Fixed, QSize_policy.Expanding);
+            btn.size_policy (QSizePolicy.Fixed, QSizePolicy.Expanding);
             return btn;
         }
     }

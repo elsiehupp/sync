@@ -546,7 +546,7 @@ signals:
         animation.end_value (0);
 
         connect (animation, &QAbstractAnimation.on_finished, this, &Share_user_line.on_delete_animation_finished);
-        connect (animation, &QVariant_animation.value_changed, this, &Share_user_line.resize_requested);
+        connect (animation, &QVariantAnimation.value_changed, this, &Share_user_line.resize_requested);
 
         animation.on_start ();
     }

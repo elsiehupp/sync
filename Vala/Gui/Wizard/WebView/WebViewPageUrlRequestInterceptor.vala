@@ -3,22 +3,21 @@
 namespace Occ {
 namespace Ui {
 
-class Web_view_page_url_request_interceptor : QWeb_engine_url_request_interceptor {
+class WebViewPageUrlRequestInterceptor : QWebEngineUrlRequestInterceptor {
 
     /***********************************************************
     ***********************************************************/
-    public Web_view_page_url_request_interceptor (GLib.Object parent = new GLib.Object ());
+    public WebViewPageUrlRequestInterceptor (GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+    }
 
     /***********************************************************
     ***********************************************************/
-    public void intercept_request (QWeb_engine_url_request_info info) override;
-}
+    public void intercept_request (QWebEngineUrlRequestInfo info)  {
+        info.http_header ("OCS-APIREQUEST", "true");
+    }
 
-Web_view_page_url_request_interceptor.Web_view_page_url_request_interceptor (GLib.Object parent)
-    : QWeb_engine_url_request_interceptor (parent) {
+} // class WebViewPageUrlRequestInterceptor
 
-}
-
-void Web_view_page_url_request_interceptor.intercept_request (QWeb_engine_url_request_info info) {
-    info.http_header ("OCS-APIREQUEST", "true");
-}
+} // namespace Ui
+} // namespace Occ

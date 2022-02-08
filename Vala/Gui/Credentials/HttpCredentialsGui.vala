@@ -6,7 +6,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 ***********************************************************/
 
 //  #include <QInputDialog>
-//  #include <QLabel>
+//  #include <Gtk.Label>
 //  #include <QDesktopServices>
 //  #include <QTimer>
 //  #include <QBuffer>
@@ -166,7 +166,7 @@ void HttpCredentialsGui.on_show_dialog () {
     dialog.label_text (message);
     dialog.text_value (this.previous_password);
     dialog.text_echo_mode (QLineEdit.Password);
-    if (var dialog_label = dialog.find_child<QLabel> ()) {
+    if (var dialog_label = dialog.find_child<Gtk.Label> ()) {
         dialog_label.open_external_links (true);
         dialog_label.text_format (Qt.RichText);
     }

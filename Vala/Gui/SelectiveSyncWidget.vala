@@ -89,12 +89,12 @@ class Selective_sync_widget : Gtk.Widget {
         this.account (account)
         this.inserting (false)
         this.folder_tree (new QTree_widget (this)) {
-        this.loading = new QLabel (_("Loading …"), this.folder_tree);
+        this.loading = new Gtk.Label (_("Loading …"), this.folder_tree);
 
         var layout = new QVBoxLayout (this);
         layout.contents_margins (0, 0, 0, 0);
 
-        var header = new QLabel (this);
+        var header = new Gtk.Label (this);
         header.on_text (_("Deselect remote folders you do not wish to synchronize."));
         header.word_wrap (true);
         layout.add_widget (header);

@@ -26,7 +26,7 @@ class Folder_wizard_remote_path : Format_warnings_wizard_page {
     /***********************************************************
     ***********************************************************/
     public void initialize_page () override;
-    public void cleanup_page () override;
+    public void clean_up_page () override;
 
 protected slots:
 
@@ -383,7 +383,7 @@ protected slots:
         return true;
     }
 
-    void Folder_wizard_remote_path.cleanup_page () {
+    void Folder_wizard_remote_path.clean_up_page () {
         show_warn ();
     }
 

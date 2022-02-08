@@ -5,14 +5,14 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 ***********************************************************/
 
 //  #include <QResizeEvent>
-//  #include <QLabel>
+//  #include <Gtk.Label>
 
 
 namespace Occ {
 namespace Ui {
 
 /// Label that can elide its text
-class ElidedLabel : QLabel {
+class ElidedLabel : Gtk.Label {
 
     /***********************************************************
     ***********************************************************/
@@ -57,17 +57,17 @@ class ElidedLabel : QLabel {
 
 
     ElidedLabel.ElidedLabel (Gtk.Widget parent)
-        : QLabel (parent) {
+        : Gtk.Label (parent) {
     }
 
     ElidedLabel.ElidedLabel (string text, Gtk.Widget parent)
-        : QLabel (text, parent)
+        : Gtk.Label (text, parent)
         this.text (text) {
     }
 
     void ElidedLabel.on_text (string text) {
         this.text = text;
-        QLabel.on_text (text);
+        Gtk.Label.on_text (text);
         update ();
     }
 
@@ -77,11 +77,11 @@ class ElidedLabel : QLabel {
     }
 
     void ElidedLabel.resize_event (QResizeEvent event) {
-        QLabel.resize_event (event);
+        Gtk.Label.resize_event (event);
 
         QFontMetrics fm = font_metrics ();
         string elided = fm.elided_text (this.text, this.elide_mode, event.size ().width ());
-        QLabel.on_text (elided);
+        Gtk.Label.on_text (elided);
     }
     }
     

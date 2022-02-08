@@ -132,7 +132,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private QProgress_indicator this.pi_sharee;
+    private QProgressIndicator this.pi_sharee;
 
     /***********************************************************
     ***********************************************************/
@@ -192,7 +192,7 @@ signals:
         connect (this.manager, &Share_manager.on_server_error, this, &Share_user_group_widget.on_display_error);
         connect (this.ui.sharee_line_edit, &QLineEdit.return_pressed, this, &Share_user_group_widget.on_line_edit_return);
         connect (this.ui.confirm_share, &QAbstractButton.clicked, this, &Share_user_group_widget.on_line_edit_return);
-        //TODO connect (this.ui.private_link_text, &QLabel.link_activated, this, &Share_user_group_widget.on_private_link_share);
+        //TODO connect (this.ui.private_link_text, &Gtk.Label.link_activated, this, &Share_user_group_widget.on_private_link_share);
 
         // By making the next two Queued_connections we can override
         // the strings the completer sets on the line edit.
@@ -350,7 +350,7 @@ signals:
         }
 
         foreach (string owner, link_owners) {
-            var owner_label = new QLabel (string (owner + " shared via link"));
+            var owner_label = new Gtk.Label (string (owner + " shared via link"));
             layout.add_widget (owner_label);
             owner_label.visible (true);
 
@@ -426,7 +426,7 @@ signals:
         }
 
     // TODO Progress Indicator where should it go?
-    //    var indicator = new QProgress_indicator (view_port);
+    //    var indicator = new QProgressIndicator (view_port);
     //    indicator.on_start_animation ();
     //    if (layout.count () == 1) {
     //        // No shares yet! Remove the label, add some stretch.
@@ -481,7 +481,7 @@ signals:
         this.pi_sharee.on_stop_animation ();
 
         // Also remove the spinner in the widget list, if any
-        foreach (var pi, this.parent_scroll_area.find_children<QProgress_indicator> ()) {
+        foreach (var pi, this.parent_scroll_area.find_children<QProgressIndicator> ()) {
             delete pi;
         }
 
@@ -518,7 +518,7 @@ signals:
 
         this.pi_sharee.on_color (QGuiApplication.palette ().color (QPalette.Text));
 
-        foreach (var pi, this.parent_scroll_area.find_children<QProgress_indicator> ()) {
+        foreach (var pi, this.parent_scroll_area.find_children<QProgressIndicator> ()) {
             pi.on_color (QGuiApplication.palette ().color (QPalette.Text));;
         }
     }

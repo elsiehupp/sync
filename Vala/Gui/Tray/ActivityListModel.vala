@@ -131,8 +131,9 @@ class ActivityListModel : QAbstractListModel {
     public 
 
     /***********************************************************
+    Q_INVOKABLE
     ***********************************************************/
-    public Q_INVOKABLE void trigger_action (int activity_index, int action_index);
+    public void trigger_action (int activity_index, int action_index);
 
     public AccountState account_state ();
 
