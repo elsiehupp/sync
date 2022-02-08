@@ -915,7 +915,7 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
     }
 
     if (!account_state) {
-        q_c_critical ("can't create folder without an account";
+        GLib.critical ("can't create folder without an account";
         return null;
     }
 
@@ -946,7 +946,7 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
 
 void FolderMan.on_signal_folder_sync_paused (Folder f, bool paused) {
     if (!f) {
-        q_c_critical ("on_signal_folder_sync_paused called with empty folder";
+        GLib.critical ("on_signal_folder_sync_paused called with empty folder";
         return;
     }
 
@@ -1000,7 +1000,7 @@ to the queue. The slot to actually on_signal_start a sync is called afterwards.
 ***********************************************************/
 void FolderMan.schedule_folder (Folder f) {
     if (!f) {
-        q_c_critical ("on_signal_schedule_sync called with null folder";
+        GLib.critical ("on_signal_schedule_sync called with null folder";
         return;
     }
     var alias = f.alias ();
@@ -1559,7 +1559,7 @@ string[] FolderMan.find_file_in_local_folders (string rel_path, AccountPointer a
 
 void FolderMan.remove_folder (Folder f) {
     if (!f) {
-        q_c_critical ("Can not remove null folder";
+        GLib.critical ("Can not remove null folder";
         return;
     }
 
@@ -1681,7 +1681,7 @@ void FolderMan.on_signal_wipe_folder_for_account (AccountState account_state) {
     bool on_signal_success = false;
     for (var f : q_as_const (folders_to_remove)) {
         if (!f) {
-            q_c_critical ("Can not remove null folder";
+            GLib.critical ("Can not remove null folder";
             return;
         }
 

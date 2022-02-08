@@ -72,7 +72,7 @@ class GETEncryptedFileJob : GETFileJob {
             const var decrypted_chunk = this.decryptor.chunk_decryption (this.pending_bytes.const_data (), this.pending_bytes.size ());
 
             if (decrypted_chunk.is_empty ()) {
-                q_c_critical ("Decryption failed!";
+                GLib.critical ("Decryption failed!";
                 return -1;
             }
 
@@ -84,7 +84,7 @@ class GETEncryptedFileJob : GETFileJob {
         const var decrypted_chunk = this.decryptor.chunk_decryption (data.const_data (), data.length ());
 
         if (decrypted_chunk.is_empty ()) {
-            q_c_critical ("Decryption failed!";
+            GLib.critical ("Decryption failed!";
             return -1;
         }
 

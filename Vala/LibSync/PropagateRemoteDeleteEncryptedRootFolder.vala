@@ -151,7 +151,7 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
             // we wait for all this.nested_items' Delete_jobs to finish, and then - fail if any of those jobs has failed
             if (network_error () != Soup.Reply.NetworkError.NoError || this.item.http_error_code != 0) {
                 const int error_code = network_error () != Soup.Reply.NetworkError.NoError ? network_error () : this.item.http_error_code;
-                q_c_critical (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Delete of nested items on_signal_finished with error" + error_code + ". Failing the entire sequence.";
+                GLib.critical (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Delete of nested items on_signal_finished with error" + error_code + ". Failing the entire sequence.";
                 task_failed ();
                 return;
             }

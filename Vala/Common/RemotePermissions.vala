@@ -10,8 +10,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 ***********************************************************/
 
 //  #include <cstring>
-
-
 //  #include <QMetaType>
 //  #include <QDebug>
 
@@ -24,24 +22,25 @@ class RemotePermissions {
 
     // The first bit tells if the value is set or not
     // The remaining bits correspond to know if the value is set
-    private uint16 this.value = 0;
+    private uint16 value = 0;
     private const int not_null_mask = 0x1;
 
     /***********************************************************
     ***********************************************************/
-    const string letters = " WDNVCKRSMm";
+    const string LETTERS = " WDNVCKRSMm";
 
     /***********************************************************
     ***********************************************************/
-    private template <typename Char> // can be 'char' or 'ushort' if conversion from string
-    private void from_array (Char remote_permissions) {
+    //  private template <typename Char> // can be 'char' or 'ushort' if conversion from string
+    private void from_array (Char[] remote_permissions) {
         this.value = not_null_mask;
         if (!remote_permissions)
             return;
-        while (*remote_permissions) {
-            if (var res = std.strchr (letters, static_cast<char> (*remote_permissions)))
-                this.value |= (1 << (res - letters));
-            ++remote_permissions;
+        for (int i; i < remote_permissions.length; i++) {
+            var res = std.strchr (LETTERS, static_cast<char> (remote_permissions[i]));
+            if (res) {
+                this.value |= (1 << (res - LETTERS));
+            }
         }
     }
 
@@ -71,7 +70,7 @@ class RemotePermissions {
     /***********************************************************
     null permissions
     ***********************************************************/
-    public RemotePermissions () = default;
+    //  public RemotePermissions () = default;
 
 
     /***********************************************************
@@ -84,7 +83,7 @@ class RemotePermissions {
         result.reserve (PermissionsCount);
         for (uint32 i = 1; i <= PermissionsCount; ++i) {
             if (this.value & (1 << i))
-                result.append (letters[i]);
+                result.append (LETTERS[i]);
         }
         if (result.is_empty ()) {
             // Make sure it is not empty so we can differentiate null and empty permissions
@@ -115,9 +114,9 @@ class RemotePermissions {
 
 
     /***********************************************************
-    read a permissions string received from the server, never null
+    Read a permissions string received from the server, never null
     ***********************************************************/
-    public static RemotePermissions from_server_string (string ) {
+    public static RemotePermissions from_server_string (string value) {
         RemotePermissions perm;
         perm.from_array (value.utf16 ());
         return perm;
@@ -154,24 +153,25 @@ class RemotePermissions {
 
     /***********************************************************
     ***********************************************************/
-    public friend bool operator== (RemotePermissions a, RemotePermissions b) {
-        return a.value == b.value;
-    }
+    //  public friend bool operator== (RemotePermissions a, RemotePermissions b) {
+    //      return a.value == b.value;
+    //  }
 
 
     /***********************************************************
     ***********************************************************/
-    public friend bool operator!= (RemotePermissions a, RemotePermissions b) {
-        return ! (a == b);
-    }
+    //  public friend bool operator!= (RemotePermissions a, RemotePermissions b) {
+    //      return ! (a == b);
+    //  }
 
 
     /***********************************************************
     ***********************************************************/
-    public friend QDebug operator<< (QDebug dbg, RemotePermissions remote_permissions) {
-        return dbg + remote_permissions.to_string ();
-    }
-}
+    //  public friend QDebug operator<< (QDebug dbg, RemotePermissions remote_permissions) {
+    //      return dbg + remote_permissions.to_string ();
+    //  }
+
+} // class RemotePermissions
 
 } // namespace Occ
     

@@ -1386,7 +1386,7 @@ void Folder.on_signal_start_sync (string[] path_list) {
     //  Q_UNUSED (path_list)
 
     if (is_busy ()) {
-        q_c_critical ("ERROR csync is still running and new sync requested.";
+        GLib.critical ("ERROR csync is still running and new sync requested.";
         return;
     }
 

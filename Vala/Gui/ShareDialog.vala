@@ -371,7 +371,7 @@ signals:
             connect (share_link_widget, &Share_link_widget.create_password_processed, this, &Share_dialog.on_signal_create_password_for_link_share_processed);
             share_link_widget.get_link_share ().password (password);
         } else {
-            q_c_critical ("share_link_widget is not a sender!";
+            GLib.critical ("share_link_widget is not a sender!";
         }
     }
 
@@ -382,7 +382,7 @@ signals:
             disconnect (this.manager, &Share_manager.on_signal_link_share_requires_password, share_link_widget, &Share_link_widget.on_signal_create_share_requires_password);
             disconnect (share_link_widget, &Share_link_widget.create_password_processed, this, &Share_dialog.on_signal_create_password_for_link_share_processed);
         } else {
-            q_c_critical ("share_link_widget is not a sender!";
+            GLib.critical ("share_link_widget is not a sender!";
         }
     }
 

@@ -120,7 +120,7 @@ void PropagateUploadFileNG.on_signal_propfind_finished () {
     if (this.sent > this.file_to_upload.size) {
         // Normally this can't happen because the size is xor'ed with the transfer identifier, and it is
         // therefore impossible that there is more data on the server than on the file.
-        q_c_critical ("Inconsistency while resuming " + this.item.file
+        GLib.critical ("Inconsistency while resuming " + this.item.file
                                       + " : the size on the server (" + this.sent + ") is bigger than the size of the file ("
                                       + this.file_to_upload.size + ")";
 

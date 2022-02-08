@@ -400,7 +400,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         // (non-existence is not an error)
         Utility.sleep (5);
         if (!AccountManager.instance ().restore ()) {
-            q_c_critical ("Could not read the account settings, quitting";
+            GLib.critical ("Could not read the account settings, quitting";
             QMessageBox.critical (
                 null,
                 _("Error accessing the configuration file"),

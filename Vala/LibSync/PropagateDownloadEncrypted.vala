@@ -143,7 +143,7 @@ class PropagateDownloadEncrypted : GLib.Object {
         }
 
         /* emit */ failed ();
-        q_c_critical ("Failed to find encrypted metadata information of remote file" + filename;
+        GLib.critical ("Failed to find encrypted metadata information of remote file" + filename;
     }
 
 
@@ -157,7 +157,7 @@ class PropagateDownloadEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_folder_encrypted_metadata_error (GLib.ByteArray file_identifier, int http_return_code) {
-            q_c_critical ("Failed to find encrypted metadata information of remote file" + this.info.filename ();
+            GLib.critical ("Failed to find encrypted metadata information of remote file" + this.info.filename ();
             /* emit */ failed ();
     }
 

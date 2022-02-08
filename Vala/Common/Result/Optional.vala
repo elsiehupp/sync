@@ -7,16 +7,19 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 namespace Occ {
 
-template <typename T>
-class Optional : Result<T, detail.OptionalNoErrorData> {
+//  template <typename T>
+class Optional : Result<T, OptionalNoErrorData> {
 
     /***********************************************************
     ***********************************************************/
-    public using Result<T, detail.OptionalNoErrorData>.Result;
+    //  public using Result<T, OptionalNoErrorData>.Result;
 
     /***********************************************************
     ***********************************************************/
-    public Optional ()
-        : Optional (detail.OptionalNoErrorData{}) {
+    public Optional () {
+        base (new OptionalNoErrorData ());
     }
-}
+
+} // class Optional
+
+} // namespace Occ

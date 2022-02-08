@@ -187,7 +187,7 @@ class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
         //  Q_ASSERT (delete_job);
 
         if (!delete_job) {
-            q_c_critical (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Sender is not a DeleteJob instance.";
+            GLib.critical (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Sender is not a DeleteJob instance.";
             task_failed ();
             return;
         }

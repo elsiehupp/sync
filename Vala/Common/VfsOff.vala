@@ -237,26 +237,26 @@ class VfsOff : Vfs {
         const var plugin_path = plugin_filename ("vfs", name);
 
         if (!is_vfs_plugin_available (mode)) {
-            q_c_critical ("Could not load plugin : not existant or bad metadata" + plugin_path;
+            GLib.critical ("Could not load plugin : not existant or bad metadata" + plugin_path;
             return null;
         }
 
         QPluginLoader loader (plugin_path);
         var plugin = loader.instance ();
         if (!plugin) {
-            q_c_critical ("Could not load plugin" + plugin_path + loader.error_string ();
+            GLib.critical ("Could not load plugin" + plugin_path + loader.error_string ();
             return null;
         }
 
         var factory = qobject_cast<PluginFactory> (plugin);
         if (!factory) {
-            q_c_critical ("Plugin" + loader.filename ("does not implement PluginFactory";
+            GLib.critical ("Plugin" + loader.filename ("does not implement PluginFactory";
             return null;
         }
 
         var vfs = std.unique_ptr<Vfs> (qobject_cast<Vfs> (factory.create (null)));
         if (!vfs) {
-            q_c_critical ("Plugin" + loader.filename ("does not create a Vfs instance";
+            GLib.critical ("Plugin" + loader.filename ("does not create a Vfs instance";
             return null;
         }
 

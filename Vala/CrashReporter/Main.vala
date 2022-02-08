@@ -22,13 +22,13 @@ int main (int argc, char argv[]) {
     // TODO : install socorro ....
     CrashReporter reporter (GLib.Uri (CRASHREPORTER_SUBMIT_URL), app.arguments ());
 
-#ifdef CRASHREPORTER_ICON
+//  #ifdef CRASHREPORTER_ICON
     reporter.logo (QPixmap (CRASHREPORTER_ICON));
 //  #endif
     reporter.window_title (CRASHREPORTER_PRODUCT_NAME);
     reporter.on_signal_text ("<html><head/><body><p><span style=\" font-weight:600;\">Sorry!</span> " CRASHREPORTER_PRODUCT_NAME " crashed. Please tell us about it! " CRASHREPORTER_PRODUCT_NAME " has created an error report for you that can help improve the stability in the future. You can now send this report directly to the " CRASHREPORTER_PRODUCT_NAME " developers.</p></body></html>");
 
-    const QFileInfo crash_log (QDir.temp_path () + "/" + CRASHREPORTER_PRODUCT_NAME + "-crash.log");
+    const QFileInfo crash_log = new QFileInfo (QDir.temp_path () + "/" + CRASHREPORTER_PRODUCT_NAME + "-crash.log");
     if (crash_log.exists ()) {
         GLib.File in_file (crash_log.file_path ());
         if (in_file.open (GLib.File.ReadOnly)) {

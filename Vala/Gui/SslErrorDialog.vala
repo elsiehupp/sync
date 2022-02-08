@@ -65,7 +65,7 @@ class Ssl_error_dialog : Gtk.Dialog {
     bool SslDialogErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certificates, AccountPointer account) {
         (void)conf;
         if (!certificates) {
-            q_c_critical ("Certs parameter required but is NULL!";
+            GLib.critical ("Certs parameter required but is NULL!";
             return false;
         }
 

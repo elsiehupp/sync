@@ -548,7 +548,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
             &UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
 
         if (!this.account_state || !this.account_state.account ()) {
-            q_c_critical () + string ("Account state is invalid. Could not on_signal_start search!");
+            GLib.critical () + string ("Account state is invalid. Could not on_signal_start search!");
             return;
         }
 
@@ -568,14 +568,14 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
         const var job = qobject_cast<JsonApiJob> (sender ());
 
         if (!job) {
-            q_c_critical () + string ("Failed to fetch providers.").arg (this.search_term);
+            GLib.critical () + string ("Failed to fetch providers.").arg (this.search_term);
             this.error_string += _("Failed to fetch providers.") + '\n';
             /* emit */ signal_error_string_changed ();
             return;
         }
 
         if (status_code != 200) {
-            q_c_critical () + string ("%1 : Failed to fetch search providers for '%2'. Error : %3")
+            GLib.critical () + string ("%1 : Failed to fetch search providers for '%2'. Error : %3")
                                                .arg (status_code)
                                                .arg (this.search_term)
                                                .arg (job.error_string ());
@@ -615,7 +615,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
         const var job = qobject_cast<JsonApiJob> (sender ());
 
         if (!job) {
-            q_c_critical () + string ("Search has failed for '%2'.").arg (this.search_term);
+            GLib.critical () + string ("Search has failed for '%2'.").arg (this.search_term);
             this.error_string += _("Search has failed for '%2'.").arg (this.search_term) + '\n';
             /* emit */ signal_error_string_changed ();
             return;
@@ -640,7 +640,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
         }
 
         if (status_code != 200) {
-            q_c_critical () + string ("%1 : Search has failed for '%2'. Error : %3")
+            GLib.critical () + string ("%1 : Search has failed for '%2'. Error : %3")
                                                .arg (status_code)
                                                .arg (this.search_term)
                                                .arg (job.error_string ());

@@ -513,7 +513,7 @@ namespace EncryptionHelper {
 
         if (EVP_PKEY_decrypt (context, unsigned_data (out), outlen, (uchar *)data.const_data (), data.size ()) <= 0) {
             const var error = handle_errors ();
-            q_c_critical ()) + "Could not decrypt the data." + error;
+            GLib.critical ()) + "Could not decrypt the data." + error;
             return {};
         } else {
             GLib.info ()) + "data decrypted successfully";

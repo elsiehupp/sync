@@ -1209,7 +1209,7 @@ class SyncEngine : GLib.Object {
     ***********************************************************/
     private bool check_error_blocklisting (SyncFileItem item) {
         if (!this.journal) {
-            q_c_critical ("Journal is undefined!";
+            GLib.critical ("Journal is undefined!";
             return false;
         }
 
