@@ -40,12 +40,12 @@ abstract class ComputeChecksumBase : GLib.Object {
         const var checksums = string.from_utf8 (this.checksums);
         int i = 0;
         // The order of the searches here defines the preference ordering.
-        if (-1 != (i = checksums.index_of (QLatin1String ("SHA3-256:"), 0, Qt.CaseInsensitive))
-            || -1 != (i = checksums.index_of (QLatin1String ("SHA256:"), 0, Qt.CaseInsensitive))
-            || -1 != (i = checksums.index_of (QLatin1String ("SHA1:"), 0, Qt.CaseInsensitive))
-            || -1 != (i = checksums.index_of (QLatin1String ("MD5:"), 0, Qt.CaseInsensitive))
-            || -1 != (i = checksums.index_of (QLatin1String ("ADLER32:"), 0, Qt.CaseInsensitive))) {
-            // Now i is the on_start of the best checksum
+        if (-1 != (i = checksums.index_of ("SHA3-256:", 0, Qt.CaseInsensitive))
+            || -1 != (i = checksums.index_of ("SHA256:", 0, Qt.CaseInsensitive))
+            || -1 != (i = checksums.index_of ("SHA1:", 0, Qt.CaseInsensitive))
+            || -1 != (i = checksums.index_of ("MD5:", 0, Qt.CaseInsensitive))
+            || -1 != (i = checksums.index_of ("ADLER32:", 0, Qt.CaseInsensitive))) {
+            // Now i is the on_signal_start of the best checksum
             // Grab it until the next space or end of xml or end of string.
             int end = this.checksums.index_of (' ', i);
             // workaround for https://github.com/owncloud/core/pull/38304
@@ -54,7 +54,7 @@ abstract class ComputeChecksumBase : GLib.Object {
             }
             return this.checksums.mid (i, end - i);
         }
-        GLib.warn (lc_checksums) << "Failed to parse" << this.checksums;
+        GLib.warn ("Failed to parse" + this.checksums;
         return {};
     }
 

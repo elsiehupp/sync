@@ -18,8 +18,6 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 namespace Occ {
 
-OCSYNC_EXPORT Q_DECLARE_LOGGING_CATEGORY (lc_file_system)
-
 /***********************************************************
  \addtogroup libsync
  @{
@@ -142,24 +140,24 @@ namespace FileSystem {
     bool rename (string origin_filename,
         const string destination_filename,
         string error_string = "") {
-        bool on_success = false;
+        bool on_signal_success = false;
         string error;
 
         GLib.File orig (origin_filename);
-        on_success = orig.rename (destination_filename);
-        if (!on_success) {
+        on_signal_success = orig.rename (destination_filename);
+        if (!on_signal_success) {
             error = orig.error_string ();
         }
 
-        if (!on_success) {
-            GLib.warn (lc_file_system) << "Error renaming file" << origin_filename
-                                    << "to" << destination_filename
-                                    << "failed : " << error;
+        if (!on_signal_success) {
+            GLib.warn ("Error renaming file" + origin_filename
+                                    + "to" + destination_filename
+                                    + "failed : " + error;
             if (error_string) {
                 *error_string = error;
             }
         }
-        return on_success;
+        return on_signal_success;
     }
 
 
@@ -174,24 +172,24 @@ namespace FileSystem {
         const string destination_filename,
         string error_string) {
 
-        bool on_success = false;
+        bool on_signal_success = false;
         GLib.File orig (origin_filename);
         // We want a rename that also overwites.  GLib.File.rename does not overwite.
         // Qt 5.1 has QSave_file.rename_overwrite we could use.
         // ### FIXME
-        on_success = true;
+        on_signal_success = true;
         bool dest_exists = file_exists (destination_filename);
         if (dest_exists && !GLib.File.remove (destination_filename)) {
             *error_string = orig.error_string ();
-            GLib.warn (lc_file_system) << "Target file could not be removed.";
-            on_success = false;
+            GLib.warn ("Target file could not be removed.";
+            on_signal_success = false;
         }
-        if (on_success) {
-            on_success = orig.rename (destination_filename);
+        if (on_signal_success) {
+            on_signal_success = orig.rename (destination_filename);
         }
-        if (!on_success) {
+        if (!on_signal_success) {
             *error_string = orig.error_string ();
-            GLib.warn (lc_file_system) << "Renaming temp file to final failed : " << *error_string;
+            GLib.warn ("Renaming temp file to final failed : " + *error_string;
             return false;
         }
 
@@ -279,13 +277,13 @@ namespace FileSystem {
 
         QTextStream stream (&info_file); // for write data on open file
 
-        stream << "[Trash Info]\n"
-               << "Path="
-               << GLib.Uri.to_percent_encoding (f.absolute_file_path (), "~this.-./")
-               << "\n"
-               << "Deletion_date="
-               << GLib.DateTime.current_date_time ().to_string (Qt.ISODate)
-               << '\n';
+        stream + "[Trash Info]\n"
+               + "Path="
+               + GLib.Uri.to_percent_encoding (f.absolute_file_path (), "~this.-./")
+               + "\n"
+               + "Deletion_date="
+               + GLib.DateTime.current_date_time ().to_string (Qt.ISODate)
+               + '\n';
         info_file.close ();
 
         // create info file format of trash file----- END
@@ -338,7 +336,7 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     bool is_lnk_file (string filename) {
-        return filename.ends_with (QLatin1String (".lnk"));
+        return filename.ends_with (".lnk");
     }
 
 

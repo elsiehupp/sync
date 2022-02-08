@@ -54,7 +54,7 @@ class AbstractNetworkJob : GLib.Object {
     
         ~NetworkJobTimeoutPauser () {
             if (!this.timer.is_null ()) {
-                this.timer.on_start ();
+                this.timer.on_signal_start ();
             }
         }
     }
@@ -151,15 +151,15 @@ class AbstractNetworkJob : GLib.Object {
 
         this.timer.single_shot (true);
         this.timer.interval ( (http_timeout ? http_timeout : 300) * 1000); // default to 5 minutes.
-        connect (&this.timer, &QTimer.timeout, this, &AbstractNetworkJob.on_timeout);
+        connect (&this.timer, &QTimer.timeout, this, &AbstractNetworkJob.on_signal_timeout);
 
-        connect (this, &AbstractNetworkJob.network_activity, this, &AbstractNetworkJob.on_reset_timeout);
+        connect (this, &AbstractNetworkJob.network_activity, this, &AbstractNetworkJob.on_signal_reset_timeout);
 
         // Network activity on the propagator jobs (GET/PUT) keeps all requests alive.
         // This is a workaround for OC instances which only support one
         // parallel up and download
         if (this.account) {
-            connect (this.account.data (), &Account.propagator_network_activity, this, &AbstractNetworkJob.on_reset_timeout);
+            connect (this.account.data (), &Account.propagator_network_activity, this, &AbstractNetworkJob.on_signal_reset_timeout);
         }
     }
 
@@ -171,14 +171,14 @@ class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
-        this.timer.on_start ();
+    public void on_signal_start () {
+        this.timer.on_signal_start ();
 
         const GLib.Uri url = account ().url ();
         const string display_url = string ("%1://%2%3").arg (url.scheme ()).arg (url.host ()).arg (url.path ());
 
         string parent_meta_object_name = parent () ? parent ().meta_object ().class_name () : "";
-        GLib.info (lc_network_job) << meta_object ().class_name () << "created for" << display_url << "+" << path () << parent_meta_object_name;
+        GLib.info () + meta_object ().class_name ("created for" + display_url + "+" + path () + parent_meta_object_name;
     }
 
 
@@ -247,7 +247,7 @@ class AbstractNetworkJob : GLib.Object {
     Whether to handle redirects transparently.
 
     If true, a follow-up request is issued automatically when
-    a redirect is encountered. The on_finished () function is
+    a redirect is encountered. The on_signal_finished () function is
     only called if there are no more redirects (or there are
     problems with the redirect).
 
@@ -347,8 +347,8 @@ class AbstractNetworkJob : GLib.Object {
         var req = this.reply.request ();
         GLib.Uri requested_url = req.url ();
         GLib.ByteArray verb = HttpLogger.request_verb (*this.reply);
-        GLib.info (lc_network_job) << "Restarting" << verb << requested_url;
-        on_reset_timeout ();
+        GLib.info ("Restarting" + verb + requested_url;
+        on_signal_reset_timeout ();
         if (this.request_body) {
             this.request_body.seek (0);
         }
@@ -360,17 +360,17 @@ class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_timeout (int64 msec) {
-        this.timer.on_start (msec);
+    public void on_signal_timeout (int64 msec) {
+        this.timer.on_signal_start (msec);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_reset_timeout () {
+    public void on_signal_reset_timeout () {
         int64 interval = this.timer.interval ();
         this.timer.stop ();
-        this.timer.on_start (interval);
+        this.timer.on_signal_start (interval);
     }
 
 
@@ -440,7 +440,7 @@ class AbstractNetworkJob : GLib.Object {
 
 
     protected void up_connections (Soup.Reply reply) {
-        connect (reply, &Soup.Reply.on_finished, this, &AbstractNetworkJob.on_finished);
+        connect (reply, &Soup.Reply.on_signal_finished, this, &AbstractNetworkJob.on_signal_finished);
         connect (reply, &Soup.Reply.encrypted, this, &AbstractNetworkJob.network_activity);
         connect (reply.manager (), &QNetworkAccessManager.proxy_authentication_required, this, &AbstractNetworkJob.network_activity);
         connect (reply, &Soup.Reply.ssl_errors, this, &AbstractNetworkJob.network_activity);
@@ -489,9 +489,9 @@ class AbstractNetworkJob : GLib.Object {
 
     The default implementation aborts the reply.
     ***********************************************************/
-    protected virtual void on_timed_out () {
+    protected virtual void on_signal_timed_out () {
         if (reply ()) {
-            reply ().on_abort ();
+            reply ().on_signal_abort ();
         } else {
             delete_later ();
         }
@@ -518,15 +518,15 @@ class AbstractNetworkJob : GLib.Object {
 
 
     /***********************************************************
-    Called at the end of Soup.Reply.on_finished processing.
+    Called at the end of Soup.Reply.on_signal_finished processing.
 
     Returning true triggers a delete_later () of this job.
     ***********************************************************/
-    private void on_finished () {
+    private void on_signal_finished () {
         this.timer.stop ();
 
         if (this.reply.error () == Soup.Reply.SslHandshakeFailedError) {
-            GLib.warn (lc_network_job) << "SslHandshakeFailedError : " << error_string () << " : can be caused by a webserver wanting SSL client certificates";
+            GLib.warn ("SslHandshakeFailedError : " + error_string (" : can be caused by a webserver wanting SSL client certificates";
         }
         // Qt doesn't yet transparently resend HTTP2 requests, do so here
         const var max_http2Resends = 3;
@@ -535,16 +535,16 @@ class AbstractNetworkJob : GLib.Object {
             && this.reply.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()) {
 
             if ( (this.request_body && !this.request_body.is_sequential ()) || verb.is_empty ()) {
-                GLib.warn (lc_network_job) << "Can't resend HTTP2 request, verb or body not suitable"
-                                        << this.reply.request ().url () << verb << this.request_body;
+                GLib.warn ("Can't resend HTTP2 request, verb or body not suitable"
+                                        + this.reply.request ().url () + verb + this.request_body;
             } else if (this.http2_resend_count >= max_http2Resends) {
-                GLib.warn (lc_network_job) << "Not resending HTTP2 request, number of resends exhausted"
-                                        << this.reply.request ().url () << this.http2_resend_count;
+                GLib.warn ("Not resending HTTP2 request, number of resends exhausted"
+                                        + this.reply.request ().url () + this.http2_resend_count;
             } else {
-                GLib.info (lc_network_job) << "HTTP2 resending" << this.reply.request ().url ();
+                GLib.info ("HTTP2 resending" + this.reply.request ().url ();
                 this.http2_resend_count++;
 
-                on_reset_timeout ();
+                on_signal_reset_timeout ();
                 if (this.request_body) {
                     if (!this.request_body.is_open ())
                     this.request_body.open (QIODevice.ReadOnly);
@@ -565,10 +565,10 @@ class AbstractNetworkJob : GLib.Object {
                 return;
 
             if (!this.ignore_credential_failure || this.reply.error () != Soup.Reply.AuthenticationRequiredError) {
-                GLib.warn (lc_network_job) << this.reply.error () << error_string ()
-                                        << this.reply.attribute (Soup.Request.HttpStatusCodeAttribute);
+                GLib.warn () + this.reply.error () + error_string ()
+                                        + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute);
                 if (this.reply.error () == Soup.Reply.ProxyAuthenticationRequiredError) {
-                    GLib.warn (lc_network_job) << this.reply.raw_header ("Proxy-Authenticate");
+                    GLib.warn () + this.reply.raw_header ("Proxy-Authenticate");
                 }
             }
             /* emit */ network_error (this.reply);
@@ -592,19 +592,19 @@ class AbstractNetworkJob : GLib.Object {
                 && requested_url.has_query ()
                 && !redirect_url.has_query ()
                 && !this.request_body) {
-                GLib.warn (lc_network_job) << "Redirecting a POST request with an implicit body loses that body";
+                GLib.warn ("Redirecting a POST request with an implicit body loses that body";
             }
 
             // ### some of the q_warnings here should be exported via display_errors () so they
             // ### can be presented to the user if the job executor has a GUI
             if (requested_url.scheme () == QLatin1String ("https") && redirect_url.scheme () == QLatin1String ("http")) {
-                GLib.warn (lc_network_job) << this << "HTTPS.HTTP downgrade detected!";
+                GLib.warn () + this + "HTTPS.HTTP downgrade detected!";
             } else if (requested_url == redirect_url || this.redirect_count + 1 >= max_redirects ()) {
-                GLib.warn (lc_network_job) << this << "Redirect loop detected!";
+                GLib.warn () + this + "Redirect loop detected!";
             } else if (this.request_body && this.request_body.is_sequential ()) {
-                GLib.warn (lc_network_job) << this << "cannot redirect request with sequential body";
+                GLib.warn () + this + "cannot redirect request with sequential body";
             } else if (verb.is_empty ()) {
-                GLib.warn (lc_network_job) << this << "cannot redirect request : could not detect original verb";
+                GLib.warn () + this + "cannot redirect request : could not detect original verb";
             } else {
                 /* emit */ redirected (this.reply, redirect_url, this.redirect_count);
 
@@ -613,8 +613,8 @@ class AbstractNetworkJob : GLib.Object {
                     this.redirect_count++;
 
                     // Create the redirected request and send it
-                    GLib.info (lc_network_job) << "Redirecting" << verb << requested_url << redirect_url;
-                    on_reset_timeout ();
+                    GLib.info ("Redirecting" + verb + requested_url + redirect_url;
+                    on_signal_reset_timeout ();
                     if (this.request_body) {
                         if (!this.request_body.is_open ()) {
                             // Avoid the QIODevice.seek (Soup.Buffer) : The device is not open warning message
@@ -637,18 +637,18 @@ class AbstractNetworkJob : GLib.Object {
             this.account.handle_invalid_credentials ();
         }
 
-        bool discard = on_finished ();
+        bool discard = on_signal_finished ();
         if (discard) {
-            GLib.debug (lc_network_job) << "Network job" << meta_object ().class_name () << "on_finished for" << path ();
+            GLib.debug ("Network job" + meta_object ().class_name ("on_signal_finished for" + path ();
             delete_later ();
         }
     }
 
 
-    private void on_timeout () {
+    private void on_signal_timeout () {
         this.timedout = true;
-        GLib.warn (lc_network_job) << "Network job timeout" << (reply () ? reply ().request ().url () : path ());
-        on_timed_out ();
+        GLib.warn ("Network job timeout" + (reply () ? reply ().request ().url () : path ());
+        on_signal_timed_out ();
     }
 
 }

@@ -91,7 +91,7 @@ class PropagateItemJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_restore_job_finished (SyncFileItem.Status status) {
+    protected void on_signal_restore_job_finished (SyncFileItem.Status status) {
         string message;
         if (this.restore_job) {
             message = this.restore_job.restore_job_msg ();
@@ -100,23 +100,23 @@ class PropagateItemJob : PropagatorJob {
 
         if (status == SyncFileItem.Status.SUCCESS || status == SyncFileItem.Status.CONFLICT
             || status == SyncFileItem.Status.RESTORATION) {
-            on_done (SyncFileItem.Status.SOFT_ERROR, message);
+            on_signal_done (SyncFileItem.Status.SOFT_ERROR, message);
         } else {
-            on_done (status, _("A file or folder was removed from a read only share, but restoring failed : %1").arg (message));
+            on_signal_done (status, _("A file or folder was removed from a read only share, but restoring failed : %1").arg (message));
         }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool on_schedule_self_or_child () override {
+    public bool on_signal_schedule_self_or_child () override {
         if (this.state != NotYetStarted) {
             return false;
         }
-        GLib.info (lc_propagator) << "Starting" << this.item.instruction << "propagation of" << this.item.destination () << "by" << this;
+        GLib.info ("Starting" + this.item.instruction + "propagation of" + this.item.destination ("by" + this;
 
         this.state = Running;
-        QMetaObject.invoke_method (this, "on_start"); // We could be in a different thread (neon jobs)
+        QMetaObject.invoke_method (this, "on_signal_start"); // We could be in a different thread (neon jobs)
         return true;
     }
 
@@ -131,14 +131,14 @@ class PropagateItemJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public virtual void on_start ();
+    public virtual void on_signal_start ();
 
 
 
     /***********************************************************
     ***********************************************************/
-    protected void on_done (SyncFileItem.Status status, string error_string = "") {
-        // Duplicate calls to on_done () are a logic error
+    protected void on_signal_done (SyncFileItem.Status status, string error_string = "") {
+        // Duplicate calls to on_signal_done () are a logic error
         ENFORCE (this.state != Finished);
         this.state = Finished;
 
@@ -159,7 +159,7 @@ class PropagateItemJob : PropagatorJob {
 
         if (propagator ().abort_requested && (this.item.status == SyncFileItem.Status.NORMAL_ERROR
                                             || this.item.status == SyncFileItem.Status.FATAL_ERROR)) {
-            // an on_abort request is ongoing. Change the status to Soft-Error
+            // an on_signal_abort request is ongoing. Change the status to Soft-Error
             this.item.status = SyncFileItem.Status.SOFT_ERROR;
         }
 
@@ -194,15 +194,15 @@ class PropagateItemJob : PropagatorJob {
         }
 
         if (this.item.has_error_status ())
-            GLib.warn (lc_propagator) << "Could not complete propagation of" << this.item.destination () << "by" << this << "with status" << this.item.status << "and error:" << this.item.error_string;
+            GLib.warn ("Could not complete propagation of" + this.item.destination ("by" + this + "with status" + this.item.status + "and error:" + this.item.error_string;
         else
-            GLib.info (lc_propagator) << "Completed propagation of" << this.item.destination () << "by" << this << "with status" << this.item.status;
+            GLib.info ("Completed propagation of" + this.item.destination ("by" + this + "with status" + this.item.status;
         /* emit */ propagator ().item_completed (this.item);
         /* emit */ finished (this.item.status);
 
         if (this.item.status == SyncFileItem.Status.FATAL_ERROR) {
             // Abort all remaining jobs.
-            propagator ().on_abort ();
+            propagator ().on_signal_abort ();
         }
     }
 

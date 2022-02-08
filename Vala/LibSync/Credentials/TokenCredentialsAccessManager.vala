@@ -13,7 +13,7 @@ class TokenCredentialsAccessManager : AccessManager {
 
     protected Soup.Reply create_request (Operation op, Soup.Request request, QIODevice outgoing_data) {
         if (this.credentials.user ().is_empty () || this.credentials.password ().is_empty ()) {
-            GLib.warn (lc_token_credentials) << "Empty user/password provided!";
+            GLib.warn ("Empty user/password provided!";
         }
 
         Soup.Request req (request);

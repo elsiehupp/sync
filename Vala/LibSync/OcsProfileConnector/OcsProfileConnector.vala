@@ -7,7 +7,7 @@
 //  #include <QLoggingCategory>
 //  #include <QIcon>
 //  #include <QPainter>
-//  #include <QImage>
+//  #include <Gtk.Image>
 //  #include <QSvgRenderer>
 //  #include <QPixmap>
 //  #include <QPixmapCache>
@@ -37,15 +37,15 @@ class OcsProfileConnector : GLib.Object {
     public void fetch_hovercard (string user_id);
     void OcsProfileConnector.fetch_hovercard (string user_id) {
         if (this.account.server_version_int () < Account.make_server_version (23, 0, 0)) {
-            q_info (lc_ocs_profile_connector) << "Server version" << this.account.server_version ()
-                                         << "does not support profile page";
+            q_info ("Server version" + this.account.server_version ()
+                                         + "does not support profile page";
             /* emit */ error ();
             return;
         }
         const string url = QStringLiteral ("/ocs/v2.php/hovercard/v1/%1").arg (user_id);
         const var job = new JsonApiJob (this.account, url, this);
-        connect (job, &JsonApiJob.json_received, this, &OcsProfileConnector.on_hovercard_fetched);
-        job.on_start ();
+        connect (job, &JsonApiJob.json_received, this, &OcsProfileConnector.on_signal_hovercard_fetched);
+        job.on_signal_start ();
     }
 
 
@@ -58,11 +58,11 @@ class OcsProfileConnector : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_hovercard_fetched (QJsonDocument json, int status_code) {
-        GLib.debug (lc_ocs_profile_connector) << "Hovercard fetched:" << json;
+    private void on_signal_hovercard_fetched (QJsonDocument json, int status_code) {
+        GLib.debug ("Hovercard fetched:" + json;
 
         if (status_code != 200) {
-            GLib.info (lc_ocs_profile_connector) << "Fetching of hovercard on_finished with status code" << status_code;
+            GLib.info ("Fetching of hovercard on_signal_finished with status code" + status_code;
             return;
         }
         const var json_data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("actions");
@@ -93,7 +93,7 @@ class OcsProfileConnector : GLib.Object {
                 load_hovercard_action_icon (hovercard_action_index, icon_data);
             });
         connect (icon_job, &IconJob.error, this, [] (Soup.Reply.NetworkError error_type) {
-            GLib.warn (lc_ocs_profile_connector) << "Could not fetch icon:" << error_type;
+            GLib.warn ("Could not fetch icon:" + error_type;
         });
     }
 
@@ -120,7 +120,7 @@ class OcsProfileConnector : GLib.Object {
             hovercard_action_icon (hovercard_action_index, icon.get ());
             return;
         }
-        GLib.warn (lc_ocs_profile_connector) << "Could not load Svg icon from data" << icon_data;
+        GLib.warn ("Could not load Svg icon from data" + icon_data;
     }
 
 
@@ -153,14 +153,14 @@ class OcsProfileConnector : GLib.Object {
 
     private static Occ.Optional<QPixmap> create_pixmap_from_svg_data (GLib.ByteArray icon_data) {
         QSvgRenderer svg_renderer;
-        if (!svg_renderer.on_load (icon_data)) {
+        if (!svg_renderer.on_signal_load (icon_data)) {
             return {};
         }
         QSize image_size{16, 16};
         if (Occ.Theme.is_hidpi ()) {
             image_size = QSize{32, 32};
         }
-        QImage scaled_svg (image_size, QImage.Format_ARGB32);
+        Gtk.Image scaled_svg (image_size, Gtk.Image.Format_ARGB32);
         scaled_svg.fill ("transparent");
         QPainter svg_painter{&scaled_svg};
         svg_renderer.render (&svg_painter);

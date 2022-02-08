@@ -13,7 +13,7 @@ namespace KeychainChunk {
 class DeleteJob : KeychainChunk.Job {
 
 
-    signal void on_finished (KeychainChunk.DeleteJob incoming_job);
+    signal void on_signal_finished (KeychainChunk.DeleteJob incoming_job);
 
 
     /***********************************************************
@@ -35,12 +35,12 @@ class DeleteJob : KeychainChunk.Job {
 
 
     /***********************************************************
-    Call this method to on_start the job (async).
-    You should connect some slot to the on_finished () signal first.
+    Call this method to on_signal_start the job (async).
+    You should connect some slot to the on_signal_finished () signal first.
 
-    @see QKeychain.Job.on_start ()
+    @see QKeychain.Job.on_signal_start ()
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         this.chunk_count = 0;
         this.error = QKeychain.NoError;
 
@@ -56,22 +56,22 @@ class DeleteJob : KeychainChunk.Job {
     #endif
         job.insecure_fallback (this.insecure_fallback);
         job.key (kck);
-        connect (job, &QKeychain.Job.on_finished, this, &KeychainChunk.DeleteJob.on_delete_job_done);
-        job.on_start ();
+        connect (job, &QKeychain.Job.on_signal_finished, this, &KeychainChunk.DeleteJob.on_signal_delete_job_done);
+        job.on_signal_start ();
     }
 
 
     /***********************************************************
-    Call this method to on_start the job synchronously.
-    Awaits completion with no need to connect some slot to the on_finished () signal first.
+    Call this method to on_signal_start the job synchronously.
+    Awaits completion with no need to connect some slot to the on_signal_finished () signal first.
 
     @return Returns true on succeess (QKeychain.NoError).
     ***********************************************************/
     public bool exec () {
-        on_start ();
+        on_signal_start ();
 
         QEventLoop wait_loop;
-        connect (this, &DeleteJob.on_finished, wait_loop, &QEventLoop.quit);
+        connect (this, &DeleteJob.on_signal_finished, wait_loop, &QEventLoop.quit);
         wait_loop.exec ();
 
         if (error () == NoError) {
@@ -80,7 +80,7 @@ class DeleteJob : KeychainChunk.Job {
 
         this.chunk_count = 0;
         if (error () != EntryNotFound) {
-            GLib.warn (lc_keychain_chunk) << "DeletePasswordJob failed with" << error_string ();
+            GLib.warn ("DeletePasswordJob failed with" + error_string ();
         }
         return false;
     }
@@ -88,7 +88,7 @@ class DeleteJob : KeychainChunk.Job {
 
     /***********************************************************
     ***********************************************************/
-    private void on_delete_job_done (QKeychain.Job incoming_job) {
+    private void on_signal_delete_job_done (QKeychain.Job incoming_job) {
         // Errors or next chunk?
         var delete_job = qobject_cast<QKeychain.DeletePasswordJob> (incoming_job);
         //  Q_ASSERT (delete_job);
@@ -100,7 +100,7 @@ class DeleteJob : KeychainChunk.Job {
                 ( (delete_job.error () == QKeychain.EntryNotFound) && this.chunk_count == 0)) {
                 this.error = delete_job.error ();
                 this.error_string = delete_job.error_string ();
-                GLib.warn (lc_keychain_chunk) << "Unable to delete" << delete_job.key () << "chunk" << string.number (this.chunk_count) << delete_job.error_string ();
+                GLib.warn ("Unable to delete" + delete_job.key ("chunk" + string.number (this.chunk_count) + delete_job.error_string ();
             }
         }
 

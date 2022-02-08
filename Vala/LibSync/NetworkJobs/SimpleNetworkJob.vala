@@ -31,7 +31,7 @@ class SimpleNetworkJob : AbstractNetworkJob {
         Soup.Request req = Soup.Request (),
         QIODevice request_body = null) {
         var reply = send_request (verb, url, req, request_body);
-        on_start ();
+        on_signal_start ();
         return reply;
     }
 
@@ -39,7 +39,7 @@ class SimpleNetworkJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private bool on_finished () {
+    private bool on_signal_finished () {
         /* emit */ finished_signal (reply ());
         return true;
     }

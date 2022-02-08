@@ -67,8 +67,8 @@ class DetermineAuthTypeJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
-        GLib.info (lc_determine_auth_type_job) << "Determining auth type for" << this.account.dav_url ();
+    public void on_signal_start () {
+        GLib.info ("Determining auth type for" + this.account.dav_url ();
 
         Soup.Request req;
         // Prevent HttpCredentialsAccessManager from setting an Authorization header.
@@ -87,9 +87,9 @@ class DetermineAuthTypeJob : GLib.Object {
         // 3. Determines if the old flow has to be used (GS for now)
         var old_flow_required = new JsonApiJob (this.account, "/ocs/v2.php/cloud/capabilities", this);
 
-        get.on_timeout (30 * 1000);
-        propfind.on_timeout (30 * 1000);
-        old_flow_required.on_timeout (30 * 1000);
+        get.on_signal_timeout (30 * 1000);
+        propfind.on_signal_timeout (30 * 1000);
+        old_flow_required.on_signal_timeout (30 * 1000);
         get.ignore_credential_failure (true);
         propfind.ignore_credential_failure (true);
         old_flow_required.ignore_credential_failure (true);
@@ -112,9 +112,9 @@ class DetermineAuthTypeJob : GLib.Object {
                 this.result_propfind = OAuth;
             } else {
                 if (auth_challenge.is_empty ()) {
-                    GLib.warn (lc_determine_auth_type_job) << "Did not receive WWW-Authenticate reply to auth-test PROPFIND";
+                    GLib.warn ("Did not receive WWW-Authenticate reply to auth-test PROPFIND";
                 } else {
-                    GLib.warn (lc_determine_auth_type_job) << "Unknown WWW-Authenticate reply to auth-test PROPFIND:" << auth_challenge;
+                    GLib.warn ("Unknown WWW-Authenticate reply to auth-test PROPFIND:" + auth_challenge;
                 }
                 this.result_propfind = Basic;
             }
@@ -134,7 +134,7 @@ class DetermineAuthTypeJob : GLib.Object {
     #ifdef WITH_WEBENGINE
                             this.result_old_flow = WEB_VIEW_FLOW;
     #else // WITH_WEBENGINE
-                            GLib.warn (lc_determine_auth_type_job) << "Server does only support flow1, but this client was compiled without support for flow1";
+                            GLib.warn ("Server does only support flow1, but this client was compiled without support for flow1";
     #endif // WITH_WEBENGINE
                         }
                     }
@@ -146,7 +146,7 @@ class DetermineAuthTypeJob : GLib.Object {
             check_all_done ();
         });
 
-        old_flow_required.on_start ();
+        old_flow_required.on_signal_start ();
     }
 
 
@@ -189,7 +189,7 @@ class DetermineAuthTypeJob : GLib.Object {
             result = Basic;
         }
 
-        GLib.info (lc_determine_auth_type_job) << "Auth type for" << this.account.dav_url () << "is" << result;
+        GLib.info ("Auth type for" + this.account.dav_url ("is" + result;
         /* emit */ auth_type (result);
         delete_later ();
     }

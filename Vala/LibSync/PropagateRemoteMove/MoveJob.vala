@@ -45,7 +45,7 @@ class MoveJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         Soup.Request req;
         req.raw_header ("Destination", GLib.Uri.to_percent_encoding (this.destination, "/"));
         for (var it = this.extra_headers.const_begin (); it != this.extra_headers.const_end (); ++it) {
@@ -58,17 +58,17 @@ class MoveJob : AbstractNetworkJob {
         }
 
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warn (lc_propagate_remote_move) << " Network error : " << reply ().error_string ();
+            GLib.warn (" Network error : " + reply ().error_string ();
         }
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool on_finished () {
-        GLib.info (lc_move_job) << "MOVE of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                        << reply_status_string ();
+    public bool on_signal_finished () {
+        GLib.info ("MOVE of" + reply ().request ().url ("FINISHED WITH STATUS"
+                        + reply_status_string ();
 
         /* emit */ finished_signal ();
         return true;

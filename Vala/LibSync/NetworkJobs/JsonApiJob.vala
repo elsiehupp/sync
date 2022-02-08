@@ -49,7 +49,7 @@ class JsonApiJob : AbstractNetworkJob {
     /***********************************************************
     @brief json_received - signal to report the json answer from ocs
     @param json - the parsed json document
-    @param status_code - the OCS status code : 100 (!) for on_success
+    @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
     signal void json_received (QJsonDocument json, int status_code);
 
@@ -58,7 +58,7 @@ class JsonApiJob : AbstractNetworkJob {
     @brief etag_response_header_received - signal to report the ETag response header value
     from ocs api v2
     @param value - the ETag response header value
-    @param status_code - the OCS status code : 100 (!) for on_success
+    @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
     signal void etag_response_header_received (GLib.ByteArray value, int status_code);
 
@@ -85,7 +85,7 @@ class JsonApiJob : AbstractNetworkJob {
     that the format=json para
     need to be set this way.
 
-    This function needs to be called before on_start () obviously.
+    This function needs to be called before on_signal_start () obviously.
     ***********************************************************/
     public void add_query_params (QUrlQuery parameters) {
         this.additional_params = parameters;
@@ -104,7 +104,7 @@ class JsonApiJob : AbstractNetworkJob {
     ***********************************************************/
     public void body (QJsonDocument body) {
         this.body = body.to_json ();
-        GLib.debug (lc_json_api_job) << "Set body for request:" << this.body;
+        GLib.debug ("Set body for request:" + this.body;
         if (!this.body.is_empty ()) {
             this.request.header (Soup.Request.ContentTypeHeader, "application/json");
         }
@@ -120,7 +120,7 @@ class JsonApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         add_raw_header ("OCS-APIREQUEST", "true");
         var query = this.additional_params;
         query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
@@ -131,20 +131,20 @@ class JsonApiJob : AbstractNetworkJob {
         } else {
             send_request (http_verb, url, this.request);
         }
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected bool on_finished () {
-        GLib.info (lc_json_api_job) << "JsonApiJob of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                            << reply_status_string ();
+    protected bool on_signal_finished () {
+        GLib.info ("JsonApiJob of" + reply ().request ().url ("FINISHED WITH STATUS"
+                            + reply_status_string ();
 
         int status_code = 0;
         int http_status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warn (lc_json_api_job) << "Network error : " << path () << error_string () << reply ().attribute (Soup.Request.HttpStatusCodeAttribute);
+            GLib.warn ("Network error : " + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute);
             status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             /* emit */ json_received (QJsonDocument (), status_code);
             return true;
@@ -159,7 +159,7 @@ class JsonApiJob : AbstractNetworkJob {
                 status_code = rex_match.captured (1).to_int ();
             }
         } else if (json_str.is_empty () && http_status_code == NOT_MODIFIED_STATUS_CODE) {
-            GLib.warn (lc_json_api_job) << "Nothing changed so nothing to retrieve - status code : " << http_status_code;
+            GLib.warn ("Nothing changed so nothing to retrieve - status code : " + http_status_code;
             status_code = http_status_code;
         } else {
             const QRegularExpression rex (R" ("statuscode" : (\d+))");
@@ -183,7 +183,7 @@ class JsonApiJob : AbstractNetworkJob {
         var json = QJsonDocument.from_json (json_str.to_utf8 (), error);
         // empty or invalid response and status code is != 304 because json_str is expected to be empty
         if ( (error.error != QJsonParseError.NoError || json.is_null ()) && http_status_code != NOT_MODIFIED_STATUS_CODE) {
-            GLib.warn (lc_json_api_job) << "invalid JSON!" << json_str << error.error_string ();
+            GLib.warn ("invalid JSON!" + json_str + error.error_string ();
             /* emit */ json_received (json, status_code);
             return true;
         }

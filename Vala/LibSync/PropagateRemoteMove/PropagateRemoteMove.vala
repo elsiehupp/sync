@@ -25,12 +25,12 @@ class PropagateRemoteMove : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         if (propagator ().abort_requested)
             return;
 
         string origin = propagator ().adjust_renamed_path (this.item.file);
-        GLib.debug (lc_propagate_remote_move) << origin << this.item.rename_target;
+        GLib.debug () + origin + this.item.rename_target;
 
         string target_file (propagator ().full_local_path (this.item.rename_target));
 
@@ -50,7 +50,7 @@ class PropagateRemoteMove : PropagateItemJob {
                 SyncJournalFileRecord parent_rec;
                 bool ok = propagator ().journal.get_file_record (parent_path, parent_rec);
                 if (!ok) {
-                    on_done (SyncFileItem.Status.NORMAL_ERROR);
+                    on_signal_done (SyncFileItem.Status.NORMAL_ERROR);
                     return;
                 }
 
@@ -64,7 +64,7 @@ class PropagateRemoteMove : PropagateItemJob {
                 }
             }
 
-            on_finalize ();
+            on_signal_finalize ();
             return;
         }
 
@@ -118,28 +118,28 @@ class PropagateRemoteMove : PropagateItemJob {
             if (!FileSystem.file_exists (local_target) && FileSystem.file_exists (local_target_alt)) {
                 string error;
                 if (!FileSystem.unchecked_rename_replace (local_target_alt, local_target, error)) {
-                    on_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not rename %1 to %2, error : %3")
+                    on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not rename %1 to %2, error : %3")
                          .arg (folder_target_alt, folder_target, error));
                     return;
                 }
-                GLib.info (lc_propagate_remote_move) << "Suffix vfs required local rename of"
-                                              << folder_target_alt << "to" << folder_target;
+                GLib.info ("Suffix vfs required local rename of"
+                                              + folder_target_alt + "to" + folder_target;
             }
         }
-        GLib.debug (lc_propagate_remote_move) << remote_source << remote_destination;
+        GLib.debug () + remote_source + remote_destination;
 
         this.job = new MoveJob (propagator ().account (), remote_source, remote_destination, this);
-        connect (this.job.data (), &MoveJob.finished_signal, this, &PropagateRemoteMove.on_move_job_finished);
+        connect (this.job.data (), &MoveJob.finished_signal, this, &PropagateRemoteMove.on_signal_move_job_finished);
         propagator ().active_job_list.append (this);
-        this.job.on_start ();
+        this.job.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_abort (PropagatorJob.AbortType abort_type) {
+    public void on_signal_abort (PropagatorJob.AbortType abort_type) {
         if (this.job && this.job.reply ())
-            this.job.reply ().on_abort ();
+            this.job.reply ().on_signal_abort ();
 
         if (abort_type == AbortType.ASYNCHRONOUS) {
             /* emit */ abort_finished ();
@@ -187,7 +187,7 @@ class PropagateRemoteMove : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_move_job_finished () {
+    private void on_signal_move_job_finished () {
         propagator ().active_job_list.remove_one (this);
 
         //  ASSERT (this.job);
@@ -200,7 +200,7 @@ class PropagateRemoteMove : PropagateItemJob {
         if (err != Soup.Reply.NoError) {
             SyncFileItem.Status status = classify_error (err, this.item.http_error_code,
                 propagator ().another_sync_needed);
-            on_done (status, this.job.error_string ());
+            on_signal_done (status, this.job.error_string ());
             return;
         }
 
@@ -208,20 +208,20 @@ class PropagateRemoteMove : PropagateItemJob {
             // Normally we expect "201 Created"
             // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
             // throw an error.
-            on_done (SyncFileItem.Status.NORMAL_ERROR,
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                 _("Wrong HTTP code returned by server. Expected 201, but received \"%1 %2\".")
                     .arg (this.item.http_error_code)
                     .arg (this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
             return;
         }
 
-        on_finalize ();
+        on_signal_finalize ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_finalize () {
+    private void on_signal_finalize () {
         // Retrieve old database data.
         // if reading from database failed still continue hoping that delete_file_record
         // reopens the database successfully.
@@ -235,7 +235,7 @@ class PropagateRemoteMove : PropagateItemJob {
         // Delete old database data.
         propagator ().journal.delete_file_record (this.item.original_file);
         if (!vfs.pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
-            GLib.warn (lc_propagate_remote_move) << "Could not set pin state of" << this.item.original_file << "to inherited";
+            GLib.warn ("Could not set pin state of" + this.item.original_file + "to inherited";
         }
 
         SyncFileItem new_item (*this.item);
@@ -243,7 +243,7 @@ class PropagateRemoteMove : PropagateItemJob {
         if (old_record.is_valid ()) {
             new_item.checksum_header = old_record.checksum_header;
             if (new_item.size != old_record.file_size) {
-                GLib.warn (lc_propagate_remote_move) << "File sizes differ on server vs sync journal : " << new_item.size << old_record.file_size;
+                GLib.warn ("File sizes differ on server vs sync journal : " + new_item.size + old_record.file_size;
 
                 // the server might have claimed a different size, we take the old one from the DB
                 new_item.size = old_record.file_size;
@@ -251,28 +251,28 @@ class PropagateRemoteMove : PropagateItemJob {
         }
         const var result = propagator ().update_metadata (new_item);
         if (!result) {
-            on_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
+            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (new_item.file));
+            on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (new_item.file));
             return;
         }
         if (pin_state && *pin_state != PinState.PinState.INHERITED
             && !vfs.pin_state (new_item.rename_target, *pin_state)) {
-            on_done (SyncFileItem.Status.NORMAL_ERROR, _("Error setting pin state"));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Error setting pin state"));
             return;
         }
 
         if (this.item.is_directory ()) {
             propagator ().renamed_directories.insert (this.item.file, this.item.rename_target);
             if (!adjust_selective_sync (propagator ().journal, this.item.file, this.item.rename_target)) {
-                on_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database"));
+                on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database"));
                 return;
             }
         }
 
         propagator ().journal.commit ("Remote Rename");
-        on_done (SyncFileItem.Status.SUCCESS);
+        on_signal_done (SyncFileItem.Status.SUCCESS);
     }
 
 } // class PropagateRemoteMove

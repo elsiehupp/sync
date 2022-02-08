@@ -12,46 +12,29 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Unified_search_result class
+@brief The UnifiedSearchResult class
 @ingroup gui
-Simple data structure that represents single Unified Search result
+Simple data structure that represents single Unified Search
+result
 ***********************************************************/
+struct UnifiedSearchResult {
 
-struct Unified_search_result {
-    enum Type : uint8 {
-        Default,
-        Fetch_more_trigger,
+    public enum Type {
+        DEFAULT = "DEFAULT",
+        FETCH_MORE_TRIGGER = "FETCH_MORE_TRIGGER",
     }
 
-    /***********************************************************
-    ***********************************************************/
-    static string type_as_string (Unified_search_result.Type type);
+    string title;
+    string subline;
+    string provider_id;
+    string provider_name;
+    bool is_rounded = false;
+    int32 order = int32.MAX;
+    GLib.Uri resource_url;
+    string icons;
+    Type type = Type.DEFAULT;
 
-    string this.title;
-    string this.subline;
-    string this.provider_id;
-    string this.provider_name;
-    bool this.is_rounded = false;
-    int32 this.order = std.numeric_limits<int32>.max ();
-    GLib.Uri this.resource_url;
-    string this.icons;
-    Type this.type = Type.Default;
-}
+} // struct UnifiedSearchResult
 
-
-    string Unified_search_result.type_as_string (Unified_search_result.Type type) {
-        string result;
-
-        switch (type) {
-        case Default:
-            result = QStringLiteral ("Default");
-            break;
-
-        case Fetch_more_trigger:
-            result = QStringLiteral ("Fetch_more_trigger");
-            break;
-        }
-        return result;
-    }
-    }
-    
+} // namespace Ui
+} // namespace Occ

@@ -68,16 +68,16 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
             return r;
 
         if (status.startsWith ("OK"))
-            r << "vcs-normal";
+            r + "vcs-normal";
         if (status.startsWith ("SYNC") || status.startsWith ("NEW"))
-            r << "vcs-update-required";
+            r + "vcs-update-required";
         if (status.startsWith ("IGNORE") || status.startsWith ("WARN"))
-            r << "vcs-locally-modified-unstaged";
+            r + "vcs-locally-modified-unstaged";
         if (status.startsWith ("ERROR"))
-            r << "vcs-conflicting";
+            r + "vcs-conflicting";
 
         if (status.contains ("+SWM"))
-            r << "document-share";
+            r + "document-share";
 
         return r;
     }

@@ -31,12 +31,12 @@ class Folder_watcher_private : GLib.Object {
         return this.path_to_watch.size ();
     }
 
-    /// On linux the watcher is ready when the ctor on_finished.
+    /// On linux the watcher is ready when the ctor on_signal_finished.
     public bool this.ready = true;
 
 protected slots:
-    void on_received_notification (int fd);
-    void on_add_folder_recursive (string path);
+    void on_signal_received_notification (int fd);
+    void on_signal_add_folder_recursive (string path);
 
 
     protected bool find_folders_below (QDir dir, string[] full_list);
@@ -64,13 +64,13 @@ protected slots:
         this.folder (path) {
         this.fd = inotify_init ();
         if (this.fd != -1) {
-            this.socket.on_reset (new QSocket_notifier (this.fd, QSocket_notifier.Read));
-            connect (this.socket.data (), &QSocket_notifier.activated, this, &Folder_watcher_private.on_received_notification);
+            this.socket.on_signal_reset (new QSocket_notifier (this.fd, QSocket_notifier.Read));
+            connect (this.socket.data (), &QSocket_notifier.activated, this, &Folder_watcher_private.on_signal_received_notification);
         } else {
-            GLib.warn (lc_folder_watcher) << "notify_init () failed : " << strerror (errno);
+            GLib.warn ("notify_init () failed : " + strerror (errno);
         }
 
-        QMetaObject.invoke_method (this, "on_add_folder_recursive", Q_ARG (string, path));
+        QMetaObject.invoke_method (this, "on_signal_add_folder_recursive", Q_ARG (string, path));
     }
 
     Folder_watcher_private.~Folder_watcher_private () = default;
@@ -79,11 +79,11 @@ protected slots:
     bool Folder_watcher_private.find_folders_below (QDir dir, string[] full_list) {
         bool ok = true;
         if (! (dir.exists () && dir.is_readable ())) {
-            GLib.debug (lc_folder_watcher) << "Non existing path coming in : " << dir.absolute_path ();
+            GLib.debug ("Non existing path coming in : " + dir.absolute_path ();
             ok = false;
         } else {
             string[] name_filter;
-            name_filter << QLatin1String ("*");
+            name_filter + QLatin1String ("*");
             QDir.Filters filter = QDir.Dirs | QDir.NoDotAndDotDot | QDir.No_sym_links | QDir.Hidden;
             const string[] pathes = dir.entry_list (name_filter, filter);
 
@@ -120,19 +120,19 @@ protected slots:
         }
     }
 
-    void Folder_watcher_private.on_add_folder_recursive (string path) {
+    void Folder_watcher_private.on_signal_add_folder_recursive (string path) {
         if (this.path_to_watch.contains (path))
             return;
 
         int subdirs = 0;
-        GLib.debug (lc_folder_watcher) << " (+) Watcher:" << path;
+        GLib.debug (" (+) Watcher:" + path;
 
         QDir in_path (path);
         inotify_register_path (in_path.absolute_path ());
 
         string[] all_subfolders;
         if (!find_folders_below (QDir (path), all_subfolders)) {
-            GLib.warn (lc_folder_watcher) << "Could not traverse all sub folders";
+            GLib.warn ("Could not traverse all sub folders";
         }
         QStringListIterator subfolders_it (all_subfolders);
         while (subfolders_it.has_next ()) {
@@ -141,21 +141,21 @@ protected slots:
             if (folder.exists () && !this.path_to_watch.contains (folder.absolute_path ())) {
                 subdirs++;
                 if (this.parent.path_is_ignored (subfolder)) {
-                    GLib.debug (lc_folder_watcher) << "* Not adding" << folder.path ();
+                    GLib.debug ("* Not adding" + folder.path ();
                     continue;
                 }
                 inotify_register_path (folder.absolute_path ());
             } else {
-                GLib.debug (lc_folder_watcher) << "    `. discarded:" << folder.path ();
+                GLib.debug ("    `. discarded:" + folder.path ();
             }
         }
 
         if (subdirs > 0) {
-            GLib.debug (lc_folder_watcher) << "    `. and" << subdirs << "subdirectories";
+            GLib.debug ("    `. and" + subdirs + "subdirectories";
         }
     }
 
-    void Folder_watcher_private.on_received_notification (int fd) {
+    void Folder_watcher_private.on_signal_received_notification (int fd) {
         int len = 0;
         struct inotify_event event = null;
         size_t i = 0;
@@ -187,7 +187,7 @@ protected slots:
             // cast an inotify_event
             event = (struct inotify_event *)&buffer[i];
             if (!event) {
-                GLib.debug (lc_folder_watcher) << "NULL event";
+                GLib.debug ("NULL event";
                 continue;
             }
 
@@ -208,7 +208,7 @@ protected slots:
             if ( (event.mask & (IN_MOVED_TO | IN_CREATE))
                 && QFileInfo (p).is_dir ()
                 && !this.parent.path_is_ignored (p)) {
-                on_add_folder_recursive (p);
+                on_signal_add_folder_recursive (p);
             }
             if (event.mask & (IN_MOVED_FROM | IN_DELETE)) {
                 remove_folders_below (p);
@@ -238,7 +238,7 @@ protected slots:
             inotify_rm_watch (this.fd, wid);
             this.watch_to_path.remove (wid);
             it = this.path_to_watch.erase (it);
-            GLib.debug (lc_folder_watcher) << "Removed watch for" << it_path;
+            GLib.debug ("Removed watch for" + it_path;
         }
     }
 

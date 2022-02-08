@@ -17,7 +17,6 @@ namespace Occ {
 @ingroup libsync
 ***********************************************************/
 class SyncFileItem {
-    // Q_GADGET
 
     private class SyncFileItemPtr : unowned SyncFileItem { }
     private class SyncFileItemVector : GLib.Vector<SyncFileItemPtr> { }
@@ -351,13 +350,13 @@ class SyncFileItem {
         // Update the inode if possible
         record.inode = this.inode;
         if (FileSystem.get_inode (local_filename, record.inode)) {
-            GLib.debug (lc_file_item) << local_filename << "Retrieved inode " << record.inode << " (previous item inode : " << this.inode << ")";
+            GLib.debug () + local_filename + "Retrieved inode " + record.inode + " (previous item inode : " + this.inode + ")";
         } else {
             // use the "old" inode coming with the item for the case where the
             // filesystem stat fails. That can happen if the the file was removed
             // or renamed meanwhile. For the rename case we still need the inode to
             // detect the rename though.
-            GLib.warn (lc_file_item) << "Failed to query the 'inode' for file " << local_filename;
+            GLib.warn ("Failed to query the 'inode' for file " + local_filename;
         }
         return record;
     }

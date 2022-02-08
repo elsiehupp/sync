@@ -4,117 +4,62 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-
 namespace Occ {
 namespace Ui {
 
-class Sync_status_summary : GLib.Object {
-
-    //  Q_PROPERTY (double sync_progress READ sync_progress NOTIFY sync_progress_changed)
-    //  Q_PROPERTY (GLib.Uri sync_icon READ sync_icon NOTIFY sync_icon_changed)
-    //  Q_PROPERTY (bool syncing READ syncing NOTIFY syncing_changed)
-    //  Q_PROPERTY (string sync_status_string READ sync_status_string NOTIFY sync_status_string_changed)
-    //  Q_PROPERTY (string sync_status_detail_string READ sync_status_detail_string NOTIFY sync_status_detail_string_changed)
+class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Sync_status_summary (GLib.Object parent = new GLib.Object ());
+    private AccountStatePtr account_state;
 
     /***********************************************************
     ***********************************************************/
-    public double sync_progress ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public bool syncing ();
-
-    /***********************************************************
-    ***********************************************************/
-    public string sync_status_"";
+    private GLib.Uri sync_icon = Theme.instance ().sync_status_ok ();
+    private double progress = 1.0;
+    private bool is_syncing = false;
+    private string sync_status_string = _("All synced!");
+    private string sync_status_detail_string;
 
 
-    public string sync_status_detail_"";
-
-signals:
-    void sync_progress_changed ();
-    void sync_icon_changed ();
-    void syncing_changed ();
-    void sync_status_string_changed ();
-    void sync_status_detail_string_changed ();
+    signal void signal_sync_progress_changed ();
+    signal void signal_sync_icon_changed ();
+    signal void signal_syncing_changed ();
+    signal void signal_sync_status_string_changed ();
+    signal void signal_sync_status_detail_string_changed ();
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_load ();
+    public SyncStatusSummary (GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        const var folder_man = FolderMan.instance ();
+        connect (folder_man, &FolderMan.folder_list_changed, this, &SyncStatusSummary.on_signal_folder_list_changed);
+        connect (folder_man, &FolderMan.folder_sync_state_change, this, &SyncStatusSummary.on_signal_folder_sync_state_changed);
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public double sync_progress () {
+        return this.progress;
+    }
 
 
     /***********************************************************
     ***********************************************************/
-    private void connect_to_folders_progress (Folder.Map map);
+    private void sync_progress (double value) {
+        if (this.progress == value) {
+            return;
+        }
+
+        this.progress = value;
+        /* emit */ signal_sync_progress_changed ();
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    private void on_folder_list_changed (Occ.Folder.Map folder_map);
-    private void on_folder_progress_info (ProgressInfo progress);
-    private void on_folder_sync_state_changed (Folder folder);
-    private void on_is_connected_changed ();
-
-    /***********************************************************
-    ***********************************************************/
-    private void sync_state_for_folder (Folder folder);
-    private void mark_folder_as_error (Folder folder);
-    private void mark_folder_as_success (Folder folder);
-    private bool folder_errors ();
-    private bool folder_error (Folder folder);
-    private void clear_folder_errors ();
-    private void sync_state_to_connected_state ();
-    private bool reload_needed (AccountState account_state);
-    private void init_sync_state ();
-
-    /***********************************************************
-    ***********************************************************/
-    private void sync_progress (double value);
-    private void syncing (bool value);
-    private void sync_status_string (string value);
-    private void sync_status_detail_string (string value);
-    private void sync_icon (GLib.Uri value);
-    private void account_state (AccountStatePtr account_state);
-
-    /***********************************************************
-    ***********************************************************/
-    private AccountStatePtr this.account_state;
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private GLib.Uri this.sync_icon = Theme.instance ().sync_status_ok ();
-    private double this.progress = 1.0;
-    private bool this.is_syncing = false;
-    private string this.sync_status_string = _("All synced!");
-    private string this.sync_status_detail_string;
-}
-}
-
-
-
-
-
-
-
-
-
-
-namespace {
-
-    Occ.SyncResult.Status determine_sync_status (Occ.SyncResult sync_result) {
+    private Occ.SyncResult.Status determine_sync_status (Occ.SyncResult sync_result) {
         const var status = sync_result.status ();
 
         if (status == Occ.SyncResult.Status.SUCCESS || status == Occ.SyncResult.Status.PROBLEM) {
@@ -128,22 +73,70 @@ namespace {
         return status;
     }
 
-    Sync_status_summary.Sync_status_summary (GLib.Object parent) {
-        base (parent);
-        const var folder_man = FolderMan.instance ();
-        connect (folder_man, &FolderMan.folder_list_changed, this, &Sync_status_summary.on_folder_list_changed);
-        connect (folder_man, &FolderMan.folder_sync_state_change, this, &Sync_status_summary.on_folder_sync_state_changed);
+    /***********************************************************
+    ***********************************************************/
+    public bool syncing () {
+        return this.is_syncing;
     }
 
-    bool Sync_status_summary.reload_needed (AccountState account_state) {
-        if (this.account_state.data () == account_state) {
-            return false;
+    /***********************************************************
+    ***********************************************************/
+    public bool syncing (bool value) {
+        if (value == this.is_syncing) {
+            return;
         }
-        return true;
+
+        this.is_syncing = value;
+        /* emit */ signal_syncing_changed ();
     }
 
-    void Sync_status_summary.on_load () {
-        const var current_user = User_model.instance ().current_user ();
+
+    /***********************************************************
+    ***********************************************************/
+    public string sync_status_string ();
+    string SyncStatusSummary.sync_status_string () {
+        return this.sync_status_string;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void sync_status_string (string value);
+    void SyncStatusSummary.sync_status_string (string value) {
+        if (this.sync_status_string == value) {
+            return;
+        }
+
+        this.sync_status_string = value;
+        /* emit */ signal_sync_status_string_changed ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public string sync_status_detail_string ();
+    string SyncStatusSummary.sync_status_detail_string () {
+        return this.sync_status_detail_string;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void sync_status_detail_string (string value);
+    void SyncStatusSummary.sync_status_detail_string (string value) {
+        if (this.sync_status_detail_string == value) {
+            return;
+        }
+
+        this.sync_status_detail_string = value;
+        /* emit */ signal_sync_status_detail_string_changed ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_load () {
+        const var current_user = UserModel.instance ().is_current_user ();
         if (!current_user) {
             return;
         }
@@ -153,43 +146,84 @@ namespace {
         init_sync_state ();
     }
 
-    double Sync_status_summary.sync_progress () {
-        return this.progress;
+
+    /***********************************************************
+    ***********************************************************/
+    private void connect_to_folders_progress (Folder.Map map) {
+        for (var folder : folder_map) {
+            if (folder.account_state () == this.account_state.data ()) {
+                connect (
+                    folder, &Folder.progress_info, this, &SyncStatusSummary.on_signal_folder_progress_info, Qt.UniqueConnection);
+            } else {
+                disconnect (folder, &Folder.progress_info, this, &SyncStatusSummary.on_signal_folder_progress_info);
+            }
+        }
     }
 
-    GLib.Uri Sync_status_summary.sync_icon () {
-        return this.sync_icon;
-    }
 
-    bool Sync_status_summary.syncing () {
-        return this.is_syncing;
-    }
-
-    void Sync_status_summary.on_folder_list_changed (Occ.Folder.Map folder_map) {
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_folder_list_changed (Occ.Folder.Map folder_map) {
         connect_to_folders_progress (folder_map);
     }
 
-    void Sync_status_summary.mark_folder_as_error (Folder folder) {
-        this.folders_with_errors.insert (folder.alias ());
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_folder_progress_info (ProgressInfo progress) {
+        const int64 completed_size = progress.completed_size ();
+        const int64 current_file = progress.current_file ();
+        const int64 completed_file = progress.completed_files ();
+        const int64 total_size = q_max (completed_size, progress.total_size ());
+        const int64 total_file_count = q_max (current_file, progress.total_files ());
+
+        sync_progress (calculate_overall_percent (total_file_count, completed_file, total_size, completed_size));
+
+        if (total_size > 0) {
+            const var completed_size_string = Utility.octets_to_string (completed_size);
+            const var total_size_string = Utility.octets_to_string (total_size);
+
+            if (progress.trust_eta ()) {
+                sync_status_detail_string (
+                    _("%1 of %2 · %3 left")
+                        .arg (completed_size_string, total_size_string)
+                        .arg (Utility.duration_to_descriptive_string1 (progress.total_progress ().estimated_eta)));
+            } else {
+                sync_status_detail_string (_("%1 of %2").arg (completed_size_string, total_size_string));
+            }
+        }
+
+        if (total_file_count > 0) {
+            sync_status_string (_("Syncing file %1 of %2").arg (current_file).arg (total_file_count));
+        }
     }
 
-    void Sync_status_summary.mark_folder_as_success (Folder folder) {
-        this.folders_with_errors.erase (folder.alias ());
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_folder_sync_state_changed (Folder folder) {
+        if (!folder) {
+            return;
+        }
+
+        if (!this.account_state || folder.account_state () != this.account_state.data ()) {
+            return;
+        }
+
+        sync_state_for_folder (folder);
     }
 
-    bool Sync_status_summary.folder_errors () {
-        return this.folders_with_errors.size () != 0;
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_is_connected_changed () {
+        sync_state_to_connected_state ();
     }
 
-    bool Sync_status_summary.folder_error (Folder folder) {
-        return this.folders_with_errors.find (folder.alias ()) != this.folders_with_errors.end ();
-    }
 
-    void Sync_status_summary.clear_folder_errors () {
-        this.folders_with_errors.clear ();
-    }
-
-    void Sync_status_summary.sync_state_for_folder (Folder folder) {
+    /***********************************************************
+    ***********************************************************/
+    private void sync_state_for_folder (Folder folder) {
         if (this.account_state && !this.account_state.is_connected ()) {
             syncing (false);
             sync_status_string (_("Offline"));
@@ -245,126 +279,48 @@ namespace {
         }
     }
 
-    void Sync_status_summary.on_folder_sync_state_changed (Folder folder) {
-        if (!folder) {
-            return;
-        }
 
-        if (!this.account_state || folder.account_state () != this.account_state.data ()) {
-            return;
-        }
-
-        sync_state_for_folder (folder);
+    /***********************************************************
+    ***********************************************************/
+    private void mark_folder_as_error (Folder folder) {
+        this.folders_with_errors.insert (folder.alias ());
     }
 
-    constexpr double calculate_overall_percent (
-        int64 total_file_count, int64 completed_file, int64 total_size, int64 completed_size) {
-        int overall_percent = 0;
-        if (total_file_count > 0) {
-            // Add one 'byte' for each file so the percentage is moving when deleting or renaming files
-            overall_percent = q_round (double (completed_size + completed_file) / double (total_size + total_file_count) * 100.0);
-        }
-        overall_percent = q_bound (0, overall_percent, 100);
-        return overall_percent / 100.0;
+
+    /***********************************************************
+    ***********************************************************/
+    private void mark_folder_as_success (Folder folder);
+    void SyncStatusSummary.mark_folder_as_success (Folder folder) {
+        this.folders_with_errors.erase (folder.alias ());
     }
 
-    void Sync_status_summary.on_folder_progress_info (ProgressInfo progress) {
-        const int64 completed_size = progress.completed_size ();
-        const int64 current_file = progress.current_file ();
-        const int64 completed_file = progress.completed_files ();
-        const int64 total_size = q_max (completed_size, progress.total_size ());
-        const int64 total_file_count = q_max (current_file, progress.total_files ());
 
-        sync_progress (calculate_overall_percent (total_file_count, completed_file, total_size, completed_size));
-
-        if (total_size > 0) {
-            const var completed_size_string = Utility.octets_to_string (completed_size);
-            const var total_size_string = Utility.octets_to_string (total_size);
-
-            if (progress.trust_eta ()) {
-                sync_status_detail_string (
-                    _("%1 of %2 · %3 left")
-                        .arg (completed_size_string, total_size_string)
-                        .arg (Utility.duration_to_descriptive_string1 (progress.total_progress ().estimated_eta)));
-            } else {
-                sync_status_detail_string (_("%1 of %2").arg (completed_size_string, total_size_string));
-            }
-        }
-
-        if (total_file_count > 0) {
-            sync_status_string (_("Syncing file %1 of %2").arg (current_file).arg (total_file_count));
-        }
+    /***********************************************************
+    ***********************************************************/
+    private bool folder_errors ();
+    bool SyncStatusSummary.folder_errors () {
+        return this.folders_with_errors.size () != 0;
     }
 
-    void Sync_status_summary.syncing (bool value) {
-        if (value == this.is_syncing) {
-            return;
-        }
 
-        this.is_syncing = value;
-        /* emit */ syncing_changed ();
+    /***********************************************************
+    ***********************************************************/
+    private bool folder_error (Folder folder) {
+        return this.folders_with_errors.find (folder.alias ()) != this.folders_with_errors.end ();
     }
 
-    void Sync_status_summary.sync_progress (double value) {
-        if (this.progress == value) {
-            return;
-        }
 
-        this.progress = value;
-        /* emit */ sync_progress_changed ();
+    /***********************************************************
+    ***********************************************************/
+    private void clear_folder_errors () {
+        this.folders_with_errors.clear ();
     }
 
-    void Sync_status_summary.sync_status_string (string value) {
-        if (this.sync_status_string == value) {
-            return;
-        }
 
-        this.sync_status_string = value;
-        /* emit */ sync_status_string_changed ();
-    }
 
-    string Sync_status_summary.sync_status_"" {
-        return this.sync_status_string;
-    }
-
-    string Sync_status_summary.sync_status_detail_"" {
-        return this.sync_status_detail_string;
-    }
-
-    void Sync_status_summary.sync_icon (GLib.Uri value) {
-        if (this.sync_icon == value) {
-            return;
-        }
-
-        this.sync_icon = value;
-        /* emit */ sync_icon_changed ();
-    }
-
-    void Sync_status_summary.sync_status_detail_string (string value) {
-        if (this.sync_status_detail_string == value) {
-            return;
-        }
-
-        this.sync_status_detail_string = value;
-        /* emit */ sync_status_detail_string_changed ();
-    }
-
-    void Sync_status_summary.connect_to_folders_progress (Folder.Map folder_map) {
-        for (var folder : folder_map) {
-            if (folder.account_state () == this.account_state.data ()) {
-                connect (
-                    folder, &Folder.progress_info, this, &Sync_status_summary.on_folder_progress_info, Qt.UniqueConnection);
-            } else {
-                disconnect (folder, &Folder.progress_info, this, &Sync_status_summary.on_folder_progress_info);
-            }
-        }
-    }
-
-    void Sync_status_summary.on_is_connected_changed () {
-        sync_state_to_connected_state ();
-    }
-
-    void Sync_status_summary.sync_state_to_connected_state () {
+    /***********************************************************
+    ***********************************************************/
+    private void sync_state_to_connected_state () {
         syncing (false);
         sync_status_detail_string ("");
         if (this.account_state && !this.account_state.is_connected ()) {
@@ -376,22 +332,23 @@ namespace {
         }
     }
 
-    void Sync_status_summary.account_state (AccountStatePtr account_state) {
-        if (!reload_needed (account_state.data ())) {
-            return;
+
+    /***********************************************************
+    ***********************************************************/
+    private bool reload_needed (AccountState account_state) {
+        if (this.account_state.data () == account_state) {
+            return false;
         }
-        if (this.account_state) {
-            disconnect (
-                this.account_state.data (), &AccountState.is_connected_changed, this, &Sync_status_summary.on_is_connected_changed);
-        }
-        this.account_state = account_state;
-        connect (this.account_state.data (), &AccountState.is_connected_changed, this, &Sync_status_summary.on_is_connected_changed);
+        return true;
     }
 
-    void Sync_status_summary.init_sync_state () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void init_sync_state () {
         var sync_state_fallback_needed = true;
         for (var folder : FolderMan.instance ().map ()) {
-            on_folder_sync_state_changed (folder);
+            on_signal_folder_sync_state_changed (folder);
             sync_state_fallback_needed = false;
         }
 
@@ -399,5 +356,59 @@ namespace {
             sync_state_to_connected_state ();
         }
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void syncing (bool value);
+
+
+    /***********************************************************
+    ***********************************************************/
+    GLib.Uri SyncStatusSummary.sync_icon () {
+        return this.sync_icon;
     }
-    
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void sync_icon (GLib.Uri value);
+    void SyncStatusSummary.sync_icon (GLib.Uri value) {
+        if (this.sync_icon == value) {
+            return;
+        }
+
+        this.sync_icon = value;
+        /* emit */ signal_sync_icon_changed ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void account_state (AccountStatePtr account_state) {
+        if (!reload_needed (account_state.data ())) {
+            return;
+        }
+        if (this.account_state) {
+            disconnect (
+                this.account_state.data (), &AccountState.is_connected_changed, this, &SyncStatusSummary.on_signal_is_connected_changed);
+        }
+        this.account_state = account_state;
+        connect (this.account_state.data (), &AccountState.is_connected_changed, this, &SyncStatusSummary.on_signal_is_connected_changed);
+    }
+
+
+    private static double calculate_overall_percent (
+        int64 total_file_count, int64 completed_file, int64 total_size, int64 completed_size) {
+        int overall_percent = 0;
+        if (total_file_count > 0) {
+            // Add one 'byte' for each file so the percentage is moving when deleting or renaming files
+            overall_percent = q_round (double (completed_size + completed_file) / double (total_size + total_file_count) * 100.0);
+        }
+        overall_percent = q_bound (0, overall_percent, 100);
+        return overall_percent / 100.0;
+    }
+} // class SyncStatusSummary
+
+} // namespace Ui
+} // namespace Occ

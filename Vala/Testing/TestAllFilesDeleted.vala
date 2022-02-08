@@ -30,8 +30,8 @@ class TestAllFilesDeleted : GLib.Object {
     ***********************************************************/
     private on_ void testAllFilesDeletedKeep_data () {
         QTest.addColumn<bool> ("deleteOnRemote");
-        QTest.newRow ("local") << false;
-        QTest.newRow ("remote") << true;
+        QTest.newRow ("local") + false;
+        QTest.newRow ("remote") + true;
 
     }
 
@@ -193,8 +193,8 @@ class TestAllFilesDeleted : GLib.Object {
     ***********************************************************/
     private on_ void testDataFingetPrint_data () {
         QTest.addColumn<bool> ("hasInitialFingerPrint");
-        QTest.newRow ("initial finger print") << true;
-        QTest.newRow ("no initial finger print") << false;
+        QTest.newRow ("initial finger print") + true;
+        QTest.newRow ("no initial finger print") + false;
     }
 
 
@@ -327,7 +327,7 @@ class TestAllFilesDeleted : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
         fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
-            string[] () << "A/" << "B/" << "C/" << "S/");
+            string[] ("A/" + "B/" + "C/" + "S/");
 
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), FileInfo{}); // all files should be one localy

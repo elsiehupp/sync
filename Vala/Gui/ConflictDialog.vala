@@ -44,15 +44,15 @@ class ConflictDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public void on_base_filename (string base_filename);
+    public void on_signal_base_filename (string base_filename);
 
 
-    public void on_local_version_filename (string local_version_filename);
+    public void on_signal_local_version_filename (string local_version_filename);
 
 
-    public void on_remote_version_filename (string remote_version_filename);
+    public void on_signal_remote_version_filename (string remote_version_filename);
 
-    void on_accept () override;
+    void on_signal_accept () override;
 
 
     /***********************************************************
@@ -92,7 +92,7 @@ namespace {
         this.ui.up_ui (this);
         force_header_font (this.ui.conflict_message);
         this.ui.button_box.button (QDialogButtonBox.Ok).enabled (false);
-        this.ui.button_box.button (QDialogButtonBox.Ok).on_text (_("Keep selected version"));
+        this.ui.button_box.button (QDialogButtonBox.Ok).on_signal_text (_("Keep selected version"));
 
         connect (this.ui.local_version_radio, &QCheckBox.toggled, this, &ConflictDialog.update_button_states);
         connect (this.ui.local_version_button, &QToolButton.clicked, this, [=] {
@@ -104,8 +104,8 @@ namespace {
             QDesktopServices.open_url (GLib.Uri.from_local_file (this.solver.remote_version_filename ()));
         });
 
-        connect (this.solver, &ConflictSolver.local_version_filename_changed, this, &ConflictDialog.update_widgets);
-        connect (this.solver, &ConflictSolver.remote_version_filename_changed, this, &ConflictDialog.update_widgets);
+        connect (this.solver, &ConflictSolver.signal_local_version_filename_changed, this, &ConflictDialog.update_widgets);
+        connect (this.solver, &ConflictSolver.signal_remote_version_filename_changed, this, &ConflictDialog.update_widgets);
     }
 
     string ConflictDialog.base_filename () {
@@ -122,24 +122,24 @@ namespace {
         return this.solver.remote_version_filename ();
     }
 
-    void ConflictDialog.on_base_filename (string base_filename) {
+    void ConflictDialog.on_signal_base_filename (string base_filename) {
         if (this.base_filename == base_filename) {
             return;
         }
 
         this.base_filename = base_filename;
-        this.ui.conflict_message.on_text (_("Conflicting versions of %1.").arg (this.base_filename));
+        this.ui.conflict_message.on_signal_text (_("Conflicting versions of %1.").arg (this.base_filename));
     }
 
-    void ConflictDialog.on_local_version_filename (string local_version_filename) {
-        this.solver.on_local_version_filename (local_version_filename);
+    void ConflictDialog.on_signal_local_version_filename (string local_version_filename) {
+        this.solver.on_signal_local_version_filename (local_version_filename);
     }
 
-    void ConflictDialog.on_remote_version_filename (string remote_version_filename) {
-        this.solver.on_remote_version_filename (remote_version_filename);
+    void ConflictDialog.on_signal_remote_version_filename (string remote_version_filename) {
+        this.solver.on_signal_remote_version_filename (remote_version_filename);
     }
 
-    void ConflictDialog.on_accept () {
+    void ConflictDialog.on_signal_accept () {
         const var is_local_picked = this.ui.local_version_radio.is_checked ();
         const var is_remote_picked = this.ui.remote_version_radio.is_checked ();
 
@@ -148,11 +148,11 @@ namespace {
             return;
         }
 
-        const var solution = is_local_picked && is_remote_picked ? ConflictSolver.KeepBothVersions
-                            : is_local_picked ? ConflictSolver.KeepLocalVersion
-                            : ConflictSolver.KeepRemoteVersion;
+        const var solution = is_local_picked && is_remote_picked ? ConflictSolver.Solution.KEEP_BOTH_VERSION
+                            : is_local_picked ? ConflictSolver.Solution.KEEP_LOCAL_VERSION
+                            : ConflictSolver.Solution.KEEP_REMOTE_VERSION;
         if (this.solver.exec (solution)) {
-            Gtk.Dialog.on_accept ();
+            Gtk.Dialog.on_signal_accept ();
         }
     }
 
@@ -161,11 +161,11 @@ namespace {
 
         const var update_group = [this, mime_database] (string filename, Gtk.Label link_label, string link_text, Gtk.Label mtime_label, Gtk.Label size_label, QToolButton button) {
             const var file_url = GLib.Uri.from_local_file (filename).to_string ();
-            link_label.on_text ("<a href='%1'>%2</a>".arg (file_url).arg (link_text));
+            link_label.on_signal_text ("<a href='%1'>%2</a>".arg (file_url).arg (link_text));
 
             const var info = QFileInfo (filename);
-            mtime_label.on_text (info.last_modified ().to_string ());
-            size_label.on_text (locale ().formatted_data_size (info.size ()));
+            mtime_label.on_signal_text (info.last_modified ().to_string ());
+            size_label.on_signal_text (locale ().formatted_data_size (info.size ()));
 
             const var mime = mime_database.mime_type_for_file (filename);
             if (QIcon.has_theme_icon (mime.icon_name ())) {
@@ -207,7 +207,7 @@ namespace {
                         : is_local_picked ? _("Keep local version")
                         : is_remote_picked ? _("Keep server version")
                         : _("Keep selected version");
-        this.ui.button_box.button (QDialogButtonBox.Ok).on_text (text);
+        this.ui.button_box.button (QDialogButtonBox.Ok).on_signal_text (text);
     }
 
     } // namespace Occ

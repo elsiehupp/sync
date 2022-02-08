@@ -315,71 +315,71 @@ class TestSyncConflict : GLib.Object {
         QTest.addColumn<string> ("output");
 
         QTest.newRow ("nomatch1")
-            << "a/b/foo"
-            << "";
+            + "a/b/foo"
+            + "";
         QTest.newRow ("nomatch2")
-            << "a/b/foo.txt"
-            << "";
+            + "a/b/foo.txt"
+            + "";
         QTest.newRow ("nomatch3")
-            << "a/b/foo_conflict"
-            << "";
+            + "a/b/foo_conflict"
+            + "";
         QTest.newRow ("nomatch4")
-            << "a/b/foo_conflict.txt"
-            << "";
+            + "a/b/foo_conflict.txt"
+            + "";
 
         QTest.newRow ("match1")
-            << "a/b/foo_conflict-123.txt"
-            << "a/b/foo.txt";
+            + "a/b/foo_conflict-123.txt"
+            + "a/b/foo.txt";
         QTest.newRow ("match2")
-            << "a/b/foo_conflict-foo-123.txt"
-            << "a/b/foo.txt";
+            + "a/b/foo_conflict-foo-123.txt"
+            + "a/b/foo.txt";
 
         QTest.newRow ("match3")
-            << "a/b/foo_conflict-123"
-            << "a/b/foo";
+            + "a/b/foo_conflict-123"
+            + "a/b/foo";
         QTest.newRow ("match4")
-            << "a/b/foo_conflict-foo-123"
-            << "a/b/foo";
+            + "a/b/foo_conflict-foo-123"
+            + "a/b/foo";
 
         // new style
         QTest.newRow ("newmatch1")
-            << "a/b/foo (conflicted copy 123).txt"
-            << "a/b/foo.txt";
+            + "a/b/foo (conflicted copy 123).txt"
+            + "a/b/foo.txt";
         QTest.newRow ("newmatch2")
-            << "a/b/foo (conflicted copy foo 123).txt"
-            << "a/b/foo.txt";
+            + "a/b/foo (conflicted copy foo 123).txt"
+            + "a/b/foo.txt";
 
         QTest.newRow ("newmatch3")
-            << "a/b/foo (conflicted copy 123)"
-            << "a/b/foo";
+            + "a/b/foo (conflicted copy 123)"
+            + "a/b/foo";
         QTest.newRow ("newmatch4")
-            << "a/b/foo (conflicted copy foo 123)"
-            << "a/b/foo";
+            + "a/b/foo (conflicted copy foo 123)"
+            + "a/b/foo";
 
         QTest.newRow ("newmatch5")
-            << "a/b/foo (conflicted copy foo 123) bla"
-            << "a/b/foo bla";
+            + "a/b/foo (conflicted copy foo 123) bla"
+            + "a/b/foo bla";
 
         QTest.newRow ("newmatch6")
-            << "a/b/foo (conflicted copy foo.bar 123)"
-            << "a/b/foo";
+            + "a/b/foo (conflicted copy foo.bar 123)"
+            + "a/b/foo";
 
         // double conflict files
         QTest.newRow ("double1")
-            << "a/b/foo_conflict-123_conflict-456.txt"
-            << "a/b/foo_conflict-123.txt";
+            + "a/b/foo_conflict-123_conflict-456.txt"
+            + "a/b/foo_conflict-123.txt";
         QTest.newRow ("double2")
-            << "a/b/foo_conflict-foo-123_conflict-bar-456.txt"
-            << "a/b/foo_conflict-foo-123.txt";
+            + "a/b/foo_conflict-foo-123_conflict-bar-456.txt"
+            + "a/b/foo_conflict-foo-123.txt";
         QTest.newRow ("double3")
-            << "a/b/foo (conflicted copy 123) (conflicted copy 456).txt"
-            << "a/b/foo (conflicted copy 123).txt";
+            + "a/b/foo (conflicted copy 123) (conflicted copy 456).txt"
+            + "a/b/foo (conflicted copy 123).txt";
         QTest.newRow ("double4")
-            << "a/b/foo (conflicted copy 123)this.conflict-456.txt"
-            << "a/b/foo (conflicted copy 123).txt";
+            + "a/b/foo (conflicted copy 123)this.conflict-456.txt"
+            + "a/b/foo (conflicted copy 123).txt";
         QTest.newRow ("double5")
-            << "a/b/foo_conflict-123 (conflicted copy 456).txt"
-            << "a/b/foo_conflict-123.txt";
+            + "a/b/foo_conflict-123 (conflicted copy 456).txt"
+            + "a/b/foo_conflict-123.txt";
     }
 
 
@@ -399,10 +399,10 @@ class TestSyncConflict : GLib.Object {
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // 1) a NEW/NEW conflict
         fakeFolder.localModifier ().mkdir ("Z");
@@ -459,7 +459,7 @@ class TestSyncConflict : GLib.Object {
         // The contents of the conflict directories will only be uploaded after
         // another sync.
         QVERIFY (fakeFolder.syncEngine ().isAnotherSyncNeeded () == ImmediateFollowUp);
-        on_cleanup ();
+        on_signal_cleanup ();
         QVERIFY (fakeFolder.syncOnce ());
 
         QVERIFY (itemSuccessful (completeSpy, conflicts[0], CSYNC_INSTRUCTION_NEW));

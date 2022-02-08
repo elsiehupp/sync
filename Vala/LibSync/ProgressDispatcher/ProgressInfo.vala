@@ -19,7 +19,7 @@ class ProgressInfo : GLib.Object {
     public enum Status {
 
         /***********************************************************
-        Emitted once at on_start
+        Emitted once at on_signal_start
         ***********************************************************/
         STARTING,
 
@@ -42,8 +42,8 @@ class ProgressInfo : GLib.Object {
         /***********************************************************
         Emitted once when done
 
-        Except when SyncEngine jumps directly to on_finalize () without going
-        through on_propagation_finished ().
+        Except when SyncEngine jumps directly to on_signal_finalize () without going
+        through on_signal_propagation_finished ().
         ***********************************************************/
         DONE
     }
@@ -221,15 +221,15 @@ class ProgressInfo : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public ProgressInfo () {
-        connect (&this.update_estimates_timer, &QTimer.timeout, this, &ProgressInfo.on_update_estimates);
-        on_reset ();
+        connect (&this.update_estimates_timer, &QTimer.timeout, this, &ProgressInfo.on_signal_update_estimates);
+        on_signal_reset ();
     }
 
 
     /***********************************************************
     Resets for a new sync run.
     ***********************************************************/
-    public void on_reset () {
+    public void on_signal_reset () {
         this.status = Starting;
 
         this.current_items.clear ();
@@ -262,7 +262,7 @@ class ProgressInfo : GLib.Object {
     is_updating_estimates () will return true afterwards.
     ***********************************************************/
     public void start_estimate_updates () {
-        this.update_estimates_timer.on_start (1000);
+        this.update_estimates_timer.on_signal_start (1000);
     }
 
 
@@ -270,7 +270,7 @@ class ProgressInfo : GLib.Object {
     Returns true when start_estimate_updates () was called.
 
     This is used when the SyncEngine wants to indicate a new sync
-    is about to on_start via the transmission_progress () signal. The
+    is about to on_signal_start via the transmission_progress () signal. The
     first ProgressInfo will have is_updating_estimates () == false.
     ***********************************************************/
     public bool is_updating_estimates () {
@@ -481,7 +481,7 @@ class ProgressInfo : GLib.Object {
     Called every second once started, this function updates the
     estimates.
     ***********************************************************/
-    private void on_update_estimates () {
+    private void on_signal_update_estimates () {
         this.size_progress.update ();
         this.file_progress.update ();
 
@@ -500,7 +500,7 @@ class ProgressInfo : GLib.Object {
 
 
     /***********************************************************
-    Sets the completed size by summing on_finished jobs with the
+    Sets the completed size by summing on_signal_finished jobs with the
     progress of active ones.
     ***********************************************************/
     private void recompute_completed_size () {

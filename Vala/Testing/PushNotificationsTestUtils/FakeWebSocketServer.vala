@@ -51,9 +51,9 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void on_process_next_message_internal (string message);
-    private void on_new_connection ();
-    private void on_socket_disconnected ();
+    private void on_signal_process_next_message_internal (string message);
+    private void on_signal_new_connection ();
+    private void on_signal_socket_disconnected ();
 
 
     /***********************************************************
@@ -73,17 +73,15 @@ signals:
 //  #include <cstdint>
 //  #include <functional>
 
-Q_LOGGING_CATEGORY (lcFakeWebSocketServer, "nextcloud.test.fakewebserver", QtInfoMsg)
-
 FakeWebSocketServer.FakeWebSocketServer (uint16 port, GLib.Object parent)
     : GLib.Object (parent)
     this.webSocketServer (new QWebSocketServer (QStringLiteral ("Fake Server"), QWebSocketServer.NonSecureMode, this)) {
     if (!this.webSocketServer.listen (QHostAddress.Any, port)) {
         Q_UNREACHABLE ();
     }
-    connect (this.webSocketServer, &QWebSocketServer.newConnection, this, &FakeWebSocketServer.on_new_connection);
+    connect (this.webSocketServer, &QWebSocketServer.newConnection, this, &FakeWebSocketServer.on_signal_new_connection);
     connect (this.webSocketServer, &QWebSocketServer.closed, this, &FakeWebSocketServer.closed);
-    qCInfo (lcFakeWebSocketServer) << "Open fake websocket server on port:" << port;
+    qCInfo (lcFakeWebSocketServer) + "Open fake websocket server on port:" + port;
     this.processTextMessageSpy = std.make_unique<QSignalSpy> (this, &FakeWebSocketServer.processTextMessage);
 }
 
@@ -132,31 +130,31 @@ QWebSocket *FakeWebSocketServer.authenticateAccount (Occ.AccountPointer account,
 
 void FakeWebSocketServer.close () {
     if (this.webSocketServer.isListening ()) {
-        qCInfo (lcFakeWebSocketServer) << "Close fake websocket server";
+        qCInfo (lcFakeWebSocketServer) + "Close fake websocket server";
 
         this.webSocketServer.close ();
         qDeleteAll (this.clients.begin (), this.clients.end ());
     }
 }
 
-void FakeWebSocketServer.on_process_next_message_internal (string message) {
+void FakeWebSocketServer.on_signal_process_next_message_internal (string message) {
     var client = qobject_cast<QWebSocket> (sender ());
     /* emit */ processTextMessage (client, message);
 }
 
-void FakeWebSocketServer.on_new_connection () {
-    qCInfo (lcFakeWebSocketServer) << "New connection on fake websocket server";
+void FakeWebSocketServer.on_signal_new_connection () {
+    qCInfo (lcFakeWebSocketServer) + "New connection on fake websocket server";
 
     var socket = this.webSocketServer.nextPendingConnection ();
 
-    connect (socket, &QWebSocket.textMessageReceived, this, &FakeWebSocketServer.on_process_next_message_internal);
-    connect (socket, &QWebSocket.disconnected, this, &FakeWebSocketServer.on_socket_disconnected);
+    connect (socket, &QWebSocket.textMessageReceived, this, &FakeWebSocketServer.on_signal_process_next_message_internal);
+    connect (socket, &QWebSocket.disconnected, this, &FakeWebSocketServer.on_signal_socket_disconnected);
 
-    this.clients << socket;
+    this.clients + socket;
 }
 
-void FakeWebSocketServer.on_socket_disconnected () {
-    qCInfo (lcFakeWebSocketServer) << "Socket disconnected";
+void FakeWebSocketServer.on_signal_socket_disconnected () {
+    qCInfo (lcFakeWebSocketServer) + "Socket disconnected";
 
     var client = qobject_cast<QWebSocket> (sender ());
 

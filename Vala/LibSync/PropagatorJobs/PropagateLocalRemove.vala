@@ -25,8 +25,8 @@ class PropagateLocalRemove : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
-        GLib.info (lc_propagate_local_remove) << "Start propagate local remove job";
+    public void on_signal_start () {
+        GLib.info ("Start propagate local remove job";
 
         this.move_to_trash = propagator ().sync_options ().move_files_to_trash;
 
@@ -34,10 +34,10 @@ class PropagateLocalRemove : PropagateItemJob {
             return;
 
         const string filename = propagator ().full_local_path (this.item.file);
-        GLib.info (lc_propagate_local_remove) << "Going to delete:" << filename;
+        GLib.info ("Going to delete:" + filename;
 
         if (propagator ().local_filename_clash (this.item.file)) {
-            on_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not remove %1 because of a local file name clash").arg (QDir.to_native_separators (filename)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not remove %1 because of a local file name clash").arg (QDir.to_native_separators (filename)));
             return;
         }
 
@@ -45,19 +45,19 @@ class PropagateLocalRemove : PropagateItemJob {
         if (this.move_to_trash) {
             if ( (QDir (filename).exists () || FileSystem.file_exists (filename))
                 && !FileSystem.move_to_trash (filename, remove_error)) {
-                on_done (SyncFileItem.Status.NORMAL_ERROR, remove_error);
+                on_signal_done (SyncFileItem.Status.NORMAL_ERROR, remove_error);
                 return;
             }
         } else {
             if (this.item.is_directory ()) {
                 if (QDir (filename).exists () && !remove_recursively ("")) {
-                    on_done (SyncFileItem.Status.NORMAL_ERROR, this.error);
+                    on_signal_done (SyncFileItem.Status.NORMAL_ERROR, this.error);
                     return;
                 }
             } else {
                 if (FileSystem.file_exists (filename)
                     && !FileSystem.remove (filename, remove_error)) {
-                    on_done (SyncFileItem.Status.NORMAL_ERROR, remove_error);
+                    on_signal_done (SyncFileItem.Status.NORMAL_ERROR, remove_error);
                     return;
                 }
             }
@@ -65,7 +65,7 @@ class PropagateLocalRemove : PropagateItemJob {
         propagator ().report_progress (*this.item, 0);
         propagator ().journal.delete_file_record (this.item.original_file, this.item.is_directory ());
         propagator ().journal.commit ("Local remove");
-        on_done (SyncFileItem.Status.SUCCESS);
+        on_signal_done (SyncFileItem.Status.SUCCESS);
     }
 
 
@@ -78,13 +78,13 @@ class PropagateLocalRemove : PropagateItemJob {
     in the database.  But in case of error, we need to remove the entries from the database of the files
     that were deleted.
 
-    \a path is relative to propagator ().local_dir + this.item.file and should on_start with a slash
+    \a path is relative to propagator ().local_dir + this.item.file and should on_signal_start with a slash
     ***********************************************************/
     bool PropagateLocalRemove.remove_recursively (string path) {
         string absolute = propagator ().full_local_path (this.item.file + path);
         string[] errors;
         GLib.List<QPair<string, bool>> deleted;
-        bool on_success = FileSystem.remove_recursively (
+        bool on_signal_success = FileSystem.remove_recursively (
             absolute,
             [&deleted] (string path, bool is_dir) {
                 // by prepending, a folder deletion may be followed by content deletions
@@ -92,7 +92,7 @@ class PropagateLocalRemove : PropagateItemJob {
             },
             errors);
 
-        if (!on_success) {
+        if (!on_signal_success) {
             // We need to delete the entries from the database now from the deleted vector.
             // Do it while avoiding redundant delete calls to the journal.
             string deleted_dir;
@@ -109,7 +109,7 @@ class PropagateLocalRemove : PropagateItemJob {
 
             this.error = errors.join (", ");
         }
-        return on_success;
+        return on_signal_success;
     }
 
 } // class PropagateLocalRemove

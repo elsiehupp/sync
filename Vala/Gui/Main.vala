@@ -40,14 +40,14 @@ int main (int argc, char **argv) {
     Q_INIT_RESOURCE (resources);
     Q_INIT_RESOURCE (theme);
 
-    qml_register_type<Sync_status_summary> ("com.nextcloud.desktopclient", 1, 0, "Sync_status_summary");
+    qml_register_type<SyncStatusSummary> ("com.nextcloud.desktopclient", 1, 0, "SyncStatusSummary");
     qml_register_type<EmojiModel> ("com.nextcloud.desktopclient", 1, 0, "EmojiModel");
     qml_register_type<UserStatusSelectorModel> ("com.nextcloud.desktopclient", 1, 0, "UserStatusSelectorModel");
     qml_register_type<Occ.ActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "ActivityListModel");
     qml_register_type<Occ.FileActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "FileActivityListModel");
-    qml_register_uncreatable_type<Occ.Unified_search_results_list_model> (
-        "com.nextcloud.desktopclient", 1, 0, "Unified_search_results_list_model", "Unified_search_results_list_model");
-    q_register_meta_type<Unified_search_results_list_model> ("Unified_search_results_list_model*");
+    qml_register_uncreatable_type<Occ.UnifiedSearchResultsListModel> (
+        "com.nextcloud.desktopclient", 1, 0, "UnifiedSearchResultsListModel", "UnifiedSearchResultsListModel");
+    q_register_meta_type<UnifiedSearchResultsListModel> ("UnifiedSearchResultsListModel*");
 
     qml_register_uncreatable_type<Occ.UserStatus> ("com.nextcloud.desktopclient", 1, 0, "UserStatus", "Access to Status enum");
 
@@ -99,7 +99,7 @@ int main (int argc, char **argv) {
         if (setrlimit (RLIMIT_CORE, core_limit) < 0) {
             fprintf (stderr, "Unable to set core dump limit\n");
         } else {
-            GLib.info (lc_application) << "Core dumps enabled";
+            GLib.info ("Core dumps enabled";
         }
     }
 //  #endif
@@ -116,19 +116,19 @@ int main (int argc, char **argv) {
 
     // if the application is already running, notify it.
     if (app.is_running ()) {
-        GLib.info (lc_application) << "Already running, exiting...";
+        GLib.info ("Already running, exiting...";
         if (app.is_session_restored ()) {
-            // This call is mirrored with the one in Application.on_parse_message
-            GLib.info (lc_application) << "Session was restored, don't notify app!";
+            // This call is mirrored with the one in Application.on_signal_parse_message
+            GLib.info ("Session was restored, don't notify app!";
             return -1;
         }
 
         string[] args = app.arguments ();
         if (args.size () > 1) {
             string message = args.join (QLatin1String ("|"));
-            if (!app.on_send_message (QLatin1String ("MSG_PARSEOPTIONS:") + message))
+            if (!app.on_signal_send_message (QLatin1String ("MSG_PARSEOPTIONS:") + message))
                 return -1;
-        } else if (!app.background_mode () && !app.on_send_message (QLatin1String ("MSG_SHOWMAINDIALOG"))) {
+        } else if (!app.background_mode () && !app.on_signal_send_message (QLatin1String ("MSG_SHOWMAINDIALOG"))) {
             return -1;
         }
         return 0;
@@ -138,10 +138,10 @@ int main (int argc, char **argv) {
     // (issue #4693)
     if (qgetenv ("QT_QPA_PLATFORMTHEME") != "appmenu-qt5") {
         if (!QSystemTrayIcon.is_system_tray_available ()) {
-            // If the systemtray is not there, we will wait one second for it to maybe on_start
+            // If the systemtray is not there, we will wait one second for it to maybe on_signal_start
             // (eg boot time) then we show the settings dialog if there is still no systemtray.
             // On XFCE however, we show a message box with explainaition how to install a systemtray.
-            GLib.info (lc_application) << "System tray is not available, waiting...";
+            GLib.info ("System tray is not available, waiting...";
             Utility.sleep (1);
 
             var desktop_session = qgetenv ("XDG_CURRENT_DESKTOP").to_lower ();
@@ -153,7 +153,7 @@ int main (int argc, char **argv) {
                 while (!QSystemTrayIcon.is_system_tray_available ()) {
                     attempts++;
                     if (attempts >= 30) {
-                        GLib.warn (lc_application) << "System tray unavailable (xfce)";
+                        GLib.warn ("System tray unavailable (xfce)";
                         warn_systray ();
                         break;
                     }
@@ -162,14 +162,14 @@ int main (int argc, char **argv) {
             }
 
             if (QSystemTrayIcon.is_system_tray_available ()) {
-                app.on_try_tray_again ();
+                app.on_signal_try_tray_again ();
             } else if (!app.background_mode () && !AccountManager.instance ().accounts ().is_empty ()) {
                 if (desktop_session != "ubuntu") {
-                    GLib.info (lc_application) << "System tray still not available, showing window and trying again later";
+                    GLib.info ("System tray still not available, showing window and trying again later";
                     app.show_main_dialog ();
-                    QTimer.single_shot (10000, app, &Application.on_try_tray_again);
+                    QTimer.single_shot (10000, app, &Application.on_signal_try_tray_again);
                 } else {
-                    GLib.info (lc_application) << "System tray still not available, but assuming it's fine on 'ubuntu' desktop";
+                    GLib.info ("System tray still not available, but assuming it's fine on 'ubuntu' desktop";
                 }
             }
         }

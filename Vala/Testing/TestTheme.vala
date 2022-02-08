@@ -18,7 +18,7 @@ class TestTheme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_hidpi_filename_dark_background_return_path_to_white_icon () {
+    private void on_signal_test_hidpi_filename_dark_background_return_path_to_white_icon () {
         FakePaintDevice paintDevice;
         const Gtk.Color backgroundColor ("#000000");
         const string iconName ("icon-name");
@@ -31,7 +31,7 @@ class TestTheme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_hidpi_filename_light_background_return_path_to_black_icon () {
+    private void on_signal_test_hidpi_filename_light_background_return_path_to_black_icon () {
         FakePaintDevice paintDevice;
         const Gtk.Color backgroundColor ("#ffffff");
         const string iconName ("icon-name");
@@ -44,7 +44,7 @@ class TestTheme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_hidpi_filename_hidpi_device_return_hidpi_icon_path () {
+    private void on_signal_test_hidpi_filename_hidpi_device_return_hidpi_icon_path () {
         FakePaintDevice paintDevice;
         paintDevice.setHidpi (true);
         const Gtk.Color backgroundColor ("#000000");
@@ -58,7 +58,7 @@ class TestTheme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_is_dark_color_nextcloud_blue_return_true () {
+    private void on_signal_test_is_dark_color_nextcloud_blue_return_true () {
         const Gtk.Color color (0, 130, 201);
 
         const var result = Occ.Theme.isDarkColor (color);
@@ -69,7 +69,7 @@ class TestTheme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_is_dark_color_light_color_return_false () {
+    private void on_signal_test_is_dark_color_light_color_return_false () {
         const Gtk.Color color (255, 255, 255);
 
         const var result = Occ.Theme.isDarkColor (color);
@@ -80,7 +80,7 @@ class TestTheme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_is_dark_color_dark_color_return_true () {
+    private void on_signal_test_is_dark_color_dark_color_return_true () {
         const Gtk.Color color (0, 0, 0);
 
         const var result = Occ.Theme.isDarkColor (color);
@@ -91,7 +91,7 @@ class TestTheme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_is_hidpi_hidpi_return_true () {
+    private void on_signal_test_is_hidpi_hidpi_return_true () {
         FakePaintDevice paintDevice;
         paintDevice.setHidpi (true);
 

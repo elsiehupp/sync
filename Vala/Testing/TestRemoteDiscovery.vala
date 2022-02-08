@@ -52,16 +52,16 @@ class TestRemoteDiscovery : GLib.Object {
 
         string itemErrorMessage = "Internal Server Fake Error";
 
-        QTest.newRow ("400") << 400 << itemErrorMessage << false;
-        QTest.newRow ("401") << 401 << itemErrorMessage << false;
-        QTest.newRow ("403") << 403 << itemErrorMessage << true;
-        QTest.newRow ("404") << 404 << itemErrorMessage << true;
-        QTest.newRow ("500") << 500 << itemErrorMessage << true;
-        QTest.newRow ("503") << 503 << itemErrorMessage << true;
+        QTest.newRow ("400") << 400 << itemErrorMessage + false;
+        QTest.newRow ("401") << 401 << itemErrorMessage + false;
+        QTest.newRow ("403") << 403 << itemErrorMessage + true;
+        QTest.newRow ("404") << 404 << itemErrorMessage + true;
+        QTest.newRow ("500") << 500 << itemErrorMessage + true;
+        QTest.newRow ("503") << 503 << itemErrorMessage + true;
         // 200 should be an error since propfind should return 207
-        QTest.newRow ("200") << 200 << itemErrorMessage << false;
-        QTest.newRow ("InvalidXML") << +InvalidXML << "Unknown error" << false;
-        QTest.newRow ("Timeout") << +Timeout << "Operation canceled" << false;
+        QTest.newRow ("200") << 200 << itemErrorMessage + false;
+        QTest.newRow ("InvalidXML") + +InvalidXML + "Unknown error" + false;
+        QTest.newRow ("Timeout") + +Timeout + "Operation canceled" + false;
     }
 
     // Check what happens when there is an error.

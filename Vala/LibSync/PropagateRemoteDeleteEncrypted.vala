@@ -21,13 +21,13 @@ class Propagate_remote_delete_encrypted : AbstractPropagateRemoteDeleteEncrypted
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override;
+    public void on_signal_start () override;
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_folder_unlocked_successfully (GLib.ByteArray folder_identifier) override;
-    private void on_folder_encrypted_metadata_received (QJsonDocument json, int status_code) override;
+    private void on_signal_folder_unlocked_successfully (GLib.ByteArray folder_identifier) override;
+    private void on_signal_folder_encrypted_metadata_received (QJsonDocument json, int status_code) override;
 }
 
 }
@@ -43,28 +43,28 @@ Propagate_remote_delete_encrypted.Propagate_remote_delete_encrypted (OwncloudPro
 
 }
 
-void Propagate_remote_delete_encrypted.on_start () {
+void Propagate_remote_delete_encrypted.on_signal_start () {
     //  Q_ASSERT (!this.item.encrypted_filename.is_empty ());
 
     const QFileInfo info (this.item.encrypted_filename);
     start_ls_col_job (info.path ());
 }
 
-void Propagate_remote_delete_encrypted.on_folder_unlocked_successfully (GLib.ByteArray folder_identifier) {
-    AbstractPropagateRemoteDeleteEncrypted.on_folder_unlocked_successfully (folder_identifier);
+void Propagate_remote_delete_encrypted.on_signal_folder_unlocked_successfully (GLib.ByteArray folder_identifier) {
+    AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_unlocked_successfully (folder_identifier);
     /* emit */ finished (!this.is_task_failed);
 }
 
-void Propagate_remote_delete_encrypted.on_folder_encrypted_metadata_received (QJsonDocument json, int status_code) {
+void Propagate_remote_delete_encrypted.on_signal_folder_encrypted_metadata_received (QJsonDocument json, int status_code) {
     if (status_code == 404) {
-        GLib.debug (PROPAGATE_REMOVE_ENCRYPTED) << "Metadata not found, but let's proceed with removing the file anyway.";
+        GLib.debug (PROPAGATE_REMOVE_ENCRYPTED) + "Metadata not found, but let's proceed with removing the file anyway.";
         delete_remote_item (this.item.encrypted_filename);
         return;
     }
 
     FolderMetadata metadata (this.propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
 
-    GLib.debug (PROPAGATE_REMOVE_ENCRYPTED) << "Metadata Received, preparing it for removal of the file";
+    GLib.debug (PROPAGATE_REMOVE_ENCRYPTED) + "Metadata Received, preparing it for removal of the file";
 
     const QFileInfo info (this.propagator.full_local_path (this.item.file));
     const string filename = info.filename ();
@@ -86,13 +86,13 @@ void Propagate_remote_delete_encrypted.on_folder_encrypted_metadata_received (QJ
         return;
     }
 
-    GLib.debug (PROPAGATE_REMOVE_ENCRYPTED) << "Metadata updated, sending to the server.";
+    GLib.debug (PROPAGATE_REMOVE_ENCRYPTED) + "Metadata updated, sending to the server.";
 
     var job = new UpdateMetadataApiJob (this.propagator.account (), this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
-    connect (job, &UpdateMetadataApiJob.on_success, this, [this] (GLib.ByteArray file_identifier) {
+    connect (job, &UpdateMetadataApiJob.on_signal_success, this, [this] (GLib.ByteArray file_identifier) {
         //  Q_UNUSED (file_identifier);
         delete_remote_item (this.item.encrypted_filename);
     });
     connect (job, &UpdateMetadataApiJob.error, this, &Propagate_remote_delete_encrypted.task_failed);
-    job.on_start ();
+    job.on_signal_start ();
 }

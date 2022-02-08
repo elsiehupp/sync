@@ -60,7 +60,7 @@ signals:
                             .adjusted (GLib.Uri.NormalizePathSegments)
                             .path ();
                     if (!href_string.starts_with (expected_path)) {
-                        GLib.warn (lc_ls_col_job) << "Invalid href" << href_string << "expected starting with" << expected_path;
+                        GLib.warn ("Invalid href" + href_string + "expected starting with" + expected_path;
                         return false;
                     }
                     current_href = href_string;
@@ -126,10 +126,10 @@ signals:
 
         if (reader.has_error ()) {
             // XML Parser error? Whatever had been emitted before will come as directory_listing_iterated
-            GLib.warn (lc_ls_col_job) << "ERROR" << reader.error_string () << xml;
+            GLib.warn ("ERROR" + reader.error_string () + xml;
             return false;
         } else if (!inside_multi_status) {
-            GLib.warn (lc_ls_col_job) << "ERROR no WebDAV response?" << xml;
+            GLib.warn ("ERROR no WebDAV response?" + xml;
             return false;
         } else {
             /* emit */ directory_listing_subfolders (folders);

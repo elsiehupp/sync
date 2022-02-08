@@ -41,7 +41,7 @@ enum CSYNC_EXCLUDE_TYPE {
 Manages file/directory exclusion.
 
 Most commonly exclude patterns are loaded from file
-add_exclude_file_path () and on_reload_exclude_files ().
+add_exclude_file_path () and on_signal_reload_exclude_files ().
 
 Excluded files are primarily relevant for sync runs, and for
 file watcher filtering.
@@ -65,7 +65,7 @@ class ExcludedFiles : GLib.Object {
     /***********************************************************
     Adds a new path to a file containing exclude patterns.
 
-    Does not load the file. Use on_reload_exclude_files () afterwards.
+    Does not load the file. Use on_signal_reload_exclude_files () afterwards.
     ***********************************************************/
     public void add_exclude_file_path (string path);
 
@@ -94,7 +94,7 @@ class ExcludedFiles : GLib.Object {
     Adds an exclude pattern anchored to base path
 
     Primarily used in tests. Patterns added this way are preserved when
-    on_reload_exclude_files () is called.
+    on_signal_reload_exclude_files () is called.
     ***********************************************************/
     public void add_manual_exclude (string expr);
 
@@ -134,7 +134,7 @@ class ExcludedFiles : GLib.Object {
     That means for 'foo/bar/file' only ('foo/bar/file', 'file')
     against the exclude patterns.
 
-    @param Path is folder-relative, should not on_start with a /.
+    @param Path is folder-relative, should not on_signal_start with a /.
 
     Note that this only matches patterns. It does not check whether the file
     or directory pointed to is hidden (or whether it even exists).
@@ -145,13 +145,13 @@ class ExcludedFiles : GLib.Object {
     /***********************************************************
     Reloads the exclude patterns from the registered paths.
     ***********************************************************/
-    public bool on_reload_exclude_files ();
+    public bool on_signal_reload_exclude_files ();
 
 
     /***********************************************************
     Loads the exclude patterns from file the registered base paths.
     ***********************************************************/
-    public void on_load_exclude_file_patterns (string base_path, GLib.File file);
+    public void on_signal_load_exclude_file_patterns (string base_path, GLib.File file);
 
 
     /***********************************************************
@@ -175,7 +175,7 @@ class ExcludedFiles : GLib.Object {
     /***********************************************************
     @brief Match the exclude pattern against the full path.
 
-    @param Path is folder-relative, should not on_start with a /.
+    @param Path is folder-relative, should not on_signal_start with a /.
 
     Note that this only matches patterns. It does not check whether the file
     or directory pointed to is hidden (or whether it even exists).
@@ -415,7 +415,7 @@ OCSYNC_EXPORT bool csync_is_windows_reserved_word (QStringRef filename) {
 
     if (len_filename == 3 || (len_filename > 3 && filename.at (3) == '.')) {
         for (char word : win_reserved_words_3) {
-            if (filename.left (3).compare (QLatin1String (word), Qt.CaseInsensitive) == 0) {
+            if (filename.left (3).compare (word, Qt.CaseInsensitive) == 0) {
                 return true;
             }
         }
@@ -423,14 +423,14 @@ OCSYNC_EXPORT bool csync_is_windows_reserved_word (QStringRef filename) {
 
     if (len_filename == 4 || (len_filename > 4 && filename.at (4) == '.')) {
         for (char word : win_reserved_words_4) {
-            if (filename.left (4).compare (QLatin1String (word), Qt.CaseInsensitive) == 0) {
+            if (filename.left (4).compare (word, Qt.CaseInsensitive) == 0) {
                 return true;
             }
         }
     }
 
     for (char word : win_reserved_words_n) {
-        if (filename.compare (QLatin1String (word), Qt.CaseInsensitive) == 0) {
+        if (filename.compare (word, Qt.CaseInsensitive) == 0) {
             return true;
         }
     }
@@ -449,14 +449,14 @@ static CSYNC_EXCLUDE_TYPE this.csync_excluded_common (string path, bool exclude_
     qsizetype blen = bname.size ();
     // 9 = strlen (".sync_.db")
     if (blen >= 9 && bname.at (0) == '.') {
-        if (bname.contains (QLatin1String (".db"))) {
-            if (bname.starts_with (QLatin1String (".sync_"), Qt.CaseInsensitive)  // ".sync_*.db*"
-                || bname.starts_with (QLatin1String (".sync_"), Qt.CaseInsensitive) // ".sync_*.db*"
-                || bname.starts_with (QLatin1String (".csync_journal.db"), Qt.CaseInsensitive)) { // ".csync_journal.db*"
+        if (bname.contains (".db")) {
+            if (bname.starts_with (".sync_", Qt.CaseInsensitive)  // ".sync_*.db*"
+                || bname.starts_with (".sync_", Qt.CaseInsensitive) // ".sync_*.db*"
+                || bname.starts_with (".csync_journal.db", Qt.CaseInsensitive)) { // ".csync_journal.db*"
                 return CSYNC_FILE_SILENTLY_EXCLUDED;
             }
         }
-        if (bname.starts_with (QLatin1String (".owncloudsync.log"), Qt.CaseInsensitive)) { // ".owncloudsync.log*"
+        if (bname.starts_with (".owncloudsync.log", Qt.CaseInsensitive)) { // ".owncloudsync.log*"
             return CSYNC_FILE_SILENTLY_EXCLUDED;
         }
     }
@@ -570,7 +570,7 @@ void ExcludedFiles.add_manual_exclude (string expr, string base_path) {
 
 void ExcludedFiles.clear_manual_excludes () {
     this.manual_excludes.clear ();
-    on_reload_exclude_files ();
+    on_signal_reload_exclude_files ();
 }
 
 void ExcludedFiles.wildcards_match_slash (bool onoff) {
@@ -582,7 +582,7 @@ void ExcludedFiles.client_version (ExcludedFiles.Version version) {
     this.client_version = version;
 }
 
-void ExcludedFiles.on_load_exclude_file_patterns (string base_path, GLib.File file) {
+void ExcludedFiles.on_signal_load_exclude_file_patterns (string base_path, GLib.File file) {
     string[] patterns;
     while (!file.at_end ()) {
         GLib.ByteArray line = file.read_line ().trimmed ();
@@ -603,7 +603,7 @@ void ExcludedFiles.on_load_exclude_file_patterns (string base_path, GLib.File fi
     }
 }
 
-bool ExcludedFiles.on_reload_exclude_files () {
+bool ExcludedFiles.on_signal_reload_exclude_files () {
     this.all_excludes.clear ();
     // clear all regex
     this.bname_traversal_regex_file.clear ();
@@ -613,16 +613,16 @@ bool ExcludedFiles.on_reload_exclude_files () {
     this.full_regex_file.clear ();
     this.full_regex_dir.clear ();
 
-    bool on_success = true;
+    bool on_signal_success = true;
     const var keys = this.exclude_files.keys ();
     for (var& base_path : keys) {
         for (var exclude_file : this.exclude_files.value (base_path)) {
             GLib.File file = new GLib.File (exclude_file);
             if (file.exists () && file.open (QIODevice.ReadOnly)) {
-                on_load_exclude_file_patterns (base_path, file);
+                on_signal_load_exclude_file_patterns (base_path, file);
             } else {
-                on_success = false;
-                q_warning () << "System exclude list file could not be opened:" << exclude_file;
+                on_signal_success = false;
+                q_warning ("System exclude list file could not be opened:" + exclude_file;
             }
         }
     }
@@ -633,7 +633,7 @@ bool ExcludedFiles.on_reload_exclude_files () {
         prepare (kv.key ());
     }
 
-    return on_success;
+    return on_signal_success;
 }
 
 bool ExcludedFiles.version_directive_keep_next_line (GLib.ByteArray directive) {
@@ -716,9 +716,9 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
 
         if (exclude_file_info.is_readable ()) {
             add_exclude_file_path (absolute_path);
-            on_reload_exclude_files ();
+            on_signal_reload_exclude_files ();
         } else {
-            q_warning () << "System exclude list file could not be read:" << absolute_path;
+            q_warning ("System exclude list file could not be read:" + absolute_path;
         }
     }
 
@@ -847,9 +847,9 @@ string ExcludedFiles.convert_to_regexp_syntax (string exclude, bool wildcards_ma
         case '*':
             flush ();
             if (wildcards_match_slash) {
-                regex.append (QLatin1String (".*"));
+                regex.append (".*");
             } else {
-                regex.append (QLatin1String ("[^/]*"));
+                regex.append ("[^/]*");
             }
             break;
         case '?':

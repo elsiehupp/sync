@@ -70,7 +70,7 @@ class TokenCredentials : AbstractCredentials {
         AccessManager qnam = new TokenCredentialsAccessManager (this);
 
         connect (qnam, SIGNAL (authentication_required (Soup.Reply *, QAuthenticator *)),
-            this, SLOT (on_authentication (Soup.Reply *, QAuthenticator *)));
+            this, SLOT (on_signal_authentication (Soup.Reply *, QAuthenticator *)));
 
         return qnam;
     }
@@ -124,7 +124,7 @@ class TokenCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public void invalidate_token () {
-        GLib.info (lc_token_credentials) << "Invalidating token";
+        GLib.info ("Invalidating token";
         this.ready = false;
         this.account.clear_cookie_jar ();
         this.token = "";
@@ -151,12 +151,12 @@ class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_authentication (Soup.Reply reply, QAuthenticator authenticator) {
+    private void on_signal_authentication (Soup.Reply reply, QAuthenticator authenticator) {
         //  Q_UNUSED (authenticator)
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,
         // those credentials were invalid and we terminate.
-        GLib.warn (lc_token_credentials) << "Stop request : Authentication failed for " << reply.url ().to_string ();
+        GLib.warn ("Stop request : Authentication failed for " + reply.url ().to_string ();
         reply.property (AUTHENTICATION_FAILED_C, true);
         reply.close ();
     }

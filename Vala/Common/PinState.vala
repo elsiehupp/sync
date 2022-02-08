@@ -31,7 +31,7 @@ enum PinState {
     /***********************************************************
     The pin state is derived from the state of the parent folder.
 
-    For example new remote files on_start out in this state, following
+    For example new remote files on_signal_start out in this state, following
     the state of their parent folder.
 
     This state is used purely for resetting pin states to their derived
@@ -63,7 +63,7 @@ enum PinState {
     The user hasn't made a decision. The client or platform may hydrate or
     dehydrate as they see fit.
 
-    New remote files in unspecified directories on_start unspecified, and
+    New remote files in unspecified directories on_signal_start unspecified, and
     dehydrated (which is an arbitrary decision).
     ***********************************************************/
     UNSPECIFIED = 3,

@@ -33,9 +33,9 @@ class Share_manager : GLib.Object {
     @param name The name of the created share, may be empty
     @param password The password of the share, may be
 
-    On on_success the signal on_link_share_created is emitted
-    For older server the on_link_share_requires_password signal is emitted when it seems appropiate
-    In case of a server error the on_server_error signal is emitted
+    On on_signal_success the signal on_signal_link_share_created is emitted
+    For older server the on_signal_link_share_requires_password signal is emitted when it seems appropiate
+    In case of a server error the on_signal_server_error signal is emitted
     ***********************************************************/
     public void create_link_share (string path,
         const string name,
@@ -49,8 +49,8 @@ class Share_manager : GLib.Object {
     @param share_type The type of share (Type_u
     @param Permissions The share permissions
 
-    On on_success the signal share_created is emitted
-    In case of a server error the on_server_error signal is emitted
+    On on_signal_success the signal share_created is emitted
+    In case of a server error the on_signal_server_error signal is emitted
     ***********************************************************/
     public void create_share (string path,
         const Share.Share_type share_type,
@@ -64,16 +64,16 @@ class Share_manager : GLib.Object {
 
     @param path The path to get the shares for rel
 
-    On on_success the on_shares_fetched signal is emitted
-    In case of a server error the on_server_error signal is emitted
+    On on_signal_success the on_signal_shares_fetched signal is emitted
+    In case of a server error the on_signal_server_error signal is emitted
     ***********************************************************/
     public void fetch_shares (string path);
 
 signals:
     void share_created (unowned<Share> share);
-    void on_link_share_created (unowned<Link_share> share);
-    void on_shares_fetched (GLib.List<unowned<Share>> shares);
-    void on_server_error (int code, string message);
+    void on_signal_link_share_created (unowned<Link_share> share);
+    void on_signal_shares_fetched (GLib.List<unowned<Share>> shares);
+    void on_signal_server_error (int code, string message);
 
 
     /***********************************************************
@@ -83,15 +83,15 @@ signals:
 
     See create_link_share ().
     ***********************************************************/
-    void on_link_share_requires_password (string message);
+    void on_signal_link_share_requires_password (string message);
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_shares_fetched (QJsonDocument reply);
-    private void on_link_share_created (QJsonDocument reply);
-    private void on_share_created (QJsonDocument reply);
-    private void on_ocs_error (int status_code, string message);
+    private void on_signal_shares_fetched (QJsonDocument reply);
+    private void on_signal_link_share_created (QJsonDocument reply);
+    private void on_signal_share_created (QJsonDocument reply);
+    private void on_signal_ocs_error (int status_code, string message);
 
     /***********************************************************
     ***********************************************************/
@@ -136,12 +136,12 @@ void Share_manager.create_link_share (string path,
     const string name,
     const string password) {
     var job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_link_share_created);
-    connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_ocs_error);
+    connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_signal_link_share_created);
+    connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_signal_ocs_error);
     job.create_link_share (path, name, password);
 }
 
-void Share_manager.on_link_share_created (QJsonDocument reply) {
+void Share_manager.on_signal_link_share_created (QJsonDocument reply) {
     string message;
     int code = Ocs_share_job.get_json_return_code (reply, message);
 
@@ -170,7 +170,7 @@ void Share_manager.create_share (string path,
     const Share.Permissions desired_permissions,
     const string password) {
     var job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_ocs_error);
+    connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_signal_ocs_error);
     connect (job, &Ocs_share_job.share_job_finished, this,
         [=] (QJsonDocument reply) {
             // Find existing share permissions (if this was shared with us)
@@ -192,14 +192,14 @@ void Share_manager.create_share (string path,
             }
 
             var job = new Ocs_share_job (this.account);
-            connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_share_created);
-            connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_ocs_error);
+            connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_signal_share_created);
+            connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_signal_ocs_error);
             job.create_share (path, share_type, share_with, valid_permissions, password);
         });
     job.get_shared_with_me ();
 }
 
-void Share_manager.on_share_created (QJsonDocument reply) {
+void Share_manager.on_signal_share_created (QJsonDocument reply) {
     //Parse share
     var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
     unowned<Share> share (parse_share (data));
@@ -211,15 +211,15 @@ void Share_manager.on_share_created (QJsonDocument reply) {
 
 void Share_manager.fetch_shares (string path) {
     var job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_shares_fetched);
-    connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_ocs_error);
-    job.on_get_shares (path);
+    connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_signal_shares_fetched);
+    connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_signal_ocs_error);
+    job.on_signal_get_shares (path);
 }
 
-void Share_manager.on_shares_fetched (QJsonDocument reply) {
+void Share_manager.on_signal_shares_fetched (QJsonDocument reply) {
     var tmp_shares = reply.object ().value ("ocs").to_object ().value ("data").to_array ();
     const string version_string = this.account.server_version ();
-    GLib.debug (lc_sharing) << version_string << "Fetched" << tmp_shares.count () << "shares";
+    GLib.debug () + version_string + "Fetched" + tmp_shares.count ("shares";
 
     GLib.List<unowned<Share>> shares;
 
@@ -241,7 +241,7 @@ void Share_manager.on_shares_fetched (QJsonDocument reply) {
         shares.append (unowned<Share> (new_share));
     }
 
-    GLib.debug (lc_sharing) << "Sending " << shares.count () << "shares";
+    GLib.debug ("Sending " + shares.count ("shares";
     /* emit */ shares_fetched (shares);
 }
 
@@ -330,7 +330,7 @@ unowned<Share> Share_manager.parse_share (QJsonObject data) {
         sharee));
 }
 
-void Share_manager.on_ocs_error (int status_code, string message) {
+void Share_manager.on_signal_ocs_error (int status_code, string message) {
     /* emit */ server_error (status_code, message);
 }
 }

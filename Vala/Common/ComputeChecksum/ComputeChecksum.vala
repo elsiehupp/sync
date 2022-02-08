@@ -114,10 +114,10 @@ class ComputeChecksum : ComputeChecksumBase {
     /***********************************************************
     Computes the checksum for the given file path.
 
-    on_done () is emitted when the calculation finishes.
+    on_signal_done () is emitted when the calculation finishes.
     ***********************************************************/
-    public void on_start (string file_path) {
-        GLib.info (lc_checksums) << "Computing" << checksum_type () << "checksum of" << file_path << "in a thread";
+    public void on_signal_start (string file_path) {
+        GLib.info ("Computing" + checksum_type ("checksum of" + file_path + "in a thread";
         start_impl (std.make_unique<GLib.File> (file_path));
     }
 
@@ -125,14 +125,14 @@ class ComputeChecksum : ComputeChecksumBase {
     /***********************************************************
     Computes the checksum for the given device.
 
-    on_done () is emitted when the calculation finishes.
+    on_signal_done () is emitted when the calculation finishes.
 
     The device ownership transfers into the thread that
     will compute the checksum. It must not have a parent.
     ***********************************************************/
-    public void on_start (std.unique_ptr<QIODevice> device) {
+    public void on_signal_start (std.unique_ptr<QIODevice> device) {
         ENFORCE (device);
-        GLib.info (lc_checksums) << "Computing" << checksum_type () << "checksum of device" << device.get () << "in a thread";
+        GLib.info ("Computing" + checksum_type ("checksum of device" + device.get ("in a thread";
         //  ASSERT (!device.parent ());
 
         start_impl (std.move (device));
@@ -144,7 +144,7 @@ class ComputeChecksum : ComputeChecksumBase {
     ***********************************************************/
     public static GLib.ByteArray compute_now (QIODevice device, GLib.ByteArray checksum_type) {
         if (!checksum_computation_enabled ()) {
-            GLib.warn (lc_checksums) << "Checksum computation disabled by environment variable";
+            GLib.warn ("Checksum computation disabled by environment variable";
             return GLib.ByteArray ();
         }
 
@@ -167,7 +167,7 @@ class ComputeChecksum : ComputeChecksumBase {
     #endif
         // for an unknown checksum or no checksum, we're done right now
         if (!checksum_type.is_empty ()) {
-            GLib.warn (lc_checksums) << "Unknown checksum type:" << checksum_type;
+            GLib.warn ("Unknown checksum type:" + checksum_type;
         }
         return GLib.ByteArray ();
     }
@@ -176,10 +176,10 @@ class ComputeChecksum : ComputeChecksumBase {
     /***********************************************************
     Computes the checksum synchronously on file. Convenience wrapper for compute_now ().
     ***********************************************************/
-    public static GLib.ByteArray compute_now_on_file (string file_path, GLib.ByteArray checksum_type) {
+    public static GLib.ByteArray compute_now_on_signal_file (string file_path, GLib.ByteArray checksum_type) {
         GLib.File file = new GLib.File (file_path);
         if (!file.open (QIODevice.ReadOnly)) {
-            GLib.warn (lc_checksums) << "Could not open file" << file_path << "for reading and computing checksum" << file.error_string ();
+            GLib.warn ("Could not open file" + file_path + "for reading and computing checksum" + file.error_string ();
             return GLib.ByteArray ();
         }
 
@@ -192,7 +192,7 @@ class ComputeChecksum : ComputeChecksumBase {
 
     /***********************************************************
     ***********************************************************/
-    private void on_calculation_done () {
+    private void on_signal_calculation_done () {
         GLib.ByteArray checksum = this.watcher.future ().result ();
         if (!checksum.is_null ()) {
             /* emit */ done (this.checksum_type, checksum);
@@ -205,8 +205,8 @@ class ComputeChecksum : ComputeChecksumBase {
     /***********************************************************
     ***********************************************************/
     private void start_impl (std.unique_ptr<QIODevice> device) {
-        connect (&this.watcher, &QFuture_watcher_base.on_finished,
-            this, &ComputeChecksum.on_calculation_done,
+        connect (&this.watcher, &QFuture_watcher_base.on_signal_finished,
+            this, &ComputeChecksum.on_signal_calculation_done,
             Qt.UniqueConnection);
 
         // We'd prefer to move the unique_ptr into the lambda, but that's
@@ -218,11 +218,11 @@ class ComputeChecksum : ComputeChecksumBase {
         this.watcher.future (Qt_concurrent.run ([shared_device, type] () {
             if (!shared_device.open (QIODevice.ReadOnly)) {
                 if (var file = qobject_cast<GLib.File> (shared_device.data ())) {
-                    GLib.warn (lc_checksums) << "Could not open file" << file.filename ()
-                            << "for reading to compute a checksum" << file.error_string ();
+                    GLib.warn ("Could not open file" + file.filename ()
+                            + "for reading to compute a checksum" + file.error_string ();
                 } else {
-                    GLib.warn (lc_checksums) << "Could not open device" << shared_device.data ()
-                            << "for reading to compute a checksum" << shared_device.error_string ();
+                    GLib.warn ("Could not open device" + shared_device.data ()
+                            + "for reading to compute a checksum" + shared_device.error_string ();
                 }
                 return GLib.ByteArray ();
             }

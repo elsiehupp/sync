@@ -23,7 +23,7 @@ class PropfindJob : AbstractNetworkJob {
     ***********************************************************/
     private GLib.List<GLib.ByteArray> properties;
 
-    signal void result (QVariantMap values);
+    signal void signal_result (QVariantMap values);
     signal void finished_with_error (Soup.Reply reply = null);
 
     /***********************************************************
@@ -35,11 +35,11 @@ class PropfindJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         GLib.List<GLib.ByteArray> properties = this.properties;
 
         if (properties.is_empty ()) {
-            GLib.warn (lc_ls_col_job) << "Propfind with no properties!";
+            GLib.warn ("Propfind with no properties!";
         }
         Soup.Request req;
         // Always have a higher priority than the propagator because we use this from the UI
@@ -67,7 +67,7 @@ class PropfindJob : AbstractNetworkJob {
         buf.open (QIODevice.ReadOnly);
         send_request ("PROPFIND", make_dav_url (path ()), req, buf);
 
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
@@ -93,9 +93,9 @@ class PropfindJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private bool on_finished () {
-        GLib.info (lc_propfind_job) << "PROPFIND of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                            << reply_status_string ();
+    private bool on_signal_finished () {
+        GLib.info ("PROPFIND of" + reply ().request ().url ("FINISHED WITH STATUS"
+                            + reply_status_string ();
 
         int http_result_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
@@ -124,14 +124,14 @@ class PropfindJob : AbstractNetworkJob {
                 }
             }
             if (reader.has_error ()) {
-                GLib.warn (lc_propfind_job) << "XML parser error : " << reader.error_string ();
+                GLib.warn ("XML parser error : " + reader.error_string ();
                 /* emit */ finished_with_error (reply ());
             } else {
-                /* emit */ result (items);
+                /* emit */ signal_result (items);
             }
         } else {
-            GLib.warn (lc_propfind_job) << "*not* successful, http result code is" << http_result_code
-                                    << (http_result_code == 302 ? reply ().header (Soup.Request.LocationHeader).to_string () : QLatin1String (""));
+            GLib.warn ("*not* successful, http result code is" + http_result_code
+                                    + (http_result_code == 302 ? reply ().header (Soup.Request.LocationHeader).to_string () : QLatin1String (""));
             /* emit */ finished_with_error (reply ());
         }
         return true;

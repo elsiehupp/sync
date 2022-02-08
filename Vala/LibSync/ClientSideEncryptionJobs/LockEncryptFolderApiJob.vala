@@ -14,9 +14,9 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override;
+    public void on_signal_start () override;
 
-    protected bool on_finished () override;
+    protected bool on_signal_finished () override;
 
 
     signal void success (GLib.ByteArray file_identifier, GLib.ByteArray token);
@@ -34,7 +34,7 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
     : base (account, E2EE_BASE_URL + QStringLiteral ("lock/") + file_identifier, parent), this.file_identifier (file_identifier) {
     }
 
-    void LockEncryptFolderApiJob.on_start () {
+    void LockEncryptFolderApiJob.on_signal_start () {
         Soup.Request req;
         req.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
@@ -42,15 +42,15 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (query);
 
-        GLib.info (lc_cse_job ()) << "locking the folder with identifier" << this.file_identifier << "as encrypted";
+        GLib.info ()) + "locking the folder with identifier" + this.file_identifier + "as encrypted";
         send_request ("POST", url, req);
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
-    bool LockEncryptFolderApiJob.on_finished () {
+    bool LockEncryptFolderApiJob.on_signal_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
-            GLib.info (lc_cse_job ()) << "error locking file" << path () << error_string () << return_code;
+            GLib.info ()) + "error locking file" + path () + error_string () + return_code;
             /* emit */ error (this.file_identifier, return_code);
             return true;
         }
@@ -59,7 +59,7 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
         var json = QJsonDocument.from_json (reply ().read_all (), error);
         var obj = json.object ().to_variant_map ();
         var token = obj["ocs"].to_map ()["data"].to_map ()["e2e-token"].to_byte_array ();
-        GLib.info (lc_cse_job ()) << "got json:" << token;
+        GLib.info ()) + "got json:" + token;
 
         //TODO : Parse the token and submit.
         /* emit */ success (this.file_identifier, token);

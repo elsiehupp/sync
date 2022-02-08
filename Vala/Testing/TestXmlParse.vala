@@ -19,31 +19,31 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_directory_listing_sub_folders (string[]& list) {
-        qDebug () << "subfolders : " << list;
+    public void on_signal_directory_listing_sub_folders (string[]& list) {
+        GLib.debug ("subfolders : " + list;
         this.subdirs.append (list);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_directory_listing_iterated (string item, GLib.HashMap<string,string>& ) {
-        qDebug () << "     item : " << item;
+    public void on_signal_directory_listing_iterated (string item, GLib.HashMap<string,string>& ) {
+        GLib.debug ("     item : " + item;
         this.items.append (item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_finished_successfully () {
+    public void on_signal_finished_successfully () {
         this.success = true;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_init () {
-        qDebug () << Q_FUNC_INFO;
+    private void on_signal_init () {
+        GLib.debug () + Q_FUNC_INFO;
         this.success = false;
         this.subdirs.clear ();
         this.items.clear ();
@@ -52,11 +52,11 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_cleanup () {}
+    private void on_signal_cleanup () {}
 
 
     private
-    private void on_test_parser1 () {
+    private void on_signal_test_parser1 () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             "<d:response>"
@@ -109,11 +109,11 @@ class TestXmlParse : GLib.Object {
         LsColXMLParser parser;
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
-                 this, SLOT (on_directory_listing_sub_folders (string[]&)) );
+                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
         connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
+                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
-                 this, SLOT (on_finished_successfully ()) );
+                 this, SLOT (on_signal_finished_successfully ()) );
 
         GLib.HashMap <string, ExtraFolderInfo> sizes;
         QVERIFY (parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" ));
@@ -132,7 +132,7 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_parser_broken_xml () {
+    private void on_signal_test_parser_broken_xml () {
         const GLib.ByteArray testXml = "X<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             "<d:response>"
@@ -185,11 +185,11 @@ class TestXmlParse : GLib.Object {
         LsColXMLParser parser;
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
-                 this, SLOT (on_directory_listing_sub_folders (string[]&)) );
+                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
         connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
+                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
-                 this, SLOT (on_finished_successfully ()) );
+                 this, SLOT (on_signal_finished_successfully ()) );
 
         GLib.HashMap <string, ExtraFolderInfo> sizes;
         QVERIFY (false == parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
@@ -205,17 +205,17 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_parser_empty_xml_no_dav () {
+    private void on_signal_test_parser_empty_xml_no_dav () {
         const GLib.ByteArray testXml = "<html><body>I am under construction</body></html>";
 
         LsColXMLParser parser;
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
-                 this, SLOT (on_directory_listing_sub_folders (string[]&)) );
+                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
         connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
+                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
-                 this, SLOT (on_finished_successfully ()) );
+                 this, SLOT (on_signal_finished_successfully ()) );
 
         GLib.HashMap <string, ExtraFolderInfo> sizes;
         QVERIFY (false == parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
@@ -230,17 +230,17 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_parser_empty_xml () {
+    private void on_signal_test_parser_empty_xml () {
         const GLib.ByteArray testXml = "";
 
         LsColXMLParser parser;
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
-                 this, SLOT (on_directory_listing_sub_folders (string[]&)) );
+                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
         connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
+                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
-                 this, SLOT (on_finished_successfully ()) );
+                 this, SLOT (on_signal_finished_successfully ()) );
 
         GLib.HashMap <string, ExtraFolderInfo> sizes;
         QVERIFY (false == parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
@@ -255,7 +255,7 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_parser_truncated_xml () {
+    private void on_signal_test_parser_truncated_xml () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             "<d:response>"
@@ -277,11 +277,11 @@ class TestXmlParse : GLib.Object {
         LsColXMLParser parser;
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
-                 this, SLOT (on_directory_listing_sub_folders (string[]&)) );
+                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
         connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
+                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
-                 this, SLOT (on_finished_successfully ()) );
+                 this, SLOT (on_signal_finished_successfully ()) );
 
         GLib.HashMap <string, ExtraFolderInfo> sizes;
         QVERIFY (!parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" ));
@@ -291,7 +291,7 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_parser_bogus_href1 () {
+    private void on_signal_test_parser_bogus_href1 () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             "<d:response>"
@@ -344,11 +344,11 @@ class TestXmlParse : GLib.Object {
         LsColXMLParser parser;
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
-                 this, SLOT (on_directory_listing_sub_folders (string[]&)) );
+                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
         connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
+                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
-                 this, SLOT (on_finished_successfully ()) );
+                 this, SLOT (on_signal_finished_successfully ()) );
 
         GLib.HashMap <string, ExtraFolderInfo> sizes;
         QVERIFY (false == parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" ));
@@ -358,7 +358,7 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_parser_bogus_href2 () {
+    private void on_signal_test_parser_bogus_href2 () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             "<d:response>"
@@ -411,11 +411,11 @@ class TestXmlParse : GLib.Object {
         LsColXMLParser parser;
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
-                 this, SLOT (on_directory_listing_sub_folders (string[]&)) );
+                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
         connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
+                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
-                 this, SLOT (on_finished_successfully ()) );
+                 this, SLOT (on_signal_finished_successfully ()) );
 
         GLib.HashMap <string, ExtraFolderInfo> sizes;
         QVERIFY (false == parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" ));
@@ -425,7 +425,7 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_parser_denormalized_path () {
+    private void on_signal_test_parser_denormalized_path () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             "<d:response>"
@@ -478,11 +478,11 @@ class TestXmlParse : GLib.Object {
         LsColXMLParser parser;
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
-                 this, SLOT (on_directory_listing_sub_folders (string[]&)) );
+                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
         connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
+                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
-                 this, SLOT (on_finished_successfully ()) );
+                 this, SLOT (on_signal_finished_successfully ()) );
 
         GLib.HashMap <string, ExtraFolderInfo> sizes;
         QVERIFY (parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" ));
@@ -501,7 +501,7 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_parser_denormalized_path_outside_namespace () {
+    private void on_signal_test_parser_denormalized_path_outside_namespace () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             "<d:response>"
@@ -554,11 +554,11 @@ class TestXmlParse : GLib.Object {
         LsColXMLParser parser;
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
-                 this, SLOT (on_directory_listing_sub_folders (string[]&)) );
+                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
         connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
+                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
-                 this, SLOT (on_finished_successfully ()) );
+                 this, SLOT (on_signal_finished_successfully ()) );
 
         GLib.HashMap <string, ExtraFolderInfo> sizes;
         QVERIFY (!parser.parse ( testXml, sizes, "/oc/remote.php/dav/sharefolder" ));
@@ -569,7 +569,7 @@ class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_href_url_encoding () {
+    private void on_signal_test_href_url_encoding () {
         const GLib.ByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
             "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             "<d:response>"
@@ -622,11 +622,11 @@ class TestXmlParse : GLib.Object {
         LsColXMLParser parser;
 
         connect ( parser, SIGNAL (directoryListingSubfolders (string[]&)),
-                 this, SLOT (on_directory_listing_sub_folders (string[]&)) );
+                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
         connect ( parser, SIGNAL (directoryListingIterated (string&, GLib.HashMap<string,string>&)),
-                 this, SLOT (on_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
+                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashMap<string,string>&)) );
         connect ( parser, SIGNAL (finishedWithoutError ()),
-                 this, SLOT (on_finished_successfully ()) );
+                 this, SLOT (on_signal_finished_successfully ()) );
 
         GLib.HashMap <string, ExtraFolderInfo> sizes;
         QVERIFY (parser.parse ( testXml, sizes, string.fromUtf8 ("/ä") ));

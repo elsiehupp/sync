@@ -17,7 +17,7 @@ class OAuthTestCase : GLib.Object {
     ***********************************************************/
     public bool replyToBrowserOk = false;
     public bool gotAuthOk = false;
-    public virtual bool on_done () { return replyToBrowserOk && gotAuthOk; }
+    public virtual bool on_signal_done () { return replyToBrowserOk && gotAuthOk; }
 
 
     /***********************************************************
@@ -53,10 +53,10 @@ class OAuthTestCase : GLib.Object {
         GLib.Object.connect (&desktopServiceHook, &DesktopServiceHook.hooked,
                          this, &OAuthTestCase.openBrowserHook);
 
-        oauth.on_reset (new OAuth (account.data (), null));
+        oauth.on_signal_reset (new OAuth (account.data (), null));
         GLib.Object.connect (oauth.data (), &OAuth.result, this, &OAuthTestCase.oauthResult);
-        oauth.on_start ();
-        QTRY_VERIFY (on_done ());
+        oauth.on_signal_start ();
+        QTRY_VERIFY (on_signal_done ());
     }
 
 
@@ -81,7 +81,7 @@ class OAuthTestCase : GLib.Object {
     ***********************************************************/
     public virtual Soup.Reply createBrowserReply (QNetworkRequest request) {
         browserReply = realQNAM.get (request);
-        GLib.Object.connect (browserReply, &Soup.Reply.on_finished, this, &OAuthTestCase.browserReplyFinished);
+        GLib.Object.connect (browserReply, &Soup.Reply.on_signal_finished, this, &OAuthTestCase.browserReplyFinished);
         return browserReply;
     }
 
@@ -92,7 +92,7 @@ class OAuthTestCase : GLib.Object {
         QCOMPARE (sender (), browserReply.data ());
         QCOMPARE (state, TokenAsked);
         browserReply.deleteLater ();
-        QCOMPARE (browserReply.rawHeader ("Location"), GLib.ByteArray ("owncloud://on_success"));
+        QCOMPARE (browserReply.rawHeader ("Location"), GLib.ByteArray ("owncloud://on_signal_success"));
         replyToBrowserOk = true;
     }
 
@@ -113,7 +113,7 @@ class OAuthTestCase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public virtual GLib.ByteArray tokenReplyPayload () {
-        QJsonDocument jsondata (QJsonObject{ { "access_token", "123" }, { "refresh_token" , "456" }, { "message_url",  "owncloud://on_success"}, { "user_id", "789" }, { "token_type", "Bearer" }
+        QJsonDocument jsondata (QJsonObject{ { "access_token", "123" }, { "refresh_token" , "456" }, { "message_url",  "owncloud://on_signal_success"}, { "user_id", "789" }, { "token_type", "Bearer" }
         });
         return jsondata.toJson ();
     }

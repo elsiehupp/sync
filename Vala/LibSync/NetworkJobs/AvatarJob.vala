@@ -23,7 +23,7 @@ class AvatarJob : AbstractNetworkJob {
     /***********************************************************
     @brief avatar_pixmap - returns either a valid pixmap or not.
     ***********************************************************/
-    signal void avatar_pixmap (QImage image);
+    signal void avatar_pixmap (Gtk.Image image);
 
 
     /***********************************************************
@@ -42,10 +42,10 @@ class AvatarJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override {
+    public void on_signal_start () override {
         Soup.Request req;
         send_request ("GET", this.avatar_url, req);
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
@@ -53,14 +53,14 @@ class AvatarJob : AbstractNetworkJob {
     The retrieved avatar images don't have the circle shape by
     default
     ***********************************************************/
-    public static QImage make_circular_avatar (QImage base_avatar) {
+    public static Gtk.Image make_circular_avatar (Gtk.Image base_avatar) {
         if (base_avatar.is_null ()) {
             return {};
         }
 
         int dim = base_avatar.width ();
 
-        QImage avatar (dim, dim, QImage.Format_ARGB32);
+        Gtk.Image avatar (dim, dim, Gtk.Image.Format_ARGB32);
         avatar.fill (Qt.transparent);
 
         QPainter painter (&avatar);
@@ -79,16 +79,16 @@ class AvatarJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private bool on_finished () override {
+    private bool on_signal_finished () override {
         int http_result_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
-        QImage av_image;
+        Gtk.Image av_image;
 
         if (http_result_code == 200) {
             GLib.ByteArray png_data = reply ().read_all ();
             if (png_data.size ()) {
                 if (av_image.load_from_data (png_data)) {
-                    GLib.debug (lc_avatar_job) << "Retrieved Avatar pixmap!";
+                    GLib.debug ("Retrieved Avatar pixmap!";
                 }
             }
         }

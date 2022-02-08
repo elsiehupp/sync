@@ -35,7 +35,7 @@ class Proxy_auth_dialog : Gtk.Dialog {
     public string password ();
 
     /// Resets the dialog for new credential entry.
-    public void on_reset ();
+    public void on_signal_reset ();
 
 
     /***********************************************************
@@ -54,7 +54,7 @@ class Proxy_auth_dialog : Gtk.Dialog {
     }
 
     void Proxy_auth_dialog.proxy_address (string address) {
-        ui.proxy_address.on_text (address);
+        ui.proxy_address.on_signal_text (address);
     }
 
     string Proxy_auth_dialog.username () {
@@ -65,7 +65,7 @@ class Proxy_auth_dialog : Gtk.Dialog {
         return ui.password_edit.text ();
     }
 
-    void Proxy_auth_dialog.on_reset () {
+    void Proxy_auth_dialog.on_signal_reset () {
         ui.username_edit.focus ();
         ui.username_edit.clear ();
         ui.password_edit.clear ();

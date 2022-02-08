@@ -5,7 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
-//  Q_DECLARE_LOGGING_CATEGORY (lc_propagate_upload_nG)
+
 /***********************************************************
 @ingroup libsync
 
@@ -23,7 +23,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     private bool this.remove_job_error = false; /// If not null, there was an error removing the job
 
     // Map chunk number with its size  from the PROPFIND on resume.
-    // (Only used from on_propfind_iterate/on_propfind_finished because the LsColJob use signals to report data.)
+    // (Only used from on_signal_propfind_iterate/on_signal_propfind_finished because the LsColJob use signals to report data.)
     private struct Server_chunk_info {
         int64 size;
         string original_name;
@@ -53,20 +53,20 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void start_new_upload ();
-    private void on_start_next_chunk ();
+    private void on_signal_start_next_chunk ();
 
     /***********************************************************
     ***********************************************************/
-    public void on_abort (AbortType abort_type) override;
+    public void on_signal_abort (AbortType abort_type) override;
 
     /***********************************************************
     ***********************************************************/
-    private void on_propfind_finished ();
-    private void on_propfind_finished_with_error ();
-    private void on_propfind_iterate (string name, GLib.HashMap<string, string> properties);
-    private void on_delete_job_finished ();
-    private void on_mk_col_finished ();
-    private void on_put_finished ();
-    private void on_move_job_finished ();
-    private void on_upload_progress (int64, int64);
+    private void on_signal_propfind_finished ();
+    private void on_signal_propfind_finished_with_error ();
+    private void on_signal_propfind_iterate (string name, GLib.HashMap<string, string> properties);
+    private void on_signal_delete_job_finished ();
+    private void on_signal_mk_col_finished ();
+    private void on_signal_put_finished ();
+    private void on_signal_move_job_finished ();
+    private void on_signal_upload_progress (int64, int64);
 };

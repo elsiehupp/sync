@@ -104,7 +104,7 @@ static void create_dirs (string path) {
     var this.mypath = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, string.fromUtf8 (path)).toUtf8 ();
     char mypath = this.mypath.data ();
 
-    char p = mypath + CSYNC_TEST_DIR.size () + 1; /* on_start behind the offset */
+    char p = mypath + CSYNC_TEST_DIR.size () + 1; /* on_signal_start behind the offset */
     int i = 0;
 
     assert_non_null (path);

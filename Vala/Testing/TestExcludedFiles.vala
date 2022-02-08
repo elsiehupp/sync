@@ -15,7 +15,7 @@ const int EXCLUDE_LIST_FILE SOURCEDIR "/../../sync-exclude.lst"
 static QScopedPointer<ExcludedFiles> excludedFiles;
 
 static void up () {
-    excludedFiles.on_reset (new ExcludedFiles);
+    excludedFiles.on_signal_reset (new ExcludedFiles);
     excludedFiles.setWildcardsMatchSlash (false);
 }
 
@@ -217,7 +217,7 @@ private on_ void check_csync_excluded () {
 
 private on_ void check_csync_excluded_per_dir () {
     const var tempDir = QStandardPaths.writableLocation (QStandardPaths.TempLocation);
-    excludedFiles.on_reset (new ExcludedFiles (tempDir + "/"));
+    excludedFiles.on_signal_reset (new ExcludedFiles (tempDir + "/"));
     excludedFiles.setWildcardsMatchSlash (false);
     excludedFiles.addManualExclude ("A");
     excludedFiles.reloadExcludeFiles ();
@@ -668,7 +668,7 @@ private on_ void check_csync_is_windows_reserved_word () {
     /***********************************************************
     ***********************************************************/
     private on_ void testAddExcludeFilePath_addSameFilePath_listSizeDoesNotIncrease () {
-        excludedFiles.on_reset (new ExcludedFiles ());
+        excludedFiles.on_signal_reset (new ExcludedFiles ());
         const var filePath = string ("exclude/.sync-exclude.lst");
 
         excludedFiles.addExcludeFilePath (filePath);
@@ -681,7 +681,7 @@ private on_ void check_csync_is_windows_reserved_word () {
     /***********************************************************
     ***********************************************************/
     private on_ void testAddExcludeFilePath_addDifferentFilePaths_listSizeIncrease () {
-        excludedFiles.on_reset (new ExcludedFiles ());
+        excludedFiles.on_signal_reset (new ExcludedFiles ());
 
         const var filePath1 = string ("exclude1/.sync-exclude.lst");
         const var filePath2 = string ("exclude2/.sync-exclude.lst");
@@ -699,7 +699,7 @@ private on_ void check_csync_is_windows_reserved_word () {
         const string basePath ("syncFolder/");
         const string folder1 ("syncFolder/folder1/");
         const string folder2 (folder1 + "folder2/");
-        excludedFiles.on_reset (new ExcludedFiles (basePath));
+        excludedFiles.on_signal_reset (new ExcludedFiles (basePath));
 
         const string defaultExcludeList ("desktop-client/config-folder/sync-exclude.lst");
         const string folder1ExcludeList (folder1 + ".sync-exclude.lst");
@@ -719,7 +719,7 @@ private on_ void check_csync_is_windows_reserved_word () {
     /***********************************************************
     ***********************************************************/
     private on_ void testReloadExcludeFiles_fileDoesNotExist_returnFalse () {
-        excludedFiles.on_reset (new ExcludedFiles ());
+        excludedFiles.on_signal_reset (new ExcludedFiles ());
         const string nonExistingFile ("directory/.sync-exclude.lst");
         excludedFiles.addExcludeFilePath (nonExistingFile);
         QCOMPARE (excludedFiles.reloadExcludeFiles (), false);
@@ -731,7 +731,7 @@ private on_ void check_csync_is_windows_reserved_word () {
     ***********************************************************/
     private on_ void testReloadExcludeFiles_fileExists_returnTrue () {
         const var tempDir = QStandardPaths.writableLocation (QStandardPaths.TempLocation);
-        excludedFiles.on_reset (new ExcludedFiles (tempDir + "/"));
+        excludedFiles.on_signal_reset (new ExcludedFiles (tempDir + "/"));
 
         const var subTempDir = QStringLiteral ("exclude");
         QVERIFY (QDir (tempDir).mkpath (subTempDir));

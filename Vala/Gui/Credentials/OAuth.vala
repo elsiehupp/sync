@@ -21,7 +21,7 @@ Job that do the authorization grant and fetch the access token
 
 Normal workfl
 
-  -. on_start ()
+  -. on_signal_start ()
       |
       +---. open_browser () open the browser to the login page, redirects to http://localhost
       |
@@ -31,18 +31,10 @@ Normal workfl
             requ
                |
                v
-             /* emit */ result (...)
+              emit signal_result (...)
 
 ***********************************************************/
 class OAuth : GLib.Object {
-
-    /***********************************************************
-    ***********************************************************/
-    public OAuth (Account account, GLib.Object parent)
-        : GLib.Object (parent)
-        this.account (account) {
-    }
-    ~OAuth () override;
 
     /***********************************************************
     ***********************************************************/
@@ -54,65 +46,34 @@ class OAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start ();
+    private Account account;
 
     /***********************************************************
     ***********************************************************/
-    public 
+    public string expected_user;
 
-    /***********************************************************
-    ***********************************************************/
-    public 
 
-    public GLib.Uri authorisation_link ();
-
-signals:
     /***********************************************************
     The state has changed.
     when logged in, token has the value of the token.
     ***********************************************************/
-    void result (OAuth.Result result, string user = "", string token = "", string refresh_token = "");
+    signal void signal_result (OAuth.Result result, string user = "", string token = "", string refresh_token = "");
 
 
     /***********************************************************
     ***********************************************************/
-    private Account this.account;
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private public string this.expected_user;
-}
-
-
-    OAuth.~OAuth () = default;
-
-    /***********************************************************
-    ***********************************************************/
-    static void http_reply_and_close (QTcpSocket socket, string code, string html,
-        string more_headers = null) {
-        if (!socket)
-            return; // socket can have been deleted if the browser was closed
-        socket.write ("HTTP/1.1 ");
-        socket.write (code);
-        socket.write ("\r\n_content-Type : text/html\r\n_connection : close\r\n_content-Length : ");
-        socket.write (GLib.ByteArray.number (qstrlen (html)));
-        if (more_headers) {
-            socket.write ("\r\n");
-            socket.write (more_headers);
-        }
-        socket.write ("\r\n\r\n");
-        socket.write (html);
-        socket.disconnect_from_host ();
-        // We don't want that deleting the server too early prevent queued data to be sent on this socket.
-        // The socket will be deleted after disconnection because disconnected is connected to delete_later
-        socket.parent (null);
+    public OAuth (Account account, GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        this.account = account;
     }
 
-    void OAuth.on_start () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_start () {
         // Listen on the socket to get a port which will be used in the redirect_uri
         if (!this.server.listen (QHostAddress.LocalLost)) {
-            /* emit */ result (NotSupported, "");
+            /* emit */ signal_result (NotSupported, "");
             return;
         }
 
@@ -152,7 +113,7 @@ signals:
                     request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
                     var job = this.account.send_request ("POST", request_token, req, request_body);
-                    job.on_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
+                    job.on_signal_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
                     GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, socket] (Soup.Reply reply) {
                         var json_data = reply.read_all ();
                         QJsonParseError json_parse_error;
@@ -185,16 +146,16 @@ signals:
                             } else {
                                 error_reason = _("The reply from the server did not contain all expected fields");
                             }
-                            GLib.warn (lc_oauth) << "Error when getting the access_token" << json << error_reason;
+                            GLib.warn ("Error when getting the access_token" + json + error_reason;
                             http_reply_and_close (socket, "500 Internal Server Error",
                                 _("<h1>Login Error</h1><p>%1</p>").arg (error_reason).to_utf8 ().const_data ());
-                            /* emit */ result (Error);
+                            /* emit */ signal_result (Error);
                             return;
                         }
                         if (!this.expected_user.is_null () && user != this.expected_user) {
                             // Connected with the wrong user
                             string message = _("<h1>Wrong user</h1>"
-                                                 "<p>You logged-in with user <em>%1</em>, but must login with user <em>%2</em>.<br>"
+                                                 "<p>You logged-in with user <em>%1</em>, but must log in with user <em>%2</em>.<br>"
                                                  "Please log out of %3 in another tab, then <a href='%4'>click here</a> "
                                                  "and log in as user %2</p>")
                                                   .arg (user, this.expected_user, Theme.instance ().app_name_gui (),
@@ -210,14 +171,52 @@ signals:
                         } else {
                             http_reply_and_close (socket, "200 OK", login_successfull_html);
                         }
-                        /* emit */ result (LoggedIn, user, access_token, refresh_token);
+                        /* emit */ signal_result (LoggedIn, user, access_token, refresh_token);
                     });
                 });
             }
         });
     }
 
-    GLib.Uri OAuth.authorisation_link () {
+
+    /***********************************************************
+    ***********************************************************/
+    public bool open_browser () {
+        if (!Utility.open_browser (authorisation_link ())) {
+            // We cannot open the browser, then we claim we don't support OAuth.
+            /* emit */ signal_result (NotSupported, "");
+            return false;
+        }
+        return true;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private static void http_reply_and_close (QTcpSocket socket, string code, string html,
+        string more_headers = null) {
+        if (!socket)
+            return; // socket can have been deleted if the browser was closed
+        socket.write ("HTTP/1.1 ");
+        socket.write (code);
+        socket.write ("\r\n_content-Type : text/html\r\n_connection : close\r\n_content-Length : ");
+        socket.write (GLib.ByteArray.number (qstrlen (html)));
+        if (more_headers) {
+            socket.write ("\r\n");
+            socket.write (more_headers);
+        }
+        socket.write ("\r\n\r\n");
+        socket.write (html);
+        socket.disconnect_from_host ();
+        // We don't want that deleting the server too early prevent queued data to be sent on this socket.
+        // The socket will be deleted after disconnection because disconnected is connected to delete_later
+        socket.parent (null);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public GLib.Uri authorisation_link () {
         //  Q_ASSERT (this.server.is_listening ());
         QUrlQuery query;
         query.query_items ({
@@ -240,14 +239,8 @@ signals:
         return url;
     }
 
-    bool OAuth.open_browser () {
-        if (!Utility.open_browser (authorisation_link ())) {
-            // We cannot open the browser, then we claim we don't support OAuth.
-            /* emit */ result (NotSupported, "");
-            return false;
-        }
-        return true;
-    }
+} // class OAuth
 
-    } // namespace Occ
+} // namespace Ui
+} // namespace Occ
     

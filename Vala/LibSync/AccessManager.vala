@@ -63,7 +63,7 @@ class AccessManager : QNetworkAccessManager {
 
         // Generate a new request identifier
         GLib.ByteArray request_id = generate_request_id ();
-        q_info (lc_access_manager) << op << verb << new_request.url ().to_string () << "has X-Request-ID" << request_id;
+        q_info () + op + verb + new_request.url ().to_string ("has X-Request-ID" + request_id;
         new_request.raw_header ("X-Request-ID", request_id);
 
     #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 4)

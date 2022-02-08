@@ -23,8 +23,6 @@ namespace Ui {
 @ingroup gui
 ***********************************************************/
 class SlideShow : Gtk.Widget {
-    //  Q_PROPERTY (int interval READ interval WRITE interval)
-    //  Q_PROPERTY (int current_slide READ current_slide WRITE current_slide NOTIFY current_slide_changed)
 
     const int SPACING = 6;
     const int SLIDE_DURATION = 1000;
@@ -118,7 +116,7 @@ class SlideShow : Gtk.Widget {
             connect (this.animation.data (), SIGNAL (value_changed (GLib.Variant)), this, SLOT (update ()));
         }
         this.animation.end_value (static_cast<qreal> (index));
-        this.animation.on_start (QAbstractAnimation.DeleteWhenStopped);
+        this.animation.on_signal_start (QAbstractAnimation.DeleteWhenStopped);
 
         this.reverse = index < this.current_index;
         this.current_index = index;
@@ -154,22 +152,22 @@ class SlideShow : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start_show (int interval) {
+    public void on_signal_start_show (int interval) {
         if (interval > 0)
             this.interval = interval;
-        this.timer.on_start (this.interval, this);
+        this.timer.on_signal_start (this.interval, this);
     }
 
     /***********************************************************
     ***********************************************************/
-    public void on_stop_show () {
+    public void on_signal_stop_show () {
         this.timer.stop ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_next_slide () {
+    public void on_signal_next_slide () {
         current_slide ( (this.current_index + 1) % this.labels.count ());
         this.reverse = false;
     }
@@ -177,7 +175,7 @@ class SlideShow : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_prev_slide () {
+    public void on_signal_prev_slide () {
         current_slide ( (this.current_index > 0 ? this.current_index : this.labels.count ()) - 1);
         this.reverse = true;
     }
@@ -185,8 +183,8 @@ class SlideShow : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_reset () {
-        on_stop_show ();
+    public void on_signal_reset () {
+        on_signal_stop_show ();
         this.pixmaps.clear ();
         this.labels.clear ();
         update_geometry ();
@@ -238,7 +236,7 @@ class SlideShow : Gtk.Widget {
     ***********************************************************/
     protected void timer_event (QTimerEvent event) {
         if (event.timer_id () == this.timer.timer_id ())
-            on_next_slide ();
+            on_signal_next_slide ();
     }
 
 
@@ -248,7 +246,7 @@ class SlideShow : Gtk.Widget {
         if (!is_active ())
             return;
 
-        on_start_show ();
+        on_signal_start_show ();
     }
 
 } // class SlideShow

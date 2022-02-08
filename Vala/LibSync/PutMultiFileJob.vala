@@ -12,8 +12,6 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 //  #include <QHttpMultiPart>
 //  #include <memory>
 
-//  Q_DECLARE_LOGGING_CATEGORY (lc_put_multi_file_job)
-
 namespace Occ {
 
 /***********************************************************
@@ -51,7 +49,7 @@ class PutMultiFileJob : AbstractNetworkJob {
         for (var single_device : this.devices) {
             single_device.device.parent (this);
             connect (this, &PutMultiFileJob.upload_progress,
-                    single_device.device.get (), &UploadDevice.on_job_upload_progress);
+                    single_device.device.get (), &UploadDevice.on_signal_job_upload_progress);
         }
     }
 
@@ -59,7 +57,7 @@ class PutMultiFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         Soup.Request req;
 
         for (var one_device : this.devices) {
@@ -79,27 +77,27 @@ class PutMultiFileJob : AbstractNetworkJob {
         send_request ("POST", this.url, req, this.body);
 
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warn (lc_put_multi_file_job) << " Network error : " << reply ().error_string ();
+            GLib.warn (" Network error : " + reply ().error_string ();
         }
 
         connect (reply (), &Soup.Reply.upload_progress, this, &PutMultiFileJob.upload_progress);
         connect (this, &AbstractNetworkJob.network_activity, account ().data (), &Account.propagator_network_activity);
-        this.request_timer.on_start ();
-        AbstractNetworkJob.on_start ();
+        this.request_timer.on_signal_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool on_finished () {
+    public bool on_signal_finished () {
         for (var one_device : this.devices) {
             one_device.device.close ();
         }
 
-        GLib.info (lc_put_multi_file_job) << "POST of" << reply ().request ().url ().to_string () << path () << "FINISHED WITH STATUS"
-                         << reply_status_string ()
-                         << reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
-                         << reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);
+        GLib.info ("POST of" + reply ().request ().url ().to_string () + path ("FINISHED WITH STATUS"
+                         + reply_status_string ()
+                         + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
+                         + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);
 
         /* emit */ finished_signal ();
         return true;

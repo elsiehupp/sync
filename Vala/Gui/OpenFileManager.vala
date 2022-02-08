@@ -51,9 +51,9 @@ static string[] xdg_data_dirs () {
 // Linux impl only, make sure to process %u and %U which might be returned
 static string find_default_file_manager () {
     QProcess p;
-    p.on_start ("xdg-mime", string[] () << "query"
-                                      << "default"
-                                      << "inode/directory",
+    p.on_signal_start ("xdg-mime", string[] ("query"
+                                      + "default"
+                                      + "inode/directory",
         GLib.File.ReadOnly);
     p.wait_for_finished ();
     string filename = string.from_utf8 (p.read_all ().trimmed ());
@@ -63,8 +63,8 @@ static string find_default_file_manager () {
     QFileInfo fi;
     string[] dirs = xdg_data_dirs ();
     string[] subdirs;
-    subdirs << "/applications/"
-            << "/applications/kde4/";
+    subdirs + "/applications/"
+            + "/applications/kde4/";
     foreach (string dir, dirs) {
         foreach (string subdir, subdirs) {
             fi.file (dir + subdir + filename);
@@ -79,7 +79,7 @@ static string find_default_file_manager () {
 // early dolphin versions did not have --select
 static bool check_dolphin_can_select () {
     QProcess p;
-    p.on_start ("dolphin", string[] () << "--help", GLib.File.ReadOnly);
+    p.on_signal_start ("dolphin", string[] ("--help", GLib.File.ReadOnly);
     p.wait_for_finished ();
     return p.read_all ().contains ("--select");
 }
@@ -149,7 +149,7 @@ void show_in_file_manager (string local_path) {
     }
 
     if (args.count () == 0)
-        args << file_to_open;
+        args + file_to_open;
 
     if (app.is_empty () || args.is_empty () || !can_handle_file) {
         // fall back : open the default file manager, without ever selecting the file

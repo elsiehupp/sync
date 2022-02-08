@@ -8,7 +8,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief Job that runs subjobs. It becomes on_finished only when all subjobs are on_finished.
+@brief Job that runs subjobs. It becomes on_signal_finished only when all subjobs are on_signal_finished.
 @ingroup libsync
 ***********************************************************/
 class PropagatorCompositeJob : PropagatorJob {
@@ -58,7 +58,7 @@ class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public bool on_schedule_self_or_child () {
+    public bool on_signal_schedule_self_or_child () {
         if (this.state == Finished) {
             return false;
         }
@@ -72,7 +72,7 @@ class PropagatorCompositeJob : PropagatorJob {
         for (var running_job : q_as_const (this.running_jobs)) {
             //  ASSERT (running_job.state == Running);
 
-            if (on_possibly_run_next_job (running_job)) {
+            if (on_signal_possibly_run_next_job (running_job)) {
                 return true;
             }
 
@@ -91,7 +91,7 @@ class PropagatorCompositeJob : PropagatorJob {
             this.tasks_to_do.remove (0);
             PropagatorJob job = propagator ().create_job (next_task);
             if (!job) {
-                GLib.warn (lc_directory) << "Useless task found for file" << next_task.destination () << "instruction" << next_task.instruction;
+                GLib.warn ("Useless task found for file" + next_task.destination ("instruction" + next_task.instruction;
                 continue;
             }
             append_job (job);
@@ -102,15 +102,15 @@ class PropagatorCompositeJob : PropagatorJob {
             PropagatorJob next_job = this.jobs_to_do.first ();
             this.jobs_to_do.remove (0);
             this.running_jobs.append (next_job);
-            return on_possibly_run_next_job (next_job);
+            return on_signal_possibly_run_next_job (next_job);
         }
 
         // If neither us or our children had stuff left to do we could hang. Make sure
-        // we mark this job as on_finished so that the propagator can schedule a new one.
+        // we mark this job as on_signal_finished so that the propagator can schedule a new one.
         if (this.jobs_to_do.is_empty () && this.tasks_to_do.is_empty () && this.running_jobs.is_empty ()) {
             // Our parent jobs are already iterating over their running jobs, post to the event loop
             // to avoid removing ourself from that list while they iterate.
-            QMetaObject.invoke_method (this, "on_finalize", Qt.QueuedConnection);
+            QMetaObject.invoke_method (this, "on_signal_finalize", Qt.QueuedConnection);
         }
         return false;
     }
@@ -131,18 +131,18 @@ class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     Abort synchronously or asynchronously - some jobs
-    require to be on_finished without immediete on_abort (on_abort on job might
+    require to be on_signal_finished without immediete on_signal_abort (on_signal_abort on job might
     cause conflicts/duplicated files - owncloud/client/issues/5949)
     ***********************************************************/
-    public void on_abort (PropagatorJob.AbortType abort_type) override {
+    public void on_signal_abort (PropagatorJob.AbortType abort_type) override {
         if (!this.running_jobs.empty ()) {
             this.aborts_count = this.running_jobs.size ();
             foreach (PropagatorJob j, this.running_jobs) {
                 if (abort_type == AbortType.ASYNCHRONOUS) {
                     connect (j, &PropagatorJob.abort_finished,
-                            this, &PropagatorCompositeJob.on_sub_job_abort_finished);
+                            this, &PropagatorCompositeJob.on_signal_sub_job_abort_finished);
                 }
-                j.on_abort (abort_type);
+                j.on_signal_abort (abort_type);
             }
         } else if (abort_type == AbortType.ASYNCHRONOUS) {
             /* emit */ abort_finished ();
@@ -163,11 +163,11 @@ class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_sub_job_abort_finished () {
-        // Count that job has been on_finished
+    private void on_signal_sub_job_abort_finished () {
+        // Count that job has been on_signal_finished
         this.aborts_count--;
 
-        // Emit on_abort if last job has been aborted
+        // Emit on_signal_abort if last job has been aborted
         if (this.aborts_count == 0) {
             /* emit */ abort_finished ();
         }
@@ -176,17 +176,17 @@ class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private bool on_possibly_run_next_job (PropagatorJob next) {
+    private bool on_signal_possibly_run_next_job (PropagatorJob next) {
         if (next.state == NotYetStarted) {
-            connect (next, &PropagatorJob.on_finished, this, &PropagatorCompositeJob.on_sub_job_finished);
+            connect (next, &PropagatorJob.on_signal_finished, this, &PropagatorCompositeJob.on_signal_sub_job_finished);
         }
-        return next.on_schedule_self_or_child ();
+        return next.on_signal_schedule_self_or_child ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_sub_job_finished (SyncFileItem.Status status) {
+    private void on_signal_sub_job_finished (SyncFileItem.Status status) {
         var sub_job = static_cast<PropagatorJob> (sender ());
         //  ASSERT (sub_job);
 
@@ -207,7 +207,7 @@ class PropagatorCompositeJob : PropagatorJob {
         }
 
         if (this.jobs_to_do.is_empty () && this.tasks_to_do.is_empty () && this.running_jobs.is_empty ()) {
-            on_finalize ();
+            on_signal_finalize ();
         } else {
             propagator ().schedule_next_job ();
         }
@@ -216,7 +216,7 @@ class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_finalize () {
+    private void on_signal_finalize () {
         // The propagator will do parallel scheduling and this could be posted
         // multiple times on the event loop, ignore the duplicate calls.
         if (this.state == Finished)

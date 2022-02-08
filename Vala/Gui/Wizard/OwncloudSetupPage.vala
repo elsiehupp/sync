@@ -73,16 +73,16 @@ class OwncloudSetupPage : QWizardPage {
         this.progress_indi.size_policy (size_policy);
 
         this.ui.progress_layout.add_widget (this.progress_indi);
-        on_stop_spinner ();
+        on_signal_stop_spinner ();
 
         set_up_customization ();
 
-        on_url_changed (QLatin1String ("")); // don't jitter UI
-        connect (this.ui.le_url, &QLineEdit.text_changed, this, &OwncloudSetupPage.on_url_changed);
-        connect (this.ui.le_url, &QLineEdit.editing_finished, this, &OwncloudSetupPage.on_url_edit_finished);
+        on_signal_url_changed (QLatin1String ("")); // don't jitter UI
+        connect (this.ui.le_url, &QLineEdit.text_changed, this, &OwncloudSetupPage.on_signal_url_changed);
+        connect (this.ui.le_url, &QLineEdit.editing_finished, this, &OwncloudSetupPage.on_signal_url_edit_finished);
 
         add_cert_dial = new AddCertificateDialog (this);
-        connect (add_cert_dial, &Gtk.Dialog.accepted, this, &OwncloudSetupPage.on_certificate_accepted);
+        connect (add_cert_dial, &Gtk.Dialog.accepted, this, &OwncloudSetupPage.on_signal_certificate_accepted);
     }
 
 
@@ -134,24 +134,24 @@ class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     public bool validate_page () {
         if (!this.auth_type_known) {
-            on_url_edit_finished ();
+            on_signal_url_edit_finished ();
             string u = url ();
             GLib.Uri qurl (u);
             if (!qurl.is_valid () || qurl.host ().is_empty ()) {
-                on_error_string (_("Server address does not seem to be valid"), false);
+                on_signal_error_string (_("Server address does not seem to be valid"), false);
                 return false;
             }
 
-            on_error_string ("", false);
+            on_signal_error_string ("", false);
             this.checking = true;
-            on_start_spinner ();
+            on_signal_start_spinner ();
             /* emit */ complete_changed ();
 
             /* emit */ determine_auth_type (u);
             return false;
         } else {
             // connecting is running
-            on_stop_spinner ();
+            on_signal_stop_spinner ();
             this.checking = false;
             /* emit */ complete_changed ();
             return true;
@@ -190,7 +190,7 @@ class OwncloudSetupPage : QWizardPage {
             return;
         }
 
-        this.ui.le_url.on_text (this.oc_url);
+        this.ui.le_url.on_signal_text (this.oc_url);
     }
 
 
@@ -209,21 +209,21 @@ class OwncloudSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    //  public void on_remote_folder (string remote_fo);
+    //  public void on_signal_remote_folder (string remote_fo);
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_auth_type (DetermineAuthTypeJob.AuthType type) {
+    public void on_signal_auth_type (DetermineAuthTypeJob.AuthType type) {
         this.auth_type_known = true;
         this.auth_type = type;
-        on_stop_spinner ();
+        on_signal_stop_spinner ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_error_string (string err, bool retry_http_only) {
+    public void on_signal_error_string (string err, bool retry_http_only) {
         if (err.is_empty ()) {
             this.ui.error_label.visible (false);
         } else {
@@ -259,36 +259,36 @@ class OwncloudSetupPage : QWizardPage {
             }
 
             this.ui.error_label.visible (true);
-            this.ui.error_label.on_text (err);
+            this.ui.error_label.on_signal_text (err);
         }
         this.checking = false;
         /* emit */ complete_changed ();
-        on_stop_spinner ();
+        on_signal_stop_spinner ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_start_spinner () {
+    public void on_signal_start_spinner () {
         this.ui.progress_layout.enabled (true);
         this.progress_indi.visible (true);
-        this.progress_indi.on_start_animation ();
+        this.progress_indi.on_signal_start_animation ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_stop_spinner () {
+    public void on_signal_stop_spinner () {
         this.ui.progress_layout.enabled (false);
         this.progress_indi.visible (false);
-        this.progress_indi.on_stop_animation ();
+        this.progress_indi.on_signal_stop_animation ();
     }
 
 
     /***********************************************************
     Called during the validation of the client certificate.
     ***********************************************************/
-    public void on_certificate_accepted () {
+    public void on_signal_certificate_accepted () {
         GLib.File cert_file (add_cert_dial.get_certificate_path ());
         cert_file.open (GLib.File.ReadOnly);
         GLib.ByteArray cert_data = cert_file.read_all ();
@@ -315,7 +315,7 @@ class OwncloudSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public void on_style_changed () {
+    public void on_signal_style_changed () {
         customize_style ();
     }
 
@@ -323,7 +323,7 @@ class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     Slot hit from text_changed of the url entry field.
     ***********************************************************/
-    protected void on_url_changed (string url) {
+    protected void on_signal_url_changed (string url) {
         // Need to set next button as default button here because
         // otherwise the on OSX the next button does not stay the default
         // button
@@ -351,14 +351,14 @@ class OwncloudSetupPage : QWizardPage {
             }
         }
         if (new_url != url) {
-            this.ui.le_url.on_text (new_url);
+            this.ui.le_url.on_signal_text (new_url);
         }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected void on_url_edit_finished () {
+    protected void on_signal_url_edit_finished () {
         string url = this.ui.le_url.full_text ();
         if (GLib.Uri (url).is_relative () && !url.is_empty ()) {
             // no scheme defined, set one
@@ -385,8 +385,8 @@ class OwncloudSetupPage : QWizardPage {
         WizardCommon.set_up_custom_media (variant, this.ui.bottom_label);
 
         var le_url_palette = this.ui.le_url.palette ();
-        le_url_palette.on_color (QPalette.Text, Qt.black);
-        le_url_palette.on_color (QPalette.Base, Qt.white);
+        le_url_palette.on_signal_color (QPalette.Text, Qt.black);
+        le_url_palette.on_signal_color (QPalette.Base, Qt.white);
         this.ui.le_url.palette (le_url_palette);
     }
 
@@ -406,9 +406,9 @@ class OwncloudSetupPage : QWizardPage {
         if (this.progress_indi) {
             const var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
-                this.progress_indi.on_color (Qt.white);
+                this.progress_indi.on_signal_color (Qt.white);
             } else {
-                this.progress_indi.on_color (Qt.black);
+                this.progress_indi.on_signal_color (Qt.black);
             }
         }
 
@@ -420,7 +420,7 @@ class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     private void setup_server_address_description_label () {
         const var app_name = Theme.instance ().app_name_gui ();
-        this.ui.server_address_description_label.on_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
+        this.ui.server_address_description_label.on_signal_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
     }
 
 

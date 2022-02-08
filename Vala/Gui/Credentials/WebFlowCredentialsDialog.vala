@@ -39,17 +39,17 @@ class WebFlowCredentialsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public void on_flow_2_auth_result (Flow2Auth.Result, string error_string, string user, string app_password);
+    public void on_signal_flow_2_auth_result (Flow2Auth.Result, string error_string, string user, string app_password);
 
     /***********************************************************
     ***********************************************************/
-    public void on_show_settings_dialog ();
+    public void on_signal_show_settings_dialog ();
 
 signals:
-    void on_url_catched (string user, string pass, string host);
+    void on_signal_url_catched (string user, string pass, string host);
     void style_changed ();
-    void on_activate ();
-    void on_close ();
+    void on_signal_activate ();
+    void on_signal_close ();
 
 
     /***********************************************************
@@ -101,13 +101,13 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flo
         this.flow_2_auth_widget = new Flow2AuthWidget ();
         this.container_layout.add_widget (this.flow_2_auth_widget);
 
-        connect (this.flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &WebFlowCredentialsDialog.on_flow_2_auth_result);
+        connect (this.flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &WebFlowCredentialsDialog.on_signal_flow_2_auth_result);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &WebFlowCredentialsDialog.style_changed, this.flow_2_auth_widget, &Flow2AuthWidget.on_style_changed);
+        connect (this, &WebFlowCredentialsDialog.style_changed, this.flow_2_auth_widget, &Flow2AuthWidget.on_signal_style_changed);
 
         // allow Flow2 page to poll on window activation
-        connect (this, &WebFlowCredentialsDialog.on_activate, this.flow_2_auth_widget, &Flow2AuthWidget.on_poll_now);
+        connect (this, &WebFlowCredentialsDialog.on_signal_activate, this.flow_2_auth_widget, &Flow2AuthWidget.on_signal_poll_now);
 
         this.flow_2_auth_widget.start_auth (account);
     } else {
@@ -115,12 +115,12 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flo
         this.web_view = new WebView ();
         this.container_layout.add_widget (this.web_view);
 
-        connect (this.web_view, &WebView.on_url_catched, this, &WebFlowCredentialsDialog.on_url_catched);
+        connect (this.web_view, &WebView.on_signal_url_catched, this, &WebFlowCredentialsDialog.on_signal_url_catched);
 //  #endif // WITH_WEBENGINE
     }
 
     var app = static_cast<Application> (Gtk.Application);
-    connect (app, &Application.is_showing_settings_dialog, this, &WebFlowCredentialsDialog.on_show_settings_dialog);
+    connect (app, &Application.is_showing_settings_dialog, this, &WebFlowCredentialsDialog.on_signal_show_settings_dialog);
 
     this.error_label = new Gtk.Label ();
     this.error_label.hide ();
@@ -165,12 +165,12 @@ void WebFlowCredentialsDialog.url (GLib.Uri url) {
 }
 
 void WebFlowCredentialsDialog.info (string message) {
-    this.info_label.on_text (message);
+    this.info_label.on_signal_text (message);
 }
 
 void WebFlowCredentialsDialog.error (string error) {
     // bring window to top
-    on_show_settings_dialog ();
+    on_signal_show_settings_dialog ();
 
     if (this.use_flow2 && this.flow_2_auth_widget) {
         this.flow_2_auth_widget.error (error);
@@ -180,7 +180,7 @@ void WebFlowCredentialsDialog.error (string error) {
     if (error.is_empty ()) {
         this.error_label.hide ();
     } else {
-        this.error_label.on_text (error);
+        this.error_label.on_signal_text (error);
         this.error_label.show ();
     }
 }
@@ -210,20 +210,20 @@ void WebFlowCredentialsDialog.customize_style () {
     // HINT : Customize dialog's own style here, if necessary in the future (Dark-/Light-Mode switching)
 }
 
-void WebFlowCredentialsDialog.on_show_settings_dialog () {
+void WebFlowCredentialsDialog.on_signal_show_settings_dialog () {
     // bring window to top but slightly delay, to avoid being hidden behind the SettingsDialog
     QTimer.single_shot (100, this, [this] {
         OwncloudGui.raise_dialog (this);
     });
 }
 
-void WebFlowCredentialsDialog.on_flow_2_auth_result (Flow2Auth.Result r, string error_string, string user, string app_password) {
+void WebFlowCredentialsDialog.on_signal_flow_2_auth_result (Flow2Auth.Result r, string error_string, string user, string app_password) {
     //  Q_UNUSED (error_string)
     if (r == Flow2Auth.LoggedIn) {
         /* emit */ url_catched (user, app_password, "");
     } else {
         // bring window to top
-        on_show_settings_dialog ();
+        on_signal_show_settings_dialog ();
     }
 }
 

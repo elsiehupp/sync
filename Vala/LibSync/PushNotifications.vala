@@ -76,17 +76,17 @@ class PushNotifications : GLib.Object {
         base (parent);
         this.account = account;
         this.web_socket = new QWeb_socket ("", QWeb_socket_protocol.Version_latest, this);
-        connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, &PushNotifications.on_web_socket_error);
-        connect (this.web_socket, &QWeb_socket.ssl_errors, this, &PushNotifications.on_web_socket_ssl_errors);
-        connect (this.web_socket, &QWeb_socket.connected, this, &PushNotifications.on_web_socket_connected);
-        connect (this.web_socket, &QWeb_socket.disconnected, this, &PushNotifications.on_web_socket_disconnected);
-        connect (this.web_socket, &QWeb_socket.pong, this, &PushNotifications.on_web_socket_pong_received);
+        connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, &PushNotifications.on_signal_web_socket_error);
+        connect (this.web_socket, &QWeb_socket.ssl_errors, this, &PushNotifications.on_signal_web_socket_ssl_errors);
+        connect (this.web_socket, &QWeb_socket.connected, this, &PushNotifications.on_signal_web_socket_connected);
+        connect (this.web_socket, &QWeb_socket.disconnected, this, &PushNotifications.on_signal_web_socket_disconnected);
+        connect (this.web_socket, &QWeb_socket.pong, this, &PushNotifications.on_signal_web_socket_pong_received);
 
         connect (&this.ping_timer, &QTimer.timeout, this, &PushNotifications.ping_web_socket_server);
         this.ping_timer.single_shot (true);
         this.ping_timer.interval (PING_INTERVAL);
 
-        connect (&this.ping_timed_out_timer, &QTimer.timeout, this, &PushNotifications.on_ping_timed_out);
+        connect (&this.ping_timed_out_timer, &QTimer.timeout, this, &PushNotifications.on_signal_ping_timed_out);
         this.ping_timed_out_timer.single_shot (true);
         this.ping_timed_out_timer.interval (PING_INTERVAL);
     }
@@ -103,7 +103,7 @@ class PushNotifications : GLib.Object {
     This method needs to be called before push notifications can be used.
     ***********************************************************/
     public void up () {
-        GLib.info (lc_push_notifications) << "Setup push notifications";
+        GLib.info ("Setup push notifications";
         this.failed_authentication_attempts_count = 0;
         reconnect_to_web_socket ();
     }
@@ -144,26 +144,26 @@ class PushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_web_socket_connected () {
-        GLib.info (lc_push_notifications) << "Connected to websocket for account" << this.account.url ();
+    private void on_signal_web_socket_connected () {
+        GLib.info ("Connected to websocket for account" + this.account.url ();
 
-        connect (this.web_socket, &QWeb_socket.text_message_received, this, &PushNotifications.on_web_socket_text_message_received, Qt.UniqueConnection);
+        connect (this.web_socket, &QWeb_socket.text_message_received, this, &PushNotifications.on_signal_web_socket_text_message_received, Qt.UniqueConnection);
 
-        authenticate_on_web_socket ();
+        authenticate_on_signal_web_socket ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_web_socket_disconnected () {
-        GLib.info (lc_push_notifications) << "Disconnected from websocket for account" << this.account.url ();
+    private void on_signal_web_socket_disconnected () {
+        GLib.info ("Disconnected from websocket for account" + this.account.url ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_web_socket_text_message_received (string message) {
-        GLib.info (lc_push_notifications) << "Received push notification:" << message;
+    private void on_signal_web_socket_text_message_received (string message) {
+        GLib.info ("Received push notification:" + message;
 
         if (message == "notify_file") {
             handle_notify_file ();
@@ -181,7 +181,7 @@ class PushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_web_socket_error (QAbstractSocket.SocketError error) {
+    private void on_signal_web_socket_error (QAbstractSocket.SocketError error) {
         // This error gets thrown in test_setup_max_connection_attempts_reached_delete_push_notifications after
         // the second connection attempt. I have no idea why this happens. Maybe the socket gets not closed correctly?
         // I think it's fine to ignore this error.
@@ -189,7 +189,7 @@ class PushNotifications : GLib.Object {
             return;
         }
 
-        GLib.warn (lc_push_notifications) << "Websocket error on with account" << this.account.url () << error;
+        GLib.warn ("Websocket error on with account" + this.account.url () + error;
         close_web_socket ();
         /* emit */ connection_lost ();
     }
@@ -197,8 +197,8 @@ class PushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_web_socket_ssl_errors (GLib.List<QSslError> errors) {
-        GLib.warn (lc_push_notifications) << "Websocket ssl errors on with account" << this.account.url () << errors;
+    private void on_signal_web_socket_ssl_errors (GLib.List<QSslError> errors) {
+        GLib.warn ("Websocket ssl errors on with account" + this.account.url () + errors;
         close_web_socket ();
         /* emit */ authentication_failed ();
     }
@@ -206,8 +206,8 @@ class PushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_web_socket_pong_received (uint64 /*elapsed_time*/, GLib.ByteArray  /*payload*/) {
-        GLib.debug (lc_push_notifications) << "Pong received in time";
+    private void on_signal_web_socket_pong_received (uint64 /*elapsed_time*/, GLib.ByteArray  /*payload*/) {
+        GLib.debug ("Pong received in time";
         // We are fine with every kind of pong and don't care about the
         // payload. As long as we receive pongs the server is still alive.
         this.pong_received_from_web_socket_server = true;
@@ -217,13 +217,13 @@ class PushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_ping_timed_out () {
+    private void on_signal_ping_timed_out () {
         if (this.pong_received_from_web_socket_server) {
-            GLib.debug (lc_push_notifications) << "Websocket respond with a pong in time.";
+            GLib.debug ("Websocket respond with a pong in time.";
             return;
         }
 
-        GLib.info (lc_push_notifications) << "Websocket did not respond with a pong in time. Try to reconnect.";
+        GLib.info ("Websocket did not respond with a pong in time. Try to reconnect.";
         // Try again to connect
         up ();
     }
@@ -236,9 +236,9 @@ class PushNotifications : GLib.Object {
         const var capabilities = this.account.capabilities ();
         const var web_socket_url = capabilities.push_notifications_web_socket_url ();
 
-        GLib.info (lc_push_notifications) << "Open connection to websocket on" << web_socket_url << "for account" << this.account.url ();
-        connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, &PushNotifications.on_web_socket_error);
-        connect (this.web_socket, &QWeb_socket.ssl_errors, this, &PushNotifications.on_web_socket_ssl_errors);
+        GLib.info ("Open connection to websocket on" + web_socket_url + "for account" + this.account.url ();
+        connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, &PushNotifications.on_signal_web_socket_error);
+        connect (this.web_socket, &QWeb_socket.ssl_errors, this, &PushNotifications.on_signal_web_socket_ssl_errors);
         this.web_socket.open (web_socket_url);
     }
 
@@ -254,7 +254,7 @@ class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void close_web_socket () {
-        GLib.info (lc_push_notifications) << "Close websocket for account" << this.account.url ();
+        GLib.info ("Close websocket for account" + this.account.url ();
 
         this.ping_timer.stop ();
         this.ping_timed_out_timer.stop ();
@@ -265,8 +265,8 @@ class PushNotifications : GLib.Object {
             this.reconnect_timer.stop ();
         }
 
-        disconnect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, &PushNotifications.on_web_socket_error);
-        disconnect (this.web_socket, &QWeb_socket.ssl_errors, this, &PushNotifications.on_web_socket_ssl_errors);
+        disconnect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, &PushNotifications.on_signal_web_socket_error);
+        disconnect (this.web_socket, &QWeb_socket.ssl_errors, this, &PushNotifications.on_signal_web_socket_ssl_errors);
 
         this.web_socket.close ();
     }
@@ -274,7 +274,7 @@ class PushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void authenticate_on_web_socket () {
+    private void authenticate_on_signal_web_socket () {
         const var credentials = this.account.credentials ();
         const var username = credentials.user ();
         const var password = credentials.password ();
@@ -290,7 +290,7 @@ class PushNotifications : GLib.Object {
     private bool try_reconnect_to_web_socket () {
         ++this.failed_authentication_attempts_count;
         if (this.failed_authentication_attempts_count >= MAX_ALLOWED_FAILED_AUTHENTICATION_ATTEMPTS) {
-            GLib.info (lc_push_notifications) << "Max authentication attempts reached";
+            GLib.info ("Max authentication attempts reached";
             return false;
         }
 
@@ -303,7 +303,7 @@ class PushNotifications : GLib.Object {
         connect (this.reconnect_timer, &QTimer.timeout, [this] () {
             reconnect_to_web_socket ();
         });
-        this.reconnect_timer.on_start ();
+        this.reconnect_timer.on_signal_start ();
 
         return true;
     }
@@ -317,7 +317,7 @@ class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void ping_web_socket_server () {
-        GLib.debug (lc_push_notifications, "Ping websocket server");
+        GLib.debug ();
 
         this.pong_received_from_web_socket_server = false;
 
@@ -330,21 +330,21 @@ class PushNotifications : GLib.Object {
     ***********************************************************/
     private void start_ping_timer () {
         this.ping_timed_out_timer.stop ();
-        this.ping_timer.on_start ();
+        this.ping_timer.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void start_ping_timed_out_timer () {
-        this.ping_timed_out_timer.on_start ();
+        this.ping_timed_out_timer.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void handle_authenticated () {
-        GLib.info (lc_push_notifications) << "Authenticated successful on websocket";
+        GLib.info ("Authenticated successful on websocket";
         this.failed_authentication_attempts_count = 0;
         this.is_ready = true;
         start_ping_timer ();
@@ -362,7 +362,7 @@ class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void handle_notify_file () {
-        GLib.info (lc_push_notifications) << "Files push notification arrived";
+        GLib.info ("Files push notification arrived";
         emit_files_changed ();
     }
 
@@ -370,7 +370,7 @@ class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void handle_invalid_credentials () {
-        GLib.info (lc_push_notifications) << "Invalid credentials submitted to websocket";
+        GLib.info ("Invalid credentials submitted to websocket";
         if (!try_reconnect_to_web_socket ()) {
             close_web_socket ();
             /* emit */ authentication_failed ();
@@ -381,7 +381,7 @@ class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void handle_notify_notification () {
-        GLib.info (lc_push_notifications) << "Push notification arrived";
+        GLib.info ("Push notification arrived";
         emit_notifications_changed ();
     }
 
@@ -389,7 +389,7 @@ class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void handle_notify_activity () {
-        GLib.info (lc_push_notifications) << "Push activity arrived";
+        GLib.info ("Push activity arrived";
         emit_activities_changed ();
     }
 

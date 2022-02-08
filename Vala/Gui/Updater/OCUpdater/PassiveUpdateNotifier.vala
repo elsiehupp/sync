@@ -34,7 +34,7 @@ class Passive_update_notifier : OCUpdater {
 
     /***********************************************************
     ***********************************************************/
-    private void version_info_arrived (Update_info info) override;
+    private void version_info_arrived (UpdateInfo info) override;
     private GLib.ByteArray this.running_app_version;
 }
 
@@ -65,12 +65,12 @@ class Passive_update_notifier : OCUpdater {
         OCUpdater.background_check_for_update ();
     }
 
-    void Passive_update_notifier.version_info_arrived (Update_info info) {
+    void Passive_update_notifier.version_info_arrived (UpdateInfo info) {
         int64 current_ver = Helper.current_version_to_int ();
         int64 remote_ver = Helper.string_version_to_int (info.version ());
 
         if (info.version ().is_empty () || current_ver >= remote_ver) {
-            GLib.info (lc_updater) << "Client is on latest version!";
+            GLib.info ("Client is on latest version!";
             download_state (Up_to_date);
         } else {
             download_state (Update_only_available_through_system);

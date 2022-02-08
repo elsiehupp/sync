@@ -27,7 +27,7 @@ class PropagateLocalMkdir : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         if (propagator ().abort_requested)
             return;
 
@@ -59,7 +59,7 @@ class PropagateLocalMkdir : PropagateItemJob {
             if (this.delete_existing_file) {
                 string remove_error;
                 if (!FileSystem.remove (new_dir_str, remove_error)) {
-                    on_done (SyncFileItem.Status.NORMAL_ERROR,
+                    on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                         _("could not delete file %1, error : %2")
                             .arg (new_dir_str, remove_error));
                     return;
@@ -67,21 +67,21 @@ class PropagateLocalMkdir : PropagateItemJob {
             } else if (this.item.instruction == CSYNC_INSTRUCTION_CONFLICT) {
                 string error;
                 if (!propagator ().create_conflict (this.item, this.associated_composite, error)) {
-                    on_done (SyncFileItem.Status.SOFT_ERROR, error);
+                    on_signal_done (SyncFileItem.Status.SOFT_ERROR, error);
                     return;
                 }
             }
         }
 
         if (Utility.fs_case_preserving () && propagator ().local_filename_clash (this.item.file)) {
-            GLib.warn (lc_propagate_local_mkdir) << "New folder to create locally already exists with different case:" << this.item.file;
-            on_done (SyncFileItem.Status.NORMAL_ERROR, _("Attention, possible case sensitivity clash with %1").arg (new_dir_str));
+            GLib.warn ("New folder to create locally already exists with different case:" + this.item.file;
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Attention, possible case sensitivity clash with %1").arg (new_dir_str));
             return;
         }
         /* emit */ propagator ().touched_file (new_dir_str);
         QDir local_dir (propagator ().local_path ());
         if (!local_dir.mkpath (this.item.file)) {
-            on_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not create folder %1").arg (new_dir_str));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not create folder %1").arg (new_dir_str));
             return;
         }
 
@@ -94,10 +94,10 @@ class PropagateLocalMkdir : PropagateItemJob {
         new_item.etag = "this.invalid_";
         const var result = propagator ().update_metadata (new_item);
         if (!result) {
-            on_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
+            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (new_item.file));
+            on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (new_item.file));
             return;
         }
         propagator ().journal.commit ("local_mkdir");
@@ -105,7 +105,7 @@ class PropagateLocalMkdir : PropagateItemJob {
         var result_status = this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
             ? SyncFileItem.Status.CONFLICT
             : SyncFileItem.Status.SUCCESS;
-        on_done (result_status);
+        on_signal_done (result_status);
     }
 
 } // class PropagateLocalMkdir

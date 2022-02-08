@@ -5,7 +5,7 @@ namespace Ui {
 
 class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
 
-    signal void on_url_catched (string user, string pass, string host);
+    signal void on_signal_url_catched (string user, string pass, string host);
 
     /***********************************************************
     ***********************************************************/
@@ -35,7 +35,7 @@ class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
             }
         }
 
-        GLib.debug (lc_wizard_webiew ()) << "Got raw user from request path : " << user;
+        GLib.debug ()) + "Got raw user from request path : " + user;
 
         user = user.replace (char ('+'), char (' '));
         password = password.replace (char ('+'), char (' '));
@@ -46,7 +46,7 @@ class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
         if (!server.starts_with ("http://") && !server.starts_with ("https://")) {
             server = "https://" + server;
         }
-        GLib.info (lc_wizard_webiew ()) << "Got user : " << user << ", server : " << server;
+        GLib.info ()) + "Got user : " + user + ", server : " + server;
 
         /* emit */ url_catched (user, password, server);
     }

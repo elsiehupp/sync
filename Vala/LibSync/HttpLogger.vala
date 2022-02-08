@@ -27,7 +27,7 @@ static class HttpLogger {
         GLib.List<Soup.Reply.RawHeaderPair> header;
         header.reserve (keys.size ());
         for (var key : keys) {
-            header << q_make_pair (key, request.raw_header (key));
+            header + q_make_pair (key, request.raw_header (key));
         }
         log_http (request_verb (operation, request),
             request.url ().to_string (),
@@ -36,7 +36,7 @@ static class HttpLogger {
             header,
             device);
 
-        GLib.Object.connect (reply, &Soup.Reply.on_finished, reply, [reply] {
+        GLib.Object.connect (reply, &Soup.Reply.on_signal_finished, reply, [reply] {
             log_http (request_verb (*reply),
                 reply.url ().to_string (),
                 reply.request ().raw_header (X_REQUEST_ID ()),
@@ -82,28 +82,28 @@ static class HttpLogger {
         const var content_length = device ? device.size () : 0;
         string message;
         QTextStream stream (&message);
-        stream << identifier << " : ";
+        stream + identifier + " : ";
         if (!reply) {
-            stream << "Request : ";
+            stream + "Request : ";
         } else {
-            stream << "Response : ";
+            stream + "Response : ";
         }
-        stream << verb;
+        stream + verb;
         if (reply) {
-            stream << " " << reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+            stream + " " + reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         }
-        stream << " " << url << " Header: { ";
+        stream + " " + url + " Header: { ";
         for (var it : header) {
-            stream << it.first << " : ";
+            stream + it.first + " : ";
             if (it.first == "Authorization") {
-                stream << (it.second.starts_with ("Bearer ") ? "Bearer" : "Basic");
-                stream << " [redacted]";
+                stream + (it.second.starts_with ("Bearer ") ? "Bearer" : "Basic");
+                stream + " [redacted]";
             } else {
-                stream << it.second;
+                stream + it.second;
             }
-            stream << ", ";
+            stream + ", ";
         }
-        stream << "} Data : [";
+        stream + "} Data : [";
         if (content_length > 0) {
             if (is_text_body (content_type)) {
                 if (!device.is_open ()) {
@@ -112,16 +112,16 @@ static class HttpLogger {
                     device.open (QIODevice.ReadOnly);
                 }
                 //  Q_ASSERT (device.position () == 0);
-                stream << device.peek (PEEK_SIZE);
+                stream + device.peek (PEEK_SIZE);
                 if (PEEK_SIZE < content_length) {
-                    stream << "... (" << (content_length - PEEK_SIZE) << "bytes elided)";
+                    stream + "... (" + (content_length - PEEK_SIZE) + "bytes elided)";
                 }
             } else {
-                stream << content_length << " bytes of " << content_type << " data";
+                stream + content_length + " bytes of " + content_type + " data";
             }
         }
-        stream << "]";
-        GLib.info (lc_network_http) << message;
+        stream + "]";
+        GLib.info () + message;
     }
 
 } // static class HttpLogger

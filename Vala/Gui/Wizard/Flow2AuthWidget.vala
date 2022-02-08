@@ -53,42 +53,42 @@ class Flow2AuthWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_auth_result (Flow2Auth.Result, string error_string, string user,
+    public void on_signal_auth_result (Flow2Auth.Result, string error_string, string user,
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_poll_now ();
+    public void on_signal_poll_now ();
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_status_changed (Flow2Auth.PollStatus status, int seconds_left);
+    public void on_signal_status_changed (Flow2Auth.PollStatus status, int seconds_left);
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_style_changed ();
+    public void on_signal_style_changed ();
 
 
     /***********************************************************
     ***********************************************************/
-    protected void on_open_browser ();
+    protected void on_signal_open_browser ();
 
 
     /***********************************************************
     ***********************************************************/
-    protected void on_copy_link_to_clipboard ();
+    protected void on_signal_copy_link_to_clipboard ();
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_start_spinner ();
+    private void on_signal_start_spinner ();
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_stop_spinner (bool show_status_label);
+    private void on_signal_stop_spinner (bool show_status_label);
 
 
     /***********************************************************

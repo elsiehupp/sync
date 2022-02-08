@@ -70,12 +70,6 @@ class Account : GLib.Object {
     }
 
 
-    //  Q_PROPERTY (string identifier MEMBER identifier)
-    //  Q_PROPERTY (string dav_user MEMBER dav_user)
-    //  Q_PROPERTY (string display_name MEMBER display_name)
-    //  Q_PROPERTY (GLib.Uri url MEMBER url)
-
-
     /***********************************************************
     Because of bugs in Qt, we use this to store info needed for
     the SSL Button
@@ -115,7 +109,7 @@ class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
 //  #ifndef TOKEN_AUTH_ONLY
-    private QImage avatar_img;
+    private Gtk.Image avatar_img;
 //  #endif
 
     /***********************************************************
@@ -373,14 +367,14 @@ class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
 //  #ifndef TOKEN_AUTH_ONLY
-    public QImage avatar () {
+    public Gtk.Image avatar () {
         return this.avatar_img;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void avatar (QImage img) {
+    public void avatar (Gtk.Image img) {
         this.avatar_img = img;
         /* emit */ account_changed_avatar ();
     }
@@ -497,12 +491,12 @@ class Account : GLib.Object {
 
         // The order for these two is important! Reading the credential's
         // settings accesses the account as well as account.credentials,
-        this.credentials.on_reset (credentials);
+        this.credentials.on_signal_reset (credentials);
         credentials.account (this);
 
         // Note: This way the QNAM can outlive the Account and Credentials.
         // This is necessary to avoid issues with the QNAM being deleted while
-        // processing on_handle_ssl_errors ().
+        // processing on_signal_handle_ssl_errors ().
         this.access_manager = unowned<QNetworkAccessManager> (this.credentials.create_qnam (), &GLib.Object.delete_later);
 
         if (jar) {
@@ -512,13 +506,13 @@ class Account : GLib.Object {
             this.access_manager.proxy (proxy);
         }
         connect (this.access_manager.data (), SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
-            SLOT (on_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
+            SLOT (on_signal_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
         connect (this.access_manager.data (), &QNetworkAccessManager.proxy_authentication_required,
             this, &Account.proxy_authentication_required);
         connect (this.credentials.data (), &AbstractCredentials.fetched,
-            this, &Account.on_credentials_fetched);
+            this, &Account.on_signal_credentials_fetched);
         connect (this.credentials.data (), &AbstractCredentials.asked,
-            this, &Account.on_credentials_asked);
+            this, &Account.on_signal_credentials_asked);
 
         try_setup_push_notifications ();
     }
@@ -609,7 +603,7 @@ class Account : GLib.Object {
     ***********************************************************/
     public QSslConfiguration get_or_create_ssl_config ()s {
         if (!this.ssl_configuration.is_null ()) {
-            // Will be set by CheckServerJob.on_finished ()
+            // Will be set by CheckServerJob.on_signal_finished ()
             // We need to use a central shared config to get SSL session tickets
             return this.ssl_configuration;
         }
@@ -681,7 +675,7 @@ class Account : GLib.Object {
     Pluggable handler
     ***********************************************************/
     public void ssl_error_handler (AbstractSslErrorHandler handler) {
-        this.ssl_error_handler.on_reset (handler);
+        this.ssl_error_handler.on_signal_reset (handler);
     }
 
 
@@ -858,7 +852,7 @@ class Account : GLib.Object {
         this.push_notifications_reconnect_timer.stop ();
 
         if (this.capabilities.available_push_notifications () != PushNotificationType.NONE) {
-            GLib.info (lc_account) << "Try to setup push notifications";
+            GLib.info ("Try to setup push notifications";
 
             if (!this.push_notifications) {
                 this.push_notifications = new PushNotifications (this, this);
@@ -869,7 +863,7 @@ class Account : GLib.Object {
                 });
 
                 const var disable_push_notifications = [this] () {
-                    GLib.info (lc_account) << "Disable push notifications object because authentication failed or connection lost";
+                    GLib.info ("Disable push notifications object because authentication failed or connection lost";
                     if (!this.push_notifications) {
                         return;
                     }
@@ -877,7 +871,7 @@ class Account : GLib.Object {
                         /* emit */ push_notifications_disabled (this);
                     }
                     if (!this.push_notifications_reconnect_timer.is_active ()) {
-                        this.push_notifications_reconnect_timer.on_start ();
+                        this.push_notifications_reconnect_timer.on_signal_start ();
                     }
                 }
 
@@ -900,24 +894,24 @@ class Account : GLib.Object {
         );
 
         if (kck.is_empty ()) {
-            GLib.debug (lc_account) << "app_password is empty";
+            GLib.debug ("app_password is empty";
             return;
         }
 
         var job = new DeletePasswordJob (Theme.instance ().app_name ());
         job.insecure_fallback (false);
         job.key (kck);
-        connect (job, &DeletePasswordJob.on_finished, [this] (Job incoming) {
+        connect (job, &DeletePasswordJob.on_signal_finished, [this] (Job incoming) {
             var delete_job = static_cast<DeletePasswordJob> (incoming);
             if (delete_job.error () == NoError)
-                GLib.info (lc_account) << "app_password deleted from keychain";
+                GLib.info ("app_password deleted from keychain";
             else
-                GLib.warn (lc_account) << "Unable to delete app_password from keychain" << delete_job.error_string ();
+                GLib.warn ("Unable to delete app_password from keychain" + delete_job.error_string ();
 
             // Allow storing a new app password on re-login
             this.wrote_app_password = false;
         });
-        job.on_start ();
+        job.on_signal_start ();
     }
 
 
@@ -935,7 +929,7 @@ class Account : GLib.Object {
             return;
         }
 
-        GLib.debug (lc_account) << "Resetting QNAM";
+        GLib.debug ("Resetting QNAM";
         QNetworkCookieJar jar = this.access_manager.cookie_jar ();
         QNetworkProxy proxy = this.access_manager.proxy ();
 
@@ -947,7 +941,7 @@ class Account : GLib.Object {
         this.access_manager.proxy (proxy);   // Remember proxy (issue #2108)
 
         connect (this.access_manager.data (), SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
-            SLOT (on_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
+            SLOT (on_signal_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
         connect (this.access_manager.data (), &QNetworkAccessManager.proxy_authentication_required,
             this, &Account.proxy_authentication_required);
     }
@@ -1000,7 +994,7 @@ class Account : GLib.Object {
         var job = new ReadPasswordJob (Theme.instance ().app_name ());
         job.insecure_fallback (false);
         job.key (kck);
-        connect (job, &ReadPasswordJob.on_finished, [this] (Job incoming) {
+        connect (job, &ReadPasswordJob.on_signal_finished, [this] (Job incoming) {
             var read_job = static_cast<ReadPasswordJob> (incoming);
             string pwd ("");
             // Error or no valid public key error out
@@ -1011,7 +1005,7 @@ class Account : GLib.Object {
 
             /* emit */ app_password_retrieved (pwd);
         });
-        job.on_start ();
+        job.on_signal_start ();
     }
 
 
@@ -1039,17 +1033,17 @@ class Account : GLib.Object {
         job.insecure_fallback (false);
         job.key (kck);
         job.binary_data (app_password.to_latin1 ());
-        connect (job, &WritePasswordJob.on_finished, [this] (Job incoming) {
+        connect (job, &WritePasswordJob.on_signal_finished, [this] (Job incoming) {
             var write_job = static_cast<WritePasswordJob> (incoming);
             if (write_job.error () == NoError)
-                GLib.info (lc_account) << "app_password stored in keychain";
+                GLib.info ("app_password stored in keychain";
             else
-                GLib.warn (lc_account) << "Unable to store app_password in keychain" << write_job.error_string ();
+                GLib.warn ("Unable to store app_password in keychain" + write_job.error_string ();
 
             // We don't try this again on error, to not raise CPU consumption
             this.wrote_app_password = true;
         });
-        job.on_start ();
+        job.on_signal_start ();
     }
 
 
@@ -1061,16 +1055,16 @@ class Account : GLib.Object {
             if (var delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ())) {
                 const var http_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
                 if (http_code != 200) {
-                    GLib.warn (lc_account) << "AppToken remove failed for user : " << display_name () << " with code : " << http_code;
+                    GLib.warn ("AppToken remove failed for user : " + display_name (" with code : " + http_code;
                 } else {
-                    GLib.info (lc_account) << "AppToken for user : " << display_name () << " has been removed.";
+                    GLib.info ("AppToken for user : " + display_name (" has been removed.";
                 }
             } else {
                 //  Q_ASSERT (false);
-                GLib.warn (lc_account) << "The sender is not a DeleteJob instance.";
+                GLib.warn ("The sender is not a DeleteJob instance.";
             }
         });
-        delete_app_token_job.on_start ();
+        delete_app_token_job.on_signal_start ();
     }
 
 
@@ -1088,8 +1082,8 @@ class Account : GLib.Object {
             (direct_editing_e_tag.is_empty () || direct_editing_e_tag != this.last_direct_editing_e_tag)) {
                 // Fetch the available editors and their mime types
                 var job = new JsonApiJob (shared_from_this (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing"));
-                GLib.Object.connect (job, &JsonApiJob.json_received, this, &Account.on_direct_editing_recieved);
-                job.on_start ();
+                GLib.Object.connect (job, &JsonApiJob.json_received, this, &Account.on_signal_direct_editing_recieved);
+                job.on_signal_start ();
         }
     }
 
@@ -1132,25 +1126,25 @@ class Account : GLib.Object {
     /***********************************************************
     Used when forgetting credentials
     ***********************************************************/
-    public void on_clear_qnam_cache () {
+    public void on_signal_clear_qnam_cache () {
         this.access_manager.clear_access_cache ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_handle_ssl_errors (Soup.Reply reply, GLib.List<QSslError> errors) {
+    public void on_signal_handle_ssl_errors (Soup.Reply reply, GLib.List<QSslError> errors) {
         NetworkJobTimeoutPauser pauser (reply);
         string out;
-        QDebug (&out) << "SSL-Errors happened for url " << reply.url ().to_string ();
+        QDebug (&out) + "SSL-Errors happened for url " + reply.url ().to_string ();
         foreach (QSslError error, errors) {
-            QDebug (&out) << "\t_error in " << error.certificate () << ":"
-                        << error.error_string () << " (" << error.error () << ")"
-                        << "\n";
+            QDebug (&out) + "\t_error in " + error.certificate (":"
+                        + error.error_string (" (" + error.error (")"
+                        + "\n";
         }
 
-        GLib.info (lc_account ()) << "ssl errors" << out;
-        GLib.info (lc_account ()) << reply.ssl_configuration ().peer_certificate_chain ();
+        GLib.info ()) + "ssl errors" + out;
+        GLib.info ()) + reply.ssl_configuration ().peer_certificate_chain ();
 
         bool all_previously_rejected = true;
         foreach (QSslError error, errors) {
@@ -1161,13 +1155,13 @@ class Account : GLib.Object {
 
         // If all certificates have previously been rejected by the user, don't ask again.
         if (all_previously_rejected) {
-            GLib.info (lc_account) << out << "Certs not trusted by user decision, returning.";
+            GLib.info () + out + "Certs not trusted by user decision, returning.";
             return;
         }
 
         GLib.List<QSslCertificate> approved_certificates;
         if (this.ssl_error_handler.is_null ()) {
-            GLib.warn (lc_account) << out << "called without valid SSL error handler for account" << url ();
+            GLib.warn () + out + "called without valid SSL error handler for account" + url ();
             return;
         }
 
@@ -1188,7 +1182,7 @@ class Account : GLib.Object {
                 /* emit */ wants_account_saved (this);
 
                 // all ssl certificates are known and accepted. We can ignore the problems right away.
-                GLib.info (lc_account) << out << "Certs are known and trusted! This is not an actual error.";
+                GLib.info () + out + "Certs are known and trusted! This is not an actual error.";
             }
 
             // Warning : Do not* use ignore_ssl_errors () (without args) here:
@@ -1214,14 +1208,14 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_credentials_fetched () {
+    protected void on_signal_credentials_fetched () {
         if (this.dav_user.is_empty ()) {
-            GLib.debug (lc_account) << "User identifier not set. Fetch it.";
+            GLib.debug ("User identifier not set. Fetch it.";
             const var fetch_user_name_job = new JsonApiJob (shared_from_this (), QStringLiteral ("/ocs/v1.php/cloud/user"));
             connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, fetch_user_name_job] (QJsonDocument json, int status_code) {
                 fetch_user_name_job.delete_later ();
                 if (status_code != 100) {
-                    GLib.warn (lc_account) << "Could not fetch user identifier. Login will probably not work.";
+                    GLib.warn ("Could not fetch user identifier. Login will probably not work.";
                     /* emit */ credentials_fetched (this.credentials.data ());
                     return;
                 }
@@ -1231,9 +1225,9 @@ class Account : GLib.Object {
                 dav_user (user_id);
                 /* emit */ credentials_fetched (this.credentials.data ());
             });
-            fetch_user_name_job.on_start ();
+            fetch_user_name_job.on_signal_start ();
         } else {
-            GLib.debug (lc_account) << "User identifier already fetched.";
+            GLib.debug ("User identifier already fetched.";
             /* emit */ credentials_fetched (this.credentials.data ());
         }
     }
@@ -1241,14 +1235,14 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_credentials_asked () {
+    protected void on_signal_credentials_asked () {
         /* emit */ credentials_asked (this.credentials.data ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected void on_direct_editing_recieved (QJsonDocument json) {
+    protected void on_signal_direct_editing_recieved (QJsonDocument json) {
         var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         var editors = data.value ("editors").to_object ();
 

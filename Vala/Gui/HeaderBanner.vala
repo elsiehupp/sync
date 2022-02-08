@@ -171,7 +171,7 @@ class HeaderBanner : Gtk.Widget {
         layout.column_minimum_width (0, min_column_width0);
         layout.column_minimum_width (1, min_column_width1);
         title_label.text_format (title_format);
-        title_label.on_text (title);
+        title_label.on_signal_text (title);
         if (!style_sheet.is_empty ())
             title_label.style_sheet (style_sheet);
         logo_label.pixmap (logo);

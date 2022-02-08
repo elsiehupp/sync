@@ -5,34 +5,28 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 ***********************************************************/
 
 //  #include <QLoggingCategory>
-//  #include <QQuick_image_provider>
+//  #include <QQuickImageProvider>
 
 namespace Occ {
 namespace Ui {
 
-class Svg_image_provider : QQuick_image_provider {
+class SvgImageProvider : QQuickImageProvider {
 
     /***********************************************************
     ***********************************************************/
-    public Svg_image_provider ();
-
-    /***********************************************************
-    ***********************************************************/
-    public QImage request_image (string identifier, QSize size, QSize requested_size) override;
-}
-
-
-    Svg_image_provider.Svg_image_provider ()
-        : QQuick_image_provider (QQuick_image_provider.Image) {
+    public SvgImageProvider () {
+        base (QQuickImageProvider.Image);
     }
 
-    QImage Svg_image_provider.request_image (string identifier, QSize size, QSize requested_size) {
+    /***********************************************************
+    ***********************************************************/
+    public Gtk.Image request_image (string identifier, QSize size, QSize requested_size) {
         //  Q_ASSERT (!identifier.is_empty ());
 
-        const var id_split = identifier.split (QStringLiteral ("/"), Qt.Skip_empty_parts);
+        const var id_split = identifier.split ("/", Qt.SkipEmptyParts);
 
         if (id_split.is_empty ()) {
-            GLib.warn (lc_svg_image_provider) << "Image identifier is incorrect!";
+            GLib.warn ("Image identifier is incorrect!");
             return {};
         }
 
@@ -40,11 +34,14 @@ class Svg_image_provider : QQuick_image_provider {
         const var pixmap_color = id_split.size () > 1 ? Gtk.Color (id_split.at (1)) : QColor_constants.Svg.black;
 
         if (pixmap_name.is_empty () || !pixmap_color.is_valid ()) {
-            GLib.warn (lc_svg_image_provider) << "Image identifier is incorrect!";
+            GLib.warn ("Image identifier is incorrect!");
             return {};
         }
 
-        return Icon_utils.create_svg_image_with_custom_color (pixmap_name, pixmap_color, size, requested_size);
+        return IconUtils.create_svg_image_with_custom_color (pixmap_name, pixmap_color, size, requested_size);
     }
-}
-}
+
+} // class SvgImageProvider
+
+} // namespace Ui
+} // namespace Occ

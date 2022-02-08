@@ -81,7 +81,7 @@ class FolderWizard : QWizard {
         page (Page_Selective_sync, this.folder_wizard_selective_sync_page);
 
         window_title (_("Add Folder Sync Connection"));
-        options (QWizard.Cancel_button_on_left);
+        options (QWizard.Cancel_button_on_signal_left);
         button_text (QWizard.Finish_button, _("Add Sync Connection"));
     }
 

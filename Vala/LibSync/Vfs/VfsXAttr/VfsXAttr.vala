@@ -59,7 +59,7 @@ class Vfs_xAttr : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public void on_file_status_changed (string system_filename, SyncFileStatus file_status) override;
+    public void on_signal_file_status_changed (string system_filename, SyncFileStatus file_status) override;
 
 
     protected void start_impl (VfsSetupParams parameters) override;
@@ -205,7 +205,7 @@ class Vfs_xAttr : Vfs {
         return availability_in_database (folder_path);
     }
 
-    void Vfs_xAttr.on_file_status_changed (string , SyncFileStatus) {
+    void Vfs_xAttr.on_signal_file_status_changed (string , SyncFileStatus) {
     }
 
     } // namespace Occ

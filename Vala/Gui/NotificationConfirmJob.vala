@@ -36,7 +36,7 @@ class Notification_confirm_job : AbstractNetworkJob {
     /***********************************************************
     @brief Start the OCS request
     ***********************************************************/
-    public void on_start () override;
+    public void on_signal_start () override;
 
 signals:
 
@@ -50,7 +50,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private bool on_finished () override;
+    private bool on_signal_finished () override;
 
     /***********************************************************
     ***********************************************************/
@@ -69,9 +69,9 @@ signals:
         this.verb = verb;
     }
 
-    void Notification_confirm_job.on_start () {
+    void Notification_confirm_job.on_signal_start () {
         if (!this.link.is_valid ()) {
-            GLib.warn (lc_notifications_job) << "Attempt to trigger invalid URL : " << this.link.to_string ();
+            GLib.warn ("Attempt to trigger invalid URL : " + this.link.to_string ();
             return;
         }
         QNetworkRequest req;
@@ -80,10 +80,10 @@ signals:
 
         send_request (this.verb, this.link, req);
 
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
-    bool Notification_confirm_job.on_finished () {
+    bool Notification_confirm_job.on_signal_finished () {
         int reply_code = 0;
         // FIXME : check for the reply code!
         const string reply_str = reply ().read_all ();

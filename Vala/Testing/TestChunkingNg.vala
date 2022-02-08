@@ -23,7 +23,7 @@ static void partialUpload (FakeFolder fakeFolder, string name, int64 size) {
                                     [&] (ProgressInfo progress) {
                 if (progress.completedSize () > (progress.totalSize () /3 )) {
                     sizeWhenAbort = progress.completedSize ();
-                    fakeFolder.syncEngine ().on_abort ();
+                    fakeFolder.syncEngine ().on_signal_abort ();
                 }
     });
 
@@ -233,22 +233,22 @@ class TestChunkingNG : GLib.Object {
         QVERIFY (fakeFolder.uploadState ().children.first ().name != chunkingId);
     }
 
-    // Check what happens when we on_abort during the final MOVE and the
-    // the final MOVE takes longer than the on_abort-delay
+    // Check what happens when we on_signal_abort during the final MOVE and the
+    // the final MOVE takes longer than the on_signal_abort-delay
     private on_ void testLateAbortHard () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] () << "SHA1" } } } });
+        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
         const int size = 15 * 1000 * 1000; // 15 MB
         setChunkSize (fakeFolder.syncEngine (), 1 * 1000 * 1000);
 
-        // Make the MOVE never reply, but trigger a client-on_abort and apply the change remotely
+        // Make the MOVE never reply, but trigger a client-on_signal_abort and apply the change remotely
         GLib.Object parent;
         GLib.ByteArray moveChecksumHeader;
         int nGET = 0;
-        int responseDelay = 100000; // bigger than on_abort-wait timeout
+        int responseDelay = 100000; // bigger than on_signal_abort-wait timeout
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
-                QTimer.singleShot (50, parent, [&] () { fakeFolder.syncEngine ().on_abort (); });
+                QTimer.singleShot (50, parent, [&] () { fakeFolder.syncEngine ().on_signal_abort (); });
                 moveChecksumHeader = request.rawHeader ("OC-Checksum");
                 return new DelayedReply<FakeChunkMoveReply> (responseDelay, fakeFolder.uploadState (), fakeFolder.remoteModifier (), op, request, parent);
             } else if (op == QNetworkAccessManager.GetOperation) {
@@ -259,7 +259,7 @@ class TestChunkingNG : GLib.Object {
 
         // Test 1 : NEW file aborted
         fakeFolder.localModifier ().insert ("A/a0", size);
-        QVERIFY (!fakeFolder.syncOnce ()); // error : on_abort!
+        QVERIFY (!fakeFolder.syncOnce ()); // error : on_signal_abort!
 
         // Now the next sync gets a NEW/NEW conflict and since there's no checksum
         // it just becomes a UPDATE_METADATA
@@ -278,7 +278,7 @@ class TestChunkingNG : GLib.Object {
 
         // Test 2 : modified file upload aborted
         fakeFolder.localModifier ().appendByte ("A/a0");
-        QVERIFY (!fakeFolder.syncOnce ()); // error : on_abort!
+        QVERIFY (!fakeFolder.syncOnce ()); // error : on_signal_abort!
 
         // An EVAL/EVAL conflict is also UPDATE_METADATA when there's no checksums
         connection = connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToPropagate, checkEtagUpdated);
@@ -289,7 +289,7 @@ class TestChunkingNG : GLib.Object {
 
         // Test 3 : modified file upload aborted, with good checksums
         fakeFolder.localModifier ().appendByte ("A/a0");
-        QVERIFY (!fakeFolder.syncOnce ()); // error : on_abort!
+        QVERIFY (!fakeFolder.syncOnce ()); // error : on_signal_abort!
 
         // Set the remote checksum -- the test setup doesn't do it automatically
         QVERIFY (!moveChecksumHeader.isEmpty ());
@@ -302,7 +302,7 @@ class TestChunkingNG : GLib.Object {
 
         // Test 4 : New file, that gets deleted locally before the next sync
         fakeFolder.localModifier ().insert ("A/a3", size);
-        QVERIFY (!fakeFolder.syncOnce ()); // error : on_abort!
+        QVERIFY (!fakeFolder.syncOnce ()); // error : on_signal_abort!
         fakeFolder.localModifier ().remove ("A/a3");
 
         // bug : in this case we must expect a re-download of A/A3
@@ -312,20 +312,20 @@ class TestChunkingNG : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    // Check what happens when we on_abort during the final MOVE and the
-    // the final MOVE is short enough for the on_abort-delay to help
+    // Check what happens when we on_signal_abort during the final MOVE and the
+    // the final MOVE is short enough for the on_signal_abort-delay to help
     private on_ void testLateAbortRecoverable () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] () << "SHA1" } } } });
+        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
         const int size = 15 * 1000 * 1000; // 15 MB
         setChunkSize (fakeFolder.syncEngine (), 1 * 1000 * 1000);
 
-        // Make the MOVE never reply, but trigger a client-on_abort and apply the change remotely
+        // Make the MOVE never reply, but trigger a client-on_signal_abort and apply the change remotely
         GLib.Object parent;
-        int responseDelay = 200; // smaller than on_abort-wait timeout
+        int responseDelay = 200; // smaller than on_signal_abort-wait timeout
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest request, QIODevice *) . Soup.Reply * {
             if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
-                QTimer.singleShot (50, parent, [&] () { fakeFolder.syncEngine ().on_abort (); });
+                QTimer.singleShot (50, parent, [&] () { fakeFolder.syncEngine ().on_signal_abort (); });
                 return new DelayedReply<FakeChunkMoveReply> (responseDelay, fakeFolder.uploadState (), fakeFolder.remoteModifier (), op, request, parent);
             }
             return null;
@@ -397,7 +397,7 @@ class TestChunkingNG : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        // Modify the file localy and on_start the upload
+        // Modify the file localy and on_signal_start the upload
         fakeFolder.localModifier ().setContents ("A/a0", 'B');
         fakeFolder.localModifier ().appendByte ("A/a0");
 
@@ -511,8 +511,8 @@ class TestChunkingNG : GLib.Object {
     // for on the issue #5106
     private on_ void connectionDroppedBeforeEtagRecieved_data () {
         QTest.addColumn<bool> ("chunking");
-        QTest.newRow ("big file") << true;
-        QTest.newRow ("small file") << false;
+        QTest.newRow ("big file") + true;
+        QTest.newRow ("small file") + false;
     }
 
 
@@ -521,11 +521,11 @@ class TestChunkingNG : GLib.Object {
     private on_ void connectionDroppedBeforeEtagRecieved () {
         QFETCH (bool, chunking);
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] () << "SHA1" } } } });
+        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
         const int size = chunking ? 1 * 1000 * 1000 : 300;
         setChunkSize (fakeFolder.syncEngine (), 300 * 1000);
 
-        // Make the MOVE never reply, but trigger a client-on_abort and apply the change remotely
+        // Make the MOVE never reply, but trigger a client-on_signal_abort and apply the change remotely
         GLib.ByteArray checksumHeader;
         int nGET = 0;
         QScopedValueRollback<int> setHttpTimeout (AbstractNetworkJob.httpTimeout, 1);

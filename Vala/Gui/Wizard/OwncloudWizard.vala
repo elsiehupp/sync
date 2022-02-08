@@ -24,8 +24,6 @@ namespace Ui {
 ***********************************************************/
 class OwncloudWizard : QWizard {
 
-    //  Q_DECLARE_LOGGING_CATEGORY (lc_wizard)
-
     /***********************************************************
     ***********************************************************/
     public enum LogType {
@@ -94,13 +92,13 @@ class OwncloudWizard : QWizard {
     signal void connect_to_oc_url (string );
     signal void create_local_and_remote_folders (string , string );
     /***********************************************************
-    Make sure to connect to this, rather than on_finished (int)!!
+    Make sure to connect to this, rather than on_signal_finished (int)!!
     ***********************************************************/
     signal void basic_setup_finished (int);
     signal void skip_folder_configuration ();
     signal void need_certificate ();
     signal void style_changed ();
-    signal void on_activate ();
+    signal void on_signal_activate ();
 
 
     /***********************************************************
@@ -132,12 +130,12 @@ class OwncloudWizard : QWizard {
         page (WizardCommon.Pages.PAGE_WEB_VIEW, this.web_view_page);
     //  #endif WITH_WEBENGINE
 
-        connect (this, &Gtk.Dialog.on_finished, this, &OwncloudWizard.basic_setup_finished);
+        connect (this, &Gtk.Dialog.on_signal_finished, this, &OwncloudWizard.basic_setup_finished);
 
-        // note: on_start Id is set by the calling class depending on if the
+        // note: on_signal_start Id is set by the calling class depending on if the
         // welcome text is to be shown or not.
 
-        connect (this, &QWizard.current_id_changed, this, &OwncloudWizard.on_current_page_changed);
+        connect (this, &QWizard.current_id_changed, this, &OwncloudWizard.on_signal_current_page_changed);
         connect (this.setup_page, &OwncloudSetupPage.determine_auth_type, this, &OwncloudWizard.determine_auth_type);
         connect (this.http_creds_page, &OwncloudHttpCredsPage.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
         connect (this.browser_creds_page, &OwncloudOAuthCredsPage.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
@@ -152,8 +150,8 @@ class OwncloudWizard : QWizard {
         Theme theme = Theme.instance ();
         window_title (_("Add %1 account").arg (theme.app_name_gui ()));
         wizard_style (QWizard.Modern_style);
-        option (QWizard.No_back_button_on_start_page);
-        option (QWizard.No_back_button_on_last_page);
+        option (QWizard.No_back_button_on_signal_start_page);
+        option (QWizard.No_back_button_on_signal_last_page);
         option (QWizard.No_cancel_button);
         button_text (QWizard.Custom_button1, _("Skip folders configuration"));
 
@@ -165,14 +163,14 @@ class OwncloudWizard : QWizard {
         button (QWizard.Next_button).size_policy (next_button_size_policy);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &OwncloudWizard.style_changed, this.setup_page, &OwncloudSetupPage.on_style_changed);
-        connect (this, &OwncloudWizard.style_changed, this.advanced_setup_page, &OwncloudAdvancedSetupPage.on_style_changed);
-        connect (this, &OwncloudWizard.style_changed, this.flow2Creds_page, &Flow2AuthCredsPage.on_style_changed);
+        connect (this, &OwncloudWizard.style_changed, this.setup_page, &OwncloudSetupPage.on_signal_style_changed);
+        connect (this, &OwncloudWizard.style_changed, this.advanced_setup_page, &OwncloudAdvancedSetupPage.on_signal_style_changed);
+        connect (this, &OwncloudWizard.style_changed, this.flow2Creds_page, &Flow2AuthCredsPage.on_signal_style_changed);
 
         customize_style ();
 
         // allow Flow2 page to poll on window activation
-        connect (this, &OwncloudWizard.on_activate, this.flow2Creds_page, &Flow2AuthCredsPage.on_poll_now);
+        connect (this, &OwncloudWizard.on_signal_activate, this.flow2Creds_page, &Flow2AuthCredsPage.on_signal_poll_now);
 
         adjust_wizard_size ();
         center_window ();
@@ -251,25 +249,25 @@ class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public void on_remote_folder (string remote_folder) {
-        this.advanced_setup_page.on_remote_folder (remote_folder);
+    public void on_signal_remote_folder (string remote_folder) {
+        this.advanced_setup_page.on_signal_remote_folder (remote_folder);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_display_error (string message, bool retry_http_only) {
+    public void on_signal_display_error (string message, bool retry_http_only) {
         switch (current_id ()) {
         case WizardCommon.Pages.PAGE_SERVER_SETUP:
-            this.setup_page.on_error_string (message, retry_http_only);
+            this.setup_page.on_signal_error_string (message, retry_http_only);
             break;
 
         case WizardCommon.Pages.PAGE_HTTP_CREDS:
-            this.http_creds_page.on_error_string (message);
+            this.http_creds_page.on_signal_error_string (message);
             break;
 
         case WizardCommon.Pages.PAGE_ADVANCED_SETUP:
-            this.advanced_setup_page.on_error_string (message);
+            this.advanced_setup_page.on_signal_error_string (message);
             break;
         }
     }
@@ -333,7 +331,7 @@ class OwncloudWizard : QWizard {
                    "Currently unselected folders will be translated to online-only folders "
                    "and your selective sync settings will be reset."
                    "\n\n"
-                   "Switching to this mode will on_abort any currently running synchronization."
+                   "Switching to this mode will on_signal_abort any currently running synchronization."
                    "\n\n"
                    "This is a new, experimental mode. If you decide to use it, please report any "
                    "issues that come up.")
@@ -357,8 +355,8 @@ class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public void on_auth_type (DetermineAuthTypeJob.AuthType type) {
-        this.setup_page.on_auth_type (type);
+    public void on_signal_auth_type (DetermineAuthTypeJob.AuthType type) {
+        this.setup_page.on_signal_auth_type (type);
 
         if (type == DetermineAuthTypeJob.AuthType.OAUTH) {
             this.credentials_page = this.browser_creds_page;
@@ -384,17 +382,17 @@ class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public void on_append_to_configuration_log (string message, LogType type) {
-        this.setup_log << message;
-        GLib.debug (lc_wizard) << "Setup-Log : " << message;
+    public void on_signal_append_to_configuration_log (string message, LogType type) {
+        this.setup_log + message;
+        GLib.debug ("Setup-Log : " + message;
     }
 
 
     /***********************************************************
     TODO: update this function
     ***********************************************************/
-    public void on_current_page_changed (int identifier) {
-        GLib.debug (lc_wizard) << "Current Wizard page changed to " << identifier;
+    public void on_signal_current_page_changed (int identifier) {
+        GLib.debug ("Current Wizard page changed to " + identifier;
 
         const var next_button_as_default = [this] () {
             var next_button = qobject_cast<QPushButton> (button (QWizard.Next_button));
@@ -448,7 +446,7 @@ class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public void on_successful_step () {
+    public void on_signal_successful_step () {
         const int identifier (current_id ());
 
         switch (identifier) {
@@ -475,13 +473,13 @@ class OwncloudWizard : QWizard {
             break;
 
         case WizardCommon.Pages.PAGE_SERVER_SETUP:
-            GLib.warn (lc_wizard, "Should not happen at this stage.");
+            GLib.warn ();
             break;
         }
 
         OwncloudGui.raise_dialog (this);
         if (next_id () == -1) {
-            disconnect (this, &Gtk.Dialog.on_finished, this, &OwncloudWizard.basic_setup_finished);
+            disconnect (this, &Gtk.Dialog.on_signal_finished, this, &OwncloudWizard.basic_setup_finished);
             /* emit */ basic_setup_finished (Gtk.Dialog.Accepted);
         } else {
             next ();
@@ -522,9 +520,9 @@ class OwncloudWizard : QWizard {
         // Set background colors
         var wizard_palette = palette ();
         const var background_color = wizard_palette.color (QPalette.Window);
-        wizard_palette.on_color (QPalette.Base, background_color);
+        wizard_palette.on_signal_color (QPalette.Base, background_color);
         // Set separator color
-        wizard_palette.on_color (QPalette.Mid, background_color);
+        wizard_palette.on_signal_color (QPalette.Mid, background_color);
 
         palette (wizard_palette);
     }

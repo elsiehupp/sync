@@ -39,12 +39,12 @@ class FolderDefinition {
     public static void save (QSettings settings, FolderDefinition folder);
 
     /// Reads a folder definition from the current settings group.
-    public static bool on_load (QSettings settings, string alias,
+    public static bool on_signal_load (QSettings settings, string alias,
         FolderDefinition folder);
 
 
     /***********************************************************
-    The highest version in the settings that on_load () can read
+    The highest version in the settings that on_signal_load () can read
 
     Version 1: initial version (default if value absent in settings)
     Version 2: introduction of metadata_parent hash in 2.6.0
@@ -94,7 +94,7 @@ void FolderDefinition.save (QSettings settings, FolderDefinition folder) {
         settings.remove (QLatin1String ("navigation_pane_clsid"));
 }
 
-bool FolderDefinition.on_load (QSettings settings, string alias,
+bool FolderDefinition.on_signal_load (QSettings settings, string alias,
     FolderDefinition folder) {
     folder.alias = FolderMan.unescape_alias (alias);
     folder.local_path = settings.value (QLatin1String ("local_path")).to_string ();
@@ -110,7 +110,7 @@ bool FolderDefinition.on_load (QSettings settings, string alias,
         if (var mode = Vfs.Mode.from_string (vfs_mode_string)) {
             folder.virtual_files_mode = *mode;
         } else {
-            GLib.warn (lc_folder) << "Unknown virtual_files_mode:" << vfs_mode_string << "assuming 'off'";
+            GLib.warn ("Unknown virtual_files_mode:" + vfs_mode_string + "assuming 'off'";
         }
     } else {
         if (settings.value (QLatin1String ("use_placeholders")).to_bool ()) {

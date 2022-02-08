@@ -12,7 +12,7 @@ namespace Ui {
 @ingroup gui
 
 Job that allows fetching a preview (of 150x150 for now) of a given file.
-Once the job has on_finished the job_finished signal will be emitted.
+Once the job has on_signal_finished the job_finished signal will be emitted.
 ***********************************************************/
 class Thumbnail_job : AbstractNetworkJob {
 
@@ -22,13 +22,13 @@ class Thumbnail_job : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public on_ void on_start () override;
+    public on_ void on_signal_start () override;
 signals:
     /***********************************************************
     @param status_code the HTTP status code
     @param reply the content of the reply
 
-    Signal that the job is done. If the status_code is 200 (on_success) reply
+    Signal that the job is done. If the status_code is 200 (on_signal_success) reply
     will contain the image data in PNG. If the status code is different the content
     of reply is undefined.
     ***********************************************************/
@@ -36,7 +36,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private bool on_finished () override;
+    private bool on_signal_finished () override;
 }
 
 
@@ -45,12 +45,12 @@ signals:
         ignore_credential_failure (true);
     }
 
-    void Thumbnail_job.on_start () {
+    void Thumbnail_job.on_signal_start () {
         send_request ("GET", make_account_url (path ()));
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
-    bool Thumbnail_job.on_finished () {
+    bool Thumbnail_job.on_signal_finished () {
         /* emit */ job_finished (reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int (), reply ().read_all ());
         return true;
     }

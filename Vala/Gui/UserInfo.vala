@@ -29,7 +29,7 @@ We only request the info when the UI is visible otherwise this might slow down t
 too many requests.
 quota is not updated fast enough when changed on the server.
 
-If the fetch job is not on_finished within 30 seconds, it is cancelled and another
+If the fetch job is not on_signal_finished within 30 seconds, it is cancelled and another
 
 Constructor notes:
  - allow_disconnected_account_state : set to true if you want to ignore AccountState's is_connected () state,
@@ -41,13 +41,13 @@ Constructor notes:
 Here follows the state machine
 
  \code{.unparsed}
- *--. on_fetch_info
+ *--. on_signal_fetch_info
          JsonApiJob (ocs/v1.php/cloud/user)
          |
-         +. on_update_last_info
+         +. on_signal_update_last_info
                AvatarJob (if this.fetch_avatar_image is true)
                |
-               +. on_avatar_image -.
+               +. on_signal_avatar_image -.
    +-----------------------------------+
    |
    +. Client Side Encryption Checks --+ --report_result ()
@@ -98,8 +98,8 @@ class UserInfo : GLib.Object {
         this.last_quota_used_bytes = 0;
         this.active = false;
         connect (account_state, &AccountState.state_changed,
-            this, &UserInfo.on_account_state_changed);
-        connect (&this.job_restart_timer, &QTimer.timeout, this, &UserInfo.on_fetch_info);
+            this, &UserInfo.on_signal_account_state_changed);
+        connect (&this.job_restart_timer, &QTimer.timeout, this, &UserInfo.on_signal_fetch_info);
         this.job_restart_timer.single_shot (true);
     }
 
@@ -125,34 +125,34 @@ class UserInfo : GLib.Object {
     ***********************************************************/
     public void active (bool active) {
         this.active = active;
-        on_account_state_changed ();
+        on_signal_account_state_changed ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_fetch_info () {
+    public void on_signal_fetch_info () {
         if (!can_get_info ()) {
             return;
         }
 
         if (this.job) {
-            // The previous job was not on_finished?  Then we cancel it!
+            // The previous job was not on_signal_finished?  Then we cancel it!
             this.job.delete_later ();
         }
 
         AccountPointer account = this.account_state.account ();
         this.job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"), this);
-        this.job.on_timeout (20 * 1000);
-        connect (this.job.data (), &JsonApiJob.json_received, this, &UserInfo.on_update_last_info);
-        connect (this.job.data (), &AbstractNetworkJob.network_error, this, &UserInfo.on_request_failed);
-        this.job.on_start ();
+        this.job.on_signal_timeout (20 * 1000);
+        connect (this.job.data (), &JsonApiJob.json_received, this, &UserInfo.on_signal_update_last_info);
+        connect (this.job.data (), &AbstractNetworkJob.network_error, this, &UserInfo.on_signal_request_failed);
+        this.job.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_update_last_info (QJsonDocument json) {
+    private void on_signal_update_last_info (QJsonDocument json) {
         var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
 
         AccountPointer account = this.account_state.account ();
@@ -178,15 +178,15 @@ class UserInfo : GLib.Object {
             /* emit */ quota_updated (this.last_quota_total_bytes, this.last_quota_used_bytes);
         }
 
-        this.job_restart_timer.on_start (DEFAULT_INTERVAL_T);
+        this.job_restart_timer.on_signal_start (DEFAULT_INTERVAL_T);
         this.last_info_received = GLib.DateTime.current_date_time ();
 
         // Avatar Image
         if (this.fetch_avatar_image) {
             var job = new AvatarJob (account, account.dav_user (), 128, this);
-            job.on_timeout (20 * 1000);
-            GLib.Object.connect (job, &AvatarJob.avatar_pixmap, this, &UserInfo.on_avatar_image);
-            job.on_start ();
+            job.on_signal_timeout (20 * 1000);
+            GLib.Object.connect (job, &AvatarJob.avatar_pixmap, this, &UserInfo.on_signal_avatar_image);
+            job.on_signal_start ();
         }
         else
             /* emit */ fetched_last_info (this);
@@ -195,15 +195,15 @@ class UserInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_account_state_changed () {
+    private void on_signal_account_state_changed () {
         if (can_get_info ()) {
             // Obviously assumes there will never be more than thousand of hours between last info
             // received and now, hence why we static_cast
             var elapsed = static_cast<int> (this.last_info_received.msecs_to (GLib.DateTime.current_date_time ()));
             if (this.last_info_received.is_null () || elapsed >= DEFAULT_INTERVAL_T) {
-                on_fetch_info ();
+                on_signal_fetch_info ();
             } else {
-                this.job_restart_timer.on_start (DEFAULT_INTERVAL_T - elapsed);
+                this.job_restart_timer.on_signal_start (DEFAULT_INTERVAL_T - elapsed);
             }
         } else {
             this.job_restart_timer.stop ();
@@ -213,16 +213,16 @@ class UserInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_request_failed () {
+    private void on_signal_request_failed () {
         this.last_quota_total_bytes = 0;
         this.last_quota_used_bytes = 0;
-        this.job_restart_timer.on_start (FAIL_INTERVAL_T);
+        this.job_restart_timer.on_signal_start (FAIL_INTERVAL_T);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_avatar_image (QImage img) {
+    private void on_signal_avatar_image (Gtk.Image img) {
         this.account_state.account ().avatar (img);
 
         /* emit */ fetched_last_info (this);

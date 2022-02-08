@@ -14,12 +14,11 @@ class FakePutMultiFileReply : FakeReply {
     ***********************************************************/
     public static GLib.Vector<FileInfo> performMultiPart (FileInfo remoteRootFileInfo, QNetworkRequest request, GLib.ByteArray putPayload, string contentType);
 
-    //  Q_INVOKABLE
     public virtual void respond ();
 
     /***********************************************************
     ***********************************************************/
-    public void on_abort () override;
+    public void on_signal_abort () override;
 
     /***********************************************************
     ***********************************************************/

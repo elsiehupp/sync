@@ -13,7 +13,7 @@ class Socket_api_job_v2 : GLib.Object {
 
     public Socket_api_job_v2 (unowned<Socket_listener> socket_listener, GLib.ByteArray command, QJsonObject arguments);
 
-    public void on_success (QJsonObject response);
+    public void on_signal_success (QJsonObject response);
     public void failure (string error);
 
     public const QJsonObject arguments () {
@@ -24,7 +24,7 @@ class Socket_api_job_v2 : GLib.Object {
     }
 
 signals:
-    void on_finished ();
+    void on_signal_finished ();
 
 
     private void do_finish (QJsonObject obj);
@@ -46,7 +46,7 @@ Socket_api_job_v2.Socket_api_job_v2 (unowned<Socket_listener> socket_listener, G
     //  ASSERT (!this.job_id.is_empty ())
 }
 
-void Socket_api_job_v2.on_success (QJsonObject response) {
+void Socket_api_job_v2.on_signal_success (QJsonObject response) {
     do_finish (response);
 }
 
@@ -59,7 +59,7 @@ void Socket_api_job_v2.failure (string error) {
 }
 
 void Socket_api_job_v2.do_finish (QJsonObject obj) {
-    this.socket_listener.on_send_message (this.command + QStringLiteral ("this.RESULT:") + QJsonDocument ({
+    this.socket_listener.on_signal_send_message (this.command + QStringLiteral ("this.RESULT:") + QJsonDocument ({
         {
             QStringLiteral ("identifier"), this.job_id
         },
@@ -67,5 +67,5 @@ void Socket_api_job_v2.do_finish (QJsonObject obj) {
             QStringLiteral ("arguments"), obj
         }
     }).to_json (QJsonDocument.Compact));
-    /* Q_EMIT */ on_finished ();
+    /* Q_EMIT */ on_signal_finished ();
 }

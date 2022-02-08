@@ -298,20 +298,20 @@ class Capabilities {
         }
 
         const var version = properties.value (QStringLiteral ("api-version"), "1.0").to_byte_array ();
-        GLib.info (lc_server_capabilities) << "E2EE API version:" << version;
+        GLib.info ("E2EE API version:" + version;
         const var splitted_version = version.split ('.');
 
         bool ok = false;
         const var major = !splitted_version.is_empty () ? splitted_version.at (0).to_int (&ok) : 0;
         if (!ok) {
-            GLib.warn (lc_server_capabilities) << "Didn't understand version scheme (major), E2EE disabled";
+            GLib.warn ("Didn't understand version scheme (major), E2EE disabled";
             return false;
         }
 
         ok = false;
         const var minor = splitted_version.size () > 1 ? splitted_version.at (1).to_int (&ok) : 0;
         if (!ok) {
-            GLib.warn (lc_server_capabilities) << "Didn't understand version scheme (minor), E2EE disabled";
+            GLib.warn ("Didn't understand version scheme (minor), E2EE disabled";
             return false;
         }
 

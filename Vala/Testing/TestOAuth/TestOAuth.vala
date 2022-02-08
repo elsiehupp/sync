@@ -28,7 +28,7 @@ class TestOAuth : public GLib.Object {
             Soup.Reply tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest & req) override {
                 //  ASSERT (browserReply);
                 // simulate the fact that the browser is closing the connection
-                browserReply.on_abort ();
+                browserReply.on_signal_abort ();
                 QCoreApplication.processEvents ();
 
                 //  ASSERT (state == BrowserOpened);

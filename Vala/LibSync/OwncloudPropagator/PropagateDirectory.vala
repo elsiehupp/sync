@@ -34,10 +34,10 @@ class PropagateDirectory : PropagatorJob {
         this.first_job = propagator.create_job (item);
         this.sub_jobs = propagator;
         if (this.first_job) {
-            connect (this.first_job.data (), &PropagatorJob.on_finished, this, &PropagateDirectory.on_first_job_finished);
+            connect (this.first_job.data (), &PropagatorJob.on_signal_finished, this, &PropagateDirectory.on_signal_first_job_finished);
             this.first_job.associated_composite (&this.sub_jobs);
         }
-        connect (&this.sub_jobs, &PropagatorJob.on_finished, this, &PropagateDirectory.on_sub_jobs_finished);
+        connect (&this.sub_jobs, &PropagatorJob.on_signal_finished, this, &PropagateDirectory.on_signal_sub_jobs_finished);
     }
 
 
@@ -57,7 +57,7 @@ class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public bool on_schedule_self_or_child () {
+    public bool on_signal_schedule_self_or_child () {
         if (this.state == Finished) {
             return false;
         }
@@ -67,7 +67,7 @@ class PropagateDirectory : PropagatorJob {
         }
 
         if (this.first_job && this.first_job.state == NotYetStarted) {
-            return this.first_job.on_schedule_self_or_child ();
+            return this.first_job.on_signal_schedule_self_or_child ();
         }
 
         if (this.first_job && this.first_job.state == Running) {
@@ -75,14 +75,14 @@ class PropagateDirectory : PropagatorJob {
             return false;
         }
 
-        return this.sub_jobs.on_schedule_self_or_child ();
+        return this.sub_jobs.on_signal_schedule_self_or_child ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public JobParallelism parallelism () {
-        // If any of the non-on_finished sub jobs is not parallel, we have to wait
+        // If any of the non-on_signal_finished sub jobs is not parallel, we have to wait
         if (this.first_job && this.first_job.parallelism () != JobParallelism.FULL_PARALLELISM) {
             return JobParallelism.WAIT_FOR_FINISHED;
         }
@@ -95,16 +95,16 @@ class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_abort (PropagatorJob.AbortType abort_type) override {
+    public void on_signal_abort (PropagatorJob.AbortType abort_type) override {
         if (this.first_job)
-            // Force first job to on_abort synchronously
-            // even if caller allows async on_abort (async_abort)
-            this.first_job.on_abort (AbortType.SYNCHRONOUS);
+            // Force first job to on_signal_abort synchronously
+            // even if caller allows async on_signal_abort (async_abort)
+            this.first_job.on_signal_abort (AbortType.SYNCHRONOUS);
 
         if (abort_type == AbortType.ASYNCHRONOUS) {
             connect (&this.sub_jobs, &PropagatorCompositeJob.abort_finished, this, &PropagateDirectory.abort_finished);
         }
-        this.sub_jobs.on_abort (abort_type);
+        this.sub_jobs.on_signal_abort (abort_type);
     }
 
 
@@ -124,17 +124,17 @@ class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_first_job_finished (SyncFileItem.Status status) {
+    private void on_signal_first_job_finished (SyncFileItem.Status status) {
         this.first_job.take ().delete_later ();
 
         if (status != SyncFileItem.Status.SUCCESS
             && status != SyncFileItem.Status.RESTORATION
             && status != SyncFileItem.Status.CONFLICT) {
             if (this.state != Finished) {
-                // Synchronously on_abort
-                on_abort (AbortType.SYNCHRONOUS);
+                // Synchronously on_signal_abort
+                on_signal_abort (AbortType.SYNCHRONOUS);
                 this.state = Finished;
-                GLib.info (lc_propagator) << "PropagateDirectory.on_first_job_finished" << "emit finished" << status;
+                GLib.info ("PropagateDirectory.on_signal_first_job_finished" + "emit finished" + status;
                 /* emit */ finished (status);
             }
             return;
@@ -146,7 +146,7 @@ class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_sub_jobs_finished (SyncFileItem.Status status) {
+    private void on_signal_sub_jobs_finished (SyncFileItem.Status status) {
         if (!this.item.is_empty () && status == SyncFileItem.Status.SUCCESS) {
             // If a directory is renamed, recursively delete any stale items
             // that may still exist below the old path.
@@ -162,7 +162,7 @@ class PropagateDirectory : PropagatorJob {
                 if (this.item.modtime <= 0) {
                     status = this.item.status = SyncFileItem.Status.NORMAL_ERROR;
                     this.item.error_string = _("Error updating metadata due to invalid modified time");
-                    GLib.warn (lc_directory) << "Error writing to the database for file" << this.item.file;
+                    GLib.warn ("Error writing to the database for file" + this.item.file;
                 }
 
                 FileSystem.mod_time (propagator ().full_local_path (this.item.destination ()), this.item.modtime);
@@ -178,7 +178,7 @@ class PropagateDirectory : PropagatorJob {
                 if (!result) {
                     status = this.item.status = SyncFileItem.Status.FATAL_ERROR;
                     this.item.error_string = _("Error updating metadata : %1").arg (result.error ());
-                    GLib.warn (lc_directory) << "Error writing to the database for file" << this.item.file << "with" << result.error ();
+                    GLib.warn ("Error writing to the database for file" + this.item.file + "with" + result.error ();
                 } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
                     this.item.status = SyncFileItem.Status.SOFT_ERROR;
                     this.item.error_string = _("File is currently in use");
@@ -186,7 +186,7 @@ class PropagateDirectory : PropagatorJob {
             }
         }
         this.state = Finished;
-        GLib.info (lc_propagator) << "PropagateDirectory.on_sub_jobs_finished" << "emit finished" << status;
+        GLib.info ("PropagateDirectory.on_signal_sub_jobs_finished" + "emit finished" + status;
         /* emit */ finished (status);
     }
 

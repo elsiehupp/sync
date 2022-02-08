@@ -38,7 +38,7 @@ class WebViewPage : AbstractCredentialsWizardPage {
         base ();
         this.oc_wizard = (OwncloudWizard)parent;
 
-        GLib.info (lc_wizard_webiew_page ()) << "Time for a webview!";
+        GLib.info ()) + "Time for a webview!";
         this.web_view = new WebView (this);
 
         var layout = new QVBoxLayout (this);
@@ -46,7 +46,7 @@ class WebViewPage : AbstractCredentialsWizardPage {
         layout.add_widget (this.web_view);
         layout (layout);
 
-        connect (this.web_view, &WebView.on_url_catched, this, &WebViewPage.on_url_catched);
+        connect (this.web_view, &WebView.on_signal_url_catched, this, &WebViewPage.on_signal_url_catched);
 
         // this.use_system_proxy = QNetworkProxyFactory.uses_system_configuration ();
     }
@@ -75,7 +75,7 @@ class WebViewPage : AbstractCredentialsWizardPage {
             }
             url += "index.php/login/flow";
         }
-        GLib.info (lc_wizard_webiew_page ()) << "Url to auth at : " << url;
+        GLib.info ()) + "Url to auth at : " + url;
         this.web_view.url (GLib.Uri (url));
 
         this.original_wizard_size = this.oc_wizard.size ();
@@ -115,14 +115,14 @@ class WebViewPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     public void connected () {
-        GLib.info (lc_wizard_webiew_page ()) << "YAY! we are connected!";
+        GLib.info ()) + "YAY! we are connected!";
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_url_catched (string user, string pass, string host) {
-        GLib.info (lc_wizard_webiew_page ()) << "Got user : " << user << ", server : " << host;
+    private void on_signal_url_catched (string user, string pass, string host) {
+        GLib.info ()) + "Got user : " + user + ", server : " + host;
 
         this.user = user;
         this.pass = pass;
@@ -130,7 +130,7 @@ class WebViewPage : AbstractCredentialsWizardPage {
         AccountPointer account = this.oc_wizard.account ();
         account.url (host);
 
-        GLib.info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_string ();
+        GLib.info ()) + "URL : " + field ("OCUrl").to_string ();
         /* emit */ connect_to_oc_url (host);
     }
 

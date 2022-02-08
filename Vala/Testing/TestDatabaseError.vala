@@ -21,7 +21,7 @@ class TestDatabaseError : GLib.Object {
 
         FileInfo finalState;
         for (int count = 0; true; ++count) {
-            qInfo () << "Starting Iteration" << count;
+            qInfo ("Starting Iteration" + count;
 
             FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
@@ -45,10 +45,10 @@ class TestDatabaseError : GLib.Object {
             // run the sync
             bool result = fakeFolder.syncOnce ();
 
-            qInfo () << "Result of iteration" << count << "was" << result;
+            qInfo ("Result of iteration" + count + "was" + result;
 
             if (fakeFolder.syncJournal ().autotestFailCounter >= 0) {
-                // No error was thrown, we are on_finished
+                // No error was thrown, we are on_signal_finished
                 QVERIFY (result);
                 QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
                 QCOMPARE (fakeFolder.currentRemoteState (), finalState);

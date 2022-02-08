@@ -40,13 +40,13 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void on_job_done (QJsonDocument reply);
+    private void on_signal_job_done (QJsonDocument reply);
 }
 
     Ocs_sharee_job.Ocs_sharee_job (AccountPointer account)
         : Ocs_job (account) {
         path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
-        connect (this, &Ocs_job.job_finished, this, &Ocs_sharee_job.on_job_done);
+        connect (this, &Ocs_job.job_finished, this, &Ocs_sharee_job.on_signal_job_done);
     }
 
     void Ocs_sharee_job.get_sharees (string search,
@@ -62,10 +62,10 @@ signals:
         add_param (string.from_latin1 ("per_page"), string.number (per_page));
         add_param (string.from_latin1 ("lookup"), GLib.Variant (lookup).to_string ());
 
-        on_start ();
+        on_signal_start ();
     }
 
-    void Ocs_sharee_job.on_job_done (QJsonDocument reply) {
+    void Ocs_sharee_job.on_signal_job_done (QJsonDocument reply) {
         /* emit */ sharee_job_finished (reply);
     }
     }

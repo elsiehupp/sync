@@ -75,13 +75,13 @@ class UploadDevice : QIODevice {
         this.start = start;
         this.size = size;
         this.bandwidth_manager = bandwidth_manager;
-        this.bandwidth_manager.on_register_upload_device (this);
+        this.bandwidth_manager.on_signal_register_upload_device (this);
     }
 
 
     ~UploadDevice () {
         if (this.bandwidth_manager) {
-            this.bandwidth_manager.on_unregister_upload_device (this);
+            this.bandwidth_manager.on_signal_unregister_upload_device (this);
         }
     }
 
@@ -100,7 +100,7 @@ class UploadDevice : QIODevice {
 
         string open_error;
         if (!FileSystem.open_and_seek_file_shared_read (&this.file, open_error, this.start)) {
-            on_error_string (open_error);
+            on_signal_error_string (open_error);
             return false;
         }
 
@@ -134,7 +134,7 @@ class UploadDevice : QIODevice {
         if (this.size - this.read <= 0) {
             // at end
             if (this.bandwidth_manager) {
-                this.bandwidth_manager.on_unregister_upload_device (this);
+                this.bandwidth_manager.on_signal_unregister_upload_device (this);
             }
             return -1;
         }
@@ -155,7 +155,7 @@ class UploadDevice : QIODevice {
 
         var c = this.file.read (data, maxlen);
         if (c < 0) {
-            on_error_string (this.file.error_string ());
+            on_signal_error_string (this.file.error_string ());
             return -1;
         }
         this.read += c;
@@ -241,8 +241,8 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public void on_job_upload_progress (int64 sent, int64 t);
-    void UploadDevice.on_job_upload_progress (int64 sent, int64 t) {
+    public void on_signal_job_upload_progress (int64 sent, int64 t);
+    void UploadDevice.on_signal_job_upload_progress (int64 sent, int64 t) {
         if (sent == 0 || t == 0) {
             return;
         }

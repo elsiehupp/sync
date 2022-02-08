@@ -31,7 +31,7 @@ class Folder_wizard_selective_sync : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private void on_virtual_files_checkbox_clicked ();
+    private void on_signal_virtual_files_checkbox_clicked ();
 
     /***********************************************************
     ***********************************************************/
@@ -52,7 +52,7 @@ class Folder_wizard_selective_sync : QWizardPage {
 
         if (Theme.instance ().show_virtual_files_option () && best_available_vfs_mode () != Vfs.Off) {
             this.virtual_files_check_box = new QCheckBox (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
-            connect (this.virtual_files_check_box, &QCheckBox.clicked, this, &Folder_wizard_selective_sync.on_virtual_files_checkbox_clicked);
+            connect (this.virtual_files_check_box, &QCheckBox.clicked, this, &Folder_wizard_selective_sync.on_signal_virtual_files_checkbox_clicked);
             connect (this.virtual_files_check_box, &QCheckBox.state_changed, this, [this] (int state) {
                 this.selective_sync.enabled (state == Qt.Unchecked);
             });
@@ -82,11 +82,11 @@ class Folder_wizard_selective_sync : QWizardPage {
             if (Utility.is_path_windows_drive_partition_root (wizard ().field (QStringLiteral ("source_folder")).to_string ())) {
                 this.virtual_files_check_box.checked (false);
                 this.virtual_files_check_box.enabled (false);
-                this.virtual_files_check_box.on_text (_("Virtual files are not supported for Windows partition roots as local folder. Please choose a valid subfolder under drive letter."));
+                this.virtual_files_check_box.on_signal_text (_("Virtual files are not supported for Windows partition roots as local folder. Please choose a valid subfolder under drive letter."));
             } else {
                 this.virtual_files_check_box.checked (best_available_vfs_mode () == Vfs.WindowsCfApi);
                 this.virtual_files_check_box.enabled (true);
-                this.virtual_files_check_box.on_text (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+                this.virtual_files_check_box.on_signal_text (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
 
                 if (Theme.instance ().enforce_virtual_files_sync_folder ()) {
                     this.virtual_files_check_box.checked (true);
@@ -124,7 +124,7 @@ class Folder_wizard_selective_sync : QWizardPage {
         QWizardPage.clean_up_page ();
     }
 
-    void Folder_wizard_selective_sync.on_virtual_files_checkbox_clicked () {
+    void Folder_wizard_selective_sync.on_signal_virtual_files_checkbox_clicked () {
         // The click has already had an effect on the box, so if it's
         // checked it was newly activated.
         if (this.virtual_files_check_box.is_checked ()) {

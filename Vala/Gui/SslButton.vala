@@ -34,7 +34,7 @@ class Ssl_button : QToolButton {
     ***********************************************************/
     public 
 
-    public void on_update_menu ();
+    public void on_signal_update_menu ();
 
 
     /***********************************************************
@@ -53,7 +53,7 @@ class Ssl_button : QToolButton {
 
         this.menu = new QMenu (this);
         GLib.Object.connect (this.menu, &QMenu.about_to_show,
-            this, &Ssl_button.on_update_menu);
+            this, &Ssl_button.on_signal_update_menu);
         menu (this.menu);
     }
 
@@ -99,40 +99,40 @@ class Ssl_button : QToolButton {
         string details;
         QTextStream stream (&details);
 
-        stream << QLatin1String ("<html><body>");
+        stream + QLatin1String ("<html><body>");
 
-        stream << _("<h3>Certificate Details</h3>");
+        stream + _("<h3>Certificate Details</h3>");
 
-        stream << QLatin1String ("<table>");
-        stream << add_cert_details_field (_("Common Name (CN):"), Utility.escape (cn));
-        stream << add_cert_details_field (_("Subject Alternative Names:"), Utility.escape (sna).replace (" ", "<br/>"));
-        stream << add_cert_details_field (_("Organization (O):"), Utility.escape (org));
-        stream << add_cert_details_field (_("Organizational Unit (OU):"), Utility.escape (ou));
-        stream << add_cert_details_field (_("State/Province:"), Utility.escape (state));
-        stream << add_cert_details_field (_("Country:"), Utility.escape (country));
-        stream << add_cert_details_field (_("Serial:"), Utility.escape (serial));
-        stream << QLatin1String ("</table>");
+        stream + QLatin1String ("<table>");
+        stream + add_cert_details_field (_("Common Name (CN):"), Utility.escape (cn));
+        stream + add_cert_details_field (_("Subject Alternative Names:"), Utility.escape (sna).replace (" ", "<br/>"));
+        stream + add_cert_details_field (_("Organization (O):"), Utility.escape (org));
+        stream + add_cert_details_field (_("Organizational Unit (OU):"), Utility.escape (ou));
+        stream + add_cert_details_field (_("State/Province:"), Utility.escape (state));
+        stream + add_cert_details_field (_("Country:"), Utility.escape (country));
+        stream + add_cert_details_field (_("Serial:"), Utility.escape (serial));
+        stream + QLatin1String ("</table>");
 
-        stream << _("<h3>Issuer</h3>");
+        stream + _("<h3>Issuer</h3>");
 
-        stream << QLatin1String ("<table>");
-        stream << add_cert_details_field (_("Issuer:"), Utility.escape (issuer));
-        stream << add_cert_details_field (_("Issued on:"), Utility.escape (effective_date));
-        stream << add_cert_details_field (_("Expires on:"), Utility.escape (expiry_date));
-        stream << QLatin1String ("</table>");
+        stream + QLatin1String ("<table>");
+        stream + add_cert_details_field (_("Issuer:"), Utility.escape (issuer));
+        stream + add_cert_details_field (_("Issued on:"), Utility.escape (effective_date));
+        stream + add_cert_details_field (_("Expires on:"), Utility.escape (expiry_date));
+        stream + QLatin1String ("</table>");
 
-        stream << _("<h3>Fingerprints</h3>");
+        stream + _("<h3>Fingerprints</h3>");
 
-        stream << QLatin1String ("<table>");
+        stream + QLatin1String ("<table>");
 
-        stream << add_cert_details_field (_("SHA-256:"), sha256escaped);
-        stream << add_cert_details_field (_("SHA-1:"), Utility.escape (sha1));
-        stream << QLatin1String ("</table>");
+        stream + add_cert_details_field (_("SHA-256:"), sha256escaped);
+        stream + add_cert_details_field (_("SHA-1:"), Utility.escape (sha1));
+        stream + QLatin1String ("</table>");
 
         if (user_approved.contains (cert)) {
-            stream << _("<p><b>Note:</b> This certificate was manually approved</p>");
+            stream + _("<p><b>Note:</b> This certificate was manually approved</p>");
         }
-        stream << QLatin1String ("</body></html>");
+        stream + QLatin1String ("</body></html>");
 
         string txt;
         if (position > 0) {
@@ -160,14 +160,14 @@ class Ssl_button : QToolButton {
         var label = new Gtk.Label (parent);
         label.style_sheet (QLatin1String ("Gtk.Label { padding : 8px; }"));
         label.text_format (Qt.RichText);
-        label.on_text (details);
+        label.on_signal_text (details);
 
         // plug label into widget action
         var action = new QWidget_action (parent);
         action.default_widget (label);
         // plug action into menu
         var menu = new QMenu (parent);
-        menu.menu_action ().on_text (txt);
+        menu.menu_action ().on_signal_text (txt);
         menu.add_action (action);
 
         return menu;
@@ -193,7 +193,7 @@ class Ssl_button : QToolButton {
         }
     }
 
-    void Ssl_button.on_update_menu () {
+    void Ssl_button.on_signal_update_menu () {
         this.menu.clear ();
 
         if (!this.account_state) {
@@ -222,7 +222,7 @@ class Ssl_button : QToolButton {
             GLib.List<QSslCertificate> chain = account.peer_certificate_chain;
 
             if (chain.is_empty ()) {
-                GLib.warn (lc_ssl) << "Empty certificate chain";
+                GLib.warn ("Empty certificate chain";
                 return;
             }
 
@@ -232,7 +232,7 @@ class Ssl_button : QToolButton {
 
             GLib.List<QSslCertificate> tmp_chain;
             foreach (QSslCertificate cert, chain) {
-                tmp_chain << cert;
+                tmp_chain + cert;
                 if (system_certificates.contains (cert))
                     break;
             }

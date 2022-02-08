@@ -71,29 +71,29 @@ class CheckServerJob : AbstractNetworkJob {
         this.permanent_redirects = 0;
         ignore_credential_failure (true);
         connect (this, &AbstractNetworkJob.redirected,
-            this, &CheckServerJob.on_redirected);
+            this, &CheckServerJob.on_signal_redirected);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         this.server_url = account ().url ();
         send_request ("GET", Utility.concat_url_path (this.server_url, path ()));
         connect (reply (), &Soup.Reply.meta_data_changed, this, &CheckServerJob.meta_data_changed_slot);
-        connect (reply (), &Soup.Reply.encrypted, this, &CheckServerJob.on_encrypted);
-        AbstractNetworkJob.on_start ();
+        connect (reply (), &Soup.Reply.encrypted, this, &CheckServerJob.on_signal_encrypted);
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_timed_out () {
-        GLib.warn (lc_check_server_job) << "TIMEOUT";
+    public void on_signal_timed_out () {
+        GLib.warn ("TIMEOUT";
         if (reply () && reply ().is_running ()) {
             /* emit */ timeout (reply ().url ());
         } else if (!reply ()) {
-            GLib.warn (lc_check_server_job) << "Timeout even there was no reply?";
+            GLib.warn ("Timeout even there was no reply?";
         }
         delete_later ();
     }
@@ -122,11 +122,11 @@ class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private bool on_finished () override {
+    private bool on_signal_finished () override {
         if (reply ().request ().url ().scheme () == QLatin1String ("https")
             && reply ().ssl_configuration ().session_ticket ().is_empty ()
             && reply ().error () == Soup.Reply.NoError) {
-            GLib.warn (lc_check_server_job) << "No SSL session identifier / session ticket is used, this might impact sync performance negatively.";
+            GLib.warn ("No SSL session identifier / session ticket is used, this might impact sync performance negatively.";
         }
 
         merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account ());
@@ -136,29 +136,29 @@ class CheckServerJob : AbstractNetworkJob {
         if ( (reply ().error () == Soup.Reply.ContentNotFoundError) && (!this.subdir_fallback)) {
             this.subdir_fallback = true;
             path (QLatin1String (NEXTCLOUD_DIR_C) + QLatin1String (STATUS_PHP_C));
-            on_start ();
-            GLib.info (lc_check_server_job) << "Retrying with" << reply ().url ();
+            on_signal_start ();
+            GLib.info ("Retrying with" + reply ().url ();
             return false;
         }
 
         GLib.ByteArray body = reply ().peek (4 * 1024);
         int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (body.is_empty () || http_status != 200) {
-            GLib.warn (lc_check_server_job) << "error : status.php replied " << http_status << body;
+            GLib.warn ("error : status.php replied " + http_status + body;
             /* emit */ instance_not_found (reply ());
         } else {
             QJsonParseError error;
             var status = QJsonDocument.from_json (body, error);
             // empty or invalid response
             if (error.error != QJsonParseError.NoError || status.is_null ()) {
-                GLib.warn (lc_check_server_job) << "status.php from server is not valid JSON!" << body << reply ().request ().url () << error.error_string ();
+                GLib.warn ("status.php from server is not valid JSON!" + body + reply ().request ().url () + error.error_string ();
             }
 
-            GLib.info (lc_check_server_job) << "status.php returns : " << status << " " << reply ().error () << " Reply : " << reply ();
+            GLib.info ("status.php returns : " + status + " " + reply ().error (" Reply : " + reply ();
             if (status.object ().contains ("installed")) {
                 /* emit */ instance_found (this.server_url, status.object ());
             } else {
-                GLib.warn (lc_check_server_job) << "No proper answer on " << reply ().url ();
+                GLib.warn ("No proper answer on " + reply ().url ();
                 /* emit */ instance_not_found (reply ());
             }
         }
@@ -176,14 +176,14 @@ class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_encrypted () {
+    private void on_signal_encrypted () {
         merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_redirected (Soup.Reply reply, GLib.Uri target_url, int redirect_count) {
+    private void on_signal_redirected (Soup.Reply reply, GLib.Uri target_url, int redirect_count) {
         GLib.ByteArray slash_status_php ("/");
         slash_status_php.append (STATUS_PHP_C);
 
@@ -194,8 +194,8 @@ class CheckServerJob : AbstractNetworkJob {
             && path.ends_with (slash_status_php)) {
             this.server_url = target_url;
             this.server_url.path (path.left (path.size () - slash_status_php.size ()));
-            GLib.info (lc_check_server_job) << "status.php was permanently redirected to"
-                                    << target_url << "new server url is" << this.server_url;
+            GLib.info ("status.php was permanently redirected to"
+                                    + target_url + "new server url is" + this.server_url;
             ++this.permanent_redirects;
         }
     }

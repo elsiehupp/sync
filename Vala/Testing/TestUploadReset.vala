@@ -13,7 +13,7 @@ using namespace Occ;
 class TestUploadReset : GLib.Object {
 
     // Verify that the chunked transfer eventually gets reset with the new chunking
-    private void on_test_file_upload_ng () {
+    private void on_signal_test_file_upload_ng () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"}, {"httpErrorCodesThatResetFailingChunkedUploads", QVariantList{500} } } } });

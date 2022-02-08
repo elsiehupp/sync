@@ -16,7 +16,7 @@ class FileActivityListModel : ActivityListModel {
 
     /***********************************************************
     ***********************************************************/
-    public void on_load (AccountState account_state, string file_id);
+    public void on_signal_load (AccountState account_state, string file_id);
 
 
     protected void start_fetch_job () override;
@@ -31,7 +31,7 @@ class FileActivityListModel : ActivityListModel {
         display_actions (false);
     }
 
-    void FileActivityListModel.on_load (AccountState account_state, string local_path) {
+    void FileActivityListModel.on_signal_load (AccountState account_state, string local_path) {
         //  Q_ASSERT (account_state);
         if (!account_state || currently_fetching ()) {
             return;
@@ -50,7 +50,7 @@ class FileActivityListModel : ActivityListModel {
         }
 
         this.file_id = file_record.file_id;
-        on_refresh_activity ();
+        on_signal_refresh_activity ();
     }
 
     void FileActivityListModel.start_fetch_job () {
@@ -71,7 +71,7 @@ class FileActivityListModel : ActivityListModel {
         job.add_query_params (parameters);
         done_fetching (true);
         hide_old_activities (true);
-        job.on_start ();
+        job.on_signal_start ();
     }
     }
     

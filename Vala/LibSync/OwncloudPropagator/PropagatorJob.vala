@@ -43,7 +43,7 @@ class PropagatorJob : GLib.Object {
         FULL_PARALLELISM,
 
         /***********************************************************
-        No other job shall be started until this one has on_finished.
+        No other job shall be started until this one has on_signal_finished.
         So this job is guaranteed to finish before any jobs below
         it are executed.
         ***********************************************************/
@@ -67,12 +67,12 @@ class PropagatorJob : GLib.Object {
     protected PropagatorCompositeJob associated_composite = null;
 
     /***********************************************************
-    Emitted when the job is fully on_finished
+    Emitted when the job is fully on_signal_finished
     ***********************************************************/
-    signal void on_finished (SyncFileItem.Status);
+    signal void on_signal_finished (SyncFileItem.Status);
 
     /***********************************************************
-    Emitted when the on_abort is fully on_finished
+    Emitted when the on_signal_abort is fully on_signal_finished
     ***********************************************************/
     signal void abort_finished (SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR);
 
@@ -123,10 +123,10 @@ class PropagatorJob : GLib.Object {
 
 
     /***********************************************************
-    Asynchronous on_abort requires emit of abort_finished () signal,
-    while synchronous is expected to on_abort immedietaly.
+    Asynchronous on_signal_abort requires emit of abort_finished () signal,
+    while synchronous is expected to on_signal_abort immedietaly.
     ***********************************************************/
-    public void on_abort (PropagatorJob.AbortType abort_type) {
+    public void on_signal_abort (PropagatorJob.AbortType abort_type) {
         if (abort_type == AbortType.ASYNCHRONOUS)
             /* emit */ abort_finished ();
     }
@@ -136,7 +136,7 @@ class PropagatorJob : GLib.Object {
     Starts this job, or a new subjob
     returns true if a job was started.
     ***********************************************************/
-    public virtual bool on_schedule_self_or_child ();
+    public virtual bool on_signal_schedule_self_or_child ();
 
 
     protected OwncloudPropagator propagator () {

@@ -65,7 +65,7 @@ class Ssl_error_dialog : Gtk.Dialog {
     bool SslDialogErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certificates, AccountPointer account) {
         (void)conf;
         if (!certificates) {
-            q_c_critical (lc_ssl_error_dialog) << "Certs parameter required but is NULL!";
+            q_c_critical ("Certs parameter required but is NULL!";
             return false;
         }
 
@@ -219,9 +219,9 @@ class Ssl_error_dialog : Gtk.Dialog {
             org = _("&lt;not specified&gt;");
         if (country.is_empty ())
             country = _("&lt;not specified&gt;");
-        li << _("Organization : %1").arg (org);
-        li << _("Unit : %1").arg (unit);
-        li << _("Country : %1").arg (country);
+        li + _("Organization : %1").arg (org);
+        li + _("Unit : %1").arg (unit);
+        li + _("Country : %1").arg (country);
         message += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
 
         message += QL ("<p>");
@@ -244,9 +244,9 @@ class Ssl_error_dialog : Gtk.Dialog {
         message += QL ("<h3>") + _("Issuer : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Common_name))) + QL ("</h3>");
         message += QL ("<div identifier=\"issuer\">");
         li.clear ();
-        li << _("Organization : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organization)));
-        li << _("Unit : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organizational_unit_name)));
-        li << _("Country : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Country_name)));
+        li + _("Organization : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organization)));
+        li + _("Unit : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organizational_unit_name)));
+        li + _("Country : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Country_name)));
         message += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
         message += QL ("</div>");
         message += QL ("</div>");
@@ -259,7 +259,7 @@ class Ssl_error_dialog : Gtk.Dialog {
             return true;
 
         bool stat = (this.ui.cb_trust_connect.check_state () == Qt.Checked);
-        GLib.info (lc_ssl_error_dialog) << "SSL-Connection is trusted : " << stat;
+        GLib.info ("SSL-Connection is trusted : " + stat;
 
         return stat;
     }

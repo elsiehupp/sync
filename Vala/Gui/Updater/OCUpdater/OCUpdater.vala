@@ -31,7 +31,7 @@ NSISUpdater starts the update if a new version of the client is available.
 On Mac_o_s_x, the sparkle framework handles the installation of the new
 version. On Linux, the update capabilit
 are relied on, and thus the Passive_upda
-if there is a new version once at every on_start
+if there is a new version once at every on_signal_start
 
 Simple class diagram of the updater:
 
@@ -112,25 +112,25 @@ signals:
 
 
     // FIXME Maybe this should be in the NSISUpdater which should have been called Windows_updater
-    public void on_start_installer ();
+    public void on_signal_start_installer ();
 
 protected slots:
     void background_check_for_update () override;
-    void on_open_update_url ();
+    void on_signal_open_update_url ();
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_version_info_arrived ();
-    private void on_timed_out ();
+    private void on_signal_version_info_arrived ();
+    private void on_signal_timed_out ();
 
 
-    protected virtual void version_info_arrived (Update_info info);
+    protected virtual void version_info_arrived (UpdateInfo info);
     protected bool update_succeeded ();
     protected QNetworkAccessManager qnam () {
         return this.access_manager;
     }
-    protected Update_info update_info () {
+    protected UpdateInfo update_info () {
         return this.update_info;
     }
 
@@ -141,7 +141,7 @@ protected slots:
     private int this.state;
     private QNetworkAccessManager this.access_manager;
     private QTimer this.timeout_watchdog; /** Timer to guard the timeout of an individual network request */
-    private Update_info this.update_info;
+    private UpdateInfo this.update_info;
 }
 
 
@@ -184,8 +184,8 @@ protected slots:
 
             message_box_start_installer.attribute (Qt.WA_DeleteOnClose);
 
-            connect (message_box_start_installer, &QMessageBox.on_finished, this, [this] {
-                on_start_installer ();
+            connect (message_box_start_installer, &QMessageBox.on_signal_finished, this, [this] {
+                on_signal_start_installer ();
             });
             message_box_start_installer.open ();
         }
@@ -201,26 +201,26 @@ protected slots:
         case Up_to_date:
         case Download_failed:
         case Download_timed_out:
-            GLib.info (lc_updater) << "Checking for available update";
+            GLib.info ("Checking for available update";
             check_for_update ();
             break;
         case Download_complete:
-            GLib.info (lc_updater) << "Update is downloaded, skip new check.";
+            GLib.info ("Update is downloaded, skip new check.";
             break;
         case Update_only_available_through_system:
-            GLib.info (lc_updater) << "Update is only available through system, skip check.";
+            GLib.info ("Update is only available through system, skip check.";
             break;
         }
     }
 
     string OCUpdater.status_string (Update_status_string_format format) {
-        string update_version = this.update_info.version_"";
+        string update_version = this.update_info.version_string ();
 
         switch (download_state ()) {
         case Downloading:
             return _("Downloading %1. Please wait …").arg (update_version);
         case Download_complete:
-            return _("%1 available. Restart application to on_start the update.").arg (update_version);
+            return _("%1 available. Restart application to on_signal_start the update.").arg (update_version);
         case Download_failed: {
             if (format == Update_status_string_format.Html) {
                 return _("Could not download update. Please open <a href='%1'>%1</a> to download the update manually.").arg (this.update_info.web ());
@@ -263,17 +263,17 @@ protected slots:
         }
     }
 
-    void OCUpdater.on_start_installer () {
+    void OCUpdater.on_signal_start_installer () {
         ConfigFile config;
         QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         string update_file = settings.value (update_available_c).to_string ();
         settings.value (auto_update_attempted_c, true);
         settings.sync ();
-        GLib.info (lc_updater) << "Running updater" << update_file;
+        GLib.info ("Running updater" + update_file;
 
         if (update_file.ends_with (".exe")) {
-            QProcess.start_detached (update_file, string[] () << "/S"
-                                                              << "/launch");
+            QProcess.start_detached (update_file, string[] ("/S"
+                                                              + "/launch");
         } else if (update_file.ends_with (".msi")) {
             // When MSIs are installed without gui they cannot launch applications
             // as they lack the user context. That is why we need to run the client
@@ -299,14 +299,14 @@ protected slots:
 
     void OCUpdater.check_for_update () {
         Soup.Reply reply = this.access_manager.get (QNetworkRequest (this.update_url));
-        connect (this.timeout_watchdog, &QTimer.timeout, this, &OCUpdater.on_timed_out);
-        this.timeout_watchdog.on_start (30 * 1000);
-        connect (reply, &Soup.Reply.on_finished, this, &OCUpdater.on_version_info_arrived);
+        connect (this.timeout_watchdog, &QTimer.timeout, this, &OCUpdater.on_signal_timed_out);
+        this.timeout_watchdog.on_signal_start (30 * 1000);
+        connect (reply, &Soup.Reply.on_signal_finished, this, &OCUpdater.on_signal_version_info_arrived);
 
         download_state (Checking_server);
     }
 
-    void OCUpdater.on_open_update_url () {
+    void OCUpdater.on_signal_open_update_url () {
         QDesktopServices.open_url (this.update_info.web ());
     }
 
@@ -319,12 +319,12 @@ protected slots:
         return current_version >= target_version_int;
     }
 
-    void OCUpdater.on_version_info_arrived () {
+    void OCUpdater.on_signal_version_info_arrived () {
         this.timeout_watchdog.stop ();
         var reply = qobject_cast<Soup.Reply> (sender ());
         reply.delete_later ();
         if (reply.error () != Soup.Reply.NoError) {
-            GLib.warn (lc_updater) << "Failed to reach version check url : " << reply.error_string ();
+            GLib.warn ("Failed to reach version check url : " + reply.error_string ();
             download_state (Download_timed_out);
             return;
         }
@@ -332,16 +332,16 @@ protected slots:
         string xml = string.from_utf8 (reply.read_all ());
 
         bool ok = false;
-        this.update_info = Update_info.parse_string (xml, ok);
+        this.update_info = UpdateInfo.parse_string (xml, ok);
         if (ok) {
             version_info_arrived (this.update_info);
         } else {
-            GLib.warn (lc_updater) << "Could not parse update information.";
+            GLib.warn ("Could not parse update information.";
             download_state (Download_timed_out);
         }
     }
 
-    void OCUpdater.on_timed_out () {
+    void OCUpdater.on_signal_timed_out () {
         download_state (Download_timed_out);
     }
 

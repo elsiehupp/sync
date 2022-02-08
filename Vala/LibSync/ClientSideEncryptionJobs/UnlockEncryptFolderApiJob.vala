@@ -35,7 +35,7 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override {
+    public void on_signal_start () override {
         Soup.Request req;
         req.raw_header ("OCS-APIREQUEST", "true");
         req.raw_header ("e2e-token", this.token);
@@ -43,18 +43,18 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         send_request ("DELETE", url, req);
 
-        AbstractNetworkJob.on_start ();
-        GLib.info (lc_cse_job ()) << "Starting the request to unlock.";
+        AbstractNetworkJob.on_signal_start ();
+        GLib.info ()) + "Starting the request to unlock.";
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected bool on_finished () override {
+    protected bool on_signal_finished () override {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
-            GLib.info (lc_cse_job ()) << "error unlocking file" << path () << error_string () << return_code;
-            GLib.info (lc_cse_job ()) << "Full Error Log" << reply ().read_all ();
+            GLib.info ()) + "error unlocking file" + path () + error_string () + return_code;
+            GLib.info ()) + "Full Error Log" + reply ().read_all ();
             /* emit */ error (this.file_identifier, return_code);
             return true;
         }

@@ -34,13 +34,13 @@ int main (int argc, char argv[]) {
     FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
     addBunchOfFiles<10, 8, 4> (0, "", fakeFolder.localModifier ());
 
-    qDebug () << "NUMFILES" << numFiles;
-    qDebug () << "NUMDIRS" << numDirs;
+    GLib.debug ("NUMFILES" + numFiles;
+    GLib.debug ("NUMDIRS" + numDirs;
     QElapsedTimer timer;
-    timer.on_start ();
+    timer.on_signal_start ();
     bool result1 = fakeFolder.syncOnce ();
-    qDebug () << "FIRST SYNC : " << result1 << timer.restart ();
+    GLib.debug ("FIRST SYNC : " + result1 << timer.restart ();
     bool result2 = fakeFolder.syncOnce ();
-    qDebug () << "SECOND SYNC : " << result2 << timer.restart ();
+    GLib.debug ("SECOND SYNC : " + result2 << timer.restart ();
     return (result1 && result2) ? 0 : -1;
 }

@@ -14,7 +14,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QLayout>
 //  #include <QVBoxLayout>
 //  #include <QPixmap>
-//  #include <QImage>
+//  #include <Gtk.Image>
 //  #include <QWidget_action>
 //  #include <QPainter>
 //  #include <QPainterPath>
@@ -29,7 +29,6 @@ namespace Ui {
 @ingroup gui
 ***********************************************************/
 class SettingsDialog : Gtk.Dialog {
-    //  Q_PROPERTY (Gtk.Widget* current_page READ current_page)
 
     const string TOOLBAR_CSS () {
         return QStringLiteral ("QTool_bar { background : %1; margin : 0; padding : 0; border : none; border-bottom : 1px solid %2; spacing : 0; } "
@@ -92,25 +91,25 @@ class SettingsDialog : Gtk.Dialog {
     ***********************************************************/
     public 
 
-    public void on_account_avatar_changed ();
+    public void on_signal_account_avatar_changed ();
 
 
-    public void on_account_display_name_changed ();
+    public void on_signal_account_display_name_changed ();
 
 signals:
     void style_changed ();
-    void on_activate ();
+    void on_signal_activate ();
 
 
     protected void reject () override;
-    protected void on_accept () override;
+    protected void on_signal_accept () override;
     protected void change_event (QEvent *) override;
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_account_added (AccountState *);
-    private void on_account_removed (AccountState *);
+    private void on_signal_account_added (AccountState *);
+    private void on_signal_account_removed (AccountState *);
 
 
     /***********************************************************
@@ -169,14 +168,14 @@ signals:
         // : This name refers to the application name e.g Nextcloud
         window_title (_("%1 Settings").arg (Theme.instance ().app_name_gui ()));
 
-        connect (AccountManager.instance (), &AccountManager.on_account_added,
-            this, &SettingsDialog.on_account_added);
-        connect (AccountManager.instance (), &AccountManager.on_account_removed,
-            this, &SettingsDialog.on_account_removed);
+        connect (AccountManager.instance (), &AccountManager.on_signal_account_added,
+            this, &SettingsDialog.on_signal_account_added);
+        connect (AccountManager.instance (), &AccountManager.on_signal_account_removed,
+            this, &SettingsDialog.on_signal_account_removed);
 
         this.action_group = new QAction_group (this);
         this.action_group.exclusive (true);
-        connect (this.action_group, &QAction_group.triggered, this, &SettingsDialog.on_switch_page);
+        connect (this.action_group, &QAction_group.triggered, this, &SettingsDialog.on_signal_switch_page);
 
         // Adds space between users + activities and general + network actions
         var spacer = new Gtk.Widget ();
@@ -191,7 +190,7 @@ signals:
         this.ui.stack.add_widget (general_settings);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &SettingsDialog.style_changed, general_settings, &General_settings.on_style_changed);
+        connect (this, &SettingsDialog.style_changed, general_settings, &General_settings.on_signal_style_changed);
 
         QAction network_action = create_color_aware_action (QLatin1String (":/client/theme/network.svg"), _("Network"));
         this.action_group.add_action (network_action);
@@ -203,22 +202,22 @@ signals:
         this.action_group_widgets.insert (network_action, network_settings);
 
         foreach (var ai, AccountManager.instance ().accounts ()) {
-            on_account_added (ai.data ());
+            on_signal_account_added (ai.data ());
         }
 
         QTimer.single_shot (1, this, &SettingsDialog.show_first_page);
 
         var show_log_window = new QAction (this);
         show_log_window.shortcut (QKeySequence ("F12"));
-        connect (show_log_window, &QAction.triggered, gui, &OwncloudGui.on_toggle_log_browser);
+        connect (show_log_window, &QAction.triggered, gui, &OwncloudGui.on_signal_toggle_log_browser);
         add_action (show_log_window);
 
         var show_log_window2 = new QAction (this);
         show_log_window2.shortcut (QKeySequence (Qt.CTRL + Qt.Key_L));
-        connect (show_log_window2, &QAction.triggered, gui, &OwncloudGui.on_toggle_log_browser);
+        connect (show_log_window2, &QAction.triggered, gui, &OwncloudGui.on_signal_toggle_log_browser);
         add_action (show_log_window2);
 
-        connect (this, &SettingsDialog.on_activate, gui, &OwncloudGui.on_settings_dialog_activated);
+        connect (this, &SettingsDialog.on_signal_activate, gui, &OwncloudGui.on_signal_settings_dialog_activated);
 
         customize_style ();
 
@@ -241,10 +240,10 @@ signals:
         Gtk.Dialog.reject ();
     }
 
-    void SettingsDialog.on_accept () {
+    void SettingsDialog.on_signal_accept () {
         ConfigFile config;
         config.save_geometry (this);
-        Gtk.Dialog.on_accept ();
+        Gtk.Dialog.on_signal_accept ();
     }
 
     void SettingsDialog.change_event (QEvent e) {
@@ -268,7 +267,7 @@ signals:
         Gtk.Dialog.change_event (e);
     }
 
-    void SettingsDialog.on_switch_page (QAction action) {
+    void SettingsDialog.on_signal_switch_page (QAction action) {
         this.ui.stack.current_widget (this.action_group_widgets.value (action));
     }
 
@@ -280,18 +279,18 @@ signals:
     }
 
     void SettingsDialog.show_issues_list (AccountState account) {
-        const var user_model = User_model.instance ();
-        const var identifier = user_model.find_user_id_for_account (account);
-        User_model.instance ().switch_current_user (identifier);
+        const var user_model = UserModel.instance ();
+        const var identifier = user_model.find_identifier_for_account (account);
+        UserModel.instance ().switch_current_user (identifier);
         /* emit */ Systray.instance ().show_window ();
     }
 
-    void SettingsDialog.on_account_added (AccountState s) {
+    void SettingsDialog.on_signal_account_added (AccountState s) {
         var height = this.tool_bar.size_hint ().height ();
         bool branding_single_account = !Theme.instance ().multi_account ();
 
         QAction account_action = null;
-        QImage avatar = s.account ().avatar ();
+        Gtk.Image avatar = s.account ().avatar ();
         const string action_text = branding_single_account ? _("Account") : s.account ().display_name ();
         if (avatar.is_null ()) {
             account_action = create_color_aware_action (QLatin1String (":/client/theme/account.svg"),
@@ -318,23 +317,23 @@ signals:
         this.action_for_account.insert (s.account ().data (), account_action);
         account_action.trigger ();
 
-        connect (account_settings, &AccountSettings.folder_changed, this.gui, &OwncloudGui.on_folders_changed);
+        connect (account_settings, &AccountSettings.folder_changed, this.gui, &OwncloudGui.on_signal_folders_changed);
         connect (account_settings, &AccountSettings.open_folder_alias,
-            this.gui, &OwncloudGui.on_folder_open_action);
+            this.gui, &OwncloudGui.on_signal_folder_open_action);
         connect (account_settings, &AccountSettings.show_issues_list, this, &SettingsDialog.show_issues_list);
-        connect (s.account ().data (), &Account.account_changed_avatar, this, &SettingsDialog.on_account_avatar_changed);
-        connect (s.account ().data (), &Account.account_changed_display_name, this, &SettingsDialog.on_account_display_name_changed);
+        connect (s.account ().data (), &Account.account_changed_avatar, this, &SettingsDialog.on_signal_account_avatar_changed);
+        connect (s.account ().data (), &Account.account_changed_display_name, this, &SettingsDialog.on_signal_account_display_name_changed);
 
         // Connect style_changed event, to adapt (Dark-/Light-Mode switching)
-        connect (this, &SettingsDialog.style_changed, account_settings, &AccountSettings.on_style_changed);
+        connect (this, &SettingsDialog.style_changed, account_settings, &AccountSettings.on_signal_style_changed);
     }
 
-    void SettingsDialog.on_account_avatar_changed () {
+    void SettingsDialog.on_signal_account_avatar_changed () {
         var account = static_cast<Account> (sender ());
         if (account && this.action_for_account.contains (account)) {
             QAction action = this.action_for_account[account];
             if (action) {
-                QImage pix = account.avatar ();
+                Gtk.Image pix = account.avatar ();
                 if (!pix.is_null ()) {
                     action.icon (QPixmap.from_image (AvatarJob.make_circular_avatar (pix)));
                 }
@@ -342,26 +341,26 @@ signals:
         }
     }
 
-    void SettingsDialog.on_account_display_name_changed () {
+    void SettingsDialog.on_signal_account_display_name_changed () {
         var account = static_cast<Account> (sender ());
         if (account && this.action_for_account.contains (account)) {
             QAction action = this.action_for_account[account];
             if (action) {
                 string display_name = account.display_name ();
-                action.on_text (display_name);
+                action.on_signal_text (display_name);
                 var height = this.tool_bar.size_hint ().height ();
                 action.icon_text (short_display_name_for_settings (account, static_cast<int> (height * button_size_ratio)));
             }
         }
     }
 
-    void SettingsDialog.on_account_removed (AccountState s) {
+    void SettingsDialog.on_signal_account_removed (AccountState s) {
         for (var it = this.action_group_widgets.begin (); it != this.action_group_widgets.end (); ++it) {
             var as = qobject_cast<AccountSettings> (*it);
             if (!as) {
                 continue;
             }
-            if (as.on_accounts_state () == s) {
+            if (as.on_signal_accounts_state () == s) {
                 this.tool_bar.remove_action (it.key ());
 
                 if (this.ui.stack.current_widget () == it.value ()) {
@@ -409,7 +408,7 @@ signals:
         ***********************************************************/
         public Tool_button_action (QIcon icon, string text, GLib.Object parent)
             : QWidget_action (parent) {
-            on_text (text);
+            on_signal_text (text);
             icon (icon);
         }
 

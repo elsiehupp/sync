@@ -59,38 +59,38 @@ class TestConcatUrl : public GLib.Object {
         QTest.addColumn<string> ("expected");
 
         // Tests about slashes
-        QTest.newRow ("noslash1")  << "/baa"  << "foo"  << make () << "/baa/foo";
-        QTest.newRow ("noslash2")  << ""      << "foo"  << make () << "/foo";
-        QTest.newRow ("noslash3")  << "/foo"  << ""     << make () << "/foo";
-        QTest.newRow ("noslash4")  << ""      << ""     << make () << "";
-        QTest.newRow ("oneslash1") << "/bar/" << "foo"  << make () << "/bar/foo";
-        QTest.newRow ("oneslash2") << "/"     << "foo"  << make () << "/foo";
-        QTest.newRow ("oneslash3") << "/foo"  << "/"    << make () << "/foo/";
-        QTest.newRow ("oneslash4") << ""      << "/"    << make () << "/";
-        QTest.newRow ("twoslash1") << "/bar/" << "/foo" << make () << "/bar/foo";
-        QTest.newRow ("twoslash2") << "/"     << "/foo" << make () << "/foo";
-        QTest.newRow ("twoslash3") << "/foo/" << "/"    << make () << "/foo/";
-        QTest.newRow ("twoslash4") << "/"     << "/"    << make () << "/";
+        QTest.newRow ("noslash1")  + "/baa"  + "foo"  + make ("/baa/foo";
+        QTest.newRow ("noslash2")  + ""      + "foo"  + make ("/foo";
+        QTest.newRow ("noslash3")  + "/foo"  + ""     + make ("/foo";
+        QTest.newRow ("noslash4")  + ""      + ""     + make ("";
+        QTest.newRow ("oneslash1") + "/bar/" + "foo"  + make ("/bar/foo";
+        QTest.newRow ("oneslash2") + "/"     + "foo"  + make ("/foo";
+        QTest.newRow ("oneslash3") + "/foo"  + "/"    + make ("/foo/";
+        QTest.newRow ("oneslash4") + ""      + "/"    + make ("/";
+        QTest.newRow ("twoslash1") + "/bar/" + "/foo" + make ("/bar/foo";
+        QTest.newRow ("twoslash2") + "/"     + "/foo" + make ("/foo";
+        QTest.newRow ("twoslash3") + "/foo/" + "/"    + make ("/foo/";
+        QTest.newRow ("twoslash4") + "/"     + "/"    + make ("/";
 
         // Tests about path encoding
         QTest.newRow ("encodepath")
-                << "/a f/b"
-                << "/a f/c"
-                << make ()
-                << "/a%20f/b/a%20f/c";
+                + "/a f/b"
+                + "/a f/c"
+                + make ()
+                + "/a%20f/b/a%20f/c";
 
         // Tests about query args
         QTest.newRow ("query1")
-                << "/baa"
-                << "/foo"
-                << make ("a=a", "b=b",
+                + "/baa"
+                + "/foo"
+                + make ("a=a", "b=b",
                         "c", "d")
-                << "/baa/foo?a%3Da=b%3Db&c=d";
+                + "/baa/foo?a%3Da=b%3Db&c=d";
         QTest.newRow ("query2")
-                << ""
-                << ""
-                << make ("foo", "bar")
-                << "?foo=bar";
+                + ""
+                + ""
+                + make ("foo", "bar")
+                + "?foo=bar";
     }
 
 }

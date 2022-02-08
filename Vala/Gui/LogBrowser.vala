@@ -59,7 +59,7 @@ protected slots:
         var label = new Gtk.Label (
             _("The client can write debug logs to a temporary folder. "
                "These logs are very helpful for diagnosing problems.\n"
-               "Since log files can get large, the client will on_start a new one for each sync "
+               "Since log files can get large, the client will on_signal_start a new one for each sync "
                "run and compress older ones. It will also delete log files after a couple "
                "of hours to avoid consuming too much disk space.\n"
                "If enabled, logs will be written to %1")
@@ -71,7 +71,7 @@ protected slots:
 
         // button to permanently save logs
         var enable_logging_button = new QCheckBox;
-        enable_logging_button.on_text (_("Enable logging to temporary folder"));
+        enable_logging_button.on_signal_text (_("Enable logging to temporary folder"));
         enable_logging_button.checked (ConfigFile ().automatic_log_dir ());
         connect (enable_logging_button, &QCheckBox.toggled, this, &Log_browser.toggle_permanent_logging);
         main_layout.add_widget (enable_logging_button);
@@ -84,7 +84,7 @@ protected slots:
         main_layout.add_widget (label);
 
         var open_folder_button = new QPushButton;
-        open_folder_button.on_text (_("Open folder"));
+        open_folder_button.on_signal_text (_("Open folder"));
         connect (open_folder_button, &QPushButton.clicked, this, [] () {
             string path = Logger.instance ().temporary_folder_log_dir_path ();
             QDir ().mkpath (path);
@@ -126,7 +126,7 @@ protected slots:
         if (enabled) {
             if (!logger.is_logging_to_file ()) {
                 logger.setup_temporary_folder_log_dir ();
-                logger.on_enter_next_log_file ();
+                logger.on_signal_enter_next_log_file ();
             }
         } else {
             logger.disable_temporary_folder_log_dir ();

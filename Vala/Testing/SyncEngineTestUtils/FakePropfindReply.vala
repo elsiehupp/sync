@@ -14,15 +14,13 @@ class FakePropfindReply : FakeReply {
     ***********************************************************/
     public FakePropfindReply (FileInfo remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest request, GLib.Object parent);
 
-    //  Q_INVOKABLE
     public void respond ();
 
-    //  Q_INVOKABLE
     public void respond404 ();
 
     /***********************************************************
     ***********************************************************/
-    public void on_abort () override { }
+    public void on_signal_abort () override { }
 
 
     /***********************************************************

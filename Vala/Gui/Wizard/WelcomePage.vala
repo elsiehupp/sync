@@ -102,9 +102,9 @@ class WelcomePage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void set_up_slide_show () {
-        connect (this.ui.slide_show, &SlideShow.clicked, this.ui.slide_show, &SlideShow.on_stop_show);
-        connect (this.ui.slide_show_next_button, &QPushButton.clicked, this.ui.slide_show, &SlideShow.on_next_slide);
-        connect (this.ui.slide_show_previous_button, &QPushButton.clicked, this.ui.slide_show, &SlideShow.on_prev_slide);
+        connect (this.ui.slide_show, &SlideShow.clicked, this.ui.slide_show, &SlideShow.on_signal_stop_show);
+        connect (this.ui.slide_show_next_button, &QPushButton.clicked, this.ui.slide_show, &SlideShow.on_signal_next_slide);
+        connect (this.ui.slide_show_previous_button, &QPushButton.clicked, this.ui.slide_show, &SlideShow.on_signal_prev_slide);
     }
 
 
@@ -113,7 +113,7 @@ class WelcomePage : QWizardPage {
     private void set_up_login_button () {
         const var app_name = Theme.instance ().app_name_gui ();
 
-        this.ui.login_button.on_text (_("Log in to your %1").arg (app_name));
+        this.ui.login_button.on_signal_text (_("Log in to your %1").arg (app_name));
         connect (this.ui.login_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
             this.next_page = WizardCommon.Pages.PAGE_SERVER_SETUP;
             this.oc_wizard.next ();
@@ -142,7 +142,7 @@ class WelcomePage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void set_up_host_your_own_server_label () {
-        this.ui.host_your_own_server_label.on_text (_("Host your own server"));
+        this.ui.host_your_own_server_label.on_signal_text (_("Host your own server"));
         this.ui.host_your_own_server_label.alignment (Qt.AlignCenter);
         this.ui.host_your_own_server_label.url (GLib.Uri ("https://docs.nextcloud.com/server/latest/admin_manual/installation/#installation"));
     }

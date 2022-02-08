@@ -20,7 +20,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void on_timer_fired ();
+    private void on_signal_timer_fired ();
 
     /***********************************************************
     ***********************************************************/
@@ -34,7 +34,7 @@ signals:
 UpdaterScheduler.UpdaterScheduler (GLib.Object parent) {
     base (parent);
     connect (&this.update_check_timer, &QTimer.timeout,
-        this, &UpdaterScheduler.on_timer_fired);
+        this, &UpdaterScheduler.on_signal_timer_fired);
 
     // Note: the sparkle-updater is not an OCUpdater
     if (var updater = qobject_cast<OCUpdater> (Updater.instance ())) {
@@ -44,26 +44,26 @@ UpdaterScheduler.UpdaterScheduler (GLib.Object parent) {
     }
 
     // at startup, do a check in any case.
-    QTimer.single_shot (3000, this, &UpdaterScheduler.on_timer_fired);
+    QTimer.single_shot (3000, this, &UpdaterScheduler.on_signal_timer_fired);
 
     ConfigFile config;
     var check_interval = config.update_check_interval ();
-    this.update_check_timer.on_start (std.chrono.milliseconds (check_interval).count ());
+    this.update_check_timer.on_signal_start (std.chrono.milliseconds (check_interval).count ());
 }
 
-void UpdaterScheduler.on_timer_fired () {
+void UpdaterScheduler.on_signal_timer_fired () {
     ConfigFile config;
 
     // re-set the check interval if it changed in the config file meanwhile
     var check_interval = std.chrono.milliseconds (config.update_check_interval ()).count ();
     if (check_interval != this.update_check_timer.interval ()) {
         this.update_check_timer.interval (check_interval);
-        GLib.info (lc_updater) << "Setting new update check interval " << check_interval;
+        GLib.info ("Setting new update check interval " + check_interval;
     }
 
     // consider the skip_update_check and !auto_update_check flags in the config.
     if (config.skip_update_check () || !config.auto_update_check ()) {
-        GLib.info (lc_updater) << "Skipping update check because of config file";
+        GLib.info ("Skipping update check because of config file";
         return;
     }
 

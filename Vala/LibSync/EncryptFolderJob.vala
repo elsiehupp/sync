@@ -28,7 +28,7 @@ class EncryptFolderJob : GLib.Object {
     private string error_string;
 
 
-    signal void on_finished (int status);
+    signal void on_signal_finished (int status);
 
 
     /***********************************************************
@@ -44,11 +44,11 @@ class EncryptFolderJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         var job = new Occ.SetEncryptionFlagApiJob (this.account, this.file_identifier, Occ.SetEncryptionFlagApiJob.Set, this);
-        connect (job, &Occ.SetEncryptionFlagApiJob.on_success, this, &EncryptFolderJob.on_encryption_flag_success);
-        connect (job, &Occ.SetEncryptionFlagApiJob.error, this, &EncryptFolderJob.on_encryption_flag_error);
-        job.on_start ();
+        connect (job, &Occ.SetEncryptionFlagApiJob.on_signal_success, this, &EncryptFolderJob.on_signal_encryption_flag_success);
+        connect (job, &Occ.SetEncryptionFlagApiJob.error, this, &EncryptFolderJob.on_signal_encryption_flag_error);
+        job.on_signal_start ();
     }
 
 
@@ -61,7 +61,7 @@ class EncryptFolderJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_encryption_flag_success (GLib.ByteArray file_identifier) {
+    private void on_signal_encryption_flag_success (GLib.ByteArray file_identifier) {
         SyncJournalFileRecord record;
         this.journal.get_file_record (this.path, record);
         if (record.is_valid ()) {
@@ -70,25 +70,25 @@ class EncryptFolderJob : GLib.Object {
         }
 
         var lock_job = new LockEncryptFolderApiJob (this.account, file_identifier, this);
-        connect (lock_job, &LockEncryptFolderApiJob.on_success,
-                this, &EncryptFolderJob.on_lock_for_encryption_success);
+        connect (lock_job, &LockEncryptFolderApiJob.on_signal_success,
+                this, &EncryptFolderJob.on_signal_lock_for_encryption_success);
         connect (lock_job, &LockEncryptFolderApiJob.error,
-                this, &EncryptFolderJob.on_lock_for_encryption_error);
-        lock_job.on_start ();
+                this, &EncryptFolderJob.on_signal_lock_for_encryption_error);
+        lock_job.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_encryption_flag_error (GLib.ByteArray file_identifier, int http_error_code) {
-        GLib.debug () << "Error on the encryption flag of" << file_identifier << "HTTP code:" << http_error_code;
+    private void on_signal_encryption_flag_error (GLib.ByteArray file_identifier, int http_error_code) {
+        GLib.debug ("Error on the encryption flag of" + file_identifier + "HTTP code:" + http_error_code;
         /* emit */ finished (Error);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_lock_for_encryption_success (GLib.ByteArray file_identifier, GLib.ByteArray token) {
+    private void on_signal_lock_for_encryption_success (GLib.ByteArray file_identifier, GLib.ByteArray token) {
         this.folder_token = token;
 
         FolderMetadata empty_metadata (this.account);
@@ -102,61 +102,61 @@ class EncryptFolderJob : GLib.Object {
         }
 
         var store_metadata_job = new StoreMetaDataApiJob (this.account, file_identifier, empty_metadata.encrypted_metadata (), this);
-        connect (store_metadata_job, &StoreMetaDataApiJob.on_success,
-                this, &EncryptFolderJob.on_upload_metadata_success);
+        connect (store_metadata_job, &StoreMetaDataApiJob.on_signal_success,
+                this, &EncryptFolderJob.on_signal_upload_metadata_success);
         connect (store_metadata_job, &StoreMetaDataApiJob.error,
-                this, &EncryptFolderJob.on_update_metadata_error);
-        store_metadata_job.on_start ();
+                this, &EncryptFolderJob.on_signal_update_metadata_error);
+        store_metadata_job.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_lock_for_encryption_error (GLib.ByteArray file_identifier, int http_error_code) {
-        GLib.info (lc_encrypt_folder_job ()) << "Locking error for" << file_identifier << "HTTP code:" << http_error_code;
+    private void on_signal_lock_for_encryption_error (GLib.ByteArray file_identifier, int http_error_code) {
+        GLib.info ()) + "Locking error for" + file_identifier + "HTTP code:" + http_error_code;
         /* emit */ finished (Error);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_unlock_folder_success (GLib.ByteArray file_identifier) {
-        GLib.info (lc_encrypt_folder_job ()) << "Unlocking on_success for" << file_identifier;
+    private void on_signal_unlock_folder_success (GLib.ByteArray file_identifier) {
+        GLib.info ()) + "Unlocking on_signal_success for" + file_identifier;
         /* emit */ finished (Success);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_unlock_folder_error (GLib.ByteArray file_identifier, int http_error_code) {
-        GLib.info (lc_encrypt_folder_job ()) << "Unlocking error for" << file_identifier << "HTTP code:" << http_error_code;
+    private void on_signal_unlock_folder_error (GLib.ByteArray file_identifier, int http_error_code) {
+        GLib.info ()) + "Unlocking error for" + file_identifier + "HTTP code:" + http_error_code;
         /* emit */ finished (Error);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_upload_metadata_success (GLib.ByteArray folder_identifier) {
+    private void on_signal_upload_metadata_success (GLib.ByteArray folder_identifier) {
         var unlock_job = new UnlockEncryptFolderApiJob (this.account, folder_identifier, this.folder_token, this);
-        connect (unlock_job, &UnlockEncryptFolderApiJob.on_success,
-                        this, &EncryptFolderJob.on_unlock_folder_success);
+        connect (unlock_job, &UnlockEncryptFolderApiJob.on_signal_success,
+                        this, &EncryptFolderJob.on_signal_unlock_folder_success);
         connect (unlock_job, &UnlockEncryptFolderApiJob.error,
-                        this, &EncryptFolderJob.on_unlock_folder_error);
-        unlock_job.on_start ();
+                        this, &EncryptFolderJob.on_signal_unlock_folder_error);
+        unlock_job.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_update_metadata_error (GLib.ByteArray folder_identifier, int http_return_code) {
+    private void on_signal_update_metadata_error (GLib.ByteArray folder_identifier, int http_return_code) {
         //  Q_UNUSED (http_return_code);
 
         var unlock_job = new UnlockEncryptFolderApiJob (this.account, folder_identifier, this.folder_token, this);
-        connect (unlock_job, &UnlockEncryptFolderApiJob.on_success,
-                        this, &EncryptFolderJob.on_unlock_folder_success);
+        connect (unlock_job, &UnlockEncryptFolderApiJob.on_signal_success,
+                        this, &EncryptFolderJob.on_signal_unlock_folder_success);
         connect (unlock_job, &UnlockEncryptFolderApiJob.error,
-                        this, &EncryptFolderJob.on_unlock_folder_error);
-        unlock_job.on_start ();
+                        this, &EncryptFolderJob.on_signal_unlock_folder_error);
+        unlock_job.on_signal_start ();
     }
 
 } // class EncryptFolderJob

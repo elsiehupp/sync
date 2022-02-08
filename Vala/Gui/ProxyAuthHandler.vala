@@ -36,13 +36,13 @@ class ProxyAuthHandler : GLib.Object {
     ~ProxyAuthHandler () override;
 
     /// Intended for QNetworkAccessManager.proxy_authentication_required ()
-    public void on_handle_proxy_authentication_required (QNetworkProxy proxy,
+    public void on_signal_handle_proxy_authentication_required (QNetworkProxy proxy,
         QAuthenticator authenticator);
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_sender_destroyed (GLib.Object *);
+    private void on_signal_sender_destroyed (GLib.Object *);
 
     /***********************************************************
     ***********************************************************/
@@ -84,7 +84,7 @@ class ProxyAuthHandler : GLib.Object {
     /// true and we won't bother him again.
     private bool this.blocked = false;
 
-    /// In several instances on_handle_proxy_authentication_required () can be called
+    /// In several instances on_signal_handle_proxy_authentication_required () can be called
     /// while it is still running. These counters detect what we're currently
     /// waiting for.
     private int this.waiting_for_dialog = 0;
@@ -125,8 +125,8 @@ ProxyAuthHandler *ProxyAuthHandler.instance () {
 ProxyAuthHandler.ProxyAuthHandler () {
     this.dialog = new Proxy_auth_dialog ();
 
-    this.config_file.on_reset (new ConfigFile);
-    this.settings.on_reset (new QSettings (this.config_file.config_file (), QSettings.IniFormat));
+    this.config_file.on_signal_reset (new ConfigFile);
+    this.settings.on_signal_reset (new QSettings (this.config_file.config_file (), QSettings.IniFormat));
     this.settings.begin_group (QLatin1String ("Proxy"));
     this.settings.begin_group (QLatin1String ("Credentials"));
 }
@@ -135,7 +135,7 @@ ProxyAuthHandler.~ProxyAuthHandler () {
     delete this.dialog;
 }
 
-void ProxyAuthHandler.on_handle_proxy_authentication_required (
+void ProxyAuthHandler.on_signal_handle_proxy_authentication_required (
     const QNetworkProxy proxy,
     QAuthenticator authenticator) {
     if (!this.dialog) {
@@ -173,10 +173,10 @@ void ProxyAuthHandler.on_handle_proxy_authentication_required (
         sending_qnam = account.shared_network_access_manager ().data ();
     }
     if (!sending_qnam) {
-        GLib.warn (lc_proxy) << "Could not get the sending QNAM for" << sender ();
+        GLib.warn ("Could not get the sending QNAM for" + sender ();
     }
 
-    GLib.info (lc_proxy) << "Proxy auth required for" << key << proxy.type ();
+    GLib.info ("Proxy auth required for" + key + proxy.type ();
 
     // If we already had a username but auth still failed,
     // invalidate the old credentials! Unfortunately, authenticator.user ()
@@ -185,7 +185,7 @@ void ProxyAuthHandler.on_handle_proxy_authentication_required (
     bool invalidated = false;
     if (!this.waiting_for_dialog && !this.waiting_for_keychain && (!authenticator.user ().is_empty ()
                                                           || (sending_qnam && this.gave_credentials_to.contains (sending_qnam)))) {
-        GLib.info (lc_proxy) << "invalidating old creds" << key;
+        GLib.info ("invalidating old creds" + key;
         this.username.clear ();
         this.password.clear ();
         invalidated = true;
@@ -204,24 +204,24 @@ void ProxyAuthHandler.on_handle_proxy_authentication_required (
         }
     }
 
-    GLib.info (lc_proxy) << "got creds for" << this.proxy;
+    GLib.info ("got creds for" + this.proxy;
     authenticator.user (this.username);
     authenticator.password (this.password);
     if (sending_qnam) {
         this.gave_credentials_to.insert (sending_qnam);
         connect (sending_qnam, &GLib.Object.destroyed,
-            this, &ProxyAuthHandler.on_sender_destroyed);
+            this, &ProxyAuthHandler.on_signal_sender_destroyed);
     }
 }
 
-void ProxyAuthHandler.on_sender_destroyed (GLib.Object obj) {
+void ProxyAuthHandler.on_signal_sender_destroyed (GLib.Object obj) {
     this.gave_credentials_to.remove (obj);
 }
 
 bool ProxyAuthHandler.get_creds_from_dialog () {
     // Open the credentials dialog
     if (!this.waiting_for_dialog) {
-        this.dialog.on_reset ();
+        this.dialog.on_signal_reset ();
         this.dialog.proxy_address (this.proxy);
         this.dialog.open ();
     }
@@ -231,13 +231,13 @@ bool ProxyAuthHandler.get_creds_from_dialog () {
     // it's done.
     if (this.dialog) {
         exec_await (this.dialog.data (),
-                  &Gtk.Dialog.on_finished,
+                  &Gtk.Dialog.on_signal_finished,
                   this.waiting_for_dialog,
                   QEventLoop.Exclude_socket_notifiers);
     }
 
     if (this.dialog && this.dialog.result () == Gtk.Dialog.Accepted) {
-        GLib.info (lc_proxy) << "got creds for" << this.proxy << "from dialog";
+        GLib.info ("got creds for" + this.proxy + "from dialog";
         this.username = this.dialog.username ();
         this.password = this.dialog.password ();
         return true;
@@ -267,7 +267,7 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
         return false;
     }
 
-    GLib.debug (lc_proxy) << "trying to load" << this.proxy;
+    GLib.debug ("trying to load" + this.proxy;
 
     if (!this.waiting_for_keychain) {
         this.username = this.settings.value (keychain_username_key ()).to_string ();
@@ -275,31 +275,31 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
             return false;
         }
 
-        this.read_password_job.on_reset (new ReadPasswordJob (Theme.instance ().app_name ()));
+        this.read_password_job.on_signal_reset (new ReadPasswordJob (Theme.instance ().app_name ()));
         this.read_password_job.settings (this.settings.data ());
         this.read_password_job.insecure_fallback (false);
         this.read_password_job.key (keychain_password_key ());
         this.read_password_job.auto_delete (false);
-        this.read_password_job.on_start ();
+        this.read_password_job.on_signal_start ();
     }
 
     // While we wait for the password job to be done, this code may be reentered.
     // This really needs the counter and the flag here, because otherwise we get
     // bad behavior when we reenter this code after the flag has been switched
-    // but before the while loop has on_finished.
+    // but before the while loop has on_signal_finished.
     exec_await (this.read_password_job.data (),
-              &QKeychain.Job.on_finished,
+              &QKeychain.Job.on_signal_finished,
               this.waiting_for_keychain);
 
     if (this.read_password_job.error () == NoError) {
-        GLib.info (lc_proxy) << "got creds for" << this.proxy << "from keychain";
+        GLib.info ("got creds for" + this.proxy + "from keychain";
         this.password = this.read_password_job.text_data ();
         return true;
     }
 
     this.username.clear ();
     if (this.read_password_job.error () != EntryNotFound) {
-        GLib.warn (lc_proxy) << "ReadPasswordJob failed with" << this.read_password_job.error_string ();
+        GLib.warn ("ReadPasswordJob failed with" + this.read_password_job.error_string ();
     }
     return false;
 }
@@ -309,7 +309,7 @@ void ProxyAuthHandler.store_creds_in_keychain () {
         return;
     }
 
-    GLib.info (lc_proxy) << "storing" << this.proxy;
+    GLib.info ("storing" + this.proxy;
 
     this.settings.value (keychain_username_key (), this.username);
 
@@ -319,15 +319,15 @@ void ProxyAuthHandler.store_creds_in_keychain () {
     job.key (keychain_password_key ());
     job.text_data (this.password);
     job.auto_delete (false);
-    job.on_start ();
+    job.on_signal_start ();
 
     exec_await (job,
-              &QKeychain.Job.on_finished,
+              &QKeychain.Job.on_signal_finished,
               this.waiting_for_keychain);
 
     job.delete_later ();
     if (job.error () != NoError) {
-        GLib.warn (lc_proxy) << "WritePasswordJob failed with" << job.error_string ();
+        GLib.warn ("WritePasswordJob failed with" + job.error_string ();
     }
 }
 

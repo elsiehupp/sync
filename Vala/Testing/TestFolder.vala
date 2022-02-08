@@ -27,13 +27,13 @@ class TestFolder : public GLib.Object {
         QTest.addColumn<string> ("folder");
         QTest.addColumn<string> ("expectedFolder");
 
-        QTest.newRow ("unixcase") << "/foo/bar" << "/foo/bar";
-        QTest.newRow ("doubleslash") << "/foo//bar" << "/foo/bar";
-        QTest.newRow ("tripleslash") << "/foo///bar" << "/foo/bar";
-        QTest.newRow ("mixedslash") << "/foo/\\bar" << "/foo/bar";
-        QTest.newRow ("windowsfwslash") << "C:/foo/bar" << "C:/foo/bar";
-        QTest.newRow ("windowsbwslash") << "C:\\foo" << "C:/foo";
-        QTest.newRow ("windowsbwslash2") << "C:\\foo\\bar" << "C:/foo/bar";
+        QTest.newRow ("unixcase") + "/foo/bar" + "/foo/bar";
+        QTest.newRow ("doubleslash") + "/foo//bar" + "/foo/bar";
+        QTest.newRow ("tripleslash") + "/foo///bar" + "/foo/bar";
+        QTest.newRow ("mixedslash") + "/foo/\\bar" + "/foo/bar";
+        QTest.newRow ("windowsfwslash") + "C:/foo/bar" + "C:/foo/bar";
+        QTest.newRow ("windowsbwslash") + "C:\\foo" + "C:/foo";
+        QTest.newRow ("windowsbwslash2") + "C:\\foo\\bar" + "C:/foo/bar";
     }
 
 }

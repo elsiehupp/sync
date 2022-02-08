@@ -24,7 +24,7 @@ class CloudProviderManager : GLib.Object {
     ***********************************************************/
     public 
 
-    public void on_folder_list_changed (Folder.Map folder_map);
+    public void on_signal_folder_list_changed (Folder.Map folder_map);
 
 
     /***********************************************************
@@ -41,7 +41,7 @@ class CloudProviderManager : GLib.Object {
 
 
 
-void on_name_acquired (GDBusConnection connection, gchar name, gpointer user_data) {
+void on_signal_name_acquired (GDBusConnection connection, gchar name, gpointer user_data) {
     //  Q_UNUSED (name);
     CloudProviderManager self;
     self = static_cast<CloudProviderManager> (user_data);
@@ -50,7 +50,7 @@ void on_name_acquired (GDBusConnection connection, gchar name, gpointer user_dat
     self.register_signals ();
 }
 
-void on_name_lost (GDBusConnection connection, gchar name, gpointer user_data) {
+void on_signal_name_lost (GDBusConnection connection, gchar name, gpointer user_data) {
     //  Q_UNUSED (connection);
     //  Q_UNUSED (name);
     //  Q_UNUSED (user_data);
@@ -59,16 +59,16 @@ void on_name_lost (GDBusConnection connection, gchar name, gpointer user_data) {
 
 void CloudProviderManager.register_signals () {
     Occ.FolderMan folder_manager = Occ.FolderMan.instance ();
-    connect (folder_manager, SIGNAL (folder_list_changed (Folder.Map &)), SLOT (on_folder_list_changed (Folder.Map &)));
-    on_folder_list_changed (folder_manager.map ());
+    connect (folder_manager, SIGNAL (folder_list_changed (Folder.Map &)), SLOT (on_signal_folder_list_changed (Folder.Map &)));
+    on_signal_folder_list_changed (folder_manager.map ());
 }
 
 CloudProviderManager.CloudProviderManager (GLib.Object parent) : GLib.Object (parent) {
     this.folder_index = 0;
-    g_bus_own_name (G_BUS_TYPE_SESSION, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, G_BUS_NAME_OWNER_FLAGS_NONE, null, on_name_acquired, null, this, null);
+    g_bus_own_name (G_BUS_TYPE_SESSION, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, G_BUS_NAME_OWNER_FLAGS_NONE, null, on_signal_name_acquired, null, this, null);
 }
 
-void CloudProviderManager.on_folder_list_changed (Folder.Map folder_map) {
+void CloudProviderManager.on_signal_folder_list_changed (Folder.Map folder_map) {
     QMapIterator<string, CloudProviderWrapper> i (this.map);
     while (i.has_next ()) {
         i.next ();

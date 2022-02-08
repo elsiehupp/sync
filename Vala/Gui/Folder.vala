@@ -170,7 +170,7 @@ class Folder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_associated_account_removed ();
+    public void on_signal_associated_account_removed ();
 
     /***********************************************************
     ***********************************************************/
@@ -321,15 +321,15 @@ class Folder : GLib.Object {
     /***********************************************************
     Whether user desires a switch that couldn't be executed yet, see member
     ***********************************************************/
-    public bool is_vfs_on_off_switch_pending () {
-        return this.vfs_on_off_pending;
+    public bool is_vfs_on_signal_off_switch_pending () {
+        return this.vfs_on_signal_off_pending;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void vfs_on_off_switch_pending (bool pending) {
-        this.vfs_on_off_pending = pending;
+    public void vfs_on_signal_off_switch_pending (bool pending) {
+        this.vfs_on_signal_off_pending = pending;
     }
 
 
@@ -371,10 +371,10 @@ signals:
     /***********************************************************
     terminate the current sync run
     ***********************************************************/
-    public void on_terminate_sync ();
+    public void on_signal_terminate_sync ();
 
     // connected to the corresponding signals in the SyncEngine
-    public void on_about_to_remove_all_files (SyncFileItem.Direction, std.function<void (bool)> callback);
+    public void on_signal_about_to_remove_all_files (SyncFileItem.Direction, std.function<void (bool)> callback);
 
 
     /***********************************************************
@@ -382,15 +382,11 @@ signals:
 
     If the list of changed files is known, it is passed.
     ***********************************************************/
-    public void on_start_sync (string[] path_list = string[] ());
+    public void on_signal_start_sync (string[] path_list = string[] ());
 
     /***********************************************************
     ***********************************************************/
-    public int on_discard_download_progress ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
+    public int on_signal_discard_download_progress ();
 
     /***********************************************************
     ***********************************************************/
@@ -398,10 +394,14 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public int on_wipe_error_blocklist ();
+    public 
+
+    /***********************************************************
+    ***********************************************************/
+    public int on_signal_wipe_error_blocklist ();
 
 
-    public int on_error_block_list_entry_count ();
+    public int on_signal_error_block_list_entry_count ();
 
 
     /***********************************************************
@@ -409,11 +409,11 @@ signals:
     changes. Needs to check whether this change should trigger a new
     sync run to be scheduled.
     ***********************************************************/
-    public void on_watched_path_changed (string path, ChangeReason reason);
+    public void on_signal_watched_path_changed (string path, ChangeReason reason);
 
 
     /***********************************************************
-    Mark a virtual file as being requested for download, and on_start a sync.
+    Mark a virtual file as being requested for download, and on_signal_start a sync.
 
     "implicit" here means that this download request comes from the user wan
     to access the file's data. The user did not change the file's pin state.
@@ -427,69 +427,69 @@ signals:
 
     Note, passing directories is not supported. Files only.
     ***********************************************************/
-    public void on_implicitly_hydrate_file (string relativepath);
+    public void on_signal_implicitly_hydrate_file (string relativepath);
 
 
     /***********************************************************
     Adds the path to the local discovery list
 
-    A weaker version of on_next_sync_full_local_discovery () that just
+    A weaker version of on_signal_next_sync_full_local_discovery () that just
     schedules all parent and child items of the path for local
     discovery.
     ***********************************************************/
-    public void on_schedule_path_for_local_discovery (string relative_path);
+    public void on_signal_schedule_path_for_local_discovery (string relative_path);
 
 
     /***********************************************************
     Ensures that the next sync performs a full local discovery.
     ***********************************************************/
-    public void on_next_sync_full_local_discovery ();
+    public void on_signal_next_sync_full_local_discovery ();
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_sync_started ();
-    private void on_sync_finished (bool);
+    private void on_signal_sync_started ();
+    private void on_signal_sync_finished (bool);
 
 
     /***********************************************************
     Adds a error message that's not tied to a specific item.
     ***********************************************************/
-    private void on_sync_error (string message, ErrorCategory category = ErrorCategory.NORMAL);
+    private void on_signal_sync_error (string message, ErrorCategory category = ErrorCategory.NORMAL);
 
     /***********************************************************
     ***********************************************************/
-    private void on_add_error_to_gui (SyncFileItem.Status status, string error_message, string subject = {});
+    private void on_signal_add_error_to_gui (SyncFileItem.Status status, string error_message, string subject = {});
 
     /***********************************************************
     ***********************************************************/
-    private void on_transmission_progress (ProgressInfo pi);
+    private void on_signal_transmission_progress (ProgressInfo pi);
 
     /***********************************************************
     ***********************************************************/
     private 
-    private void on_run_etag_job ();
-    private void on_etag_retrieved (GLib.ByteArray , GLib.DateTime tp);
-    private void on_etag_retrieved_from_sync_engine (GLib.ByteArray , GLib.DateTime time);
+    private void on_signal_run_etag_job ();
+    private void on_signal_etag_retrieved (GLib.ByteArray , GLib.DateTime tp);
+    private void on_signal_etag_retrieved_from_sync_engine (GLib.ByteArray , GLib.DateTime time);
 
     /***********************************************************
     ***********************************************************/
-    private void on_emit_finished_delayed ();
+    private void on_signal_emit_finished_delayed ();
 
     /***********************************************************
     ***********************************************************/
-    private void on_new_big_folder_discovered (string , bool is_external);
+    private void on_signal_new_big_folder_discovered (string , bool is_external);
 
     /***********************************************************
     ***********************************************************/
-    private void on_log_propagation_start ();
+    private void on_signal_log_propagation_start ();
 
 
     /***********************************************************
     Adds this folder to the list of scheduled folders in the
     FolderMan.
     ***********************************************************/
-    private void on_schedule_this_folder ();
+    private void on_signal_schedule_this_folder ();
 
 
     /***********************************************************
@@ -498,34 +498,34 @@ signals:
     This is pretty awkward, but IssuesWidget just keeps better track
     of conflicts across partial local discovery.
     ***********************************************************/
-    private void on_folder_conflicts (string folder, string[] conflict_paths);
+    private void on_signal_folder_conflicts (string folder, string[] conflict_paths);
 
 
     /***********************************************************
     Warn users if they create a file or folder that is selective-sync excluded
     ***********************************************************/
-    private void on_warn_on_new_excluded_item (SyncJournalFileRecord record, QStringRef path);
+    private void on_signal_warn_on_signal_new_excluded_item (SyncJournalFileRecord record, QStringRef path);
 
 
     /***********************************************************
     Warn users about an unreliable folder watcher
     ***********************************************************/
-    private void on_watcher_unreliable (string message);
+    private void on_signal_watcher_unreliable (string message);
 
 
     /***********************************************************
-    Aborts any running sync and blocks it until hydration is on_finished.
+    Aborts any running sync and blocks it until hydration is on_signal_finished.
 
     Hydration circumvents the regular SyncEngine and both mustn't be running
     at the same time.
     ***********************************************************/
-    private void on_hydration_starts ();
+    private void on_signal_hydration_starts ();
 
 
     /***********************************************************
     Unblocks normal sync operation
     ***********************************************************/
-    private void on_hydration_done ();
+    private void on_signal_hydration_done ();
 
 
     /***********************************************************
@@ -641,7 +641,7 @@ signals:
     executed yet (syncs are still running), some options should be hidden,
     disabled or different.
     ***********************************************************/
-    private bool this.vfs_on_off_pending = false;
+    private bool this.vfs_on_signal_off_pending = false;
 
 
     /***********************************************************
@@ -653,7 +653,7 @@ signals:
     /***********************************************************
     Watches this folder's local directory for changes.
 
-    Created by register_folder_watcher (), triggers on_watched_path_changed ()
+    Created by register_folder_watcher (), triggers on_signal_watched_path_changed ()
     ***********************************************************/
     private QScopedPointer<Folder_watcher> this.folder_watcher;
 
@@ -682,8 +682,8 @@ Folder.Folder (FolderDefinition definition,
     this.journal (this.definition.absolute_journal_path ())
     this.file_log (new SyncRunFileLog)
     this.vfs (vfs.release ()) {
-    this.time_since_last_sync_start.on_start ();
-    this.time_since_last_sync_done.on_start ();
+    this.time_since_last_sync_start.on_signal_start ();
+    this.time_since_last_sync_done.on_signal_start ();
 
     SyncResult.Status status = SyncResult.Status.NOT_YET_STARTED;
     if (definition.paused) {
@@ -696,47 +696,47 @@ Folder.Folder (FolderDefinition definition,
 
     this.sync_result.folder (this.definition.alias);
 
-    this.engine.on_reset (new SyncEngine (this.account_state.account (), path (), remote_path (), this.journal));
+    this.engine.on_signal_reset (new SyncEngine (this.account_state.account (), path (), remote_path (), this.journal));
     // pass the setting if hidden files are to be ignored, will be read in csync_update
     this.engine.ignore_hidden_files (this.definition.ignore_hidden_files);
 
     ConfigFile.setup_default_exclude_file_paths (this.engine.excluded_files ());
     if (!reload_excludes ())
-        GLib.warn (lc_folder, "Could not read system exclude file");
+        GLib.warn ();
 
     connect (this.account_state.data (), &AccountState.is_connected_changed, this, &Folder.can_sync_changed);
-    connect (this.engine.data (), &SyncEngine.root_etag, this, &Folder.on_etag_retrieved_from_sync_engine);
+    connect (this.engine.data (), &SyncEngine.root_etag, this, &Folder.on_signal_etag_retrieved_from_sync_engine);
 
-    connect (this.engine.data (), &SyncEngine.started, this, &Folder.on_sync_started, Qt.QueuedConnection);
-    connect (this.engine.data (), &SyncEngine.on_finished, this, &Folder.on_sync_finished, Qt.QueuedConnection);
+    connect (this.engine.data (), &SyncEngine.started, this, &Folder.on_signal_sync_started, Qt.QueuedConnection);
+    connect (this.engine.data (), &SyncEngine.on_signal_finished, this, &Folder.on_signal_sync_finished, Qt.QueuedConnection);
 
     connect (this.engine.data (), &SyncEngine.about_to_remove_all_files,
-        this, &Folder.on_about_to_remove_all_files);
-    connect (this.engine.data (), &SyncEngine.transmission_progress, this, &Folder.on_transmission_progress);
+        this, &Folder.on_signal_about_to_remove_all_files);
+    connect (this.engine.data (), &SyncEngine.transmission_progress, this, &Folder.on_signal_transmission_progress);
     connect (this.engine.data (), &SyncEngine.item_completed,
-        this, &Folder.on_item_completed);
+        this, &Folder.on_signal_item_completed);
     connect (this.engine.data (), &SyncEngine.new_big_folder,
-        this, &Folder.on_new_big_folder_discovered);
-    connect (this.engine.data (), &SyncEngine.seen_locked_file, FolderMan.instance (), &FolderMan.on_sync_once_file_unlocks);
+        this, &Folder.on_signal_new_big_folder_discovered);
+    connect (this.engine.data (), &SyncEngine.seen_locked_file, FolderMan.instance (), &FolderMan.on_signal_sync_once_file_unlocks);
     connect (this.engine.data (), &SyncEngine.about_to_propagate,
-        this, &Folder.on_log_propagation_start);
-    connect (this.engine.data (), &SyncEngine.sync_error, this, &Folder.on_sync_error);
+        this, &Folder.on_signal_log_propagation_start);
+    connect (this.engine.data (), &SyncEngine.sync_error, this, &Folder.on_signal_sync_error);
 
-    connect (this.engine.data (), &SyncEngine.add_error_to_gui, this, &Folder.on_add_error_to_gui);
+    connect (this.engine.data (), &SyncEngine.add_error_to_gui, this, &Folder.on_signal_add_error_to_gui);
 
     this.schedule_self_timer.single_shot (true);
     this.schedule_self_timer.interval (SyncEngine.minimum_file_age_for_upload);
     connect (&this.schedule_self_timer, &QTimer.timeout,
-        this, &Folder.on_schedule_this_folder);
+        this, &Folder.on_signal_schedule_this_folder);
 
     connect (ProgressDispatcher.instance (), &ProgressDispatcher.folder_conflicts,
-        this, &Folder.on_folder_conflicts);
+        this, &Folder.on_signal_folder_conflicts);
 
-    this.local_discovery_tracker.on_reset (new LocalDiscoveryTracker);
-    connect (this.engine.data (), &SyncEngine.on_finished,
-        this.local_discovery_tracker.data (), &LocalDiscoveryTracker.on_sync_finished);
+    this.local_discovery_tracker.on_signal_reset (new LocalDiscoveryTracker);
+    connect (this.engine.data (), &SyncEngine.on_signal_finished,
+        this.local_discovery_tracker.data (), &LocalDiscoveryTracker.on_signal_sync_finished);
     connect (this.engine.data (), &SyncEngine.item_completed,
-        this.local_discovery_tracker.data (), &LocalDiscoveryTracker.on_item_completed);
+        this.local_discovery_tracker.data (), &LocalDiscoveryTracker.on_signal_item_completed);
 
     // Potentially upgrade suffix vfs to windows vfs
     ENFORCE (this.vfs);
@@ -748,7 +748,7 @@ Folder.Folder (FolderDefinition definition,
                 SyncEngine.wipe_virtual_files (path (), this.journal, this.vfs);
 
                 // Then switch to winvfs mode
-                this.vfs.on_reset (winvfs.release ());
+                this.vfs.on_signal_reset (winvfs.release ());
                 this.definition.virtual_files_mode = Vfs.WindowsCfApi;
             }
         }
@@ -764,22 +764,22 @@ Folder.~Folder () {
     if (this.vfs)
         this.vfs.stop ();
 
-    // Reset then engine first as it will on_abort and try to access members of the Folder
-    this.engine.on_reset ();
+    // Reset then engine first as it will on_signal_abort and try to access members of the Folder
+    this.engine.on_signal_reset ();
 }
 
 void Folder.check_local_path () {
     const QFileInfo fi (this.definition.local_path);
     this.canonical_local_path = fi.canonical_file_path ();
     if (this.canonical_local_path.is_empty ()) {
-        GLib.warn (lc_folder) << "Broken symlink:" << this.definition.local_path;
+        GLib.warn ("Broken symlink:" + this.definition.local_path;
         this.canonical_local_path = this.definition.local_path;
     } else if (!this.canonical_local_path.ends_with ('/')) {
         this.canonical_local_path.append ('/');
     }
 
     if (fi.is_dir () && fi.is_readable ()) {
-        GLib.debug (lc_folder) << "Checked local path ok";
+        GLib.debug ("Checked local path ok";
     } else {
         // Check directory again
         if (!FileSystem.file_exists (this.definition.local_path, fi)) {
@@ -897,7 +897,7 @@ void Folder.sync_paused (bool paused) {
     /* emit */ can_sync_changed ();
 }
 
-void Folder.on_associated_account_removed () {
+void Folder.on_signal_associated_account_removed () {
     if (this.vfs) {
         this.vfs.stop ();
         this.vfs.unregister_folder ();
@@ -913,22 +913,22 @@ SyncResult Folder.sync_result () {
 }
 
 void Folder.prepare_to_sync () {
-    this.sync_result.on_reset ();
+    this.sync_result.on_signal_reset ();
     this.sync_result.status (SyncResult.Status.NOT_YET_STARTED);
 }
 
-void Folder.on_run_etag_job () {
-    GLib.info (lc_folder) << "Trying to check" << remote_url ().to_string () << "for changes via ETag check. (time since last sync:" << (this.time_since_last_sync_done.elapsed () / 1000) << "s)";
+void Folder.on_signal_run_etag_job () {
+    GLib.info ("Trying to check" + remote_url ().to_string ("for changes via ETag check. (time since last sync:" + (this.time_since_last_sync_done.elapsed () / 1000) + "s)";
 
     AccountPointer account = this.account_state.account ();
 
     if (this.request_etag_job) {
-        GLib.info (lc_folder) << remote_url ().to_string () << "has ETag job queued, not trying to sync";
+        GLib.info () + remote_url ().to_string ("has ETag job queued, not trying to sync";
         return;
     }
 
     if (!can_sync ()) {
-        GLib.info (lc_folder) << "Not syncing.  :" << remote_url ().to_string () << this.definition.paused << AccountState.state_string (this.account_state.state ());
+        GLib.info ("Not syncing.  :" + remote_url ().to_string () + this.definition.paused + AccountState.state_string (this.account_state.state ());
         return;
     }
 
@@ -936,28 +936,28 @@ void Folder.on_run_etag_job () {
     // sync if it's different.
 
     this.request_etag_job = new RequestEtagJob (account, remote_path (), this);
-    this.request_etag_job.on_timeout (60 * 1000);
+    this.request_etag_job.on_signal_timeout (60 * 1000);
     // check if the etag is different when retrieved
-    GLib.Object.connect (this.request_etag_job.data (), &RequestEtagJob.on_etag_retrieved, this, &Folder.on_etag_retrieved);
-    FolderMan.instance ().on_schedule_e_tag_job (alias (), this.request_etag_job);
+    GLib.Object.connect (this.request_etag_job.data (), &RequestEtagJob.on_signal_etag_retrieved, this, &Folder.on_signal_etag_retrieved);
+    FolderMan.instance ().on_signal_schedule_e_tag_job (alias (), this.request_etag_job);
     // The this.request_etag_job is var deleting itself on finish. Our guard pointer this.request_etag_job will then be null.
 }
 
-void Folder.on_etag_retrieved (GLib.ByteArray etag, GLib.DateTime tp) {
+void Folder.on_signal_etag_retrieved (GLib.ByteArray etag, GLib.DateTime tp) {
     // re-enable sync if it was disabled because network was down
     FolderMan.instance ().sync_enabled (true);
 
     if (this.last_etag != etag) {
-        GLib.info (lc_folder) << "Compare etag with previous etag : last:" << this.last_etag << ", received:" << etag << ". CHANGED";
+        GLib.info ("Compare etag with previous etag : last:" + this.last_etag + ", received:" + etag + ". CHANGED";
         this.last_etag = etag;
-        on_schedule_this_folder ();
+        on_signal_schedule_this_folder ();
     }
 
     this.account_state.tag_last_successful_etag_request (tp);
 }
 
-void Folder.on_etag_retrieved_from_sync_engine (GLib.ByteArray etag, GLib.DateTime time) {
-    GLib.info (lc_folder) << "Root etag from during sync:" << etag;
+void Folder.on_signal_etag_retrieved_from_sync_engine (GLib.ByteArray etag, GLib.DateTime time) {
+    GLib.info ("Root etag from during sync:" + etag;
     account_state ().tag_last_successful_etag_request (time);
     this.last_etag = etag;
 }
@@ -996,7 +996,7 @@ void Folder.show_sync_result_popup () {
         create_gui_log (this.sync_result.first_item_locked ().file, Log_status_file_locked, locked_count);
     }
 
-    GLib.info (lc_folder) << "Folder" << this.sync_result.folder () << "sync result : " << this.sync_result.status ();
+    GLib.info ("Folder" + this.sync_result.folder ("sync result : " + this.sync_result.status ();
 }
 
 void Folder.create_gui_log (string filename, LogStatus status, int count,
@@ -1089,23 +1089,23 @@ void Folder.start_vfs () {
     vfs_params.provider_version = Theme.instance ().version ();
     vfs_params.multiple_accounts_registered = AccountManager.instance ().accounts ().size () > 1;
 
-    connect (this.vfs.data (), &Vfs.begin_hydrating, this, &Folder.on_hydration_starts);
-    connect (this.vfs.data (), &Vfs.done_hydrating, this, &Folder.on_hydration_done);
+    connect (this.vfs.data (), &Vfs.begin_hydrating, this, &Folder.on_signal_hydration_starts);
+    connect (this.vfs.data (), &Vfs.done_hydrating, this, &Folder.on_signal_hydration_done);
 
     connect (&this.engine.sync_file_status_tracker (), &SyncFileStatusTracker.file_status_changed,
-            this.vfs.data (), &Vfs.on_file_status_changed);
+            this.vfs.data (), &Vfs.on_signal_file_status_changed);
 
-    this.vfs.on_start (vfs_params);
+    this.vfs.on_signal_start (vfs_params);
 
     // Immediately mark the sqlite temporaries as excluded. They get recreated
     // on database-open and need to get marked again every time.
     string state_database_file = this.journal.database_file_path ();
     this.journal.open ();
-    this.vfs.on_file_status_changed (state_database_file + "-wal", SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED);
-    this.vfs.on_file_status_changed (state_database_file + "-shm", SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED);
+    this.vfs.on_signal_file_status_changed (state_database_file + "-wal", SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED);
+    this.vfs.on_signal_file_status_changed (state_database_file + "-shm", SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED);
 }
 
-int Folder.on_discard_download_progress () {
+int Folder.on_signal_discard_download_progress () {
     // Delete from journal and from filesystem.
     QDir folderpath (this.definition.local_path);
     GLib.Set<string> keep_nothing;
@@ -1113,27 +1113,27 @@ int Folder.on_discard_download_progress () {
         this.journal.get_and_delete_stale_download_infos (keep_nothing);
     for (var deleted_info : deleted_infos) {
         const string tmppath = folderpath.file_path (deleted_info.tmpfile);
-        GLib.info (lc_folder) << "Deleting temporary file : " << tmppath;
+        GLib.info ("Deleting temporary file : " + tmppath;
         FileSystem.remove (tmppath);
     }
     return deleted_infos.size ();
 }
 
-int Folder.on_download_info_count () {
-    return this.journal.on_download_info_count ();
+int Folder.on_signal_download_info_count () {
+    return this.journal.on_signal_download_info_count ();
 }
 
-int Folder.on_error_block_list_entry_count () {
-    return this.journal.on_error_block_list_entry_count ();
+int Folder.on_signal_error_block_list_entry_count () {
+    return this.journal.on_signal_error_block_list_entry_count ();
 }
 
-int Folder.on_wipe_error_blocklist () {
+int Folder.on_signal_wipe_error_blocklist () {
     return this.journal.wipe_error_blocklist ();
 }
 
-void Folder.on_watched_path_changed (string path, ChangeReason reason) {
+void Folder.on_signal_watched_path_changed (string path, ChangeReason reason) {
     if (!path.starts_with (this.path ())) {
-        GLib.debug (lc_folder) << "Changed path is not contained in folder, ignoring:" << path;
+        GLib.debug ("Changed path is not contained in folder, ignoring:" + path;
         return;
     }
 
@@ -1153,7 +1153,7 @@ void Folder.on_watched_path_changed (string path, ChangeReason reason) {
 
     // Use the path to figure out whether it was our own change
     if (this.engine.was_file_touched (path)) {
-        GLib.debug (lc_folder) << "Changed path was touched by SyncEngine, ignoring:" << path;
+        GLib.debug ("Changed path was touched by SyncEngine, ignoring:" + path;
         return;
     }
 
@@ -1176,11 +1176,11 @@ void Folder.on_watched_path_changed (string path, ChangeReason reason) {
             }
         }
         if (spurious) {
-            GLib.info (lc_folder) << "Ignoring spurious notification for file" << relative_path;
+            GLib.info ("Ignoring spurious notification for file" + relative_path;
             return; // probably a spurious notification
         }
     }
-    on_warn_on_new_excluded_item (record, relative_path);
+    on_signal_warn_on_signal_new_excluded_item (record, relative_path);
 
     /* emit */ watched_file_changed_externally (path);
 
@@ -1189,18 +1189,18 @@ void Folder.on_watched_path_changed (string path, ChangeReason reason) {
     schedule_this_folder_soon ();
 }
 
-void Folder.on_implicitly_hydrate_file (string relativepath) {
-    GLib.info (lc_folder) << "Implicitly hydrate virtual file:" << relativepath;
+void Folder.on_signal_implicitly_hydrate_file (string relativepath) {
+    GLib.info ("Implicitly hydrate virtual file:" + relativepath;
 
     // Set in the database that we should download the file
     SyncJournalFileRecord record;
     this.journal.get_file_record (relativepath.to_utf8 (), record);
     if (!record.is_valid ()) {
-        GLib.info (lc_folder) << "Did not find file in database";
+        GLib.info ("Did not find file in database";
         return;
     }
     if (!record.is_virtual_file ()) {
-        GLib.info (lc_folder) << "The file is not virtual";
+        GLib.info ("The file is not virtual";
         return;
     }
     record.type = ItemTypeVirtualFileDownload;
@@ -1211,13 +1211,13 @@ void Folder.on_implicitly_hydrate_file (string relativepath) {
     const var pin = this.vfs.pin_state (relativepath);
     if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
         if (!this.vfs.pin_state (relativepath, PinState.PinState.UNSPECIFIED)) {
-            GLib.warn (lc_folder) << "Could not set pin state of" << relativepath << "to unspecified";
+            GLib.warn ("Could not set pin state of" + relativepath + "to unspecified";
         }
     }
 
     // Add to local discovery
-    on_schedule_path_for_local_discovery (relativepath);
-    on_schedule_this_folder ();
+    on_signal_schedule_path_for_local_discovery (relativepath);
+    on_signal_schedule_this_folder ();
 }
 
 void Folder.virtual_files_enabled (bool enabled) {
@@ -1238,7 +1238,7 @@ void Folder.virtual_files_enabled (bool enabled) {
         disconnect (this.vfs.data (), null, this, null);
         disconnect (&this.engine.sync_file_status_tracker (), null, this.vfs.data (), null);
 
-        this.vfs.on_reset (create_vfs_from_plugin (new_mode).release ());
+        this.vfs.on_signal_reset (create_vfs_from_plugin (new_mode).release ());
 
         this.definition.virtual_files_mode = new_mode;
         start_vfs ();
@@ -1252,12 +1252,12 @@ void Folder.virtual_files_enabled (bool enabled) {
 
 void Folder.root_pin_state (PinState state) {
     if (!this.vfs.pin_state ("", state)) {
-        GLib.warn (lc_folder) << "Could not set root pin state of" << this.definition.alias;
+        GLib.warn ("Could not set root pin state of" + this.definition.alias;
     }
 
     // We don't actually need discovery, but it's important to recurse
     // into all folders, so the changes can be applied.
-    on_next_sync_full_local_discovery ();
+    on_signal_next_sync_full_local_discovery ();
 }
 
 void Folder.switch_to_virtual_files () {
@@ -1273,7 +1273,7 @@ void Folder.process_switched_to_virtual_files () {
 }
 
 bool Folder.supports_selective_sync () {
-    return !virtual_files_enabled () && !is_vfs_on_off_switch_pending ();
+    return !virtual_files_enabled () && !is_vfs_on_signal_off_switch_pending ();
 }
 
 void Folder.save_to_settings () {
@@ -1312,7 +1312,7 @@ void Folder.save_to_settings () {
     FolderDefinition.save (*settings, this.definition);
 
     settings.sync ();
-    GLib.info (lc_folder) << "Saved folder" << this.definition.alias << "to settings, status" << settings.status ();
+    GLib.info ("Saved folder" + this.definition.alias + "to settings, status" + settings.status ();
 }
 
 void Folder.remove_from_settings () {
@@ -1335,11 +1335,11 @@ bool Folder.is_file_excluded_relative (string relative_path) {
     return this.engine.excluded_files ().is_excluded (path () + relative_path, path (), this.definition.ignore_hidden_files);
 }
 
-void Folder.on_terminate_sync () {
-    GLib.info (lc_folder) << "folder " << alias () << " Terminating!";
+void Folder.on_signal_terminate_sync () {
+    GLib.info ("folder " + alias (" Terminating!";
 
     if (this.engine.is_sync_running ()) {
-        this.engine.on_abort ();
+        this.engine.on_signal_abort ();
 
         sync_state (SyncResult.Status.SYNC_ABORT_REQUESTED);
     }
@@ -1347,10 +1347,10 @@ void Folder.on_terminate_sync () {
 
 void Folder.wipe_for_removal () {
     // Delete files that have been partially downloaded.
-    on_discard_download_progress ();
+    on_signal_discard_download_progress ();
 
     // Unregister the socket API so it does not keep the .sync_journal file open
-    FolderMan.instance ().socket_api ().on_unregister_path (alias ());
+    FolderMan.instance ().socket_api ().on_signal_unregister_path (alias ());
     this.journal.close (); // close the sync journal
 
     // Remove database and temporaries
@@ -1359,12 +1359,12 @@ void Folder.wipe_for_removal () {
     GLib.File file = new GLib.File (state_database_file);
     if (file.exists ()) {
         if (!file.remove ()) {
-            GLib.warn (lc_folder) << "Failed to remove existing csync State_d_b " << state_database_file;
+            GLib.warn ("Failed to remove existing csync State_d_b " + state_database_file;
         } else {
-            GLib.info (lc_folder) << "wipe : Removed csync State_d_b " << state_database_file;
+            GLib.info ("wipe : Removed csync State_d_b " + state_database_file;
         }
     } else {
-        GLib.warn (lc_folder) << "statedatabase is empty, can not remove.";
+        GLib.warn ("statedatabase is empty, can not remove.";
     }
 
     // Also remove other database related files
@@ -1375,33 +1375,33 @@ void Folder.wipe_for_removal () {
 
     this.vfs.stop ();
     this.vfs.unregister_folder ();
-    this.vfs.on_reset (null); // warning : folder now in an invalid state
+    this.vfs.on_signal_reset (null); // warning : folder now in an invalid state
 }
 
 bool Folder.reload_excludes () {
-    return this.engine.excluded_files ().on_reload_exclude_files ();
+    return this.engine.excluded_files ().on_signal_reload_exclude_files ();
 }
 
-void Folder.on_start_sync (string[] path_list) {
+void Folder.on_signal_start_sync (string[] path_list) {
     //  Q_UNUSED (path_list)
 
     if (is_busy ()) {
-        q_c_critical (lc_folder) << "ERROR csync is still running and new sync requested.";
+        q_c_critical ("ERROR csync is still running and new sync requested.";
         return;
     }
 
-    this.time_since_last_sync_start.on_start ();
+    this.time_since_last_sync_start.on_signal_start ();
     this.sync_result.status (SyncResult.Status.SYNC_PREPARE);
     /* emit */ sync_state_change ();
 
-    GLib.info (lc_folder) << "*** Start syncing " << remote_url ().to_string () << " -" << APPLICATION_NAME << "client version"
-                     << q_printable (Theme.instance ().version ());
+    GLib.info ("*** Start syncing " + remote_url ().to_string (" -" + APPLICATION_NAME + "client version"
+                     + q_printable (Theme.instance ().version ());
 
-    this.file_log.on_start (path ());
+    this.file_log.on_signal_start (path ());
 
     if (!reload_excludes ()) {
-        on_sync_error (_("Could not read system exclude file"));
-        QMetaObject.invoke_method (this, "on_sync_finished", Qt.QueuedConnection, Q_ARG (bool, false));
+        on_signal_sync_error (_("Could not read system exclude file"));
+        QMetaObject.invoke_method (this, "on_signal_sync_finished", Qt.QueuedConnection, Q_ARG (bool, false));
         return;
     }
 
@@ -1425,13 +1425,13 @@ void Folder.on_start_sync (string[] path_list) {
     if (this.folder_watcher && this.folder_watcher.is_reliable ()
         && has_done_full_local_discovery
         && !periodic_full_local_discovery_now) {
-        GLib.info (lc_folder) << "Allowing local discovery to read from the database";
+        GLib.info ("Allowing local discovery to read from the database";
         this.engine.local_discovery_options (
             LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM,
             this.local_discovery_tracker.local_discovery_paths ());
         this.local_discovery_tracker.start_sync_partial_discovery ();
     } else {
-        GLib.info (lc_folder) << "Forbidding local discovery to read from the database";
+        GLib.info ("Forbidding local discovery to read from the database";
         this.engine.local_discovery_options (LocalDiscoveryStyle.FILESYSTEM_ONLY);
         this.local_discovery_tracker.start_sync_full_discovery ();
     }
@@ -1440,7 +1440,7 @@ void Folder.on_start_sync (string[] path_list) {
 
     correct_placeholder_files ();
 
-    QMetaObject.invoke_method (this.engine.data (), "on_start_sync", Qt.QueuedConnection);
+    QMetaObject.invoke_method (this.engine.data (), "on_signal_start_sync", Qt.QueuedConnection);
 
     /* emit */ sync_started ();
 }
@@ -1452,7 +1452,7 @@ void Folder.correct_placeholder_files () {
     const var placeholders_corrected_key = QStringLiteral ("placeholders_corrected");
     const var placeholders_corrected = this.journal.key_value_store_get_int (placeholders_corrected_key, 0);
     if (!placeholders_corrected) {
-        GLib.debug (lc_folder) << "Make sure all virtual files are placeholder files";
+        GLib.debug ("Make sure all virtual files are placeholder files";
         switch_to_virtual_files ();
         this.journal.key_value_store_set (placeholders_corrected_key, true);
     }
@@ -1501,32 +1501,32 @@ void Folder.dirty_network_limits () {
     this.engine.network_limits (upload_limit, download_limit);
 }
 
-void Folder.on_sync_error (string message, ErrorCategory category) {
+void Folder.on_signal_sync_error (string message, ErrorCategory category) {
     this.sync_result.append_error_string (message);
     /* emit */ ProgressDispatcher.instance ().sync_error (alias (), message, category);
 }
 
-void Folder.on_add_error_to_gui (SyncFileItem.Status status, string error_message, string subject) {
+void Folder.on_signal_add_error_to_gui (SyncFileItem.Status status, string error_message, string subject) {
     /* emit */ ProgressDispatcher.instance ().add_error_to_gui (alias (), status, error_message, subject);
 }
 
-void Folder.on_sync_started () {
-    GLib.info (lc_folder) << "#### Propagation on_start ####################################################";
+void Folder.on_signal_sync_started () {
+    GLib.info ("#### Propagation on_signal_start ####################################################";
     this.sync_result.status (SyncResult.Status.SYNC_RUNNING);
     /* emit */ sync_state_change ();
 }
 
-void Folder.on_sync_finished (bool on_success) {
-    GLib.info (lc_folder) << "Client version" << q_printable (Theme.instance ().version ())
-                     << " Qt" << q_version ()
-                     << " SSL " << QSslSocket.ssl_library_version_"".to_utf8 ().data ()
+void Folder.on_signal_sync_finished (bool on_signal_success) {
+    GLib.info ("Client version" + q_printable (Theme.instance ().version ())
+                     + " Qt" + q_version ()
+                     + " SSL " + QSslSocket.ssl_library_version_"".to_utf8 ().data ()
         ;
 
     bool sync_error = !this.sync_result.error_strings ().is_empty ();
     if (sync_error) {
-        GLib.warn (lc_folder) << "SyncEngine on_finished with ERROR";
+        GLib.warn ("SyncEngine on_signal_finished with ERROR";
     } else {
-        GLib.info (lc_folder) << "SyncEngine on_finished without problem.";
+        GLib.info ("SyncEngine on_signal_finished without problem.";
     }
     this.file_log.finish ();
     show_sync_result_popup ();
@@ -1550,19 +1550,19 @@ void Folder.on_sync_finished (bool on_success) {
         this.consecutive_failing_syncs = 0;
     } else {
         this.consecutive_failing_syncs++;
-        GLib.info (lc_folder) << "the last" << this.consecutive_failing_syncs << "syncs failed";
+        GLib.info ("the last" + this.consecutive_failing_syncs + "syncs failed";
     }
 
-    if (this.sync_result.status () == SyncResult.Status.SUCCESS && on_success) {
+    if (this.sync_result.status () == SyncResult.Status.SUCCESS && on_signal_success) {
         // Clear the allow list as all the folders that should be on that list are sync-ed
         journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, string[] ());
     }
 
     if ( (this.sync_result.status () == SyncResult.Status.SUCCESS
             || this.sync_result.status () == SyncResult.Status.PROBLEM)
-        && on_success) {
+        && on_signal_success) {
         if (this.engine.last_local_discovery_style () == LocalDiscoveryStyle.FILESYSTEM_ONLY) {
-            this.time_since_last_full_local_discovery.on_start ();
+            this.time_since_last_full_local_discovery.on_signal_start ();
         }
     }
 
@@ -1574,16 +1574,16 @@ void Folder.on_sync_finished (bool on_success) {
     // file system change notifications are ignored for that folder. And it takes
     // some time under certain conditions to make the file system notifications
     // all come in.
-    QTimer.single_shot (200, this, &Folder.on_emit_finished_delayed);
+    QTimer.single_shot (200, this, &Folder.on_signal_emit_finished_delayed);
 
     this.last_sync_duration = std.chrono.milliseconds (this.time_since_last_sync_start.elapsed ());
-    this.time_since_last_sync_done.on_start ();
+    this.time_since_last_sync_done.on_signal_start ();
 
     // Increment the follow-up sync counter if necessary.
     if (another_sync_needed == AnotherSyncNeeded.IMMEDIATE_FOLLOW_UP) {
         this.consecutive_follow_up_syncs++;
-        GLib.info (lc_folder) << "another sync was requested by the on_finished sync, this has"
-                         << "happened" << this.consecutive_follow_up_syncs << "times";
+        GLib.info ("another sync was requested by the on_signal_finished sync, this has"
+                         + "happened" + this.consecutive_follow_up_syncs + "times";
     } else {
         this.consecutive_follow_up_syncs = 0;
     }
@@ -1597,7 +1597,7 @@ void Folder.on_sync_finished (bool on_success) {
     }
 }
 
-void Folder.on_emit_finished_delayed () {
+void Folder.on_signal_emit_finished_delayed () {
     /* emit */ sync_finished (this.sync_result);
 
     // Immediately check the etag again if there was some sync activity.
@@ -1608,19 +1608,19 @@ void Folder.on_emit_finished_delayed () {
                || this.sync_result.first_item_renamed ()
                || this.sync_result.first_item_updated ()
                || this.sync_result.first_new_conflict_item ())) {
-        on_run_etag_job ();
+        on_signal_run_etag_job ();
     }
 }
 
 // the progress comes without a folder and the valid path set. Add that here
 // and hand the result over to the progress dispatcher.
-void Folder.on_transmission_progress (ProgressInfo pi) {
+void Folder.on_signal_transmission_progress (ProgressInfo pi) {
     /* emit */ progress_info (pi);
     ProgressDispatcher.instance ().progress_info (alias (), pi);
 }
 
 // a item is completed : count the errors and forward to the ProgressDispatcher
-void Folder.on_item_completed (SyncFileItemPtr item) {
+void Folder.on_signal_item_completed (SyncFileItemPtr item) {
     if (item.instruction == CSYNC_INSTRUCTION_NONE || item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA) {
         // We only care about the updates that deserve to be shown in the UI
         return;
@@ -1632,7 +1632,7 @@ void Folder.on_item_completed (SyncFileItemPtr item) {
     /* emit */ ProgressDispatcher.instance ().item_completed (alias (), item);
 }
 
-void Folder.on_new_big_folder_discovered (string new_f, bool is_external) {
+void Folder.on_signal_new_big_folder_discovered (string new_f, bool is_external) {
     var new_folder = new_f;
     if (!new_folder.ends_with ('/')) {
         new_folder += '/';
@@ -1668,23 +1668,23 @@ void Folder.on_new_big_folder_discovered (string new_f, bool is_external) {
     }
 }
 
-void Folder.on_log_propagation_start () {
+void Folder.on_signal_log_propagation_start () {
     this.file_log.log_lap ("Propagation starts");
 }
 
-void Folder.on_schedule_this_folder () {
+void Folder.on_signal_schedule_this_folder () {
     FolderMan.instance ().schedule_folder (this);
 }
 
-void Folder.on_next_sync_full_local_discovery () {
+void Folder.on_signal_next_sync_full_local_discovery () {
     this.time_since_last_full_local_discovery.invalidate ();
 }
 
-void Folder.on_schedule_path_for_local_discovery (string relative_path) {
+void Folder.on_signal_schedule_path_for_local_discovery (string relative_path) {
     this.local_discovery_tracker.add_touched_path (relative_path.to_utf8 ());
 }
 
-void Folder.on_folder_conflicts (string folder, string[] conflict_paths) {
+void Folder.on_signal_folder_conflicts (string folder, string[] conflict_paths) {
     if (folder != this.definition.alias)
         return;
     var r = this.sync_result;
@@ -1694,7 +1694,7 @@ void Folder.on_folder_conflicts (string folder, string[] conflict_paths) {
         r.num_old_conflict_items (conflict_paths.size () - r.num_new_conflict_items ());
 }
 
-void Folder.on_warn_on_new_excluded_item (SyncJournalFileRecord record, QStringRef path) {
+void Folder.on_signal_warn_on_signal_new_excluded_item (SyncJournalFileRecord record, QStringRef path) {
     // Never warn for items in the database
     if (record.is_valid ())
         return;
@@ -1725,8 +1725,8 @@ void Folder.on_warn_on_new_excluded_item (SyncJournalFileRecord record, QStringR
     Logger.instance ().post_optional_gui_log (Theme.instance ().app_name_gui (), message);
 }
 
-void Folder.on_watcher_unreliable (string message) {
-    GLib.warn (lc_folder) << "Folder watcher for" << path () << "became unreliable:" << message;
+void Folder.on_signal_watcher_unreliable (string message) {
+    GLib.warn ("Folder watcher for" + path ("became unreliable:" + message;
     var full_message =
         _("Changes in synchronized folders could not be tracked reliably.\n"
            "\n"
@@ -1738,22 +1738,22 @@ void Folder.on_watcher_unreliable (string message) {
     Logger.instance ().post_gui_log (Theme.instance ().app_name_gui (), full_message);
 }
 
-void Folder.on_hydration_starts () {
+void Folder.on_signal_hydration_starts () {
     // Abort any running full sync run and reschedule
     if (this.engine.is_sync_running ()) {
-        on_terminate_sync ();
+        on_signal_terminate_sync ();
         schedule_this_folder_soon ();
         // TODO : This sets the sync state to Abort_requested on done, we don't want that
     }
 
     // Let everyone know we're syncing
-    this.sync_result.on_reset ();
+    this.sync_result.on_signal_reset ();
     this.sync_result.status (SyncResult.Status.SYNC_RUNNING);
     /* emit */ sync_started ();
     /* emit */ sync_state_change ();
 }
 
-void Folder.on_hydration_done () {
+void Folder.on_signal_hydration_done () {
     // emit signal to update ui and reschedule normal syncs if necessary
     this.sync_result.status (SyncResult.Status.SUCCESS);
     /* emit */ sync_finished (this.sync_result);
@@ -1762,7 +1762,7 @@ void Folder.on_hydration_done () {
 
 void Folder.schedule_this_folder_soon () {
     if (!this.schedule_self_timer.is_active ()) {
-        this.schedule_self_timer.on_start ();
+        this.schedule_self_timer.on_signal_start ();
     }
 }
 
@@ -1776,24 +1776,24 @@ void Folder.register_folder_watcher () {
     if (!QDir (path ()).exists ())
         return;
 
-    this.folder_watcher.on_reset (new Folder_watcher (this));
+    this.folder_watcher.on_signal_reset (new Folder_watcher (this));
     connect (this.folder_watcher.data (), &Folder_watcher.path_changed,
         this, [this] (string path) {
-            on_watched_path_changed (path, Folder.ChangeReason.Other);
+            on_signal_watched_path_changed (path, Folder.ChangeReason.Other);
         });
     connect (this.folder_watcher.data (), &Folder_watcher.lost_changes,
-        this, &Folder.on_next_sync_full_local_discovery);
+        this, &Folder.on_signal_next_sync_full_local_discovery);
     connect (this.folder_watcher.data (), &Folder_watcher.became_unreliable,
-        this, &Folder.on_watcher_unreliable);
-    this.folder_watcher.on_init (path ());
+        this, &Folder.on_signal_watcher_unreliable);
+    this.folder_watcher.on_signal_init (path ());
     this.folder_watcher.start_notificaton_test (path () + QLatin1String (".owncloudsync.log"));
 }
 
 bool Folder.virtual_files_enabled () {
-    return this.definition.virtual_files_mode != Vfs.Off && !is_vfs_on_off_switch_pending ();
+    return this.definition.virtual_files_mode != Vfs.Off && !is_vfs_on_signal_off_switch_pending ();
 }
 
-void Folder.on_about_to_remove_all_files (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
+void Folder.on_signal_about_to_remove_all_files (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
     ConfigFile cfg_file;
     if (!cfg_file.prompt_delete_files ()) {
         callback (false);
@@ -1812,19 +1812,19 @@ void Folder.on_about_to_remove_all_files (SyncFileItem.Direction dir, std.functi
     var msg_box = new QMessageBox (QMessageBox.Warning, _("Remove All Files?"),
         message.arg (short_gui_local_path ()), QMessageBox.NoButton);
     msg_box.attribute (Qt.WA_DeleteOnClose);
-    msg_box.window_flags (msg_box.window_flags () | Qt.Window_stays_on_top_hint);
+    msg_box.window_flags (msg_box.window_flags () | Qt.Window_stays_on_signal_top_hint);
     msg_box.add_button (_("Remove all files"), QMessageBox.DestructiveRole);
     QPushButton keep_btn = msg_box.add_button (_("Keep files"), QMessageBox.AcceptRole);
     bool old_paused = sync_paused ();
     sync_paused (true);
-    connect (msg_box, &QMessageBox.on_finished, this, [msg_box, keep_btn, callback, old_paused, this] {
+    connect (msg_box, &QMessageBox.on_signal_finished, this, [msg_box, keep_btn, callback, old_paused, this] {
         const bool cancel = msg_box.clicked_button () == keep_btn;
         callback (cancel);
         if (cancel) {
             FileSystem.folder_minimum_permissions (path ());
             journal_database ().clear_file_table ();
             this.last_etag.clear ();
-            on_schedule_this_folder ();
+            on_signal_schedule_this_folder ();
         }
         sync_paused (old_paused);
     });

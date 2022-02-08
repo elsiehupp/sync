@@ -23,29 +23,29 @@ class WriteJob : KeychainChunk.Job {
 
 
     /***********************************************************
-    Call this method to on_start the job (async).
-    You should connect some slot to the on_finished () signal first.
+    Call this method to on_signal_start the job (async).
+    You should connect some slot to the on_signal_finished () signal first.
 
-    @see QKeychain.Job.on_start ()
+    @see QKeychain.Job.on_signal_start ()
     ***********************************************************/
-    public void on_start ();
+    public void on_signal_start ();
 
 
     /***********************************************************
-    Call this method to on_start the job synchronously.
-    Awaits completion with no need to connect some slot to the on_finished () signal first.
+    Call this method to on_signal_start the job synchronously.
+    Awaits completion with no need to connect some slot to the on_signal_finished () signal first.
 
     @return Returns true on succeess (QKeychain.NoError).
     ***********************************************************/
     public bool exec ();
 
 signals:
-    void on_finished (KeychainChunk.WriteJob incoming_job);
+    void on_signal_finished (KeychainChunk.WriteJob incoming_job);
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_write_job_done (QKeychain.Job incoming_job);
+    private void on_signal_write_job_done (QKeychain.Job incoming_job);
 
 
     /***********************************************************
@@ -66,37 +66,37 @@ signals:
         : WriteJob (null, key, data, parent) {
     }
 
-    void WriteJob.on_start () {
+    void WriteJob.on_signal_start () {
         this.error = QKeychain.NoError;
 
-        on_write_job_done (null);
+        on_signal_write_job_done (null);
     }
 
     bool WriteJob.exec () {
-        on_start ();
+        on_signal_start ();
 
         QEventLoop wait_loop;
-        connect (this, &WriteJob.on_finished, wait_loop, &QEventLoop.quit);
+        connect (this, &WriteJob.on_signal_finished, wait_loop, &QEventLoop.quit);
         wait_loop.exec ();
 
         if (error () != NoError) {
-            GLib.warn (lc_keychain_chunk) << "WritePasswordJob failed with" << error_string ();
+            GLib.warn ("WritePasswordJob failed with" + error_string ();
             return false;
         }
 
         return true;
     }
 
-    void WriteJob.on_write_job_done (QKeychain.Job incoming_job) {
+    void WriteJob.on_signal_write_job_done (QKeychain.Job incoming_job) {
         var write_job = qobject_cast<QKeychain.WritePasswordJob> (incoming_job);
 
-        // Errors? (write_job can be null here, see : WriteJob.on_start)
+        // Errors? (write_job can be null here, see : WriteJob.on_signal_start)
         if (write_job) {
             this.error = write_job.error ();
             this.error_string = write_job.error_string ();
 
             if (write_job.error () != NoError) {
-                GLib.warn (lc_keychain_chunk) << "Error while writing" << write_job.key () << "chunk" << write_job.error_string ();
+                GLib.warn ("Error while writing" + write_job.key ("chunk" + write_job.error_string ();
                 this.chunk_buffer.clear ();
             }
         }
@@ -112,7 +112,7 @@ signals:
 
             // keep the limit
             if (this.chunk_count > KeychainChunk.MaxChunks) {
-                GLib.warn (lc_keychain_chunk) << "Maximum chunk count exceeded while writing" << write_job.key () << "chunk" << string.number (index) << "cutting off after" << string.number (KeychainChunk.MaxChunks) << "chunks";
+                GLib.warn ("Maximum chunk count exceeded while writing" + write_job.key ("chunk" + string.number (index) + "cutting off after" + string.number (KeychainChunk.MaxChunks) + "chunks";
 
                 write_job.delete_later ();
 
@@ -138,11 +138,11 @@ signals:
             add_settings_to_job (this.account, job);
     #endif
             job.insecure_fallback (this.insecure_fallback);
-            connect (job, &QKeychain.Job.on_finished, this, &KeychainChunk.WriteJob.on_write_job_done);
+            connect (job, &QKeychain.Job.on_signal_finished, this, &KeychainChunk.WriteJob.on_signal_write_job_done);
             // only add the key's (sub)"index" after the first element, to stay compatible with older versions and non-Windows
             job.key (kck);
             job.binary_data (chunk);
-            job.on_start ();
+            job.on_signal_start ();
 
             chunk.clear ();
         } else {

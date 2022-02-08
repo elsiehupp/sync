@@ -278,7 +278,7 @@ class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private on_ void abortAfterFailedMkdir () {
         FakeFolder fakeFolder{FileInfo{}};
-        QSignalSpy finishedSpy (&fakeFolder.syncEngine (), SIGNAL (on_finished (bool)));
+        QSignalSpy finishedSpy (&fakeFolder.syncEngine (), SIGNAL (on_signal_finished (bool)));
         fakeFolder.serverErrorPaths ().append ("NewFolder");
         fakeFolder.localModifier ().mkdir ("NewFolder");
         // This should be aborted and would otherwise fail in FileInfo.create.
@@ -292,7 +292,7 @@ class TestSyncEngine : GLib.Object {
      * etag stored in the database yet. */
     private on_ void testDirEtagAfterIncompleteSync () {
         FakeFolder fakeFolder{FileInfo{}};
-        QSignalSpy finishedSpy (&fakeFolder.syncEngine (), SIGNAL (on_finished (bool)));
+        QSignalSpy finishedSpy (&fakeFolder.syncEngine (), SIGNAL (on_signal_finished (bool)));
         fakeFolder.serverErrorPaths ().append ("NewFolder/foo");
         fakeFolder.remoteModifier ().mkdir ("NewFolder");
         fakeFolder.remoteModifier ().insert ("NewFolder/foo");
@@ -331,7 +331,7 @@ class TestSyncEngine : GLib.Object {
         GLib.Set<string> seen;
         for (GLib.List<GLib.Variant> args : completeSpy) {
             var item = args[0].value<SyncFileItemPtr> ();
-            qDebug () << item.file << item.isDirectory () << item.status;
+            GLib.debug () + item.file + item.isDirectory () + item.status;
             QVERIFY (!seen.contains (item.file)); // signal only sent once per item
             seen.insert (item.file);
             if (item.file == "Y/Z/d2") {
@@ -354,35 +354,35 @@ class TestSyncEngine : GLib.Object {
         QTest.addColumn<int> ("expectedGET");
 
         QTest.newRow ("Same mtime, but no server checksum . ignored in reconcile")
-            << true << GLib.ByteArray ()
+            + true + GLib.ByteArray ()
             << 0;
 
         QTest.newRow ("Same mtime, weak server checksum differ . downloaded")
-            << true << GLib.ByteArray ("Adler32:bad")
+            + true + GLib.ByteArray ("Adler32:bad")
             << 1;
 
         QTest.newRow ("Same mtime, matching weak checksum . skipped")
-            << true << GLib.ByteArray ("Adler32:2a2010d")
+            + true + GLib.ByteArray ("Adler32:2a2010d")
             << 0;
 
         QTest.newRow ("Same mtime, strong server checksum differ . downloaded")
-            << true << GLib.ByteArray ("SHA1:bad")
+            + true + GLib.ByteArray ("SHA1:bad")
             << 1;
 
         QTest.newRow ("Same mtime, matching strong checksum . skipped")
-            << true << GLib.ByteArray ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
+            + true + GLib.ByteArray ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
             << 0;
 
         QTest.newRow ("mtime changed, but no server checksum . download")
-            << false << GLib.ByteArray ()
+            + false + GLib.ByteArray ()
             << 1;
 
         QTest.newRow ("mtime changed, weak checksum match . download anyway")
-            << false << GLib.ByteArray ("Adler32:2a2010d")
+            + false + GLib.ByteArray ("Adler32:2a2010d")
             << 1;
 
         QTest.newRow ("mtime changed, strong checksum match . skip")
-            << false << GLib.ByteArray ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
+            + false + GLib.ByteArray ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
             << 0;
     }
 
@@ -433,7 +433,7 @@ class TestSyncEngine : GLib.Object {
 
 
     /***********************************************************
-     * Checks whether SyncFileItems have the expected properties before on_start
+     * Checks whether SyncFileItems have the expected properties before on_signal_start
      * of propagation.
      */
     private on_ void testSyncFileItemProperties () {
@@ -756,7 +756,7 @@ class TestSyncEngine : GLib.Object {
         });
 
         fakeFolder.localModifier ().insert ("file", 100, 'W');
-        QTimer.singleShot (100, fakeFolder.syncEngine (), [&] () { fakeFolder.syncEngine ().on_abort (); });
+        QTimer.singleShot (100, fakeFolder.syncEngine (), [&] () { fakeFolder.syncEngine ().on_signal_abort (); });
         QVERIFY (!fakeFolder.syncOnce ());
 
         QCOMPARE (nPUT, 3);

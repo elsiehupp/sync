@@ -38,8 +38,8 @@ class OwncloudConnectionMethodDialog : Gtk.Dialog {
         , ui (new Ui.OwncloudConnectionMethodDialog) {
         ui.up_ui (this);
 
-        connect (ui.btn_no_tLS, &QAbstractButton.clicked, this, &OwncloudConnectionMethodDialog.on_return_no_tls);
-        connect (ui.btn_client_side_tLS, &QAbstractButton.clicked, this, &OwncloudConnectionMethodDialog.on_return_client_side_tls);
+        connect (ui.btn_no_tLS, &QAbstractButton.clicked, this, &OwncloudConnectionMethodDialog.on_signal_return_no_tls);
+        connect (ui.btn_client_side_tLS, &QAbstractButton.clicked, this, &OwncloudConnectionMethodDialog.on_signal_return_client_side_tls);
         connect (ui.btn_back, &QAbstractButton.clicked, this, &OwncloudConnectionMethodDialog.return_back);
     }
 
@@ -55,28 +55,28 @@ class OwncloudConnectionMethodDialog : Gtk.Dialog {
     The URL that was tried
     ***********************************************************/
     public void url (GLib.Uri url) {
-        ui.label.on_text (_("<html><head/><body><p>Failed to connect to the secure server address <em>%1</em>. How do you wish to proceed?</p></body></html>").arg (url.to_display_"".to_html_escaped ()));
+        ui.label.on_signal_text (_("<html><head/><body><p>Failed to connect to the secure server address <em>%1</em>. How do you wish to proceed?</p></body></html>").arg (url.to_display_"".to_html_escaped ()));
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_return_no_tls () {
-        on_done (No_TLS);
+    public void on_signal_return_no_tls () {
+        on_signal_done (No_TLS);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_return_client_side_tls () {
-        on_done (Client_Side_TLS);
+    public void on_signal_return_client_side_tls () {
+        on_signal_done (Client_Side_TLS);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void return_back () {
-        on_done (Back);
+        on_signal_done (Back);
     }
 
 } // class OwncloudConnectionMethodDialog

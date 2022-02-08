@@ -23,7 +23,7 @@ class Simple_sslErrorHandler : Occ.AbstractSslErrorHandler {
         (void)conf;
 
         if (!certificates) {
-            GLib.debug () << "Certs parameter required but is NULL!";
+            GLib.debug ("Certs parameter required but is NULL!";
             return false;
         }
 

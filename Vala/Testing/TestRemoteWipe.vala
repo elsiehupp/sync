@@ -42,21 +42,21 @@ class TestRemoteWipe : public GLib.Object {
 //        folderman.addFolder (newAccountState, folderDefinition (dirPath + "/sub/nextcloud/"));
 
 //        // check if account exists
-//        qDebug () << "Does account exists?!";
+//        GLib.debug ("Does account exists?!";
 //        QVERIFY (!account.identifier ().isEmpty ());
 
 //        manager.deleteAccount (newAccountState);
 //        manager.save ();
 
 //        // check if account exists
-//        qDebug () << "Does account exists yet?!";
+//        GLib.debug ("Does account exists yet?!";
 //        QVERIFY (account);
 
 //        // check if folder exists
 //        QVERIFY (dirToRemove.exists ());
 
 //        // remote folders
-//        qDebug () <<  "Removing folder for account " << newAccountState.account ().url ();
+//        GLib.debug () +  "Removing folder for account " + newAccountState.account ().url ();
 
 //        folderman.slotWipeFolderForAccount (newAccountState);
 

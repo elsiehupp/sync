@@ -102,7 +102,7 @@ protected slots:
     /***********************************************************
     Start the OCS request
     ***********************************************************/
-    void on_start () override;
+    void on_signal_start () override;
 
 signals:
 
@@ -128,14 +128,14 @@ signals:
     @brief etag_response_header_received - signal to report the ETag response header value
     from ocs api v2
     @param value - the ETag response header value
-    @param status_code - the OCS status code : 100 (!) for on_success
+    @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
     void etag_response_header_received (GLib.ByteArray value, int status_code);
 
 
     /***********************************************************
     ***********************************************************/
-    private bool on_finished () override;
+    private bool on_signal_finished () override;
 
     /***********************************************************
     ***********************************************************/
@@ -190,7 +190,7 @@ signals:
         return result;
     }
 
-    void Ocs_job.on_start () {
+    void Ocs_job.on_signal_start () {
         add_raw_header ("Ocs-APIREQUEST", "true");
         add_raw_header ("Content-Type", "application/x-www-form-urlencoded");
 
@@ -215,10 +215,10 @@ signals:
         query_items.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path (), query_items);
         send_request (this.verb, url, this.request, buffer);
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
-    bool Ocs_job.on_finished () {
+    bool Ocs_job.on_signal_finished () {
         const GLib.ByteArray reply_data = reply ().read_all ();
 
         QJsonParseError error;
@@ -229,23 +229,23 @@ signals:
         // when it is null we might have a 304 so get status code from reply () and gives a warning...
         if (error.error != QJsonParseError.NoError) {
             status_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
-            GLib.warn (lc_ocs) << "Could not parse reply to"
-                             << this.verb
-                             << Utility.concat_url_path (account ().url (), path ())
-                             << this.params
-                             << error.error_string ()
-                             << ":" << reply_data;
+            GLib.warn ("Could not parse reply to"
+                             + this.verb
+                             + Utility.concat_url_path (account ().url (), path ())
+                             + this.params
+                             + error.error_string ()
+                             + ":" + reply_data;
         } else {
             status_code  = get_json_return_code (json, message);
         }
 
         //... then it checks for the status_code
         if (!this.pass_status_codes.contains (status_code)) {
-            GLib.warn (lc_ocs) << "Reply to"
-                             << this.verb
-                             << Utility.concat_url_path (account ().url (), path ())
-                             << this.params
-                             << "has unexpected status code:" << status_code << reply_data;
+            GLib.warn ("Reply to"
+                             + this.verb
+                             + Utility.concat_url_path (account ().url (), path ())
+                             + this.params
+                             + "has unexpected status code:" + status_code + reply_data;
             /* emit */ ocs_error (status_code, message);
 
         } else {

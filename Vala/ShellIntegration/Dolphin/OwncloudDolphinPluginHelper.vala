@@ -130,7 +130,7 @@ OwncloudDolphinPluginHelper* OwncloudDolphinPluginHelper.instance () {
 OwncloudDolphinPluginHelper.OwncloudDolphinPluginHelper () {
     connect (&this.socket, &QLocalSocket.connected, this, &OwncloudDolphinPluginHelper.slotConnected);
     connect (&this.socket, &QLocalSocket.readyRead, this, &OwncloudDolphinPluginHelper.slotReadyRead);
-    this.connectTimer.on_start (45 * 1000, Qt.VeryCoarseTimer, this);
+    this.connectTimer.on_signal_start (45 * 1000, Qt.VeryCoarseTimer, this);
     tryConnect ();
 }
 

@@ -28,23 +28,23 @@ class TestLongWindowsPath : GLib.Object {
     private on_ void testLongPathStat_data () {
         QTest.addColumn<string> ("name");
 
-        QTest.newRow ("long") << QStringLiteral ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
+        QTest.newRow ("long") + QStringLiteral ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                 "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                 "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
                                                 "olonglonglonglong/file.txt");
-        QTest.newRow ("long emoji") << string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
+        QTest.newRow ("long emoji") + string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                          "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                          "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
                                                          "olonglonglonglong/file🐷.txt");
-        QTest.newRow ("long russian") << string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
+        QTest.newRow ("long russian") + string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                            "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                            "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
                                                            "olonglonglonglong/собственное.txt");
-        QTest.newRow ("long arabic") << string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
+        QTest.newRow ("long arabic") + string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                           "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                           "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
                                                           "olonglonglonglong/السحاب.txt");
-        QTest.newRow ("long chinese") << string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
+        QTest.newRow ("long chinese") + string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                            "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                            "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
                                                            "olonglonglonglong/自己的云.txt");
@@ -59,7 +59,7 @@ class TestLongWindowsPath : GLib.Object {
         const QFileInfo longPath (tmp.path () + name);
 
         const var data = QByteArrayLiteral ("hello");
-        qDebug () << longPath;
+        GLib.debug () + longPath;
         QVERIFY (longPath.dir ().mkpath ("."));
 
         GLib.File file = new GLib.File (longPath.filePath ());

@@ -12,7 +12,7 @@ namespace Occ {
 ***********************************************************/
 class RequestEtagJob : AbstractNetworkJob {
 
-    signal void on_etag_retrieved (GLib.ByteArray etag, GLib.DateTime time);
+    signal void on_signal_etag_retrieved (GLib.ByteArray etag, GLib.DateTime time);
     signal void finished_with_result (HttpResult<GLib.ByteArray> etag);
 
     /***********************************************************
@@ -24,7 +24,7 @@ class RequestEtagJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         Soup.Request req;
         req.raw_header ("Depth", "0");
 
@@ -41,17 +41,17 @@ class RequestEtagJob : AbstractNetworkJob {
         send_request ("PROPFIND", make_dav_url (path ()), req, buf);
 
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warn (lc_etag_job) << "request network error : " << reply ().error_string ();
+            GLib.warn ("request network error : " + reply ().error_string ();
         }
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private bool on_finished () {
-        GLib.info (lc_etag_job) << "Request Etag of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                        <<  reply_status_string ();
+    private bool on_signal_finished () {
+        GLib.info ("Request Etag of" + reply ().request ().url ("FINISHED WITH STATUS"
+                        +  reply_status_string ();
 
         var http_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (http_code == 207) {

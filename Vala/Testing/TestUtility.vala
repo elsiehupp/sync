@@ -17,14 +17,14 @@ class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_init_test_case () {
+    private void on_signal_init_test_case () {
         QStandardPaths.setTestModeEnabled (true);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_format_fingerprint () {
+    private void on_signal_test_format_fingerprint () {
         QVERIFY2 (formatFingerprint ("68ac906495480a3404beee4874ed853a037a7a8f")
                  == "68:ac:90:64:95:48:0a:34:04:be:ee:48:74:ed:85:3a:03:7a:7a:8f",
 		"Utility.formatFingerprint () is broken");
@@ -33,7 +33,7 @@ class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_octets_to_string () {
+    private void on_signal_test_octets_to_string () {
         QLocale.setDefault (QLocale ("en"));
         QCOMPARE (octetsToString (999) , string ("999 B"));
         QCOMPARE (octetsToString (1024) , string ("1 KB"));
@@ -59,10 +59,10 @@ class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_launch_on_startup () {
+    private void on_signal_test_launch_on_signal_startup () {
         string postfix = string.number (Occ.Utility.rand ());
 
-        const string appName = string.fromLatin1 ("on_test_launch_on_startup.%1").arg (postfix);
+        const string appName = string.fromLatin1 ("on_signal_test_launch_on_signal_startup.%1").arg (postfix);
         const string guiName = "LaunchOnStartup GUI Name";
 
         QVERIFY (hasLaunchOnStartup (appName) == false);
@@ -75,7 +75,7 @@ class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_duration_to_descriptive_"" {
+    private void on_signal_test_duration_to_descriptive_"" {
         QLocale.setDefault (QLocale ("C"));
         //Note: in order for the plural to work we would need to load the english translation
 
@@ -119,14 +119,14 @@ class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_version_of_installed_binary () {
+    private void on_signal_test_version_of_installed_binary () {
         if (isLinux ()) {
             // pass the cmd client from our build dir
             // this is a bit inaccurate as it does not test the "real thing"
             // but cmd and gui have the same --version handler by now
             // and cmd works without X in CI
             string ver = versionOfInstalledBinary (QStringLiteral (OWNCLOUD_BIN_PATH  "/" APPLICATION_EXECUTABLE "cmd"));
-            qDebug () << "Version of installed Nextcloud : " << ver;
+            GLib.debug ("Version of installed Nextcloud : " + ver;
             QVERIFY (!ver.isEmpty ());
 
             const QRegularExpression rx (QRegularExpression.anchoredPattern (APPLICATION_SHORTNAME R" ( version \d+\.\d+\.\d+.*)"));
@@ -139,7 +139,7 @@ class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_time_ago () {
+    private void on_signal_test_time_ago () {
         // Both times in same timezone
         GLib.DateTime d1 = GLib.DateTime.fromString ("2015-01-24T09:20:30+01:00", Qt.ISODate);
         GLib.DateTime d2 = GLib.DateTime.fromString ("2015-01-23T09:20:30+01:00", Qt.ISODate);
@@ -166,7 +166,7 @@ class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_fs_case_preserving () {
+    private void on_signal_test_fs_case_preserving () {
         QVERIFY (isMac () || isWindows () ? fsCasePreserving () : ! fsCasePreserving ());
         QScopedValueRollback<bool> scope (Occ.fsCasePreserving_override);
         Occ.fsCasePreserving_override = true;
@@ -178,7 +178,7 @@ class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_filenames_equal () {
+    private void on_signal_test_filenames_equal () {
         QTemporaryDir dir;
         QVERIFY (dir.isValid ());
         QDir dir2 (dir.path ());
@@ -208,19 +208,19 @@ class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_sanitize_for_filename_data () {
+    private void on_signal_test_sanitize_for_filename_data () {
         QTest.addColumn<string> ("input");
         QTest.addColumn<string> ("output");
 
         QTest.newRow ("")
-            << "foobar"
-            << "foobar";
+            + "foobar"
+            + "foobar";
         QTest.newRow ("")
-            << "a/b?c<d>e\\f:g*h|i\"j"
-            << "abcdefghij";
+            + "a/b?c<d>e\\f:g*h|i\"j"
+            + "abcdefghij";
         QTest.newRow ("")
-            << string.fromLatin1 ("a\x01 b\x1f c\x80 d\x9f")
-            << "a b c d";
+            + string.fromLatin1 ("a\x01 b\x1f c\x80 d\x9f")
+            + "a b c d";
     }
 
 
@@ -254,7 +254,7 @@ const int CHECK_NORMALIZE_ETAG (TEST, EXPECT)
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_is_path_windows_drive_partition_root () {
+    private void on_signal_test_is_path_windows_drive_partition_root () {
         // should always return false on non-Windows
         QVERIFY (!isPathWindowsDrivePartitionRoot ("c:"));
         QVERIFY (!isPathWindowsDrivePartitionRoot ("c:/"));

@@ -31,7 +31,7 @@ class Ocs_share_job : Ocs_job {
 
     @param path Path to request shares for (default all shares)
     ***********************************************************/
-    public void on_get_shares (string path = "");
+    public void on_signal_get_shares (string path = "");
 
 
     /***********************************************************
@@ -141,7 +141,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void on_job_done (QJsonDocument reply);
+    private void on_signal_job_done (QJsonDocument reply);
 
     /***********************************************************
     ***********************************************************/
@@ -153,24 +153,24 @@ signals:
     Ocs_share_job.Ocs_share_job (AccountPointer account)
         : Ocs_job (account) {
         path ("ocs/v2.php/apps/files_sharing/api/v1/shares");
-        connect (this, &Ocs_job.job_finished, this, &Ocs_share_job.on_job_done);
+        connect (this, &Ocs_job.job_finished, this, &Ocs_share_job.on_signal_job_done);
     }
 
-    void Ocs_share_job.on_get_shares (string path) {
+    void Ocs_share_job.on_signal_get_shares (string path) {
         verb ("GET");
 
         add_param (string.from_latin1 ("path"), path);
         add_param (string.from_latin1 ("reshares"), string ("true"));
         add_pass_status_code (404);
 
-        on_start ();
+        on_signal_start ();
     }
 
     void Ocs_share_job.delete_share (string share_id) {
         append_path (share_id);
         verb ("DELETE");
 
-        on_start ();
+        on_signal_start ();
     }
 
     void Ocs_share_job.expire_date (string share_id, QDate date) {
@@ -184,7 +184,7 @@ signals:
         }
         this.value = date;
 
-        on_start ();
+        on_signal_start ();
     }
 
     void Ocs_share_job.password (string share_id, string password) {
@@ -194,7 +194,7 @@ signals:
         add_param (string.from_latin1 ("password"), password);
         this.value = password;
 
-        on_start ();
+        on_signal_start ();
     }
 
     void Ocs_share_job.note (string share_id, string note) {
@@ -204,7 +204,7 @@ signals:
         add_param (string.from_latin1 ("note"), note);
         this.value = note;
 
-        on_start ();
+        on_signal_start ();
     }
 
     void Ocs_share_job.public_upload (string share_id, bool public_upload) {
@@ -215,7 +215,7 @@ signals:
         add_param (string.from_latin1 ("public_upload"), value);
         this.value = public_upload;
 
-        on_start ();
+        on_signal_start ();
     }
 
     void Ocs_share_job.name (string share_id, string name) {
@@ -224,7 +224,7 @@ signals:
         add_param (string.from_latin1 ("name"), name);
         this.value = name;
 
-        on_start ();
+        on_signal_start ();
     }
 
     void Ocs_share_job.permissions (string share_id,
@@ -235,7 +235,7 @@ signals:
         add_param (string.from_latin1 ("permissions"), string.number (permissions));
         this.value = (int)permissions;
 
-        on_start ();
+        on_signal_start ();
     }
 
     void Ocs_share_job.label (string share_id, string label) {
@@ -245,7 +245,7 @@ signals:
         add_param (QStringLiteral ("label"), label);
         this.value = label;
 
-        on_start ();
+        on_signal_start ();
     }
 
     void Ocs_share_job.create_link_share (string path,
@@ -265,7 +265,7 @@ signals:
 
         add_pass_status_code (403);
 
-        on_start ();
+        on_signal_start ();
     }
 
     void Ocs_share_job.create_share (string path,
@@ -284,16 +284,16 @@ signals:
             add_param (string.from_latin1 ("password"), password);
         }
 
-        on_start ();
+        on_signal_start ();
     }
 
     void Ocs_share_job.get_shared_with_me () {
         verb ("GET");
         add_param (QLatin1String ("shared_with_me"), QLatin1String ("true"));
-        on_start ();
+        on_signal_start ();
     }
 
-    void Ocs_share_job.on_job_done (QJsonDocument reply) {
+    void Ocs_share_job.on_signal_job_done (QJsonDocument reply) {
         /* emit */ share_job_finished (reply, this.value);
     }
     }

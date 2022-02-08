@@ -20,7 +20,7 @@ class Socket_upload_job : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start ();
+    public void on_signal_start ();
 
 
     /***********************************************************
@@ -46,7 +46,7 @@ class Socket_upload_job : GLib.Object {
 
 Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> job)
     : this.api_job (job) {
-    connect (job.data (), &Socket_api_job_v2.on_finished, this, &Socket_upload_job.delete_later);
+    connect (job.data (), &Socket_api_job_v2.on_signal_finished, this, &Socket_upload_job.delete_later);
 
     this.local_path = this.api_job.arguments ()[QLatin1String ("local_path")].to_string ();
     this.remote_path = this.api_job.arguments ()[QLatin1String ("remote_path")].to_string ();
@@ -76,9 +76,9 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> job)
         this.synced_files.append (item.file);
     });
 
-    connect (this.engine, &Occ.SyncEngine.on_finished, this, [this] (bool ok) {
+    connect (this.engine, &Occ.SyncEngine.on_signal_finished, this, [this] (bool ok) {
         if (ok) {
-            this.api_job.on_success ({
+            this.api_job.on_signal_success ({
                 {
                     "local_path",
                     this.local_path
@@ -95,7 +95,7 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> job)
     });
 }
 
-void Socket_upload_job.on_start () {
+void Socket_upload_job.on_signal_start () {
     var opt = this.engine.sync_options ();
     opt.file_pattern (this.pattern);
     if (!opt.file_regex ().is_valid ()) {
@@ -106,7 +106,7 @@ void Socket_upload_job.on_start () {
 
     // create the dir, fail if it already exists
     var mkdir = new Occ.MkColJob (this.engine.account (), this.remote_path);
-    connect (mkdir, &Occ.MkColJob.finished_without_error, this.engine, &Occ.SyncEngine.on_start_sync);
+    connect (mkdir, &Occ.MkColJob.finished_without_error, this.engine, &Occ.SyncEngine.on_signal_start_sync);
     connect (mkdir, &Occ.MkColJob.finished_with_error, this, [this] (Soup.Reply reply) {
         if (reply.error () == 202) {
             this.api_job.failure (QStringLiteral ("Destination %1 already exists").arg (this.remote_path));
@@ -114,5 +114,5 @@ void Socket_upload_job.on_start () {
             this.api_job.failure (reply.error_string ());
         }
     });
-    mkdir.on_start ();
+    mkdir.on_signal_start ();
 }

@@ -84,18 +84,18 @@ class SyncFileStatusTracker : GLib.Object {
     public SyncFileStatusTracker (SyncEngine sync_engine) {
         this.sync_engine = sync_engine;
         connect (sync_engine, &SyncEngine.about_to_propagate,
-            this, &SyncFileStatusTracker.on_about_to_propagate);
+            this, &SyncFileStatusTracker.on_signal_about_to_propagate);
         connect (sync_engine, &SyncEngine.item_completed,
-            this, &SyncFileStatusTracker.on_item_completed);
-        connect (sync_engine, &SyncEngine.on_finished, this, &SyncFileStatusTracker.on_sync_finished);
-        connect (sync_engine, &SyncEngine.started, this, &SyncFileStatusTracker.on_sync_engine_running_changed);
-        connect (sync_engine, &SyncEngine.on_finished, this, &SyncFileStatusTracker.on_sync_engine_running_changed);
+            this, &SyncFileStatusTracker.on_signal_item_completed);
+        connect (sync_engine, &SyncEngine.on_signal_finished, this, &SyncFileStatusTracker.on_signal_sync_finished);
+        connect (sync_engine, &SyncEngine.started, this, &SyncFileStatusTracker.on_signal_sync_engine_running_changed);
+        connect (sync_engine, &SyncEngine.on_signal_finished, this, &SyncFileStatusTracker.on_signal_sync_engine_running_changed);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_path_touched (string filename) {
+    public void on_signal_path_touched (string filename) {
         string folder_path = this.sync_engine.local_path ();
 
         //  ASSERT (filename.starts_with (folder_path));
@@ -109,7 +109,7 @@ class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     Path relative to folder
     ***********************************************************/
-    public void on_add_silently_excluded (string folder_path) {
+    public void on_signal_add_silently_excluded (string folder_path) {
         this.sync_problems[folder_path] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
         /* emit */ file_status_changed (get_system_destination (folder_path), resolve_sync_and_error_status (folder_path, SharedFlag.NOT_SHARED));
     }
@@ -117,14 +117,14 @@ class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_about_to_propagate (SyncFileItemVector items) {
+    private void on_signal_about_to_propagate (SyncFileItemVector items) {
         //  ASSERT (this.sync_count.is_empty ());
 
         ProblemsMap old_problems;
         std.swap (this.sync_problems, old_problems);
 
         foreach (SyncFileItemPtr item, items) {
-            GLib.debug (lc_status_tracker) << "Investigating" << item.destination () << item.status << item.instruction;
+            GLib.debug ("Investigating" + item.destination () + item.status + item.instruction;
             this.dirty_paths.remove (item.destination ());
 
             if (has_error_status (*item)) {
@@ -170,8 +170,8 @@ class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_item_completed (SyncFileItemPtr item) {
-        GLib.debug (lc_status_tracker) << "Item completed" << item.destination () << item.status << item.instruction;
+    private void on_signal_item_completed (SyncFileItemPtr item) {
+        GLib.debug ("Item completed" + item.destination () + item.status + item.instruction;
 
         if (has_error_status (*item)) {
             this.sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_ERROR;
@@ -187,7 +187,7 @@ class SyncFileStatusTracker : GLib.Object {
             && item.instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
             && item.instruction != CSYNC_INSTRUCTION_IGNORE
             && item.instruction != CSYNC_INSTRUCTION_ERROR) {
-            // dec_sync_count calls must* be symetric with inc_sync_count calls in on_about_to_propagate
+            // dec_sync_count calls must* be symetric with inc_sync_count calls in on_signal_about_to_propagate
             dec_sync_count_and_emit_status_changed (item.destination (), shared_flag);
         } else {
             /* emit */ file_status_changed (get_system_destination (item.destination ()), resolve_sync_and_error_status (item.destination (), shared_flag));
@@ -197,8 +197,8 @@ class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_sync_finished () {
-        // Clear the sync counts to reduce the impact of unsymetrical inc/dec calls (e.g. when directory job on_abort)
+    private void on_signal_sync_finished () {
+        // Clear the sync counts to reduce the impact of unsymetrical inc/dec calls (e.g. when directory job on_signal_abort)
         GLib.HashMap<string, int> old_sync_count;
         std.swap (this.sync_count, old_sync_count);
         for (var it = old_sync_count.begin (); it != old_sync_count.end (); ++it) {
@@ -214,7 +214,7 @@ class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_sync_engine_running_changed () {
+    private void on_signal_sync_engine_running_changed () {
         /* emit */ file_status_changed (get_system_destination (""), resolve_sync_and_error_status ("", SharedFlag.NOT_SHARED));
     }
 
@@ -256,7 +256,7 @@ class SyncFileStatusTracker : GLib.Object {
         if (this.sync_count.value (relative_path)) {
             status.set (SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
         } else {
-            // After a sync on_finished, we need to show the users issues from that last sync like the activity list does.
+            // After a sync on_signal_finished, we need to show the users issues from that last sync like the activity list does.
             // Also used for parent directories showing a warning for an error child.
             SyncFileStatus.SyncFileStatusTag problem_status = lookup_problem (relative_path, this.sync_problems);
             if (problem_status != SyncFileStatus.SyncFileStatusTag.STATUS_NONE)
@@ -275,7 +275,7 @@ class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void invalidate_parent_paths (string path) {
-        string[] split_path = path.split ('/', Qt.Skip_empty_parts);
+        string[] split_path = path.split ('/', Qt.SkipEmptyParts);
         for (int i = 0; i < split_path.size (); ++i) {
             string parent_path = string[] (split_path.mid (0, i)).join (QLatin1String ("/"));
             /* emit */ file_status_changed (get_system_destination (parent_path), file_status (parent_path));
@@ -360,7 +360,7 @@ class SyncFileStatusTracker : GLib.Object {
         // our ability to notify changes through the file_status_changed signal,
         // it's an acceptable compromize to treat all exclude types the same.
         // Update : This extra check shouldn't hurt even though silently excluded files
-        // are now available via on_add_silently_excluded ().
+        // are now available via on_signal_add_silently_excluded ().
         if (this.sync_engine.excluded_files ().is_excluded (this.sync_engine.local_path () + relative_path,
                 this.sync_engine.local_path (),
                 this.sync_engine.ignore_hidden_files ())) {

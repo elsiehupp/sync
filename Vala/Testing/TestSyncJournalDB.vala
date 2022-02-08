@@ -31,11 +31,11 @@ class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_init_test_case () {}
+    private void on_signal_init_test_case () {}
 
 
     private
-    private void on_cleanup_test_case () {
+    private void on_signal_cleanup_test_case () {
         const string file = this.database.databaseFilePath ();
         GLib.File.remove (file);
     }
@@ -107,7 +107,7 @@ class TestSyncJournalDB : GLib.Object {
             QVERIFY (storedRecord.remotePerm == record.remotePerm);
             QVERIFY (storedRecord.checksumHeader == record.checksumHeader);
 
-            // qDebug ()<< "OOOOO " << storedRecord.modtime.toTime_t () << record.modtime.toTime_t ();
+            // GLib.debug ()<< "OOOOO " + storedRecord.modtime.toTime_t () + record.modtime.toTime_t ();
 
             // Attention : compare time_t types here, as GLib.DateTime seem to maintain
             // milliseconds internally, which disappear in sqlite. Go for full seconds here.
@@ -293,15 +293,15 @@ class TestSyncJournalDB : GLib.Object {
 
         QByteArrayList elements;
         elements
-            << "foo"
-            << "foo/file"
-            << "bar"
-            << "moo"
-            << "moo/file"
-            << "foo%bar"
-            << "foo bla bar/file"
-            << "fo_"
-            << "fo_/file";
+            + "foo"
+            + "foo/file"
+            + "bar"
+            + "moo"
+            + "moo/file"
+            + "foo%bar"
+            + "foo bla bar/file"
+            + "fo_"
+            + "fo_/file";
         for (var& elem : elements)
             makeEntry (elem);
 
@@ -311,7 +311,7 @@ class TestSyncJournalDB : GLib.Object {
                 SyncJournalFileRecord record;
                 this.database.getFileRecord (elem, record);
                 if (!record.isValid ()) {
-                    qWarning () << "Missing record : " << elem;
+                    qWarning ("Missing record : " + elem;
                     ok = false;
                 }
             }

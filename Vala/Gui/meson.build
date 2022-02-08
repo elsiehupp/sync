@@ -96,6 +96,7 @@ srcs = files([
 
     'Tray/ActivityLink.vala',
     'Tray/ActivityListModel.vala',
+    'Tray/AsyncImageResponse.vala',
     'Tray/NotificationCache.vala',
     'Tray/ServerNotificationHandler.vala',
     'Tray/SvgImageProvider.vala',

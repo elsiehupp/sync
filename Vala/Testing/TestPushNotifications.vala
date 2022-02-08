@@ -8,22 +8,22 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <QWebSocketServer>
 //  #include <QSignalSpy>
 
-const int RETURN_FALSE_ON_FAIL (expr)
+const int RETURN_FALSE_on_signal_FAIL (expr)
     if (! (expr)) {
         return false;
     }
 
 bool verifyCalledOnceWithAccount (QSignalSpy spy, Occ.AccountPointer account) {
-    RETURN_FALSE_ON_FAIL (spy.count () == 1);
+    RETURN_FALSE_on_signal_FAIL (spy.count () == 1);
     var accountFromSpy = spy.at (0).at (0).value<Occ.Account> ();
-    RETURN_FALSE_ON_FAIL (accountFromSpy == account.data ());
+    RETURN_FALSE_on_signal_FAIL (accountFromSpy == account.data ());
 
     return true;
 }
 
 bool failThreeAuthenticationAttempts (FakeWebSocketServer fakeServer, Occ.AccountPointer account) {
-    RETURN_FALSE_ON_FAIL (account);
-    RETURN_FALSE_ON_FAIL (account.pushNotifications ());
+    RETURN_FALSE_on_signal_FAIL (account);
+    RETURN_FALSE_on_signal_FAIL (account.pushNotifications ());
 
     account.pushNotifications ().setReconnectTimerInterval (0);
 
@@ -31,16 +31,16 @@ bool failThreeAuthenticationAttempts (FakeWebSocketServer fakeServer, Occ.Accoun
 
     // Let three authentication attempts fail
     for (uint8_t i = 0; i < 3; ++i) {
-        RETURN_FALSE_ON_FAIL (fakeServer.waitForTextMessages ());
-        RETURN_FALSE_ON_FAIL (fakeServer.textMessagesCount () == 2);
+        RETURN_FALSE_on_signal_FAIL (fakeServer.waitForTextMessages ());
+        RETURN_FALSE_on_signal_FAIL (fakeServer.textMessagesCount () == 2);
         var socket = fakeServer.socketForTextMessage (0);
         fakeServer.clearTextMessages ();
         socket.sendTextMessage ("err : Invalid credentials");
     }
 
     // Now the authenticationFailed Signal should be emitted
-    RETURN_FALSE_ON_FAIL (authenticationFailedSpy.wait ());
-    RETURN_FALSE_ON_FAIL (authenticationFailedSpy.count () == 1);
+    RETURN_FALSE_on_signal_FAIL (authenticationFailedSpy.wait ());
+    RETURN_FALSE_on_signal_FAIL (authenticationFailedSpy.count () == 1);
 
     return true;
 }
@@ -74,9 +74,9 @@ class TestPushNotifications : GLib.Object {
 
         QVERIFY (fakeServer.authenticateAccount (
             account, [&] (Occ.PushNotifications pushNotifications) {
-                filesChangedSpy.on_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.filesChanged));
-                notificationsChangedSpy.on_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.notificationsChanged));
-                activitiesChangedSpy.on_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.activitiesChanged));
+                filesChangedSpy.on_signal_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.filesChanged));
+                notificationsChangedSpy.on_signal_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.notificationsChanged));
+                activitiesChangedSpy.on_signal_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.activitiesChanged));
             },
             [&] {
                 QVERIFY (verifyCalledOnceWithAccount (*filesChangedSpy, account));
@@ -179,7 +179,7 @@ class TestPushNotifications : GLib.Object {
         QVERIFY (fakeServer.waitForTextMessages ());
         QCOMPARE (fakeServer.textMessagesCount (), 2);
         var socket = fakeServer.socketForTextMessage (0);
-        socket.on_abort ();
+        socket.on_signal_abort ();
 
         QVERIFY (connectionLostSpy.wait ());
         // Account handled connectionLost signal and disabled push notifications
@@ -236,7 +236,7 @@ class TestPushNotifications : GLib.Object {
         QVERIFY (pushNotificationsDisabledSpy.isValid ());
 
         // Wait for authentication and then sent a network error
-        socket.on_abort ();
+        socket.on_signal_abort ();
 
         QVERIFY (pushNotificationsDisabledSpy.wait ());
         QCOMPARE (pushNotificationsDisabledSpy.count (), 1);
@@ -281,9 +281,9 @@ class TestPushNotifications : GLib.Object {
         account.pushNotifications ().setPingInterval (0);
         QVERIFY (fakeServer.authenticateAccount (
             account, [&] (Occ.PushNotifications pushNotifications) {
-                filesChangedSpy.on_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.filesChanged));
-                notificationsChangedSpy.on_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.notificationsChanged));
-                activitiesChangedSpy.on_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.activitiesChanged));
+                filesChangedSpy.on_signal_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.filesChanged));
+                notificationsChangedSpy.on_signal_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.notificationsChanged));
+                activitiesChangedSpy.on_signal_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.activitiesChanged));
             },
             [&] {
                 QVERIFY (verifyCalledOnceWithAccount (*filesChangedSpy, account));

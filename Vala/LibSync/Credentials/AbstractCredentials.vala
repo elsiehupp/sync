@@ -150,11 +150,11 @@ class AbstractCredentials : GLib.Object {
     public static string keychain_key (string url, string user, string account_id) {
         string u (url);
         if (u.is_empty ()) {
-            GLib.warn (lc_credentials) << "Empty url in key_chain, error!";
+            GLib.warn ("Empty url in key_chain, error!";
             return "";
         }
         if (user.is_empty ()) {
-            GLib.warn (lc_credentials) << "Error : User is empty!";
+            GLib.warn ("Error : User is empty!";
             return "";
         }
 

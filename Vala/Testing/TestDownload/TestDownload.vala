@@ -78,7 +78,7 @@ class TestDownload : GLib.Object {
         });
 
         bool timedOut = false;
-        QTimer.singleShot (10000, fakeFolder.syncEngine (), [&] () { timedOut = true; fakeFolder.syncEngine ().on_abort (); });
+        QTimer.singleShot (10000, fakeFolder.syncEngine (), [&] () { timedOut = true; fakeFolder.syncEngine ().on_signal_abort (); });
         QVERIFY (!fakeFolder.syncOnce ());  // Fail because A/broken
         QVERIFY (!timedOut);
         QCOMPARE (getItem (completeSpy, "A/broken").status, SyncFileItem.Status.NORMAL_ERROR);
@@ -89,7 +89,7 @@ class TestDownload : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void serverMaintenence () {
-        // Server in maintenance must on_abort the sync.
+        // Server in maintenance must on_signal_abort the sync.
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.remoteModifier ().insert ("A/broken");

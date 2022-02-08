@@ -73,7 +73,7 @@ class Legal_notice : Gtk.Dialog {
         Theme.replace_link_color_string_background_aware (notice);
 
         this.ui.notice.text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
-        this.ui.notice.on_text (notice);
+        this.ui.notice.on_signal_text (notice);
         this.ui.notice.word_wrap (true);
         this.ui.notice.open_external_links (true);
     }

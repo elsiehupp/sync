@@ -495,8 +495,8 @@ void FakePutReply.respond () {
     /* emit */ finished ();
 }
 
-void FakePutReply.on_abort () {
-    setError (OperationCanceledError, QStringLiteral ("on_abort"));
+void FakePutReply.on_signal_abort () {
+    setError (OperationCanceledError, QStringLiteral ("on_signal_abort"));
     /* emit */ finished ();
 }
 
@@ -581,8 +581,8 @@ void FakePutMultiFileReply.respond () {
     /* emit */ finished ();
 }
 
-void FakePutMultiFileReply.on_abort () {
-    setError (OperationCanceledError, QStringLiteral ("on_abort"));
+void FakePutMultiFileReply.on_signal_abort () {
+    setError (OperationCanceledError, QStringLiteral ("on_signal_abort"));
     /* emit */ finished ();
 }
 
@@ -609,7 +609,7 @@ FakeMkcolReply.FakeMkcolReply (FileInfo remoteRootFileInfo, QNetworkAccessManage
     fileInfo = remoteRootFileInfo.createDir (fileName);
 
     if (!fileInfo) {
-        on_abort ();
+        on_signal_abort ();
         return;
     }
     QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
@@ -673,7 +673,7 @@ FakeGetReply.FakeGetReply (FileInfo remoteRootFileInfo, QNetworkAccessManager.Op
     //  Q_ASSERT (!fileName.isEmpty ());
     fileInfo = remoteRootFileInfo.find (fileName);
     if (!fileInfo) {
-        qDebug () << "meh;";
+        GLib.debug ("meh;";
     }
     Q_ASSERT_X (fileInfo, Q_FUNC_INFO, "Could not find file on the remote");
     QMetaObject.invokeMethod (this, &FakeGetReply.respond, Qt.QueuedConnection);
@@ -699,7 +699,7 @@ void FakeGetReply.respond () {
     /* emit */ finished ();
 }
 
-void FakeGetReply.on_abort () {
+void FakeGetReply.on_signal_abort () {
     setError (OperationCanceledError, QStringLiteral ("Operation Canceled"));
     aborted = true;
 }
@@ -733,12 +733,12 @@ FakeGetWithDataReply.FakeGetWithDataReply (FileInfo remoteRootFileInfo, GLib.Byt
 
     if (request.hasRawHeader ("Range")) {
         const string range = string.fromUtf8 (request.rawHeader ("Range"));
-        const QRegularExpression bytesPattern (QStringLiteral ("bytes= (?<on_start>\\d+)- (?<end>\\d+)"));
+        const QRegularExpression bytesPattern (QStringLiteral ("bytes= (?<on_signal_start>\\d+)- (?<end>\\d+)"));
         const QRegularExpressionMatch match = bytesPattern.match (range);
         if (match.hasMatch ()) {
-            const int on_start = match.captured (QStringLiteral ("on_start")).toInt ();
+            const int on_signal_start = match.captured (QStringLiteral ("on_signal_start")).toInt ();
             const int end = match.captured (QStringLiteral ("end")).toInt ();
-            payload = payload.mid (on_start, end - on_start + 1);
+            payload = payload.mid (on_signal_start, end - on_signal_start + 1);
         }
     }
 }
@@ -761,7 +761,7 @@ void FakeGetWithDataReply.respond () {
     /* emit */ finished ();
 }
 
-void FakeGetWithDataReply.on_abort () {
+void FakeGetWithDataReply.on_signal_abort () {
     setError (OperationCanceledError, QStringLiteral ("Operation Canceled"));
     aborted = true;
 }
@@ -803,7 +803,7 @@ FileInfo *FakeChunkMoveReply.perform (FileInfo uploadsFileInfo, FileInfo remoteR
     //  Q_ASSERT (sourceFolder);
     //  Q_ASSERT (sourceFolder.isDir);
     int count = 0;
-    qlonglong size = 0;
+    int64 size = 0;
     char payload = '\0';
 
     string fileName = getFilePathFromUrl (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
@@ -828,10 +828,10 @@ FileInfo *FakeChunkMoveReply.perform (FileInfo uploadsFileInfo, FileInfo remoteR
         //  Q_ASSERT (request.hasRawHeader ("If"));
 
         // And it should condition on the destination file
-        var on_start = GLib.ByteArray ("<" + request.rawHeader ("Destination") + ">");
-        //  Q_ASSERT (request.rawHeader ("If").startsWith (on_start));
+        var on_signal_start = GLib.ByteArray ("<" + request.rawHeader ("Destination") + ">");
+        //  Q_ASSERT (request.rawHeader ("If").startsWith (on_signal_start));
 
-        if (request.rawHeader ("If") != on_start + " ([\"" + fileInfo.etag + "\"])") {
+        if (request.rawHeader ("If") != on_signal_start + " ([\"" + fileInfo.etag + "\"])") {
             return null;
         }
         fileInfo.size = size;
@@ -863,8 +863,8 @@ void FakeChunkMoveReply.respondPreconditionFailed () {
     /* emit */ finished ();
 }
 
-void FakeChunkMoveReply.on_abort () {
-    setError (OperationCanceledError, QStringLiteral ("on_abort"));
+void FakeChunkMoveReply.on_signal_abort () {
+    setError (OperationCanceledError, QStringLiteral ("on_signal_abort"));
     /* emit */ finished ();
 }
 
@@ -919,10 +919,10 @@ void FakeErrorReply.respond () {
     /* emit */ metaDataChanged ();
     /* emit */ readyRead ();
     // finishing can come strictly after readyRead was called
-    QTimer.singleShot (5, this, &FakeErrorReply.on_slot_finished);
+    QTimer.singleShot (5, this, &FakeErrorReply.on_signal_slot_finished);
 }
 
-void FakeErrorReply.on_slot_finished () {
+void FakeErrorReply.on_signal_slot_finished () {
     setFinished (true);
     /* emit */ finished ();
 }
@@ -946,8 +946,8 @@ FakeHangingReply.FakeHangingReply (QNetworkAccessManager.Operation op, QNetworkR
     open (QIODevice.ReadOnly);
 }
 
-void FakeHangingReply.on_abort () {
-    // Follow more or less the implementation of QNetworkReplyImpl.on_abort
+void FakeHangingReply.on_signal_abort () {
+    // Follow more or less the implementation of QNetworkReplyImpl.on_signal_abort
     close ();
     setError (OperationCanceledError, _("Operation canceled"));
     /* emit */ errorOccurred (OperationCanceledError);
@@ -965,7 +965,7 @@ QJsonObject FakeQNAM.forEachReplyPart (QIODevice outgoingData,
                                        std.function<QJsonObject (GLib.HashMap<string, GLib.ByteArray> &)> replyFunction) {
     var fullReply = QJsonObject{};
     var putPayload = outgoingData.peek (outgoingData.bytesAvailable ());
-    outgoingData.on_reset ();
+    outgoingData.on_signal_reset ();
     var stringPutPayload = string.fromUtf8 (putPayload);
     const int boundaryPosition = sizeof ("multipart/related; boundary=");
     const string boundaryValue = QStringLiteral ("--") + contentType.mid (boundaryPosition, contentType.length () - boundaryPosition - 1) + QStringLiteral ("\r\n");
@@ -1029,7 +1029,7 @@ Soup.Reply *FakeQNAM.createRequest (QNetworkAccessManager.Operation op, QNetwork
                 reply = new FakePutMultiFileReply { info, op, newRequest, contentType, outgoingData.readAll (), this };
             }
         } else {
-            qDebug () << verb << outgoingData;
+            GLib.debug () + verb + outgoingData;
             Q_UNREACHABLE ();
         }
     }
@@ -1056,7 +1056,7 @@ FakeFolder.FakeFolder (FileInfo fileTemplate, Occ.Optional<FileInfo> localFileIn
     Occ.Logger.instance ().addLogRule ({ QStringLiteral ("sync.httplogger=true") });
 
     QDir rootDir { this.tempDir.path () };
-    qDebug () << "FakeFolder operating on" << rootDir;
+    GLib.debug ("FakeFolder operating on" + rootDir;
     if (localFileInfo) {
         toDisk (rootDir, *localFileInfo);
     } else {
@@ -1112,7 +1112,7 @@ void FakeFolder.switchToVfs (unowned<Occ.Vfs> vfs) {
         vfs.unregisterFolder ();
     });
 
-    vfs.on_start (vfsParams);
+    vfs.on_signal_start (vfsParams);
 }
 
 FileInfo FakeFolder.currentLocalState () {
@@ -1143,7 +1143,7 @@ void FakeFolder.execUntilBeforePropagation () {
 void FakeFolder.execUntilItemCompleted (string relativePath) {
     QSignalSpy spy (this.syncEngine.get (), SIGNAL (itemCompleted (SyncFileItemPtr &)));
     QElapsedTimer t;
-    t.on_start ();
+    t.on_signal_start ();
     while (t.elapsed () < 5000) {
         spy.clear ();
         QVERIFY (spy.wait ());
@@ -1185,7 +1185,7 @@ void FakeFolder.fromDisk (QDir dir, FileInfo templateFi) {
             f.open (GLib.File.ReadOnly);
             var content = f.read (1);
             if (content.size () == 0) {
-                qWarning () << "Empty file at:" << diskChild.filePath ();
+                qWarning ("Empty file at:" + diskChild.filePath ();
                 continue;
             }
             char contentChar = content.at (0);

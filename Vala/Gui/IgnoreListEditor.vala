@@ -31,7 +31,7 @@ class Ignore_list_editor : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_restore_defaults (QAbstractButton button);
+    private void on_signal_restore_defaults (QAbstractButton button);
 
     /***********************************************************
     ***********************************************************/
@@ -59,7 +59,7 @@ class Ignore_list_editor : Gtk.Dialog {
         ui.ignore_table_widget.read_ignore_file (user_config);
 
         connect (this, &Gtk.Dialog.accepted, [=] () {
-            ui.ignore_table_widget.on_write_ignore_file (user_config);
+            ui.ignore_table_widget.on_signal_write_ignore_file (user_config);
             /* handle the hidden file checkbox */
 
             /* the ignore_hidden_files flag is a folder specific setting, but for now, it is
@@ -70,7 +70,7 @@ class Ignore_list_editor : Gtk.Dialog {
             FolderMan.instance ().ignore_hidden_files (ignore_hidden_files ());
         });
         connect (ui.button_box, &QDialogButtonBox.clicked,
-                this, &Ignore_list_editor.on_restore_defaults);
+                this, &Ignore_list_editor.on_signal_restore_defaults);
 
         ui.sync_hidden_files_check_box.checked (!FolderMan.instance ().ignore_hidden_files ());
     }
@@ -89,11 +89,11 @@ class Ignore_list_editor : Gtk.Dialog {
         return !ui.sync_hidden_files_check_box.is_checked ();
     }
 
-    void Ignore_list_editor.on_restore_defaults (QAbstractButton button) {
+    void Ignore_list_editor.on_signal_restore_defaults (QAbstractButton button) {
         if (ui.button_box.button_role (button) != QDialogButtonBox.Reset_role)
             return;
 
-        ui.ignore_table_widget.on_remove_all_items ();
+        ui.ignore_table_widget.on_signal_remove_all_items ();
 
         ConfigFile cfg_file;
         setup_table_read_only_items ();

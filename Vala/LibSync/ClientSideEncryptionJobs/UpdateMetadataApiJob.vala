@@ -37,7 +37,7 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override {
+    public void on_signal_start () override {
         Soup.Request req;
         req.raw_header ("OCS-APIREQUEST", "true");
         req.header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
@@ -57,20 +57,20 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
         var buffer = new Soup.Buffer (this);
         buffer.data (data);
 
-        GLib.info (lc_cse_job ()) << "updating the metadata for the file_identifier" << this.file_identifier << "as encrypted";
+        GLib.info ()) + "updating the metadata for the file_identifier" + this.file_identifier + "as encrypted";
         send_request ("PUT", url, req, buffer);
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
-    protected bool on_finished () override {
+    protected bool on_signal_finished () override {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (return_code != 200) {
-                GLib.info (lc_cse_job ()) << "error updating the metadata" << path () << error_string () << return_code;
+                GLib.info ()) + "error updating the metadata" + path () + error_string () + return_code;
                 emit error (this.file_identifier, return_code);
             }
 
-            GLib.info (lc_cse_job ()) << "Metadata submited to the server successfully";
+            GLib.info ()) + "Metadata submited to the server successfully";
             emit success (this.file_identifier);
         return true;
     }

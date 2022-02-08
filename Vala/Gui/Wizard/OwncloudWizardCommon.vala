@@ -31,7 +31,7 @@ class WizardCommon {
         } else {
             string string_value = variant.to_string ();
             if (!string_value.is_empty ()) {
-                label.on_text (string_value);
+                label.on_signal_text (string_value);
                 label.text_format (Qt.RichText);
                 label.visible (true);
                 label.open_external_links (true);
@@ -75,7 +75,7 @@ class WizardCommon {
         var palette = label.palette ();
         Gtk.Color text_color = palette.color (QPalette.Text);
         text_color.alpha (128);
-        palette.on_color (QPalette.Text, text_color);
+        palette.on_signal_color (QPalette.Text, text_color);
         label.palette (palette);
     }
 

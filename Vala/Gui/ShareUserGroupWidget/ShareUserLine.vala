@@ -31,32 +31,32 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public void on_style_changed ();
+    public void on_signal_style_changed ();
 
     /***********************************************************
     ***********************************************************/
-    public void on_focus_password_line_edit ();
+    public void on_signal_focus_password_line_edit ();
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_delete_share_button_clicked ();
-    private void on_permissions_changed ();
-    private void on_edit_permissions_changed ();
-    private void on_password_checkbox_changed ();
-    private void on_delete_animation_finished ();
+    private void on_signal_delete_share_button_clicked ();
+    private void on_signal_permissions_changed ();
+    private void on_signal_edit_permissions_changed ();
+    private void on_signal_password_checkbox_changed ();
+    private void on_signal_delete_animation_finished ();
 
     /***********************************************************
     ***********************************************************/
-    private void on_refresh_password_options ();
+    private void on_signal_refresh_password_options ();
 
     /***********************************************************
     ***********************************************************/
-    private void on_refresh_password_line_edit_placeholder ();
+    private void on_signal_refresh_password_line_edit_placeholder ();
 
     /***********************************************************
     ***********************************************************/
-    private void on_password_set ();
+    private void on_signal_password_set ();
 
     /***********************************************************
     ***********************************************************/
@@ -64,27 +64,27 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void on_permissions_set ();
+    private void on_signal_permissions_set ();
 
     /***********************************************************
     ***********************************************************/
-    private void on_avatar_loaded (QImage avat
+    private void on_signal_avatar_loaded (Gtk.Image avat
 
     /***********************************************************
     ***********************************************************/
-    private void on_password_confirmed ();
+    private void on_signal_password_confirmed ();
 
     /***********************************************************
     ***********************************************************/
-    private void on_line_edit_password_return_pr
+    private void on_signal_line_edit_password_return_pr
 
     /***********************************************************
     ***********************************************************/
-    private void on_confirm_password_clicked ();
+    private void on_signal_confirm_password_clicked ();
 
     /***********************************************************
     ***********************************************************/
-    private void on_avatar_context_menu (QPoint global_position);
+    private void on_signal_avatar_context_menu (QPoint global_position);
 
 
     /***********************************************************
@@ -103,7 +103,7 @@ signals:
     private 
     private void show_note_options (bool show);
     private void toggle_note_options (bool enable);
-    private void on_note_confirm_button_clicked ();
+    private void on_signal_note_confirm_button_clicked ();
     private void note (string note);
 
     /***********************************************************
@@ -165,7 +165,7 @@ signals:
         this.ui.up_ui (this);
 
         this.ui.shared_with.elide_mode (Qt.Elide_right);
-        this.ui.shared_with.on_text (share.get_share_with ().format ());
+        this.ui.shared_with.on_signal_text (share.get_share_with ().format ());
 
         // adds permissions
         // can edit permission
@@ -173,16 +173,16 @@ signals:
         if (!this.is_file) enabled = enabled && (max_sharing_permissions & Share_permission_create &&
                                           max_sharing_permissions & Share_permission_delete);
         this.ui.permissions_edit.enabled (enabled);
-        connect (this.ui.permissions_edit, &QAbstractButton.clicked, this, &Share_user_line.on_edit_permissions_changed);
-        connect (this.ui.note_confirm_button, &QAbstractButton.clicked, this, &Share_user_line.on_note_confirm_button_clicked);
+        connect (this.ui.permissions_edit, &QAbstractButton.clicked, this, &Share_user_line.on_signal_edit_permissions_changed);
+        connect (this.ui.note_confirm_button, &QAbstractButton.clicked, this, &Share_user_line.on_signal_note_confirm_button_clicked);
         connect (this.ui.calendar, &QDate_time_edit.date_changed, this, &Share_user_line.expire_date);
 
         connect (this.share.data (), &User_group_share.note_set, this, &Share_user_line.disable_progess_indicator_animation);
         connect (this.share.data (), &User_group_share.note_error, this, &Share_user_line.disable_progess_indicator_animation);
         connect (this.share.data (), &User_group_share.expire_date_set, this, &Share_user_line.disable_progess_indicator_animation);
 
-        connect (this.ui.confirm_password, &QToolButton.clicked, this, &Share_user_line.on_confirm_password_clicked);
-        connect (this.ui.line_edit_password, &QLineEdit.return_pressed, this, &Share_user_line.on_line_edit_password_return_pressed);
+        connect (this.ui.confirm_password, &QToolButton.clicked, this, &Share_user_line.on_signal_confirm_password_clicked);
+        connect (this.ui.line_edit_password, &QLineEdit.return_pressed, this, &Share_user_line.on_signal_line_edit_password_return_pressed);
 
         // create menu with checkable permissions
         var menu = new QMenu (this);
@@ -190,7 +190,7 @@ signals:
         this.permission_reshare.checkable (true);
         this.permission_reshare.enabled (max_sharing_permissions & Share_permission_share);
         menu.add_action (this.permission_reshare);
-        connect (this.permission_reshare, &QAction.triggered, this, &Share_user_line.on_permissions_changed);
+        connect (this.permission_reshare, &QAction.triggered, this, &Share_user_line.on_signal_permissions_changed);
 
         show_note_options (false);
 
@@ -231,7 +231,7 @@ signals:
           this.delete_share_button= new QAction (deleteicon,_("Unshare"), this);
 
         menu.add_action (this.delete_share_button);
-        connect (this.delete_share_button, &QAction.triggered, this, &Share_user_line.on_delete_share_button_clicked);
+        connect (this.delete_share_button, &QAction.triggered, this, &Share_user_line.on_signal_delete_share_button_clicked);
 
         /***********************************************************
         Files can't have create or delete permissions
@@ -241,19 +241,19 @@ signals:
             this.permission_create.checkable (true);
             this.permission_create.enabled (max_sharing_permissions & Share_permission_create);
             menu.add_action (this.permission_create);
-            connect (this.permission_create, &QAction.triggered, this, &Share_user_line.on_permissions_changed);
+            connect (this.permission_create, &QAction.triggered, this, &Share_user_line.on_signal_permissions_changed);
 
             this.permission_change = new QAction (_("Can change"), this);
             this.permission_change.checkable (true);
             this.permission_change.enabled (max_sharing_permissions & Share_permission_update);
             menu.add_action (this.permission_change);
-            connect (this.permission_change, &QAction.triggered, this, &Share_user_line.on_permissions_changed);
+            connect (this.permission_change, &QAction.triggered, this, &Share_user_line.on_signal_permissions_changed);
 
             this.permission_delete = new QAction (_("Can delete"), this);
             this.permission_delete.checkable (true);
             this.permission_delete.enabled (max_sharing_permissions & Share_permission_delete);
             menu.add_action (this.permission_delete);
-            connect (this.permission_delete, &QAction.triggered, this, &Share_user_line.on_permissions_changed);
+            connect (this.permission_delete, &QAction.triggered, this, &Share_user_line.on_signal_permissions_changed);
         }
 
         // Adds action to display password widget (check box)
@@ -265,15 +265,15 @@ signals:
             this.password_protect_link_action.enabled (!this.share.is_password_set () || !this.account.capabilities ().share_email_password_enforced ());
 
             menu.add_action (this.password_protect_link_action);
-            connect (this.password_protect_link_action, &QAction.triggered, this, &Share_user_line.on_password_checkbox_changed);
+            connect (this.password_protect_link_action, &QAction.triggered, this, &Share_user_line.on_signal_password_checkbox_changed);
 
-            on_refresh_password_line_edit_placeholder ();
+            on_signal_refresh_password_line_edit_placeholder ();
 
-            connect (this.share.data (), &Share.password_set, this, &Share_user_line.on_password_set);
-            connect (this.share.data (), &Share.password_error, this, &Share_user_line.on_password_error);
+            connect (this.share.data (), &Share.password_set, this, &Share_user_line.on_signal_password_set);
+            connect (this.share.data (), &Share.password_error, this, &Share_user_line.on_signal_password_error);
         }
 
-        on_refresh_password_options ();
+        on_signal_refresh_password_options ();
 
         this.ui.error_label.hide ();
 
@@ -296,15 +296,15 @@ signals:
             this.ui.permission_tool_button.visible (false);
         }
 
-        connect (share.data (), &Share.permissions_set, this, &Share_user_line.on_permissions_set);
-        connect (share.data (), &Share.share_deleted, this, &Share_user_line.on_share_deleted);
+        connect (share.data (), &Share.permissions_set, this, &Share_user_line.on_signal_permissions_set);
+        connect (share.data (), &Share.share_deleted, this, &Share_user_line.on_signal_share_deleted);
 
         if (!share.account ().capabilities ().share_resharing ()) {
             this.permission_reshare.visible (false);
         }
 
         const var avatar_event_filter = new Avatar_event_filter (this.ui.avatar);
-        connect (avatar_event_filter, &Avatar_event_filter.context_menu, this, &Share_user_line.on_avatar_context_menu);
+        connect (avatar_event_filter, &Avatar_event_filter.context_menu, this, &Share_user_line.on_signal_avatar_context_menu);
         this.ui.avatar.install_event_filter (avatar_event_filter);
 
         load_avatar ();
@@ -312,7 +312,7 @@ signals:
         customize_style ();
     }
 
-    void Share_user_line.on_avatar_context_menu (QPoint global_position) {
+    void Share_user_line.on_signal_avatar_context_menu (QPoint global_position) {
         if (this.share.get_share_type () == Share.Type_user) {
             this.profile_page_menu.exec (global_position);
         }
@@ -336,8 +336,8 @@ signals:
          */
         if (this.share.get_share_with ().type () == Sharee.User) {
             var job = new AvatarJob (this.share.account (), this.share.get_share_with ().share_with (), avatar_size, this);
-            connect (job, &AvatarJob.avatar_pixmap, this, &Share_user_line.on_avatar_loaded);
-            job.on_start ();
+            connect (job, &AvatarJob.avatar_pixmap, this, &Share_user_line.on_signal_avatar_loaded);
+            job.on_signal_start ();
         }
     }
 
@@ -364,15 +364,15 @@ signals:
         if (!pixmap.is_null ()) {
             this.ui.avatar.pixmap (pixmap);
         } else {
-            GLib.debug (lc_sharing) << "pixmap is null for share type : " << this.share.get_share_with ().type ();
+            GLib.debug ("pixmap is null for share type : " + this.share.get_share_with ().type ();
 
             // The avatar label is the first character of the user name.
             const var text = this.share.get_share_with ().display_name ();
-            this.ui.avatar.on_text (text.at (0).to_upper ());
+            this.ui.avatar.on_signal_text (text.at (0).to_upper ());
         }
     }
 
-    void Share_user_line.on_avatar_loaded (QImage avatar) {
+    void Share_user_line.on_signal_avatar_loaded (Gtk.Image avatar) {
         if (avatar.is_null ())
             return;
 
@@ -383,7 +383,7 @@ signals:
         this.ui.avatar.style_sheet ("");
     }
 
-    void Share_user_line.on_delete_share_button_clicked () {
+    void Share_user_line.on_signal_delete_share_button_clicked () {
         enabled (false);
         this.share.delete_share ();
     }
@@ -392,7 +392,7 @@ signals:
         delete this.ui;
     }
 
-    void Share_user_line.on_edit_permissions_changed () {
+    void Share_user_line.on_signal_edit_permissions_changed () {
         enabled (false);
 
         // Can never manually be set to "partial".
@@ -429,7 +429,7 @@ signals:
         this.share.permissions (permissions);
     }
 
-    void Share_user_line.on_permissions_changed () {
+    void Share_user_line.on_signal_permissions_changed () {
         enabled (false);
 
         Share.Permissions permissions = Share_permission_read;
@@ -452,29 +452,29 @@ signals:
         this.share.permissions (permissions);
     }
 
-    void Share_user_line.on_password_checkbox_changed () {
+    void Share_user_line.on_signal_password_checkbox_changed () {
         if (!this.password_protect_link_action.is_checked ()) {
             this.ui.error_label.hide ();
             this.ui.error_label.clear ();
 
             if (!this.share.is_password_set ()) {
                 this.ui.line_edit_password.clear ();
-                on_refresh_password_options ();
+                on_signal_refresh_password_options ();
             } else {
-                // do not call on_refresh_password_options here, as it will be called after the network request is complete
+                // do not call on_signal_refresh_password_options here, as it will be called after the network request is complete
                 toggle_password_progress_animation (true);
                 this.share.password ("");
             }
         } else {
-            on_refresh_password_options ();
+            on_signal_refresh_password_options ();
 
             if (this.ui.line_edit_password.is_visible () && this.ui.line_edit_password.is_enabled ()) {
-                on_focus_password_line_edit ();
+                on_signal_focus_password_line_edit ();
             }
         }
     }
 
-    void Share_user_line.on_delete_animation_finished () {
+    void Share_user_line.on_signal_delete_animation_finished () {
         /* emit */ resize_requested ();
         /* emit */ visual_deletion_done ();
         delete_later ();
@@ -485,7 +485,7 @@ signals:
         connect (this, SIGNAL (destroyed (GLib.Object *)), parent_widget (), SLOT (repaint ()));
     }
 
-    void Share_user_line.on_refresh_password_options () {
+    void Share_user_line.on_signal_refresh_password_options () {
         const bool is_password_enabled = this.share.get_share_type () == Share.Type_email && this.password_protect_link_action.is_checked ();
 
         this.ui.password_label.visible (is_password_enabled);
@@ -496,7 +496,7 @@ signals:
         /* emit */ resize_requested ();
     }
 
-    void Share_user_line.on_refresh_password_line_edit_placeholder () {
+    void Share_user_line.on_signal_refresh_password_line_edit_placeholder () {
         if (this.share.is_password_set ()) {
             this.ui.line_edit_password.placeholder_text (string.from_utf8 (password_is_placeholder));
         } else {
@@ -504,54 +504,54 @@ signals:
         }
     }
 
-    void Share_user_line.on_password_set () {
+    void Share_user_line.on_signal_password_set () {
         toggle_password_progress_animation (false);
         this.ui.line_edit_password.enabled (true);
         this.ui.confirm_password.enabled (true);
 
-        this.ui.line_edit_password.on_text ("");
+        this.ui.line_edit_password.on_signal_text ("");
 
         this.password_protect_link_action.enabled (!this.share.is_password_set () || !this.account.capabilities ().share_email_password_enforced ());
 
-        on_refresh_password_line_edit_placeholder ();
+        on_signal_refresh_password_line_edit_placeholder ();
 
-        on_refresh_password_options ();
+        on_signal_refresh_password_options ();
     }
 
-    void Share_user_line.on_password_error (int status_code, string message) {
-        GLib.warn (lc_sharing) << "Error from server" << status_code << message;
+    void Share_user_line.on_signal_password_error (int status_code, string message) {
+        GLib.warn ("Error from server" + status_code + message;
 
         toggle_password_progress_animation (false);
 
         this.ui.line_edit_password.enabled (true);
         this.ui.confirm_password.enabled (true);
 
-        on_refresh_password_line_edit_placeholder ();
+        on_signal_refresh_password_line_edit_placeholder ();
 
-        on_refresh_password_options ();
+        on_signal_refresh_password_options ();
 
-        on_focus_password_line_edit ();
+        on_signal_focus_password_line_edit ();
 
         this.ui.error_label.show ();
-        this.ui.error_label.on_text (message);
+        this.ui.error_label.on_signal_text (message);
 
         /* emit */ resize_requested ();
     }
 
-    void Share_user_line.on_share_deleted () {
+    void Share_user_line.on_signal_share_deleted () {
         var animation = new QPropertyAnimation (this, "maximum_height", this);
 
         animation.duration (500);
         animation.start_value (height ());
         animation.end_value (0);
 
-        connect (animation, &QAbstractAnimation.on_finished, this, &Share_user_line.on_delete_animation_finished);
+        connect (animation, &QAbstractAnimation.on_signal_finished, this, &Share_user_line.on_signal_delete_animation_finished);
         connect (animation, &QVariantAnimation.value_changed, this, &Share_user_line.resize_requested);
 
-        animation.on_start ();
+        animation.on_signal_start ();
     }
 
-    void Share_user_line.on_permissions_set () {
+    void Share_user_line.on_signal_permissions_set () {
         display_permissions ();
         enabled (true);
     }
@@ -585,11 +585,11 @@ signals:
         }
     }
 
-    void Share_user_line.on_style_changed () {
+    void Share_user_line.on_signal_style_changed () {
         customize_style ();
     }
 
-    void Share_user_line.on_focus_password_line_edit () {
+    void Share_user_line.on_signal_focus_password_line_edit () {
         this.ui.line_edit_password.focus ();
     }
 
@@ -600,7 +600,7 @@ signals:
         this.delete_share_button.icon (deleteicon);
 
         this.ui.note_confirm_button.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
-        this.ui.progress_indicator.on_color (QGuiApplication.palette ().color (QPalette.Window_text));
+        this.ui.progress_indicator.on_signal_color (QGuiApplication.palette ().color (QPalette.Window_text));
 
         // make sure to force Background_role to QPalette.Window_text for a lable, because it's parent always has a different role set that applies to children unless customized
         this.ui.error_label.background_role (QPalette.Window_text);
@@ -609,9 +609,9 @@ signals:
     QPixmap Share_user_line.pixmap_for_sharee_type (Sharee.Type type, Gtk.Color background_color) {
         switch (type) {
         case Sharee.Room:
-            return Ui.Icon_utils.pixmap_for_background (QStringLiteral ("talk-app.svg"), background_color);
+            return Ui.IconUtils.pixmap_for_background (QStringLiteral ("talk-app.svg"), background_color);
         case Sharee.Email:
-            return Ui.Icon_utils.pixmap_for_background (QStringLiteral ("email.svg"), background_color);
+            return Ui.IconUtils.pixmap_for_background (QStringLiteral ("email.svg"), background_color);
         case Sharee.Group:
         case Sharee.Federated:
         case Sharee.Circle:
@@ -635,18 +635,18 @@ signals:
             break;
         }
 
-        const var calculate_background_based_on_text = [this] () {
+        const var calculate_background_based_on_signal_text = [this] () {
             const var hash = QCryptographicHash.hash (this.ui.shared_with.text ().to_utf8 (), QCryptographicHash.Md5);
             //  Q_ASSERT (hash.size () > 0);
             if (hash.size () == 0) {
-                GLib.warn (lc_sharing) << "Failed to calculate hash color for share:" << this.share.path ();
+                GLib.warn ("Failed to calculate hash color for share:" + this.share.path ();
                 return Gtk.Color{};
             }
             const double hue = static_cast<uint8> (hash[0]) / 255.;
             return Gtk.Color.from_hsl_f (hue, 0.7, 0.68);
         }
 
-        return calculate_background_based_on_text ();
+        return calculate_background_based_on_signal_text ();
     }
 
     void Share_user_line.show_note_options (bool show) {
@@ -656,7 +656,7 @@ signals:
 
         if (show) {
             const var note = this.share.get_note ();
-            this.ui.note_text_edit.on_text (note);
+            this.ui.note_text_edit.on_signal_text (note);
             this.ui.note_text_edit.focus ();
         }
 
@@ -672,7 +672,7 @@ signals:
         }
     }
 
-    void Share_user_line.on_note_confirm_button_clicked () {
+    void Share_user_line.on_signal_note_confirm_button_clicked () {
         note (this.ui.note_text_edit.to_plain_text ());
     }
 
@@ -716,10 +716,10 @@ signals:
     void Share_user_line.enable_progess_indicator_animation (bool enable) {
         if (enable) {
             if (!this.ui.progress_indicator.is_animated ()) {
-                this.ui.progress_indicator.on_start_animation ();
+                this.ui.progress_indicator.on_signal_start_animation ();
             }
         } else {
-            this.ui.progress_indicator.on_stop_animation ();
+            this.ui.progress_indicator.on_signal_stop_animation ();
         }
     }
 
@@ -729,10 +729,10 @@ signals:
         this.ui.password_progress_indicator.visible (show);
         if (show) {
             if (!this.ui.password_progress_indicator.is_animated ()) {
-                this.ui.password_progress_indicator.on_start_animation ();
+                this.ui.password_progress_indicator.on_signal_start_animation ();
             }
         } else {
-            this.ui.password_progress_indicator.on_stop_animation ();
+            this.ui.password_progress_indicator.on_signal_stop_animation ();
         }
     }
 
@@ -767,7 +767,7 @@ signals:
         return this.account.capabilities ().share_internal_enforce_expire_date ();
     }
 
-    void Share_user_line.on_password_confirmed () {
+    void Share_user_line.on_signal_password_confirmed () {
         if (this.ui.line_edit_password.text ().is_empty ()) {
             return;
         }
@@ -782,10 +782,10 @@ signals:
         this.share.password (this.ui.line_edit_password.text ());
     }
 
-    void Share_user_line.on_line_edit_password_return_pressed () {
-        on_password_confirmed ();
+    void Share_user_line.on_signal_line_edit_password_return_pressed () {
+        on_signal_password_confirmed ();
     }
 
-    void Share_user_line.on_confirm_password_clicked () {
-        on_password_confirmed ();
+    void Share_user_line.on_signal_confirm_password_clicked () {
+        on_signal_password_confirmed ();
     }

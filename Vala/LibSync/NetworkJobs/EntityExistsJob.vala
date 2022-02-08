@@ -24,15 +24,15 @@ class EntityExistsJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         send_request ("HEAD", make_account_url (path ()));
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private bool on_finished () {
+    private bool on_signal_finished () {
         /* emit */ exists (reply ());
         return true;
     }

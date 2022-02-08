@@ -55,7 +55,7 @@ class CookieJar : QNetworkCookieJar {
     ***********************************************************/
     public GLib.List<QNetworkCookie> cookies_for_url (GLib.Uri url) {
         GLib.List<QNetworkCookie> cookies = QNetworkCookieJar.cookies_for_url (url);
-        GLib.debug (lc_cookie_jar) << url << "requests:" << cookies;
+        GLib.debug () + url + "requests:" + cookies;
         return cookies;
     }
 
@@ -75,13 +75,13 @@ class CookieJar : QNetworkCookieJar {
             info.dir ().mkpath (".");
         }
 
-        GLib.debug (lc_cookie_jar) << filename;
+        GLib.debug () + filename;
         GLib.File file = new GLib.File (filename);
         if (!file.open (QIODevice.WriteOnly)) {
             return false;
         }
         QDataStream stream (&file);
-        stream << remove_expired (all_cookies ());
+        stream + remove_expired (all_cookies ());
         file.close ();
         return true;
     }
@@ -114,7 +114,7 @@ class CookieJar : QNetworkCookieJar {
         GLib.List<QNetworkCookie> updated_list;
         foreach (QNetworkCookie cookie, cookies) {
             if (cookie.expiration_date () > GLib.DateTime.current_date_time_utc () && !cookie.is_session_cookie ()) {
-                updated_list << cookie;
+                updated_list + cookie;
             }
         }
         return updated_list;
@@ -122,10 +122,10 @@ class CookieJar : QNetworkCookieJar {
 
 
     //  QDataStream operator<< (QDataStream stream, GLib.List<QNetworkCookie> list) {
-    //      stream << JAR_VERSION;
-    //      stream << uint32 (list.size ());
+    //      stream + JAR_VERSION;
+    //      stream + uint32 (list.size ());
     //      for (var cookie : list)
-    //          stream << cookie.to_raw_form ();
+    //          stream + cookie.to_raw_form ();
     //      return stream;
     //  }
 
@@ -146,7 +146,7 @@ class CookieJar : QNetworkCookieJar {
     //          stream >> value;
     //          GLib.List<QNetworkCookie> new_cookies = QNetworkCookie.parse_cookies (value);
     //          if (new_cookies.count () == 0 && value.length () != 0) {
-    //              GLib.warn (lc_cookie_jar) << "CookieJar : Unable to parse saved cookie:" << value;
+    //              GLib.warn ("CookieJar : Unable to parse saved cookie:" + value;
     //          }
     //          for (int j = 0; j < new_cookies.count (); ++j)
     //              list.append (new_cookies.at (j));

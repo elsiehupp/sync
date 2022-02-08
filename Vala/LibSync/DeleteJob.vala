@@ -45,7 +45,7 @@ class DeleteJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         Soup.Request req;
         if (!this.folder_token.is_empty ()) {
             req.raw_header ("e2e-token", this.folder_token);
@@ -58,17 +58,17 @@ class DeleteJob : AbstractNetworkJob {
         }
 
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warn (lc_delete_job) << " Network error : " << reply ().error_string ();
+            GLib.warn (" Network error : " + reply ().error_string ();
         }
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool on_finished () {
-        GLib.info (lc_delete_job) << "DELETE of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                           << reply_status_string ();
+    public bool on_signal_finished () {
+        GLib.info ("DELETE of" + reply ().request ().url ("FINISHED WITH STATUS"
+                           + reply_status_string ();
 
         /* emit */ finished_signal ();
         return true;

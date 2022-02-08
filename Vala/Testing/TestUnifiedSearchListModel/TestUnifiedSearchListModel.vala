@@ -37,13 +37,13 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_init_test_case () {
-        fakeQnam.on_reset (new FakeQNAM ({}));
+    private void on_signal_init_test_case () {
+        fakeQnam.on_signal_reset (new FakeQNAM ({}));
         account = Occ.Account.create ();
         account.setCredentials (new FakeCredentials{fakeQnam.data ()});
         account.setUrl (GLib.Uri ( ("http://example.de")));
 
-        accountState.on_reset (new Occ.AccountState (account));
+        accountState.on_signal_reset (new Occ.AccountState (account));
 
         fakeQnam.setOverride ([this] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice device) {
             //  Q_UNUSED (device);
@@ -85,17 +85,17 @@ class TestUnifiedSearchListmodel : GLib.Object {
             return reply;
         });
 
-        model.on_reset (new Occ.UnifiedSearchResultsListModel (accountState.data ()));
+        model.on_signal_reset (new Occ.UnifiedSearchResultsListModel (accountState.data ()));
 
-        modelTester.on_reset (new QAbstractItemModelTester (model.data ()));
+        modelTester.on_signal_reset (new QAbstractItemModelTester (model.data ()));
 
-        fakeDesktopServicesUrlHandler.on_reset (new FakeDesktopServicesUrlHandler);
+        fakeDesktopServicesUrlHandler.on_signal_reset (new FakeDesktopServicesUrlHandler);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_search_term_start_stop_search () {
+    private void on_signal_test_search_term_start_stop_search () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
         QVERIFY (model.rowCount () == 0);
@@ -130,7 +130,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_search_term_results_found () {
+    private void on_signal_test_search_term_results_found () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
         QVERIFY (model.rowCount () == 0);
@@ -149,7 +149,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
         QVERIFY (searchInProgressChanged.wait ());
 
-        // make sure search has on_finished
+        // make sure search has on_signal_finished
         QVERIFY (!model.isSearchInProgress ());
 
         QVERIFY (model.rowCount () > 0);
@@ -158,7 +158,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_search_term_results_not_found () {
+    private void on_signal_test_search_term_results_not_found () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
         QVERIFY (model.rowCount () == 0);
@@ -177,7 +177,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
         QVERIFY (searchInProgressChanged.wait ());
 
-        // make sure search has on_finished
+        // make sure search has on_signal_finished
         QVERIFY (!model.isSearchInProgress ());
 
         QVERIFY (model.rowCount () == 0);
@@ -186,7 +186,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_fetch_more_clicked () {
+    private void on_signal_test_fetch_more_clicked () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
         QVERIFY (model.rowCount () == 0);
@@ -204,7 +204,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
         QVERIFY (searchInProgressChanged.wait ());
 
-        // make sure search has on_finished
+        // make sure search has on_signal_finished
         QVERIFY (!model.isSearchInProgress ());
 
         const var numRowsInModelPrev = model.rowCount ();
@@ -288,7 +288,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_search_term_result_tickled () {
+    private void on_signal_test_search_term_result_tickled () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
         QVERIFY (model.rowCount () == 0);
@@ -307,7 +307,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
         QVERIFY (searchInProgressChanged.wait ());
 
-        // make sure search has on_finished and some results has been received
+        // make sure search has on_signal_finished and some results has been received
         QVERIFY (!model.isSearchInProgress ());
 
         QVERIFY (model.rowCount () != 0);
@@ -323,7 +323,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
         for (int i = 0; i < model.rowCount (); ++i) {
             const var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
 
-            if (type == Occ.UnifiedSearchResult.Type.Default) {
+            if (type == Occ.UnifiedSearchResult.Type.DEFAULT) {
                 const var providerId =
                     model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                         .toString ();
@@ -348,7 +348,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_search_term_results_error () {
+    private void on_signal_test_search_term_results_error () {
         // make sure the model is empty
         model.setSearchTerm (QStringLiteral (""));
         QVERIFY (model.rowCount () == 0);
@@ -366,7 +366,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
         QVERIFY (searchInProgressChanged.wait ());
 
-        // make sure search has on_finished
+        // make sure search has on_signal_finished
         QVERIFY (!model.isSearchInProgress ());
 
         // make sure the model is empty and an error string has been set
@@ -380,7 +380,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_cleanup_test_case () {
+    private void on_signal_cleanup_test_case () {
         FakeSearchResultsStorage.destroy ();
     }
 }

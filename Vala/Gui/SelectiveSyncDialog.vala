@@ -36,7 +36,7 @@ class Selective_sync_dialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public void on_accept () override;
+    public void on_signal_accept () override;
 
     /***********************************************************
     ***********************************************************/
@@ -52,7 +52,7 @@ class Selective_sync_dialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_init (AccountPointer account);
+    private void on_signal_init (AccountPointer account);
 
     /***********************************************************
     ***********************************************************/
@@ -68,9 +68,9 @@ class Selective_sync_dialog : Gtk.Dialog {
     Selective_sync_dialog.Selective_sync_dialog (AccountPointer account, Folder folder, Gtk.Widget parent, Qt.Window_flags f)
         : Gtk.Dialog (parent, f)
         this.folder (folder)
-        this.ok_button (null) // defined in on_init () {
+        this.ok_button (null) // defined in on_signal_init () {
         bool ok = false;
-        on_init (account);
+        on_signal_init (account);
         string[] selective_sync_list = this.folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (ok) {
             this.selective_sync.folder_info (this.folder.remote_path (), this.folder.alias (), selective_sync_list);
@@ -85,11 +85,11 @@ class Selective_sync_dialog : Gtk.Dialog {
         const string[] blocklist, Gtk.Widget parent, Qt.Window_flags f)
         : Gtk.Dialog (parent, f)
         this.folder (null) {
-        on_init (account);
+        on_signal_init (account);
         this.selective_sync.folder_info (folder, folder, blocklist);
     }
 
-    void Selective_sync_dialog.on_init (AccountPointer account) {
+    void Selective_sync_dialog.on_signal_init (AccountPointer account) {
         window_title (_("Choose What to Sync"));
         var layout = new QVBoxLayout (this);
         this.selective_sync = new Selective_sync_widget (account, this);
@@ -103,7 +103,7 @@ class Selective_sync_dialog : Gtk.Dialog {
         layout.add_widget (button_box);
     }
 
-    void Selective_sync_dialog.on_accept () {
+    void Selective_sync_dialog.on_signal_accept () {
         if (this.folder) {
             bool ok = false;
             var old_block_list_set = this.folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok).to_set ();
@@ -115,7 +115,7 @@ class Selective_sync_dialog : Gtk.Dialog {
 
             FolderMan folder_man = FolderMan.instance ();
             if (this.folder.is_busy ()) {
-                this.folder.on_terminate_sync ();
+                this.folder.on_signal_terminate_sync ();
             }
 
             //The part that changed should not be read from the DB on next sync because there might be new folders
@@ -124,12 +124,12 @@ class Selective_sync_dialog : Gtk.Dialog {
             var changes = (old_block_list_set - block_list_set) + (block_list_set - old_block_list_set);
             foreach (var it, changes) {
                 this.folder.journal_database ().schedule_path_for_remote_discovery (it);
-                this.folder.on_schedule_path_for_local_discovery (it);
+                this.folder.on_signal_schedule_path_for_local_discovery (it);
             }
 
             folder_man.schedule_folder (this.folder);
         }
-        Gtk.Dialog.on_accept ();
+        Gtk.Dialog.on_signal_accept ();
     }
 
     string[] Selective_sync_dialog.create_block_list () {

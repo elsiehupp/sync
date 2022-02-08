@@ -22,7 +22,7 @@ class ProppatchJob : AbstractNetworkJob {
     ***********************************************************/
     private GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties;
 
-    signal void on_success ();
+    signal void on_signal_success ();
     signal void finished_with_error ();
 
     /***********************************************************
@@ -34,9 +34,9 @@ class ProppatchJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         if (this.properties.is_empty ()) {
-            GLib.warn (lc_proppatch_job) << "Proppatch with no properties!";
+            GLib.warn ("Proppatch with no properties!";
         }
         Soup.Request req;
 
@@ -70,7 +70,7 @@ class ProppatchJob : AbstractNetworkJob {
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
         send_request ("PROPPATCH", make_dav_url (path ()), req, buf);
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
@@ -97,17 +97,17 @@ class ProppatchJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private bool on_finished () {
-        GLib.info (lc_proppatch_job) << "PROPPATCH of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                            << reply_status_string ();
+    private bool on_signal_finished () {
+        GLib.info ("PROPPATCH of" + reply ().request ().url ("FINISHED WITH STATUS"
+                            + reply_status_string ();
 
         int http_result_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
         if (http_result_code == 207) {
             /* emit */ success ();
         } else {
-            GLib.warn (lc_proppatch_job) << "*not* successful, http result code is" << http_result_code
-                                    << (http_result_code == 302 ? reply ().header (Soup.Request.LocationHeader).to_string () : QLatin1String (""));
+            GLib.warn ("*not* successful, http result code is" + http_result_code
+                                    + (http_result_code == 302 ? reply ().header (Soup.Request.LocationHeader).to_string () : QLatin1String (""));
             /* emit */ finished_with_error ();
         }
         return true;

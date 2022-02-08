@@ -130,7 +130,7 @@ class FileInfo : FileModifier {
     /***********************************************************
     ***********************************************************/
     public friend inline QDebug operator<< (QDebug dbg, FileInfo& fi) {
-        return dbg << "{ " << fi.path () << " : " << fi.children;
+        return dbg + "{ " + fi.path (" : " + fi.children;
     }
 }
 
@@ -145,9 +145,9 @@ inline const FileInfo findConflict (FileInfo dir, string filename) {
     const FileInfo parentDir = dir.find (info.path ());
     if (!parentDir)
         return null;
-    string on_start = info.baseName () + " (conflicted copy";
+    string on_signal_start = info.baseName () + " (conflicted copy";
     for (var item : parentDir.children) {
-        if (item.name.startsWith (on_start)) {
+        if (item.name.startsWith (on_signal_start)) {
             return item;
         }
     }

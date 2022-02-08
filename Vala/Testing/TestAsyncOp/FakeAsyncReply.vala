@@ -21,7 +21,6 @@ class FakeAsyncReply : FakeReply {
         QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
     }
 
-    //  Q_INVOKABLE
     public void respond () {
         setAttribute (QNetworkRequest.HttpStatusCodeAttribute, 202);
         setRawHeader ("OC-JobStatus-Location", this.pollLocation);
@@ -32,6 +31,6 @@ class FakeAsyncReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public void on_abort () override {}
+    public void on_signal_abort () override {}
     public int64 readData (char *, int64) override { return 0; }
 }

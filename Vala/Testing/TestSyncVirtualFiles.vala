@@ -49,7 +49,7 @@ unowned<Vfs> setupVfs (FakeFolder folder) {
     folder.switchToVfs (suffixVfs);
 
     // Using this directly doesn't recursively unpin everything and instead leaves
-    // the files in the hydration that that they on_start with
+    // the files in the hydration that that they on_signal_start with
     folder.syncJournal ().internalPinStates ().setForPath ("", PinState.PinState.UNSPECIFIED);
 
     return suffixVfs;
@@ -59,17 +59,17 @@ class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_virtual_file_lifecycle_data () {
+    private void on_signal_test_virtual_file_lifecycle_data () {
         QTest.addColumn<bool> ("doLocalDiscovery");
 
-        QTest.newRow ("full local discovery") << true;
-        QTest.newRow ("skip local discovery") << false;
+        QTest.newRow ("full local discovery") + true;
+        QTest.newRow ("skip local discovery") + false;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_virtual_file_lifecycle () {
+    private void on_signal_test_virtual_file_lifecycle () {
         QFETCH (bool, doLocalDiscovery);
 
         FakeFolder fakeFolder{ FileInfo () };
@@ -77,12 +77,12 @@ class TestSyncVirtualFiles : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
             if (!doLocalDiscovery)
                 fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Create a virtual file for a new remote file
         fakeFolder.remoteModifier ().mkdir ("A");
@@ -96,7 +96,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (itemInstruction (completeSpy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_NEW));
         QCOMPARE (dbRecord (fakeFolder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Another sync doesn't actually lead to changes
         QVERIFY (fakeFolder.syncOnce ());
@@ -106,7 +106,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QCOMPARE (dbRecord (fakeFolder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
         QVERIFY (completeSpy.isEmpty ());
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Not even when the remote is rediscovered
         fakeFolder.syncJournal ().forceRemoteDiscoveryNextSync ();
@@ -117,7 +117,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QCOMPARE (dbRecord (fakeFolder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
         QVERIFY (completeSpy.isEmpty ());
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Neither does a remote change
         fakeFolder.remoteModifier ().appendByte ("A/a1");
@@ -128,7 +128,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_UPDATE_METADATA));
         QCOMPARE (dbRecord (fakeFolder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
         QCOMPARE (dbRecord (fakeFolder, "A/a1" DVSUFFIX).fileSize, 65);
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // If the local virtual file file is removed, it'll just be recreated
         if (!doLocalDiscovery)
@@ -141,7 +141,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_NEW));
         QCOMPARE (dbRecord (fakeFolder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
         QCOMPARE (dbRecord (fakeFolder, "A/a1" DVSUFFIX).fileSize, 65);
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Remote rename is propagated
         fakeFolder.remoteModifier ().rename ("A/a1", "A/a1m");
@@ -157,7 +157,7 @@ class TestSyncVirtualFiles : GLib.Object {
             || (itemInstruction (completeSpy, "A/a1m" DVSUFFIX, CSYNC_INSTRUCTION_NEW)
                 && itemInstruction (completeSpy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_REMOVE)));
         QCOMPARE (dbRecord (fakeFolder, "A/a1m" DVSUFFIX).type, ItemTypeVirtualFile);
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Remote remove is propagated
         fakeFolder.remoteModifier ().remove ("A/a1m");
@@ -167,7 +167,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "A/a1m" DVSUFFIX, CSYNC_INSTRUCTION_REMOVE));
         QVERIFY (!dbRecord (fakeFolder, "A/a1" DVSUFFIX).isValid ());
         QVERIFY (!dbRecord (fakeFolder, "A/a1m" DVSUFFIX).isValid ());
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Edge case : Local virtual file but no database entry for some reason
         fakeFolder.remoteModifier ().insert ("A/a2", 64);
@@ -175,7 +175,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (fakeFolder.currentLocalState ().find ("A/a2" DVSUFFIX));
         QVERIFY (fakeFolder.currentLocalState ().find ("A/a3" DVSUFFIX));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         fakeFolder.syncEngine ().journal ().deleteFileRecord ("A/a2" DVSUFFIX);
         fakeFolder.syncEngine ().journal ().deleteFileRecord ("A/a3" DVSUFFIX);
@@ -188,22 +188,22 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (!fakeFolder.currentLocalState ().find ("A/a3" DVSUFFIX));
         QVERIFY (itemInstruction (completeSpy, "A/a3" DVSUFFIX, CSYNC_INSTRUCTION_REMOVE));
         QVERIFY (!dbRecord (fakeFolder, "A/a3" DVSUFFIX).isValid ());
-        on_cleanup ();
+        on_signal_cleanup ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_virtual_file_conflict () {
+    private void on_signal_test_virtual_file_conflict () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Create a virtual file for a new remote file
         fakeFolder.remoteModifier ().mkdir ("A");
@@ -217,7 +217,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (fakeFolder.currentLocalState ().find ("A/a1" DVSUFFIX));
         QVERIFY (fakeFolder.currentLocalState ().find ("B/b2" DVSUFFIX));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // A : the correct file and a conflicting file are added, virtual files stay
         // B : same setup, but the virtual files are deleted by the user
@@ -261,27 +261,27 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (!dbRecord (fakeFolder, "B/b2" DVSUFFIX).isValid ());
         QVERIFY (!dbRecord (fakeFolder, "C/c1" DVSUFFIX).isValid ());
 
-        on_cleanup ();
+        on_signal_cleanup ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_with_normal_sync () {
+    private void on_signal_test_with_normal_sync () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // No effect sync
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Existing files are propagated just fine in both directions
         fakeFolder.localModifier ().appendByte ("A/a1");
@@ -289,7 +289,7 @@ class TestSyncVirtualFiles : GLib.Object {
         fakeFolder.remoteModifier ().appendByte ("A/a2");
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // New files on the remote create virtual files
         fakeFolder.remoteModifier ().insert ("A/new");
@@ -299,22 +299,22 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/new"));
         QVERIFY (itemInstruction (completeSpy, "A/new" DVSUFFIX, CSYNC_INSTRUCTION_NEW));
         QCOMPARE (dbRecord (fakeFolder, "A/new" DVSUFFIX).type, ItemTypeVirtualFile);
-        on_cleanup ();
+        on_signal_cleanup ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_virtual_file_download () {
+    private void on_signal_test_virtual_file_download () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Create a virtual file for remote files
         fakeFolder.remoteModifier ().mkdir ("A");
@@ -341,7 +341,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.currentLocalState ().find ("A/b2" DVSUFFIX));
         QVERIFY (fakeFolder.currentLocalState ().find ("A/b3" DVSUFFIX));
         QVERIFY (fakeFolder.currentLocalState ().find ("A/b4" DVSUFFIX));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Download by changing the database entry
         triggerDownload (fakeFolder, "A/a1");
@@ -422,24 +422,24 @@ class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_virtual_file_download_resume () {
+    private void on_signal_test_virtual_file_download_resume () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
             fakeFolder.syncJournal ().wipeErrorBlocklist ();
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Create a virtual file for remote files
         fakeFolder.remoteModifier ().mkdir ("A");
         fakeFolder.remoteModifier ().insert ("A/a1");
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (fakeFolder.currentLocalState ().find ("A/a1" DVSUFFIX));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Download by changing the database entry
         triggerDownload (fakeFolder, "A/a1");
@@ -451,7 +451,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (!fakeFolder.currentLocalState ().find ("A/a1"));
         QCOMPARE (dbRecord (fakeFolder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFileDownload);
         QVERIFY (!dbRecord (fakeFolder, "A/a1").isValid ());
-        on_cleanup ();
+        on_signal_cleanup ();
 
         fakeFolder.serverErrorPaths ().clear ();
         QVERIFY (fakeFolder.syncOnce ());
@@ -465,7 +465,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_new_files_not_virtual () {
+    private void on_signal_test_new_files_not_virtual () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -487,7 +487,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_download_recursive () {
+    private void on_signal_test_download_recursive () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -585,16 +585,16 @@ class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_rename_to_virtual () {
+    private void on_signal_test_rename_to_virtual () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // If a file is renamed to <name>.owncloud, it becomes virtual
         fakeFolder.localModifier ().rename ("A/a1", "A/a1" DVSUFFIX);
@@ -622,22 +622,22 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (dbRecord (fakeFolder, "A/rand").type == ItemTypeFile);
 
         QVERIFY (!fakeFolder.currentLocalState ().find ("A/dangling" DVSUFFIX));
-        on_cleanup ();
+        on_signal_cleanup ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_rename_virtual () {
+    private void on_signal_test_rename_virtual () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         fakeFolder.remoteModifier ().insert ("file1", 128, 'C');
         fakeFolder.remoteModifier ().insert ("file2", 256, 'C');
@@ -647,7 +647,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.currentLocalState ().find ("file1" DVSUFFIX));
         QVERIFY (fakeFolder.currentLocalState ().find ("file2" DVSUFFIX));
         QVERIFY (fakeFolder.currentLocalState ().find ("file3" DVSUFFIX));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         fakeFolder.localModifier ().rename ("file1" DVSUFFIX, "renamed1" DVSUFFIX);
         fakeFolder.localModifier ().rename ("file2" DVSUFFIX, "renamed2" DVSUFFIX);
@@ -673,27 +673,27 @@ class TestSyncVirtualFiles : GLib.Object {
 
         QVERIFY (itemInstruction (completeSpy, "file3", CSYNC_INSTRUCTION_SYNC));
         QVERIFY (dbRecord (fakeFolder, "file3").type == ItemTypeFile);
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Test rename while adding/removing vfs suffix
         fakeFolder.localModifier ().rename ("renamed1" DVSUFFIX, "R1");
         // Contents of file2 could also change at the same time...
         fakeFolder.localModifier ().rename ("file3", "R3" DVSUFFIX);
         QVERIFY (fakeFolder.syncOnce ());
-        on_cleanup ();
+        on_signal_cleanup ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_rename_virtual2 () {
+    private void on_signal_test_rename_virtual2 () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         ItemCompletedSpy completeSpy (fakeFolder);
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         fakeFolder.remoteModifier ().insert ("case3", 128, 'C');
         fakeFolder.remoteModifier ().insert ("case4", 256, 'C');
@@ -709,7 +709,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.currentLocalState ().find ("case4"));
         QVERIFY (fakeFolder.currentLocalState ().find ("case5" DVSUFFIX));
         QVERIFY (fakeFolder.currentLocalState ().find ("case6"));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Case 1 : foo . bar (tested elsewhere)
         // Case 2 : foo.oc . bar.oc (tested elsewhere)
@@ -772,7 +772,7 @@ class TestSyncVirtualFiles : GLib.Object {
     }
 
     // Dehydration via sync works
-    private void on_test_sync_dehydration () {
+    private void on_signal_test_sync_dehydration () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         setupVfs (fakeFolder);
 
@@ -780,10 +780,10 @@ class TestSyncVirtualFiles : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
         ItemCompletedSpy completeSpy (fakeFolder);
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         //
         // Mark for dehydration and check
@@ -854,7 +854,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
         QCOMPARE (fakeFolder.currentRemoteState ().find ("C/c2").size, 26);
         QVERIFY (itemInstruction (completeSpy, "C/c2", CSYNC_INSTRUCTION_CONFLICT));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         var expectedLocalState = fakeFolder.currentLocalState ();
         var expectedRemoteState = fakeFolder.currentRemoteState ();
@@ -866,7 +866,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_wipe_virtual_suffix_files () {
+    private void on_signal_test_wipe_virtual_suffix_files () {
         FakeFolder fakeFolder{ FileInfo{} };
         setupVfs (fakeFolder);
 
@@ -913,7 +913,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_new_virtuals () {
+    private void on_signal_test_new_virtuals () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -991,14 +991,14 @@ class TestSyncVirtualFiles : GLib.Object {
 
     // Check what happens if vfs-suffixed files exist on the server or locally
     // while the file is hydrated
-    private void on_test_suffix_files_while_local_hydrated () {
+    private void on_signal_test_suffix_files_while_local_hydrated () {
         FakeFolder fakeFolder{ FileInfo () };
 
         ItemCompletedSpy completeSpy (fakeFolder);
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // suffixed files are happily synced with Vfs.Off
         fakeFolder.remoteModifier ().mkdir ("A");
@@ -1018,7 +1018,7 @@ class TestSyncVirtualFiles : GLib.Object {
         fakeFolder.remoteModifier ().insert ("A/remote3" DVSUFFIX DVSUFFIX, 80, 'A');
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Enable suffix vfs
         setupVfs (fakeFolder);
@@ -1029,7 +1029,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "A/file2" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/file3" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/file3" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Add a real file where the suffixed file exists
         fakeFolder.localModifier ().insert ("A/test1", 11, 'A');
@@ -1040,7 +1040,7 @@ class TestSyncVirtualFiles : GLib.Object {
         // (when renaming placeholder to real file). But the alternative would mean
         // special casing this to allow CONFLICT at virtual file creation level. Ew.
         QVERIFY (itemInstruction (completeSpy, "A/test2" DVSUFFIX, CSYNC_INSTRUCTION_UPDATE_METADATA));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Local changes of suffixed file do nothing
         fakeFolder.localModifier ().setContents ("A/file1" DVSUFFIX, 'B');
@@ -1052,7 +1052,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "A/file2" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/file3" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/file3" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Remote changes don't do anything either
         fakeFolder.remoteModifier ().setContents ("A/file1" DVSUFFIX, 'C');
@@ -1064,7 +1064,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "A/file2" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/file3" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/file3" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Local removal : when not querying server
         fakeFolder.localModifier ().remove ("A/file1" DVSUFFIX);
@@ -1076,7 +1076,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (completeSpy.findItem ("A/file2" DVSUFFIX).isEmpty ());
         QVERIFY (completeSpy.findItem ("A/file3" DVSUFFIX).isEmpty ());
         QVERIFY (completeSpy.findItem ("A/file3" DVSUFFIX DVSUFFIX).isEmpty ());
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Local removal : when querying server
         fakeFolder.remoteModifier ().setContents ("A/file1" DVSUFFIX, 'D');
@@ -1085,7 +1085,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "A/file2" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/file3" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/file3" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Remote removal
         fakeFolder.remoteModifier ().remove ("A/remote1" DVSUFFIX);
@@ -1097,7 +1097,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "A/remote2" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/remote3" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/remote3" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // New files with a suffix aren't propagated downwards in the first place
         fakeFolder.remoteModifier ().insert ("A/new1" DVSUFFIX);
@@ -1107,19 +1107,19 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (!fakeFolder.currentLocalState ().find ("A/new1"));
         QVERIFY (!fakeFolder.currentLocalState ().find ("A/new1" DVSUFFIX));
         QVERIFY (!fakeFolder.currentLocalState ().find ("A/new1" DVSUFFIX DVSUFFIX));
-        on_cleanup ();
+        on_signal_cleanup ();
     }
 
     // Check what happens if vfs-suffixed files exist on the server or in the database
-    private void on_test_extra_files_local_dehydrated () {
+    private void on_signal_test_extra_files_local_dehydrated () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
 
         ItemCompletedSpy completeSpy (fakeFolder);
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // create a bunch of local virtual files, in some instances
         // ignore remote files
@@ -1148,7 +1148,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "A/file3" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/file4" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/file4" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Create odd extra files locally and remotely
         fakeFolder.localModifier ().insert ("A/file1", 10, 'A');
@@ -1163,13 +1163,13 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "A/file5" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/file6", CSYNC_INSTRUCTION_CONFLICT));
         QVERIFY (itemInstruction (completeSpy, "A/file6" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        on_cleanup ();
+        on_signal_cleanup ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_availability () {
+    private void on_signal_test_availability () {
         FakeFolder fakeFolder{ FileInfo () };
         var vfs = setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -1237,7 +1237,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_pin_state_locals () {
+    private void on_signal_test_pin_state_locals () {
         FakeFolder fakeFolder{ FileInfo () };
         var vfs = setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -1321,7 +1321,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_incompatible_pins () {
+    private void on_signal_test_incompatible_pins () {
         FakeFolder fakeFolder{ FileInfo () };
         var vfs = setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -1362,7 +1362,7 @@ class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_place_holder_exist () {
+    private void on_signal_test_place_holder_exist () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.remoteModifier ().insert ("A/a1" DVSUFFIX, 111);
         fakeFolder.remoteModifier ().insert ("A/hello" DVSUFFIX, 222);
@@ -1370,8 +1370,8 @@ class TestSyncVirtualFiles : GLib.Object {
         var vfs = setupVfs (fakeFolder);
 
         ItemCompletedSpy completeSpy (fakeFolder);
-        var on_cleanup = [&] () { completeSpy.clear (); };
-        on_cleanup ();
+        var on_signal_cleanup = [&] () { completeSpy.clear (); };
+        on_signal_cleanup ();
 
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -1381,7 +1381,7 @@ class TestSyncVirtualFiles : GLib.Object {
         fakeFolder.remoteModifier ().insert ("A/a2" DVSUFFIX);
         fakeFolder.remoteModifier ().insert ("A/hello", 12);
         fakeFolder.localModifier ().insert ("A/igno" DVSUFFIX, 123);
-        on_cleanup ();
+        on_signal_cleanup ();
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (itemInstruction (completeSpy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         QVERIFY (itemInstruction (completeSpy, "A/igno" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
@@ -1392,7 +1392,7 @@ class TestSyncVirtualFiles : GLib.Object {
                  *fakeFolder.currentRemoteState ().find ("A/hello" DVSUFFIX));
         QCOMPARE (fakeFolder.currentLocalState ().find ("A/igno" DVSUFFIX).size, 123);
 
-        on_cleanup ();
+        on_signal_cleanup ();
         // Dehydrate
         QVERIFY (vfs.setPinState ("", PinState.VfsItemAvailability.ONLINE_ONLY));
         QVERIFY (!fakeFolder.syncOnce ());
@@ -1408,7 +1408,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState ().find ("A/igno" DVSUFFIX).size, 123);
 
         // Now disable vfs and check that all files are still there
-        on_cleanup ();
+        on_signal_cleanup ();
         SyncEngine.wipeVirtualFiles (fakeFolder.localPath (), fakeFolder.syncJournal (), *vfs);
         fakeFolder.switchToVfs (unowned<Vfs> (new VfsOff));
         QVERIFY (fakeFolder.syncOnce ());

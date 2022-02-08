@@ -36,7 +36,7 @@ class WebView : Gtk.Widget {
     private WebViewPageUrlRequestInterceptor interceptor;
     private WebViewPageUrlSchemeHandler scheme_handler;
 
-    signal void on_url_catched (string user, string pass, string host);
+    signal void on_signal_url_catched (string user, string pass, string host);
 
     /***********************************************************
     ***********************************************************/
@@ -81,7 +81,7 @@ class WebView : Gtk.Widget {
         this.ui.vertical_layout.add_widget (this.webview);
 
         connect (this.webview, &QWebEngineView.load_progress, this.ui.progress_bar, &QProgressBar.value);
-        connect (this.scheme_handler, &WebViewPageUrlSchemeHandler.on_url_catched, this, &WebView.on_url_catched);
+        connect (this.scheme_handler, &WebViewPageUrlSchemeHandler.on_signal_url_catched, this, &WebView.on_signal_url_catched);
     }
 
 

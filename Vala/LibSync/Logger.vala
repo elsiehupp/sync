@@ -43,7 +43,7 @@ class Logger : GLib.Object {
     private int crash_log_index = 0;
 
     signal void log_window_log (string value);
-    signal void gui_log (string value_1, string value_2);
+    signal void signal_gui_log (string value_1, string value_2);
     signal void gui_message (string value_1, string value_2);
     signal void optional_gui_log (string value_1, string value_2);
 
@@ -95,7 +95,7 @@ class Logger : GLib.Object {
             this.crash_log_index = (this.crash_log_index + 1) % CRASH_LOG_SIZE;
             this.crash_log[this.crash_log_index] = message;
             if (this.logstream) {
-                (*this.logstream) << message << Qt.endl;
+                (*this.logstream) + message + Qt.endl;
                 if (this.do_file_flush)
                     this.logstream.flush ();
             }
@@ -110,7 +110,7 @@ class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void post_gui_log (string title, string message) {
-        /* emit */ gui_log (title, message);
+        /* emit */ signal_gui_log (title, message);
     }
 
 
@@ -135,7 +135,7 @@ class Logger : GLib.Object {
         if (this.logstream) {
             this.logstream.flush ();
             this.log_file.close ();
-            this.logstream.on_reset ();
+            this.logstream.on_signal_reset ();
         }
     }
 
@@ -152,7 +152,7 @@ class Logger : GLib.Object {
     public void log_file (string name) {
         QMutexLocker locker = new QMutexLocker (&this.mutex);
         if (this.logstream) {
-            this.logstream.on_reset (null);
+            this.logstream.on_signal_reset (null);
             this.log_file.close ();
         }
 
@@ -177,7 +177,7 @@ class Logger : GLib.Object {
             return;
         }
 
-        this.logstream.on_reset (new QTextStream (&this.log_file));
+        this.logstream.on_signal_reset (new QTextStream (&this.log_file));
         this.logstream.codec (QTextCodec.codec_for_name ("UTF-8"));
     }
 
@@ -265,7 +265,7 @@ class Logger : GLib.Object {
         if (!this.temporary_folder_log_dir)
             return;
 
-        on_enter_next_log_file ();
+        on_signal_enter_next_log_file ();
         log_dir ("");
         log_debug (false);
         log_file ("");
@@ -292,16 +292,16 @@ class Logger : GLib.Object {
         string tmp;
         QTextStream out (&tmp);
         for (var p : rules) {
-            out << p << '\n';
+            out + p + '\n';
         }
-        GLib.debug () << tmp;
+        GLib.debug () + tmp;
         QLoggingCategory.filter_rules (tmp);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_enter_next_log_file () {
+    public void on_signal_enter_next_log_file () {
         if (!this.log_directory.is_empty ()) {
 
             QDir dir (this.log_directory);
@@ -387,7 +387,7 @@ class Logger : GLib.Object {
         if (log_file.open (GLib.File.WriteOnly)) {
             QTextStream out (&log_file);
             for (int i = 1; i <= CRASH_LOG_SIZE; ++i) {
-                out << this.crash_log[ (this.crash_log_index + i) % CRASH_LOG_SIZE] << '\n';
+                out + this.crash_log[ (this.crash_log_index + i) % CRASH_LOG_SIZE] + '\n';
             }
         }
     }

@@ -18,7 +18,7 @@ class TestLocalDiscovery : GLib.Object {
 
         LocalDiscoveryTracker tracker;
         connect (&fakeFolder.syncEngine (), &SyncEngine.itemCompleted, tracker, &LocalDiscoveryTracker.slotItemCompleted);
-        connect (&fakeFolder.syncEngine (), &SyncEngine.on_finished, tracker, &LocalDiscoveryTracker.slotSyncFinished);
+        connect (&fakeFolder.syncEngine (), &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slotSyncFinished);
 
         // More subdirectories are useful for testing
         fakeFolder.localModifier ().mkdir ("A/X");
@@ -105,14 +105,14 @@ class TestLocalDiscovery : GLib.Object {
         QVERIFY (!engine.shouldDiscoverLocally (""));
     }
 
-    // Check whether item on_success and item failure adjusts the
+    // Check whether item on_signal_success and item failure adjusts the
     // tracker correctly.
     private on_ void testTrackerItemCompletion () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
         LocalDiscoveryTracker tracker;
         connect (&fakeFolder.syncEngine (), &SyncEngine.itemCompleted, tracker, &LocalDiscoveryTracker.slotItemCompleted);
-        connect (&fakeFolder.syncEngine (), &SyncEngine.on_finished, tracker, &LocalDiscoveryTracker.slotSyncFinished);
+        connect (&fakeFolder.syncEngine (), &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slotSyncFinished);
         var trackerContains = [&] (char path) {
             return tracker.localDiscoveryPaths ().find (path) != tracker.localDiscoveryPaths ().end ();
         }

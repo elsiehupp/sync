@@ -1,7 +1,7 @@
 
 //  #include <QAbstractListModel>
-//  #include <QImage>
-//  #include <QQuick_image_provider>
+//  #include <Gtk.Image>
+//  #include <QQuickImageProvider>
 //  #include <chrono>
 //  #include <pushnotifications
 //  #include <QDesktopServ
@@ -14,62 +14,267 @@
 namespace Occ {
 namespace Ui {
 
-class User_model : QAbstractListModel {
-    //  Q_PROPERTY (User* current_user READ current_user NOTIFY new_user_selected)
-    //  Q_PROPERTY (int current_user_id READ current_user_id NOTIFY new_user_selected)
+class UserModel : QAbstractListModel {
 
-    // time span in milliseconds which has to be between two
-    // refreshes of the notifications
+    public enum UserRoles {
+        NAME = Qt.USER_ROLE + 1,
+        SERVER,
+        SERVER_HAS_USER_STATUS,
+        STATUS_ICON,
+        STATUS_EMOJI,
+        STATUS_MESSAGE,
+        DESKTOP_NOTIFICATION,
+        AVATAR,
+        IS_CURRENT_USER,
+        IS_CONNECTED,
+        IDENTIFIER;
+
+        public static GLib.HashMap<int, GLib.ByteArray> role_names () {
+            GLib.HashMap<int, GLib.ByteArray> roles;
+            roles[UserRoles.NAME] = "name";
+            roles[UserRoles.SERVER] = "server";
+            roles[UserRoles.SERVER_HAS_USER_STATUS] = "server_has_user_status";
+            roles[UserRoles.STATUS_ICON] = "status_icon";
+            roles[UserRoles.STATUS_EMOJI] = "status_emoji";
+            roles[UserRoles.STATUS_MESSAGE] = "status_message";
+            roles[UserRoles.DESKTOP_NOTIFICATION] = "desktop_notifications_allowed";
+            roles[UserRoles.AVATAR] = "avatar";
+            roles[UserRoles.IS_CURRENT_USER] = "is_current_user";
+            roles[UserRoles.IS_CONNECTED] = "is_connected";
+            roles[UserRoles.IDENTIFIER] = "identifier";
+            return roles;
+        }
+    }
+
+    /***********************************************************
+    Time span in milliseconds which must elapse between
+    sequential refreshes of the notifications
+    ***********************************************************/
     const int NOTIFICATION_REQUEST_FREE_PERIOD = 15000;
 
 
-    const int64 expired_activities_check_interval_msecs = 1000 * 60;
-    const int64 activity_default_expiration_time_msecs = 1000 * 60 * 10;
+    /***********************************************************
+    Time span in milliseconds which must elapse between
+    sequential checks for expired activities
+    ***********************************************************/
+    const int64 EXPIRED_ACTIVITIES_CHECK_INTERVAL_MSEC = 1000 * 60;
+
+
+    /***********************************************************
+    Time span in milliseconds after which activities will
+    expired by default
+    ***********************************************************/
+    const int64 ACTIVITY_DEFAULT_EXPIRATION_TIME_MSECS = 1000 * 60 * 10;
 
 
     /***********************************************************
     ***********************************************************/
-    public static User_model instance ();
+    static UserModel instance {
+        public get {
+            if (!this.instance) {
+                this.instance = new UserModel ();
+            }
+            return this.instance;
+        }
+        private set {
+            this.instance = value;
+        }
+    }
+    private GLib.List<User> this.users;
+    /***********************************************************
+    ***********************************************************/
+    int current_user_id {
+        public get {
+            return this.current_user_id;
+        }
+        private set {
+            this.current_user_id = value;
+        }
+        construct {
+            this.current_user_id = 0;
+        }
+    }
+
+    private bool this.init = true;
+
+
+    signal void signal_add_account ();
+    signal void signal_new_user_selected ();
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    private UserModel (GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        // TODO : Remember selected user from last quit via settings file
+        if (AccountManager.instance ().accounts ().size () > 0) {
+            build_user_list ();
+        }
+
+        connect (AccountManager.instance (), &AccountManager.on_signal_account_added,
+            this, &UserModel.build_user_list);
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    public bool is_user_connected (int identifier) {
+        if (identifier < 0 || identifier >= this.users.size ())
+            return false;
+
+        return this.users[identifier].is_connected ();
+    }
 
     /***********************************************************
     ***********************************************************/
-    public int current_user_index ();
+    public string current_user_server () {
+        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
+            return {};
+
+        return this.users[this.current_user_id].server ();
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public int row_count (QModelIndex parent = QModelIndex ()) override;
+    public int current_user_index () {
+        return this.current_user_id;
+    }
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Variant data (QModelIndex in
+    public int row_count (QModelIndex index = QModelIndex ()) {
+        //  Q_UNUSED (index);
+        return this.users.count ();
+    }
 
     /***********************************************************
     ***********************************************************/
-    public QImage avatar_by_id (
+    public GLib.Variant data (QModelIndex index, int role) {
+        if (index.row () < 0 || index.row () >= this.users.count ()) {
+            return GLib.Variant ();
+        }
+
+        if (role == UserRoles.NAME) {
+            return this.users[index.row ()].name ();
+        } else if (role == UserRoles.SERVER) {
+            return this.users[index.row ()].server ();
+        } else if (role == UserRoles.SERVER_HAS_USER_STATUS) {
+            return this.users[index.row ()].server_has_user_status ();
+        } else if (role == UserRoles.STATUS_ICON) {
+            return this.users[index.row ()].status_icon ();
+        } else if (role == UserRoles.STATUS_EMOJI) {
+            return this.users[index.row ()].status_emoji ();
+        } else if (role == UserRoles.STATUS_MESSAGE) {
+            return this.users[index.row ()].status_message ();
+        } else if (role == UserRoles.DESKTOP_NOTIFICATION) {
+            return this.users[index.row ()].are_desktop_notifications_allowed ();
+        } else if (role == UserRoles.AVATAR) {
+            return this.users[index.row ()].avatar_url ();
+        } else if (role == UserRoles.IS_CURRENT_USER) {
+            return this.users[index.row ()].is_current_user ();
+        } else if (role == UserRoles.IS_CONNECTED) {
+            return this.users[index.row ()].is_connected ();
+        } else if (role == UserRoles.IDENTIFIER) {
+            return index.row ();
+        }
+        return GLib.Variant ();
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public User current_user ();
+    public Gtk.Image avatar_by_identifier (int identifier) {
+        if (identifier < 0 || identifier >= this.users.size ())
+            return {};
+
+        return this.users[identifier].avatar ();
+    }
 
     /***********************************************************
     ***********************************************************/
-    public int find_user_id_for_account (AccountS
+    public User current_user () {
+        if (current_user_id () < 0 || current_user_id () >= this.users.size ())
+            return null;
+
+        return this.users[current_user_id ()];
+    }
 
     /***********************************************************
     ***********************************************************/
-    public void fetch_current_activity_model ();
+    public int find_identifier_for_account (AccountState account) {
+        const var it = std.find_if (std.cbegin (this.users), std.cend (this.users), [=] (User user) {
+            return user.account ().identifier () == account.account ().identifier ();
+        });
+
+        if (it == std.cend (this.users)) {
+            return -1;
+        }
+
+        const var identifier = std.distance (std.cbegin (this.users), it);
+        return identifier;
+    }
 
     /***********************************************************
     ***********************************************************/
-    public 
+    public void fetch_current_activity_model () {
+        if (current_user_id () < 0 || current_user_id () >= this.users.size ())
+            return;
+
+        this.users[current_user_id ()].on_signal_refresh ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void add_user (AccountStatePtr user, bool is_current) {
+        bool contains_user = false;
+        for (var u : q_as_const (this.users)) {
+            if (u.account () == user.account ()) {
+                contains_user = true;
+                continue;
+            }
+        }
+
+        if (!contains_user) {
+            int row = row_count ();
+            begin_insert_rows (QModelIndex (), row, row);
+
+            User u = new User (user, is_current);
+
+            connect (u, &User.signal_avatar_changed, this, [this, row] {
+            /* emit */ data_changed (index (row, 0), index (row, 0), {UserModel.UserRoles.AVATAR});
+            });
+
+            connect (u, &User.signal_status_changed, this, [this, row] {
+                /* emit */ data_changed (index (row, 0), index (row, 0), {UserModel.UserRoles.STATUS_ICON,
+                                        UserModel.UserRoles.STATUS_EMOJI,
+                                                                UserModel.UserRoles.STATUS_MESSAGE});
+            });
+
+            connect (u, &User.signal_desktop_notifications_allowed_changed, this, [this, row] {
+                /* emit */ data_changed (index (row, 0), index (row, 0), {
+                    UserModel.UserRoles.DESKTOP_NOTIFICATION
+                });
+            });
+
+            connect (u, &User.signal_account_state_changed, this, [this, row] {
+                /* emit */ data_changed (index (row, 0), index (row, 0), {
+                    UserModel.UserRoles.IS_CONNECTED
+                });
+            });
+
+            this.users + u;
+            if (is_current) {
+                this.current_user_id = this.users.index_of (this.users.last ());
+            }
+
+            end_insert_rows ();
+            ConfigFile config;
+            this.users.last ().on_signal_notification_refresh_interval (config.notification_refresh_interval ());
+            /* emit */ signal_new_user_selected ();
+        }
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -78,437 +283,180 @@ class User_model : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void open_current_
+    void UserModel.open_current_account_local_folder () {
+        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
+            return;
 
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public int num_users ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public int current_user_id ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void switch_current_user (int identifier);
-
-    /***********************************************************
-    ***********************************************************/
-    public void login (int identifier);
-
-
-    public void logout (int identifier);
-
-
-    public void remove_account (int identifier);
-
-    public std.shared_ptr<Occ.UserStatusConnector> user_status_connector (int identifier);
-
-    public ActivityListModel current_activity_model ();
-
-    public enum User_roles {
-        Name_role = Qt.User_role + 1,
-        Server_role,
-        Server_has_user_status_role,
-        Status_icon_role,
-        Status_emoji_role,
-        Status_message_role,
-        Desktop_notifications_allowed_role,
-        Avatar_role,
-        Is_current_user_role,
-        Is_connected_role,
-        Id_role
+        this.users[this.current_user_id].open_local_folder ();
     }
 
-    /***********************************************************
-    ***********************************************************/
-    public AccountAppList app_list ();
-
-signals:
-    Q_INVOKABLE void add_account ();
-    Q_INVOKABLE void new_user_selected ();
-
-
-    protected GLib.HashMap<int, GLib.ByteArray> role_names () override;
-
 
     /***********************************************************
     ***********************************************************/
-    private static User_model this.instance;
-    private User_model (GLib.Object parent = new GLib.Object ());
-    private GLib.List<User> this.users;
-    private int this.current_user_id = 0;
-    private bool this.init = true;
+    public 
+    void UserModel.open_current_account_talk () {
+        if (!current_user ())
+            return;
 
-    /***********************************************************
-    ***********************************************************/
-    private void build_user_list ();
-}
-
-User_model *User_model.instance = null;
-
-User_model *User_model.instance () {
-    if (!this.instance) {
-        this.instance = new User_model ();
-    }
-    return this.instance;
-}
-
-User_model.User_model (GLib.Object parent)
-    : QAbstractListModel (parent) {
-    // TODO : Remember selected user from last quit via settings file
-    if (AccountManager.instance ().accounts ().size () > 0) {
-        build_user_list ();
-    }
-
-    connect (AccountManager.instance (), &AccountManager.on_account_added,
-        this, &User_model.build_user_list);
-}
-
-void User_model.build_user_list () {
-    for (int i = 0; i < AccountManager.instance ().accounts ().size (); i++) {
-        var user = AccountManager.instance ().accounts ().at (i);
-        add_user (user);
-    }
-    if (this.init) {
-        this.users.first ().current_user (true);
-        this.init = false;
-    }
-}
-
-// Q_INVOKABLE
-int User_model.num_users () {
-    return this.users.size ();
-}
-
-// Q_INVOKABLE
-int User_model.current_user_id () {
-    return this.current_user_id;
-}
-
-// Q_INVOKABLE
-bool User_model.is_user_connected (int identifier) {
-    if (identifier < 0 || identifier >= this.users.size ())
-        return false;
-
-    return this.users[identifier].is_connected ();
-}
-
-QImage User_model.avatar_by_id (int identifier) {
-    if (identifier < 0 || identifier >= this.users.size ())
-        return {};
-
-    return this.users[identifier].avatar ();
-}
-
-// Q_INVOKABLE
-string User_model.current_user_server () {
-    if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
-        return {};
-
-    return this.users[this.current_user_id].server ();
-}
-
-void User_model.add_user (AccountStatePtr user, bool is_current) {
-    bool contains_user = false;
-    for (var u : q_as_const (this.users)) {
-        if (u.account () == user.account ()) {
-            contains_user = true;
-            continue;
+        const var talk_app = current_user ().talk_app ();
+        if (talk_app) {
+            Utility.open_browser (talk_app.url ());
+        } else {
+            GLib.warn ("The Talk app is not enabled on" + current_user ().server ();
         }
     }
 
-    if (!contains_user) {
-        int row = row_count ();
-        begin_insert_rows (QModelIndex (), row, row);
 
-        User u = new User (user, is_current);
+    /***********************************************************
+    ***********************************************************/
+    public 
+    void UserModel.open_current_account_server () {
+        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
+            return;
 
-        connect (u, &User.avatar_changed, this, [this, row] {
-           /* emit */ data_changed (index (row, 0), index (row, 0), {User_model.Avatar_role});
-        });
-
-        connect (u, &User.status_changed, this, [this, row] {
-            /* emit */ data_changed (index (row, 0), index (row, 0), {User_model.Status_icon_role,
-			    				    User_model.Status_emoji_role,
-                                                            User_model.Status_message_role});
-        });
-
-        connect (u, &User.desktop_notifications_allowed_changed, this, [this, row] {
-            /* emit */ data_changed (index (row, 0), index (row, 0), {
-                User_model.Desktop_notifications_allowed_role
-            });
-        });
-
-        connect (u, &User.account_state_changed, this, [this, row] {
-            /* emit */ data_changed (index (row, 0), index (row, 0), {
-                User_model.Is_connected_role
-            });
-        });
-
-        this.users << u;
-        if (is_current) {
-            this.current_user_id = this.users.index_of (this.users.last ());
+        string url = this.users[this.current_user_id].server (false);
+        if (!url.starts_with ("http://") && !url.starts_with ("https://")) {
+            url = "https://" + this.users[this.current_user_id].server (false);
         }
 
-        end_insert_rows ();
-        ConfigFile config;
-        this.users.last ().on_notification_refresh_interval (config.notification_refresh_interval ());
-        /* emit */ new_user_selected ();
-    }
-}
-
-int User_model.current_user_index () {
-    return this.current_user_id;
-}
-
-// Q_INVOKABLE
-void User_model.open_current_account_local_folder () {
-    if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
-        return;
-
-    this.users[this.current_user_id].open_local_folder ();
-}
-
-// Q_INVOKABLE
-void User_model.open_current_account_talk () {
-    if (!current_user ())
-        return;
-
-    const var talk_app = current_user ().talk_app ();
-    if (talk_app) {
-        Utility.open_browser (talk_app.url ());
-    } else {
-        GLib.warn (lc_activity) << "The Talk app is not enabled on" << current_user ().server ();
-    }
-}
-
-// Q_INVOKABLE
-void User_model.open_current_account_server () {
-    if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
-        return;
-
-    string url = this.users[this.current_user_id].server (false);
-    if (!url.starts_with ("http://") && !url.starts_with ("https://")) {
-        url = "https://" + this.users[this.current_user_id].server (false);
+        QDesktopServices.open_url (url);
     }
 
-    QDesktopServices.open_url (url);
-}
-
-// Q_INVOKABLE
-void User_model.switch_current_user (int identifier) {
-    if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
-        return;
-
-    this.users[this.current_user_id].current_user (false);
-    this.users[identifier].current_user (true);
-    this.current_user_id = identifier;
-    /* emit */ new_user_selected ();
-}
-
-// Q_INVOKABLE
-void User_model.login (int identifier) {
-    if (identifier < 0 || identifier >= this.users.size ())
-        return;
-
-    this.users[identifier].login ();
-}
-
-// Q_INVOKABLE
-void User_model.logout (int identifier) {
-    if (identifier < 0 || identifier >= this.users.size ())
-        return;
-
-    this.users[identifier].logout ();
-}
-
-// Q_INVOKABLE
-void User_model.remove_account (int identifier) {
-    if (identifier < 0 || identifier >= this.users.size ())
-        return;
-
-    QMessageBox message_box (QMessageBox.Question,
-        _("Confirm Account Removal"),
-        _("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
-           "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
-            .arg (this.users[identifier].name ()),
-        QMessageBox.NoButton);
-    QPushButton yes_button =
-        message_box.add_button (_("Remove connection"), QMessageBox.YesRole);
-    message_box.add_button (_("Cancel"), QMessageBox.NoRole);
-
-    message_box.exec ();
-    if (message_box.clicked_button () != yes_button) {
-        return;
+    /***********************************************************
+    ***********************************************************/
+    public int number_of_users () {
+        return this.users.size ();
     }
 
-    if (this.users[identifier].is_current_user () && this.users.count () > 1) {
-        identifier == 0 ? switch_current_user (1) : switch_current_user (0);
+    /***********************************************************
+    ***********************************************************/
+    public 
+
+    /***********************************************************
+    ***********************************************************/
+    public 
+
+
+    /***********************************************************
+    ***********************************************************/
+    public 
+
+    /***********************************************************
+    ***********************************************************/
+    public 
+
+    /***********************************************************
+    ***********************************************************/
+    public void switch_current_user (int identifier) {
+        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
+            return;
+
+        this.users[this.current_user_id].is_current_user (false);
+        this.users[identifier].is_current_user (true);
+        this.current_user_id = identifier;
+        /* emit */ signal_new_user_selected ();
     }
 
-    this.users[identifier].logout ();
-    this.users[identifier].remove_account ();
+    /***********************************************************
+    ***********************************************************/
+    public void log_in (int identifier) {
+        if (identifier < 0 || identifier >= this.users.size ())
+            return;
 
-    begin_remove_rows (QModelIndex (), identifier, identifier);
-    this.users.remove_at (identifier);
-    end_remove_rows ();
-}
-
-std.shared_ptr<Occ.UserStatusConnector> User_model.user_status_connector (int identifier) {
-    if (identifier < 0 || identifier >= this.users.size ()) {
-        return null;
+        this.users[identifier].log_in ();
     }
 
-    return this.users[identifier].account ().user_status_connector ();
-}
 
-int User_model.row_count (QModelIndex parent) {
-    //  Q_UNUSED (parent);
-    return this.users.count ();
-}
+    /***********************************************************
+    ***********************************************************/
+    public void log_out (int identifier);
+    void UserModel.log_out (int identifier) {
+        if (identifier < 0 || identifier >= this.users.size ())
+            return;
 
-GLib.Variant User_model.data (QModelIndex index, int role) {
-    if (index.row () < 0 || index.row () >= this.users.count ()) {
-        return GLib.Variant ();
+        this.users[identifier].log_out ();
     }
 
-    if (role == Name_role) {
-        return this.users[index.row ()].name ();
-    } else if (role == Server_role) {
-        return this.users[index.row ()].server ();
-    } else if (role == Server_has_user_status_role) {
-        return this.users[index.row ()].server_has_user_status ();
-    } else if (role == Status_icon_role) {
-        return this.users[index.row ()].status_icon ();
-    } else if (role == Status_emoji_role) {
-        return this.users[index.row ()].status_emoji ();
-    } else if (role == Status_message_role) {
-        return this.users[index.row ()].status_message ();
-    } else if (role == Desktop_notifications_allowed_role) {
-        return this.users[index.row ()].is_desktop_notifications_allowed ();
-    } else if (role == Avatar_role) {
-        return this.users[index.row ()].avatar_url ();
-    } else if (role == Is_current_user_role) {
-        return this.users[index.row ()].is_current_user ();
-    } else if (role == Is_connected_role) {
-        return this.users[index.row ()].is_connected ();
-    } else if (role == Id_role) {
-        return index.row ();
-    }
-    return GLib.Variant ();
-}
 
-GLib.HashMap<int, GLib.ByteArray> User_model.role_names () {
-    GLib.HashMap<int, GLib.ByteArray> roles;
-    roles[Name_role] = "name";
-    roles[Server_role] = "server";
-    roles[Server_has_user_status_role] = "server_has_user_status";
-    roles[Status_icon_role] = "status_icon";
-    roles[Status_emoji_role] = "status_emoji";
-    roles[Status_message_role] = "status_message";
-    roles[Desktop_notifications_allowed_role] = "desktop_notifications_allowed";
-    roles[Avatar_role] = "avatar";
-    roles[Is_current_user_role] = "is_current_user";
-    roles[Is_connected_role] = "is_connected";
-    roles[Id_role] = "identifier";
-    return roles;
-}
+    /***********************************************************
+    ***********************************************************/
+    public void remove_account (int identifier) {
+        if (identifier < 0 || identifier >= this.users.size ())
+            return;
 
-ActivityListModel *User_model.current_activity_model () {
-    if (current_user_index () < 0 || current_user_index () >= this.users.size ())
-        return null;
+        QMessageBox message_box (QMessageBox.Question,
+            _("Confirm Account Removal"),
+            _("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
+            "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
+                .arg (this.users[identifier].name ()),
+            QMessageBox.NoButton);
+        QPushButton yes_button =
+            message_box.add_button (_("Remove connection"), QMessageBox.YesRole);
+        message_box.add_button (_("Cancel"), QMessageBox.NoRole);
 
-    return this.users[current_user_index ()].get_activity_model ();
-}
+        message_box.exec ();
+        if (message_box.clicked_button () != yes_button) {
+            return;
+        }
 
-void User_model.fetch_current_activity_model () {
-    if (current_user_id () < 0 || current_user_id () >= this.users.size ())
-        return;
+        if (this.users[identifier].is_current_user () && this.users.count () > 1) {
+            identifier == 0 ? switch_current_user (1) : switch_current_user (0);
+        }
 
-    this.users[current_user_id ()].on_refresh ();
-}
+        this.users[identifier].log_out ();
+        this.users[identifier].remove_account ();
 
-AccountAppList User_model.app_list () {
-    if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
-        return {};
-
-    return this.users[this.current_user_id].app_list ();
-}
-
-User *User_model.current_user () {
-    if (current_user_id () < 0 || current_user_id () >= this.users.size ())
-        return null;
-
-    return this.users[current_user_id ()];
-}
-
-int User_model.find_user_id_for_account (AccountState account) {
-    const var it = std.find_if (std.cbegin (this.users), std.cend (this.users), [=] (User user) {
-        return user.account ().identifier () == account.account ().identifier ();
-    });
-
-    if (it == std.cend (this.users)) {
-        return -1;
+        begin_remove_rows (QModelIndex (), identifier, identifier);
+        this.users.remove_at (identifier);
+        end_remove_rows ();
     }
 
-    const var identifier = std.distance (std.cbegin (this.users), it);
-    return identifier;
-}
 
-/*-------------------------------------------------------------------------------------*/
+    /***********************************************************
+    ***********************************************************/
+    public std.shared_ptr<Occ.UserStatusConnector> user_status_connector (int identifier) {
+        if (identifier < 0 || identifier >= this.users.size ()) {
+            return null;
+        }
 
-Image_provider.Image_provider ()
-    : QQuick_image_provider (QQuick_image_provider.Image) {
-}
-
-QImage Image_provider.request_image (string identifier, QSize size, QSize requested_size) {
-    //  Q_UNUSED (size)
-    //  Q_UNUSED (requested_size)
-
-    const var make_icon = [] (string path) {
-        QImage image (128, 128, QImage.Format_ARGB32);
-        image.fill (Qt.Global_color.transparent);
-        QPainter painter (&image);
-        QSvgRenderer renderer (path);
-        renderer.render (&painter);
-        return image;
+        return this.users[identifier].account ().user_status_connector ();
     }
 
-    if (identifier == QLatin1String ("fallback_white")) {
-        return make_icon (QStringLiteral (":/client/theme/white/user.svg"));
+
+    /***********************************************************
+    ***********************************************************/
+    public ActivityListModel current_activity_model () {
+        if (current_user_index () < 0 || current_user_index () >= this.users.size ())
+            return null;
+
+        return this.users[current_user_index ()].get_activity_model ();
     }
 
-    if (identifier == QLatin1String ("fallback_black")) {
-        return make_icon (QStringLiteral (":/client/theme/black/user.svg"));
+
+    /***********************************************************
+    ***********************************************************/
+    public AccountAppList app_list (){
+        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
+            return {};
+
+        return this.users[this.current_user_id].app_list ();
     }
 
-    const int uid = identifier.to_int ();
-    return User_model.instance ().avatar_by_id (uid);
-}
 
+    /***********************************************************
+    ***********************************************************/
+    private void build_user_list () {
+        for (int i = 0; i < AccountManager.instance ().accounts ().size (); i++) {
+            var user = AccountManager.instance ().accounts ().at (i);
+            add_user (user);
+        }
+        if (this.init) {
+            this.users.first ().is_current_user (true);
+            this.init = false;
+        }
+    }
 
-}
+} // class UserModel
+
+} // namespace Ui
+} // namespace Occ

@@ -7,13 +7,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 namespace Occ {
 
 class UserStatus {
-    // Q_GADGET
-
-    //  Q_PROPERTY (string identifier MEMBER this.identifier)
-    //  Q_PROPERTY (string message MEMBER this.message)
-    //  Q_PROPERTY (string icon MEMBER this.icon)
-    //  Q_PROPERTY (OnlineStatus state MEMBER this.state)
-
 
     /***********************************************************
     ***********************************************************/

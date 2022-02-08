@@ -22,7 +22,7 @@ class FakePayloadReply : FakeReply {
     ***********************************************************/
     public void respond ();
 
-    public void on_abort () override {}
+    public void on_signal_abort () override {}
     public int64 readData (char buf, int64 max) override;
     public int64 bytesAvailable () override;
     public GLib.ByteArray this.body;

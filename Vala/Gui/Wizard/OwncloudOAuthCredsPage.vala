@@ -45,8 +45,8 @@ class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
         title (WizardCommon.title_template ().arg (_("Connect to %1").arg (Theme.instance ().app_name_gui ())));
         sub_title (WizardCommon.sub_title_template ().arg (_("Login in your browser")));
 
-        connect (this.ui.open_link_button, &QCommand_link_button.clicked, this, &OwncloudOAuthCredsPage.on_open_browser);
-        connect (this.ui.copy_link_button, &QCommand_link_button.clicked, this, &OwncloudOAuthCredsPage.on_copy_link_to_clipboard);
+        connect (this.ui.open_link_button, &QCommand_link_button.clicked, this, &OwncloudOAuthCredsPage.on_signal_open_browser);
+        connect (this.ui.copy_link_button, &QCommand_link_button.clicked, this, &OwncloudOAuthCredsPage.on_signal_copy_link_to_clipboard);
     }
 
 
@@ -66,9 +66,9 @@ class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         //  Q_ASSERT (oc_wizard);
         oc_wizard.account ().credentials (CredentialsFactory.create ("http"));
-        this.async_auth.on_reset (new OAuth (oc_wizard.account ().data (), this));
-        connect (this.async_auth.data (), &OAuth.result, this, &OwncloudOAuthCredsPage.on_async_auth_result, Qt.QueuedConnection);
-        this.async_auth.on_start ();
+        this.async_auth.on_signal_reset (new OAuth (oc_wizard.account ().data (), this));
+        connect (this.async_auth.data (), &OAuth.result, this, &OwncloudOAuthCredsPage.on_signal_async_auth_result, Qt.QueuedConnection);
+        this.async_auth.on_signal_start ();
 
         // Don't hide the wizard (avoid user confusion)!
         //wizard ().hide ();
@@ -80,7 +80,7 @@ class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     public void clean_up_page () {
         // The next or back button was activated, show the wizard again
         wizard ().show ();
-        this.async_auth.on_reset ();
+        this.async_auth.on_signal_reset ();
     }
 
 
@@ -107,14 +107,14 @@ class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public void on_async_auth_result (OAuth.Result result_string, string user,
+    public void on_signal_async_auth_result (OAuth.Result result_string, string user,
         string token, string refresh_token) {
         switch (result_string) {
         case OAuth.NotSupported: {
             /* OAuth not supported (can't open browser), fallback to HTTP credentials */
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             oc_wizard.back ();
-            oc_wizard.on_auth_type (DetermineAuthTypeJob.AuthType.BASIC);
+            oc_wizard.on_signal_auth_type (DetermineAuthTypeJob.AuthType.BASIC);
             break;
         }
         case OAuth.Error:
@@ -137,7 +137,7 @@ class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_open_browser () {
+    protected void on_signal_open_browser () {
         if (this.ui.error_label)
             this.ui.error_label.hide ();
 
@@ -150,9 +150,9 @@ class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_copy_link_to_clipboard () {
+    protected void on_signal_copy_link_to_clipboard () {
         if (this.async_auth)
-            QApplication.clipboard ().on_text (this.async_auth.authorisation_link ().to_string (GLib.Uri.FullyEncoded));
+            QApplication.clipboard ().on_signal_text (this.async_auth.authorisation_link ().to_string (GLib.Uri.FullyEncoded));
     }
 
 } // class OwncloudOAuthCredsPage

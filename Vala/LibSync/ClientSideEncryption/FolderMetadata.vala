@@ -15,10 +15,10 @@ class FolderMetadata {
     public FolderMetadata (AccountPointer account, GLib.ByteArray metadata = GLib.ByteArray (), int status_code = -1) {
         this.account = account;
         if (metadata.is_empty () || status_code == 404) {
-            GLib.info (lc_cse_metadata ()) << "Setupping Empty Metadata";
+            GLib.info ()) + "Setupping Empty Metadata";
             up_empty_metadata ();
         } else {
-            GLib.info (lc_cse_metadata ()) << "Setting up existing metadata";
+            GLib.info ()) + "Setting up existing metadata";
             up_existing_metadata (metadata);
         }
     }
@@ -37,7 +37,7 @@ class FolderMetadata {
                         key, GLib.ByteArray.from_base64 (encrypted_metadata));
 
         if (decrypt_result.is_empty ()) {
-        GLib.debug (lc_cse ()) << "ERROR. Could not decrypt the metadata key";
+        GLib.debug ()) + "ERROR. Could not decrypt the metadata key";
         return {};
         }
         return GLib.ByteArray.from_base64 (decrypt_result);
@@ -62,7 +62,7 @@ class FolderMetadata {
     /***********************************************************
     ***********************************************************/
     public GLib.ByteArray encrypted_metadata () {
-        GLib.debug (lc_cse) << "Generating metadata";
+        GLib.debug ("Generating metadata";
 
         QJsonObject metadata_keys;
         for (var it = this.metadata_keys.const_begin (), end = this.metadata_keys.const_end (); it != end; it++) {
@@ -104,7 +104,7 @@ class FolderMetadata {
 
             string encrypted_encrypted = encrypt_json_object (encrypted_doc.to_json (QJsonDocument.Compact), this.metadata_keys.last ());
             if (encrypted_encrypted.is_empty ()) {
-            GLib.debug (lc_cse) << "Metadata generation failed!";
+            GLib.debug ("Metadata generation failed!";
             }
 
             QJsonObject file;
@@ -158,7 +158,7 @@ class FolderMetadata {
     to ease the port to Nlohmann Json API
     ***********************************************************/
     private void up_empty_metadata () {
-        GLib.debug (lc_cse) << "Settint up empty metadata";
+        GLib.debug ("Settint up empty metadata";
         GLib.ByteArray new_metadata_pass = EncryptionHelper.generate_random (16);
         this.metadata_keys.insert (0, new_metadata_pass);
 
@@ -177,7 +177,7 @@ class FolderMetadata {
         * ocs and data.
         */
         QJsonDocument doc = QJsonDocument.from_json (metadata);
-        GLib.info (lc_cse_metadata ()) << doc.to_json (QJsonDocument.Compact);
+        GLib.info ()) + doc.to_json (QJsonDocument.Compact);
 
         // The metadata is being retrieved as a string stored in a json.
         // This seems* to be broken but the RFC doesn't explicits how it wants.
@@ -198,7 +198,7 @@ class FolderMetadata {
 
         QJsonDocument debug_helper;
         debug_helper.object (metadata_keys);
-        GLib.debug (lc_cse) << "Keys : " << debug_helper.to_json (QJsonDocument.Compact);
+        GLib.debug ("Keys : " + debug_helper.to_json (QJsonDocument.Compact);
 
         // Iterate over the document to store the keys. I'm unsure that the keys are in order,
         // perhaps it's better to store a map instead of a vector, perhaps this just doesn't matter.
@@ -210,7 +210,7 @@ class FolderMetadata {
             ***********************************************************/
             GLib.ByteArray b64Decrypted_key = decrypt_metadata_key (curr_b64Pass);
             if (b64Decrypted_key.is_empty ()) {
-            GLib.debug (lc_cse ()) << "Could not decrypt metadata for key" << it.key ();
+            GLib.debug ()) + "Could not decrypt metadata for key" + it.key ();
             continue;
             }
 
@@ -219,10 +219,10 @@ class FolderMetadata {
         }
 
         // Cool, We actually have the key, we can decrypt the rest of the metadata.
-        GLib.debug (lc_cse) << "Sharing : " << sharing;
+        GLib.debug ("Sharing : " + sharing;
         if (sharing.size ()) {
             var sharing_decrypted = decrypt_json_object (sharing, this.metadata_keys.last ());
-            GLib.debug (lc_cse) << "Sharing Decrypted" << sharing_decrypted;
+            GLib.debug ("Sharing Decrypted" + sharing_decrypted;
 
             //Sharing is also a JSON object, so extract it and populate.
             var sharing_doc = QJsonDocument.from_json (sharing_decrypted);
@@ -231,7 +231,7 @@ class FolderMetadata {
                 this.sharing.push_back ({it.key (), it.value ().to_string ()});
             }
         } else {
-            GLib.debug (lc_cse) << "Skipping sharing section since it is empty";
+            GLib.debug ("Skipping sharing section since it is empty";
         }
 
         for (var it = files.const_begin (), end = files.const_end (); it != end; it++) {

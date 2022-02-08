@@ -76,7 +76,7 @@ class Link_share : Share {
     /***********************************************************
     Set the name of the link share.
 
-    Emits either name_set () or on_server_error ().
+    Emits either name_set () or on_signal_server_error ().
     ***********************************************************/
     public void name (string name);
 
@@ -102,8 +102,8 @@ class Link_share : Share {
     /***********************************************************
     Set the expiration date
 
-    On on_success the expire_date_set signal is emitted
-    In case of a server error the on_server_error signal is emitted.
+    On on_signal_success the expire_date_set signal is emitted
+    In case of a server error the on_signal_server_error signal is emitted.
     ***********************************************************/
     public void expire_date (QDate expire_date);
 
@@ -118,7 +118,7 @@ class Link_share : Share {
     Create Ocs_share_job and connect to signal/slots
     ***********************************************************/
     public template <typename Link_share_slot>
-    public Ocs_share_job create_share_job (Link_share_slot on_function);
+    public Ocs_share_job create_share_job (Link_share_slot on_signal_function);
 
 signals:
     void expire_date_set ();
@@ -129,10 +129,10 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void on_note_set (QJsonDocument &, GLib.Variant value);
-    private void on_expire_date_set (QJsonDocument reply, GLib.Variant value);
-    private void on_name_set (QJsonDocument &, GLib.Variant value);
-    private void on_label_set (QJsonDocument &, GLib.Variant value);
+    private void on_signal_note_set (QJsonDocument &, GLib.Variant value);
+    private void on_signal_expire_date_set (QJsonDocument reply, GLib.Variant value);
+    private void on_signal_name_set (QJsonDocument &, GLib.Variant value);
+    private void on_signal_label_set (QJsonDocument &, GLib.Variant value);
 
 
     /***********************************************************
@@ -206,14 +206,14 @@ string Link_share.get_label () {
 }
 
 void Link_share.name (string name) {
-    create_share_job (&Link_share.on_name_set).name (get_id (), name);
+    create_share_job (&Link_share.on_signal_name_set).name (get_id (), name);
 }
 
 void Link_share.note (string note) {
-    create_share_job (&Link_share.on_note_set).note (get_id (), note);
+    create_share_job (&Link_share.on_signal_note_set).note (get_id (), note);
 }
 
-void Link_share.on_note_set (QJsonDocument &, GLib.Variant note) {
+void Link_share.on_signal_note_set (QJsonDocument &, GLib.Variant note) {
     this.note = note.to_string ();
     /* emit */ note_set ();
 }
@@ -223,22 +223,22 @@ string Link_share.get_token () {
 }
 
 void Link_share.expire_date (QDate date) {
-    create_share_job (&Link_share.on_expire_date_set).expire_date (get_id (), date);
+    create_share_job (&Link_share.on_signal_expire_date_set).expire_date (get_id (), date);
 }
 
 void Link_share.label (string label) {
-    create_share_job (&Link_share.on_label_set).label (get_id (), label);
+    create_share_job (&Link_share.on_signal_label_set).label (get_id (), label);
 }
 
 template <typename Link_share_slot>
-Ocs_share_job *Link_share.create_share_job (Link_share_slot on_function) {
+Ocs_share_job *Link_share.create_share_job (Link_share_slot on_signal_function) {
     var job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_share_job.share_job_finished, this, on_function);
-    connect (job, &Ocs_job.ocs_error, this, &Link_share.on_ocs_error);
+    connect (job, &Ocs_share_job.share_job_finished, this, on_signal_function);
+    connect (job, &Ocs_job.ocs_error, this, &Link_share.on_signal_ocs_error);
     return job;
 }
 
-void Link_share.on_expire_date_set (QJsonDocument reply, GLib.Variant value) {
+void Link_share.on_signal_expire_date_set (QJsonDocument reply, GLib.Variant value) {
     var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
 
 
@@ -254,12 +254,12 @@ void Link_share.on_expire_date_set (QJsonDocument reply, GLib.Variant value) {
     /* emit */ expire_date_set ();
 }
 
-void Link_share.on_name_set (QJsonDocument &, GLib.Variant value) {
+void Link_share.on_signal_name_set (QJsonDocument &, GLib.Variant value) {
     this.name = value.to_string ();
     /* emit */ name_set ();
 }
 
-void Link_share.on_label_set (QJsonDocument &, GLib.Variant label) {
+void Link_share.on_signal_label_set (QJsonDocument &, GLib.Variant label) {
     if (this.label != label.to_string ()) {
         this.label = label.to_string ();
         /* emit */ label_set ();

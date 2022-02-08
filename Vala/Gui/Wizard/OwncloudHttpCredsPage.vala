@@ -46,10 +46,10 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
             // default, handled in ui file
             break;
         case Theme.UserIdentifierType.EMAIL:
-            this.ui.username_label.on_text (_("&Email"));
+            this.ui.username_label.on_signal_text (_("&Email"));
             break;
         case Theme.UserIdentifierType.CUSTOM:
-            this.ui.username_label.on_text (theme.custom_user_id ());
+            this.ui.username_label.on_signal_text (theme.custom_user_id ());
             break;
         default:
             break;
@@ -60,7 +60,7 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         sub_title (WizardCommon.sub_title_template ().arg (_("Enter user credentials")));
 
         this.ui.result_layout.add_widget (this.progress_indi);
-        on_stop_spinner ();
+        on_signal_stop_spinner ();
         set_up_customization ();
     }
 
@@ -83,7 +83,7 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         if (http_creds) {
             const string user = http_creds.fetch_user ();
             if (!user.is_empty ()) {
-                this.ui.le_username.on_text (user);
+                this.ui.le_username.on_signal_text (user);
             }
         } else {
             GLib.Uri url = oc_wizard.account ().url ();
@@ -99,13 +99,13 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
             const string password = url.password ();
 
             if (!user.is_empty ()) {
-                this.ui.le_username.on_text (user);
+                this.ui.le_username.on_signal_text (user);
             }
             if (!password.is_empty ()) {
-                this.ui.le_password.on_text (password);
+                this.ui.le_password.on_signal_text (password);
             }
         }
-        this.ui.token_label.on_text (HttpCredentialsGui.request_app_password_text (oc_wizard.account ().data ()));
+        this.ui.token_label.on_signal_text (HttpCredentialsGui.request_app_password_text (oc_wizard.account ().data ()));
         this.ui.token_label.visible (!this.ui.token_label.text ().is_empty ());
         this.ui.le_username.focus ();
     }
@@ -128,7 +128,7 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
 
         if (!this.connected) {
             this.ui.error_label.visible (false);
-            on_start_spinner ();
+            on_signal_start_spinner ();
 
             // Reset cookies to ensure the username / password is actually used
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
@@ -143,7 +143,7 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
             this.connected = false;
 
             /* emit */ complete_changed ();
-            on_stop_spinner ();
+            on_signal_stop_spinner ();
             return true;
         }
         return true;
@@ -161,46 +161,46 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     public void connected () {
         this.connected = true;
-        on_stop_spinner ();
+        on_signal_stop_spinner ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_error_string (string error_string) {
+    public void on_signal_error_string (string error_string) {
         if (error_string == "") {
             this.ui.error_label.visible (false);
         } else {
             this.ui.error_label.visible (true);
-            this.ui.error_label.on_text (error_string);
+            this.ui.error_label.on_signal_text (error_string);
         }
         /* emit */ complete_changed ();
-        on_stop_spinner ();
+        on_signal_stop_spinner ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_style_changed () {
+    public void on_signal_style_changed () {
         customize_style ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_start_spinner () {
+    private void on_signal_start_spinner () {
         this.ui.result_layout.enabled (true);
         this.progress_indi.visible (true);
-        this.progress_indi.on_start_animation ();
+        this.progress_indi.on_signal_start_animation ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_stop_spinner () {
+    private void on_signal_stop_spinner () {
         this.ui.result_layout.enabled (false);
         this.progress_indi.visible (false);
-        this.progress_indi.on_stop_animation ();
+        this.progress_indi.on_signal_stop_animation ();
     }
 
 
@@ -226,7 +226,7 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     private void customize_style () {
         if (this.progress_indi)
-            this.progress_indi.on_color (QGuiApplication.palette ().color (QPalette.Text));
+            this.progress_indi.on_signal_color (QGuiApplication.palette ().color (QPalette.Text));
     }
 
 } // class OwncloudHttpCredsPage

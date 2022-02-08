@@ -33,23 +33,23 @@ class ValidateChecksumHeader : ComputeChecksumBase {
     the signal validated () will be emitted. In case of any kind
     of error, the signal validation_failed () will be emitted.
     ***********************************************************/
-    public void on_start (string file_path, GLib.ByteArray checksum_header) {
+    public void on_signal_start (string file_path, GLib.ByteArray checksum_header) {
         if (var calculator = prepare_start (checksum_header))
-            calculator.on_start (file_path);
+            calculator.on_signal_start (file_path);
     }
 
 
     /***********************************************************
     Check a device's actual checksum against the provided checksum_header
 
-    Like the other on_start () but works on a device.
+    Like the other on_signal_start () but works on a device.
 
     The device ownership transfers into the thread that
     will compute the checksum. It must not have a parent.
     ***********************************************************/
-    public void on_start (std.unique_ptr<QIODevice> device, GLib.ByteArray checksum_header) {
+    public void on_signal_start (std.unique_ptr<QIODevice> device, GLib.ByteArray checksum_header) {
         if (var calculator = prepare_start (checksum_header))
-            calculator.on_start (std.move (device));
+            calculator.on_signal_start (std.move (device));
     }
 
 
@@ -59,7 +59,7 @@ class ValidateChecksumHeader : ComputeChecksumBase {
 
     /***********************************************************
     ***********************************************************/
-    private void on_checksum_calculated (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
+    private void on_signal_checksum_calculated (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
         if (checksum_type != this.expected_checksum_type) {
             /* emit */ validation_failed (_("The checksum header contained an unknown checksum type \"%1\"").arg (string.from_latin1 (this.expected_checksum_type)));
             return;
@@ -82,7 +82,7 @@ class ValidateChecksumHeader : ComputeChecksumBase {
         }
 
         if (!parse_checksum_header (checksum_header, this.expected_checksum_type, this.expected_checksum)) {
-            GLib.warn (lc_checksums) << "Checksum header malformed:" << checksum_header;
+            GLib.warn ("Checksum header malformed:" + checksum_header;
             /* emit */ validation_failed (_("The checksum header is malformed."));
             return null;
         }
@@ -90,7 +90,7 @@ class ValidateChecksumHeader : ComputeChecksumBase {
         var calculator = new ComputeChecksum (this);
         calculator.checksum_type (this.expected_checksum_type);
         connect (calculator, &ComputeChecksum.done,
-            this, &ValidateChecksumHeader.on_checksum_calculated);
+            this, &ValidateChecksumHeader.on_signal_checksum_calculated);
         return calculator;
     }
 }

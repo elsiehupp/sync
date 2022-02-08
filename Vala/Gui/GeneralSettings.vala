@@ -39,24 +39,24 @@ class General_settings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_style_changed ();
+    public void on_signal_style_changed ();
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_save_misc_settings ();
-    private void on_toggle_launch_on_startup (bool);
-    private void on_toggle_optional_server_notifications (bool);
-    private void on_show_in_explorer_navigation_pane (bool);
-    private void on_ignore_files_editor ();
-    private void on_create_debug_archive ();
-    private void on_load_misc_settings ();
-    private void on_show_legal_notice ();
+    private void on_signal_save_misc_settings ();
+    private void on_signal_toggle_launch_on_signal_startup (bool);
+    private void on_signal_toggle_optional_server_notifications (bool);
+    private void on_signal_show_in_explorer_navigation_pane (bool);
+    private void on_signal_ignore_files_editor ();
+    private void on_signal_create_debug_archive ();
+    private void on_signal_load_misc_settings ();
+    private void on_signal_show_legal_notice ();
 #if defined (BUILD_UPDATER)
-    private void on_update_info ();
-    private void on_update_channel_changed (string channel);
-    private void on_update_check_now ();
-    private void on_toggle_auto_update_check ();
+    private void on_signal_update_info ();
+    private void on_signal_update_channel_changed (string channel);
+    private void on_signal_update_check_now ();
+    private void on_signal_toggle_auto_update_check ();
 //  #endif
 
     /***********************************************************
@@ -160,44 +160,44 @@ General_settings.General_settings (Gtk.Widget parent)
     this.ui.up_ui (this);
 
     connect (this.ui.server_notifications_check_box, &QAbstractButton.toggled,
-        this, &General_settings.on_toggle_optional_server_notifications);
+        this, &General_settings.on_signal_toggle_optional_server_notifications);
     this.ui.server_notifications_check_box.tool_tip (_("Server notifications that require attention."));
 
-    connect (this.ui.show_in_explorer_navigation_pane_check_box, &QAbstractButton.toggled, this, &General_settings.on_show_in_explorer_navigation_pane);
+    connect (this.ui.show_in_explorer_navigation_pane_check_box, &QAbstractButton.toggled, this, &General_settings.on_signal_show_in_explorer_navigation_pane);
 
     // Rename 'Explorer' appropriately on non-Windows
 
-    if (Utility.has_system_launch_on_startup (Theme.instance ().app_name ())) {
+    if (Utility.has_system_launch_on_signal_startup (Theme.instance ().app_name ())) {
         this.ui.autostart_check_box.checked (true);
         this.ui.autostart_check_box.disabled (true);
         this.ui.autostart_check_box.tool_tip (_("You cannot disable autostart because system-wide autostart is enabled."));
     } else {
-        const bool has_auto_start = Utility.has_launch_on_startup (Theme.instance ().app_name ());
+        const bool has_auto_start = Utility.has_launch_on_signal_startup (Theme.instance ().app_name ());
         // make sure the binary location is correctly set
-        on_toggle_launch_on_startup (has_auto_start);
+        on_signal_toggle_launch_on_signal_startup (has_auto_start);
         this.ui.autostart_check_box.checked (has_auto_start);
-        connect (this.ui.autostart_check_box, &QAbstractButton.toggled, this, &General_settings.on_toggle_launch_on_startup);
+        connect (this.ui.autostart_check_box, &QAbstractButton.toggled, this, &General_settings.on_signal_toggle_launch_on_signal_startup);
     }
 
     // setup about section
     string about = Theme.instance ().about ();
     this.ui.about_label.text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
-    this.ui.about_label.on_text (about);
+    this.ui.about_label.on_signal_text (about);
     this.ui.about_label.open_external_links (true);
 
     // About legal notice
-    connect (this.ui.legal_notice_button, &QPushButton.clicked, this, &General_settings.on_show_legal_notice);
+    connect (this.ui.legal_notice_button, &QPushButton.clicked, this, &General_settings.on_signal_show_legal_notice);
 
-    on_load_misc_settings ();
+    on_signal_load_misc_settings ();
     // updater info now set in : customize_style
-    //on_update_info ();
+    //on_signal_update_info ();
 
     // misc
-    connect (this.ui.mono_icons_check_box, &QAbstractButton.toggled, this, &General_settings.on_save_misc_settings);
-    connect (this.ui.crashreporter_check_box, &QAbstractButton.toggled, this, &General_settings.on_save_misc_settings);
-    connect (this.ui.new_folder_limit_check_box, &QAbstractButton.toggled, this, &General_settings.on_save_misc_settings);
-    connect (this.ui.new_folder_limit_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &General_settings.on_save_misc_settings);
-    connect (this.ui.new_external_storage, &QAbstractButton.toggled, this, &General_settings.on_save_misc_settings);
+    connect (this.ui.mono_icons_check_box, &QAbstractButton.toggled, this, &General_settings.on_signal_save_misc_settings);
+    connect (this.ui.crashreporter_check_box, &QAbstractButton.toggled, this, &General_settings.on_signal_save_misc_settings);
+    connect (this.ui.new_folder_limit_check_box, &QAbstractButton.toggled, this, &General_settings.on_signal_save_misc_settings);
+    connect (this.ui.new_folder_limit_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &General_settings.on_signal_save_misc_settings);
+    connect (this.ui.new_external_storage, &QAbstractButton.toggled, this, &General_settings.on_signal_save_misc_settings);
 
 //  #ifndef WITH_CRASHREPORTER
     this.ui.crashreporter_check_box.visible (false);
@@ -220,11 +220,11 @@ General_settings.General_settings (Gtk.Widget parent)
     // is no point in offering an option
     this.ui.mono_icons_check_box.visible (Theme.instance ().mono_icons_available ());
 
-    connect (this.ui.ignored_files_button, &QAbstractButton.clicked, this, &General_settings.on_ignore_files_editor);
-    connect (this.ui.debug_archive_button, &QAbstractButton.clicked, this, &General_settings.on_create_debug_archive);
+    connect (this.ui.ignored_files_button, &QAbstractButton.clicked, this, &General_settings.on_signal_ignore_files_editor);
+    connect (this.ui.debug_archive_button, &QAbstractButton.clicked, this, &General_settings.on_signal_create_debug_archive);
 
-    // on_account_added means the wizard was on_finished and the wizard might change some options.
-    connect (AccountManager.instance (), &AccountManager.on_account_added, this, &General_settings.on_load_misc_settings);
+    // on_signal_account_added means the wizard was on_signal_finished and the wizard might change some options.
+    connect (AccountManager.instance (), &AccountManager.on_signal_account_added, this, &General_settings.on_signal_load_misc_settings);
 
     customize_style ();
 }
@@ -240,7 +240,7 @@ QSize General_settings.size_hint () {
     }
 }
 
-void General_settings.on_load_misc_settings () {
+void General_settings.on_signal_load_misc_settings () {
     QScoped_value_rollback<bool> scope (this.currently_loading, true);
     ConfigFile cfg_file;
     this.ui.mono_icons_check_box.checked (cfg_file.mono_icons ());
@@ -255,7 +255,7 @@ void General_settings.on_load_misc_settings () {
 }
 
 #if defined (BUILD_UPDATER)
-void General_settings.on_update_info () {
+void General_settings.on_signal_update_info () {
     if (ConfigFile ().skip_update_check () || !Updater.instance ()) {
         // updater disabled on compile
         this.ui.updates_group_box.visible (false);
@@ -265,11 +265,11 @@ void General_settings.on_update_info () {
     // Note: the sparkle-updater is not an OCUpdater
     var ocupdater = qobject_cast<OCUpdater> (Updater.instance ());
     if (ocupdater) {
-        connect (ocupdater, &OCUpdater.download_state_changed, this, &General_settings.on_update_info, Qt.UniqueConnection);
-        connect (this.ui.restart_button, &QAbstractButton.clicked, ocupdater, &OCUpdater.on_start_installer, Qt.UniqueConnection);
+        connect (ocupdater, &OCUpdater.download_state_changed, this, &General_settings.on_signal_update_info, Qt.UniqueConnection);
+        connect (this.ui.restart_button, &QAbstractButton.clicked, ocupdater, &OCUpdater.on_signal_start_installer, Qt.UniqueConnection);
         connect (this.ui.restart_button, &QAbstractButton.clicked, Gtk.Application, &QApplication.quit, Qt.UniqueConnection);
-        connect (this.ui.update_button, &QAbstractButton.clicked, this, &General_settings.on_update_check_now, Qt.UniqueConnection);
-        connect (this.ui.auto_check_for_updates_check_box, &QAbstractButton.toggled, this, &General_settings.on_toggle_auto_update_check);
+        connect (this.ui.update_button, &QAbstractButton.clicked, this, &General_settings.on_signal_update_check_now, Qt.UniqueConnection);
+        connect (this.ui.auto_check_for_updates_check_box, &QAbstractButton.toggled, this, &General_settings.on_signal_toggle_auto_update_check);
 
         string status = ocupdater.status_string (OCUpdater.Update_status_string_format.Html);
         Theme.replace_link_color_string_background_aware (status);
@@ -278,7 +278,7 @@ void General_settings.on_update_info () {
         connect (this.ui.update_state_label, &Gtk.Label.link_activated, this, [] (string link) {
             Utility.open_browser (GLib.Uri (link));
         });
-        this.ui.update_state_label.on_text (status);
+        this.ui.update_state_label.on_signal_text (status);
 
         this.ui.restart_button.visible (ocupdater.download_state () == OCUpdater.Download_complete);
 
@@ -292,10 +292,10 @@ void General_settings.on_update_info () {
     // Channel selection
     this.ui.update_channel.current_index (ConfigFile ().update_channel () == "beta" ? 1 : 0);
     connect (this.ui.update_channel, &QCombo_box.current_text_changed,
-        this, &General_settings.on_update_channel_changed, Qt.UniqueConnection);
+        this, &General_settings.on_signal_update_channel_changed, Qt.UniqueConnection);
 }
 
-void General_settings.on_update_channel_changed (string channel) {
+void General_settings.on_signal_update_channel_changed (string channel) {
     if (channel == ConfigFile ().update_channel ())
         return;
 
@@ -317,7 +317,7 @@ void General_settings.on_update_channel_changed (string channel) {
         this);
     var accept_button = msg_box.add_button (_("Change update channel"), QMessageBox.AcceptRole);
     msg_box.add_button (_("Cancel"), QMessageBox.RejectRole);
-    connect (msg_box, &QMessageBox.on_finished, msg_box, [this, channel, msg_box, accept_button] {
+    connect (msg_box, &QMessageBox.on_signal_finished, msg_box, [this, channel, msg_box, accept_button] {
         msg_box.delete_later ();
         if (msg_box.clicked_button () == accept_button) {
             ConfigFile ().update_channel (channel);
@@ -332,7 +332,7 @@ void General_settings.on_update_channel_changed (string channel) {
     msg_box.open ();
 }
 
-void General_settings.on_update_check_now () {
+void General_settings.on_signal_update_check_now () {
     var updater = qobject_cast<OCUpdater> (Updater.instance ());
     if (ConfigFile ().skip_update_check ()) {
         updater = null; // don't show update info if updates are disabled
@@ -345,14 +345,14 @@ void General_settings.on_update_check_now () {
     }
 }
 
-void General_settings.on_toggle_auto_update_check () {
+void General_settings.on_signal_toggle_auto_update_check () {
     ConfigFile cfg_file;
     bool is_checked = this.ui.auto_check_for_updates_check_box.is_checked ();
     cfg_file.auto_update_check (is_checked, "");
 }
 //  #endif // defined (BUILD_UPDATER)
 
-void General_settings.on_save_misc_settings () {
+void General_settings.on_signal_save_misc_settings () {
     if (this.currently_loading)
         return;
     ConfigFile cfg_file;
@@ -366,24 +366,24 @@ void General_settings.on_save_misc_settings () {
     cfg_file.confirm_external_storage (this.ui.new_external_storage.is_checked ());
 }
 
-void General_settings.on_toggle_launch_on_startup (bool enable) {
+void General_settings.on_signal_toggle_launch_on_signal_startup (bool enable) {
     Theme theme = Theme.instance ();
-    Utility.launch_on_startup (theme.app_name (), theme.app_name_gui (), enable);
+    Utility.launch_on_signal_startup (theme.app_name (), theme.app_name_gui (), enable);
 }
 
-void General_settings.on_toggle_optional_server_notifications (bool enable) {
+void General_settings.on_signal_toggle_optional_server_notifications (bool enable) {
     ConfigFile cfg_file;
     cfg_file.optional_server_notifications (enable);
 }
 
-void General_settings.on_show_in_explorer_navigation_pane (bool checked) {
+void General_settings.on_signal_show_in_explorer_navigation_pane (bool checked) {
     ConfigFile cfg_file;
     cfg_file.show_in_explorer_navigation_pane (checked);
     // Now update the registry with the change.
     FolderMan.instance ().navigation_pane_helper ().show_in_explorer_navigation_pane (checked);
 }
 
-void General_settings.on_ignore_files_editor () {
+void General_settings.on_signal_ignore_files_editor () {
     if (this.ignore_editor.is_null ()) {
         ConfigFile cfg_file;
         this.ignore_editor = new Ignore_list_editor (this);
@@ -394,7 +394,7 @@ void General_settings.on_ignore_files_editor () {
     }
 }
 
-void General_settings.on_create_debug_archive () {
+void General_settings.on_signal_create_debug_archive () {
     const var filename = QFileDialog.get_save_filename (this, _("Create Debug Archive"), "", _("Zip Archives") + " (*.zip)");
     if (filename.is_empty ()) {
         return;
@@ -404,13 +404,13 @@ void General_settings.on_create_debug_archive () {
     QMessageBox.information (this, _("Debug Archive Created"), _("Debug archive is created at %1").arg (filename));
 }
 
-void General_settings.on_show_legal_notice () {
+void General_settings.on_signal_show_legal_notice () {
     var notice = new Legal_notice ();
     notice.exec ();
     delete notice;
 }
 
-void General_settings.on_style_changed () {
+void General_settings.on_signal_style_changed () {
     customize_style ();
 }
 
@@ -418,11 +418,11 @@ void General_settings.customize_style () {
     // setup about section
     string about = Theme.instance ().about ();
     Theme.replace_link_color_string_background_aware (about);
-    this.ui.about_label.on_text (about);
+    this.ui.about_label.on_signal_text (about);
 
 #if defined (BUILD_UPDATER)
     // updater info
-    on_update_info ();
+    on_signal_update_info ();
 #else
     this.ui.updates_group_box.visible (false);
 //  #endif

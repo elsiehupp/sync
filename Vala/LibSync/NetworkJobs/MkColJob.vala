@@ -53,7 +53,7 @@ class MkColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         // add 'Content-Length : 0' header (see https://github.com/owncloud/client/issues/3256)
         Soup.Request req;
         req.raw_header ("Content-Length", "0");
@@ -67,15 +67,15 @@ class MkColJob : AbstractNetworkJob {
         } else {
             send_request ("MKCOL", make_dav_url (path ()), req);
         }
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private bool on_finished () {
-        GLib.info (lc_mk_col_job) << "MKCOL of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                        << reply_status_string ();
+    private bool on_signal_finished () {
+        GLib.info ("MKCOL of" + reply ().request ().url ("FINISHED WITH STATUS"
+                        + reply_status_string ();
 
         if (reply ().error () != Soup.Reply.NoError) {
             /* Q_EMIT */ finished_with_error (reply ());

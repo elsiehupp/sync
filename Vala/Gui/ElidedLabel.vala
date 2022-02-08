@@ -65,9 +65,9 @@ class ElidedLabel : Gtk.Label {
         this.text (text) {
     }
 
-    void ElidedLabel.on_text (string text) {
+    void ElidedLabel.on_signal_text (string text) {
         this.text = text;
-        Gtk.Label.on_text (text);
+        Gtk.Label.on_signal_text (text);
         update ();
     }
 
@@ -81,7 +81,7 @@ class ElidedLabel : Gtk.Label {
 
         QFontMetrics fm = font_metrics ();
         string elided = fm.elided_text (this.text, this.elide_mode, event.size ().width ());
-        Gtk.Label.on_text (elided);
+        Gtk.Label.on_signal_text (elided);
     }
     }
     

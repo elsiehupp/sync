@@ -51,8 +51,8 @@ class HttpCredentialsGui : HttpCredentials {
 
 
     /***********************************************************
-    This will query the server and either uses OAuth via this.async_auth.on_start ()
-    or call on_show_dialog to ask the password
+    This will query the server and either uses OAuth via this.async_auth.on_signal_start ()
+    or call on_signal_show_dialog to ask the password
     ***********************************************************/
     public void ask_from_user () override;
     /***********************************************************
@@ -70,9 +70,9 @@ class HttpCredentialsGui : HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_async_auth_result (OAuth.Result, string user, string access_token, string refresh_token);
-    private void on_show_dialog ();
-    private void on_ask_from_user_async ();
+    private void on_signal_async_auth_result (OAuth.Result, string user, string access_token, string refresh_token);
+    private void on_signal_show_dialog ();
+    private void on_signal_ask_from_user_async ();
 
 signals:
     void authorisation_link_changed ();
@@ -84,46 +84,46 @@ signals:
 
 
 void HttpCredentialsGui.ask_from_user () {
-    // This function can be called from AccountState.on_invalid_credentials,
+    // This function can be called from AccountState.on_signal_invalid_credentials,
     // which (indirectly, through HttpCredentials.invalidate_token) schedules
     // a cache wipe of the qnam. We can only execute a network job again once
     // the cache has been cleared, otherwise we'd interfere with the job.
-    QTimer.single_shot (100, this, &HttpCredentialsGui.on_ask_from_user_async);
+    QTimer.single_shot (100, this, &HttpCredentialsGui.on_signal_ask_from_user_async);
 }
 
-void HttpCredentialsGui.on_ask_from_user_async () {
+void HttpCredentialsGui.on_signal_ask_from_user_async () {
     // First, we will check what kind of auth we need.
     var job = new DetermineAuthTypeJob (this.account.shared_from_this (), this);
     GLib.Object.connect (job, &DetermineAuthTypeJob.auth_type, this, [this] (DetermineAuthTypeJob.AuthType type) {
         if (type == DetermineAuthTypeJob.AuthType.OAUTH) {
-            this.async_auth.on_reset (new OAuth (this.account, this));
+            this.async_auth.on_signal_reset (new OAuth (this.account, this));
             this.async_auth.expected_user = this.account.dav_user ();
             connect (this.async_auth.data (), &OAuth.result,
-                this, &HttpCredentialsGui.on_async_auth_result);
+                this, &HttpCredentialsGui.on_signal_async_auth_result);
             connect (this.async_auth.data (), &OAuth.destroyed,
                 this, &HttpCredentialsGui.authorisation_link_changed);
-            this.async_auth.on_start ();
+            this.async_auth.on_signal_start ();
             /* emit */ authorisation_link_changed ();
         } else if (type == DetermineAuthTypeJob.AuthType.BASIC) {
-            on_show_dialog ();
+            on_signal_show_dialog ();
         } else {
             // Shibboleth?
-            GLib.warn (lc_http_credentials_gui) << "Bad http auth type:" << type;
+            GLib.warn ("Bad http auth type:" + type;
             /* emit */ asked ();
         }
     });
-    job.on_start ();
+    job.on_signal_start ();
 }
 
-void HttpCredentialsGui.on_async_auth_result (OAuth.Result r, string user,
+void HttpCredentialsGui.on_signal_async_auth_result (OAuth.Result r, string user,
     const string token, string refresh_token) {
     switch (r) {
     case OAuth.NotSupported:
-        on_show_dialog ();
-        this.async_auth.on_reset (null);
+        on_signal_show_dialog ();
+        this.async_auth.on_signal_reset (null);
         return;
     case OAuth.Error:
-        this.async_auth.on_reset (null);
+        this.async_auth.on_signal_reset (null);
         /* emit */ asked ();
         return;
     case OAuth.LoggedIn:
@@ -136,11 +136,11 @@ void HttpCredentialsGui.on_async_auth_result (OAuth.Result r, string user,
     this.refresh_token = refresh_token;
     this.ready = true;
     persist ();
-    this.async_auth.on_reset (null);
+    this.async_auth.on_signal_reset (null);
     /* emit */ asked ();
 }
 
-void HttpCredentialsGui.on_show_dialog () {
+void HttpCredentialsGui.on_signal_show_dialog () {
     string message = _("Please enter %1 password:<br>"
                      "<br>"
                      "User : %2<br>"
@@ -172,7 +172,7 @@ void HttpCredentialsGui.on_show_dialog () {
     }
 
     dialog.open ();
-    connect (dialog, &Gtk.Dialog.on_finished, this, [this, dialog] (int result) {
+    connect (dialog, &Gtk.Dialog.on_signal_finished, this, [this, dialog] (int result) {
         if (result == Gtk.Dialog.Accepted) {
             this.password = dialog.text_value ();
             this.refresh_token.clear ();

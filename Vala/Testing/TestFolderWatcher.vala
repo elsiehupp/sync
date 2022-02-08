@@ -9,31 +9,31 @@ implied, as to its usefulness for any purpose.
 void touch (string file) {
     string cmd;
     cmd = string ("touch %1").arg (file);
-    qDebug () << "Command : " << cmd;
+    GLib.debug ("Command : " + cmd;
     system (cmd.toLocal8Bit ());
 }
 
 void mkdir (string file) {
     string cmd = string ("mkdir %1").arg (file);
-    qDebug () << "Command : " << cmd;
+    GLib.debug ("Command : " + cmd;
     system (cmd.toLocal8Bit ());
 }
 
 void rmdir (string file) {
     string cmd = string ("rmdir %1").arg (file);
-    qDebug () << "Command : " << cmd;
+    GLib.debug ("Command : " + cmd;
     system (cmd.toLocal8Bit ());
 }
 
 void rm (string file) {
     string cmd = string ("rm %1").arg (file);
-    qDebug () << "Command : " << cmd;
+    GLib.debug ("Command : " + cmd;
     system (cmd.toLocal8Bit ());
 }
 
 void mv (string file1, string file2) {
     string cmd = string ("mv %1 %2").arg (file1, file2);
-    qDebug () << "Command : " << cmd;
+    GLib.debug ("Command : " + cmd;
     system (cmd.toLocal8Bit ());
 }
 
@@ -48,7 +48,7 @@ class TestFolderWatcher : GLib.Object {
 
     bool waitForPathChanged (string path) {
         QElapsedTimer t;
-        t.on_start ();
+        t.on_signal_start ();
         while (t.elapsed () < 5000) {
             // Check if it was already reported as changed by the watcher
             for (int i = 0; i < this.pathChangedSpy.size (); ++i) {
@@ -73,7 +73,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     public TestFolderWatcher () {
         QDir rootDir (this.root.path ());
         this.rootPath = rootDir.canonicalPath ();
-        qDebug () << "creating test directory tree in " << this.rootPath;
+        GLib.debug ("creating test directory tree in " + this.rootPath;
 
         rootDir.mkpath ("a1/b1/c1");
         rootDir.mkpath ("a1/b1/c2");
@@ -85,9 +85,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         Utility.writeRandomFile ( this.rootPath+"/a2/renamefile");
         Utility.writeRandomFile ( this.rootPath+"/a1/movefile");
 
-        this.watcher.on_reset (new FolderWatcher);
-        this.watcher.on_init (this.rootPath);
-        this.pathChangedSpy.on_reset (new QSignalSpy (this.watcher.data (), SIGNAL (pathChanged (string))));
+        this.watcher.on_signal_reset (new FolderWatcher);
+        this.watcher.on_signal_init (this.rootPath);
+        this.pathChangedSpy.on_signal_reset (new QSignalSpy (this.watcher.data (), SIGNAL (pathChanged (string))));
     }
 
 
@@ -103,7 +103,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private void on_init () {
+    private void on_signal_init () {
         this.pathChangedSpy.clear ();
         CHECK_WATCH_COUNT (countFolders (this.rootPath) + 1);
     }
@@ -111,7 +111,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private void on_cleanup () {
+    private void on_signal_cleanup () {
         CHECK_WATCH_COUNT (countFolders (this.rootPath) + 1);
     }
 
@@ -122,7 +122,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         string file (this.rootPath + "/foo.txt");
         string cmd;
         cmd = string ("echo \"xyz\" > %1").arg (file);
-        qDebug () << "Command : " << cmd;
+        GLib.debug ("Command : " + cmd;
         system (cmd.toLocal8Bit ());
 
         QVERIFY (waitForPathChanged (file));

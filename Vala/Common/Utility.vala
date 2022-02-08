@@ -42,8 +42,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 namespace Occ {
 
-//  Q_DECLARE_LOGGING_CATEGORY (lc_utility)
-
 /***********************************************************
 \addtogroup libsync
  @{
@@ -107,13 +105,13 @@ class Utility {
     ***********************************************************/
     static void setup_fav_link_private (string folder) {
         // Nautilus : add to ~/.gtk-bookmarks
-        GLib.File gtk_bookmarks = new GLib.File (QDir.home_path () + QLatin1String ("/.config/gtk-3.0/bookmarks"));
+        GLib.File gtk_bookmarks = new GLib.File (QDir.home_path () + "/.config/gtk-3.0/bookmarks");
         GLib.ByteArray folder_url = "file://" + folder.to_utf8 ();
         if (gtk_bookmarks.open (GLib.File.ReadWrite)) {
             GLib.ByteArray places = gtk_bookmarks.read_all ();
             if (!places.contains (folder_url)) {
                 places += folder_url;
-                gtk_bookmarks.on_reset ();
+                gtk_bookmarks.on_signal_reset ();
                 gtk_bookmarks.write (places + '\n');
             }
         }
@@ -152,8 +150,8 @@ class Utility {
 
         GLib.File file = new GLib.File (fname);
         if (file.open (QIODevice.WriteOnly | QIODevice.Text)) {
-            QTextStream outfile = new QTextStream (&file);
-            outfile << rand_string;
+            string outfile; // = new QTextStream (&file);
+            outfile = rand_string;
             // optional, as GLib.File destructor will already do it:
             file.close ();
             return true;
@@ -250,7 +248,7 @@ class Utility {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    public static bool has_system_launch_on_startup (string app_name) {
+    public static bool has_system_launch_on_signal_startup (string app_name) {
         //  Q_UNUSED (app_name)
         return false;
     }
@@ -270,16 +268,16 @@ class Utility {
     /***********************************************************
     OCSYNC_EXPORT
     ***********************************************************/
-    public static bool has_launch_on_startup (string app_name) {
-        return has_launch_on_startup_private (app_name);
+    public static bool has_launch_on_signal_startup (string app_name) {
+        return has_launch_on_signal_startup_private (app_name);
     }
 
 
-    static bool has_launch_on_startup_private (string app_name) {
+    static bool has_launch_on_signal_startup_private (string app_name) {
         //  Q_UNUSED (app_name)
         string desktop_file_location = get_user_autostart_dir_private ()
-                                        + QLatin1String (LINUX_APPLICATION_ID)
-                                        + QLatin1String (".desktop");
+                                        + LINUX_APPLICATION_ID
+                                        + ".desktop";
         return GLib.File.exists (desktop_file_location);
     }
 
@@ -287,25 +285,25 @@ class Utility {
     /***********************************************************
     OCSYNC_EXPORT
     ***********************************************************/
-    public static void launch_on_startup (string app_name, string gui_name, bool enable) {
-        launch_on_startup_private (app_name, gui_name, enable);
+    public static void launch_on_signal_startup (string app_name, string gui_name, bool enable) {
+        launch_on_signal_startup_private (app_name, gui_name, enable);
     }
 
 
-    static void launch_on_startup_private (string app_name, string gui_name, bool enable) {
+    static void launch_on_signal_startup_private (string app_name, string gui_name, bool enable) {
         //  Q_UNUSED (app_name)
         string user_auto_start_path = get_user_autostart_dir_private ();
         string desktop_file_location = user_auto_start_path
-                                        + QLatin1String (LINUX_APPLICATION_ID)
-                                        + QLatin1String (".desktop");
+                                        + LINUX_APPLICATION_ID
+                                        + ".desktop";
         if (enable) {
             if (!QDir ().exists (user_auto_start_path) && !QDir ().mkpath (user_auto_start_path)) {
-                GLib.warn (lc_utility) << "Could not create autostart folder" << user_auto_start_path;
+                GLib.warn ("Could not create autostart folder" + user_auto_start_path);
                 return;
             }
             GLib.File ini_file = new GLib.File (desktop_file_location);
             if (!ini_file.open (QIODevice.WriteOnly)) {
-                GLib.warn (lc_utility) << "Could not write var on_start entry" << desktop_file_location;
+                GLib.warn ("Could not write var on_signal_start entry" + desktop_file_location);
                 return;
             }
             // When running inside an AppImage, we need to set the path to the
@@ -314,22 +312,22 @@ class Utility {
             const bool running_inside_app_image = !app_image_path.is_null () && GLib.File.exists (app_image_path);
             const string executable_path = running_inside_app_image ? app_image_path : QCoreApplication.application_file_path ();
 
-            QTextStream ts = new QTextStream (&ini_file);
-            ts.codec ("UTF-8");
-            ts << "[Desktop Entry]\n"
-            << "Name=" << gui_name << '\n'
-            << "GenericName=" << "File Synchronizer\n"
-            << "Exec=\"" << executable_path << "\" --background\n"
-            << "Terminal=" << "false\n"
-            << "Icon=" << APPLICATION_ICON_NAME << '\n'
-            << "Categories=" << "Network\n"
-            << "Type=" << "Application\n"
-            << "StartupNotify=" << "false\n"
-            << "X-GNOME-Autostart-enabled=" << "true\n"
-            << "X-GNOME-Autostart-Delay=10" << Qt.endl;
+            string ts; // = new QTextStream (&ini_file);
+            //  ts.codec ("UTF-8");
+            ts = "[Desktop Entry]\n"
+               + "Name=" + gui_name + '\n'
+               + "GenericName=" + "File Synchronizer\n"
+               + "Exec=\"" + executable_path + "\" --background\n"
+               + "Terminal=" + "false\n"
+               + "Icon=" + APPLICATION_ICON_NAME + '\n'
+               + "Categories=" + "Network\n"
+               + "Type=" + "Application\n"
+               + "StartupNotify=" + "false\n"
+               + "X-GNOME-Autostart-enabled=" + "true\n"
+               + "X-GNOME-Autostart-Delay=10";
         } else {
             if (!GLib.File.remove (desktop_file_location)) {
-                GLib.warn (lc_utility) << "Could not remove autostart desktop file";
+                GLib.warn ("Could not remove autostart desktop file");
             }
         }
     }
@@ -641,9 +639,9 @@ class Utility {
                 binary = Gtk.Application.arguments ()[0];
             }
             string[] parameters;
-            parameters << "--version";
+            parameters.append ("--version");
             QProcess process;
-            process.on_start (binary, parameters);
+            process.on_signal_start (binary, parameters);
             process.wait_for_finished (); // sets current thread to sleep and waits for ping_process end
             re = process.read_all_standard_output ();
             int newline = re.index_of ('\n');
@@ -755,7 +753,7 @@ class Utility {
 
         public void start () {
             this.start_time = GLib.DateTime.current_date_time_utc ();
-            this.timer.on_start ();
+            this.timer.on_signal_start ();
         }
 
 
@@ -769,7 +767,7 @@ class Utility {
 
         public uint64 add_lap_time (string lap_name) {
             if (!this.timer.is_valid ()) {
-                on_start ();
+                on_signal_start ();
             }
             uint64 re = this.timer.elapsed ();
             this.lap_times[lap_name] = re;

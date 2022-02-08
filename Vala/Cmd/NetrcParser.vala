@@ -49,16 +49,16 @@ class NetrcParser {
 
 
     namespace {
-        string default_keyword = QLatin1String ("default");
-        string machine_keyword = QLatin1String ("machine");
-        string login_keyword = QLatin1String ("login");
-        string password_keyword = QLatin1String ("password");
+        string default_keyword = "default";
+        string machine_keyword = "machine";
+        string login_keyword = "login";
+        string password_keyword = "password";
     }
 
     NetrcParser.NetrcParser (string file) {
         this.netrc_location = file;
         if (this.netrc_location.is_empty ()) {
-            this.netrc_location = QDir.home_path () + QLatin1String ("/.netrc");
+            this.netrc_location = QDir.home_path () + "/.netrc";
         }
     }
 
@@ -95,7 +95,7 @@ class NetrcParser {
             }
 
             if (!tokenizer.has_next ()) {
-                GLib.debug () << "error fetching value for" << key;
+                GLib.debug ("error fetching value for" + key;
                 return false;
             }
             string value = tokenizer.next ();

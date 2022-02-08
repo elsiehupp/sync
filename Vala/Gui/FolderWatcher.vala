@@ -22,8 +22,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-//  Q_DECLARE_LOGGING_CATEGORY (lc_folder_watcher)
-
 
 /***********************************************************
 @brief Monitors a directory recursively for changes
@@ -37,7 +35,7 @@ through the path_changed () signal.
 
 class Folder_watcher : GLib.Object {
 
-    // Construct, connect signals, call on_init ()
+    // Construct, connect signals, call on_signal_init ()
     public Folder_watcher (Folder folder = null);
     ~Folder_watcher () override;
 
@@ -45,7 +43,7 @@ class Folder_watcher : GLib.Object {
     /***********************************************************
     @param root Path of the root of the folder
     ***********************************************************/
-    public void on_init (string root);
+    public void on_signal_init (string root);
 
     
     /***********************************************************
@@ -108,7 +106,7 @@ protected slots:
 
     /***********************************************************
     ***********************************************************/
-    private void on_start_notification_test_when_ready ();
+    private void on_signal_start_notification_test_when_ready ();
 
 
     protected GLib.HashMap<string, int> this.pending_pathes;
@@ -144,9 +142,9 @@ protected slots:
 
     Folder_watcher.~Folder_watcher () = default;
 
-    void Folder_watcher.on_init (string root) {
-        this.d.on_reset (new Folder_watcher_private (this, root));
-        this.timer.on_start ();
+    void Folder_watcher.on_signal_init (string root) {
+        this.d.on_signal_reset (new Folder_watcher_private (this, root));
+        this.timer.on_signal_start ();
     }
 
     bool Folder_watcher.path_is_ignored (string path) {
@@ -157,7 +155,7 @@ protected slots:
 
     #ifndef OWNCLOUD_TEST
         if (this.folder.is_file_excluded_absolute (path) && !Utility.is_conflict_file (path)) {
-            GLib.debug (lc_folder_watcher) << "* Ignoring file" << path;
+            GLib.debug ("* Ignoring file" + path;
             return true;
         }
     #endif
@@ -187,12 +185,12 @@ protected slots:
 
         // Don't do the local file modification immediately:
         // wait for Folder_watch_private.ready
-        on_start_notification_test_when_ready ();
+        on_signal_start_notification_test_when_ready ();
     }
 
-    void Folder_watcher.on_start_notification_test_when_ready () {
+    void Folder_watcher.on_signal_start_notification_test_when_ready () {
         if (!this.d.ready) {
-            QTimer.single_shot (1000, this, &Folder_watcher.on_start_notification_test_when_ready);
+            QTimer.single_shot (1000, this, &Folder_watcher.on_signal_start_notification_test_when_ready);
             return;
         }
 
@@ -264,7 +262,7 @@ protected slots:
             return;
         }
 
-        GLib.info (lc_folder_watcher) << "Detected changes in paths:" << changed_paths;
+        GLib.info ("Detected changes in paths:" + changed_paths;
         foreach (string path, changed_paths) {
             /* emit */ path_changed (path);
         }

@@ -17,7 +17,7 @@ void PropagateUploadFileV1.do_start_upload () {
     this.start_chunk = 0;
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn (lc_propagate_upload ()) << "invalid modified time" << this.item.file << this.item.modtime;
+        GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
     }
     this.transfer_id = uint32 (Utility.rand ()) ^ uint32 (this.item.modtime) ^ (uint32 (this.file_to_upload.size) << 16);
 
@@ -25,13 +25,13 @@ void PropagateUploadFileV1.do_start_upload () {
 
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn (lc_propagate_upload ()) << "invalid modified time" << this.item.file << this.item.modtime;
+        GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
     }
     if (progress_info.valid && progress_info.is_chunked () && progress_info.modtime == this.item.modtime && progress_info.size == this.item.size
         && (progress_info.content_checksum == this.item.checksum_header || progress_info.content_checksum.is_empty () || this.item.checksum_header.is_empty ())) {
         this.start_chunk = progress_info.chunk;
         this.transfer_id = progress_info.transferid;
-        GLib.info (lc_propagate_upload_v1) << this.item.file << " : Resuming from chunk " << this.start_chunk;
+        GLib.info () + this.item.file + " : Resuming from chunk " + this.start_chunk;
     } else if (this.chunk_count <= 1 && !this.item.checksum_header.is_empty ()) {
         // If there is only one chunk, write the checksum in the database, so if the PUT is sent
         // to the server, but the connection drops before we get the etag, we can check the checksum
@@ -42,7 +42,7 @@ void PropagateUploadFileV1.do_start_upload () {
         pi.transferid = 0; // We set a null transfer identifier because it is not chunked.
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn (lc_propagate_upload ()) << "invalid modified time" << this.item.file << this.item.modtime;
+            GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
         }
         pi.modtime = this.item.modtime;
         pi.error_count = 0;
@@ -55,18 +55,18 @@ void PropagateUploadFileV1.do_start_upload () {
     this.current_chunk = 0;
 
     propagator ().report_progress (*this.item, 0);
-    on_start_next_chunk ();
+    on_signal_start_next_chunk ();
 }
 
-void PropagateUploadFileV1.on_start_next_chunk () {
+void PropagateUploadFileV1.on_signal_start_next_chunk () {
     if (propagator ().abort_requested)
         return;
 
     if (!this.jobs.is_empty () && this.current_chunk + this.start_chunk >= this.chunk_count - 1) {
         // Don't do parallel upload of chunk if this might be the last chunk because the server cannot handle that
         // https://github.com/owncloud/core/issues/11106
-        // We return now and when the this.jobs are on_finished we will proceed with the last chunk
-        // Note: Some other parts of the code such as on_upload_progress also assume that the last chunk
+        // We return now and when the this.jobs are on_signal_finished we will proceed with the last chunk
+        // Note: Some other parts of the code such as on_signal_upload_progress also assume that the last chunk
         // is sent last.
         return;
     }
@@ -84,7 +84,7 @@ void PropagateUploadFileV1.on_start_next_chunk () {
         int sending_chunk = (this.current_chunk + this.start_chunk) % this.chunk_count;
         // XOR with chunk size to make sure everything goes well if chunk size changes between runs
         uint32 transid = this.transfer_id ^ uint32 (chunk_size ());
-        GLib.info (lc_propagate_upload_v1) << "Upload chunk" << sending_chunk << "of" << this.chunk_count << "transferid (remote)=" << transid;
+        GLib.info ("Upload chunk" + sending_chunk + "of" + this.chunk_count + "transferid (remote)=" + transid;
         path += string ("-chunking-%1-%2-%3").arg (transid).arg (this.chunk_count).arg (sending_chunk);
 
         headers[QByteArrayLiteral ("OC-Chunked")] = QByteArrayLiteral ("1");
@@ -102,10 +102,10 @@ void PropagateUploadFileV1.on_start_next_chunk () {
         // if there's only one chunk, it's the final one
         is_final_chunk = true;
     }
-    GLib.debug (lc_propagate_upload_v1) << this.chunk_count << is_final_chunk << chunk_start << current_chunk_size;
+    GLib.debug () + this.chunk_count + is_final_chunk + chunk_start + current_chunk_size;
 
     if (is_final_chunk && !this.transmission_checksum_header.is_empty ()) {
-        GLib.info (lc_propagate_upload_v1) << propagator ().full_remote_path (path) << this.transmission_checksum_header;
+        GLib.info () + propagator ().full_remote_path (path) + this.transmission_checksum_header;
         headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
     }
 
@@ -113,7 +113,7 @@ void PropagateUploadFileV1.on_start_next_chunk () {
     var device = std.make_unique<UploadDevice> (
             filename, chunk_start, current_chunk_size, propagator ().bandwidth_manager);
     if (!device.open (QIODevice.ReadOnly)) {
-        GLib.warn (lc_propagate_upload_v1) << "Could not prepare upload device : " << device.error_string ();
+        GLib.warn ("Could not prepare upload device : " + device.error_string ();
 
         // If the file is currently locked, we want to retry the sync
         // when it becomes available again.
@@ -129,13 +129,13 @@ void PropagateUploadFileV1.on_start_next_chunk () {
     var device_ptr = device.get (); // for connections later
     var job = new PUTFile_job (propagator ().account (), propagator ().full_remote_path (path), std.move (device), headers, this.current_chunk, this);
     this.jobs.append (job);
-    connect (job, &PUTFile_job.finished_signal, this, &PropagateUploadFileV1.on_put_finished);
-    connect (job, &PUTFile_job.upload_progress, this, &PropagateUploadFileV1.on_upload_progress);
-    connect (job, &PUTFile_job.upload_progress, device_ptr, &UploadDevice.on_job_upload_progress);
-    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_job_destroyed);
+    connect (job, &PUTFile_job.finished_signal, this, &PropagateUploadFileV1.on_signal_put_finished);
+    connect (job, &PUTFile_job.upload_progress, this, &PropagateUploadFileV1.on_signal_upload_progress);
+    connect (job, &PUTFile_job.upload_progress, device_ptr, &UploadDevice.on_signal_job_upload_progress);
+    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_signal_job_destroyed);
     if (is_final_chunk)
         adjust_last_job_timeout (job, file_size);
-    job.on_start ();
+    job.on_signal_start ();
     propagator ().active_job_list.append (this);
     this.current_chunk++;
 
@@ -166,23 +166,23 @@ void PropagateUploadFileV1.on_start_next_chunk () {
 
     if (parallel_chunk_upload && (propagator ().active_job_list.count () < propagator ().maximum_active_transfer_job ())
         && this.current_chunk < this.chunk_count) {
-        on_start_next_chunk ();
+        on_signal_start_next_chunk ();
     }
     if (!parallel_chunk_upload || this.chunk_count - this.current_chunk <= 0) {
         propagator ().schedule_next_job ();
     }
 }
 
-void PropagateUploadFileV1.on_put_finished () {
+void PropagateUploadFileV1.on_signal_put_finished () {
     var job = qobject_cast<PUTFile_job> (sender ());
     //  ASSERT (job);
 
-    on_job_destroyed (job); // remove it from the this.jobs list
+    on_signal_job_destroyed (job); // remove it from the this.jobs list
 
     propagator ().active_job_list.remove_one (this);
 
     if (this.finished) {
-        // We have sent the on_finished signal already. We don't need to handle any remaining jobs
+        // We have sent the on_signal_finished signal already. We don't need to handle any remaining jobs
         return;
     }
 
@@ -199,7 +199,7 @@ void PropagateUploadFileV1.on_put_finished () {
     if (this.item.http_error_code == 202) {
         string path = string.from_utf8 (job.reply ().raw_header ("OC-Job_status-Location"));
         if (path.is_empty ()) {
-            on_done (SyncFileItem.Status.NORMAL_ERROR, _("Poll URL missing"));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Poll URL missing"));
             return;
         }
         this.finished = true;
@@ -208,7 +208,7 @@ void PropagateUploadFileV1.on_put_finished () {
     }
 
     // Check the file again post upload.
-    // Two cases must be considered separately : If the upload is on_finished,
+    // Two cases must be considered separately : If the upload is on_signal_finished,
     // the file is on the server and has a changed ETag. In that case,
     // the etag has to be properly updated in the client journal, and because
     // of that we can bail out here with an error. But we can reschedule a
@@ -233,7 +233,7 @@ void PropagateUploadFileV1.on_put_finished () {
     // Check whether the file changed since discovery. the file check here is the original and not the temprary.
     //  Q_ASSERT (this.item.modtime > 0);
     if (this.item.modtime <= 0) {
-        GLib.warn (lc_propagate_upload ()) << "invalid modified time" << this.item.file << this.item.modtime;
+        GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
     }
     if (!FileSystem.verify_file_unchanged (full_file_path, this.item.size, this.item.modtime)) {
         propagator ().another_sync_needed = true;
@@ -252,7 +252,7 @@ void PropagateUploadFileV1.on_put_finished () {
                 // just wait for the other job to finish.
                 return;
             }
-            on_done (SyncFileItem.Status.NORMAL_ERROR, _("The server did not acknowledge the last chunk. (No e-tag was present)"));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("The server did not acknowledge the last chunk. (No e-tag was present)"));
             return;
         }
 
@@ -266,16 +266,16 @@ void PropagateUploadFileV1.on_put_finished () {
         pi.valid = true;
         var current_chunk = job.chunk;
         foreach (var job, this.jobs) {
-            // Take the minimum on_finished one
+            // Take the minimum on_signal_finished one
             if (var put_job = qobject_cast<PUTFile_job> (job)) {
                 current_chunk = q_min (current_chunk, put_job.chunk - 1);
             }
         }
-        pi.chunk = (current_chunk + this.start_chunk + 1) % this.chunk_count; // next chunk to on_start with
+        pi.chunk = (current_chunk + this.start_chunk + 1) % this.chunk_count; // next chunk to on_signal_start with
         pi.transferid = this.transfer_id;
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warn (lc_propagate_upload ()) << "invalid modified time" << this.item.file << this.item.modtime;
+            GLib.warn ()) + "invalid modified time" + this.item.file + this.item.modtime;
         }
         pi.modtime = this.item.modtime;
         pi.error_count = 0; // successful chunk upload resets
@@ -283,7 +283,7 @@ void PropagateUploadFileV1.on_put_finished () {
         pi.size = this.item.size;
         propagator ().journal.upload_info (this.item.file, pi);
         propagator ().journal.commit ("Upload info");
-        on_start_next_chunk ();
+        on_signal_start_next_chunk ();
         return;
     }
     // the following code only happens after all chunks were uploaded.
@@ -292,7 +292,7 @@ void PropagateUploadFileV1.on_put_finished () {
     GLib.ByteArray fid = job.reply ().raw_header ("OC-FileID");
     if (!fid.is_empty ()) {
         if (!this.item.file_id.is_empty () && this.item.file_id != fid) {
-            GLib.warn (lc_propagate_upload_v1) << "File ID changed!" << this.item.file_id << fid;
+            GLib.warn ("File ID changed!" + this.item.file_id + fid;
         }
         this.item.file_id = fid;
     }
@@ -302,14 +302,14 @@ void PropagateUploadFileV1.on_put_finished () {
     if (job.reply ().raw_header ("X-OC-MTime") != "accepted") {
         // X-OC-MTime is supported since owncloud 5.0.   But not when chunking.
         // Normally Owncloud 6 always puts X-OC-MTime
-        GLib.warn (lc_propagate_upload_v1) << "Server does not support X-OC-MTime" << job.reply ().raw_header ("X-OC-MTime");
+        GLib.warn ("Server does not support X-OC-MTime" + job.reply ().raw_header ("X-OC-MTime");
         // Well, the mtime was not set
     }
 
-    on_finalize ();
+    on_signal_finalize ();
 }
 
-void PropagateUploadFileV1.on_upload_progress (int64 sent, int64 total) {
+void PropagateUploadFileV1.on_signal_upload_progress (int64 sent, int64 total) {
     // Completion is signaled with sent=0, total=0; avoid accidentally
     // resetting progress due to the sent being zero by ignoring it.
     // finished_signal () is bound to be emitted soon anyway.
@@ -325,7 +325,7 @@ void PropagateUploadFileV1.on_upload_progress (int64 sent, int64 total) {
     // amount is the number of bytes already sent by all the other chunks that were sent
     // not including this one.
     // FIXME : this assumes all chunks have the same size, which is true only if the last chunk
-    // has not been on_finished (which should not happen because the last chunk is sent sequentially)
+    // has not been on_signal_finished (which should not happen because the last chunk is sent sequentially)
     int64 amount = progress_chunk * chunk_size ();
 
     sender ().property ("byte_written", sent);
@@ -341,7 +341,7 @@ void PropagateUploadFileV1.on_upload_progress (int64 sent, int64 total) {
     propagator ().report_progress (*this.item, amount);
 }
 
-void PropagateUploadFileV1.on_abort (PropagatorJob.AbortType abort_type) {
+void PropagateUploadFileV1.on_signal_abort (PropagatorJob.AbortType abort_type) {
     abort_network_jobs (
         abort_type,
         [this, abort_type] (AbstractNetworkJob job) {

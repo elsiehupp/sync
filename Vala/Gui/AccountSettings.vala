@@ -63,7 +63,6 @@ class AccountSettings : Gtk.Widget {
         }
     }
 
-    //  Q_PROPERTY (AccountState* account_state MEMBER this.account_state)
 
     const string PROPERTY_FOLDER = "folder";
     const string PROPERTY_PATH = "path";
@@ -81,7 +80,6 @@ class AccountSettings : Gtk.Widget {
         + "background-color : %1; width : 1px;"
         + "}";
 
-    //  Q_PROPERTY (AccountState* account_state MEMBER this.account_state)
 
     /***********************************************************
     ***********************************************************/
@@ -127,7 +125,7 @@ class AccountSettings : Gtk.Widget {
         delegate.parent (this);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &AccountSettings.style_changed, delegate, &FolderStatusDelegate.on_style_changed);
+        connect (this, &AccountSettings.style_changed, delegate, &FolderStatusDelegate.on_signal_style_changed);
 
         this.ui.folder_list.header ().hide ();
         this.ui.folder_list.item_delegate (delegate);
@@ -145,57 +143,57 @@ class AccountSettings : Gtk.Widget {
         connect (this, &AccountSettings.remove_account_folders,
                 AccountManager.instance (), &AccountManager.remove_account_folders);
         connect (this.ui.folder_list, &Gtk.Widget.custom_context_menu_requested,
-            this, &AccountSettings.on_custom_context_menu_requested);
+            this, &AccountSettings.on_signal_custom_context_menu_requested);
         connect (this.ui.folder_list, &QAbstractItemView.clicked,
-            this, &AccountSettings.on_folder_list_clicked);
-        connect (this.ui.folder_list, &QTreeView.expanded, this, &AccountSettings.on_refresh_selective_sync_status);
-        connect (this.ui.folder_list, &QTreeView.collapsed, this, &AccountSettings.on_refresh_selective_sync_status);
+            this, &AccountSettings.on_signal_folder_list_clicked);
+        connect (this.ui.folder_list, &QTreeView.expanded, this, &AccountSettings.on_signal_refresh_selective_sync_status);
+        connect (this.ui.folder_list, &QTreeView.collapsed, this, &AccountSettings.on_signal_refresh_selective_sync_status);
         connect (this.ui.selective_sync_notification, &Gtk.Label.link_activated,
-            this, &AccountSettings.on_link_activated);
+            this, &AccountSettings.on_signal_link_activated);
         connect (this.model, &FolderStatusModel.suggest_expand, this.ui.folder_list, &QTreeView.expand);
-        connect (this.model, &FolderStatusModel.dirty_changed, this, &AccountSettings.on_refresh_selective_sync_status);
-        on_refresh_selective_sync_status ();
+        connect (this.model, &FolderStatusModel.dirty_changed, this, &AccountSettings.on_signal_refresh_selective_sync_status);
+        on_signal_refresh_selective_sync_status ();
         connect (this.model, &QAbstractItemModel.rows_inserted,
-            this, &AccountSettings.on_refresh_selective_sync_status);
+            this, &AccountSettings.on_signal_refresh_selective_sync_status);
 
         var sync_now_action = new QAction (this);
         sync_now_action.shortcut (QKeySequence (Qt.Key_F6));
-        connect (sync_now_action, &QAction.triggered, this, &AccountSettings.on_schedule_current_folder);
+        connect (sync_now_action, &QAction.triggered, this, &AccountSettings.on_signal_schedule_current_folder);
         add_action (sync_now_action);
 
         var sync_now_with_remote_discovery = new QAction (this);
         sync_now_with_remote_discovery.shortcut (QKeySequence (Qt.CTRL + Qt.Key_F6));
-        connect (sync_now_with_remote_discovery, &QAction.triggered, this, &AccountSettings.on_schedule_current_folder_force_remote_discovery);
+        connect (sync_now_with_remote_discovery, &QAction.triggered, this, &AccountSettings.on_signal_schedule_current_folder_force_remote_discovery);
         add_action (sync_now_with_remote_discovery);
 
-        on_hide_selective_sync_widget ();
+        on_signal_hide_selective_sync_widget ();
         this.ui.big_folder_ui.visible (false);
-        connect (this.model, &QAbstractItemModel.on_data_changed, this, &AccountSettings.on_selective_sync_changed);
-        connect (this.ui.selective_sync_apply, &QAbstractButton.clicked, this, &AccountSettings.on_hide_selective_sync_widget);
-        connect (this.ui.selective_sync_cancel, &QAbstractButton.clicked, this, &AccountSettings.on_hide_selective_sync_widget);
+        connect (this.model, &QAbstractItemModel.on_signal_data_changed, this, &AccountSettings.on_signal_selective_sync_changed);
+        connect (this.ui.selective_sync_apply, &QAbstractButton.clicked, this, &AccountSettings.on_signal_hide_selective_sync_widget);
+        connect (this.ui.selective_sync_cancel, &QAbstractButton.clicked, this, &AccountSettings.on_signal_hide_selective_sync_widget);
 
-        connect (this.ui.selective_sync_apply, &QAbstractButton.clicked, this.model, &FolderStatusModel.on_apply_selective_sync);
-        connect (this.ui.selective_sync_cancel, &QAbstractButton.clicked, this.model, &FolderStatusModel.on_reset_folders);
-        connect (this.ui.big_folder_apply, &QAbstractButton.clicked, this.model, &FolderStatusModel.on_apply_selective_sync);
-        connect (this.ui.big_folder_sync_all, &QAbstractButton.clicked, this.model, &FolderStatusModel.on_sync_all_pending_big_folders);
-        connect (this.ui.big_folder_sync_none, &QAbstractButton.clicked, this.model, &FolderStatusModel.on_sync_no_pending_big_folders);
+        connect (this.ui.selective_sync_apply, &QAbstractButton.clicked, this.model, &FolderStatusModel.on_signal_apply_selective_sync);
+        connect (this.ui.selective_sync_cancel, &QAbstractButton.clicked, this.model, &FolderStatusModel.on_signal_reset_folders);
+        connect (this.ui.big_folder_apply, &QAbstractButton.clicked, this.model, &FolderStatusModel.on_signal_apply_selective_sync);
+        connect (this.ui.big_folder_sync_all, &QAbstractButton.clicked, this.model, &FolderStatusModel.on_signal_sync_all_pending_big_folders);
+        connect (this.ui.big_folder_sync_none, &QAbstractButton.clicked, this.model, &FolderStatusModel.on_signal_sync_no_pending_big_folders);
 
-        connect (FolderMan.instance (), &FolderMan.folder_list_changed, this.model, &FolderStatusModel.on_reset_folders);
-        connect (this, &AccountSettings.folder_changed, this.model, &FolderStatusModel.on_reset_folders);
+        connect (FolderMan.instance (), &FolderMan.folder_list_changed, this.model, &FolderStatusModel.on_signal_reset_folders);
+        connect (this, &AccountSettings.folder_changed, this.model, &FolderStatusModel.on_signal_reset_folders);
 
         // quota_progress_bar style now set in customize_style ()
         /*Gtk.Color color = palette ().highlight ().color ();
          this.ui.quota_progress_bar.style_sheet (string.from_latin1 (PROGRESS_BAR_STYLE_C).arg (color.name ()));*/
 
         // Connect E2E stuff
-        connect (this, &AccountSettings.request_mnemonic, this.account_state.account ().e2e (), &ClientSideEncryption.on_request_mnemonic);
-        connect (this.account_state.account ().e2e (), &ClientSideEncryption.show_mnemonic, this, &AccountSettings.on_show_mnemonic);
+        connect (this, &AccountSettings.request_mnemonic, this.account_state.account ().e2e (), &ClientSideEncryption.on_signal_request_mnemonic);
+        connect (this.account_state.account ().e2e (), &ClientSideEncryption.show_mnemonic, this, &AccountSettings.on_signal_show_mnemonic);
 
-        connect (this.account_state.account ().e2e (), &ClientSideEncryption.mnemonic_generated, this, &AccountSettings.on_new_mnemonic_generated);
+        connect (this.account_state.account ().e2e (), &ClientSideEncryption.mnemonic_generated, this, &AccountSettings.on_signal_new_mnemonic_generated);
         if (this.account_state.account ().e2e ().new_mnemonic_generated ()) {
-            on_new_mnemonic_generated ();
+            on_signal_new_mnemonic_generated ();
         } else {
-            this.ui.encryption_message.on_text (_("This account supports end-to-end encryption"));
+            this.ui.encryption_message.on_signal_text (_("This account supports end-to-end encryption"));
 
             var mnemonic = new QAction (_("Display mnemonic"), this);
             connect (mnemonic, &QAction.triggered, this, &AccountSettings.request_mnemonic);
@@ -203,13 +201,13 @@ class AccountSettings : Gtk.Widget {
             this.ui.encryption_message.hide ();
         }
 
-        this.ui.connect_label.on_text (_("No account configured."));
+        this.ui.connect_label.on_signal_text (_("No account configured."));
 
-        connect (this.account_state, &AccountState.state_changed, this, &AccountSettings.on_account_state_changed);
-        on_account_state_changed ();
+        connect (this.account_state, &AccountState.state_changed, this, &AccountSettings.on_signal_account_state_changed);
+        on_signal_account_state_changed ();
 
         connect (&this.user_info, &UserInfo.quota_updated,
-            this, &AccountSettings.on_update_quota);
+            this, &AccountSettings.on_signal_update_quota);
 
         customize_style ();
     }
@@ -230,7 +228,7 @@ class AccountSettings : Gtk.Widget {
     public bool can_encrypt_or_decrypt (FolderStatusModel.SubFolderInfo info) {
         if (info.folder.sync_result ().status () != SyncResult.Status.SUCCESS) {
             QMessageBox msg_box;
-            msg_box.on_text ("Please wait for the folder to sync before trying to encrypt it.");
+            msg_box.on_signal_text ("Please wait for the folder to sync before trying to encrypt it.");
             msg_box.exec ();
             return false;
         }
@@ -241,7 +239,7 @@ class AccountSettings : Gtk.Widget {
 
         if (folder_path.count () != 0) {
             QMessageBox msg_box;
-            msg_box.on_text (_("You cannot encrypt a folder with contents, please remove the files.\n"
+            msg_box.on_signal_text (_("You cannot encrypt a folder with contents, please remove the files.\n"
                            "Wait for the new sync, then encrypt it."));
             msg_box.exec ();
             return false;
@@ -252,7 +250,7 @@ class AccountSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_open_oc () {
+    public void on_signal_open_oc () {
         if (this.OCUrl.is_valid ()) {
             Utility.open_browser (this.OCUrl);
         }
@@ -264,7 +262,7 @@ class AccountSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_update_quota (int64 total, int64 used) {
+    public void on_signal_update_quota (int64 total, int64 used) {
         if (total > 0) {
             this.ui.quota_progress_bar.visible (true);
             this.ui.quota_progress_bar.enabled (true);
@@ -276,7 +274,7 @@ class AccountSettings : Gtk.Widget {
             string total_str = Utility.octets_to_string (total);
             string percent_str = Utility.compact_format_double (percent, 1);
             string tool_tip = _("%1 (%3%) of %2 in use. Some folders, including network mounted or shared folders, might have different limits.").arg (used_str, total_str, percent_str);
-            this.ui.quota_info_label.on_text (_("%1 of %2 in use").arg (used_str, total_str));
+            this.ui.quota_info_label.on_signal_text (_("%1 of %2 in use").arg (used_str, total_str));
             this.ui.quota_info_label.tool_tip (tool_tip);
             this.ui.quota_progress_bar.tool_tip (tool_tip);
         } else {
@@ -285,17 +283,17 @@ class AccountSettings : Gtk.Widget {
 
             /* -1 means not computed; -2 means unknown; -3 means unlimited  (#owncloud/client/issues/3940)*/
             if (total == 0 || total == -1) {
-                this.ui.quota_info_label.on_text (_("Currently there is no storage usage information available."));
+                this.ui.quota_info_label.on_signal_text (_("Currently there is no storage usage information available."));
             } else {
                 string used_str = Utility.octets_to_string (used);
-                this.ui.quota_info_label.on_text (_("%1 in use").arg (used_str));
+                this.ui.quota_info_label.on_signal_text (_("%1 in use").arg (used_str));
             }
         }
     }
 
     /***********************************************************
     ***********************************************************/
-    public void on_account_state_changed () {
+    public void on_signal_account_state_changed () {
         const AccountState.State state = this.account_state ? this.account_state.state () : AccountState.State.DISCONNECTED;
         if (state != AccountState.State.DISCONNECTED) {
             this.ui.ssl_button.update_account_state (this.account_state);
@@ -304,7 +302,7 @@ class AccountSettings : Gtk.Widget {
             safe_url.password (""); // Remove the password from the URL to avoid showing it in the UI
             const var folders = FolderMan.instance ().map ().values ();
             for (Folder folder : folders) {
-                this.model.on_update_folder_state (folder);
+                this.model.on_signal_update_folder_state (folder);
             }
 
             const string server = string.from_latin1 ("<a href=\"%1\">%2</a>")
@@ -323,7 +321,7 @@ class AccountSettings : Gtk.Widget {
             case AccountState.State.CONNECTED: {
                 string[] errors;
                 if (account.server_version_unsupported ()) {
-                    errors << _("The server version %1 is unsupported! Proceed at your own risk.").arg (account.server_version ());
+                    errors + _("The server version %1 is unsupported! Proceed at your own risk.").arg (account.server_version ());
                 }
                 show_connection_label (_("Connected to %1.").arg (server_with_user), errors);
                 break;
@@ -341,7 +339,7 @@ class AccountSettings : Gtk.Widget {
                 GLib.Uri url;
                 if (var credentials = qobject_cast<HttpCredentialsGui> (account.credentials ())) {
                     connect (credentials, &HttpCredentialsGui.authorisation_link_changed,
-                        this, &AccountSettings.on_account_state_changed, Qt.UniqueConnection);
+                        this, &AccountSettings.on_signal_account_state_changed, Qt.UniqueConnection);
                     url = credentials.authorisation_link ();
                 }
                 if (url.is_valid ()) {
@@ -386,20 +384,20 @@ class AccountSettings : Gtk.Widget {
             }
         } else if (this.model.is_dirty ()) {
             // If we connect and have pending changes, show the list.
-            on_do_expand ();
+            on_signal_do_expand ();
         }
 
         // Disabling expansion of folders might require hiding the selective
         // sync user interface buttons.
-        on_refresh_selective_sync_status ();
+        on_signal_refresh_selective_sync_status ();
 
         if (state == AccountState.State.Connected) {
             /* TODO : We should probably do something better here.
             Verify if the user has a private key already uploaded to the server,
             if it has, do not offer to create one.
              */
-            GLib.info (lc_account_settings) << "Account" << on_accounts_state ().account ().display_name ()
-                << "Client Side Encryption" << on_accounts_state ().account ().capabilities ().client_side_encryption_available ();
+            GLib.info ("Account" + on_signal_accounts_state ().account ().display_name ()
+                + "Client Side Encryption" + on_signal_accounts_state ().account ().capabilities ().client_side_encryption_available ();
 
             if (this.account_state.account ().capabilities ().client_side_encryption_available ()) {
                 this.ui.encryption_message.show ();
@@ -409,7 +407,7 @@ class AccountSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_style_changed () {
+    public void on_signal_style_changed () {
         customize_style ();
 
         // Notify the other widgets (Dark-/Light-Mode switching)
@@ -417,14 +415,14 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    public AccountState on_accounts_state () {
+    public AccountState on_signal_accounts_state () {
         return this.account_state;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_hide_selective_sync_widget () {
+    public void on_signal_hide_selective_sync_widget () {
         this.ui.selective_sync_apply.enabled (false);
         this.ui.selective_sync_status.visible (false);
         this.ui.selective_sync_buttons.visible (false);
@@ -432,26 +430,26 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_add_folder () {
+    protected void on_signal_add_folder () {
         FolderMan folder_man = FolderMan.instance ();
-        folder_man.sync_enabled (false); // do not on_start more syncs.
+        folder_man.sync_enabled (false); // do not on_signal_start more syncs.
 
         var folder_wizard = new FolderWizard (this.account_state.account (), this);
         folder_wizard.attribute (Qt.WA_DeleteOnClose);
 
-        connect (folder_wizard, &Gtk.Dialog.accepted, this, &AccountSettings.on_folder_wizard_accepted);
-        connect (folder_wizard, &Gtk.Dialog.rejected, this, &AccountSettings.on_folder_wizard_rejected);
+        connect (folder_wizard, &Gtk.Dialog.accepted, this, &AccountSettings.on_signal_folder_wizard_accepted);
+        connect (folder_wizard, &Gtk.Dialog.rejected, this, &AccountSettings.on_signal_folder_wizard_rejected);
         folder_wizard.open ();
     }
 
 
-    protected void on_enable_current_folder (bool terminate = false) {
+    protected void on_signal_enable_current_folder (bool terminate = false) {
         var alias = selected_folder_alias ();
 
         if (!alias.is_empty ()) {
             FolderMan folder_man = FolderMan.instance ();
 
-            GLib.info (lc_account_settings) << "Application : enable folder with alias " << alias;
+            GLib.info ("Application : enable folder with alias " + alias;
             bool currently_paused = false;
 
             // this sets the folder status to disabled but does not interrupt it.
@@ -469,7 +467,7 @@ class AccountSettings : Gtk.Widget {
                     msgbox.attribute (Qt.WA_DeleteOnClose);
                     msgbox.default_button (QMessageBox.Yes);
                     connect (msgbox, &QMessageBox.accepted, this, [this]{
-                        on_enable_current_folder (true);
+                        on_signal_enable_current_folder (true);
                     });
                     msgbox.open ();
                     return;
@@ -479,7 +477,7 @@ class AccountSettings : Gtk.Widget {
             // message box can return at any time while the thread keeps running,
             // so better check again after the user has responded.
             if (f.is_busy () && terminate) {
-                f.on_terminate_sync ();
+                f.on_signal_terminate_sync ();
             }
             f.sync_paused (!currently_paused);
 
@@ -487,12 +485,12 @@ class AccountSettings : Gtk.Widget {
             if (currently_paused)
                 this.was_disabled_before = true;
 
-            this.model.on_update_folder_state (f);
+            this.model.on_signal_update_folder_state (f);
         }
     }
 
 
-    protected void on_schedule_current_folder () {
+    protected void on_signal_schedule_current_folder () {
         FolderMan folder_man = FolderMan.instance ();
         if (var folder = folder_man.folder (selected_folder_alias ())) {
             folder_man.schedule_folder (folder);
@@ -500,28 +498,28 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_schedule_current_folder_force_remote_discovery () {
+    protected void on_signal_schedule_current_folder_force_remote_discovery () {
         FolderMan folder_man = FolderMan.instance ();
         if (var folder = folder_man.folder (selected_folder_alias ())) {
-            folder.on_wipe_error_blocklist ();
+            folder.on_signal_wipe_error_blocklist ();
             folder.journal_database ().force_remote_discovery_next_sync ();
             folder_man.schedule_folder (folder);
         }
     }
 
 
-    protected void on_force_sync_current_folder () {
+    protected void on_signal_force_sync_current_folder () {
         FolderMan folder_man = FolderMan.instance ();
         if (var selected_folder = folder_man.folder (selected_folder_alias ())) {
             // Terminate and reschedule any running sync
             for (var f : folder_man.map ()) {
                 if (f.is_sync_running ()) {
-                    f.on_terminate_sync ();
+                    f.on_signal_terminate_sync ();
                     folder_man.schedule_folder (f);
                 }
             }
 
-            selected_folder.on_wipe_error_blocklist (); // issue #6757
+            selected_folder.on_signal_wipe_error_blocklist (); // issue #6757
 
             // Insert the selected folder at the front of the queue
             folder_man.schedule_folder_next (selected_folder);
@@ -529,13 +527,13 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_remove_current_folder () {
+    protected void on_signal_remove_current_folder () {
         var folder = FolderMan.instance ().folder (selected_folder_alias ());
         QModelIndex selected = this.ui.folder_list.selection_model ().current_index ();
         if (selected.is_valid () && folder) {
             int row = selected.row ();
 
-            GLib.info (lc_account_settings) << "Remove Folder alias " << folder.alias ();
+            GLib.info ("Remove Folder alias " + folder.alias ();
             string short_gui_local_path = folder.short_gui_local_path ();
 
             var message_box = new QMessageBox (QMessageBox.Question,
@@ -549,7 +547,7 @@ class AccountSettings : Gtk.Widget {
             QPushButton yes_button =
                 message_box.add_button (_("Remove Folder Sync Connection"), QMessageBox.YesRole);
             message_box.add_button (_("Cancel"), QMessageBox.NoRole);
-            connect (message_box, &QMessageBox.on_finished, this, [message_box, yes_button, folder, row, this]{
+            connect (message_box, &QMessageBox.on_signal_finished, this, [message_box, yes_button, folder, row, this]{
                 if (message_box.clicked_button () == yes_button) {
                     Utility.remove_fav_link (folder.path ());
                     FolderMan.instance ().remove_folder (folder);
@@ -565,7 +563,7 @@ class AccountSettings : Gtk.Widget {
 
 
     // sync folder
-    protected void on_open_current_folder () {
+    protected void on_signal_open_current_folder () {
         var alias = selected_folder_alias ();
         if (!alias.is_empty ()) {
             /* emit */ open_folder_alias (alias);
@@ -574,7 +572,7 @@ class AccountSettings : Gtk.Widget {
 
 
     // selected subfolder in sync folder
-    protected void on_open_current_local_sub_folder () {
+    protected void on_signal_open_current_local_sub_folder () {
         QModelIndex selected = this.ui.folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || this.model.classify (selected) != FolderStatusModel.ItemType.SUBFOLDER)
             return;
@@ -584,7 +582,7 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_edit_current_ignored_files () {
+    protected void on_signal_edit_current_ignored_files () {
         Folder f = FolderMan.instance ().folder (selected_folder_alias ());
         if (!f)
             return;
@@ -592,11 +590,11 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_open_make_folder_dialog () {
+    protected void on_signal_open_make_folder_dialog () {
         const var selected = this.ui.folder_list.selection_model ().current_index ();
 
         if (!selected.is_valid ()) {
-            GLib.warn (lc_account_settings) << "Selection model current folder index is not valid.";
+            GLib.warn ("Selection model current folder index is not valid.";
             return;
         }
 
@@ -632,7 +630,7 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_edit_current_local_ignored_files () {
+    protected void on_signal_edit_current_local_ignored_files () {
         QModelIndex selected = this.ui.folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || this.model.classify (selected) != FolderStatusModel.ItemType.SUBFOLDER)
             return;
@@ -641,7 +639,7 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_enable_vfs_current_folder () {
+    protected void on_signal_enable_vfs_current_folder () {
         FolderMan folder_man = FolderMan.instance ();
         QPointer<Folder> folder = folder_man.folder (selected_folder_alias ());
         QModelIndex selected = this.ui.folder_list.selection_model ().current_index ();
@@ -661,7 +659,7 @@ class AccountSettings : Gtk.Widget {
                 if (*connection)
                     GLib.Object.disconnect (*connection);
 
-                GLib.info (lc_account_settings) << "Enabling vfs support for folder" << folder.path ();
+                GLib.info ("Enabling vfs support for folder" + folder.path ();
 
                 // Wipe selective sync blocklist
                 bool ok = false;
@@ -670,7 +668,7 @@ class AccountSettings : Gtk.Widget {
 
                 // Change the folder vfs mode and load the plugin
                 folder.virtual_files_enabled (true);
-                folder.vfs_on_off_switch_pending (false);
+                folder.vfs_on_signal_off_switch_pending (false);
 
                 // Setting to PinState.UNSPECIFIED retains existing data.
                 // Selective sync excluded folders become VfsItemAvailability.ONLINE_ONLY.
@@ -678,10 +676,10 @@ class AccountSettings : Gtk.Widget {
                 for (var entry : old_blocklist) {
                     folder.journal_database ().schedule_path_for_remote_discovery (entry);
                     if (!folder.vfs ().pin_state (entry, PinState.VfsItemAvailability.ONLINE_ONLY)) {
-                        GLib.warn (lc_account_settings) << "Could not set pin state of" << entry << "to online only";
+                        GLib.warn ("Could not set pin state of" + entry + "to online only";
                     }
                 }
-                folder.on_next_sync_full_local_discovery ();
+                folder.on_signal_next_sync_full_local_discovery ();
 
                 FolderMan.instance ().schedule_folder (folder);
 
@@ -691,8 +689,8 @@ class AccountSettings : Gtk.Widget {
 
             if (folder.is_sync_running ()) {
                 *connection = connect (folder, &Folder.sync_finished, this, switch_vfs_on);
-                folder.vfs_on_off_switch_pending (true);
-                folder.on_terminate_sync ();
+                folder.vfs_on_signal_off_switch_pending (true);
+                folder.on_signal_terminate_sync ();
                 this.ui.folder_list.do_items_layout ();
             } else {
                 switch_vfs_on ();
@@ -701,7 +699,7 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_disable_vfs_current_folder () {
+    protected void on_signal_disable_vfs_current_folder () {
         FolderMan folder_man = FolderMan.instance ();
         QPointer<Folder> folder = folder_man.folder (selected_folder_alias ());
         QModelIndex selected = this.ui.folder_list.selection_model ().current_index ();
@@ -717,10 +715,10 @@ class AccountSettings : Gtk.Widget {
                "The only advantage of disabling virtual file support is that the selective sync feature "
                "will become available again."
                "\n\n"
-               "This action will on_abort any currently running synchronization."));
+               "This action will on_signal_abort any currently running synchronization."));
         var accept_button = msg_box.add_button (_("Disable support"), QMessageBox.AcceptRole);
         msg_box.add_button (_("Cancel"), QMessageBox.RejectRole);
-        connect (msg_box, &QMessageBox.on_finished, msg_box, [this, msg_box, folder, accept_button] {
+        connect (msg_box, &QMessageBox.on_signal_finished, msg_box, [this, msg_box, folder, accept_button] {
             msg_box.delete_later ();
             if (msg_box.clicked_button () != accept_button|| !folder)
                 return;
@@ -734,18 +732,18 @@ class AccountSettings : Gtk.Widget {
                 if (*connection)
                     GLib.Object.disconnect (*connection);
 
-                GLib.info (lc_account_settings) << "Disabling vfs support for folder" << folder.path ();
+                GLib.info ("Disabling vfs support for folder" + folder.path ();
 
                 // Also wipes virtual files, schedules remote discovery
                 folder.virtual_files_enabled (false);
-                folder.vfs_on_off_switch_pending (false);
+                folder.vfs_on_signal_off_switch_pending (false);
 
                 // Wipe pin states and selective sync database
                 folder.root_pin_state (PinState.PinState.ALWAYS_LOCAL);
                 folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {});
 
                 // Prevent issues with missing local files
-                folder.on_next_sync_full_local_discovery ();
+                folder.on_signal_next_sync_full_local_discovery ();
 
                 FolderMan.instance ().schedule_folder (folder);
 
@@ -754,8 +752,8 @@ class AccountSettings : Gtk.Widget {
 
             if (folder.is_sync_running ()) {
                 *connection = connect (folder, &Folder.sync_finished, this, switch_vfs_off);
-                folder.vfs_on_off_switch_pending (true);
-                folder.on_terminate_sync ();
+                folder.vfs_on_signal_off_switch_pending (true);
+                folder.on_signal_terminate_sync ();
                 this.ui.folder_list.do_items_layout ();
             } else {
                 switch_vfs_off ();
@@ -765,7 +763,7 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_current_folder_availability (PinState state) {
+    protected void on_signal_current_folder_availability (PinState state) {
         //  ASSERT (state == PinState.VfsItemAvailability.ONLINE_ONLY || state == PinState.PinState.ALWAYS_LOCAL);
 
         FolderMan folder_man = FolderMan.instance ();
@@ -780,26 +778,26 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_sub_folder_availability (Folder folder, string path, PinState state) {
+    protected void on_signal_sub_folder_availability (Folder folder, string path, PinState state) {
         //  Q_ASSERT (folder && folder.virtual_files_enabled ());
         //  Q_ASSERT (!path.ends_with ('/'));
 
         // Update the pin state on all items
         if (!folder.vfs ().pin_state (path, state)) {
-            GLib.warn (lc_account_settings) << "Could not set pin state of" << path << "to" << state;
+            GLib.warn ("Could not set pin state of" + path + "to" + state;
         }
 
         // Trigger sync
-        folder.on_schedule_path_for_local_discovery (path);
+        folder.on_signal_schedule_path_for_local_discovery (path);
         folder.schedule_this_folder_soon ();
     }
 
 
-    protected void on_folder_wizard_accepted () {
+    protected void on_signal_folder_wizard_accepted () {
         var folder_wizard = qobject_cast<FolderWizard> (sender ());
         FolderMan folder_man = FolderMan.instance ();
 
-        GLib.info (lc_account_settings) << "Folder wizard completed";
+        GLib.info ("Folder wizard completed";
 
         FolderDefinition definition;
         definition.local_path = FolderDefinition.prepare_local_path (
@@ -813,7 +811,7 @@ class AccountSettings : Gtk.Widget {
         {
             QDir dir (definition.local_path);
             if (!dir.exists ()) {
-                GLib.info (lc_account_settings) << "Creating folder" << definition.local_path;
+                GLib.info ("Creating folder" + definition.local_path;
                 if (!dir.mkpath (".")) {
                     QMessageBox.warning (this, _("Folder creation failed"),
                         _("<p>Could not create local folder <i>%1</i>.</p>")
@@ -848,21 +846,21 @@ class AccountSettings : Gtk.Widget {
 
             // The user already accepted the selective sync dialog. everything is in the allow list
             f.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
-                string[] () << QLatin1String ("/"));
+                string[] () + QLatin1String ("/"));
             folder_man.schedule_all_folders ();
             /* emit */ folder_changed ();
         }
     }
 
 
-    protected void on_folder_wizard_rejected () {
-        GLib.info (lc_account_settings) << "Folder wizard cancelled";
+    protected void on_signal_folder_wizard_rejected () {
+        GLib.info ("Folder wizard cancelled";
         FolderMan folder_man = FolderMan.instance ();
         folder_man.sync_enabled (true);
     }
 
 
-    protected void on_delete_account () {
+    protected void on_signal_delete_account () {
         // Deleting the account potentially deletes 'this', so
         // the QMessageBox should be destroyed before that happens.
         var message_box = new QMessageBox (QMessageBox.Question,
@@ -875,7 +873,7 @@ class AccountSettings : Gtk.Widget {
         var yes_button = message_box.add_button (_("Remove connection"), QMessageBox.YesRole);
         message_box.add_button (_("Cancel"), QMessageBox.NoRole);
         message_box.attribute (Qt.WA_DeleteOnClose);
-        connect (message_box, &QMessageBox.on_finished, this, [this, message_box, yes_button]{
+        connect (message_box, &QMessageBox.on_signal_finished, this, [this, message_box, yes_button]{
             if (message_box.clicked_button () == yes_button) {
                 // Else it might access during destruction. This should be better handled by it having a unowned
                 this.model.account_state (null);
@@ -889,7 +887,7 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_toggle_sign_in_state () {
+    protected void on_signal_toggle_sign_in_state () {
         if (this.account_state.is_signed_out ()) {
             this.account_state.account ().reset_rejected_certificates ();
             this.account_state.sign_in ();
@@ -899,7 +897,7 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_refresh_selective_sync_status () {
+    protected void on_signal_refresh_selective_sync_status () {
         string message;
         int cnt = 0;
         const var folders = FolderMan.instance ().map ().values ();
@@ -939,13 +937,13 @@ class AccountSettings : Gtk.Widget {
                       ? _("There are folders that were not synchronized because they are external storages : ")
                       : _("There are folders that were not synchronized because they are too big or external storages : ");
 
-            this.ui.selective_sync_notification.on_text (info + message);
+            this.ui.selective_sync_notification.on_signal_text (info + message);
             this.ui.big_folder_ui.visible (true);
         }
     }
 
 
-    protected void on_mark_subfolder_encrypted (FolderStatusModel.SubFolderInfo folder_info) {
+    protected void on_signal_mark_subfolder_encrypted (FolderStatusModel.SubFolderInfo folder_info) {
         if (!can_encrypt_or_decrypt (folder_info)) {
             return;
         }
@@ -959,7 +957,7 @@ class AccountSettings : Gtk.Widget {
         const var encrypt_folder = [this, file_id, path, folder_alias] {
             const var folder = FolderMan.instance ().folder (folder_alias);
             if (!folder) {
-                GLib.warn (lc_account_settings) << "Could not encrypt folder because folder" << folder_alias << "does not exist anymore";
+                GLib.warn ("Could not encrypt folder because folder" + folder_alias + "does not exist anymore";
                 QMessageBox.warning (null, _("Encryption failed"), _("Could not encrypt folder because the folder does not exist anymore"));
                 return;
             }
@@ -968,11 +966,11 @@ class AccountSettings : Gtk.Widget {
             //  Q_ASSERT (!path.starts_with ('/') && path.ends_with ('/'));
             // But EncryptFolderJob expects directory path Foo/Bar convention
             const var chopped_path = path.chopped (1);
-            var job = new Occ.EncryptFolderJob (on_accounts_state ().account (), folder.journal_database (), chopped_path, file_id, this);
+            var job = new Occ.EncryptFolderJob (on_signal_accounts_state ().account (), folder.journal_database (), chopped_path, file_id, this);
             job.property (PROPERTY_FOLDER, GLib.Variant.from_value (folder));
             job.property (PROPERTY_PATH, GLib.Variant.from_value (path));
-            connect (job, &Occ.EncryptFolderJob.on_finished, this, &AccountSettings.on_encrypt_folder_finished);
-            job.on_start ();
+            connect (job, &Occ.EncryptFolderJob.on_signal_finished, this, &AccountSettings.on_signal_encrypt_folder_finished);
+            job.on_signal_start ();
         }
 
         if (folder.virtual_files_enabled ()
@@ -984,12 +982,12 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_subfolder_context_menu_requested (QModelIndex index, QPoint position) {
+    protected void on_signal_subfolder_context_menu_requested (QModelIndex index, QPoint position) {
         //  Q_UNUSED (position);
 
         QMenu menu;
         var ac = menu.add_action (_("Open folder"));
-        connect (ac, &QAction.triggered, this, &AccountSettings.on_open_current_local_sub_folder);
+        connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_open_current_local_sub_folder);
 
         var filename = this.model.data (index, DataRole.FOLDER_PATH_ROLE).to_string ();
         if (!GLib.File.exists (filename)) {
@@ -1007,21 +1005,21 @@ class AccountSettings : Gtk.Widget {
             if (!is_encrypted && !is_parent_encrypted) {
                 ac = menu.add_action (_("Encrypt"));
                 connect (ac, &QAction.triggered, [this, info] {
-                    on_mark_subfolder_encrypted (info);
+                    on_signal_mark_subfolder_encrypted (info);
                 });
             } else {
                 // Ingore decrypting for now since it only works with an empty folder
                 // connect (ac, &QAction.triggered, [this, info] {
-                //    on_mark_subfolder_decrypted (info);
+                //    on_signal_mark_subfolder_decrypted (info);
                 // });
             }
         }
 
         ac = menu.add_action (_("Edit Ignored Files"));
-        connect (ac, &QAction.triggered, this, &AccountSettings.on_edit_current_local_ignored_files);
+        connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_edit_current_local_ignored_files);
 
         ac = menu.add_action (_("Create new folder"));
-        connect (ac, &QAction.triggered, this, &AccountSettings.on_open_make_folder_dialog);
+        connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_open_make_folder_dialog);
         ac.enabled (GLib.File.exists (filename));
 
         const var folder = info.folder;
@@ -1042,12 +1040,12 @@ class AccountSettings : Gtk.Widget {
 
             ac = availability_menu.add_action (Utility.vfs_pin_action_text ());
             connect (ac, &QAction.triggered, this, [this, folder, path] {
-                on_sub_folder_availability (folder, path, PinState.PinState.ALWAYS_LOCAL);
+                on_signal_sub_folder_availability (folder, path, PinState.PinState.ALWAYS_LOCAL);
             });
 
             ac = availability_menu.add_action (Utility.vfs_free_space_action_text ());
             connect (ac, &QAction.triggered, this, [this, folder, path] {
-                on_sub_folder_availability (folder, path, PinState.VfsItemAvailability.ONLINE_ONLY);
+                on_signal_sub_folder_availability (folder, path, PinState.VfsItemAvailability.ONLINE_ONLY);
             });
         }
 
@@ -1055,7 +1053,7 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_custom_context_menu_requested (QPoint position) {
+    protected void on_signal_custom_context_menu_requested (QPoint position) {
         QTreeView tv = this.ui.folder_list;
         QModelIndex index = tv.index_at (position);
         if (!index.is_valid ()) {
@@ -1063,7 +1061,7 @@ class AccountSettings : Gtk.Widget {
         }
 
         if (this.model.classify (index) == FolderStatusModel.ItemType.SUBFOLDER) {
-            on_subfolder_context_menu_requested (index, position);
+            on_signal_subfolder_context_menu_requested (index, position);
             return;
         }
 
@@ -1085,52 +1083,52 @@ class AccountSettings : Gtk.Widget {
         menu.attribute (Qt.WA_DeleteOnClose);
 
         QAction ac = menu.add_action (_("Open folder"));
-        connect (ac, &QAction.triggered, this, &AccountSettings.on_open_current_folder);
+        connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_open_current_folder);
 
         ac = menu.add_action (_("Edit Ignored Files"));
-        connect (ac, &QAction.triggered, this, &AccountSettings.on_edit_current_ignored_files);
+        connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_edit_current_ignored_files);
 
         ac = menu.add_action (_("Create new folder"));
-        connect (ac, &QAction.triggered, this, &AccountSettings.on_open_make_folder_dialog);
+        connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_open_make_folder_dialog);
         ac.enabled (GLib.File.exists (folder.path ()));
 
         if (!this.ui.folder_list.is_expanded (index) && folder.supports_selective_sync ()) {
             ac = menu.add_action (_("Choose what to sync"));
             ac.enabled (folder_connected);
-            connect (ac, &QAction.triggered, this, &AccountSettings.on_do_expand);
+            connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_do_expand);
         }
 
         if (!folder_paused) {
             ac = menu.add_action (_("Force sync now"));
             if (folder && folder.is_sync_running ()) {
-                ac.on_text (_("Restart sync"));
+                ac.on_signal_text (_("Restart sync"));
             }
             ac.enabled (folder_connected);
-            connect (ac, &QAction.triggered, this, &AccountSettings.on_force_sync_current_folder);
+            connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_force_sync_current_folder);
         }
 
         ac = menu.add_action (folder_paused ? _("Resume sync") : _("Pause sync"));
-        connect (ac, &QAction.triggered, this, &AccountSettings.on_enable_current_folder);
+        connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_enable_current_folder);
 
         ac = menu.add_action (_("Remove folder sync connection"));
-        connect (ac, &QAction.triggered, this, &AccountSettings.on_remove_current_folder);
+        connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_remove_current_folder);
 
         if (folder.virtual_files_enabled ()) {
             var availability_menu = menu.add_menu (_("Availability"));
 
             ac = availability_menu.add_action (Utility.vfs_pin_action_text ());
             connect (ac, &QAction.triggered, this, [this] () {
-                on_current_folder_availability (PinState.PinState.ALWAYS_LOCAL);
+                on_signal_current_folder_availability (PinState.PinState.ALWAYS_LOCAL);
             });
             ac.disabled (Theme.instance ().enforce_virtual_files_sync_folder ());
 
             ac = availability_menu.add_action (Utility.vfs_free_space_action_text ());
             connect (ac, &QAction.triggered, this, [this] () {
-                on_current_folder_availability (PinState.VfsItemAvailability.ONLINE_ONLY);
+                on_signal_current_folder_availability (PinState.VfsItemAvailability.ONLINE_ONLY);
             });
 
             ac = menu.add_action (_("Disable virtual file support …"));
-            connect (ac, &QAction.triggered, this, &AccountSettings.on_disable_vfs_current_folder);
+            connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_disable_vfs_current_folder);
             ac.disabled (Theme.instance ().enforce_virtual_files_sync_folder ());
         }
 
@@ -1142,7 +1140,7 @@ class AccountSettings : Gtk.Widget {
                 // TODO : remove when UX decision is made
                 ac.enabled (!Utility.is_path_windows_drive_partition_root (folder.path ()));
                 //
-                connect (ac, &QAction.triggered, this, &AccountSettings.on_enable_vfs_current_folder);
+                connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_enable_vfs_current_folder);
             }
         }
 
@@ -1150,7 +1148,7 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_folder_list_clicked (QModelIndex index) {
+    protected void on_signal_folder_list_clicked (QModelIndex index) {
         if (index.data (DataRole.ADD_BUTTON).to_bool ()) {
             // "Add Folder Sync Connection"
             QTreeView tv = this.ui.folder_list;
@@ -1164,7 +1162,7 @@ class AccountSettings : Gtk.Widget {
                 return;
 
             if (index.flags () & Qt.ItemIsEnabled) {
-                on_add_folder ();
+                on_signal_add_folder ();
             } else {
                 QToolTip.show_text (
                     QCursor.position (),
@@ -1178,7 +1176,7 @@ class AccountSettings : Gtk.Widget {
             QTreeView tv = this.ui.folder_list;
             var position = tv.map_from_global (QCursor.position ());
             if (FolderStatusDelegate.options_button_rect (tv.visual_rect (index), layout_direction ()).contains (position)) {
-                on_custom_context_menu_requested (position);
+                on_signal_custom_context_menu_requested (position);
                 return;
             }
             if (FolderStatusDelegate.errors_list_rect (tv.visual_rect (index)).contains (position)) {
@@ -1195,7 +1193,7 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_do_expand () {
+    protected void on_signal_do_expand () {
         // Make sure at least the root items are expanded
         for (int i = 0; i < this.model.row_count (); ++i) {
             var index = this.model.index (i);
@@ -1205,7 +1203,7 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_link_activated (string link) {
+    protected void on_signal_link_activated (string link) {
         // Parse folder alias and filename from the link, calculate the index
         // and select it if it exists.
         const string[] li = link.split (QLatin1String ("?folder="));
@@ -1234,21 +1232,21 @@ class AccountSettings : Gtk.Widget {
                 this.ui.folder_list.current_index (index);
                 this.ui.folder_list.scroll_to (index);
             } else {
-                GLib.warn (lc_account_settings) << "Unable to find a valid index for " << my_folder;
+                GLib.warn ("Unable to find a valid index for " + my_folder;
             }
         }
     }
 
 
     // Encryption Related Stuff.
-    protected void on_show_mnemonic (string mnemonic) {
-        AccountManager.instance ().on_display_mnemonic (mnemonic);
+    protected void on_signal_show_mnemonic (string mnemonic) {
+        AccountManager.instance ().on_signal_display_mnemonic (mnemonic);
     }
 
 
     // Encryption Related Stuff.
-    protected void on_new_mnemonic_generated () {
-        this.ui.encryption_message.on_text (_("This account supports end-to-end encryption"));
+    protected void on_signal_new_mnemonic_generated () {
+        this.ui.encryption_message.on_signal_text (_("This account supports end-to-end encryption"));
 
         var mnemonic = new QAction (_("Enable encryption"), this);
         connect (mnemonic, &QAction.triggered, this, &AccountSettings.request_mnemonic);
@@ -1260,8 +1258,8 @@ class AccountSettings : Gtk.Widget {
 
 
     // Encryption Related Stuff.
-    protected void on_encrypt_folder_finished (int status) {
-        GLib.info (lc_account_settings) << "Current folder encryption status code:" << status;
+    protected void on_signal_encrypt_folder_finished (int status) {
+        GLib.info ("Current folder encryption status code:" + status;
         var job = qobject_cast<EncryptFolderJob> (sender ());
         //  Q_ASSERT (job);
         if (!job.error_string ().is_empty ()) {
@@ -1279,7 +1277,7 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    protected void on_selective_sync_changed (
+    protected void on_signal_selective_sync_changed (
         QModelIndex top_left, QModelIndex bottom_right,
         GLib.Vector<int> roles) {
         //  Q_UNUSED (bottom_right);
@@ -1319,8 +1317,8 @@ class AccountSettings : Gtk.Widget {
 
             const var anim = new QPropertyAnimation (this.ui.selective_sync_status, "maximum_height", this.ui.selective_sync_status);
             anim.end_value (this.model.is_dirty () ? hint.height () : 0);
-            anim.on_start (QAbstractAnimation.DeleteWhenStopped);
-            connect (anim, &QPropertyAnimation.on_finished, [this, should_be_visible] () {
+            anim.on_signal_start (QAbstractAnimation.DeleteWhenStopped);
+            connect (anim, &QPropertyAnimation.on_signal_finished, [this, should_be_visible] () {
                 this.ui.selective_sync_status.maximum_height (QWIDGETSIZE_MAX);
                 if (!should_be_visible) {
                     this.ui.selective_sync_status.hide ();
@@ -1340,15 +1338,15 @@ class AccountSettings : Gtk.Widget {
         if (errors.is_empty ()) {
             string message = message;
             Theme.replace_link_color_string_background_aware (message);
-            this.ui.connect_label.on_text (message);
+            this.ui.connect_label.on_signal_text (message);
             this.ui.connect_label.tool_tip ("");
             this.ui.connect_label.style_sheet ("");
         } else {
             errors.prepend (message);
             string message = errors.join (QLatin1String ("\n"));
-            GLib.debug (lc_account_settings) << message;
+            GLib.debug () + message;
             Theme.replace_link_color_string (message, Gtk.Color ("#c1c8e6"));
-            this.ui.connect_label.on_text (message);
+            this.ui.connect_label.on_signal_text (message);
             this.ui.connect_label.tool_tip ("");
             this.ui.connect_label.style_sheet (err_style);
         }
@@ -1397,7 +1395,7 @@ class AccountSettings : Gtk.Widget {
 
         connect (button_box, &QDialogButtonBox.clicked, [=] (QAbstractButton * button) {
             if (button_box.button_role (button) == QDialogButtonBox.AcceptRole)
-                ignore_list_widget.on_write_ignore_file (ignore_file);
+                ignore_list_widget.on_signal_write_ignore_file (ignore_file);
             dialog.close ();
         });
         connect (button_box, &QDialogButtonBox.rejected,
@@ -1412,7 +1410,7 @@ class AccountSettings : Gtk.Widget {
     private void customize_style () {
         string message = this.ui.connect_label.text ();
         Theme.replace_link_color_string_background_aware (message);
-        this.ui.connect_label.on_text (message);
+        this.ui.connect_label.on_signal_text (message);
 
         Gtk.Color color = palette ().highlight ().color ();
         this.ui.quota_progress_bar.style_sheet (string.from_latin1 (PROGRESS_BAR_STYLE_C).arg (color.name ()));
@@ -1430,10 +1428,10 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    private static void show_enable_e2ee_with_virtual_files_warning_dialog (std.function<void (void)> on_accept) {
+    private static void show_enable_e2ee_with_virtual_files_warning_dialog (std.function<void (void)> on_signal_accept) {
         const var message_box = new QMessageBox;
         message_box.attribute (Qt.WA_DeleteOnClose);
-        message_box.on_text (AccountSettings._("End-to-End Encryption with Virtual Files"));
+        message_box.on_signal_text (AccountSettings._("End-to-End Encryption with Virtual Files"));
         message_box.informative_text (AccountSettings._("You seem to have the Virtual Files feature enabled on this folder. "
                                                            "At the moment, it is not possible to implicitly download virtual files that are "
                                                            "End-to-End encrypted. To get the best experience with Virtual Files and "
@@ -1442,11 +1440,11 @@ class AccountSettings : Gtk.Widget {
         message_box.icon (QMessageBox.Warning);
         const var dont_encrypt_button = message_box.add_button (QMessageBox.StandardButton.Cancel);
         //  Q_ASSERT (dont_encrypt_button);
-        dont_encrypt_button.on_text (AccountSettings._("Don't encrypt folder"));
+        dont_encrypt_button.on_signal_text (AccountSettings._("Don't encrypt folder"));
         const var encrypt_button = message_box.add_button (QMessageBox.StandardButton.Ok);
         //  Q_ASSERT (encrypt_button);
-        encrypt_button.on_text (AccountSettings._("Encrypt folder"));
-        GLib.Object.connect (message_box, &QMessageBox.accepted, on_accept);
+        encrypt_button.on_signal_text (AccountSettings._("Encrypt folder"));
+        GLib.Object.connect (message_box, &QMessageBox.accepted, on_signal_accept);
 
         message_box.open ();
     }

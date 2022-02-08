@@ -12,15 +12,13 @@ class FakeChunkMoveReply : FakeReply {
     ***********************************************************/
     public static FileInfo perform (FileInfo uploadsFileInfo, FileInfo remoteRootFileInfo, QNetworkRequest request);
 
-    //  Q_INVOKABLE
     public virtual void respond ();
 
-    //  Q_INVOKABLE
     public void respondPreconditionFailed ();
 
     /***********************************************************
     ***********************************************************/
-    public void on_abort () override;
+    public void on_signal_abort () override;
 
     /***********************************************************
     ***********************************************************/

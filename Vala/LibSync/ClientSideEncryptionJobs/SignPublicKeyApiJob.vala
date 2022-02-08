@@ -14,7 +14,7 @@ To be
 this.job = new SignPubli
 this.job.csr ( csr
 connect (this.job.
-this.job.on_start
+this.job.on_signal_start
 \encode
 
 @ingroup libsync
@@ -28,22 +28,22 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     @brief csr - the CSR with the public key.
-    This function needs to be called before on_start () obviously.
+    This function needs to be called before on_signal_start () obviously.
     ***********************************************************/
     public void csr (GLib.ByteArray csr);
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override;
+    public void on_signal_start () override;
 
-    protected bool on_finished () override;
+    protected bool on_signal_finished () override;
 
 
     /***********************************************************
     @brief json_received - signal to report the json answer from ocs
     @param json - the parsed json document
-    @param status_code - the OCS status code : 100 (!) for on_success
+    @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
     signal void json_received (QJsonDocument json, int status_code);
 
@@ -65,7 +65,7 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
         this.csr.data (data);
     }
 
-    void SignPublicKeyApiJob.on_start () {
+    void SignPublicKeyApiJob.on_signal_start () {
         Soup.Request req;
         req.raw_header ("OCS-APIREQUEST", "true");
         req.header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
@@ -74,13 +74,13 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (query);
 
-        GLib.info (lc_sign_public_key_api_job) << "Sending the CSR" << this.csr.data ();
+        GLib.info ("Sending the CSR" + this.csr.data ();
         send_request ("POST", url, req, this.csr);
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
-    bool SignPublicKeyApiJob.on_finished () {
-        GLib.info (lc_store_private_key_api_job ()) << "Sending CSR ended with"  << path () << error_string () << reply ().attribute (Soup.Request.HttpStatusCodeAttribute);
+    bool SignPublicKeyApiJob.on_signal_finished () {
+        GLib.info ()) + "Sending CSR ended with"  + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute);
 
         QJsonParseError error;
         var json = QJsonDocument.from_json (reply ().read_all (), error);

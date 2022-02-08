@@ -83,13 +83,13 @@ class OwncloudGui : GLib.Object {
 
 signals:
     void setup_proxy ();
-    void on_server_error (int code, string message);
+    void on_signal_server_error (int code, string message);
     void is_showing_settings_dialog ();
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_compute_overall_sync_status ();
+    public void on_signal_compute_overall_sync_status ();
 
     /***********************************************************
     ***********************************************************/
@@ -101,7 +101,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public void on_show_optional_tray_message (string 
+    public void on_signal_show_optional_tray_message (string 
 
     /***********************************************************
     ***********************************************************/
@@ -113,7 +113,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public void on_update_progress (string_value
+    public void on_signal_update_progress (string_value
 
     /***********************************************************
     ***********************************************************/
@@ -125,7 +125,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public void on_folders_chang
+    public void on_signal_folders_chang
 
     /***********************************************************
     ***********************************************************/
@@ -137,7 +137,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public void on_show_sync_protocol ();
+    public void on_signal_show_sync_protocol ();
 
     /***********************************************************
     ***********************************************************/
@@ -149,7 +149,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public void on_sync_state_change (Fo
+    public void on_signal_sync_state_change (Fo
 
     /***********************************************************
     ***********************************************************/
@@ -161,7 +161,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public void on_toggle_log_browser ();
+    public void on_signal_toggle_log_browser ();
 
     /***********************************************************
     ***********************************************************/
@@ -171,25 +171,25 @@ signals:
     ***********************************************************/
     public 
 
-    public void on_open_settings_dialog ();
+    public void on_signal_open_settings_dialog ();
 
 
-    public void on_open_main_dialog ();
+    public void on_signal_open_main_dialog ();
 
 
-    public void on_settings_dialog_activated ();
+    public void on_signal_settings_dialog_activated ();
 
 
-    public void on_help ();
+    public void on_signal_help ();
 
 
-    public void on_open_path (string path);
+    public void on_signal_open_path (string path);
 
 
-    public void on_account_state_changed ();
+    public void on_signal_account_state_changed ();
 
 
-    public void on_tray_message_if_server_unsupported (Account account);
+    public void on_signal_tray_message_if_server_unsupported (Account account);
 
 
     /***********************************************************
@@ -199,17 +199,17 @@ signals:
     local_path is the absolute local path to it (so not relative
     to the folder).
     ***********************************************************/
-    void on_show_share_dialog (string share_path, string local_path, Share_dialog_start_page start_page);
+    void on_signal_show_share_dialog (string share_path, string local_path, Share_dialog_start_page start_page);
 
-    void on_remove_destroyed_share_dialogs ();
+    void on_signal_remove_destroyed_share_dialogs ();
 
-    void on_new_account_wizard ();
+    void on_signal_new_account_wizard ();
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_login ();
-    private void on_logout ();
+    private void on_signal_login ();
+    private void on_signal_logout ();
 
 
     /***********************************************************
@@ -259,42 +259,42 @@ OwncloudGui.OwncloudGui (Application parent)
     this.tray.show ();
 
     connect (this.tray.data (), &QSystemTrayIcon.activated,
-        this, &OwncloudGui.on_tray_clicked);
+        this, &OwncloudGui.on_signal_tray_clicked);
 
     connect (this.tray.data (), &Systray.open_help,
-        this, &OwncloudGui.on_help);
+        this, &OwncloudGui.on_signal_help);
 
     connect (this.tray.data (), &Systray.open_account_wizard,
-        this, &OwncloudGui.on_new_account_wizard);
+        this, &OwncloudGui.on_signal_new_account_wizard);
 
     connect (this.tray.data (), &Systray.open_main_dialog,
-        this, &OwncloudGui.on_open_main_dialog);
+        this, &OwncloudGui.on_signal_open_main_dialog);
 
     connect (this.tray.data (), &Systray.open_settings,
-        this, &OwncloudGui.on_show_settings);
+        this, &OwncloudGui.on_signal_show_settings);
 
     connect (this.tray.data (), &Systray.shutdown,
-        this, &OwncloudGui.on_shutdown);
+        this, &OwncloudGui.on_signal_shutdown);
 
     connect (this.tray.data (), &Systray.open_share_dialog,
         this, [=] (string share_path, string local_path) {
-                on_show_share_dialog (share_path, local_path, Share_dialog_start_page.Users_and_groups);
+                on_signal_show_share_dialog (share_path, local_path, Share_dialog_start_page.Users_and_groups);
             });
 
     ProgressDispatcher pd = ProgressDispatcher.instance ();
     connect (pd, &ProgressDispatcher.progress_info, this,
-        &OwncloudGui.on_update_progress);
+        &OwncloudGui.on_signal_update_progress);
 
     FolderMan folder_man = FolderMan.instance ();
     connect (folder_man, &FolderMan.folder_sync_state_change,
-        this, &OwncloudGui.on_sync_state_change);
+        this, &OwncloudGui.on_signal_sync_state_change);
 
-    connect (Logger.instance (), &Logger.gui_log,
-        this, &OwncloudGui.on_show_tray_message);
+    connect (Logger.instance (), &Logger.signal_gui_log,
+        this, &OwncloudGui.on_signal_show_tray_message);
     connect (Logger.instance (), &Logger.optional_gui_log,
-        this, &OwncloudGui.on_show_optional_tray_message);
+        this, &OwncloudGui.on_signal_show_optional_tray_message);
     connect (Logger.instance (), &Logger.gui_message,
-        this, &OwncloudGui.on_show_gui_message);
+        this, &OwncloudGui.on_signal_show_gui_message);
 }
 
 void OwncloudGui.create_tray () {
@@ -314,7 +314,7 @@ bool OwncloudGui.cloud_provider_api_available () {
                               "org.freedesktop.Cloud_provider.Manager1", this.bus);
 
     if (!dbus_iface.is_valid ()) {
-        GLib.info (lc_application) << "DBus interface unavailable";
+        GLib.info ("DBus interface unavailable";
         return false;
     }
     return true;
@@ -322,27 +322,27 @@ bool OwncloudGui.cloud_provider_api_available () {
 //  #endif
 
 // This should rather be in application.... or rather in ConfigFile?
-void OwncloudGui.on_open_settings_dialog () {
-    // if account is set up, on_start the configuration wizard.
+void OwncloudGui.on_signal_open_settings_dialog () {
+    // if account is set up, on_signal_start the configuration wizard.
     if (!AccountManager.instance ().accounts ().is_empty ()) {
         if (this.settings_dialog.is_null () || QApplication.active_window () != this.settings_dialog) {
-            on_show_settings ();
+            on_signal_show_settings ();
         } else {
             this.settings_dialog.close ();
         }
     } else {
-        GLib.info (lc_application) << "No configured folders yet, starting setup wizard";
-        on_new_account_wizard ();
+        GLib.info ("No configured folders yet, starting setup wizard";
+        on_signal_new_account_wizard ();
     }
 }
 
-void OwncloudGui.on_open_main_dialog () {
+void OwncloudGui.on_signal_open_main_dialog () {
     if (!this.tray.is_open ()) {
         this.tray.show_window ();
     }
 }
 
-void OwncloudGui.on_tray_clicked (QSystemTrayIcon.Activation_reason reason) {
+void OwncloudGui.on_signal_tray_clicked (QSystemTrayIcon.Activation_reason reason) {
     if (reason == QSystemTrayIcon.Trigger) {
         if (OwncloudSetupWizard.bring_wizard_to_front_if_visible ()) {
             // brought wizard to front
@@ -356,7 +356,7 @@ void OwncloudGui.on_tray_clicked (QSystemTrayIcon.Activation_reason reason) {
             this.tray.hide_window ();
         } else {
             if (AccountManager.instance ().accounts ().is_empty ()) {
-                this.on_open_settings_dialog ();
+                this.on_signal_open_settings_dialog ();
             } else {
                 this.tray.show_window ();
             }
@@ -367,8 +367,8 @@ void OwncloudGui.on_tray_clicked (QSystemTrayIcon.Activation_reason reason) {
     // or SSL error dialog also comes to front.
 }
 
-void OwncloudGui.on_sync_state_change (Folder folder) {
-    on_compute_overall_sync_status ();
+void OwncloudGui.on_signal_sync_state_change (Folder folder) {
+    on_signal_compute_overall_sync_status ();
 
     if (!folder) {
         return; // Valid, just a general GUI redraw was needed.
@@ -376,31 +376,31 @@ void OwncloudGui.on_sync_state_change (Folder folder) {
 
     var result = folder.sync_result ();
 
-    GLib.info (lc_application) << "Sync state changed for folder " << folder.remote_url ().to_string () << " : " << result.status_string ();
+    GLib.info ("Sync state changed for folder " + folder.remote_url ().to_string (" : " + result.status_string ();
 
     if (result.status () == SyncResult.Status.SUCCESS
         || result.status () == SyncResult.Status.PROBLEM
         || result.status () == SyncResult.Status.SYNC_ABORT_REQUESTED
         || result.status () == SyncResult.Status.ERROR) {
-        Logger.instance ().on_enter_next_log_file ();
+        Logger.instance ().on_signal_enter_next_log_file ();
     }
 }
 
-void OwncloudGui.on_folders_changed () {
-    on_compute_overall_sync_status ();
+void OwncloudGui.on_signal_folders_changed () {
+    on_signal_compute_overall_sync_status ();
 }
 
-void OwncloudGui.on_open_path (string path) {
+void OwncloudGui.on_signal_open_path (string path) {
     show_in_file_manager (path);
 }
 
-void OwncloudGui.on_account_state_changed () {
-    on_compute_overall_sync_status ();
+void OwncloudGui.on_signal_account_state_changed () {
+    on_signal_compute_overall_sync_status ();
 }
 
-void OwncloudGui.on_tray_message_if_server_unsupported (Account account) {
+void OwncloudGui.on_signal_tray_message_if_server_unsupported (Account account) {
     if (account.server_version_unsupported ()) {
-        on_show_tray_message (
+        on_signal_show_tray_message (
             _("Unsupported Server Version"),
             _("The server on account %1 runs an unsupported version %2. "
                "Using this client with unsupported server versions is untested and "
@@ -409,7 +409,7 @@ void OwncloudGui.on_tray_message_if_server_unsupported (Account account) {
     }
 }
 
-void OwncloudGui.on_compute_overall_sync_status () {
+void OwncloudGui.on_signal_compute_overall_sync_status () {
     bool all_signed_out = true;
     bool all_paused = true;
     bool all_disconnected = true;
@@ -420,7 +420,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
         // Don't overwrite the status if we're currently syncing
         if (FolderMan.instance ().is_any_sync_running ())
             return;
-        //this.action_status.on_text (text);
+        //this.action_status.on_signal_text (text);
     }
 
     foreach (var a, AccountManager.instance ().accounts ()) {
@@ -533,45 +533,45 @@ void OwncloudGui.hide_and_show_tray () {
     this.tray.show ();
 }
 
-void OwncloudGui.on_show_tray_message (string title, string message) {
+void OwncloudGui.on_signal_show_tray_message (string title, string message) {
     if (this.tray)
         this.tray.show_message (title, message);
     else
-        GLib.warn (lc_application) << "Tray not ready : " << message;
+        GLib.warn ("Tray not ready : " + message;
 }
 
-void OwncloudGui.on_show_optional_tray_message (string title, string message) {
-    on_show_tray_message (title, message);
+void OwncloudGui.on_signal_show_optional_tray_message (string title, string message) {
+    on_signal_show_tray_message (title, message);
 }
 
 /***********************************************************
 open the folder with the given Alias
 ***********************************************************/
-void OwncloudGui.on_folder_open_action (string alias) {
+void OwncloudGui.on_signal_folder_open_action (string alias) {
     Folder f = FolderMan.instance ().folder (alias);
     if (f) {
-        GLib.info (lc_application) << "opening local url " << f.path ();
+        GLib.info ("opening local url " + f.path ();
         GLib.Uri url = GLib.Uri.from_local_file (f.path ());
         QDesktopServices.open_url (url);
     }
 }
 
-void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
+void OwncloudGui.on_signal_update_progress (string folder, ProgressInfo progress) {
     //  Q_UNUSED (folder);
 
     // FIXME : Lots of messages computed for nothing in this method, needs revisiting
     if (progress.status () == ProgressInfo.Status.DISCOVERY) {
 #if 0
         if (!progress.current_discovered_remote_folder.is_empty ()) {
-            this.action_status.on_text (_("Checking for changes in remote \"%1\"")
+            this.action_status.on_signal_text (_("Checking for changes in remote \"%1\"")
                                        .arg (progress.current_discovered_remote_folder));
         } else if (!progress.current_discovered_local_folder.is_empty ()) {
-            this.action_status.on_text (_("Checking for changes in local \"%1\"")
+            this.action_status.on_signal_text (_("Checking for changes in local \"%1\"")
                                        .arg (progress.current_discovered_local_folder));
         }
 //  #endif
     } else if (progress.status () == ProgressInfo.Status.DONE) {
-        QTimer.single_shot (2000, this, &OwncloudGui.on_compute_overall_sync_status);
+        QTimer.single_shot (2000, this, &OwncloudGui.on_signal_compute_overall_sync_status);
     }
     if (progress.status () != ProgressInfo.Status.PROPAGATION) {
         return;
@@ -591,7 +591,7 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
                       .arg (current_file)
                       .arg (total_file_count);
         }
-        //this.action_status.on_text (message);
+        //this.action_status.on_signal_text (message);
     } else {
         string total_size_str = Utility.octets_to_string (progress.total_size ());
         string message;
@@ -602,7 +602,7 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
             message = _("Syncing %1")
                       .arg (total_size_str);
         }
-        //this.action_status.on_text (message);
+        //this.action_status.on_signal_text (message);
     }
 
     if (!progress.last_completed_item.is_empty ()) {
@@ -616,7 +616,7 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
             string full_path = f.path () + '/' + progress.last_completed_item.file;
             if (GLib.File (full_path).exists ()) {
                 connect (action, &QAction.triggered, this, [this, full_path] {
-                    this.on_open_path (full_path);
+                    this.on_signal_open_path (full_path);
                 });
             } else {
                 action.enabled (false);
@@ -629,7 +629,7 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo progress) {
     }
 }
 
-void OwncloudGui.on_login () {
+void OwncloudGui.on_signal_login () {
     if (var account = qvariant_cast<AccountStatePtr> (sender ().property (property_account_c))) {
         account.account ().reset_rejected_certificates ();
         account.sign_in ();
@@ -641,7 +641,7 @@ void OwncloudGui.on_login () {
     }
 }
 
-void OwncloudGui.on_logout () {
+void OwncloudGui.on_signal_logout () {
     var list = AccountManager.instance ().accounts ();
     if (var account = qvariant_cast<AccountStatePtr> (sender ().property (property_account_c))) {
         list.clear ();
@@ -653,21 +653,21 @@ void OwncloudGui.on_logout () {
     }
 }
 
-void OwncloudGui.on_new_account_wizard () {
-    OwncloudSetupWizard.run_wizard (Gtk.Application, SLOT (on_owncloud_wizard_done (int)));
+void OwncloudGui.on_signal_new_account_wizard () {
+    OwncloudSetupWizard.run_wizard (Gtk.Application, SLOT (on_signal_owncloud_wizard_done (int)));
 }
 
-void OwncloudGui.on_show_gui_message (string title, string message) {
+void OwncloudGui.on_signal_show_gui_message (string title, string message) {
     var msg_box = new QMessageBox;
-    msg_box.window_flags (msg_box.window_flags () | Qt.Window_stays_on_top_hint);
+    msg_box.window_flags (msg_box.window_flags () | Qt.Window_stays_on_signal_top_hint);
     msg_box.attribute (Qt.WA_DeleteOnClose);
-    msg_box.on_text (message);
+    msg_box.on_signal_text (message);
     msg_box.window_title (title);
     msg_box.icon (QMessageBox.Information);
     msg_box.open ();
 }
 
-void OwncloudGui.on_show_settings () {
+void OwncloudGui.on_signal_show_settings () {
     if (this.settings_dialog.is_null ()) {
         this.settings_dialog = new SettingsDialog (this);
         this.settings_dialog.attribute (Qt.WA_DeleteOnClose, true);
@@ -676,16 +676,16 @@ void OwncloudGui.on_show_settings () {
     raise_dialog (this.settings_dialog.data ());
 }
 
-void OwncloudGui.on_settings_dialog_activated () {
+void OwncloudGui.on_signal_settings_dialog_activated () {
     /* emit */ is_showing_settings_dialog ();
 }
 
-void OwncloudGui.on_show_sync_protocol () {
-    on_show_settings ();
+void OwncloudGui.on_signal_show_sync_protocol () {
+    on_signal_show_settings ();
     //this.settings_dialog.show_activity_page ();
 }
 
-void OwncloudGui.on_shutdown () {
+void OwncloudGui.on_signal_shutdown () {
     // explicitly close windows. This is somewhat of a hack to ensure
     // that saving the geometries happens ASAP during a OS shutdown
 
@@ -697,9 +697,9 @@ void OwncloudGui.on_shutdown () {
     this.app.quit ();
 }
 
-void OwncloudGui.on_toggle_log_browser () {
+void OwncloudGui.on_signal_toggle_log_browser () {
     if (this.log_browser.is_null ()) {
-        // on_init the log browser.
+        // on_signal_init the log browser.
         this.log_browser = new Log_browser;
         // ## TODO : allow new log name maybe?
     }
@@ -711,13 +711,13 @@ void OwncloudGui.on_toggle_log_browser () {
     }
 }
 
-void OwncloudGui.on_open_owncloud () {
+void OwncloudGui.on_signal_open_owncloud () {
     if (var account = qvariant_cast<AccountPointer> (sender ().property (property_account_c))) {
         Utility.open_browser (account.url ());
     }
 }
 
-void OwncloudGui.on_help () {
+void OwncloudGui.on_signal_help () {
     QDesktopServices.open_url (GLib.Uri (Theme.instance ().help_url ()));
 }
 
@@ -726,14 +726,14 @@ void OwncloudGui.raise_dialog (Gtk.Widget raise_widget) {
         // Qt has a bug which causes parent-less dialogs to pop-under.
         raise_widget.show_normal ();
         raise_widget.raise ();
-        raise_widget.on_activate_window ();
+        raise_widget.on_signal_activate_window ();
     }
 }
 
-void OwncloudGui.on_show_share_dialog (string share_path, string local_path, Share_dialog_start_page start_page) {
+void OwncloudGui.on_signal_show_share_dialog (string share_path, string local_path, Share_dialog_start_page start_page) {
     const var folder = FolderMan.instance ().folder_for_path (local_path);
     if (!folder) {
-        GLib.warn (lc_application) << "Could not open share dialog for" << local_path << "no responsible folder found";
+        GLib.warn ("Could not open share dialog for" + local_path + "no responsible folder found";
         return;
     }
 
@@ -754,20 +754,20 @@ void OwncloudGui.on_show_share_dialog (string share_path, string local_path, Sha
 
     Share_dialog w = null;
     if (this.share_dialogs.contains (local_path) && this.share_dialogs[local_path]) {
-        GLib.info (lc_application) << "Raising share dialog" << share_path << local_path;
+        GLib.info ("Raising share dialog" + share_path + local_path;
         w = this.share_dialogs[local_path];
     } else {
-        GLib.info (lc_application) << "Opening share dialog" << share_path << local_path << max_sharing_permissions;
+        GLib.info ("Opening share dialog" + share_path + local_path + max_sharing_permissions;
         w = new Share_dialog (account_state, share_path, local_path, max_sharing_permissions, file_record.numeric_file_id (), start_page);
         w.attribute (Qt.WA_DeleteOnClose, true);
 
         this.share_dialogs[local_path] = w;
-        connect (w, &GLib.Object.destroyed, this, &OwncloudGui.on_remove_destroyed_share_dialogs);
+        connect (w, &GLib.Object.destroyed, this, &OwncloudGui.on_signal_remove_destroyed_share_dialogs);
     }
     raise_dialog (w);
 }
 
-void OwncloudGui.on_remove_destroyed_share_dialogs () {
+void OwncloudGui.on_signal_remove_destroyed_share_dialogs () {
     QMutable_map_iterator<string, QPointer<Share_dialog>> it (this.share_dialogs);
     while (it.has_next ()) {
         it.next ();

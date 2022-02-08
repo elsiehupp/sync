@@ -22,28 +22,28 @@ class Get_or_create_public_link_share : GLib.Object {
         this.account (account)
         this.share_manager (account)
         this.local_file (local_file) {
-        connect (&this.share_manager, &Share_manager.on_shares_fetched,
-            this, &Get_or_create_public_link_share.on_shares_fetched);
-        connect (&this.share_manager, &Share_manager.on_link_share_created,
-            this, &Get_or_create_public_link_share.on_link_share_created);
-        connect (&this.share_manager, &Share_manager.on_link_share_requires_password,
-            this, &Get_or_create_public_link_share.on_link_share_requires_password);
-        connect (&this.share_manager, &Share_manager.on_server_error,
-            this, &Get_or_create_public_link_share.on_server_error);
+        connect (&this.share_manager, &Share_manager.on_signal_shares_fetched,
+            this, &Get_or_create_public_link_share.on_signal_shares_fetched);
+        connect (&this.share_manager, &Share_manager.on_signal_link_share_created,
+            this, &Get_or_create_public_link_share.on_signal_link_share_created);
+        connect (&this.share_manager, &Share_manager.on_signal_link_share_requires_password,
+            this, &Get_or_create_public_link_share.on_signal_link_share_requires_password);
+        connect (&this.share_manager, &Share_manager.on_signal_server_error,
+            this, &Get_or_create_public_link_share.on_signal_server_error);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void run () {
-        GLib.debug (lc_public_link) << "Fetching shares";
+        GLib.debug ("Fetching shares";
         this.share_manager.fetch_shares (this.local_file);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_shares_fetched (GLib.List<unowned<Share>> shares) {
+    private void on_signal_shares_fetched (GLib.List<unowned<Share>> shares) {
         var share_name = SocketApi._("Context menu share");
 
         // If there already is a context menu share, reuse it
@@ -53,28 +53,28 @@ class Get_or_create_public_link_share : GLib.Object {
                 continue;
 
             if (link_share.get_name () == share_name) {
-                GLib.debug (lc_public_link) << "Found existing share, reusing";
-                return on_success (link_share.get_link ().to_string ());
+                GLib.debug ("Found existing share, reusing";
+                return on_signal_success (link_share.get_link ().to_string ());
             }
         }
 
         // otherwise create a new one
-        GLib.debug (lc_public_link) << "Creating new share";
+        GLib.debug ("Creating new share";
         this.share_manager.create_link_share (this.local_file, share_name, "");
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_link_share_created (unowned<Link_share> share) {
-        GLib.debug (lc_public_link) << "New share created";
-        on_success (share.get_link ().to_string ());
+    private void on_signal_link_share_created (unowned<Link_share> share) {
+        GLib.debug ("New share created";
+        on_signal_success (share.get_link ().to_string ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_password_required () {
+    private void on_signal_password_required () {
         bool ok = false;
         string password = QInputDialog.get_text (null,
                                                  _("Password for share required"),
@@ -95,8 +95,8 @@ class Get_or_create_public_link_share : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_link_share_requires_password (string message) {
-        GLib.info (lc_public_link) << "Could not create link share:" << message;
+    private void on_signal_link_share_requires_password (string message) {
+        GLib.info ("Could not create link share:" + message;
         /* emit */ error (message);
         delete_later ();
     }
@@ -104,8 +104,8 @@ class Get_or_create_public_link_share : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_server_error (int code, string message) {
-        GLib.warn (lc_public_link) << "Share fetch/create error" << code << message;
+    private void on_signal_server_error (int code, string message) {
+        GLib.warn ("Share fetch/create error" + code + message;
         QMessageBox.warning (
             null,
             _("Sharing error"),
@@ -117,13 +117,13 @@ class Get_or_create_public_link_share : GLib.Object {
     }
 
 signals:
-    void on_done (string link);
+    void on_signal_done (string link);
     void error (string message);
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_success (string link) {
+    private void on_signal_success (string link) {
         /* emit */ done (link);
         delete_later ();
     }

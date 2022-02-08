@@ -128,7 +128,7 @@ class VfsOff : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public void on_file_status_changed (string , SyncFileStatus) override {}
+    public void on_signal_file_status_changed (string , SyncFileStatus) override {}
 
 
     /***********************************************************
@@ -155,28 +155,28 @@ class VfsOff : Vfs {
 
         const var base_meta_data = loader.meta_data ();
         if (base_meta_data.is_empty () || !base_meta_data.contains ("IID")) {
-            GLib.debug (lc_plugin) << "Plugin doesn't exist" << loader.filename ();
+            GLib.debug ("Plugin doesn't exist" + loader.filename ();
             return false;
         }
         if (base_meta_data["IID"].to_string () != "org.owncloud.PluginFactory") {
-            GLib.warn (lc_plugin) << "Plugin has wrong IID" << loader.filename () << base_meta_data["IID"];
+            GLib.warn ("Plugin has wrong IID" + loader.filename () + base_meta_data["IID"];
             return false;
         }
 
         const var metadata = base_meta_data["MetaData"].to_object ();
         if (metadata["type"].to_string () != "vfs") {
-            GLib.warn (lc_plugin) << "Plugin has wrong type" << loader.filename () << metadata["type"];
+            GLib.warn ("Plugin has wrong type" + loader.filename () + metadata["type"];
             return false;
         }
         if (metadata["version"].to_string () != MIRALL_VERSION_STRING) {
-            GLib.warn (lc_plugin) << "Plugin has wrong version" << loader.filename () << metadata["version"];
+            GLib.warn ("Plugin has wrong version" + loader.filename () + metadata["version"];
             return false;
         }
 
         // Attempting to load the plugin is essential as it could have dependencies that
         // can't be resolved and thus not be available after all.
-        if (!loader.on_load ()) {
-            GLib.warn (lc_plugin) << "Plugin failed to load:" << loader.error_string ();
+        if (!loader.on_signal_load ()) {
+            GLib.warn ("Plugin failed to load:" + loader.error_string ();
             return false;
         }
 
@@ -237,30 +237,30 @@ class VfsOff : Vfs {
         const var plugin_path = plugin_filename ("vfs", name);
 
         if (!is_vfs_plugin_available (mode)) {
-            q_c_critical (lc_plugin) << "Could not load plugin : not existant or bad metadata" << plugin_path;
+            q_c_critical ("Could not load plugin : not existant or bad metadata" + plugin_path;
             return null;
         }
 
         QPluginLoader loader (plugin_path);
         var plugin = loader.instance ();
         if (!plugin) {
-            q_c_critical (lc_plugin) << "Could not load plugin" << plugin_path << loader.error_string ();
+            q_c_critical ("Could not load plugin" + plugin_path + loader.error_string ();
             return null;
         }
 
         var factory = qobject_cast<PluginFactory> (plugin);
         if (!factory) {
-            q_c_critical (lc_plugin) << "Plugin" << loader.filename () << "does not implement PluginFactory";
+            q_c_critical ("Plugin" + loader.filename ("does not implement PluginFactory";
             return null;
         }
 
         var vfs = std.unique_ptr<Vfs> (qobject_cast<Vfs> (factory.create (null)));
         if (!vfs) {
-            q_c_critical (lc_plugin) << "Plugin" << loader.filename () << "does not create a Vfs instance";
+            q_c_critical ("Plugin" + loader.filename ("does not create a Vfs instance";
             return null;
         }
 
-        GLib.info (lc_plugin) << "Created VFS instance from plugin" << plugin_path;
+        GLib.info ("Created VFS instance from plugin" + plugin_path;
         return vfs;
     }
 

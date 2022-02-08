@@ -29,13 +29,13 @@ class IconJob : GLib.Object {
         request.attribute (Soup.Request.FollowRedirectsAttribute, true);
     #endif
         const var reply = account.send_raw_request (QByteArrayLiteral ("GET"), url, request);
-        connect (reply, &Soup.Reply.on_finished, this, &IconJob.on_finished);
+        connect (reply, &Soup.Reply.on_signal_finished, this, &IconJob.on_signal_finished);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_finished () {
+    private void on_signal_finished () {
         const var reply = qobject_cast<Soup.Reply> (sender ());
         if (!reply) {
             return;

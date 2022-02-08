@@ -18,8 +18,8 @@ class HttpServer : QTcpServer {
 
     /***********************************************************
     ***********************************************************/
-    private void on_read_client ();
-    private void on_discard_client ();
+    private void on_signal_read_client ();
+    private void on_signal_discard_client ();
 }
 
 
@@ -46,18 +46,18 @@ HttpServer.HttpServer (uint16 port, GLib.Object parent)
     listen (QHostAddress.Any, port);
 }
 
-void HttpServer.on_read_client () {
+void HttpServer.on_signal_read_client () {
     QTcpSocket* socket = (QTcpSocket*)sender ();
     if (socket.canReadLine ()) {
         string[] tokens = string (socket.readLine ()).split (QRegularExpression ("[ \r\n][ \r\n]*"));
         if (tokens[0] == "GET") {
             QTextStream os (socket);
             os.setAutoDetectUnicode (true);
-            os << "HTTP/1.0 200 Ok\r\n"
+            os + "HTTP/1.0 200 Ok\r\n"
                 "Content-Type : text/html; charset=\"utf-8\"\r\n"
                 "\r\n"
                 "<h1>Nothing to see here</h1>\n"
-                << GLib.DateTime.currentDateTimeUtc ().toString () << "\n";
+                + GLib.DateTime.currentDateTimeUtc ().toString ("\n";
             socket.close ();
 
             QtServiceBase.instance ().logMessage ("Wrote to client");
@@ -69,7 +69,7 @@ void HttpServer.on_read_client () {
         }
     }
 }
-void HttpServer.on_discard_client () {
+void HttpServer.on_signal_discard_client () {
     QTcpSocket* socket = (QTcpSocket*)sender ();
     socket.deleteLater ();
 
@@ -80,7 +80,7 @@ void HttpServer.incomingConnection (int socket) {
     if (disabled)
         return;
     QTcpSocket* s = new QTcpSocket (this);
-    connect (s, SIGNAL (readyRead ()), this, SLOT (on_read_client ()));
-    connect (s, SIGNAL (disconnected ()), this, SLOT (on_discard_client ()));
+    connect (s, SIGNAL (readyRead ()), this, SLOT (on_signal_read_client ()));
+    connect (s, SIGNAL (disconnected ()), this, SLOT (on_signal_discard_client ()));
     s.setSocketDescriptor (socket);
 }

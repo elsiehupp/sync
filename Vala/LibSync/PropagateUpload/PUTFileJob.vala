@@ -5,7 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
-//  Q_DECLARE_LOGGING_CATEGORY (lc_put_job)
+
 /***********************************************************
 @brief The PUTFile_job class
 @ingroup libsync
@@ -51,11 +51,11 @@ class PUTFile_job : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override;
+    public void on_signal_start () override;
 
     /***********************************************************
     ***********************************************************/
-    public bool on_finished () override;
+    public bool on_signal_finished () override;
 
     /***********************************************************
     ***********************************************************/
@@ -91,7 +91,7 @@ PUTFile_job.~PUTFile_job () {
     reply (null);
 }
 
-void PUTFile_job.on_start () {
+void PUTFile_job.on_signal_start () {
     Soup.Request req;
     for (GLib.HashMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = this.headers.begin (); it != this.headers.end (); ++it) {
         req.raw_header (it.key (), it.value ());
@@ -106,22 +106,22 @@ void PUTFile_job.on_start () {
     }
 
     if (reply ().error () != Soup.Reply.NoError) {
-        GLib.warn (lc_put_job) << " Network error : " << reply ().error_string ();
+        GLib.warn (" Network error : " + reply ().error_string ();
     }
 
     connect (reply (), &Soup.Reply.upload_progress, this, &PUTFile_job.upload_progress);
     connect (this, &AbstractNetworkJob.network_activity, account ().data (), &Account.propagator_network_activity);
-    this.request_timer.on_start ();
-    AbstractNetworkJob.on_start ();
+    this.request_timer.on_signal_start ();
+    AbstractNetworkJob.on_signal_start ();
 }
 
-bool PUTFile_job.on_finished () {
+bool PUTFile_job.on_signal_finished () {
     this.device.close ();
 
-    GLib.info (lc_put_job) << "PUT of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
-                     << reply_status_string ()
-                     << reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
-                     << reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);
+    GLib.info ("PUT of" + reply ().request ().url ().to_string ("FINISHED WITH STATUS"
+                     + reply_status_string ()
+                     + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
+                     + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);
 
     /* emit */ finished_signal ();
     return true;

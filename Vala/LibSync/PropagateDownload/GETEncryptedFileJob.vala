@@ -47,7 +47,7 @@ class GETEncryptedFileJob : GETFileJob {
         if (!this.decryptor) {
             // only initialize the decryptor once, because, according to Qt documentation, metadata might get changed during the processing of the data sometimes
             // https://doc.qt.io/qt-5/qnetworkreply.html#meta_data_changed
-            this.decryptor.on_reset (new EncryptionHelper.StreamingDecryptor (this.encrypted_file_info.encryption_key, this.encrypted_file_info.initialization_vector, this.content_length));
+            this.decryptor.on_signal_reset (new EncryptionHelper.StreamingDecryptor (this.encrypted_file_info.encryption_key, this.encrypted_file_info.initialization_vector, this.content_length));
         }
 
         if (!this.decryptor.is_initialized ()) {
@@ -72,7 +72,7 @@ class GETEncryptedFileJob : GETFileJob {
             const var decrypted_chunk = this.decryptor.chunk_decryption (this.pending_bytes.const_data (), this.pending_bytes.size ());
 
             if (decrypted_chunk.is_empty ()) {
-                q_c_critical (lc_propagate_download) << "Decryption failed!";
+                q_c_critical ("Decryption failed!";
                 return -1;
             }
 
@@ -84,7 +84,7 @@ class GETEncryptedFileJob : GETFileJob {
         const var decrypted_chunk = this.decryptor.chunk_decryption (data.const_data (), data.length ());
 
         if (decrypted_chunk.is_empty ()) {
-            q_c_critical (lc_propagate_download) << "Decryption failed!";
+            q_c_critical ("Decryption failed!";
             return -1;
         }
 

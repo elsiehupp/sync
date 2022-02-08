@@ -104,7 +104,7 @@ class SqlQuery {
 
             if (this.err_id != SQLITE_OK) {
                 this.error = string.from_utf8 (sqlite3_errmsg (this.database));
-                GLib.warn (lc_sql) << "Sqlite prepare statement error:" << this.error << "in" << this.sql;
+                GLib.warn ("Sqlite prepare statement error:" + this.error + "in" + this.sql;
                 ENFORCE (allow_failure, "SQLITE Prepare error");
             } else {
                 //  ASSERT (this.stmt);
@@ -192,10 +192,10 @@ class SqlQuery {
     /***********************************************************
     ***********************************************************/
     public bool exec () {
-        GLib.debug (lc_sql) << "SQL exec" << this.sql;
+        GLib.debug ("SQL exec" + this.sql;
 
         if (!this.stmt) {
-            GLib.warn (lc_sql) << "Can't exec query, statement unprepared.";
+            GLib.warn ("Can't exec query, statement unprepared.";
             return false;
         }
 
@@ -217,15 +217,15 @@ class SqlQuery {
 
             if (this.err_id != SQLITE_DONE && this.err_id != SQLITE_ROW) {
                 this.error = string.from_utf8 (sqlite3_errmsg (this.database));
-                GLib.warn (lc_sql) << "Sqlite exec statement error:" << this.err_id << this.error << "in" << this.sql;
+                GLib.warn ("Sqlite exec statement error:" + this.err_id + this.error + "in" + this.sql;
                 if (this.err_id == SQLITE_IOERR) {
-                    GLib.warn (lc_sql) << "IOERR extended errcode : " << sqlite3_extended_errcode (this.database);
+                    GLib.warn ("IOERR extended errcode : " + sqlite3_extended_errcode (this.database);
     #if SQLITE_VERSION_NUMBER >= 3012000
-                    GLib.warn (lc_sql) << "IOERR system errno : " << sqlite3_system_errno (this.database);
+                    GLib.warn ("IOERR system errno : " + sqlite3_system_errno (this.database);
     #endif
                 }
             } else {
-                GLib.debug (lc_sql) << "Last exec affected" << num_rows_affected () << "rows.";
+                GLib.debug ("Last exec affected" + num_rows_affected ("rows.";
             }
             return (this.err_id == SQLITE_DONE); // either SQLITE_ROW or SQLITE_DONE
         }
@@ -264,7 +264,7 @@ class SqlQuery {
         result.has_data = this.err_id == SQLITE_ROW;
         if (!result.ok) {
             this.error = string.from_utf8 (sqlite3_errmsg (this.database));
-            GLib.warn (lc_sql) << "Sqlite step statement error:" << this.err_id << this.error << "in" << this.sql;
+            GLib.warn ("Sqlite step statement error:" + this.err_id + this.error + "in" + this.sql;
         }
 
         return result;
@@ -275,7 +275,7 @@ class SqlQuery {
     ***********************************************************/
     public template<class T, typename std.enable_if<std.is_enum<T>.value, int>.type = 0>
     public void bind_value (int pos, T value) {
-        GLib.debug (lc_sql) << "SQL bind" << pos << value;
+        GLib.debug ("SQL bind" + pos + value;
         bind_value_internal (pos, static_cast<int> (value));
     }
 
@@ -284,7 +284,7 @@ class SqlQuery {
     ***********************************************************/
     public template<class T, typename std.enable_if<!std.is_enum<T>.value, int>.type = 0>
     public void bind_value (int pos, T value) {
-        GLib.debug (lc_sql) << "SQL bind" << pos << value;
+        GLib.debug ("SQL bind" + pos + value;
         bind_value_internal (pos, value);
     }
 
@@ -292,7 +292,7 @@ class SqlQuery {
     /***********************************************************
     ***********************************************************/
     public void bind_value (int pos, GLib.ByteArray value) {
-        GLib.debug (lc_sql) << "SQL bind" << pos << string.from_utf8 (value);
+        GLib.debug ("SQL bind" + pos + string.from_utf8 (value);
         bind_value_internal (pos, value);
     }
 
@@ -382,7 +382,7 @@ class SqlQuery {
         }
         }
         if (res != SQLITE_OK) {
-            GLib.warn (lc_sql) << "ERROR binding SQL value:" << value << "error:" << res;
+            GLib.warn ("ERROR binding SQL value:" + value + "error:" + res;
         }
         //  ASSERT (res == SQLITE_OK);
     }

@@ -42,7 +42,7 @@ class Selective_sync_tree_view_item : QTree_widget_item {
     private bool operator< (QTree_widget_item other) override {
         int column = tree_widget ().sort_column ();
         if (column == 1) {
-            return data (1, Qt.User_role).to_long_long () < other.data (1, Qt.User_role).to_long_long ();
+            return data (1, Qt.USER_ROLE).to_long_long () < other.data (1, Qt.USER_ROLE).to_long_long ();
         }
         return QTree_widget_item.operator< (other);
     }

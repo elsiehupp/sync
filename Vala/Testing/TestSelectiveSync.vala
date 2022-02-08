@@ -25,7 +25,7 @@ class TestSelectiveSync : GLib.Object {
             // Record what path we are querying for the size
             if (req.attribute (QNetworkRequest.CustomVerbAttribute) == "PROPFIND") {
                 if (device.readAll ().contains ("<size "))
-                    sizeRequests << req.url ().path ();
+                    sizeRequests + req.url ().path ();
             }
             return null;
         });
@@ -72,7 +72,7 @@ class TestSelectiveSync : GLib.Object {
 
         // Simulate that we accept all files by seting a wildcard allow list
         fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
-            string[] () << QLatin1String ("/"));
+            string[] () + QLatin1String ("/"));
         fakeFolder.syncEngine ().journal ().schedulePathForRemoteDiscovery (string ("A/newBigDir"));
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (newBigFolder.count (), 0);

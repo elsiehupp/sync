@@ -16,7 +16,7 @@ This does not* delete files, it does a http request.
 ***********************************************************/
 class DeleteApiJob : AbstractNetworkJob {
 
-    signal void result (int http_code);
+    signal void signal_result (int http_code);
 
     /***********************************************************
     ***********************************************************/
@@ -27,33 +27,33 @@ class DeleteApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         Soup.Request req;
         req.raw_header ("OCS-APIREQUEST", "true");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         send_request ("DELETE", url, req);
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private bool on_finished () {
-        GLib.info (lc_json_api_job) << "JsonApiJob of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                            << reply ().error ()
-                            << (reply ().error () == Soup.Reply.NoError ? QLatin1String ("") : error_string ());
+    private bool on_signal_finished () {
+        GLib.info ("JsonApiJob of" + reply ().request ().url ("FINISHED WITH STATUS"
+                            + reply ().error ()
+                            + (reply ().error () == Soup.Reply.NoError ? QLatin1String ("") : error_string ());
 
         int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warn (lc_json_api_job) << "Network error : " << path () << error_string () << http_status;
-            /* emit */ result (http_status);
+            GLib.warn ("Network error : " + path () + error_string () + http_status;
+            /* emit */ signal_result (http_status);
             return true;
         }
 
         const var reply_data = string.from_utf8 (reply ().read_all ());
-        GLib.info (lc_json_api_job ()) << "TMX Delete Job" << reply_data;
-        /* emit */ result (http_status);
+        GLib.info ()) + "TMX Delete Job" + reply_data;
+        /* emit */ signal_result (http_status);
         return true;
     }
 

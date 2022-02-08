@@ -15,11 +15,10 @@ class FakePutReply : FakeReply {
     ***********************************************************/
     public static FileInfo perform (FileInfo remoteRootFileInfo, QNetworkRequest request, GLib.ByteArray putPayload);
 
-    //  Q_INVOKABLE
     public virtual void respond ();
 
     /***********************************************************
     ***********************************************************/
-    public void on_abort () override;
+    public void on_signal_abort () override;
     public int64 readData (char *, int64) override { return 0; }
 };

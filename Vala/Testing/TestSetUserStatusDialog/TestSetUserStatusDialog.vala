@@ -110,7 +110,7 @@ class TestSetUserStatusDialog : GLib.Object {
     private on_ void testSetUserStatus_setCustomMessage_userStatusSetCorrect () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
-        QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.on_finished);
+        QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.on_signal_finished);
 
         const string userStatusMessage ("Some status");
         const string userStatusIcon ("❤");
@@ -143,7 +143,7 @@ class TestSetUserStatusDialog : GLib.Object {
         fakeUserStatusJob.setFakePredefinedStatuses (createFakePredefinedStatuses (createDateTime ()));
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         model.setPredefinedStatus (0);
-        QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.on_finished);
+        QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.on_signal_finished);
 
         const string userStatusMessage ("Some status");
         const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.Online);
@@ -173,7 +173,7 @@ class TestSetUserStatusDialog : GLib.Object {
         fakeUserStatusJob.setFakePredefinedStatuses (createFakePredefinedStatuses (createDateTime ()));
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         model.setPredefinedStatus (0);
-        QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.on_finished);
+        QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.on_signal_finished);
 
         const string userStatusIcon ("❤");
         const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.Online);

@@ -74,7 +74,7 @@ class NavigationPaneHelper : GLib.Object {
     void NavigationPaneHelper.schedule_update_cloud_storage_registry () {
         // Schedule the update to happen a bit later to avoid doing the update multiple times in a row.
         if (!this.update_cloud_storage_registry_timer.is_active ())
-            this.update_cloud_storage_registry_timer.on_start (500);
+            this.update_cloud_storage_registry_timer.on_signal_start (500);
     }
 
     void NavigationPaneHelper.update_cloud_storage_registry () {
@@ -104,7 +104,7 @@ class NavigationPaneHelper : GLib.Object {
                     string icon_path = QDir.to_native_separators (Gtk.Application.application_file_path ());
                     string target_folder_path = QDir.to_native_separators (folder.clean_path ());
 
-                    GLib.info (lc_nav_pane) << "Explorer Cloud storage provider : saving path" << target_folder_path << "to CLSID" << clsid_str;
+                    GLib.info ("Explorer Cloud storage provider : saving path" + target_folder_path + "to CLSID" + clsid_str;
 
                     // This code path should only occur on Windows (the config will be false, and the checkbox invisible on other platforms).
                     // Add runtime checks rather than #ifdefing out the whole code to help catch breakages when developing on other platforms.
@@ -122,7 +122,7 @@ class NavigationPaneHelper : GLib.Object {
             string clsid_path_wow64 = "" % R" (Software\Classes\Wow6432Node\CLSID\)" % clsid_str;
             string namespace_path = "" % R" (Software\Microsoft\Windows\Current_version\Explorer\Desktop\Name_space\)" % clsid_str;
 
-            GLib.info (lc_nav_pane) << "Explorer Cloud storage provider : now unused, removing own CLSID" << clsid_str;
+            GLib.info ("Explorer Cloud storage provider : now unused, removing own CLSID" + clsid_str;
         }
     }
 

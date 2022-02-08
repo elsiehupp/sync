@@ -18,7 +18,7 @@ class CleanupPollsJob : GLib.Object {
     string local_path;
     unowned Vfs vfs;
 
-    signal void on_finished ();
+    signal void on_signal_finished ();
     signal void aborted (string error);
 
     /***********************************************************
@@ -37,10 +37,10 @@ class CleanupPollsJob : GLib.Object {
 
 
     /***********************************************************
-    Start the job.  After the job is completed, it will emit either on_finished or aborted, and it
+    Start the job.  After the job is completed, it will emit either on_signal_finished or aborted, and it
     will destroy itself.
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         if (this.poll_infos.empty ()) {
             /* emit */ finished ();
             delete_later ();
@@ -54,14 +54,14 @@ class CleanupPollsJob : GLib.Object {
         item.modtime = info.modtime;
         item.size = info.file_size;
         var job = new PollJob (this.account, info.url, item, this.journal, this.local_path, this);
-        connect (job, &PollJob.finished_signal, this, &CleanupPollsJob.on_poll_finished);
-        job.on_start ();
+        connect (job, &PollJob.finished_signal, this, &CleanupPollsJob.on_signal_poll_finished);
+        job.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_poll_finished () {
+    private void on_signal_poll_finished () {
         var job = qobject_cast<PollJob> (sender ());
         //  ASSERT (job);
         if (job.item.status == SyncFileItem.Status.FATAL_ERROR) {
@@ -69,10 +69,10 @@ class CleanupPollsJob : GLib.Object {
             delete_later ();
             return;
         } else if (job.item.status != SyncFileItem.Status.SUCCESS) {
-            GLib.warn (lc_cleanup_polls) << "There was an error with file " << job.item.file << job.item.error_string;
+            GLib.warn ("There was an error with file " + job.item.file + job.item.error_string;
         } else {
             if (!OwncloudPropagator.static_update_metadata (*job.item, this.local_path, this.vfs.data (), this.journal)) {
-                GLib.warn (lc_cleanup_polls) << "database error";
+                GLib.warn ("database error";
                 job.item.status = SyncFileItem.Status.FATAL_ERROR;
                 job.item.error_string = _("Error writing metadata to the database");
                 /* emit */ aborted (job.item.error_string);
@@ -82,7 +82,7 @@ class CleanupPollsJob : GLib.Object {
             this.journal.upload_info (job.item.file, SyncJournalDb.UploadInfo ());
         }
         // Continue with the next entry, or finish
-        on_start ();
+        on_signal_start ();
     }
 
 } // namespace Occ

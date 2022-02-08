@@ -71,11 +71,11 @@ class TestAsyncOp : GLib.Object {
             return null;
         });
 
-        // Callback to be used to on_finalize the transaction and return the on_success
+        // Callback to be used to on_signal_finalize the transaction and return the on_signal_success
         var successCallback = [] (TestCase tc, QNetworkRequest request) {
-            tc.pollRequest = [] (TestCase *, QNetworkRequest &) . Soup.Reply * { std.on_abort (); }; // shall no longer be called
+            tc.pollRequest = [] (TestCase *, QNetworkRequest &) . Soup.Reply * { std.on_signal_abort (); }; // shall no longer be called
             FileInfo info = tc.perform ();
-            GLib.ByteArray body = R" ({ "status":"on_finished", "ETag":"\")" + info.etag + R" (\"", "fileId":")" + info.fileId + "\"}\n";
+            GLib.ByteArray body = R" ({ "status":"on_signal_finished", "ETag":"\")" + info.etag + R" (\"", "fileId":")" + info.fileId + "\"}\n";
             return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, null);
         }
         // Callback that never finishes
@@ -85,7 +85,7 @@ class TestAsyncOp : GLib.Object {
         }
         // Callback that simulate an error.
         var errorCallback = [] (TestCase tc, QNetworkRequest request) {
-            tc.pollRequest = [] (TestCase *, QNetworkRequest &) . Soup.Reply * { std.on_abort (); }; // shall no longer be called;
+            tc.pollRequest = [] (TestCase *, QNetworkRequest &) . Soup.Reply * { std.on_signal_abort (); }; // shall no longer be called;
             GLib.ByteArray body = "{\"status\":\"error\",\"errorCode\":500,\"errorMessage\":\"TestingErrors\"}\n";
             return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, null);
         }
@@ -105,12 +105,12 @@ class TestAsyncOp : GLib.Object {
             fakeFolder.localModifier ().insert (file, size);
             testCases[file] = { std.move (cb) };
         }
-        fakeFolder.localModifier ().mkdir ("on_success");
-        insertFile ("on_success/chunked_success", options.maxChunkSize * 3, successCallback);
-        insertFile ("on_success/single_success", 300, successCallback);
-        insertFile ("on_success/chunked_patience", options.maxChunkSize * 3,
+        fakeFolder.localModifier ().mkdir ("on_signal_success");
+        insertFile ("on_signal_success/chunked_success", options.maxChunkSize * 3, successCallback);
+        insertFile ("on_signal_success/single_success", 300, successCallback);
+        insertFile ("on_signal_success/chunked_patience", options.maxChunkSize * 3,
             waitAndChain (waitAndChain (successCallback)));
-        insertFile ("on_success/single_patience", 300,
+        insertFile ("on_signal_success/single_patience", 300,
             waitAndChain (waitAndChain (successCallback)));
         fakeFolder.localModifier ().mkdir ("err");
         insertFile ("err/chunked_error", options.maxChunkSize * 3, errorCallback);
@@ -119,11 +119,11 @@ class TestAsyncOp : GLib.Object {
         insertFile ("err/single_error2", 300, waitAndChain (errorCallback));
 
         // First sync should finish by itself.
-        // All the things in "on_success/" should be transfered, the things in "err/" not
+        // All the things in "on_signal_success/" should be transfered, the things in "err/" not
         QVERIFY (!fakeFolder.syncOnce ());
         QCOMPARE (nGET, 0);
-        QCOMPARE (*fakeFolder.currentLocalState ().find ("on_success"),
-            *fakeFolder.currentRemoteState ().find ("on_success"));
+        QCOMPARE (*fakeFolder.currentLocalState ().find ("on_signal_success"),
+            *fakeFolder.currentRemoteState ().find ("on_signal_success"));
         testCases.clear ();
         testCases["err/chunked_error"] = { successCallback };
         testCases["err/chunked_error2"] = { successCallback };
@@ -135,7 +135,7 @@ class TestAsyncOp : GLib.Object {
         insertFile ("waiting/willNotConflict", 300, waitForeverCallback);
         insertFile ("waiting/big", options.maxChunkSize * 3,
             waitAndChain (waitAndChain ([&] (TestCase tc, QNetworkRequest request) {
-                QTimer.singleShot (0, fakeFolder.syncEngine (), &SyncEngine.on_abort);
+                QTimer.singleShot (0, fakeFolder.syncEngine (), &SyncEngine.on_signal_abort);
                 return waitAndChain (waitForeverCallback) (tc, request);
             })));
 

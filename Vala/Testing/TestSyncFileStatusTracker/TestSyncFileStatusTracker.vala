@@ -287,7 +287,7 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("B/b0"), SyncFileStatus (SyncFileStatus.StatusError));
         statusSpy.clear ();
 
-        // Remove the error and on_start a second sync, the blocklist should kick in
+        // Remove the error and on_signal_start a second sync, the blocklist should kick in
         fakeFolder.serverErrorPaths ().clear ();
         fakeFolder.scheduleSync ();
         fakeFolder.execUntilBeforePropagation ();

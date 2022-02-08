@@ -35,7 +35,7 @@ class FakeSearchResultsStorage { {lass Provider {
     public static FakeSearchResultsStorage instance () {
         if (!this.instance) {
             this.instance = new FakeSearchResultsStorage ();
-            this.instance.on_init ();
+            this.instance.on_signal_init ();
         }
 
         return this.instance;
@@ -54,7 +54,7 @@ class FakeSearchResultsStorage { {lass Provider {
 
     /***********************************************************
     ***********************************************************/
-    public void on_init () {
+    public void on_signal_init () {
         if (!this.searchResultsData.isEmpty ()) {
             return;
         }
@@ -82,7 +82,7 @@ class FakeSearchResultsStorage { {lass Provider {
             QJsonDocument.fromVariant (QVariantMap{{QStringLiteral ("ocs"), ocsMap}}).toJson (QJsonDocument.Compact);
     }
 
-    // on_init the map of fake search results for each provider
+    // on_signal_init the map of fake search results for each provider
     public void initSearchResultsData () {
         for (var fakeProvider : fakeProvidersInitInfo) {
             var providerData = this.searchResultsData[fakeProvider.id];

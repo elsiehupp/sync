@@ -14,7 +14,7 @@ To be
 this.job = new StorePrivateKeyApiJob
 this.job.private_key
 connect (this.job.
-this.job.on_start
+this.job.on_signal_start
 \encode
 
 @ingroup libsync
@@ -28,22 +28,22 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     @brief csr - the CSR with the public key.
-    This function needs to be called before on_start () obviously.
+    This function needs to be called before on_signal_start () obviously.
     ***********************************************************/
     public void private_key (GLib.ByteArray private_key);
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override;
+    public void on_signal_start () override;
 
-    protected bool on_finished () override;
+    protected bool on_signal_finished () override;
 
 
     /***********************************************************
     @brief json_received - signal to report the json answer from ocs
     @param json - the parsed json document
-    @param status_code - the OCS status code : 100 (!) for on_success
+    @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
     signal void json_received (QJsonDocument json, int status_code);
 
@@ -64,7 +64,7 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
         this.priv_key.data (data);
     }
 
-    void StorePrivateKeyApiJob.on_start () {
+    void StorePrivateKeyApiJob.on_signal_start () {
         Soup.Request req;
         req.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
@@ -72,15 +72,15 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (query);
 
-        GLib.info (lc_store_private_key_api_job) << "Sending the private key" << this.priv_key.data ();
+        GLib.info ("Sending the private key" + this.priv_key.data ();
         send_request ("POST", url, req, this.priv_key);
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
-    bool StorePrivateKeyApiJob.on_finished () {
+    bool StorePrivateKeyApiJob.on_signal_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200)
-            GLib.info (lc_store_private_key_api_job ()) << "Sending private key ended with"  << path () << error_string () << return_code;
+            GLib.info ()) + "Sending private key ended with"  + path () + error_string () + return_code;
 
         QJsonParseError error;
         var json = QJsonDocument.from_json (reply ().read_all (), error);

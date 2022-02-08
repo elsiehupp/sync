@@ -330,7 +330,7 @@ class SyncJournalDb : GLib.Object {
     this.invalid_ etag stays in  place.
 
     The list is cleared on close () (end of sync ru
-    clear_etag_storage_filter () (on_start of sync run).
+    clear_etag_storage_filter () (on_signal_start of sync run).
 
     The contained paths have a trailing /.
     ***********************************************************/
@@ -409,7 +409,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         // Error during creation, just keep the original and throw errors later
-        GLib.warn (lc_database) << "Could not find a writable database path" << file.filename () << file.error_string ();
+        GLib.warn ("Could not find a writable database path" + file.filename () + file.error_string ());
         return journal_path;
     }
 
@@ -446,43 +446,43 @@ class SyncJournalDb : GLib.Object {
 
         if (FileSystem.file_exists (new_database_name)) {
             if (!FileSystem.remove (new_database_name, error)) {
-                GLib.warn (lc_database) << "Database migration : Could not remove database file" << new_database_name
-                                << "due to" << error;
+                GLib.warn ("Database migration : Could not remove database file" + new_database_name
+                                + "due to" + error);
                 return false;
             }
         }
         if (FileSystem.file_exists (new_database_name_wal)) {
             if (!FileSystem.remove (new_database_name_wal, error)) {
-                GLib.warn (lc_database) << "Database migration : Could not remove database WAL file" << new_database_name_wal
-                                << "due to" << error;
+                GLib.warn ("Database migration : Could not remove database WAL file" + new_database_name_wal
+                                + "due to" + error);
                 return false;
             }
         }
         if (FileSystem.file_exists (new_database_name_shm)) {
             if (!FileSystem.remove (new_database_name_shm, error)) {
-                GLib.warn (lc_database) << "Database migration : Could not remove database SHM file" << new_database_name_shm
-                                << "due to" << error;
+                GLib.warn ("Database migration : Could not remove database SHM file" + new_database_name_shm
+                                + "due to" + error);
                 return false;
             }
         }
 
         if (!FileSystem.rename (old_database_name, new_database_name, error)) {
-            GLib.warn (lc_database) << "Database migration : could not rename" << old_database_name
-                            << "to" << new_database_name << ":" << error;
+            GLib.warn ("Database migration : could not rename" + old_database_name
+                            + "to" + new_database_name + ":" + error);
             return false;
         }
         if (!FileSystem.rename (old_database_name_wal, new_database_name_wal, error)) {
-            GLib.warn (lc_database) << "Database migration : could not rename" << old_database_name_wal
-                            << "to" << new_database_name_wal << ":" << error;
+            GLib.warn ("Database migration : could not rename" + old_database_name_wal
+                            + "to" + new_database_name_wal + ":" + error);
             return false;
         }
         if (!FileSystem.rename (old_database_name_shm, new_database_name_shm, error)) {
-            GLib.warn (lc_database) << "Database migration : could not rename" << old_database_name_shm
-                            << "to" << new_database_name_shm << ":" << error;
+            GLib.warn ("Database migration : could not rename" + old_database_name_shm
+                            + "to" + new_database_name_shm + ":" + error);
             return false;
         }
 
-        GLib.info (lc_database) << "Journal successfully migrated from" << old_database_name << "to" << new_database_name;
+        GLib.info ("Journal successfully migrated from" + old_database_name + "to" + new_database_name);
         return true;
     }
 
@@ -528,7 +528,7 @@ class SyncJournalDb : GLib.Object {
             var next = query.next ();
             if (!next.ok) {
                 string err = query.error ();
-                GLib.warn (lc_database) << "No journal entry found for" << filename << "Error:" << err;
+                GLib.warn ("No journal entry found for" + filename + "Error:" + err);
                 close ();
                 return false;
             }
@@ -577,7 +577,7 @@ class SyncJournalDb : GLib.Object {
             var next = query.next ();
             if (!next.ok) {
                 string err = query.error ();
-                GLib.warn (lc_database) << "No journal entry found for mangled name" << mangled_name << "Error : " << err;
+                GLib.warn ("No journal entry found for mangled name" + mangled_name + "Error : " + err);
                 close ();
                 return false;
             }
@@ -770,7 +770,7 @@ class SyncJournalDb : GLib.Object {
             SyncJournalFileRecord record;
             fill_file_record_from_get_query (record, *query);
             if (!record.path.starts_with (path) || record.path.index_of ("/", path.size () + 1) > 0) {
-                q_warning (lc_database) << "hash collision" << path << record.path ();
+                GLib.warn ("hash collision" + path + record.path ());
                 continue;
             }
             row_callback (record);
@@ -791,19 +791,19 @@ class SyncJournalDb : GLib.Object {
             GLib.ByteArray prefix = record.path + "/";
             foreach (GLib.ByteArray it in this.etag_storage_filter) {
                 if (it.starts_with (prefix)) {
-                    GLib.info (lc_database) << "Filtered writing the etag of" << prefix << "because it is a prefix of" << it;
+                    GLib.info ("Filtered writing the etag of" + prefix + "because it is a prefix of" + it);
                     record.etag = "this.invalid_";
                     break;
                 }
             }
         }
 
-        GLib.info (lc_database)
-            << "Updating file record for path:" << record.path () << "inode:" << record.inode
-            << "modtime:" << record.modtime << "type:" << record.type
-            << "etag:" << record.etag << "file_id:" << record.file_id << "remote_perm:" << record.remote_perm.to_string ()
-            << "file_size:" << record.file_size << "checksum:" << record.checksum_header
-            << "e2e_mangled_name:" << record.e2e_mangled_name () << "is_e2e_encrypted:" << record.is_e2e_encrypted;
+        GLib.info (
+            + "Updating file record for path:" + record.path ("inode:") + record.inode
+            + "modtime:" + record.modtime + "type:" + record.type
+            + "etag:" + record.etag + "file_id:" + record.file_id + "remote_perm:" + record.remote_perm.to_string ()
+            + "file_size:" + record.file_size + "checksum:" + record.checksum_header
+            + "e2e_mangled_name:" + record.e2e_mangled_name ("is_e2e_encrypted:") + record.is_e2e_encrypted);
 
         const int64 phash = get_pHash (record.path);
         if (check_connect ()) {
@@ -859,7 +859,7 @@ class SyncJournalDb : GLib.Object {
 
             return {};
         } else {
-            GLib.warn (lc_database) << "Failed to connect database.";
+            GLib.warn ("Failed to connect database.");
             return _("Failed to connect database."); // check_connect failed.
         }
     }
@@ -914,12 +914,12 @@ class SyncJournalDb : GLib.Object {
     public void key_value_store_delete (string key) {
         PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.DeleteKeyValueStoreQuery, QByteArrayLiteral ("DELETE FROM key_value_store WHERE key=?1;"), this.database);
         if (!query) {
-            GLib.warn (lc_database) << "Failed to init_or_reset this.delete_key_value_store_query";
+            GLib.warn ("Failed to init_or_reset this.delete_key_value_store_query");
             //  Q_ASSERT (false);
         }
         query.bind_value (1, key);
         if (!query.exec ()) {
-            GLib.warn (lc_database) << "Failed to exec this.delete_key_value_store_query for key" << key;
+            GLib.warn ("Failed to exec this.delete_key_value_store_query for key" + key);
             //  Q_ASSERT (false);
         }
     }
@@ -962,7 +962,7 @@ class SyncJournalDb : GLib.Object {
             }
             return true;
         } else {
-            GLib.warn (lc_database) << "Failed to connect database.";
+            GLib.warn ("Failed to connect database.");
             return false; // check_connect failed.
         }
     }
@@ -975,11 +975,11 @@ class SyncJournalDb : GLib.Object {
         GLib.ByteArray content_checksum_type) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
-        GLib.info (lc_database) << "Updating file checksum" << filename << content_checksum << content_checksum_type;
+        GLib.info ("Updating file checksum" + filename + content_checksum + content_checksum_type);
 
         const int64 phash = get_pHash (filename.to_utf8 ());
         if (!check_connect ()) {
-            GLib.warn (lc_database) << "Failed to connect database.";
+            GLib.warn ("Failed to connect database.");
             return false;
         }
 
@@ -1007,11 +1007,11 @@ class SyncJournalDb : GLib.Object {
         int64 modtime, int64 size, uint64 inode) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
-        GLib.info (lc_database) << "Updating local metadata for:" << filename << modtime << size << inode;
+        GLib.info ("Updating local metadata for:" + filename + modtime + size + inode);
 
         const int64 phash = get_pHash (filename.to_utf8 ());
         if (!check_connect ()) {
-            GLib.warn (lc_database) << "Failed to connect database.";
+            GLib.warn ("Failed to connect database.");
             return false;
         }
 
@@ -1088,11 +1088,11 @@ class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public void wal_checkpoint () {
         QElapsedTimer t;
-        t.on_start ();
+        t.on_signal_start ();
         SqlQuery pragma1 = new SqlQuery (this.database);
         pragma1.prepare ("PRAGMA wal_checkpoint (FULL);");
         if (pragma1.exec ()) {
-            GLib.debug (lc_database) << "took" << t.elapsed () << "msec";
+            GLib.debug ("took" + t.elapsed ("msec"));
         }
     }
 
@@ -1117,13 +1117,13 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void error_blocklist_entry (SyncJournalErrorBlocklistRecord item) {
+    public void error_blocklist_entry_for_item (SyncJournalErrorBlocklistRecord item) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
-        GLib.info (lc_database) << "Setting blocklist entry for" << item.file << item.retry_count
-                    << item.error_string << item.last_try_time << item.ignore_duration
-                    << item.last_try_modtime << item.last_try_etag << item.rename_target
-                    << item.error_category;
+        GLib.info ("Setting blocklist entry for" + item.file + item.retry_count
+                    + item.error_string + item.last_try_time + item.ignore_duration
+                    + item.last_try_modtime + item.last_try_etag + item.rename_target
+                    + item.error_category);
 
         if (!check_connect ()) {
             return;
@@ -1210,7 +1210,7 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public int on_error_block_list_entry_count () {
+    public int on_signal_error_block_list_entry_count () {
         int re = 0;
 
         QMutexLocker locker = new QMutexLocker (this.mutex);
@@ -1341,7 +1341,7 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public int on_download_info_count () {
+    public int on_signal_download_info_count () {
         int re = 0;
 
         QMutexLocker locker = new QMutexLocker (this.mutex);
@@ -1474,7 +1474,7 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public SyncJournalErrorBlocklistRecord error_blocklist_entry (string file) {
+    public SyncJournalErrorBlocklistRecord error_blocklist_entry_for_file (string file) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         SyncJournalErrorBlocklistRecord entry;
 
@@ -1549,14 +1549,14 @@ class SyncJournalDb : GLib.Object {
     }
 
 
-    //  public void avoid_renames_on_next_sync (string path) {
-    //      avoid_renames_on_next_sync (path.to_utf8 ());
+    //  public void avoid_renames_on_signal_next_sync (string path) {
+    //      avoid_renames_on_signal_next_sync (path.to_utf8 ());
     //  }
 
 
     /***********************************************************
     ***********************************************************/
-    public void avoid_renames_on_next_sync (GLib.ByteArray path) {
+    public void avoid_renames_on_signal_next_sync (GLib.ByteArray path) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
         if (!check_connect ()) {
@@ -1583,7 +1583,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (info.url.is_empty ()) {
-            GLib.debug (lc_database) << "Deleting Poll job" << info.file;
+            GLib.debug ("Deleting Poll job" + info.file);
             SqlQuery query = new SqlQuery ("DELETE FROM async_poll WHERE path=?", this.database);
             query.bind_value (1, info.file);
             query.exec ();
@@ -1709,7 +1709,7 @@ class SyncJournalDb : GLib.Object {
         SqlQuery del_query = new SqlQuery ("DELETE FROM selectivesync WHERE type == ?1", this.database);
         del_query.bind_value (1, int (type));
         if (!del_query.exec ()) {
-            GLib.warn (lc_database) << "SQL error when deleting selective sync list" << list << del_query.error ();
+            GLib.warn ("SQL error when deleting selective sync list" + list + del_query.error ());
         }
 
         SqlQuery ins_query = new SqlQuery ("INSERT INTO selectivesync VALUES (?1, ?2)", this.database);
@@ -1718,7 +1718,7 @@ class SyncJournalDb : GLib.Object {
             ins_query.bind_value (1, path);
             ins_query.bind_value (2, int (type));
             if (!ins_query.exec ()) {
-                GLib.warn (lc_database) << "SQL error when inserting into selective sync" << type << path << del_query.error ();
+                GLib.warn ("SQL error when inserting into selective sync" + type + path + del_query.error ());
             }
         }
 
@@ -1851,7 +1851,7 @@ class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public void close () {
         QMutexLocker locker = new QMutexLocker (this.mutex);
-        GLib.info (lc_database) << "Closing DB" << this.database_file;
+        GLib.info ("Closing DB" + this.database_file);
 
         commit_transaction ();
 
@@ -1881,7 +1881,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (!query.next ().has_data) {
-            GLib.warn (lc_database) << "No checksum type mapping found for" << checksum_type_id;
+            GLib.warn ("No checksum type mapping found for" + checksum_type_id);
             return GLib.ByteArray ();
         }
         return query.byte_array_value (0);
@@ -1891,47 +1891,44 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     The data-fingerprint used to detect backup
     ***********************************************************/
-    void data_fingerprint (GLib.ByteArray data_fingerprint) {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
-        if (!check_connect ()) {
-            return;
+    GLib.ByteArray data_fingerprint {
+        set {
+            QMutexLocker locker = new QMutexLocker (this.mutex);
+            if (!check_connect ()) {
+                return;
+            }
+
+            PreparedSqlQuery data_fingerprint_query1 = this.query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query1, QByteArrayLiteral ("DELETE FROM datafingerprint;"), this.database);
+            PreparedSqlQuery data_fingerprint_query2 = this.query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query2, QByteArrayLiteral ("INSERT INTO datafingerprint (fingerprint) VALUES (?1);"), this.database);
+            if (!data_fingerprint_query1 || !data_fingerprint_query2) {
+                return;
+            }
+
+            data_fingerprint_query1.exec ();
+
+            data_fingerprint_query2.bind_value (1, value);
+            data_fingerprint_query2.exec ();
         }
+        get {
+            QMutexLocker locker = new QMutexLocker (this.mutex);
+            if (!check_connect ()) {
+                return GLib.ByteArray ();
+            }
 
-        PreparedSqlQuery data_fingerprint_query1 = this.query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query1, QByteArrayLiteral ("DELETE FROM datafingerprint;"), this.database);
-        PreparedSqlQuery data_fingerprint_query2 = this.query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query2, QByteArrayLiteral ("INSERT INTO datafingerprint (fingerprint) VALUES (?1);"), this.database);
-        if (!data_fingerprint_query1 || !data_fingerprint_query2) {
-            return;
+            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Get_data_fingerprint_query, QByteArrayLiteral ("SELECT fingerprint FROM datafingerprint"), this.database);
+            if (!query) {
+                return GLib.ByteArray ();
+            }
+
+            if (!query.exec ()) {
+                return GLib.ByteArray ();
+            }
+
+            if (!query.next ().has_data) {
+                return GLib.ByteArray ();
+            }
+            return query.byte_array_value (0);
         }
-
-        data_fingerprint_query1.exec ();
-
-        data_fingerprint_query2.bind_value (1, data_fingerprint);
-        data_fingerprint_query2.exec ();
-    }
-
-
-    /***********************************************************
-    The data-fingerprint used to detect backup
-    ***********************************************************/
-    GLib.ByteArray data_fingerprint () {
-        QMutexLocker locker = new QMutexLocker (this.mutex);
-        if (!check_connect ()) {
-            return GLib.ByteArray ();
-        }
-
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Get_data_fingerprint_query, QByteArrayLiteral ("SELECT fingerprint FROM datafingerprint"), this.database);
-        if (!query) {
-            return GLib.ByteArray ();
-        }
-
-        if (!query.exec ()) {
-            return GLib.ByteArray ();
-        }
-
-        if (!query.next ().has_data) {
-            return GLib.ByteArray ();
-        }
-        return query.byte_array_value (0);
     }
 
 
@@ -1942,7 +1939,7 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     Store a new or updated record in the database
     ***********************************************************/
-    public void conflict_record (ConflictRecord record) {
+    public void store_conflict_record (ConflictRecord record) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         if (!check_connect ())
             return;
@@ -1966,7 +1963,7 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     Retrieve a conflict record by path of the file with the conflict tag
     ***********************************************************/
-    public ConflictRecord conflict_record (GLib.ByteArray path) {
+    public ConflictRecord conflict_record_for_path (GLib.ByteArray path) {
         ConflictRecord entry;
 
         QMutexLocker locker = new QMutexLocker (this.mutex);
@@ -2133,7 +2130,7 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void commit_internal (string context, bool start_trans) {
-        GLib.debug (lc_database) << "Transaction commit" << context << (start_trans ? "and starting new transaction" : "");
+        GLib.debug ("Transaction commit" + context + (start_trans ? "and starting new transaction" : ""));
         commit_transaction ();
 
         if (start_trans) {
@@ -2166,7 +2163,7 @@ class SyncJournalDb : GLib.Object {
         while (query.next ().has_data) {
             columns.append (query.byte_array_value (1));
         }
-        GLib.debug (lc_database) << "Columns in the current journal:" << columns;
+        GLib.debug ("Columns in the current journal:" + columns);
         return columns;
     }
 
@@ -2403,7 +2400,7 @@ class SyncJournalDb : GLib.Object {
     ***********************************************************/
     private bool sql_fail (string log, SqlQuery query) {
         commit_transaction ();
-        GLib.warn (lc_database) << "SQL Error" << log << query.error ();
+        GLib.warn ("SQL Error" + log + query.error ());
         this.database.close ();
         //  ASSERT (false);
         return false;
@@ -2415,12 +2412,12 @@ class SyncJournalDb : GLib.Object {
     private void start_transaction () {
         if (this.transaction == 0) {
             if (!this.database.transaction ()) {
-                GLib.warn (lc_database) << "ERROR starting transaction:" << this.database.error ();
+                GLib.warn ("ERROR starting transaction:" + this.database.error ());
                 return;
             }
             this.transaction = 1;
         } else {
-            GLib.debug (lc_database) << "Database Transaction is running, not starting another one!";
+            GLib.debug ("Database Transaction is running, not starting another one!");
         }
     }
 
@@ -2430,12 +2427,12 @@ class SyncJournalDb : GLib.Object {
     private void commit_transaction () {
         if (this.transaction == 1) {
             if (!this.database.commit ()) {
-                GLib.warn (lc_database) << "ERROR committing to the database:" << this.database.error ();
+                GLib.warn ("ERROR committing to the database:" + this.database.error ());
                 return;
             }
             this.transaction = 0;
         } else {
-            GLib.debug (lc_database) << "No database Transaction to commit";
+            GLib.debug ("No database Transaction to commit");
         }
     }
 
@@ -2445,7 +2442,7 @@ class SyncJournalDb : GLib.Object {
     private bool check_connect () {
         if (autotest_fail_counter >= 0) {
             if (!autotest_fail_counter--) {
-                GLib.info (lc_database) << "Error Simulated";
+                GLib.info ("Error Simulated");
                 return false;
             }
         }
@@ -2454,7 +2451,7 @@ class SyncJournalDb : GLib.Object {
             // Unfortunately the sqlite is_open check can return true even when the underlying storage
             // has become unavailable - and then some operations may cause crashes. See #6049
             if (!GLib.File.exists (this.database_file)) {
-                GLib.warn (lc_database) << "Database open, but file" << this.database_file << "does not exist";
+                GLib.warn ("Database open, but file" + this.database_file + "does not exist");
                 close ();
                 return false;
             }
@@ -2462,19 +2459,19 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (this.database_file.is_empty ()) {
-            GLib.warn (lc_database) << "Database filename" << this.database_file << "is empty";
+            GLib.warn ("Database filename" + this.database_file + "is empty");
             return false;
         }
 
         // The database file is created by this call (SQLITE_OPEN_CREATE)
         if (!this.database.open_or_create_read_write (this.database_file)) {
             string error = this.database.error ();
-            GLib.warn (lc_database) << "Error opening the database:" << error;
+            GLib.warn ("Error opening the database:" + error);
             return false;
         }
 
         if (!GLib.File.exists (this.database_file)) {
-            GLib.warn (lc_database) << "Database file" << this.database_file << "does not exist";
+            GLib.warn ("Database file" + this.database_file + "does not exist");
             return false;
         }
 
@@ -2484,7 +2481,7 @@ class SyncJournalDb : GLib.Object {
             return sql_fail ("SELECT sqlite_version ()", pragma1);
         } else {
             pragma1.next ();
-            GLib.info (lc_database) << "Sqlite3 version" << pragma1.string_value (0);
+            GLib.info ("Sqlite3 version" + pragma1.string_value (0));
         }
 
         // Set locking mode to avoid issues with WAL on Windows
@@ -2496,7 +2493,7 @@ class SyncJournalDb : GLib.Object {
             return sql_fail ("Set PRAGMA locking_mode", pragma1);
         } else {
             pragma1.next ();
-            GLib.info (lc_database) << "Sqlite3 locking_mode=" << pragma1.string_value (0);
+            GLib.info ("Sqlite3 locking_mode=" + pragma1.string_value (0));
         }
 
         pragma1.prepare ("PRAGMA journal_mode=" + this.journal_mode + ";");
@@ -2504,7 +2501,7 @@ class SyncJournalDb : GLib.Object {
             return sql_fail ("Set PRAGMA journal_mode", pragma1);
         } else {
             pragma1.next ();
-            GLib.info (lc_database) << "Sqlite3 journal_mode=" << pragma1.string_value (0);
+            GLib.info ("Sqlite3 journal_mode=" + pragma1.string_value (0));
         }
 
         // For debugging purposes, allow temp_store to be set
@@ -2514,7 +2511,7 @@ class SyncJournalDb : GLib.Object {
             if (!pragma1.exec ()) {
                 return sql_fail ("Set PRAGMA temp_store", pragma1);
             }
-            GLib.info (lc_database) << "Sqlite3 with temp_store =" << env_temp_store;
+            GLib.info ("Sqlite3 with temp_store =" + env_temp_store);
         }
 
         // With WAL journal the NORMAL sync mode is safe from corruption,
@@ -2526,7 +2523,7 @@ class SyncJournalDb : GLib.Object {
         if (!pragma1.exec ()) {
             return sql_fail ("Set PRAGMA synchronous", pragma1);
         } else {
-            GLib.info (lc_database) << "Sqlite3 synchronous=" << synchronous_mode;
+            GLib.info ("Sqlite3 synchronous=" + synchronous_mode);
         }
 
         pragma1.prepare ("PRAGMA case_sensitive_like = ON;");
@@ -2593,7 +2590,7 @@ class SyncJournalDb : GLib.Object {
             if (this.journal_mode != "DELETE"
                 && create_query.error_id () == SQLITE_IOERR
                 && sqlite3_extended_errcode (this.database.sqlite_database ()) == SQLITE_IOERR_SHMMAP) {
-                GLib.warn (lc_database) << "IO error SHMMAP on table creation, attempting with DELETE journal mode";
+                GLib.warn ("IO error SHMMAP on table creation, attempting with DELETE journal mode");
                 this.journal_mode = "DELETE";
                 commit_transaction ();
                 this.database.close ();
@@ -2737,7 +2734,7 @@ class SyncJournalDb : GLib.Object {
             int patch = version_query.int_value (2);
 
             if (major == 1 && minor == 8 && (patch == 0 || patch == 1)) {
-                GLib.info (lc_database) << "possible_upgrade_from_mirall_1_8_0_or_1 detected!";
+                GLib.info ("possible_upgrade_from_mirall_1_8_0_or_1 detected!");
                 force_remote_discovery = true;
             }
 
@@ -2745,7 +2742,7 @@ class SyncJournalDb : GLib.Object {
             // local files and a remote discovery will fix them.
             // See #5190 #5242.
             if (major == 2 && minor < 3) {
-                GLib.info (lc_database) << "upgrade form client < 2.3.0 detected! forcing remote discovery";
+                GLib.info ("upgrade form client < 2.3.0 detected! forcing remote discovery");
                 force_remote_discovery = true;
             }
 
@@ -2771,7 +2768,7 @@ class SyncJournalDb : GLib.Object {
 
         bool rc = update_database_structure ();
         if (!rc) {
-            GLib.warn (lc_database) << "Failed to update the database structure!";
+            GLib.warn ("Failed to update the database structure!");
         }
 
 
@@ -2809,7 +2806,7 @@ class SyncJournalDb : GLib.Object {
             return sql_fail (QStringLiteral ("prepare this.get_error_blocklist_query"), *get_error_blocklist_query);
         }
 
-        // don't on_start a new transaction now
+        // don't on_signal_start a new transaction now
         commit_internal (QStringLiteral ("check_connect End"), false);
 
         // This avoid reading from the DB if we already know it is empty
@@ -2831,7 +2828,7 @@ class SyncJournalDb : GLib.Object {
     acquiring the lock
     ***********************************************************/
     private void force_remote_discovery_next_sync_locked () {
-        GLib.info (lc_database) << "Forcing remote re-discovery by deleting folder Etags";
+        GLib.info ("Forcing remote re-discovery by deleting folder Etags");
         SqlQuery delete_remote_folder_etags_query = new SqlQuery (this.database);
         delete_remote_folder_etags_query.prepare ("UPDATE metadata SET md5='this.invalid_' WHERE type=2;");
         delete_remote_folder_etags_query.exec ();
@@ -2876,7 +2873,7 @@ class SyncJournalDb : GLib.Object {
             }
 
             if (!query.next ().has_data) {
-                GLib.warn (lc_database) << "No checksum type mapping found for" << checksum_type;
+                GLib.warn ("No checksum type mapping found for" + checksum_type);
                 return 0;
             }
             var value = query.int_value (0);
@@ -2925,7 +2922,7 @@ class SyncJournalDb : GLib.Object {
         if (entries.is_empty ())
             return true;
 
-        GLib.debug (lc_database) << "Removing stale" << name << "entries:" << entries.join (QStringLiteral (", "));
+        GLib.debug ("Removing stale" + name + "entries:" + entries.join (", "));
         // FIXME : Was ported from exec_batch, check if correct!
         foreach (string entry in entries) {
             query.reset_and_clear_bindings ();

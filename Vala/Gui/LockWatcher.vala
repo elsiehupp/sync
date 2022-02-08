@@ -67,7 +67,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void on_check_files ();
+    private void on_signal_check_files ();
 
     /***********************************************************
     ***********************************************************/
@@ -87,29 +87,29 @@ signals:
 LockWatcher.LockWatcher (GLib.Object parent) {
     base (parent);
     connect (&this.timer, &QTimer.timeout,
-        this, &LockWatcher.on_check_files);
-    this.timer.on_start (check_frequency);
+        this, &LockWatcher.on_signal_check_files);
+    this.timer.on_signal_start (check_frequency);
 }
 
 void LockWatcher.add_file (string path) {
-    GLib.info (lc_lock_watcher) << "Watching for lock of" << path << "being released";
+    GLib.info ("Watching for lock of" + path + "being released";
     this.watched_paths.insert (path);
 }
 
 void LockWatcher.check_interval (std.chrono.milliseconds interval) {
-    this.timer.on_start (interval.count ());
+    this.timer.on_signal_start (interval.count ());
 }
 
 bool LockWatcher.contains (string path) {
     return this.watched_paths.contains (path);
 }
 
-void LockWatcher.on_check_files () {
+void LockWatcher.on_signal_check_files () {
     GLib.Set<string> unlocked;
 
     foreach (string path, this.watched_paths) {
         if (!FileSystem.is_file_locked (path)) {
-            GLib.info (lc_lock_watcher) << "Lock of" << path << "was released";
+            GLib.info ("Lock of" + path + "was released";
             /* emit */ file_unlocked (path);
             unlocked.insert (path);
         }

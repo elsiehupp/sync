@@ -50,10 +50,8 @@ namespace {
 
 namespace Occ {
 
-//  Q_DECLARE_LOGGING_CATEGORY (lc_propagator)
-
 /***********************************************************
-Free disk space threshold below which syncs will on_abort and not even on_start.
+Free disk space threshold below which syncs will on_signal_abort and not even on_signal_start.
 ***********************************************************/
 int64 critical_free_space_limit ();
 
@@ -74,7 +72,7 @@ class OwncloudPropagator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public SyncJournalDb const this.journal;
-    public bool this.finished_emited; // used to ensure that on_finished is only emitted once
+    public bool this.finished_emited; // used to ensure that on_signal_finished is only emitted once
 
 
     /***********************************************************
@@ -98,7 +96,7 @@ class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start (SyncFileItemVector &&this.synced_items);
+    public void on_signal_start (SyncFileItemVector &&this.synced_items);
 
     /***********************************************************
     ***********************************************************/
@@ -245,18 +243,18 @@ class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_abort () {
+    public void on_signal_abort () {
         if (this.abort_requested)
             return;
         if (this.root_job) {
-            // Connect to abort_finished  which signals that on_abort has been asynchronously on_finished
+            // Connect to abort_finished  which signals that on_signal_abort has been asynchronously on_signal_finished
             connect (this.root_job.data (), &PropagateDirectory.abort_finished, this, &OwncloudPropagator.emit_finished);
 
-            // Use Queued Connection because we're possibly already in an item's on_finished stack
-            QMetaObject.invoke_method (this.root_job.data (), "on_abort", Qt.QueuedConnection,
+            // Use Queued Connection because we're possibly already in an item's on_signal_finished stack
+            QMetaObject.invoke_method (this.root_job.data (), "on_signal_abort", Qt.QueuedConnection,
                                       Q_ARG (PropagatorJob.AbortType, PropagatorJob.AbortType.ASYNCHRONOUS));
 
-            // Give asynchronous on_abort 5000 msec to finish on its own
+            // Give asynchronous on_signal_abort 5000 msec to finish on its own
             QTimer.single_shot (5000, this, SLOT (abort_timeout ()));
         } else {
             // No root job, call emit_finished
@@ -293,7 +291,7 @@ class OwncloudPropagator : GLib.Object {
     It also creates a new upload job in composite if the item
     moved away is a file and conflict uploads are requested.
 
-    Returns true on on_success, false and error on error.
+    Returns true on on_signal_success, false and error on error.
     ***********************************************************/
     public bool create_conflict (SyncFileItemPtr item,
         PropagatorCompositeJob composite, string error);
@@ -359,13 +357,13 @@ class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     private on_ void abort_timeout () {
         // Abort synchronously and finish
-        this.root_job.data ().on_abort (PropagatorJob.AbortType.SYNCHRONOUS);
+        this.root_job.data ().on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
         emit_finished (SyncFileItem.Status.NORMAL_ERROR);
     }
 
 
     /***********************************************************
-    Emit the on_finished signal and make sure it is only emitted once
+    Emit the on_signal_finished signal and make sure it is only emitted once
     ***********************************************************/
     private on_ void emit_finished (SyncFileItem.Status status) {
         if (!this.finished_emited)
@@ -382,7 +380,7 @@ signals:
     void new_item (SyncFileItemPtr &);
     void item_completed (SyncFileItemPtr &);
     void progress (SyncFileItem &, int64 bytes);
-    void on_finished (bool on_success);
+    void on_signal_finished (bool on_signal_success);
 
 
     /***********************************************************
@@ -534,11 +532,11 @@ signals:
         entry.ignore_duration = old.ignore_duration * 5;
 
         if (item.http_error_code == 403) {
-            GLib.warn (lc_propagator) << "Probably firewall error : " << item.http_error_code << ", blocklisting up to 1h only";
+            GLib.warn ("Probably firewall error : " + item.http_error_code + ", blocklisting up to 1h only";
             entry.ignore_duration = q_min (entry.ignore_duration, int64 (60 * 60));
 
         } else if (item.http_error_code == 413 || item.http_error_code == 415) {
-            GLib.warn (lc_propagator) << "Fatal Error condition" << item.http_error_code << ", maximum blocklist ignore time!";
+            GLib.warn ("Fatal Error condition" + item.http_error_code + ", maximum blocklist ignore time!";
             entry.ignore_duration = max_blocklist_time;
         }
 
@@ -590,9 +588,9 @@ signals:
         if (item.has_blocklist_entry && new_entry.ignore_duration > 0) {
             item.status = SyncFileItem.Status.BLOCKLISTED_ERROR;
 
-            GLib.info (lc_propagator) << "blocklisting " << item.file
-                                 << " for " << new_entry.ignore_duration
-                                 << ", retry count " << new_entry.retry_count;
+            GLib.info ("blocklisting " + item.file
+                                 + " for " + new_entry.ignore_duration
+                                 + ", retry count " + new_entry.retry_count;
 
             return;
         }
@@ -600,8 +598,8 @@ signals:
         // Some soft errors might become louder on repeat occurrence
         if (item.status == SyncFileItem.Status.SOFT_ERROR
             && new_entry.retry_count > 1) {
-            GLib.warn (lc_propagator) << "escalating soft error on " << item.file
-                                    << " to normal error, " << item.http_error_code;
+            GLib.warn ("escalating soft error on " + item.file
+                                    + " to normal error, " + item.http_error_code;
             item.status = SyncFileItem.Status.NORMAL_ERROR;
             return;
         }
@@ -692,7 +690,7 @@ signals:
         return small_file_size;
     }
 
-    void OwncloudPropagator.on_start (SyncFileItemVector &&items) {
+    void OwncloudPropagator.on_signal_start (SyncFileItemVector &&items) {
         //  Q_ASSERT (std.is_sorted (items.begin (), items.end ()));
 
         // This builds all the jobs needed for the propagation.
@@ -723,7 +721,7 @@ signals:
         }
 
         reset_delayed_upload_tasks ();
-        this.root_job.on_reset (new PropagateRootDirectory (this));
+        this.root_job.on_signal_reset (new PropagateRootDirectory (this));
         QStack<QPair<string /* directory name */, PropagateDirectory * /* job */>> directories;
         directories.push (q_make_pair ("", this.root_job.data ()));
         GLib.Vector<PropagatorJob> directories_to_remove;
@@ -754,8 +752,8 @@ signals:
                 } else if (item.instruction == CSYNC_INSTRUCTION_RENAME) {
                     // all is good, the rename will be executed before the directory deletion
                 } else {
-                    GLib.warn (lc_propagator) << "WARNING :  Job within a removed directory?  This should not happen!"
-                                            << item.file << item.instruction;
+                    GLib.warn ("WARNING :  Job within a removed directory?  This should not happen!"
+                                            + item.file + item.instruction;
                 }
             }
 
@@ -764,8 +762,8 @@ signals:
             // when there's a new local directory at the same time as a remote file.
             if (!maybe_conflict_directory.is_empty ()) {
                 if (item.destination ().starts_with (maybe_conflict_directory)) {
-                    GLib.info (lc_propagator) << "Skipping job inside CONFLICT directory"
-                                         << item.file << item.instruction;
+                    GLib.info ("Skipping job inside CONFLICT directory"
+                                         + item.file + item.instruction;
                     item.instruction = CSYNC_INSTRUCTION_NONE;
                     continue;
                 } else {
@@ -796,7 +794,7 @@ signals:
             this.root_job.dir_deletion_jobs.append_job (it);
         }
 
-        connect (this.root_job.data (), &PropagatorJob.on_finished, this, &OwncloudPropagator.emit_finished);
+        connect (this.root_job.data (), &PropagatorJob.on_signal_finished, this, &OwncloudPropagator.emit_finished);
 
         this.job_scheduled = false;
         schedule_next_job ();
@@ -883,7 +881,7 @@ signals:
         //  Q_ASSERT (!file.is_empty ());
 
         if (!file.is_empty () && Utility.fs_case_preserving ()) {
-            GLib.debug (lc_propagator) << "CaseClashCheck for " << file;
+            GLib.debug ("CaseClashCheck for " + file;
             // On Linux, the file system is case sensitive, but this code is useful for testing.
             // Just check that there is no other file with the same name and different casing.
             QFileInfo file_info (file);
@@ -926,13 +924,13 @@ signals:
         this.job_scheduled = false;
 
         if (this.active_job_list.count () < maximum_active_transfer_job ()) {
-            if (this.root_job.on_schedule_self_or_child ()) {
+            if (this.root_job.on_signal_schedule_self_or_child ()) {
                 schedule_next_job ();
             }
         } else if (this.active_job_list.count () < hard_maximum_active_job ()) {
             int likely_finished_quickly_count = 0;
             // Note: Only counts the first 3 jobs! Then for each
-            // one that is likely on_finished quickly, we can launch another one.
+            // one that is likely on_signal_finished quickly, we can launch another one.
             // When a job finishes another one will "move up" to be one of the first 3 and then
             // be counted too.
             for (int i = 0; i < maximum_active_transfer_job () && i < this.active_job_list.count (); i++) {
@@ -941,8 +939,8 @@ signals:
                 }
             }
             if (this.active_job_list.count () < maximum_active_transfer_job () + likely_finished_quickly_count) {
-                GLib.debug (lc_propagator) << "Can pump in another request! active_jobs =" << this.active_job_list.count ();
-                if (this.root_job.on_schedule_self_or_child ()) {
+                GLib.debug ("Can pump in another request! active_jobs =" + this.active_job_list.count ();
+                if (this.root_job.on_signal_schedule_self_or_child ()) {
                     schedule_next_job ();
                 }
             }
@@ -1007,7 +1005,7 @@ signals:
                 *error = rename_error;
             return false;
         }
-        GLib.info (lc_propagator) << "Created conflict file" << fn << "." << conflict_filename;
+        GLib.info ("Created conflict file" + fn + "." + conflict_filename;
 
         // Create a new conflict record. To get the base etag, we need to read it from the database.
         ConflictRecord conflict_record;
@@ -1084,12 +1082,12 @@ signals:
     }
 
     void OwncloudPropagator.add_to_bulk_upload_block_list (string file) {
-        GLib.debug (lc_propagator) << "block list for bulk upload" << file;
+        GLib.debug ("block list for bulk upload" + file;
         this.bulk_upload_block_list.insert (file);
     }
 
     void OwncloudPropagator.remove_from_bulk_upload_block_list (string file) {
-        GLib.debug (lc_propagator) << "block list for bulk upload" << file;
+        GLib.debug ("block list for bulk upload" + file;
         this.bulk_upload_block_list.remove (file);
     }
 
@@ -1115,7 +1113,7 @@ signals:
             ret = etag;
         }
         if (oc_etag.length () > 0 && oc_etag != etag) {
-            GLib.debug (lc_propagator) << "Quite peculiar, we have an etag != OC-Etag [no problem!]" << etag << oc_etag;
+            GLib.debug ("Quite peculiar, we have an etag != OC-Etag [no problem!]" + etag + oc_etag;
         }
         return ret;
     }

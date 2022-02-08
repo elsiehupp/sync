@@ -29,10 +29,10 @@ class CSyncChecksumHook : ComputeChecksumBase {
         if (type.is_empty ())
             return null;
 
-        GLib.info (lc_checksums) << "Computing" << type << "checksum of" << path << "in the csync hook";
-        GLib.ByteArray checksum = ComputeChecksum.compute_now_on_file (string.from_utf8 (path), type);
+        GLib.info ("Computing" + type + "checksum of" + path + "in the csync hook";
+        GLib.ByteArray checksum = ComputeChecksum.compute_now_on_signal_file (string.from_utf8 (path), type);
         if (checksum.is_null ()) {
-            GLib.warn (lc_checksums) << "Failed to compute checksum" << type << "for" << path;
+            GLib.warn ("Failed to compute checksum" + type + "for" + path;
             return null;
         }
 

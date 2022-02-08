@@ -84,8 +84,8 @@ class TestOwnSql : GLib.Object {
 
         q.exec ();
         while ( q.next ().hasData ) {
-            qDebug () << "Name : " << q.stringValue (1);
-            qDebug () << "Address : " << q.stringValue (2);
+            GLib.debug ("Name : " + q.stringValue (1);
+            GLib.debug ("Address : " + q.stringValue (2);
         }
     }
 
@@ -99,8 +99,8 @@ class TestOwnSql : GLib.Object {
         q.bindValue (1, 2);
         q.exec ();
         if ( q.next ().hasData ) {
-            qDebug () << "Name:" << q.stringValue (1);
-            qDebug () << "Address:" << q.stringValue (2);
+            GLib.debug ("Name:" + q.stringValue (1);
+            GLib.debug ("Address:" + q.stringValue (2);
         }
     }
 
@@ -112,10 +112,10 @@ class TestOwnSql : GLib.Object {
 
         SqlQuery q (this.database);
         int rc = q.prepare (sql);
-        qDebug () << "Pragma:" << rc;
+        GLib.debug ("Pragma:" + rc;
         q.exec ();
         if ( q.next ().hasData ) {
-            qDebug () << "P:" << q.stringValue (1);
+            GLib.debug ("P:" + q.stringValue (1);
         }
     }
 
@@ -162,7 +162,7 @@ class TestOwnSql : GLib.Object {
         q2.prepare ("SELECT * FROM addresses");
         SqlQuery q3 ("SELECT * FROM addresses", this.database);
         SqlQuery q4;
-        database.on_reset ();
+        database.on_signal_reset ();
     }
 
 

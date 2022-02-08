@@ -41,13 +41,13 @@ class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
         this.flow_2_auth_widget = new Flow2AuthWidget ();
         this.layout.add_widget (this.flow_2_auth_widget);
 
-        connect (this.flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &Flow2AuthCredsPage.on_flow_2_auth_result);
+        connect (this.flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &Flow2AuthCredsPage.on_signal_flow_2_auth_result);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &Flow2AuthCredsPage.style_changed, this.flow_2_auth_widget, &Flow2AuthWidget.on_style_changed);
+        connect (this, &Flow2AuthCredsPage.style_changed, this.flow_2_auth_widget, &Flow2AuthWidget.on_signal_style_changed);
 
         // allow Flow2 page to poll on window activation
-        connect (this, &Flow2AuthCredsPage.poll_now, this.flow_2_auth_widget, &Flow2AuthWidget.on_poll_now);
+        connect (this, &Flow2AuthCredsPage.poll_now, this.flow_2_auth_widget, &Flow2AuthWidget.on_signal_poll_now);
     }
 
 
@@ -79,7 +79,7 @@ class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
         // Don't hide the wizard (avoid user confusion)!
         //wizard ().hide ();
 
-        this.flow_2_auth_widget.on_style_changed ();
+        this.flow_2_auth_widget.on_signal_style_changed ();
     }
 
 
@@ -123,7 +123,7 @@ class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public void on_flow_2_auth_result (Flow2Auth.Result result, string error_string, string user, string app_password) {
+    public void on_signal_flow_2_auth_result (Flow2Auth.Result result, string error_string, string user, string app_password) {
         //  Q_UNUSED (error_string)
         switch (result) {
         case Flow2Auth.NotSupported: {
@@ -133,7 +133,7 @@ class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
             /* Don't fallback to HTTP credentials */
             /*OwncloudWizard oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             oc_wizard.back ();
-            oc_wizard.on_auth_type (DetermineAuthTypeJob.AuthType.BASIC);*/
+            oc_wizard.on_signal_auth_type (DetermineAuthTypeJob.AuthType.BASIC);*/
             break;
         }
         case Flow2Auth.Error:
@@ -154,14 +154,14 @@ class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public void on_poll_now () {
+    public void on_signal_poll_now () {
         /* emit */ poll_now ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_style_changed () {
+    public void on_signal_style_changed () {
         /* emit */ style_changed ();
     }
 

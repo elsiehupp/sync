@@ -3,937 +3,850 @@ namespace Occ {
 namespace Ui {
 
 class User : GLib.Object {
-    //  Q_PROPERTY (string name READ name NOTIFY name_changed)
-    //  Q_PROPERTY (string server READ server CONSTANT)
-    //  Q_PROPERTY (bool server_has_user_status READ server_has_user_status CONSTANT)
-    //  Q_PROPERTY (GLib.Uri status_icon READ status_icon NOTIFY status_changed)
-    //  Q_PROPERTY (string status_emoji READ status_emoji NOTIFY status_changed)
-    //  Q_PROPERTY (string status_message READ status_message NOTIFY status_changed)
-    //  Q_PROPERTY (bool desktop_notifications_allowed READ is_desktop_notifications_allowed NOTIFY desktop_notifications_allowed_changed)
-    //  Q_PROPERTY (bool has_local_folder READ has_local_folder NOTIFY has_local_folder_changed)
-    //  Q_PROPERTY (bool server_has_talk READ server_has_talk NOTIFY server_has_talk_changed)
-    //  Q_PROPERTY (string avatar READ avatar_url NOTIFY avatar_changed)
-    //  Q_PROPERTY (bool is_connected READ is_connected NOTIFY account_state_changed)
-    //  Q_PROPERTY (Unified_search_results_list_model* unified_search_results_list_model READ get_unified_search_results_list_model CONSTANT)
 
     /***********************************************************
     ***********************************************************/
-    public User (AccountStatePtr account, bool is_current = false, GLib.Object parent = new GLib.Object ());
+    private AccountStatePtr account;
+    private bool is_current_user;
+    private ActivityListModel activity_model;
+    private UnifiedSearchResultsListModel unified_search_results_model;
+    private ActivityList blocklisted_notifications;
 
     /***********************************************************
     ***********************************************************/
-    public AccountPointer account ();
+    private QTimer expired_activities_check_timer;
+    private QTimer notification_check_timer;
+    private GLib.HashMap<AccountState, QElapsedTimer> time_since_last_check;
 
     /***********************************************************
     ***********************************************************/
-    public 
+    private QElapsedTimer gui_log_timer;
+    private NotificationCache notification_cache;
 
     /***********************************************************
+    Number of currently running notification requests. If non
+    zero, no query for notifications is started.
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public bool is_current_user ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public Folder get_folder ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public Unified_search_results_list_model get_u
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public string name ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public bool has_local_folder ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public bool server_has_
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public bool has_activities ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public QImage avatar ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    public void logout ();
+    private int notification_requests_running;
 
 
-    public void remove_account ();
-
-
-    public string avatar_url ();
-
-
-    public bool is_desktop_notifications_allowed ();
-
-
-    public UserStatus.OnlineStatus status ();
-
-
-    public string status_message ();
-
-
-    public GLib.Uri status_icon ();
-
-
-    public string status_emoji ();
-
-
-    public void process_completed_sync_item (Folder folder, SyncFileItemPtr item);
-
-signals:
-    void gui_log (string , string );
-    void name_changed ();
-    void has_local_folder_changed ();
-    void server_has_talk_changed ();
-    void avatar_changed ();
-    void account_state_changed ();
-    void status_changed ();
-    void desktop_notifications_allowed_changed ();
+    signal void signal_gui_log (string value1, string value2);
+    signal void signal_name_changed ();
+    signal void signal_has_local_folder_changed ();
+    signal void signal_server_has_talk_changed ();
+    signal void signal_avatar_changed ();
+    signal void signal_account_state_changed ();
+    signal void signal_status_changed ();
+    signal void signal_desktop_notifications_allowed_changed ();
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_item_completed (string folder, SyncFileItemPtr item);
+    public User (AccountStatePtr account, bool is_current = false, GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        this.account = account;
+        this.is_current_user = is_current;
+        this.activity_model = new ActivityListModel (this.account.data (), this);
+        this.unified_search_results_model = new UnifiedSearchResultsListModel (this.account.data (), this);
+        this.notification_requests_running = 0;
+        connect (ProgressDispatcher.instance (), &ProgressDispatcher.progress_info,
+            this, &User.on_signal_progress_info);
+        connect (ProgressDispatcher.instance (), &ProgressDispatcher.item_completed,
+            this, &User.on_signal_item_completed);
+        connect (ProgressDispatcher.instance (), &ProgressDispatcher.sync_error,
+            this, &User.on_signal_add_error);
+        connect (ProgressDispatcher.instance (), &ProgressDispatcher.add_error_to_gui,
+            this, &User.on_signal_add_error_to_gui);
 
-    /***********************************************************
-    ***********************************************************/
-    public 
+        connect (&this.notification_check_timer, &QTimer.timeout,
+            this, &User.on_signal_refresh);
 
-    /***********************************************************
-    ***********************************************************/
-    public 
+        connect (&this.expired_activities_check_timer, &QTimer.timeout,
+            this, &User.on_signal_check_expired_activities);
 
-    /***********************************************************
-    ***********************************************************/
-    public void on_add_error (string folder_alias, string message, ErrorCategory category);
+        connect (this.account.data (), &AccountState.state_changed,
+                [=] () {
+                    if (is_connected ()) {
+                        on_signal_refresh_immediately ();
+                    }
+                });
+        connect (this.account.data (), &AccountState.state_changed, this, &User.signal_account_state_changed);
+        connect (this.account.data (), &AccountState.has_fetched_navigation_apps,
+            this, &User.on_signal_rebuild_navigation_app_list);
+        connect (this.account.account ().data (), &Account.account_changed_display_name, this, &User.signal_name_changed);
 
-    /***********************************************************
-    ***********************************************************/
-    public 
+        connect (FolderMan.instance (), &FolderMan.folder_list_changed, this, &User.signal_has_local_folder_changed);
 
-    /***********************************************************
-    ***********************************************************/
-    public 
+        connect (this, &User.signal_gui_log, Logger.instance (), &Logger.signal_gui_log);
 
-    /***********************************************************
-    ***********************************************************/
-    public void on_notification_request_finished (int status_c
+        connect (this.account.account ().data (), &Account.account_changed_avatar, this, &User.signal_avatar_changed);
+        connect (this.account.account ().data (), &Account.user_status_changed, this, &User.signal_status_changed);
+        connect (this.account.data (), &AccountState.signal_desktop_notifications_allowed_changed, this, &User.signal_desktop_notifications_allowed_changed);
 
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_end_notification_request (int reply_code);
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_send_notific
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_refresh_notifications ();
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_refresh_activities ();
-
-
-    public void on_refresh ();
-
-
-    public void on_refresh_user_status ();
-
-
-    public void on_refresh_immediately ();
-
-
-    public void on_notification_refresh_interval (std.chrono.milliseconds interval);
-
-
-    public void on_rebuild_navigation_app_list ();
+        connect (this.activity_model, &ActivityListModel.send_notification_request, this, &User.on_signal_send_notification_request);
+    }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_push_notifications_ready ();
-    private void on_disconnect_push_notifications ();
-    private void on_received_push_notification (Account account);
-    private void on_received_push_activity (Account account);
-    private void on_check_expired_activities ();
-
-    /***********************************************************
-    ***********************************************************/
-    private void connect_push_notifications ();
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-
-    /***********************************************************
-    ***********************************************************/
-    private bool is_unsolvable_conflict (SyncFileItemPtr item);
-
-    /***********************************************************
-    ***********************************************************/
-    private void show_desktop_notification (string title, string message);
+    public AccountPointer account () {
+        return this.account.account ();
+    }
 
 
     /***********************************************************
     ***********************************************************/
-    private AccountStatePtr this.account;
-    private bool this.is_current_user;
-    private ActivityListModel this.activity_model;
-    private Unified_search_results_list_model this.unified_search_results_model;
-    private Activity_list this.blocklisted_notifications;
+    public AccountStatePtr account_state () {
+        return this.account;
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    private QTimer this.expired_activities_check_timer;
-    private QTimer this.notification_check_timer;
-    private GLib.HashMap<AccountState *, QElapsedTimer> this.time_since_last_check;
+    public string server (bool shortened) {
+        string server_url = this.account.account ().url ().to_string ();
+        if (shortened) {
+            server_url.replace (QLatin1String ("https://"), QLatin1String (""));
+            server_url.replace (QLatin1String ("http://"), QLatin1String (""));
+        }
+        return server_url;
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    private QElapsedTimer this.gui_log_timer;
-    private Notification_cache this.notification_cache;
-
-    // number of currently running notification requests. If non zero,
-    // no query for notifications is started.
-    private int this.notification_requests_running;
-}
+    public AccountAppList app_list () {
+        return this.account.app_list ();
+    }
 
 
-User.User (AccountStatePtr account, bool is_current, GLib.Object parent)
-    : GLib.Object (parent)
-    this.account (account)
-    this.is_current_user (is_current)
-    this.activity_model (new ActivityListModel (this.account.data (), this))
-    this.unified_search_results_model (new Unified_search_results_list_model (this.account.data (), this))
-    this.notification_requests_running (0) {
-    connect (ProgressDispatcher.instance (), &ProgressDispatcher.progress_info,
-        this, &User.on_progress_info);
-    connect (ProgressDispatcher.instance (), &ProgressDispatcher.item_completed,
-        this, &User.on_item_completed);
-    connect (ProgressDispatcher.instance (), &ProgressDispatcher.sync_error,
-        this, &User.on_add_error);
-    connect (ProgressDispatcher.instance (), &ProgressDispatcher.add_error_to_gui,
-        this, &User.on_add_error_to_gui);
+    /***********************************************************
+    ***********************************************************/
+    public bool is_current_user () {
+        return this.is_current_user;
+    }
 
-    connect (&this.notification_check_timer, &QTimer.timeout,
-        this, &User.on_refresh);
 
-    connect (&this.expired_activities_check_timer, &QTimer.timeout,
-        this, &User.on_check_expired_activities);
+    /***********************************************************
+    ***********************************************************/
+    public void is_current_user (bool is_current_user) {
+        this.is_current_user = is_current_user;
+    }
 
-    connect (this.account.data (), &AccountState.state_changed,
-            [=] () {
-                if (is_connected ()) {
-                    on_refresh_immediately ();
+
+    /***********************************************************
+    ***********************************************************/
+    public bool is_connected () {
+        return (this.account.connection_status () == AccountState.ConnectionStatus.Connected);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public Folder get_folder () {
+        foreach (Folder folder, FolderMan.instance ().map ()) {
+            if (folder.account_state () == this.account.data ()) {
+                return folder;
+            }
+        }
+
+        return null;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public ActivityListModel get_activity_model () {
+        return this.activity_model;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public UnifiedSearchResultsListModel get_unified_search_results_list_model () {
+        return this.unified_search_results_model;
+    }
+
+
+    /***********************************************************
+    If dav_display_name is empty (which can be several reasons,
+    the simplest is missing login at startup), fall back to username
+    ***********************************************************/
+    public string name () {
+        string name = this.account.account ().dav_display_name ();
+        if (name == "") {
+            name = this.account.account ().credentials ().user ();
+        }
+        return name;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool check_push_notifications_are_ready () {
+        const var push_notifications = this.account.account ().push_notifications ();
+
+        const var push_activities_available = this.account.account ().capabilities ().available_push_notifications () & PushNotificationType.ACTIVITIES;
+        const var push_notifications_available = this.account.account ().capabilities ().available_push_notifications () & PushNotificationType.NOTIFICATIONS;
+
+        const var push_activities_and_notifications_available = push_activities_available && push_notifications_available;
+
+        if (push_activities_and_notifications_available && push_notifications && push_notifications.is_ready ()) {
+            connect_push_notifications ();
+            return true;
+        } else {
+            connect (this.account.account ().data (), &Account.push_notifications_ready, this, &User.on_signal_push_notifications_ready, Qt.UniqueConnection);
+            return false;
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void open_local_folder () {
+        const var folder = get_folder ();
+
+        if (folder) {
+            QDesktopServices.open_url (GLib.Uri.from_local_file (folder.path ()));
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool has_local_folder () {
+        return get_folder () != null;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool server_has_talk () {
+        return talk_app () != null;
+    }
+
+
+
+    /***********************************************************
+    ***********************************************************/
+    public AccountApp talk_app () {
+        return this.account.find_app (QStringLiteral ("spreed"));
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool has_activities () {
+        return this.account.account ().capabilities ().has_activities ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public Gtk.Image avatar () {
+        return AvatarJob.make_circular_avatar (this.account.account ().avatar ());
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void log_in () {
+        this.account.account ().reset_rejected_certificates ();
+        this.account.sign_in ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void log_out () {
+        this.account.sign_out_by_ui ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void remove_account () {
+        AccountManager.instance ().delete_account (this.account.data ());
+        AccountManager.instance ().save ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public string avatar_url () {
+        if (avatar ().is_null ()) {
+            return "";
+        }
+
+        return QStringLiteral ("image://avatars/") + this.account.account ().identifier ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool are_desktop_notifications_allowed () {
+        return this.account.data ().are_desktop_notifications_allowed ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public UserStatus.OnlineStatus status () {
+        return this.account.account ().user_status_connector ().user_status ().state ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public string status_message () {
+        return this.account.account ().user_status_connector ().user_status ().message ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public GLib.Uri status_icon () {
+        return this.account.account ().user_status_connector ().user_status ().state_icon ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public string status_emoji () {
+        return this.account.account ().user_status_connector ().user_status ().icon ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool server_has_user_status () {
+        return this.account.account ().capabilities ().user_status ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void process_completed_sync_item (Folder folder, SyncFileItemPtr item) {
+        Activity activity;
+        activity.type = Activity.Type.SYNC_FILE_ITEM; //client activity
+        activity.status = item.status;
+        activity.date_time = GLib.DateTime.current_date_time ();
+        activity.message = item.original_file;
+        activity.link = folder.account_state ().account ().url ();
+        activity.acc_name = folder.account_state ().account ().display_name ();
+        activity.file = item.file;
+        activity.folder = folder.alias ();
+        activity.file_action = "";
+
+        if (item.instruction == CSYNC_INSTRUCTION_REMOVE) {
+            activity.file_action = "file_deleted";
+        } else if (item.instruction == CSYNC_INSTRUCTION_NEW) {
+            activity.file_action = "file_created";
+        } else if (item.instruction == CSYNC_INSTRUCTION_RENAME) {
+            activity.file_action = "file_renamed";
+        } else {
+            activity.file_action = "file_changed";
+        }
+
+        if (item.status == SyncFileItem.Status.NO_STATUS || item.status == SyncFileItem.Status.SUCCESS) {
+            GLib.warn ("Item " + item.file + " retrieved successfully.";
+
+            if (item.direction != SyncFileItem.Direction.UP) {
+                activity.message = _("Synced %1").arg (item.original_file);
+            } else if (activity.file_action == "file_renamed") {
+                activity.message = _("You renamed %1").arg (item.original_file);
+            } else if (activity.file_action == "file_deleted") {
+                activity.message = _("You deleted %1").arg (item.original_file);
+            } else if (activity.file_action == "file_created") {
+                activity.message = _("You created %1").arg (item.original_file);
+            } else {
+                activity.message = _("You changed %1").arg (item.original_file);
+            }
+
+            this.activity_model.add_sync_file_item_to_activity_list (activity);
+        } else {
+            GLib.warn ("Item " + item.file + " retrieved resulted in error " + item.error_string;
+            activity.subject = item.error_string;
+
+            if (item.status == SyncFileItem.Status.FileIgnored) {
+                this.activity_model.add_ignored_file_to_list (activity);
+            } else {
+                // add 'protocol error' to activity list
+                if (item.status == SyncFileItem.Status.FileNameInvalid) {
+                    show_desktop_notification (item.file, activity.subject);
                 }
-            });
-    connect (this.account.data (), &AccountState.state_changed, this, &User.account_state_changed);
-    connect (this.account.data (), &AccountState.has_fetched_navigation_apps,
-        this, &User.on_rebuild_navigation_app_list);
-    connect (this.account.account ().data (), &Account.account_changed_display_name, this, &User.name_changed);
-
-    connect (FolderMan.instance (), &FolderMan.folder_list_changed, this, &User.has_local_folder_changed);
-
-    connect (this, &User.gui_log, Logger.instance (), &Logger.gui_log);
-
-    connect (this.account.account ().data (), &Account.account_changed_avatar, this, &User.avatar_changed);
-    connect (this.account.account ().data (), &Account.user_status_changed, this, &User.status_changed);
-    connect (this.account.data (), &AccountState.desktop_notifications_allowed_changed, this, &User.desktop_notifications_allowed_changed);
-
-    connect (this.activity_model, &ActivityListModel.send_notification_request, this, &User.on_send_notification_request);
-}
-
-void User.show_desktop_notification (string title, string message) {
-    ConfigFile config;
-    if (!config.optional_server_notifications () || !is_desktop_notifications_allowed ()) {
-        return;
-    }
-
-    // after one hour, clear the gui log notification store
-    constexpr int64 clear_gui_log_interval = 60 * 60 * 1000;
-    if (this.gui_log_timer.elapsed () > clear_gui_log_interval) {
-        this.notification_cache.clear ();
-    }
-
-    const Notification_cache.Notification notification {
-        title,
-        message
-    }
-    if (this.notification_cache.contains (notification)) {
-        return;
-    }
-
-    this.notification_cache.insert (notification);
-    /* emit */ gui_log (notification.title, notification.message);
-    // restart the gui log timer now that we show a new notification
-    this.gui_log_timer.on_start ();
-}
-
-void User.on_build_notification_display (Activity_list list) {
-    this.activity_model.clear_notifications ();
-
-    foreach (var activity, list) {
-        if (this.blocklisted_notifications.contains (activity)) {
-            GLib.info (lc_activity) << "Activity in blocklist, skip";
-            continue;
-        }
-        const var message = AccountManager.instance ().accounts ().count () == 1 ? "" : activity.acc_name;
-        show_desktop_notification (activity.subject, message);
-        this.activity_model.add_notification_to_activity_list (activity);
-    }
-}
-
-void User.on_notification_refresh_interval (std.chrono.milliseconds interval) {
-    if (!check_push_notifications_are_ready ()) {
-        GLib.debug (lc_activity) << "Starting Notification refresh timer with " << interval.count () / 1000 << " sec interval";
-        this.notification_check_timer.on_start (interval.count ());
-    }
-}
-
-void User.on_push_notifications_ready () {
-    GLib.info (lc_activity) << "Push notifications are ready";
-
-    if (this.notification_check_timer.is_active ()) {
-        // as we are now able to use push notifications - let's stop the polling timer
-        this.notification_check_timer.stop ();
-    }
-
-    connect_push_notifications ();
-}
-
-void User.on_disconnect_push_notifications () {
-    disconnect (this.account.account ().push_notifications (), &PushNotifications.notifications_changed, this, &User.on_received_push_notification);
-    disconnect (this.account.account ().push_notifications (), &PushNotifications.activities_changed, this, &User.on_received_push_activity);
-
-    disconnect (this.account.account ().data (), &Account.push_notifications_disabled, this, &User.on_disconnect_push_notifications);
-
-    // connection to Web_socket may have dropped or an error occured, so we need to bring back the polling until we have re-established the connection
-    on_notification_refresh_interval (ConfigFile ().notification_refresh_interval ());
-}
-
-void User.on_received_push_notification (Account account) {
-    if (account.identifier () == this.account.account ().identifier ()) {
-        on_refresh_notifications ();
-    }
-}
-
-void User.on_received_push_activity (Account account) {
-    if (account.identifier () == this.account.account ().identifier ()) {
-        on_refresh_activities ();
-    }
-}
-
-void User.on_check_expired_activities () {
-    for (Activity activity : this.activity_model.errors_list ()) {
-        if (activity.expire_at_msecs > 0 && GLib.DateTime.current_date_time ().to_m_secs_since_epoch () >= activity.expire_at_msecs) {
-            this.activity_model.remove_activity_from_activity_list (activity);
+                this.activity_model.add_error_to_activity_list (activity);
+            }
         }
     }
 
-    if (this.activity_model.errors_list ().size () == 0) {
-        this.expired_activities_check_timer.stop ();
-    }
-}
 
-void User.connect_push_notifications () {
-    connect (this.account.account ().data (), &Account.push_notifications_disabled, this, &User.on_disconnect_push_notifications, Qt.UniqueConnection);
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_item_completed (string folder, SyncFileItemPtr item) {
+        var folder_instance = FolderMan.instance ().folder (folder);
 
-    connect (this.account.account ().push_notifications (), &PushNotifications.notifications_changed, this, &User.on_received_push_notification, Qt.UniqueConnection);
-    connect (this.account.account ().push_notifications (), &PushNotifications.activities_changed, this, &User.on_received_push_activity, Qt.UniqueConnection);
-}
-
-bool User.check_push_notifications_are_ready () {
-    const var push_notifications = this.account.account ().push_notifications ();
-
-    const var push_activities_available = this.account.account ().capabilities ().available_push_notifications () & PushNotificationType.ACTIVITIES;
-    const var push_notifications_available = this.account.account ().capabilities ().available_push_notifications () & PushNotificationType.NOTIFICATIONS;
-
-    const var push_activities_and_notifications_available = push_activities_available && push_notifications_available;
-
-    if (push_activities_and_notifications_available && push_notifications && push_notifications.is_ready ()) {
-        connect_push_notifications ();
-        return true;
-    } else {
-        connect (this.account.account ().data (), &Account.push_notifications_ready, this, &User.on_push_notifications_ready, Qt.UniqueConnection);
-        return false;
-    }
-}
-
-void User.on_refresh_immediately () {
-    if (this.account.data () && this.account.data ().is_connected ()) {
-        on_refresh_activities ();
-    }
-    on_refresh_notifications ();
-}
-
-void User.on_refresh () {
-    on_refresh_user_status ();
-
-    if (check_push_notifications_are_ready ()) {
-        // we are relying on Web_socket push notifications - ignore refresh attempts from UI
-        this.time_since_last_check[this.account.data ()].invalidate ();
-        return;
-    }
-
-    // QElapsedTimer isn't actually constructed as invalid.
-    if (!this.time_since_last_check.contains (this.account.data ())) {
-        this.time_since_last_check[this.account.data ()].invalidate ();
-    }
-    QElapsedTimer timer = this.time_since_last_check[this.account.data ()];
-
-    // Fetch Activities only if visible and if last check is longer than 15 secs ago
-    if (timer.is_valid () && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {
-        GLib.debug (lc_activity) << "Do not check as last check is only secs ago : " << timer.elapsed () / 1000;
-        return;
-    }
-    if (this.account.data () && this.account.data ().is_connected ()) {
-        if (!timer.is_valid ()) {
-            on_refresh_activities ();
-        }
-        on_refresh_notifications ();
-        timer.on_start ();
-    }
-}
-
-void User.on_refresh_activities () {
-    this.activity_model.on_refresh_activity ();
-}
-
-void User.on_refresh_user_status () {
-    if (this.account.data () && this.account.data ().is_connected ()) {
-        this.account.account ().user_status_connector ().fetch_user_status ();
-    }
-}
-
-void User.on_refresh_notifications () {
-    // on_start a server notification handler if no notification requests
-    // are running
-    if (this.notification_requests_running == 0) {
-        var snh = new Server_notification_handler (this.account.data ());
-        connect (snh, &Server_notification_handler.new_notification_list,
-            this, &User.on_build_notification_display);
-
-        snh.on_fetch_notifications ();
-    } else {
-        GLib.warn (lc_activity) << "Notification request counter not zero.";
-    }
-}
-
-void User.on_rebuild_navigation_app_list () {
-    /* emit */ server_has_talk_changed ();
-    // Rebuild App list
-    User_apps_model.instance ().build_app_list ();
-}
-
-void User.on_notification_request_finished (int status_code) {
-    int row = sender ().property ("activity_row").to_int ();
-
-    // the ocs API returns stat code 100 or 200 inside the xml if it succeeded.
-    if (status_code != OCS_SUCCESS_STATUS_CODE && status_code != OCS_SUCCESS_STATUS_CODE_V2) {
-        GLib.warn (lc_activity) << "Notification Request to Server failed, leave notification visible.";
-    } else {
-        // to do use the model to rebuild the list or remove the item
-        GLib.warn (lc_activity) << "Notification Request to Server successed, rebuilding list.";
-        this.activity_model.remove_activity_from_activity_list (row);
-    }
-}
-
-void User.on_end_notification_request (int reply_code) {
-    this.notification_requests_running--;
-    on_notification_request_finished (reply_code);
-}
-
-void User.on_send_notification_request (string account_name, string link, GLib.ByteArray verb, int row) {
-    GLib.info (lc_activity) << "Server Notification Request " << verb << link << "on account" << account_name;
-
-    const string[] valid_verbs = string[] () << "GET"
-                                                 << "PUT"
-                                                 << "POST"
-                                                 << "DELETE";
-
-    if (valid_verbs.contains (verb)) {
-        AccountStatePtr acc = AccountManager.instance ().account (account_name);
-        if (acc) {
-            var job = new Notification_confirm_job (acc.account ());
-            GLib.Uri l (link);
-            job.link_and_verb (l, verb);
-            job.property ("activity_row", GLib.Variant.from_value (row));
-            connect (job, &AbstractNetworkJob.network_error,
-                this, &User.on_notify_network_error);
-            connect (job, &Notification_confirm_job.job_finished,
-                this, &User.on_notify_server_finished);
-            job.on_start ();
-
-            // count the number of running notification requests. If this member var
-            // is larger than zero, no new fetching of notifications is started
-            this.notification_requests_running++;
-        }
-    } else {
-        GLib.warn (lc_activity) << "Notification Links : Invalid verb:" << verb;
-    }
-}
-
-void User.on_notify_network_error (Soup.Reply reply) {
-    var job = qobject_cast<Notification_confirm_job> (sender ());
-    if (!job) {
-        return;
-    }
-
-    int result_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
-
-    on_end_notification_request (result_code);
-    GLib.warn (lc_activity) << "Server notify job failed with code " << result_code;
-}
-
-void User.on_notify_server_finished (string reply, int reply_code) {
-    var job = qobject_cast<Notification_confirm_job> (sender ());
-    if (!job) {
-        return;
-    }
-
-    on_end_notification_request (reply_code);
-    GLib.info (lc_activity) << "Server Notification reply code" << reply_code << reply;
-}
-
-void User.on_progress_info (string folder, ProgressInfo progress) {
-    if (progress.status () == ProgressInfo.Status.RECONCILE) {
-        // Wipe all non-persistent entries - as well as the persistent ones
-        // in cases where a local discovery was done.
-        var f = FolderMan.instance ().folder (folder);
-        if (!f)
+        if (!folder_instance || !is_activity_of_current_account (folder_instance) || is_unsolvable_conflict (item)) {
             return;
-        const var engine = f.sync_engine ();
-        const var style = engine.last_local_discovery_style ();
-        foreach (Activity activity, this.activity_model.errors_list ()) {
-            if (activity.expire_at_msecs != -1) {
-                // we process expired activities in a different slot
-                continue;
-            }
-            if (activity.folder != folder) {
-                continue;
-            }
-
-            if (style == LocalDiscoveryStyle.FILESYSTEM_ONLY) {
-                this.activity_model.remove_activity_from_activity_list (activity);
-                continue;
-            }
-
-            if (activity.status == SyncFileItem.Status.CONFLICT && !QFileInfo (f.path () + activity.file).exists ()) {
-                this.activity_model.remove_activity_from_activity_list (activity);
-                continue;
-            }
-
-            if (activity.status == SyncFileItem.Status.FILE_LOCKED && !QFileInfo (f.path () + activity.file).exists ()) {
-                this.activity_model.remove_activity_from_activity_list (activity);
-                continue;
-            }
-
-            if (activity.status == SyncFileItem.Status.FILE_IGNORED && !QFileInfo (f.path () + activity.file).exists ()) {
-                this.activity_model.remove_activity_from_activity_list (activity);
-                continue;
-            }
-
-            if (!QFileInfo (f.path () + activity.file).exists ()) {
-                this.activity_model.remove_activity_from_activity_list (activity);
-                continue;
-            }
-
-            var path = QFileInfo (activity.file).dir ().path ().to_utf8 ();
-            if (path == ".")
-                path.clear ();
-
-            if (engine.should_discover_locally (path))
-                this.activity_model.remove_activity_from_activity_list (activity);
-        }
-    }
-
-    if (progress.status () == ProgressInfo.Status.DONE) {
-        // We keep track very well of pending conflicts.
-        // Inform other components about them.
-        string[] conflicts;
-        foreach (Activity activity, this.activity_model.errors_list ()) {
-            if (activity.folder == folder
-                && activity.status == SyncFileItem.Status.CONFLICT) {
-                conflicts.append (activity.file);
-            }
         }
 
-        /* emit */ ProgressDispatcher.instance ().folder_conflicts (folder, conflicts);
-    }
-}
-
-void User.on_add_error (string folder_alias, string message, ErrorCategory category) {
-    var folder_instance = FolderMan.instance ().folder (folder_alias);
-    if (!folder_instance)
-        return;
-
-    if (folder_instance.account_state () == this.account.data ()) {
-        GLib.warn (lc_activity) << "Item " << folder_instance.short_gui_local_path () << " retrieved resulted in " << message;
-
-        Activity activity;
-        activity.type = Activity.Sync_result_type;
-        activity.status = SyncResult.Status.ERROR;
-        activity.date_time = GLib.DateTime.from_string (GLib.DateTime.current_date_time ().to_string (), Qt.ISODate);
-        activity.subject = message;
-        activity.message = folder_instance.short_gui_local_path ();
-        activity.link = folder_instance.short_gui_local_path ();
-        activity.acc_name = folder_instance.account_state ().account ().display_name ();
-        activity.folder = folder_alias;
-
-        if (category == ErrorCategory.INSUFFICIENT_REMOTE_STORAGE) {
-            Activity_link link;
-            link.label = _("Retry all uploads");
-            link.link = folder_instance.path ();
-            link.verb = "";
-            link.primary = true;
-            activity.links.append (link);
-        }
-
-        // add 'other errors' to activity list
-        this.activity_model.add_error_to_activity_list (activity);
-    }
-}
-
-void User.on_add_error_to_gui (string folder_alias, SyncFileItem.Status status, string error_message, string subject) {
-    const var folder_instance = FolderMan.instance ().folder (folder_alias);
-    if (!folder_instance) {
-        return;
+        GLib.warn ("Item " + item.file + " retrieved resulted in " + item.error_string;
+        process_completed_sync_item (folder_instance, item);
     }
 
-    if (folder_instance.account_state () == this.account.data ()) {
-        GLib.warn (lc_activity) << "Item " << folder_instance.short_gui_local_path () << " retrieved resulted in " << error_message;
 
-        Activity activity;
-        activity.type = Activity.Sync_file_item_type;
-        activity.status = status;
-        const var current_date_time = GLib.DateTime.current_date_time ();
-        activity.date_time = GLib.DateTime.from_string (current_date_time.to_string (), Qt.ISODate);
-        activity.expire_at_msecs = current_date_time.add_m_secs (activity_default_expiration_time_msecs).to_m_secs_since_epoch ();
-        activity.subject = !subject.is_empty () ? subject : folder_instance.short_gui_local_path ();
-        activity.message = error_message;
-        activity.link = folder_instance.short_gui_local_path ();
-        activity.acc_name = folder_instance.account_state ().account ().display_name ();
-        activity.folder = folder_alias;
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_add_error (string folder_alias, string message, ErrorCategory category) {
+        var folder_instance = FolderMan.instance ().folder (folder_alias);
+        if (!folder_instance)
+            return;
 
-        // add 'other errors' to activity list
-        this.activity_model.add_error_to_activity_list (activity);
+        if (folder_instance.account_state () == this.account.data ()) {
+            GLib.warn ("Item " + folder_instance.short_gui_local_path (" retrieved resulted in " + message;
 
-        show_desktop_notification (activity.subject, activity.message);
+            Activity activity;
+            activity.type = Activity.Type.SYNC_RESULT;
+            activity.status = SyncResult.Status.ERROR;
+            activity.date_time = GLib.DateTime.from_string (GLib.DateTime.current_date_time ().to_string (), Qt.ISODate);
+            activity.subject = message;
+            activity.message = folder_instance.short_gui_local_path ();
+            activity.link = folder_instance.short_gui_local_path ();
+            activity.acc_name = folder_instance.account_state ().account ().display_name ();
+            activity.folder = folder_alias;
 
-        if (!this.expired_activities_check_timer.is_active ()) {
-            this.expired_activities_check_timer.on_start (expired_activities_check_interval_msecs);
-        }
-    }
-}
-
-bool User.is_activity_of_current_account (Folder folder) {
-    return folder.account_state () == this.account.data ();
-}
-
-bool User.is_unsolvable_conflict (SyncFileItemPtr item) {
-    // We just care about conflict issues that we are able to resolve
-    return item.status == SyncFileItem.Status.CONFLICT && !Utility.is_conflict_file (item.file);
-}
-
-void User.process_completed_sync_item (Folder folder, SyncFileItemPtr item) {
-    Activity activity;
-    activity.type = Activity.Sync_file_item_type; //client activity
-    activity.status = item.status;
-    activity.date_time = GLib.DateTime.current_date_time ();
-    activity.message = item.original_file;
-    activity.link = folder.account_state ().account ().url ();
-    activity.acc_name = folder.account_state ().account ().display_name ();
-    activity.file = item.file;
-    activity.folder = folder.alias ();
-    activity.file_action = "";
-
-    if (item.instruction == CSYNC_INSTRUCTION_REMOVE) {
-        activity.file_action = "file_deleted";
-    } else if (item.instruction == CSYNC_INSTRUCTION_NEW) {
-        activity.file_action = "file_created";
-    } else if (item.instruction == CSYNC_INSTRUCTION_RENAME) {
-        activity.file_action = "file_renamed";
-    } else {
-        activity.file_action = "file_changed";
-    }
-
-    if (item.status == SyncFileItem.Status.NO_STATUS || item.status == SyncFileItem.Status.SUCCESS) {
-        GLib.warn (lc_activity) << "Item " << item.file << " retrieved successfully.";
-
-        if (item.direction != SyncFileItem.Direction.UP) {
-            activity.message = _("Synced %1").arg (item.original_file);
-        } else if (activity.file_action == "file_renamed") {
-            activity.message = _("You renamed %1").arg (item.original_file);
-        } else if (activity.file_action == "file_deleted") {
-            activity.message = _("You deleted %1").arg (item.original_file);
-        } else if (activity.file_action == "file_created") {
-            activity.message = _("You created %1").arg (item.original_file);
-        } else {
-            activity.message = _("You changed %1").arg (item.original_file);
-        }
-
-        this.activity_model.add_sync_file_item_to_activity_list (activity);
-    } else {
-        GLib.warn (lc_activity) << "Item " << item.file << " retrieved resulted in error " << item.error_string;
-        activity.subject = item.error_string;
-
-        if (item.status == SyncFileItem.Status.FileIgnored) {
-            this.activity_model.add_ignored_file_to_list (activity);
-        } else {
-            // add 'protocol error' to activity list
-            if (item.status == SyncFileItem.Status.FileNameInvalid) {
-                show_desktop_notification (item.file, activity.subject);
+            if (category == ErrorCategory.INSUFFICIENT_REMOTE_STORAGE) {
+                ActivityLink link;
+                link.label = _("Retry all uploads");
+                link.link = folder_instance.path ();
+                link.verb = "";
+                link.primary = true;
+                activity.links.append (link);
             }
+
+            // add 'other errors' to activity list
             this.activity_model.add_error_to_activity_list (activity);
         }
     }
-}
 
-void User.on_item_completed (string folder, SyncFileItemPtr item) {
-    var folder_instance = FolderMan.instance ().folder (folder);
 
-    if (!folder_instance || !is_activity_of_current_account (folder_instance) || is_unsolvable_conflict (item)) {
-        return;
-    }
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_add_error_to_gui (string folder_alias, SyncFileItem.Status status, string error_message, string subject) {
+        const var folder_instance = FolderMan.instance ().folder (folder_alias);
+        if (!folder_instance) {
+            return;
+        }
 
-    GLib.warn (lc_activity) << "Item " << item.file << " retrieved resulted in " << item.error_string;
-    process_completed_sync_item (folder_instance, item);
-}
+        if (folder_instance.account_state () == this.account.data ()) {
+            GLib.warn ("Item " + folder_instance.short_gui_local_path (" retrieved resulted in " + error_message;
 
-AccountPointer User.account () {
-    return this.account.account ();
-}
+            Activity activity;
+            activity.type = Activity.Type.SYNC_FILE_ITEM;
+            activity.status = status;
+            const var current_date_time = GLib.DateTime.current_date_time ();
+            activity.date_time = GLib.DateTime.from_string (current_date_time.to_string (), Qt.ISODate);
+            activity.expire_at_msecs = current_date_time.add_m_secs (ACTIVITY_DEFAULT_EXPIRATION_TIME_MSECS).to_m_secs_since_epoch ();
+            activity.subject = !subject.is_empty () ? subject : folder_instance.short_gui_local_path ();
+            activity.message = error_message;
+            activity.link = folder_instance.short_gui_local_path ();
+            activity.acc_name = folder_instance.account_state ().account ().display_name ();
+            activity.folder = folder_alias;
 
-AccountStatePtr User.account_state () {
-    return this.account;
-}
+            // add 'other errors' to activity list
+            this.activity_model.add_error_to_activity_list (activity);
 
-void User.current_user (bool is_current) {
-    this.is_current_user = is_current;
-}
+            show_desktop_notification (activity.subject, activity.message);
 
-Folder *User.get_folder () {
-    foreach (Folder folder, FolderMan.instance ().map ()) {
-        if (folder.account_state () == this.account.data ()) {
-            return folder;
+            if (!this.expired_activities_check_timer.is_active ()) {
+                this.expired_activities_check_timer.on_signal_start (EXPIRED_ACTIVITIES_CHECK_INTERVAL_MSEC);
+            }
         }
     }
 
-    return null;
-}
 
-ActivityListModel *User.get_activity_model () {
-    return this.activity_model;
-}
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_notification_request_finished (int status_code) {
+        int row = sender ().property ("activity_row").to_int ();
 
-Unified_search_results_list_model *User.get_unified_search_results_list_model () {
-    return this.unified_search_results_model;
-}
-
-void User.open_local_folder () {
-    const var folder = get_folder ();
-
-    if (folder) {
-        QDesktopServices.open_url (GLib.Uri.from_local_file (folder.path ()));
-    }
-}
-
-void User.login () {
-    this.account.account ().reset_rejected_certificates ();
-    this.account.sign_in ();
-}
-
-void User.logout () {
-    this.account.sign_out_by_ui ();
-}
-
-string User.name () {
-    // If dav_display_name is empty (can be several reasons, simplest is missing login at startup), fall back to username
-    string name = this.account.account ().dav_display_name ();
-    if (name == "") {
-        name = this.account.account ().credentials ().user ();
-    }
-    return name;
-}
-
-string User.server (bool shortened) {
-    string server_url = this.account.account ().url ().to_string ();
-    if (shortened) {
-        server_url.replace (QLatin1String ("https://"), QLatin1String (""));
-        server_url.replace (QLatin1String ("http://"), QLatin1String (""));
-    }
-    return server_url;
-}
-
-UserStatus.OnlineStatus User.status () {
-    return this.account.account ().user_status_connector ().user_status ().state ();
-}
-
-string User.status_message () {
-    return this.account.account ().user_status_connector ().user_status ().message ();
-}
-
-GLib.Uri User.status_icon () {
-    return this.account.account ().user_status_connector ().user_status ().state_icon ();
-}
-
-string User.status_emoji () {
-    return this.account.account ().user_status_connector ().user_status ().icon ();
-}
-
-bool User.server_has_user_status () {
-    return this.account.account ().capabilities ().user_status ();
-}
-
-QImage User.avatar () {
-    return AvatarJob.make_circular_avatar (this.account.account ().avatar ());
-}
-
-string User.avatar_url () {
-    if (avatar ().is_null ()) {
-        return "";
+        // the ocs API returns stat code 100 or 200 inside the xml if it succeeded.
+        if (status_code != OCS_SUCCESS_STATUS_CODE && status_code != OCS_SUCCESS_STATUS_CODE_V2) {
+            GLib.warn ("Notification Request to Server failed, leave notification visible.";
+        } else {
+            // to do use the model to rebuild the list or remove the item
+            GLib.warn ("Notification Request to Server successed, rebuilding list.";
+            this.activity_model.remove_activity_from_activity_list (row);
+        }
     }
 
-    return QStringLiteral ("image://avatars/") + this.account.account ().identifier ();
-}
 
-bool User.has_local_folder () {
-    return get_folder () != null;
-}
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_end_notification_request (int reply_code) {
+        this.notification_requests_running--;
+        on_signal_notification_request_finished (reply_code);
+    }
 
-bool User.server_has_talk () {
-    return talk_app () != null;
-}
 
-AccountApp *User.talk_app () {
-    return this.account.find_app (QStringLiteral ("spreed"));
-}
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_notify_network_error (Soup.Reply reply) {
+        var job = qobject_cast<Notification_confirm_job> (sender ());
+        if (!job) {
+            return;
+        }
 
-bool User.has_activities () {
-    return this.account.account ().capabilities ().has_activities ();
-}
+        int result_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 
-AccountAppList User.app_list () {
-    return this.account.app_list ();
-}
+        on_signal_end_notification_request (result_code);
+        GLib.warn ("Server notify job failed with code " + result_code;
+    }
 
-bool User.is_current_user () {
-    return this.is_current_user;
-}
 
-bool User.is_connected () {
-    return (this.account.connection_status () == AccountState.ConnectionStatus.Connected);
-}
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_progress_info (string folder, ProgressInfo progress) {
+        if (progress.status () == ProgressInfo.Status.RECONCILE) {
+            // Wipe all non-persistent entries - as well as the persistent ones
+            // in cases where a local discovery was done.
+            var f = FolderMan.instance ().folder (folder);
+            if (!f)
+                return;
+            const var engine = f.sync_engine ();
+            const var style = engine.last_local_discovery_style ();
+            foreach (Activity activity, this.activity_model.errors_list ()) {
+                if (activity.expire_at_msecs != -1) {
+                    // we process expired activities in a different slot
+                    continue;
+                }
+                if (activity.folder != folder) {
+                    continue;
+                }
 
-bool User.is_desktop_notifications_allowed () {
-    return this.account.data ().is_desktop_notifications_allowed ();
-}
+                if (style == LocalDiscoveryStyle.FILESYSTEM_ONLY) {
+                    this.activity_model.remove_activity_from_activity_list (activity);
+                    continue;
+                }
 
-void User.remove_account () {
-    AccountManager.instance ().delete_account (this.account.data ());
-    AccountManager.instance ().save ();
-}
+                if (activity.status == SyncFileItem.Status.CONFLICT && !QFileInfo (f.path () + activity.file).exists ()) {
+                    this.activity_model.remove_activity_from_activity_list (activity);
+                    continue;
+                }
+
+                if (activity.status == SyncFileItem.Status.FILE_LOCKED && !QFileInfo (f.path () + activity.file).exists ()) {
+                    this.activity_model.remove_activity_from_activity_list (activity);
+                    continue;
+                }
+
+                if (activity.status == SyncFileItem.Status.FILE_IGNORED && !QFileInfo (f.path () + activity.file).exists ()) {
+                    this.activity_model.remove_activity_from_activity_list (activity);
+                    continue;
+                }
+
+                if (!QFileInfo (f.path () + activity.file).exists ()) {
+                    this.activity_model.remove_activity_from_activity_list (activity);
+                    continue;
+                }
+
+                var path = QFileInfo (activity.file).dir ().path ().to_utf8 ();
+                if (path == ".")
+                    path.clear ();
+
+                if (engine.should_discover_locally (path))
+                    this.activity_model.remove_activity_from_activity_list (activity);
+            }
+        }
+
+        if (progress.status () == ProgressInfo.Status.DONE) {
+            // We keep track very well of pending conflicts.
+            // Inform other components about them.
+            string[] conflicts;
+            foreach (Activity activity, this.activity_model.errors_list ()) {
+                if (activity.folder == folder
+                    && activity.status == SyncFileItem.Status.CONFLICT) {
+                    conflicts.append (activity.file);
+                }
+            }
+
+            /* emit */ ProgressDispatcher.instance ().folder_conflicts (folder, conflicts);
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_send_notification_request (string account_name, string link, GLib.ByteArray verb, int row) {
+        GLib.info ("Server Notification Request " + verb + link + "on account" + account_name;
+
+        const string[] valid_verbs = new string[4] {"GET",
+                                                    "PUT",
+                                                    "POST",
+                                                    "DELETE"
+                                                   };
+
+        if (valid_verbs.contains (verb)) {
+            AccountStatePtr acc = AccountManager.instance ().account (account_name);
+            if (acc) {
+                var job = new Notification_confirm_job (acc.account ());
+                GLib.Uri l (link);
+                job.link_and_verb (l, verb);
+                job.property ("activity_row", GLib.Variant.from_value (row));
+                connect (job, &AbstractNetworkJob.network_error,
+                    this, &User.on_signal_notify_network_error);
+                connect (job, &Notification_confirm_job.job_finished,
+                    this, &User.on_signal_notify_server_finished);
+                job.on_signal_start ();
+
+                // count the number of running notification requests. If this member var
+                // is larger than zero, no new fetching of notifications is started
+                this.notification_requests_running++;
+            }
+        } else {
+            GLib.warn ("Notification Links: Invalid verb:" + verb);
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_notify_server_finished (string reply, int reply_code) {
+        var job = qobject_cast<Notification_confirm_job> (sender ());
+        if (!job) {
+            return;
+        }
+
+        on_signal_end_notification_request (reply_code);
+        GLib.info ("Server Notification reply code" + reply_code + reply;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_build_notification_display (ActivityList list) {
+        this.activity_model.clear_notifications ();
+
+        foreach (var activity in list) {
+            if (this.blocklisted_notifications.contains (activity)) {
+                GLib.info ("Activity in blocklist, skip";
+                continue;
+            }
+            const var message = AccountManager.instance ().accounts ().count () == 1 ? "" : activity.acc_name;
+            show_desktop_notification (activity.subject, message);
+            this.activity_model.add_notification_to_activity_list (activity);
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_refresh_notifications () {
+        // on_signal_start a server notification handler if no notification requests
+        // are running
+        if (this.notification_requests_running == 0) {
+            var snh = new ServerNotificationHandler (this.account.data ());
+            connect (snh, &ServerNotificationHandler.signal_new_notification_list,
+                this, &User.on_signal_build_notification_display);
+
+            snh.on_signal_fetch_notifications ();
+        } else {
+            GLib.warn ("Notification request counter not zero.";
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_refresh_activities () {
+        this.activity_model.on_signal_refresh_activity ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_refresh () {
+        on_signal_refresh_user_status ();
+
+        if (check_push_notifications_are_ready ()) {
+            // we are relying on Web_socket push notifications - ignore refresh attempts from UI
+            this.time_since_last_check[this.account.data ()].invalidate ();
+            return;
+        }
+
+        // QElapsedTimer isn't actually constructed as invalid.
+        if (!this.time_since_last_check.contains (this.account.data ())) {
+            this.time_since_last_check[this.account.data ()].invalidate ();
+        }
+        QElapsedTimer timer = this.time_since_last_check[this.account.data ()];
+
+        // Fetch Activities only if visible and if last check is longer than 15 secs ago
+        if (timer.is_valid () && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {
+            GLib.debug ("Do not check as last check is only secs ago : " + timer.elapsed () / 1000;
+            return;
+        }
+        if (this.account.data () && this.account.data ().is_connected ()) {
+            if (!timer.is_valid ()) {
+                on_signal_refresh_activities ();
+            }
+            on_signal_refresh_notifications ();
+            timer.on_signal_start ();
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_refresh_user_status () {
+        if (this.account.data () && this.account.data ().is_connected ()) {
+            this.account.account ().user_status_connector ().fetch_user_status ();
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_refresh_immediately () {
+        if (this.account.data () && this.account.data ().is_connected ()) {
+            on_signal_refresh_activities ();
+        }
+        on_signal_refresh_notifications ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_notification_refresh_interval (std.chrono.milliseconds interval) {
+        if (!check_push_notifications_are_ready ()) {
+            GLib.debug ("Starting Notification refresh timer with " + interval.count () / 1000 + " sec interval";
+            this.notification_check_timer.on_signal_start (interval.count ());
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_rebuild_navigation_app_list () {
+        /* emit */ signal_server_has_talk_changed ();
+        // Rebuild App list
+        UserAppsModel.instance ().build_app_list ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_push_notifications_ready () {
+        GLib.info ("Push notifications are ready";
+
+        if (this.notification_check_timer.is_active ()) {
+            // as we are now able to use push notifications - let's stop the polling timer
+            this.notification_check_timer.stop ();
+        }
+
+        connect_push_notifications ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_disconnect_push_notifications () {
+        disconnect (this.account.account ().push_notifications (), &PushNotifications.notifications_changed, this, &User.on_signal_received_push_notification);
+        disconnect (this.account.account ().push_notifications (), &PushNotifications.activities_changed, this, &User.on_signal_received_push_activity);
+
+        disconnect (this.account.account ().data (), &Account.push_notifications_disabled, this, &User.on_signal_disconnect_push_notifications);
+
+        // connection to Web_socket may have dropped or an error occured, so we need to bring back the polling until we have re-established the connection
+        on_signal_notification_refresh_interval (ConfigFile ().notification_refresh_interval ());
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_received_push_notification (Account account) {
+        if (account.identifier () == this.account.account ().identifier ()) {
+            on_signal_refresh_notifications ();
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_received_push_activity (Account account) {
+        if (account.identifier () == this.account.account ().identifier ()) {
+            on_signal_refresh_activities ();
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_check_expired_activities () {
+        for (Activity activity : this.activity_model.errors_list ()) {
+            if (activity.expire_at_msecs > 0 && GLib.DateTime.current_date_time ().to_m_secs_since_epoch () >= activity.expire_at_msecs) {
+                this.activity_model.remove_activity_from_activity_list (activity);
+            }
+        }
+
+        if (this.activity_model.errors_list ().size () == 0) {
+            this.expired_activities_check_timer.stop ();
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void connect_push_notifications () {
+        connect (this.account.account ().data (), &Account.push_notifications_disabled, this, &User.on_signal_disconnect_push_notifications, Qt.UniqueConnection);
+
+        connect (this.account.account ().push_notifications (), &PushNotifications.notifications_changed, this, &User.on_signal_received_push_notification, Qt.UniqueConnection);
+        connect (this.account.account ().push_notifications (), &PushNotifications.activities_changed, this, &User.on_signal_received_push_activity, Qt.UniqueConnection);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private bool is_activity_of_current_account (Folder folder) {
+        return folder.account_state () == this.account.data ();
+    }
+
+
+    /***********************************************************
+    We only care about conflict issues that we are able to
+    resolve
+    ***********************************************************/
+    private static bool is_unsolvable_conflict (SyncFileItemPtr item) {
+        return item.status == SyncFileItem.Status.CONFLICT && !Utility.is_conflict_file (item.file);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void show_desktop_notification (string title, string message) {
+        ConfigFile config;
+        if (!config.optional_server_notifications () || !are_desktop_notifications_allowed ()) {
+            return;
+        }
+
+        // after one hour, clear the gui log notification store
+        constexpr int64 clear_gui_log_interval = 60 * 60 * 1000;
+        if (this.gui_log_timer.elapsed () > clear_gui_log_interval) {
+            this.notification_cache.clear ();
+        }
+
+        const NotificationCache.Notification notification {
+            title,
+            message
+        }
+        if (this.notification_cache.contains (notification)) {
+            return;
+        }
+
+        this.notification_cache.insert (notification);
+        /* emit */ signal_gui_log (notification.title, notification.message);
+        // restart the gui log timer now that we show a new notification
+        this.gui_log_timer.on_signal_start ();
+    }
+
+} // class User
+
+} // namespace Ui
+} // namespace Occ

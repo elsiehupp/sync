@@ -109,7 +109,7 @@ class Job : GLib.Object {
 //  #endif
 
     /***********************************************************
-    @return Whether this job autodeletes itself once on_finished () has been emitted. Default is true.
+    @return Whether this job autodeletes itself once on_signal_finished () has been emitted. Default is true.
     @see auto_delete ()
     ***********************************************************/
     public bool auto_delete () {
@@ -118,7 +118,7 @@ class Job : GLib.Object {
 
 
     /***********************************************************
-    Set whether this job should autodelete itself once on_finished () has been emitted.
+    Set whether this job should autodelete itself once on_signal_finished () has been emitted.
     @see auto_delete ()
     ***********************************************************/
     public void auto_delete (bool auto_delete) {

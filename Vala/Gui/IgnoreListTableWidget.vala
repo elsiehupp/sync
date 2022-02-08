@@ -28,17 +28,17 @@ class IgnoreListTableWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_remove_all_items ();
+    public void on_signal_remove_all_items ();
 
 
-    public void on_write_ignore_file (string  file);
+    public void on_signal_write_ignore_file (string  file);
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_item_selection_changed ();
-    private void on_remove_current_item ();
-    private void on_add_pattern ();
+    private void on_signal_item_selection_changed ();
+    private void on_signal_remove_current_item ();
+    private void on_signal_add_pattern ();
 
 
     /***********************************************************
@@ -61,20 +61,20 @@ class IgnoreListTableWidget : Gtk.Widget {
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         ui.up_ui (this);
 
-        ui.description_label.on_text (_("Files or folders matching a pattern will not be synchronized.\n\n"
+        ui.description_label.on_signal_text (_("Files or folders matching a pattern will not be synchronized.\n\n"
                                          "Items where deletion is allowed will be deleted if they prevent a "
                                          "directory from being removed. "
                                          "This is useful for meta data."));
 
         ui.remove_push_button.enabled (false);
         connect (ui.table_widget,         &QTable_widget.item_selection_changed,
-                this, &IgnoreListTableWidget.on_item_selection_changed);
+                this, &IgnoreListTableWidget.on_signal_item_selection_changed);
         connect (ui.remove_push_button,    &QAbstractButton.clicked,
-                this, &IgnoreListTableWidget.on_remove_current_item);
+                this, &IgnoreListTableWidget.on_signal_remove_current_item);
         connect (ui.add_push_button,       &QAbstractButton.clicked,
-                this, &IgnoreListTableWidget.on_add_pattern);
+                this, &IgnoreListTableWidget.on_signal_add_pattern);
         connect (ui.remove_all_push_button, &QAbstractButton.clicked,
-                this, &IgnoreListTableWidget.on_remove_all_items);
+                this, &IgnoreListTableWidget.on_signal_remove_all_items);
 
         ui.table_widget.resize_columns_to_contents ();
         ui.table_widget.horizontal_header ().section_resize_mode (pattern_col, QHeaderView.Stretch);
@@ -85,7 +85,7 @@ class IgnoreListTableWidget : Gtk.Widget {
         delete ui;
     }
 
-    void IgnoreListTableWidget.on_item_selection_changed () {
+    void IgnoreListTableWidget.on_signal_item_selection_changed () {
         QTable_widget_item item = ui.table_widget.current_item ();
         if (!item) {
             ui.remove_push_button.enabled (false);
@@ -96,17 +96,17 @@ class IgnoreListTableWidget : Gtk.Widget {
         ui.remove_push_button.enabled (enable);
     }
 
-    void IgnoreListTableWidget.on_remove_current_item () {
+    void IgnoreListTableWidget.on_signal_remove_current_item () {
         ui.table_widget.remove_row (ui.table_widget.current_row ());
         if (ui.table_widget.row_count () == read_only_rows)
             ui.remove_all_push_button.enabled (false);
     }
 
-    void IgnoreListTableWidget.on_remove_all_items () {
+    void IgnoreListTableWidget.on_signal_remove_all_items () {
         ui.table_widget.row_count (0);
     }
 
-    void IgnoreListTableWidget.on_write_ignore_file (string  file) {
+    void IgnoreListTableWidget.on_signal_write_ignore_file (string  file) {
         GLib.File ignores (file);
         if (ignores.open (QIODevice.WriteOnly)) {
             // rewrites the whole file since now the user can also remove system patterns
@@ -141,7 +141,7 @@ class IgnoreListTableWidget : Gtk.Widget {
         }
     }
 
-    void IgnoreListTableWidget.on_add_pattern () {
+    void IgnoreListTableWidget.on_signal_add_pattern () {
         bool ok_clicked = false;
         string pattern = QInputDialog.get_text (this, _("Add Ignore Pattern"),
             _("Add a new ignore pattern:"),
@@ -177,7 +177,7 @@ class IgnoreListTableWidget : Gtk.Widget {
         ui.table_widget.row_count (new_row + 1);
 
         var pattern_item = new QTable_widget_item;
-        pattern_item.on_text (pattern);
+        pattern_item.on_signal_text (pattern);
         ui.table_widget.item (new_row, pattern_col, pattern_item);
 
         var deletable_item = new QTable_widget_item;

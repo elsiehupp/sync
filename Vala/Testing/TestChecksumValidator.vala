@@ -25,7 +25,7 @@ using namespace Occ.Utility;
     public slots:
 
     void slotUpValidated (GLib.ByteArray& type, GLib.ByteArray& checksum) {
-         qDebug () << "Checksum : " << checksum;
+         GLib.debug ("Checksum : " + checksum;
          QVERIFY (this.expected == checksum );
          QVERIFY (this.expectedType == type );
     }
@@ -46,9 +46,9 @@ using namespace Occ.Utility;
         QProcess md5;
         string[] args;
         args.append (file);
-        md5.on_start (cmd, args);
+        md5.on_signal_start (cmd, args);
         GLib.ByteArray sumShell;
-        qDebug () << "File : "<< file;
+        GLib.debug ("File : "<< file;
 
         if ( md5.waitForFinished ()  ) {
 
@@ -63,7 +63,7 @@ using namespace Occ.Utility;
     ***********************************************************/
     private slots:
 
-    void on_init_test_case () {
+    void on_signal_init_test_case () {
         this.testfile = this.root.path ()+"/csFile";
         Utility.writeRandomFile ( this.testfile);
     }
@@ -114,16 +114,16 @@ using namespace Occ.Utility;
         this.expectedType = "Adler32";
         vali.setChecksumType (this.expectedType);
 
-        connect (vali, SIGNAL (on_done (GLib.ByteArray,GLib.ByteArray)), SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
+        connect (vali, SIGNAL (on_signal_done (GLib.ByteArray,GLib.ByteArray)), SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
 
         var file = new GLib.File (this.testfile, vali);
         file.open (QIODevice.ReadOnly);
         this.expected = calcAdler32 (file);
-        qDebug () << "XX Expected Checksum : " << this.expected;
-        vali.on_start (this.testfile);
+        GLib.debug ("XX Expected Checksum : " + this.expected;
+        vali.on_signal_start (this.testfile);
 
         QEventLoop loop;
-        connect (vali, SIGNAL (on_done (GLib.ByteArray,GLib.ByteArray)), loop, SLOT (quit ()), Qt.QueuedConnection);
+        connect (vali, SIGNAL (on_signal_done (GLib.ByteArray,GLib.ByteArray)), loop, SLOT (quit ()), Qt.QueuedConnection);
         loop.exec ();
 
         delete vali;
@@ -135,15 +135,15 @@ using namespace Occ.Utility;
         var vali = new ComputeChecksum (this);
         this.expectedType = Occ.checkSumMD5C;
         vali.setChecksumType (this.expectedType);
-        connect (vali, SIGNAL (on_done (GLib.ByteArray,GLib.ByteArray)), this, SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
+        connect (vali, SIGNAL (on_signal_done (GLib.ByteArray,GLib.ByteArray)), this, SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
 
         var file = new GLib.File (this.testfile, vali);
         file.open (QIODevice.ReadOnly);
         this.expected = calcMd5 (file);
-        vali.on_start (this.testfile);
+        vali.on_signal_start (this.testfile);
 
         QEventLoop loop;
-        connect (vali, SIGNAL (on_done (GLib.ByteArray,GLib.ByteArray)), loop, SLOT (quit ()), Qt.QueuedConnection);
+        connect (vali, SIGNAL (on_signal_done (GLib.ByteArray,GLib.ByteArray)), loop, SLOT (quit ()), Qt.QueuedConnection);
         loop.exec ();
 
         delete vali;
@@ -154,16 +154,16 @@ using namespace Occ.Utility;
         var vali = new ComputeChecksum (this);
         this.expectedType = Occ.checkSumSHA1C;
         vali.setChecksumType (this.expectedType);
-        connect (vali, SIGNAL (on_done (GLib.ByteArray,GLib.ByteArray)), this, SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
+        connect (vali, SIGNAL (on_signal_done (GLib.ByteArray,GLib.ByteArray)), this, SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
 
         var file = new GLib.File (this.testfile, vali);
         file.open (QIODevice.ReadOnly);
         this.expected = calcSha1 (file);
 
-        vali.on_start (this.testfile);
+        vali.on_signal_start (this.testfile);
 
         QEventLoop loop;
-        connect (vali, SIGNAL (on_done (GLib.ByteArray,GLib.ByteArray)), loop, SLOT (quit ()), Qt.QueuedConnection);
+        connect (vali, SIGNAL (on_signal_done (GLib.ByteArray,GLib.ByteArray)), loop, SLOT (quit ()), Qt.QueuedConnection);
         loop.exec ();
 
         delete vali;
@@ -187,27 +187,27 @@ using namespace Occ.Utility;
 
         file.seek (0);
         this.successDown = false;
-        vali.on_start (this.testfile, adler);
+        vali.on_signal_start (this.testfile, adler);
 
         QTRY_VERIFY (this.successDown);
 
         this.expectedError = QStringLiteral ("The downloaded file does not match the checksum, it will be resumed. \"543345\" != \"%1\"").arg (string.fromUtf8 (this.expected));
         this.errorSeen = false;
         file.seek (0);
-        vali.on_start (this.testfile, "Adler32:543345");
+        vali.on_signal_start (this.testfile, "Adler32:543345");
         QTRY_VERIFY (this.errorSeen);
 
         this.expectedError = QLatin1String ("The checksum header contained an unknown checksum type \"Klaas32\"");
         this.errorSeen = false;
         file.seek (0);
-        vali.on_start (this.testfile, "Klaas32:543345");
+        vali.on_signal_start (this.testfile, "Klaas32:543345");
         QTRY_VERIFY (this.errorSeen);
 
         delete vali;
 //  #endif
     }
 
-    void on_cleanup_test_case () {
+    void on_signal_cleanup_test_case () {
     }
 }
 

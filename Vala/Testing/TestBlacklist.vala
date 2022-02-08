@@ -21,8 +21,8 @@ class TestBlocklist : GLib.Object {
     ***********************************************************/
     private on_ void testBlocklistBasic_data () {
         QTest.addColumn<bool> ("remote");
-        QTest.newRow ("remote") << true;
-        QTest.newRow ("local") << false;
+        QTest.newRow ("remote") + true;
+        QTest.newRow ("local") + false;
     }
 
 
@@ -51,7 +51,7 @@ class TestBlocklist : GLib.Object {
             return null;
         });
 
-        var on_cleanup = [&] () {
+        var on_signal_cleanup = [&] () {
             completeSpy.clear ();
         }
 
@@ -78,7 +78,7 @@ class TestBlocklist : GLib.Object {
             if (remote)
                 QCOMPARE (journalRecord (fakeFolder, "A").etag, initialEtag);
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Ignored during the second run - but soft errors are also errors
         QVERIFY (!fakeFolder.syncOnce ()); {
@@ -98,7 +98,7 @@ class TestBlocklist : GLib.Object {
             if (remote)
                 QCOMPARE (journalRecord (fakeFolder, "A").etag, initialEtag);
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // Let's expire the blocklist entry to verify it gets retried {
             var entry = fakeFolder.syncJournal ().errorBlocklistEntry (testFileName);
@@ -123,7 +123,7 @@ class TestBlocklist : GLib.Object {
             if (remote)
                 QCOMPARE (journalRecord (fakeFolder, "A").etag, initialEtag);
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // When the file changes a retry happens immediately
         modifier.appendByte (testFileName);
@@ -144,7 +144,7 @@ class TestBlocklist : GLib.Object {
             if (remote)
                 QCOMPARE (journalRecord (fakeFolder, "A").etag, initialEtag);
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         // When the error goes away and the item is retried, the sync succeeds
         fakeFolder.serverErrorPaths ().clear (); {
@@ -166,7 +166,7 @@ class TestBlocklist : GLib.Object {
             if (remote)
                 QCOMPARE (journalRecord (fakeFolder, "A").etag, fakeFolder.currentRemoteState ().find ("A").etag);
         }
-        on_cleanup ();
+        on_signal_cleanup ();
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }

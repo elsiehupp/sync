@@ -62,7 +62,7 @@ class DiscoveryPhase : GLib.Object {
 
     If a folder is deleted and must be recursed into, its job isn't
     executed immediately. Instead it's queued here and only run
-    once the rest of the discovery has on_finished and we are certain
+    once the rest of the discovery has on_signal_finished and we are certain
     that the folder wasn't just renamed. This avoids running the
     discovery on contents in the old location of renamed folders.
 
@@ -172,7 +172,7 @@ class DiscoveryPhase : GLib.Object {
 
     signal void fatal_error (string error_string);
     signal void item_discovered (SyncFileItemPtr item);
-    signal void on_finished ();
+    signal void on_signal_finished ();
 
 
     /***********************************************************
@@ -243,7 +243,7 @@ class DiscoveryPhase : GLib.Object {
             && remote_perm.has_permission (RemotePermissions.IsMounted)) {
             // external storage.
 
-            // Note: DiscoverySingleDirectoryJob.on_directory_listing_iterated_slot make sure that only the
+            // Note: DiscoverySingleDirectoryJob.on_signal_directory_listing_iterated_slot make sure that only the
             // root of a mounted storage has 'M', all sub entries have 'm'
 
             // Only allow it if the allow list contains exactly this path (not parents)
@@ -269,8 +269,8 @@ class DiscoveryPhase : GLib.Object {
 
         // do a PROPFIND to know the size of this folder
         var propfind_job = new PropfindJob (this.account, this.remote_folder + path, this);
-        propfind_job.properties (GLib.List<GLib.ByteArray> () << "resourcetype"
-                                                        << "http://owncloud.org/ns:size");
+        propfind_job.properties (GLib.List<GLib.ByteArray> ("resourcetype"
+                                                        + "http://owncloud.org/ns:size");
         GLib.Object.connect (propfind_job, &PropfindJob.finished_with_error,
             this, [=] {
                 return callback (false);
@@ -293,7 +293,7 @@ class DiscoveryPhase : GLib.Object {
                 return callback (false);
             }
         });
-        propfind_job.on_start ();
+        propfind_job.on_signal_start ();
     }
 
 
@@ -326,7 +326,7 @@ class DiscoveryPhase : GLib.Object {
 
 
     /***********************************************************
-    If the database-path is scheduled for deletion, on_abort it.
+    If the database-path is scheduled for deletion, on_signal_abort it.
 
     Check if there is already a job to delete that item:
     If that's not the case, return { false, GLib.ByteArray () }.
@@ -356,15 +356,15 @@ class DiscoveryPhase : GLib.Object {
                         // re-creation of virtual files count as a delete
                         || ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)
                         || ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW))) {
-                    GLib.warn (lc_discovery) << "ENFORCE (FAILING)" << original_path;
-                    GLib.warn (lc_discovery) << "instruction == CSYNC_INSTRUCTION_REMOVE" << (instruction == CSYNC_INSTRUCTION_REMOVE);
-                    GLib.warn (lc_discovery) << " ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)"
-                                           << ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW);
-                    GLib.warn (lc_discovery) << " ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW))"
-                                           << ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW);
-                    GLib.warn (lc_discovery) << "instruction" << instruction;
-                    GLib.warn (lc_discovery) << " (*it).type" << (*it).type;
-                    GLib.warn (lc_discovery) << " (*it).is_restoration " << (*it).is_restoration;
+                    GLib.warn ("ENFORCE (FAILING)" + original_path;
+                    GLib.warn ("instruction == CSYNC_INSTRUCTION_REMOVE" + (instruction == CSYNC_INSTRUCTION_REMOVE);
+                    GLib.warn (" ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)"
+                                           + ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW);
+                    GLib.warn (" ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW))"
+                                           + ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW);
+                    GLib.warn ("instruction" + instruction;
+                    GLib.warn (" (*it).type" + (*it).type;
+                    GLib.warn (" (*it).is_restoration " + (*it).is_restoration;
                     //  Q_ASSERT (false);
                     add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
                     /* emit */ fatal_error (_("Error while canceling delete of %1").arg (original_path));
@@ -390,14 +390,14 @@ class DiscoveryPhase : GLib.Object {
     ***********************************************************/
     public void start_job (ProcessDirectoryJob job) {
         ENFORCE (!this.current_root_job);
-        connect (job, &ProcessDirectoryJob.on_finished, this, [this, job] {
+        connect (job, &ProcessDirectoryJob.on_signal_finished, this, [this, job] {
             ENFORCE (this.current_root_job == sender ());
             this.current_root_job = null;
             if (job.dir_item)
                 /* emit */ item_discovered (job.dir_item);
             job.delete_later ();
 
-            // Once the main job has on_finished recurse here to execute the remaining
+            // Once the main job has on_signal_finished recurse here to execute the remaining
             // jobs for queued deleted directories.
             if (!this.queued_deleted_directories.is_empty ()) {
                 var next_job = this.queued_deleted_directories.take (this.queued_deleted_directories.first_key ());
@@ -407,7 +407,7 @@ class DiscoveryPhase : GLib.Object {
             }
         });
         this.current_root_job = job;
-        job.on_start ();
+        job.on_signal_start ();
     }
 
 
@@ -473,7 +473,7 @@ class DiscoveryPhase : GLib.Object {
             } else if (property == QLatin1String ("getcontentlength")) {
                 // See #4573, sometimes negative size values are returned
                 bool ok = false;
-                qlonglong ll = value.to_long_long (&ok);
+                int64 ll = value.to_long_long (&ok);
                 if (ok && ll >= 0) {
                     result.size = ll;
                 } else {
@@ -494,7 +494,7 @@ class DiscoveryPhase : GLib.Object {
             } else if (property == "share-types" && !value.is_empty ()) {
                 // Since GLib.HashMap is sorted, "share-types" is always after "permissions".
                 if (result.remote_perm.is_null ()) {
-                    q_warning () << "Server returned a share type, but no permissions?";
+                    q_warning ("Server returned a share type, but no permissions?";
                 } else {
                     // S means shared with me.
                     // But for our purpose, we want to know if the file is shared. It does not matter

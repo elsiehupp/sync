@@ -28,7 +28,6 @@ class FakePostReply : Soup.Reply {
         QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
     }
 
-    //  Q_INVOKABLE
     public virtual void respond () {
         if (aborted) {
             setError (OperationCanceledError, "Operation Canceled");
@@ -65,7 +64,7 @@ class FakePostReply : Soup.Reply {
 
     /***********************************************************
     ***********************************************************/
-    public void on_abort () override {
+    public void on_signal_abort () override {
         aborted = true;
     }
 

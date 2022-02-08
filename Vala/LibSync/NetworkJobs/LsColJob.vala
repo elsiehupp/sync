@@ -45,11 +45,11 @@ class LsColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         GLib.List<GLib.ByteArray> properties = this.properties;
 
         if (properties.is_empty ()) {
-            GLib.warn (lc_ls_col_job) << "Propfind with no properties!";
+            GLib.warn ("Propfind with no properties!";
         }
         GLib.ByteArray prop_str;
         foreach (GLib.ByteArray prop, properties) {
@@ -81,7 +81,7 @@ class LsColJob : AbstractNetworkJob {
         } else {
             send_request ("PROPFIND", make_dav_url (path ()), req, buf);
         }
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
@@ -111,9 +111,9 @@ class LsColJob : AbstractNetworkJob {
     be more asynchronous in processing while data is coming from
     the network, not all in one big blob at the end.
     ***********************************************************/
-    private bool on_finished () {
-        GLib.info (lc_ls_col_job) << "LSCOL of" << reply ().request ().url () << "FINISHED WITH STATUS"
-                        << reply_status_string ();
+    private bool on_signal_finished () {
+        GLib.info ("LSCOL of" + reply ().request ().url ("FINISHED WITH STATUS"
+                        + reply_status_string ();
 
         string content_type = reply ().header (Soup.Request.ContentTypeHeader).to_string ();
         int http_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

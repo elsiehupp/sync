@@ -34,7 +34,7 @@ static class FileSystem {
         GLib.File f1 (fn1);
         GLib.File f2 (fn2);
         if (!f1.open (QIODevice.ReadOnly) || !f2.open (QIODevice.ReadOnly)) {
-            GLib.warn (lc_file_system) << "file_equals : Failed to open " << fn1 << "or" << fn2;
+            GLib.warn ("file_equals : Failed to open " + fn1 + "or" + fn2;
             return false;
         }
 
@@ -71,8 +71,8 @@ static class FileSystem {
             result = stat.modtime;
         } else {
             result = Utility.q_date_time_to_time_t (QFileInfo (filename).last_modified ());
-            GLib.warn (lc_file_system) << "Could not get modification time for" << filename
-                                    << "with csync, using QFileInfo:" << result;
+            GLib.warn ("Could not get modification time for" + filename
+                                    + "with csync, using QFileInfo:" + result;
         }
         return result;
     }
@@ -84,8 +84,8 @@ static class FileSystem {
         times[0].tv_usec = times[1].tv_usec = 0;
         int rc = c_utimes (filename, times);
         if (rc != 0) {
-            GLib.warn (lc_file_system) << "Error setting mtime for" << filename
-                                    << "failed : rc" << rc << ", errno:" << errno;
+            GLib.warn ("Error setting mtime for" + filename
+                                    + "failed : rc" + rc + ", errno:" + errno;
             return false;
         }
         return true;
@@ -140,9 +140,9 @@ static class FileSystem {
         const int64 actual_size = get_size (filename);
         const time_t actual_mtime = get_mod_time (filename);
         if ( (actual_size != previous_size && actual_mtime > 0) || (actual_mtime != previous_mtime && previous_mtime > 0 && actual_mtime > 0)) {
-            GLib.info (lc_file_system) << "File" << filename << "has changed:"
-                                    << "size : " << previous_size << "<." << actual_size
-                                    << ", mtime : " << previous_mtime << "<." << actual_mtime;
+            GLib.info ("File" + filename + "has changed:"
+                                    + "size : " + previous_size + "<." + actual_size
+                                    + ", mtime : " + previous_mtime + "<." + actual_mtime;
             return false;
         }
         return true;
@@ -153,13 +153,13 @@ static class FileSystem {
     Removes a directory and its contents recursively
 
     Returns true if all removes succeeded.
-    on_deleted () is called for each deleted file or directory, including the root.
+    on_signal_deleted () is called for each deleted file or directory, including the root.
     errors are collected in errors.
 
     Code inspired from Qt5's QDir.remove_recursively
     ***********************************************************/
     bool remove_recursively (string path,
-        const std.function<void (string path, bool is_dir)> on_deleted = null,
+        const std.function<void (string path, bool is_dir)> on_signal_deleted = null,
         string[] errors = null) {
         bool all_removed = true;
         QDirIterator di (path, QDir.AllEntries | QDir.Hidden | QDir.System | QDir.NoDotAndDotDot);
@@ -172,19 +172,19 @@ static class FileSystem {
             // we never want to go into this branch for .lnk files
             bool is_dir = fi.is_dir () && !fi.is_sym_link () && !FileSystem.is_junction (fi.absolute_file_path ());
             if (is_dir) {
-                remove_ok = remove_recursively (path + '/' + di.filename (), on_deleted, errors); // recursive
+                remove_ok = remove_recursively (path + '/' + di.filename (), on_signal_deleted, errors); // recursive
             } else {
                 string remove_error;
                 remove_ok = FileSystem.remove (di.file_path (), remove_error);
                 if (remove_ok) {
-                    if (on_deleted)
-                        on_deleted (di.file_path (), false);
+                    if (on_signal_deleted)
+                        on_signal_deleted (di.file_path (), false);
                 } else {
                     if (errors) {
                         errors.append (_("FileSystem", "Error removing \"%1\" : %2")
                                             .arg (QDir.to_native_separators (di.file_path ()), remove_error));
                     }
-                    GLib.warn (lc_file_system) << "Error removing " << di.file_path () << ':' << remove_error;
+                    GLib.warn ("Error removing " + di.file_path () + ':' + remove_error;
                 }
             }
             if (!remove_ok)
@@ -193,14 +193,14 @@ static class FileSystem {
         if (all_removed) {
             all_removed = QDir ().rmdir (path);
             if (all_removed) {
-                if (on_deleted)
-                    on_deleted (path, true);
+                if (on_signal_deleted)
+                    on_signal_deleted (path, true);
             } else {
                 if (errors) {
                     errors.append (_("FileSystem", "Could not remove folder \"%1\"")
                                         .arg (QDir.to_native_separators (path)));
                 }
-                GLib.warn (lc_file_system) << "Error removing folder" << path;
+                GLib.warn ("Error removing folder" + path;
             }
         }
         return all_removed;

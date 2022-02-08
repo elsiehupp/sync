@@ -124,7 +124,7 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t ha
   GLib.ByteArray full_path = handle.path % '/' % GLib.ByteArray () % const_cast<const char> (dirent.d_name);
   if (file_stat.path.is_null ()) {
       file_stat.original_path = full_path;
-      GLib.warn (lc_c_sync_v_iOLocal) << "Invalid characters in file/directory name, please rename:" << dirent.d_name << handle.path;
+      GLib.warn ("Invalid characters in file/directory name, please rename:" + dirent.d_name + handle.path;
   }
 
   /* Check for availability of d_type, see manpage. */

@@ -22,7 +22,7 @@ class Profile_page_menu : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_hovercard_fetched ();
+    private void on_signal_hovercard_fetched ();
 
     /***********************************************************
     ***********************************************************/
@@ -35,8 +35,8 @@ class Profile_page_menu : Gtk.Widget {
     Profile_page_menu.Profile_page_menu (AccountPointer account, string share_with_user_id, Gtk.Widget parent)
         : Gtk.Widget (parent)
         this.profile_connector (account) {
-        connect (&this.profile_connector, &OcsProfileConnector.hovercard_fetched, this, &Profile_page_menu.on_hovercard_fetched);
-        connect (&this.profile_connector, &OcsProfileConnector.icon_loaded, this, &Profile_page_menu.on_icon_loaded);
+        connect (&this.profile_connector, &OcsProfileConnector.hovercard_fetched, this, &Profile_page_menu.on_signal_hovercard_fetched);
+        connect (&this.profile_connector, &OcsProfileConnector.icon_loaded, this, &Profile_page_menu.on_signal_icon_loaded);
         this.profile_connector.fetch_hovercard (share_with_user_id);
     }
 
@@ -46,7 +46,7 @@ class Profile_page_menu : Gtk.Widget {
         this.menu.exec (global_position);
     }
 
-    void Profile_page_menu.on_hovercard_fetched () {
+    void Profile_page_menu.on_signal_hovercard_fetched () {
         this.menu.clear ();
 
         const var hovercard_actions = this.profile_connector.hovercard ().actions;
@@ -59,7 +59,7 @@ class Profile_page_menu : Gtk.Widget {
         }
     }
 
-    void Profile_page_menu.on_icon_loaded (size_t hovercard_action_index) {
+    void Profile_page_menu.on_signal_icon_loaded (size_t hovercard_action_index) {
         const var hovercard_actions = this.profile_connector.hovercard ().actions;
         const var menu_actions = this.menu.actions ();
         if (hovercard_action_index >= hovercard_actions.size ()

@@ -31,7 +31,7 @@ class GetMetadataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () override {
+    public void on_signal_start () override {
         Soup.Request req;
         req.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
@@ -39,16 +39,16 @@ class GetMetadataApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (query);
 
-        GLib.info (lc_cse_job ()) << "Requesting the metadata for the file_identifier" << this.file_identifier << "as encrypted";
+        GLib.info ()) + "Requesting the metadata for the file_identifier" + this.file_identifier + "as encrypted";
         send_request ("GET", url, req);
-        AbstractNetworkJob.on_start ();
+        AbstractNetworkJob.on_signal_start ();
     }
 
 
-    protected bool on_finished () override {
+    protected bool on_signal_finished () override {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
-            GLib.info (lc_cse_job ()) << "error requesting the metadata" << path () << error_string () << return_code;
+            GLib.info ()) + "error requesting the metadata" + path () + error_string () + return_code;
             /* emit */ error (this.file_identifier, return_code);
             return true;
         }

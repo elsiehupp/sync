@@ -169,7 +169,7 @@ class RemotePermissions {
     /***********************************************************
     ***********************************************************/
     public friend QDebug operator<< (QDebug dbg, RemotePermissions remote_permissions) {
-        return dbg << remote_permissions.to_string ();
+        return dbg + remote_permissions.to_string ();
     }
 }
 

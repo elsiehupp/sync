@@ -16,9 +16,9 @@ class TestInotifyWatcher : public FolderWatcherPrivate {
 
     /***********************************************************
     ***********************************************************/
-    private void on_init_test_case () {
+    private void on_signal_init_test_case () {
         this.root = QDir.tempPath () + "/" + "test_" + string.number (Occ.Utility.rand ());
-        qDebug () << "creating test directory tree in " << this.root;
+        GLib.debug ("creating test directory tree in " + this.root;
         QDir rootDir (this.root);
 
         rootDir.mkpath (this.root + "/a1/b1/c1");
@@ -59,7 +59,7 @@ class TestInotifyWatcher : public FolderWatcherPrivate {
 
     /***********************************************************
     ***********************************************************/
-    private void on_cleanup_test_case () {
+    private void on_signal_cleanup_test_case () {
         if ( this.root.startsWith (QDir.tempPath () )) {
            system ( string ("rm -rf %1").arg (this.root).toLocal8Bit () );
         }

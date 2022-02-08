@@ -78,7 +78,7 @@ class Vfs_suffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public void on_file_status_changed (string , SyncFileStatus) override {}
+    public void on_signal_file_status_changed (string , SyncFileStatus) override {}
 
     protected void start_impl (VfsSetupParams parameters) override;
 }

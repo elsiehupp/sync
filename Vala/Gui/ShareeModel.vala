@@ -47,7 +47,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private void on_sharees_fetched (QJsonDocument reply);
+    private void on_signal_sharees_fetched (QJsonDocument reply);
 
     /***********************************************************
     ***********************************************************/
@@ -81,12 +81,12 @@ signals:
         this.search = search;
         this.sharee_blocklist = blocklist;
         var job = new Ocs_sharee_job (this.account);
-        connect (job, &Ocs_sharee_job.sharee_job_finished, this, &Sharee_model.on_sharees_fetched);
+        connect (job, &Ocs_sharee_job.sharee_job_finished, this, &Sharee_model.on_signal_sharees_fetched);
         connect (job, &Ocs_job.ocs_error, this, &Sharee_model.display_error_message);
         job.get_sharees (this.search, this.type, 1, 50, lookup_mode == Global_search ? true : false);
     }
 
-    void Sharee_model.on_sharees_fetched (QJsonDocument reply) {
+    void Sharee_model.on_signal_sharees_fetched (QJsonDocument reply) {
         GLib.Vector<unowned<Sharee>> new_sharees;
      {
             const string[] sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
@@ -138,7 +138,7 @@ signals:
 
     // Helper function for new_sharees   (could be a lambda when we can use them)
     static unowned<Sharee> sharee_from_model_index (QModelIndex index) {
-        return index.data (Qt.User_role).value<unowned<Sharee>> ();
+        return index.data (Qt.USER_ROLE).value<unowned<Sharee>> ();
     }
 
     struct Find_sharee_helper {
@@ -171,9 +171,9 @@ signals:
             }
             var it = std.find_if (this.sharees.const_begin (), this.sharees.const_end (), helper);
             if (it == this.sharees.const_end ()) {
-                new_persistant << QModelIndex ();
+                new_persistant + QModelIndex ();
             } else {
-                new_persistant << index (std.distance (this.sharees.const_begin (), it));
+                new_persistant + index (std.distance (this.sharees.const_begin (), it));
             }
         }
 
@@ -201,7 +201,7 @@ signals:
             // doesn't leak to the user.
             return string (sharee.display_name () + " (" + sharee.share_with () + ")");
 
-        } else if (role == Qt.User_role) {
+        } else if (role == Qt.USER_ROLE) {
             return GLib.Variant.from_value (sharee);
         }
 

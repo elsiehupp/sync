@@ -31,7 +31,7 @@ class Utility {
         }
 
         if (!allowed_url_schemes.contains (url.scheme ())) {
-            GLib.warn (lc_utility) << "URL format is not supported, or it has been compromised for:" << url.to_string ();
+            GLib.warn ("URL format is not supported, or it has been compromised for:" + url.to_string ();
             return false;
         }
 
@@ -45,7 +45,7 @@ class Utility {
                         "URL %1. Maybe no default browser is configured?")
                         .arg (url.to_string ()));
             }
-            GLib.warn (lc_utility) << "QDesktopServices.open_url failed for" << url;
+            GLib.warn ("QDesktopServices.open_url failed for" + url;
             return false;
         }
         return true;
@@ -83,7 +83,7 @@ class Utility {
                         "create a new message. Maybe no default email client is "
                         "configured?"));
             }
-            GLib.warn (lc_utility) << "QDesktopServices.open_url failed for" << url;
+            GLib.warn ("QDesktopServices.open_url failed for" + url;
             return false;
         }
         return true;

@@ -45,7 +45,7 @@ class ClientProxy : GLib.Object {
     public void lookup_system_proxy_async (GLib.Uri url, GLib.Object dst, char slot) {
         var runnable = new SystemProxyRunnable (url);
         GLib.Object.connect (runnable, SIGNAL (system_proxy_looked_up (QNetworkProxy)), dst, slot);
-        QThreadPool.global_instance ().on_start (runnable); // takes ownership and deletes
+        QThreadPool.global_instance ().on_signal_start (runnable); // takes ownership and deletes
     }
 
 
@@ -98,7 +98,7 @@ class ClientProxy : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_setup_qt_proxy_from_config () {
+    public void on_signal_setup_qt_proxy_from_config () {
         Occ.ConfigFile config;
         int proxy_type = QNetworkProxy.DefaultProxy;
         QNetworkProxy proxy;
@@ -111,12 +111,12 @@ class ClientProxy : GLib.Object {
 
         switch (proxy_type) {
             case QNetworkProxy.NoProxy:
-                GLib.info (lc_client_proxy) << "Set proxy configuration to use NO proxy";
+                GLib.info ("Set proxy configuration to use NO proxy";
                 QNetworkProxyFactory.use_system_configuration (false);
                 QNetworkProxy.application_proxy (QNetworkProxy.NoProxy);
                 break;
             case QNetworkProxy.DefaultProxy:
-                GLib.info (lc_client_proxy) << "Set proxy configuration to use the preferred system proxy for http tcp connections"; {
+                GLib.info ("Set proxy configuration to use the preferred system proxy for http tcp connections"; {
                     QNetworkProxyQuery query;
                     query.protocol_tag ("http");
                     query.query_type (QNetworkProxyQuery.TcpSocket);
@@ -128,13 +128,13 @@ class ClientProxy : GLib.Object {
                 break;
             case QNetworkProxy.Socks5Proxy:
                 proxy.type (QNetworkProxy.Socks5Proxy);
-                GLib.info (lc_client_proxy) << "Set proxy configuration to SOCKS5" << print_q_network_proxy (proxy);
+                GLib.info ("Set proxy configuration to SOCKS5" + print_q_network_proxy (proxy);
                 QNetworkProxyFactory.use_system_configuration (false);
                 QNetworkProxy.application_proxy (proxy);
                 break;
             case QNetworkProxy.HttpProxy:
                 proxy.type (QNetworkProxy.HttpProxy);
-                GLib.info (lc_client_proxy) << "Set proxy configuration to HTTP" << print_q_network_proxy (proxy);
+                GLib.info ("Set proxy configuration to HTTP" + print_q_network_proxy (proxy);
                 QNetworkProxyFactory.use_system_configuration (false);
                 QNetworkProxy.application_proxy (proxy);
                 break;

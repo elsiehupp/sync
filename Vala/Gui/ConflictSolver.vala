@@ -11,107 +11,97 @@ namespace Occ {
 namespace Ui {
 
 class ConflictSolver : GLib.Object {
-    //  Q_PROPERTY (string local_version_filename READ local_version_filename WRITE on_local_version_filename NOTIFY local_version_filename_changed)
-    //  Q_PROPERTY (string remote_version_filename READ remote_version_filename WRITE on_remote_version_filename NOTIFY remote_version_filename_changed)
 
     /***********************************************************
     ***********************************************************/
     public enum Solution {
-        KeepLocalVersion,
-        KeepRemoteVersion,
-        KeepBothVersions
+        KEEP_LOCAL_VERSION,
+        KEEP_REMOTE_VERSION,
+        KEEP_BOTH_VERSION
     }
 
     /***********************************************************
     ***********************************************************/
-    public ConflictSolver (Gtk.Widget parent = null);
-
-    /***********************************************************
-    ***********************************************************/
-    public string local_version_filename ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_local_version_filename (string local_version_filename);
-
-
-    public void on_remote_version_filename (string remote_version_filename);
-
-signals:
-    void local_version_filename_changed ();
-    void remote_version_filename_changed ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private bool delete_local_version ();
-    private bool rename_local_version ();
-    private bool overwrite_remote_version ();
-
-    /***********************************************************
-    ***********************************************************/
-    private Gtk.Widget this.parent_widget;
-    private string this.local_version_filename;
-    private string this.remote_version_filename;
-}
-
-    ConflictSolver.ConflictSolver (Gtk.Widget parent)
-        : GLib.Object (parent)
-        this.parent_widget (parent) {
+    private Gtk.Widget parent_widget;
+    string local_version_filename {
+        public get {
+            return this.local_version_filename;
+        }
+        private set {
+            this.local_version_filename; = value;
+        }
+    }
+    string remote_version_filename {
+        public get {
+            return this.remote_version_filename;
+        }
+        private set {
+            this.remote_version_filename; = value;
+        }
     }
 
-    string ConflictSolver.local_version_filename () {
-        return this.local_version_filename;
+
+    signal void signal_local_version_filename_changed ();
+    signal void signal_remote_version_filename_changed ();
+
+
+    /***********************************************************
+    ***********************************************************/
+    public ConflictSolver (Gtk.Widget parent_widget = null) {
+        base (parent_widget);
+        this.parent_widget = parent_widget;
     }
 
-    string ConflictSolver.remote_version_filename () {
-        return this.remote_version_filename;
-    }
 
-    bool ConflictSolver.exec (ConflictSolver.Solution solution) {
+
+
+    /***********************************************************
+    ***********************************************************/
+
+
+    /***********************************************************
+    ***********************************************************/
+    public bool exec (ConflictSolver.Solution solution) {
         switch (solution) {
-        case KeepLocalVersion:
+        case Solution.KEEP_LOCAL_VERSION:
             return overwrite_remote_version ();
-        case KeepRemoteVersion:
+        case Solution.KEEP_REMOTE_VERSION:
             return delete_local_version ();
-        case KeepBothVersions:
+        case Solution.KEEP_BOTH_VERSION:
             return rename_local_version ();
         }
         Q_UNREACHABLE ();
         return false;
     }
 
-    void ConflictSolver.on_local_version_filename (string local_version_filename) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_local_version_filename (string local_version_filename) {
         if (this.local_version_filename == local_version_filename) {
             return;
         }
 
         this.local_version_filename = local_version_filename;
-        /* emit */ local_version_filename_changed ();
+        /* emit */ signal_local_version_filename_changed ();
     }
 
-    void ConflictSolver.on_remote_version_filename (string remote_version_filename) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_remote_version_filename (string remote_version_filename) {
         if (this.remote_version_filename == remote_version_filename) {
             return;
         }
 
         this.remote_version_filename = remote_version_filename;
-        /* emit */ remote_version_filename_changed ();
+        /* emit */ signal_remote_version_filename_changed ();
     }
 
-    bool ConflictSolver.delete_local_version () {
+
+    /***********************************************************
+    ***********************************************************/
+    private bool delete_local_version () {
         if (this.local_version_filename.is_empty ()) {
             return false;
         }
@@ -134,7 +124,10 @@ signals:
         }
     }
 
-    bool ConflictSolver.rename_local_version () {
+
+    /***********************************************************
+    ***********************************************************/
+    private bool rename_local_version () {
         if (this.local_version_filename.is_empty ()) {
             return false;
         }
@@ -165,13 +158,16 @@ signals:
         if (FileSystem.unchecked_rename_replace (this.local_version_filename, target_filename, error)) {
             return true;
         } else {
-            GLib.warn (lc_conflict) << "Rename error:" << error;
+            GLib.warn ("Rename error:" + error;
             QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
             return false;
         }
     }
 
-    bool ConflictSolver.overwrite_remote_version () {
+
+    /***********************************************************
+    ***********************************************************/
+    private bool overwrite_remote_version () {
         if (this.local_version_filename.is_empty ()) {
             return false;
         }
@@ -189,11 +185,13 @@ signals:
         if (FileSystem.unchecked_rename_replace (this.local_version_filename, this.remote_version_filename, error)) {
             return true;
         } else {
-            GLib.warn (lc_conflict) << "Rename error:" << error;
+            GLib.warn ("Rename error:" + error;
             QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
             return false;
         }
     }
 
-    } // namespace Occ
-    
+} // class ConflictSolver
+
+} // namespace Ui
+} // namespace Occ

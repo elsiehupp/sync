@@ -95,39 +95,39 @@ class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_start () {
+    public void on_signal_start () {
         // Start the actual HTTP job
         var ls_col_job = new LsColJob (this.account, this.sub_path, this);
 
         GLib.List<GLib.ByteArray> props;
-        props << "resourcetype"
-              << "getlastmodified"
-              << "getcontentlength"
-              << "getetag"
-              << "http://owncloud.org/ns:size"
-              << "http://owncloud.org/ns:identifier"
-              << "http://owncloud.org/ns:fileid"
-              << "http://owncloud.org/ns:download_uRL"
-              << "http://owncloud.org/ns:d_dC"
-              << "http://owncloud.org/ns:permissions"
-              << "http://owncloud.org/ns:checksums";
+        props + "resourcetype"
+              + "getlastmodified"
+              + "getcontentlength"
+              + "getetag"
+              + "http://owncloud.org/ns:size"
+              + "http://owncloud.org/ns:identifier"
+              + "http://owncloud.org/ns:fileid"
+              + "http://owncloud.org/ns:download_uRL"
+              + "http://owncloud.org/ns:d_dC"
+              + "http://owncloud.org/ns:permissions"
+              + "http://owncloud.org/ns:checksums";
         if (this.is_root_path)
-            props << "http://owncloud.org/ns:data-fingerprint";
+            props + "http://owncloud.org/ns:data-fingerprint";
         if (this.account.server_version_int () >= Account.make_server_version (10, 0, 0)) {
             // Server older than 10.0 have performances issue if we ask for the share-types on every PROPFIND
-            props << "http://owncloud.org/ns:share-types";
+            props + "http://owncloud.org/ns:share-types";
         }
         if (this.account.capabilities ().client_side_encryption_available ()) {
-            props << "http://nextcloud.org/ns:is-encrypted";
+            props + "http://nextcloud.org/ns:is-encrypted";
         }
 
         ls_col_job.properties (props);
 
         GLib.Object.connect (ls_col_job, &LsColJob.directory_listing_iterated,
-            this, &DiscoverySingleDirectoryJob.on_directory_listing_iterated_slot);
-        GLib.Object.connect (ls_col_job, &LsColJob.finished_with_error, this, &DiscoverySingleDirectoryJob.on_ls_job_finished_with_error_slot);
-        GLib.Object.connect (ls_col_job, &LsColJob.finished_without_error, this, &DiscoverySingleDirectoryJob.on_ls_job_finished_without_error_slot);
-        ls_col_job.on_start ();
+            this, &DiscoverySingleDirectoryJob.on_signal_directory_listing_iterated_slot);
+        GLib.Object.connect (ls_col_job, &LsColJob.finished_with_error, this, &DiscoverySingleDirectoryJob.on_signal_ls_job_finished_with_error_slot);
+        GLib.Object.connect (ls_col_job, &LsColJob.finished_without_error, this, &DiscoverySingleDirectoryJob.on_signal_ls_job_finished_without_error_slot);
+        ls_col_job.on_signal_start ();
 
         this.ls_col_job = ls_col_job;
     }
@@ -135,41 +135,41 @@ class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_abort () {
+    public void on_signal_abort () {
         if (this.ls_col_job && this.ls_col_job.reply ()) {
-            this.ls_col_job.reply ().on_abort ();
+            this.ls_col_job.reply ().on_signal_abort ();
         }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_directory_listing_iterated_slot (string , GLib.HashMap<string, string> &);
+    private void on_signal_directory_listing_iterated_slot (string , GLib.HashMap<string, string> &);
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_ls_job_finished_without_error_slot ();
+    private void on_signal_ls_job_finished_without_error_slot ();
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_ls_job_finished_with_error_slot (Soup.Reply *);
+    private void on_signal_ls_job_finished_with_error_slot (Soup.Reply *);
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_fetch_e2e_metadata ();
+    private void on_signal_fetch_e2e_metadata ();
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_metadata_received (QJsonDocument json, int status_code);
+    private void on_signal_metadata_received (QJsonDocument json, int status_code);
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_metadata_error (GLib.ByteArray file_identifier, int http_return_code);
+    private void on_signal_metadata_error (GLib.ByteArray file_identifier, int http_return_code);
 
 }
 

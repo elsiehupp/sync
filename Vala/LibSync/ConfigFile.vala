@@ -308,7 +308,7 @@ class ConfigFile {
         var default_poll_interval = chrono.milliseconds (DEFAULT_REMOTE_POLL_INTERVAL);
         var remote_interval = milliseconds_value (settings, REMOTE_POLL_INTERVAL_C, default_poll_interval);
         if (remote_interval < chrono.seconds (5)) {
-            GLib.warn (lc_config_file) << "Remote Interval is less than 5 seconds, reverting to" << DEFAULT_REMOTE_POLL_INTERVAL;
+            GLib.warn ("Remote Interval is less than 5 seconds, reverting to" + DEFAULT_REMOTE_POLL_INTERVAL;
             remote_interval = default_poll_interval;
         }
         return remote_interval;
@@ -326,12 +326,12 @@ class ConfigFile {
             con = default_connection ();
 
         if (interval < chrono.seconds (5)) {
-            GLib.warn (lc_config_file) << "Remote Poll interval of " << interval.count () << " is below five seconds.";
+            GLib.warn ("Remote Poll interval of " + interval.count (" is below five seconds.";
             return;
         }
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.begin_group (con);
-        settings.value (QLatin1String (REMOTE_POLL_INTERVAL_C), qlonglong (interval.count ()));
+        settings.value (QLatin1String (REMOTE_POLL_INTERVAL_C), int64 (interval.count ()));
         settings.sync ();
     }
 
@@ -349,7 +349,7 @@ class ConfigFile {
         var default_interval = chrono.minutes (5);
         var interval = milliseconds_value (settings, NOTIFICATION_REFRESH_INTERVAL_C, default_interval);
         if (interval < chrono.minutes (1)) {
-            GLib.warn (lc_config_file) << "Notification refresh interval smaller than one minute, setting to one minute";
+            GLib.warn ("Notification refresh interval smaller than one minute, setting to one minute";
             interval = chrono.minutes (1);
         }
         return interval;
@@ -371,7 +371,7 @@ class ConfigFile {
         var default_interval = chrono.hours (2);
         var interval = milliseconds_value (settings, FORCE_SYNC_INTERVAL_C, default_interval);
         if (interval < poll_interval) {
-            GLib.warn (lc_config_file) << "Force sync interval is less than the remote poll inteval, reverting to" << poll_interval.count ();
+            GLib.warn ("Force sync interval is less than the remote poll inteval, reverting to" + poll_interval.count ();
             interval = poll_interval;
         }
         return interval;
@@ -668,7 +668,7 @@ class ConfigFile {
             if (job.exec ()) {
                 QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
                 settings.remove (QLatin1String (PROXY_PASS_C));
-                GLib.info (lc_config_file ()) << "Migrated proxy password to keychain";
+                GLib.info ()) + "Migrated proxy password to keychain";
             }
         } else {
             // Read password from keychain
@@ -861,7 +861,7 @@ class ConfigFile {
     ***********************************************************/
     static chrono.milliseconds milliseconds_value (QSettings setting, char key,
         chrono.milliseconds default_value) {
-        return chrono.milliseconds (setting.value (QLatin1String (key), qlonglong (default_value.count ())).to_long_long ());
+        return chrono.milliseconds (setting.value (QLatin1String (key), int64 (default_value.count ())).to_long_long ());
     }
 
 
@@ -925,7 +925,7 @@ class ConfigFile {
         }
         if (fi.exists () && fi.is_dir ()) {
             dir_path = fi.absolute_file_path ();
-            GLib.info (lc_config_file) << "Using custom config dir " << dir_path;
+            GLib.info ("Using custom config dir " + dir_path;
             this.conf_dir = dir_path;
             return true;
         }
@@ -1095,7 +1095,7 @@ class ConfigFile {
 
         var min_interval = chrono.minutes (5);
         if (interval < min_interval) {
-            GLib.warn (lc_config_file) << "Update check interval less than five minutes, resetting to 5 minutes";
+            GLib.warn ("Update check interval less than five minutes, resetting to 5 minutes";
             interval = min_interval;
         }
         return interval;
@@ -1311,17 +1311,17 @@ class ConfigFile {
         string user_list = config.exclude_file (ConfigFile.USER_SCOPE);
 
         if (!GLib.File.exists (user_list)) {
-            GLib.info (lc_config_file) << "User defined ignore list does not exist:" << user_list;
+            GLib.info ("User defined ignore list does not exist:" + user_list;
             if (!GLib.File.copy (system_list, user_list)) {
-                GLib.info (lc_config_file) << "Could not copy over default list to:" << user_list;
+                GLib.info ("Could not copy over default list to:" + user_list;
             }
         }
 
         if (!GLib.File.exists (user_list)) {
-            GLib.info (lc_config_file) << "Adding system ignore list to csync:" << system_list;
+            GLib.info ("Adding system ignore list to csync:" + system_list;
             excluded_files.add_exclude_file_path (system_list);
         } else {
-            GLib.info (lc_config_file) << "Adding user defined ignore list to csync:" << user_list;
+            GLib.info ("Adding user defined ignore list to csync:" + user_list;
             excluded_files.add_exclude_file_path (user_list);
         }
     }

@@ -79,13 +79,13 @@ class CloudProviderWrapper : GLib.Object {
     ***********************************************************/
     public 
 
-    public void on_sync_finished (SyncResult &);
+    public void on_signal_sync_finished (SyncResult &);
 
 
-    public void on_update_progress (string folder, ProgressInfo progress);
+    public void on_signal_update_progress (string folder, ProgressInfo progress);
 
 
-    public void on_sync_paused_changed (Folder*, bool);
+    public void on_signal_sync_paused_changed (Folder*, bool);
 
 
     /***********************************************************
@@ -122,10 +122,10 @@ CloudProviderWrapper.CloudProviderWrapper (GLib.Object parent, Folder folder, in
     action_group = get_action_group ();
     cloud_providers_account_exporter_action_group (this.cloud_provider_account, action_group);
 
-    connect (ProgressDispatcher.instance (), SIGNAL (progress_info (string, ProgressInfo)), this, SLOT (on_update_progress (string, ProgressInfo)));
-    connect (this.folder, SIGNAL (sync_started ()), this, SLOT (on_sync_started ()));
-    connect (this.folder, SIGNAL (sync_finished (SyncResult)), this, SLOT (on_sync_finished (SyncResult)));
-    connect (this.folder, SIGNAL (sync_paused_changed (Folder*,bool)), this, SLOT (on_sync_paused_changed (Folder*, bool)));
+    connect (ProgressDispatcher.instance (), SIGNAL (progress_info (string, ProgressInfo)), this, SLOT (on_signal_update_progress (string, ProgressInfo)));
+    connect (this.folder, SIGNAL (sync_started ()), this, SLOT (on_signal_sync_started ()));
+    connect (this.folder, SIGNAL (sync_finished (SyncResult)), this, SLOT (on_signal_sync_finished (SyncResult)));
+    connect (this.folder, SIGNAL (sync_paused_changed (Folder*,bool)), this, SLOT (on_signal_sync_paused_changed (Folder*, bool)));
 
     this.paused = this.folder.sync_paused ();
     update_pause_status ();
@@ -158,7 +158,7 @@ static GMenu_item menu_item_new_submenu (string label, GMenu_model submenu) {
     return g_menu_item_new_submenu (label.to_utf8 ().data (), submenu);
 }
 
-void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo progress) {
+void CloudProviderWrapper.on_signal_update_progress (string folder, ProgressInfo progress) {
     // Only update progress for the current folder
     Folder f = FolderMan.instance ().folder (folder);
     if (f != this.folder)
@@ -252,11 +252,11 @@ Folder* CloudProviderWrapper.folder () {
     return this.folder;
 }
 
-void CloudProviderWrapper.on_sync_started () {
+void CloudProviderWrapper.on_signal_sync_started () {
     cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_SYNCING);
 }
 
-void CloudProviderWrapper.on_sync_finished (SyncResult result) {
+void CloudProviderWrapper.on_signal_sync_finished (SyncResult result) {
     if (result.status () == result.Success || result.status () == result.Problem) {
         cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
         update_status_text (result.status_string ());
@@ -307,7 +307,7 @@ GMenu_model* CloudProviderWrapper.get_menu_model () {
     item = menu_item_new (_("Settings"), "cloudprovider.opensettings");
     g_menu_append_item (section, item);
     g_clear_object (&item);
-    item = menu_item_new (_("Log out"), "cloudprovider.logout");
+    item = menu_item_new (_("Log out"), "cloudprovider.log_out");
     g_menu_append_item (section, item);
     g_clear_object (&item);
     item = menu_item_new (_("Quit sync client"), "cloudprovider.quit");
@@ -327,11 +327,11 @@ activate_action_open (GSimple_action action, GVariant parameter, gpointer user_d
     var gui = dynamic_cast<OwncloudGui> (self.parent ().parent ());
 
     if (g_str_equal (name, "openhelp")) {
-        gui.on_help ();
+        gui.on_signal_help ();
     }
 
     if (g_str_equal (name, "opensettings")) {
-        gui.on_show_settings ();
+        gui.on_signal_show_settings ();
     }
 
     if (g_str_equal (name, "openwebsite")) {
@@ -348,7 +348,7 @@ activate_action_open (GSimple_action action, GVariant parameter, gpointer user_d
         show_in_file_manager (string (path));
     }
 
-    if (g_str_equal (name, "logout")) {
+    if (g_str_equal (name, "log_out")) {
         self.folder ().account_state ().sign_out_by_ui ();
     }
 
@@ -398,7 +398,7 @@ static GAction_entry actions[] = {
         {0,0,0}
     },
     {
-        "logout",
+        "log_out",
         activate_action_open,
         null,
         null,
@@ -465,7 +465,7 @@ GAction_group* CloudProviderWrapper.get_action_group () {
     return G_ACTION_GROUP (g_object_ref (action_group));
 }
 
-void CloudProviderWrapper.on_sync_paused_changed (Folder folder, bool state) {
+void CloudProviderWrapper.on_signal_sync_paused_changed (Folder folder, bool state) {
     //  Q_UNUSED (folder);
     this.paused = state;
     GAction pause = g_action_map_lookup_action (G_ACTION_MAP (action_group), "pause");

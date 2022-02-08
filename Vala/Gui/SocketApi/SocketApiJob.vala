@@ -36,7 +36,7 @@ class Socket_api_job : GLib.Object {
 
 
 void Socket_api_job.resolve (string response) {
-    this.socket_listener.on_send_message ("RESOLVE|" + this.job_id + '|' + response);
+    this.socket_listener.on_signal_send_message ("RESOLVE|" + this.job_id + '|' + response);
 }
 
 void Socket_api_job.resolve (QJsonObject response) {
@@ -46,5 +46,5 @@ void Socket_api_job.resolve (QJsonObject response) {
 }
 
 void Socket_api_job.reject (string response) {
-    this.socket_listener.on_send_message ("REJECT|" + this.job_id + '|' + response);
+    this.socket_listener.on_signal_send_message ("REJECT|" + this.job_id + '|' + response);
 }

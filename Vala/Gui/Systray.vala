@@ -42,7 +42,7 @@ class Access_manager_factory : QQml_network_access_manager_factory {
 #ifdef Q_OS_OSX
 bool can_os_x_send_user_notification ();
 void send_os_xUser_notification (string title, string message);
-void tray_window_level_and_visible_on_all_spaces (QWindow window);
+void tray_window_level_and_visible_on_signal_all_spaces (QWindow window);
 //  #endif
 
 /***********************************************************
@@ -52,8 +52,6 @@ void tray_window_level_and_visible_on_all_spaces (QWindow window);
 class Systray
    : QSystemTrayIcon {
 
-    //  Q_PROPERTY (string window_title READ window_title CONSTANT)
-    //  Q_PROPERTY (bool use_normal_window READ use_normal_window CONSTANT)
 
     /***********************************************************
     ***********************************************************/
@@ -109,7 +107,6 @@ class Systray
     public bool use_normal_window ();
 
     /***********************************************************
-    Q_INVOKABLE
     ***********************************************************/
     public void pause_resume_sy
 
@@ -121,16 +118,16 @@ class Systray
     ***********************************************************/
     public 
 
-    public Q_INVOKABLE void opened ();
+    public void opened ();
 
 
-    public Q_INVOKABLE void closed ();
+    public void closed ();
 
 
-    public Q_INVOKABLE void position_window (QQuick_window window);
+    public void position_window (QQuick_window window);
 
 
-    public Q_INVOKABLE void force_window_init (QQuick_window window);
+    public void force_window_init (QQuick_window window);
 
 signals:
     void current_user_changed ();
@@ -148,18 +145,18 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    public void on_new_user_selected ();
+    public void on_signal_new_user_selected ();
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_unpause_all_folders ();
-    private void on_pause_all_folders ();
+    private void on_signal_unpause_all_folders ();
+    private void on_signal_pause_all_folders ();
 
 
     /***********************************************************
     ***********************************************************/
-    private void pause_on_all_folders_helper (bool pause);
+    private void pause_on_signal_all_folders_helper (bool pause);
 
     /***********************************************************
     ***********************************************************/
@@ -203,22 +200,22 @@ void Systray.tray_engine (QQml_application_engine tray_engine) {
     this.tray_engine.network_access_manager_factory (&this.access_manager_factory);
 
     this.tray_engine.add_import_path ("qrc:/qml/theme");
-    this.tray_engine.add_image_provider ("avatars", new Image_provider);
-    this.tray_engine.add_image_provider (QLatin1String ("svgimage-custom-color"), new Occ.Ui.Svg_image_provider);
-    this.tray_engine.add_image_provider (QLatin1String ("unified-search-result-icon"), new Unified_search_result_image_provider);
+    this.tray_engine.add_ImageProvider ("avatars", new ImageProvider);
+    this.tray_engine.add_ImageProvider (QLatin1String ("svgimage-custom-color"), new Occ.Ui.SvgImageProvider);
+    this.tray_engine.add_ImageProvider (QLatin1String ("unified-search-result-icon"), new UnifiedSearchResultImageProvider);
 }
 
 Systray.Systray ()
     : QSystemTrayIcon (null) {
-    qml_register_singleton_type<User_model> ("com.nextcloud.desktopclient", 1, 0, "User_model",
+    qml_register_singleton_type<UserModel> ("com.nextcloud.desktopclient", 1, 0, "UserModel",
         [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
-            return User_model.instance ();
+            return UserModel.instance ();
         }
     );
 
-    qml_register_singleton_type<User_apps_model> ("com.nextcloud.desktopclient", 1, 0, "User_apps_model",
+    qml_register_singleton_type<UserAppsModel> ("com.nextcloud.desktopclient", 1, 0, "UserAppsModel",
         [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
-            return User_apps_model.instance ();
+            return UserAppsModel.instance ();
         }
     );
 
@@ -243,8 +240,8 @@ Systray.Systray ()
         context_menu.add_action (_("Open main dialog"), this, &Systray.open_main_dialog);
     }
 
-    var pause_action = context_menu.add_action (_("Pause sync"), this, &Systray.on_pause_all_folders);
-    var resume_action = context_menu.add_action (_("Resume sync"), this, &Systray.on_unpause_all_folders);
+    var pause_action = context_menu.add_action (_("Pause sync"), this, &Systray.on_signal_pause_all_folders);
+    var resume_action = context_menu.add_action (_("Resume sync"), this, &Systray.on_signal_unpause_all_folders);
     context_menu.add_action (_("Settings"), this, &Systray.open_settings);
     context_menu.add_action (_("Exit %1").arg (Theme.instance ().app_name_gui ()), this, &Systray.shutdown);
     context_menu (context_menu);
@@ -256,7 +253,7 @@ Systray.Systray ()
             return f.sync_paused ();
         });
         const var pause_text = folders.size () > 1 ? _("Pause sync for all") : _("Pause sync");
-        pause_action.on_text (pause_text);
+        pause_action.on_signal_text (pause_text);
         pause_action.visible (!all_paused);
         pause_action.enabled (!all_paused);
 
@@ -264,26 +261,26 @@ Systray.Systray ()
             return f.sync_paused ();
         });
         const var resume_text = folders.size () > 1 ? _("Resume sync for all") : _("Resume sync");
-        resume_action.on_text (resume_text);
+        resume_action.on_signal_text (resume_text);
         resume_action.visible (any_paused);
         resume_action.enabled (any_paused);
     });
 
-    connect (User_model.instance (), &User_model.new_user_selected,
-        this, &Systray.on_new_user_selected);
-    connect (User_model.instance (), &User_model.add_account,
+    connect (UserModel.instance (), &UserModel.signal_new_user_selected,
+        this, &Systray.on_signal_new_user_selected);
+    connect (UserModel.instance (), &UserModel.signal_add_account,
             this, &Systray.open_account_wizard);
 
-    connect (AccountManager.instance (), &AccountManager.on_account_added,
+    connect (AccountManager.instance (), &AccountManager.on_signal_account_added,
         this, &Systray.show_window);
 }
 
 void Systray.create () {
     if (this.tray_engine) {
         if (!AccountManager.instance ().accounts ().is_empty ()) {
-            this.tray_engine.root_context ().context_property ("activity_model", User_model.instance ().current_activity_model ());
+            this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance ().current_activity_model ());
         }
-        this.tray_engine.on_load ("qrc:/qml/src/gui/tray/Window.qml");
+        this.tray_engine.on_signal_load ("qrc:/qml/src/gui/tray/Window.qml");
     }
     hide_window ();
     /* emit */ activated (QSystemTrayIcon.Activation_reason.Unknown);
@@ -297,25 +294,25 @@ void Systray.create () {
     }
 }
 
-void Systray.on_new_user_selected () {
+void Systray.on_signal_new_user_selected () {
     if (this.tray_engine) {
         // Change Activity_model
-        this.tray_engine.root_context ().context_property ("activity_model", User_model.instance ().current_activity_model ());
+        this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance ().current_activity_model ());
     }
 
     // Rebuild App list
-    User_apps_model.instance ().build_app_list ();
+    UserAppsModel.instance ().build_app_list ();
 }
 
-void Systray.on_unpause_all_folders () {
-    pause_on_all_folders_helper (false);
+void Systray.on_signal_unpause_all_folders () {
+    pause_on_signal_all_folders_helper (false);
 }
 
-void Systray.on_pause_all_folders () {
-    pause_on_all_folders_helper (true);
+void Systray.on_signal_pause_all_folders () {
+    pause_on_signal_all_folders_helper (true);
 }
 
-void Systray.pause_on_all_folders_helper (bool pause) {
+void Systray.pause_on_signal_all_folders_helper (bool pause) {
     // For some reason we get the raw pointer from Folder.account_state ()
     // that's why we need a list of raw pointers for the call to contains
     // later on...
@@ -333,7 +330,7 @@ void Systray.pause_on_all_folders_helper (bool pause) {
         if (accounts.contains (f.account_state ())) {
             f.sync_paused (pause);
             if (pause) {
-                f.on_terminate_sync ();
+                f.on_signal_terminate_sync ();
             }
         }
     }
@@ -356,12 +353,10 @@ bool Systray.use_normal_window () {
     return config.show_main_dialog_as_normal_window ();
 }
 
-// Q_INVOKABLE
 void Systray.opened () {
     this.is_open = true;
 }
 
-// Q_INVOKABLE
 void Systray.closed () {
     this.is_open = false;
 }
@@ -370,8 +365,8 @@ void Systray.show_message (string title, string message, Message_icon icon) {
 #ifdef USE_FDO_NOTIFICATIONS
     if (QDBus_interface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid ()) {
         const QVariantMap hints = {{QStringLiteral ("desktop-entry"), LINUX_APPLICATION_ID}};
-        GLib.List<GLib.Variant> args = GLib.List<GLib.Variant> () << APPLICATION_NAME << uint32 (0) << APPLICATION_ICON_NAME
-                                                 << title << message << string[] () << hints << int32 (-1);
+        GLib.List<GLib.Variant> args = GLib.List<GLib.Variant> () + APPLICATION_NAME + uint32 (0) + APPLICATION_ICON_NAME
+                                                 + title + message + string[] () + hints + int32 (-1);
         QDBus_message method = QDBus_message.create_method_call (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE, "Notify");
         method.arguments (args);
         QDBus_connection.session_bus ().async_call (method);
@@ -397,10 +392,10 @@ bool Systray.sync_is_paused () {
 void Systray.pause_resume_sync () {
     if (this.sync_is_paused) {
         this.sync_is_paused = false;
-        on_unpause_all_folders ();
+        on_signal_unpause_all_folders ();
     } else {
         this.sync_is_paused = true;
-        on_pause_all_folders ();
+        on_signal_pause_all_folders ();
     }
 }
 
@@ -486,10 +481,10 @@ QPoint Systray.compute_window_reference_point () {
     const var taskbar_screen_edge = taskbar_orientation ();
     const var screen_rect = current_screen_rect ();
 
-    GLib.debug (lc_systray) << "screen_rect:" << screen_rect;
-    GLib.debug (lc_systray) << "taskbar_rect:" << taskbar_rect;
-    GLib.debug (lc_systray) << "taskbar_screen_edge:" << taskbar_screen_edge;
-    GLib.debug (lc_systray) << "tray_icon_center:" << tray_icon_center;
+    GLib.debug ("screen_rect:" + screen_rect;
+    GLib.debug ("taskbar_rect:" + taskbar_rect;
+    GLib.debug ("taskbar_screen_edge:" + taskbar_screen_edge;
+    GLib.debug ("tray_icon_center:" + tray_icon_center;
 
     switch (taskbar_screen_edge) {
     case Task_bar_position.Bottom:
@@ -555,10 +550,10 @@ QPoint Systray.compute_window_position (int width, int height) {
         return rect.translated (offset);
     } ();
 
-    GLib.debug (lc_systray) << "taskbar_screen_edge:" << taskbar_screen_edge;
-    GLib.debug (lc_systray) << "screen_rect:" << screen_rect;
-    GLib.debug (lc_systray) << "window_rect (reference)" << QRect (top_left, bottom_right);
-    GLib.debug (lc_systray) << "window_rect (adjusted)" << window_rect;
+    GLib.debug ("taskbar_screen_edge:" + taskbar_screen_edge;
+    GLib.debug ("screen_rect:" + screen_rect;
+    GLib.debug ("window_rect (reference)" + QRect (top_left, bottom_right);
+    GLib.debug ("window_rect (adjusted)" + window_rect;
 
     return window_rect.top_left ();
 }

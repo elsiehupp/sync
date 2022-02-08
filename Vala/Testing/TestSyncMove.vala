@@ -15,7 +15,7 @@ struct OperationCounter {
     int nMOVE = 0;
     int nDELETE = 0;
 
-    void on_reset () { *this = {}; }
+    void on_signal_reset () { *this = {}; }
 
     var functor () {
         return [&] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice *) {
@@ -74,7 +74,7 @@ class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_move_custom_remote_root () {
+    private void on_signal_test_move_custom_remote_root () {
         FileInfo subFolder (QStringLiteral ("AS"), { { QStringLiteral ("f1"), 4 } });
         FileInfo folder (QStringLiteral ("A"), { subFolder });
         FileInfo fileInfo ({}, { folder });
@@ -86,7 +86,7 @@ class TestSyncMove : GLib.Object {
         fakeFolder.setServerOverride (counter.functor ());
 
         // Move file and then move it back again {
-            counter.on_reset ();
+            counter.on_signal_reset ();
             localModifier.rename (QStringLiteral ("AS/f1"), QStringLiteral ("f1"));
 
             ItemCompletedSpy completeSpy (fakeFolder);
@@ -252,7 +252,7 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (nDELETE, 3);
         QVERIFY (! (fakeFolder.currentLocalState () == remoteInfo));
 
-        // on_cleanup, and upload a file that will have a checksum in the database
+        // on_signal_cleanup, and upload a file that will have a checksum in the database
         fakeFolder.localModifier ().remove ("C/c1m");
         fakeFolder.localModifier ().insert ("C/c3");
         QVERIFY (fakeFolder.syncOnce ());
@@ -282,8 +282,8 @@ class TestSyncMove : GLib.Object {
         // There have been bugs related to how the original
         // folder and the folder with the duplicate tree are
         // ordered. Test both cases here.
-        QTest.newRow ("first ordering") << "O"; // "O" > "A"
-        QTest.newRow ("second ordering") << "0"; // "0" < "A"
+        QTest.newRow ("first ordering") + "O"; // "O" > "A"
+        QTest.newRow ("second ordering") + "0"; // "0" < "A"
     }
 
     // If the same folder is shared in two different ways with the same
@@ -340,7 +340,7 @@ class TestSyncMove : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         QCOMPARE (counter.nGET, 1);
-        counter.on_reset ();
+        counter.on_signal_reset ();
 
         // remove localy, and remote move at the same time
         fakeFolder.localModifier ().remove ("A/Q/W/a1m");
@@ -349,7 +349,7 @@ class TestSyncMove : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         QCOMPARE (counter.nGET, 1);
-        counter.on_reset ();
+        counter.on_signal_reset ();
     }
 
 
@@ -364,7 +364,7 @@ class TestSyncMove : GLib.Object {
         fakeFolder.setServerOverride (counter.functor ());
 
         // Move {
-            counter.on_reset ();
+            counter.on_signal_reset ();
             local.rename ("A/a1", "A/a1m");
             remote.rename ("B/b1", "B/b1m");
             ItemCompletedSpy completeSpy (fakeFolder);
@@ -383,7 +383,7 @@ class TestSyncMove : GLib.Object {
         }
 
         // Touch+Move on same side
-        counter.on_reset ();
+        counter.on_signal_reset ();
         local.rename ("A/a2", "A/a2m");
         local.setContents ("A/a2m", 'A');
         remote.rename ("B/b2", "B/b2m");
@@ -399,7 +399,7 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (remote.find ("B/b2m").contentChar, 'A');
 
         // Touch+Move on opposite sides
-        counter.on_reset ();
+        counter.on_signal_reset ();
         local.rename ("A/a1m", "A/a1m2");
         remote.setContents ("A/a1m", 'B');
         remote.rename ("B/b1m", "B/b1m2");
@@ -421,7 +421,7 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (remote.find ("B/b1m2").contentChar, 'W');
 
         // Touch+create on one side, move on the other {
-            counter.on_reset ();
+            counter.on_signal_reset ();
             local.appendByte ("A/a1m");
             local.insert ("A/a1mt");
             remote.rename ("A/a1m", "A/a1mt");
@@ -445,7 +445,7 @@ class TestSyncMove : GLib.Object {
         }
 
         // Create new on one side, move to new on the other {
-            counter.on_reset ();
+            counter.on_signal_reset ();
             local.insert ("A/a1N", 13);
             remote.rename ("A/a1mt", "A/a1N");
             remote.insert ("B/b1N", 13);
@@ -467,7 +467,7 @@ class TestSyncMove : GLib.Object {
         }
 
         // Local move, remote move
-        counter.on_reset ();
+        counter.on_signal_reset ();
         local.rename ("C/c1", "C/c1mL");
         remote.rename ("C/c1", "C/c1mR");
         QVERIFY (fakeFolder.syncOnce ());
@@ -480,7 +480,7 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (counter.nDELETE, 0);
 
         // Rename/rename conflict on a folder
-        counter.on_reset ();
+        counter.on_signal_reset ();
         remote.rename ("C", "CMR");
         local.rename ("C", "CML");
         QVERIFY (fakeFolder.syncOnce ());
@@ -493,7 +493,7 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (counter.nDELETE, 0);
 
         // Folder move {
-            counter.on_reset ();
+            counter.on_signal_reset ();
             local.rename ("A", "AM");
             remote.rename ("B", "BM");
             ItemCompletedSpy completeSpy (fakeFolder);
@@ -513,7 +513,7 @@ class TestSyncMove : GLib.Object {
         }
 
         // Folder move with contents touched on the same side {
-            counter.on_reset ();
+            counter.on_signal_reset ();
             local.setContents ("AM/a2m", 'C');
             // We must change the modtime for it is likely that it did not change between sync.
             // (Previous version of the client (<=2.5) would not need this because it was always doing
@@ -538,7 +538,7 @@ class TestSyncMove : GLib.Object {
         }
 
         // Folder rename with contents touched on the other tree
-        counter.on_reset ();
+        counter.on_signal_reset ();
         remote.setContents ("A2/a2m", 'D');
         // setContents alone may not produce updated mtime if the test is fast
         // and since we don't use checksums here, that matters.
@@ -558,7 +558,7 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (remote.find ("B3/b2m").contentChar, 'D');
 
         // Folder rename with contents touched on both ends
-        counter.on_reset ();
+        counter.on_signal_reset ();
         remote.setContents ("A3/a2m", 'R');
         remote.appendByte ("A3/a2m");
         local.setContents ("A3/a2m", 'L');
@@ -595,7 +595,7 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (remote.find ("B4/b2m").contentChar, 'R');
 
         // Rename a folder and rename the contents at the same time
-        counter.on_reset ();
+        counter.on_signal_reset ();
         local.rename ("A4/a2m", "A4/a2m2");
         local.rename ("A4", "A5");
         remote.rename ("B4/b2m", "B4/b2m2");
@@ -745,8 +745,8 @@ class TestSyncMove : GLib.Object {
     ***********************************************************/
     private on_ void testDeepHierarchy_data () {
         QTest.addColumn<bool> ("local");
-        QTest.newRow ("remote") << false;
-        QTest.newRow ("local") << true;
+        QTest.newRow ("remote") + false;
+        QTest.newRow ("local") + true;
     }
 
 
@@ -817,7 +817,7 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (counter.nGET, 0);
         QCOMPARE (counter.nPUT, 0);
         QCOMPARE (counter.nMOVE, 2);
-        counter.on_reset ();
+        counter.on_signal_reset ();
 
         // 2) move alphabetically after
         fakeFolder.remoteModifier ().rename ("this.A/a2", "this.A/a2m");
@@ -860,7 +860,7 @@ class TestSyncMove : GLib.Object {
         QCOMPARE (counter.nGET, 2);
         QCOMPARE (counter.nPUT, 2);
         QCOMPARE (counter.nDELETE, 0);
-        counter.on_reset ();
+        counter.on_signal_reset ();
 
     }
 
@@ -886,8 +886,8 @@ class TestSyncMove : GLib.Object {
     private on_ void testMovedWithError_data () {
         QTest.addColumn<Vfs.Mode> ("vfsMode");
 
-        QTest.newRow ("Vfs.Off") << Vfs.Off;
-        QTest.newRow ("Vfs.WithSuffix") << Vfs.WithSuffix;
+        QTest.newRow ("Vfs.Off") + Vfs.Off;
+        QTest.newRow ("Vfs.WithSuffix") + Vfs.WithSuffix;
     }
 
 

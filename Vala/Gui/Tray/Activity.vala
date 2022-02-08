@@ -17,66 +17,69 @@ class Activity {
 
     /***********************************************************
     ***********************************************************/
-    public using Identifier = QPair<qlonglong, string>;
+    public class Identifier : Pair<int64, string> { }
+
+    /***********************************************************
+    @brief The ActivityList
+    @ingroup gui
+
+    A GLib.List based list of Activities
+    ***********************************************************/
+    public class ActivityList : GLib.List<Activity> { }
 
     /***********************************************************
     ***********************************************************/
     public enum Type {
-        Activity_type,
-        Notification_type,
-        Sync_result_type,
-        Sync_file_item_type
+        ACTIVITY,
+        NOTIFICATION,
+        SYNC_RESULT,
+        SYNC_FILE_ITEM
     }
 
     /***********************************************************
     ***********************************************************/
-    public Type this.type;
-    public qlonglong this.identifier;
-    public string this.file_action;
-    public string this.object_type;
-    public string this.subject;
-    public string this.message;
-    public string this.folder;
-    public string this.file;
-    public GLib.Uri this.link;
-    public GLib.DateTime this.date_time;
-    public int64 this.expire_at_msecs = -1;
-    public string this.acc_name;
-    public string this.icon;
+    public Type type;
+    public int64 identifier;
+    public string file_action;
+    public string object_type;
+    public string subject;
+    public string message;
+    public string folder;
+    public string file;
+    public GLib.Uri link;
+    public GLib.DateTime date_time;
+    public int64 expire_at_msecs = -1;
+    public string acc_name;
+    public string icon;
 
-    // Stores information about the error
-    int this.status;
 
-    GLib.Vector<Activity_link> this.links;
+    /***********************************************************
+    Stores information about the error
+    ***********************************************************/
+    int status;
+
+    GLib.Vector<ActivityLink> links;
+
     /***********************************************************
     @brief Sort operator to sort the list youngest first.
     @param val
     @return
     ***********************************************************/
-
-    Identifier ident ();
-}
-
-bool operator== (Activity rhs, Activity lhs);
-bool operator< (Activity rhs, Activity lhs);
-
-/***********************************************************
-@brief The Activity_list
-@ingroup gui
-
-A GLib.List based list of Activities
-***********************************************************/
-using Activity_list = GLib.List<Activity>;
+    public Identifier ident () {
+        return Identifier (this.identifier, this.acc_name);
+    }
 
 
-bool operator< (Activity rhs, Activity lhs) {
-    return rhs.date_time > lhs.date_time;
-}
+    //  bool operator== (Activity rhs, Activity lhs) {
+    //      return (rhs.type == lhs.type && rhs.id == lhs.id && rhs.acc_name == lhs.acc_name);
+    //  }
 
-bool operator== (Activity rhs, Activity lhs) {
-    return (rhs.type == lhs.type && rhs.id == lhs.id && rhs.acc_name == lhs.acc_name);
-}
 
-Activity.Identifier Activity.ident () {
-    return Identifier (this.identifier, this.acc_name);
-}
+    //  bool operator< (Activity rhs, Activity lhs) {
+    //      return rhs.date_time > lhs.date_time;
+    //  }
+
+} // class Activity
+
+} // namespace Ui
+} // namespace Occ

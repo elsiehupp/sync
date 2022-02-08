@@ -63,7 +63,7 @@ class SyncRunFileLog {
         return dt.to_string (Qt.ISODate);
     }
 
-    void SyncRunFileLog.on_start (string folder_path) {
+    void SyncRunFileLog.on_signal_start (string folder_path) {
         const int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
 
         const string logpath = QStandardPaths.writable_location (QStandardPaths.AppDataLocation);
@@ -107,25 +107,25 @@ class SyncRunFileLog {
             GLib.File.remove (new_filename);
             GLib.File.rename (filename, new_filename);
         }
-        this.file.on_reset (new GLib.File (filename));
+        this.file.on_signal_reset (new GLib.File (filename));
 
         this.file.open (QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text);
         this.out.device (this.file.data ());
 
         if (!exists) {
-            this.out << folder_path << endl;
+            this.out + folder_path + endl;
             // We are creating a new file, add the note.
-            this.out << "# timestamp | duration | file | instruction | dir | modtime | etag | "
+            this.out + "# timestamp | duration | file | instruction | dir | modtime | etag | "
                     "size | file_id | status | error_string | http result code | "
                     "other size | other modtime | X-Request-ID"
-                 << endl;
+                 + endl;
 
             FileSystem.file_hidden (filename, true);
         }
 
-        this.total_duration.on_start ();
-        this.lap_duration.on_start ();
-        this.out << "#=#=#=# Syncrun started " << date_time_str (GLib.DateTime.current_date_time_utc ()) << endl;
+        this.total_duration.on_signal_start ();
+        this.lap_duration.on_signal_start ();
+        this.out + "#=#=#=# Syncrun started " + date_time_str (GLib.DateTime.current_date_time_utc ()) + endl;
     }
     void SyncRunFileLog.log_item (SyncFileItem item) {
         // don't log the directory items that are in the list
@@ -143,39 +143,39 @@ class SyncRunFileLog {
         }
 
         const char L = '|';
-        this.out << ts << L;
-        this.out << L;
+        this.out + ts + L;
+        this.out + L;
         if (item.instruction != CSYNC_INSTRUCTION_RENAME) {
-            this.out << item.destination () << L;
+            this.out + item.destination () + L;
         } else {
-            this.out << item.file << QLatin1String (" . ") << item.rename_target << L;
+            this.out + item.file + QLatin1String (" . ") + item.rename_target + L;
         }
-        this.out << item.instruction << L;
-        this.out << item.direction << L;
-        this.out << string.number (item.modtime) << L;
-        this.out << item.etag << L;
-        this.out << string.number (item.size) << L;
-        this.out << item.file_id << L;
-        this.out << item.status << L;
-        this.out << item.error_string << L;
-        this.out << string.number (item.http_error_code) << L;
-        this.out << string.number (item.previous_size) << L;
-        this.out << string.number (item.previous_modtime) << L;
-        this.out << item.request_id << L;
+        this.out + item.instruction + L;
+        this.out + item.direction + L;
+        this.out + string.number (item.modtime) + L;
+        this.out + item.etag + L;
+        this.out + string.number (item.size) + L;
+        this.out + item.file_id + L;
+        this.out + item.status + L;
+        this.out + item.error_string + L;
+        this.out + string.number (item.http_error_code) + L;
+        this.out + string.number (item.previous_size) + L;
+        this.out + string.number (item.previous_modtime) + L;
+        this.out + item.request_id + L;
 
-        this.out << endl;
+        this.out + endl;
     }
 
     void SyncRunFileLog.log_lap (string name) {
-        this.out << "#=#=#=#=# " << name << " " << date_time_str (GLib.DateTime.current_date_time_utc ())
-             << " (last step : " << this.lap_duration.restart () << " msec"
-             << ", total : " << this.total_duration.elapsed () << " msec)" << endl;
+        this.out + "#=#=#=#=# " + name + " " + date_time_str (GLib.DateTime.current_date_time_utc ())
+             + " (last step : " + this.lap_duration.restart (" msec"
+             + ", total : " + this.total_duration.elapsed (" msec)" + endl;
     }
 
     void SyncRunFileLog.finish () {
-        this.out << "#=#=#=# Syncrun on_finished " << date_time_str (GLib.DateTime.current_date_time_utc ())
-             << " (last step : " << this.lap_duration.elapsed () << " msec"
-             << ", total : " << this.total_duration.elapsed () << " msec)" << endl;
+        this.out + "#=#=#=# Syncrun on_signal_finished " + date_time_str (GLib.DateTime.current_date_time_utc ())
+             + " (last step : " + this.lap_duration.elapsed (" msec"
+             + ", total : " + this.total_duration.elapsed (" msec)" + endl;
         this.file.close ();
     }
     }

@@ -30,42 +30,20 @@ namespace Occ {
 @ingroup libsync
 ***********************************************************/
 class Theme : GLib.Object {
-//      Q_PROPERTY (bool branded READ is_branded CONSTANT)
-//      Q_PROPERTY (string app_name_gui READ app_name_gui CONSTANT)
-//      Q_PROPERTY (string app_name READ app_name CONSTANT)
-//      Q_PROPERTY (GLib.Uri state_online_image_source READ state_online_image_source CONSTANT)
-//      Q_PROPERTY (GLib.Uri state_offline_image_source READ state_offline_image_source CONSTANT)
-//      Q_PROPERTY (GLib.Uri status_online_image_source READ status_online_image_source CONSTANT)
-//      Q_PROPERTY (GLib.Uri status_do_not_disturb_image_source READ status_do_not_disturb_image_source CONSTANT)
-//      Q_PROPERTY (GLib.Uri status_away_image_source READ status_away_image_source CONSTANT)
-//      Q_PROPERTY (GLib.Uri status_invisible_image_source READ status_invisible_image_source CONSTANT)
-//  #ifndef TOKEN_AUTH_ONLY
-//      Q_PROPERTY (QIcon folder_disabled_icon READ folder_disabled_icon CONSTANT)
-//      Q_PROPERTY (QIcon folder_offline_icon READ folder_offline_icon CONSTANT)
-//      Q_PROPERTY (QIcon application_icon READ application_icon CONSTANT)
-//  #endif
-//      Q_PROPERTY (string version READ version CONSTANT)
-//      Q_PROPERTY (string help_url READ help_url CONSTANT)
-//      Q_PROPERTY (string conflict_help_url READ conflict_help_url CONSTANT)
-//      Q_PROPERTY (string override_server_url READ override_server_url)
-//      Q_PROPERTY (bool force_override_server_url READ force_override_server_url)
-//  #ifndef TOKEN_AUTH_ONLY
-//      Q_PROPERTY (Gtk.Color wizard_header_title_color READ wizard_header_title_color CONSTANT)
-//      Q_PROPERTY (Gtk.Color wizard_header_background_color READ wizard_header_background_color CONSTANT)
-//  #endif
-//      Q_PROPERTY (string update_check_url READ update_check_url CONSTANT)
-
-//      Q_PROPERTY (Gtk.Color error_box_text_color READ error_box_text_color CONSTANT)
-//      Q_PROPERTY (Gtk.Color error_box_background_color READ error_box_background_color CONSTANT)
-//      Q_PROPERTY (Gtk.Color error_box_border_color READ error_box_border_color CONSTANT)
 
     /***********************************************************
     ***********************************************************/
     public enum CustomMediaType {
-        OC_SETUP_TOP, // own_cloud connect page
+        /***********************************************************
+        onwCloud connect page
+        ***********************************************************/
+        OC_SETUP_TOP,
         OC_SETUP_SIDE,
         OC_SETUP_BOTTOM,
-        OC_SETUP_RESULT_BOTTOM // own_cloud connect result page
+        /***********************************************************
+        ownCloud connect result page
+        ***********************************************************/
+        OC_SETUP_RESULT_BOTTOM
     }
 
     /***********************************************************
@@ -372,7 +350,7 @@ class Theme : GLib.Object {
         case SyncResult.Status.UNDEFINED:
             return _("theme", "Status undefined");
         case SyncResult.Status.NOT_YET_STARTED:
-            return _("theme", "Waiting to on_start sync");
+            return _("theme", "Waiting to on_signal_start sync");
         case SyncResult.Status.SYNC_RUNNING:
             return _("theme", "Sync is running");
         case SyncResult.Status.SUCCESS:
@@ -614,7 +592,7 @@ class Theme : GLib.Object {
         if (use_svg) {
             const var max_height = Theme.is_hidpi () ? 200 : 100;
             const var max_width = 2 * max_height;
-            const var icon = QIcon (logo_base_path + ".svg");
+            const var icon = new Gtk.Icon (logo_base_path + ".svg");
             const var size = icon.actual_size (QSize (max_width, max_height));
             return icon.pixmap (size);
         } else {
@@ -637,7 +615,7 @@ class Theme : GLib.Object {
         if (use_svg) {
             const var max_height = 64;
             const var max_width = 2 * max_height;
-            const var icon = QIcon (logo_base_path + ".svg");
+            const var icon = new Gtk.Icon (logo_base_path + ".svg");
             const var size = icon.actual_size (QSize (max_width, max_height));
             return icon.pixmap (size);
         } else {
@@ -960,19 +938,19 @@ class Theme : GLib.Object {
     public string version_switch_output () {
         string help_text;
         QTextStream stream (&help_text);
-        stream << app_name ()
-            << " version "
-            << version () << Qt.endl;
+        stream + app_name ()
+            + " version "
+            + version () + Qt.endl;
     #ifdef GIT_SHA1
-        stream << "Git revision " << GIT_SHA1 << Qt.endl;
+        stream + "Git revision " + GIT_SHA1 + Qt.endl;
     #endif
-        stream << "Using Qt " << q_version () << ", built against Qt " << QT_VERSION_STR << Qt.endl;
+        stream + "Using Qt " + q_version (", built against Qt " + QT_VERSION_STR + Qt.endl;
 
         if (!QGuiApplication.platform_name ().is_empty ())
-            stream << "Using Qt platform plugin '" << QGuiApplication.platform_name () << "'" << Qt.endl;
+            stream + "Using Qt platform plugin '" + QGuiApplication.platform_name ("'" + Qt.endl;
 
-        stream << "Using '" << QSslSocket.ssl_library_version_"" << "'" << Qt.endl;
-        stream << "Running on " << Utility.platform_name () << ", " << QSysInfo.current_cpu_architecture () << Qt.endl;
+        stream + "Using '" + QSslSocket.ssl_library_version_"" + "'" + Qt.endl;
+        stream + "Running on " + Utility.platform_name (", " + QSysInfo.current_cpu_architecture () + Qt.endl;
         return help_text;
     }
 	
@@ -987,7 +965,7 @@ class Theme : GLib.Object {
 	public QIcon ui_theme_icon (string icon_name, bool ui_has_dark_background) {
         string icon_path = string (Theme.theme_prefix) + (ui_has_dark_background ? "white/" : "black/") + icon_name;
         std.string icn_path = icon_path.to_utf8 ().const_data ();
-        return QIcon (QPixmap (icon_path));
+        return new Gtk.Icon (QPixmap (icon_path));
     }
 
 
@@ -1072,17 +1050,17 @@ class Theme : GLib.Object {
     ***********************************************************/
     public static QIcon create_color_aware_icon (string name, QPalette palette = QGuiApplication.palette ()) {
         QSvgRenderer renderer (name);
-        QImage img (64, 64, QImage.Format_ARGB32);
+        Gtk.Image img (64, 64, Gtk.Image.Format_ARGB32);
         img.fill (Qt.Global_color.transparent);
         QPainter img_painter (&img);
-        QImage inverted (64, 64, QImage.Format_ARGB32);
+        Gtk.Image inverted (64, 64, Gtk.Image.Format_ARGB32);
         inverted.fill (Qt.Global_color.transparent);
         QPainter inv_painter (&inverted);
 
         renderer.render (&img_painter);
         renderer.render (&inv_painter);
 
-        inverted.invert_pixels (QImage.Invert_rgb);
+        inverted.invert_pixels (Gtk.Image.Invert_rgb);
 
         QIcon icon;
         if (Theme.is_dark_color (palette.color (QPalette.Base))) {
@@ -1108,9 +1086,9 @@ class Theme : GLib.Object {
     2019/12/09: Adapted from create_color_aware_icon.
     ***********************************************************/
     public static QPixmap create_color_aware_pixmap (string name, QPalette palette = QGuiApplication.palette ()) {
-        QImage img = new QImage (name);
-        QImage inverted = new QImage (img);
-        inverted.invert_pixels (QImage.Invert_rgb);
+        Gtk.Image img = new Gtk.Image (name);
+        Gtk.Image inverted = new Gtk.Image (img);
+        inverted.invert_pixels (Gtk.Image.Invert_rgb);
 
         QPixmap pixmap;
         if (Theme.is_dark_color (palette.color (QPalette.Base))) {
@@ -1197,7 +1175,7 @@ class Theme : GLib.Object {
             const string svg_name = string (Theme.theme_prefix) + string.from_latin1 ("%1/%2.svg").arg (flavor).arg (name);
             QSvgRenderer renderer (svg_name);
             const var create_pixmap_from_svg = [&renderer] (int size) {
-                QImage img (size, size, QImage.Format_ARGB32);
+                Gtk.Image img (size, size, Gtk.Image.Format_ARGB32);
                 img.fill (Qt.Global_color.transparent);
                 QPainter img_painter (&img);
                 renderer.render (&img_painter);

@@ -22,9 +22,9 @@ namespace Ui {
 /***********************************************************
 This is a job-like class to check that the server is up and
 that we are connected. here are two entry points:
-on_check_server_and_auth and on_check_authentication.
-on_check_authentication is the quick version that only does
-the propfind while on_check_server_and_auth is doing the 4
+on_signal_check_server_and_auth and on_signal_check_authentication.
+on_signal_check_authentication is the quick version that only does
+the propfind while on_signal_check_server_and_auth is doing the 4
 calls.
 
 We cannot use the capabilites call to test the l
@@ -33,31 +33,31 @@ https://github.com/owncloud/core/issues/12930
 Here follows the state machine
 
 \code{.unparsed}
-*--. on_check_server_and_auth  (check status.php)
+*--. on_signal_check_server_and_auth  (check status.php)
         Will asynchronously check for system proxy (if using system proxy)
-        And then invoke on_check_server_and_auth
+        And then invoke on_signal_check_server_and_auth
         CheckServerJob
         |
-        +. on_no_status_found -. X
+        +. on_signal_no_status_found -. X
         |
-        +. on_job_timeout -. X
+        +. on_signal_job_timeout -. X
         |
-        +. on_status_found --+-. X (if credentials are still missing)
+        +. on_signal_status_found --+-. X (if credentials are still missing)
                               |
   +---------------------------+
   |
-*-+. on_check_authentication (PROPFIND on root)
+*-+. on_signal_check_authentication (PROPFIND on root)
         PropfindJob
         |
-        +. on_auth_failed -. X
+        +. on_signal_auth_failed -. X
         |
-        +. on_auth_success --+-. X (depending if coming from on_check_server_and_auth or not)
+        +. on_signal_auth_success --+-. X (depending if coming from on_signal_check_server_and_auth or not)
                               |
   +---------------------------+
   |
   +. check_server_capabilities --------------v (in parallel)
         JsonApiJob (cloud/capabilities)
-        +. on_capabilities_recieved -+
+        +. on_signal_capabilities_recieved -+
                                       |
     +---------------------------------+
     |
@@ -99,31 +99,31 @@ class ConnectionValidator : GLib.Object {
 
 
     /// Checks the server and the authentication.
-    public void on_check_server_and_auth ();
+    public void on_signal_check_server_and_auth ();
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_system_proxy_lookup_done (QNetworkProxy proxy);
+    public void on_signal_system_proxy_lookup_done (QNetworkProxy proxy);
 
     /// Checks authentication only.
-    public void on_check_authentication ();
+    public void on_signal_check_authentication ();
 
 signals:
     void connection_result (ConnectionValidator.Status status, string[] errors);
 
 protected slots:
-    void on_check_server_and_auth ();
+    void on_signal_check_server_and_auth ();
 
-    void on_status_found (GLib.Uri url, QJsonObject info);
-    void on_no_status_found (Soup.Reply reply);
-    void on_job_timeout (GLib.Uri url);
+    void on_signal_status_found (GLib.Uri url, QJsonObject info);
+    void on_signal_no_status_found (Soup.Reply reply);
+    void on_signal_job_timeout (GLib.Uri url);
 
-    void on_auth_failed (Soup.Reply reply);
-    void on_auth_success ();
+    void on_signal_auth_failed (Soup.Reply reply);
+    void on_signal_auth_success ();
 
-    void on_capabilities_recieved (QJsonDocument &);
-    void on_user_fetched (UserInfo user_info);
+    void on_signal_capabilities_recieved (QJsonDocument &);
+    void on_signal_user_fetched (UserInfo user_info);
 
 
 //  #ifndef TOKEN_AUTH_ONLY
@@ -160,71 +160,71 @@ protected slots:
         this.is_checking_server_and_auth (false) {
     }
 
-    void ConnectionValidator.on_check_server_and_auth () {
+    void ConnectionValidator.on_signal_check_server_and_auth () {
         if (!this.account) {
-            this.errors << _("No Nextcloud account configured");
+            this.errors + _("No Nextcloud account configured");
             report_result (NotConfigured);
             return;
         }
-        GLib.debug (lc_connection_validator) << "Checking server and authentication";
+        GLib.debug ("Checking server and authentication";
 
         this.is_checking_server_and_auth = true;
 
         // Lookup system proxy in a thread https://github.com/owncloud/client/issues/2993
         if (ClientProxy.is_using_system_default ()) {
-            GLib.debug (lc_connection_validator) << "Trying to look up system proxy";
+            GLib.debug ("Trying to look up system proxy";
             ClientProxy.lookup_system_proxy_async (this.account.url (),
-                this, SLOT (on_system_proxy_lookup_done (QNetworkProxy)));
+                this, SLOT (on_signal_system_proxy_lookup_done (QNetworkProxy)));
         } else {
             // We want to reset the QNAM proxy so that the global proxy settings are used (via ClientProxy settings)
             this.account.network_access_manager ().proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
-            QMetaObject.invoke_method (this, "on_check_server_and_auth", Qt.QueuedConnection);
+            QMetaObject.invoke_method (this, "on_signal_check_server_and_auth", Qt.QueuedConnection);
         }
     }
 
-    void ConnectionValidator.on_system_proxy_lookup_done (QNetworkProxy proxy) {
+    void ConnectionValidator.on_signal_system_proxy_lookup_done (QNetworkProxy proxy) {
         if (!this.account) {
-            GLib.warn (lc_connection_validator) << "Bailing out, Account had been deleted";
+            GLib.warn ("Bailing out, Account had been deleted";
             return;
         }
 
         if (proxy.type () != QNetworkProxy.NoProxy) {
-            GLib.info (lc_connection_validator) << "Setting QNAM proxy to be system proxy" << ClientProxy.print_q_network_proxy (proxy);
+            GLib.info ("Setting QNAM proxy to be system proxy" + ClientProxy.print_q_network_proxy (proxy);
         } else {
-            GLib.info (lc_connection_validator) << "No system proxy set by OS";
+            GLib.info ("No system proxy set by OS";
         }
         this.account.network_access_manager ().proxy (proxy);
 
-        on_check_server_and_auth ();
+        on_signal_check_server_and_auth ();
     }
 
     // The actual check
-    void ConnectionValidator.on_check_server_and_auth () {
+    void ConnectionValidator.on_signal_check_server_and_auth () {
         var check_job = new CheckServerJob (this.account, this);
-        check_job.on_timeout (timeout_to_use_msec);
+        check_job.on_signal_timeout (timeout_to_use_msec);
         check_job.ignore_credential_failure (true);
-        connect (check_job, &CheckServerJob.instance_found, this, &ConnectionValidator.on_status_found);
-        connect (check_job, &CheckServerJob.instance_not_found, this, &ConnectionValidator.on_no_status_found);
-        connect (check_job, &CheckServerJob.timeout, this, &ConnectionValidator.on_job_timeout);
-        check_job.on_start ();
+        connect (check_job, &CheckServerJob.instance_found, this, &ConnectionValidator.on_signal_status_found);
+        connect (check_job, &CheckServerJob.instance_not_found, this, &ConnectionValidator.on_signal_no_status_found);
+        connect (check_job, &CheckServerJob.timeout, this, &ConnectionValidator.on_signal_job_timeout);
+        check_job.on_signal_start ();
     }
 
-    void ConnectionValidator.on_status_found (GLib.Uri url, QJsonObject info) {
+    void ConnectionValidator.on_signal_status_found (GLib.Uri url, QJsonObject info) {
         // Newer servers don't disclose any version in status.php anymore
         // https://github.com/owncloud/core/pull/27473/files
         // so this string can be empty.
         string server_version = CheckServerJob.version (info);
 
         // status.php was found.
-        GLib.info (lc_connection_validator) << "** Application : own_cloud found : "
-                                      << url << " with version "
-                                      << CheckServerJob.version_string (info)
-                                      << " (" << server_version << ")";
+        GLib.info ("** Application : own_cloud found : "
+                                      + url + " with version "
+                                      + CheckServerJob.version_string (info)
+                                      + " (" + server_version + ")";
 
         // Update server url in case of redirection
         if (this.account.url () != url) {
-            GLib.info (lc_connection_validator ()) << "status.php was redirected to" << url.to_string ();
+            GLib.info ()) + "status.php was redirected to" + url.to_string ();
             this.account.url (url);
             this.account.wants_account_saved (this.account.data ());
         }
@@ -241,13 +241,13 @@ protected slots:
         }
 
         // now check the authentication
-        QTimer.single_shot (0, this, &ConnectionValidator.on_check_authentication);
+        QTimer.single_shot (0, this, &ConnectionValidator.on_signal_check_authentication);
     }
 
     // status.php could not be loaded (network or server issue!).
-    void ConnectionValidator.on_no_status_found (Soup.Reply reply) {
+    void ConnectionValidator.on_signal_no_status_found (Soup.Reply reply) {
         var job = qobject_cast<CheckServerJob> (sender ());
-        GLib.warn (lc_connection_validator) << reply.error () << job.error_string () << reply.peek (1024);
+        GLib.warn () + reply.error () + job.error_string () + reply.peek (1024);
         if (reply.error () == Soup.Reply.SslHandshakeFailedError) {
             report_result (SslError);
             return;
@@ -263,14 +263,14 @@ protected slots:
         report_result (StatusNotFound);
     }
 
-    void ConnectionValidator.on_job_timeout (GLib.Uri url) {
+    void ConnectionValidator.on_signal_job_timeout (GLib.Uri url) {
         //  Q_UNUSED (url);
         //this.errors.append (_("Unable to connect to %1").arg (url.to_string ()));
         this.errors.append (_("Timeout"));
         report_result (Timeout);
     }
 
-    void ConnectionValidator.on_check_authentication () {
+    void ConnectionValidator.on_signal_check_authentication () {
         AbstractCredentials creds = this.account.credentials ();
 
         if (!creds.ready ()) {
@@ -279,32 +279,32 @@ protected slots:
         }
 
         // simply GET the webdav root, will fail if credentials are wrong.
-        // continue in on_auth_check here :-)
-        GLib.debug (lc_connection_validator) << "# Check whether authenticated propfind works.";
+        // continue in on_signal_auth_check here :-)
+        GLib.debug ("# Check whether authenticated propfind works.";
         var job = new PropfindJob (this.account, "/", this);
-        job.on_timeout (timeout_to_use_msec);
-        job.properties (GLib.List<GLib.ByteArray> () << "getlastmodified");
-        connect (job, &PropfindJob.result, this, &ConnectionValidator.on_auth_success);
-        connect (job, &PropfindJob.finished_with_error, this, &ConnectionValidator.on_auth_failed);
-        job.on_start ();
+        job.on_signal_timeout (timeout_to_use_msec);
+        job.properties (GLib.List<GLib.ByteArray> ("getlastmodified");
+        connect (job, &PropfindJob.result, this, &ConnectionValidator.on_signal_auth_success);
+        connect (job, &PropfindJob.finished_with_error, this, &ConnectionValidator.on_signal_auth_failed);
+        job.on_signal_start ();
     }
 
-    void ConnectionValidator.on_auth_failed (Soup.Reply reply) {
+    void ConnectionValidator.on_signal_auth_failed (Soup.Reply reply) {
         var job = qobject_cast<PropfindJob> (sender ());
         Status stat = Timeout;
 
         if (reply.error () == Soup.Reply.SslHandshakeFailedError) {
-            this.errors << job.error_string_parsing_body ();
+            this.errors + job.error_string_parsing_body ();
             stat = SslError;
 
         } else if (reply.error () == Soup.Reply.AuthenticationRequiredError
             || !this.account.credentials ().still_valid (reply)) {
-            GLib.warn (lc_connection_validator) << "******** Password is wrong!" << reply.error () << job.error_string ();
-            this.errors << _("The provided credentials are not correct");
+            GLib.warn ("******** Password is wrong!" + reply.error () + job.error_string ();
+            this.errors + _("The provided credentials are not correct");
             stat = CredentialsWrong;
 
         } else if (reply.error () != Soup.Reply.NoError) {
-            this.errors << job.error_string_parsing_body ();
+            this.errors + job.error_string_parsing_body ();
 
             const int http_status =
                 reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
@@ -317,7 +317,7 @@ protected slots:
         report_result (stat);
     }
 
-    void ConnectionValidator.on_auth_success () {
+    void ConnectionValidator.on_signal_auth_success () {
         this.errors.clear ();
         if (!this.is_checking_server_and_auth) {
             report_result (Connected);
@@ -328,15 +328,15 @@ protected slots:
 
     void ConnectionValidator.check_server_capabilities () {
         // The main flow now needs the capabilities
-        var job = new JsonApiJob (this.account, QLatin1String ("ocs/v1.php/cloud/capabilities"), this);
-        job.on_timeout (timeout_to_use_msec);
-        GLib.Object.connect (job, &JsonApiJob.json_received, this, &ConnectionValidator.on_capabilities_recieved);
-        job.on_start ();
+        var job = new JsonApiJob (this.account, "ocs/v1.php/cloud/capabilities", this);
+        job.on_signal_timeout (timeout_to_use_msec);
+        GLib.Object.connect (job, &JsonApiJob.json_received, this, &ConnectionValidator.on_signal_capabilities_recieved);
+        job.on_signal_start ();
     }
 
-    void ConnectionValidator.on_capabilities_recieved (QJsonDocument json) {
+    void ConnectionValidator.on_signal_capabilities_recieved (QJsonDocument json) {
         var capabilities = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
-        GLib.info (lc_connection_validator) << "Server capabilities" << capabilities;
+        GLib.info ("Server capabilities" + capabilities;
         this.account.capabilities (capabilities.to_variant_map ());
 
         // New servers also report the version in the capabilities
@@ -355,12 +355,12 @@ protected slots:
 
     void ConnectionValidator.fetch_user () {
         var user_info = new UserInfo (this.account_state.data (), true, true, this);
-        GLib.Object.connect (user_info, &UserInfo.fetched_last_info, this, &ConnectionValidator.on_user_fetched);
+        GLib.Object.connect (user_info, &UserInfo.fetched_last_info, this, &ConnectionValidator.on_signal_user_fetched);
         user_info.active (true);
     }
 
     bool ConnectionValidator.and_check_server_version (string version) {
-        GLib.info (lc_connection_validator) << this.account.url () << "has server version" << version;
+        GLib.info () + this.account.url ("has server version" + version;
         this.account.server_version (version);
 
         // We cannot deal with servers < 7.0.0
@@ -387,7 +387,7 @@ protected slots:
         return true;
     }
 
-    void ConnectionValidator.on_user_fetched (UserInfo user_info) {
+    void ConnectionValidator.on_signal_user_fetched (UserInfo user_info) {
         if (user_info) {
             user_info.active (false);
             user_info.delete_later ();

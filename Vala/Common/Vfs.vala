@@ -123,7 +123,7 @@ class Vfs : GLib.Object {
 
 
     /***********************************************************
-    the parameters passed to on_start ()
+    the parameters passed to on_signal_start ()
     ***********************************************************/
     protected VfsSetupParams setup_params;
 
@@ -147,7 +147,7 @@ class Vfs : GLib.Object {
 
 
     /***********************************************************
-    Access to the parameters the instance was on_start ()ed with.
+    Access to the parameters the instance was on_signal_start ()ed with.
     ***********************************************************/
     public VfsSetupParams parameters () {
         return this.setup_params;
@@ -159,7 +159,7 @@ class Vfs : GLib.Object {
 
     The plugin-specific work is done in start_impl ().
     ***********************************************************/
-    public void on_start (VfsSetupParams parameters) {
+    public void on_signal_start (VfsSetupParams parameters) {
         this.setup_params = parameters;
         start_impl (parameters);
     }
@@ -282,7 +282,7 @@ class Vfs : GLib.Object {
     folder_path is relative to the sync folder. Can be "" for root folder.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public virtual bool pin_state (string folder_path, PinState state);
+    public virtual bool pin_state_for_path (string folder_path, PinState state);
 
 
     /***********************************************************
@@ -296,7 +296,7 @@ class Vfs : GLib.Object {
     Returns none on retrieval error.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public virtual Optional<PinState> pin_state (string folder_path);
+    public virtual Optional<PinState> pin_state_of_path (string folder_path);
 
 
     /***********************************************************
@@ -318,7 +318,7 @@ class Vfs : GLib.Object {
     via the vfs plugin. The connection to SyncFileStatusTracker allows both to be based
     on the same data.
     ***********************************************************/
-    public virtual void on_file_status_changed (string system_filename, SyncFileStatus file_status);
+    public virtual void on_signal_file_status_changed (string system_filename, SyncFileStatus file_status);
 
 
     /***********************************************************
@@ -336,7 +336,7 @@ class Vfs : GLib.Object {
     /***********************************************************
     Setup the plugin for the folder.
 
-    For example, the VFS provider might monitor files to be able to on_start a file
+    For example, the VFS provider might monitor files to be able to on_signal_start a file
     hydration (download of a file's remote contents) when the user wants to open
     it.
 
@@ -349,7 +349,7 @@ class Vfs : GLib.Object {
     /***********************************************************
     Db-backed pin state handling. Derived classes may use it to implement pin states.
     ***********************************************************/
-    protected bool pin_state_in_database (string folder_path, PinState state) {
+    protected bool is_pin_state_in_database (string folder_path, PinState state) {
         var path = folder_path.to_utf8 ();
         this.setup_params.journal.internal_pin_states ().wipe_for_path_and_below (path);
         if (state != PinState.PinState.INHERITED)
@@ -360,7 +360,7 @@ class Vfs : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected Optional<PinState> pin_state_in_database (string folder_path) {
+    protected Optional<PinState> find_pin_state_in_database (string folder_path) {
         var pin = this.setup_params.journal.internal_pin_states ().effective_for_path (folder_path.to_utf8 ());
         return pin;
     }

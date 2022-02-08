@@ -5,7 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
-//  Q_DECLARE_LOGGING_CATEGORY (lc_propagate_upload_v1)
+
 /***********************************************************
 @ingroup libsync
 
@@ -16,7 +16,7 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
 
     /***********************************************************
-    That's the on_start chunk that was stored in the database for resuming.
+    That's the on_signal_start chunk that was stored in the database for resuming.
     In the non-resuming case it is 0.
     If we are resuming, this is the first chunk we need to send
     ***********************************************************/
@@ -52,11 +52,11 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    public void on_abort (PropagatorJob.AbortType abort_type) override;
+    public void on_signal_abort (PropagatorJob.AbortType abort_type) override;
 
     /***********************************************************
     ***********************************************************/
-    private void on_start_next_chunk ();
-    private void on_put_finished ();
-    private void on_upload_progress (int64, int64);
+    private void on_signal_start_next_chunk ();
+    private void on_signal_put_finished ();
+    private void on_signal_upload_progress (int64, int64);
 };

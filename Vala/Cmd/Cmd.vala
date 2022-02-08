@@ -41,7 +41,7 @@ class Cmd : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_transmission_progress_slot () {
+    public void on_signal_transmission_progress_slot () {
     }
 }
 
@@ -76,7 +76,7 @@ CmdOptions opts = null;
 
 string query_password (string user) {
     EchoDisabler disabler;
-    std.cout << "Password for user " << q_printable (user) << " : ";
+    std.cout + "Password for user " + q_printable (user) + " : ";
     std.string s;
     std.getline (std.cin, s);
     return string.from_std_string (s);
@@ -86,37 +86,37 @@ string query_password (string user) {
 void help () {
     const string binary_name = APPLICATION_EXECUTABLE + "cmd";
 
-    std.cout << binary_name << " - command line " APPLICATION_NAME " client tool" << std.endl;
-    std.cout << "" << std.endl;
-    std.cout << "Usage : " << binary_name << " [OPTION] <source_dir> <server_url>" << std.endl;
-    std.cout << "" << std.endl;
-    std.cout << "A proxy can either be set manually using --httpproxy." << std.endl;
-    std.cout << "Otherwise, the setting from a configured sync client will be used." << std.endl;
-    std.cout << std.endl;
-    std.cout << "Options:" << std.endl;
-    std.cout << "  --silent, -s           Don't be so verbose" << std.endl;
-    std.cout << "  --httpproxy [proxy]    Specify a http proxy to use." << std.endl;
-    std.cout << "                         Proxy is http://server:port" << std.endl;
-    std.cout << "  --trust                Trust the SSL certification." << std.endl;
-    std.cout << "  --exclude [file]       Exclude list file" << std.endl;
-    std.cout << "  --unsyncedfolders [file]    File containing the list of unsynced remote folders (selective sync)" << std.endl;
-    std.cout << "  --user, -u [name]      Use [name] as the login name" << std.endl;
-    std.cout << "  --password, -p [pass]  Use [pass] as password" << std.endl;
-    std.cout << "  -n                     Use netrc (5) for login" << std.endl;
-    std.cout << "  --non-interactive      Do not block execution with interaction" << std.endl;
-    std.cout << "  --max-sync-retries [n] Retries maximum n times (default to 3)" << std.endl;
-    std.cout << "  --uplimit [n]          Limit the upload speed of files to n KB/s" << std.endl;
-    std.cout << "  --downlimit [n]        Limit the download speed of files to n KB/s" << std.endl;
-    std.cout << "  -h                     Sync hidden files, do not ignore them" << std.endl;
-    std.cout << "  --version, -v          Display version and exit" << std.endl;
-    std.cout << "  --logdebug             More verbose logging" << std.endl;
-    std.cout << "  --path                 Path to a folder on a remote server" << std.endl;
-    std.cout << "" << std.endl;
+    std.cout + binary_name + " - command line " APPLICATION_NAME " client tool" + std.endl;
+    std.cout + "" + std.endl;
+    std.cout + "Usage : " + binary_name + " [OPTION] <source_dir> <server_url>" + std.endl;
+    std.cout + "" + std.endl;
+    std.cout + "A proxy can either be set manually using --httpproxy." + std.endl;
+    std.cout + "Otherwise, the setting from a configured sync client will be used." + std.endl;
+    std.cout + std.endl;
+    std.cout + "Options:" + std.endl;
+    std.cout + "  --silent, -s           Don't be so verbose" + std.endl;
+    std.cout + "  --httpproxy [proxy]    Specify a http proxy to use." + std.endl;
+    std.cout + "                         Proxy is http://server:port" + std.endl;
+    std.cout + "  --trust                Trust the SSL certification." + std.endl;
+    std.cout + "  --exclude [file]       Exclude list file" + std.endl;
+    std.cout + "  --unsyncedfolders [file]    File containing the list of unsynced remote folders (selective sync)" + std.endl;
+    std.cout + "  --user, -u [name]      Use [name] as the login name" + std.endl;
+    std.cout + "  --password, -p [pass]  Use [pass] as password" + std.endl;
+    std.cout + "  -n                     Use netrc (5) for login" + std.endl;
+    std.cout + "  --non-interactive      Do not block execution with interaction" + std.endl;
+    std.cout + "  --max-sync-retries [n] Retries maximum n times (default to 3)" + std.endl;
+    std.cout + "  --uplimit [n]          Limit the upload speed of files to n KB/s" + std.endl;
+    std.cout + "  --downlimit [n]        Limit the download speed of files to n KB/s" + std.endl;
+    std.cout + "  -h                     Sync hidden files, do not ignore them" + std.endl;
+    std.cout + "  --version, -v          Display version and exit" + std.endl;
+    std.cout + "  --logdebug             More verbose logging" + std.endl;
+    std.cout + "  --path                 Path to a folder on a remote server" + std.endl;
+    std.cout + "" + std.endl;
     exit (0);
 }
 
 void show_version () {
-    std.cout << q_utf8Printable (Theme.instance ().version_switch_output ());
+    std.cout + q_utf8Printable (Theme.instance ().version_switch_output ());
     exit (0);
 }
 
@@ -143,7 +143,7 @@ void parse_options (string[] app_args, CmdOptions options) {
     }
     QFileInfo fi (options.source_dir);
     if (!fi.exists ()) {
-        std.cerr << "Source dir '" << q_printable (options.source_dir) << "' does not exist." << std.endl;
+        std.cerr + "Source dir '" + q_printable (options.source_dir) + "' does not exist." + std.endl;
         exit (1);
     }
     options.source_dir = fi.absolute_file_path ();
@@ -253,8 +253,8 @@ int main (int argc, char **argv) {
 
     if (options.target_url.contains ("/webdav", Qt.CaseInsensitive) || options.target_url.contains ("/dav", Qt.CaseInsensitive)) {
         q_warning ("Dav or webdav in server URL.");
-        std.cerr << "Error! Please specify only the base URL of your host with username and password. Example:" << std.endl
-                  << "http (s)://username:password@cloud.example.com" << std.endl;
+        std.cerr + "Error! Please specify only the base URL of your host with username and password. Example:" + std.endl
+                  + "http (s)://username:password@cloud.example.com" + std.endl;
         return EXIT_FAILURE;
     }
 
@@ -288,7 +288,7 @@ int main (int argc, char **argv) {
 
     if (options.interactive) {
         if (user.is_empty ()) {
-            std.cout << "Please enter user name : ";
+            std.cout + "Please enter user name : ";
             std.string s;
             std.getline (std.cin, s);
             user = string.from_std_string (s);
@@ -347,15 +347,15 @@ int main (int argc, char **argv) {
     account.ssl_error_handler (ssl_error_handler);
 
     QEventLoop loop;
-    var job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/capabilities"));
+    var job = new JsonApiJob (account, "ocs/v1.php/cloud/capabilities");
     GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument json) {
         var capabilities = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
-        GLib.debug () << "Server capabilities" << capabilities;
+        GLib.debug ("Server capabilities" + capabilities;
         account.capabilities (capabilities.to_variant_map ());
         account.server_version (capabilities["core"].to_object ()["status"].to_object ()["version"].to_string ());
         loop.quit ();
     });
-    job.on_start ();
+    job.on_signal_start ();
     loop.exec ();
 
     if (job.reply ().error () != Soup.Reply.NoError) {
@@ -363,14 +363,14 @@ int main (int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"));
+    job = new JsonApiJob (account, "ocs/v1.php/cloud/user");
     GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument json) {
         const QJsonObject data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         account.dav_user (data.value ("identifier").to_string ());
         account.dav_display_name (data.value ("display-name").to_string ());
         loop.quit ();
     });
-    job.on_start ();
+    job.on_signal_start ();
     loop.exec ();
 
     // much lower age than the default since this utility is usually made to be run right after a change in the tests
@@ -385,7 +385,7 @@ restart_sync:
     if (!options.unsyncedfolders.is_empty ()) {
         GLib.File f (options.unsyncedfolders);
         if (!f.open (GLib.File.ReadOnly)) {
-            q_critical () << "Could not open file containing the list of unsynced folders : " << options.unsyncedfolders;
+            q_critical ("Could not open file containing the list of unsynced folders : " + options.unsyncedfolders;
         } else {
             // filter out empty lines and comments
             selective_sync_list = string.from_utf8 (f.read_all ()).split ('\n').filter (QRegularExpression ("\\S+")).filter (QRegularExpression ("^[^#]"));
@@ -412,14 +412,14 @@ restart_sync:
     SyncEngine engine (account, options.source_dir, folder, database);
     engine.ignore_hidden_files (options.ignore_hidden_files);
     engine.network_limits (options.uplimit, options.downlimit);
-    GLib.Object.connect (&engine, &SyncEngine.on_finished,
+    GLib.Object.connect (&engine, &SyncEngine.on_signal_finished,
         [&app] (bool result) {
             app.exit (result ? EXIT_SUCCESS : EXIT_FAILURE);
         });
-    GLib.Object.connect (&engine, &SyncEngine.transmission_progress, cmd, &Cmd.on_transmission_progress_slot);
+    GLib.Object.connect (&engine, &SyncEngine.transmission_progress, cmd, &Cmd.on_signal_transmission_progress_slot);
     GLib.Object.connect (&engine, &SyncEngine.sync_error,
         [] (string error) {
-            q_warning () << "Sync error:" << error;
+            q_warning ("Sync error:" + error;
         });
 
     // Exclude lists
@@ -436,23 +436,23 @@ restart_sync:
         engine.excluded_files ().add_exclude_file_path (system_exclude_file);
     }
 
-    if (!engine.excluded_files ().on_reload_exclude_files ()) {
+    if (!engine.excluded_files ().on_signal_reload_exclude_files ()) {
         q_fatal ("Cannot load system exclude list or list supplied via --exclude");
         return EXIT_FAILURE;
     }
 
     // Have to be done async, else, an error before exec () does not terminate the event loop.
-    QMetaObject.invoke_method (&engine, "on_start_sync", Qt.QueuedConnection);
+    QMetaObject.invoke_method (&engine, "on_signal_start_sync", Qt.QueuedConnection);
 
     int result_code = app.exec ();
 
     if (engine.is_another_sync_needed () != AnotherSyncNeeded.NO_FOLLOW_UP_SYNC) {
         if (restart_count < options.restart_times) {
             restart_count++;
-            GLib.debug () << "Restarting Sync, because another sync is needed" << restart_count;
+            GLib.debug ("Restarting Sync, because another sync is needed" + restart_count;
             goto restart_sync;
         }
-        q_warning () << "Another sync is needed, but not done because restart count is exceeded" << restart_count;
+        q_warning ("Another sync is needed, but not done because restart count is exceeded" + restart_count;
     }
 
     return result_code;

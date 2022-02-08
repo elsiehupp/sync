@@ -9,138 +9,9 @@ namespace Ui {
 
 class EmojiModel : GLib.Object {
 
-    //  Q_PROPERTY (QVariantList model READ model NOTIFY model_changed)
-    //  Q_PROPERTY (QAbstractListModel emoji_categories_model READ emoji_categories_model CONSTANT)
-    //  Q_PROPERTY (
-    //  Q_PROPERTY (QVariantList history READ history NOTIFY hi
-    //  Q_PROPERTY (
-    //  Q_PROPERTY (QVariantList people MEMBER people CONST
-    //  Q_PROPERTY (QVariantList nature MEMBER nature CONSTANT)
-    //  Q_PROPERTY (QVariantList food MEMBER food CONSTANT)
-    //  Q_PROPERTY (QVariantList activity MEMBER activity CONSTAN
-    //  Q_PROPERTY (QVariantList travel MEMBER travel CONSTANT)
-    //  Q_PROPERTY (QVariantList objects MEMBER objects CONSTANT)
-    Q_PROPERTY (QVariantList symbols MEMBER symbols CONSTANT)
-    Q_PROPERTY (QVariantList flags MEMBER flags CONSTANT)
-
     /***********************************************************
     ***********************************************************/
-    public EmojiModel (GLib.Object parent = new GLib.Object ())
-        : GLib.Object (parent) {
-    }
-
-
-    /***********************************************************
-    Q_INVOKABLE
-    ***********************************************************/
-    public QVariantList history ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    Q_INVOKABLE
-    ***********************************************************/
-    public void emoji_
-
-    /***********************************************************
-    ***********************************************************/
-    public QVariantList model ();
-
-
-    public QAbstractListModel emoji_categories_model ();
-
-signals:
-    void history_changed ();
-    void model_changed ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private const QVariantList people;
-    private const QVariantList nature;
-    private const QVariantList food;
-    private const QVariantList activity;
-    private const QVariantList travel;
-    private const QVariantList objects;
-    private const QVariantList symbols;
-    private const QVariantList flags;
-
-    /***********************************************************
-    ***********************************************************/
-    private QSettings this.settings;
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private EmojiCategoriesModel this.emoji_categories_model;
-}
-
-
-
-    QVariantList EmojiModel.history () {
-        return this.settings.value ("Editor/emojis", QVariantList ()).to_list ();
-    }
-
-    void EmojiModel.category (string category) {
-        if (this.category == category) {
-            return;
-        }
-        this.category = category;
-        /* emit */ model_changed ();
-    }
-
-    QAbstractListModel *EmojiModel.emoji_categories_model () {
-        return this.emoji_categories_model;
-    }
-
-    QVariantList EmojiModel.model () {
-        if (this.category == "history") {
-            return history ();
-        } else if (this.category == "people") {
-            return people;
-        } else if (this.category == "nature") {
-            return nature;
-        } else if (this.category == "food") {
-            return food;
-        } else if (this.category == "activity") {
-            return activity;
-        } else if (this.category == "travel") {
-            return travel;
-        } else if (this.category == "objects") {
-            return objects;
-        } else if (this.category == "symbols") {
-            return symbols;
-        } else if (this.category == "flags") {
-            return flags;
-        }
-        return history ();
-    }
-
-    void EmojiModel.emoji_used (GLib.Variant model_data) {
-        var history_emojis = history ();
-
-        var history_emojis_iter = history_emojis.begin ();
-        while (history_emojis_iter != history_emojis.end ()) {
-            if ( (*history_emojis_iter).value<Emoji> ().unicode == model_data.value<Emoji> ().unicode) {
-                history_emojis_iter = history_emojis.erase (history_emojis_iter);
-            } else {
-                history_emojis_iter++;
-            }
-        }
-
-        history_emojis.push_front (model_data);
-        this.settings.value ("Editor/emojis", history_emojis);
-
-        /* emit */ history_changed ();
-    }
-
-    const QVariantList EmojiModel.people = {
+    private const QVariantList PEOPLE = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x98\x80"), ":grinning:"
         }),
@@ -763,7 +634,7 @@ signals:
             string.from_utf8 ("\xf0\x9f\x92\xbc"), ":briefcase:" }),
     }
 
-    const QVariantList EmojiModel.nature = {
+    private const QVariantList NATURE = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x99\x88"), ":see_no_evil:"
         }),
@@ -1245,7 +1116,7 @@ signals:
             string.from_utf8 ("\xf0\x9f\x8e\x8d"), ":bamboo:" }),
     }
 
-    const QVariantList EmojiModel.food = {
+    private const QVariantList FOOD = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x8d\x87"), ":grapes:"
         }),
@@ -1331,7 +1202,7 @@ signals:
             string.from_utf8 ("\xf0\x9f\xa7\x80"), ":cheese:"
         }),
         GLib.Variant.from_value (Emoji {
-            string.from_utf8 ("\xf0\x9f\x8d\x96"), ":meat_on_bone:"
+            string.from_utf8 ("\xf0\x9f\x8d\x96"), ":meat_on_signal_bone:"
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x8d\x97"), ":poultry_leg:"
@@ -1502,7 +1373,7 @@ signals:
             string.from_utf8 ("\xf0\x9f\xa5\x84"), ":spoon:" }),
     }
 
-    const QVariantList EmojiModel.activity = {
+    private const QVariantList ACTIVITY = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x91\xbe"), ":space_invader:"
         }),
@@ -1765,7 +1636,7 @@ signals:
             string.from_utf8 ("\xf0\x9f\x8e\xa8"), ":art:"
         }),
         GLib.Variant.from_value (Emoji {
-            string.from_utf8 ("\xf0\x9f\x8e\xb0"), ":on_machine:"
+            string.from_utf8 ("\xf0\x9f\x8e\xb0"), ":on_signal_machine:"
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x9b\x80"), ":bath:"
@@ -1921,7 +1792,7 @@ signals:
             string.from_utf8 ("\xf0\x9f\x8f\xb9"), ":bow_and_arrow:" }),
     }
 
-    const QVariantList EmojiModel.travel = {
+    private const QVariantList TRAVEL = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x8f\x8e"), ":race_car:"
         }),
@@ -2277,7 +2148,7 @@ signals:
             string.from_utf8 ("\xf0\x9f\x8f\x81"), ":checkered_flag:" }),
     }
 
-    const QVariantList EmojiModel.objects = {
+    private const QVariantList OBJECTS = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xe2\x98\xa0"), ":skull_crossbones:"
         }),
@@ -2804,7 +2675,7 @@ signals:
             string.from_utf8 ("\xf0\x9f\x9b\x92"), ":shopping_cart:"
         }),
         GLib.Variant.from_value (Emoji {
-            string.from_utf8 ("\xf0\x9f\x9a\xa9"), ":triangular_flag_on_post:"
+            string.from_utf8 ("\xf0\x9f\x9a\xa9"), ":triangular_flag_on_signal_post:"
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x8e\x8c"), ":crossed_flags:"
@@ -2819,7 +2690,7 @@ signals:
             string.from_utf8 ("\xf0\x9f\x8f\xb3\xf0\x9f\x8c\x88"), ":rainbow_flag:" }),
     }
 
-    const QVariantList EmojiModel.symbols = {
+    private const QVariantList SYMBOLS = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x91\x81\xf0\x9f\x97\xa8"), ":eye_in_speech_bubble:"
         }),
@@ -3646,7 +3517,7 @@ signals:
             string.from_utf8 ("\xf0\x9f\x94\xb5"), ":blue_circle:" }),
     }
 
-    const QVariantList EmojiModel.flags = {
+    private const QVariantList FLAGS = {
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x87\xa6\xf0\x9f\x87\xa8"), ":flag_ac:"
         }),
@@ -4418,5 +4289,98 @@ signals:
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x87\xbf\xf0\x9f\x87\xbc"), ":flag_zw:" }),
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private QSettings settings;
+
+    /***********************************************************
+    ***********************************************************/
+    EmojiCategoriesModel emoji_categories_model {
+        public get {
+            return this.emoji_categories_model;
+        }
+        private set {
+            this.emoji_categories_model = value;
+        }
     }
-    
+
+
+    signal void signal_history_changed ();
+    signal void signal_model_changed ();
+
+
+    /***********************************************************
+    ***********************************************************/
+    public EmojiModel (GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public QVariantList history () {
+        return this.settings.value ("Editor/emojis", QVariantList ()).to_list ();
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public void category (string category) {
+        if (this.category == category) {
+            return;
+        }
+        this.category = category;
+        /* emit */ signal_model_changed ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void emoji_used (GLib.Variant model_data) {
+        var history_emojis = history ();
+
+        var history_emojis_iter = history_emojis.begin ();
+        while (history_emojis_iter != history_emojis.end ()) {
+            if ( (*history_emojis_iter).value<Emoji> ().unicode == model_data.value<Emoji> ().unicode) {
+                history_emojis_iter = history_emojis.erase (history_emojis_iter);
+            } else {
+                history_emojis_iter++;
+            }
+        }
+
+        history_emojis.push_front (model_data);
+        this.settings.value ("Editor/emojis", history_emojis);
+
+        /* emit */ signal_history_changed ();
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public QVariantList model () {
+        if (this.category == "history") {
+            return history ();
+        } else if (this.category == "people") {
+            return PEOPLE;
+        } else if (this.category == "nature") {
+            return NATURE;
+        } else if (this.category == "food") {
+            return FOOD;
+        } else if (this.category == "activity") {
+            return ACTIVITY;
+        } else if (this.category == "travel") {
+            return TRAVEL;
+        } else if (this.category == "objects") {
+            return OBJECTS;
+        } else if (this.category == "symbols") {
+            return SYMBOLS;
+        } else if (this.category == "flags") {
+            return FLAGS;
+        }
+        return history ();
+    }
+
+} // class EmojiModel
+
+} // namespace Ui
+} // namespace Occ
