@@ -22,10 +22,10 @@ class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private struct PathComparator {
-        private bool operator () ( const string lhs, string rhs ) {
-            // This will make sure that the std.map is ordered and queried case-insensitively on macOS and Windows.
-            return path_compare (lhs, rhs) < 0;
-        }
+        //  private bool operator () (string lhs, string rhs) {
+        //      // This will make sure that the std.map is ordered and queried case-insensitively on macOS and Windows.
+        //      return path_compare (lhs, rhs) < 0;
+        //  }
     }
 
 
@@ -124,7 +124,7 @@ class SyncFileStatusTracker : GLib.Object {
         std.swap (this.sync_problems, old_problems);
 
         foreach (SyncFileItemPtr item in items) {
-            GLib.debug ("Investigating" + item.destination () + item.status + item.instruction;
+            GLib.debug ("Investigating " + item.destination () + item.status + item.instruction);
             this.dirty_paths.remove (item.destination ());
 
             if (has_error_status (*item)) {
@@ -171,7 +171,7 @@ class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_item_completed (SyncFileItemPtr item) {
-        GLib.debug ("Item completed" + item.destination () + item.status + item.instruction;
+        GLib.debug ("Item completed " + item.destination () + item.status + item.instruction);
 
         if (has_error_status (*item)) {
             this.sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_ERROR;
@@ -252,7 +252,7 @@ class SyncFileStatusTracker : GLib.Object {
     private SyncFileStatus resolve_sync_and_error_status (string relative_path, SharedFlag shared_state, PathKnownFlag is_path_known = PathKnownFlag.PATH_KNOWN) {
         // If it's a new file and that we're not syncing it yet,
         // don't show any icon and wait for the filesystem watcher to trigger a sync.
-        SyncFileStatus status (is_path_known ? SyncFileStatus.SyncFileStatusTag.STATUS_UP_TO_DATE : SyncFileStatus.SyncFileStatusTag.STATUS_NONE);
+        SyncFileStatus status = new SyncFileStatus (is_path_known ? SyncFileStatus.SyncFileStatusTag.STATUS_UP_TO_DATE : SyncFileStatus.SyncFileStatusTag.STATUS_NONE);
         if (this.sync_count.value (relative_path)) {
             status.set (SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
         } else {
@@ -383,7 +383,7 @@ class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static int path_compare ( const string lhs, string rhs ) {
+    private static int path_compare (string lhs, string rhs) {
         // Should match Utility.fs_case_preserving, we want don't want to pay for the runtime check on every comparison.
         return lhs.compare (rhs, Qt.CaseSensitive);
     }
@@ -391,7 +391,7 @@ class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static bool path_starts_with ( const string lhs, string rhs ) {
+    private static bool path_starts_with (string lhs, string rhs) {
         return lhs.starts_with (rhs, Qt.CaseSensitive);
     }
 

@@ -14,20 +14,30 @@ class PUTFile_job : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private QIODevice this.device;
-    private GLib.HashMap<GLib.ByteArray, GLib.ByteArray> this.headers;
-    private string this.error_string;
-    private GLib.Uri this.url;
-    private QElapsedTimer this.request_timer;
+    private QIODevice device;
+    private GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
+    private string error_string;
+    private GLib.Uri url;
+    private QElapsedTimer request_timer;
+
+    /***********************************************************
+    ***********************************************************/
+    public int chunk;
 
 
-    // Takes ownership of the device
-    public PUTFile_job (AccountPointer account, string path, std.unique_ptr<QIODevice> device,
-        const GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ())
-        : base (account, path, parent)
-        this.device (device.release ())
-        this.headers (headers)
-        this.chunk (chunk) {
+    signal void finished_signal ();
+    signal void upload_progress (int64 value1, int64 value2);
+
+
+    /***********************************************************
+    Takes ownership of the device
+    ***********************************************************/
+    public PUTFile_job.take (AccountPointer account, string path, std.unique_ptr<QIODevice> device,
+        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
+        base (account, path, parent);
+        this.device = device.release ();
+        this.headers = headers;
+        this.chunk = chunk;
         this.device.parent (this);
     }
 
@@ -35,27 +45,62 @@ class PUTFile_job : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public PUTFile_job (AccountPointer account, GLib.Uri url, std.unique_ptr<QIODevice> device,
-        const GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ())
-        : base (account, "", parent)
-        this.device (device.release ())
-        this.headers (headers)
-        this.url (url)
-        this.chunk (chunk) {
+        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
+        base (account, "", parent);
+        this.device = device.release ();
+        this.headers = headers;
+        this.url = url;
+        this.chunk = chunk;
         this.device.parent (this);
     }
-    ~PUTFile_job ();
+
+
+    ~PUTFile_job () {
+        // Make sure that we destroy the Soup.Reply before our this.device of which it keeps an internal pointer.
+        reply (null);
+    }
 
     /***********************************************************
     ***********************************************************/
-    public int this.chunk;
+    public void on_signal_start () {
+        Soup.Request reques;
+        foreach (var header in this.headers) {
+            reques.raw_header (header.key (), header.value ());
+        }
+
+        reques.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
+
+        if (this.url.is_valid ()) {
+            send_request ("PUT", this.url, reques, this.device);
+        } else {
+            send_request ("PUT", make_dav_url (path ()), reques, this.device);
+        }
+
+        if (reply ().error () != Soup.Reply.NoError) {
+            GLib.warning (" Network error: " + reply ().error_string ());
+        }
+
+        connect (reply (), &Soup.Reply.upload_progress, this, &PUTFile_job.upload_progress);
+        connect (this, &AbstractNetworkJob.network_activity, account ().data (), &Account.propagator_network_activity);
+        this.request_timer.on_signal_start ();
+        AbstractNetworkJob.on_signal_start ();
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start ();
+    public bool on_signal_finished () {
+        this.device.close ();
 
-    /***********************************************************
-    ***********************************************************/
-    public bool on_signal_finished ();
+        GLib.info ("PUT of " + reply ().request ().url ().to_string () + " FINISHED WITH STATUS "
+            + reply_status_string ()
+            + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
+            + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute));
+
+        /* emit */ finished_signal ();
+        return true;
+    }
+
 
     /***********************************************************
     ***********************************************************/
@@ -77,52 +122,9 @@ class PUTFile_job : AbstractNetworkJob {
         return std.chrono.milliseconds (this.request_timer.elapsed ());
     }
 
-signals:
-    void finished_signal ();
-    void upload_progress (int64, int64);
-
 }
 
 
 
 
-PUTFile_job.~PUTFile_job () {
-    // Make sure that we destroy the Soup.Reply before our this.device of which it keeps an internal pointer.
-    reply (null);
-}
 
-void PUTFile_job.on_signal_start () {
-    Soup.Request reques;
-    for (GLib.HashMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = this.headers.begin (); it != this.headers.end (); ++it) {
-        reques.raw_header (it.key (), it.value ());
-    }
-
-    reques.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
-
-    if (this.url.is_valid ()) {
-        send_request ("PUT", this.url, reques, this.device);
-    } else {
-        send_request ("PUT", make_dav_url (path ()), reques, this.device);
-    }
-
-    if (reply ().error () != Soup.Reply.NoError) {
-        GLib.warning (" Network error : " + reply ().error_string ();
-    }
-
-    connect (reply (), &Soup.Reply.upload_progress, this, &PUTFile_job.upload_progress);
-    connect (this, &AbstractNetworkJob.network_activity, account ().data (), &Account.propagator_network_activity);
-    this.request_timer.on_signal_start ();
-    AbstractNetworkJob.on_signal_start ();
-}
-
-bool PUTFile_job.on_signal_finished () {
-    this.device.close ();
-
-    GLib.info ("PUT of" + reply ().request ().url ().to_string () + "FINISHED WITH STATUS"
-                     + reply_status_string ()
-                     + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
-                     + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);
-
-    /* emit */ finished_signal ();
-    return true;
-}

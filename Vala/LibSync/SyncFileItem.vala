@@ -350,13 +350,13 @@ class SyncFileItem {
         // Update the inode if possible
         record.inode = this.inode;
         if (FileSystem.get_inode (local_filename, record.inode)) {
-            GLib.debug (local_filename + "Retrieved inode " + record.inode + " (previous item inode : " + this.inode + ")";
+            GLib.debug (local_filename + "Retrieved inode " + record.inode + " (previous item inode: " + this.inode + ")");
         } else {
             // use the "old" inode coming with the item for the case where the
             // filesystem stat fails. That can happen if the the file was removed
             // or renamed meanwhile. For the rename case we still need the inode to
             // detect the rename though.
-            GLib.warning ("Failed to query the 'inode' for file " + local_filename;
+            GLib.warning ("Failed to query the 'inode' for file " + local_filename);
         }
         return record;
     }

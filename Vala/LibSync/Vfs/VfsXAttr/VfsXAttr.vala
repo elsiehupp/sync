@@ -151,12 +151,12 @@ class Vfs_xAttr : Vfs {
         //  Q_ASSERT (!stat.path.starts_with ('/'));
 
         var path = new GLib.ByteArray (*parent_path + '/' + stat.path);
-        var pin = [=] {
+        var pin = () => {
             var absolute_path = string.from_utf8 (path);
             //  Q_ASSERT (absolute_path.starts_with (parameters ().filesystem_path.to_utf8 ()));
             var folder_path = absolute_path.mid (parameters ().filesystem_path.length ());
             return pin_state (folder_path);
-        } ();
+        };
 
         if (xattr.has_nextcloud_placeholder_attributes (path)) {
             var should_download = pin && (*pin == PinState.PinState.ALWAYS_LOCAL);

@@ -1,29 +1,11 @@
 
 //  #include <openssl/rand.h>
+// #include <initializer_list>
 
 namespace Occ {
-    namespace Word_list {
-        string[] get_random_words (int nr);
-        string get_unified_string (string[]& l);
+class Word_list {
 
-
-    // #include <initializer_list>
-
-    int get_random_number (int max) {
-        uchar d[8];
-        RAND_bytes (d, 8);
-
-        uint32 num = 0;
-
-        foreach (uchar c in d) {
-            num = num << 8;
-            num += c;
-        }
-
-        return static_cast<int> (num % max);
-    }
-
-    string[] get_random_words (int nr) {
+    public static string[] get_random_words (int nr) {
         string[] word_list = {
             "abandon",
             "ability",
@@ -2073,7 +2055,7 @@ namespace Occ {
             "zero",
             "zone",
             "zoo"
-        }
+        };
 
         string[] random_words;
         while (random_words.size () != nr) {
@@ -2084,16 +2066,32 @@ namespace Occ {
         }
         return random_words;
     }
+    
 
-    string get_unified_string (string[]& w_list) {
+    public static string get_unified_string (string[] w_list) {
         string ret;
-        foreach (var& string_value in w_list) {
+        foreach (string string_value in w_list) {
             ret += string_value;
         }
         return ret;
     }
 
-    // Namespaces
+
+    public static int get_random_number (int max) {
+        uchar d[8];
+        RAND_bytes (d, 8);
+
+        uint32 num = 0;
+
+        foreach (uchar c in d) {
+            num = num << 8;
+            num += c;
+        }
+
+        return static_cast<int> (num % max);
     }
-    }
-    
+
+
+} // class Word_list
+
+} // namespace Occ

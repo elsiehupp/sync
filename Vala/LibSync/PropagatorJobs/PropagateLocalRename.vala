@@ -33,7 +33,7 @@ class PropagateLocalRename : PropagateItemJob {
         // to this.item.rename_target and the file is not moved as a result.
         if (this.item.file != this.item.rename_target) {
             propagator ().report_progress (*this.item, 0);
-            GLib.debug ("MOVE " + existing_file + " => " + target_file;
+            GLib.debug ("MOVE " + existing_file + " => " + target_file);
 
             if (string.compare (this.item.file, this.item.rename_target, Qt.CaseInsensitive) != 0
                 && propagator ().local_filename_clash (this.item.rename_target)) {
@@ -65,13 +65,13 @@ class PropagateLocalRename : PropagateItemJob {
         var vfs = propagator ().sync_options ().vfs;
         var pin_state = vfs.pin_state (this.item.original_file);
         if (!vfs.pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
-            GLib.warning ("Could not set pin state of" + this.item.original_file + "to inherited";
+            GLib.warning ("Could not set pin state of " + this.item.original_file + " to inherited.");
         }
 
         var old_file = this.item.file;
 
         if (!this.item.is_directory ()) { // Directories are saved at the end
-            SyncFileItem new_item (*this.item);
+            SyncFileItem new_item = new SyncFileItem (*this.item);
             if (old_record.is_valid ()) {
                 new_item.checksum_header = old_record.checksum_header;
             }

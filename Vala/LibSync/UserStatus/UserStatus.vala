@@ -10,13 +10,23 @@ class UserStatus {
 
     /***********************************************************
     ***********************************************************/
-    public enum OnlineStatus : uint8 {
+    public enum OnlineStatus {
         Online,
         DoNotDisturb,
         Away,
         Offline,
         Invisible
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private string identifier;
+    private string message;
+    private string icon;
+    private OnlineStatus state = OnlineStatus.Online;
+    private bool message_predefined;
+    private Optional<ClearAt> clear_at;
 
     /***********************************************************
     ***********************************************************/
@@ -109,14 +119,6 @@ class UserStatus {
     public GLib.Uri state_icon ();
 
 
-    /***********************************************************
-    ***********************************************************/
-    private string this.identifier;
-    private string this.message;
-    private string this.icon;
-    private OnlineStatus this.state = OnlineStatus.Online;
-    private bool this.message_predefined;
-    private Optional<ClearAt> this.clear_at;
 }
 
 

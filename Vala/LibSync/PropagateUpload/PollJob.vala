@@ -77,7 +77,7 @@ class PollJob : AbstractNetworkJob {
         GLib.ByteArray json_data = reply ().read_all ().trimmed ();
         QJsonParseError json_parse_error;
         QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
-        GLib.info (">" + json_data + "<" + reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int () + json + json_parse_error.error_string ();
+        GLib.info ("> " + json_data + " <" + reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int () + json + json_parse_error.error_string ());
         if (json_parse_error.error != QJsonParseError.NoError) {
             this.item.error_string = _("Invalid JSON reply from the poll URL");
             this.item.status = SyncFileItem.Status.NORMAL_ERROR;

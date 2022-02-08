@@ -61,12 +61,12 @@ class PutMultiFileJob : AbstractNetworkJob {
         Soup.Request reques;
 
         foreach (var one_device in this.devices) {
-            var one_part = QHttp_part{};
+            var one_part = new QHttp_part ();
 
             one_part.body_device (one_device.device.get ());
 
-            for (GLib.HashMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = one_device.headers.begin (); it != one_device.headers.end (); ++it) {
-                one_part.raw_header (it.key (), it.value ());
+            foreach (var header in one_device.headers) {
+                one_part.raw_header (header.key (), header.value ());
             }
 
             reques.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
@@ -77,7 +77,7 @@ class PutMultiFileJob : AbstractNetworkJob {
         send_request ("POST", this.url, reques, this.body);
 
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warning (" Network error : " + reply ().error_string ();
+            GLib.warning (" Network error: " + reply ().error_string ());
         }
 
         connect (reply (), &Soup.Reply.upload_progress, this, &PutMultiFileJob.upload_progress);
@@ -94,10 +94,10 @@ class PutMultiFileJob : AbstractNetworkJob {
             one_device.device.close ();
         }
 
-        GLib.info ("POST of" + reply ().request ().url ().to_string () + path ("FINISHED WITH STATUS"
-                         + reply_status_string ()
-                         + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
-                         + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute);
+        GLib.info ("POST of" + reply ().request ().url ().to_string () + path () + "FINISHED WITH STATUS"
+                + reply_status_string ()
+                + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
+                + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute));
 
         /* emit */ finished_signal ();
         return true;

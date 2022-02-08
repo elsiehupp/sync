@@ -104,7 +104,7 @@ class Vfs_suffix : Vfs {
     /***********************************************************
     ***********************************************************/
     public Result<void, string> dehydrate_placeholder (SyncFileItem item) {
-        SyncFileItem virtual_item (item);
+        SyncFileItem virtual_item = new SyncFileItem (item);
         virtual_item.file = item.rename_target;
         var r = create_placeholder (virtual_item);
         if (!r)
@@ -199,7 +199,7 @@ class Vfs_suffix : Vfs {
         // that are not marked as a virtual file. These could be real .owncloud
         // files that were synced before vfs was enabled.
         QByte_array_list to_wipe;
-        parameters.journal.get_files_below_path ("", [&to_wipe] (SyncJournalFileRecord record) {
+        parameters.journal.get_files_below_path ("", /*[&to_wipe]*/ (SyncJournalFileRecord record) => {
             if (!record.is_virtual_file () && record.path.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX))
                 to_wipe.append (record.path);
         });

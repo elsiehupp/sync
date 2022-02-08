@@ -142,7 +142,7 @@ class SyncResult {
 
     /***********************************************************
     ***********************************************************/
-    public SyncResult () = default;
+    //  public SyncResult () = default;
 
 
     /***********************************************************
@@ -169,7 +169,7 @@ class SyncResult {
     /***********************************************************
     ***********************************************************/
     public void on_signal_reset () {
-        *this = SyncResult ();
+        SyncResult ();
     }
 
 
@@ -235,8 +235,8 @@ class SyncResult {
 
     /***********************************************************
     ***********************************************************/
-    public void folder (string folder) {
-        this.folder = folder;
+    public void folder (string value) {
+        this.folder = value;
     }
 
 
@@ -307,8 +307,8 @@ class SyncResult {
 
     /***********************************************************
     ***********************************************************/
-    public void num_old_conflict_items (int n) {
-        this.num_old_conflict_items = n;
+    public void num_old_conflict_items (int value) {
+        this.num_old_conflict_items = value;
     }
 
 
@@ -342,59 +342,61 @@ class SyncResult {
 
     /***********************************************************
     ***********************************************************/
-    public const SyncFileItemPtr first_item_new () {
+    public SyncFileItemPtr first_item_new () {
         return this.first_item_new;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public const SyncFileItemPtr first_item_deleted () {
+    public SyncFileItemPtr first_item_deleted () {
         return this.first_item_deleted;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public 
-    }
+    //  public 
+    //  }
 
 
     /***********************************************************
     ***********************************************************/
-    public const SyncFileItemPtr first_item_updated () {
+    public SyncFileItemPtr first_item_updated () {
         return this.first_item_updated;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public const SyncFileItemPtr first_item_renamed () {
+    public SyncFileItemPtr first_item_renamed () {
+        return this.first_item_renamed;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public 
+    //  public 
+    //  }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public SyncFileItemPtr first_new_conflict_item () {
+        return this.first_new_conflict_item;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public urn this.first_new_conflict_item;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public const SyncFileItemPtr first_item_error () {
+    public SyncFileItemPtr first_item_error () {
         return this.first_item_error;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public const SyncFileItemPtr first_item_locked () {
+    public SyncFileItemPtr first_item_locked () {
         return this.first_item_locked;
     }
 
