@@ -59,7 +59,7 @@ class DetermineAuthTypeJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public DetermineAuthTypeJob (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
+    public DetermineAuthTypeJob.for_account (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
     }
@@ -70,19 +70,19 @@ class DetermineAuthTypeJob : GLib.Object {
     public void on_signal_start () {
         GLib.info ("Determining auth type for" + this.account.dav_url ();
 
-        Soup.Request reques;
+        Soup.Request request;
         // Prevent HttpCredentialsAccessManager from setting an Authorization header.
-        reques.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
+        request.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
         // Don't reuse previous auth credentials
-        reques.attribute (Soup.Request.AuthenticationReuseAttribute, Soup.Request.Manual);
+        request.attribute (Soup.Request.AuthenticationReuseAttribute, Soup.Request.Manual);
 
         // Start three parallel requests
 
         // 1. determines whether it's a basic auth server
-        var get = this.account.send_request ("GET", this.account.url (), reques);
+        var get = this.account.send_request ("GET", this.account.url (), request);
 
         // 2. checks the HTTP auth method.
-        var propfind = this.account.send_request ("PROPFIND", this.account.dav_url (), reques);
+        var propfind = this.account.send_request ("PROPFIND", this.account.dav_url (), request);
 
         // 3. Determines if the old flow has to be used (GS for now)
         var old_flow_required = new JsonApiJob (this.account, "/ocs/v2.php/cloud/capabilities", this);

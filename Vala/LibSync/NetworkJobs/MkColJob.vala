@@ -18,7 +18,7 @@ class MkColJob : AbstractNetworkJob {
     ***********************************************************/
     GLib.Uri url;
 
-    GLib.HashMap<GLib.ByteArray, GLib.ByteArray> extra_headers;
+    GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers;
 
 
     signal void finished_with_error (Soup.Reply reply);
@@ -27,15 +27,15 @@ class MkColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public MkColJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public MkColJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public MkColJob (AccountPointer account, GLib.Uri url,
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent) {
+    public MkColJob.for_url (AccountPointer account, GLib.Uri url,
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent) {
         base (account, "", parent);
         this.url = url;
         this.extra_headers = extra_headers;
@@ -44,8 +44,8 @@ class MkColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public MkColJob (AccountPointer account, string path,
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent = new GLib.Object ())
+    public MkColJob.for_path (AccountPointer account, string path,
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.extra_headers = extra_headers;
     }
@@ -55,17 +55,17 @@ class MkColJob : AbstractNetworkJob {
     ***********************************************************/
     public void on_signal_start () {
         // add 'Content-Length : 0' header (see https://github.com/owncloud/client/issues/3256)
-        Soup.Request reques;
-        reques.raw_header ("Content-Length", "0");
+        Soup.Request request;
+        request.raw_header ("Content-Length", "0");
         for (var it = this.extra_headers.const_begin (); it != this.extra_headers.const_end (); ++it) {
-            reques.raw_header (it.key (), it.value ());
+            request.raw_header (it.key (), it.value ());
         }
 
         // assumes ownership
         if (this.url.is_valid ()) {
-            send_request ("MKCOL", this.url, reques);
+            send_request ("MKCOL", this.url, request);
         } else {
-            send_request ("MKCOL", make_dav_url (path ()), reques);
+            send_request ("MKCOL", make_dav_url (path ()), request);
         }
         AbstractNetworkJob.on_signal_start ();
     }

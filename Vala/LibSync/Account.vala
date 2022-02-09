@@ -65,8 +65,7 @@ class Account : GLib.Object {
     @ingroup libsync
     ***********************************************************/
     class AbstractSslErrorHandler {
-        public virtual ~AbstractSslErrorHandler () = default;
-        public virtual bool handle_errors (GLib.List<QSslError>, QSslConfiguration conf, GLib.List<QSslCertificate> *, AccountPointer);
+        public virtual bool handle_errors (GLib.List<QSslError>, QSslConfiguration conf, GLib.List<QSslCertificate> cert_list, AccountPointer account);
     }
 
 
@@ -88,19 +87,58 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QWeakPointer<Account> shared_this;
+    QWeakPointer<Account> shared_this {
+        private get {
+            return this.shared_this;
+        }
+        public set {
+            this.shared_this = value.to_weak_ref ();
+            setup_user_status_connector ();
+        }
+    }
 
     /***********************************************************
+    The internal identifier of the account.
     ***********************************************************/
-    private string identifier;
+    string identifier { public get; private set; }
 
     /***********************************************************
+    The user that can be used in dav url.
+
+    This can very well be different frome the login user that's
+    stored in credentials ().user ().
     ***********************************************************/
-    private string dav_user;
+    string dav_user {
+        public get {
+            return this.dav_user.is_empty () && this.credentials ? this.credentials.user () : this.dav_user;
+        }
+        public set {
+            if (this.dav_user == value) {
+                return;
+            }
+            this.dav_user = value;
+            /* emit */ wants_account_saved (this);
+        }
+    }
 
     /***********************************************************
+    The name of the account as shown in the toolbar
     ***********************************************************/
-    private string display_name;
+    string display_name {
+        public get {
+            string dn = "%1@%2".arg (credentials ().user (), this.url.host ());
+            int port = url ().port ();
+            if (port > 0 && port != 80 && port != 443) {
+                dn.append (':');
+                dn.append (string.number (port));
+            }
+            return dn;
+        }
+        public set {
+            this.display_name = value;
+            /* emit */ account_changed_display_name ();
+        }
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -109,16 +147,33 @@ class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
 //  #ifndef TOKEN_AUTH_ONLY
-    private Gtk.Image avatar_img;
+    Gtk.Image avatar {
+        public get {
+            return this.avatar;
+        }
+        public set {
+            this.avatar = value;
+            /* emit */ account_changed_avatar ();
+        }
+    }
 //  #endif
 
     /***********************************************************
     ***********************************************************/
-    private GLib.HashMap<string, GLib.Variant> settings_map;
+    private GLib.HashTable<string, GLib.Variant> settings_map;
 
     /***********************************************************
+    Server url of the account
     ***********************************************************/
-    private GLib.Uri url;
+    GLib.Uri url {
+        public get {
+            return this.url;
+        }
+        public set {
+            this.url = value;
+            this.user_visible_url = value;
+        }
+    }
 
     /***********************************************************
     If url to use for any user-visible urls.
@@ -131,36 +186,128 @@ class Account : GLib.Object {
     private GLib.Uri user_visible_url;
 
     /***********************************************************
+    The certificates of the account
     ***********************************************************/
-    private GLib.List<QSslCertificate> approved_certificates;
+    GLib.List<QSslCertificate> approved_certificates { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    private QSslConfiguration ssl_configuration;
+    public void approved_certificates (GLib.List<QSslCertificate> certificates) {
+        this.approved_certificates = certificates;
+        QSslConfiguration.default_configuration ().add_ca_certificates (certificates);
+    }
 
     /***********************************************************
     ***********************************************************/
-    private Capabilities capabilities;
+    QSslConfiguration ssl_configuration { public get; public set; }
 
     /***********************************************************
+    Access the server capabilities
     ***********************************************************/
-    private string server_version;
+    Capabilities capabilities {
+        public get {
+            return this.capabilities;
+        }
+        private set {
+            this.capabilities = Capabilities (value);
+
+            setup_user_status_connector ();
+            try_setup_push_notifications ();
+        }
+    }
 
     /***********************************************************
+    Access the server version
+
+    For servers >= 10.0.0, this can be the empty string until
+    capabilities have been received.
     ***********************************************************/
-    private QScopedPointer<AbstractSslErrorHandler> ssl_error_handler;
+    string server_version {
+        private get {
+            return this.server_version;
+        }
+        public set {
+            if (this.server_version == value) {
+                return;
+            }
+    
+            var old_server_version = this.server_version;
+            this.server_version = value;
+            /* emit */ server_version_changed (this, old_server_version, value);
+        }
+    }
+
+    /***********************************************************
+    Pluggable handler
+    ***********************************************************/
+    QScopedPointer<AbstractSslErrorHandler> ssl_error_handler {
+        private get {
+            return this.ssl_error_handler;
+        }
+        public set {
+            this.ssl_error_handler.on_signal_reset (value);
+        }
+    }
 
     /***********************************************************
     ***********************************************************/
     private unowned QNetworkAccessManager access_manager;
 
     /***********************************************************
+    Holds the accounts credentials
     ***********************************************************/
-    private QScopedPointer<AbstractCredentials> credentials;
+    QScopedPointer<AbstractCredentials> credentials {
+        public get {
+            return this.credentials.data ();
+        }
+        public set {
+            // set active credential manager
+            QNetworkCookieJar jar = null;
+            QNetworkProxy proxy;
+
+            if (this.access_manager) {
+                jar = this.access_manager.cookie_jar ();
+                jar.parent (null);
+
+                // Remember proxy (issue #2108)
+                proxy = this.access_manager.proxy ();
+
+                this.access_manager = new unowned QNetworkAccessManager ();
+            }
+
+            // The order for these two is important! Reading the credential's
+            // settings accesses the account as well as account.credentials,
+            this.credentials.on_signal_reset (value);
+            value.account (this);
+
+            // Note: This way the QNAM can outlive the Account and Credentials.
+            // This is necessary to avoid issues with the QNAM being deleted while
+            // processing on_signal_handle_ssl_errors ().
+            this.access_manager = new unowned QNetworkAccessManager (this.credentials.create_qnam (), &GLib.Object.delete_later);
+
+            if (jar) {
+                this.access_manager.cookie_jar (jar);
+            }
+            if (proxy.type () != QNetworkProxy.DefaultProxy) {
+                this.access_manager.proxy (proxy);
+            }
+            connect (this.access_manager.data (), SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
+                SLOT (on_signal_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
+            connect (this.access_manager.data (), &QNetworkAccessManager.proxy_authentication_required,
+                this, &Account.proxy_authentication_required);
+            connect (this.credentials.data (), &AbstractCredentials.fetched,
+                this, &Account.on_signal_credentials_fetched);
+            connect (this.credentials.data (), &AbstractCredentials.asked,
+                this, &Account.on_signal_credentials_asked);
+
+            try_setup_push_notifications ();
+        }
+    }
 
     /***********************************************************
+    True when the server connection is using HTTP2
     ***********************************************************/
-    private bool http2Supported = false;
+    public bool http2Supported;
 
     /***********************************************************
     Certificates that were explicitly rejected by the user
@@ -175,7 +322,6 @@ class Account : GLib.Object {
     ***********************************************************/
     private ClientSideEncryption e2e;
 
-
     /***********************************************************
     Used in RemoteWipe
     ***********************************************************/
@@ -183,8 +329,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private friend class AccountManager;
-
+    //  private friend class AccountManager;
 
     /***********************************************************
     Direct Editing
@@ -199,108 +344,93 @@ class Account : GLib.Object {
     ***********************************************************/
     private std.shared_ptr<UserStatusConnector> user_status_connector;
 
-
     /***********************************************************
-    ***********************************************************/
-    private bool is_remote_wipe_requested_HACK = false;
-    // <-- FIXME MS@2019-12-07
 
+    IMPORTANT - remove later - FIXME MS@2019-12-07 -.
+    TODO: For "Log out" & "Remove account":
+        Remove client CA certificates and KEY!
+
+    Disabled as long as selecting another cert is not supported
+    by the UI.
+
+    Being able to specify a new certificate is important anyway:
+    expiry etc.
+
+    We introduce this dirty hack here, to allow deleting them
+    upon Remote Wipe.
+    ***********************************************************/
+    public bool is_remote_wipe_requested_HACK;
 
     /***********************************************************
     Emitted whenever there's network activity
     ***********************************************************/
     signal void propagator_network_activity ();
 
-
-
     /***********************************************************
     Triggered by handle_invalid_credentials ()
     ***********************************************************/
     signal void invalid_credentials ();
 
-
-
     /***********************************************************
     ***********************************************************/
     signal void credentials_fetched (AbstractCredentials credentials);
 
-
     /***********************************************************
     ***********************************************************/
     signal void credentials_asked (AbstractCredentials credentials);
-
-
 
     /***********************************************************
     Forwards from QNetworkAccessManager.proxy_authentication_required ().
     ***********************************************************/
     signal void proxy_authentication_required (QNetworkProxy proxy, QAuthenticator authenticator);
 
-
-
     /***********************************************************
     e.g. when the approved SSL certificates changed
     ***********************************************************/
     signal void wants_account_saved (Account acc);
 
-
-
     /***********************************************************
     ***********************************************************/
     signal void server_version_changed (Account account, string new_version, string old_version);
-
-
 
     /***********************************************************
     ***********************************************************/
     signal void account_changed_avatar ();
 
-
-
     /***********************************************************
     ***********************************************************/
     signal void account_changed_display_name ();
 
-
-
     /***********************************************************
     Used in RemoteWipe
     ***********************************************************/
-    signal void app_password_retrieved (string);
-
-
+    signal void app_password_retrieved (string value);
 
     /***********************************************************
     ***********************************************************/
     signal void push_notifications_ready (Account account);
 
-
-
     /***********************************************************
     ***********************************************************/
     signal void push_notifications_disabled (Account account);
-
-
 
     /***********************************************************
     ***********************************************************/
     signal void user_status_changed ();
 
-
     /***********************************************************
     ***********************************************************/
     private Account (GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        this.capabilities = new QVariantMap ();
+        this.capabilities = new GLib.HashTable<string, GLib.Variant> ();
+        this.http2Supported = false;
+        this.is_remote_wipe_requested_HACK = false;
         q_register_meta_type<AccountPointer> ("AccountPointer");
         q_register_meta_type<Account> ("Account*");
 
         this.push_notifications_reconnect_timer.interval (PUSH_NOTIFICATIONS_RECONNECT_INTERVAL);
         connect (&this.push_notifications_reconnect_timer, &QTimer.timeout, this, &Account.try_setup_push_notifications);
     }
-
-
-
 
 
     /***********************************************************
@@ -314,109 +444,8 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void shared_this (AccountPointer shared_this) {
-        this.shared_this = shared_this.to_weak_ref ();
-        setup_user_status_connector ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public AccountPointer shared_from_this () {
         return this.shared_this.to_strong_ref ();
-    }
-
-
-    /***********************************************************
-    The user that can be used in dav url.
-
-    This can very well be different frome the login user that's
-    stored in credentials ().user ().
-    ***********************************************************/
-    public string dav_user () {
-        return this.dav_user.is_empty () && this.credentials ? this.credentials.user () : this.dav_user;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void dav_user (string new_dav_user) {
-        if (this.dav_user == new_dav_user) {
-            return;
-        }
-        this.dav_user = new_dav_user;
-        /* emit */ wants_account_saved (this);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string dav_display_name () {
-        return this.display_name;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void dav_display_name (string new_display_name) {
-        this.display_name = new_display_name;
-        /* emit */ account_changed_display_name ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-//  #ifndef TOKEN_AUTH_ONLY
-    public Gtk.Image avatar () {
-        return this.avatar_img;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void avatar (Gtk.Image img) {
-        this.avatar_img = img;
-        /* emit */ account_changed_avatar ();
-    }
-//  #endif
-
-
-    /***********************************************************
-    The name of the account as shown in the toolbar
-    ***********************************************************/
-    public string display_name () {
-        string dn = string ("%1@%2").arg (credentials ().user (), this.url.host ());
-        int port = url ().port ();
-        if (port > 0 && port != 80 && port != 443) {
-            dn.append (':');
-            dn.append (string.number (port));
-        }
-        return dn;
-    }
-
-
-
-    /***********************************************************
-    The internal identifier of the account.
-    ***********************************************************/
-    public string identifier () {
-        return this.identifier;
-    }
-
-
-    /***********************************************************
-    Server url of the account
-    ***********************************************************/
-    public void url (GLib.Uri url) {
-        this.url = url;
-        this.user_visible_url = url;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public GLib.Uri url () {
-        return this.url;
     }
 
 
@@ -465,120 +494,67 @@ class Account : GLib.Object {
 
 
     /***********************************************************
-    Holds the accounts credentials
-    ***********************************************************/
-    public AbstractCredentials credentials () {
-        return this.credentials.data ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void credentials (AbstractCredentials credentials) {
-        // set active credential manager
-        QNetworkCookieJar jar = null;
-        QNetworkProxy proxy;
-
-        if (this.access_manager) {
-            jar = this.access_manager.cookie_jar ();
-            jar.parent (null);
-
-            // Remember proxy (issue #2108)
-            proxy = this.access_manager.proxy ();
-
-            this.access_manager = new unowned QNetworkAccessManager ();
-        }
-
-        // The order for these two is important! Reading the credential's
-        // settings accesses the account as well as account.credentials,
-        this.credentials.on_signal_reset (credentials);
-        credentials.account (this);
-
-        // Note: This way the QNAM can outlive the Account and Credentials.
-        // This is necessary to avoid issues with the QNAM being deleted while
-        // processing on_signal_handle_ssl_errors ().
-        this.access_manager = new unowned QNetworkAccessManager (this.credentials.create_qnam (), &GLib.Object.delete_later);
-
-        if (jar) {
-            this.access_manager.cookie_jar (jar);
-        }
-        if (proxy.type () != QNetworkProxy.DefaultProxy) {
-            this.access_manager.proxy (proxy);
-        }
-        connect (this.access_manager.data (), SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
-            SLOT (on_signal_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
-        connect (this.access_manager.data (), &QNetworkAccessManager.proxy_authentication_required,
-            this, &Account.proxy_authentication_required);
-        connect (this.credentials.data (), &AbstractCredentials.fetched,
-            this, &Account.on_signal_credentials_fetched);
-        connect (this.credentials.data (), &AbstractCredentials.asked,
-            this, &Account.on_signal_credentials_asked);
-
-        try_setup_push_notifications ();
-    }
-
-
-    /***********************************************************
     Create a network request on the account's QNAM.
 
     Network requests in AbstractNetworkJobs are created through
     this function. Other places should prefer to use jobs or
     send_request ().
     ***********************************************************/
-    public Soup.Reply send_raw_request (GLib.ByteArray verb,
-        GLib.Uri url,
-        Soup.Request reques = Soup.Request (),
+    public Soup.Reply send_raw_request_for_device (GLib.ByteArray verb,
+        GLib.Uri url, Soup.Request request = Soup.Request (),
         QIODevice data = null) {
-        reques.url (url);
-        reques.ssl_configuration (this.get_or_create_ssl_config ());
+        request.url (url);
+        request.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "HEAD" && !data) {
-            return this.access_manager.head (reques);
+            return this.access_manager.head (request);
         } else if (verb == "GET" && !data) {
-            return this.access_manager.get (reques);
+            return this.access_manager.get (request);
         } else if (verb == "POST") {
-            return this.access_manager.post (reques, data);
+            return this.access_manager.post (request, data);
         } else if (verb == "PUT") {
-            return this.access_manager.put (reques, data);
+            return this.access_manager.put (request, data);
         } else if (verb == "DELETE" && !data) {
-            return this.access_manager.delete_resource (reques);
+            return this.access_manager.delete_resource (request);
         }
-        return this.access_manager.send_custom_request (reques, verb, data);
+        return this.access_manager.send_custom_request (request, verb, data);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Soup.Reply send_raw_request (GLib.ByteArray verb,
-        GLib.Uri url, Soup.Request reques, GLib.ByteArray data)  {
-        reques.url (url);
-        reques.ssl_configuration (this.get_or_create_ssl_config ());
+    public Soup.Reply send_raw_request_for_data (GLib.ByteArray verb,
+        GLib.Uri url, Soup.Request request = Soup.Request (),
+        GLib.ByteArray data)  {
+        request.url (url);
+        request.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "HEAD" && data.is_empty ()) {
-            return this.access_manager.head (reques);
+            return this.access_manager.head (request);
         } else if (verb == "GET" && data.is_empty ()) {
-            return this.access_manager.get (reques);
+            return this.access_manager.get (request);
         } else if (verb == "POST") {
-            return this.access_manager.post (reques, data);
+            return this.access_manager.post (request, data);
         } else if (verb == "PUT") {
-            return this.access_manager.put (reques, data);
+            return this.access_manager.put (request, data);
         } else if (verb == "DELETE" && data.is_empty ()) {
-            return this.access_manager.delete_resource (reques);
+            return this.access_manager.delete_resource (request);
         }
-        return this.access_manager.send_custom_request (reques, verb, data);
+        return this.access_manager.send_custom_request (request, verb, data);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Soup.Reply send_raw_request (GLib.ByteArray verb,
-        GLib.Uri url, Soup.Request reques, QHttpMultiPart data) {
-        reques.url (url);
-        reques.ssl_configuration (this.get_or_create_ssl_config ());
+    public Soup.Reply send_raw_request_for_multipart (GLib.ByteArray verb,
+        GLib.Uri url, Soup.Request request = Soup.Request (),
+        QHttpMultiPart data) {
+        request.url (url);
+        request.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "PUT") {
-            return this.access_manager.put (reques, data);
+            return this.access_manager.put (request, data);
         } else if (verb == "POST") {
-            return this.access_manager.post (reques, data);
+            return this.access_manager.post (request, data);
         }
-        return this.access_manager.send_custom_request (reques, verb, data);
+        return this.access_manager.send_custom_request (request, verb, data);
     }
 
 
@@ -589,11 +565,10 @@ class Account : GLib.Object {
     types.
     ***********************************************************/
     public SimpleNetworkJob send_request (GLib.ByteArray verb,
-        GLib.Uri url,
-        Soup.Request reques = Soup.Request (),
+        GLib.Uri url, Soup.Request request = Soup.Request (),
         QIODevice data = null) {
         var job = new SimpleNetworkJob (shared_from_this ());
-        job.start_request (verb, url, reques, data);
+        job.start_request (verb, url, request, data);
         return job;
     }
 
@@ -601,7 +576,7 @@ class Account : GLib.Object {
     /***********************************************************
     The ssl configuration during the first connection
     ***********************************************************/
-    public QSslConfiguration get_or_create_ssl_config ()s {
+    public QSslConfiguration get_or_create_ssl_config () {
         if (!this.ssl_configuration.is_null ()) {
             // Will be set by CheckServerJob.on_signal_finished ()
             // We need to use a central shared config to get SSL session tickets
@@ -625,36 +600,6 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QSslConfiguration ssl_configuration () {
-        return ssl_configuration;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void ssl_configuration (QSslConfiguration config) {
-        this.ssl_configuration = config;
-    }
-
-
-    /***********************************************************
-    The certificates of the account
-    ***********************************************************/
-    public GLib.List<QSslCertificate> approved_certificates () {
-        return approved_certificates;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void approved_certificates (GLib.List<QSslCertificate> certificates) {
-        this.approved_certificates = certificates;
-        QSslConfiguration.default_configuration ().add_ca_certificates (certificates);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public void add_approved_certificates (GLib.List<QSslCertificate> certificates) {
         this.approved_certificates += certificates;
     }
@@ -670,20 +615,10 @@ class Account : GLib.Object {
     }
 
 
-
-    /***********************************************************
-    Pluggable handler
-    ***********************************************************/
-    public void ssl_error_handler (AbstractSslErrorHandler handler) {
-        this.ssl_error_handler.on_signal_reset (handler);
-    }
-
-
-
     /***********************************************************
     To be called by credentials only, for storing username and the like
     ***********************************************************/
-    public GLib.Variant credential_setting (string key) {
+    public GLib.Variant credential_setting_key (string key) {
         if (this.credentials) {
             string prefix = this.credentials.auth_type ();
             GLib.Variant value = this.settings_map.value (prefix + "this." + key);
@@ -698,7 +633,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void credential_setting (string key, GLib.Variant value) {
+    public void credential_setting_key_value (string key, GLib.Variant value) {
         if (this.credentials) {
             string prefix = this.credentials.auth_type ();
             this.settings_map.insert (prefix + "this." + key, value);
@@ -713,35 +648,6 @@ class Account : GLib.Object {
 
 
     /***********************************************************
-    Access the server capabilities
-    ***********************************************************/
-    public const Capabilities capabilities () {
-        return this.capabilities;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void capabilities (QVariantMap capabilities) {
-        this.capabilities = Capabilities (capabilities);
-
-        setup_user_status_connector ();
-        try_setup_push_notifications ();
-    }
-
-
-    /***********************************************************
-    Access the server version
-
-    For servers >= 10.0.0, this can be the empty string until
-    capabilities have been received.
-    ***********************************************************/
-    public string server_version () {
-        return this.server_version;
-    }
-
-
-    /***********************************************************
     Server version for easy comparison.
 
     Example: server_version_int () >= make_server_version (11, 2, 3)
@@ -749,7 +655,7 @@ class Account : GLib.Object {
     Will be 0 if the version is not available yet.
     ***********************************************************/
     public int server_version_int () {
-        // FIXME : Use Qt 5.5 QVersionNumber
+        // FIXME: Use Qt 5.5 QVersionNumber
         var components = server_version ().split ('.');
         return make_server_version (components.value (0).to_int (),
             components.value (1).to_int (),
@@ -761,19 +667,6 @@ class Account : GLib.Object {
     ***********************************************************/
     public static int make_server_version (int major_version, int minor_version, int patch_version) {
         return (major_version << 16) + (minor_version << 8) + patch_version;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void server_version (string version) {
-        if (version == this.server_version) {
-            return;
-        }
-
-        var old_server_version = this.server_version;
-        this.server_version = version;
-        /* emit */ server_version_changed (this, old_server_version, version);
     }
 
 
@@ -807,27 +700,12 @@ class Account : GLib.Object {
 
 
     /***********************************************************
-    True when the server connection is using HTTP2
-    ***********************************************************/
-    public bool is_http2Supported () {
-        return http2Supported;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void http2Supported (bool value) {
-        http2Supported = value;
-    }
-
-
-    /***********************************************************
     clear all cookies. (Session cookies or not)
     ***********************************************************/
     public void clear_cookie_jar () {
-        var jar = qobject_cast<CookieJar> (this.access_manager.cookie_jar ());
+        var jar = (CookieJar) this.access_manager.cookie_jar ();
         //  ASSERT (jar);
-        jar.all_cookies (GLib.List<QNetworkCookie> ());
+        jar.all_cookies (new GLib.List<QNetworkCookie> ());
         /* emit */ wants_account_saved (this);
     }
 
@@ -862,8 +740,8 @@ class Account : GLib.Object {
                     /* emit */ push_notifications_ready (this);
                 });
 
-                var disable_push_notifications = [this] () {
-                    GLib.info ("Disable push notifications object because authentication failed or connection lost";
+                var disable_push_notifications = () => {
+                    GLib.info ("Disable push notifications object because authentication failed or connection lost");
                     if (!this.push_notifications) {
                         return;
                     }
@@ -986,16 +864,16 @@ class Account : GLib.Object {
     ***********************************************************/
     public void retrieve_app_password () {
         const string kck = AbstractCredentials.keychain_key (
-                    url ().to_string (),
-                    credentials ().user () + app_password,
-                    identifier ()
+            url ().to_string (),
+            credentials ().user () + app_password,
+            identifier ()
         );
 
         var job = new ReadPasswordJob (Theme.instance ().app_name ());
         job.insecure_fallback (false);
         job.key (kck);
         connect (job, &ReadPasswordJob.on_signal_finished, (Job incoming) => {
-            var read_job = static_cast<ReadPasswordJob> (incoming);
+            var read_job = (ReadPasswordJob) (incoming);
             string pwd ("");
             // Error or no valid public key error out
             if (read_job.error () == NoError &&
@@ -1034,7 +912,7 @@ class Account : GLib.Object {
         job.key (kck);
         job.binary_data (app_password.to_latin1 ());
         connect (job, &WritePasswordJob.on_signal_finished, (Job incoming) => {
-            var write_job = static_cast<WritePasswordJob> (incoming);
+            var write_job = (WritePasswordJob) (incoming);
             if (write_job.error () == NoError)
                 GLib.info ("app_password stored in keychain");
             else
@@ -1050,19 +928,19 @@ class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void delete_app_token () {
-        var delete_app_token_job = new DeleteJob (shared_from_this (), QStringLiteral ("/ocs/v2.php/core/apppassword"));
+        var delete_app_token_job = new DeleteJob (shared_from_this (), "/ocs/v2.php/core/apppassword");
         connect (delete_app_token_job, &DeleteJob.finished_signal, this, () => {
             var delete_job = (DeleteJob)GLib.Object.sender ();
             if (delete_job) {
                 var http_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
                 if (http_code != 200) {
-                    GLib.warning ("AppToken remove failed for user : " + display_name () + " with code : " + http_code));
+                    GLib.warning ("AppToken remove failed for user: " + display_name () + " with code: " + http_code);
                 } else {
                     GLib.info ("AppToken for user : " + display_name () + " has been removed.");
                 }
             } else {
                 //  Q_ASSERT (false);
-                GLib.warning ("The sender is not a DeleteJob instance.";
+                GLib.warning ("The sender is not a DeleteJob instance.");
             }
         });
         delete_app_token_job.on_signal_start ();
@@ -1093,10 +971,10 @@ class Account : GLib.Object {
     ***********************************************************/
     public void setup_user_status_connector () {
         this.user_status_connector = std.make_shared<OcsUserStatusConnector> (shared_from_this ());
-        connect (this.user_status_connector.get (), &UserStatusConnector.user_status_fetched, this, (UserStatus &) {
+        connect (this.user_status_connector.get (), &UserStatusConnector.user_status_fetched, this, (UserStatus &) => {
             /* emit */ user_status_changed ();
         });
-        connect (this.user_status_connector.get (), &UserStatusConnector.message_cleared, this, {
+        connect (this.user_status_connector.get (), &UserStatusConnector.message_cleared, this, () => {
             /* emit */ user_status_changed ();
         });
     }
@@ -1143,8 +1021,8 @@ class Account : GLib.Object {
                         + "\n");
         }
 
-        //  GLib.info ("ssl errors" + out);
-        GLib.info (reply.ssl_configuration ().peer_certificate_chain ()));
+        //  GLib.info ("ssl errors" + output);
+        GLib.info (reply.ssl_configuration ().peer_certificate_chain ());
 
         bool all_previously_rejected = true;
         foreach (QSslError error in errors) {
@@ -1155,13 +1033,13 @@ class Account : GLib.Object {
 
         // If all certificates have previously been rejected by the user, don't ask again.
         if (all_previously_rejected) {
-            GLib.info (out + "Certs not trusted by user decision, returning.";
+            GLib.info (output + "Certs not trusted by user decision, returning.");
             return;
         }
 
         GLib.List<QSslCertificate> approved_certificates;
         if (this.ssl_error_handler.is_null ()) {
-            GLib.warning () + out + "called without valid SSL error handler for account" + url ();
+            GLib.warning (output + "called without valid SSL error handler for account" + url ());
             return;
         }
 
@@ -1182,7 +1060,7 @@ class Account : GLib.Object {
                 /* emit */ wants_account_saved (this);
 
                 // all ssl certificates are known and accepted. We can ignore the problems right away.
-                GLib.info (out + "Certs are known and trusted! This is not an actual error.";
+                GLib.info (output + " Certs are known and trusted! This is not an actual error.");
             }
 
             // Warning : Do not* use ignore_ssl_errors () (without args) here:
@@ -1211,7 +1089,7 @@ class Account : GLib.Object {
     protected void on_signal_credentials_fetched () {
         if (this.dav_user.is_empty ()) {
             GLib.debug ("User identifier not set. Fetch it.");
-            var fetch_user_name_job = new JsonApiJob (shared_from_this (), QStringLiteral ("/ocs/v1.php/cloud/user"));
+            var fetch_user_name_job = new JsonApiJob (shared_from_this (), "/ocs/v1.php/cloud/user");
             connect (fetch_user_name_job, &JsonApiJob.json_received, this, /*[this, fetch_user_name_job]*/ (QJsonDocument json, int status_code) => {
                 fetch_user_name_job.delete_later ();
                 if (status_code != 100) {
@@ -1227,7 +1105,7 @@ class Account : GLib.Object {
             });
             fetch_user_name_job.on_signal_start ();
         } else {
-            GLib.debug ("User identifier already fetched.";
+            GLib.debug ("User identifier already fetched.");
             /* emit */ credentials_fetched (this.credentials.data ());
         }
     }
@@ -1271,31 +1149,6 @@ class Account : GLib.Object {
         }
     }
 
-
-    /***********************************************************
-    IMPORTANT - remove later - FIXME MS@2019-12-07 -.
-    TODO: For "Log out" & "Remove account":
-        Remove client CA certificates and KEY!
-
-    Disabled as long as selecting another cert is not supported
-    by the UI.
-
-    Being able to specify a new certificate is important anyway:
-    expiry etc.
-
-    We introduce this dirty hack here, to allow deleting them
-    upon Remote Wipe.
-    ***********************************************************/
-    public void remote_wipe_requested_HACK () {
-        this.is_remote_wipe_requested_HACK = true;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool is_remote_wipe_requested_HACK () {
-        return this.is_remote_wipe_requested_HACK;
-    }
 }
 
 } // namespace Occ

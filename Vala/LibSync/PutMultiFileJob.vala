@@ -22,26 +22,35 @@ class PutMultiFileJob : AbstractNetworkJob {
 
     struct SingleUploadFileData {
         std.unique_ptr<UploadDevice> device;
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
     }
 
 
     /***********************************************************
     ***********************************************************/
     private QHttpMultiPart body;
-    private GLib.Vector<SingleUploadFileData> devices;
-    private string error_string;
+    private GLib.List<SingleUploadFileData> devices;
+
+    string error_string {
+        public get {
+            this.error_string == "" ? AbstractNetworkJob.error_string () : this.error_string;
+        }
+        protected set {
+            this.error_string = value;
+        }
+    }
+
     private GLib.Uri url;
     private QElapsedTimer request_timer;
 
 
     signal void finished_signal ();
-    signal void upload_progress (int64, int64);
+    signal void upload_progress (int64 value1, int64 value2);
 
     /***********************************************************
     ***********************************************************/
-    public PutMultiFileJob (AccountPointer account, GLib.Uri url,
-        GLib.Vector<SingleUploadFileData> devices, GLib.Object parent = new GLib.Object ()) {
+    public PutMultiFileJob.for_account (AccountPointer account, GLib.Uri url,
+        GLib.List<SingleUploadFileData> devices, GLib.Object parent = new GLib.Object ()) {
         base (account, {}, parent);
         this.devices = std.move (devices);
         this.url = url;
@@ -53,12 +62,11 @@ class PutMultiFileJob : AbstractNetworkJob {
         }
     }
 
-    ~PutMultiFileJob () = default;
 
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request reques;
+        Soup.Request request;
 
         foreach (var one_device in this.devices) {
             var one_part = new QHttp_part ();
@@ -69,12 +77,12 @@ class PutMultiFileJob : AbstractNetworkJob {
                 one_part.raw_header (header.key (), header.value ());
             }
 
-            reques.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
+            request.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
 
             this.body.append (one_part);
         }
 
-        send_request ("POST", this.url, reques, this.body);
+        send_request ("POST", this.url, request, this.body);
 
         if (reply ().error () != Soup.Reply.NoError) {
             GLib.warning (" Network error: " + reply ().error_string ());
@@ -101,13 +109,6 @@ class PutMultiFileJob : AbstractNetworkJob {
 
         /* emit */ finished_signal ();
         return true;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string error_string () {
-        return this.error_string.is_empty () ? AbstractNetworkJob.error_string () : this.error_string;
     }
 
 

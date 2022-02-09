@@ -13,7 +13,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <Soup.Buffer>
 //  #include <QXmlStrea
 //  #include <string[
-//  #include <QStack>
+//  #include <GLib.List>
 //  #include <QTimer>
 //  #include <QMutex>
 //  #include <QCoreApplicatio
@@ -138,7 +138,7 @@ class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractNetworkJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public AbstractNetworkJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.timedout = false;
         this.follow_redirects = true;
@@ -344,8 +344,8 @@ class AbstractNetworkJob : GLib.Object {
     ***********************************************************/
     public void retry () {
         ENFORCE (this.reply);
-        var reques = this.reply.request ();
-        GLib.Uri requested_url = reques.url ();
+        var request = this.reply.request ();
+        GLib.Uri requested_url = request.url ();
         GLib.ByteArray verb = HttpLogger.request_verb (*this.reply);
         GLib.info ("Restarting" + verb + requested_url;
         on_signal_reset_timeout ();
@@ -353,8 +353,8 @@ class AbstractNetworkJob : GLib.Object {
             this.request_body.seek (0);
         }
         // The cookie will be added automatically, we don't want AccessManager.create_request to duplicate them
-        reques.raw_header ("cookie", GLib.ByteArray ());
-        send_request (verb, requested_url, reques, this.request_body);
+        request.raw_header ("cookie", GLib.ByteArray ());
+        send_request (verb, requested_url, request, this.request_body);
     }
 
 
@@ -384,9 +384,9 @@ class AbstractNetworkJob : GLib.Object {
     protected Soup.Reply send_request (
         GLib.ByteArray verb,
         GLib.Uri url,
-        Soup.Request reques = Soup.Request (),
+        Soup.Request request = Soup.Request (),
         QIODevice request_body = null) {
-        var reply = this.account.send_raw_request (verb, url, reques, request_body);
+        var reply = this.account.send_raw_request (verb, url, request, request_body);
         this.request_body = null;
         adopt_request (reply);
         return reply;
@@ -396,9 +396,9 @@ class AbstractNetworkJob : GLib.Object {
     protected Soup.Reply send_request (
         GLib.ByteArray verb,
         GLib.Uri url,
-        Soup.Request reques,
+        Soup.Request request,
         QHttpMultiPart request_body) {
-        var reply = this.account.send_raw_request (verb, url, reques, request_body);
+        var reply = this.account.send_raw_request (verb, url, request, request_body);
         this.request_body = null;
         adopt_request (reply);
         return reply;
@@ -413,9 +413,9 @@ class AbstractNetworkJob : GLib.Object {
     protected Soup.Reply send_request (
         GLib.ByteArray verb,
         string relative_path,
-        Soup.Request reques = Soup.Request (),
+        Soup.Request request = Soup.Request (),
         QIODevice request_body = null) {
-        var reply = this.account.send_raw_request (verb, url, reques, request_body);
+        var reply = this.account.send_raw_request (verb, url, request, request_body);
         this.request_body = request_body;
         if (this.request_body) {
             this.request_body.parent (reply);
@@ -663,7 +663,7 @@ class AbstractNetworkJob : GLib.Object {
     Returns a null string if no message was found.
     ***********************************************************/
     string extract_error_message (GLib.ByteArray error_response) {
-        QXmlStreamReader reader (error_response);
+        QXmlStreamReader reader = new QXmlStreamReader (error_response);
         reader.read_next_start_element ();
         if (reader.name () != "error") {
             return "";

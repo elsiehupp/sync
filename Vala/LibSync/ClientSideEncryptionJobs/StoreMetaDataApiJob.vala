@@ -35,9 +35,9 @@ class StoreMetaDataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request reques;
-        reques.raw_header ("OCS-APIREQUEST", "true");
-        reques.header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
+        Soup.Request request;
+        request.raw_header ("OCS-APIREQUEST", "true");
+        request.header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
         QUrlQuery query;
         query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
@@ -48,7 +48,7 @@ class StoreMetaDataApiJob : AbstractNetworkJob {
         buffer.data (data);
 
         GLib.info ("sending the metadata for the file_identifier" + this.file_identifier + "as encrypted";
-        send_request ("POST", url, reques, buffer);
+        send_request ("POST", url, request, buffer);
         AbstractNetworkJob.on_signal_start ();
     }
 

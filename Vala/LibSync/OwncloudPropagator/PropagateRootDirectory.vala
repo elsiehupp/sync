@@ -69,9 +69,9 @@ class PropagateRootDirectory : PropagateDirectory {
         if (this.first_job)
             // Force first job to on_signal_abort synchronously
             // even if caller allows async on_signal_abort (async_abort)
-            this.first_job.on_signal_abort (AbortType.SYNCHRONOUS);
+            this.first_job.on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
 
-        if (abort_type == AbortType.ASYNCHRONOUS) {
+        if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             struct AbortsFinished {
                 bool sub_jobs_finished = false;
                 bool dir_deletion_finished = false;
@@ -125,7 +125,7 @@ class PropagateRootDirectory : PropagateDirectory {
             && status != SyncFileItem.Status.CONFLICT) {
             if (this.state != Finished) {
                 // Synchronously on_signal_abort
-                on_signal_abort (AbortType.SYNCHRONOUS);
+                on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
                 this.state = Finished;
                 GLib.info ("PropagateRootDirectory.on_signal_sub_jobs_finished" + "emit finished" + status;
                 /* emit */ finished (status);

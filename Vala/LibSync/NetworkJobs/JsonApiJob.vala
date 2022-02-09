@@ -17,7 +17,7 @@ To be used like this:
 \code
 this.job = new JsonApiJob (account, QLatin1String ("o
 connect (j
-The received QVariantMap is null in case of error
+The received GLib.HashTable<string, GLib.Variant> is null in case of error
 \encode
 
 @ingroup libsync
@@ -38,13 +38,30 @@ class JsonApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray body;
+    GLib.ByteArray body {
+        private get {
+            return this.body;
+        }
+        public set {
+            this.body = value.to_json ();
+            GLib.debug ("Set body for request:" + this.body);
+            if (!this.body.is_empty ()) {
+                this.request.header (Soup.Request.ContentTypeHeader, "application/json");
+            }
+        }
+    }
+
     private QUrlQuery additional_params;
     private Soup.Request request;
 
     /***********************************************************
     ***********************************************************/
-    private Verb verb = Verb.GET;
+    Verb verb { private get; public set; }
+
+    public JsonApiJob () {
+        base ();
+        this.verb = Verb.GET;
+    }
 
     /***********************************************************
     @brief json_received - signal to report the json answer from ocs
@@ -72,7 +89,7 @@ class JsonApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public JsonApiJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public JsonApiJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -97,24 +114,6 @@ class JsonApiJob : AbstractNetworkJob {
     ***********************************************************/
     public void add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
         this.request.raw_header (header_name, value);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void body (QJsonDocument body) {
-        this.body = body.to_json ();
-        GLib.debug ("Set body for request:" + this.body;
-        if (!this.body.is_empty ()) {
-            this.request.header (Soup.Request.ContentTypeHeader, "application/json");
-        }
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void verb (Verb value) {
-        this.verb = value;
     }
 
 

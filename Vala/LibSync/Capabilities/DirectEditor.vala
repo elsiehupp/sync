@@ -10,29 +10,26 @@ class DirectEditor : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private string identifier;
+    string identifier { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<GLib.ByteArray> mime_types;
+    GLib.List<GLib.ByteArray> mime_types { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<GLib.ByteArray> optional_mime_types;
+    GLib.List<GLib.ByteArray> optional_mime_types { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    public DirectEditor (string identifier, string name, GLib.Object parent = new GLib.Object ())
+    string name { public get; private set; }
+
+    /***********************************************************
+    ***********************************************************/
+    public DirectEditor (string identifier, string name, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.identifier = identifier;
         this.name = name;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string name () {
-        return this.name;
     }
 
 
@@ -52,13 +49,6 @@ class DirectEditor : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string identifier () {
-        return this.identifier;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public bool has_mimetype (QMimeType mime_type) {
         return this.mime_types.contains (mime_type.name ().to_latin1 ());
     }
@@ -70,17 +60,6 @@ class DirectEditor : GLib.Object {
         return this.optional_mime_types.contains (mime_type.name ().to_latin1 ());
     }
 
+} // class DirectEditor
 
-    /***********************************************************
-    ***********************************************************/
-    public GLib.List<GLib.ByteArray> mime_types () {
-        return this.mime_types;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public GLib.List<GLib.ByteArray> optional_mime_types () {
-        return this.optional_mime_types;
-    }
-}
+} // namespace Occ

@@ -22,8 +22,8 @@ class GETEncryptedFileJob : GETFileJob {
     /***********************************************************
     DOES NOT take ownership of the device.
     ***********************************************************/
-    public GETEncryptedFileJob (AccountPointer account, string path, QIODevice device,
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
+    public GETEncryptedFileJob.for_path (AccountPointer account, string path, QIODevice device,
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
         int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent = new GLib.Object ()) {
         base (account, path, device, headers, expected_etag_for_resume, resume_start, parent);
         this.encrypted_file_info = encrypted_info;
@@ -32,8 +32,8 @@ class GETEncryptedFileJob : GETFileJob {
 
     /***********************************************************
     ***********************************************************/
-    public GETEncryptedFileJob (AccountPointer account, GLib.Uri url, QIODevice device,
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
+    public GETEncryptedFileJob.for_url (AccountPointer account, GLib.Uri url, QIODevice device,
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
         int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent = new GLib.Object ()) {
         base (account, url, device, headers, expected_etag_for_resume, resume_start, parent);
         this.encrypted_file_info = encrypted_info;

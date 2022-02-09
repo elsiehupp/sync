@@ -31,7 +31,7 @@ class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private class ProblemsMap : GLib.HashMap<string, SyncFileStatus.SyncFileStatusTag, PathComparator> { }
+    private class ProblemsMap : GLib.HashTable<string, SyncFileStatus.SyncFileStatusTag, PathComparator> { }
 
 
     /***********************************************************
@@ -63,7 +63,7 @@ class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Set<string> dirty_paths;
+    private GLib.List<string> dirty_paths;
 
 
     /***********************************************************
@@ -73,7 +73,7 @@ class SyncFileStatusTracker : GLib.Object {
     A directory that starts/ends propagation will in turn
     increase/decrease its own parent by 1.
     ***********************************************************/
-    private GLib.HashMap<string, int> sync_count;
+    private GLib.HashTable<string, int> sync_count;
 
 
     signal void file_status_changed (string system_filename, SyncFileStatus file_status);
@@ -149,7 +149,7 @@ class SyncFileStatusTracker : GLib.Object {
         // Some metadata status won't trigger files to be synced, make sure that we
         // push the OK status for dirty files that don't need to be propagated.
         // Swap into a copy since file_status () reads this.dirty_paths to determine the status
-        GLib.Set<string> old_dirty_paths;
+        GLib.List<string> old_dirty_paths;
         std.swap (this.dirty_paths, old_dirty_paths);
         foreach (var old_dirty_path in q_as_const (old_dirty_paths))
             /* emit */ file_status_changed (get_system_destination (old_dirty_path), file_status (old_dirty_path));
@@ -199,11 +199,11 @@ class SyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private void on_signal_sync_finished () {
         // Clear the sync counts to reduce the impact of unsymetrical inc/dec calls (e.g. when directory job on_signal_abort)
-        GLib.HashMap<string, int> old_sync_count;
+        GLib.HashTable<string, int> old_sync_count;
         std.swap (this.sync_count, old_sync_count);
         for (var it = old_sync_count.begin (); it != old_sync_count.end (); ++it) {
             // Don't announce folders, file_status expect only paths without '/', otherwise it asserts
-            if (it.key ().ends_with ('/')) {
+            if (it.key ().has_suffix ('/')) {
                 continue;
             }
 
@@ -289,7 +289,7 @@ class SyncFileStatusTracker : GLib.Object {
         string system_path = this.sync_engine.local_path () + relative_path;
         // SyncEngine.local_path () has a trailing slash, make sure to remove it if the
         // destination is empty.
-        if (system_path.ends_with ('/')) {
+        if (system_path.has_suffix ('/')) {
             system_path.truncate (system_path.length () - 1);
         }
         return system_path;
@@ -309,7 +309,7 @@ class SyncFileStatusTracker : GLib.Object {
 
             // We passed from OK to SYNC, increment the parent to keep it marked as
             // SYNC while we propagate ourselves and our own children.
-            //  ASSERT (!relative_path.ends_with ('/'));
+            //  ASSERT (!relative_path.has_suffix ('/'));
             int last_slash_index = relative_path.last_index_of ('/');
             if (last_slash_index != -1)
                 inc_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), SharedFlag.UNKNOWN_SHARED);
@@ -333,7 +333,7 @@ class SyncFileStatusTracker : GLib.Object {
             /* emit */ file_status_changed (get_system_destination (relative_path), status);
 
             // We passed from SYNC to OK, decrement our parent.
-            //  ASSERT (!relative_path.ends_with ('/'));
+            //  ASSERT (!relative_path.has_suffix ('/'));
             int last_slash_index = relative_path.last_index_of ('/');
             if (last_slash_index != -1)
                 dec_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), SharedFlag.UNKNOWN_SHARED);
@@ -346,7 +346,7 @@ class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private SyncFileStatus file_status (string relative_path) {
-        //  ASSERT (!relative_path.ends_with ('/'));
+        //  ASSERT (!relative_path.has_suffix ('/'));
 
         if (relative_path.is_empty ()) {
             // This is the root sync folder, it doesn't have an entry in the database and won't be walked by csync, so resolve manually.

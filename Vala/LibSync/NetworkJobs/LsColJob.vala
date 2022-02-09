@@ -10,7 +10,7 @@ namespace Occ {
 class LsColJob : AbstractNetworkJob {
 
 
-    public GLib.HashMap<string, ExtraFolderInfo> folder_infos;
+    public GLib.HashTable<string, ExtraFolderInfo> folder_infos;
 
     /***********************************************************
     Used instead of path () if the url is specified in the constructor
@@ -23,21 +23,21 @@ class LsColJob : AbstractNetworkJob {
 
 
     signal void directory_listing_subfolders (string[] items);
-    signal void directory_listing_iterated (string name, GLib.HashMap<string, string> properties);
+    signal void directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
     signal void finished_with_error (Soup.Reply reply);
     signal void finished_without_error ();
 
 
     /***********************************************************
     ***********************************************************/
-    public LsColJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public LsColJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public LsColJob (AccountPointer account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
+    public LsColJob.for_account (AccountPointer account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         this.url = url;
     }
@@ -66,8 +66,8 @@ class LsColJob : AbstractNetworkJob {
             }
         }
 
-        Soup.Request reques;
-        reques.raw_header ("Depth", "1");
+        Soup.Request request;
+        request.raw_header ("Depth", "1");
         GLib.ByteArray xml ("<?xml version=\"1.0\" ?>\n"
                     "<d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\">\n"
                     "  <d:prop>\n"
@@ -77,9 +77,9 @@ class LsColJob : AbstractNetworkJob {
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
         if (this.url.is_valid ()) {
-            send_request ("PROPFIND", this.url, reques, buf);
+            send_request ("PROPFIND", this.url, request, buf);
         } else {
-            send_request ("PROPFIND", make_dav_url (path ()), reques, buf);
+            send_request ("PROPFIND", make_dav_url (path ()), request, buf);
         }
         AbstractNetworkJob.on_signal_start ();
     }

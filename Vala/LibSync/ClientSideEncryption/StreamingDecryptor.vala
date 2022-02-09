@@ -12,17 +12,15 @@ class StreamingDecryptor {
     ***********************************************************/
     private CipherContext context;
     private bool is_initialized = false;
-    private bool is_finished = false;
+    bool is_finished { public get; private set; }
     private uint64 decrypted_so_far = 0;
     private uint64 total_size = 0;
 
     /***********************************************************
     ***********************************************************/
-    public StreamingDecryptor (GLib.ByteArray key, GLib.ByteArray iv, uint64 total_size);
-
-    /***********************************************************
-    ***********************************************************/
-    public bool is_finished ();
+    public StreamingDecryptor (GLib.ByteArray key, GLib.ByteArray iv, uint64 total_size) {
+        this.is_finished = false;
+    }
 
 } // class StreamingDecryptor
 

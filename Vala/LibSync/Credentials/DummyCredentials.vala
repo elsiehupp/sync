@@ -10,48 +10,33 @@ class DummyCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public string user;
-    public string password;
+    public new string user; // get should be Q_UNREACHABLE ();
+    public new string password;
 
     /***********************************************************
     ***********************************************************/
-    public string auth_type () {
+    public new string auth_type () {
         return "dummy";
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string user () {
-        return this.user;
+    public override QNetworkAccessManager create_qnam () {
+        return new AccessManager ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string password () {
-        Q_UNREACHABLE ();
-        return "";
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public QNetworkAccessManager create_qnam () {
-        return new AccessManager;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool ready () {
+    public override bool ready () {
         return true;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool still_valid (Soup.Reply reply) {
+    public override bool still_valid (Soup.Reply reply) {
         //  Q_UNUSED (reply)
         return true;
     }
@@ -59,32 +44,33 @@ class DummyCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public void fetch_from_keychain () {
+    public override void fetch_from_keychain () {
         this.was_fetched = true;
-        /* Q_EMIT */ (fetched ());
+        /* Q_EMIT */ fetched ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void ask_from_user () {
+    public override void ask_from_user () {
         /* Q_EMIT */ (asked ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void persist () { }
+    public override void persist () { }
 
 
     /***********************************************************
     ***********************************************************/
-    public void invalidate_token () {}
+    public override void invalidate_token () {}
 
 
+    
     /***********************************************************
     ***********************************************************/
-    public void forget_sensitive_data () {}
+    public override void forget_sensitive_data () {}
 
 } // class DummyCredentials
 

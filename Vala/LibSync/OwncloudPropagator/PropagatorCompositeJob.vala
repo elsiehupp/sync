@@ -13,9 +13,9 @@ namespace Occ {
 ***********************************************************/
 class PropagatorCompositeJob : PropagatorJob {
 
-    public GLib.Vector<PropagatorJob> jobs_to_do;
+    public GLib.List<PropagatorJob> jobs_to_do;
     public SyncFileItemVector tasks_to_do;
-    public GLib.Vector<PropagatorJob> running_jobs;
+    public GLib.List<PropagatorJob> running_jobs;
 
     /***********************************************************
     NoStatus, or NormalError / SoftError if there was an error
@@ -138,13 +138,13 @@ class PropagatorCompositeJob : PropagatorJob {
         if (!this.running_jobs.empty ()) {
             this.aborts_count = this.running_jobs.size ();
             foreach (PropagatorJob j in this.running_jobs) {
-                if (abort_type == AbortType.ASYNCHRONOUS) {
+                if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
                     connect (j, &PropagatorJob.abort_finished,
                             this, &PropagatorCompositeJob.on_signal_sub_job_abort_finished);
                 }
                 j.on_signal_abort (abort_type);
             }
-        } else if (abort_type == AbortType.ASYNCHRONOUS) {
+        } else if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ abort_finished ();
         }
     }

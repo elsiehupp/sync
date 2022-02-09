@@ -16,10 +16,10 @@ class TokenCredentialsAccessManager : AccessManager {
             GLib.warning ("Empty user/password provided!";
         }
 
-        Soup.Request reques (request);
+        Soup.Request request (request);
 
         GLib.ByteArray cred_hash = new GLib.ByteArray (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
-        reques.raw_header (GLib.ByteArray ("Authorization"), GLib.ByteArray ("Basic ") + cred_hash);
+        request.raw_header (GLib.ByteArray ("Authorization"), GLib.ByteArray ("Basic ") + cred_hash);
 
         // A pre-authenticated cookie
         GLib.ByteArray token = this.credentials.token.to_utf8 ();
@@ -27,7 +27,7 @@ class TokenCredentialsAccessManager : AccessManager {
             raw_cookie (token, request.url ());
         }
 
-        return AccessManager.create_request (op, reques, outgoing_data);
+        return AccessManager.create_request (op, request, outgoing_data);
     }
 
 } // class TokenCredentialsAccessManager

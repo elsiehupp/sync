@@ -24,7 +24,7 @@ class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Vector<BulkUploadItem> files_to_upload;
+    private GLib.List<BulkUploadItem> files_to_upload;
 
     /***********************************************************
     ***********************************************************/
@@ -50,7 +50,7 @@ class BulkPropagatorJob : PropagatorJob {
         string remote_path;
         string local_path;
         int64 file_size;
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
     }
 
 
@@ -388,7 +388,7 @@ class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void trigger_upload () {
-        var upload_parameters_data = new GLib.Vector<SingleUploadFileData> ();
+        var upload_parameters_data = new GLib.List<SingleUploadFileData> ();
         upload_parameters_data.reserve (this.files_to_upload.size ());
 
         int timeout = 0;
@@ -600,8 +600,8 @@ class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng
     ***********************************************************/
-    private GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers (SyncFileItemPtr item) {
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
+    private GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers (SyncFileItemPtr item) {
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
         headers[QByteArrayLiteral ("Content-Type")] = QByteArrayLiteral ("application/octet-stream");
         headers[QByteArrayLiteral ("X-File-Mtime")] = new GLib.ByteArray.number (int64 (item.modtime));
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS")) {
@@ -655,7 +655,7 @@ class BulkPropagatorJob : PropagatorJob {
         SyncFileItemPtr item,
         SyncFileItem.Status status,
         string error) {
-        on_signal_abort (AbortType.SYNCHRONOUS);
+        on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
         on_signal_done (item, status, error);
     }
 

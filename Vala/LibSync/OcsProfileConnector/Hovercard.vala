@@ -1,7 +1,7 @@
 namespace Occ {
 
 class Hovercard {
-    GLib.Vector<HovercardAction> actions;
+    GLib.List<HovercardAction> actions;
 }
 
 } // namespace Occ

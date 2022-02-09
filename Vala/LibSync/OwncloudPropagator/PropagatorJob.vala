@@ -63,13 +63,17 @@ class PropagatorJob : GLib.Object {
 
     That can be useful for jobs that want to spawn follow-up jobs without
     becoming composite jobs themselves.
+
+    Set should be used only from PropagatorCompositeJob itself,
+    when a job is added and from PropagateDirectory to
+    associate the sub_jobs with the first job.
     ***********************************************************/
-    protected PropagatorCompositeJob associated_composite = null;
+    PropagatorCompositeJob associated_composite { public set; protected get; }
 
     /***********************************************************
     Emitted when the job is fully on_signal_finished
     ***********************************************************/
-    signal void on_signal_finished (SyncFileItem.Status);
+    signal void signal_finished (SyncFileItem.Status);
 
     /***********************************************************
     Emitted when the on_signal_abort is fully on_signal_finished
@@ -81,6 +85,7 @@ class PropagatorJob : GLib.Object {
     public PropagatorJob (OwncloudPropagator propagator) {
         base (propagator);
         this.state = JobState.NOT_YET_STARTED;
+        this.associated_composite = null;
     }
 
 
@@ -110,16 +115,6 @@ class PropagatorJob : GLib.Object {
     }
 
 
-    /***********************************************************
-    Set the associated composite job
-
-    Used only from PropagatorCompositeJob itself, when a job is added
-    and from PropagateDirectory to associate the sub_jobs with the first
-    job.
-    ***********************************************************/
-    public void associated_composite (PropagatorCompositeJob job) {
-        this.associated_composite = job;
-    }
 
 
     /***********************************************************
@@ -127,7 +122,7 @@ class PropagatorJob : GLib.Object {
     while synchronous is expected to on_signal_abort immedietaly.
     ***********************************************************/
     public void on_signal_abort (PropagatorJob.AbortType abort_type) {
-        if (abort_type == AbortType.ASYNCHRONOUS)
+        if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS)
             /* emit */ abort_finished ();
     }
 

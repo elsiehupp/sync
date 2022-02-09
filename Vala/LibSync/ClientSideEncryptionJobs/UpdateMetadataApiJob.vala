@@ -38,9 +38,9 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request reques;
-        reques.raw_header ("OCS-APIREQUEST", "true");
-        reques.header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
+        Soup.Request request;
+        request.raw_header ("OCS-APIREQUEST", "true");
+        request.header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
 
         QUrlQuery url_query;
         url_query.add_query_item (QStringLiteral ("format"), QStringLiteral ("json"));
@@ -58,7 +58,7 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
         buffer.data (data);
 
         GLib.info ("updating the metadata for the file_identifier" + this.file_identifier + "as encrypted";
-        send_request ("PUT", url, reques, buffer);
+        send_request ("PUT", url, request, buffer);
         AbstractNetworkJob.on_signal_start ();
     }
 

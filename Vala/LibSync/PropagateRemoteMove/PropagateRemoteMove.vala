@@ -76,8 +76,8 @@ class PropagateRemoteMove : PropagateItemJob {
         //  ASSERT (itype != ItemTypeVirtualFileDownload && itype != ItemTypeVirtualFileDehydration);
         if (vfs.mode () == Vfs.WithSuffix && itype != ItemTypeDirectory) {
             var suffix = vfs.file_suffix ();
-            bool source_had_suffix = remote_source.ends_with (suffix);
-            bool destination_had_suffix = remote_destination.ends_with (suffix);
+            bool source_had_suffix = remote_source.has_suffix (suffix);
+            bool destination_had_suffix = remote_destination.has_suffix (suffix);
 
             // Remote source and destination definitely shouldn't have the suffix
             if (source_had_suffix)
@@ -141,7 +141,7 @@ class PropagateRemoteMove : PropagateItemJob {
         if (this.job && this.job.reply ())
             this.job.reply ().on_signal_abort ();
 
-        if (abort_type == AbortType.ASYNCHRONOUS) {
+        if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ abort_finished ();
         }
     }
@@ -166,8 +166,8 @@ class PropagateRemoteMove : PropagateItemJob {
             return false;
 
         bool changed = false;
-        //  ASSERT (!from_.ends_with ("/"));
-        //  ASSERT (!to_.ends_with ("/"));
+        //  ASSERT (!from_.has_suffix ("/"));
+        //  ASSERT (!to_.has_suffix ("/"));
         string from = from_ + "/";
         string to = to_ + "/";
 

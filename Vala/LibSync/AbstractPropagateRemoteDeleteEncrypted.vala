@@ -18,47 +18,37 @@ the base class for Propagate Remote Delete Encrypted jobs
 ***********************************************************/
 class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
-
-
     /***********************************************************
     ***********************************************************/
     protected OwncloudPropagator propagator = null;
-
 
     /***********************************************************
     ***********************************************************/
     protected SyncFileItemPtr item;
 
-
     /***********************************************************
     ***********************************************************/
     protected GLib.ByteArray folder_token;
-
 
     /***********************************************************
     ***********************************************************/
     protected GLib.ByteArray folder_identifier;
 
-
     /***********************************************************
     ***********************************************************/
     protected bool folder_locked = false;
-
 
     /***********************************************************
     ***********************************************************/
     protected bool is_task_failed = false;
 
+    /***********************************************************
+    ***********************************************************/
+    Soup.Reply.NetworkError network_error { public get; protected set; }
 
     /***********************************************************
     ***********************************************************/
-    protected Soup.Reply.NetworkError network_error = Soup.Reply.NoError;
-
-
-    /***********************************************************
-    ***********************************************************/
-    protected string error_string;
-
+    string error_string { public get; protected set; }
 
     /***********************************************************
     ***********************************************************/
@@ -69,27 +59,9 @@ class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     ***********************************************************/
     public AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator propagator, SyncFileItemPtr item, GLib.Object parent) {
         base (parent);
+        this.network_error = Soup.Reply.NoError;
         this.propagator = propagator;
         this.item = item;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public Soup.Reply.NetworkError network_error () {
-        return this.network_error;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string error_string () {
-        return this.error_string;
     }
 
 
@@ -111,7 +83,7 @@ class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void store_first_error_string (string error_string) {
-        if (this.error_string.is_empty ()) {
+        if (this.error_string == "") {
             this.error_string = error_string;
         }
     }

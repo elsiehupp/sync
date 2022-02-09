@@ -22,7 +22,7 @@ class DeleteJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray folder_token;
+    public GLib.ByteArray folder_token;
 
 
     signal void finished_signal ();
@@ -30,14 +30,14 @@ class DeleteJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public DeleteJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public DeleteJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public DeleteJob (AccountPointer account, GLib.Uri url, GLib.Object parent)
+    public DeleteJob.for_account (AccountPointer account, GLib.Uri url, GLib.Object parent)
         base (account, "", parent);
         this.url = url;
     }
@@ -46,15 +46,15 @@ class DeleteJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request reques;
+        Soup.Request request;
         if (!this.folder_token.is_empty ()) {
-            reques.raw_header ("e2e-token", this.folder_token);
+            request.raw_header ("e2e-token", this.folder_token);
         }
 
         if (this.url.is_valid ()) {
-            send_request ("DELETE", this.url, reques);
+            send_request ("DELETE", this.url, request);
         } else {
-            send_request ("DELETE", make_dav_url (path ()), reques);
+            send_request ("DELETE", make_dav_url (path ()), request);
         }
 
         if (reply ().error () != Soup.Reply.NoError) {
@@ -75,16 +75,6 @@ class DeleteJob : AbstractNetworkJob {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public GLib.ByteArray folder_token () {
-        return this.folder_token;
-    }
-
-
-    public void folder_token (GLib.ByteArray folder_token) {
-        this.folder_token = folder_token;
-    }
 
 } // class DeleteJob
 

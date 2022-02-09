@@ -12,7 +12,11 @@ class PropagateDownloadEncrypted : GLib.Object {
     private SyncFileItemPtr item;
     private QFileInfo info;
     private EncryptedFile encrypted_info;
-    private string error_string;
+
+
+    /***********************************************************
+    ***********************************************************/
+    string error_string { public get; protected set; }
 
 
     signal void file_metadata_found ();
@@ -97,13 +101,6 @@ class PropagateDownloadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string error_string () {
-        return this.error_string;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public void on_signal_check_folder_id (string[] list) {
         var job = qobject_cast<LsColJob> (sender ());
         const string folder_identifier = list.first ();
@@ -131,7 +128,7 @@ class PropagateDownloadEncrypted : GLib.Object {
                    + this.item.encrypted_filename);
         const string filename = this.info.filename ();
         var meta = new FolderMetadata (this.propagator.account (), json.to_json (QJsonDocument.Compact));
-        const GLib.Vector<EncryptedFile> files = meta.files ();
+        const GLib.List<EncryptedFile> files = meta.files ();
 
         const string encrypted_filename = this.item.encrypted_filename.section ('/', -1);
         foreach (EncryptedFile file in files) {

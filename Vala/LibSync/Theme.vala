@@ -51,7 +51,7 @@ class Theme : GLib.Object {
     private static Theme instance;
     private bool mono = false;
 //  #ifndef TOKEN_AUTH_ONLY
-    private mutable GLib.HashMap<string, QIcon> icon_cache;
+    private mutable GLib.HashTable<string, QIcon> icon_cache;
 //  #endif
 
 
@@ -427,7 +427,7 @@ class Theme : GLib.Object {
         var base_url = help_url ();
         if (base_url.is_empty ())
             return "";
-        if (!base_url.ends_with ('/'))
+        if (!base_url.has_suffix ('/'))
             base_url.append ('/');
         return base_url + "conflicts.html";
     }
@@ -1189,9 +1189,9 @@ class Theme : GLib.Object {
 
             var use_svg = should_prefer_svg ();
             var sizes = use_svg
-                ? GLib.Vector<int> {
+                ? GLib.List<int> {
                     16, 32, 64, 128, 256 }
-                : GLib.Vector<int> {
+                : GLib.List<int> {
                     16, 22, 32, 48, 64, 128, 256, 512, 1024 };
             foreach (int size in sizes) {
                 var px = use_svg ? create_pixmap_from_svg (size) : load_pixmap (size);

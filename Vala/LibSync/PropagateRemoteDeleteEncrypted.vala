@@ -54,7 +54,7 @@ class Propagate_remote_delete_encrypted : AbstractPropagateRemoteDeleteEncrypted
 
         // Find existing metadata for this file
         bool found = false;
-        const GLib.Vector<EncryptedFile> files = metadata.files ();
+        const GLib.List<EncryptedFile> files = metadata.files ();
         foreach (EncryptedFile file in files) {
             if (file.original_filename == filename) {
                 metadata.remove_encrypted_file (file);

@@ -28,7 +28,7 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
     /***********************************************************
     Nested files and folders
     ***********************************************************/
-    private GLib.HashMap<string, Occ.SyncJournalFileRecord> nested_items;
+    private GLib.HashTable<string, Occ.SyncJournalFileRecord> nested_items;
 
     /***********************************************************
     ***********************************************************/

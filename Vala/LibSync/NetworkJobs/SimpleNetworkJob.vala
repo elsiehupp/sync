@@ -20,7 +20,7 @@ class SimpleNetworkJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public SimpleNetworkJob (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
+    public SimpleNetworkJob.for_account (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
     }
 
@@ -28,9 +28,9 @@ class SimpleNetworkJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public Soup.Reply start_request (GLib.ByteArray verb, GLib.Uri url,
-        Soup.Request reques = Soup.Request (),
+        Soup.Request request = Soup.Request (),
         QIODevice request_body = null) {
-        var reply = send_request (verb, url, reques, request_body);
+        var reply = send_request (verb, url, request, request_body);
         on_signal_start ();
         return reply;
     }

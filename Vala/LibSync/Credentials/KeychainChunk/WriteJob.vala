@@ -13,46 +13,13 @@ splits too large keychain entry's data into chunks on Windows
 ***********************************************************/
 class WriteJob : KeychainChunk.Job {
 
-    /***********************************************************
-    ***********************************************************/
-    public WriteJob (Account account, string key, GLib.ByteArray data, GLib.Object parent = new GLib.Object ());
-
-    /***********************************************************
-    ***********************************************************/
-    public WriteJob (string key, GLib.ByteArray data, GLib.Object parent = new GLib.Object ());
-
-
-    /***********************************************************
-    Call this method to on_signal_start the job (async).
-    You should connect some slot to the on_signal_finished () signal first.
-
-    @see QKeychain.Job.on_signal_start ()
-    ***********************************************************/
-    public void on_signal_start ();
-
-
-    /***********************************************************
-    Call this method to on_signal_start the job synchronously.
-    Awaits completion with no need to connect some slot to the on_signal_finished () signal first.
-
-    @return Returns true on succeess (QKeychain.NoError).
-    ***********************************************************/
-    public bool exec ();
-
-signals:
-    void on_signal_finished (KeychainChunk.WriteJob incoming_job);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_signal_write_job_done (QKeychain.Job incoming_job);
-
+    signal void signal_finished (KeychainChunk.WriteJob incoming_job);
 
     /***********************************************************
     WriteJob
     ***********************************************************/
-    WriteJob.WriteJob (Account account, string key, GLib.ByteArray data, GLib.Object parent)
-        : Job (parent) {
+    public WriteJob.for_account (Account account, string key, GLib.ByteArray data, GLib.Object parent = new GLib.Object ()) {
+        base (parent);
         this.account = account;
         this.key = key;
 
@@ -62,33 +29,52 @@ signals:
         this.chunk_count = 0;
     }
 
-    WriteJob.WriteJob (string key, GLib.ByteArray data, GLib.Object parent)
-        : WriteJob (null, key, data, parent) {
+    /***********************************************************
+    ***********************************************************/
+    public WriteJob (string key, GLib.ByteArray data, GLib.Object parent = new GLib.Object ()) {
+        base (null, key, data, parent);
     }
 
-    void WriteJob.on_signal_start () {
+
+    /***********************************************************
+    Call this method to on_signal_start the job (async).
+    You should connect some slot to the signal_finished () signal first.
+
+    @see QKeychain.Job.on_signal_start ()
+    ***********************************************************/
+    public void on_signal_start () {
         this.error = QKeychain.NoError;
 
         on_signal_write_job_done (null);
     }
 
-    bool WriteJob.exec () {
-        on_signal_start ();
+
+    /***********************************************************
+    Call this method to on_signal_start the job synchronously.
+    Awaits completion with no need to connect some slot to the signal_finished () signal first.
+
+    @return Returns true on succeess (QKeychain.NoError).
+    ***********************************************************/
+    public bool exec () {
+        signal_start ();
 
         QEventLoop wait_loop;
         connect (this, &WriteJob.on_signal_finished, wait_loop, &QEventLoop.quit);
         wait_loop.exec ();
 
         if (error () != NoError) {
-            GLib.warning ("WritePasswordJob failed with" + error_string ();
+            GLib.warning ("WritePasswordJob failed with" + error_string ());
             return false;
         }
 
         return true;
     }
 
-    void WriteJob.on_signal_write_job_done (QKeychain.Job incoming_job) {
-        var write_job = qobject_cast<QKeychain.WritePasswordJob> (incoming_job);
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_write_job_done (QKeychain.Job incoming_job) {
+        var write_job = (QKeychain.WritePasswordJob)incoming_job;
 
         // Errors? (write_job can be null here, see : WriteJob.on_signal_start)
         if (write_job) {
@@ -155,4 +141,8 @@ signals:
 
         write_job.delete_later ();
     }
+
 } // class WriteJob
+
+} // namespace KeychainChunk
+} // namespace Occ

@@ -26,7 +26,7 @@ class DiscoveryPhase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    enum LocalDiscoveryStyle {
+    public enum LocalDiscoveryStyle {
     
         /***********************************************************
         Read all local data from the filesystem
@@ -54,7 +54,7 @@ class DiscoveryPhase : GLib.Object {
     can be changed. See find_and_cancel_deleted_job (). Note that
     item_discovered () will already have been emitted for the item.
     ***********************************************************/
-    GLib.HashMap<string, SyncFileItemPtr> deleted_item;
+    GLib.HashTable<string, SyncFileItemPtr> deleted_item;
 
 
     /***********************************************************
@@ -68,17 +68,17 @@ class DiscoveryPhase : GLib.Object {
 
     See find_and_cancel_deleted_job ().
     ***********************************************************/
-    GLib.HashMap<string, ProcessDirectoryJob> queued_deleted_directories;
+    GLib.HashTable<string, ProcessDirectoryJob> queued_deleted_directories;
 
     /***********************************************************
     Map source (original path)
     ***********************************************************/
-    GLib.HashMap<string, string> renamed_items_remote;
+    GLib.HashTable<string, string> renamed_items_remote;
 
     /***********************************************************
     Map destinations (current server or local path)
     ***********************************************************/
-    GLib.HashMap<string, string> renamed_items_local;
+    GLib.HashTable<string, string> renamed_items_local;
 
     /***********************************************************
     Set of paths that should not be removed even though they are
@@ -91,7 +91,7 @@ class DiscoveryPhase : GLib.Object {
 
     The value of this map doesn't matter.
     ***********************************************************/
-    GLib.HashMap<string, bool> forbidden_deletes;
+    GLib.HashTable<string, bool> forbidden_deletes;
 
     /***********************************************************
     Input
@@ -172,7 +172,7 @@ class DiscoveryPhase : GLib.Object {
 
     signal void fatal_error (string error_string);
     signal void item_discovered (SyncFileItemPtr item);
-    signal void on_signal_finished ();
+    signal void signal_finished ();
 
 
     /***********************************************************
@@ -275,7 +275,7 @@ class DiscoveryPhase : GLib.Object {
             this, [=] {
                 return callback (false);
             });
-        GLib.Object.connect (propfind_job, &PropfindJob.result, this, [=] (QVariantMap values) {
+        GLib.Object.connect (propfind_job, &PropfindJob.result, this, [=] (GLib.HashTable<string, GLib.Variant> values) {
             var result = values.value (QLatin1String ("size")).to_long_long ();
             if (result >= limit) {
                 // we tell the UI there is a new folder
@@ -285,7 +285,7 @@ class DiscoveryPhase : GLib.Object {
                 // it is not too big, put it in the allow list (so we will not do more query for the children)
                 // and and do not block.
                 var p = path;
-                if (!p.ends_with ('/'))
+                if (!p.has_suffix ('/'))
                     p += '/';
                 this.selective_sync_allow_list.insert (
                     std.upper_bound (this.selective_sync_allow_list.begin (), this.selective_sync_allow_list.end (), p),
@@ -313,7 +313,7 @@ class DiscoveryPhase : GLib.Object {
     /***********************************************************
     Implementation of DiscoveryPhase.adjust_renamed_path
     ***********************************************************/
-    string adjust_renamed_path (GLib.HashMap<string, string> renamed_items, string original) {
+    string adjust_renamed_path (GLib.HashTable<string, string> renamed_items, string original) {
         int slash_pos = original.size ();
         while ( (slash_pos = original.last_index_of ('/', slash_pos - 1)) > 0) {
             var it = renamed_items.const_find (original.left (slash_pos));
@@ -453,14 +453,14 @@ class DiscoveryPhase : GLib.Object {
             return false;
         }
         --it;
-        //  Q_ASSERT (it.ends_with ('/')); // Folder.selective_sync_block_list makes sure of that
+        //  Q_ASSERT (it.has_suffix ('/')); // Folder.selective_sync_block_list makes sure of that
         return path_slash.starts_with (*it);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private static void property_map_to_remote_info (GLib.HashMap<string, string> map, RemoteInfo result) {
+    private static void property_map_to_remote_info (GLib.HashTable<string, string> map, RemoteInfo result) {
         for (var it = map.const_begin (); it != map.const_end (); ++it) {
             string property = it.key ();
             string value = it.value ();
@@ -492,9 +492,9 @@ class DiscoveryPhase : GLib.Object {
             } else if (property == "checksums") {
                 result.checksum_header = find_best_checksum (value.to_utf8 ());
             } else if (property == "share-types" && !value.is_empty ()) {
-                // Since GLib.HashMap is sorted, "share-types" is always after "permissions".
+                // Since GLib.HashTable is sorted, "share-types" is always after "permissions".
                 if (result.remote_perm.is_null ()) {
-                    q_warning ("Server returned a share type, but no permissions?";
+                    GLib.warning ("Server returned a share type, but no permissions?";
                 } else {
                     // S means shared with me.
                     // But for our purpose, we want to know if the file is shared. It does not matter

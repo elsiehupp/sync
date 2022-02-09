@@ -13,7 +13,7 @@ namespace Occ {
 class GETFileJob : AbstractNetworkJob {
 
     QIODevice device;
-    GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
+    GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
     string error_string;
     GLib.ByteArray expected_etag_for_resume;
     int64 expected_content_length;
@@ -53,8 +53,8 @@ class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     DOES NOT take ownership of the device.
     ***********************************************************/
-    public GETFileJob (AccountPointer account, string path, QIODevice device,
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
+    public GETFileJob.for_account (AccountPointer account, string path, QIODevice device,
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
         int64 resume_start, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.device = device;
@@ -77,8 +77,8 @@ class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     For direct_download_url:
     ***********************************************************/
-    public GETFileJob.direct (AccountPointer account, GLib.Uri url, QIODevice device,
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
+    public GETFileJob.direct.for_account (AccountPointer account, GLib.Uri url, QIODevice device,
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
         int64 resume_start, GLib.Object parent = new GLib.Object ()) {
         base (account, url.to_encoded (), parent);
         this.device = device;
@@ -115,18 +115,18 @@ class GETFileJob : AbstractNetworkJob {
             GLib.debug ("Retry with range " + this.headers["Range"]);
         }
 
-        Soup.Request reques;
+        Soup.Request request;
         foreach (var header in = this.headers) {
-            reques.raw_header (header.key (), header.value ());
+            request.raw_header (header.key (), header.value ());
         }
 
-        reques.priority (Soup.Request.Low_priority); // Long downloads must not block non-propagation jobs.
+        request.priority (Soup.Request.Low_priority); // Long downloads must not block non-propagation jobs.
 
         if (this.direct_download_url.is_empty ()) {
-            send_request ("GET", make_dav_url (path ()), reques);
+            send_request ("GET", make_dav_url (path ()), request);
         } else {
             // Use direct URL
-            send_request ("GET", this.direct_download_url, reques);
+            send_request ("GET", this.direct_download_url, request);
         }
 
         GLib.debug (this.bandwidth_manager + this.bandwidth_choked + this.bandwidth_limited);

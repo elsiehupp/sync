@@ -17,7 +17,7 @@ class EntityExistsJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public EntityExistsJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public EntityExistsJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 

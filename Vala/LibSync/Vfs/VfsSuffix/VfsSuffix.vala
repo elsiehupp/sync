@@ -80,7 +80,7 @@ class Vfs_suffix : Vfs {
 
         // The concrete shape of the placeholder is also used in is_dehydrated_placeholder () below
         string fn = this.setup_params.filesystem_path + item.file;
-        if (!fn.ends_with (file_suffix ())) {
+        if (!fn.has_suffix (file_suffix ())) {
             //  ASSERT (false, "vfs file isn't ending with suffix");
             return string ("vfs file isn't ending with suffix");
         }
@@ -146,7 +146,7 @@ class Vfs_suffix : Vfs {
     /***********************************************************
     ***********************************************************/
     public bool is_dehydrated_placeholder (string file_path) {
-        if (!file_path.ends_with (file_suffix ()))
+        if (!file_path.has_suffix (file_suffix ()))
             return false;
         QFileInfo file_info = new QFileInfo (file_path);
         return file_info.exists () && file_info.size () == 1;
@@ -156,7 +156,7 @@ class Vfs_suffix : Vfs {
     /***********************************************************
     ***********************************************************/
     public bool stat_type_virtual_file (csync_file_stat_t stat, void stat_data) {
-        if (stat.path.ends_with (file_suffix ().to_utf8 ())) {
+        if (stat.path.has_suffix (file_suffix ().to_utf8 ())) {
             stat.type = ItemTypeVirtualFile;
             return true;
         }
@@ -200,7 +200,7 @@ class Vfs_suffix : Vfs {
         // files that were synced before vfs was enabled.
         QByte_array_list to_wipe;
         parameters.journal.get_files_below_path ("", /*[&to_wipe]*/ (SyncJournalFileRecord record) => {
-            if (!record.is_virtual_file () && record.path.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX))
+            if (!record.is_virtual_file () && record.path.has_suffix (APPLICATION_DOTVIRTUALFILE_SUFFIX))
                 to_wipe.append (record.path);
         });
         foreach (var path in to_wipe)

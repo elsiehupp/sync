@@ -65,7 +65,7 @@ class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public CheckServerJob (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
+    public CheckServerJob.for_account (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
         base (account, QLatin1String (STATUS_PHP_C), parent);
         this.subdir_fallback = false;
         this.permanent_redirects = 0;
@@ -191,7 +191,7 @@ class CheckServerJob : AbstractNetworkJob {
         string path = target_url.path ();
         if ( (http_code == 301 || http_code == 308) // permanent redirection
             && redirect_count == this.permanent_redirects // don't apply permanent redirects after a temporary one
-            && path.ends_with (slash_status_php)) {
+            && path.has_suffix (slash_status_php)) {
             this.server_url = target_url;
             this.server_url.path (path.left (path.size () - slash_status_php.size ()));
             GLib.info ("status.php was permanently redirected to"

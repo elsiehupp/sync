@@ -20,12 +20,12 @@ class LsColXMLParser : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool parse (GLib.ByteArray xml,
-               GLib.HashMap<string, ExtraFolderInfo> *sizes,
+               GLib.HashTable<string, ExtraFolderInfo> *sizes,
                const string expected_path);
 
 signals:
     void directory_listing_subfolders (string[] items);
-    void directory_listing_iterated (string name, GLib.HashMap<string, string> properties);
+    void directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
     void finished_with_error (Soup.Reply reply);
     void finished_without_error ();
 
@@ -34,15 +34,15 @@ signals:
 
     LsColXMLParser.LsColXMLParser () = default;
 
-    bool LsColXMLParser.parse (GLib.ByteArray xml, GLib.HashMap<string, ExtraFolderInfo> *file_info, string expected_path) {
+    bool LsColXMLParser.parse (GLib.ByteArray xml, GLib.HashTable<string, ExtraFolderInfo> *file_info, string expected_path) {
         // Parse DAV response
-        QXmlStreamReader reader (xml);
+        QXmlStreamReader reader = new QXmlStreamReader (xml);
         reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
 
         string[] folders;
         string current_href;
-        GLib.HashMap<string, string> current_tmp_properties;
-        GLib.HashMap<string, string> current_http200Properties;
+        GLib.HashTable<string, string> current_tmp_properties;
+        GLib.HashTable<string, string> current_http200Properties;
         bool current_props_have_http200 = false;
         bool inside_propstat = false;
         bool inside_prop = false;
@@ -104,7 +104,7 @@ signals:
             if (type == QXmlStreamReader.EndElement) {
                 if (reader.namespace_uri () == QLatin1String ("DAV:")) {
                     if (reader.name () == "response") {
-                        if (current_href.ends_with ('/')) {
+                        if (current_href.has_suffix ('/')) {
                             current_href.chop (1);
                         }
                         /* emit */ directory_listing_iterated (current_href, current_http200Properties);
@@ -113,7 +113,7 @@ signals:
                     } else if (reader.name () == "propstat") {
                         inside_propstat = false;
                         if (current_props_have_http200) {
-                            current_http200Properties = GLib.HashMap<string, string> (current_tmp_properties);
+                            current_http200Properties = GLib.HashTable<string, string> (current_tmp_properties);
                         }
                         current_tmp_properties.clear ();
                         current_props_have_http200 = false;

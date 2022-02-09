@@ -147,7 +147,7 @@ class Vfs_xAttr : Vfs {
         }
 
         var parent_path = static_cast<GLib.ByteArray> (stat_data);
-        //  Q_ASSERT (!parent_path.ends_with ('/'));
+        //  Q_ASSERT (!parent_path.has_suffix ('/'));
         //  Q_ASSERT (!stat.path.starts_with ('/'));
 
         var path = new GLib.ByteArray (*parent_path + '/' + stat.path);

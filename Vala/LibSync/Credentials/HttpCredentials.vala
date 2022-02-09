@@ -80,78 +80,63 @@ class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    protected string user;
-
+    string user { public get; protected set; }
 
     /***********************************************************
-    User's password, or access_token for OAuth
+    User's password or OAuth access token
     ***********************************************************/
-    protected string password;
-
+    string password { public get; protected set; }
 
     /***********************************************************
     OAuth this.refresh_token, set if OAuth is used.
     ***********************************************************/
     protected string refresh_token;
 
-
     /***********************************************************
     ***********************************************************/
     protected string previous_password;
-
 
     /***********************************************************
     ***********************************************************/
     protected string fetch_error_string;
 
-
     /***********************************************************
     ***********************************************************/
-    protected bool ready = false;
-
+    bool ready { public get; protected set; }
 
     /***********************************************************
     ***********************************************************/
     protected bool is_renewing_oauth_token = false;
 
-
     /***********************************************************
     ***********************************************************/
     protected GLib.ByteArray client_cert_bundle;
-
 
     /***********************************************************
     ***********************************************************/
     protected GLib.ByteArray client_cert_password;
 
-
     /***********************************************************
     ***********************************************************/
     protected QSslKey client_ssl_key;
-
 
     /***********************************************************
     ***********************************************************/
     protected QSslCertificate client_ssl_certificate;
 
-
     /***********************************************************
     ***********************************************************/
     protected bool keychain_migration = false;
-
 
     /***********************************************************
     true if we haven't done yet any reading from keychain
     ***********************************************************/
     protected bool retry_on_signal_key_chain_error = true;
 
-
-
     /***********************************************************
     Jobs we need to retry once the auth token is fetched
     ***********************************************************/
-    protected GLib.Vector<QPointer<AbstractNetworkJob>> retry_queue;
-
+    protected GLib.List<QPointer<AbstractNetworkJob>> retry_queue;
 
     /***********************************************************
     Don't add credentials if this is set on a Soup.Request
@@ -193,11 +178,6 @@ class HttpCredentials : AbstractCredentials {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public bool ready () {
-        return this.ready;
-    }
 
 
     /***********************************************************
@@ -286,22 +266,6 @@ class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public string user () {
-        return this.user;
-    }
-
-
-    /***********************************************************
-    The password or token
-    ***********************************************************/
-    public string password ();
-    string HttpCredentials.password () {
-        return this.password;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public void invalidate_token () {
         if (!this.password.is_empty ()) {
             this.previous_password = this.password;
@@ -377,19 +341,19 @@ class HttpCredentials : AbstractCredentials {
             return false;
 
         GLib.Uri request_token = Utility.concat_url_path (this.account.url (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
-        Soup.Request reques;
-        reques.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
+        Soup.Request request;
+        request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         string basic_auth = string ("%1:%2").arg (
             Theme.instance ().oauth_client_id (), Theme.instance ().oauth_client_secret ());
-        reques.raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
-        reques.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
+        request.raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
+        request.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
 
         var request_body = new Soup.Buffer;
         QUrlQuery arguments (string ("grant_type=refresh_token&refresh_token=%1").arg (this.refresh_token));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
-        var job = this.account.send_request ("POST", request_token, reques, request_body);
+        var job = this.account.send_request ("POST", request_token, request, request_body);
         job.on_signal_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
         GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, (Soup.Reply reply) {
             var json_data = reply.read_all ();

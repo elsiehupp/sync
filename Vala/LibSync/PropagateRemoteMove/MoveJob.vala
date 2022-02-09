@@ -21,21 +21,21 @@ class MoveJob : AbstractNetworkJob {
     ***********************************************************/
     const GLib.Uri url;
 
-    GLib.HashMap<GLib.ByteArray, GLib.ByteArray> extra_headers;
+    GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers;
 
     signal void finished_signal ();
 
     /***********************************************************
     ***********************************************************/
-    public MoveJob (AccountPointer account, string path, string destination, GLib.Object parent = new GLib.Object ()) {
+    public MoveJob.for_path (AccountPointer account, string path, string destination, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.destination = destination;
     }
 
     /***********************************************************
     ***********************************************************/
-    public MoveJob (AccountPointer account, GLib.Uri url, string destination,
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent) {
+    public MoveJob.for_url (AccountPointer account, GLib.Uri url, string destination,
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent) {
         base (account, "", parent);
         this.destination = destination;
         this.url = url;
@@ -46,15 +46,15 @@ class MoveJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request reques;
-        reques.raw_header ("Destination", GLib.Uri.to_percent_encoding (this.destination, "/"));
+        Soup.Request request;
+        request.raw_header ("Destination", GLib.Uri.to_percent_encoding (this.destination, "/"));
         for (var it = this.extra_headers.const_begin (); it != this.extra_headers.const_end (); ++it) {
-            reques.raw_header (it.key (), it.value ());
+            request.raw_header (it.key (), it.value ());
         }
         if (this.url.is_valid ()) {
-            send_request ("MOVE", this.url, reques);
+            send_request ("MOVE", this.url, request);
         } else {
-            send_request ("MOVE", make_dav_url (path ()), reques);
+            send_request ("MOVE", make_dav_url (path ()), request);
         }
 
         if (reply ().error () != Soup.Reply.NoError) {

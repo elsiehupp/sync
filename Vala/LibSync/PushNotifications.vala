@@ -21,8 +21,20 @@ class PushNotifications : GLib.Object {
     private QWeb_socket web_socket;
     private uint8 failed_authentication_attempts_count = 0;
     private QTimer reconnect_timer = null;
-    private uint32 reconnect_timer_interval = 20 * 1000;
-    private bool is_ready = false;
+
+    /***********************************************************
+    Set the interval for reconnection attempts
+
+    @param interval Interval in milliseconds.
+    ***********************************************************/
+    uint32 reconnect_timer_interval { private get; public set; }
+
+    /***********************************************************
+    Indicates if push notifications ready to use
+
+    Ready to use means connected and authenticated.
+    ***********************************************************/
+    bool is_ready { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -75,6 +87,8 @@ class PushNotifications : GLib.Object {
     public PushNotifications (Account account, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
+        this.reconnect_timer_interval = 20 * 1000;
+        this.is_ready = false;
         this.web_socket = new QWeb_socket ("", QWeb_socket_protocol.Version_latest, this);
         connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, &PushNotifications.on_signal_web_socket_error);
         connect (this.web_socket, &QWeb_socket.ssl_errors, this, &PushNotifications.on_signal_web_socket_ssl_errors);
@@ -109,24 +123,6 @@ class PushNotifications : GLib.Object {
     }
 
 
-    /***********************************************************
-    Set the interval for reconnection attempts
-
-    @param interval Interval in milliseconds.
-    ***********************************************************/
-    public void reconnect_timer_interval (uint32 interval) {
-        this.reconnect_timer_interval = interval;
-    }
-
-
-    /***********************************************************
-    Indicates if push notifications ready to use
-
-    Ready to use means connected and authenticated.
-    ***********************************************************/
-    public bool is_ready () {
-        return this.is_ready;
-    }
 
 
     /***********************************************************

@@ -6,7 +6,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Occ {
 
-class UserStatus {
+class UserStatus : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -18,160 +18,71 @@ class UserStatus {
         Invisible
     }
 
+    /***********************************************************
+    Q_REQUIRED_RESULT
+    ***********************************************************/
+    string identifier { public get; public set; }
 
     /***********************************************************
+    Q_REQUIRED_RESULT
     ***********************************************************/
-    private string identifier;
-    private string message;
-    private string icon;
-    private OnlineStatus state = OnlineStatus.Online;
-    private bool message_predefined;
-    private Optional<ClearAt> clear_at;
+    string message { public get; public set; }
 
     /***********************************************************
+    Q_REQUIRED_RESULT
     ***********************************************************/
-    public UserStatus ();
+    string icon { public get; public set; }
+
+    /***********************************************************
+    Q_REQUIRED_RESULT
+    ***********************************************************/
+    OnlineStatus state { public get; public set; }
+
+    /***********************************************************
+    Q_REQUIRED_RESULT
+    ***********************************************************/
+    bool message_predefined { public get; public set; }
+
+    /***********************************************************
+    Optional<ClearAt> date_time
+    Q_REQUIRED_RESULT
+    ***********************************************************/
+    Optional<ClearAt> clear_at { public get; public set; }
 
     /***********************************************************
     ***********************************************************/
     public UserStatus (string identifier, string message, string icon,
-        OnlineStatus state, bool message_predefined, Optional<ClearAt> clear_at = {});
-
-
-    /***********************************************************
-    Q_REQUIRED_RESULT
-    ***********************************************************/
-    public string identifier ();
-
-
-    /***********************************************************
-    Q_REQUIRED_RESULT
-    ***********************************************************/
-    public string message ();
-
-
-    /***********************************************************
-    Q_REQUIRED_RESULT
-    ***********************************************************/
-    public string icon ();
-
-
-    /***********************************************************
-    Q_REQUIRED_RESULT
-    ***********************************************************/
-    public OnlineStatus state ();
-
-
-    /***********************************************************
-    Q_REQUIRED_RESULT
-    ***********************************************************/
-    public Optional<ClearAt> clear_at () {
-        return this.clear_at;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void id (string identifier) {
+        OnlineStatus state = OnlineStatus.Online, bool message_predefined, Optional<ClearAt> clear_at = new Optional<ClearAt> ()) {
         this.identifier = identifier;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void UserStatus.message (string message) {
         this.message = message;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void state (OnlineStatus state) {
-        this.state = state;
-    }
-
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void icon (string icon) {
         this.icon = icon;
+        this.state = state;
+        this.message_predefined = message_predefined;
+        this.clear_at = clear_at;
     }
-
 
     /***********************************************************
+    Q_REQUIRED_RESULT
     ***********************************************************/
-    public void message_predefined (bool value) {
-        this.message_predefined = value;
+    public GLib.Uri state_icon () {
+        switch (this.state) {
+        case UserStatus.OnlineStatus.Away:
+            return Theme.instance ().status_away_image_source ();
+
+        case UserStatus.OnlineStatus.DoNotDisturb:
+            return Theme.instance ().status_do_not_disturb_image_source ();
+
+        case UserStatus.OnlineStatus.Invisible:
+        case UserStatus.OnlineStatus.Offline:
+            return Theme.instance ().status_invisible_image_source ();
+
+        case UserStatus.OnlineStatus.Online:
+            return Theme.instance ().status_online_image_source ();
+        }
+
+        //  Q_UNREACHABLE ();
     }
 
+} // class UserStatus
 
-    /***********************************************************
-    ***********************************************************/
-    public void clear_at (Optional<ClearAt> date_time) {
-        this.clear_at = date_time;
-    }
-
-    //  Q_REQUIRED_RESULT
-    public bool message_predefined ();
-
-    //  Q_REQUIRED_RESULT
-    public GLib.Uri state_icon ();
-
-
-}
-
-
-
-
-UserStatus.UserStatus () = default;
-
-UserStatus.UserStatus (
-    const string identifier, string message, string icon,
-    OnlineStatus state, bool message_predefined, Optional<ClearAt> clear_at)
-    : this.identifier (identifier)
-    this.message (message)
-    this.icon (icon)
-    this.state (state)
-    this.message_predefined (message_predefined)
-    this.clear_at (clear_at) {
-}
-
-string UserStatus.identifier () {
-    return this.identifier;
-}
-
-string UserStatus.message () {
-    return this.message;
-}
-
-string UserStatus.icon () {
-    return this.icon;
-}
-
-var UserStatus.state () . OnlineStatus {
-    return this.state;
-}
-
-bool UserStatus.message_predefined () {
-    return this.message_predefined;
-}
-
-GLib.Uri UserStatus.state_icon () {
-    switch (this.state) {
-    case UserStatus.OnlineStatus.Away:
-        return Theme.instance ().status_away_image_source ();
-
-    case UserStatus.OnlineStatus.DoNotDisturb:
-        return Theme.instance ().status_do_not_disturb_image_source ();
-
-    case UserStatus.OnlineStatus.Invisible:
-    case UserStatus.OnlineStatus.Offline:
-        return Theme.instance ().status_invisible_image_source ();
-
-    case UserStatus.OnlineStatus.Online:
-        return Theme.instance ().status_online_image_source ();
-    }
-
-    Q_UNREACHABLE ();
-}
+} // namespace Occ

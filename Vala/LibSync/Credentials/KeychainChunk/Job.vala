@@ -30,12 +30,25 @@ class Job : GLib.Object {
     protected string service_name;
     protected Account account;
     protected string key;
-    protected bool insecure_fallback = false;
-    protected bool auto_delete = true;
+
+    /***********************************************************
+    If we use it but don't support insecure fallback, give us
+    nice compilation errors ;p
+    ***********************************************************/
+    public bool insecure_fallback = false;
+
+
+    /***********************************************************
+    Whether this job autodeletes itself once signal_finished () has been emitted. Default is true.
+    @see auto_delete ()
+    ***********************************************************/
+    public bool auto_delete = true;
+
     protected bool keychain_migration = false;
 
-    protected QKeychain.Error error = QKeychain.NoError;
-    protected string error_string;
+    QKeychain.Error error { public get; protected set; }
+
+    string error_string { public get; protected set; }
 
     protected int chunk_count = 0;
     protected GLib.ByteArray chunk_buffer;
@@ -44,32 +57,20 @@ class Job : GLib.Object {
     ***********************************************************/
     public Job (GLib.Object parent = new GLib.Object ()) {
         base (parent);
+        this.error = QKeychain.NoError;
         this.service_name = Theme.instance ().app_name ();
     }
 
+
     ~Job () {
         this.chunk_count = 0;
-        this.chunk_buffer.clear ();
+        this.chunk_buffer.steal (); // to clear securely?
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public QKeychain.Error error () {
-        return this.error;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string error_string () {
-        return this.error_string;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public  GLib.ByteArray binary_data () {
+    public GLib.ByteArray binary_data () {
         return this.chunk_buffer;
     }
 
@@ -77,24 +78,7 @@ class Job : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string text_data () {
-        return this.chunk_buffer;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool insecure_fallback () {
-        return this.insecure_fallback;
-    }
-
-
-#if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-    /***********************************************************
-    If we use it but don't support insecure fallback, give us
-    nice compilation errors ;p
-    ***********************************************************/
-    public void insecure_fallback (bool insecure_fallback) {
-        this.insecure_fallback = insecure_fallback;
+        return this.chunk_buffer.to_string ();
     }
 
 
@@ -105,24 +89,6 @@ class Job : GLib.Object {
         var settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
         settings.parent (job); // make the job parent to make setting deleted properly
         job.settings (settings.release ());
-    }
-//  #endif
-
-    /***********************************************************
-    @return Whether this job autodeletes itself once on_signal_finished () has been emitted. Default is true.
-    @see auto_delete ()
-    ***********************************************************/
-    public bool auto_delete () {
-        return this.auto_delete;
-    }
-
-
-    /***********************************************************
-    Set whether this job should autodelete itself once on_signal_finished () has been emitted.
-    @see auto_delete ()
-    ***********************************************************/
-    public void auto_delete (bool auto_delete) {
-        this.auto_delete = auto_delete;
     }
 
 } // class Job

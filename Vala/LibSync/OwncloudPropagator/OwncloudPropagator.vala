@@ -9,7 +9,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QLoggingCategory>
 using Soup;
 
-//  #include <QStack>
+//  #include <GLib.List>
 //  #include <QFileInfo>
 //  #include <QDir>
 //  #include <QLoggingCategory>
@@ -77,17 +77,17 @@ class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public OwncloudPropagator (AccountPointer account, string local_dir,
+    public OwncloudPropagator.for_account (AccountPointer account, string local_dir,
                        const string remote_folder, SyncJournalDb progress_database,
-                       GLib.Set<string> bulk_upload_block_list)
+                       GLib.List<string> bulk_upload_block_list)
         : this.journal (progress_database)
         this.finished_emited (false)
         this.bandwidth_manager (this)
         this.another_sync_needed (false)
         this.chunk_size (10 * 1000 * 1000) // 10 MB, overridden in sync_options
         this.account (account)
-        this.local_dir ( (local_dir.ends_with (char ('/'))) ? local_dir : local_dir + '/')
-        this.remote_folder ( (remote_folder.ends_with (char ('/'))) ? remote_folder : remote_folder + '/')
+        this.local_dir ( (local_dir.has_suffix (char ('/'))) ? local_dir : local_dir + '/')
+        this.remote_folder ( (remote_folder.has_suffix (char ('/'))) ? remote_folder : remote_folder + '/')
         this.bulk_upload_block_list (bulk_upload_block_list) {
         q_register_meta_type<PropagatorJob.AbortType> ("PropagatorJob.AbortType");
     }
@@ -101,16 +101,16 @@ class OwncloudPropagator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void start_directory_propagation (SyncFileItemPtr item,
-                                   QStack<QPair<string, PropagateDirectory>> directories,
-                                   GLib.Vector<PropagatorJob> directories_to_remove,
+                                   GLib.List<QPair<string, PropagateDirectory>> directories, // should be a LIFO stack
+                                   GLib.List<PropagatorJob> directories_to_remove,
                                    string removed_directory,
                                    const SyncFileItemVector items);
 
     /***********************************************************
     ***********************************************************/
     public void start_file_propagation (SyncFileItemPtr item,
-                              QStack<QPair<string, PropagateDirectory>> directories,
-                              GLib.Vector<PropagatorJob> directories_to_remove,
+                              GLib.List<QPair<string, PropagateDirectory>> directories, // should be a LIFO stack
+                              GLib.List<PropagatorJob> directories_to_remove,
                               string removed_directory,
                               string maybe_conflict_directory);
 
@@ -161,7 +161,7 @@ class OwncloudPropagator : GLib.Object {
 
     This allows skipping of uploads that have a very high likelihood of failure.
     ***********************************************************/
-    public GLib.HashMap<string, int64> this.folder_quota;
+    public GLib.HashTable<string, int64> this.folder_quota;
 
     
     /***********************************************************
@@ -297,7 +297,7 @@ class OwncloudPropagator : GLib.Object {
         PropagatorCompositeJob composite, string error);
 
     // Map original path (as in the DB) to target final path
-    public GLib.HashMap<string, string> this.renamed_directories;
+    public GLib.HashTable<string, string> this.renamed_directories;
     public string adjust_renamed_path (string original);
 
 
@@ -435,7 +435,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Set<string> this.bulk_upload_block_list;
+    private GLib.List<string> this.bulk_upload_block_list;
 
     /***********************************************************
     ***********************************************************/
@@ -700,7 +700,7 @@ signals:
 
         var regex = sync_options ().file_regex ();
         if (regex.is_valid ()) {
-            GLib.Set<QStringRef> names;
+            GLib.List<QStringRef> names;
             foreach (var i in items) {
                 if (regex.match (i.file).has_match ()) {
                     int index = -1;
@@ -722,9 +722,9 @@ signals:
 
         reset_delayed_upload_tasks ();
         this.root_job.on_signal_reset (new PropagateRootDirectory (this));
-        QStack<QPair<string /* directory name */, PropagateDirectory * /* job */>> directories;
+        GLib.List<QPair<string /* directory name */, PropagateDirectory /* job */>> directories; // should be a LIFO stack
         directories.push (q_make_pair ("", this.root_job.data ()));
-        GLib.Vector<PropagatorJob> directories_to_remove;
+        GLib.List<PropagatorJob> directories_to_remove;
         string removed_directory;
         string maybe_conflict_directory;
         foreach (SyncFileItemPtr item in items) {
@@ -801,8 +801,8 @@ signals:
     }
 
     void OwncloudPropagator.start_directory_propagation (SyncFileItemPtr item,
-                                                       QStack<QPair<string, PropagateDirectory>> directories,
-                                                       GLib.Vector<PropagatorJob> directories_to_remove,
+                                                       GLib.List<QPair<string, PropagateDirectory>> directories, // should be a LIFO stack
+                                                       GLib.List<PropagatorJob> directories_to_remove,
                                                        string removed_directory,
                                                        const SyncFileItemVector items) {
         var directory_propagation_job = std.make_unique<PropagateDirectory> (this, item);
@@ -845,8 +845,8 @@ signals:
     }
 
     void OwncloudPropagator.start_file_propagation (SyncFileItemPtr item,
-                                                  QStack<QPair<string, PropagateDirectory> > directories,
-                                                  GLib.Vector<PropagatorJob> directories_to_remove,
+                                                  GLib.List<QPair<string, PropagateDirectory> > directories, // should be a LIFO stack
+                                                  GLib.List<PropagatorJob> directories_to_remove,
                                                   string removed_directory,
                                                   string maybe_conflict_directory) {
         if (item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE) {
@@ -984,7 +984,7 @@ signals:
         }
         string conflict_user_name;
         if (account ().capabilities ().upload_conflict_files ())
-            conflict_user_name = account ().dav_display_name ();
+            conflict_user_name = account ().display_name;
         string conflict_filename = Utility.make_conflict_filename (
             item.file, Utility.q_date_time_from_time_t (conflict_mod_time), conflict_user_name);
         string conflict_file_path = full_local_path (conflict_filename);

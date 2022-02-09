@@ -16,51 +16,51 @@ class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Vector<RemoteInfo> this.results;
-    private string this.sub_path;
-    private GLib.ByteArray this.first_etag;
+    private GLib.List<RemoteInfo> results;
+    private string sub_path;
+    private GLib.ByteArray first_etag;
     private GLib.ByteArray file_identifier;
-    private GLib.ByteArray this.local_file_id;
-    private AccountPointer this.account;
+    private GLib.ByteArray local_file_id;
+    private AccountPointer account;
 
 
     /***********************************************************
     The first result is for the directory itself and need to be
     ignored. This flag is true if it was already ignored.
     ***********************************************************/
-    private bool this.ignored_first;
+    private bool ignored_first;
 
 
     /***********************************************************
     Set to true if this is the root path and we need to check
     the data-fingerprint
     ***********************************************************/
-    private bool this.is_root_path;
+    private bool is_root_path;
 
 
     /***********************************************************
     If this directory is an external storage (The first item
     has 'M' in its permission)
     ***********************************************************/
-    private bool this.is_external_storage;
+    private bool is_external_storage;
 
 
     /***********************************************************
     If this directory is e2ee
     ***********************************************************/
-    private bool this.is_e2e_encrypted;
+    private bool is_e2e_encrypted;
 
     /***********************************************************
     If set, the discovery will finish with an error
     ***********************************************************/
-    private int64 this.size = 0;
-    private string this.error;
-    private QPointer<LsColJob> this.ls_col_job;
+    private int64 size = 0;
+    private string error;
+    private QPointer<LsColJob> ls_col_job;
 
 
     /***********************************************************
     ***********************************************************/
-    private public GLib.ByteArray this.data_fingerprint;
+    private public GLib.ByteArray data_fingerprint;
 
 
     /***********************************************************
@@ -68,12 +68,12 @@ class DiscoverySingleDirectoryJob : GLib.Object {
     ***********************************************************/
     signal void first_directory_permissions (RemotePermissions);
     signal void etag (GLib.ByteArray , GLib.DateTime time);
-    signal void finished (HttpResult<GLib.Vector<RemoteInfo>> result);
+    signal void finished (HttpResult<GLib.List<RemoteInfo>> result);
 
 
     /***********************************************************
     ***********************************************************/
-    public DiscoverySingleDirectoryJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public DiscoverySingleDirectoryJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.sub_path = path;
         this.account = account;
@@ -88,7 +88,7 @@ class DiscoverySingleDirectoryJob : GLib.Object {
     Specify that this is the root and we need to check the
     data-fingerprint
     ***********************************************************/
-    public void is_root_path () {
+    public void is_root_path_true () {
         this.is_root_path = true;
     }
 
@@ -99,26 +99,26 @@ class DiscoverySingleDirectoryJob : GLib.Object {
         // Start the actual HTTP job
         var ls_col_job = new LsColJob (this.account, this.sub_path, this);
 
-        GLib.List<GLib.ByteArray> props;
-        props + "resourcetype"
-              + "getlastmodified"
-              + "getcontentlength"
-              + "getetag"
-              + "http://owncloud.org/ns:size"
-              + "http://owncloud.org/ns:identifier"
-              + "http://owncloud.org/ns:fileid"
-              + "http://owncloud.org/ns:download_uRL"
-              + "http://owncloud.org/ns:d_dC"
-              + "http://owncloud.org/ns:permissions"
-              + "http://owncloud.org/ns:checksums";
+        GLib.List<GLib.ByteArray> props = new GLib.List<GLib.ByteArray> ();
+        props.append ("resourcetype");
+        props.append ("getlastmodified");
+        props.append ("getcontentlength");
+        props.append ("getetag");
+        props.append ("http://owncloud.org/ns:size");
+        props.append ("http://owncloud.org/ns:identifier");
+        props.append ("http://owncloud.org/ns:fileid");
+        props.append ("http://owncloud.org/ns:download_uRL");
+        props.append ("http://owncloud.org/ns:d_dC");
+        props.append ("http://owncloud.org/ns:permissions");
+        props.append ("http://owncloud.org/ns:checksums");
         if (this.is_root_path)
-            props + "http://owncloud.org/ns:data-fingerprint";
+            props.append ("http://owncloud.org/ns:data-fingerprint");
         if (this.account.server_version_int () >= Account.make_server_version (10, 0, 0)) {
             // Server older than 10.0 have performances issue if we ask for the share-types on every PROPFIND
-            props + "http://owncloud.org/ns:share-types";
+            props.append ("http://owncloud.org/ns:share-types");
         }
         if (this.account.capabilities ().client_side_encryption_available ()) {
-            props + "http://nextcloud.org/ns:is-encrypted";
+            props.append ("http://nextcloud.org/ns:is-encrypted");
         }
 
         ls_col_job.properties (props);
@@ -144,7 +144,7 @@ class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_directory_listing_iterated_slot (string , GLib.HashMap<string, string> &);
+    private void on_signal_directory_listing_iterated_slot (string , GLib.HashTable<string, string> &);
 
 
     /***********************************************************

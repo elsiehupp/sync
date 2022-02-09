@@ -15,7 +15,15 @@ namespace Occ {
 class PropagateRemoteMkdir : PropagateItemJob {
 
     QPointer<AbstractNetworkJob> job;
-    bool delete_existing;
+
+    /***********************************************************
+    Whether an existing entity with the same name may be deleted before
+    creating the directory.
+
+    Default: false.
+    ***********************************************************/
+    public bool delete_existing;
+
     PropagateUploadEncrypted upload_encrypted_helper;
 
     //  friend class PropagateDirectory; // So it can access the this.item;
@@ -67,7 +75,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         if (this.job && this.job.reply ())
             this.job.reply ().on_signal_abort ();
 
-        if (abort_type == AbortType.ASYNCHRONOUS) {
+        if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ abort_finished ();
         }
     }
@@ -78,17 +86,6 @@ class PropagateRemoteMkdir : PropagateItemJob {
     ***********************************************************/
     public bool is_likely_finished_quickly () {
         return true;
-    }
-
-
-    /***********************************************************
-    Whether an existing entity with the same name may be deleted before
-    creating the directory.
-
-    Default: false.
-    ***********************************************************/
-    public void delete_existing (bool enabled) {
-        this.delete_existing = enabled;
     }
 
 
@@ -186,11 +183,11 @@ class PropagateRemoteMkdir : PropagateItemJob {
         if (this.upload_encrypted_helper && this.upload_encrypted_helper.is_folder_locked () && !this.upload_encrypted_helper.is_unlock_running ()) {
             // since we are done, we need to unlock a folder in case it was locked
             connect (this.upload_encrypted_helper, &PropagateUploadEncrypted.folder_unlocked, this, [this, err, job_http_reason_phrase_string, job_path] () {
-                finalize_mk_col_job (err, job_http_reason_phrase_string, job_path);
+                finalize_mkcol_job (err, job_http_reason_phrase_string, job_path);
             });
             this.upload_encrypted_helper.unlock_folder ();
         } else {
-            finalize_mk_col_job (err, job_http_reason_phrase_string, job_path);
+            finalize_mkcol_job (err, job_http_reason_phrase_string, job_path);
         }
     }
 
@@ -229,7 +226,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    private void finalize_mk_col_job (Soup.Reply.NetworkError err, string job_http_reason_phrase_string, string job_path) {
+    private void finalize_mkcol_job (Soup.Reply.NetworkError err, string job_http_reason_phrase_string, string job_path) {
         if (this.item.http_error_code == 405) {
             // This happens when the directory already exists. Nothing to do.
             GLib.debug ("Folder" + job_path + "already exists.";
@@ -252,7 +249,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         propagator ().active_job_list.append (this);
         var propfind_job = new PropfindJob (propagator ().account (), job_path, this);
         propfind_job.properties ({"http://owncloud.org/ns:permissions"});
-        connect (propfind_job, &PropfindJob.result, this, [this, job_path] (QVariantMap result) {
+        connect (propfind_job, &PropfindJob.result, this, [this, job_path] (GLib.HashTable<string, GLib.Variant> result) {
             propagator ().active_job_list.remove_one (this);
             this.item.remote_perm = RemotePermissions.from_server_string (result.value (QStringLiteral ("permissions")).to_string ());
 
@@ -264,7 +261,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
                 propagator ().active_job_list.append (this);
 
                 // We're expecting directory path in /Foo/Bar convention...
-                //  Q_ASSERT (job_path.starts_with ('/') && !job_path.ends_with ('/'));
+                //  Q_ASSERT (job_path.starts_with ('/') && !job_path.has_suffix ('/'));
                 // But encryption job expect it in Foo/Bar/ convention
                 var job = new Occ.EncryptFolderJob (propagator ().account (), propagator ().journal, job_path.mid (1), this.item.file_id, this);
                 connect (job, &Occ.EncryptFolderJob.on_signal_finished, this, &PropagateRemoteMkdir.on_signal_encrypt_folder_finished);

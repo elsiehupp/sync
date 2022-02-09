@@ -20,7 +20,7 @@ class DeleteApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public DeleteApiJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public DeleteApiJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -28,10 +28,10 @@ class DeleteApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request reques;
-        reques.raw_header ("OCS-APIREQUEST", "true");
+        Soup.Request request;
+        request.raw_header ("OCS-APIREQUEST", "true");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
-        send_request ("DELETE", url, reques);
+        send_request ("DELETE", url, request);
         AbstractNetworkJob.on_signal_start ();
     }
 

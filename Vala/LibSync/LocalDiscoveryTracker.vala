@@ -36,11 +36,12 @@ class LocalDiscoveryTracker : GLib.Object {
 
     /***********************************************************
     The paths that should be checked by the next local discovery.
+    Access list of files that shall be locally rediscovered.
 
     Mostly a collection of files the filewatchers have reported as touched.
     Also includes files that have had errors in the last sync run.
     ***********************************************************/
-    private GLib.Set<string> local_discovery_paths;
+    GLib.List<string> local_discovery_paths { public get; private set; }
 
 
     /***********************************************************
@@ -50,7 +51,7 @@ class LocalDiscoveryTracker : GLib.Object {
     this.local_discovery_paths again when the sync is done to
     make sure everything is retried.
     ***********************************************************/
-    private GLib.Set<string> previous_local_discovery_paths;
+    private GLib.List<string> previous_local_discovery_paths;
 
 
     /***********************************************************
@@ -93,14 +94,6 @@ class LocalDiscoveryTracker : GLib.Object {
 
         this.previous_local_discovery_paths = std.move (this.local_discovery_paths);
         this.local_discovery_paths.clear ();
-    }
-
-
-    /***********************************************************
-    Access list of files that shall be locally rediscovered.
-    ***********************************************************/
-    public GLib.Set<string> local_discovery_paths () {
-        return this.local_discovery_paths;
     }
 
 

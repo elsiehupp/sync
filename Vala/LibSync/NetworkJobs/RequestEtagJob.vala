@@ -17,7 +17,7 @@ class RequestEtagJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public RequestEtagJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public RequestEtagJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -25,8 +25,8 @@ class RequestEtagJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request reques;
-        reques.raw_header ("Depth", "0");
+        Soup.Request request;
+        request.raw_header ("Depth", "0");
 
         GLib.ByteArray xml ("<?xml version=\"1.0\" ?>\n"
                     "<d:propfind xmlns:d=\"DAV:\">\n"
@@ -38,7 +38,7 @@ class RequestEtagJob : AbstractNetworkJob {
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
         // assumes ownership
-        send_request ("PROPFIND", make_dav_url (path ()), reques, buf);
+        send_request ("PROPFIND", make_dav_url (path ()), request, buf);
 
         if (reply ().error () != Soup.Reply.NoError) {
             GLib.warning ("request network error : " + reply ().error_string ();
@@ -56,7 +56,7 @@ class RequestEtagJob : AbstractNetworkJob {
         var http_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (http_code == 207) {
             // Parse DAV response
-            QXmlStreamReader reader (reply ());
+            QXmlStreamReader reader = new QXmlStreamReader (reply ());
             reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration (QStringLiteral ("d"), QStringLiteral ("DAV:")));
             GLib.ByteArray etag;
             while (!reader.at_end ()) {

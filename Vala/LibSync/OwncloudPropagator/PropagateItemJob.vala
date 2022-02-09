@@ -15,12 +15,25 @@ class PropagateItemJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private QScopedPointer<PropagateItemJob> restore_job;
-    private JobParallelism parallelism;
-
+    JobParallelism parallelism { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
     public SyncFileItemPtr item;
+
+    /***********************************************************
+    set a custom restore job message that is used if the restore job succeeded.
+    It is displayed in the activity view.
+    ***********************************************************/
+    string restore_job_msg {
+        protected get {
+            return this.item.is_restoration ? this.item.error_string : "";
+        }
+        protected set {
+            this.item.is_restoration = true;
+            this.item.error_string = value;
+        }
+    }
 
 
     /***********************************************************
@@ -34,6 +47,8 @@ class PropagateItemJob : PropagatorJob {
         // so every "PropagateItemJob" that will potentially execute Lock job on E2EE folder will get executed sequentially.
         // As an alternative, we could optimize Lock/Unlock calls, so we do a batch-write on one folder and only lock and unlock a folder once per batch.
         this.parallelism = (this.item.is_encrypted || has_encrypted_ancestor ()) ? JobParallelism.WAIT_FOR_FINISHED : JobParallelism.FULL_PARALLELISM;
+
+        this.restore_job_msg = "";
     }
 
 
@@ -44,23 +59,6 @@ class PropagateItemJob : PropagatorJob {
             // we might risk end up with dangling pointer in the list which may cause crashes.
             p.active_job_list.remove_all (this);
         }
-    }
-
-
-    /***********************************************************
-    set a custom restore job message that is used if the restore job succeeded.
-    It is displayed in the activity view.
-    ***********************************************************/
-    protected string restore_job_msg () {
-        return this.item.is_restoration ? this.item.error_string : "";
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    protected void restore_job_msg (string message = "") {
-        this.item.is_restoration = true;
-        this.item.error_string = message;
     }
 
 
@@ -121,11 +119,6 @@ class PropagateItemJob : PropagatorJob {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public JobParallelism parallelism () {
-        return this.parallelism;
-    }
 
 
 

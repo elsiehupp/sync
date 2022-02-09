@@ -13,12 +13,12 @@ namespace KeychainChunk {
 class DeleteJob : KeychainChunk.Job {
 
 
-    signal void on_signal_finished (KeychainChunk.DeleteJob incoming_job);
+    signal void signal_finished (KeychainChunk.DeleteJob incoming_job);
 
 
     /***********************************************************
     ***********************************************************/
-    public DeleteJob (Account account, string key, bool keychain_migration, GLib.Object parent = new GLib.Object ()) {
+    public DeleteJob.for_account (Account account, string key, bool keychain_migration, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.key = key;
@@ -36,7 +36,7 @@ class DeleteJob : KeychainChunk.Job {
 
     /***********************************************************
     Call this method to on_signal_start the job (async).
-    You should connect some slot to the on_signal_finished () signal first.
+    You should connect some slot to the signal_finished () signal first.
 
     @see QKeychain.Job.on_signal_start ()
     ***********************************************************/
@@ -63,7 +63,7 @@ class DeleteJob : KeychainChunk.Job {
 
     /***********************************************************
     Call this method to on_signal_start the job synchronously.
-    Awaits completion with no need to connect some slot to the on_signal_finished () signal first.
+    Awaits completion with no need to connect some slot to the signal_finished () signal first.
 
     @return Returns true on succeess (QKeychain.NoError).
     ***********************************************************/

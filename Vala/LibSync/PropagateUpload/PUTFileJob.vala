@@ -14,9 +14,16 @@ class PUTFile_job : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private QIODevice device;
-    private GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
-    private string error_string;
+    QIODevice device { public get; private set; }
+    private GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
+    string error_string {
+        public get {
+            this.error_string == "" ? AbstractNetworkJob.error_string () : this.error_string;
+        }
+        protected set {
+            this.error_string = value;
+        }
+    }
     private GLib.Uri url;
     private QElapsedTimer request_timer;
 
@@ -32,8 +39,8 @@ class PUTFile_job : AbstractNetworkJob {
     /***********************************************************
     Takes ownership of the device
     ***********************************************************/
-    public PUTFile_job.take (AccountPointer account, string path, std.unique_ptr<QIODevice> device,
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
+    public PUTFile_job.for_path (AccountPointer account, string path, std.unique_ptr<QIODevice> device,
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.device = device.release ();
         this.headers = headers;
@@ -44,8 +51,8 @@ class PUTFile_job : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public PUTFile_job (AccountPointer account, GLib.Uri url, std.unique_ptr<QIODevice> device,
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
+    public PUTFile_job.for_url (AccountPointer account, GLib.Uri url, std.unique_ptr<QIODevice> device,
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         this.device = device.release ();
         this.headers = headers;
@@ -63,17 +70,17 @@ class PUTFile_job : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request reques;
+        Soup.Request request;
         foreach (var header in this.headers) {
-            reques.raw_header (header.key (), header.value ());
+            request.raw_header (header.key (), header.value ());
         }
 
-        reques.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
+        request.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
 
         if (this.url.is_valid ()) {
-            send_request ("PUT", this.url, reques, this.device);
+            send_request ("PUT", this.url, request, this.device);
         } else {
-            send_request ("PUT", make_dav_url (path ()), reques, this.device);
+            send_request ("PUT", make_dav_url (path ()), request, this.device);
         }
 
         if (reply ().error () != Soup.Reply.NoError) {
@@ -104,27 +111,10 @@ class PUTFile_job : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public QIODevice device () {
-        return this.device;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string error_string () {
-        return this.error_string.is_empty () ? AbstractNetworkJob.error_string () : this.error_string;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public std.chrono.milliseconds ms_since_start () {
         return std.chrono.milliseconds (this.request_timer.elapsed ());
     }
 
-}
+} // class PUTFile_job
 
-
-
-
-
+} // namespace Occ

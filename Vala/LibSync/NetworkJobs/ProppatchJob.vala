@@ -20,14 +20,29 @@ class ProppatchJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties;
+    GLib.HashTable<GLib.ByteArray, GLib.ByteArray> properties {
+        public get {
+            return this.properties;
+        }
+        /***********************************************************
+        Used to specify which properties shall be set.
+
+        The property keys can
+        - contain no colon : they refer to a property in the DAV :
+        - contain a colon : and thus specify an explicit namespace,
+        e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
+        ***********************************************************/
+        public set {
+            this.properties = value;
+        }
+    }
 
     signal void on_signal_success ();
     signal void finished_with_error ();
 
     /***********************************************************
     ***********************************************************/
-    public ProppatchJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public ProppatchJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -38,7 +53,7 @@ class ProppatchJob : AbstractNetworkJob {
         if (this.properties.is_empty ()) {
             GLib.warning ("Proppatch with no properties!";
         }
-        Soup.Request reques;
+        Soup.Request request;
 
         GLib.ByteArray prop_str;
         QMapIterator<GLib.ByteArray, GLib.ByteArray> it (this.properties);
@@ -69,29 +84,11 @@ class ProppatchJob : AbstractNetworkJob {
         var buf = new Soup.Buffer (this);
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
-        send_request ("PROPPATCH", make_dav_url (path ()), reques, buf);
+        send_request ("PROPPATCH", make_dav_url (path ()), request, buf);
         AbstractNetworkJob.on_signal_start ();
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties () {
-        return this.properties;
-    }
-
-
-    /***********************************************************
-    Used to specify which properties shall be set.
-
-    The property keys can
-     - contain no colon : they refer to a property in the DAV :
-     - contain a colon : and thus specify an explicit namespace,
-       e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
-    ***********************************************************/
-    public void properties (GLib.HashMap<GLib.ByteArray, GLib.ByteArray> properties) {
-        this.properties = properties;
-    }
 
 
 

@@ -4,10 +4,10 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QVariantMap>
+//  #include <GLib.HashTable<string, GLib.Variant>>
 //  #include <QLoggingCategory>
 //  #include <QDebug>
-//  #include <QVariantMap>
+//  #include <GLib.HashTable<string, GLib.Variant>>
 //  #include <QMimeDatabase>
 
 namespace Occ {
@@ -34,7 +34,7 @@ class Capabilities {
 
     /***********************************************************
     ***********************************************************/
-    private QVariantMap capabilities;
+    private GLib.HashTable<string, GLib.Variant> capabilities;
 
     /***********************************************************
     ***********************************************************/
@@ -42,7 +42,7 @@ class Capabilities {
 
     /***********************************************************
     ***********************************************************/
-    public Capabilities (QVariantMap capabilities) {
+    public Capabilities (GLib.HashTable<string, GLib.Variant> capabilities) {
         this.capabilities = capabilities;
     }
 

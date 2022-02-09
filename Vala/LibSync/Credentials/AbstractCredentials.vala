@@ -12,39 +12,7 @@ using CSync;
 
 namespace Occ {
 
-class AbstractCredentials : GLib.Object {
-
-    protected Account account = null;
-    protected bool was_fetched = false;
-
-
-    /***********************************************************
-    Emitted when fetch_from_keychain () is done.
-
-    Note that ready () can be true or false, depending on
-    whether there was useful data in the keychain.
-    ***********************************************************/
-    signal void fetched ();
-
-
-    /***********************************************************
-    Emitted when ask_from_user () is done.
-
-    Note that ready () can be true or false, depending on
-    whether the user provided data or not.
-    ***********************************************************/
-    signal void asked ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    public AbstractCredentials ();
-    AbstractCredentials.AbstractCredentials () = default;
-
-
-    /***********************************************************
-    No need for virtual destructor - GLib.Object already has one.
-    ***********************************************************/
+abstract class AbstractCredentials : GLib.Object {
 
     /***********************************************************
     The bound account for the credentials instance.
@@ -52,46 +20,64 @@ class AbstractCredentials : GLib.Object {
     Credentials are always used in conjunction with an account.
     Calling Account.credentials () will call this function.
     Credentials only live as long as the underlying account object.
+
+
+    ENFORCE (!this.account, "should only set account once");
     ***********************************************************/
-    public virtual void account (Account account) {
-        ENFORCE (!this.account, "should only account once");
-        this.account = account;
+    Account account { protected get; public set; }
+
+    /***********************************************************
+    Whether fetch_from_keychain () was called before.
+    ***********************************************************/
+    bool was_fetched { public get; protected set; }
+
+    /***********************************************************
+    ***********************************************************/
+    string auth_type { public get; protected set; }
+
+    /***********************************************************
+    ***********************************************************/
+    string user { public get; protected set; }
+
+    /***********************************************************
+    Emitted when fetch_from_keychain () is done.
+
+    Note that ready () can be true or false, depending on
+    whether there was useful data in the keychain.
+    ***********************************************************/
+    protected signal void fetched ();
+
+    /***********************************************************
+    Emitted when ask_from_user () is done.
+
+    Note that ready () can be true or false, depending on
+    whether the user provided data or not.
+    ***********************************************************/
+    protected signal void asked ();
+
+    /***********************************************************
+    ***********************************************************/
+    protected AbstractCredentials () {
+        base ();
+        this.was_fetched = false;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public virtual string auth_type ();
+    public abstract string password ();
 
 
     /***********************************************************
     ***********************************************************/
-    public virtual string user ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    public virtual string password ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    public virtual QNetworkAccessManager create_qnam ();
+    public abstract QNetworkAccessManager create_qnam ();
 
 
     /***********************************************************
     Whether there are credentials that can be used for a
     connection attempt.
     ***********************************************************/
-    public virtual bool ready ();
-
-
-    /***********************************************************
-    Whether fetch_from_keychain () was called before.
-    ***********************************************************/
-    public bool was_fetched () {
-        return this.was_fetched;
-    }
+    public abstract bool ready ();
 
 
     /***********************************************************
@@ -100,7 +86,7 @@ class AbstractCredentials : GLib.Object {
     Should set this.was_fetched = true, and later emit
     fetched () when done.
     ***********************************************************/
-    public virtual void fetch_from_keychain ();
+    public abstract void fetch_from_keychain ();
 
 
     /***********************************************************
@@ -108,17 +94,17 @@ class AbstractCredentials : GLib.Object {
 
     Should emit asked () when done.
     ***********************************************************/
-    public virtual void ask_from_user ();
+    public abstract void ask_from_user ();
 
 
     /***********************************************************
     ***********************************************************/
-    public virtual bool still_valid (Soup.Reply reply);
+    public abstract bool still_valid (Soup.Reply reply);
 
 
     /***********************************************************
     ***********************************************************/
-    public virtual void persist ();
+    public abstract void persist ();
 
 
     /***********************************************************
@@ -132,8 +118,7 @@ class AbstractCredentials : GLib.Object {
 
     ready () must return false afterwards.
     ***********************************************************/
-    public virtual void invalidate_token ();
-
+    public abstract void invalidate_token ();
 
     /***********************************************************
     Clears out all sensitive data; used for fully signing out users.
@@ -142,29 +127,28 @@ class AbstractCredentials : GLib.Object {
 
     For http auth, this would clear the session cookie and password.
     ***********************************************************/
-    public virtual void forget_sensitive_data ();
-
+    public abstract void forget_sensitive_data ();
 
     /***********************************************************
     ***********************************************************/
     public static string keychain_key (string url, string user, string account_id) {
-        string u (url);
-        if (u.is_empty ()) {
-            GLib.warning ("Empty url in key_chain, error!";
+        if (url == "") {
+            GLib.warning ("Empty url in keychain, error!");
             return "";
         }
-        if (user.is_empty ()) {
-            GLib.warning ("Error : User is empty!";
+        if (user == "") {
+            GLib.warning ("Error: User is empty!");
             return "";
         }
 
-        if (!u.ends_with (char ('/'))) {
-            u.append (char ('/'));
+        string url_copy = url;
+        if (!url.has_suffix ("/")) {
+            url_copy += "/";
         }
 
-        string key = user + ':' + u;
-        if (!account_id.is_empty ()) {
-            key += ':' + account_id;
+        string key = user + ":" + url_copy;
+        if (account_id != "") {
+            key += ":" + account_id;
         }
         return key;
     }
@@ -173,7 +157,7 @@ class AbstractCredentials : GLib.Object {
     /***********************************************************
     If the job need to be restarted or queue, this does it and returns true.
     ***********************************************************/
-    public virtual bool retry_if_needed (AbstractNetworkJob *) {
+    public virtual bool retry_if_needed (AbstractNetworkJob job) {
         return false;
     }
 

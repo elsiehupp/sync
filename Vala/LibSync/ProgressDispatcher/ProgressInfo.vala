@@ -279,7 +279,7 @@ class ProgressInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    GLib.HashMap<string, ProgressItem> current_items;
+    GLib.HashTable<string, ProgressItem> current_items;
 
     /***********************************************************
     ***********************************************************/
@@ -327,11 +327,6 @@ class ProgressInfo : GLib.Object {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    Status status () {
-        return this.status;
-    }
 
 
     /***********************************************************
@@ -550,7 +545,7 @@ class ProgressInfo : GLib.Object {
     /***********************************************************
     Get the current file completion estimate structure
     ***********************************************************/
-    Estimates file_progress (SyncFileItem item) {
+    Estimates file_progress_for_item (SyncFileItem item) {
         return this.current_items[item.file].progress.estimates ();
     }
 

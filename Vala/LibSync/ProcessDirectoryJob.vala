@@ -175,12 +175,12 @@ class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     Holds entries that resulted from a NORMAL_QUERY
     ***********************************************************/
-    private GLib.Vector<RemoteInfo> server_normal_query_entries;
+    private GLib.List<RemoteInfo> server_normal_query_entries;
 
     /***********************************************************
     Holds entries that resulted from a NORMAL_QUERY
     ***********************************************************/
-    private GLib.Vector<LocalInfo> local_normal_query_entries;
+    private GLib.List<LocalInfo> local_normal_query_entries;
 
     /***********************************************************
     Whether the local/remote directory item queries are done.
@@ -228,7 +228,7 @@ class ProcessDirectoryJob : GLib.Object {
     The jobs are enqueued while processind directory entries and
     then gradually run via calls to process_sub_jobs ().
     ***********************************************************/
-    private GLib.Vector<ProcessDirectoryJob> running_jobs;
+    private GLib.List<ProcessDirectoryJob> running_jobs;
 
     /***********************************************************
     ***********************************************************/
@@ -258,7 +258,7 @@ class ProcessDirectoryJob : GLib.Object {
     This directory is encrypted or is within the tree of
     directories with root directory encrypted
     ***********************************************************/
-    private bool is_inside_encrypted_tree = false;
+    public bool is_inside_encrypted_tree = false;
 
     /***********************************************************
     ***********************************************************/
@@ -266,7 +266,7 @@ class ProcessDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    signal void on_signal_finished ();
+    signal void signal_finished ();
 
     /***********************************************************
     The root etag of this directory was fetched
@@ -383,23 +383,11 @@ class ProcessDirectoryJob : GLib.Object {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public void inside_encrypted_tree (bool is_inside_encrypted_tree) {
-        this.is_inside_encrypted_tree = is_inside_encrypted_tree;
-    }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool is_inside_encrypted_tree () {
-        return this.is_inside_encrypted_tree;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private bool check_for_invalid_filename (PathTuple path, GLib.HashMap<string, Entries> entries, Entries entry) {
+    private bool check_for_invalid_filename (PathTuple path, GLib.HashTable<string, Entries> entries, Entries entry) {
         var original_filename = entry.local_entry.name;
         var new_filename = original_filename.trimmed ();
 
@@ -457,7 +445,7 @@ class ProcessDirectoryJob : GLib.Object {
         // However, if foo and foo.owncloud exists locally, there'll be "foo"
         // with local, database, server entries and "foo.owncloud" with only a local
         // entry.
-        GLib.HashMap<string, Entries> entries;
+        GLib.HashTable<string, Entries> entries;
         foreach (var e in this.server_normal_query_entries) {
             entries[e.name].server_entry = std.move (e);
         }
@@ -542,7 +530,7 @@ class ProcessDirectoryJob : GLib.Object {
             // On the server the path is mangled in case of E2EE
             if (!e.server_entry.e2e_mangled_name.is_empty ()) {
                 //  Q_ASSERT (this.discovery_data.remote_folder.starts_with ('/'));
-                //  Q_ASSERT (this.discovery_data.remote_folder.ends_with ('/'));
+                //  Q_ASSERT (this.discovery_data.remote_folder.has_suffix ('/'));
 
                 var root_path = this.discovery_data.remote_folder.mid (1);
                 //  Q_ASSERT (e.server_entry.e2e_mangled_name.starts_with (root_path));
@@ -639,7 +627,7 @@ class ProcessDirectoryJob : GLib.Object {
                 item.error_string = _("File is listed on the ignore list.");
                 break;
             case CSYNC_FILE_EXCLUDE_INVALID_CHAR:
-                if (item.file.ends_with ('.')) {
+                if (item.file.has_suffix ('.')) {
                     item.error_string = _("File names ending with a period are not supported on this file system.");
                 } else {
                     char invalid = '\0';
@@ -813,7 +801,7 @@ class ProcessDirectoryJob : GLib.Object {
             }
 
             //  Q_ASSERT (this.discovery_data.remote_folder.starts_with ('/'));
-            //  Q_ASSERT (this.discovery_data.remote_folder.ends_with ('/'));
+            //  Q_ASSERT (this.discovery_data.remote_folder.has_suffix ('/'));
 
             var root_path = this.discovery_data.remote_folder.mid (1);
             //  Q_ASSERT (server_entry.e2e_mangled_name.starts_with (root_path));
@@ -1310,7 +1298,7 @@ class ProcessDirectoryJob : GLib.Object {
 
                 // Checksum comparison at this stage is only enabled for .eml files,
                 // check #4754 #4755
-                bool is_eml_file = path.original.ends_with (QLatin1String (".eml"), Qt.CaseInsensitive);
+                bool is_eml_file = path.original.has_suffix (QLatin1String (".eml"), Qt.CaseInsensitive);
                 if (is_eml_file && db_entry.file_size == local_entry.size && !db_entry.checksum_header.is_empty ()) {
                     if (compute_local_checksum (db_entry.checksum_header, this.discovery_data.local_dir + path.local, item)
                             && item.checksum_header == db_entry.checksum_header) {
@@ -1719,7 +1707,7 @@ class ProcessDirectoryJob : GLib.Object {
         if (recurse) {
             var job = new ProcessDirectoryJob (path, item, recurse_query_local, recurse_query_server,
                 this.last_sync_timestamp, this);
-            job.inside_encrypted_tree (is_inside_encrypted_tree () || item.is_encrypted);
+            job.is_inside_encrypted_tree (is_inside_encrypted_tree () || item.is_encrypted);
             if (removed) {
                 job.parent (this.discovery_data);
                 this.discovery_data.queued_deleted_directories[path.original] = job;
@@ -1937,7 +1925,7 @@ class ProcessDirectoryJob : GLib.Object {
     private bool has_virtual_file_suffix (string string_value) {
         if (!is_vfs_with_suffix ())
             return false;
-        return string_value.ends_with (this.discovery_data.sync_options.vfs.file_suffix ());
+        return string_value.has_suffix (this.discovery_data.sync_options.vfs.file_suffix ());
     }
 
 
@@ -1970,7 +1958,7 @@ class ProcessDirectoryJob : GLib.Object {
         var server_job = new DiscoverySingleDirectoryJob (this.discovery_data.account,
             this.discovery_data.remote_folder + this.current_folder.server, this);
         if (!this.dir_item)
-            server_job.is_root_path (); // query the fingerprint on the root
+            server_job.is_root_path_true (); // query the fingerprint on the root
         connect (server_job, &DiscoverySingleDirectoryJob.etag, this, &ProcessDirectoryJob.etag);
         this.discovery_data.currently_active_jobs++;
         this.pending_async_jobs++;

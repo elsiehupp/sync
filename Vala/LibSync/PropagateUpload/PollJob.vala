@@ -26,7 +26,7 @@ class PollJob : AbstractNetworkJob {
     /***********************************************************
     Takes ownership of the device
     ***********************************************************/
-    public PollJob (AccountPointer account, string path, SyncFileItemPtr item,
+    public PollJob.for_account (AccountPointer account, string path, SyncFileItemPtr item,
         SyncJournalDb journal, string local_path, GLib.Object parent)
         : base (account, path, parent)
         this.journal (journal)

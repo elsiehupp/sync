@@ -10,7 +10,7 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public LockEncryptFolderApiJob (AccountPointer account, GLib.ByteArray file_identifier, GLib.Object parent = new GLib.Object ());
+    public LockEncryptFolderApiJob.for_account (AccountPointer account, GLib.ByteArray file_identifier, GLib.Object parent = new GLib.Object ());
 
     /***********************************************************
     ***********************************************************/
@@ -35,15 +35,15 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
     }
 
     void LockEncryptFolderApiJob.on_signal_start () {
-        Soup.Request reques;
-        reques.raw_header ("OCS-APIREQUEST", "true");
+        Soup.Request request;
+        request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
         query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (query);
 
         GLib.info ("locking the folder with identifier" + this.file_identifier + "as encrypted";
-        send_request ("POST", url, reques);
+        send_request ("POST", url, request);
         AbstractNetworkJob.on_signal_start ();
     }
 

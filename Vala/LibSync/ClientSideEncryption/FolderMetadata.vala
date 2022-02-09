@@ -4,15 +4,16 @@ class FolderMetadata {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Vector<EncryptedFile> files;
-    private GLib.HashMap<int, GLib.ByteArray> metadata_keys;
+    GLib.List<EncryptedFile> files { public get; private set; }
+
+    private GLib.HashTable<int, GLib.ByteArray> metadata_keys;
     private AccountPointer account;
-    private GLib.Vector<QPair<string, string>> sharing;
+    private GLib.List<QPair<string, string>> sharing;
 
 
     /***********************************************************
     ***********************************************************/
-    public FolderMetadata (AccountPointer account, GLib.ByteArray metadata = new GLib.ByteArray (), int status_code = -1) {
+    public FolderMetadata.for_account (AccountPointer account, GLib.ByteArray metadata = new GLib.ByteArray (), int status_code = -1) {
         this.account = account;
         if (metadata.is_empty () || status_code == 404) {
             GLib.info ("Setupping Empty Metadata";
@@ -147,14 +148,7 @@ class FolderMetadata {
 
 
     /***********************************************************
-    ***********************************************************/
-    public GLib.Vector<EncryptedFile> files () {
-        return this.files;
-    }
-
-
-    /***********************************************************
-    Use std.string and GLib.Vector internally on this class
+    Use std.string and GLib.List internally on this class
     to ease the port to Nlohmann Json API
     ***********************************************************/
     private void up_empty_metadata () {

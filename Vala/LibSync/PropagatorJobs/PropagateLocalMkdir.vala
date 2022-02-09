@@ -14,14 +14,18 @@ namespace Occ {
 class PropagateLocalMkdir : PropagateItemJob {
 
     /***********************************************************
+    Whether an existing file with the same name may be deleted before
+    creating the directory.
+
+    Default: false.
     ***********************************************************/
-    private bool delete_existing_file;
+    bool delete_existing_file { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    public PropagateLocalMkdir (OwncloudPropagator propagator, SyncFileItemPtr item)
-        : PropagateItemJob (propagator, item)
-        this.delete_existing_file (false) {
+    public PropagateLocalMkdir (OwncloudPropagator propagator, SyncFileItemPtr item) {
+        base (propagator, item);
+        this.delete_existing_file = false;
     }
 
 
@@ -32,17 +36,6 @@ class PropagateLocalMkdir : PropagateItemJob {
             return;
 
         start_local_mkdir ();
-    }
-
-
-    /***********************************************************
-    Whether an existing file with the same name may be deleted before
-    creating the directory.
-
-    Default: false.
-    ***********************************************************/
-    public void delete_existing_file (bool enabled) {
-        this.delete_existing_file = enabled;
     }
 
 

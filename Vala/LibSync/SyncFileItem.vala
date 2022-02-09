@@ -19,7 +19,7 @@ namespace Occ {
 class SyncFileItem {
 
     private class SyncFileItemPtr : unowned SyncFileItem { }
-    private class SyncFileItemVector : GLib.Vector<SyncFileItemPtr> { }
+    private class SyncFileItemVector : GLib.List<SyncFileItemPtr> { }
 
 
     /***********************************************************

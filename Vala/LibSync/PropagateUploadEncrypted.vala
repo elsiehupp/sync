@@ -32,11 +32,11 @@ class PropagateUploadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray folder_token;
+    GLib.ByteArray folder_token { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    private 
+    //  private 
 
     /***********************************************************
     ***********************************************************/
@@ -44,13 +44,16 @@ class PropagateUploadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private bool is_unlock_running = false;
-    private bool is_folder_locked = false;
+    bool is_unlock_running { public get; private set; }
+
+    /***********************************************************
+    ***********************************************************/
+    private bool is_folder_locked { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
     private GLib.ByteArray generated_key;
-    private GLib.ByteArray generated_iv;
+    private GLib.ByteArray generated_initialization_vector;
     private FolderMetadata metadata;
     private EncryptedFile encrypted_file;
     private string complete_filename;
@@ -60,11 +63,9 @@ class PropagateUploadEncrypted : GLib.Object {
     ***********************************************************/
     signal void finalized (string path, string filename, uint64 size);
 
-
     /***********************************************************
     ***********************************************************/
     signal void error ();
-
 
     /***********************************************************
     ***********************************************************/
@@ -72,33 +73,35 @@ class PropagateUploadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateUploadEncrypted (OwncloudPropagator propagator, string remote_parent_path, SyncFileItemPtr item, GLib.Object parent = new GLib.Object ())
+    public PropagateUploadEncrypted (OwncloudPropagator propagator, string remote_parent_path, SyncFileItemPtr item, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.propagator = propagator;
         this.remote_parent_path = remote_parent_path;
         this.item = item;
         this.metadata = null;
+        this.is_unlock_running = false;
+        this.is_folder_locked = false;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        var root_path = [=] () {
+        var root_path = () => {
             var result = this.propagator.remote_path ();
             if (result.starts_with ('/')) {
                 return result.mid (1);
             } else {
                 return result;
             }
-        } ();
-        var absolute_remote_parent_path = [=]{
+        };
+        var absolute_remote_parent_path = () => {
             var path = string (root_path + this.remote_parent_path);
-            if (path.ends_with ('/')) {
+            if (path.has_suffix ('/')) {
                 path.chop (1);
             }
             return path;
-        } ();
+        };
 
         /* If the file is in a encrypted folder, which we know, we wouldn't be here otherwise,
         we need to do the long road:
@@ -125,7 +128,7 @@ class PropagateUploadEncrypted : GLib.Object {
         //  ASSERT (!this.is_unlock_running);
 
         if (this.is_unlock_running) {
-            q_warning ("Double-call to unlock_folder.";
+            GLib.warning ("Double-call to unlock_folder.");
             return;
         }
 
@@ -154,23 +157,8 @@ class PropagateUploadEncrypted : GLib.Object {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public bool is_unlock_running () {
-        return this.is_unlock_running;
-    }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public bool is_folder_locked () { }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public const GLib.ByteArray folder_token () {
-        return this.folder_token;
-    }
 
 
     /***********************************************************
@@ -269,7 +257,7 @@ class PropagateUploadEncrypted : GLib.Object {
         // Find existing metadata for this file
         bool found = false;
         EncryptedFile encrypted_file;
-        const GLib.Vector<EncryptedFile> files = this.metadata.files ();
+        const GLib.List<EncryptedFile> files = this.metadata.files ();
 
         foreach (EncryptedFile file in files) {
             if (file.original_filename == filename) {

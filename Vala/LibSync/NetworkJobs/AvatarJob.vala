@@ -30,7 +30,7 @@ class AvatarJob : AbstractNetworkJob {
     @param user_id The user for which to obtain the avatar
     @param size The size of the avatar (square so size * size)
     ***********************************************************/
-    public AvatarJob (AccountPointer account, string user_id, int size, GLib.Object parent = new GLib.Object ()) {
+    public AvatarJob.for_account (AccountPointer account, string user_id, int size, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         if (account.server_version_int () >= Account.make_server_version (10, 0, 0)) {
             this.avatar_url = Utility.concat_url_path (account.url (), string ("remote.php/dav/avatars/%1/%2.png").arg (user_id, string.number (size)));
@@ -43,8 +43,8 @@ class AvatarJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        Soup.Request reques;
-        send_request ("GET", this.avatar_url, reques);
+        Soup.Request request;
+        send_request ("GET", this.avatar_url, request);
         AbstractNetworkJob.on_signal_start ();
     }
 

@@ -86,20 +86,19 @@ class SyncOptions {
     /***********************************************************
     Only sync files that match the expression
     Invalid pattern by default.
+    A regular expression to match file names
+    If no pattern is provided the default is an invalid regular
+    expression.
     ***********************************************************/
-    private QRegularExpression file_regex = QRegularExpression ("(");
+    QRegularExpression file_regex { public get; private set; }
 
 
     /***********************************************************
     ***********************************************************/
     public SyncOptions () {
         this.vfs = new VfsOff ();
+        this.file_regex = QRegularExpression ("(");
     }
-
-
-    /***********************************************************
-    ***********************************************************/
-    ~SyncOptions () = default;
 
 
     /***********************************************************
@@ -146,16 +145,6 @@ class SyncOptions {
     public void verify_chunk_sizes () {
         this.min_chunk_size = q_min (this.min_chunk_size, this.initial_chunk_size);
         this.max_chunk_size = q_max (this.max_chunk_size, this.initial_chunk_size);
-    }
-
-
-    /***********************************************************
-    A regular expression to match file names
-    If no pattern is provided the default is an invalid regular
-    expression.
-    ***********************************************************/
-    public QRegularExpression file_regex () {
-        return this.file_regex;
     }
 
 

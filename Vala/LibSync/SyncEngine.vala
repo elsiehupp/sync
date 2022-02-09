@@ -77,31 +77,32 @@ class SyncEngine : GLib.Object {
     /***********************************************************
     Must only be acessed during update and reconcile
     ***********************************************************/
-    private GLib.Vector<SyncFileItemPtr> sync_items;
+    private GLib.List<SyncFileItemPtr> sync_items;
 
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer account;
+    AccountPointer account { public get; private set; }
+
     private bool needs_update;
     private bool sync_running;
-    private string local_path;
+    string local_path { public get; private set; }
     private string remote_path;
     private GLib.ByteArray remote_root_etag;
-    private SyncJournalDb journal;
+    SyncJournalDb journal { public get; private set; }
     private QScopedPointer<DiscoveryPhase> discovery_phase;
     private unowned OwncloudPropagator propagator;
 
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Set<string> bulk_upload_block_list;
+    private GLib.List<string> bulk_upload_block_list;
 
 
     /***********************************************************
     List of all files with conflicts
     ***********************************************************/
-    private GLib.Set<string> seen_conflict_files;
+    private GLib.List<string> seen_conflict_files;
 
 
     /***********************************************************
@@ -111,9 +112,9 @@ class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<ExcludedFiles> excluded_files;
-    private QScopedPointer<SyncFileStatusTracker> sync_file_status_tracker;
-    private Utility.StopWatch stop_watch;
+    private QScopedPointer<ExcludedFiles> excluded_files { public get; private set; }
+    QScopedPointer<SyncFileStatusTracker> sync_file_status_tracker { public get; private set; }
+    Utility.StopWatch stop_watch { public get; private set; }
 
 
     /***********************************************************
@@ -132,14 +133,14 @@ class SyncEngine : GLib.Object {
     /***********************************************************
     If ignored files should be ignored
     ***********************************************************/
-    private bool ignore_hidden_files = false;
+    public bool ignore_hidden_files = false;
 
 
     /***********************************************************
     ***********************************************************/
     private int upload_limit;
     private int download_limit;
-    private SyncOptions sync_options;
+    public SyncOptions sync_options;
 
 
     /***********************************************************
@@ -167,15 +168,17 @@ class SyncEngine : GLib.Object {
     /***********************************************************
     List of unique errors that occurred in a sync run.
     ***********************************************************/
-    private GLib.Set<string> unique_errors;
+    private GLib.List<string> unique_errors;
 
 
     /***********************************************************
     The kind of local discovery the last sync run used
+    Access the last sync run's local discovery style
     ***********************************************************/
-    private LocalDiscoveryStyle last_local_discovery_style = LocalDiscoveryStyle.FILESYSTEM_ONLY;
-    private LocalDiscoveryStyle local_discovery_style = LocalDiscoveryStyle.FILESYSTEM_ONLY;
-    private GLib.Set<string> local_discovery_paths;
+    DiscoveryPhase.LocalDiscoveryStyle last_local_discovery_style { public get; private set; }
+
+    private DiscoveryPhase.LocalDiscoveryStyle local_discovery_style = DiscoveryPhase.LocalDiscoveryStyle.FILESYSTEM_ONLY;
+    private GLib.List<string> local_discovery_paths;
     /***********************************************************
     When the client touches a file, block change notifications
     for this duration (ms)
@@ -268,7 +271,7 @@ class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public SyncEngine (AccountPointer account, string local_path,
+    public SyncEngine.for_account (AccountPointer account, string local_path,
         string remote_path, SyncJournalDb journal) {
         this.account = account;
         this.needs_update = false;
@@ -282,6 +285,7 @@ class SyncEngine : GLib.Object {
         this.upload_limit = 0;
         this.download_limit = 0;
         this.another_sync_needed = AnotherSyncNeeded.NO_FOLLOW_UP_SYNC;
+        this.last_local_discovery_style = DiscoveryPhase.LocalDiscoveryStyle.FILESYSTEM_ONLY;
         q_register_meta_type<SyncFileItem> ("SyncFileItem");
         q_register_meta_type<SyncFileItemPtr> ("SyncFileItemPtr");
         q_register_meta_type<SyncFileItem.Status> ("SyncFileItem.Status");
@@ -290,7 +294,7 @@ class SyncEngine : GLib.Object {
         q_register_meta_type<SyncFileItem.Direction> ("SyncFileItem.Direction");
 
         // Everything in the SyncEngine expects a trailing slash for the local_path.
-        //  ASSERT (local_path.ends_with ('/'));
+        //  ASSERT (local_path.has_suffix ('/'));
 
         this.excluded_files.on_signal_reset (new ExcludedFiles (local_path));
 
@@ -315,7 +319,7 @@ class SyncEngine : GLib.Object {
     ***********************************************************/
     public void on_signal_start_sync () {
         if (this.journal.exists ()) {
-            GLib.Vector<SyncJournalDb.PollInfo> poll_infos = this.journal.get_poll_infos ();
+            GLib.List<SyncJournalDb.PollInfo> poll_infos = this.journal.get_poll_infos ();
             if (!poll_infos.is_empty ()) {
                 GLib.info ("Finish Poll jobs before starting a sync");
                 var job = new CleanupPollsJob (poll_infos, this.account,
@@ -445,10 +449,10 @@ class SyncEngine : GLib.Object {
         }
         this.discovery_phase.statedatabase = this.journal;
         this.discovery_phase.local_dir = this.local_path;
-        if (!this.discovery_phase.local_dir.ends_with ('/'))
+        if (!this.discovery_phase.local_dir.has_suffix ('/'))
             this.discovery_phase.local_dir+='/';
         this.discovery_phase.remote_folder = this.remote_path;
-        if (!this.discovery_phase.remote_folder.ends_with ('/'))
+        if (!this.discovery_phase.remote_folder.has_suffix ('/'))
             this.discovery_phase.remote_folder+='/';
         this.discovery_phase.sync_options = this.sync_options;
         this.discovery_phase.should_discover_localy = [this] (string s) {
@@ -544,49 +548,6 @@ class SyncEngine : GLib.Object {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public SyncOptions sync_options () {
-        return this.sync_options;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void sync_options (SyncOptions options) { }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool ignore_hidden_files () {
-        return this.ignore_hidden_files;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void ignore_hidden_files (bool ignore) {
-        this.ignore_hidden_files = ignore;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public ExcludedFiles excluded_files () {
-        return this.excluded_files;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public Utility.StopWatch stop_watch () { }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public SyncFileStatusTracker sync_file_status_tracker () {
-        return this.sync_file_status_tracker;
-    }
 
 
     /***********************************************************
@@ -611,27 +572,6 @@ class SyncEngine : GLib.Object {
 
 
     /***********************************************************
-    ***********************************************************/
-    public AccountPointer account () {
-        return this.account;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public SyncJournalDb journal () {
-        return this.journal;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string local_path () {
-        return this.local_path;
-    }
-
-
-    /***********************************************************
     Control whether local discovery should read from filesystem
     or database.
 
@@ -644,7 +584,7 @@ class SyncEngine : GLib.Object {
     this.last_local_discovery_style to discover the last
     sync's style.
     ***********************************************************/
-    public void local_discovery_options (LocalDiscoveryStyle style, GLib.Set<string> paths) {
+    public void local_discovery_options (DiscoveryPhase.LocalDiscoveryStyle style, GLib.List<string> paths) {
         this.local_discovery_style = style;
         this.local_discovery_paths = std.move (paths);
 
@@ -656,7 +596,7 @@ class SyncEngine : GLib.Object {
         string prev;
         var it = this.local_discovery_paths.begin ();
         while (it != this.local_discovery_paths.end ()) {
-            if (!prev.is_null () && it.starts_with (prev) && (prev.ends_with ('/') || *it == prev || it.at (prev.size ()) <= '/')) {
+            if (!prev.is_null () && it.starts_with (prev) && (prev.has_suffix ('/') || *it == prev || it.at (prev.size ()) <= '/')) {
                 it = this.local_discovery_paths.erase (it);
             } else {
                 prev = *it;
@@ -675,7 +615,7 @@ class SyncEngine : GLib.Object {
     'foo/bar/touched_file', then the result will be true.
     ***********************************************************/
     public bool should_discover_locally (string path) {
-        if (this.local_discovery_style == LocalDiscoveryStyle.FILESYSTEM_ONLY)
+        if (this.local_discovery_style == DiscoveryPhase.LocalDiscoveryStyle.FILESYSTEM_ONLY)
             return true;
 
         // The intention is that if "A/X" is in this.local_discovery_paths:
@@ -690,7 +630,7 @@ class SyncEngine : GLib.Object {
         if (it == this.local_discovery_paths.end () || !it.starts_with (path)) {
             // Maybe a subfolder of something in the list?
             if (it != this.local_discovery_paths.begin () && path.starts_with (* (--it))) {
-                return it.ends_with ('/') || (path.size () > it.size () && path.at (it.size ()) <= '/');
+                return it.has_suffix ('/') || (path.size () > it.size () && path.at (it.size ()) <= '/');
             }
             return false;
         }
@@ -712,12 +652,6 @@ class SyncEngine : GLib.Object {
     }
 
 
-    /***********************************************************
-    Access the last sync run's local discovery style
-    ***********************************************************/
-    public LocalDiscoveryStyle last_local_discovery_style () {
-        return this.last_local_discovery_style;
-    }
 
 
     /***********************************************************
@@ -1282,7 +1216,7 @@ class SyncEngine : GLib.Object {
     ***********************************************************/
     private void delete_stale_download_infos (SyncFileItemVector sync_items) {
         // Find all downloadinfo paths that we want to preserve.
-        GLib.Set<string> download_file_paths;
+        GLib.List<string> download_file_paths;
         foreach (SyncFileItemPtr it in sync_items) {
             if (it.direction == SyncFileItem.Direction.DOWN
                 && it.type == ItemTypeFile
@@ -1292,7 +1226,7 @@ class SyncEngine : GLib.Object {
         }
 
         // Delete from journal and from filesystem.
-        const GLib.Vector<SyncJournalDb.DownloadInfo> deleted_infos =
+        const GLib.List<SyncJournalDb.DownloadInfo> deleted_infos =
             this.journal.get_and_delete_stale_download_infos (download_file_paths);
         foreach (SyncJournalDb.DownloadInfo deleted_info in deleted_infos) {
             const string temporary_path = this.propagator.full_local_path (deleted_info.tmpfile);
@@ -1307,7 +1241,7 @@ class SyncEngine : GLib.Object {
     ***********************************************************/
     private void delete_stale_upload_infos (SyncFileItemVector sync_items) {
         // Find all blocklisted paths that we want to preserve.
-        GLib.Set<string> upload_file_paths;
+        GLib.List<string> upload_file_paths;
         foreach (SyncFileItemPtr it in sync_items) {
             if (it.direction == SyncFileItem.Direction.UP
                 && it.type == ItemTypeFile
@@ -1321,10 +1255,10 @@ class SyncEngine : GLib.Object {
 
         // Delete the stales chunk on the server.
         if (account ().capabilities ().chunking_ng ()) {
-            foreach (uint32 transfer_id in ids) {
-                if (!transfer_id)
+            foreach (uint32 transfer_identifier in ids) {
+                if (!transfer_identifier)
                     continue; // Was not a chunked upload
-                GLib.Uri url = Utility.concat_url_path (account ().url (), QLatin1String ("remote.php/dav/uploads/") + account ().dav_user () + '/' + string.number (transfer_id));
+                GLib.Uri url = Utility.concat_url_path (account ().url (), QLatin1String ("remote.php/dav/uploads/") + account ().dav_user () + '/' + string.number (transfer_identifier));
                 (new DeleteJob (account (), url, this)).on_signal_start ();
             }
         }
@@ -1336,7 +1270,7 @@ class SyncEngine : GLib.Object {
     ***********************************************************/
     private void delete_stale_error_blocklist_entries (SyncFileItemVector sync_items) {
         // Find all blocklisted paths that we want to preserve.
-        GLib.Set<string> blocklist_file_paths;
+        GLib.List<string> blocklist_file_paths;
         foreach (SyncFileItemPtr it in sync_items) {
             if (it.has_blocklist_entry)
                 blocklist_file_paths.insert (it.file);
@@ -1415,7 +1349,7 @@ class SyncEngine : GLib.Object {
         this.seen_conflict_files.clear ();
         this.unique_errors.clear ();
         this.local_discovery_paths.clear ();
-        this.local_discovery_style = LocalDiscoveryStyle.FILESYSTEM_ONLY;
+        this.local_discovery_style = DiscoveryPhase.LocalDiscoveryStyle.FILESYSTEM_ONLY;
 
         this.clear_touched_files_timer.on_signal_start ();
     }

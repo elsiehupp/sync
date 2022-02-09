@@ -22,7 +22,7 @@ class IconJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public IconJob (AccountPointer account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
+    public IconJob.for_account (AccountPointer account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         Soup.Request request (url);
     // #if (QT_VERSION >= 0x050600)

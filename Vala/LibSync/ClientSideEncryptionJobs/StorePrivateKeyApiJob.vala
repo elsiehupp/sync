@@ -23,7 +23,7 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public StorePrivateKeyApiJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
+    public StorePrivateKeyApiJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
 
 
     /***********************************************************
@@ -65,15 +65,15 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
     }
 
     void StorePrivateKeyApiJob.on_signal_start () {
-        Soup.Request reques;
-        reques.raw_header ("OCS-APIREQUEST", "true");
+        Soup.Request request;
+        request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
         query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (query);
 
         GLib.info ("Sending the private key" + this.priv_key.data ();
-        send_request ("POST", url, reques, this.priv_key);
+        send_request ("POST", url, request, this.priv_key);
         AbstractNetworkJob.on_signal_start ();
     }
 

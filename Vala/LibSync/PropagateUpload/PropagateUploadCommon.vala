@@ -59,7 +59,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
     /***********************************************************
     Network jobs that are currently in transit
     ***********************************************************/
-    protected GLib.Vector<AbstractNetworkJob> jobs;
+    protected GLib.List<AbstractNetworkJob> jobs;
 
     /***********************************************************
     Tells that all the jobs have been finished
@@ -67,7 +67,15 @@ class PropagateUploadFileCommon : PropagateItemJob {
     protected bool finished = BITFIELD (1);
 
 
-    protected bool delete_existing = BITFIELD (1);
+    /***********************************************************
+    Whether an existing entity with the same name may be deleted before
+    the upload.
+
+    delete_existing = BITFIELD (1);
+
+    Default: false.
+    ***********************************************************/
+    bool delete_existing { public get; protected set; }
 
 
     /***********************************************************
@@ -106,17 +114,6 @@ class PropagateUploadFileCommon : PropagateItemJob {
         if (!ok) {
             return;
         }
-    }
-
-
-    /***********************************************************
-    Whether an existing entity with the same name may be deleted before
-    the upload.
-
-    Default: false.
-    ***********************************************************/
-    public void delete_existing (bool enabled) {
-        this.delete_existing = enabled;
     }
 
 
@@ -463,7 +460,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
     void PropagateUploadFileCommon.abort_with_error (SyncFileItem.Status status, string error) {
         if (this.aborting)
             return;
-        on_signal_abort (AbortType.SYNCHRONOUS);
+        on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
         on_signal_done (status, error);
     }
 
@@ -551,7 +548,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
     returns false on and, for async aborts, emits abort_finished when done.
     ***********************************************************/
     protected void abort_network_jobs (
-        AbortType abort_type,
+        PropagatorJob.AbortType abort_type,
         std.function<bool (AbstractNetworkJob job)> may_abort_job) {
         if (this.aborting)
             return;
@@ -584,14 +581,14 @@ class PropagateUploadFileCommon : PropagateItemJob {
                 continue;
 
             // Abort the job
-            if (abort_type == AbortType.ASYNCHRONOUS) {
+            if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
                 // Connect to on_signal_finished signal of job reply to asynchonously finish the on_signal_abort
                 connect (reply, &Soup.Reply.on_signal_finished, this, one_abort_finished);
             }
             reply.on_signal_abort ();
         }
 
-        if (*running_count == 0 && abort_type == AbortType.ASYNCHRONOUS)
+        if (*running_count == 0 && abort_type == PropagatorJob.AbortType.ASYNCHRONOUS)
             /* emit */ abort_finished ();
     }
 
@@ -692,8 +689,8 @@ class PropagateUploadFileCommon : PropagateItemJob {
     /***********************************************************
     Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng
     ***********************************************************/
-    protected GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers () {
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
+    protected GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers () {
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
         headers[QByteArrayLiteral ("Content-Type")] = QByteArrayLiteral ("application/octet-stream");
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {

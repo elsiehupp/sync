@@ -157,7 +157,7 @@ class ConfigFile {
         }
         string dir = this.conf_dir;
 
-        if (!dir.ends_with ('/'))
+        if (!dir.has_suffix ('/'))
             dir.append ('/');
         return dir;
     }
@@ -472,7 +472,7 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public string log_dir () {
+    public string log_directory () {
         var default_log_dir = string (config_path () + QStringLiteral ("/logs"));
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         return settings.value (QLatin1String (LOG_DIR_C), default_log_dir).to_string ();
@@ -481,7 +481,7 @@ class ConfigFile {
 
     /***********************************************************
     ***********************************************************/
-    public void log_dir (string dir) {
+    public void log_directory (string dir) {
         QSettings settings = new QSettings (config_file (), QSettings.IniFormat);
         settings.value (QLatin1String (LOG_DIR_C), dir);
     }

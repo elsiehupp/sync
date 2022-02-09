@@ -12,18 +12,18 @@ namespace Occ {
 @ingroup libsync
 ***********************************************************/
 class CleanupPollsJob : GLib.Object {
-    GLib.Vector<SyncJournalDb.PollInfo> poll_infos;
+    GLib.List<SyncJournalDb.PollInfo> poll_infos;
     AccountPointer account;
     SyncJournalDb journal;
     string local_path;
     unowned Vfs vfs;
 
-    signal void on_signal_finished ();
+    signal void signal_finished ();
     signal void aborted (string error);
 
     /***********************************************************
     ***********************************************************/
-    public CleanupPollsJob (GLib.Vector<SyncJournalDb.PollInfo> poll_infos, AccountPointer account, SyncJournalDb journal, string local_path,
+    public CleanupPollsJob (GLib.List<SyncJournalDb.PollInfo> poll_infos, AccountPointer account, SyncJournalDb journal, string local_path,
         unowned Vfs vfs, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.poll_infos = poll_infos;

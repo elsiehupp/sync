@@ -22,7 +22,7 @@ class DiscoverySingleLocalDirectoryJob : GLib.Object, QRunnable {
     private Occ.Vfs vfs;
 
 
-    signal void on_signal_finished (GLib.Vector<LocalInfo> result);
+    signal void signal_finished (GLib.List<LocalInfo> result);
     signal void finished_fatal_error (string error_string);
     signal void finished_non_fatal_error (string error_string);
 
@@ -31,12 +31,12 @@ class DiscoverySingleLocalDirectoryJob : GLib.Object, QRunnable {
 
     /***********************************************************
     ***********************************************************/
-    public DiscoverySingleLocalDirectoryJob (AccountPointer account, string local_path, Occ.Vfs vfs, GLib.Object parent = new GLib.Object ()) {
+    public DiscoverySingleLocalDirectoryJob.for_account (AccountPointer account, string local_path, Occ.Vfs vfs, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.local_path = local_path;
         this.account = account;
         this.vfs = vfs;
-        q_register_meta_type<GLib.Vector<LocalInfo> > ("GLib.Vector<LocalInfo>");
+        q_register_meta_type<GLib.List<LocalInfo> > ("GLib.List<LocalInfo>");
     }
 
 
@@ -45,7 +45,7 @@ class DiscoverySingleLocalDirectoryJob : GLib.Object, QRunnable {
     ***********************************************************/
     public void run () {
         string local_path = this.local_path;
-        if (local_path.ends_with ('/')) // Happens if this.current_folder.local.is_empty ()
+        if (local_path.has_suffix ('/')) // Happens if this.current_folder.local.is_empty ()
             local_path.chop (1);
 
         var dh = csync_vio_local_opendir (local_path);
@@ -67,7 +67,7 @@ class DiscoverySingleLocalDirectoryJob : GLib.Object, QRunnable {
             return;
         }
 
-        GLib.Vector<LocalInfo> results;
+        GLib.List<LocalInfo> results;
         while (true) {
             errno = 0;
             var dirent = csync_vio_local_readdir (dh, this.vfs);

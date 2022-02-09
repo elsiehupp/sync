@@ -18,7 +18,7 @@
 //  #include <QJsonObject>
 //  #include <QXmlStreamReader>
 //  #include <QXmlStreamNamespaceDeclaration>
-//  #include <QStack>
+//  #include <GLib.List>
 //  #include <QInputDialog>
 //  #include <QLineEdit>
 //  #include <QIODevice>
@@ -164,12 +164,12 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void generate_csr (AccountPointer account, EVP_PKEY key_pair) {
+    private void generate_csr.for_account (AccountPointer account, EVP_PKEY key_pair) {
         // OpenSSL expects const char.
         var cn_array = account.dav_user ().to_local8Bit ();
         GLib.info ("Getting the following array for the account Id" + cn_array;
 
-        var cert_params = GLib.HashMap<const char *, char> {
+        var cert_params = GLib.HashTable<const char *, char> {
             {"C", "DE"},
             {"ST", "Baden-Wuerttemberg"},
             {"L", "Stuttgart"},
@@ -180,7 +180,7 @@ class ClientSideEncryption : GLib.Object {
         int ret = 0;
         int n_version = 1;
 
-        // 2. set version of x509 reques
+        // 2. set version of x509 request
         X509_REQ *x509_req = X509_REQ_new ();
         var release_on_signal_exit_x509_req = q_scope_guard ([&] {
                     X509_REQ_free (x509_req);
@@ -188,7 +188,7 @@ class ClientSideEncryption : GLib.Object {
 
         ret = X509_REQ_version (x509_req, n_version);
 
-        // 3. set subject of x509 reques
+        // 3. set subject of x509 request
         var x509_name = X509_REQ_get_subject_name (x509_req);
 
         foreach (var& v in cert_params) {
@@ -291,13 +291,6 @@ class ClientSideEncryption : GLib.Object {
         start_delete_job (user + E2E_PRIVATE);
         start_delete_job (user + E2E_CERTIFICATE);
         start_delete_job (user + E2E_MNEMONIC);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool new_mnemonic_generated () {
-        return this.new_mnemonic_generated;
     }
 
 
@@ -490,7 +483,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void decrypt_private_key (AccountPointer account, GLib.ByteArray key) {
+    private void decrypt_private_key.for_account (AccountPointer account, GLib.ByteArray key) {
         string message = _("Please enter your end to end encryption passphrase:<br>"
                         "<br>"
                         "User : %2<br>"

@@ -44,7 +44,26 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    private UserStatus user_status;
+    UserStatus user_status {
+        public get {
+            return this.user_status;
+        }
+        public set {
+            if (!this.user_status_supported) {
+                /* emit */ error (Error.UserStatusNotSupported);
+                return;
+            }
+
+            if (this.online_status_job || this.message_job) {
+                GLib.debug ("Set online status job or set message job are already running.");
+                return;
+            }
+
+            user_status_online_status (value.state ());
+            user_status_message (value);
+        }
+    }
+
 
     /***********************************************************
     ***********************************************************/
@@ -83,22 +102,6 @@ class OcsUserStatusConnector : UserStatusConnector {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public void user_status (UserStatus user_status) {
-        if (!this.user_status_supported) {
-            /* emit */ error (Error.UserStatusNotSupported);
-            return;
-        }
-
-        if (this.online_status_job || this.message_job) {
-            GLib.debug ("Set online status job or set message job are already running.";
-            return;
-        }
-
-        user_status_online_status (user_status.state ());
-        user_status_message (user_status);
-    }
 
 
     /***********************************************************
@@ -108,13 +111,6 @@ class OcsUserStatusConnector : UserStatusConnector {
         this.clear_message_job.verb (JsonApiJob.Verb.DELETE);
         connect (this.clear_message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_signal_message_cleared);
         this.clear_message_job.on_signal_start ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public UserStatus user_status () {
-        return this.user_status;
     }
 
 
@@ -423,7 +419,7 @@ class OcsUserStatusConnector : UserStatusConnector {
             var days = Qt.Sunday - QDate.current_date ().day_of_week ();
             return QDate.current_date ().add_days (days + 1).start_of_day ().to_time_t ();
         }
-        GLib.warning ("Can not handle clear at endof day type" + clear_at.endof;
+        GLib.warn ("Can not handle clear at endof day type" + clear_at.endof;
         return GLib.DateTime.current_date_time ().to_time_t ();
     }
 
@@ -452,7 +448,7 @@ class OcsUserStatusConnector : UserStatusConnector {
     }
 
 
-    private static uint64 clear_at_to_timestamp (Occ.Optional<Occ.ClearAt> clear_at) {
+    private static uint64 clear_at_to_timestamp_optional (Occ.Optional<Occ.ClearAt> clear_at) {
         if (clear_at) {
             return clear_at_to_timestamp (*clear_at);
         }
@@ -476,7 +472,7 @@ class OcsUserStatusConnector : UserStatusConnector {
                 clear_at_value.type = Occ.ClearAtType.EndOf;
                 clear_at_value.endof = time_value;
             } else {
-                GLib.warning ("Can not handle clear type value" + type_value;
+                GLib.warn ("Can not handle clear type value" + type_value;
             }
             clear_at = clear_at_value;
         }

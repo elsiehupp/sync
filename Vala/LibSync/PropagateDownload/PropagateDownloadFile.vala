@@ -70,7 +70,18 @@ class PropagateDownloadFile : PropagateItemJob {
     private int64 download_progress;
     private QPointer<GETFileJob> job;
     private GLib.File tmp_file;
-    private bool delete_existing;
+
+    /***********************************************************
+    Whether an existing folder with the same name may be deleted before
+    the download.
+
+    If it's a non-empty folder, it'll be renamed to a confl
+    to preserve any non-synced content that may be inside.
+
+    Default: false.
+    ***********************************************************/
+    bool delete_existing { private get; public set; }
+
     private bool is_encrypted = false;
     private EncryptedFile encrypted_info;
     private ConflictRecord conflict_record;
@@ -168,20 +179,6 @@ class PropagateDownloadFile : PropagateItemJob {
         if (!propagator ().create_conflict (this.item, this.associated_composite, error)) {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, error);
         }
-    }
-
-
-    /***********************************************************
-    Whether an existing folder with the same name may be deleted before
-    the download.
-
-    If it's a non-empty folder, it'll be renamed to a confl
-    to preserve any non-synced content that may be inside.
-
-    Default: false.
-    ***********************************************************/
-    public void delete_existing_folder (bool enabled) {
-        this.delete_existing = enabled;
     }
 
 
@@ -306,7 +303,7 @@ class PropagateDownloadFile : PropagateItemJob {
             propagator ().journal.commit ("download file on_signal_start");
         }
 
-        GLib.HashMap<GLib.ByteArray, GLib.ByteArray> headers;
+        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
 
         if (this.item.direct_download_url.is_empty ()) {
             // Normal job, download from o_c instance
@@ -737,7 +734,7 @@ class PropagateDownloadFile : PropagateItemJob {
         // handle the special recall file
         if (!this.item.remote_perm.has_permission (RemotePermissions.IsShared)
             && (this.item.file == QLatin1String (".sys.admin#recall#")
-                || this.item.file.ends_with (QLatin1String ("/.sys.admin#recall#")))) {
+                || this.item.file.has_suffix (QLatin1String ("/.sys.admin#recall#")))) {
             handle_recall_file (fn, propagator ().local_path (), *propagator ().journal);
         }
 
@@ -754,7 +751,7 @@ class PropagateDownloadFile : PropagateItemJob {
         if (this.job && this.job.reply ())
             this.job.reply ().on_signal_abort ();
 
-        if (abort_type == AbortType.ASYNCHRONOUS) {
+        if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ abort_finished ();
         }
     }

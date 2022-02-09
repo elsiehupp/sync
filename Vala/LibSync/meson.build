@@ -113,9 +113,7 @@ srcs = files([
     'PropagateRemoteMove/PropagateRemoteMove.vala',
 
     'PropagateUpload/PollJob.vala',
-    'PropagateUpload/PropagateUploadFileCommon.vala',
-    'PropagateUpload/PropagateUploadFileNG.vala',
-    'PropagateUpload/PropagateUploadFileV1.vala',
+    'PropagateUpload/PropagateUploadCommon.vala',
     'PropagateUpload/PropagateUploadNg.vala',
     'PropagateUpload/PropagateUploadV1.vala',
     'PropagateUpload/PUTFileJob.vala',

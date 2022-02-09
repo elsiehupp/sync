@@ -77,7 +77,7 @@ class PropagateRemoteDelete : PropagateItemJob {
         if (this.job && this.job.reply ())
             this.job.reply ().on_signal_abort ();
 
-        if (abort_type == AbortType.ASYNCHRONOUS) {
+        if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ abort_finished ();
         }
     }

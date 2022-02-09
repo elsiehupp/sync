@@ -31,7 +31,18 @@ class ProgressDispatcher : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private QElapsedTimer timer;
-    private static ProgressDispatcher instance = null;
+    static ProgressDispatcher instance {
+        public get {
+            if (!this.instance) {
+                this.instance = new ProgressDispatcher ();
+            }
+            return this.instance;
+        }
+        private set {
+            this.instance = value;
+        }
+    }
+    //  this.instance = null;
 
 
     /***********************************************************
@@ -41,7 +52,7 @@ class ProgressDispatcher : GLib.Object {
     @param[out]  progress   A struct with all progress info.
 
     ***********************************************************/
-    signal void progress_info (string folder, ProgressInfo progress);
+    signal void signal_progress_info (string folder, ProgressInfo progress);
 
 
     /***********************************************************
@@ -79,14 +90,6 @@ class ProgressDispatcher : GLib.Object {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public static ProgressDispatcher instance () {
-        if (!this.instance) {
-            this.instance = new ProgressDispatcher ();
-        }
-        return this.instance;
-    }
 
 
     /***********************************************************
@@ -98,7 +101,7 @@ class ProgressDispatcher : GLib.Object {
         //             && progress.total_file_count == 0) ) {
             return;
         }
-        /* emit */ progress_info (folder, progress);
+        /* emit */ signal_progress_info (folder, progress);
     }
 
 

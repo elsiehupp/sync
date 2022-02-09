@@ -25,15 +25,15 @@ class EncryptFolderJob : GLib.Object {
     private string path;
     private GLib.ByteArray file_identifier;
     private GLib.ByteArray folder_token;
-    private string error_string;
+    string error_string { public get; protected set; }
 
 
-    signal void on_signal_finished (int status);
+    signal void signal_finished (int status);
 
 
     /***********************************************************
     ***********************************************************/
-    public EncryptFolderJob (AccountPointer account, SyncJournalDb journal, string path, GLib.ByteArray file_identifier, GLib.Object parent = new GLib.Object ()) {
+    public EncryptFolderJob.for_account (AccountPointer account, SyncJournalDb journal, string path, GLib.ByteArray file_identifier, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.journal = journal;
@@ -49,13 +49,6 @@ class EncryptFolderJob : GLib.Object {
         connect (job, &Occ.SetEncryptionFlagApiJob.on_signal_success, this, &EncryptFolderJob.on_signal_encryption_flag_success);
         connect (job, &Occ.SetEncryptionFlagApiJob.error, this, &EncryptFolderJob.on_signal_encryption_flag_error);
         job.on_signal_start ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string error_string () {
-        return this.error_string;
     }
 
 
