@@ -55,7 +55,7 @@ class LsColJob : AbstractNetworkJob {
         GLib.List<GLib.ByteArray> properties = this.properties;
 
         if (properties.is_empty ()) {
-            GLib.warning ("Propfind with no properties!";
+            GLib.warning ("Propfind with no properties!");
         }
         GLib.ByteArray prop_str;
         foreach (GLib.ByteArray prop in properties) {
@@ -74,11 +74,11 @@ class LsColJob : AbstractNetworkJob {
 
         Soup.Request request;
         request.raw_header ("Depth", "1");
-        GLib.ByteArray xml ("<?xml version=\"1.0\" ?>\n"
-                    "<d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\">\n"
-                    "  <d:prop>\n"
-            + prop_str + "  </d:prop>\n"
-                        "</d:propfind>\n");
+        GLib.ByteArray xml = "<?xml version=\"1.0\" ?>\n"
+                           + "<d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\">\n"
+                           + "  <d:prop>\n"
+                           + prop_str.bytes () + "  </d:prop>\n"
+                           + "</d:propfind>\n";
         var buf = new Soup.Buffer (this);
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
@@ -98,8 +98,8 @@ class LsColJob : AbstractNetworkJob {
     the network, not all in one big blob at the end.
     ***********************************************************/
     private bool on_signal_finished () {
-        GLib.info ("LSCOL of" + reply ().request ().url ("FINISHED WITH STATUS"
-                        + reply_status_string ();
+        GLib.info ("LSCOL of" + reply ().request ().url ()
+            + " finished with status " + reply_status_string ());
 
         string content_type = reply ().header (Soup.Request.ContentTypeHeader).to_string ();
         int http_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

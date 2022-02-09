@@ -61,7 +61,7 @@ struct HttpError {
     string message;
 }
 
-template <typename T>
+
 struct HttpResult : Result<T, HttpError> { }
 
 

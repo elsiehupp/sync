@@ -58,7 +58,7 @@ class MoveJob : AbstractNetworkJob {
         }
 
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warning (" Network error : " + reply ().error_string ();
+            GLib.warning ("Network error: " + reply ().error_string ());
         }
         AbstractNetworkJob.on_signal_start ();
     }
@@ -67,8 +67,8 @@ class MoveJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public bool on_signal_finished () {
-        GLib.info ("MOVE of" + reply ().request ().url ("FINISHED WITH STATUS"
-                        + reply_status_string ();
+        GLib.info ("MOVE of " + reply ().request ().url ()
+            + " finished with status " + reply_status_string ());
 
         /* emit */ finished_signal ();
         return true;

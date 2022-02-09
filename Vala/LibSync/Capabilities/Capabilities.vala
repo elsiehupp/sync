@@ -143,7 +143,7 @@ class Capabilities {
 
     /***********************************************************
     ***********************************************************/
-    public bool =share_remote_enforce_expire_date () {
+    public bool share_remote_enforce_expire_date () {
         return this.capabilities["files_sharing"].to_map ()["public"].to_map ()["expire_date_remote"].to_map ()["enforced"].to_bool ();
     }
 
@@ -440,8 +440,8 @@ class Capabilities {
     should be uploaded.
     ***********************************************************/
     public bool upload_conflict_files () {
-        static var env_is_set = !q_environment_variable_is_empty ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
-        static int env_value = q_environment_variable_int_value ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
+        var env_is_set = !q_environment_variable_is_empty ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
+        int env_value = q_environment_variable_int_value ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
         if (env_is_set)
             return env_value != 0;
 

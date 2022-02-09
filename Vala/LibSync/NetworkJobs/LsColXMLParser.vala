@@ -20,19 +20,19 @@ class LsColXMLParser : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool parse (GLib.ByteArray xml,
-               GLib.HashTable<string, ExtraFolderInfo> *sizes,
-               const string expected_path);
-
-signals:
-    void directory_listing_subfolders (string[] items);
-    void directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
-    void finished_with_error (Soup.Reply reply);
-    void finished_without_error ();
+        GLib.HashTable<string, ExtraFolderInfo> *sizes,
+        string expected_path);
 
 
+    signal void directory_listing_subfolders (string[] items);
+    signal void directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
+    signal void finished_with_error (Soup.Reply reply);
+    signal void finished_without_error ();
 
 
-    LsColXMLParser.LsColXMLParser () = default;
+
+
+    //  LsColXMLParser.LsColXMLParser () = default;
 
     bool LsColXMLParser.parse (GLib.ByteArray xml, GLib.HashTable<string, ExtraFolderInfo> *file_info, string expected_path) {
         // Parse DAV response
@@ -60,24 +60,24 @@ signals:
                             .adjusted (GLib.Uri.NormalizePathSegments)
                             .path ();
                     if (!href_string.starts_with (expected_path)) {
-                        GLib.warning ("Invalid href" + href_string + "expected starting with" + expected_path;
+                        GLib.warning ("Invalid href " + href_string + " expected starting with " + expected_path);
                         return false;
                     }
                     current_href = href_string;
-                } else if (name == QLatin1String ("response")) {
-                } else if (name == QLatin1String ("propstat")) {
+                } else if (name == "response") {
+                } else if (name == "propstat") {
                     inside_propstat = true;
-                } else if (name == QLatin1String ("status") && inside_propstat) {
+                } else if (name == "status" && inside_propstat) {
                     string http_status = reader.read_element_text ();
                     if (http_status.starts_with ("HTTP/1.1 200")) {
                         current_props_have_http200 = true;
                     } else {
                         current_props_have_http200 = false;
                     }
-                } else if (name == QLatin1String ("prop")) {
+                } else if (name == "prop") {
                     inside_prop = true;
                     continue;
-                } else if (name == QLatin1String ("multistatus")) {
+                } else if (name == "multistatus") {
                     inside_multi_status = true;
                     continue;
                 }
@@ -126,10 +126,10 @@ signals:
 
         if (reader.has_error ()) {
             // XML Parser error? Whatever had been emitted before will come as directory_listing_iterated
-            GLib.warning ("ERROR" + reader.error_string () + xml;
+            GLib.warning ("ERROR " + reader.error_string () + xml);
             return false;
         } else if (!inside_multi_status) {
-            GLib.warning ("ERROR no WebDAV response?" + xml;
+            GLib.warning ("ERROR no WebDAV response? " + xml.to_string ());
             return false;
         } else {
             /* emit */ directory_listing_subfolders (folders);

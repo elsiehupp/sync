@@ -24,16 +24,16 @@ class RequestEtagJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public new void on_signal_start () {
         Soup.Request request;
         request.raw_header ("Depth", "0");
 
-        GLib.ByteArray xml ("<?xml version=\"1.0\" ?>\n"
-                    "<d:propfind xmlns:d=\"DAV:\">\n"
-                    "  <d:prop>\n"
-                    "    <d:getetag/>\n"
-                    "  </d:prop>\n"
-                    "</d:propfind>\n");
+        GLib.ByteArray xml = "<?xml version=\"1.0\" ?>\n"
+                           + "<d:propfind xmlns:d=\"DAV:\">\n"
+                           + "  <d:prop>\n"
+                           + "    <d:getetag/>\n"
+                           + "  </d:prop>\n"
+                           + "</d:propfind>\n";
         var buf = new Soup.Buffer (this);
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
@@ -41,7 +41,7 @@ class RequestEtagJob : AbstractNetworkJob {
         send_request ("PROPFIND", make_dav_url (path ()), request, buf);
 
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warning ("request network error : " + reply ().error_string ();
+            GLib.warning ("Request network error: " + reply ().error_string ());
         }
         AbstractNetworkJob.on_signal_start ();
     }
@@ -50,8 +50,8 @@ class RequestEtagJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        GLib.info ("Request Etag of" + reply ().request ().url ("FINISHED WITH STATUS"
-                        +  reply_status_string ();
+        GLib.info ("Request Etag of" + reply ().request ().url ()
+            + " finished with status " +  reply_status_string ());
 
         var http_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (http_code == 207) {
@@ -77,9 +77,10 @@ class RequestEtagJob : AbstractNetworkJob {
             /* emit */ etag_retrieved (etag, GLib.DateTime.from_string (string.from_utf8 (this.response_timestamp), Qt.RFC2822Date));
             /* emit */ finished_with_result (etag);
         } else {
-            /* emit */ finished_with_result (HttpError {
-                http_code, error_string ()
-            });
+            HttpError error;
+            error.code = http_code;
+            error.message = error_string ();
+            /* emit */ finished_with_result (error);
         }
         return true;
     }

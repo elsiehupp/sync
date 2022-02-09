@@ -30,7 +30,7 @@ class AccessManager : QNetworkAccessManager {
     public AccessManager (GLib.Object parent = new GLib.Object ()) {
         base (parent);
 
-        cookie_jar (new CookieJar);
+        cookie_jar (new CookieJar ());
     }
 
 

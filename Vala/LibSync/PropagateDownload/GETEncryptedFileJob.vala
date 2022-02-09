@@ -40,10 +40,7 @@ class GETEncryptedFileJob : GETFileJob {
     }
 
 
-    ~GETEncryptedFileJob () override = default;
-
-
-    protected int64 write_to_device (GLib.ByteArray data) {
+    protected new int64 write_to_device (GLib.ByteArray data) {
         if (!this.decryptor) {
             // only initialize the decryptor once, because, according to Qt documentation, metadata might get changed during the processing of the data sometimes
             // https://doc.qt.io/qt-5/qnetworkreply.html#meta_data_changed

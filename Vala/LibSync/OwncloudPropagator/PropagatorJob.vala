@@ -73,7 +73,7 @@ class PropagatorJob : GLib.Object {
     /***********************************************************
     Emitted when the job is fully on_signal_finished
     ***********************************************************/
-    signal void signal_finished (SyncFileItem.Status);
+    signal void signal_finished (SyncFileItem.Status status);
 
     /***********************************************************
     Emitted when the on_signal_abort is fully on_signal_finished

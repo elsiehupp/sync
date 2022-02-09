@@ -60,10 +60,10 @@ class AvatarJob : AbstractNetworkJob {
 
         int dim = base_avatar.width ();
 
-        Gtk.Image avatar (dim, dim, Gtk.Image.Format_ARGB32);
+        Gtk.Image avatar = new Gtk.Image (dim, dim, Gtk.Image.Format_ARGB32);
         avatar.fill (Qt.transparent);
 
-        QPainter painter (&avatar);
+        QPainter painter = new QPainter (&avatar);
         painter.render_hint (QPainter.Antialiasing);
 
         QPainterPath path;
@@ -88,7 +88,7 @@ class AvatarJob : AbstractNetworkJob {
             GLib.ByteArray png_data = reply ().read_all ();
             if (png_data.size ()) {
                 if (av_image.load_from_data (png_data)) {
-                    GLib.debug ("Retrieved Avatar pixmap!";
+                    GLib.debug ("Retrieved Avatar pixmap!");
                 }
             }
         }

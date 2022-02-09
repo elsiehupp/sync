@@ -144,7 +144,7 @@ class GETFileJob : AbstractNetworkJob {
         }
 
         Soup.Request request;
-        foreach (var header in = this.headers) {
+        foreach (var header in this.headers) {
             request.raw_header (header.key (), header.value ());
         }
 
@@ -226,13 +226,12 @@ class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public 
+    //  public 
 
 
     /***********************************************************
     ***********************************************************/
-    public void bandwidth_limited (bool b);
-    void GETFileJob.bandwidth_limited (bool b) {
+    public void bandwidth_limited (bool b) {
         this.bandwidth_limited = b;
         QMetaObject.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
     }
@@ -241,8 +240,7 @@ class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    void GETFileJob.give_bandwidth_quota (int64 q) {
+    public void give_bandwidth_quota (int64 q) {
         this.bandwidth_quota = q;
         GLib.debug ("Got " + q + " bytes");
         QMetaObject.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
@@ -250,7 +248,7 @@ class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public 
+    //  public 
 
 
     /***********************************************************
@@ -342,7 +340,7 @@ class GETFileJob : AbstractNetworkJob {
             }
             if (!this.has_emitted_finished_signal) {
                 GLib.info ("GET of " + reply ().request ().url ().to_string ()
-                          + " FINISHED WITH STATUS " + reply_status_string ()
+                          + " finished with status " + reply_status_string ()
                           + reply ().raw_header ("Content-Range") + reply ().raw_header ("Content-Length"));
 
                 /* emit */ finished_signal ();

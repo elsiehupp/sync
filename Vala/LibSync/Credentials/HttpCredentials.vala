@@ -59,7 +59,7 @@ from the keychain
             refresh_access_token ()
                 |
                 v
-            emit fetched ()
+            /* emit */ fetched ()
 
 2) If the credentials is still not valid when fetched () is
 emitted, the ui, will call ask_from_user () which is

@@ -17,7 +17,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 namespace Occ {
 
-static class PropagatorJobs {
+class PropagatorJobs {
 
     /***********************************************************
     Tags for checksum header.
@@ -26,7 +26,7 @@ static class PropagatorJobs {
     const string CHECK_SUM_HEADER_C = "OC-Checksum";
     const string CONTENT_MD5_HEADER_C = "Content-MD5";
 
-    public GLib.ByteArray local_file_id_from_full_id (GLib.ByteArray identifier) {
+    public static GLib.ByteArray local_file_id_from_full_id (GLib.ByteArray identifier) {
         return identifier.left (8);
     }
 

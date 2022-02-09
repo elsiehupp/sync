@@ -11,7 +11,7 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private GLib.ByteArray file_identifier;
-    private GLib.ByteArray this.b64_metadata;
+    private GLib.ByteArray b64_metadata;
     private GLib.ByteArray token;
 
 
@@ -28,23 +28,23 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
         GLib.ByteArray locked_token,
         GLib.Object parent = new GLib.Object ()) {
         
-        base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent)
+        base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent);
         this.file_identifier = file_identifier;
         this.b64_metadata = b64_metadata;
-        this.token = token;
+        //  this.token = token;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public new void on_signal_start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
-        request.header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
+        request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         QUrlQuery url_query;
-        url_query.add_query_item (QStringLiteral ("format"), QStringLiteral ("json"));
-        url_query.add_query_item (QStringLiteral ("e2e-token"), this.token);
+        url_query.add_query_item ("format", "json");
+        url_query.add_query_item ("e2e-token", this.token);
 
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (url_query);
@@ -57,7 +57,7 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
         var buffer = new Soup.Buffer (this);
         buffer.data (data);
 
-        GLib.info ("updating the metadata for the file_identifier" + this.file_identifier + "as encrypted";
+        GLib.info ("Updating the metadata for the file_identifier " + this.file_identifier.to_string () + " as encrypted.");
         send_request ("PUT", url, request, buffer);
         AbstractNetworkJob.on_signal_start ();
     }
@@ -66,14 +66,15 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
     protected bool on_signal_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (return_code != 200) {
-                GLib.info ("error updating the metadata" + path () + error_string () + return_code;
-                emit error (this.file_identifier, return_code);
+                GLib.info ("Error updating the metadata " + path () + error_string () + return_code);
+                /* emit */ error (this.file_identifier, return_code);
             }
 
-            GLib.info ("Metadata submited to the server successfully";
-            emit success (this.file_identifier);
+            GLib.info ("Metadata submited to the server successfully.");
+            /* emit */ success (this.file_identifier);
         return true;
     }
-}
+
+} // class UpdateMetadataApiJob
 
 } // namespace Occ

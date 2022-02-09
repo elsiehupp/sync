@@ -82,7 +82,7 @@ class WriteJob : KeychainChunk.Job {
             this.error_string = write_job.error_string ();
 
             if (write_job.error () != NoError) {
-                GLib.warning ("Error while writing" + write_job.key ("chunk" + write_job.error_string ();
+                GLib.warning ("Error while writing " + write_job.key () + " chunk " + write_job.error_string ());
                 this.chunk_buffer.clear ();
             }
         }
@@ -98,7 +98,7 @@ class WriteJob : KeychainChunk.Job {
 
             // keep the limit
             if (this.chunk_count > KeychainChunk.MaxChunks) {
-                GLib.warning ("Maximum chunk count exceeded while writing" + write_job.key ("chunk" + string.number (index) + "cutting off after" + string.number (KeychainChunk.MaxChunks) + "chunks";
+                GLib.warning ("Maximum chunk count exceeded while writing " + write_job.key () + " chunk " + index + " cutting off after " + KeychainChunk.MaxChunks.to_string () + " chunks.");
 
                 write_job.delete_later ();
 

@@ -89,7 +89,7 @@ class ReadJob : KeychainChunk.Job {
         this.chunk_count = 0;
         this.chunk_buffer.clear ();
         if (error () != EntryNotFound) {
-            GLib.warning ("ReadPasswordJob failed with" + error_string ();
+            GLib.warning ("ReadPasswordJob failed with " + error_string ());
         }
         return false;
     }
@@ -112,7 +112,7 @@ class ReadJob : KeychainChunk.Job {
                     // Could be that the backend was not yet available. Wait some extra seconds.
                     // (Issues #4274 and #6522)
                     // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
-                    GLib.info ("Backend unavailable (yet?) Retrying in a few seconds." + read_job.error_string ();
+                    GLib.info ("Backend unavailable (yet?) Retrying in a few seconds. " + read_job.error_string ());
                     QTimer.single_shot (10000, this, &ReadJob.on_signal_start);
                     this.retry_on_signal_key_chain_error = false;
                     read_job.delete_later ();
@@ -124,7 +124,7 @@ class ReadJob : KeychainChunk.Job {
                 ( (read_job.error () == QKeychain.EntryNotFound) && this.chunk_count == 0)) {
                 this.error = read_job.error ();
                 this.error_string = read_job.error_string ();
-                GLib.warning ("Unable to read" + read_job.key ("chunk" + string.number (this.chunk_count) + read_job.error_string ();
+                GLib.warning ("Unable to read " + read_job.key () + " chunk " + string.number (this.chunk_count) + read_job.error_string ());
             }
         }
 

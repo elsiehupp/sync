@@ -22,22 +22,19 @@ this.job.on_signal_start
 class StorePrivateKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
-    ***********************************************************/
-    public StorePrivateKeyApiJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ());
-
-
-    /***********************************************************
     @brief csr - the CSR with the public key.
     This function needs to be called before on_signal_start () obviously.
     ***********************************************************/
-    public void private_key (GLib.ByteArray private_key);
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_signal_start ();
-
-    protected bool on_signal_finished ();
+    Soup.Buffer private_key {
+        private get {
+            return this.private_key;
+        }
+        public set {
+            GLib.ByteArray data = new GLib.ByteArray ("private_key=");
+            data += GLib.Uri.to_percent_encoding (value);
+            this.private_key.data (data);
+        }
+    }
 
 
     /***********************************************************
@@ -50,37 +47,33 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private Soup.Buffer this.priv_key;
-
-
-
-    StorePrivateKeyApiJob.StorePrivateKeyApiJob (AccountPointer& account, string path, GLib.Object parent)
-    : base (account, path, parent) {
+    public StorePrivateKeyApiJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+        base (account, path, parent);
     }
 
-    void StorePrivateKeyApiJob.private_key (GLib.ByteArray priv_key) {
-        GLib.ByteArray data = "private_key=";
-        data += GLib.Uri.to_percent_encoding (priv_key);
-        this.priv_key.data (data);
-    }
 
-    void StorePrivateKeyApiJob.on_signal_start () {
+    /***********************************************************
+    ***********************************************************/
+    public new void on_signal_start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
-        query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
+        query.add_query_item ("format", "json");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (query);
 
-        GLib.info ("Sending the private key" + this.priv_key.data ();
-        send_request ("POST", url, request, this.priv_key);
+        GLib.info ("Sending the private key" + this.private_key.data ());
+        send_request ("POST", url, request, this.private_key);
         AbstractNetworkJob.on_signal_start ();
     }
 
-    bool StorePrivateKeyApiJob.on_signal_finished () {
+
+    /***********************************************************
+    ***********************************************************/
+    protected bool on_signal_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200)
-            GLib.info ("Sending private key ended with"  + path () + error_string () + return_code;
+            GLib.info ("Sending private key ended with "  + path () + error_string () + return_code);
 
         QJsonParseError error;
         var json = QJsonDocument.from_json (reply ().read_all (), error);
@@ -88,6 +81,6 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
         return true;
     }
 
-}
+} // class StorePrivateKeyApiJob
 
 } // namespace Occ

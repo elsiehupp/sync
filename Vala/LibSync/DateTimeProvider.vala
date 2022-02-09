@@ -1,10 +1,7 @@
-//  #pragma once
 
 namespace Occ {
 
-class DateTimeProvider {
-
-    ~DateTimeProvider () = default;
+class DateTimeProvider : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

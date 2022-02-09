@@ -264,7 +264,7 @@ class SyncFileStatusTracker : GLib.Object {
         }
 
         //  ASSERT (shared_flag != SharedFlag.UNKNOWN_SHARED,
-            "The shared status needs to have been fetched from a SyncFileItem or the DB at this point.");
+        //      "The shared status needs to have been fetched from a SyncFileItem or the DB at this point.");
         if (shared_flag == SharedFlag.SHARED)
             status.shared (true);
 
@@ -275,9 +275,9 @@ class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void invalidate_parent_paths (string path) {
-        string[] split_path = path.split ('/', Qt.SkipEmptyParts);
+        string[] split_path = path.split ("/", Qt.SkipEmptyParts);
         for (int i = 0; i < split_path.size (); ++i) {
-            string parent_path = string[] (split_path.mid (0, i)).join (QLatin1String ("/"));
+            string parent_path = split_path.mid (0, i).join ("/");
             /* emit */ file_status_changed (get_system_destination (parent_path), file_status (parent_path));
         }
     }

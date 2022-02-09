@@ -27,7 +27,7 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
         GLib.ByteArray token,
         GLib.Object parent = new GLib.Object ()) {
         
-        base (account, E2EE_BASE_URL + "lock/" + file_identifier, parent)
+        base (account, E2EE_BASE_URL + "lock/" + file_identifier, parent);
         this.file_identifier = file_identifier;
         this.token = token;
     }
@@ -35,7 +35,7 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public new void on_signal_start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
         request.raw_header ("e2e-token", this.token);
@@ -44,7 +44,7 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
         send_request ("DELETE", url, request);
 
         AbstractNetworkJob.on_signal_start ();
-        GLib.info ("Starting the request to unlock.";
+        GLib.info ("Starting the request to unlock.");
     }
 
 
@@ -53,14 +53,15 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
     protected bool on_signal_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
-            GLib.info ("error unlocking file" + path () + error_string () + return_code;
-            GLib.info ("Full Error Log" + reply ().read_all ();
+            GLib.info ("Error unlocking file " + path () + error_string () + return_code);
+            GLib.info ("Full Error Log" + reply ().read_all ());
             /* emit */ error (this.file_identifier, return_code);
             return true;
         }
         /* emit */ success (this.file_identifier);
         return true;
     }
-}
+
+} // class UnlockEncryptFolderApiJob
 
 } // namespace Occ

@@ -49,14 +49,14 @@ class ProppatchJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public new void on_signal_start () {
         if (this.properties.is_empty ()) {
-            GLib.warning ("Proppatch with no properties!";
+            GLib.warning ("Proppatch with no properties!");
         }
         Soup.Request request;
 
         GLib.ByteArray prop_str;
-        QMapIterator<GLib.ByteArray, GLib.ByteArray> it (this.properties);
+        QMapIterator<GLib.ByteArray, GLib.ByteArray> it = new QMapIterator<GLib.ByteArray, GLib.ByteArray> (this.properties);
         while (it.has_next ()) {
             it.next ();
             GLib.ByteArray key_name = it.key ();
@@ -76,10 +76,10 @@ class ProppatchJob : AbstractNetworkJob {
             prop_str += "</" + key_name + ">\n";
         }
         GLib.ByteArray xml = "<?xml version=\"1.0\" ?>\n"
-                        "<d:propertyupdate xmlns:d=\"DAV:\">\n"
-                        "  <d:set><d:prop>\n"
-            + prop_str + "  </d:prop></d:set>\n"
-                        "</d:propertyupdate>\n";
+                           + "<d:propertyupdate xmlns:d=\"DAV:\">\n"
+                           + "  <d:set><d:prop>\n"
+                           + prop_str.bytes () + "  </d:prop></d:set>\n"
+                           + "</d:propertyupdate>\n";
 
         var buf = new Soup.Buffer (this);
         buf.data (xml);
@@ -89,14 +89,11 @@ class ProppatchJob : AbstractNetworkJob {
     }
 
 
-
-
-
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        GLib.info ("PROPPATCH of" + reply ().request ().url ("FINISHED WITH STATUS"
-                            + reply_status_string ();
+        GLib.info ("PROPPATCH of" + reply ().request ().url ()
+            + " finished with status " + reply_status_string ());
 
         int http_result_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
@@ -104,7 +101,7 @@ class ProppatchJob : AbstractNetworkJob {
             /* emit */ success ();
         } else {
             GLib.warning ("*not* successful, http result code is" + http_result_code
-                                    + (http_result_code == 302 ? reply ().header (Soup.Request.LocationHeader).to_string () : QLatin1String (""));
+                + (http_result_code == 302 ? reply ().header (Soup.Request.LocationHeader).to_string () : ""));
             /* emit */ finished_with_error ();
         }
         return true;

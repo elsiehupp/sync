@@ -24,9 +24,9 @@ class PrivateKeyContext {
     // return-value optimization (RVO) is not obligatory
     // and we have a `for_key` static function that returns
     // an instance of this class
-    public PrivateKeyContext (PrivateKeyContext&& other) {
-        std.swap (this.context, other.ctx);
-    }
+    //  public PrivateKeyContext (PrivateKeyContext&& other) {
+    //      std.swap (this.context, other.ctx);
+    //  }
 
 
     public static PrivateKeyContext for_key (EVP_PKEY *pkey, ENGINE *e = null) {

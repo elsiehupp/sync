@@ -10,47 +10,37 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public LockEncryptFolderApiJob.for_account (AccountPointer account, GLib.ByteArray file_identifier, GLib.Object parent = new GLib.Object ());
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_signal_start ();
-
-    protected bool on_signal_finished ();
-
+    private GLib.ByteArray file_identifier;
 
     signal void success (GLib.ByteArray file_identifier, GLib.ByteArray token);
     signal void error (GLib.ByteArray file_identifier, int httpd_error_code);
 
+    /***********************************************************
+    ***********************************************************/
+    public LockEncryptFolderApiJob (AccountPointer account, GLib.ByteArray file_identifier, GLib.Object parent = new GLib.Object ()) {
+        base (account, E2EE_BASE_URL + "lock/" + file_identifier, parent);
+        this.file_identifier = file_identifier;
+    }
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray file_identifier;
-
-
-
-
-    LockEncryptFolderApiJob.LockEncryptFolderApiJob (AccountPointer& account, GLib.ByteArray file_identifier, GLib.Object parent)
-    : base (account, E2EE_BASE_URL + QStringLiteral ("lock/") + file_identifier, parent), this.file_identifier (file_identifier) {
-    }
-
-    void LockEncryptFolderApiJob.on_signal_start () {
+    public void on_signal_start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
-        query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
+        query.add_query_item ("format", "json");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (query);
 
-        GLib.info ("locking the folder with identifier" + this.file_identifier + "as encrypted";
+        GLib.info ("Locking the folder with identifier " + this.file_identifier.to_string () + " as encrypted.");
         send_request ("POST", url, request);
         AbstractNetworkJob.on_signal_start ();
     }
 
-    bool LockEncryptFolderApiJob.on_signal_finished () {
+    protected bool on_signal_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
-            GLib.info ("error locking file" + path () + error_string () + return_code;
+            GLib.info ("Error locking file " + path () + error_string () + return_code);
             /* emit */ error (this.file_identifier, return_code);
             return true;
         }
@@ -59,12 +49,13 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
         var json = QJsonDocument.from_json (reply ().read_all (), error);
         var obj = json.object ().to_variant_map ();
         var token = obj["ocs"].to_map ()["data"].to_map ()["e2e-token"].to_byte_array ();
-        GLib.info ("got json:" + token;
+        GLib.info ("Got json: " + token);
 
         //TODO : Parse the token and submit.
         /* emit */ success (this.file_identifier, token);
         return true;
     }
-}
+
+} // class LockEncryptFolderApiJob
 
 } // namespace Occ

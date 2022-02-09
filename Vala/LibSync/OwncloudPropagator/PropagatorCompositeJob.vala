@@ -39,7 +39,7 @@ class PropagatorCompositeJob : PropagatorJob {
     Deleting them here would risk deleting something that has
     already been deleted by a shared parent.
     ***********************************************************/
-    ~PropagatorCompositeJob () override = default;
+    //  ~PropagatorCompositeJob () override = default;
 
     /***********************************************************
     ***********************************************************/
@@ -91,7 +91,7 @@ class PropagatorCompositeJob : PropagatorJob {
             this.tasks_to_do.remove (0);
             PropagatorJob job = propagator ().create_job (next_task);
             if (!job) {
-                GLib.warning ("Useless task found for file" + next_task.destination ("instruction" + next_task.instruction;
+                GLib.warning ("Useless task found for file " + next_task.destination () + " instruction " + next_task.instruction);
                 continue;
             }
             append_job (job);

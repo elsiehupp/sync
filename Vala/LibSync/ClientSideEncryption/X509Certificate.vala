@@ -14,9 +14,9 @@ class X509Certificate {
     // return-value optimization (RVO) is not obligatory
     // and we have a static functions that return
     // an instance of this class
-    public X509Certificate (X509Certificate&& other) {
-        std.swap (this.certificate, other.certificate);
-    }
+    //  public X509Certificate (X509Certificate&& other) {
+    //      std.swap (this.certificate, other.certificate);
+    //  }
 
     ~X509Certificate () {
         X509_free (this.certificate);

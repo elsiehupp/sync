@@ -11,7 +11,7 @@ class StoreMetaDataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private GLib.ByteArray file_identifier;
-    private GLib.ByteArray this.b64_metadata;
+    private GLib.ByteArray b64_metadata;
 
 
     signal void success (GLib.ByteArray file_identifier);
@@ -26,7 +26,7 @@ class StoreMetaDataApiJob : AbstractNetworkJob {
         GLib.ByteArray b64_metadata,
         GLib.Object parent = new GLib.Object ()) {
 
-        base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent)
+        base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent);
         this.file_identifier = file_identifier;
         this.b64_metadata = b64_metadata;
     }
@@ -34,10 +34,10 @@ class StoreMetaDataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public new void on_signal_start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
-        request.header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
+        request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
         QUrlQuery query;
         query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
@@ -47,7 +47,7 @@ class StoreMetaDataApiJob : AbstractNetworkJob {
         var buffer = new Soup.Buffer (this);
         buffer.data (data);
 
-        GLib.info ("sending the metadata for the file_identifier" + this.file_identifier + "as encrypted";
+        GLib.info ("Sending the metadata for the file_identifier " + this.file_identifier + " as encrypted.");
         send_request ("POST", url, request, buffer);
         AbstractNetworkJob.on_signal_start ();
     }
@@ -58,14 +58,15 @@ class StoreMetaDataApiJob : AbstractNetworkJob {
     protected bool on_signal_finished () {
         int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (return_code != 200) {
-                GLib.info ("error sending the metadata" + path () + error_string () + return_code;
-                emit error (this.file_identifier, return_code);
+                GLib.info ("Error sending the metadata " + path () + error_string () + return_code);
+                /* emit */ error (this.file_identifier, return_code);
             }
 
-            GLib.info ("Metadata submited to the server successfully";
-            emit success (this.file_identifier);
+            GLib.info ("Metadata submited to the server successfully");
+            /* emit */ success (this.file_identifier);
         return true;
     }
-}
+
+} // class StoreMetaDataApiJob
 
 } // namespace Occ

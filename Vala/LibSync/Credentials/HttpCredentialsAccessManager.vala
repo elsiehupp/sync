@@ -12,7 +12,7 @@ class HttpCredentialsAccessManager : AccessManager {
     The credentials object dies along with the account, while
     the QNAM might outlive both.
     ***********************************************************/
-    private QPointer<const HttpCredentials> this.credentials;
+    private const QPointer<HttpCredentials> credentials;
 
 
     public HttpCredentialsAccessManager (HttpCredentials credentials, GLib.Object parent = new GLib.Object ()) {
@@ -22,7 +22,7 @@ class HttpCredentialsAccessManager : AccessManager {
 
 
     protected Soup.Reply create_request (Operation op, Soup.Request request, QIODevice outgoing_data) {
-        Soup.Request request (request);
+        Soup.Request request = new Soup.Request (request);
         if (!request.attribute (HttpCredentials.DontAddCredentialsAttribute).to_bool ()) {
             if (this.credentials && !this.credentials.password ().is_empty ()) {
                 if (this.credentials.is_using_oauth ()) {

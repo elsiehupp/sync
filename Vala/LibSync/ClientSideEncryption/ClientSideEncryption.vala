@@ -100,7 +100,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ClientSideEncryption () = default;
+    //  public ClientSideEncryption () = default;
 
     /***********************************************************
     ***********************************************************/
@@ -148,12 +148,12 @@ class ClientSideEncryption : GLib.Object {
         GLib.info ("Key correctly generated";
         GLib.info ("Storing keys locally";
 
-        Biometric priv_key;
-        if (PEM_write_bio_Private_key (priv_key, local_key_pair, null, null, 0, null, null) <= 0) {
+        Biometric private_key;
+        if (PEM_write_bio_Private_key (private_key, local_key_pair, null, null, 0, null, null) <= 0) {
             GLib.info ("Could not read private key from bio.";
             return;
         }
-        GLib.ByteArray key = BIO2Byte_array (priv_key);
+        GLib.ByteArray key = BIO2Byte_array (private_key);
         //this.private_key = QSslKey (key, QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
         this.private_key = key;
 

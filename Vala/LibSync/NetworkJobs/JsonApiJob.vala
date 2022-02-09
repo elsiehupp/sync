@@ -137,13 +137,13 @@ class JsonApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     protected bool on_signal_finished () {
-        GLib.info ("JsonApiJob of" + reply ().request ().url ("FINISHED WITH STATUS"
-                            + reply_status_string ();
+        GLib.info ("JsonApiJob of" + reply ().request ().url ()
+            + " finished with status " + reply_status_string ());
 
         int status_code = 0;
         int http_status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warning ("Network error : " + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute);
+            GLib.warning ("Network error : " + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute));
             status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             /* emit */ json_received (QJsonDocument (), status_code);
             return true;
@@ -151,19 +151,19 @@ class JsonApiJob : AbstractNetworkJob {
 
         string json_str = string.from_utf8 (reply ().read_all ());
         if (json_str.contains ("<?xml version=\"1.0\"?>")) {
-            const QRegularExpression rex ("<statuscode> (\\d+)</statuscode>");
-            var rex_match = rex.match (json_str);
+            const QRegularExpression regex = new QRegularExpression ("<statuscode> (\\d+)</statuscode>");
+            var rex_match = regex.match (json_str);
             if (rex_match.has_match ()) {
                 // this is a error message coming back from ocs.
                 status_code = rex_match.captured (1).to_int ();
             }
         } else if (json_str.is_empty () && http_status_code == NOT_MODIFIED_STATUS_CODE) {
-            GLib.warning ("Nothing changed so nothing to retrieve - status code : " + http_status_code;
+            GLib.warning ("Nothing changed so nothing to retrieve - status code: " + http_status_code);
             status_code = http_status_code;
         } else {
-            const QRegularExpression rex (R" ("statuscode" : (\d+))");
+            const QRegularExpression regex = new QRegularExpression (" (\"statuscode\" : (\\d+))");
             // example : "{"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"version":{"major":8,"minor":"... (504)
-            var rx_match = rex.match (json_str);
+            var rx_match = regex.match (json_str);
             if (rx_match.has_match ()) {
                 status_code = rx_match.captured (1).to_int ();
             }
@@ -182,7 +182,7 @@ class JsonApiJob : AbstractNetworkJob {
         var json = QJsonDocument.from_json (json_str.to_utf8 (), error);
         // empty or invalid response and status code is != 304 because json_str is expected to be empty
         if ( (error.error != QJsonParseError.NoError || json.is_null ()) && http_status_code != NOT_MODIFIED_STATUS_CODE) {
-            GLib.warning ("invalid JSON!" + json_str + error.error_string ();
+            GLib.warning ("Invalid JSON! " + json_str + error.error_string ());
             /* emit */ json_received (json, status_code);
             return true;
         }
