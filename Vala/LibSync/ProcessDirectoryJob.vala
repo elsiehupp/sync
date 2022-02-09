@@ -854,7 +854,7 @@ class ProcessDirectoryJob : GLib.Object {
                 item.modtime = server_entry.modtime;
                 item.size = size_on_signal_server;
                 if (server_entry.is_directory) {
-                    ENFORCE (db_entry.is_directory ());
+                    //  ENFORCE (db_entry.is_directory ());
                     item.instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
                 } else if (!local_entry.is_valid () && this.query_local != PARENT_NOT_CHANGED) {
                     // Deleted locally, changed on server
@@ -867,7 +867,7 @@ class ProcessDirectoryJob : GLib.Object {
                 item.modtime = server_entry.modtime;
                 item.size = size_on_signal_server;
                 if (server_entry.is_directory) {
-                    ENFORCE (db_entry.is_directory ());
+                    //  ENFORCE (db_entry.is_directory ());
                     item.instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
                 } else if (!local_entry.is_valid () && this.query_local != PARENT_NOT_CHANGED) {
                     // Deleted locally, changed on server

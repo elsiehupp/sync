@@ -188,13 +188,14 @@ class Account : GLib.Object {
     /***********************************************************
     The certificates of the account
     ***********************************************************/
-    GLib.List<QSslCertificate> approved_certificates { public get; private set; }
-
-    /***********************************************************
-    ***********************************************************/
-    public void approved_certificates (GLib.List<QSslCertificate> certificates) {
-        this.approved_certificates = certificates;
-        QSslConfiguration.default_configuration ().add_ca_certificates (certificates);
+    GLib.List<QSslCertificate> approved_certificates {
+        public get {
+            return this.approved_certificates;
+        }
+        private set {
+            this.approved_certificates = value;
+            QSslConfiguration.default_configuration ().add_ca_certificates (value);
+        }
     }
 
     /***********************************************************
@@ -319,8 +320,10 @@ class Account : GLib.Object {
     private static string config_filename;
 
     /***********************************************************
+    Qt expects everything in the connect to be a pointer, so
+    return a pointer.
     ***********************************************************/
-    private ClientSideEncryption e2e;
+    ClientSideEncryption e2e { public get; private set; }
 
     /***********************************************************
     Used in RemoteWipe
@@ -338,11 +341,11 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private PushNotifications push_notifications = null;
+    PushNotifications push_notifications { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    private std.shared_ptr<UserStatusConnector> user_status_connector;
+    std.shared_ptr<UserStatusConnector> user_status_connector { public get; private set; }
 
     /***********************************************************
 
@@ -424,6 +427,7 @@ class Account : GLib.Object {
         base (parent);
         this.capabilities = new GLib.HashTable<string, GLib.Variant> ();
         this.http2Supported = false;
+        this.push_notifications = null;
         this.is_remote_wipe_requested_HACK = false;
         q_register_meta_type<AccountPointer> ("AccountPointer");
         q_register_meta_type<Account> ("Account*");
@@ -851,12 +855,6 @@ class Account : GLib.Object {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public ClientSideEncryption e2e () {
-        // Qt expects everything in the connect to be a pointer, so return a pointer.
-        return this.e2e;
-    }
 
 
     /***********************************************************
@@ -980,11 +978,6 @@ class Account : GLib.Object {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public PushNotifications push_notifications () {
-        return this.push_notifications;
-    }
 
 
     /***********************************************************
@@ -995,11 +988,6 @@ class Account : GLib.Object {
 
 
 
-    /***********************************************************
-    ***********************************************************/
-    public std.shared_ptr<UserStatusConnector> user_status_connector () {
-        return this.user_status_connector;
-    }
 
 
     /***********************************************************

@@ -22,7 +22,7 @@ abstract class AbstractCredentials : GLib.Object {
     Credentials only live as long as the underlying account object.
 
 
-    ENFORCE (!this.account, "should only set account once");
+    //  ENFORCE (!this.account, "should only set account once");
     ***********************************************************/
     Account account { protected get; public set; }
 

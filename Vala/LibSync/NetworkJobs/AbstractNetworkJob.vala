@@ -41,7 +41,7 @@ class AbstractNetworkJob : GLib.Object {
 
         /***********************************************************
         ***********************************************************/
-        private QPointer<QTimer> this.timer;
+        private QPointer<QTimer> timer;
 
         /***********************************************************
         ***********************************************************/
@@ -61,54 +61,72 @@ class AbstractNetworkJob : GLib.Object {
 
 
     /***********************************************************
-    // If not set, it is overwritten by the Application constructor with the value from the config
+    static variable the HTTP timeout (in seconds).
+
+    If set to 0, the default will be used
+    If not set, it is overwritten by the Application constructor
+    with the value from the config
     ***********************************************************/
-    int http_timeout = q_environment_variable_int_value ("OWNCLOUD_TIMEOUT");
+    static int http_timeout = q_environment_variable_int_value ("OWNCLOUD_TIMEOUT");
 
     /***********************************************************
+    On get ():
+    //  ASSERT (!this.response_timestamp.is_empty ());
     ***********************************************************/
-    protected GLib.ByteArray this.response_timestamp;
-
+    GLib.ByteArray response_timestamp { public get; protected set; }
 
     /***********************************************************
     Set to true when the timeout slot is received
     ***********************************************************/
-    protected bool this.timedout;
+    protected bool timedout;
 
 
     /***********************************************************
-    static variable the HTTP timeout (in seconds).
-    
-    If set to 0, the default will be used
-    ***********************************************************/
-    static int http_timeout;
+    Whether to handle redirects transparently.
 
-
-    /***********************************************************
     Automatically follows redirects. Note that this only works
     for GET requests that don't set up any HTTP body or other
     flags.
+
+    If true, a follow-up request is issued automatically when
+    a redirect is encountered. The on_signal_finished ()
+    function is only called if there are no more redirects
+    (or there are problems with the redirect).
+
+    The transparent redirect following may be disabled for some
+    requests where custom handling is necessary.
     ***********************************************************/
-    protected bool this.follow_redirects;
+    public bool follow_redirects;
 
+    AccountPointer account { public get; protected set; }
 
-
-    protected AccountPointer this.account;
-
-
-    private bool this.ignore_credential_failure;
-
+    public bool ignore_credential_failure;
 
     /***********************************************************
     (QPointer because the NetworkManager may be destroyed before
-        the jobs at exit)
+    the jobs at exit)
     ***********************************************************/
-    private QPointer<Soup.Reply> this.reply;
+    QPointer<Soup.Reply> reply {
+        public get {
+            return this.reply;
+        }
+        public set {
+            if (value) {
+                value.property ("do_not_handle_auth", true);
+            }
 
-    private string this.path;
-    private QTimer this.timer;
-    private int this.redirect_count = 0;
-    private int this.http2_resend_count = 0;
+            Soup.Reply old = this.reply;
+            this.reply = value;
+            delete old;
+        }
+    }
+
+    public string path;
+
+
+    private QTimer timer;
+    private int redirect_count = 0;
+    private int http2_resend_count = 0;
 
     /***********************************************************
     Set by the xyz_request () functions and needed to be able to
@@ -116,7 +134,7 @@ class AbstractNetworkJob : GLib.Object {
 
     Reparented to the currently running Soup.Reply.
     ***********************************************************/
-    private QPointer<QIODevice> this.request_body;
+    private QPointer<QIODevice> request_body;
 
     /***********************************************************
     Emitted on network error.
@@ -179,91 +197,6 @@ class AbstractNetworkJob : GLib.Object {
 
         string parent_meta_object_name = parent () ? parent ().meta_object ().class_name () : "";
         GLib.info (meta_object ().class_name ("created for" + display_url + "+" + path () + parent_meta_object_name;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public AccountPointer account () {
-        return this.account;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string path () {
-        return this.path;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void path (string path) {
-        this.path = path;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public Soup.Reply reply () {
-        return this.reply;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void reply (Soup.Reply reply) {
-        if (reply)
-            reply.property ("do_not_handle_auth", true);
-
-        Soup.Reply old = this.reply;
-        this.reply = reply;
-        delete old;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool ignore_credential_failure () {
-        return this.ignore_credential_failure;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void ignore_credential_failure (bool ignore) {
-        this.ignore_credential_failure = ignore;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool follow_redirects () {
-        return this.follow_redirects;
-    }
-
-
-    /***********************************************************
-    Whether to handle redirects transparently.
-
-    If true, a follow-up request is issued automatically when
-    a redirect is encountered. The on_signal_finished () function is
-    only called if there are no more redirects (or there are
-    problems with the redirect).
-
-    The transparent redirect following may be disabled for some
-    requests where custom handling is necessary.
-    ***********************************************************/
-    public void follow_redirects (bool follow) {
-        this.follow_redirects = follow;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public GLib.ByteArray response_timestamp () {
-        //  ASSERT (!this.response_timestamp.is_empty ());
-        return this.response_timestamp;
     }
 
 
@@ -343,7 +276,7 @@ class AbstractNetworkJob : GLib.Object {
     Make a new request
     ***********************************************************/
     public void retry () {
-        ENFORCE (this.reply);
+        //  ENFORCE (this.reply);
         var request = this.reply.request ();
         GLib.Uri requested_url = request.url ();
         GLib.ByteArray verb = HttpLogger.request_verb (*this.reply);
@@ -364,6 +297,12 @@ class AbstractNetworkJob : GLib.Object {
         this.timer.on_signal_start (msec);
     }
 
+    //  private void on_signal_timeout () {
+    //      this.timedout = true;
+    //      GLib.warning ("Network job timeout" + (reply () ? reply ().request ().url () : path ());
+    //      on_signal_timed_out ();
+    //  }
+
 
     /***********************************************************
     ***********************************************************/
@@ -381,7 +320,7 @@ class AbstractNetworkJob : GLib.Object {
 
     Takes ownership of the request_body (to allow redirects).
     ***********************************************************/
-    protected Soup.Reply send_request (
+    protected Soup.Reply send_request_for_device (
         GLib.ByteArray verb,
         GLib.Uri url,
         Soup.Request request = Soup.Request (),
@@ -393,7 +332,7 @@ class AbstractNetworkJob : GLib.Object {
     }
 
 
-    protected Soup.Reply send_request (
+    protected Soup.Reply send_request_for_multipart (
         GLib.ByteArray verb,
         GLib.Uri url,
         Soup.Request request,
@@ -407,10 +346,10 @@ class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     send_request does not take a relative path instead of an url,
-    but the old API allowed that. We have this undefined overload
-    to help catch usage errors
+    but the old API allowed that. We have this undefined
+    overload to help catch usage errors
     ***********************************************************/
-    protected Soup.Reply send_request (
+    protected Soup.Reply send_request_for_relative_path (
         GLib.ByteArray verb,
         string relative_path,
         Soup.Request request = Soup.Request (),
@@ -642,13 +581,6 @@ class AbstractNetworkJob : GLib.Object {
             GLib.debug ("Network job" + meta_object ().class_name ("on_signal_finished for" + path ();
             delete_later ();
         }
-    }
-
-
-    private void on_signal_timeout () {
-        this.timedout = true;
-        GLib.warning ("Network job timeout" + (reply () ? reply ().request ().url () : path ());
-        on_signal_timed_out ();
     }
 
 }

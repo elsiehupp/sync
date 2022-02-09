@@ -132,7 +132,7 @@ class PropagateItemJob : PropagatorJob {
     ***********************************************************/
     protected void on_signal_done (SyncFileItem.Status status, string error_string = "") {
         // Duplicate calls to on_signal_done () are a logic error
-        ENFORCE (this.state != Finished);
+        //  ENFORCE (this.state != Finished);
         this.state = Finished;
 
         this.item.status = status_arg;

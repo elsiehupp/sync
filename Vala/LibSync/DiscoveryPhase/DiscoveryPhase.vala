@@ -389,9 +389,9 @@ class DiscoveryPhase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void start_job (ProcessDirectoryJob job) {
-        ENFORCE (!this.current_root_job);
+        //  ENFORCE (!this.current_root_job);
         connect (job, &ProcessDirectoryJob.on_signal_finished, this, [this, job] {
-            ENFORCE (this.current_root_job == sender ());
+            //  ENFORCE (this.current_root_job == sender ());
             this.current_root_job = null;
             if (job.dir_item)
                 /* emit */ item_discovered (job.dir_item);

@@ -7,7 +7,7 @@ Copyright (c) by Markus Goetz <guruz@owncloud.com>
 
 //  #include <QLoggingCategory>
 //  #include <QMutex>
-//  #include <QSettings>
+//  #include <GLib.Settings>
 //  #include <QNetworkCookieJar>
 
 namespace Occ {
@@ -23,37 +23,33 @@ class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private string this.user;
-    private string this.password;
+    string user { public get; private set; }
 
+
+    /***********************************************************
+    ***********************************************************/
+    new string password { public get; private set; }
 
     /***********************************************************
     The cookies
     ***********************************************************/
-    private string this.token;
-
-
-    /***********************************************************
-    ***********************************************************/
-    private bool this.ready;
-
+    private string token;
 
     /***********************************************************
     ***********************************************************/
-    public TokenCredentials () {
-        this.user = "";
-        this.password = "";
-        this.ready = false;
-    }
-
+    new bool ready { private set; public get; }
 
     /***********************************************************
     ***********************************************************/
-    public TokenCredentials (string user, string password, string token) {
+    public TokenCredentials (string user = "", string password = "", string token = "") {
         this.user = user;
         this.password = password;
         this.token = token;
-        this.ready = true;
+        if (token == "") {
+            this.ready = false;
+        } else {
+            this.ready = true;
+        }
     }
 
 
@@ -66,7 +62,7 @@ class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public QNetworkAccessManager create_qnam () {
+    public new QNetworkAccessManager create_qnam () {
         AccessManager qnam = new TokenCredentialsAccessManager (this);
 
         connect (qnam, SIGNAL (authentication_required (Soup.Reply *, QAuthenticator *)),
@@ -78,21 +74,14 @@ class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public bool ready () {
-        return this.ready;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void ask_from_user () {
+    public new void ask_from_user () {
         /* emit */ asked ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void fetch_from_keychain () {
+    public new void fetch_from_keychain () {
         this.was_fetched = true;
         /* Q_EMIT */ fetched ();
     }
@@ -100,7 +89,7 @@ class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public bool still_valid (Soup.Reply reply) {
+    public new bool still_valid (Soup.Reply reply) {
         return ( (reply.error () != Soup.Reply.AuthenticationRequiredError)
             // returned if user/password or token are incorrect
             && (reply.error () != Soup.Reply.OperationCanceledError
@@ -110,21 +99,13 @@ class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public void persist () {
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string user () {
-        return this.user;
-    }
+    public new void persist () { }
 
 
     /***********************************************************
     ***********************************************************/
     public void invalidate_token () {
-        GLib.info ("Invalidating token";
+        GLib.info ("Invalidating token");
         this.ready = false;
         this.account.clear_cookie_jar ();
         this.token = "";
@@ -135,17 +116,8 @@ class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public void forget_sensitive_data () {
+    public new void forget_sensitive_data () {
         invalidate_token ();
-    }
-
-
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string password () {
-        return this.password;
     }
 
 
@@ -156,7 +128,7 @@ class TokenCredentials : AbstractCredentials {
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,
         // those credentials were invalid and we terminate.
-        GLib.warning ("Stop request : Authentication failed for " + reply.url ().to_string ();
+        GLib.warning ("Stop request: Authentication failed for " + reply.url ().to_string ());
         reply.property (AUTHENTICATION_FAILED_C, true);
         reply.close ();
     }

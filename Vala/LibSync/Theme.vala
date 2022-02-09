@@ -47,41 +47,52 @@ class Theme : GLib.Object {
     }
 
     /***********************************************************
+    returns a singleton instance.
     ***********************************************************/
-    private static Theme instance;
+    static Theme instance {
+        public get {
+            if (Theme.instance == null) {
+                Theme.instance = new THEME_CLASS ();
+                // some themes may not call the base ctor
+                Theme.instance.mono = false;
+            }
+            return Theme.instance;
+        }
+        private set {
+            Theme.instance = value;
+        }
+    }
+
     private bool mono = false;
+    /***********************************************************
+    Define if the systray icons should be using mono design
+    Retrieve wether to use mono icons for systray
+    ***********************************************************/
+    bool systray_use_mono_icons {
+        public get {
+            return this.mono;
+        }
+        public set {
+            this.mono = value;
+            /* emit */ systray_use_mono_icons_changed (mono);
+        }
+    }
+
 //  #ifndef TOKEN_AUTH_ONLY
-    private mutable GLib.HashTable<string, QIcon> icon_cache;
+    // mutable
+    private GLib.HashTable<string, QIcon> icon_cache;
 //  #endif
 
 
     /***********************************************************
     ***********************************************************/
-    signal void systray_use_mono_icons_changed (bool);
+    signal void systray_use_mono_icons_changed (bool value);
 
 
     /***********************************************************
     ***********************************************************/
     protected Theme () {
         base (null);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private Theme (Theme const &);
-
-
-    /***********************************************************
-    returns a singleton instance.
-    ***********************************************************/
-    public static Theme instance () {
-        if (!this.instance) {
-            this.instance = new THEME_CLASS;
-            // some themes may not call the base ctor
-            this.instance.mono = false;
-        }
-        return this.instance;
     }
 
 
@@ -251,7 +262,7 @@ class Theme : GLib.Object {
         }
         // try to find a 2x version
 
-        const int dot_index = filename.last_index_of ('.');
+        int dot_index = filename.last_index_of ('.');
         if (dot_index != -1) {
             string at2xfilename = filename;
             at2xfilename.insert (dot_index, "@2x");
@@ -265,10 +276,10 @@ class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static string hidpi_filename (string icon_name, Gtk.Color background_color, QPaint_device dev = null) {
+    public static string hidpi_filename_for_color (string icon_name, Gtk.Color background_color, QPaint_device dev = null) {
         var is_dark_background = Theme.is_dark_color (background_color);
 
-        const string icon_path = string (Theme.theme_prefix) + (is_dark_background ? "white/" : "black/") + icon_name;
+        const string icon_path = Theme.theme_prefix + (is_dark_background ? "white/" : "black/") + icon_name;
 
         return Theme.hidpi_filename (icon_path, dev);
     }
@@ -721,21 +732,6 @@ class Theme : GLib.Object {
     }
 
 
-    /***********************************************************
-    Define if the systray icons should be using mono design
-    ***********************************************************/
-    public void systray_use_mono_icons (bool mono) {
-        this.mono = mono;
-        /* emit */ systray_use_mono_icons_changed (mono);
-    }
-
-
-    /***********************************************************
-    Retrieve wether to use mono icons for systray
-    ***********************************************************/
-    public bool systray_use_mono_icons () {
-        return this.mono;
-    }
 
 
     /***********************************************************
@@ -840,10 +836,10 @@ class Theme : GLib.Object {
     /***********************************************************
     @brief What to display as the user identifier (e.g. in the wizards)
 
-    @return UserIdentifierType.UserIdentifierType.USER_NAME, unless reimplemented
+    @return UserIdentifierType.USER_NAME, unless reimplemented
     ***********************************************************/
     public UserIdentifierType user_identifier_type () {
-        return UserIdentifierType.UserIdentifierType.USER_NAME;
+        return UserIdentifierType.USER_NAME;
     }
 
 
@@ -890,7 +886,7 @@ class Theme : GLib.Object {
 
     @return An empty string, unless reimplemented
     ***********************************************************/
-    public string WIZARD_URL_HINT {
+    public string WIZARD_URL_HINT () {
         return "";
     }
 
@@ -937,20 +933,20 @@ class Theme : GLib.Object {
     ***********************************************************/
     public string version_switch_output () {
         string help_text;
-        QTextStream stream (&help_text);
-        stream + app_name ()
-            + " version "
-            + version () + Qt.endl;
+        QTextStream stream = new QTextStream (&help_text);
+        stream += app_name ();
+        stream += " version ";
+        stream += version () + Qt.endl;
     // #ifdef GIT_SHA1
-        stream + "Git revision " + GIT_SHA1 + Qt.endl;
+        stream += "Git revision " + GIT_SHA1 + Qt.endl;
     // #endif
-        stream + "Using Qt " + q_version (", built against Qt " + QT_VERSION_STR + Qt.endl;
+        stream += "Using Qt " + q_version () + ", built against Qt " + QT_VERSION_STR + Qt.endl;
 
         if (!QGuiApplication.platform_name ().is_empty ())
-            stream + "Using Qt platform plugin '" + QGuiApplication.platform_name ("'" + Qt.endl;
+            stream += "Using Qt platform plugin '" + QGuiApplication.platform_name () + "'" + Qt.endl;
 
-        stream + "Using '" + QSslSocket.ssl_library_version_string () + "'" + Qt.endl;
-        stream + "Running on " + Utility.platform_name (", " + QSysInfo.current_cpu_architecture () + Qt.endl;
+        stream += "Using '" + QSslSocket.ssl_library_version_string () + "'" + Qt.endl;
+        stream += "Running on " + Utility.platform_name (", " + QSysInfo.current_cpu_architecture () + Qt.endl;
         return help_text;
     }
 	
@@ -964,7 +960,7 @@ class Theme : GLib.Object {
     ***********************************************************/
 	public QIcon ui_theme_icon (string icon_name, bool ui_has_dark_background) {
         string icon_path = string (Theme.theme_prefix) + (ui_has_dark_background ? "white/" : "black/") + icon_name;
-        std.string icn_path = icon_path.to_utf8 ().const_data ();
+        string icn_path = icon_path.to_utf8 ().const_data ();
         return new Gtk.Icon (QPixmap (icon_path));
     }
 
@@ -1003,9 +999,7 @@ class Theme : GLib.Object {
     the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
     public static Gtk.Color get_background_aware_link_color (Gtk.Color background_color = QGuiApplication.palette ().base ().color ()) {
-        return {
-            (is_dark_color (background_color) ? Gtk.Color ("#6193dc") : QGuiApplication.palette ().color (QPalette.Link))
-        }
+        return is_dark_color (background_color) ? Gtk.Color ("#6193dc") : QGuiApplication.palette ().color (QPalette.Link)
     }
 
 
@@ -1049,11 +1043,11 @@ class Theme : GLib.Object {
     2019/12/09: Moved here from SettingsDialog.
     ***********************************************************/
     public static QIcon create_color_aware_icon (string name, QPalette palette = QGuiApplication.palette ()) {
-        QSvgRenderer renderer (name);
-        Gtk.Image img (64, 64, Gtk.Image.Format_ARGB32);
+        QSvgRenderer renderer = new QSvgRenderer (name);
+        Gtk.Image img = new Gtk.Image (64, 64, Gtk.Image.Format_ARGB32);
         img.fill (Qt.Global_color.transparent);
-        QPainter img_painter (&img);
-        Gtk.Image inverted (64, 64, Gtk.Image.Format_ARGB32);
+        QPainter img_painter = new QPainter  (&img);
+        Gtk.Image inverted = new Gtk.Image (64, 64, Gtk.Image.Format_ARGB32);
         inverted.fill (Qt.Global_color.transparent);
         QPainter inv_painter (&inverted);
 
@@ -1125,7 +1119,7 @@ class Theme : GLib.Object {
     @return color for the Error_box text.
     ***********************************************************/
     public Gtk.Color error_box_text_color () {
-        return Gtk.Color{"white"};
+        return new Gtk.Color ("white");
     }
 
 
@@ -1134,7 +1128,7 @@ class Theme : GLib.Object {
     ***********************************************************/
     public Gtk.Color error_box_background_color ();
     Gtk.Color Theme.error_box_background_color () {
-        return Gtk.Color{"red"};
+        return new Gtk.Color ("red");
     }
 
 
@@ -1142,7 +1136,7 @@ class Theme : GLib.Object {
     @return color for the Error_box border.
     ***********************************************************/
     public Gtk.Color error_box_border_color () {
-        return Gtk.Color{"black"};
+        return new Gtk.Color ("black");
     }
 
 

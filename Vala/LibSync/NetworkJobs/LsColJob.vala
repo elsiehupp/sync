@@ -18,8 +18,14 @@ class LsColJob : AbstractNetworkJob {
     private GLib.Uri url;
 
     /***********************************************************
+    Used to specify which properties shall be retrieved.
+
+    The properties can
+     - contain no colon : they refer to a property in the DAV :
+     - contain a colon : and thus specify an explicit namespace,
+       e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
     ***********************************************************/
-    private GLib.List<GLib.ByteArray> properties;
+    public GLib.List<GLib.ByteArray> properties;
 
 
     signal void directory_listing_subfolders (string[] items);
@@ -30,14 +36,14 @@ class LsColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public LsColJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public LsColJob.for_path (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public LsColJob.for_account (AccountPointer account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
+    public LsColJob.for_url (AccountPointer account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         this.url = url;
     }
@@ -82,26 +88,6 @@ class LsColJob : AbstractNetworkJob {
             send_request ("PROPFIND", make_dav_url (path ()), request, buf);
         }
         AbstractNetworkJob.on_signal_start ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public GLib.List<GLib.ByteArray> properties () {
-        return this.properties;
-    }
-
-
-    /***********************************************************
-    Used to specify which properties shall be retrieved.
-
-    The properties can
-     - contain no colon : they refer to a property in the DAV :
-     - contain a colon : and thus specify an explicit namespace,
-       e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
-    ***********************************************************/
-    public void properties (GLib.List<GLib.ByteArray> properties) {
-        this.properties = properties;
     }
 
 

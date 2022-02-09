@@ -5,6 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+
 /***********************************************************
 @brief The UploadDevice class
 @ingroup libsync
@@ -26,7 +27,7 @@ class UploadDevice : QIODevice {
     /***********************************************************
     Amount of file data after this.start to use
     ***********************************************************/
-    private int64 size = 0;
+    int64 size { public get; private set; }
 
 
     /***********************************************************
@@ -57,23 +58,43 @@ class UploadDevice : QIODevice {
     Bandwidth manager related
     If this.bandwidth_quota will be used
     ***********************************************************/
-    private bool bandwidth_limited = false;
+    bool bandwidth_limited {
+        public get {
+            return this.bandwidth_limited;
+        }
+        public set {
+            this.bandwidth_limited = value;
+            QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection);
+        }
+    }
 
 
     /***********************************************************
     Bandwidth manager related
     If upload is paused (read_data () will return 0)
     ***********************************************************/
-    private bool choked = false; 
+    bool choked {
+        public get {
+            return this.choked;
+        }
+        public set {
+            this.choked = value;
+            if (!this.choked) {
+                QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection);
+            }
+        }
+    }
 
-    private friend class BandwidthManager;
+    //  private friend class BandwidthManager;
 
     /***********************************************************
     ***********************************************************/
-    public UploadDevice (string filename, int64 start, int64 size, BandwidthManager bandwidth_manager) {
+    public UploadDevice (string filename, int64 start, int64 size = 0, BandwidthManager bandwidth_manager) {
         this.file = filename;
         this.start = start;
         this.size = size;
+        this.choked = false;
+        this.bandwidth_limited = false;
         this.bandwidth_manager = bandwidth_manager;
         this.bandwidth_manager.on_signal_register_upload_device (this);
     }
@@ -89,8 +110,7 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    bool UploadDevice.open (QIODevice.Open_mode mode) {
+    public bool open (QIODevice.Open_mode mode) {
         if (mode & QIODevice.WriteOnly)
             return false;
 
@@ -113,8 +133,7 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public void close ();
-    void UploadDevice.close () {
+    public void close () {
         this.file.close ();
         QIODevice.close ();
     }
@@ -142,10 +161,10 @@ class UploadDevice : QIODevice {
         if (maxlen <= 0) {
             return 0;
         }
-        if (is_choked ()) {
+        if (choked ()) {
             return 0;
         }
-        if (is_bandwidth_limited ()) {
+        if (bandwidth_limited ()) {
             maxlen = q_min (maxlen, this.bandwidth_quota);
             if (maxlen <= 0) { // no quota
                 return 0;
@@ -165,24 +184,14 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public bool at_end ();
-    bool UploadDevice.at_end () {
+    public bool at_end () {
         return this.read >= this.size;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public int64 size ();
-    int64 UploadDevice.size () {
-        return this.size;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int64 bytes_available ();
-    int64 UploadDevice.bytes_available () {
+    public int64 bytes_available () {
         return this.size - this.read + QIODevice.bytes_available ();
     }
 
@@ -212,72 +221,23 @@ class UploadDevice : QIODevice {
 
     /***********************************************************
     ***********************************************************/
-    public void bandwidth_limited (bool);
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool is_bandwidth_limited () {
-        return this.bandwidth_limited;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void choked (bool);
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool is_choked () {
-        return this.choked;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void give_bandwidth_quota (int64 bwq);
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_signal_job_upload_progress (int64 sent, int64 t);
-    void UploadDevice.on_signal_job_upload_progress (int64 sent, int64 t) {
-        if (sent == 0 || t == 0) {
-            return;
-        }
-        this.read_with_progress = sent;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    void UploadDevice.give_bandwidth_quota (int64 bwq) {
+    public void give_bandwidth_quota (int64 bwq) {
         if (!at_end ()) {
             this.bandwidth_quota = bwq;
             QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection); // tell QNAM that we have quota
         }
     }
 
-    void UploadDevice.bandwidth_limited (bool b) {
-        this.bandwidth_limited = b;
-        QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection);
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_job_upload_progress (int64 sent, int64 t) {
+        if (sent == 0 || t == 0) {
+            return;
+        }
+        this.read_with_progress = sent;
     }
 
-    void UploadDevice.choked (bool b) {
-        this.choked = b;
-        if (!this.choked) {
-            QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection);
-        }
-    }
+} // class UploadDevice
+
+} // namespace Occ

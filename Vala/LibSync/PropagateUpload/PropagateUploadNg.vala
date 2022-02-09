@@ -194,7 +194,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             return;
 
         int64 file_size = this.file_to_upload.size;
-        ENFORCE (file_size >= this.sent, "Sent data exceeds file size");
+        //  ENFORCE (file_size >= this.sent, "Sent data exceeds file size");
 
         // prevent situation that chunk size is bigger then required one to send
         this.current_chunk_size = q_min (propagator ().chunk_size, file_size - this.sent);
@@ -444,7 +444,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             return;
         }
 
-        ENFORCE (this.sent <= this.file_to_upload.size, "can't send more than size");
+        //  ENFORCE (this.sent <= this.file_to_upload.size, "can't send more than size");
 
         // Adjust the chunk size for the time taken.
         //

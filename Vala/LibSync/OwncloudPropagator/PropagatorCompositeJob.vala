@@ -193,7 +193,7 @@ class PropagatorCompositeJob : PropagatorJob {
         // Delete the job and remove it from our list of jobs.
         sub_job.delete_later ();
         int i = this.running_jobs.index_of (sub_job);
-        ENFORCE (i >= 0); // should only happen if this function is called more than once
+        //  ENFORCE (i >= 0); // should only happen if this function is called more than once
         this.running_jobs.remove (i);
 
         // Any sub job error will cause the whole composite to fail. This is important

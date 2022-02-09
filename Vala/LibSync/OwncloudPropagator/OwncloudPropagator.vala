@@ -26,53 +26,14 @@ using Soup;
 //  #include <deque>
 
 
-namespace {
-
-    /***********************************************************
-    We do not want to upload files that are currently being modified.
-    To avoid that, we don't upload files that have a modification time
-    that is too close to the current time.
-
-    This interacts with the ms_between_request_and_sync delay in the fol
-    manager. If that delay between file-change notification and sync
-    has passed, we should accept the file for upload here.
-    ***********************************************************/
-    inline bool file_is_still_changing (Occ.SyncFileItem item) {
-        var modtime = Occ.Utility.q_date_time_from_time_t (item.modtime);
-        const int64 ms_since_mod = modtime.msecs_to (GLib.DateTime.current_date_time_utc ());
-
-        return std.chrono.milliseconds (ms_since_mod) < Occ.SyncEngine.minimum_file_age_for_upload
-            // if the mtime is too much in the future we do* upload the file
-            && ms_since_mod > -10000;
-    }
-
-}
-
 namespace Occ {
-
-/***********************************************************
-Free disk space threshold below which syncs will on_signal_abort and not even on_signal_start.
-***********************************************************/
-int64 critical_free_space_limit ();
-
-/***********************************************************
-The client will not intentionally reduce the available free disk space below
- this limit.
-
-Uploads will still run and downloads that are small enough will continue too.
-***********************************************************/
-int64 free_space_limit ();
-
-void blocklist_update (SyncJournalDb journal, SyncFileItem item);
-
-
 
 class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public SyncJournalDb const this.journal;
-    public bool this.finished_emited; // used to ensure that on_signal_finished is only emitted once
+    public SyncJournalDb const journal;
+    public bool finished_emited; // used to ensure that on_signal_finished is only emitted once
 
 
     /***********************************************************
@@ -124,13 +85,13 @@ class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public int this.download_limit = 0;
-    public int this.upload_limit = 0;
-    public BandwidthManager this.bandwidth_manager;
+    public int download_limit = 0;
+    public int upload_limit = 0;
+    public BandwidthManager bandwidth_manager;
 
     /***********************************************************
     ***********************************************************/
-    public bool this.abort_requested = false;
+    public bool abort_requested = false;
 
 
     /***********************************************************
@@ -140,13 +101,13 @@ class OwncloudPropagator : GLib.Object {
         Jobs add themself to the list when they do an assynchronous operation.
         Jobs can be several time on the list (example, when several chunks are uploaded in parallel)
     ***********************************************************/
-    public GLib.List<PropagateItemJob> this.active_job_list;
+    public GLib.List<PropagateItemJob> active_job_list;
 
 
     /***********************************************************
     We detected that another sync is required after this one
     ***********************************************************/
-    public bool this.another_sync_needed;
+    public bool another_sync_needed;
 
 
     /***********************************************************
@@ -161,7 +122,7 @@ class OwncloudPropagator : GLib.Object {
 
     This allows skipping of uploads that have a very high likelihood of failure.
     ***********************************************************/
-    public GLib.HashTable<string, int64> this.folder_quota;
+    public GLib.HashTable<string, int64> folder_quota;
 
     
     /***********************************************************
@@ -177,7 +138,7 @@ class OwncloudPropagator : GLib.Object {
     if Capabilities.desired_chunk_upload_duration has a target
     chunk-upload duration set.
     ***********************************************************/
-    public int64 this.chunk_size;
+    public int64 chunk_size;
     public int64 small_file_size ();
 
 
@@ -265,6 +226,9 @@ class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
+    //  private AccountPointer account;
+    /***********************************************************
+    ***********************************************************/
     public AccountPointer account ();
 
     /***********************************************************
@@ -297,7 +261,7 @@ class OwncloudPropagator : GLib.Object {
         PropagatorCompositeJob composite, string error);
 
     // Map original path (as in the DB) to target final path
-    public GLib.HashTable<string, string> this.renamed_directories;
+    public GLib.HashTable<string, string> renamed_directories;
     public string adjust_renamed_path (string original);
 
 
@@ -413,17 +377,13 @@ signals:
     ***********************************************************/
     private 
 
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private AccountPointer this.account;
-    private QScopedPointer<PropagateRootDirectory> this.root_job;
-    private SyncOptions this.sync_options;
-    private bool this.job_scheduled = false;
+    private QScopedPointer<PropagateRootDirectory> root_job;
+    private SyncOptions sync_options;
+    private bool job_scheduled = false;
 
     /***********************************************************
     ***********************************************************/
-    private const string this.local_dir; // absolute path to the local directory. ends with '/'
+    private const string local_dir; // absolute path to the local directory. ends with '/'
 
     /***********************************************************
     ***********************************************************/
@@ -431,15 +391,15 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private bool this.schedule_delayed_tasks = false;
+    private bool schedule_delayed_tasks = false;
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<string> this.bulk_upload_block_list;
+    private GLib.List<string> bulk_upload_block_list;
 
     /***********************************************************
     ***********************************************************/
-    private static bool this.allow_delayed_upload;
+    private static bool allow_delayed_upload;
 }
 
 
@@ -1168,3 +1128,51 @@ signals:
     }
     }
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***********************************************************
+We do not want to upload files that are currently being modified.
+To avoid that, we don't upload files that have a modification time
+that is too close to the current time.
+
+This interacts with the ms_between_request_and_sync delay in the fol
+manager. If that delay between file-change notification and sync
+has passed, we should accept the file for upload here.
+***********************************************************/
+inline bool file_is_still_changing (Occ.SyncFileItem item) {
+    var modtime = Occ.Utility.q_date_time_from_time_t (item.modtime);
+    const int64 ms_since_mod = modtime.msecs_to (GLib.DateTime.current_date_time_utc ());
+
+    return std.chrono.milliseconds (ms_since_mod) < Occ.SyncEngine.minimum_file_age_for_upload
+        // if the mtime is too much in the future we do* upload the file
+        && ms_since_mod > -10000;
+}
+
+/***********************************************************
+Free disk space threshold below which syncs will on_signal_abort and not even on_signal_start.
+***********************************************************/
+int64 critical_free_space_limit ();
+
+/***********************************************************
+The client will not intentionally reduce the available free disk space below
+ this limit.
+
+Uploads will still run and downloads that are small enough will continue too.
+***********************************************************/
+int64 free_space_limit ();
+
+void blocklist_update (SyncJournalDb journal, SyncFileItem item);

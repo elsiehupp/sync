@@ -14,13 +14,42 @@ class GETFileJob : AbstractNetworkJob {
 
     QIODevice device;
     GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
-    string error_string;
+    string error_string {
+        public get {
+            if (!this.error_string.is_empty ()) {
+                return this.error_string;
+            }
+            return AbstractNetworkJob.error_string ();
+        }
+        private set {
+            this.error_string = value;
+        }
+    }
+
     GLib.ByteArray expected_etag_for_resume;
-    int64 expected_content_length;
-    int64 resume_start;
-    SyncFileItem.Status error_status;
+    int64 expected_content_length {
+        public get {
+            return -1;
+        }
+        public set {
+            this.expected_content_length = value;
+        }
+    }
+
+
+    int64 resume_start {
+        public get {
+            return -1;
+        }
+        private set {
+            this.resume_start = value;
+        }
+    }
+
+    public SyncFileItem.Status error_status;
+
     GLib.Uri direct_download_url;
-    GLib.ByteArray etag;
+    GLib.ByteArray etag { public get; private set; }
 
     /***********************************************************
     If this.bandwidth_quota will be used
@@ -32,18 +61,17 @@ class GETFileJob : AbstractNetworkJob {
     ***********************************************************/
     bool bandwidth_choked;
     int64 bandwidth_quota;
-    QPointer<BandwidthManager> bandwidth_manager;
-    bool has_emitted_finished_signal;
-    time_t last_modified;
 
+    QPointer<BandwidthManager> bandwidth_manager { private get; public set; }
+    bool has_emitted_finished_signal;
+    time_t last_modified { public get; private set; }
 
     /***********************************************************
     Will be set to true once we've seen a 2xx response header
     ***********************************************************/
     bool save_body_to_file = false;
 
-
-    protected int64 content_length;
+    int64 content_length { public get; protected set; }
 
 
     signal void finished_signal ();
@@ -184,12 +212,6 @@ class GETFileJob : AbstractNetworkJob {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public void bandwidth_manager (BandwidthManager bandwidth_manager);
-    void GETFileJob.bandwidth_manager (BandwidthManager bandwidth_manager) {
-        this.bandwidth_manager = bandwidth_manager;
-    }
 
 
 
@@ -241,34 +263,12 @@ class GETFileJob : AbstractNetworkJob {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public string error_string () {
-        if (!this.error_string.is_empty ()) {
-            return this.error_string;
-        }
-        return AbstractNetworkJob.error_string ();
-    }
 
 
     /***********************************************************
     ***********************************************************/
     public void on_signal_error_string (string s) {
         this.error_string = s;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public SyncFileItem.Status error_status () {
-        return this.error_status;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void error_status (SyncFileItem.Status s) {
-        this.error_status = s;
     }
 
 
@@ -284,46 +284,6 @@ class GETFileJob : AbstractNetworkJob {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public GLib.ByteArray etag () {
-        return this.etag;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int64 resume_start () {
-        return -1;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public time_t last_modified () {
-        return this.last_modified;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int64 content_length () {
-        return this.content_length;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int64 expected_content_length () {
-        return -1;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void expected_content_length (int64 size) {
-        this.expected_content_length = size;
-    }
 
 
     /***********************************************************
