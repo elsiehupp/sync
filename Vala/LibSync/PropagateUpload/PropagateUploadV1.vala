@@ -151,8 +151,8 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
         }
         int64 file_size = this.file_to_upload.size;
         var headers = PropagateUploadFileCommon.headers ();
-        headers[QByteArrayLiteral ("OC-Total-Length")] = new GLib.ByteArray.number (file_size);
-        headers[QByteArrayLiteral ("OC-Chunk-Size")] = new GLib.ByteArray.number (chunk_size ());
+        headers[GLib.ByteArray ("OC-Total-Length")] = new GLib.ByteArray.number (file_size);
+        headers[GLib.ByteArray ("OC-Chunk-Size")] = new GLib.ByteArray.number (chunk_size ());
 
         string path = this.file_to_upload.file;
 
@@ -166,7 +166,7 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
             GLib.info ("Upload chunk" + sending_chunk + "of" + this.chunk_count + "transferid (remote)=" + transid;
             path += string ("-chunking-%1-%2-%3").arg (transid).arg (this.chunk_count).arg (sending_chunk);
 
-            headers[QByteArrayLiteral ("OC-Chunked")] = QByteArrayLiteral ("1");
+            headers[GLib.ByteArray ("OC-Chunked")] = GLib.ByteArray ("1");
 
             chunk_start = chunk_size () * sending_chunk;
             current_chunk_size = chunk_size ();
@@ -205,13 +205,13 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
         }
 
         // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
-        var device_ptr = device.get (); // for connections later
+        var device_ptr = device; // for connections later
         var job = new PUTFile_job (propagator ().account (), propagator ().full_remote_path (path), std.move (device), headers, this.current_chunk, this);
         this.jobs.append (job);
-        connect (job, &PUTFile_job.finished_signal, this, &PropagateUploadFileV1.on_signal_put_finished);
-        connect (job, &PUTFile_job.upload_progress, this, &PropagateUploadFileV1.on_signal_upload_progress);
-        connect (job, &PUTFile_job.upload_progress, device_ptr, &UploadDevice.on_signal_job_upload_progress);
-        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_signal_job_destroyed);
+        connect (job, PUTFile_job.signal_finished, this, PropagateUploadFileV1.on_signal_put_finished);
+        connect (job, PUTFile_job.signal_upload_progress, this, PropagateUploadFileV1.on_signal_upload_progress);
+        connect (job, PUTFile_job.signal_upload_progress, device_ptr, UploadDevice.on_signal_job_upload_progress);
+        connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
         if (is_final_chunk)
             adjust_last_job_timeout (job, file_size);
         job.on_signal_start ();
@@ -397,7 +397,7 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
     private void on_signal_upload_progress (int64 sent, int64 total) {
         // Completion is signaled with sent=0, total=0; avoid accidentally
         // resetting progress due to the sent being zero by ignoring it.
-        // finished_signal () is bound to be emitted soon anyway.
+        // signal_finished () is bound to be emitted soon anyway.
         // See https://bugreports.qt.io/browse/QTBUG-44782.
         if (sent == 0 && total == 0) {
             return;

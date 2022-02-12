@@ -15,7 +15,7 @@ Primarily adds timeout and redirection handling.
 ***********************************************************/
 class SimpleNetworkJob : AbstractNetworkJob {
 
-    signal void finished_signal (Soup.Reply reply);
+    signal void signal_finished (Soup.Reply reply);
 
 
     /***********************************************************
@@ -40,7 +40,7 @@ class SimpleNetworkJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        /* emit */ finished_signal (reply ());
+        /* emit */ signal_finished (reply ());
         return true;
     }
 

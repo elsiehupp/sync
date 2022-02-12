@@ -16,10 +16,10 @@ class FolderMetadata {
     public FolderMetadata.for_account (AccountPointer account, GLib.ByteArray metadata = new GLib.ByteArray (), int status_code = -1) {
         this.account = account;
         if (metadata.is_empty () || status_code == 404) {
-            GLib.info ("Setupping Empty Metadata";
+            GLib.info ("Setting up empty metadata.");
             up_empty_metadata ();
         } else {
-            GLib.info ("Setting up existing metadata";
+            GLib.info ("Setting up existing metadata.");
             up_existing_metadata (metadata);
         }
     }
@@ -38,7 +38,7 @@ class FolderMetadata {
                         key, GLib.ByteArray.from_base64 (encrypted_metadata));
 
         if (decrypt_result.is_empty ()) {
-        GLib.debug ("ERROR. Could not decrypt the metadata key";
+        GLib.debug ("ERROR. Could not decrypt the metadata key.");
         return {};
         }
         return GLib.ByteArray.from_base64 (decrypt_result);
@@ -47,32 +47,32 @@ class FolderMetadata {
 
     /***********************************************************
     ***********************************************************/
-    public void add_encrypted_file (EncryptedFile f) {
+    public void add_encrypted_file (EncryptedFile encrypted_file) {
 
         for (int i = 0; i < this.files.size (); i++) {
-            if (this.files.at (i).original_filename == f.original_filename) {
+            if (this.files.at (i).original_filename == encrypted_file.original_filename) {
                 this.files.remove_at (i);
                 break;
             }
         }
 
-        this.files.append (f);
+        this.files.append (encrypted_file);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public GLib.ByteArray encrypted_metadata () {
-        GLib.debug ("Generating metadata";
+        GLib.debug ("Generating metadata.");
 
         QJsonObject metadata_keys;
-        for (var it = this.metadata_keys.const_begin (), end = this.metadata_keys.const_end (); it != end; it++) {
+        foreach (var key in this.metadata_keys) {
             /***********************************************************
             We have to already base64 encode the metadatakey here. This was a misunderstanding in the RFC
             Now we should be compatible with Android and IOS. Maybe we can fix it later.
             ***********************************************************/
             const GLib.ByteArray encrypted_key = encrypt_metadata_key (it.value ().to_base64 ());
-            metadata_keys.insert (string.number (it.key ()), string (encrypted_key));
+            metadata_keys.insert (string.number (key.key ()), string (encrypted_key));
         }
 
 
@@ -87,40 +87,40 @@ class FolderMetadata {
         string sharing_encrypted = encrypt_json_object (recepient_doc.to_json (QJsonDocument.Compact), this.metadata_keys.last ());
         ***********************************************************/
 
-        QJsonObject metadata = {
+        QJsonObject metadata = new QJsonObject (
             {"metadata_keys", metadata_keys},
             {"sharing", sharing_encrypted},
             {"version", 1}
-        }
+        )
 
         QJsonObject files;
-        for (var it = this.files.const_begin (), end = this.files.const_end (); it != end; it++) {
+        foreach (var each_file in this.files) {
             QJsonObject encrypted;
-            encrypted.insert ("key", string (it.encryption_key.to_base64 ()));
-            encrypted.insert ("filename", it.original_filename);
-            encrypted.insert ("mimetype", string (it.mimetype));
-            encrypted.insert ("version", it.file_version);
+            encrypted.insert ("key", each_file.encryption_key.to_base64 ().to_string ());
+            encrypted.insert ("filename", each_file.original_filename);
+            encrypted.insert ("mimetype", each_file.mimetype.to_string ());
+            encrypted.insert ("version", each_file.file_version);
             QJsonDocument encrypted_doc;
             encrypted_doc.object (encrypted);
 
             string encrypted_encrypted = encrypt_json_object (encrypted_doc.to_json (QJsonDocument.Compact), this.metadata_keys.last ());
             if (encrypted_encrypted.is_empty ()) {
-            GLib.debug ("Metadata generation failed!";
+                GLib.debug ("Metadata generation failed!");
             }
 
             QJsonObject file;
             file.insert ("encrypted", encrypted_encrypted);
-            file.insert ("initialization_vector", string (it.initialization_vector.to_base64 ()));
-            file.insert ("authentication_tag", string (it.authentication_tag.to_base64 ()));
+            file.insert ("initialization_vector", each_file.initialization_vector.to_base64 ().to_string ());
+            file.insert ("authentication_tag", each_file.authentication_tag.to_base64 ().to_string ());
             file.insert ("metadata_key", this.metadata_keys.last_key ());
 
             files.insert (it.encrypted_filename, file);
         }
 
-        QJsonObject meta_object = {
+        QJsonObject meta_object = new QJsonObject (
             {"metadata", metadata},
             {"files", files}
-        }
+        )
 
         QJsonDocument internal_metadata;
         internal_metadata.object (meta_object);
@@ -130,10 +130,10 @@ class FolderMetadata {
 
     /***********************************************************
     ***********************************************************/
-    public void remove_encrypted_file (EncryptedFile f) {
-        for (int i = 0; i < this.files.size (); i++) {
-            if (this.files.at (i).original_filename == f.original_filename) {
-                this.files.remove_at (i);
+    public void remove_encrypted_file (EncryptedFile encrypted_file) {
+        foreach (var file in this.files) {
+            if (file.original_filename == encrypted_file.original_filename) {
+                this.files.remove (file);
                 break;
             }
         }
@@ -143,7 +143,9 @@ class FolderMetadata {
     /***********************************************************
     ***********************************************************/
     public void remove_all_encrypted_files () {
-        this.files.clear ();
+        foreach(var file in this.files) {
+            this.files.remove (file);
+        }
     }
 
 
@@ -152,7 +154,7 @@ class FolderMetadata {
     to ease the port to Nlohmann Json API
     ***********************************************************/
     private void up_empty_metadata () {
-        GLib.debug ("Settint up empty metadata";
+        GLib.debug ("Setting up empty metadata.");
         GLib.ByteArray new_metadata_pass = EncryptionHelper.generate_random (16);
         this.metadata_keys.insert (0, new_metadata_pass);
 
@@ -250,8 +252,8 @@ class FolderMetadata {
             file.file_version = decrypted_file_obj["version"].to_int ();
 
             // In case we wrongly stored "inode/directory" we try to recover from it
-            if (file.mimetype == QByteArrayLiteral ("inode/directory")) {
-                file.mimetype = QByteArrayLiteral ("httpd/unix-directory");
+            if (file.mimetype == GLib.ByteArray ("inode/directory")) {
+                file.mimetype = GLib.ByteArray ("httpd/unix-directory");
             }
 
             this.files.push_back (file);

@@ -94,7 +94,7 @@ class DetermineAuthTypeJob : GLib.Object {
         propfind.ignore_credential_failure (true);
         old_flow_required.ignore_credential_failure (true);
 
-        connect (get, &SimpleNetworkJob.finished_signal, this, [this, get] () {
+        connect (get, SimpleNetworkJob.signal_finished, this, [this, get] () {
             var reply = get.reply ();
             var www_authenticate_header = reply.raw_header ("WWW-Authenticate");
             if (reply.error () == Soup.Reply.AuthenticationRequiredError
@@ -106,8 +106,8 @@ class DetermineAuthTypeJob : GLib.Object {
             this.get_done = true;
             check_all_done ();
         });
-        connect (propfind, &SimpleNetworkJob.finished_signal, this, (Soup.Reply reply) {
-            var auth_challenge = reply.raw_header ("WWW-Authenticate").to_lower ();
+        connect (propfind, SimpleNetworkJob.signal_finished, this, (Soup.Reply reply) {
+            var auth_challenge = reply.raw_header ("WWW-Authenticate").down ();
             if (auth_challenge.contains ("bearer ")) {
                 this.result_propfind = OAuth;
             } else {
@@ -121,7 +121,7 @@ class DetermineAuthTypeJob : GLib.Object {
             this.propfind_done = true;
             check_all_done ();
         });
-        connect (old_flow_required, &JsonApiJob.json_received, this, (QJsonDocument json, int status_code) {
+        connect (old_flow_required, JsonApiJob.signal_json_received, this, (QJsonDocument json, int status_code) {
             if (status_code == 200) {
                 this.result_old_flow = LoginFlowV2;
 

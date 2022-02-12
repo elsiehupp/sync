@@ -299,7 +299,7 @@ class ProgressInfo : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public ProgressInfo () {
-        connect (&this.update_estimates_timer, &QTimer.timeout, this, &ProgressInfo.on_signal_update_estimates);
+        connect (&this.update_estimates_timer, QTimer.timeout, this, ProgressInfo.on_signal_update_estimates);
         on_signal_reset ();
     }
 

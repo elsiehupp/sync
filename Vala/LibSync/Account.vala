@@ -65,7 +65,7 @@ class Account : GLib.Object {
     @ingroup libsync
     ***********************************************************/
     class AbstractSslErrorHandler {
-        public virtual bool handle_errors (GLib.List<QSslError>, QSslConfiguration conf, GLib.List<QSslCertificate> cert_list, AccountPointer account);
+        public virtual bool handle_errors (GLib.List<QSslError> error_list, QSslConfiguration conf, GLib.List<QSslCertificate> cert_list, AccountPointer account);
     }
 
 
@@ -117,7 +117,7 @@ class Account : GLib.Object {
                 return;
             }
             this.dav_user = value;
-            /* emit */ wants_account_saved (this);
+            /* emit */ signal_wants_account_saved (this);
         }
     }
 
@@ -136,7 +136,7 @@ class Account : GLib.Object {
         }
         public set {
             this.display_name = value;
-            /* emit */ account_changed_display_name ();
+            /* emit */ signal_account_changed_display_name ();
         }
     }
 
@@ -153,7 +153,7 @@ class Account : GLib.Object {
         }
         public set {
             this.avatar = value;
-            /* emit */ account_changed_avatar ();
+            /* emit */ signal_account_changed_avatar ();
         }
     }
 //  #endif
@@ -234,7 +234,7 @@ class Account : GLib.Object {
     
             var old_server_version = this.server_version;
             this.server_version = value;
-            /* emit */ server_version_changed (this, old_server_version, value);
+            /* emit */ signal_server_version_changed (this, old_server_version, value);
         }
     }
 
@@ -273,7 +273,7 @@ class Account : GLib.Object {
                 // Remember proxy (issue #2108)
                 proxy = this.access_manager.proxy ();
 
-                this.access_manager = new unowned QNetworkAccessManager ();
+                this.access_manager = new /*unowned*/ QNetworkAccessManager ();
             }
 
             // The order for these two is important! Reading the credential's
@@ -284,7 +284,7 @@ class Account : GLib.Object {
             // Note: This way the QNAM can outlive the Account and Credentials.
             // This is necessary to avoid issues with the QNAM being deleted while
             // processing on_signal_handle_ssl_errors ().
-            this.access_manager = new unowned QNetworkAccessManager (this.credentials.create_qnam (), &GLib.Object.delete_later);
+            this.access_manager = new /*unowned*/ QNetworkAccessManager (this.credentials.create_qnam (), GLib.Object.delete_later);
 
             if (jar) {
                 this.access_manager.cookie_jar (jar);
@@ -292,14 +292,18 @@ class Account : GLib.Object {
             if (proxy.type () != QNetworkProxy.DefaultProxy) {
                 this.access_manager.proxy (proxy);
             }
-            connect (this.access_manager.data (), SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
-                SLOT (on_signal_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
-            connect (this.access_manager.data (), &QNetworkAccessManager.proxy_authentication_required,
-                this, &Account.proxy_authentication_required);
-            connect (this.credentials.data (), &AbstractCredentials.fetched,
-                this, &Account.on_signal_credentials_fetched);
-            connect (this.credentials.data (), &AbstractCredentials.asked,
-                this, &Account.on_signal_credentials_asked);
+            this.ssl_errors.connect (
+                this.access_manager.data (),
+                this.on_signal_handle_ssl_errors);
+            QNetworkAccessManager.signal_proxy_authentication_required.connect (
+                this.access_manager.data (),
+                Account.signal_proxy_authentication_required);
+            AbstractCredentials.signal_fetched.connect (
+                this.credentials.data (),
+                Account.on_signal_credentials_fetched);
+            AbstractCredentials.signal_asked.connect (
+                this.credentials.data (),
+                Account.on_signal_credentials_asked);
 
             try_setup_push_notifications ();
         }
@@ -367,59 +371,63 @@ class Account : GLib.Object {
     /***********************************************************
     Emitted whenever there's network activity
     ***********************************************************/
-    signal void propagator_network_activity ();
+    signal void signal_propagator_network_activity ();
 
     /***********************************************************
     Triggered by handle_invalid_credentials ()
     ***********************************************************/
-    signal void invalid_credentials ();
+    signal void signal_invalid_credentials ();
 
     /***********************************************************
     ***********************************************************/
-    signal void credentials_fetched (AbstractCredentials credentials);
+    signal void signal_credentials_fetched (AbstractCredentials credentials);
 
     /***********************************************************
     ***********************************************************/
-    signal void credentials_asked (AbstractCredentials credentials);
+    signal void signal_credentials_asked (AbstractCredentials credentials);
 
     /***********************************************************
-    Forwards from QNetworkAccessManager.proxy_authentication_required ().
+    Forwards from QNetworkAccessManager.signal_proxy_authentication_required ().
     ***********************************************************/
-    signal void proxy_authentication_required (QNetworkProxy proxy, QAuthenticator authenticator);
+    signal void signal_proxy_authentication_required (QNetworkProxy proxy, QAuthenticator authenticator);
 
     /***********************************************************
     e.g. when the approved SSL certificates changed
     ***********************************************************/
-    signal void wants_account_saved (Account acc);
+    signal void signal_wants_account_saved (Account acc);
 
     /***********************************************************
     ***********************************************************/
-    signal void server_version_changed (Account account, string new_version, string old_version);
+    signal void signal_server_version_changed (Account account, string new_version, string old_version);
 
     /***********************************************************
     ***********************************************************/
-    signal void account_changed_avatar ();
+    signal void signal_account_changed_avatar ();
 
     /***********************************************************
     ***********************************************************/
-    signal void account_changed_display_name ();
+    signal void signal_account_changed_display_name ();
 
     /***********************************************************
     Used in RemoteWipe
     ***********************************************************/
-    signal void app_password_retrieved (string value);
+    signal void signal_app_password_retrieved (string value);
 
     /***********************************************************
     ***********************************************************/
-    signal void push_notifications_ready (Account account);
+    signal void signal_push_notifications_ready (Account account);
 
     /***********************************************************
     ***********************************************************/
-    signal void push_notifications_disabled (Account account);
+    signal void signal_push_notifications_disabled (Account account);
 
     /***********************************************************
     ***********************************************************/
-    signal void user_status_changed ();
+    signal void signal_user_status_changed ();
+
+    /***********************************************************
+    ***********************************************************/
+    signal void ssl_errors (Soup.Reply reply, GLib.List<QSslError> error_list);
 
     /***********************************************************
     ***********************************************************/
@@ -433,14 +441,14 @@ class Account : GLib.Object {
         q_register_meta_type<Account> ("Account*");
 
         this.push_notifications_reconnect_timer.interval (PUSH_NOTIFICATIONS_RECONNECT_INTERVAL);
-        connect (&this.push_notifications_reconnect_timer, &QTimer.timeout, this, &Account.try_setup_push_notifications);
+        connect (&this.push_notifications_reconnect_timer, QTimer.timeout, this, Account.try_setup_push_notifications);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static AccountPointer create () {
-        AccountPointer acc = AccountPointer (new Account);
+        AccountPointer acc = AccountPointer (new Account ());
         acc.shared_this (acc);
         return acc;
     }
@@ -710,7 +718,7 @@ class Account : GLib.Object {
         var jar = (CookieJar) this.access_manager.cookie_jar ();
         //  ASSERT (jar);
         jar.all_cookies (new GLib.List<QNetworkCookie> ());
-        /* emit */ wants_account_saved (this);
+        /* emit */ signal_wants_account_saved (this);
     }
 
 
@@ -736,32 +744,33 @@ class Account : GLib.Object {
         if (this.capabilities.available_push_notifications () != PushNotificationType.NONE) {
             GLib.info ("Try to setup push notifications");
 
-            if (!this.push_notifications) {
+            if (this.push_notifications == null) {
                 this.push_notifications = new PushNotifications (this, this);
 
-                connect (this.push_notifications, &PushNotifications.ready, this, () => {
-                    this.push_notifications_reconnect_timer.stop ();
-                    /* emit */ push_notifications_ready (this);
-                });
-
-                var disable_push_notifications = () => {
-                    GLib.info ("Disable push notifications object because authentication failed or connection lost");
-                    if (!this.push_notifications) {
-                        return;
-                    }
-                    if (!this.push_notifications.is_ready ()) {
-                        /* emit */ push_notifications_disabled (this);
-                    }
-                    if (!this.push_notifications_reconnect_timer.is_active ()) {
-                        this.push_notifications_reconnect_timer.on_signal_start ();
-                    }
-                }
-
-                connect (this.push_notifications, &PushNotifications.connection_lost, this, disable_push_notifications);
-                connect (this.push_notifications, &PushNotifications.authentication_failed, this, disable_push_notifications);
+                PushNotifications.signal_ready.connect (this.push_notifications, on_signal_ready);
+                PushNotifications.signal_connection_lost.connect (this.push_notifications, on_signal_connection_lost);
+                PushNotifications.signal_authentication_failed.connect (this.push_notifications, on_signal_connection_lost);
             }
             // If push notifications already running it is no problem to call setup again
             this.push_notifications.up ();
+        }
+    }
+
+    private void on_signal_ready () {
+        this.push_notifications_reconnect_timer.stop ();
+        /* emit */ signal_push_notifications_ready (this);
+    }
+
+    private void on_signal_connection_lost () {
+        GLib.info ("Disable push notifications object because authentication failed or connection lost.");
+        if (!this.push_notifications) {
+            return;
+        }
+        if (!this.push_notifications.is_ready ()) {
+            /* emit */ signal_push_notifications_disabled (this);
+        }
+        if (!this.push_notifications_reconnect_timer.is_active ()) {
+            this.push_notifications_reconnect_timer.on_signal_start ();
         }
     }
 
@@ -783,7 +792,7 @@ class Account : GLib.Object {
         var job = new DeletePasswordJob (Theme.instance ().app_name ());
         job.insecure_fallback (false);
         job.key (kck);
-        connect (job, &DeletePasswordJob.on_signal_finished, (Job incoming) => {
+        connect (job, DeletePasswordJob.on_signal_finished, (Job incoming) => {
             var delete_job = static_cast<DeletePasswordJob> (incoming);
             if (delete_job.error () == NoError)
                 GLib.info ("app_password deleted from keychain");
@@ -817,15 +826,14 @@ class Account : GLib.Object {
 
         // Use a unowned to allow locking the life of the QNAM on the stack.
         // Make it call delete_later to make sure that we can return to any QNAM stack frames safely.
-        this.access_manager = new unowned QNetworkAccessManager (this.credentials.create_qnam (), &GLib.Object.delete_later);
+        this.access_manager = new /*unowned*/ QNetworkAccessManager (this.credentials.create_qnam (), GLib.Object.delete_later);
 
         this.access_manager.cookie_jar (jar); // takes ownership of the old cookie jar
         this.access_manager.proxy (proxy);   // Remember proxy (issue #2108)
 
-        connect (this.access_manager.data (), SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
-            SLOT (on_signal_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>)));
-        connect (this.access_manager.data (), &QNetworkAccessManager.proxy_authentication_required,
-            this, &Account.proxy_authentication_required);
+        connect (this.access_manager.data (), SIGNAL (ssl_errors (Soup.Reply reply, GLib.List<QSslError> error_list)),
+            SLOT (on_signal_handle_ssl_errors (Soup.Reply reply, GLib.List<QSslError> error_list)));
+        Account.signal_proxy_authentication_required.connect (this.access_manager.data (), QNetworkAccessManager.signal_proxy_authentication_required);
     }
 
 
@@ -845,13 +853,13 @@ class Account : GLib.Object {
 
     /***********************************************************
     Called by network jobs on credential errors, emits
-    invalid_credentials ()
+    signal_invalid_credentials ()
     ***********************************************************/
     public void handle_invalid_credentials () {
         // Retrieving password will trigger remote wipe check job
         retrieve_app_password ();
 
-        /* emit */ invalid_credentials ();
+        /* emit */ signal_invalid_credentials ();
     }
 
 
@@ -870,16 +878,16 @@ class Account : GLib.Object {
         var job = new ReadPasswordJob (Theme.instance ().app_name ());
         job.insecure_fallback (false);
         job.key (kck);
-        connect (job, &ReadPasswordJob.on_signal_finished, (Job incoming) => {
+        connect (job, ReadPasswordJob.on_signal_finished, (Job incoming) => {
             var read_job = (ReadPasswordJob) (incoming);
-            string pwd ("");
+            string pwd "";
             // Error or no valid public key error out
             if (read_job.error () == NoError &&
                     read_job.binary_data ().length () > 0) {
                 pwd = read_job.binary_data ();
             }
 
-            /* emit */ app_password_retrieved (pwd);
+            /* emit */ signal_app_password_retrieved (pwd);
         });
         job.on_signal_start ();
     }
@@ -909,7 +917,7 @@ class Account : GLib.Object {
         job.insecure_fallback (false);
         job.key (kck);
         job.binary_data (app_password.to_latin1 ());
-        connect (job, &WritePasswordJob.on_signal_finished, (Job incoming) => {
+        connect (job, WritePasswordJob.on_signal_finished, (Job incoming) => {
             var write_job = (WritePasswordJob) (incoming);
             if (write_job.error () == NoError)
                 GLib.info ("app_password stored in keychain");
@@ -927,7 +935,7 @@ class Account : GLib.Object {
     ***********************************************************/
     public void delete_app_token () {
         var delete_app_token_job = new DeleteJob (shared_from_this (), "/ocs/v2.php/core/apppassword");
-        connect (delete_app_token_job, &DeleteJob.finished_signal, this, () => {
+        connect (delete_app_token_job, DeleteJob.signal_finished, this, () => {
             var delete_job = (DeleteJob)GLib.Object.sender ();
             if (delete_job) {
                 var http_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
@@ -959,7 +967,7 @@ class Account : GLib.Object {
             (direct_editing_e_tag.is_empty () || direct_editing_e_tag != this.last_direct_editing_e_tag)) {
                 // Fetch the available editors and their mime types
                 var job = new JsonApiJob (shared_from_this (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing"));
-                GLib.Object.connect (job, &JsonApiJob.json_received, this, &Account.on_signal_direct_editing_recieved);
+                GLib.Object.JsonApiJob.signal_json_received.connect (job, this, Account.on_signal_direct_editing_recieved);
                 job.on_signal_start ();
         }
     }
@@ -969,11 +977,11 @@ class Account : GLib.Object {
     ***********************************************************/
     public void setup_user_status_connector () {
         this.user_status_connector = std.make_shared<OcsUserStatusConnector> (shared_from_this ());
-        connect (this.user_status_connector.get (), &UserStatusConnector.user_status_fetched, this, (UserStatus &) => {
-            /* emit */ user_status_changed ();
+        connect (this.user_status_connector, UserStatusConnector.user_status_fetched, this, (UserStatus status) => {
+            /* emit */ signal_user_status_changed ();
         });
-        connect (this.user_status_connector.get (), &UserStatusConnector.message_cleared, this, () => {
-            /* emit */ user_status_changed ();
+        connect (this.user_status_connector, UserStatusConnector.message_cleared, this, () => {
+            /* emit */ signal_user_status_changed ();
         });
     }
 
@@ -1045,7 +1053,7 @@ class Account : GLib.Object {
             if (!approved_certificates.is_empty ()) {
                 QSslConfiguration.default_configuration ().add_ca_certificates (approved_certificates);
                 add_approved_certificates (approved_certificates);
-                /* emit */ wants_account_saved (this);
+                /* emit */ signal_wants_account_saved (this);
 
                 // all ssl certificates are known and accepted. We can ignore the problems right away.
                 GLib.info (output + " Certs are known and trusted! This is not an actual error.");
@@ -1078,23 +1086,23 @@ class Account : GLib.Object {
         if (this.dav_user.is_empty ()) {
             GLib.debug ("User identifier not set. Fetch it.");
             var fetch_user_name_job = new JsonApiJob (shared_from_this (), "/ocs/v1.php/cloud/user");
-            connect (fetch_user_name_job, &JsonApiJob.json_received, this, /*[this, fetch_user_name_job]*/ (QJsonDocument json, int status_code) => {
+            connect (fetch_user_name_job, JsonApiJob.signal_json_received, this, /*[this, fetch_user_name_job]*/ (QJsonDocument json, int status_code) => {
                 fetch_user_name_job.delete_later ();
                 if (status_code != 100) {
                     GLib.warning ("Could not fetch user identifier. Login will probably not work.");
-                    /* emit */ credentials_fetched (this.credentials.data ());
+                    /* emit */ signal_credentials_fetched (this.credentials.data ());
                     return;
                 }
 
                 var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
                 var user_id = obj_data.value ("identifier").to_string ();
                 dav_user (user_id);
-                /* emit */ credentials_fetched (this.credentials.data ());
+                /* emit */ signal_credentials_fetched (this.credentials.data ());
             });
             fetch_user_name_job.on_signal_start ();
         } else {
             GLib.debug ("User identifier already fetched.");
-            /* emit */ credentials_fetched (this.credentials.data ());
+            /* emit */ signal_credentials_fetched (this.credentials.data ());
         }
     }
 
@@ -1102,7 +1110,7 @@ class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_credentials_asked () {
-        /* emit */ credentials_asked (this.credentials.data ());
+        /* emit */ signal_credentials_asked (this.credentials.data ());
     }
 
 

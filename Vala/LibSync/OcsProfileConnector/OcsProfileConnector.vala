@@ -44,7 +44,7 @@ class OcsProfileConnector : GLib.Object {
         }
         const string url = QStringLiteral ("/ocs/v2.php/hovercard/v1/%1").arg (user_id);
         var job = new JsonApiJob (this.account, url, this);
-        connect (job, &JsonApiJob.json_received, this, &OcsProfileConnector.on_signal_hovercard_fetched);
+        JsonApiJob.signal_json_received.connect (job, this, OcsProfileConnector.on_signal_hovercard_fetched);
         job.on_signal_start ();
     }
 
@@ -88,11 +88,11 @@ class OcsProfileConnector : GLib.Object {
     private void start_fetch_icon_job (size_t hovercard_action_index) {
         var hovercard_action = this.current_hovercard.actions[hovercard_action_index];
         var icon_job = new IconJob{this.account, hovercard_action.icon_url, this};
-        connect (icon_job, &IconJob.job_finished,
+        connect (icon_job, IconJob.job_finished,
             [this, hovercard_action_index] (GLib.ByteArray icon_data) {
                 load_hovercard_action_icon (hovercard_action_index, icon_data);
             });
-        connect (icon_job, &IconJob.error, this, [] (Soup.Reply.NetworkError error_type) {
+        connect (icon_job, IconJob.error, this, [] (Soup.Reply.NetworkError error_type) {
             GLib.warning ("Could not fetch icon:" + error_type;
         });
     }
@@ -117,7 +117,7 @@ class OcsProfileConnector : GLib.Object {
         }
         var icon = icon_data_to_pixmap (icon_data);
         if (icon.is_valid ()) {
-            hovercard_action_icon (hovercard_action_index, icon.get ());
+            hovercard_action_icon (hovercard_action_index, icon);
             return;
         }
         GLib.warning ("Could not load Svg icon from data" + icon_data;

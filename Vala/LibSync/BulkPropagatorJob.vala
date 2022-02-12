@@ -137,12 +137,10 @@ class BulkPropagatorJob : PropagatorJob {
             compute_checksum.checksum_type (GLib.ByteArray ());
         }
 
-        connect (compute_checksum.get (), &ComputeChecksum.done,
-                this, /*[this, item, file_to_upload]*/ (GLib.ByteArray content_checksum_type, GLib.ByteArray content_checksum) => {
+        ComputeChecksum.signal_done.connect ((compute_checksum, content_checksum_type, content_checksum) => {
             on_signal_start_upload (item, file_to_upload, content_checksum_type, content_checksum);
         });
-        connect (compute_checksum.get (), &ComputeChecksum.done,
-                compute_checksum.get (), &GLib.Object.delete_later);
+        ComputeChecksum.signal_done.connect (compute_checksum, GLib.Object.delete_later);
         compute_checksum.release ().on_signal_start (file_to_upload.path);
     }
 
@@ -302,7 +300,7 @@ class BulkPropagatorJob : PropagatorJob {
     private void on_signal_upload_progress (SyncFileItemPtr item, int64 sent, int64 total) {
         // Completion is signaled with sent=0, total=0; avoid accidentally
         // resetting progress due to the sent being zero by ignoring it.
-        // finished_signal () is bound to be emitted soon anyway.
+        // signal_finished () is bound to be emitted soon anyway.
         // See https://bugreports.qt.io/browse/QTBUG-44782.
         if (sent == 0 && total == 0) {
             return;
@@ -343,7 +341,7 @@ class BulkPropagatorJob : PropagatorJob {
         propagator ().journal.commit ("Upload info");
 
         var current_headers = headers (item);
-        current_headers[QByteArrayLiteral ("Content-Length")] = new GLib.ByteArray.number (file_to_upload.size);
+        current_headers[GLib.ByteArray ("Content-Length")] = new GLib.ByteArray.number (file_to_upload.size);
 
         if (!item.rename_target.is_empty () && item.file != item.rename_target) {
             // Try to rename the file
@@ -417,17 +415,16 @@ class BulkPropagatorJob : PropagatorJob {
 
         var bulk_upload_url = Utility.concat_url_path (propagator ().account ().url (), "/remote.php/dav/bulk");
         var job = std.make_unique<PutMultiFileJob> (propagator ().account (), bulk_upload_url, std.move (upload_parameters_data), this);
-        connect (job.get (), &PutMultiFileJob.finished_signal, this, &BulkPropagatorJob.on_signal_put_finished);
+        PutMultiFileJob.signal_finished.connect (job, BulkPropagatorJob.on_signal_put_finished);
 
         foreach (var single_file in this.files_to_upload) {
-            connect (job.get (), &PutMultiFileJob.upload_progress,
-                    this, /*[this, single_file]*/ (int64 sent, int64 total) => {
+            PutMultiFileJob.signal_upload_progress.connect ((job, sent, total) => {
                 on_signal_upload_progress (single_file.item, sent, total);
             });
         }
 
-        adjust_last_job_timeout (job.get (), timeout);
-        this.jobs.append (job.get ());
+        adjust_last_job_timeout (job, timeout);
+        this.jobs.append (job);
         job.release ().on_signal_start ();
         if (parallelism () == PropagatorJob.JobParallelism.JobParallelism.FULL_PARALLELISM && this.jobs.size () < PARALLEL_JOBS_MAXIMUM_COUNT) {
             on_signal_schedule_self_or_child ();
@@ -482,7 +479,7 @@ class BulkPropagatorJob : PropagatorJob {
         BulkUploadItem single_file,
         PutMultiFileJob job,
         QJsonObject file_reply) {
-        bool on_signal_finished = false;
+        bool finished = false;
 
         GLib.info (single_file.item.file + "file headers" + file_reply;
 
@@ -502,7 +499,7 @@ class BulkPropagatorJob : PropagatorJob {
         single_file.item.status = SyncFileItem.Status.SUCCESS;
 
         // Check the file again post upload.
-        // Two cases must be considered separately : If the upload is on_signal_finished,
+        // Two cases must be considered separately : If the upload is finished,
         // the file is on the server and has a changed ETag. In that case,
         // the etag has to be properly updated in the client journal, and because
         // of that we can bail out here with an error. But we can reschedule a
@@ -511,17 +508,17 @@ class BulkPropagatorJob : PropagatorJob {
         // yet, the upload can be stopped and an error can be displayed, because
         // the server hasn't registered the new file yet.
         var etag = get_etag_from_json_reply (file_reply);
-        on_signal_finished = etag.length () > 0;
+        finished = etag.length () > 0;
 
         var full_file_path (propagator ().full_local_path (single_file.item.file));
 
         // Check if the file still exists
-        if (!check_file_still_exists (single_file.item, on_signal_finished, full_file_path)) {
+        if (!check_file_still_exists (single_file.item, finished, full_file_path)) {
             return;
         }
 
         // Check whether the file changed since discovery. the file check here is the original and not the temporary.
-        if (!check_file_changed (single_file.item, on_signal_finished, full_file_path)) {
+        if (!check_file_changed (single_file.item, finished, full_file_path)) {
             return;
         }
 
@@ -602,10 +599,10 @@ class BulkPropagatorJob : PropagatorJob {
     ***********************************************************/
     private GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers (SyncFileItemPtr item) {
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
-        headers[QByteArrayLiteral ("Content-Type")] = QByteArrayLiteral ("application/octet-stream");
-        headers[QByteArrayLiteral ("X-File-Mtime")] = new GLib.ByteArray.number (int64 (item.modtime));
+        headers[GLib.ByteArray ("Content-Type")] = GLib.ByteArray ("application/octet-stream");
+        headers[GLib.ByteArray ("X-File-Mtime")] = new GLib.ByteArray.number (int64 (item.modtime));
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS")) {
-            headers[QByteArrayLiteral ("OC-LazyOps")] = QByteArrayLiteral ("true");
+            headers[GLib.ByteArray ("OC-LazyOps")] = GLib.ByteArray ("true");
         }
 
         if (item.file.contains (QLatin1String (".sys.admin#recall#"))) {
@@ -624,24 +621,24 @@ class BulkPropagatorJob : PropagatorJob {
             && item.instruction != CSYNC_INSTRUCTION_TYPE_CHANGE) {
             // We add quotes because the owncloud server always adds quotes around the etag, and
             //  csync_owncloud.c's owncloud_file_id always strips the quotes.
-            headers[QByteArrayLiteral ("If-Match")] = '"' + item.etag + '"';
+            headers[GLib.ByteArray ("If-Match")] = '"' + item.etag + '"';
         }
 
         // Set up a conflict file header pointing to the original file
         var conflict_record = propagator ().journal.conflict_record (item.file.to_utf8 ());
         if (conflict_record.is_valid ()) {
-            headers[QByteArrayLiteral ("OC-Conflict")] = "1";
+            headers[GLib.ByteArray ("OC-Conflict")] = "1";
             if (!conflict_record.initial_base_path.is_empty ()) {
-                headers[QByteArrayLiteral ("OC-ConflictInitialBasePath")] = conflict_record.initial_base_path;
+                headers[GLib.ByteArray ("OC-ConflictInitialBasePath")] = conflict_record.initial_base_path;
             }
             if (!conflict_record.base_file_id.is_empty ()) {
-                headers[QByteArrayLiteral ("OC-ConflictBaseFileId")] = conflict_record.base_file_id;
+                headers[GLib.ByteArray ("OC-ConflictBaseFileId")] = conflict_record.base_file_id;
             }
             if (conflict_record.base_modtime != -1) {
-                headers[QByteArrayLiteral ("OC-ConflictBaseMtime")] = new GLib.ByteArray.number (conflict_record.base_modtime);
+                headers[GLib.ByteArray ("OC-ConflictBaseMtime")] = new GLib.ByteArray.number (conflict_record.base_modtime);
             }
             if (!conflict_record.base_etag.is_empty ()) {
-                headers[QByteArrayLiteral ("OC-ConflictBaseEtag")] = conflict_record.base_etag;
+                headers[GLib.ByteArray ("OC-ConflictBaseEtag")] = conflict_record.base_etag;
             }
         }
 
@@ -702,10 +699,10 @@ class BulkPropagatorJob : PropagatorJob {
     ***********************************************************/
     private bool check_file_still_exists (
         SyncFileItemPtr item,
-        bool on_signal_finished,
+        bool finished,
         string full_file_path) {
         if (!FileSystem.file_exists (full_file_path)) {
-            if (!on_signal_finished) {
+            if (!finished) {
                 abort_with_error (item, SyncFileItem.Status.SOFT_ERROR, _("The local file was removed during sync."));
                 return false;
             } else {
@@ -721,11 +718,11 @@ class BulkPropagatorJob : PropagatorJob {
     ***********************************************************/
     private bool check_file_changed (
         SyncFileItemPtr item,
-        bool on_signal_finished,
+        bool finished,
         string full_file_path) {
         if (!FileSystem.verify_file_unchanged (full_file_path, item.size, item.modtime)) {
             propagator ().another_sync_needed = true;
-            if (!on_signal_finished) {
+            if (!finished) {
                 abort_with_error (item, SyncFileItem.Status.SOFT_ERROR, _("Local file changed during sync."));
                 // FIXME :  the legacy code was retrying for a few seconds.
                 //         and also checking that after the last chunk, and removed the file in case of INSTRUCTION_NEW

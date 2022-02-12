@@ -38,11 +38,11 @@ class PropagateRemoteDelete : PropagateItemJob {
             } else {
                 this.delete_encrypted_helper = new PropagateRemoteDeleteEncryptedRootFolder (propagator (), this.item, this);
             }
-            connect (this.delete_encrypted_helper, &AbstractPropagateRemoteDeleteEncrypted.on_signal_finished, this, (bool on_signal_success) {
+            connect (this.delete_encrypted_helper, AbstractPropagateRemoteDeleteEncrypted.on_signal_finished, this, (bool on_signal_success) {
                 if (!on_signal_success) {
                     SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR;
-                    if (this.delete_encrypted_helper.network_error () != Soup.Reply.NoError && this.delete_encrypted_helper.network_error () != Soup.Reply.ContentNotFoundError) {
-                        status = classify_error (this.delete_encrypted_helper.network_error (), this.item.http_error_code, propagator ().another_sync_needed);
+                    if (this.delete_encrypted_helper.signal_network_error () != Soup.Reply.NoError && this.delete_encrypted_helper.signal_network_error () != Soup.Reply.ContentNotFoundError) {
+                        status = classify_error (this.delete_encrypted_helper.signal_network_error (), this.item.http_error_code, propagator ().another_sync_needed);
                     }
                     on_signal_done (status, this.delete_encrypted_helper.error_string ());
                 } else {
@@ -65,7 +65,7 @@ class PropagateRemoteDelete : PropagateItemJob {
             propagator ().full_remote_path (filename),
             this);
 
-        connect (this.job.data (), &DeleteJob.finished_signal, this, &PropagateRemoteDelete.on_signal_delete_job_finished);
+        connect (this.job.data (), DeleteJob.signal_finished, this, PropagateRemoteDelete.on_signal_delete_job_finished);
         propagator ().active_job_list.append (this);
         this.job.on_signal_start ();
     }

@@ -70,8 +70,8 @@ class CheckServerJob : AbstractNetworkJob {
         this.subdir_fallback = false;
         this.permanent_redirects = 0;
         ignore_credential_failure (true);
-        connect (this, &AbstractNetworkJob.redirected,
-            this, &CheckServerJob.on_signal_redirected);
+        connect (this, AbstractNetworkJob.redirected,
+            this, CheckServerJob.on_signal_redirected);
     }
 
 
@@ -80,8 +80,8 @@ class CheckServerJob : AbstractNetworkJob {
     public void on_signal_start () {
         this.server_url = account ().url ();
         send_request ("GET", Utility.concat_url_path (this.server_url, path ()));
-        connect (reply (), &Soup.Reply.meta_data_changed, this, &CheckServerJob.meta_data_changed_slot);
-        connect (reply (), &Soup.Reply.encrypted, this, &CheckServerJob.on_signal_encrypted);
+        connect (reply (), Soup.Reply.meta_data_changed, this, CheckServerJob.meta_data_changed_slot);
+        connect (reply (), Soup.Reply.encrypted, this, CheckServerJob.on_signal_encrypted);
         AbstractNetworkJob.on_signal_start ();
     }
 

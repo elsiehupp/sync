@@ -141,8 +141,8 @@ class AbstractNetworkJob : GLib.Object {
 
     \a reply is never null
     ***********************************************************/
-    signal void network_error (Soup.Reply reply);
-    signal void network_activity ();
+    signal void signal_network_error (Soup.Reply reply);
+    signal void signal_network_activity ();
 
 
     /***********************************************************
@@ -169,15 +169,15 @@ class AbstractNetworkJob : GLib.Object {
 
         this.timer.single_shot (true);
         this.timer.interval ( (http_timeout ? http_timeout : 300) * 1000); // default to 5 minutes.
-        connect (&this.timer, &QTimer.timeout, this, &AbstractNetworkJob.on_signal_timeout);
+        connect (&this.timer, QTimer.timeout, this, AbstractNetworkJob.on_signal_timeout);
 
-        connect (this, &AbstractNetworkJob.network_activity, this, &AbstractNetworkJob.on_signal_reset_timeout);
+        connect (this, AbstractNetworkJob.signal_network_activity, this, AbstractNetworkJob.on_signal_reset_timeout);
 
         // Network activity on the propagator jobs (GET/PUT) keeps all requests alive.
         // This is a workaround for OC instances which only support one
         // parallel up and download
         if (this.account) {
-            connect (this.account.data (), &Account.propagator_network_activity, this, &AbstractNetworkJob.on_signal_reset_timeout);
+            connect (this.account.data (), Account.signal_propagator_network_activity, this, AbstractNetworkJob.on_signal_reset_timeout);
         }
     }
 
@@ -379,13 +379,13 @@ class AbstractNetworkJob : GLib.Object {
 
 
     protected void up_connections (Soup.Reply reply) {
-        connect (reply, &Soup.Reply.on_signal_finished, this, &AbstractNetworkJob.on_signal_finished);
-        connect (reply, &Soup.Reply.encrypted, this, &AbstractNetworkJob.network_activity);
-        connect (reply.manager (), &QNetworkAccessManager.proxy_authentication_required, this, &AbstractNetworkJob.network_activity);
-        connect (reply, &Soup.Reply.ssl_errors, this, &AbstractNetworkJob.network_activity);
-        connect (reply, &Soup.Reply.meta_data_changed, this, &AbstractNetworkJob.network_activity);
-        connect (reply, &Soup.Reply.download_progress, this, &AbstractNetworkJob.network_activity);
-        connect (reply, &Soup.Reply.upload_progress, this, &AbstractNetworkJob.network_activity);
+        connect (reply, Soup.Reply.on_signal_finished, this, AbstractNetworkJob.on_signal_finished);
+        connect (reply, Soup.Reply.encrypted, this, AbstractNetworkJob.signal_network_activity);
+        connect (reply.manager (), QNetworkAccessManager.signal_proxy_authentication_required, this, AbstractNetworkJob.signal_network_activity);
+        connect (reply, Soup.Reply.ssl_errors, this, AbstractNetworkJob.signal_network_activity);
+        connect (reply, Soup.Reply.meta_data_changed, this, AbstractNetworkJob.signal_network_activity);
+        connect (reply, Soup.Reply.download_progress, this, AbstractNetworkJob.signal_network_activity);
+        connect (reply, Soup.Reply.signal_upload_progress, this, AbstractNetworkJob.signal_network_activity);
     }
 
 
@@ -510,7 +510,7 @@ class AbstractNetworkJob : GLib.Object {
                     GLib.warning () + this.reply.raw_header ("Proxy-Authenticate");
                 }
             }
-            /* emit */ network_error (this.reply);
+            /* emit */ signal_network_error (this.reply);
         }
 
         // get the Date timestamp from reply

@@ -83,13 +83,13 @@ class SyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     public SyncFileStatusTracker (SyncEngine sync_engine) {
         this.sync_engine = sync_engine;
-        connect (sync_engine, &SyncEngine.about_to_propagate,
-            this, &SyncFileStatusTracker.on_signal_about_to_propagate);
-        connect (sync_engine, &SyncEngine.item_completed,
-            this, &SyncFileStatusTracker.on_signal_item_completed);
-        connect (sync_engine, &SyncEngine.on_signal_finished, this, &SyncFileStatusTracker.on_signal_sync_finished);
-        connect (sync_engine, &SyncEngine.started, this, &SyncFileStatusTracker.on_signal_sync_engine_running_changed);
-        connect (sync_engine, &SyncEngine.on_signal_finished, this, &SyncFileStatusTracker.on_signal_sync_engine_running_changed);
+        connect (sync_engine, SyncEngine.about_to_propagate,
+            this, SyncFileStatusTracker.on_signal_about_to_propagate);
+        connect (sync_engine, SyncEngine.item_completed,
+            this, SyncFileStatusTracker.on_signal_item_completed);
+        connect (sync_engine, SyncEngine.on_signal_finished, this, SyncFileStatusTracker.on_signal_sync_finished);
+        connect (sync_engine, SyncEngine.started, this, SyncFileStatusTracker.on_signal_sync_engine_running_changed);
+        connect (sync_engine, SyncEngine.on_signal_finished, this, SyncFileStatusTracker.on_signal_sync_engine_running_changed);
     }
 
 

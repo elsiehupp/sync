@@ -1250,7 +1250,7 @@ class Theme : GLib.Object {
     }
 
     private static bool should_prefer_svg () {
-        return GLib.ByteArray (APPLICATION_ICON_SET).to_upper () == QByteArrayLiteral ("SVG");
+        return GLib.ByteArray (APPLICATION_ICON_SET).to_upper () == GLib.ByteArray ("SVG");
     }
 }
 

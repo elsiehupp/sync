@@ -209,7 +209,7 @@ class OwncloudPropagator : GLib.Object {
             return;
         if (this.root_job) {
             // Connect to abort_finished  which signals that on_signal_abort has been asynchronously on_signal_finished
-            connect (this.root_job.data (), &PropagateDirectory.abort_finished, this, &OwncloudPropagator.emit_finished);
+            connect (this.root_job.data (), PropagateDirectory.abort_finished, this, OwncloudPropagator.emit_finished);
 
             // Use Queued Connection because we're possibly already in an item's on_signal_finished stack
             QMetaObject.invoke_method (this.root_job.data (), "on_signal_abort", Qt.QueuedConnection,
@@ -754,7 +754,7 @@ signals:
             this.root_job.dir_deletion_jobs.append_job (it);
         }
 
-        connect (this.root_job.data (), &PropagatorJob.on_signal_finished, this, &OwncloudPropagator.emit_finished);
+        connect (this.root_job.data (), PropagatorJob.on_signal_finished, this, OwncloudPropagator.emit_finished);
 
         this.job_scheduled = false;
         schedule_next_job ();
@@ -785,7 +785,7 @@ signals:
         if (item.instruction == CSYNC_INSTRUCTION_REMOVE) {
             // We do the removal of directories at the end, because there might be moves from
             // these directories that will happen later.
-            directories_to_remove.prepend (directory_propagation_job.get ());
+            directories_to_remove.prepend (directory_propagation_job);
             removed_directory = item.file + "/";
 
             // We should not update the etag of parent directories of the removed directory
@@ -799,7 +799,7 @@ signals:
             }
         } else {
             var current_dir_job = directories.top ().second;
-            current_dir_job.append_job (directory_propagation_job.get ());
+            current_dir_job.append_job (directory_propagation_job);
         }
         directories.push (q_make_pair (item.destination () + "/", directory_propagation_job.release ()));
     }
@@ -872,7 +872,7 @@ signals:
     void OwncloudPropagator.schedule_next_job () {
         if (this.job_scheduled) return; // don't schedule more than 1
         this.job_scheduled = true;
-        QTimer.single_shot (3, this, &OwncloudPropagator.schedule_next_job_impl);
+        QTimer.single_shot (3, this, OwncloudPropagator.schedule_next_job_impl);
     }
 
     void OwncloudPropagator.schedule_next_job_impl () {

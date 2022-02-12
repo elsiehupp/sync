@@ -38,11 +38,11 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
 
 
     /***********************************************************
-    @brief json_received - signal to report the json answer from ocs
+    @brief signal_json_received - signal to report the json answer from ocs
     @param json - the parsed json document
     @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
-    signal void json_received (QJsonDocument json, int status_code);
+    internal signal void signal_json_received (QJsonDocument json, int return_code);
 
 
     /***********************************************************
@@ -76,7 +76,7 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
 
         QJsonParseError error;
         var json = QJsonDocument.from_json (reply ().read_all (), error);
-        /* emit */ json_received (json, reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
+        /* emit */ signal_json_received (json, reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
         return true;
     }
 

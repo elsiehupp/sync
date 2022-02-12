@@ -21,7 +21,7 @@ class PollJob : AbstractNetworkJob {
     ***********************************************************/
     public SyncFileItemPtr item;
 
-    signal void finished_signal ();
+    signal void signal_finished ();
 
     /***********************************************************
     Takes ownership of the device
@@ -43,7 +43,7 @@ class PollJob : AbstractNetworkJob {
         GLib.Uri final_url = GLib.Uri.from_user_input (account_url.scheme () + QLatin1String ("://") + account_url.authority ()
             + (path ().starts_with ('/') ? QLatin1String ("") : QLatin1String ("/")) + path ());
         send_request ("GET", final_url);
-        connect (reply (), &Soup.Reply.download_progress, this, &AbstractNetworkJob.on_signal_reset_timeout, Qt.UniqueConnection);
+        connect (reply (), Soup.Reply.download_progress, this, AbstractNetworkJob.on_signal_reset_timeout, Qt.UniqueConnection);
         AbstractNetworkJob.on_signal_start ();
     }
 
@@ -67,10 +67,10 @@ class PollJob : AbstractNetworkJob {
                     this.journal.poll_info (info);
                     this.journal.commit ("remove poll info");
                 }
-                /* emit */ finished_signal ();
+                /* emit */ signal_finished ();
                 return true;
             }
-            QTimer.single_shot (8 * 1000, this, &PollJob.on_signal_start);
+            QTimer.single_shot (8 * 1000, this, PollJob.on_signal_start);
             return false;
         }
 
@@ -81,13 +81,13 @@ class PollJob : AbstractNetworkJob {
         if (json_parse_error.error != QJsonParseError.NoError) {
             this.item.error_string = _("Invalid JSON reply from the poll URL");
             this.item.status = SyncFileItem.Status.NORMAL_ERROR;
-            /* emit */ finished_signal ();
+            /* emit */ signal_finished ();
             return true;
         }
 
         var status = json["status"].to_string ();
         if (status == QLatin1String ("on_signal_init") || status == QLatin1String ("started")) {
-            QTimer.single_shot (5 * 1000, this, &PollJob.on_signal_start);
+            QTimer.single_shot (5 * 1000, this, PollJob.on_signal_start);
             return false;
         }
 
@@ -109,7 +109,7 @@ class PollJob : AbstractNetworkJob {
         this.journal.poll_info (info);
         this.journal.commit ("remove poll info");
 
-        /* emit */ finished_signal ();
+        /* emit */ signal_finished ();
         return true;
     }
 

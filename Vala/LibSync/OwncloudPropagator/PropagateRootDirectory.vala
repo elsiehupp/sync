@@ -25,7 +25,7 @@ class PropagateRootDirectory : PropagateDirectory {
     public PropagateRootDirectory (OwncloudPropagator propagator) {
         base (propagator, SyncFileItemPtr (new SyncFileItem ()));
         this.dir_deletion_jobs = propagator;
-        connect (&this.dir_deletion_jobs, &PropagatorJob.on_signal_finished, this, &PropagateRootDirectory.on_signal_dir_deletion_jobs_finished);
+        connect (&this.dir_deletion_jobs, PropagatorJob.on_signal_finished, this, PropagateRootDirectory.on_signal_dir_deletion_jobs_finished);
     }
 
 
@@ -78,12 +78,12 @@ class PropagateRootDirectory : PropagateDirectory {
             }
             var abort_status = new unowned AbortsFinished (new AbortsFinished);
 
-            connect (&this.sub_jobs, &PropagatorCompositeJob.abort_finished, this, [this, abort_status] () {
+            connect (&this.sub_jobs, PropagatorCompositeJob.abort_finished, this, [this, abort_status] () {
                 abort_status.sub_jobs_finished = true;
                 if (abort_status.sub_jobs_finished && abort_status.dir_deletion_finished)
                     /* emit */ abort_finished ();
             });
-            connect (&this.dir_deletion_jobs, &PropagatorCompositeJob.abort_finished, this, [this, abort_status] () {
+            connect (&this.dir_deletion_jobs, PropagatorCompositeJob.abort_finished, this, [this, abort_status] () {
                 abort_status.dir_deletion_finished = true;
                 if (abort_status.sub_jobs_finished && abort_status.dir_deletion_finished)
                     /* emit */ abort_finished ();

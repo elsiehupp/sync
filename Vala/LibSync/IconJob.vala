@@ -28,8 +28,8 @@ class IconJob : GLib.Object {
     // #if (QT_VERSION >= 0x050600)
         request.attribute (Soup.Request.FollowRedirectsAttribute, true);
     // #endif
-        var reply = account.send_raw_request (QByteArrayLiteral ("GET"), url, request);
-        connect (reply, &Soup.Reply.on_signal_finished, this, &IconJob.on_signal_finished);
+        var reply = account.send_raw_request (GLib.ByteArray ("GET"), url, request);
+        connect (reply, Soup.Reply.on_signal_finished, this, IconJob.on_signal_finished);
     }
 
 
@@ -42,9 +42,9 @@ class IconJob : GLib.Object {
         }
         delete_later ();
 
-        var network_error = reply.error ();
-        if (network_error != Soup.Reply.NoError) {
-            /* emit */ error (network_error);
+        var signal_network_error = reply.error ();
+        if (signal_network_error != Soup.Reply.NoError) {
+            /* emit */ error (signal_network_error);
             return;
         }
 

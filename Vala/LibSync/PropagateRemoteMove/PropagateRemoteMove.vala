@@ -129,7 +129,7 @@ class PropagateRemoteMove : PropagateItemJob {
         GLib.debug (remote_source + remote_destination;
 
         this.job = new MoveJob (propagator ().account (), remote_source, remote_destination, this);
-        connect (this.job.data (), &MoveJob.finished_signal, this, &PropagateRemoteMove.on_signal_move_job_finished);
+        connect (this.job.data (), MoveJob.signal_finished, this, PropagateRemoteMove.on_signal_move_job_finished);
         propagator ().active_job_list.append (this);
         this.job.on_signal_start ();
     }

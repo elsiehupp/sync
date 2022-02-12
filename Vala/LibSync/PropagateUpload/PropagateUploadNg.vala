@@ -127,12 +127,12 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             this.jobs.append (job);
             job.properties (GLib.List<GLib.ByteArray> ("resourcetype"
                                                 + "getcontentlength");
-            connect (job, &LsColJob.finished_without_error, this, &PropagateUploadFileNG.on_signal_propfind_finished);
-            connect (job, &LsColJob.finished_with_error,
-                this, &PropagateUploadFileNG.on_signal_propfind_finished_with_error);
-            connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_signal_job_destroyed);
-            connect (job, &LsColJob.directory_listing_iterated,
-                this, &PropagateUploadFileNG.on_signal_propfind_iterate);
+            connect (job, LsColJob.finished_without_error, this, PropagateUploadFileNG.on_signal_propfind_finished);
+            connect (job, LsColJob.finished_with_error,
+                this, PropagateUploadFileNG.on_signal_propfind_finished_with_error);
+            connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
+            connect (job, LsColJob.directory_listing_iterated,
+                this, PropagateUploadFileNG.on_signal_propfind_iterate);
             job.on_signal_start ();
             return;
         } else if (progress_info.valid && progress_info.is_chunked ()) {
@@ -179,11 +179,11 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         headers["OC-Total-Length"] = new GLib.ByteArray.number (this.file_to_upload.size);
         var job = new MkColJob (propagator ().account (), chunk_url (), headers, this);
 
-        connect (job, &MkColJob.finished_with_error,
-            this, &PropagateUploadFileNG.on_signal_mkcol_finished);
-        connect (job, &MkColJob.finished_without_error,
-            this, &PropagateUploadFileNG.on_signal_mkcol_finished);
-        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_signal_job_destroyed);
+        connect (job, MkColJob.finished_with_error,
+            this, PropagateUploadFileNG.on_signal_mkcol_finished);
+        connect (job, MkColJob.finished_without_error,
+            this, PropagateUploadFileNG.on_signal_mkcol_finished);
+        connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
         job.on_signal_start ();
     }
 
@@ -210,21 +210,21 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             var headers = PropagateUploadFileCommon.headers ();
 
             // "If-Match applies to the source, but we are interested in comparing the etag of the destination
-            var if_match = headers.take (QByteArrayLiteral ("If-Match"));
+            var if_match = headers.take (GLib.ByteArray ("If-Match"));
             if (!if_match.is_empty ()) {
-                headers[QByteArrayLiteral ("If")] = "<" + GLib.Uri.to_percent_encoding (destination, "/") + "> ([" + if_match + "])";
+                headers[GLib.ByteArray ("If")] = "<" + GLib.Uri.to_percent_encoding (destination, "/") + "> ([" + if_match + "])";
             }
             if (!this.transmission_checksum_header.is_empty ()) {
                 GLib.info (destination + this.transmission_checksum_header;
                 headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
             }
-            headers[QByteArrayLiteral ("OC-Total-Length")] = new GLib.ByteArray.number (file_size);
+            headers[GLib.ByteArray ("OC-Total-Length")] = new GLib.ByteArray.number (file_size);
 
             var job = new MoveJob (propagator ().account (), Utility.concat_url_path (chunk_url (), "/.file"),
                 destination, headers, this);
             this.jobs.append (job);
-            connect (job, &MoveJob.finished_signal, this, &PropagateUploadFileNG.on_signal_move_job_finished);
-            connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_signal_job_destroyed);
+            connect (job, MoveJob.signal_finished, this, PropagateUploadFileNG.on_signal_move_job_finished);
+            connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
             propagator ().active_job_list.append (this);
             adjust_last_job_timeout (job, file_size);
             job.on_signal_start ();
@@ -254,15 +254,15 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         GLib.Uri url = chunk_url (this.current_chunk);
 
         // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
-        var device_ptr = device.get (); // for connections later
+        var device_ptr = device; // for connections later
         var job = new PUTFile_job (propagator ().account (), url, std.move (device), headers, this.current_chunk, this);
         this.jobs.append (job);
-        connect (job, &PUTFile_job.finished_signal, this, &PropagateUploadFileNG.on_signal_put_finished);
-        connect (job, &PUTFile_job.upload_progress,
-            this, &PropagateUploadFileNG.on_signal_upload_progress);
-        connect (job, &PUTFile_job.upload_progress,
-            device_ptr, &UploadDevice.on_signal_job_upload_progress);
-        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_signal_job_destroyed);
+        connect (job, PUTFile_job.signal_finished, this, PropagateUploadFileNG.on_signal_put_finished);
+        connect (job, PUTFile_job.signal_upload_progress,
+            this, PropagateUploadFileNG.on_signal_upload_progress);
+        connect (job, PUTFile_job.signal_upload_progress,
+            device_ptr, UploadDevice.on_signal_job_upload_progress);
+        connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
         job.on_signal_start ();
         propagator ().active_job_list.append (this);
         this.current_chunk++;
@@ -321,7 +321,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             // with corruptions if there are too many chunks, or if we on_signal_abort and there are still stale chunks.
             foreach (var server_chunk in q_as_const (this.server_chunks)) {
                 var job = new DeleteJob (propagator ().account (), Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
-                GLib.Object.connect (job, &DeleteJob.finished_signal, this, &PropagateUploadFileNG.on_signal_delete_job_finished);
+                GLib.Object.connect (job, DeleteJob.signal_finished, this, PropagateUploadFileNG.on_signal_delete_job_finished);
                 this.jobs.append (job);
                 job.on_signal_start ();
             }
@@ -577,7 +577,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     private void on_signal_upload_progress (int64 sent, int64 total) {
         // Completion is signaled with sent=0, total=0; avoid accidentally
         // resetting progress due to the sent being zero by ignoring it.
-        // finished_signal () is bound to be emitted soon anyway.
+        // signal_finished () is bound to be emitted soon anyway.
         // See https://bugreports.qt.io/browse/QTBUG-44782.
         if (sent == 0 && total == 0) {
             return;

@@ -31,7 +31,7 @@ class PutMultiFileJob : AbstractNetworkJob {
     private QHttpMultiPart body;
     private GLib.List<SingleUploadFileData> devices;
 
-    string error_string {
+    new string error_string {
         public get {
             this.error_string == "" ? AbstractNetworkJob.error_string () : this.error_string;
         }
@@ -44,8 +44,8 @@ class PutMultiFileJob : AbstractNetworkJob {
     private QElapsedTimer request_timer;
 
 
-    signal void finished_signal ();
-    signal void upload_progress (int64 value1, int64 value2);
+    internal signal void signal_finished ();
+    internal signal void signal_upload_progress (int64 value1, int64 value2);
 
     /***********************************************************
     ***********************************************************/
@@ -57,8 +57,8 @@ class PutMultiFileJob : AbstractNetworkJob {
         this.body.content_type (QHttpMultiPart.Related_type);
         foreach (var single_device in this.devices) {
             single_device.device.parent (this);
-            connect (this, &PutMultiFileJob.upload_progress,
-                    single_device.device.get (), &UploadDevice.on_signal_job_upload_progress);
+            connect (this, PutMultiFileJob.signal_upload_progress,
+                    single_device.device, UploadDevice.on_signal_job_upload_progress);
         }
     }
 
@@ -71,7 +71,7 @@ class PutMultiFileJob : AbstractNetworkJob {
         foreach (var one_device in this.devices) {
             var one_part = new QHttp_part ();
 
-            one_part.body_device (one_device.device.get ());
+            one_part.body_device (one_device.device);
 
             foreach (var header in one_device.headers) {
                 one_part.raw_header (header.key (), header.value ());
@@ -88,8 +88,8 @@ class PutMultiFileJob : AbstractNetworkJob {
             GLib.warning (" Network error: " + reply ().error_string ());
         }
 
-        connect (reply (), &Soup.Reply.upload_progress, this, &PutMultiFileJob.upload_progress);
-        connect (this, &AbstractNetworkJob.network_activity, account ().data (), &Account.propagator_network_activity);
+        connect (reply (), Soup.Reply.signal_upload_progress, this, PutMultiFileJob.signal_upload_progress);
+        connect (this, AbstractNetworkJob.signal_network_activity, account ().data (), Account.signal_propagator_network_activity);
         this.request_timer.on_signal_start ();
         AbstractNetworkJob.on_signal_start ();
     }
@@ -107,7 +107,7 @@ class PutMultiFileJob : AbstractNetworkJob {
                 + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
                 + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute));
 
-        /* emit */ finished_signal ();
+        /* emit */ signal_finished ();
         return true;
     }
 

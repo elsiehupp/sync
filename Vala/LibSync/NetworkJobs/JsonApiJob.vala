@@ -64,11 +64,11 @@ class JsonApiJob : AbstractNetworkJob {
     }
 
     /***********************************************************
-    @brief json_received - signal to report the json answer from ocs
+    @brief signal_json_received - signal to report the json answer from ocs
     @param json - the parsed json document
     @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
-    signal void json_received (QJsonDocument json, int status_code);
+    internal signal void signal_json_received (QJsonDocument json, int return_code);
 
 
     /***********************************************************
@@ -145,7 +145,7 @@ class JsonApiJob : AbstractNetworkJob {
         if (reply ().error () != Soup.Reply.NoError) {
             GLib.warning ("Network error : " + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute));
             status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-            /* emit */ json_received (QJsonDocument (), status_code);
+            /* emit */ signal_json_received (QJsonDocument (), status_code);
             return true;
         }
 
@@ -183,11 +183,11 @@ class JsonApiJob : AbstractNetworkJob {
         // empty or invalid response and status code is != 304 because json_str is expected to be empty
         if ( (error.error != QJsonParseError.NoError || json.is_null ()) && http_status_code != NOT_MODIFIED_STATUS_CODE) {
             GLib.warning ("Invalid JSON! " + json_str + error.error_string ());
-            /* emit */ json_received (json, status_code);
+            /* emit */ signal_json_received (json, status_code);
             return true;
         }
 
-        /* emit */ json_received (json, status_code);
+        /* emit */ signal_json_received (json, status_code);
         return true;
     }
 

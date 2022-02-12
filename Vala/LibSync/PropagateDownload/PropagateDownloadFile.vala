@@ -127,11 +127,11 @@ class PropagateDownloadFile : PropagateItemJob {
             start_after_is_encrypted_is_checked ();
         } else {
             this.download_encrypted_helper = new PropagateDownloadEncrypted (propagator (), parent_path, this.item, this);
-            connect (this.download_encrypted_helper, &PropagateDownloadEncrypted.file_metadata_found, {
+            connect (this.download_encrypted_helper, PropagateDownloadEncrypted.file_metadata_found, {
                 this.is_encrypted = true;
                 start_after_is_encrypted_is_checked ();
             });
-            connect (this.download_encrypted_helper, &PropagateDownloadEncrypted.failed, {
+            connect (this.download_encrypted_helper, PropagateDownloadEncrypted.failed, {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                     _("File %1 cannot be downloaded because encryption information is missing.").arg (QDir.to_native_separators (this.item.file)));
             });
@@ -324,8 +324,8 @@ class PropagateDownloadFile : PropagateItemJob {
                 this.tmp_file, headers, expected_etag_for_resume, this.resume_start, this);
         }
         this.job.bandwidth_manager (&propagator ().bandwidth_manager);
-        connect (this.job.data (), &GETFileJob.finished_signal, this, &PropagateDownloadFile.on_signal_get_finished);
-        connect (this.job.data (), &GETFileJob.download_progress, this, &PropagateDownloadFile.on_signal_download_progress);
+        connect (this.job.data (), GETFileJob.signal_finished, this, PropagateDownloadFile.on_signal_get_finished);
+        connect (this.job.data (), GETFileJob.download_progress, this, PropagateDownloadFile.on_signal_download_progress);
         propagator ().active_job_list.append (this);
         this.job.on_signal_start ();
     }
@@ -446,7 +446,7 @@ class PropagateDownloadFile : PropagateItemJob {
         // Qt removes the content-length header for transparently decompressed HTTP1 replies
         // but not for HTTP2 or SPDY replies. For these it remains and contains the size
         // of the compressed data. See QTBUG-73364.
-        var content_encoding = job.reply ().raw_header ("content-encoding").to_lower ();
+        var content_encoding = job.reply ().raw_header ("content-encoding").down ();
         if ( (content_encoding == "gzip" || content_encoding == "deflate")
             && (job.reply ().attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()
             || job.reply ().attribute (Soup.Request.Spdy_was_used_attribute).to_bool ())) {
@@ -503,10 +503,10 @@ class PropagateDownloadFile : PropagateItemJob {
         // will also emit the validated () signal to continue the flow in slot on_signal_transmission_checksum_validated ()
         // as this is (still) also correct.
         var validator = new ValidateChecksumHeader (this);
-        connect (validator, &ValidateChecksumHeader.validated,
-            this, &PropagateDownloadFile.on_signal_transmission_checksum_validated);
-        connect (validator, &ValidateChecksumHeader.validation_failed,
-            this, &PropagateDownloadFile.on_signal_checksum_fail);
+        connect (validator, ValidateChecksumHeader.validated,
+            this, PropagateDownloadFile.on_signal_transmission_checksum_validated);
+        connect (validator, ValidateChecksumHeader.validation_failed,
+            this, PropagateDownloadFile.on_signal_checksum_fail);
         var checksum_header = find_best_checksum (job.reply ().raw_header (CHECK_SUM_HEADER_C));
         var content_md5Header = job.reply ().raw_header (CONTENT_MD5_HEADER_C);
         if (checksum_header.is_empty () && !content_md5Header.is_empty ())
@@ -533,8 +533,8 @@ class PropagateDownloadFile : PropagateItemJob {
         var compute_checksum = new ComputeChecksum (this);
         compute_checksum.checksum_type (the_content_checksum_type);
 
-        connect (compute_checksum, &ComputeChecksum.done,
-            this, &PropagateDownloadFile.on_signal_content_checksum_computed);
+        connect (compute_checksum, ComputeChecksum.done,
+            this, PropagateDownloadFile.on_signal_content_checksum_computed);
         compute_checksum.on_signal_start (this.tmp_file.filename ());
     }
 
@@ -871,8 +871,8 @@ class PropagateDownloadFile : PropagateItemJob {
             GLib.debug (this.item.file + "may not need download, computing checksum";
             var compute_checksum = new ComputeChecksum (this);
             compute_checksum.checksum_type (parse_checksum_header_type (this.item.checksum_header));
-            connect (compute_checksum, &ComputeChecksum.done,
-                this, &PropagateDownloadFile.on_signal_conflict_checksum_computed);
+            connect (compute_checksum, ComputeChecksum.done,
+                this, PropagateDownloadFile.on_signal_conflict_checksum_computed);
             propagator ().active_job_list.append (this);
             compute_checksum.on_signal_start (propagator ().full_local_path (this.item.file));
             return;

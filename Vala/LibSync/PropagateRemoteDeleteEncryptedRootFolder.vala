@@ -85,13 +85,13 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Metadata updated, sending to the server.";
 
         var job = new UpdateMetadataApiJob (this.propagator.account (), this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
-        connect (job, &UpdateMetadataApiJob.on_signal_success, this, (GLib.ByteArray file_identifier) {
+        connect (job, UpdateMetadataApiJob.on_signal_success, this, (GLib.ByteArray file_identifier) {
             //  Q_UNUSED (file_identifier);
             for (var it = this.nested_items.const_begin (); it != this.nested_items.const_end (); ++it) {
                 delete_nested_remote_item (it.key ());
             }
         });
-        connect (job, &UpdateMetadataApiJob.error, this, &PropagateRemoteDeleteEncryptedRootFolder.task_failed);
+        connect (job, UpdateMetadataApiJob.error, this, PropagateRemoteDeleteEncryptedRootFolder.task_failed);
         job.on_signal_start ();
     }
 
@@ -149,8 +149,8 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
 
         if (this.nested_items.size () == 0) {
             // we wait for all this.nested_items' Delete_jobs to finish, and then - fail if any of those jobs has failed
-            if (network_error () != Soup.Reply.NetworkError.NoError || this.item.http_error_code != 0) {
-                const int error_code = network_error () != Soup.Reply.NetworkError.NoError ? network_error () : this.item.http_error_code;
+            if (signal_network_error () != Soup.Reply.NetworkError.NoError || this.item.http_error_code != 0) {
+                const int error_code = signal_network_error () != Soup.Reply.NetworkError.NoError ? signal_network_error () : this.item.http_error_code;
                 GLib.critical (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Delete of nested items on_signal_finished with error" + error_code + ". Failing the entire sequence.";
                 task_failed ();
                 return;
@@ -164,11 +164,11 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
     ***********************************************************/
     private void decrypt_and_remote_delete () {
         var job = new Occ.SetEncryptionFlagApiJob (this.propagator.account (), this.item.file_id, Occ.SetEncryptionFlagApiJob.Clear, this);
-        connect (job, &Occ.SetEncryptionFlagApiJob.on_signal_success, this, (GLib.ByteArray file_identifier) {
+        connect (job, Occ.SetEncryptionFlagApiJob.on_signal_success, this, (GLib.ByteArray file_identifier) {
             //  Q_UNUSED (file_identifier);
             delete_remote_item (this.item.file);
         });
-        connect (job, &Occ.SetEncryptionFlagApiJob.error, this, (GLib.ByteArray file_identifier, int http_return_code) {
+        connect (job, Occ.SetEncryptionFlagApiJob.error, this, (GLib.ByteArray file_identifier, int http_return_code) {
             //  Q_UNUSED (file_identifier);
             this.item.http_error_code = http_return_code;
             task_failed ();
@@ -186,7 +186,7 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
         delete_job.folder_token (this.folder_token);
         delete_job.property (ENCRYPTED_FILENAME_PROPERTY_KEY, filename);
 
-        connect (delete_job, &DeleteJob.finished_signal, this, &PropagateRemoteDeleteEncryptedRootFolder.on_signal_delete_nested_remote_item_finished);
+        connect (delete_job, DeleteJob.signal_finished, this, PropagateRemoteDeleteEncryptedRootFolder.on_signal_delete_nested_remote_item_finished);
 
         delete_job.on_signal_start ();
     }

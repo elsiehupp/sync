@@ -105,14 +105,14 @@ class LsColJob : AbstractNetworkJob {
         int http_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (http_code == 207 && content_type.contains ("application/xml; charset=utf-8")) {
             LsColXMLParser parser;
-            connect (&parser, &LsColXMLParser.directory_listing_subfolders,
-                this, &LsColJob.directory_listing_subfolders);
-            connect (&parser, &LsColXMLParser.directory_listing_iterated,
-                this, &LsColJob.directory_listing_iterated);
-            connect (&parser, &LsColXMLParser.finished_with_error,
-                this, &LsColJob.finished_with_error);
-            connect (&parser, &LsColXMLParser.finished_without_error,
-                this, &LsColJob.finished_without_error);
+            connect (&parser, LsColXMLParser.directory_listing_subfolders,
+                this, LsColJob.directory_listing_subfolders);
+            connect (&parser, LsColXMLParser.directory_listing_iterated,
+                this, LsColJob.directory_listing_iterated);
+            connect (&parser, LsColXMLParser.finished_with_error,
+                this, LsColJob.finished_with_error);
+            connect (&parser, LsColXMLParser.finished_without_error,
+                this, LsColJob.finished_without_error);
 
             string expected_path = reply ().request ().url ().path (); // something like "/owncloud/remote.php/dav/folder"
             if (!parser.parse (reply ().read_all (), this.folder_infos, expected_path)) {

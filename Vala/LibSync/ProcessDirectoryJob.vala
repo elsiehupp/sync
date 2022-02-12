@@ -35,8 +35,8 @@ This job is tightly coupled with the DiscoveryPhase class.
 After being on_signal_start ()'ed
 
 Internally, this job will call DiscoveryPhase.schedule_more_jobs when one of its sub-jobs is
-on_signal_finished. DiscoveryPhase.schedule_more_jobs will call process_sub_jobs () to continue work until
-the job is on_signal_finished.
+finished. DiscoveryPhase.schedule_more_jobs will call process_sub_jobs () to continue work until
+the job is finished.
 
 Results are fed outwards via the DiscoveryPhase.item_discovered () signal.
 ***********************************************************/
@@ -95,7 +95,7 @@ class ProcessDirectoryJob : GLib.Object {
         local :    A/Y/file
         server :   B/X/file
     ***********************************************************/
-    private struct PathTuple {
+    public struct PathTuple {
 
         /***********************************************************
         Path as in the DB (before the sync)
@@ -127,10 +127,10 @@ class ProcessDirectoryJob : GLib.Object {
         PathTuple add_name (string name) {
             PathTuple result;
             result.original = path_append (this.original, name);
-            var build_string = [&] (string other) {
+            string build_string = (other) => {
                 // Optimize by trying to keep all string implicitly shared if they are the same (common case)
                 return other == this.original ? result.original : path_append (other, name);
-            }
+            };
             result.target = build_string (this.target);
             result.server = build_string (this.server);
             result.local = build_string (this.local);
@@ -279,7 +279,7 @@ class ProcessDirectoryJob : GLib.Object {
 
     The base pin state is used if the root dir's pin state can't be retrieved.
     ***********************************************************/
-    public ProcessDirectoryJob (DiscoveryPhase data, PinState base_pin_state,
+    public ProcessDirectoryJob.root_job (DiscoveryPhase data, PinState base_pin_state,
         int64 last_sync_timestamp, GLib.Object parent) {
         base (parent);
         this.last_sync_timestamp = last_sync_timestamp;
@@ -291,10 +291,10 @@ class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     For creating subjobs
     ***********************************************************/
-    public ProcessDirectoryJob (PathTuple path, SyncFileItemPtr dir_item,
+    public ProcessDirectoryJob.sub_job (PathTuple path, SyncFileItemPtr dir_item,
         QueryMode query_local, QueryMode query_server, int64 last_sync_timestamp,
-        ProcessDirectoryJob parent);
-        base (parent)
+        ProcessDirectoryJob parent) {
+        base (parent);
         this.dir_item = dir_item;
         this.last_sync_timestamp = last_sync_timestamp;
         this.query_server = query_server;
@@ -342,7 +342,7 @@ class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     public int process_sub_jobs (int number_of_jobs) {
         if (this.queued_jobs.empty () && this.running_jobs.empty () && this.pending_async_jobs == 0) {
-            this.pending_async_jobs = -1; // We're on_signal_finished, we don't want to emit finished again
+            this.pending_async_jobs = -1; // We're finished, we don't want to emit finished again
             if (this.dir_item) {
                 if (this.child_modified && this.dir_item.instruction == CSYNC_INSTRUCTION_REMOVE) {
                     // re-create directory that has modified contents
@@ -558,7 +558,7 @@ class ProcessDirectoryJob : GLib.Object {
             }
             process_file (std.move (path), e.local_entry, e.server_entry, e.db_entry);
         }
-        QTimer.single_shot (0, this.discovery_data, &DiscoveryPhase.schedule_more_jobs);
+        QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
     }
 
 
@@ -936,7 +936,7 @@ class ProcessDirectoryJob : GLib.Object {
                         if (!result) {
                             process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, this.query_server);
                         }
-                        QTimer.single_shot (0, this.discovery_data, &DiscoveryPhase.schedule_more_jobs);
+                        QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
                     });
                 return;
             }
@@ -1078,9 +1078,9 @@ class ProcessDirectoryJob : GLib.Object {
                 // we need to make a request to the server to know that the original file is deleted on the server
                 this.pending_async_jobs++;
                 var job = new RequestEtagJob (this.discovery_data.account, this.discovery_data.remote_folder + original_path, this);
-                connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> etag) mutable {
+                connect (job, RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> etag) mutable {
                     this.pending_async_jobs--;
-                    QTimer.single_shot (0, this.discovery_data, &DiscoveryPhase.schedule_more_jobs);
+                    QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
                     if (etag || etag.error ().code != 404 ||
                         // Somehow another item claimed this original path, consider as if it existed
                         this.discovery_data.is_renamed (original_path)) {
@@ -1563,8 +1563,8 @@ class ProcessDirectoryJob : GLib.Object {
             if (base.is_virtual_file () && is_vfs_with_suffix ())
                 chop_virtual_file_suffix (server_original_path);
             var job = new RequestEtagJob (this.discovery_data.account, server_original_path, this);
-            connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> etag) mutable {
-                if (!etag || (etag.get () != base.etag && !item.is_directory ()) || this.discovery_data.is_renamed (original_path)) {
+            connect (job, RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> etag) mutable {
+                if (!etag || (etag != base.etag && !item.is_directory ()) || this.discovery_data.is_renamed (original_path)) {
                     GLib.info ("Can't rename because the etag has changed or the directory is gone" + original_path;
                     // Can't be a rename, leave it as a new.
                     post_process_local_new ();
@@ -1572,11 +1572,11 @@ class ProcessDirectoryJob : GLib.Object {
                     // In case the deleted item was discovered in parallel
                     this.discovery_data.find_and_cancel_deleted_job (original_path);
                     process_rename (path);
-                    recurse_query_server = etag.get () == base.etag ? PARENT_NOT_CHANGED : NORMAL_QUERY;
+                    recurse_query_server = etag == base.etag ? PARENT_NOT_CHANGED : NORMAL_QUERY;
                 }
                 process_file_finalize (item, path, item.is_directory (), NORMAL_QUERY, recurse_query_server);
                 this.pending_async_jobs--;
-                QTimer.single_shot (0, this.discovery_data, &DiscoveryPhase.schedule_more_jobs);
+                QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
             });
             job.on_signal_start ();
             return;
@@ -1712,7 +1712,7 @@ class ProcessDirectoryJob : GLib.Object {
                 job.parent (this.discovery_data);
                 this.discovery_data.queued_deleted_directories[path.original] = job;
             } else {
-                connect (job, &ProcessDirectoryJob.on_signal_finished, this, &ProcessDirectoryJob.sub_job_finished);
+                ProcessDirectoryJob.signal_finished.connect (job, ProcessDirectoryJob.sub_job_finished);
                 this.queued_jobs.push_back (job);
             }
         } else {
@@ -1878,7 +1878,7 @@ class ProcessDirectoryJob : GLib.Object {
 
         if (item.is_directory () && item.instruction != CSYNC_INSTRUCTION_IGNORE) {
             var job = new ProcessDirectoryJob (path, item, NORMAL_QUERY, IN_BLOCK_LIST, this.last_sync_timestamp, this);
-            connect (job, &ProcessDirectoryJob.on_signal_finished, this, &ProcessDirectoryJob.sub_job_finished);
+            connect (job, ProcessDirectoryJob.on_signal_finished, this, ProcessDirectoryJob.sub_job_finished);
             this.queued_jobs.push_back (job);
         } else {
             /* emit */ this.discovery_data.item_discovered (item);
@@ -1901,7 +1901,7 @@ class ProcessDirectoryJob : GLib.Object {
         int count = this.running_jobs.remove_all (job);
         //  ASSERT (count == 1);
         job.delete_later ();
-        QTimer.single_shot (0, this.discovery_data, &DiscoveryPhase.schedule_more_jobs);
+        QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
     }
 
 
@@ -1959,10 +1959,10 @@ class ProcessDirectoryJob : GLib.Object {
             this.discovery_data.remote_folder + this.current_folder.server, this);
         if (!this.dir_item)
             server_job.is_root_path_true (); // query the fingerprint on the root
-        connect (server_job, &DiscoverySingleDirectoryJob.etag, this, &ProcessDirectoryJob.etag);
+        connect (server_job, DiscoverySingleDirectoryJob.etag, this, ProcessDirectoryJob.etag);
         this.discovery_data.currently_active_jobs++;
         this.pending_async_jobs++;
-        connect (server_job, &DiscoverySingleDirectoryJob.on_signal_finished, this, [this, server_job] (var results) {
+        connect (server_job, DiscoverySingleDirectoryJob.on_signal_finished, this, [this, server_job] (var results) {
             this.discovery_data.currently_active_jobs--;
             this.pending_async_jobs--;
             if (results) {
@@ -1994,7 +1994,7 @@ class ProcessDirectoryJob : GLib.Object {
                 }
             }
         });
-        connect (server_job, &DiscoverySingleDirectoryJob.first_directory_permissions, this,
+        connect (server_job, DiscoverySingleDirectoryJob.first_directory_permissions, this,
             [this] (RemotePermissions perms) {
                 this.root_permissions = perms;
             });
@@ -2015,13 +2015,13 @@ class ProcessDirectoryJob : GLib.Object {
         this.discovery_data.currently_active_jobs++;
         this.pending_async_jobs++;
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.item_discovered, this.discovery_data, &DiscoveryPhase.item_discovered);
+        connect (local_job, DiscoverySingleLocalDirectoryJob.item_discovered, this.discovery_data, DiscoveryPhase.item_discovered);
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.child_ignored, this, (bool b) {
+        connect (local_job, DiscoverySingleLocalDirectoryJob.child_ignored, this, (bool b) {
             this.child_ignored = b;
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_fatal_error, this, (string message) {
+        connect (local_job, DiscoverySingleLocalDirectoryJob.finished_fatal_error, this, (string message) {
             this.discovery_data.currently_active_jobs--;
             this.pending_async_jobs--;
             if (this.server_job)
@@ -2030,7 +2030,7 @@ class ProcessDirectoryJob : GLib.Object {
             /* emit */ this.discovery_data.fatal_error (message);
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_non_fatal_error, this, (string message) {
+        connect (local_job, DiscoverySingleLocalDirectoryJob.finished_non_fatal_error, this, (string message) {
             this.discovery_data.currently_active_jobs--;
             this.pending_async_jobs--;
 
@@ -2044,7 +2044,7 @@ class ProcessDirectoryJob : GLib.Object {
             }
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.on_signal_finished, this, (var results) {
+        connect (local_job, DiscoverySingleLocalDirectoryJob.on_signal_finished, this, (var results) {
             this.discovery_data.currently_active_jobs--;
             this.pending_async_jobs--;
 

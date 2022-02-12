@@ -271,11 +271,11 @@ class DiscoveryPhase : GLib.Object {
         var propfind_job = new PropfindJob (this.account, this.remote_folder + path, this);
         propfind_job.properties (GLib.List<GLib.ByteArray> ("resourcetype"
                                                         + "http://owncloud.org/ns:size");
-        GLib.Object.connect (propfind_job, &PropfindJob.finished_with_error,
+        GLib.Object.connect (propfind_job, PropfindJob.finished_with_error,
             this, [=] {
                 return callback (false);
             });
-        GLib.Object.connect (propfind_job, &PropfindJob.result, this, [=] (GLib.HashTable<string, GLib.Variant> values) {
+        GLib.Object.connect (propfind_job, PropfindJob.result, this, [=] (GLib.HashTable<string, GLib.Variant> values) {
             var result = values.value (QLatin1String ("size")).to_long_long ();
             if (result >= limit) {
                 // we tell the UI there is a new folder
@@ -390,7 +390,7 @@ class DiscoveryPhase : GLib.Object {
     ***********************************************************/
     public void start_job (ProcessDirectoryJob job) {
         //  ENFORCE (!this.current_root_job);
-        connect (job, &ProcessDirectoryJob.on_signal_finished, this, [this, job] {
+        connect (job, ProcessDirectoryJob.on_signal_finished, this, [this, job] {
             //  ENFORCE (this.current_root_job == sender ());
             this.current_root_job = null;
             if (job.dir_item)

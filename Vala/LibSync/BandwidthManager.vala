@@ -113,34 +113,34 @@ class BandwidthManager : GLib.Object {
         this.current_upload_limit = this.propagator.upload_limit;
         this.current_download_limit = this.propagator.download_limit;
 
-        GLib.Object.connect (&this.switching_timer, &QTimer.timeout, this, &BandwidthManager.on_signal_switching_timer_expired);
+        GLib.Object.connect (&this.switching_timer, QTimer.timeout, this, BandwidthManager.on_signal_switching_timer_expired);
         this.switching_timer.interval (10 * 1000);
         this.switching_timer.on_signal_start ();
         QMetaObject.invoke_method (this, "on_signal_switching_timer_expired", Qt.QueuedConnection);
 
         // absolute uploads/downloads
-        GLib.Object.connect (&this.absolute_limit_timer, &QTimer.timeout, this, &BandwidthManager.on_signal_absolute_limit_timer_expired);
+        GLib.Object.connect (&this.absolute_limit_timer, QTimer.timeout, this, BandwidthManager.on_signal_absolute_limit_timer_expired);
         this.absolute_limit_timer.interval (1000);
         this.absolute_limit_timer.on_signal_start ();
 
         // Relative uploads
-        GLib.Object.connect (&this.relative_upload_measuring_timer, &QTimer.timeout,
-            this, &BandwidthManager.on_signal_relative_upload_measuring_timer_expired);
+        GLib.Object.connect (&this.relative_upload_measuring_timer, QTimer.timeout,
+            this, BandwidthManager.on_signal_relative_upload_measuring_timer_expired);
         this.relative_upload_measuring_timer.interval (relative_limit_measuring_timer_interval_msec);
         this.relative_upload_measuring_timer.on_signal_start ();
         this.relative_upload_measuring_timer.single_shot (true); // will be restarted from the delay timer
-        GLib.Object.connect (&this.relative_upload_delay_timer, &QTimer.timeout,
-            this, &BandwidthManager.on_signal_relative_upload_delay_timer_expired);
+        GLib.Object.connect (&this.relative_upload_delay_timer, QTimer.timeout,
+            this, BandwidthManager.on_signal_relative_upload_delay_timer_expired);
         this.relative_upload_delay_timer.single_shot (true); // will be restarted from the measuring timer
 
         // Relative downloads
-        GLib.Object.connect (&this.relative_download_measuring_timer, &QTimer.timeout,
-            this, &BandwidthManager.on_signal_relative_download_measuring_timer_expired);
+        GLib.Object.connect (&this.relative_download_measuring_timer, QTimer.timeout,
+            this, BandwidthManager.on_signal_relative_download_measuring_timer_expired);
         this.relative_download_measuring_timer.interval (relative_limit_measuring_timer_interval_msec);
         this.relative_download_measuring_timer.on_signal_start ();
         this.relative_download_measuring_timer.single_shot (true); // will be restarted from the delay timer
-        GLib.Object.connect (&this.relative_download_delay_timer, &QTimer.timeout,
-            this, &BandwidthManager.on_signal_relative_download_delay_timer_expired);
+        GLib.Object.connect (&this.relative_download_delay_timer, QTimer.timeout,
+            this, BandwidthManager.on_signal_relative_download_delay_timer_expired);
         this.relative_download_delay_timer.single_shot (true); // will be restarted from the measuring timer
     }
 
@@ -178,7 +178,7 @@ class BandwidthManager : GLib.Object {
     public void on_signal_register_upload_device (UploadDevice p) {
         this.absolute_upload_device_list.push_back (p);
         this.relative_upload_device_list.push_back (p);
-        GLib.Object.connect (p, &GLib.Object.destroyed, this, &BandwidthManager.on_signal_unregister_upload_device);
+        GLib.Object.connect (p, GLib.Object.destroyed, this, BandwidthManager.on_signal_unregister_upload_device);
 
         if (using_absolute_upload_limit ()) {
             p.bandwidth_limited (true);
@@ -210,7 +210,7 @@ class BandwidthManager : GLib.Object {
     ***********************************************************/
     public void on_signal_register_download_job (GETFileJob j) {
         this.download_job_list.push_back (j);
-        GLib.Object.connect (j, &GLib.Object.destroyed, this, &BandwidthManager.on_signal_unregister_download_job);
+        GLib.Object.connect (j, GLib.Object.destroyed, this, BandwidthManager.on_signal_unregister_download_job);
 
         if (using_absolute_download_limit ()) {
             j.bandwidth_limited (true);

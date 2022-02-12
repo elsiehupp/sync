@@ -15,8 +15,8 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
     private Soup.Buffer token_buf;
 
 
-    signal void success (GLib.ByteArray file_identifier);
-    signal void error (GLib.ByteArray file_identifier, int http_return_code);
+    internal signal void signal_success (GLib.ByteArray file_identifier);
+    internal signal void signal_error (GLib.ByteArray file_identifier, int http_return_code);
 
 
     /***********************************************************

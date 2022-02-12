@@ -47,7 +47,7 @@ bool xattr_set (GLib.ByteArray path, GLib.ByteArray name, GLib.ByteArray value) 
 bool Occ.XAttr_wrapper.has_nextcloud_placeholder_attributes (string path) {
     var value = xattr_get (path.to_utf8 (), hydrate_exec_attribute_name);
     if (value) {
-        return value == QByteArrayLiteral (APPLICATION_EXECUTABLE);
+        return value == GLib.ByteArray (APPLICATION_EXECUTABLE);
     } else {
         return false;
     }

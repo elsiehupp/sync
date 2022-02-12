@@ -36,7 +36,7 @@ static class HttpLogger {
             header,
             device);
 
-        GLib.Object.connect (reply, &Soup.Reply.on_signal_finished, reply, [reply] {
+        GLib.Object.connect (reply, Soup.Reply.on_signal_finished, reply, [reply] {
             log_http (request_verb (*reply),
                 reply.url ().to_string (),
                 reply.request ().raw_header (X_REQUEST_ID ()),
@@ -53,15 +53,15 @@ static class HttpLogger {
     static GLib.ByteArray request_verb (QNetworkAccessManager.Operation operation, Soup.Request request) {
         switch (operation) {
         case QNetworkAccessManager.HeadOperation:
-            return QByteArrayLiteral ("HEAD");
+            return GLib.ByteArray ("HEAD");
         case QNetworkAccessManager.GetOperation:
-            return QByteArrayLiteral ("GET");
+            return GLib.ByteArray ("GET");
         case QNetworkAccessManager.PutOperation:
-            return QByteArrayLiteral ("PUT");
+            return GLib.ByteArray ("PUT");
         case QNetworkAccessManager.PostOperation:
-            return QByteArrayLiteral ("POST");
+            return GLib.ByteArray ("POST");
         case QNetworkAccessManager.DeleteOperation:
-            return QByteArrayLiteral ("DELETE");
+            return GLib.ByteArray ("DELETE");
         case QNetworkAccessManager.CustomOperation:
             return request.attribute (Soup.Request.CustomVerbAttribute).to_byte_array ();
         case QNetworkAccessManager.UnknownOperation:

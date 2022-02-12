@@ -32,8 +32,8 @@ class PUTFile_job : AbstractNetworkJob {
     public int chunk;
 
 
-    signal void finished_signal ();
-    signal void upload_progress (int64 value1, int64 value2);
+    signal void signal_finished ();
+    signal void signal_upload_progress (int64 value1, int64 value2);
 
 
     /***********************************************************
@@ -87,8 +87,8 @@ class PUTFile_job : AbstractNetworkJob {
             GLib.warning (" Network error: " + reply ().error_string ());
         }
 
-        connect (reply (), &Soup.Reply.upload_progress, this, &PUTFile_job.upload_progress);
-        connect (this, &AbstractNetworkJob.network_activity, account ().data (), &Account.propagator_network_activity);
+        connect (reply (), Soup.Reply.signal_upload_progress, this, PUTFile_job.signal_upload_progress);
+        connect (this, AbstractNetworkJob.signal_network_activity, account ().data (), Account.signal_propagator_network_activity);
         this.request_timer.on_signal_start ();
         AbstractNetworkJob.on_signal_start ();
     }
@@ -104,7 +104,7 @@ class PUTFile_job : AbstractNetworkJob {
             + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
             + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute));
 
-        /* emit */ finished_signal ();
+        /* emit */ signal_finished ();
         return true;
     }
 

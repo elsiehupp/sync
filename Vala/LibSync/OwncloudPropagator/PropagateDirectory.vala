@@ -34,10 +34,10 @@ class PropagateDirectory : PropagatorJob {
         this.first_job = propagator.create_job (item);
         this.sub_jobs = propagator;
         if (this.first_job) {
-            connect (this.first_job.data (), &PropagatorJob.on_signal_finished, this, &PropagateDirectory.on_signal_first_job_finished);
+            connect (this.first_job.data (), PropagatorJob.on_signal_finished, this, PropagateDirectory.on_signal_first_job_finished);
             this.first_job.associated_composite (&this.sub_jobs);
         }
-        connect (&this.sub_jobs, &PropagatorJob.on_signal_finished, this, &PropagateDirectory.on_signal_sub_jobs_finished);
+        connect (&this.sub_jobs, PropagatorJob.on_signal_finished, this, PropagateDirectory.on_signal_sub_jobs_finished);
     }
 
 
@@ -102,7 +102,7 @@ class PropagateDirectory : PropagatorJob {
             this.first_job.on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-            connect (&this.sub_jobs, &PropagatorCompositeJob.abort_finished, this, &PropagateDirectory.abort_finished);
+            connect (&this.sub_jobs, PropagatorCompositeJob.abort_finished, this, PropagateDirectory.abort_finished);
         }
         this.sub_jobs.on_signal_abort (abort_type);
     }

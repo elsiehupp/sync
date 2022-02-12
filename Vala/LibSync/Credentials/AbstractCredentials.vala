@@ -45,7 +45,7 @@ abstract class AbstractCredentials : GLib.Object {
     Note that ready () can be true or false, depending on
     whether there was useful data in the keychain.
     ***********************************************************/
-    protected signal void fetched ();
+    internal signal void signal_fetched ();
 
     /***********************************************************
     Emitted when ask_from_user () is done.
@@ -53,7 +53,7 @@ abstract class AbstractCredentials : GLib.Object {
     Note that ready () can be true or false, depending on
     whether the user provided data or not.
     ***********************************************************/
-    protected signal void asked ();
+    internal signal void signal_asked ();
 
     /***********************************************************
     ***********************************************************/

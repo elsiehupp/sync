@@ -139,8 +139,8 @@ class PropagatorCompositeJob : PropagatorJob {
             this.aborts_count = this.running_jobs.size ();
             foreach (PropagatorJob j in this.running_jobs) {
                 if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-                    connect (j, &PropagatorJob.abort_finished,
-                            this, &PropagatorCompositeJob.on_signal_sub_job_abort_finished);
+                    connect (j, PropagatorJob.abort_finished,
+                            this, PropagatorCompositeJob.on_signal_sub_job_abort_finished);
                 }
                 j.on_signal_abort (abort_type);
             }
@@ -178,7 +178,7 @@ class PropagatorCompositeJob : PropagatorJob {
     ***********************************************************/
     private bool on_signal_possibly_run_next_job (PropagatorJob next) {
         if (next.state == NotYetStarted) {
-            connect (next, &PropagatorJob.on_signal_finished, this, &PropagatorCompositeJob.on_signal_sub_job_finished);
+            connect (next, PropagatorJob.on_signal_finished, this, PropagatorCompositeJob.on_signal_sub_job_finished);
         }
         return next.on_signal_schedule_self_or_child ();
     }

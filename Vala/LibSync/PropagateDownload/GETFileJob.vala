@@ -74,7 +74,7 @@ class GETFileJob : AbstractNetworkJob {
     int64 content_length { public get; protected set; }
 
 
-    signal void finished_signal ();
+    signal void signal_finished ();
     signal void download_progress (int64 value1, int64 value2);
 
 
@@ -162,7 +162,7 @@ class GETFileJob : AbstractNetworkJob {
             this.bandwidth_manager.on_signal_register_download_job (this);
         }
 
-        connect (this, &AbstractNetworkJob.network_activity, account ().data (), &Account.propagator_network_activity);
+        connect (this, AbstractNetworkJob.signal_network_activity, account ().data (), Account.signal_propagator_network_activity);
 
         AbstractNetworkJob.on_signal_start ();
     }
@@ -178,7 +178,7 @@ class GETFileJob : AbstractNetworkJob {
                 this.bandwidth_manager.on_signal_unregister_download_job (this);
             }
             if (!this.has_emitted_finished_signal) {
-                /* emit */ finished_signal ();
+                /* emit */ signal_finished ();
             }
             this.has_emitted_finished_signal = true;
             return true; // discard
@@ -205,10 +205,10 @@ class GETFileJob : AbstractNetworkJob {
     void GETFileJob.new_reply_hook (Soup.Reply reply) {
         reply.read_buffer_size (16 * 1024); // keep low so we can easier limit the bandwidth
 
-        connect (reply, &Soup.Reply.meta_data_changed, this, &GETFileJob.on_signal_meta_data_changed);
-        connect (reply, &QIODevice.ready_read, this, &GETFileJob.on_signal_ready_read);
-        connect (reply, &Soup.Reply.on_signal_finished, this, &GETFileJob.on_signal_ready_read);
-        connect (reply, &Soup.Reply.download_progress, this, &GETFileJob.download_progress);
+        connect (reply, Soup.Reply.meta_data_changed, this, GETFileJob.on_signal_meta_data_changed);
+        connect (reply, QIODevice.ready_read, this, GETFileJob.on_signal_ready_read);
+        connect (reply, Soup.Reply.on_signal_finished, this, GETFileJob.on_signal_ready_read);
+        connect (reply, Soup.Reply.download_progress, this, GETFileJob.download_progress);
     }
 
 
@@ -343,7 +343,7 @@ class GETFileJob : AbstractNetworkJob {
                           + " finished with status " + reply_status_string ()
                           + reply ().raw_header ("Content-Range") + reply ().raw_header ("Content-Length"));
 
-                /* emit */ finished_signal ();
+                /* emit */ signal_finished ();
             }
             this.has_emitted_finished_signal = true;
             delete_later ();
@@ -365,8 +365,8 @@ class GETFileJob : AbstractNetworkJob {
             // Redirects and auth failures (oauth token renew) are handled by AbstractNetworkJob and
             // will end up restarting the job. We do not want to process further data from the initial
             // request. new_reply_hook () will reestablish signal connections for the follow-up request.
-            bool ok = disconnect (reply (), &Soup.Reply.on_signal_finished, this, &GETFileJob.on_signal_ready_read)
-                && disconnect (reply (), &Soup.Reply.ready_read, this, &GETFileJob.on_signal_ready_read);
+            bool ok = disconnect (reply (), Soup.Reply.on_signal_finished, this, GETFileJob.on_signal_ready_read)
+                && disconnect (reply (), Soup.Reply.ready_read, this, GETFileJob.on_signal_ready_read);
             //  ASSERT (ok);
             return;
         }

@@ -64,7 +64,7 @@ class ReadJob : KeychainChunk.Job {
     // #endif
         job.insecure_fallback (this.insecure_fallback);
         job.key (kck);
-        connect (job, &QKeychain.Job.on_signal_finished, this, &KeychainChunk.ReadJob.on_signal_read_job_done);
+        connect (job, QKeychain.Job.on_signal_finished, this, KeychainChunk.ReadJob.on_signal_read_job_done);
         job.on_signal_start ();
     }
 
@@ -79,7 +79,7 @@ class ReadJob : KeychainChunk.Job {
         on_signal_start ();
 
         QEventLoop wait_loop;
-        connect (this, &ReadJob.on_signal_finished, wait_loop, &QEventLoop.quit);
+        connect (this, ReadJob.on_signal_finished, wait_loop, QEventLoop.quit);
         wait_loop.exec ();
 
         if (error () == NoError) {
@@ -113,7 +113,7 @@ class ReadJob : KeychainChunk.Job {
                     // (Issues #4274 and #6522)
                     // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
                     GLib.info ("Backend unavailable (yet?) Retrying in a few seconds. " + read_job.error_string ());
-                    QTimer.single_shot (10000, this, &ReadJob.on_signal_start);
+                    QTimer.single_shot (10000, this, ReadJob.on_signal_start);
                     this.retry_on_signal_key_chain_error = false;
                     read_job.delete_later ();
                     return;

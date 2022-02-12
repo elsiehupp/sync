@@ -59,7 +59,7 @@ class WriteJob : KeychainChunk.Job {
         signal_start ();
 
         QEventLoop wait_loop;
-        connect (this, &WriteJob.on_signal_finished, wait_loop, &QEventLoop.quit);
+        connect (this, WriteJob.on_signal_finished, wait_loop, QEventLoop.quit);
         wait_loop.exec ();
 
         if (error () != NoError) {
@@ -124,7 +124,7 @@ class WriteJob : KeychainChunk.Job {
             add_settings_to_job (this.account, job);
     // #endif
             job.insecure_fallback (this.insecure_fallback);
-            connect (job, &QKeychain.Job.on_signal_finished, this, &KeychainChunk.WriteJob.on_signal_write_job_done);
+            connect (job, QKeychain.Job.on_signal_finished, this, KeychainChunk.WriteJob.on_signal_write_job_done);
             // only add the key's (sub)"index" after the first element, to stay compatible with older versions and non-Windows
             job.key (kck);
             job.binary_data (chunk);

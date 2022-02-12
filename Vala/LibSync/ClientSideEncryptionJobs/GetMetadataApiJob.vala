@@ -13,8 +13,8 @@ class GetMetadataApiJob : AbstractNetworkJob {
     private GLib.ByteArray file_identifier;
 
 
-    signal void json_received (QJsonDocument json, int status_code);
-    signal void error (GLib.ByteArray file_identifier, int http_return_code);
+    internal signal void signal_json_received (QJsonDocument json, int return_code);
+    signal void singal_error (GLib.ByteArray file_identifier, int http_return_code);
 
 
     /***********************************************************
@@ -54,7 +54,7 @@ class GetMetadataApiJob : AbstractNetworkJob {
         }
         QJsonParseError error;
         var json = QJsonDocument.from_json (reply ().read_all (), error);
-        /* emit */ json_received (json, reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
+        /* emit */ signal_json_received (json, reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
         return true;
     }
 

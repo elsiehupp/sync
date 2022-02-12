@@ -162,9 +162,9 @@ class PropagateUploadFileCommon : PropagateItemJob {
 
         var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
         this.upload_encrypted_helper = new PropagateUploadEncrypted (propagator (), remote_parent_path, this.item, this);
-        connect (this.upload_encrypted_helper, &PropagateUploadEncrypted.finalized,
-                this, &PropagateUploadFileCommon.setup_encrypted_file);
-        connect (this.upload_encrypted_helper, &PropagateUploadEncrypted.error, {
+        connect (this.upload_encrypted_helper, PropagateUploadEncrypted.finalized,
+                this, PropagateUploadFileCommon.setup_encrypted_file);
+        connect (this.upload_encrypted_helper, PropagateUploadEncrypted.error, {
             GLib.debug ("Error setting up encryption.";
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Failed to upload encrypted file."));
         });
@@ -230,8 +230,8 @@ class PropagateUploadFileCommon : PropagateItemJob {
             propagator ().full_remote_path (this.file_to_upload.file),
             this);
         this.jobs.append (job);
-        connect (job, &DeleteJob.finished_signal, this, &PropagateUploadFileCommon.on_signal_compute_content_checksum);
-        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_signal_job_destroyed);
+        connect (job, DeleteJob.signal_finished, this, PropagateUploadFileCommon.on_signal_compute_content_checksum);
+        connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
         job.on_signal_start ();
     }
 
@@ -289,10 +289,10 @@ class PropagateUploadFileCommon : PropagateItemJob {
         var compute_checksum = new ComputeChecksum (this);
         compute_checksum.checksum_type (checksum_type);
 
-        connect (compute_checksum, &ComputeChecksum.done,
-            this, &PropagateUploadFileCommon.on_signal_compute_transmission_checksum);
-        connect (compute_checksum, &ComputeChecksum.done,
-            compute_checksum, &GLib.Object.delete_later);
+        connect (compute_checksum, ComputeChecksum.done,
+            this, PropagateUploadFileCommon.on_signal_compute_transmission_checksum);
+        connect (compute_checksum, ComputeChecksum.done,
+            compute_checksum, GLib.Object.delete_later);
         compute_checksum.on_signal_start (this.file_to_upload.path);
     }
 
@@ -319,10 +319,10 @@ class PropagateUploadFileCommon : PropagateItemJob {
             compute_checksum.checksum_type (GLib.ByteArray ());
         }
 
-        connect (compute_checksum, &ComputeChecksum.done,
-            this, &PropagateUploadFileCommon.on_signal_start_upload);
-        connect (compute_checksum, &ComputeChecksum.done,
-            compute_checksum, &GLib.Object.delete_later);
+        connect (compute_checksum, ComputeChecksum.done,
+            this, PropagateUploadFileCommon.on_signal_start_upload);
+        connect (compute_checksum, ComputeChecksum.done,
+            compute_checksum, GLib.Object.delete_later);
         compute_checksum.on_signal_start (this.file_to_upload.path);
     }
 
@@ -411,7 +411,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             this.upload_status = {
                 status, error_string
             }
-            connect (this.upload_encrypted_helper, &PropagateUploadEncrypted.folder_unlocked, this, &PropagateUploadFileCommon.on_signal_folder_unlocked);
+            connect (this.upload_encrypted_helper, PropagateUploadEncrypted.folder_unlocked, this, PropagateUploadFileCommon.on_signal_folder_unlocked);
             this.upload_encrypted_helper.unlock_folder ();
         } else {
             on_signal_done (status, error_string);
@@ -429,7 +429,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
     public void start_poll_job (string path) {
         var job = new PollJob (propagator ().account (), path, this.item,
             propagator ().journal, propagator ().local_path (), this);
-        connect (job, &PollJob.finished_signal, this, &PropagateUploadFileCommon.on_signal_poll_finished);
+        connect (job, PollJob.signal_finished, this, PropagateUploadFileCommon.on_signal_poll_finished);
         SyncJournalDb.PollInfo info;
         info.file = this.item.file;
         info.url = path;
@@ -527,7 +527,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             this.upload_status = {
                 SyncFileItem.Status.SUCCESS, ""
             }
-            connect (this.upload_encrypted_helper, &PropagateUploadEncrypted.folder_unlocked, this, &PropagateUploadFileCommon.on_signal_folder_unlocked);
+            connect (this.upload_encrypted_helper, PropagateUploadEncrypted.folder_unlocked, this, PropagateUploadFileCommon.on_signal_folder_unlocked);
             this.upload_encrypted_helper.unlock_folder ();
         } else {
             on_signal_done (SyncFileItem.Status.SUCCESS);
@@ -583,7 +583,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             // Abort the job
             if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
                 // Connect to on_signal_finished signal of job reply to asynchonously finish the on_signal_abort
-                connect (reply, &Soup.Reply.on_signal_finished, this, one_abort_finished);
+                connect (reply, Soup.Reply.on_signal_finished, this, one_abort_finished);
             }
             reply.on_signal_abort ();
         }
@@ -691,14 +691,14 @@ class PropagateUploadFileCommon : PropagateItemJob {
     ***********************************************************/
     protected GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers () {
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
-        headers[QByteArrayLiteral ("Content-Type")] = QByteArrayLiteral ("application/octet-stream");
+        headers[GLib.ByteArray ("Content-Type")] = GLib.ByteArray ("application/octet-stream");
         //  Q_ASSERT (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
             GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
         }
-        headers[QByteArrayLiteral ("X-OC-Mtime")] = new GLib.ByteArray.number (int64 (this.item.modtime));
+        headers[GLib.ByteArray ("X-OC-Mtime")] = new GLib.ByteArray.number (int64 (this.item.modtime));
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS"))
-            headers[QByteArrayLiteral ("OC-LazyOps")] = QByteArrayLiteral ("true");
+            headers[GLib.ByteArray ("OC-LazyOps")] = GLib.ByteArray ("true");
 
         if (this.item.file.contains (QLatin1String (".sys.admin#recall#"))) {
             // This is a file recall triggered by the admin.  Note: the
@@ -717,21 +717,21 @@ class PropagateUploadFileCommon : PropagateItemJob {
             && !this.delete_existing) {
             // We add quotes because the owncloud server always adds quotes around the etag, and
             //  csync_owncloud.c's owncloud_file_id always strips the quotes.
-            headers[QByteArrayLiteral ("If-Match")] = '"' + this.item.etag + '"';
+            headers[GLib.ByteArray ("If-Match")] = '"' + this.item.etag + '"';
         }
 
         // Set up a conflict file header pointing to the original file
         var conflict_record = propagator ().journal.conflict_record (this.item.file.to_utf8 ());
         if (conflict_record.is_valid ()) {
-            headers[QByteArrayLiteral ("OC-Conflict")] = "1";
+            headers[GLib.ByteArray ("OC-Conflict")] = "1";
             if (!conflict_record.initial_base_path.is_empty ())
-                headers[QByteArrayLiteral ("OC-ConflictInitialBasePath")] = conflict_record.initial_base_path;
+                headers[GLib.ByteArray ("OC-ConflictInitialBasePath")] = conflict_record.initial_base_path;
             if (!conflict_record.base_file_id.is_empty ())
-                headers[QByteArrayLiteral ("OC-ConflictBaseFileId")] = conflict_record.base_file_id;
+                headers[GLib.ByteArray ("OC-ConflictBaseFileId")] = conflict_record.base_file_id;
             if (conflict_record.base_modtime != -1)
-                headers[QByteArrayLiteral ("OC-ConflictBaseMtime")] = new GLib.ByteArray.number (conflict_record.base_modtime);
+                headers[GLib.ByteArray ("OC-ConflictBaseMtime")] = new GLib.ByteArray.number (conflict_record.base_modtime);
             if (!conflict_record.base_etag.is_empty ())
-                headers[QByteArrayLiteral ("OC-ConflictBaseEtag")] = conflict_record.base_etag;
+                headers[GLib.ByteArray ("OC-ConflictBaseEtag")] = conflict_record.base_etag;
         }
 
         if (this.upload_encrypted_helper && !this.upload_encrypted_helper.folder_token ().is_empty ()) {

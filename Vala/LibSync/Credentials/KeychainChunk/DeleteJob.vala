@@ -56,7 +56,7 @@ class DeleteJob : KeychainChunk.Job {
     // #endif
         job.insecure_fallback (this.insecure_fallback);
         job.key (kck);
-        connect (job, &QKeychain.Job.on_signal_finished, this, &KeychainChunk.DeleteJob.on_signal_delete_job_done);
+        connect (job, QKeychain.Job.on_signal_finished, this, KeychainChunk.DeleteJob.on_signal_delete_job_done);
         job.on_signal_start ();
     }
 
@@ -71,7 +71,7 @@ class DeleteJob : KeychainChunk.Job {
         on_signal_start ();
 
         QEventLoop wait_loop;
-        connect (this, &DeleteJob.on_signal_finished, wait_loop, &QEventLoop.quit);
+        connect (this, DeleteJob.on_signal_finished, wait_loop, QEventLoop.quit);
         wait_loop.exec ();
 
         if (error () == NoError) {

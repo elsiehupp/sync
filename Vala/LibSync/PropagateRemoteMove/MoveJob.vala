@@ -23,7 +23,7 @@ class MoveJob : AbstractNetworkJob {
 
     GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers;
 
-    signal void finished_signal ();
+    signal void signal_finished ();
 
     /***********************************************************
     ***********************************************************/
@@ -70,7 +70,7 @@ class MoveJob : AbstractNetworkJob {
         GLib.info ("MOVE of " + reply ().request ().url ()
             + " finished with status " + reply_status_string ());
 
-        /* emit */ finished_signal ();
+        /* emit */ signal_finished ();
         return true;
     }
 

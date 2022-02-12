@@ -109,7 +109,7 @@ class OcsUserStatusConnector : UserStatusConnector {
     public void clear_message () {
         this.clear_message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + QStringLiteral ("/message"));
         this.clear_message_job.verb (JsonApiJob.Verb.DELETE);
-        connect (this.clear_message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_signal_message_cleared);
+        connect (this.clear_message_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_message_cleared);
         this.clear_message_job.on_signal_start ();
     }
 
@@ -212,7 +212,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         }
 
         this.get_user_status_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL, this);
-        connect (this.get_user_status_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_signal_user_status_fetched);
+        connect (this.get_user_status_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_user_status_fetched);
         this.get_user_status_job.on_signal_start ();
     }
 
@@ -227,7 +227,7 @@ class OcsUserStatusConnector : UserStatusConnector {
 
         this.get_predefined_stauses_job = new JsonApiJob (this.account,
             BASE_URL + QStringLiteral ("/predefined_statuses"), this);
-        connect (this.get_predefined_stauses_job, &JsonApiJob.json_received, this,
+        connect (this.get_predefined_stauses_job, JsonApiJob.signal_json_received, this,
             &OcsUserStatusConnector.on_signal_predefined_statuses_fetched);
         this.get_predefined_stauses_job.on_signal_start ();
     }
@@ -245,7 +245,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         QJsonDocument body;
         body.object (data_object);
         this.online_status_job.body (body);
-        connect (this.online_status_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_signal_user_status_online_status_set);
+        connect (this.online_status_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_user_status_online_status_set);
         this.online_status_job.on_signal_start ();
     }
 
@@ -282,7 +282,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         QJsonDocument body;
         body.object (data_object);
         this.message_job.body (body);
-        connect (this.message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_signal_user_status_message_set);
+        connect (this.message_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_user_status_message_set);
         this.message_job.on_signal_start ();
     }
 
@@ -314,7 +314,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         QJsonDocument body;
         body.object (data_object);
         this.message_job.body (body);
-        connect (this.message_job, &JsonApiJob.json_received, this, &OcsUserStatusConnector.on_signal_user_status_message_set);
+        connect (this.message_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_user_status_message_set);
         this.message_job.on_signal_start ();
     }
 
@@ -339,9 +339,9 @@ class OcsUserStatusConnector : UserStatusConnector {
             }
         }
 
-        // api should return invisible, dnd,... to_lower () it is to make sure
+        // api should return invisible, dnd,... down () it is to make sure
         // it matches this.pre_defined_status, otherwise the default is online (0)
-        return pre_defined_status.value (status.to_lower (), Occ.UserStatus.OnlineStatus.Online);
+        return pre_defined_status.value (status.down (), Occ.UserStatus.OnlineStatus.Online);
     }
 
 

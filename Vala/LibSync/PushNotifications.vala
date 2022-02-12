@@ -44,43 +44,39 @@ class PushNotifications : GLib.Object {
 
 
     /***********************************************************
-    Will be emitted after a successful connection and authentication
+    Eitted after a successful connection and authentication
     ***********************************************************/
-    signal void ready ();
-
+    internal signal void signal_ready ();
 
     /***********************************************************
-    Will be emitted if files on the server changed
+    Emitted when files on the server changed
     ***********************************************************/
-    signal void files_changed (Account account);
-
+    internal signal void signal_files_changed (Account account);
 
     /***********************************************************
-    Will be emitted if activities have been changed on the server
+    Emitted when activities have been changed on the server
     ***********************************************************/
-    signal void activities_changed (Account account);
-
+    internal signal void signal_activities_changed (Account account);
 
     /***********************************************************
-    Will be emitted if notifications have been changed on the server
+    Emitted when notifications have been changed on the server
     ***********************************************************/
-    signal void notifications_changed (Account account);
-
+    internal signal void signal_notifications_changed (Account account);
 
     /***********************************************************
-    Will be emitted if push notifications are unable to authenticate
+    Emitted when push notifications are unable to authenticate
+
+    It's safe to call PushNotifications.up () after this signal
+    has been emitted.
+    ***********************************************************/
+    internal signal void signal_authentication_failed ();
+
+    /***********************************************************
+    Emitted when push notifications are unable to connect or the connection timed out
 
     It's save to call #PushNotifications.up () after this signal has been emitted.
     ***********************************************************/
-    signal void authentication_failed ();
-
-
-    /***********************************************************
-    Will be emitted if push notifications are unable to connect or the connection timed out
-
-    It's save to call #PushNotifications.up () after this signal has been emitted.
-    ***********************************************************/
-    signal void connection_lost ();
+    internal signal void signal_connection_lost ();
 
     /***********************************************************
     ***********************************************************/
@@ -90,17 +86,17 @@ class PushNotifications : GLib.Object {
         this.reconnect_timer_interval = 20 * 1000;
         this.is_ready = false;
         this.web_socket = new QWeb_socket ("", QWeb_socket_protocol.Version_latest, this);
-        connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, &PushNotifications.on_signal_web_socket_error);
-        connect (this.web_socket, &QWeb_socket.ssl_errors, this, &PushNotifications.on_signal_web_socket_ssl_errors);
-        connect (this.web_socket, &QWeb_socket.connected, this, &PushNotifications.on_signal_web_socket_connected);
-        connect (this.web_socket, &QWeb_socket.disconnected, this, &PushNotifications.on_signal_web_socket_disconnected);
-        connect (this.web_socket, &QWeb_socket.pong, this, &PushNotifications.on_signal_web_socket_pong_received);
+        connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, PushNotifications.on_signal_web_socket_error);
+        connect (this.web_socket, QWeb_socket.ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
+        connect (this.web_socket, QWeb_socket.connected, this, PushNotifications.on_signal_web_socket_connected);
+        connect (this.web_socket, QWeb_socket.disconnected, this, PushNotifications.on_signal_web_socket_disconnected);
+        connect (this.web_socket, QWeb_socket.pong, this, PushNotifications.on_signal_web_socket_pong_received);
 
-        connect (&this.ping_timer, &QTimer.timeout, this, &PushNotifications.ping_web_socket_server);
+        connect (&this.ping_timer, QTimer.timeout, this, PushNotifications.ping_web_socket_server);
         this.ping_timer.single_shot (true);
         this.ping_timer.interval (PING_INTERVAL);
 
-        connect (&this.ping_timed_out_timer, &QTimer.timeout, this, &PushNotifications.on_signal_ping_timed_out);
+        connect (&this.ping_timed_out_timer, QTimer.timeout, this, PushNotifications.on_signal_ping_timed_out);
         this.ping_timed_out_timer.single_shot (true);
         this.ping_timed_out_timer.interval (PING_INTERVAL);
     }
@@ -143,7 +139,7 @@ class PushNotifications : GLib.Object {
     private void on_signal_web_socket_connected () {
         GLib.info ("Connected to websocket for account" + this.account.url ();
 
-        connect (this.web_socket, &QWeb_socket.text_message_received, this, &PushNotifications.on_signal_web_socket_text_message_received, Qt.UniqueConnection);
+        connect (this.web_socket, QWeb_socket.text_message_received, this, PushNotifications.on_signal_web_socket_text_message_received, Qt.UniqueConnection);
 
         authenticate_on_signal_web_socket ();
     }
@@ -233,8 +229,8 @@ class PushNotifications : GLib.Object {
         var web_socket_url = capabilities.push_notifications_web_socket_url ();
 
         GLib.info ("Open connection to websocket on" + web_socket_url + "for account" + this.account.url ();
-        connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, &PushNotifications.on_signal_web_socket_error);
-        connect (this.web_socket, &QWeb_socket.ssl_errors, this, &PushNotifications.on_signal_web_socket_ssl_errors);
+        connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, PushNotifications.on_signal_web_socket_error);
+        connect (this.web_socket, QWeb_socket.ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
         this.web_socket.open (web_socket_url);
     }
 
@@ -261,8 +257,8 @@ class PushNotifications : GLib.Object {
             this.reconnect_timer.stop ();
         }
 
-        disconnect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, &PushNotifications.on_signal_web_socket_error);
-        disconnect (this.web_socket, &QWeb_socket.ssl_errors, this, &PushNotifications.on_signal_web_socket_ssl_errors);
+        disconnect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, PushNotifications.on_signal_web_socket_error);
+        disconnect (this.web_socket, QWeb_socket.ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
 
         this.web_socket.close ();
     }
@@ -296,7 +292,7 @@ class PushNotifications : GLib.Object {
 
         this.reconnect_timer.interval (this.reconnect_timer_interval);
         this.reconnect_timer.single_shot (true);
-        connect (this.reconnect_timer, &QTimer.timeout, () {
+        connect (this.reconnect_timer, QTimer.timeout, () {
             reconnect_to_web_socket ();
         });
         this.reconnect_timer.on_signal_start ();

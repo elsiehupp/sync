@@ -46,8 +46,8 @@ class EncryptFolderJob : GLib.Object {
     ***********************************************************/
     public void on_signal_start () {
         var job = new Occ.SetEncryptionFlagApiJob (this.account, this.file_identifier, Occ.SetEncryptionFlagApiJob.Set, this);
-        connect (job, &Occ.SetEncryptionFlagApiJob.on_signal_success, this, &EncryptFolderJob.on_signal_encryption_flag_success);
-        connect (job, &Occ.SetEncryptionFlagApiJob.error, this, &EncryptFolderJob.on_signal_encryption_flag_error);
+        connect (job, Occ.SetEncryptionFlagApiJob.on_signal_success, this, EncryptFolderJob.on_signal_encryption_flag_success);
+        connect (job, Occ.SetEncryptionFlagApiJob.error, this, EncryptFolderJob.on_signal_encryption_flag_error);
         job.on_signal_start ();
     }
 
@@ -63,10 +63,10 @@ class EncryptFolderJob : GLib.Object {
         }
 
         var lock_job = new LockEncryptFolderApiJob (this.account, file_identifier, this);
-        connect (lock_job, &LockEncryptFolderApiJob.on_signal_success,
-                this, &EncryptFolderJob.on_signal_lock_for_encryption_success);
-        connect (lock_job, &LockEncryptFolderApiJob.error,
-                this, &EncryptFolderJob.on_signal_lock_for_encryption_error);
+        connect (lock_job, LockEncryptFolderApiJob.on_signal_success,
+                this, EncryptFolderJob.on_signal_lock_for_encryption_success);
+        connect (lock_job, LockEncryptFolderApiJob.error,
+                this, EncryptFolderJob.on_signal_lock_for_encryption_error);
         lock_job.on_signal_start ();
     }
 
@@ -95,10 +95,10 @@ class EncryptFolderJob : GLib.Object {
         }
 
         var store_metadata_job = new StoreMetaDataApiJob (this.account, file_identifier, empty_metadata.encrypted_metadata (), this);
-        connect (store_metadata_job, &StoreMetaDataApiJob.on_signal_success,
-                this, &EncryptFolderJob.on_signal_upload_metadata_success);
-        connect (store_metadata_job, &StoreMetaDataApiJob.error,
-                this, &EncryptFolderJob.on_signal_update_metadata_error);
+        connect (store_metadata_job, StoreMetaDataApiJob.on_signal_success,
+                this, EncryptFolderJob.on_signal_upload_metadata_success);
+        connect (store_metadata_job, StoreMetaDataApiJob.error,
+                this, EncryptFolderJob.on_signal_update_metadata_error);
         store_metadata_job.on_signal_start ();
     }
 
@@ -131,10 +131,10 @@ class EncryptFolderJob : GLib.Object {
     ***********************************************************/
     private void on_signal_upload_metadata_success (GLib.ByteArray folder_identifier) {
         var unlock_job = new UnlockEncryptFolderApiJob (this.account, folder_identifier, this.folder_token, this);
-        connect (unlock_job, &UnlockEncryptFolderApiJob.on_signal_success,
-                        this, &EncryptFolderJob.on_signal_unlock_folder_success);
-        connect (unlock_job, &UnlockEncryptFolderApiJob.error,
-                        this, &EncryptFolderJob.on_signal_unlock_folder_error);
+        connect (unlock_job, UnlockEncryptFolderApiJob.on_signal_success,
+                        this, EncryptFolderJob.on_signal_unlock_folder_success);
+        connect (unlock_job, UnlockEncryptFolderApiJob.error,
+                        this, EncryptFolderJob.on_signal_unlock_folder_error);
         unlock_job.on_signal_start ();
     }
 
@@ -145,10 +145,10 @@ class EncryptFolderJob : GLib.Object {
         //  Q_UNUSED (http_return_code);
 
         var unlock_job = new UnlockEncryptFolderApiJob (this.account, folder_identifier, this.folder_token, this);
-        connect (unlock_job, &UnlockEncryptFolderApiJob.on_signal_success,
-                        this, &EncryptFolderJob.on_signal_unlock_folder_success);
-        connect (unlock_job, &UnlockEncryptFolderApiJob.error,
-                        this, &EncryptFolderJob.on_signal_unlock_folder_error);
+        connect (unlock_job, UnlockEncryptFolderApiJob.on_signal_success,
+                        this, EncryptFolderJob.on_signal_unlock_folder_success);
+        connect (unlock_job, UnlockEncryptFolderApiJob.error,
+                        this, EncryptFolderJob.on_signal_unlock_folder_error);
         unlock_job.on_signal_start ();
     }
 

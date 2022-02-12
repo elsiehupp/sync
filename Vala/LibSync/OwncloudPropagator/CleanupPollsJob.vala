@@ -54,7 +54,7 @@ class CleanupPollsJob : GLib.Object {
         item.modtime = info.modtime;
         item.size = info.file_size;
         var job = new PollJob (this.account, info.url, item, this.journal, this.local_path, this);
-        connect (job, &PollJob.finished_signal, this, &CleanupPollsJob.on_signal_poll_finished);
+        connect (job, PollJob.signal_finished, this, CleanupPollsJob.on_signal_poll_finished);
         job.on_signal_start ();
     }
 
