@@ -136,7 +136,7 @@ protected slots:
     }
 
     void Folder_wizard_remote_path.on_signal_handle_mkdir_network_error (Soup.Reply reply) {
-        GLib.warn ("webdav mkdir request failed:" + reply.error ();
+        GLib.warning ("webdav mkdir request failed:" + reply.error ();
         if (!this.account.credentials ().still_valid (reply)) {
             show_warn (_("Authentication failed accessing %1").arg (Theme.instance ().app_name_gui ()));
         } else {

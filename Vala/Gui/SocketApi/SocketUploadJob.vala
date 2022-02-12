@@ -4,7 +4,7 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QJsonArray>
 //  #include <QRegularExpression>
 //  #include <QTemporary_file>
@@ -59,7 +59,7 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> job)
     const var accname = job.arguments ()[QLatin1String ("account")][QLatin1String ("name")].to_string ();
     var account = AccountManager.instance ().account (accname);
 
-    if (!QFileInfo (this.local_path).is_absolute ()) {
+    if (!GLib.FileInfo (this.local_path).is_absolute ()) {
         job.failure (QStringLiteral ("Local path must be a an absolute path"));
         return;
     }

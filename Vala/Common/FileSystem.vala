@@ -11,7 +11,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 
 //  #include <ctime>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QLoggingCategory>
 //  #include <ocsynclib.h>
 
@@ -48,7 +48,7 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     void file_read_only (string filename, bool read_only) {
-        GLib.File file = new GLib.File (filename);
+        GLib.File file = GLib.File.new_for_path (filename);
         GLib.File.Permissions permissions = file.permissions ();
 
         GLib.File.Permissions all_write_permissions =
@@ -75,7 +75,7 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     void file_read_only_weak (string filename, bool read_only) {
-        GLib.File file = new GLib.File (filename);
+        GLib.File file = GLib.File.new_for_path (filename);
         GLib.File.Permissions permissions = file.permissions ();
 
         if (!read_only && (permissions & GLib.File.WriteOwner)) {
@@ -110,18 +110,18 @@ namespace FileSystem {
     /***********************************************************
     @brief Checks whether a file exists.
 
-    Use this over QFileInfo.exists () and GLib.File.exists () to avoid bugs with lnk
+    Use this over GLib.FileInfo.exists () and GLib.File.exists () to avoid bugs with lnk
     files, see above.
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool file_exists (string filename, QFileInfo file_info = new QFileInfo ()) {
+    bool file_exists (string filename, GLib.FileInfo file_info = new GLib.FileInfo ()) {
         bool re = file_info.exists ();
         // if the filename is different from the filename in file_info, the file_info is
         // not valid. There needs to be one initialised here. Otherwise the incoming
         // file_info is re-used.
         if (file_info.file_path () != filename) {
-            QFileInfo my_f_i (filename);
+            GLib.FileInfo my_f_i = new GLib.FileInfo (filename);
             re = my_f_i.exists ();
         }
         return re;
@@ -138,26 +138,27 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     bool rename (string origin_filename,
-        const string destination_filename,
+        string destination_filename,
         string error_string = "") {
-        bool on_signal_success = false;
+        bool success = false;
         string error;
 
-        GLib.File orig (origin_filename);
-        on_signal_success = orig.rename (destination_filename);
-        if (!on_signal_success) {
+        GLib.File orig = GLib.File.new_for_path (origin_filename);
+        success = orig.rename (destination_filename);
+        if (!success) {
             error = orig.error_string ();
         }
 
-        if (!on_signal_success) {
-            GLib.warn ("Error renaming file" + origin_filename
-                                    + "to" + destination_filename
-                                    + "failed : " + error;
+        if (!success) {
+            GLib.warning (
+                "Error renaming file" + origin_filename
+                + "to" + destination_filename
+                + "failed : " + error;
             if (error_string) {
                 *error_string = error;
             }
         }
-        return on_signal_success;
+        return success;
     }
 
 
@@ -172,24 +173,24 @@ namespace FileSystem {
         const string destination_filename,
         string error_string) {
 
-        bool on_signal_success = false;
+        bool success = false;
         GLib.File orig (origin_filename);
         // We want a rename that also overwites.  GLib.File.rename does not overwite.
         // Qt 5.1 has QSaveFile.rename_overwrite we could use.
         // ### FIXME
-        on_signal_success = true;
+        success = true;
         bool dest_exists = file_exists (destination_filename);
         if (dest_exists && !GLib.File.remove (destination_filename)) {
             *error_string = orig.error_string ();
-            GLib.warn ("Target file could not be removed.";
-            on_signal_success = false;
+            GLib.warning ("Target file could not be removed.";
+            success = false;
         }
-        if (on_signal_success) {
-            on_signal_success = orig.rename (destination_filename);
+        if (success) {
+            success = orig.rename (destination_filename);
         }
-        if (!on_signal_success) {
+        if (!success) {
             *error_string = orig.error_string ();
-            GLib.warn ("Renaming temp file to final failed : " + *error_string;
+            GLib.warning ("Renaming temp file to final failed : " + *error_string;
             return false;
         }
 
@@ -206,10 +207,10 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     bool remove (string filename, string error_string = "") {
-        GLib.File f (filename);
-        if (!f.remove ()) {
+        GLib.File file = GLib.File.new_for_path (filename);
+        if (!file.remove ()) {
             if (error_string) {
-                *error_string = f.error_string ();
+                *error_string = file.error_string ();
             }
             return false;
         }
@@ -241,35 +242,35 @@ namespace FileSystem {
             return false; //mkpath will return true if path exists
         }
 
-        QFileInfo f (filename);
+        GLib.FileInfo file_info (filename);
 
         QDir file;
         int suffix_number = 1;
-        if (file.exists (trash_file_path + f.filename ())) { //file in trash already exists, move to "filename.1"
-            string path = trash_file_path + f.filename () + '.';
+        if (file.exists (trash_file_path + file_info.filename ())) { //file in trash already exists, move to "filename.1"
+            string path = trash_file_path + file_info.filename () + '.';
             while (file.exists (path + string.number (suffix_number))) { //or to "filename.2" if "filename.1" exists, etc
                 suffix_number++;
             }
-            if (!file.rename (f.absolute_file_path (), path + string.number (suffix_number))) { // rename (file old path, file trash path)
+            if (!file.rename (file_info.absolute_file_path (), path + string.number (suffix_number))) { // rename (file old path, file trash path)
                 *error_string = _("FileSystem", R" (Could not move "%1" to "%2")")
-                                   .arg (f.absolute_file_path (), path + string.number (suffix_number));
+                                   .arg (file_info.absolute_file_path (), path + string.number (suffix_number));
                 return false;
             }
         } else {
-            if (!file.rename (f.absolute_file_path (), trash_file_path + f.filename ())) { // rename (file old path, file trash path)
+            if (!file.rename (file_info.absolute_file_path (), trash_file_path + file_info.filename ())) { // rename (file old path, file trash path)
                 *error_string = _("FileSystem", R" (Could not move "%1" to "%2")")
-                                   .arg (f.absolute_file_path (), trash_file_path + f.filename ());
+                                   .arg (file_info.absolute_file_path (), trash_file_path + file_info.filename ());
                 return false;
             }
         }
 
         // create file format for trash info file----- START
         GLib.File info_file;
-        if (file.exists (trash_info_path + f.filename () + ".trashinfo")) { // TrashInfo file already exists, create "filename.1.trashinfo"
-            string filename = trash_info_path + f.filename () + '.' + string.number (suffix_number) + ".trashinfo";
+        if (file.exists (trash_info_path + file_info.filename () + ".trashinfo")) { // TrashInfo file already exists, create "filename.1.trashinfo"
+            string filename = trash_info_path + file_info.filename () + '.' + string.number (suffix_number) + ".trashinfo";
             info_file.filename (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
         } else {
-            string filename = trash_info_path + f.filename () + ".trashinfo";
+            string filename = trash_info_path + file_info.filename () + ".trashinfo";
             info_file.filename (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
         }
 
@@ -279,7 +280,7 @@ namespace FileSystem {
 
         stream + "[Trash Info]\n"
                + "Path="
-               + GLib.Uri.to_percent_encoding (f.absolute_file_path (), "~this.-./")
+               + GLib.Uri.to_percent_encoding (file_info.absolute_file_path (), "~this.-./")
                + "\n"
                + "DeletionDate="
                + GLib.DateTime.current_date_time ().to_string (Qt.ISODate)
@@ -297,7 +298,7 @@ namespace FileSystem {
     This version sets a more permissive sharing mode on Windows.
 
     Warning : The resulting file may have an empty filename and be unsuitable for use
-    with QFileInfo! Calling seek () on the GLib.File with >32bit signed values will fail!
+    with GLib.FileInfo! Calling seek () on the GLib.File with >32bit signed values will fail!
 
     OCSYNC_EXPORT
     ***********************************************************/
@@ -320,17 +321,6 @@ namespace FileSystem {
 
 
     /***********************************************************
-    Returns true when a file is locked. (Windows only)
-
-    OCSYNC_EXPORT
-    ***********************************************************/
-    bool is_file_locked (string filename) {
-        //  Q_UNUSED (filename);
-        return false;
-    }
-
-
-    /***********************************************************
     Returns whether the file is a shortcut file (ends with .lnk)
 
     OCSYNC_EXPORT
@@ -346,21 +336,10 @@ namespace FileSystem {
     OCSYNC_EXPORT
     ***********************************************************/
     bool is_exclude_file (string filename) {
-        return filename.compare (".sync-exclude.lst", Qt.CaseInsensitive) == 0
-            || filename.compare ("exclude.lst", Qt.CaseInsensitive) == 0
-            || filename.ends_with ("/.sync-exclude.lst", Qt.CaseInsensitive)
-            || filename.ends_with ("/exclude.lst", Qt.CaseInsensitive);
-    }
-
-
-    /***********************************************************
-    Returns whether the file is a junction (windows only)
-
-    OCSYNC_EXPORT
-    ***********************************************************/
-    bool is_junction (string filename) {
-        //  Q_UNUSED (filename);
-        return false;
+        return filename.down () == ".sync-exclude.lst"
+            || filename.down () == "exclude.lst"
+            || filename.down ().has_suffix ("/.sync-exclude.lst")
+            || filename.down ().has_suffix ("/exclude.lst");
     }
 
 

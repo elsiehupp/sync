@@ -4,7 +4,7 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QDir>
 //  #include <QJsonDocument>
 //  #include <QJsonArray>

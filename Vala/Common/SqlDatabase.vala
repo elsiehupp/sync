@@ -5,7 +5,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 //  #include <QLoggingCategory>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QDir>
 //  #include <QLoggingCategory>
 
@@ -105,9 +105,9 @@ class SqlDatabase {
             if (check_result == CheckDbResult.CANT_PREPARE) {
                 // When disk space is low, preparing may fail even though the database is fine.
                 // Typically CANTOPEN or IOERR.
-                int64 free_space = Utility.free_disk_space (QFileInfo (filename).dir ().absolute_path ());
+                int64 free_space = Utility.free_disk_space (GLib.FileInfo (filename).dir ().absolute_path ());
                 if (free_space != -1 && free_space < 1000000) {
-                    GLib.warn ("Can't prepare consistency check and disk space is low: " + free_space);
+                    GLib.warning ("Can't prepare consistency check and disk space is low: " + free_space);
                     close ();
                     return false;
                 }
@@ -115,7 +115,7 @@ class SqlDatabase {
                 // Even when there's enough disk space, it might very well be that the
                 // file is on a read-only filesystem and can't be opened because of that.
                 if (this.err_id == SQLITE_CANTOPEN) {
-                    GLib.warn ("Can't open database to prepare consistency check, aborting.");
+                    GLib.warning ("Can't open database to prepare consistency check, aborting.");
                     close ();
                     return false;
                 }
@@ -144,7 +144,7 @@ class SqlDatabase {
         }
 
         if (check_database () != CheckDbResult.OK) {
-            GLib.warn ("Consistency check failed in read_only mode, giving up " + filename);
+            GLib.warning ("Consistency check failed in read_only mode, giving up " + filename);
             close ();
             return false;
         }
@@ -184,7 +184,7 @@ class SqlDatabase {
             }
             sqlite_do (sqlite3_close (this.database));
             if (this.err_id != SQLITE_OK)
-                GLib.warn ("Closing database failed" + this.error);
+                GLib.warning ("Closing database failed" + this.error);
             this.database = null;
         }
     }
@@ -209,11 +209,11 @@ class SqlDatabase {
         sqlite_do (sqlite3_open_v2 (filename.to_utf8 ().const_data (), this.database, sqlite_flags, null));
 
         if (this.err_id != SQLITE_OK) {
-            GLib.warn ("Error:" + this.error + "for" + filename);
+            GLib.warning ("Error:" + this.error + "for" + filename);
             if (this.err_id == SQLITE_CANTOPEN) {
-                //  GLib.warn ("CANTOPEN extended errcode : " + sqlite3_extended_errcode (this.database);
+                //  GLib.warning ("CANTOPEN extended errcode : " + sqlite3_extended_errcode (this.database);
     //  #if SQLITE_VERSION_NUMBER >= 3012000
-                GLib.warn ("CANTOPEN system errno : " + sqlite3_system_errno (this.database));
+                GLib.warning ("CANTOPEN system errno : " + sqlite3_system_errno (this.database));
     //  #endif
             }
             close ();
@@ -221,7 +221,7 @@ class SqlDatabase {
         }
 
         if (!this.database) {
-            GLib.warn ("Error : no database for" + filename);
+            GLib.warning ("Error : no database for" + filename);
             return false;
         }
 
@@ -238,13 +238,13 @@ class SqlDatabase {
         SqlQuery quick_check = new SqlQuery (*this);
 
         if (quick_check.prepare ("PRAGMA quick_check;", /*allow_failure=*/true) != SQLITE_OK) {
-            GLib.warn ("Error preparing quick_check on database");
+            GLib.warning ("Error preparing quick_check on database");
             this.err_id = quick_check.error_id ();
             this.error = quick_check.error ();
             return CheckDbResult.CANT_PREPARE;
         }
         if (!quick_check.exec ()) {
-            GLib.warn ("Error running quick_check on database");
+            GLib.warning ("Error running quick_check on database");
             this.err_id = quick_check.error_id ();
             this.error = quick_check.error ();
             return CheckDbResult.CANT_EXEC;
@@ -253,7 +253,7 @@ class SqlDatabase {
         quick_check.next ();
         string result = quick_check.string_value (0);
         if (result != "ok") {
-            GLib.warn ("quick_check returned failure:" + result);
+            GLib.warning ("quick_check returned failure:" + result);
             return CheckDbResult.NOT_OKAY;
         }
 

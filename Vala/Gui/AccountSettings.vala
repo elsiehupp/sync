@@ -594,7 +594,7 @@ class AccountSettings : Gtk.Widget {
         const var selected = this.ui.folder_list.selection_model ().current_index ();
 
         if (!selected.is_valid ()) {
-            GLib.warn ("Selection model current folder index is not valid.";
+            GLib.warning ("Selection model current folder index is not valid.";
             return;
         }
 
@@ -676,7 +676,7 @@ class AccountSettings : Gtk.Widget {
                 for (var entry : old_blocklist) {
                     folder.journal_database ().schedule_path_for_remote_discovery (entry);
                     if (!folder.vfs ().pin_state (entry, PinState.VfsItemAvailability.ONLINE_ONLY)) {
-                        GLib.warn ("Could not set pin state of" + entry + "to online only";
+                        GLib.warning ("Could not set pin state of" + entry + "to online only";
                     }
                 }
                 folder.on_signal_next_sync_full_local_discovery ();
@@ -784,7 +784,7 @@ class AccountSettings : Gtk.Widget {
 
         // Update the pin state on all items
         if (!folder.vfs ().pin_state (path, state)) {
-            GLib.warn ("Could not set pin state of" + path + "to" + state;
+            GLib.warning ("Could not set pin state of" + path + "to" + state;
         }
 
         // Trigger sync
@@ -957,7 +957,7 @@ class AccountSettings : Gtk.Widget {
         const var encrypt_folder = [this, file_id, path, folder_alias] {
             const var folder = FolderMan.instance ().folder (folder_alias);
             if (!folder) {
-                GLib.warn ("Could not encrypt folder because folder" + folder_alias + "does not exist anymore";
+                GLib.warning ("Could not encrypt folder because folder" + folder_alias + "does not exist anymore";
                 QMessageBox.warning (null, _("Encryption failed"), _("Could not encrypt folder because the folder does not exist anymore"));
                 return;
             }
@@ -1232,7 +1232,7 @@ class AccountSettings : Gtk.Widget {
                 this.ui.folder_list.current_index (index);
                 this.ui.folder_list.scroll_to (index);
             } else {
-                GLib.warn ("Unable to find a valid index for " + my_folder;
+                GLib.warning ("Unable to find a valid index for " + my_folder;
             }
         }
     }
@@ -1379,7 +1379,7 @@ class AccountSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void open_ignored_files_dialog (string abs_folder_path) {
-        //  Q_ASSERT (QFileInfo (abs_folder_path).is_absolute ());
+        //  Q_ASSERT (GLib.FileInfo (abs_folder_path).is_absolute ());
 
         const string ignore_file = abs_folder_path + ".sync-exclude.lst";
         var layout = new QVBoxLayout ();

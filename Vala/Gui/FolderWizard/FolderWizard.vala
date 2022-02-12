@@ -7,7 +7,7 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 //  #include <QDesktopServices>
 //  #include <QDir>
 //  #include <QFileDialog>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QFileIconProvider>
 //  #include <QInputDialog>
 //  #include <QValidator>

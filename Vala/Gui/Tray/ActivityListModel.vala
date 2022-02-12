@@ -297,7 +297,7 @@ class ActivityListModel : QAbstractListModel {
                 }
 
                 // get relative path to the file so we can open it in the file manager
-                const var local_files = FolderMan.instance ().find_file_in_local_folders (QFileInfo (rel_path).path (), ast.account ());
+                const var local_files = FolderMan.instance ().find_file_in_local_folders (GLib.FileInfo (rel_path).path (), ast.account ());
 
                 if (local_files.is_empty ()) {
                     return "";
@@ -430,7 +430,7 @@ class ActivityListModel : QAbstractListModel {
     ***********************************************************/
     public void trigger_default_action (int activity_index) {
         if (activity_index < 0 || activity_index >= this.final_list.size ()) {
-            GLib.warn ("Couldn't trigger default action at index" + activity_index + "/ final list size:" + this.final_list.size ();
+            GLib.warning ("Couldn't trigger default action at index" + activity_index + "/ final list size:" + this.final_list.size ();
             return;
         }
 
@@ -452,7 +452,7 @@ class ActivityListModel : QAbstractListModel {
             const var conflicted_path = dir.file_path (conflicted_relative_path);
             const var base_path = dir.file_path (base_relative_path);
 
-            const var base_name = QFileInfo (base_path).filename ();
+            const var base_name = GLib.FileInfo (base_path).filename ();
 
             if (!this.current_conflict_dialog.is_null ()) {
                 this.current_conflict_dialog.close ();
@@ -497,14 +497,14 @@ class ActivityListModel : QAbstractListModel {
     ***********************************************************/
     public void trigger_action (int activity_index, int action_index) {
         if (activity_index < 0 || activity_index >= this.final_list.size ()) {
-            GLib.warn ("Couldn't trigger action on activity at index" + activity_index + "/ final list size:" + this.final_list.size ();
+            GLib.warning ("Couldn't trigger action on activity at index" + activity_index + "/ final list size:" + this.final_list.size ();
             return;
         }
 
         const var activity = this.final_list[activity_index];
 
         if (action_index < 0 || action_index >= activity.links.size ()) {
-            GLib.warn ("Couldn't trigger action at index" + action_index + "/ actions list size:" + activity.links.size ();
+            GLib.warning ("Couldn't trigger action at index" + action_index + "/ actions list size:" + activity.links.size ();
             return;
         }
 

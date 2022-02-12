@@ -170,7 +170,7 @@ protected slots:
         string[] new_sub_paths = dir.entry_list (QDir.NoDotAndDotDot | QDir.Dirs | QDir.Files);
         for (int i = 0; i < new_sub_paths.size (); i++) {
             string path = dir.path () + "/" + new_sub_paths[i];
-            QFileInfo file_info (path);
+            GLib.FileInfo file_info (path);
             sub_paths.append (path);
             if (file_info.is_dir ()) {
                 QDir dir (path);
@@ -219,7 +219,7 @@ protected slots:
     }
 
     void Folder_watcher.change_detected (string path) {
-        QFileInfo file_info (path);
+        GLib.FileInfo file_info (path);
         string[] paths (path);
         if (file_info.is_dir ()) {
             QDir dir (path);

@@ -21,7 +21,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QSslCertificat
 //  #include <QProcess>
 //  #include <QElapsedTimer>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <qtextcodec.h>
 
 
@@ -694,7 +694,7 @@ class SyncEngine : GLib.Object {
         GLib.info ("Convert to virtual files inside" + local_path);
         journal.get_files_below_path ({}, [&] (SyncJournalFileRecord record) {
             var path = record.path ();
-            var filename = QFileInfo (path).filename ();
+            var filename = GLib.FileInfo (path).filename ();
             if (FileSystem.is_exclude_file (filename)) {
                 return;
             }
@@ -1298,7 +1298,7 @@ class SyncEngine : GLib.Object {
         var conflict_record_paths = this.journal.conflict_record_paths ();
         foreach (var path in conflict_record_paths) {
             var fs_path = this.propagator.full_local_path (string.from_utf8 (path));
-            if (!QFileInfo (fs_path).exists ()) {
+            if (!GLib.FileInfo (fs_path).exists ()) {
                 this.journal.delete_conflict_record (path);
             }
         }

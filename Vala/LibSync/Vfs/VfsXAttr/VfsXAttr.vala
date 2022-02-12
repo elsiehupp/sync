@@ -76,7 +76,7 @@ class VfsXAttr : Vfs {
         }
 
         var path = string (this.setup_params.filesystem_path + item.file);
-        GLib.File file = new GLib.File (path);
+        GLib.File file = GLib.File.new_for_path (path);
         if (file.exists () && file.size () > 1
             && !FileSystem.verify_file_unchanged (path, item.size, item.modtime)) {
             return new Result<void, string>.from_error (_("Cannot create a placeholder because a file with the placeholder name already exists."));
@@ -97,7 +97,7 @@ class VfsXAttr : Vfs {
     ***********************************************************/
     public Result<void, string> dehydrate_placeholder (SyncFileItem item) {
         var path = string (this.setup_params.filesystem_path + item.file);
-        GLib.File file = new GLib.File (path);
+        GLib.File file = GLib.File.new_for_path (path);
         if (!file.remove ()) {
             return new Result<void, string>.from_error (_("Couldn't remove the original file to dehydrate."));
         }
@@ -133,7 +133,7 @@ class VfsXAttr : Vfs {
     /***********************************************************
     ***********************************************************/
     public bool is_dehydrated_placeholder (string file_path) {
-        var file_info = QFileInfo (file_path);
+        var file_info = GLib.FileInfo (file_path);
         return file_info.exists () &&
                 xattr.has_nextcloud_placeholder_attributes (file_path);
     }

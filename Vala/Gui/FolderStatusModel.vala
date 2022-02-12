@@ -880,7 +880,7 @@ class FolderStatusModel : QAbstractItemModel {
             bool ok = false;
             var old_block_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
             if (!ok) {
-                GLib.warn ("Could not read selective sync list from database.";
+                GLib.warning ("Could not read selective sync list from database.";
                 continue;
             }
             string[] block_list = create_block_list (folder_info, old_block_list);
@@ -943,7 +943,7 @@ class FolderStatusModel : QAbstractItemModel {
             bool ok = false;
             var undecided_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok);
             if (!ok) {
-                GLib.warn ("Could not read selective sync list from database.";
+                GLib.warning ("Could not read selective sync list from database.";
                 return;
             }
 
@@ -955,7 +955,7 @@ class FolderStatusModel : QAbstractItemModel {
             // Remove all undecided folders from the blocklist
             var block_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
             if (!ok) {
-                GLib.warn ("Could not read selective sync list from database.";
+                GLib.warning ("Could not read selective sync list from database.";
                 return;
             }
             foreach (var undecided_folder, undecided_list) {
@@ -966,7 +966,7 @@ class FolderStatusModel : QAbstractItemModel {
             // Add all undecided folders to the allow list
             var allow_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok);
             if (!ok) {
-                GLib.warn ("Could not read selective sync list from database.";
+                GLib.warning ("Could not read selective sync list from database.";
                 return;
             }
             allow_list += undecided_list;
@@ -1084,7 +1084,7 @@ class FolderStatusModel : QAbstractItemModel {
             } else {
                 estimated_up_bw += progress.file_progress (citm.item).estimated_bandwidth;
             }
-            var filename = QFileInfo (citm.item.file).filename ();
+            var filename = GLib.FileInfo (citm.item.file).filename ();
             if (all_filenames.length () > 0) {
                 // : Build a list of file names
                 all_filenames.append (QStringLiteral (", \"%1\"").arg (filename));
@@ -1217,7 +1217,7 @@ class FolderStatusModel : QAbstractItemModel {
         var selective_sync_undecided_list = parent_info.folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok2);
 
         if (! (ok1 && ok2)) {
-            GLib.warn ("Could not retrieve selective sync info from journal";
+            GLib.warning ("Could not retrieve selective sync info from journal";
             return;
         }
 

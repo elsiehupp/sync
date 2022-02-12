@@ -4,7 +4,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QFileIconProvider>
 //  #include <QInputDialog>
 //  #include <QPointer>
@@ -118,7 +118,7 @@ signals:
         connect (this.account_state.data (), &AccountState.state_changed, this, &Share_dialog.on_signal_account_state_changed);
 
         // Set icon
-        QFileInfo f_info (this.local_path);
+        GLib.FileInfo f_info (this.local_path);
         QFileIconProvider icon_provider;
         QIcon icon = icon_provider.icon (f_info);
         var pixmap = icon.pixmap (thumbnail_size, thumbnail_size);
@@ -127,7 +127,7 @@ signals:
         }
 
         // Set filename
-        string filename = QFileInfo (this.share_path).filename ();
+        string filename = GLib.FileInfo (this.share_path).filename ();
         this.ui.label_name.on_signal_text (_("%1").arg (filename));
         QFont f (this.ui.label_name.font ());
         f.point_size (q_round (f.point_size () * 1.4));
@@ -158,7 +158,7 @@ signals:
             return;
         }
 
-        if (QFileInfo (this.local_path).is_file ()) {
+        if (GLib.FileInfo (this.local_path).is_file ()) {
             var job = new Thumbnail_job (this.share_path, this.account_state.account (), this);
             connect (job, &Thumbnail_job.job_finished, this, &Share_dialog.on_signal_thumbnail_fetched);
             job.on_signal_start ();
@@ -177,10 +177,10 @@ signals:
 
         bool sharing_possible = true;
         if (!account_state.account ().capabilities ().share_public_link ()) {
-            GLib.warn ("Link shares have been disabled";
+            GLib.warning ("Link shares have been disabled";
             sharing_possible = false;
         } else if (! (max_sharing_permissions & Share_permission_share)) {
-            GLib.warn ("The file cannot be shared because it does not have sharing permission.";
+            GLib.warning ("The file cannot be shared because it does not have sharing permission.";
             sharing_possible = false;
         }
 
@@ -417,7 +417,7 @@ signals:
 
     void Share_dialog.on_signal_thumbnail_fetched (int status_code, GLib.ByteArray reply) {
         if (status_code != 200) {
-            GLib.warn ("Thumbnail status code : " + status_code;
+            GLib.warning ("Thumbnail status code : " + status_code;
             return;
         }
 

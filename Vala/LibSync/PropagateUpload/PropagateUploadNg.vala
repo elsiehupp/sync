@@ -5,7 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 //  #include <QNetworkAccessManager>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QDir>
 //  #include <cmath>
 //  #include <cstring>
@@ -237,11 +237,6 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         if (!device.open (QIODevice.ReadOnly)) {
             GLib.warning ("Could not prepare upload device : " + device.error_string ();
 
-            // If the file is currently locked, we want to retry the sync
-            // when it becomes available again.
-            if (FileSystem.is_file_locked (filename)) {
-                /* emit */ propagator ().seen_locked_file (filename);
-            }
             // Soft error because this is likely caused by the user modifying his files while syncing
             abort_with_error (SyncFileItem.Status.SOFT_ERROR, device.error_string ());
             return;

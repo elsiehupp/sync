@@ -168,7 +168,7 @@ class Updater : GLib.Object {
         var url = update_url ();
         GLib.debug () + url;
         if (url.is_empty ()) {
-            GLib.warn ("Not a valid updater URL, will not do update check";
+            GLib.warning ("Not a valid updater URL, will not do update check";
             return null;
         }
         // the best we can do is notify about updates

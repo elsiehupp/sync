@@ -437,7 +437,7 @@ class AccountState : GLib.Object, QSharedData {
         }
 
         if (this.connection_validator) {
-            GLib.warn ("ConnectionValidator already running, ignoring" + account ().display_name ();
+            GLib.warning ("ConnectionValidator already running, ignoring" + account ().display_name ();
             return;
         }
 
@@ -537,7 +537,7 @@ class AccountState : GLib.Object, QSharedData {
     ***********************************************************/
     protected void on_signal_connection_validator_result (ConnectionValidator.Status status, string[] errors) {
         if (is_signed_out ()) {
-            GLib.warn ("Signed out, ignoring" + status + this.account.url ().to_string ();
+            GLib.warning ("Signed out, ignoring" + status + this.account.url ().to_string ();
             return;
         }
 
@@ -672,7 +672,7 @@ class AccountState : GLib.Object, QSharedData {
     protected void on_signal_navigation_apps_fetched (QJsonDocument reply, int status_code) {
         if (this.account) {
             if (status_code == 304) {
-                GLib.warn ("Status code " + status_code + " Not Modified - No new navigation apps.";
+                GLib.warning ("Status code " + status_code + " Not Modified - No new navigation apps.";
             } else {
                 this.apps.clear ();
 

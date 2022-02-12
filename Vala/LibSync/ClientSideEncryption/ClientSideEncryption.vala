@@ -13,7 +13,7 @@
 
 //  #include <QDebug>
 //  #include <QLoggingCategory>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QDir>
 //  #include <QJsonObject>
 //  #include <QXmlStreamReader>

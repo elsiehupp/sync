@@ -6,7 +6,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 
 //  #include <QDebug>
 //  #include <QDesktopServices>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QMimeDatabase>
 //  #include <QPushButton>
 //  #include <Gtk.Dialog>
@@ -163,7 +163,7 @@ namespace {
             const var file_url = GLib.Uri.from_local_file (filename).to_string ();
             link_label.on_signal_text ("<a href='%1'>%2</a>".arg (file_url).arg (link_text));
 
-            const var info = QFileInfo (filename);
+            const var info = GLib.FileInfo (filename);
             mtime_label.on_signal_text (info.last_modified ().to_string ());
             size_label.on_signal_text (locale ().formatted_data_size (info.size ()));
 
@@ -191,8 +191,8 @@ namespace {
                     this.ui.remote_version_size,
                     this.ui.remote_version_button);
 
-        const var local_mtime = QFileInfo (local_version).last_modified ();
-        const var remote_mtime = QFileInfo (remote_version).last_modified ();
+        const var local_mtime = GLib.FileInfo (local_version).last_modified ();
+        const var remote_mtime = GLib.FileInfo (remote_version).last_modified ();
 
         bold_font (this.ui.local_version_mtime, local_mtime > remote_mtime);
         bold_font (this.ui.remote_version_mtime, remote_mtime > local_mtime);

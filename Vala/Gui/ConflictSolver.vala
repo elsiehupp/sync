@@ -106,7 +106,7 @@ class ConflictSolver : GLib.Object {
             return false;
         }
 
-        QFileInfo info (this.local_version_filename);
+        GLib.FileInfo info (this.local_version_filename);
         if (!info.exists ()) {
             return false;
         }
@@ -132,7 +132,7 @@ class ConflictSolver : GLib.Object {
             return false;
         }
 
-        QFileInfo info (this.local_version_filename);
+        GLib.FileInfo info (this.local_version_filename);
         if (!info.exists ()) {
             return false;
         }
@@ -146,7 +146,7 @@ class ConflictSolver : GLib.Object {
         const var target_filename = [=] {
             uint32 i = 1;
             var result = rename_pattern.arg (i);
-            while (QFileInfo.exists (result)) {
+            while (GLib.FileInfo.exists (result)) {
                 //  Q_ASSERT (i > 0);
                 i++;
                 result = rename_pattern.arg (i);
@@ -158,7 +158,7 @@ class ConflictSolver : GLib.Object {
         if (FileSystem.unchecked_rename_replace (this.local_version_filename, target_filename, error)) {
             return true;
         } else {
-            GLib.warn ("Rename error:" + error;
+            GLib.warning ("Rename error:" + error;
             QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
             return false;
         }
@@ -176,7 +176,7 @@ class ConflictSolver : GLib.Object {
             return false;
         }
 
-        QFileInfo info (this.local_version_filename);
+        GLib.FileInfo info (this.local_version_filename);
         if (!info.exists ()) {
             return false;
         }
@@ -185,7 +185,7 @@ class ConflictSolver : GLib.Object {
         if (FileSystem.unchecked_rename_replace (this.local_version_filename, this.remote_version_filename, error)) {
             return true;
         } else {
-            GLib.warn ("Rename error:" + error;
+            GLib.warning ("Rename error:" + error;
             QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
             return false;
         }

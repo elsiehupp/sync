@@ -209,7 +209,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
 
         // Check if we believe that the upload will fail due to remote quota limits
         const int64 quota_guess = propagator ().folder_quota.value (
-            QFileInfo (this.file_to_upload.file).path (), std.numeric_limits<int64>.max ());
+            GLib.FileInfo (this.file_to_upload.file).path (), std.numeric_limits<int64>.max ());
         if (this.file_to_upload.size > quota_guess) {
             // Necessary for blocklisting logic
             this.item.http_error_code = 507;
@@ -237,7 +237,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public 
+    //  public 
 
     /***********************************************************
     ***********************************************************/
@@ -492,7 +492,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
 
     void on_signal_finalize () {
         // Update the quota, if known
-        var quota_it = propagator ().folder_quota.find (QFileInfo (this.item.file).path ());
+        var quota_it = propagator ().folder_quota.find (GLib.FileInfo (this.item.file).path ());
         if (quota_it != propagator ().folder_quota.end ())
             quota_it.value () -= this.file_to_upload.size;
 
@@ -647,7 +647,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
             // store the quota for the real local file using the information
             // on the file to upload, that could have been modified by
             // filters or something.
-            var path = QFileInfo (this.item.file).path ();
+            var path = GLib.FileInfo (this.item.file).path ();
             var quota_it = propagator ().folder_quota.find (path);
             if (quota_it != propagator ().folder_quota.end ()) {
                 quota_it.value () = q_min (quota_it.value (), this.file_to_upload.size - 1);

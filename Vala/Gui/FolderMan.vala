@@ -288,14 +288,8 @@ signals:
 
 
     /***********************************************************
-    Triggers a sync run once the lock on the given file is removed.
-
-    Automatically detemines the folder that's responsible for the file.
-    See on_signal_watched_file_unlocked ().
+    slot to schedule an ETag job (from Folder only)
     ***********************************************************/
-    public void on_signal_sync_once_file_unlocks (string path);
-
-    // slot to schedule an ETag job (from Folder only)
     public void on_signal_schedule_e_tag_job (string alias, RequestEtagJob job);
 
 
@@ -423,9 +417,6 @@ signals:
     /// The currently running etag query
     private QPointer<RequestEtagJob> this.current_etag_job;
 
-    /// Watches files that couldn't be synced due to locks
-    private QScopedPointer<LockWatcher> this.lock_watcher;
-
     /// Occasionally schedules folders
     private QTimer this.time_scheduler;
 
@@ -456,7 +447,6 @@ FolderMan *FolderMan.instance = null;
 
 FolderMan.FolderMan (GLib.Object parent)
     : GLib.Object (parent)
-    this.lock_watcher (new LockWatcher)
     this.navigation_pane_helper (this) {
     //  ASSERT (!this.instance);
     this.instance = this;
@@ -485,9 +475,6 @@ FolderMan.FolderMan (GLib.Object parent)
 
     connect (AccountManager.instance (), &AccountManager.account_sync_connection_removed,
         this, &FolderMan.on_signal_account_removed);
-
-    connect (this.lock_watcher.data (), &LockWatcher.file_unlocked,
-        this, &FolderMan.on_signal_watched_file_unlocked);
 
     connect (this, &FolderMan.folder_list_changed, this, &FolderMan.on_signal_setup_push_notifications);
 }
@@ -593,7 +580,7 @@ int FolderMan.setup_folders () {
             settings.begin_group (group_name);
             if (skip_settings_keys.contains (settings.group ())) {
                 // Should not happen : bad container keys should have been deleted
-                GLib.warn ("Folder structure" + group_name + "is too new, ignoring";
+                GLib.warning ("Folder structure" + group_name + "is too new, ignoring";
             } else {
                 setup_folders_helper (*settings, account, skip_settings_keys, backwards_compatible, folders_with_placeholders);
             }
@@ -664,14 +651,14 @@ void FolderMan.setup_folders_helper (QSettings settings, AccountStatePtr account
                 }
 
                 if (!journal_file_move_success) {
-                    GLib.warn ("Wasn't able to move 3.0 syncjournal database files to new location. One-time loss off sync settings possible.";
+                    GLib.warning ("Wasn't able to move 3.0 syncjournal database files to new location. One-time loss off sync settings possible.";
                 } else {
                     GLib.info ("Successfully migrated syncjournal database.";
                 }
 
                 var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
                 if (!vfs && folder_definition.virtual_files_mode != Vfs.Off) {
-                    GLib.warn ("Could not load plugin for mode" + folder_definition.virtual_files_mode;
+                    GLib.warning ("Could not load plugin for mode" + folder_definition.virtual_files_mode;
                 }
 
                 Folder f = add_folder_internal (folder_definition, account.data (), std.move (vfs));
@@ -793,7 +780,7 @@ void FolderMan.backward_migration_settings_keys (string[] *delete_keys, string[]
 bool FolderMan.ensure_journal_gone (string journal_database_file) {
     // remove the old journal file
     while (GLib.File.exists (journal_database_file) && !GLib.File.remove (journal_database_file)) {
-        GLib.warn ("Could not remove old database file at" + journal_database_file;
+        GLib.warning ("Could not remove old database file at" + journal_database_file;
         int ret = QMessageBox.warning (null, _("Could not reset folder state"),
             _("An old sync journal \"%1\" was found, "
                "but could not be removed. Please make sure "
@@ -872,7 +859,7 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
     // check the unescaped variant (for the case when the filename comes out
     // of the directory listing). If the file does not exist, escape the
     // file and try again.
-    QFileInfo cfg_file (this.folder_config_path, file);
+    GLib.FileInfo cfg_file (this.folder_config_path, file);
 
     if (!cfg_file.exists ()) {
         // try the escaped variant.
@@ -880,7 +867,7 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
         cfg_file.file (this.folder_config_path, escaped_alias);
     }
     if (!cfg_file.is_readable ()) {
-        GLib.warn ("Cannot read folder definition for alias " + cfg_file.file_path ();
+        GLib.warning ("Cannot read folder definition for alias " + cfg_file.file_path ();
         return folder;
     }
 
@@ -905,7 +892,7 @@ Folder *FolderMan.setup_folder_from_old_config_file (string file, AccountState a
     string alias = unescape_alias (escaped_alias);
 
     if (backend.is_empty () || backend != QLatin1String ("owncloud")) {
-        GLib.warn ("obsolete configuration of type" + backend;
+        GLib.warning ("obsolete configuration of type" + backend;
         return null;
     }
 
@@ -988,10 +975,6 @@ void FolderMan.schedule_all_folders () {
 void FolderMan.on_signal_schedule_app_restart () {
     this.app_restart_required = true;
     GLib.info ("Application restart requested!";
-}
-
-void FolderMan.on_signal_sync_once_file_unlocks (string path) {
-    this.lock_watcher.add_file (path);
 }
 
 /***********************************************************
@@ -1333,7 +1316,7 @@ void FolderMan.on_signal_forward_folder_sync_state_change () {
 void FolderMan.on_signal_server_version_changed (Account account) {
     // Pause folders if the server version is unsupported
     if (account.server_version_unsupported ()) {
-        GLib.warn ("The server version is unsupported:" + account.server_version ()
+        GLib.warning ("The server version is unsupported:" + account.server_version ()
                                + "pausing all folders on the account";
 
         for (var f : q_as_const (this.folder_map)) {
@@ -1453,7 +1436,7 @@ Folder *FolderMan.add_folder (AccountState account_state, FolderDefinition folde
 
     var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
     if (!vfs) {
-        GLib.warn ("Could not load plugin for mode" + folder_definition.virtual_files_mode;
+        GLib.warning ("Could not load plugin for mode" + folder_definition.virtual_files_mode;
         return null;
     }
 
@@ -1605,7 +1588,7 @@ string FolderMan.get_backup_name (string full_path_name) {
         return "";
 
     string new_name = full_path_name + _(" (backup)");
-    QFileInfo fi (new_name);
+    GLib.FileInfo fi (new_name);
     int cnt = 2;
     do {
         if (fi.exists ()) {
@@ -1622,7 +1605,7 @@ bool FolderMan.start_from_scratch (string local_folder) {
         return false;
     }
 
-    QFileInfo fi (local_folder);
+    GLib.FileInfo fi (local_folder);
     QDir parent_dir (fi.dir ());
     string folder_name = fi.filename ();
 
@@ -1653,14 +1636,14 @@ bool FolderMan.start_from_scratch (string local_folder) {
         string new_name = get_backup_name (parent_dir.absolute_file_path (folder_name));
         string rename_error;
         if (!FileSystem.rename (fi.absolute_file_path (), new_name, rename_error)) {
-            GLib.warn ("start_from_scratch : Could not rename" + fi.absolute_file_path ()
+            GLib.warning ("start_from_scratch : Could not rename" + fi.absolute_file_path ()
                                    + "to" + new_name + "error:" + rename_error;
             return false;
         }
     }
 
     if (!parent_dir.mkdir (fi.absolute_file_path ())) {
-        GLib.warn ("start_from_scratch : Could not mkdir" + fi.absolute_file_path ();
+        GLib.warning ("start_from_scratch : Could not mkdir" + fi.absolute_file_path ();
         return false;
     }
 
@@ -1705,14 +1688,14 @@ void FolderMan.on_signal_wipe_folder_for_account (AccountState account_state) {
         if (user_folder.exists ()) {
             on_signal_success = user_folder.remove_recursively ();
             if (!on_signal_success) {
-                GLib.warn ("Failed to remove existing folder " + f.path ();
+                GLib.warning ("Failed to remove existing folder " + f.path ();
             } else {
                 GLib.info ("wipe : Removed  file " + f.path ();
             }
 
         } else {
             on_signal_success = true;
-            GLib.warn ("folder does not exist, can not remove.";
+            GLib.warning ("folder does not exist, can not remove.";
         }
 
         f.sync_paused (true);
@@ -1891,7 +1874,7 @@ static string check_path_validity_recursive (string path) {
         return FolderMan._("No valid folder selected!");
     }
 
-    const QFileInfo sel_file (path);
+    const GLib.FileInfo sel_file (path);
 
     if (!sel_file.exists ()) {
         string parent_path = sel_file.dir ().path ();
@@ -1910,11 +1893,11 @@ static string check_path_validity_recursive (string path) {
     return "";
 }
 
-// QFileInfo.canonical_path returns an empty string if the file does not exist.
+// GLib.FileInfo.canonical_path returns an empty string if the file does not exist.
 // This function also works with files that does not exist and resolve the symlinks in the
 // parent directories.
 static string canonical_path (string path) {
-    QFileInfo sel_file (path);
+    GLib.FileInfo sel_file (path);
     if (!sel_file.exists ()) {
         const var parent_path = sel_file.dir ().path ();
 
@@ -1986,7 +1969,7 @@ string FolderMan.find_good_path_for_new_sync_folder (string base_path, GLib.Uri 
     // possibly find a valid sync folder inside it.
     // Example: Someone syncs their home directory. Then ~/foobar is not
     // going to be an acceptable sync folder path for any value of foobar.
-    string parent_folder = QFileInfo (folder).dir ().canonical_path ();
+    string parent_folder = GLib.FileInfo (folder).dir ().canonical_path ();
     if (FolderMan.instance ().folder_for_path (parent_folder)) {
         // Any path with that parent is going to be unacceptable,
         // so just keep it as-is.
@@ -1996,7 +1979,7 @@ string FolderMan.find_good_path_for_new_sync_folder (string base_path, GLib.Uri 
     int attempt = 1;
     while (true) {
         const bool is_good =
-            !QFileInfo (folder).exists ()
+            !GLib.FileInfo (folder).exists ()
             && FolderMan.instance ().check_path_validity_for_new_folder (folder, server_url).is_empty ();
         if (is_good) {
             break;

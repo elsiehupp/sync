@@ -141,7 +141,7 @@ class FileInfo : FileModifier {
 /***********************************************************
 Return the FileInfo for a conflict file for the specified relative filename */
 inline const FileInfo findConflict (FileInfo dir, string filename) {
-    QFileInfo info (filename);
+    GLib.FileInfo info (filename);
     const FileInfo parentDir = dir.find (info.path ());
     if (!parentDir)
         return null;

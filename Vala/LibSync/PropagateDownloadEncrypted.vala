@@ -1,5 +1,5 @@
 
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 
 namespace Occ {
 
@@ -10,7 +10,7 @@ class PropagateDownloadEncrypted : GLib.Object {
     private OwncloudPropagator propagator;
     private string local_parent_path;
     private SyncFileItemPtr item;
-    private QFileInfo info;
+    private GLib.FileInfo info;
     private EncryptedFile encrypted_info;
 
 
@@ -74,7 +74,7 @@ class PropagateDownloadEncrypted : GLib.Object {
             GLib.debug ("Content Checksum Computed starting decryption" + tmp_filename);
 
             tmp_file.close ();
-            GLib.File tmp_output = new GLib.File (this.propagator.full_local_path (tmp_filename), this);
+            GLib.File tmp_output = GLib.File.new_for_path (this.propagator.full_local_path (tmp_filename), this);
             EncryptionHelper.file_decryption (this.encrypted_info.encryption_key,
                                                                             this.encrypted_info.initialization_vector,
                                                                             tmp_file,

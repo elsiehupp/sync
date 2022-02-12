@@ -60,7 +60,7 @@ static string find_default_file_manager () {
     if (filename.is_empty ())
         return "";
 
-    QFileInfo fi;
+    GLib.FileInfo fi;
     string[] dirs = xdg_data_dirs ();
     string[] subdirs;
     subdirs + "/applications/"
@@ -95,8 +95,8 @@ void show_in_file_manager (string local_path) {
     QSettings desktop_file (default_manager, QSettings.IniFormat);
     string exec = desktop_file.value ("Desktop Entry/Exec").to_string ();
 
-    string file_to_open = QFileInfo (local_path).absolute_file_path ();
-    string path_to_open = QFileInfo (local_path).absolute_path ();
+    string file_to_open = GLib.FileInfo (local_path).absolute_file_path ();
+    string path_to_open = GLib.FileInfo (local_path).absolute_path ();
     bool can_handle_file = false; // assume dumb fm
 
     args = exec.split (' ');

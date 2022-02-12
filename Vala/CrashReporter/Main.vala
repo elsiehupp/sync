@@ -8,7 +8,7 @@ Copyright (C) by Dominik Schmidt <domme@tomahawk-player.org>
 //  #include <QAppl
 //  #include <QDir>
 //  #include <QDebug>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 
 int main (int argc, char argv[]) {
     QCoreApplication.attribute (Qt.AAUseHighDpiPixmaps, true);
@@ -28,7 +28,7 @@ int main (int argc, char argv[]) {
     reporter.window_title (CRASHREPORTER_PRODUCT_NAME);
     reporter.on_signal_text ("<html><head/><body><p><span style=\" font-weight:600;\">Sorry!</span> " CRASHREPORTER_PRODUCT_NAME " crashed. Please tell us about it! " CRASHREPORTER_PRODUCT_NAME " has created an error report for you that can help improve the stability in the future. You can now send this report directly to the " CRASHREPORTER_PRODUCT_NAME " developers.</p></body></html>");
 
-    const QFileInfo crash_log = new QFileInfo (QDir.temp_path () + "/" + CRASHREPORTER_PRODUCT_NAME + "-crash.log");
+    const GLib.FileInfo crash_log = new GLib.FileInfo (QDir.temp_path () + "/" + CRASHREPORTER_PRODUCT_NAME + "-crash.log");
     if (crash_log.exists ()) {
         GLib.File in_file (crash_log.file_path ());
         if (in_file.open (GLib.File.ReadOnly)) {
@@ -74,7 +74,7 @@ int main (int argc, char argv[]) {
     // send log
     //    GLib.File log_file ( INSERT_FILE_PATH_HERE );
     //    log_file.open ( GLib.File.ReadOnly );
-    //    reporter.report_data ( "upload_file_miralllog", q_compress ( log_file.read_all () ), "application/x-gzip", QFileInfo ( INSERT_FILE_PATH_HERE ).filename ().to_utf8 ());
+    //    reporter.report_data ( "upload_file_miralllog", q_compress ( log_file.read_all () ), "application/x-gzip", GLib.FileInfo ( INSERT_FILE_PATH_HERE ).filename ().to_utf8 ());
     //    log_file.close ();
 
     reporter.show ();

@@ -16,7 +16,7 @@ class TestOwnSql : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testOpenDb () {
-        QFileInfo fi ( this.tempDir.path () + "/testdatabase.sqlite" );
+        GLib.FileInfo fi ( this.tempDir.path () + "/testdatabase.sqlite" );
         QVERIFY ( !fi.exists () ); // must not exist
         this.database.openOrCreateReadWrite (fi.filePath ());
         fi.refresh ();

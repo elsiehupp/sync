@@ -108,7 +108,7 @@ void HttpCredentialsGui.on_signal_ask_from_user_async () {
             on_signal_show_dialog ();
         } else {
             // Shibboleth?
-            GLib.warn ("Bad http auth type:" + type;
+            GLib.warning ("Bad http auth type:" + type;
             /* emit */ asked ();
         }
     });

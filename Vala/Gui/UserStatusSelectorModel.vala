@@ -405,7 +405,7 @@ class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_error (UserStatusConnector.Error error) {
-        GLib.warn ("Error:" + error;
+        GLib.warning ("Error:" + error;
 
         switch (error) {
         case UserStatusConnector.Error.CouldNotFetchPredefinedUserStatuses:

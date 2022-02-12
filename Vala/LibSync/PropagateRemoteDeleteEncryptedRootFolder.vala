@@ -15,7 +15,7 @@ Removing the root encrypted folder is consisted of multiple steps:
 - 7th step is to decrypt and delete the root folder, because it is now possible as it has become empty
 ***********************************************************/
 
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QLoggingCategory>
 
 

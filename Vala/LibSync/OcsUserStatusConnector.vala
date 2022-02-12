@@ -419,7 +419,7 @@ class OcsUserStatusConnector : UserStatusConnector {
             var days = Qt.Sunday - QDate.current_date ().day_of_week ();
             return QDate.current_date ().add_days (days + 1).start_of_day ().to_time_t ();
         }
-        GLib.warn ("Can not handle clear at endof day type" + clear_at.endof;
+        GLib.warning ("Can not handle clear at endof day type" + clear_at.endof;
         return GLib.DateTime.current_date_time ().to_time_t ();
     }
 
@@ -472,7 +472,7 @@ class OcsUserStatusConnector : UserStatusConnector {
                 clear_at_value.type = Occ.ClearAtType.EndOf;
                 clear_at_value.endof = time_value;
             } else {
-                GLib.warn ("Can not handle clear type value" + type_value;
+                GLib.warning ("Can not handle clear type value" + type_value;
             }
             clear_at = clear_at_value;
         }

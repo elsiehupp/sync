@@ -290,8 +290,8 @@ void WebFlowCredentials.on_signal_ask_from_user_cancelled () {
 
 bool WebFlowCredentials.still_valid (Soup.Reply reply) {
     if (reply.error () != Soup.Reply.NoError) {
-        GLib.warn ()) + reply.error ();
-        GLib.warn ()) + reply.error_string ();
+        GLib.warning ()) + reply.error ();
+        GLib.warning ()) + reply.error_string ();
     }
     return (reply.error () != Soup.Reply.AuthenticationRequiredError);
 }
@@ -345,7 +345,7 @@ void WebFlowCredentials.write_single_client_ca_cert_pem () {
 
         // keep the limit
         if (index > (this.client_ssl_ca_certificates_max_count - 1)) {
-            GLib.warn ("Maximum client CA cert count exceeded while writing slot" + string.number (index) + "cutting off after" + string.number (this.client_ssl_ca_certificates_max_count) + "certificates";
+            GLib.warning ("Maximum client CA cert count exceeded while writing slot" + string.number (index) + "cutting off after" + string.number (this.client_ssl_ca_certificates_max_count) + "certificates";
 
             this.client_ssl_ca_certificates_write_queue.clear ();
 
@@ -384,7 +384,7 @@ void WebFlowCredentials.on_signal_write_client_ca_certificates_pem_job_done (Key
     // errors / next ca cert?
     if (write_job && !this.client_ssl_ca_certificates.is_empty ()) {
         if (write_job.error () != NoError) {
-            GLib.warn ("Error while writing client CA cert" + write_job.error_string ();
+            GLib.warning ("Error while writing client CA cert" + write_job.error_string ();
         }
 
         if (!this.client_ssl_ca_certificates_write_queue.is_empty ()) {
@@ -412,7 +412,7 @@ void WebFlowCredentials.on_signal_write_job_done (QKeychain.Job job) {
     case NoError:
         break;
     default:
-        GLib.warn ("Error while writing password" + job.error_string ();
+        GLib.warning ("Error while writing password" + job.error_string ();
     }
 }
 
@@ -537,11 +537,11 @@ void WebFlowCredentials.on_signal_read_client_key_pem_job_done (KeychainChunk.Re
             this.client_ssl_key = QSslKey (client_key_pem, QSsl.Ec);
         }
         if (this.client_ssl_key.is_null ()) {
-            GLib.warn ("Could not load SSL key into Qt!";
+            GLib.warning ("Could not load SSL key into Qt!";
         }
         client_key_pem.clear ();
     } else {
-        GLib.warn ("Unable to read client key" + read_job.error_string ();
+        GLib.warning ("Unable to read client key" + read_job.error_string ();
     }
 
     // Start fetching client CA certificates
@@ -560,7 +560,7 @@ void WebFlowCredentials.read_single_client_ca_cert_pem () {
         connect (job, &KeychainChunk.ReadJob.on_signal_finished, this, &WebFlowCredentials.on_signal_read_client_ca_certificates_pem_job_done);
         job.on_signal_start ();
     } else {
-        GLib.warn ("Maximum client CA cert count exceeded while reading, ignoring after" + this.client_ssl_ca_certificates_max_count;
+        GLib.warning ("Maximum client CA cert count exceeded while reading, ignoring after" + this.client_ssl_ca_certificates_max_count;
 
         on_signal_read_client_ca_certificates_pem_job_done (null);
     }
@@ -581,7 +581,7 @@ void WebFlowCredentials.on_signal_read_client_ca_certificates_pem_job_done (Keyc
         } else {
             if (read_job.error () != QKeychain.Error.EntryNotFound ||
                 ( (read_job.error () == QKeychain.Error.EntryNotFound) && this.client_ssl_ca_certificates.count () == 0)) {
-                GLib.warn ("Unable to read client CA cert slot" + string.number (this.client_ssl_ca_certificates.count ()) + read_job.error_string ();
+                GLib.warning ("Unable to read client CA cert slot" + string.number (this.client_ssl_ca_certificates.count ()) + read_job.error_string ();
             }
         }
     }
@@ -614,7 +614,7 @@ void WebFlowCredentials.on_signal_read_password_job_done (Job incoming_job) {
     }
 
     if (this.user.is_empty ()) {
-        GLib.warn ("Strange : User is empty!";
+        GLib.warning ("Strange : User is empty!";
     }
 
     if (error == QKeychain.NoError) {

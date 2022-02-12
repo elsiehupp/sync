@@ -161,7 +161,7 @@ PathComponents PathComponents.subComponents () & {
 }
 
 void DiskFileModifier.remove (string relativePath) {
-    QFileInfo fi { this.rootDir.filePath (relativePath) };
+    GLib.FileInfo fi { this.rootDir.filePath (relativePath) };
     if (fi.isFile ())
         QVERIFY (this.rootDir.remove (relativePath));
     else
@@ -1174,7 +1174,7 @@ void FakeFolder.toDisk (QDir dir, FileInfo templateFi) {
 }
 
 void FakeFolder.fromDisk (QDir dir, FileInfo templateFi) {
-    foreach (QFileInfo diskChild, dir.entryInfoList (QDir.AllEntries | QDir.NoDotAndDotDot)) {
+    foreach (GLib.FileInfo diskChild, dir.entryInfoList (QDir.AllEntries | QDir.NoDotAndDotDot)) {
         if (diskChild.isDir ()) {
             QDir subDir = dir;
             subDir.cd (diskChild.fileName ());

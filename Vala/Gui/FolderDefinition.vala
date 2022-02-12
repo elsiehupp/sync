@@ -110,7 +110,7 @@ bool FolderDefinition.on_signal_load (QSettings settings, string alias,
         if (var mode = Vfs.Mode.from_string (vfs_mode_string)) {
             folder.virtual_files_mode = *mode;
         } else {
-            GLib.warn ("Unknown virtual_files_mode:" + vfs_mode_string + "assuming 'off'";
+            GLib.warning ("Unknown virtual_files_mode:" + vfs_mode_string + "assuming 'off'";
         }
     } else {
         if (settings.value (QLatin1String ("use_placeholders")).to_bool ()) {

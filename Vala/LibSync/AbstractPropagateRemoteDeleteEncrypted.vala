@@ -6,7 +6,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 
 using Soup;
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QLoggingCategory>
 
 namespace Occ {

@@ -65,7 +65,7 @@ class UpdateInfo {
         int error_col = 0;
         QDomDocument doc;
         if (!doc.content (xml, false, error_msg, error_line, error_col)) {
-            GLib.warn (error_msg + " at " + error_line + "," + error_col
+            GLib.warning (error_msg + " at " + error_line + "," + error_col
                 + "\n" +  xml.split_ref ("\n").value (error_line- 1 ) + "\n"
                 + string (" ").repeated (error_col - 1) + "^\n"
                 + "." + xml + "<-");

@@ -667,7 +667,7 @@ class TestSyncEngine : GLib.Object {
         // We can't depend on currentLocalState for hidden files since
         // it should rightfully skip things like download temporaries
         var localFileExists = [&] (string name) {
-            return QFileInfo (fakeFolder.localPath () + name).exists ();
+            return GLib.FileInfo (fakeFolder.localPath () + name).exists ();
         }
 
         fakeFolder.syncEngine ().setIgnoreHiddenFiles (true);
@@ -776,12 +776,12 @@ class TestSyncEngine : GLib.Object {
         fakeFolder.localModifier ().appendByte ("A/a2");
         fakeFolder.localModifier ().appendByte ("A/a2");
         fakeFolder.syncOnce (); // perms should be preserved
-        QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1").permissions (), perm);
-        QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a2").permissions (), perm);
+        QCOMPARE (GLib.FileInfo (fakeFolder.localPath () + "A/a1").permissions (), perm);
+        QCOMPARE (GLib.FileInfo (fakeFolder.localPath () + "A/a2").permissions (), perm);
 
         var conflictName = fakeFolder.syncJournal ().conflictRecord (fakeFolder.syncJournal ().conflictRecordPaths ().first ()).path;
         QVERIFY (conflictName.contains ("A/a2"));
-        QCOMPARE (QFileInfo (fakeFolder.localPath () + conflictName).permissions (), perm);
+        QCOMPARE (GLib.FileInfo (fakeFolder.localPath () + conflictName).permissions (), perm);
     }
 
 
@@ -810,7 +810,7 @@ class TestSyncEngine : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        QCOMPARE (QFileInfo (fakeFolder.localPath () + "foo").lastModified (), datetime);
+        QCOMPARE (GLib.FileInfo (fakeFolder.localPath () + "foo").lastModified (), datetime);
     }
 
 

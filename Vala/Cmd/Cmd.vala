@@ -9,7 +9,7 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 //  #include <iostream>
 //  #include <random>
 //  #include <qcoreapplication.h>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QJsonDocument>
 //  #include <QJsonObject>
 //  #include <QNetworkProxy>
@@ -141,7 +141,7 @@ void parse_options (string[] app_args, CmdOptions options) {
     if (!options.source_dir.ends_with ('/')) {
         options.source_dir.append ('/');
     }
-    QFileInfo fi (options.source_dir);
+    GLib.FileInfo fi (options.source_dir);
     if (!fi.exists ()) {
         std.cerr + "Source dir '" + q_printable (options.source_dir) + "' does not exist." + std.endl;
         exit (1);

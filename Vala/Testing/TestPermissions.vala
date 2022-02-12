@@ -102,7 +102,7 @@ class TestPermissions : GLib.Object {
         //2. remove the file that can be removed
         //  (they should properly be gone)
         var removeReadOnly = [&] (string file)  {
-            QVERIFY (!QFileInfo (fakeFolder.localPath () + file).permission (GLib.File.WriteOwner));
+            QVERIFY (!GLib.FileInfo (fakeFolder.localPath () + file).permission (GLib.File.WriteOwner));
             GLib.File (fakeFolder.localPath () + file).setPermissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
             fakeFolder.localModifier ().remove (file);
         }
@@ -112,7 +112,7 @@ class TestPermissions : GLib.Object {
         //3. Edit the files that cannot be modified
         //  (they should be recovered, and a conflict shall be created)
         var editReadOnly = [&] (string file)  {
-            QVERIFY (!QFileInfo (fakeFolder.localPath () + file).permission (GLib.File.WriteOwner));
+            QVERIFY (!GLib.FileInfo (fakeFolder.localPath () + file).permission (GLib.File.WriteOwner));
             GLib.File (fakeFolder.localPath () + file).setPermissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
             fakeFolder.localModifier ().appendByte (file);
         }

@@ -10,7 +10,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 using Soup;
 
 //  #include <GLib.List>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QDir>
 //  #include <QLoggingCategory>
 //  #include <QTimer>
@@ -340,17 +340,10 @@ class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     private on_ void schedule_next_job_impl ();
 
-signals:
-    void new_item (SyncFileItemPtr &);
-    void item_completed (SyncFileItemPtr &);
-    void progress (SyncFileItem &, int64 bytes);
-    void on_signal_finished (bool on_signal_success);
-
-
-    /***********************************************************
-    Emitted when propagation has problems with a locked file.
-    ***********************************************************/
-    void seen_locked_file (string filename);
+    signal void new_item (SyncFileItemPtr &);
+    signal void item_completed (SyncFileItemPtr &);
+    signal void progress (SyncFileItem &, int64 bytes);
+    signal void on_signal_finished (bool on_signal_success);
 
 
     /***********************************************************
@@ -844,7 +837,7 @@ signals:
             GLib.debug ("CaseClashCheck for " + file;
             // On Linux, the file system is case sensitive, but this code is useful for testing.
             // Just check that there is no other file with the same name and different casing.
-            QFileInfo file_info = new QFileInfo (file);
+            GLib.FileInfo file_info = new GLib.FileInfo (file);
             const string fn = file_info.filename ();
             const string[] list = file_info.dir ().entry_list ({
                 fn
@@ -954,13 +947,6 @@ signals:
 
         if (!FileSystem.rename (fn, conflict_file_path, rename_error)) {
             // If the rename fails, don't replace it.
-
-            // If the file is locked, we want to retry this sync when it
-            // becomes available again.
-            if (FileSystem.is_file_locked (fn)) {
-                /* emit */ seen_locked_file (fn);
-            }
-
             if (error)
                 *error = rename_error;
             return false;
@@ -985,7 +971,7 @@ signals:
 
         // Create a new upload job if the new conflict file should be uploaded
         if (account ().capabilities ().upload_conflict_files ()) {
-            if (composite && !QFileInfo (conflict_file_path).is_dir ()) {
+            if (composite && !GLib.FileInfo (conflict_file_path).is_dir ()) {
                 SyncFileItemPtr conflict_item = SyncFileItemPtr (new SyncFileItem);
                 conflict_item.file = conflict_filename;
                 conflict_item.type = ItemTypeFile;

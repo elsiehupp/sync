@@ -78,7 +78,7 @@ class SyncRunFileLog {
         int depth_index = 2;
         while (GLib.File.exists (filename)) {
 
-            GLib.File file = new GLib.File (filename);
+            GLib.File file = GLib.File.new_for_path (filename);
             file.open (QIODevice.ReadOnly| QIODevice.Text);
             QTextStream in (&file);
             string line = in.read_line ();
@@ -99,7 +99,7 @@ class SyncRunFileLog {
         }
 
         // When the file is too big, just rename it to an old name.
-        QFileInfo info (filename);
+        GLib.FileInfo info (filename);
         bool exists = info.exists ();
         if (exists && info.size () > logfile_max_size) {
             exists = false;
@@ -107,7 +107,7 @@ class SyncRunFileLog {
             GLib.File.remove (new_filename);
             GLib.File.rename (filename, new_filename);
         }
-        this.file.on_signal_reset (new GLib.File (filename));
+        this.file.on_signal_reset (GLib.File.new_for_path (filename));
 
         this.file.open (QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text);
         this.out.device (this.file.data ());

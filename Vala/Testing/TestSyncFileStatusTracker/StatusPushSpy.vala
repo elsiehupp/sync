@@ -20,10 +20,10 @@ class StatusPushSpy : QSignalSpy {
     /***********************************************************
     ***********************************************************/
     public SyncFileStatus statusOf (string relativePath) {
-        QFileInfo file (this.syncEngine.localPath (), relativePath);
+        GLib.FileInfo file (this.syncEngine.localPath (), relativePath);
         // Start from the end to get the latest status
         for (int i = size () - 1; i >= 0; --i) {
-            if (QFileInfo (at (i)[0].toString ()) == file)
+            if (GLib.FileInfo (at (i)[0].toString ()) == file)
                 return at (i)[1].value<SyncFileStatus> ();
         }
         return {};
@@ -33,18 +33,18 @@ class StatusPushSpy : QSignalSpy {
     /***********************************************************
     ***********************************************************/
     public bool statusEmittedBefore (string firstPath, string secondPath) {
-        QFileInfo firstFile (this.syncEngine.localPath (), firstPath);
-        QFileInfo secondFile (this.syncEngine.localPath (), secondPath);
+        GLib.FileInfo firstFile (this.syncEngine.localPath (), firstPath);
+        GLib.FileInfo secondFile (this.syncEngine.localPath (), secondPath);
         // Start from the end to get the latest status
         int i = size () - 1;
         for (; i >= 0; --i) {
-            if (QFileInfo (at (i)[0].toString ()) == secondFile)
+            if (GLib.FileInfo (at (i)[0].toString ()) == secondFile)
                 break;
-            else if (QFileInfo (at (i)[0].toString ()) == firstFile)
+            else if (GLib.FileInfo (at (i)[0].toString ()) == firstFile)
                 return false;
         }
         for (; i >= 0; --i) {
-            if (QFileInfo (at (i)[0].toString ()) == firstFile)
+            if (GLib.FileInfo (at (i)[0].toString ()) == firstFile)
                 return true;
         }
         return false;

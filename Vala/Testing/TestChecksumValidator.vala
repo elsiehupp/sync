@@ -71,7 +71,7 @@ using namespace Occ.Utility;
     void testMd5Calc () {
         string file ( this.root.path () + "/file_a.bin");
         QVERIFY (writeRandomFile (file));
-        QFileInfo fi (file);
+        GLib.FileInfo fi (file);
         QVERIFY (fi.exists ());
 
         GLib.File fileDevice (file);
@@ -90,7 +90,7 @@ using namespace Occ.Utility;
     void testSha1Calc () {
         string file ( this.root.path () + "/file_b.bin");
         writeRandomFile (file);
-        QFileInfo fi (file);
+        GLib.FileInfo fi (file);
         QVERIFY (fi.exists ());
 
         GLib.File fileDevice (file);
@@ -116,7 +116,7 @@ using namespace Occ.Utility;
 
         connect (vali, SIGNAL (on_signal_done (GLib.ByteArray,GLib.ByteArray)), SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
 
-        var file = new GLib.File (this.testfile, vali);
+        var file = GLib.File.new_for_path (this.testfile, vali);
         file.open (QIODevice.ReadOnly);
         this.expected = calcAdler32 (file);
         GLib.debug ("XX Expected Checksum : " + this.expected;
@@ -137,7 +137,7 @@ using namespace Occ.Utility;
         vali.setChecksumType (this.expectedType);
         connect (vali, SIGNAL (on_signal_done (GLib.ByteArray,GLib.ByteArray)), this, SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
 
-        var file = new GLib.File (this.testfile, vali);
+        var file = GLib.File.new_for_path (this.testfile, vali);
         file.open (QIODevice.ReadOnly);
         this.expected = calcMd5 (file);
         vali.on_signal_start (this.testfile);
@@ -156,7 +156,7 @@ using namespace Occ.Utility;
         vali.setChecksumType (this.expectedType);
         connect (vali, SIGNAL (on_signal_done (GLib.ByteArray,GLib.ByteArray)), this, SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
 
-        var file = new GLib.File (this.testfile, vali);
+        var file = GLib.File.new_for_path (this.testfile, vali);
         file.open (QIODevice.ReadOnly);
         this.expected = calcSha1 (file);
 
@@ -177,7 +177,7 @@ using namespace Occ.Utility;
         connect (vali, &ValidateChecksumHeader.validated, this, &TestChecksumValidator.slotDownValidated);
         connect (vali, &ValidateChecksumHeader.validationFailed, this, &TestChecksumValidator.slotDownError);
 
-        var file = new GLib.File (this.testfile, vali);
+        var file = GLib.File.new_for_path (this.testfile, vali);
         file.open (QIODevice.ReadOnly);
         this.expected = calcAdler32 (file);
 

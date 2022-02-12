@@ -349,7 +349,7 @@ class User : GLib.Object {
         }
 
         if (item.status == SyncFileItem.Status.NO_STATUS || item.status == SyncFileItem.Status.SUCCESS) {
-            GLib.warn ("Item " + item.file + " retrieved successfully.";
+            GLib.warning ("Item " + item.file + " retrieved successfully.";
 
             if (item.direction != SyncFileItem.Direction.UP) {
                 activity.message = _("Synced %1").arg (item.original_file);
@@ -365,7 +365,7 @@ class User : GLib.Object {
 
             this.activity_model.add_sync_file_item_to_activity_list (activity);
         } else {
-            GLib.warn ("Item " + item.file + " retrieved resulted in error " + item.error_string;
+            GLib.warning ("Item " + item.file + " retrieved resulted in error " + item.error_string;
             activity.subject = item.error_string;
 
             if (item.status == SyncFileItem.Status.FileIgnored) {
@@ -390,7 +390,7 @@ class User : GLib.Object {
             return;
         }
 
-        GLib.warn ("Item " + item.file + " retrieved resulted in " + item.error_string;
+        GLib.warning ("Item " + item.file + " retrieved resulted in " + item.error_string;
         process_completed_sync_item (folder_instance, item);
     }
 
@@ -403,7 +403,7 @@ class User : GLib.Object {
             return;
 
         if (folder_instance.account_state () == this.account.data ()) {
-            GLib.warn ("Item " + folder_instance.short_gui_local_path (" retrieved resulted in " + message;
+            GLib.warning ("Item " + folder_instance.short_gui_local_path (" retrieved resulted in " + message;
 
             Activity activity;
             activity.type = Activity.Type.SYNC_RESULT;
@@ -439,7 +439,7 @@ class User : GLib.Object {
         }
 
         if (folder_instance.account_state () == this.account.data ()) {
-            GLib.warn ("Item " + folder_instance.short_gui_local_path (" retrieved resulted in " + error_message;
+            GLib.warning ("Item " + folder_instance.short_gui_local_path (" retrieved resulted in " + error_message;
 
             Activity activity;
             activity.type = Activity.Type.SYNC_FILE_ITEM;
@@ -472,10 +472,10 @@ class User : GLib.Object {
 
         // the ocs API returns stat code 100 or 200 inside the xml if it succeeded.
         if (status_code != OCS_SUCCESS_STATUS_CODE && status_code != OCS_SUCCESS_STATUS_CODE_V2) {
-            GLib.warn ("Notification Request to Server failed, leave notification visible.";
+            GLib.warning ("Notification Request to Server failed, leave notification visible.";
         } else {
             // to do use the model to rebuild the list or remove the item
-            GLib.warn ("Notification Request to Server successed, rebuilding list.";
+            GLib.warning ("Notification Request to Server successed, rebuilding list.";
             this.activity_model.remove_activity_from_activity_list (row);
         }
     }
@@ -500,7 +500,7 @@ class User : GLib.Object {
         int result_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 
         on_signal_end_notification_request (result_code);
-        GLib.warn ("Server notify job failed with code " + result_code;
+        GLib.warning ("Server notify job failed with code " + result_code;
     }
 
 
@@ -529,27 +529,27 @@ class User : GLib.Object {
                     continue;
                 }
 
-                if (activity.status == SyncFileItem.Status.CONFLICT && !QFileInfo (f.path () + activity.file).exists ()) {
+                if (activity.status == SyncFileItem.Status.CONFLICT && !GLib.FileInfo (f.path () + activity.file).exists ()) {
                     this.activity_model.remove_activity_from_activity_list (activity);
                     continue;
                 }
 
-                if (activity.status == SyncFileItem.Status.FILE_LOCKED && !QFileInfo (f.path () + activity.file).exists ()) {
+                if (activity.status == SyncFileItem.Status.FILE_LOCKED && !GLib.FileInfo (f.path () + activity.file).exists ()) {
                     this.activity_model.remove_activity_from_activity_list (activity);
                     continue;
                 }
 
-                if (activity.status == SyncFileItem.Status.FILE_IGNORED && !QFileInfo (f.path () + activity.file).exists ()) {
+                if (activity.status == SyncFileItem.Status.FILE_IGNORED && !GLib.FileInfo (f.path () + activity.file).exists ()) {
                     this.activity_model.remove_activity_from_activity_list (activity);
                     continue;
                 }
 
-                if (!QFileInfo (f.path () + activity.file).exists ()) {
+                if (!GLib.FileInfo (f.path () + activity.file).exists ()) {
                     this.activity_model.remove_activity_from_activity_list (activity);
                     continue;
                 }
 
-                var path = QFileInfo (activity.file).dir ().path ().to_utf8 ();
+                var path = GLib.FileInfo (activity.file).dir ().path ().to_utf8 ();
                 if (path == ".")
                     path.clear ();
 
@@ -603,7 +603,7 @@ class User : GLib.Object {
                 this.notification_requests_running++;
             }
         } else {
-            GLib.warn ("Notification Links: Invalid verb:" + verb);
+            GLib.warning ("Notification Links: Invalid verb:" + verb);
         }
     }
 
@@ -650,7 +650,7 @@ class User : GLib.Object {
 
             snh.on_signal_fetch_notifications ();
         } else {
-            GLib.warn ("Notification request counter not zero.";
+            GLib.warning ("Notification request counter not zero.";
         }
     }
 

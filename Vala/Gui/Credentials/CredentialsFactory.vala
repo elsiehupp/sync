@@ -24,7 +24,7 @@ namespace CredentialsFactory {
         } else if (type == "webflow") {
             return new WebFlowCredentials;
         } else {
-            GLib.warn ());
+            GLib.warning ());
             return new DummyCredentials;
         }
     }

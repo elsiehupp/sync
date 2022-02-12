@@ -32,7 +32,7 @@ class CSyncChecksumHook : ComputeChecksumBase {
         GLib.info ("Computing" + type + "checksum of" + path + "in the csync hook";
         GLib.ByteArray checksum = ComputeChecksum.compute_now_on_signal_file (string.from_utf8 (path), type);
         if (checksum.is_null ()) {
-            GLib.warn ("Failed to compute checksum" + type + "for" + path;
+            GLib.warning ("Failed to compute checksum" + type + "for" + path;
             return null;
         }
 

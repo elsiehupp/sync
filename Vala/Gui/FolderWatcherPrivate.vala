@@ -67,7 +67,7 @@ protected slots:
             this.socket.on_signal_reset (new QSocket_notifier (this.fd, QSocket_notifier.Read));
             connect (this.socket.data (), &QSocket_notifier.activated, this, &Folder_watcher_private.on_signal_received_notification);
         } else {
-            GLib.warn ("notify_init () failed : " + strerror (errno);
+            GLib.warning ("notify_init () failed : " + strerror (errno);
         }
 
         QMetaObject.invoke_method (this, "on_signal_add_folder_recursive", Q_ARG (string, path));
@@ -132,7 +132,7 @@ protected slots:
 
         string[] all_subfolders;
         if (!find_folders_below (QDir (path), all_subfolders)) {
-            GLib.warn ("Could not traverse all sub folders";
+            GLib.warning ("Could not traverse all sub folders";
         }
         QStringListIterator subfolders_it (all_subfolders);
         while (subfolders_it.has_next ()) {
@@ -206,7 +206,7 @@ protected slots:
             this.parent.change_detected (p);
 
             if ( (event.mask & (IN_MOVED_TO | IN_CREATE))
-                && QFileInfo (p).is_dir ()
+                && GLib.FileInfo (p).is_dir ()
                 && !this.parent.path_is_ignored (p)) {
                 on_signal_add_folder_recursive (p);
             }

@@ -67,13 +67,13 @@ class ServerNotificationHandler : GLib.Object {
     ***********************************************************/
     private void on_signal_notifications_received (QJsonDocument json, int status_code) {
         if (status_code != SUCCESS_STATUS_CODE && status_code != NOT_MODIFIED_STATUS_CODE) {
-            GLib.warn ("Notifications failed with status code " + status_code;
+            GLib.warning ("Notifications failed with status code " + status_code;
             delete_later ();
             return;
         }
 
         if (status_code == NOT_MODIFIED_STATUS_CODE) {
-            GLib.warn ("Status code " + status_code + " Not Modified - No new notifications.";
+            GLib.warning ("Status code " + status_code + " Not Modified - No new notifications.";
             delete_later ();
             return;
         }
@@ -145,7 +145,7 @@ class ServerNotificationHandler : GLib.Object {
     ***********************************************************/
     private void on_signal_etag_response_header_received (GLib.ByteArray value, int status_code) {
         if (status_code == SUCCESS_STATUS_CODE) {
-            GLib.warn ("New Notification ETag Response Header received " + value;
+            GLib.warning ("New Notification ETag Response Header received " + value;
             var account = qvariant_cast<AccountState> (sender ().property (PROPERTY_ACCOUNT_STATE));
             account.notifications_etag_response_header (value);
         }

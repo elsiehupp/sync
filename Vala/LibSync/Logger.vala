@@ -293,7 +293,7 @@ class Logger : GLib.Object {
             int max_number = -1;
             foreach (string s in files) {
                 if (this.log_expire > 0) {
-                    QFileInfo file_info = new QFileInfo (dir.absolute_file_path (s));
+                    GLib.FileInfo file_info = new GLib.FileInfo (dir.absolute_file_path (s));
                     if (file_info.last_modified ().add_secs (60 * 60 * this.log_expire) < now) {
                         dir.remove (s);
                     }
@@ -329,7 +329,7 @@ class Logger : GLib.Object {
     ***********************************************************/
     private static bool compress_log (string original_name, string target_name) {
     // #ifdef ZLIB_FOUND
-        GLib.File original = new GLib.File (original_name);
+        GLib.File original = GLib.File.new_for_path (original_name);
         if (!original.open (QIODevice.ReadOnly))
             return false;
         var compressed = gzopen (target_name.to_utf8 (), "wb");
@@ -356,7 +356,7 @@ class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void dump_crash_log () {
-        GLib.File log_file = new GLib.File (QDir.temp_path () + "/" + APPLICATION_NAME + "-crash.log");
+        GLib.File log_file = GLib.File.new_for_path (QDir.temp_path () + "/" + APPLICATION_NAME + "-crash.log");
         if (log_file_object.open (GLib.File.WriteOnly)) {
             QTextStream output = new QTextStream (&log_file);
             for (int i = 1; i <= CRASH_LOG_SIZE; ++i) {

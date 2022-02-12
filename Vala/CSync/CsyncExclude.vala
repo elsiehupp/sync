@@ -320,7 +320,7 @@ const int this.GNU_SOURCE
 
 #include "../version.h"
 
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QDir>
 
 /***********************************************************
@@ -540,7 +540,7 @@ ExcludedFiles.ExcludedFiles (string local_path)
 ExcludedFiles.~ExcludedFiles () = default;
 
 void ExcludedFiles.add_exclude_file_path (string path) {
-    const QFileInfo exclude_file_info (path);
+    const GLib.FileInfo exclude_file_info (path);
     const var filename = exclude_file_info.filename ();
     const var base_path = filename.compare (QStringLiteral ("sync-exclude.lst"), Qt.CaseInsensitive) == 0
                                                                     ? this.local_path
@@ -617,7 +617,7 @@ bool ExcludedFiles.on_signal_reload_exclude_files () {
     const var keys = this.exclude_files.keys ();
     for (var& base_path : keys) {
         for (var exclude_file : this.exclude_files.value (base_path)) {
-            GLib.File file = new GLib.File (exclude_file);
+            GLib.File file = GLib.File.new_for_path (exclude_file);
             if (file.exists () && file.open (QIODevice.ReadOnly)) {
                 on_signal_load_exclude_file_patterns (base_path, file);
             } else {
@@ -676,7 +676,7 @@ bool ExcludedFiles.is_excluded (
         // Check all path subcomponents, but to not* check the base path:
         // We do want to be able to sync with a hidden folder as the target.
         while (path.size () > base_path.size ()) {
-            QFileInfo fi (path);
+            GLib.FileInfo fi (path);
             if (fi.filename () != QStringLiteral (".sync-exclude.lst")
                 && (fi.is_hidden () || fi.filename ().starts_with ('.'))) {
                 return true;
@@ -687,7 +687,7 @@ bool ExcludedFiles.is_excluded (
         }
     }
 
-    QFileInfo fi (file_path);
+    GLib.FileInfo fi (file_path);
     ItemType type = ItemTypeFile;
     if (fi.is_dir ()) {
         type = ItemTypeDirectory;
@@ -712,7 +712,7 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
     if (filetype == ItemTypeDirectory) {
         const var base_path = string (this.local_path + path + '/');
         const string absolute_path = base_path + QStringLiteral (".sync-exclude.lst");
-        QFileInfo exclude_file_info (absolute_path);
+        GLib.FileInfo exclude_file_info (absolute_path);
 
         if (exclude_file_info.is_readable ()) {
             add_exclude_file_path (absolute_path);

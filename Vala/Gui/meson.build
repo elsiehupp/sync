@@ -1,4 +1,4 @@
-project('com.elsiehupp.NextcloudVala', 'c', 'vala', version: '1.0.0')
+# project('com.elsiehupp.NextcloudVala', 'c', 'vala', version: '1.0.0')
 
 srcs = files([
     'AccountManager.vala',
@@ -47,7 +47,6 @@ srcs = files([
     'IgnoreListTableWidget.vala',
     'InvalidFilenameDialog.vala',
     'LegalNotice.vala',
-    'LockWatcher.vala',
     'LogBrowser.vala',
     'Main.vala',
     'NavigationPaneHelper.vala',

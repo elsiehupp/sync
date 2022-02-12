@@ -207,7 +207,7 @@ namespace {
         string dev_tr_path = Gtk.Application.application_dir_path () + string.from_latin1 ("/../src/gui/");
         if (QDir (dev_tr_path).exists ()) {
             // might miss Qt, QtKeyChain, etc.
-            GLib.warn ("Running from build location! Translations may be incomplete!";
+            GLib.warning ("Running from build location! Translations may be incomplete!";
             return dev_tr_path;
         }
 #if defined (Q_OS_UNIX)
@@ -327,21 +327,21 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         if (old_dir.ends_with ('/')) old_dir.chop (1); // macOS 10.11.x does not like trailing slash for rename/move.
         QT_WARNING_POP
         application_name (this.theme.app_name ());
-        if (QFileInfo (old_dir).is_dir ()) {
+        if (GLib.FileInfo (old_dir).is_dir ()) {
             var conf_dir = ConfigFile ().config_path ();
             if (conf_dir.ends_with ('/')) conf_dir.chop (1);  // macOS 10.11.x does not like trailing slash for rename/move.
             GLib.info ("Migrating old config from" + old_dir + "to" + conf_dir;
 
             if (!GLib.File.rename (old_dir, conf_dir)) {
-                GLib.warn ("Failed to move the old config directory to its new location (" + old_dir + "to" + conf_dir + ")";
+                GLib.warning ("Failed to move the old config directory to its new location (" + old_dir + "to" + conf_dir + ")";
 
                 // Try to move the files one by one
-                if (QFileInfo (conf_dir).is_dir () || QDir ().mkdir (conf_dir)) {
+                if (GLib.FileInfo (conf_dir).is_dir () || QDir ().mkdir (conf_dir)) {
                     const string[] files_list = QDir (old_dir).entry_list (QDir.Files);
                     GLib.info ("Will move the individual files" + files_list;
                     for (var name : files_list) {
                         if (!GLib.File.rename (old_dir + "/" + name,  conf_dir + "/" + name)) {
-                            GLib.warn ("Fallback move of " + name + "also failed";
+                            GLib.warning ("Fallback move of " + name + "also failed";
                         }
                     }
                 }
@@ -383,7 +383,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
 
     // Check vfs plugins
     if (Theme.instance ().show_virtual_files_option () && best_available_vfs_mode () == Vfs.Off) {
-        GLib.warn ("Theme wants to show vfs mode, but no vfs plugins are available";
+        GLib.warning ("Theme wants to show vfs mode, but no vfs plugins are available";
     }
     if (is_vfs_plugin_available (Vfs.WindowsCfApi))
         GLib.info ("VFS windows plugin is available";
@@ -639,7 +639,7 @@ void Application.on_signal_parse_message (string message, GLib.Object *) {
         GLib.info ("Running for" + this.started_at.elapsed () / 1000.0 << "sec";
         if (this.started_at.elapsed () < 10 * 1000) {
             // This call is mirrored with the one in int main ()
-            GLib.warn ("Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and var on_signal_start";
+            GLib.warning ("Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and var on_signal_start";
             return;
         }
 
@@ -748,7 +748,7 @@ void Application.show_version () {
 }
 
 void Application.show_hint (std.string error_hint) {
-    static string bin_name = QFileInfo (QCoreApplication.application_file_path ()).filename ();
+    static string bin_name = GLib.FileInfo (QCoreApplication.application_file_path ()).filename ();
     std.cerr + error_hint + std.endl;
     std.cerr + "Try '" + bin_name.to_std_"" + " --help' for more information" + std.endl;
     std.exit (1);

@@ -122,16 +122,16 @@ signals:
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
-                GLib.warn () + string ("Error returned from the server : <em>%1<em>")
+                GLib.warning () + string ("Error returned from the server : <em>%1<em>")
                                            .arg (error_from_json.to_html_escaped ());
             } else if (this.network_reply_check.error () != Soup.Reply.NoError) {
-                GLib.warn () + string ("There was an error accessing the 'token' endpoint : <br><em>%1</em>")
+                GLib.warning () + string ("There was an error accessing the 'token' endpoint : <br><em>%1</em>")
                                   .arg (this.network_reply_check.error_string ().to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
-                GLib.warn () + string ("Could not parse the JSON returned from the server : <br><em>%1</em>")
+                GLib.warning () + string ("Could not parse the JSON returned from the server : <br><em>%1</em>")
                                   .arg (json_parse_error.error_string ());
             } else {
-                GLib.warn () +  string ("The reply from the server did not contain all expected fields");
+                GLib.warning () +  string ("The reply from the server did not contain all expected fields");
             }
 
         // check for wipe request
@@ -197,16 +197,16 @@ signals:
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
-                GLib.warn () + string ("Error returned from the server : <em>%1</em>")
+                GLib.warning () + string ("Error returned from the server : <em>%1</em>")
                                   .arg (error_from_json.to_html_escaped ());
             } else if (this.network_reply_success.error () != Soup.Reply.NoError) {
-                GLib.warn () + string ("There was an error accessing the 'on_signal_success' endpoint : <br><em>%1</em>")
+                GLib.warning () + string ("There was an error accessing the 'on_signal_success' endpoint : <br><em>%1</em>")
                                   .arg (this.network_reply_success.error_string ().to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
-                GLib.warn () + string ("Could not parse the JSON returned from the server : <br><em>%1</em>")
+                GLib.warning () + string ("Could not parse the JSON returned from the server : <br><em>%1</em>")
                                   .arg (json_parse_error.error_string ());
             } else {
-                GLib.warn () + string ("The reply from the server did not contain all expected fields.");
+                GLib.warning () + string ("The reply from the server did not contain all expected fields.");
             }
         }
 

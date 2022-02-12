@@ -367,7 +367,7 @@ signals:
         const var fetch_user_name_job = new JsonApiJob (this.oc_wizard.account ().shared_from_this (), "/ocs/v1.php/cloud/user");
         connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, url] (QJsonDocument json, int status_code) {
             if (status_code != 100) {
-                GLib.warn ("Could not fetch username.";
+                GLib.warning ("Could not fetch username.";
             }
 
             sender ().delete_later ();
@@ -407,7 +407,7 @@ signals:
 
         var job = qobject_cast<PropfindJob> (sender ());
         if (!job) {
-            GLib.warn ("Cannot check for authed redirects. This slot should be invoked from PropfindJob!";
+            GLib.warning ("Cannot check for authed redirects. This slot should be invoked from PropfindJob!";
             return;
         }
         Soup.Reply reply = job.reply ();
@@ -506,7 +506,7 @@ signals:
                 res += _("OK");
             } else {
                 res += _("failed.");
-                GLib.warn ("Failed to create " + fi.path ();
+                GLib.warning ("Failed to create " + fi.path ();
                 this.oc_wizard.on_signal_display_error (_("Could not create local folder %1").arg (Utility.escape (local_folder)), false);
                 next_step = false;
             }

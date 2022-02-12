@@ -4,7 +4,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QDir>
 //  #include <QDirIterator>
 //  #include <QCoreApplication>
@@ -60,7 +60,7 @@ static class FileSystem {
     /***********************************************************
     @brief Get the mtime for a filepath
 
-    Use this over QFileInfo.last_modified () to avoid timezone related bugs. See
+    Use this over GLib.FileInfo.last_modified () to avoid timezone related bugs. See
     owncloud/core#9781 for details.
     ***********************************************************/
     time_t get_mod_time (string filename) {
@@ -70,9 +70,9 @@ static class FileSystem {
             && (stat.modtime != 0)) {
             result = stat.modtime;
         } else {
-            result = Utility.q_date_time_to_time_t (QFileInfo (filename).last_modified ());
+            result = Utility.q_date_time_to_time_t (GLib.FileInfo (filename).last_modified ());
             GLib.warning ("Could not get modification time for" + filename
-                                    + "with csync, using QFileInfo:" + result;
+                                    + "with csync, using GLib.FileInfo:" + result;
         }
         return result;
     }
@@ -95,11 +95,11 @@ static class FileSystem {
     /***********************************************************
     @brief Get the size for a file
 
-    Use this over QFileInfo.size () to avoid bugs with lnk files on Windows.
+    Use this over GLib.FileInfo.size () to avoid bugs with lnk files on Windows.
     See https://bugreports.qt.io/browse/QTBUG-24831.
     ***********************************************************/
     int64 get_size (string filename) {
-        return QFileInfo (filename).size ();
+        return GLib.FileInfo (filename).size ();
     }
 
 
@@ -166,11 +166,11 @@ static class FileSystem {
 
         while (di.has_next ()) {
             di.next ();
-            const QFileInfo file_info = di.file_info ();
+            const GLib.FileInfo file_info = di.file_info ();
             bool remove_ok = false;
             // The use of is_sym_link here is okay:
             // we never want to go into this branch for .lnk files
-            bool is_dir = file_info.is_dir () && !file_info.is_sym_link () && !FileSystem.is_junction (file_info.absolute_file_path ());
+            bool is_dir = file_info.is_dir () && !file_info.is_sym_link ();
             if (is_dir) {
                 remove_ok = remove_recursively (path + '/' + di.filename (), on_signal_deleted, errors); // recursive
             } else {

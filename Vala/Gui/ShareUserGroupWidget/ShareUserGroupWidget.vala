@@ -7,7 +7,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 //  #include <QBuffer>
 //  #include <QFileIconProvider>
 //  #include <QClipboard>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QAbstract_proxy_model>
 //  #include <QCompleter>
 //  #include <QBox_layout>
@@ -162,7 +162,7 @@ signals:
         this.ui.up_ui (this);
 
         //Is this a file or folder?
-        this.is_file = QFileInfo (local_path).is_file ();
+        this.is_file = GLib.FileInfo (local_path).is_file ();
 
         this.completer = new QCompleter (this);
         this.completer_model = new Sharee_model (this.account,
@@ -485,7 +485,7 @@ signals:
             delete pi;
         }
 
-        GLib.warn ("Sharing error from server" + code + message;
+        GLib.warning ("Sharing error from server" + code + message;
         this.ui.error_label.on_signal_text (message);
         this.ui.error_label.show ();
         activate_sharee_line_edit ();

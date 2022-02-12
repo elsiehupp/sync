@@ -7,7 +7,7 @@ Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 
 //  #include <QBuffer>
 //  #include <QClipboard>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QDesktopServices>
 //  #include <QMessageBox>
 //  #include <QMenu>
@@ -228,7 +228,7 @@ Share_link_widget.Share_link_widget (AccountPointer account,
     this.ui.share_link_tool_button.hide ();
 
     //Is this a file or folder?
-    QFileInfo fi (local_path);
+    GLib.FileInfo fi (local_path);
     this.is_file = fi.is_file ();
 
     connect (this.ui.enable_share_link, &QPushButton.clicked, this, &Share_link_widget.on_signal_create_share_link);
@@ -241,10 +241,10 @@ Share_link_widget.Share_link_widget (AccountPointer account,
 
     var sharing_possible = true;
     if (!this.account.capabilities ().share_public_link ()) {
-        GLib.warn ("Link shares have been disabled";
+        GLib.warning ("Link shares have been disabled";
         sharing_possible = false;
     } else if (! (max_sharing_permissions & Share_permission_share)) {
-        GLib.warn ("The file can not be shared because it was shared without sharing permission.";
+        GLib.warning ("The file can not be shared because it was shared without sharing permission.";
         sharing_possible = false;
     }
 
@@ -268,7 +268,7 @@ Share_link_widget.Share_link_widget (AccountPointer account,
 
     // check if the file is already inside of a synced folder
     if (share_path.is_empty ()) {
-        GLib.warn ("Unable to share files not in a sync folder.";
+        GLib.warning ("Unable to share files not in a sync folder.";
         return;
     }
 }
@@ -731,7 +731,7 @@ void Share_link_widget.on_signal_link_context_menu_action_triggered (QAction act
 void Share_link_widget.on_signal_server_error (int code, string message) {
     on_signal_toggle_share_link_animation (false);
 
-    GLib.warn ("Error from server" + code + message;
+    GLib.warning ("Error from server" + code + message;
     on_signal_display_error (message);
 }
 

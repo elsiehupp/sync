@@ -159,24 +159,24 @@ class VfsOff : Vfs {
             return false;
         }
         if (base_meta_data["IID"].to_string () != "org.owncloud.PluginFactory") {
-            GLib.warn ("Plugin has wrong IID" + loader.filename () + base_meta_data["IID"];
+            GLib.warning ("Plugin has wrong IID" + loader.filename () + base_meta_data["IID"];
             return false;
         }
 
         const var metadata = base_meta_data["MetaData"].to_object ();
         if (metadata["type"].to_string () != "vfs") {
-            GLib.warn ("Plugin has wrong type" + loader.filename () + metadata["type"];
+            GLib.warning ("Plugin has wrong type" + loader.filename () + metadata["type"];
             return false;
         }
         if (metadata["version"].to_string () != MIRALL_VERSION_STRING) {
-            GLib.warn ("Plugin has wrong version" + loader.filename () + metadata["version"];
+            GLib.warning ("Plugin has wrong version" + loader.filename () + metadata["version"];
             return false;
         }
 
         // Attempting to load the plugin is essential as it could have dependencies that
         // can't be resolved and thus not be available after all.
         if (!loader.on_signal_load ()) {
-            GLib.warn ("Plugin failed to load:" + loader.error_string ();
+            GLib.warning ("Plugin failed to load:" + loader.error_string ();
             return false;
         }
 

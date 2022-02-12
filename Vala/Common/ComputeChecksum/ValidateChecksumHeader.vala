@@ -82,7 +82,7 @@ class ValidateChecksumHeader : ComputeChecksumBase {
         }
 
         if (!parse_checksum_header (checksum_header, this.expected_checksum_type, this.expected_checksum)) {
-            GLib.warn ("Checksum header malformed:" + checksum_header;
+            GLib.warning ("Checksum header malformed:" + checksum_header;
             /* emit */ validation_failed (_("The checksum header is malformed."));
             return null;
         }

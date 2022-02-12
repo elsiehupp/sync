@@ -144,7 +144,7 @@ class ComputeChecksum : ComputeChecksumBase {
     ***********************************************************/
     public static GLib.ByteArray compute_now (QIODevice device, GLib.ByteArray checksum_type) {
         if (!checksum_computation_enabled ()) {
-            GLib.warn ("Checksum computation disabled by environment variable";
+            GLib.warning ("Checksum computation disabled by environment variable";
             return GLib.ByteArray ();
         }
 
@@ -167,7 +167,7 @@ class ComputeChecksum : ComputeChecksumBase {
     #endif
         // for an unknown checksum or no checksum, we're done right now
         if (!checksum_type.is_empty ()) {
-            GLib.warn ("Unknown checksum type:" + checksum_type;
+            GLib.warning ("Unknown checksum type:" + checksum_type;
         }
         return GLib.ByteArray ();
     }
@@ -177,9 +177,9 @@ class ComputeChecksum : ComputeChecksumBase {
     Computes the checksum synchronously on file. Convenience wrapper for compute_now ().
     ***********************************************************/
     public static GLib.ByteArray compute_now_on_signal_file (string file_path, GLib.ByteArray checksum_type) {
-        GLib.File file = new GLib.File (file_path);
+        GLib.File file = GLib.File.new_for_path (file_path);
         if (!file.open (QIODevice.ReadOnly)) {
-            GLib.warn ("Could not open file" + file_path + "for reading and computing checksum" + file.error_string ();
+            GLib.warning ("Could not open file" + file_path + "for reading and computing checksum" + file.error_string ();
             return GLib.ByteArray ();
         }
 
@@ -218,10 +218,10 @@ class ComputeChecksum : ComputeChecksumBase {
         this.watcher.future (Qt_concurrent.run ([shared_device, type] () {
             if (!shared_device.open (QIODevice.ReadOnly)) {
                 if (var file = qobject_cast<GLib.File> (shared_device.data ())) {
-                    GLib.warn ("Could not open file" + file.filename ()
+                    GLib.warning ("Could not open file" + file.filename ()
                             + "for reading to compute a checksum" + file.error_string ();
                 } else {
-                    GLib.warn ("Could not open device" + shared_device.data ()
+                    GLib.warning ("Could not open device" + shared_device.data ()
                             + "for reading to compute a checksum" + shared_device.error_string ();
                 }
                 return GLib.ByteArray ();

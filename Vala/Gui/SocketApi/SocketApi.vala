@@ -311,7 +311,7 @@ static string build_message (string verb, string path, string status = "") {
     }
     if (!path.is_empty ()) {
         message.append (':');
-        QFileInfo fi (path);
+        GLib.FileInfo fi (path);
         message.append (QDir.to_native_separators (fi.absolute_file_path ()));
     }
     return message;
@@ -319,7 +319,7 @@ static string build_message (string verb, string path, string status = "") {
 
 void Socket_listener.on_signal_send_message (string message, bool do_wait) {
     if (!socket) {
-        GLib.warn ("Not sending message to dead socket:" + message;
+        GLib.warning ("Not sending message to dead socket:" + message;
         return;
     }
 
@@ -335,7 +335,7 @@ void Socket_listener.on_signal_send_message (string message, bool do_wait) {
         socket.wait_for_bytes_written (1000);
     }
     if (sent != bytes_to_send.length ()) {
-        GLib.warn ("Could not send all data on socket for " + local_message;
+        GLib.warning ("Could not send all data on socket for " + local_message;
     }
 }
 
@@ -366,11 +366,11 @@ SocketApi.SocketApi (GLib.Object parent) {
         runtime_dir = QStandardPaths.writable_location (QStandardPaths.Runtime_location);
         socket_path = runtime_dir + "/" + Theme.instance ().app_name () + "/socket";
     } else {
-        GLib.warn ("An unexpected system detected, this probably won't work.";
+        GLib.warning ("An unexpected system detected, this probably won't work.";
     }
 
     Socket_api_server.remove_server (socket_path);
-    QFileInfo info (socket_path);
+    GLib.FileInfo info (socket_path);
     if (!info.dir ().exists ()) {
         bool result = info.dir ().mkpath (".");
         GLib.debug ("creating" + info.dir ().path () + result;
@@ -380,7 +380,7 @@ SocketApi.SocketApi (GLib.Object parent) {
         }
     }
     if (!this.local_server.listen (socket_path)) {
-        GLib.warn ("can't on_signal_start server" + socket_path;
+        GLib.warning ("can't on_signal_start server" + socket_path;
     } else {
         GLib.info ("server started, listening at " + socket_path;
     }
@@ -494,7 +494,7 @@ void SocketApi.on_signal_read_socket () {
                     .invoke (this, Qt.QueuedConnection,
                         Q_ARG (unowned<Socket_api_job>, socket_api_job));
             } else {
-                GLib.warn ("The command is not supported by this version of the client:" + command
+                GLib.warning ("The command is not supported by this version of the client:" + command
                                        + "with argument:" + argument;
                 socket_api_job.reject (QStringLiteral ("command not found"));
             }
@@ -502,7 +502,7 @@ void SocketApi.on_signal_read_socket () {
             QJsonParseError error;
             const var json = QJsonDocument.from_json (argument.to_utf8 (), error).object ();
             if (error.error != QJsonParseError.NoError) {
-                GLib.warn ()) + "Invalid json" + argument.to_string () + error.error_string ();
+                GLib.warning ()) + "Invalid json" + argument.to_string () + error.error_string ();
                 listener.send_error (error.error_string ());
                 return;
             }
@@ -512,7 +512,7 @@ void SocketApi.on_signal_read_socket () {
                     .invoke (this, Qt.QueuedConnection,
                         Q_ARG (unowned<Socket_api_job_v2>, socket_api_job));
             } else {
-                GLib.warn ("The command is not supported by this version of the client:" + command
+                GLib.warning ("The command is not supported by this version of the client:" + command
                                        + "with argument:" + argument;
                 socket_api_job.failure (QStringLiteral ("command not found"));
             }
@@ -692,7 +692,7 @@ void SocketApi.command_EDIT (string local_file, Socket_listener listener) {
     //  Q_UNUSED (listener)
     var file_data = File_data.get (local_file);
     if (!file_data.folder) {
-        GLib.warn ("Unknown path" + local_file;
+        GLib.warning ("Unknown path" + local_file;
         return;
     }
 
@@ -745,7 +745,7 @@ void SocketApi.command_COPY_PUBLIC_LINK (string local_file, Socket_listener *) {
 void SocketApi.fetch_private_link_url_helper (string local_file, std.function<void (string url)> target_fun) {
     var file_data = File_data.get (local_file);
     if (!file_data.folder) {
-        GLib.warn ("Unknown path" + local_file;
+        GLib.warning ("Unknown path" + local_file;
         return;
     }
 
@@ -831,7 +831,7 @@ void SocketApi.command_MAKE_AVAILABLE_LOCALLY (string files_arg, Socket_listener
 
         // Update the pin state on all items
         if (!data.folder.vfs ().pin_state (data.folder_relative_path, PinState.PinState.ALWAYS_LOCAL)) {
-            GLib.warn ("Could not set pin state of" + data.folder_relative_path + "to always local";
+            GLib.warning ("Could not set pin state of" + data.folder_relative_path + "to always local";
         }
 
         // Trigger sync
@@ -853,7 +853,7 @@ void SocketApi.command_MAKE_ONLINE_ONLY (string files_arg, Socket_listener *) {
 
         // Update the pin state on all items
         if (!data.folder.vfs ().pin_state (data.folder_relative_path, PinState.VfsItemAvailability.ONLINE_ONLY)) {
-            GLib.warn ("Could not set pin state of" + data.folder_relative_path + "to online only";
+            GLib.warning ("Could not set pin state of" + data.folder_relative_path + "to online only";
         }
 
         // Trigger sync
@@ -878,7 +878,7 @@ void SocketApi.command_RESOLVE_CONFLICT (string local_file, Socket_listener *) {
     const var conflicted_path = dir.file_path (conflicted_relative_path);
     const var base_path = dir.file_path (base_relative_path);
 
-    const var base_name = QFileInfo (base_path).filename ();
+    const var base_name = GLib.FileInfo (base_path).filename ();
 
 //  #ifndef OWNCLOUD_TEST
     ConflictDialog dialog;
@@ -911,11 +911,11 @@ void SocketApi.command_MOVE_ITEM (string local_file, Socket_listener *) {
     }
 
     // If the parent doesn't accept new files, go to the root of the sync folder
-    QFileInfo file_info (local_file);
+    GLib.FileInfo file_info (local_file);
     const var parent_record = parent_dir.journal_record ();
     if ( (file_info.is_file () && !parent_record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_ADD_FILE))
         || (file_info.is_dir () && !parent_record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES))) {
-        default_dir_and_name = QFileInfo (default_dir_and_name).filename ();
+        default_dir_and_name = GLib.FileInfo (default_dir_and_name).filename ();
     }
 
     // Add back the folder path
@@ -1085,7 +1085,7 @@ SyncJournalFileRecord SocketApi.File_data.journal_record () {
 }
 
 SocketApi.File_data SocketApi.File_data.parent_folder () {
-    return File_data.get (QFileInfo (local_path).dir ().path ().to_utf8 ());
+    return File_data.get (GLib.FileInfo (local_path).dir ().path ().to_utf8 ());
 }
 
 void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener listener) {
@@ -1120,7 +1120,7 @@ void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener list
         const var is_e2e_encrypted_path = file_data.journal_record ().is_e2e_encrypted || !file_data.journal_record ().e2e_mangled_name.is_empty ();
         var flag_string = is_on_signal_the_server && !is_e2e_encrypted_path ? QLatin1String (".") : QLatin1String (":d:");
 
-        const QFileInfo file_info (file_data.local_path);
+        const GLib.FileInfo file_info (file_data.local_path);
         if (!file_info.is_dir ()) {
             listener.on_signal_send_message (QLatin1String ("MENU_ITEM:ACTIVITY") + flag_string + _("Activity"));
         }
@@ -1434,7 +1434,7 @@ void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned<Socket_api_job> job) 
 //  #endif
 
 string SocketApi.build_register_path_message (string path) {
-    QFileInfo fi (path);
+    GLib.FileInfo fi (path);
     string message = "REGISTER_PATH:";
     message.append (QDir.to_native_separators (fi.absolute_file_path ()));
     return message;

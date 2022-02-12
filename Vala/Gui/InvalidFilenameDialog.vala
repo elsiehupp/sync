@@ -9,7 +9,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <QDir>
 //  #include <qabstractbutton.h
 //  #include <QDialogBut
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QPushButton>
 
 //  #include <array>
@@ -102,7 +102,7 @@ class InvalidFilenameDialog : Gtk.Dialog {
         //  Q_ASSERT (this.account);
         //  Q_ASSERT (this.folder);
 
-        const var file_path_file_info = QFileInfo (this.file_path);
+        const var file_path_file_info = GLib.FileInfo (this.file_path);
         this.relative_file_path = file_path_file_info.path () + QStringLiteral ("/");
         this.relative_file_path = this.relative_file_path.replace (folder.path (), QStringLiteral (""));
         this.relative_file_path = this.relative_file_path.is_empty () ? QStringLiteral ("") : this.relative_file_path + QStringLiteral ("/");

@@ -103,7 +103,6 @@ rights.  These rights are described in the Digia Qt LGPL Exception
 version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
-//  #include <qtlockedfile.h>
 //  #include <QDir>
 //  #include <QFile_open_even
 //  #include <QShared_memory>
@@ -114,16 +113,6 @@ namespace SharedTools {
     /***********************************************************
     ***********************************************************/
     const int instances_size = 1024;
-
-    /***********************************************************
-    ***********************************************************/
-    static string instances_lock_filename (string app_session_id) {
-        const string slash = '/';
-        string res = QDir.temp_path ();
-        if (!res.ends_with (slash))
-            res += slash;
-        return res + app_session_id + QLatin1String ("-instances");
-    }
 
     QtSingleApplication.QtSingleApplication (string app_id, int argc, char **argv)
         : QApplication (argc, argv),
@@ -150,11 +139,6 @@ namespace SharedTools {
             }
         }
 
-        // QtLockedFile is used to workaround QTBUG-10364
-        QtLockedFile lockfile (instances_lock_filename (app_session_id));
-
-        lockfile.open (QtLockedFile.ReadWrite);
-        lockfile.lock (QtLockedFile.LockMode.WRITE_LOCK);
         var pids = static_cast<int64> (instances.data ());
         if (!created) {
             // Find the first instance that it still running
@@ -171,16 +155,12 @@ namespace SharedTools {
                                   string.number (QCoreApplication.application_pid ()));
         connect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.message_received);
         pid_peer.is_client ();
-        lockfile.unlock ();
     }
 
     QtSingleApplication.~QtSingleApplication () {
         if (!instances)
             return;
         const int64 app_pid = QCoreApplication.application_pid ();
-        QtLockedFile lockfile (instances_lock_filename (QtLocalPeer.app_session_id (app_id)));
-        lockfile.open (QtLockedFile.ReadWrite);
-        lockfile.lock (QtLockedFile.LockMode.WRITE_LOCK);
         // Rewrite array, removing current pid and previously crashed ones
         var pids = static_cast<int64> (instances.data ());
         int64 newpids = pids;
@@ -189,7 +169,6 @@ namespace SharedTools {
                 *newpids++ = *pids;
         }
         *newpids = 0;
-        lockfile.unlock ();
     }
 
     bool QtSingleApplication.event (QEvent event) {

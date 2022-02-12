@@ -85,7 +85,7 @@ class VfsSuffix : Vfs {
             return string ("vfs file isn't ending with suffix");
         }
 
-        GLib.File file = new GLib.File (fn);
+        GLib.File file = GLib.File.new_for_path (fn);
         if (file.exists () && file.size () > 1
             && !FileSystem.verify_file_unchanged (fn, item.size, item.modtime)) {
             return string ("Cannot create a placeholder because a file with the placeholder name already exist");
@@ -148,7 +148,7 @@ class VfsSuffix : Vfs {
     public bool is_dehydrated_placeholder (string file_path) {
         if (!file_path.has_suffix (file_suffix ()))
             return false;
-        QFileInfo file_info = new QFileInfo (file_path);
+        GLib.FileInfo file_info = new GLib.FileInfo (file_path);
         return file_info.exists () && file_info.size () == 1;
     }
 

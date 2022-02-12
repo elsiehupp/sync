@@ -473,7 +473,7 @@ class OwncloudWizard : QWizard {
             break;
 
         case WizardCommon.Pages.PAGE_SERVER_SETUP:
-            GLib.warn ();
+            GLib.warning ();
             break;
         }
 

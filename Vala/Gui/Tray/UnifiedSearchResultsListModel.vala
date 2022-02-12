@@ -197,7 +197,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
 
             const string relative_path = dir + '/' + filename;
             const var local_files =
-                FolderMan.instance ().find_file_in_local_folders (QFileInfo (relative_path).path (), this.account_state.account ());
+                FolderMan.instance ().find_file_in_local_folders (GLib.FileInfo (relative_path).path (), this.account_state.account ());
 
             if (!local_files.is_empty ()) {
                 GLib.info ("Opening file:" + local_files.const_first ();

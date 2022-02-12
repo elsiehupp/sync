@@ -105,7 +105,7 @@ class Get_or_create_public_link_share : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_server_error (int code, string message) {
-        GLib.warn ("Share fetch/create error" + code + message;
+        GLib.warning ("Share fetch/create error" + code + message;
         QMessageBox.warning (
             null,
             _("Sharing error"),

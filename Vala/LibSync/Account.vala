@@ -10,7 +10,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QSslSocket>
 //  #include <QNetworkCo
 //  #include <QNetw
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QDir>
 //  #include <QSslKey>
 //  #include <QAuthenticat

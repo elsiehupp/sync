@@ -47,7 +47,7 @@ class PropagateLocalMkdir : PropagateItemJob {
 
         // When turning something that used to be a file into a directory
         // we need to delete the file first.
-        QFileInfo file_info = new QFileInfo (new_dir_str);
+        GLib.FileInfo file_info = new GLib.FileInfo (new_dir_str);
         if (file_info.exists () && file_info.is_file ()) {
             if (this.delete_existing_file) {
                 string remove_error;

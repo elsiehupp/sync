@@ -84,14 +84,14 @@ struct Zip_entry {
     string zip_filename;
 }
 
-Zip_entry file_info_to_zip_entry (QFileInfo info) {
+Zip_entry file_info_to_zip_entry (GLib.FileInfo info) {
     return {
         info.absolute_file_path (),
         info.filename ()
     }
 }
 
-Zip_entry file_info_to_log_zip_entry (QFileInfo info) {
+Zip_entry file_info_to_log_zip_entry (GLib.FileInfo info) {
     var entry = file_info_to_zip_entry (info);
     entry.zip_filename.prepend ("logs/");
     return entry;
@@ -99,7 +99,7 @@ Zip_entry file_info_to_log_zip_entry (QFileInfo info) {
 
 Zip_entry sync_folder_to_zip_entry (Occ.Folder f) {
     const var journal_path = f.journal_database ().database_file_path ();
-    const var journal_info = QFileInfo (journal_path);
+    const var journal_info = GLib.FileInfo (journal_path);
     return file_info_to_zip_entry (journal_info);
 }
 
@@ -107,7 +107,7 @@ GLib.Vector<Zip_entry> create_file_list () {
     var list = GLib.Vector<Zip_entry> ();
     Occ.ConfigFile config;
 
-    list.append (file_info_to_zip_entry (QFileInfo (config.config_file ())));
+    list.append (file_info_to_zip_entry (GLib.FileInfo (config.config_file ())));
 
     const var logger = Occ.Logger.instance ();
 
@@ -120,7 +120,7 @@ GLib.Vector<Zip_entry> create_file_list () {
                        std.back_inserter (list),
                        file_info_to_log_zip_entry);
     } else if (!logger.log_file ().is_empty ()) {
-        list.append (file_info_to_zip_entry (QFileInfo (logger.log_file ())));
+        list.append (file_info_to_zip_entry (GLib.FileInfo (logger.log_file ())));
     }
 
     const var folders = Occ.FolderMan.instance ().map ().values ();
@@ -139,7 +139,7 @@ void create_debug_archive (string filename) {
         if (entry.local_filename.is_empty ()) {
             zip.add_directory (entry.zip_filename);
         } else {
-            GLib.File file = new GLib.File (entry.local_filename);
+            GLib.File file = GLib.File.new_for_path (entry.local_filename);
             if (!file.open (GLib.File.ReadOnly)) {
                 continue;
             }

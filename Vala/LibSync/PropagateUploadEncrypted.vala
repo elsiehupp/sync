@@ -251,7 +251,7 @@ class PropagateUploadEncrypted : GLib.Object {
         // Encrypt File!
         this.metadata = new FolderMetadata (this.propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
 
-        QFileInfo info (this.propagator.full_local_path (this.item.file));
+        GLib.FileInfo info (this.propagator.full_local_path (this.item.file));
         const string filename = info.filename ();
 
         // Find existing metadata for this file
@@ -358,7 +358,7 @@ class PropagateUploadEncrypted : GLib.Object {
     private void on_signal_update_metadata_success (GLib.ByteArray file_identifier) {
         //  Q_UNUSED (file_identifier);
         GLib.debug ("Uploading of the metadata on_signal_success, Encrypting the file";
-        QFileInfo output_info (this.complete_filename);
+        GLib.FileInfo output_info (this.complete_filename);
 
         GLib.debug ("Encrypted Info:" + output_info.path () + output_info.filename () + output_info.size ();
         GLib.debug ("Finalizing the upload part, now the actuall uploader will take over";

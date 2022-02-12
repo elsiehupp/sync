@@ -222,7 +222,7 @@ class Ssl_button : QToolButton {
             GLib.List<QSslCertificate> chain = account.peer_certificate_chain;
 
             if (chain.is_empty ()) {
-                GLib.warn ("Empty certificate chain";
+                GLib.warning ("Empty certificate chain";
                 return;
             }
 

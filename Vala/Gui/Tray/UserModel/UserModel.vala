@@ -302,7 +302,7 @@ class UserModel : QAbstractListModel {
         if (talk_app) {
             Utility.open_browser (talk_app.url ());
         } else {
-            GLib.warn ("The Talk app is not enabled on" + current_user ().server ();
+            GLib.warning ("The Talk app is not enabled on" + current_user ().server ();
         }
     }
 

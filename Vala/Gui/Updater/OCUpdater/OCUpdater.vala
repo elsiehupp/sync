@@ -324,7 +324,7 @@ protected slots:
         var reply = qobject_cast<Soup.Reply> (sender ());
         reply.delete_later ();
         if (reply.error () != Soup.Reply.NoError) {
-            GLib.warn ("Failed to reach version check url : " + reply.error_string ();
+            GLib.warning ("Failed to reach version check url : " + reply.error_string ();
             download_state (Download_timed_out);
             return;
         }
@@ -336,7 +336,7 @@ protected slots:
         if (ok) {
             version_info_arrived (this.update_info);
         } else {
-            GLib.warn ("Could not parse update information.";
+            GLib.warning ("Could not parse update information.";
             download_state (Download_timed_out);
         }
     }

@@ -54,7 +54,7 @@ abstract class ComputeChecksumBase : GLib.Object {
             }
             return this.checksums.mid (i, end - i);
         }
-        GLib.warn ("Failed to parse" + this.checksums;
+        GLib.warning ("Failed to parse" + this.checksums;
         return {};
     }
 

@@ -10,7 +10,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QDir>
 //  #include <set>
 //  #include <QTextCodec>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QThreadPool>
 //  #include <common/checksums.h>
 //  #include <common/constants.h>
@@ -1043,7 +1043,7 @@ class ProcessDirectoryJob : GLib.Object {
                     return;
                 }
             } else {
-                if (!QFileInfo (this.discovery_data.local_dir + original_path_adjusted).is_dir ()) {
+                if (!GLib.FileInfo (this.discovery_data.local_dir + original_path_adjusted).is_dir ()) {
                     GLib.info ("Local directory does not exist anymore." + original_path_adjusted;
                     return;
                 }

@@ -56,13 +56,13 @@ class TestLongWindowsPath : GLib.Object {
     private on_ void testLongPathStat () {
         QTemporaryDir tmp;
         QFETCH (string, name);
-        const QFileInfo longPath (tmp.path () + name);
+        const GLib.FileInfo longPath (tmp.path () + name);
 
         const var data = QByteArrayLiteral ("hello");
         GLib.debug () + longPath;
         QVERIFY (longPath.dir ().mkpath ("."));
 
-        GLib.File file = new GLib.File (longPath.filePath ());
+        GLib.File file = GLib.File.new_for_path (longPath.filePath ());
         QVERIFY (file.open (GLib.File.WriteOnly));
         QVERIFY (file.write (data.constData ()) == data.size ());
         file.close ();

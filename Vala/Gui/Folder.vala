@@ -33,7 +33,7 @@ class Folder : GLib.Object {
     ***********************************************************/
     public enum ChangeReason {
         Other,
-        UnLock
+        //  UnLock
     }
 
 
@@ -558,7 +558,7 @@ signals:
         Log_status_error,
         Log_status_conflict,
         Log_status_updated,
-        Log_status_file_locked
+        //  Log_status_file_locked
     }
 
     /***********************************************************
@@ -578,7 +578,7 @@ signals:
     private 
     private AccountStatePtr this.account_state;
     private FolderDefinition this.definition;
-    private string this.canonical_local_path; // As returned with QFileInfo:canonical_file_path.  Always ends with "/"
+    private string this.canonical_local_path; // As returned with GLib.FileInfo:canonical_file_path.  Always ends with "/"
 
     /***********************************************************
     ***********************************************************/
@@ -702,7 +702,7 @@ Folder.Folder (FolderDefinition definition,
 
     ConfigFile.setup_default_exclude_file_paths (this.engine.excluded_files ());
     if (!reload_excludes ())
-        GLib.warn ();
+        GLib.warning ();
 
     connect (this.account_state.data (), &AccountState.is_connected_changed, this, &Folder.can_sync_changed);
     connect (this.engine.data (), &SyncEngine.root_etag, this, &Folder.on_signal_etag_retrieved_from_sync_engine);
@@ -717,7 +717,6 @@ Folder.Folder (FolderDefinition definition,
         this, &Folder.on_signal_item_completed);
     connect (this.engine.data (), &SyncEngine.new_big_folder,
         this, &Folder.on_signal_new_big_folder_discovered);
-    connect (this.engine.data (), &SyncEngine.seen_locked_file, FolderMan.instance (), &FolderMan.on_signal_sync_once_file_unlocks);
     connect (this.engine.data (), &SyncEngine.about_to_propagate,
         this, &Folder.on_signal_log_propagation_start);
     connect (this.engine.data (), &SyncEngine.sync_error, this, &Folder.on_signal_sync_error);
@@ -769,10 +768,10 @@ Folder.~Folder () {
 }
 
 void Folder.check_local_path () {
-    const QFileInfo fi (this.definition.local_path);
+    const GLib.FileInfo fi (this.definition.local_path);
     this.canonical_local_path = fi.canonical_file_path ();
     if (this.canonical_local_path.is_empty ()) {
-        GLib.warn ("Broken symlink:" + this.definition.local_path;
+        GLib.warning ("Broken symlink:" + this.definition.local_path;
         this.canonical_local_path = this.definition.local_path;
     } else if (!this.canonical_local_path.ends_with ('/')) {
         this.canonical_local_path.append ('/');
@@ -976,8 +975,8 @@ void Folder.show_sync_result_popup () {
     if (this.sync_result.first_item_renamed ()) {
         LogStatus status (Log_status_rename);
         // if the path changes it's rather a move
-        QDir ren_target = QFileInfo (this.sync_result.first_item_renamed ().rename_target).dir ();
-        QDir ren_source = QFileInfo (this.sync_result.first_item_renamed ().file).dir ();
+        QDir ren_target = GLib.FileInfo (this.sync_result.first_item_renamed ().rename_target).dir ();
+        QDir ren_source = GLib.FileInfo (this.sync_result.first_item_renamed ().file).dir ();
         if (ren_target != ren_source) {
             status = Log_status_move;
         }
@@ -1211,7 +1210,7 @@ void Folder.on_signal_implicitly_hydrate_file (string relativepath) {
     const var pin = this.vfs.pin_state (relativepath);
     if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
         if (!this.vfs.pin_state (relativepath, PinState.PinState.UNSPECIFIED)) {
-            GLib.warn ("Could not set pin state of" + relativepath + "to unspecified";
+            GLib.warning ("Could not set pin state of" + relativepath + "to unspecified";
         }
     }
 
@@ -1252,7 +1251,7 @@ void Folder.virtual_files_enabled (bool enabled) {
 
 void Folder.root_pin_state (PinState state) {
     if (!this.vfs.pin_state ("", state)) {
-        GLib.warn ("Could not set root pin state of" + this.definition.alias;
+        GLib.warning ("Could not set root pin state of" + this.definition.alias;
     }
 
     // We don't actually need discovery, but it's important to recurse
@@ -1356,15 +1355,15 @@ void Folder.wipe_for_removal () {
     // Remove database and temporaries
     string state_database_file = this.engine.journal ().database_file_path ();
 
-    GLib.File file = new GLib.File (state_database_file);
+    GLib.File file = GLib.File.new_for_path (state_database_file);
     if (file.exists ()) {
         if (!file.remove ()) {
-            GLib.warn ("Failed to remove existing csync State_d_b " + state_database_file;
+            GLib.warning ("Failed to remove existing csync State_d_b " + state_database_file;
         } else {
             GLib.info ("wipe : Removed csync State_d_b " + state_database_file;
         }
     } else {
-        GLib.warn ("statedatabase is empty, can not remove.";
+        GLib.warning ("statedatabase is empty, can not remove.";
     }
 
     // Also remove other database related files
@@ -1524,7 +1523,7 @@ void Folder.on_signal_sync_finished (bool on_signal_success) {
 
     bool sync_error = !this.sync_result.error_strings ().is_empty ();
     if (sync_error) {
-        GLib.warn ("SyncEngine on_signal_finished with ERROR";
+        GLib.warning ("SyncEngine on_signal_finished with ERROR";
     } else {
         GLib.info ("SyncEngine on_signal_finished without problem.";
     }
@@ -1703,7 +1702,7 @@ void Folder.on_signal_warn_on_signal_new_excluded_item (SyncJournalFileRecord re
     // Note: This assumes we're getting file watcher notifications
     // for folders only on creation and deletion - if we got a notification
     // on content change that would create spurious warnings.
-    QFileInfo fi (this.canonical_local_path + path);
+    GLib.FileInfo fi (this.canonical_local_path + path);
     if (!fi.exists ())
         return;
 
@@ -1726,7 +1725,7 @@ void Folder.on_signal_warn_on_signal_new_excluded_item (SyncJournalFileRecord re
 }
 
 void Folder.on_signal_watcher_unreliable (string message) {
-    GLib.warn ("Folder watcher for" + path ("became unreliable:" + message;
+    GLib.warning ("Folder watcher for" + path ("became unreliable:" + message;
     var full_message =
         _("Changes in synchronized folders could not be tracked reliably.\n"
            "\n"

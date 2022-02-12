@@ -395,7 +395,7 @@ class SyncJournalDb : GLib.Object {
         journal_path += string.from_latin1 (ba.left (6).to_hex ()) + ".db";
 
         // If it exists already, the path is clearly usable
-        GLib.File file = new GLib.File (QDir (local_path).file_path (journal_path));
+        GLib.File file = GLib.File.new_for_path (QDir (local_path).file_path (journal_path));
         if (file.exists ()) {
             return journal_path;
         }
@@ -409,7 +409,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         // Error during creation, just keep the original and throw errors later
-        GLib.warn ("Could not find a writable database path" + file.filename () + file.error_string ());
+        GLib.warning ("Could not find a writable database path" + file.filename () + file.error_string ());
         return journal_path;
     }
 
@@ -446,38 +446,38 @@ class SyncJournalDb : GLib.Object {
 
         if (FileSystem.file_exists (new_database_name)) {
             if (!FileSystem.remove (new_database_name, error)) {
-                GLib.warn ("Database migration : Could not remove database file" + new_database_name
+                GLib.warning ("Database migration : Could not remove database file" + new_database_name
                                 + "due to" + error);
                 return false;
             }
         }
         if (FileSystem.file_exists (new_database_name_wal)) {
             if (!FileSystem.remove (new_database_name_wal, error)) {
-                GLib.warn ("Database migration : Could not remove database WAL file" + new_database_name_wal
+                GLib.warning ("Database migration : Could not remove database WAL file" + new_database_name_wal
                                 + "due to" + error);
                 return false;
             }
         }
         if (FileSystem.file_exists (new_database_name_shm)) {
             if (!FileSystem.remove (new_database_name_shm, error)) {
-                GLib.warn ("Database migration : Could not remove database SHM file" + new_database_name_shm
+                GLib.warning ("Database migration : Could not remove database SHM file" + new_database_name_shm
                                 + "due to" + error);
                 return false;
             }
         }
 
         if (!FileSystem.rename (old_database_name, new_database_name, error)) {
-            GLib.warn ("Database migration : could not rename" + old_database_name
+            GLib.warning ("Database migration : could not rename" + old_database_name
                             + "to" + new_database_name + ":" + error);
             return false;
         }
         if (!FileSystem.rename (old_database_name_wal, new_database_name_wal, error)) {
-            GLib.warn ("Database migration : could not rename" + old_database_name_wal
+            GLib.warning ("Database migration : could not rename" + old_database_name_wal
                             + "to" + new_database_name_wal + ":" + error);
             return false;
         }
         if (!FileSystem.rename (old_database_name_shm, new_database_name_shm, error)) {
-            GLib.warn ("Database migration : could not rename" + old_database_name_shm
+            GLib.warning ("Database migration : could not rename" + old_database_name_shm
                             + "to" + new_database_name_shm + ":" + error);
             return false;
         }
@@ -528,7 +528,7 @@ class SyncJournalDb : GLib.Object {
             var next = query.next ();
             if (!next.ok) {
                 string err = query.error ();
-                GLib.warn ("No journal entry found for" + filename + "Error:" + err);
+                GLib.warning ("No journal entry found for" + filename + "Error:" + err);
                 close ();
                 return false;
             }
@@ -577,7 +577,7 @@ class SyncJournalDb : GLib.Object {
             var next = query.next ();
             if (!next.ok) {
                 string err = query.error ();
-                GLib.warn ("No journal entry found for mangled name" + mangled_name + "Error : " + err);
+                GLib.warning ("No journal entry found for mangled name" + mangled_name + "Error : " + err);
                 close ();
                 return false;
             }
@@ -770,7 +770,7 @@ class SyncJournalDb : GLib.Object {
             SyncJournalFileRecord record;
             fill_file_record_from_get_query (record, *query);
             if (!record.path.starts_with (path) || record.path.index_of ("/", path.size () + 1) > 0) {
-                GLib.warn ("hash collision" + path + record.path ());
+                GLib.warning ("hash collision" + path + record.path ());
                 continue;
             }
             row_callback (record);
@@ -859,7 +859,7 @@ class SyncJournalDb : GLib.Object {
 
             return {};
         } else {
-            GLib.warn ("Failed to connect database.");
+            GLib.warning ("Failed to connect database.");
             return _("Failed to connect database."); // check_connect failed.
         }
     }
@@ -914,12 +914,12 @@ class SyncJournalDb : GLib.Object {
     public void key_value_store_delete (string key) {
         PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_KEY_VALUE_STORE_QUERY, QByteArrayLiteral ("DELETE FROM key_value_store WHERE key=?1;"), this.database);
         if (!query) {
-            GLib.warn ("Failed to init_or_reset this.delete_key_value_store_query");
+            GLib.warning ("Failed to init_or_reset this.delete_key_value_store_query");
             //  Q_ASSERT (false);
         }
         query.bind_value (1, key);
         if (!query.exec ()) {
-            GLib.warn ("Failed to exec this.delete_key_value_store_query for key" + key);
+            GLib.warning ("Failed to exec this.delete_key_value_store_query for key" + key);
             //  Q_ASSERT (false);
         }
     }
@@ -962,7 +962,7 @@ class SyncJournalDb : GLib.Object {
             }
             return true;
         } else {
-            GLib.warn ("Failed to connect database.");
+            GLib.warning ("Failed to connect database.");
             return false; // check_connect failed.
         }
     }
@@ -979,7 +979,7 @@ class SyncJournalDb : GLib.Object {
 
         const int64 phash = get_pHash (filename.to_utf8 ());
         if (!check_connect ()) {
-            GLib.warn ("Failed to connect database.");
+            GLib.warning ("Failed to connect database.");
             return false;
         }
 
@@ -1011,7 +1011,7 @@ class SyncJournalDb : GLib.Object {
 
         const int64 phash = get_pHash (filename.to_utf8 ());
         if (!check_connect ()) {
-            GLib.warn ("Failed to connect database.");
+            GLib.warning ("Failed to connect database.");
             return false;
         }
 
@@ -1709,7 +1709,7 @@ class SyncJournalDb : GLib.Object {
         SqlQuery del_query = new SqlQuery ("DELETE FROM selectivesync WHERE type == ?1", this.database);
         del_query.bind_value (1, int (type));
         if (!del_query.exec ()) {
-            GLib.warn ("SQL error when deleting selective sync list" + list + del_query.error ());
+            GLib.warning ("SQL error when deleting selective sync list" + list + del_query.error ());
         }
 
         SqlQuery ins_query = new SqlQuery ("INSERT INTO selectivesync VALUES (?1, ?2)", this.database);
@@ -1718,7 +1718,7 @@ class SyncJournalDb : GLib.Object {
             ins_query.bind_value (1, path);
             ins_query.bind_value (2, int (type));
             if (!ins_query.exec ()) {
-                GLib.warn ("SQL error when inserting into selective sync" + type + path + del_query.error ());
+                GLib.warning ("SQL error when inserting into selective sync" + type + path + del_query.error ());
             }
         }
 
@@ -1881,7 +1881,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (!query.next ().has_data) {
-            GLib.warn ("No checksum type mapping found for" + checksum_type_id);
+            GLib.warning ("No checksum type mapping found for" + checksum_type_id);
             return GLib.ByteArray ();
         }
         return query.byte_array_value (0);
@@ -2400,7 +2400,7 @@ class SyncJournalDb : GLib.Object {
     ***********************************************************/
     private bool sql_fail (string log, SqlQuery query) {
         commit_transaction ();
-        GLib.warn ("SQL Error" + log + query.error ());
+        GLib.warning ("SQL Error" + log + query.error ());
         this.database.close ();
         //  ASSERT (false);
         return false;
@@ -2412,7 +2412,7 @@ class SyncJournalDb : GLib.Object {
     private void start_transaction () {
         if (this.transaction == 0) {
             if (!this.database.transaction ()) {
-                GLib.warn ("ERROR starting transaction:" + this.database.error ());
+                GLib.warning ("ERROR starting transaction:" + this.database.error ());
                 return;
             }
             this.transaction = 1;
@@ -2427,7 +2427,7 @@ class SyncJournalDb : GLib.Object {
     private void commit_transaction () {
         if (this.transaction == 1) {
             if (!this.database.commit ()) {
-                GLib.warn ("ERROR committing to the database:" + this.database.error ());
+                GLib.warning ("ERROR committing to the database:" + this.database.error ());
                 return;
             }
             this.transaction = 0;
@@ -2451,7 +2451,7 @@ class SyncJournalDb : GLib.Object {
             // Unfortunately the sqlite is_open check can return true even when the underlying storage
             // has become unavailable - and then some operations may cause crashes. See #6049
             if (!GLib.File.exists (this.database_file)) {
-                GLib.warn ("Database open, but file" + this.database_file + "does not exist");
+                GLib.warning ("Database open, but file" + this.database_file + "does not exist");
                 close ();
                 return false;
             }
@@ -2459,19 +2459,19 @@ class SyncJournalDb : GLib.Object {
         }
 
         if (this.database_file.is_empty ()) {
-            GLib.warn ("Database filename" + this.database_file + "is empty");
+            GLib.warning ("Database filename" + this.database_file + "is empty");
             return false;
         }
 
         // The database file is created by this call (SQLITE_OPEN_CREATE)
         if (!this.database.open_or_create_read_write (this.database_file)) {
             string error = this.database.error ();
-            GLib.warn ("Error opening the database:" + error);
+            GLib.warning ("Error opening the database:" + error);
             return false;
         }
 
         if (!GLib.File.exists (this.database_file)) {
-            GLib.warn ("Database file" + this.database_file + "does not exist");
+            GLib.warning ("Database file" + this.database_file + "does not exist");
             return false;
         }
 
@@ -2590,7 +2590,7 @@ class SyncJournalDb : GLib.Object {
             if (this.journal_mode != "DELETE"
                 && create_query.error_id () == SQLITE_IOERR
                 && sqlite3_extended_errcode (this.database.sqlite_database ()) == SQLITE_IOERR_SHMMAP) {
-                GLib.warn ("IO error SHMMAP on table creation, attempting with DELETE journal mode");
+                GLib.warning ("IO error SHMMAP on table creation, attempting with DELETE journal mode");
                 this.journal_mode = "DELETE";
                 commit_transaction ();
                 this.database.close ();
@@ -2768,7 +2768,7 @@ class SyncJournalDb : GLib.Object {
 
         bool rc = update_database_structure ();
         if (!rc) {
-            GLib.warn ("Failed to update the database structure!");
+            GLib.warning ("Failed to update the database structure!");
         }
 
 
@@ -2873,7 +2873,7 @@ class SyncJournalDb : GLib.Object {
             }
 
             if (!query.next ().has_data) {
-                GLib.warn ("No checksum type mapping found for" + checksum_type);
+                GLib.warning ("No checksum type mapping found for" + checksum_type);
                 return 0;
             }
             var value = query.int_value (0);

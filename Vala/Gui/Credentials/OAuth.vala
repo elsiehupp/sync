@@ -146,7 +146,7 @@ class OAuth : GLib.Object {
                             } else {
                                 error_reason = _("The reply from the server did not contain all expected fields");
                             }
-                            GLib.warn ("Error when getting the access_token" + json + error_reason;
+                            GLib.warning ("Error when getting the access_token" + json + error_reason;
                             http_reply_and_close (socket, "500 Internal Server Error",
                                 _("<h1>Login Error</h1><p>%1</p>").arg (error_reason).to_utf8 ().const_data ());
                             /* emit */ signal_result (Error);

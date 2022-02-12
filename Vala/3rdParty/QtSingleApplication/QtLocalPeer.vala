@@ -11,7 +11,6 @@ rights.  These rights are described in the Digia Qt LGPL Exception
 version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
-//  #include <qtlockedfile.h>
 //  #include <QLocal_server>
 //  #include <QLocal_socket>
 //  #include <QDir>
@@ -56,7 +55,6 @@ protected slots:
     protected string identifier;
     protected string socket_name;
     protected QLocal_server* server;
-    protected QtLockedFile lock_file;
 }
 
 } // namespace SharedTools
@@ -112,19 +110,9 @@ QtLocalPeer.QtLocalPeer (GLib.Object parent, string app_id)
 
     socket_name = app_session_id (identifier);
     server = new QLocal_server (this);
-    string lock_name = QDir (QDir.temp_path ()).absolute_path ()
-                       + '/' + socket_name
-                       + "-lockfile";
-    lock_file.set_filename (lock_name);
-    lock_file.open (QIODevice.ReadWrite);
 }
 
 bool QtLocalPeer.is_client () {
-    if (lock_file.is_locked ())
-        return false;
-
-    if (!lock_file.lock (QtLockedFile.LockMode.WRITE_LOCK, false))
-        return true;
 
     if (!QLocal_server.remove_server (socket_name))
         q_warning ("QtSingleCoreApplication : could not on_cleanup socket");

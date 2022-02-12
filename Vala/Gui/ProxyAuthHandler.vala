@@ -173,7 +173,7 @@ void ProxyAuthHandler.on_signal_handle_proxy_authentication_required (
         sending_qnam = account.shared_network_access_manager ().data ();
     }
     if (!sending_qnam) {
-        GLib.warn ("Could not get the sending QNAM for" + sender ();
+        GLib.warning ("Could not get the sending QNAM for" + sender ();
     }
 
     GLib.info ("Proxy auth required for" + key + proxy.type ();
@@ -299,7 +299,7 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
 
     this.username.clear ();
     if (this.read_password_job.error () != EntryNotFound) {
-        GLib.warn ("ReadPasswordJob failed with" + this.read_password_job.error_string ();
+        GLib.warning ("ReadPasswordJob failed with" + this.read_password_job.error_string ();
     }
     return false;
 }
@@ -327,7 +327,7 @@ void ProxyAuthHandler.store_creds_in_keychain () {
 
     job.delete_later ();
     if (job.error () != NoError) {
-        GLib.warn ("WritePasswordJob failed with" + job.error_string ();
+        GLib.warning ("WritePasswordJob failed with" + job.error_string ();
     }
 }
 

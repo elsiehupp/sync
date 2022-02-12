@@ -537,7 +537,7 @@ void OwncloudGui.on_signal_show_tray_message (string title, string message) {
     if (this.tray)
         this.tray.show_message (title, message);
     else
-        GLib.warn ("Tray not ready : " + message;
+        GLib.warning ("Tray not ready : " + message;
 }
 
 void OwncloudGui.on_signal_show_optional_tray_message (string title, string message) {
@@ -733,7 +733,7 @@ void OwncloudGui.raise_dialog (Gtk.Widget raise_widget) {
 void OwncloudGui.on_signal_show_share_dialog (string share_path, string local_path, Share_dialog_start_page start_page) {
     const var folder = FolderMan.instance ().folder_for_path (local_path);
     if (!folder) {
-        GLib.warn ("Could not open share dialog for" + local_path + "no responsible folder found";
+        GLib.warning ("Could not open share dialog for" + local_path + "no responsible folder found";
         return;
     }
 

@@ -5,7 +5,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 ***********************************************************/
 
 //  #include <QLoggingCategory>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 
 namespace Occ {
 
@@ -23,7 +23,7 @@ class Propagate_remote_delete_encrypted : AbstractPropagateRemoteDeleteEncrypted
     public void on_signal_start () {
         //  Q_ASSERT (!this.item.encrypted_filename.is_empty ());
 
-        const QFileInfo info = new QFileInfo (this.item.encrypted_filename);
+        const GLib.FileInfo info = new GLib.FileInfo (this.item.encrypted_filename);
         start_ls_col_job (info.path ());
     }
 
@@ -49,7 +49,7 @@ class Propagate_remote_delete_encrypted : AbstractPropagateRemoteDeleteEncrypted
 
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED + "Metadata Received, preparing it for removal of the file");
 
-        const QFileInfo info = new QFileInfo (this.propagator.full_local_path (this.item.file));
+        const GLib.FileInfo info = new GLib.FileInfo (this.propagator.full_local_path (this.item.file));
         const string filename = info.filename ();
 
         // Find existing metadata for this file

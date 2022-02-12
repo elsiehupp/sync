@@ -519,7 +519,7 @@ signals:
     }
 
     void Share_user_line.on_signal_password_error (int status_code, string message) {
-        GLib.warn ("Error from server" + status_code + message;
+        GLib.warning ("Error from server" + status_code + message;
 
         toggle_password_progress_animation (false);
 
@@ -639,7 +639,7 @@ signals:
             const var hash = QCryptographicHash.hash (this.ui.shared_with.text ().to_utf8 (), QCryptographicHash.Md5);
             //  Q_ASSERT (hash.size () > 0);
             if (hash.size () == 0) {
-                GLib.warn ("Failed to calculate hash color for share:" + this.share.path ();
+                GLib.warning ("Failed to calculate hash color for share:" + this.share.path ();
                 return Gtk.Color{};
             }
             const double hue = static_cast<uint8> (hash[0]) / 255.;

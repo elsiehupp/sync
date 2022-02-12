@@ -11,7 +11,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 //  #include <QCoreApplication>
 //  #include <QDir>
-//  #include <QFileInfo>
+//  #include <GLib.FileInfo>
 //  #include <QLoggingCategory>
 //  #include <GLib.Settings>
 //  #include <QNetworkProxy>
@@ -127,7 +127,7 @@ class ConfigFile {
             if (dir_path.is_empty ())
                 return false;
 
-            QFileInfo file_info = new QFileInfo (dir_path);
+            GLib.FileInfo file_info = new GLib.FileInfo (dir_path);
             if (!file_info.exists ()) {
                 QDir ().mkpath (dir_path);
                 file_info.file (dir_path);
@@ -170,12 +170,12 @@ class ConfigFile {
                 var new_location = QStandardPaths.writable_location (QStandardPaths.AppDataLocation);
 
                 // Check if this is the first time loading the new location
-                if (!QFileInfo (new_location).is_dir ()) {
+                if (!GLib.FileInfo (new_location).is_dir ()) {
                     // Migrate data to the new locations
                     var old_location = QStandardPaths.writable_location (QStandardPaths.AppConfigLocation);
 
                     // Only migrate if the old location exists.
-                    if (QFileInfo (old_location).is_dir ()) {
+                    if (GLib.FileInfo (old_location).is_dir ()) {
                         QDir ().mkpath (new_location);
                         copy_dir_recursive (old_location, new_location);
                     }
@@ -209,7 +209,7 @@ class ConfigFile {
     directories.
     ***********************************************************/
     public string exclude_file (Scope scope) {
-        QFileInfo file_info;
+        GLib.FileInfo file_info;
 
         switch (scope) {
         case USER_SCOPE:
@@ -236,12 +236,12 @@ class ConfigFile {
     Doesn't access config dir
     ***********************************************************/
     public static string exclude_file_from_system () {
-        QFileInfo file_info;
+        GLib.FileInfo file_info;
         file_info.file (string (SYSCONFDIR "/" + Theme.instance ().app_name ()), EXCL_FILE);
         if (!file_info.exists ()) {
             // Prefer to return the preferred path! Only use the fallback location
             // if the other path does not exist and the fallback is valid.
-            QFileInfo next_to_binary (QCoreApplication.application_dir_path (), EXCL_FILE);
+            GLib.FileInfo next_to_binary (QCoreApplication.application_dir_path (), EXCL_FILE);
             if (next_to_binary.exists ()) {
                 file_info = next_to_binary;
             } else {
@@ -251,7 +251,7 @@ class ConfigFile {
                 d.cd_up (); // go out of usr
                 if (!d.is_root ()) { // it is really a mountpoint
                     if (d.cd ("etc") && d.cd (Theme.instance ().app_name ())) {
-                        QFileInfo in_mount_dir (d, EXCL_FILE);
+                        GLib.FileInfo in_mount_dir (d, EXCL_FILE);
                         if (in_mount_dir.exists ()) {
                             file_info = in_mount_dir;
                         }
@@ -294,7 +294,7 @@ class ConfigFile {
     /***********************************************************
     ***********************************************************/
     public bool exists () {
-        GLib.File file = new GLib.File (config_file ());
+        GLib.File file = GLib.File.new_for_path (config_file ());
         return file.exists ();
     }
 

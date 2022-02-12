@@ -26,7 +26,7 @@ class SvgImageProvider : QQuickImageProvider {
         const var id_split = identifier.split ("/", Qt.SkipEmptyParts);
 
         if (id_split.is_empty ()) {
-            GLib.warn ("Image identifier is incorrect!");
+            GLib.warning ("Image identifier is incorrect!");
             return {};
         }
 
@@ -34,7 +34,7 @@ class SvgImageProvider : QQuickImageProvider {
         const var pixmap_color = id_split.size () > 1 ? Gtk.Color (id_split.at (1)) : QColor_constants.Svg.black;
 
         if (pixmap_name.is_empty () || !pixmap_color.is_valid ()) {
-            GLib.warn ("Image identifier is incorrect!");
+            GLib.warning ("Image identifier is incorrect!");
             return {};
         }
 

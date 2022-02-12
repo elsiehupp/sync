@@ -104,7 +104,7 @@ class SqlQuery {
 
             if (this.err_id != SQLITE_OK) {
                 this.error = string.from_utf8 (sqlite3_errmsg (this.database));
-                GLib.warn ("Sqlite prepare statement error:" + this.error + "in" + this.sql;
+                GLib.warning ("Sqlite prepare statement error:" + this.error + "in" + this.sql;
                 ENFORCE (allow_failure, "SQLITE Prepare error");
             } else {
                 //  ASSERT (this.stmt);
@@ -195,7 +195,7 @@ class SqlQuery {
         GLib.debug ("SQL exec" + this.sql;
 
         if (!this.stmt) {
-            GLib.warn ("Can't exec query, statement unprepared.";
+            GLib.warning ("Can't exec query, statement unprepared.";
             return false;
         }
 
@@ -217,11 +217,11 @@ class SqlQuery {
 
             if (this.err_id != SQLITE_DONE && this.err_id != SQLITE_ROW) {
                 this.error = string.from_utf8 (sqlite3_errmsg (this.database));
-                GLib.warn ("Sqlite exec statement error:" + this.err_id + this.error + "in" + this.sql;
+                GLib.warning ("Sqlite exec statement error:" + this.err_id + this.error + "in" + this.sql;
                 if (this.err_id == SQLITE_IOERR) {
-                    GLib.warn ("IOERR extended errcode : " + sqlite3_extended_errcode (this.database);
+                    GLib.warning ("IOERR extended errcode : " + sqlite3_extended_errcode (this.database);
     #if SQLITE_VERSION_NUMBER >= 3012000
-                    GLib.warn ("IOERR system errno : " + sqlite3_system_errno (this.database);
+                    GLib.warning ("IOERR system errno : " + sqlite3_system_errno (this.database);
     #endif
                 }
             } else {
@@ -264,7 +264,7 @@ class SqlQuery {
         result.has_data = this.err_id == SQLITE_ROW;
         if (!result.ok) {
             this.error = string.from_utf8 (sqlite3_errmsg (this.database));
-            GLib.warn ("Sqlite step statement error:" + this.err_id + this.error + "in" + this.sql;
+            GLib.warning ("Sqlite step statement error:" + this.err_id + this.error + "in" + this.sql;
         }
 
         return result;
@@ -382,7 +382,7 @@ class SqlQuery {
         }
         }
         if (res != SQLITE_OK) {
-            GLib.warn ("ERROR binding SQL value:" + value + "error:" + res;
+            GLib.warning ("ERROR binding SQL value:" + value + "error:" + res;
         }
         //  ASSERT (res == SQLITE_OK);
     }

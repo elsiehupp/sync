@@ -185,7 +185,7 @@ protected slots:
 
     void ConnectionValidator.on_signal_system_proxy_lookup_done (QNetworkProxy proxy) {
         if (!this.account) {
-            GLib.warn ("Bailing out, Account had been deleted";
+            GLib.warning ("Bailing out, Account had been deleted";
             return;
         }
 
@@ -247,7 +247,7 @@ protected slots:
     // status.php could not be loaded (network or server issue!).
     void ConnectionValidator.on_signal_no_status_found (Soup.Reply reply) {
         var job = qobject_cast<CheckServerJob> (sender ());
-        GLib.warn () + reply.error () + job.error_string () + reply.peek (1024);
+        GLib.warning () + reply.error () + job.error_string () + reply.peek (1024);
         if (reply.error () == Soup.Reply.SslHandshakeFailedError) {
             report_result (SslError);
             return;
@@ -299,7 +299,7 @@ protected slots:
 
         } else if (reply.error () == Soup.Reply.AuthenticationRequiredError
             || !this.account.credentials ().still_valid (reply)) {
-            GLib.warn ("******** Password is wrong!" + reply.error () + job.error_string ();
+            GLib.warning ("******** Password is wrong!" + reply.error () + job.error_string ();
             this.errors + _("The provided credentials are not correct");
             stat = CredentialsWrong;
 

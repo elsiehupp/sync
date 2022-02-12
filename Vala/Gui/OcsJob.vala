@@ -229,7 +229,7 @@ signals:
         // when it is null we might have a 304 so get status code from reply () and gives a warning...
         if (error.error != QJsonParseError.NoError) {
             status_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
-            GLib.warn ("Could not parse reply to"
+            GLib.warning ("Could not parse reply to"
                              + this.verb
                              + Utility.concat_url_path (account ().url (), path ())
                              + this.params
@@ -241,7 +241,7 @@ signals:
 
         //... then it checks for the status_code
         if (!this.pass_status_codes.contains (status_code)) {
-            GLib.warn ("Reply to"
+            GLib.warning ("Reply to"
                              + this.verb
                              + Utility.concat_url_path (account ().url (), path ())
                              + this.params

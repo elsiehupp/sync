@@ -162,7 +162,7 @@ class PropagateDownloadFile : PropagateItemJob {
     ***********************************************************/
     void delete_existing_folder () {
         string existing_dir = propagator ().full_local_path (this.item.file);
-        if (!QFileInfo (existing_dir).is_dir ()) {
+        if (!GLib.FileInfo (existing_dir).is_dir ()) {
             return;
         }
 
@@ -597,7 +597,7 @@ class PropagateDownloadFile : PropagateItemJob {
         bool previous_file_exists = FileSystem.file_exists (fn);
         if (previous_file_exists) {
             // Preserve the existing file permissions.
-            QFileInfo existing_file = new QFileInfo (fn);
+            GLib.FileInfo existing_file = new GLib.FileInfo (fn);
             if (existing_file.permissions () != this.tmp_file.permissions ()) {
                 this.tmp_file.permissions (existing_file.permissions ());
             }
@@ -615,7 +615,7 @@ class PropagateDownloadFile : PropagateItemJob {
         FileSystem.file_read_only_weak (this.tmp_file.filename (), !this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE));
 
         bool is_conflict = this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
-            && (QFileInfo (fn).is_dir () || !FileSystem.file_equals (fn, this.tmp_file.filename ()));
+            && (GLib.FileInfo (fn).is_dir () || !FileSystem.file_equals (fn, this.tmp_file.filename ()));
         if (is_conflict) {
             string error;
             if (!propagator ().create_conflict (this.item, this.associated_composite, error)) {
@@ -936,12 +936,12 @@ class PropagateDownloadFile : PropagateItemJob {
 
         FileSystem.file_hidden (file_path, true);
 
-        GLib.File file = new GLib.File (file_path);
+        GLib.File file = GLib.File.new_for_path (file_path);
         if (!file.open (QIODevice.ReadOnly)) {
             GLib.warning ("Could not open recall file: " + file.error_string ());
             return;
         }
-        QFileInfo existing_file = new QFileInfo (file_path);
+        GLib.FileInfo existing_file = new GLib.FileInfo (file_path);
         QDir base_dir = existing_file.dir ();
 
         while (!file.at_end ()) {
@@ -978,7 +978,7 @@ class PropagateDownloadFile : PropagateItemJob {
     /***********************************************************
     Anonymous namespace for the recall feature
     ***********************************************************/
-    static void preserve_group_ownership (string filename, QFileInfo file_info) {
+    static void preserve_group_ownership (string filename, GLib.FileInfo file_info) {
 //  #ifdef Q_OS_UNIX
         int chown_err = chown (filename.to_local8Bit ().const_data (), -1, file_info.group_id ());
         if (chown_err) {

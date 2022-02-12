@@ -68,7 +68,7 @@ class Folder_wizard_selective_sync : QWizardPage {
         if (target_path.starts_with ('/')) {
             target_path = target_path.mid (1);
         }
-        string alias = QFileInfo (target_path).filename ();
+        string alias = GLib.FileInfo (target_path).filename ();
         if (alias.is_empty ())
             alias = Theme.instance ().app_name ();
         string[] initial_blocklist;
@@ -117,7 +117,7 @@ class Folder_wizard_selective_sync : QWizardPage {
 
     void Folder_wizard_selective_sync.clean_up_page () {
         string target_path = wizard ().property ("target_path").to_string ();
-        string alias = QFileInfo (target_path).filename ();
+        string alias = GLib.FileInfo (target_path).filename ();
         if (alias.is_empty ())
             alias = Theme.instance ().app_name ();
         this.selective_sync.folder_info (target_path, alias);

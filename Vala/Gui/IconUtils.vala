@@ -139,7 +139,7 @@ Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fil
         QSvgRenderer svg_renderer;
 
         if (!svg_renderer.on_signal_load (source_svg_path)) {
-            GLib.warn ("Could no load initial SVG image";
+            GLib.warning ("Could no load initial SVG image";
             return {};
         }
 

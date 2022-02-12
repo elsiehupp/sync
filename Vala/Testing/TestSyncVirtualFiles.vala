@@ -92,7 +92,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (!fakeFolder.currentLocalState ().find ("A/a1"));
         QVERIFY (fakeFolder.currentLocalState ().find ("A/a1" DVSUFFIX));
-        QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1" DVSUFFIX).lastModified (), someDate);
+        QCOMPARE (GLib.FileInfo (fakeFolder.localPath () + "A/a1" DVSUFFIX).lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (itemInstruction (completeSpy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_NEW));
         QCOMPARE (dbRecord (fakeFolder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
@@ -102,7 +102,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (!fakeFolder.currentLocalState ().find ("A/a1"));
         QVERIFY (fakeFolder.currentLocalState ().find ("A/a1" DVSUFFIX));
-        QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1" DVSUFFIX).lastModified (), someDate);
+        QCOMPARE (GLib.FileInfo (fakeFolder.localPath () + "A/a1" DVSUFFIX).lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QCOMPARE (dbRecord (fakeFolder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
         QVERIFY (completeSpy.isEmpty ());
@@ -113,7 +113,7 @@ class TestSyncVirtualFiles : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (!fakeFolder.currentLocalState ().find ("A/a1"));
         QVERIFY (fakeFolder.currentLocalState ().find ("A/a1" DVSUFFIX));
-        QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1" DVSUFFIX).lastModified (), someDate);
+        QCOMPARE (GLib.FileInfo (fakeFolder.localPath () + "A/a1" DVSUFFIX).lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QCOMPARE (dbRecord (fakeFolder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
         QVERIFY (completeSpy.isEmpty ());

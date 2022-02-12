@@ -102,14 +102,14 @@ class AccountManager : GLib.Object {
 
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
         if (settings.status () != QSettings.NoError || !settings.is_writable ()) {
-            GLib.warn ("Could not read settings from" + settings.filename ()
+            GLib.warning ("Could not read settings from" + settings.filename ()
                                         + settings.status ();
             return false;
         }
 
         if (skip_settings_keys.contains (settings.group ())) {
             // Should not happen : bad container keys should have been deleted
-            GLib.warn ("Accounts structure is too new, ignoring";
+            GLib.warning ("Accounts structure is too new, ignoring";
             return true;
         }
 
@@ -295,7 +295,7 @@ class AccountManager : GLib.Object {
             if (jar) {
                 GLib.info ("Saving cookies." + acc.cookie_jar_path ();
                 if (!jar.save (acc.cookie_jar_path ())) {
-                    GLib.warn ("Failed to save cookies to" + acc.cookie_jar_path ();
+                    GLib.warning ("Failed to save cookies to" + acc.cookie_jar_path ();
                 }
             }
         }
@@ -308,7 +308,7 @@ class AccountManager : GLib.Object {
         var url_config = settings.value (QLatin1String (URL_C));
         if (!url_config.is_valid ()) {
             // No URL probably means a corrupted entry in the account settings
-            GLib.warn ("No URL for account " + settings.group ();
+            GLib.warning ("No URL for account " + settings.group ();
             return AccountPointer ();
         }
 
@@ -399,7 +399,7 @@ class AccountManager : GLib.Object {
 
             GLib.info ("Migrate : checking old config " + o_c_cfg_file;
 
-            QFileInfo fi (o_c_cfg_file);
+            GLib.FileInfo fi (o_c_cfg_file);
             if (fi.is_readable ()) {
                 std.unique_ptr<QSettings> o_c_settings (new QSettings (o_c_cfg_file, QSettings.IniFormat));
                 o_c_settings.begin_group (QLatin1String ("own_cloud"));

@@ -1,4 +1,4 @@
-project('com.elsiehupp.NextcloudVala', 'c', 'vala', version: '1.0.0')
+# project('com.elsiehupp.NextcloudVala', 'c', 'vala', version: '1.0.0')
 
 srcs = files([
     'Benchmarks/benchlargesync.vala',
@@ -72,7 +72,6 @@ srcs = files([
     'TestIconUtils.vala',
     'TestInotifyWatcher.vala',
     'TestLocalDiscovery.vala',
-    'TestLockedFiles.vala',
     'TestLongWindowsPath.vala',
     'TestNetrcParser.vala',
     'TestNextcloudPropagator.vala',

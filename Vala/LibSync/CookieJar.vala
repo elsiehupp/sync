@@ -70,13 +70,13 @@ class CookieJar : QNetworkCookieJar {
     /***********************************************************
     ***********************************************************/
     public bool save (string filename) {
-        const QFileInfo info (filename);
+        const GLib.FileInfo info (filename);
         if (!info.dir ().exists ()) {
             info.dir ().mkpath (".");
         }
 
         GLib.debug (filename;
-        GLib.File file = new GLib.File (filename);
+        GLib.File file = GLib.File.new_for_path (filename);
         if (!file.open (QIODevice.WriteOnly)) {
             return false;
         }
@@ -90,12 +90,12 @@ class CookieJar : QNetworkCookieJar {
     /***********************************************************
     ***********************************************************/
     public bool restore (string filename) {
-        const QFileInfo info (filename);
+        const GLib.FileInfo info (filename);
         if (!info.exists ()) {
             return false;
         }
 
-        GLib.File file = new GLib.File (filename);
+        GLib.File file = GLib.File.new_for_path (filename);
         if (!file.open (QIODevice.ReadOnly)) {
             return false;
         }

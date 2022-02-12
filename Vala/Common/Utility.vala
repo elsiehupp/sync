@@ -105,7 +105,7 @@ class Utility {
     ***********************************************************/
     static void setup_fav_link_private (string folder) {
         // Nautilus : add to ~/.gtk-bookmarks
-        GLib.File gtk_bookmarks = new GLib.File (QDir.home_path () + "/.config/gtk-3.0/bookmarks");
+        GLib.File gtk_bookmarks = GLib.File.new_for_path (QDir.home_path () + "/.config/gtk-3.0/bookmarks");
         GLib.ByteArray folder_url = "file://" + folder.to_utf8 ();
         if (gtk_bookmarks.open (GLib.File.ReadWrite)) {
             GLib.ByteArray places = gtk_bookmarks.read_all ();
@@ -148,7 +148,7 @@ class Utility {
             rand_string.append (char (r));
         }
 
-        GLib.File file = new GLib.File (fname);
+        GLib.File file = GLib.File.new_for_path (fname);
         if (file.open (QIODevice.WriteOnly | QIODevice.Text)) {
             string outfile; // = new QTextStream (&file);
             outfile = rand_string;
@@ -298,12 +298,12 @@ class Utility {
                                         + ".desktop";
         if (enable) {
             if (!QDir ().exists (user_auto_start_path) && !QDir ().mkpath (user_auto_start_path)) {
-                GLib.warn ("Could not create autostart folder" + user_auto_start_path);
+                GLib.warning ("Could not create autostart folder" + user_auto_start_path);
                 return;
             }
-            GLib.File ini_file = new GLib.File (desktop_file_location);
+            GLib.File ini_file = GLib.File.new_for_path (desktop_file_location);
             if (!ini_file.open (QIODevice.WriteOnly)) {
-                GLib.warn ("Could not write var on_signal_start entry" + desktop_file_location);
+                GLib.warning ("Could not write var on_signal_start entry" + desktop_file_location);
                 return;
             }
             // When running inside an AppImage, we need to set the path to the
@@ -327,7 +327,7 @@ class Utility {
                + "X-GNOME-Autostart-Delay=10";
         } else {
             if (!GLib.File.remove (desktop_file_location)) {
-                GLib.warn ("Could not remove autostart desktop file");
+                GLib.warning ("Could not remove autostart desktop file");
             }
         }
     }

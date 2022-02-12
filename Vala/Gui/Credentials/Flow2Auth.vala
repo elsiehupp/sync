@@ -173,7 +173,7 @@ signals:
                 poll_token = json.value ("poll").to_object ().value ("token").to_string ();
                 poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_string ();
                 if (this.enforce_https && GLib.Uri (poll_endpoint).scheme () != QStringLiteral ("https")) {
-                    GLib.warn ("Can not poll endpoint because the returned url" + poll_endpoint + "does not on_signal_start with https";
+                    GLib.warning ("Can not poll endpoint because the returned url" + poll_endpoint + "does not on_signal_start with https";
                     /* emit */ signal_result (Error, _("The polling URL does not on_signal_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
                 }
@@ -196,7 +196,7 @@ signals:
                 } else {
                     error_reason = _("The reply from the server did not contain all expected fields");
                 }
-                GLib.warn ("Error when getting the login_url" + json + error_reason;
+                GLib.warning ("Error when getting the login_url" + json + error_reason;
                 /* emit */ signal_result (Error, error_reason);
                 this.poll_timer.stop ();
                 this.is_busy = false;
@@ -285,7 +285,7 @@ signals:
                 && !json.is_empty ()) {
                 server_url = json["server"].to_string ();
                 if (this.enforce_https && server_url.scheme () != QStringLiteral ("https")) {
-                    GLib.warn ("Returned server url" + server_url + "does not on_signal_start with https";
+                    GLib.warning ("Returned server url" + server_url + "does not on_signal_start with https";
                     /* emit */ signal_result (Error, _("The returned server URL does not on_signal_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
                 }
