@@ -82,7 +82,7 @@ signals:
         });
         GLib.Object.connect (this, &RemoteWipe.authorized, FolderMan.instance (),
                          &FolderMan.on_signal_wipe_folder_for_account);
-        GLib.Object.connect (FolderMan.instance (), &FolderMan.wipe_done, this,
+        GLib.Object.connect (FolderMan.instance (), &FolderMan.signal_wipe_done, this,
                          &RemoteWipe.on_signal_notify_server_success_job);
         GLib.Object.connect (this.account.data (), &Account.app_password_retrieved, this,
                          &RemoteWipe.on_signal_start_check_job_with_app_password);

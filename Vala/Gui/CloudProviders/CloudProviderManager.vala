@@ -59,7 +59,7 @@ void on_signal_name_lost (GDBusConnection connection, gchar name, gpointer user_
 
 void CloudProviderManager.register_signals () {
     Occ.FolderMan folder_manager = Occ.FolderMan.instance ();
-    connect (folder_manager, SIGNAL (folder_list_changed (Folder.Map &)), SLOT (on_signal_folder_list_changed (Folder.Map &)));
+    connect (folder_manager, SIGNAL (signal_folder_list_changed (Folder.Map &)), SLOT (on_signal_folder_list_changed (Folder.Map &)));
     on_signal_folder_list_changed (folder_manager.map ());
 }
 

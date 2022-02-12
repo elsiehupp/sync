@@ -14,16 +14,16 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief Linux (inotify) API implementation of Folder_watcher
+@brief Linux (inotify) API implementation of FolderWatcher
 @ingroup gui
 ***********************************************************/
-class Folder_watcher_private : GLib.Object {
+class FolderWatcherPrivate : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Folder_watcher_private () = default;
-    public Folder_watcher_private (Folder_watcher p, string path);
-    ~Folder_watcher_private () override;
+    public FolderWatcherPrivate () = default;
+    public FolderWatcherPrivate (FolderWatcher p, string path);
+    ~FolderWatcherPrivate () override;
 
     /***********************************************************
     ***********************************************************/
@@ -46,7 +46,7 @@ protected slots:
 
     /***********************************************************
     ***********************************************************/
-    private Folder_watcher this.parent;
+    private FolderWatcher this.parent;
 
     /***********************************************************
     ***********************************************************/
@@ -58,14 +58,14 @@ protected slots:
 }
 
 
-    Folder_watcher_private.Folder_watcher_private (Folder_watcher p, string path)
+    FolderWatcherPrivate.FolderWatcherPrivate (FolderWatcher p, string path)
         : GLib.Object ()
         this.parent (p)
         this.folder (path) {
         this.fd = inotify_init ();
         if (this.fd != -1) {
             this.socket.on_signal_reset (new QSocket_notifier (this.fd, QSocket_notifier.Read));
-            connect (this.socket.data (), &QSocket_notifier.activated, this, &Folder_watcher_private.on_signal_received_notification);
+            connect (this.socket.data (), &QSocket_notifier.activated, this, &FolderWatcherPrivate.on_signal_received_notification);
         } else {
             GLib.warning ("notify_init () failed : " + strerror (errno);
         }
@@ -73,10 +73,10 @@ protected slots:
         QMetaObject.invoke_method (this, "on_signal_add_folder_recursive", Q_ARG (string, path));
     }
 
-    Folder_watcher_private.~Folder_watcher_private () = default;
+    FolderWatcherPrivate.~FolderWatcherPrivate () = default;
 
     // attention : result list passed by reference!
-    bool Folder_watcher_private.find_folders_below (QDir dir, string[] full_list) {
+    bool FolderWatcherPrivate.find_folders_below (QDir dir, string[] full_list) {
         bool ok = true;
         if (! (dir.exists () && dir.is_readable ())) {
             GLib.debug ("Non existing path coming in : " + dir.absolute_path ();
@@ -99,7 +99,7 @@ protected slots:
         return ok;
     }
 
-    void Folder_watcher_private.inotify_register_path (string path) {
+    void FolderWatcherPrivate.inotify_register_path (string path) {
         if (path.is_empty ())
             return;
 
@@ -113,14 +113,14 @@ protected slots:
             // unreliable.
             if (this.parent.is_reliable && (errno == ENOMEM || errno == ENOSPC)) {
                 this.parent.is_reliable = false;
-                /* emit */ this.parent.became_unreliable (
+                /* emit */ this.parent.signal_became_unreliable (
                     _("This problem usually happens when the inotify watches are exhausted. "
                        "Check the FAQ for details."));
             }
         }
     }
 
-    void Folder_watcher_private.on_signal_add_folder_recursive (string path) {
+    void FolderWatcherPrivate.on_signal_add_folder_recursive (string path) {
         if (this.path_to_watch.contains (path))
             return;
 
@@ -155,7 +155,7 @@ protected slots:
         }
     }
 
-    void Folder_watcher_private.on_signal_received_notification (int fd) {
+    void FolderWatcherPrivate.on_signal_received_notification (int fd) {
         int len = 0;
         struct inotify_event event = null;
         size_t i = 0;
@@ -196,14 +196,14 @@ protected slots:
                 continue;
             GLib.ByteArray filename (event.name);
             // Filter out journal changes - redundant with filtering in
-            // Folder_watcher.path_is_ignored.
+            // FolderWatcher.path_is_ignored.
             if (filename.starts_with (".sync_")
                 || filename.starts_with (".csync_journal.db")
                 || filename.starts_with (".sync_")) {
                 continue;
             }
             const string p = this.watch_to_path[event.wd] + '/' + filename;
-            this.parent.change_detected (p);
+            this.parent.on_signal_change_detected (p);
 
             if ( (event.mask & (IN_MOVED_TO | IN_CREATE))
                 && GLib.FileInfo (p).is_dir ()
@@ -216,7 +216,7 @@ protected slots:
         }
     }
 
-    void Folder_watcher_private.remove_folders_below (string path) {
+    void FolderWatcherPrivate.remove_folders_below (string path) {
         var it = this.path_to_watch.find (path);
         if (it == this.path_to_watch.end ())
             return;

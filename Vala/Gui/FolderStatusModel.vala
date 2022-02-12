@@ -240,9 +240,9 @@ class FolderStatusModel : QAbstractItemModel {
         this.folders.clear ();
         this.account_state = account_state;
 
-        connect (FolderMan.instance (), &FolderMan.folder_sync_state_change,
+        connect (FolderMan.instance (), &FolderMan.signal_folder_sync_state_change,
             this, &FolderStatusModel.on_signal_folder_sync_state_change, Qt.UniqueConnection);
-        connect (FolderMan.instance (), &FolderMan.schedule_queue_changed,
+        connect (FolderMan.instance (), &FolderMan.signal_schedule_queue_changed,
             this, &FolderStatusModel.on_signal_folder_schedule_queue_changed, Qt.UniqueConnection);
 
         var folders = FolderMan.instance ().map ();
@@ -258,8 +258,8 @@ class FolderStatusModel : QAbstractItemModel {
             info.checked = Qt.PartiallyChecked;
             this.folders + info;
 
-            connect (f, &Folder.progress_info, this, &FolderStatusModel.on_signal_progress, Qt.UniqueConnection);
-            connect (f, &Folder.new_big_folder_discovered, this, &FolderStatusModel.on_signal_new_big_folder, Qt.UniqueConnection);
+            connect (f, &Folder.signal_progress_info, this, &FolderStatusModel.on_signal_progress, Qt.UniqueConnection);
+            connect (f, &Folder.signal_new_big_folder_discovered, this, &FolderStatusModel.on_signal_new_big_folder, Qt.UniqueConnection);
         }
 
         // Sort by header text
@@ -1556,4 +1556,5 @@ class FolderStatusModel : QAbstractItemModel {
 
 } // class FolderStatusModel
 
+} // namespace Ui
 } // namespace Occ

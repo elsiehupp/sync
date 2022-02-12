@@ -34,8 +34,8 @@ class SyncStatusSummary : GLib.Object {
     public SyncStatusSummary (GLib.Object parent = new GLib.Object ()) {
         base (parent);
         const var folder_man = FolderMan.instance ();
-        connect (folder_man, &FolderMan.folder_list_changed, this, &SyncStatusSummary.on_signal_folder_list_changed);
-        connect (folder_man, &FolderMan.folder_sync_state_change, this, &SyncStatusSummary.on_signal_folder_sync_state_changed);
+        connect (folder_man, &FolderMan.signal_folder_list_changed, this, &SyncStatusSummary.on_signal_folder_list_changed);
+        connect (folder_man, &FolderMan.signal_folder_sync_state_change, this, &SyncStatusSummary.on_signal_folder_sync_state_changed);
     }
 
     /***********************************************************
@@ -153,9 +153,9 @@ class SyncStatusSummary : GLib.Object {
         for (var folder : folder_map) {
             if (folder.account_state () == this.account_state.data ()) {
                 connect (
-                    folder, &Folder.progress_info, this, &SyncStatusSummary.on_signal_folder_progress_info, Qt.UniqueConnection);
+                    folder, &Folder.signal_progress_info, this, &SyncStatusSummary.on_signal_folder_progress_info, Qt.UniqueConnection);
             } else {
-                disconnect (folder, &Folder.progress_info, this, &SyncStatusSummary.on_signal_folder_progress_info);
+                disconnect (folder, &Folder.signal_progress_info, this, &SyncStatusSummary.on_signal_folder_progress_info);
             }
         }
     }

@@ -75,7 +75,7 @@ class User : GLib.Object {
             this, &User.on_signal_rebuild_navigation_app_list);
         connect (this.account.account ().data (), &Account.account_changed_display_name, this, &User.signal_name_changed);
 
-        connect (FolderMan.instance (), &FolderMan.folder_list_changed, this, &User.signal_has_local_folder_changed);
+        connect (FolderMan.instance (), &FolderMan.signal_folder_list_changed, this, &User.signal_has_local_folder_changed);
 
         connect (this, &User.signal_gui_log, Logger.instance (), &Logger.signal_gui_log);
 
@@ -384,7 +384,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_item_completed (string folder, SyncFileItemPtr item) {
-        var folder_instance = FolderMan.instance ().folder (folder);
+        var folder_instance = FolderMan.instance ().folder_by_alias (folder);
 
         if (!folder_instance || !is_activity_of_current_account (folder_instance) || is_unsolvable_conflict (item)) {
             return;
@@ -398,7 +398,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_add_error (string folder_alias, string message, ErrorCategory category) {
-        var folder_instance = FolderMan.instance ().folder (folder_alias);
+        var folder_instance = FolderMan.instance ().folder_by_alias (folder_alias);
         if (!folder_instance)
             return;
 
@@ -433,7 +433,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_add_error_to_gui (string folder_alias, SyncFileItem.Status status, string error_message, string subject) {
-        const var folder_instance = FolderMan.instance ().folder (folder_alias);
+        const var folder_instance = FolderMan.instance ().folder_by_alias (folder_alias);
         if (!folder_instance) {
             return;
         }
@@ -510,7 +510,7 @@ class User : GLib.Object {
         if (progress.status () == ProgressInfo.Status.RECONCILE) {
             // Wipe all non-persistent entries - as well as the persistent ones
             // in cases where a local discovery was done.
-            var f = FolderMan.instance ().folder (folder);
+            var f = FolderMan.instance ().folder_by_alias (folder);
             if (!f)
                 return;
             const var engine = f.sync_engine ();

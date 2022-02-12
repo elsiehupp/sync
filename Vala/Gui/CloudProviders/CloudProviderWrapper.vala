@@ -123,9 +123,9 @@ CloudProviderWrapper.CloudProviderWrapper (GLib.Object parent, Folder folder, in
     cloud_providers_account_exporter_action_group (this.cloud_provider_account, action_group);
 
     connect (ProgressDispatcher.instance (), SIGNAL (progress_info (string, ProgressInfo)), this, SLOT (on_signal_update_progress (string, ProgressInfo)));
-    connect (this.folder, SIGNAL (sync_started ()), this, SLOT (on_signal_sync_started ()));
-    connect (this.folder, SIGNAL (sync_finished (SyncResult)), this, SLOT (on_signal_sync_finished (SyncResult)));
-    connect (this.folder, SIGNAL (sync_paused_changed (Folder*,bool)), this, SLOT (on_signal_sync_paused_changed (Folder*, bool)));
+    connect (this.folder, SIGNAL (signal_sync_started ()), this, SLOT (on_signal_sync_started ()));
+    connect (this.folder, SIGNAL (signal_sync_finished (SyncResult)), this, SLOT (on_signal_sync_finished (SyncResult)));
+    connect (this.folder, SIGNAL (signal_sync_paused_changed (Folder*,bool)), this, SLOT (on_signal_sync_paused_changed (Folder*, bool)));
 
     this.paused = this.folder.sync_paused ();
     update_pause_status ();

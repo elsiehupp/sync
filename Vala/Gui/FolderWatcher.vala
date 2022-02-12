@@ -22,64 +22,41 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-
 /***********************************************************
 @brief Monitors a directory recursively for changes
 
 Folder Watcher monitors a directory and its sub directories
 for changes in the local file system.
-through the path_changed () signal.
+through the signal_path_changed () signal.
 
 @ingroup gui
 ***********************************************************/
+class FolderWatcher : GLib.Object {
 
-class Folder_watcher : GLib.Object {
-
-    // Construct, connect signals, call on_signal_init ()
-    public Folder_watcher (Folder folder = null);
-    ~Folder_watcher () override;
-
+    protected GLib.HashMap<string, int> pending_pathes;
 
     /***********************************************************
-    @param root Path of the root of the folder
     ***********************************************************/
-    public void on_signal_init (string root);
-
-    
-    /***********************************************************
-    Check if the path is ignored.
-    ***********************************************************/
-    public bool path_is_ignored (string path);
-
+    private QScopedPointer<FolderWatcherPrivate> d;
+    private QElapsedTimer timer;
+    private GLib.Set<string> last_paths;
+    private Folder folder;
+    private bool is_reliable = true;
 
     /***********************************************************
-    Returns false if the folder watcher can't be trusted to capture all
-    notifications.
-
-    For example, this can happen on linux if the inotify user limit from
-    /proc/sys/fs/inotify/max_user_watches is exceeded.
+    Path of the expected test notification
     ***********************************************************/
-    public bool is_reliable ();
-
+    private string test_notification_path;
 
     /***********************************************************
-    Triggers a change in the path and verifies a notification arrives.
-
-    If no notification is seen, the folderwatcher marks itself as unreliable.
-    The path must be ignored by the watcher.
     ***********************************************************/
-    public void start_notificaton_test (string path);
+    //  private friend class FolderWatcherPrivate;
 
-    /// For testing linux behavior only
-    public int test_linux_watch_count ();
-
-signals:
     /***********************************************************
     Emitted when one of the watched directories or one
     of the contained files is changed.
     ***********************************************************/
-    void path_changed (string path);
-
+    internal signal void signal_path_changed (string path);
 
     /***********************************************************
     Emitted if some notifications were lost.
@@ -89,97 +66,70 @@ signals:
     watcher could still be able to capture all future notifications -
     i.e. is_reliable () is orthogonal to losing changes occasionally.
     ***********************************************************/
-    void lost_changes ();
-
+    internal signal void signal_lost_changes ();
 
     /***********************************************************
     Signals when the watcher became unreliable. The string is a translated
     message that can be shown to users.
     ***********************************************************/
-    void became_unreliable (string message);
-
-protected slots:
-    // called from the implementations to indicate a change in path
-    void change_detected (string path);
-    void change_detected (string[] paths);
-
+    internal signal void signal_became_unreliable (string message);
 
     /***********************************************************
+    Construct, connect signals, call init ()
     ***********************************************************/
-    private void on_signal_start_notification_test_when_ready ();
-
-
-    protected GLib.HashMap<string, int> this.pending_pathes;
-
-
-    /***********************************************************
-    ***********************************************************/
-    private QScopedPointer<Folder_watcher_private> this.d;
-    private QElapsedTimer this.timer;
-    private GLib.Set<string> this.last_paths;
-    private Folder this.folder;
-    private bool this.is_reliable = true;
-
-    /***********************************************************
-    ***********************************************************/
-    private void append_sub_paths (QDir dir, string[]& sub_paths);
-
-
-    /***********************************************************
-    Path of the expected test notification
-    ***********************************************************/
-    private string this.test_notification_path;
-
-    /***********************************************************
-    ***********************************************************/
-    private friend class Folder_watcher_private;
-}
-
-    Folder_watcher.Folder_watcher (Folder folder)
-        : GLib.Object (folder)
-        this.folder (folder) {
+    public FolderWatcher (Folder folder = null) {
+        base (folder);
+        this.folder = folder;
     }
 
-    Folder_watcher.~Folder_watcher () = default;
 
-    void Folder_watcher.on_signal_init (string root) {
-        this.d.on_signal_reset (new Folder_watcher_private (this, root));
+    /***********************************************************
+    @param root Path of the root of the folder
+    ***********************************************************/
+    public void init (string root) {
+        this.d.on_signal_reset (new FolderWatcherPrivate (this, root));
         this.timer.on_signal_start ();
     }
 
-    bool Folder_watcher.path_is_ignored (string path) {
+    
+    /***********************************************************
+    Check if the path is ignored.
+    ***********************************************************/
+    public bool path_is_ignored (string path) {
         if (path.is_empty ())
             return true;
         if (!this.folder)
             return false;
 
-    #ifndef OWNCLOUD_TEST
+    //  #ifndef OWNCLOUD_TEST
         if (this.folder.is_file_excluded_absolute (path) && !Utility.is_conflict_file (path)) {
             GLib.debug ("* Ignoring file" + path;
             return true;
         }
-    #endif
+    //  #endif
         return false;
     }
 
-    bool Folder_watcher.is_reliable () {
+
+    /***********************************************************
+    Returns false if the folder watcher can't be trusted to capture all
+    notifications.
+
+    For example, this can happen on linux if the inotify user limit from
+    /proc/sys/fs/inotify/max_user_watches is exceeded.
+    ***********************************************************/
+    public bool is_reliable () {
         return this.is_reliable;
     }
 
-    void Folder_watcher.append_sub_paths (QDir dir, string[]& sub_paths) {
-        string[] new_sub_paths = dir.entry_list (QDir.NoDotAndDotDot | QDir.Dirs | QDir.Files);
-        for (int i = 0; i < new_sub_paths.size (); i++) {
-            string path = dir.path () + "/" + new_sub_paths[i];
-            GLib.FileInfo file_info (path);
-            sub_paths.append (path);
-            if (file_info.is_dir ()) {
-                QDir dir (path);
-                append_sub_paths (dir, sub_paths);
-            }
-        }
-    }
 
-    void Folder_watcher.start_notificaton_test (string path) {
+    /***********************************************************
+    Triggers a change in the path and verifies a notification arrives.
+
+    If no notification is seen, the folderwatcher marks itself as unreliable.
+    The path must be ignored by the watcher.
+    ***********************************************************/
+    public void start_notificaton_test (string path) {
         //  Q_ASSERT (this.test_notification_path.is_empty ());
         this.test_notification_path = path;
 
@@ -188,47 +138,33 @@ protected slots:
         on_signal_start_notification_test_when_ready ();
     }
 
-    void Folder_watcher.on_signal_start_notification_test_when_ready () {
-        if (!this.d.ready) {
-            QTimer.single_shot (1000, this, &Folder_watcher.on_signal_start_notification_test_when_ready);
-            return;
-        }
 
-        var path = this.test_notification_path;
-        if (GLib.File.exists (path)) {
-            var mtime = FileSystem.get_mod_time (path);
-            FileSystem.mod_time (path, mtime + 1);
-        } else {
-            GLib.File f (path);
-            f.open (QIODevice.WriteOnly | QIODevice.Append);
-        }
-
-        QTimer.single_shot (5000, this, [this] () {
-            if (!this.test_notification_path.is_empty ())
-                /* emit */ became_unreliable (_("The watcher did not receive a test notification."));
-            this.test_notification_path.clear ();
-        });
-    }
-
-    int Folder_watcher.test_linux_watch_count () {
-    #ifdef Q_OS_LINUX
+    /***********************************************************
+    For testing linux behavior only
+    ***********************************************************/
+    public int test_linux_watch_count () {
         return this.d.test_watch_count ();
-    #else
-        return -1;
-    #endif
     }
 
-    void Folder_watcher.change_detected (string path) {
+
+    /***********************************************************
+    Called from the implementations to indicate a change in path
+    ***********************************************************/
+    protected void on_signal_change_detected (string path) {
         GLib.FileInfo file_info (path);
         string[] paths (path);
         if (file_info.is_dir ()) {
             QDir dir (path);
             append_sub_paths (dir, paths);
         }
-        change_detected (paths);
+        on_signal_change_detected (paths);
     }
 
-    void Folder_watcher.change_detected (string[] paths) {
+
+    /***********************************************************
+    Called from the implementations to indicate a change in path
+    ***********************************************************/
+    protected void on_signal_change_detected (string[] paths) {
         // TODO : this shortcut doesn't look very reliable:
         //   - why is the timeout only 1 second?
         //   - what if there is more than one file being updated frequently?
@@ -264,9 +200,52 @@ protected slots:
 
         GLib.info ("Detected changes in paths:" + changed_paths;
         foreach (string path, changed_paths) {
-            /* emit */ path_changed (path);
+            /* emit */ signal_path_changed (path);
         }
     }
 
-    } // namespace Occ
-    
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_start_notification_test_when_ready () {
+        if (!this.d.ready) {
+            QTimer.single_shot (1000, this, &FolderWatcher.on_signal_start_notification_test_when_ready);
+            return;
+        }
+
+        var path = this.test_notification_path;
+        if (GLib.File.exists (path)) {
+            var mtime = FileSystem.get_mod_time (path);
+            FileSystem.mod_time (path, mtime + 1);
+        } else {
+            GLib.File f (path);
+            f.open (QIODevice.WriteOnly | QIODevice.Append);
+        }
+
+        QTimer.single_shot (5000, this, [this] () {
+            if (!this.test_notification_path.is_empty ())
+                /* emit */ signal_became_unreliable (_("The watcher did not receive a test notification."));
+            this.test_notification_path.clear ();
+        });
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void append_sub_paths (QDir dir, string[]& sub_paths) {
+        string[] new_sub_paths = dir.entry_list (QDir.NoDotAndDotDot | QDir.Dirs | QDir.Files);
+        for (int i = 0; i < new_sub_paths.size (); i++) {
+            string path = dir.path () + "/" + new_sub_paths[i];
+            GLib.FileInfo file_info (path);
+            sub_paths.append (path);
+            if (file_info.is_dir ()) {
+                QDir dir (path);
+                append_sub_paths (dir, sub_paths);
+            }
+        }
+    }
+
+} // class FolderWatcher
+
+} // namespace Ui
+} // namespace Occ

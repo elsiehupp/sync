@@ -132,11 +132,11 @@ to traverse a file tree that was created before by the create_dir function.
 It appends a listing to the result member of the incoming struct in state
 that can be compared later to what was expected in the calling functions.
 
-The int parameter cnt contains the number of seen files (not dirs) in the
+The int parameter count contains the number of seen files (not dirs) in the
 whole tree.
 
 ***********************************************************/
-static void traverse_dir (void **state, string dir, int cnt) {
+static void traverse_dir (void **state, string dir, int count) {
     csync_vio_handle_t dh = null;
     std.unique_ptr<csync_file_stat_t> dirent;
     var sv = (statevar*) *state;
@@ -174,11 +174,11 @@ static void traverse_dir (void **state, string dir, int cnt) {
                sv.result += subdir_out;
             }
         } else {
-            *cnt = *cnt +1;
+            *count = *count +1;
         }
         output (subdir_out.constData ());
         if ( is_dir ) {
-            traverse_dir (state, string.fromUtf8 (subdir), cnt);
+            traverse_dir (state, string.fromUtf8 (subdir), count);
         }
     }
 

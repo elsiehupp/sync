@@ -178,7 +178,7 @@ class AccountSettings : Gtk.Widget {
         connect (this.ui.big_folder_sync_all, &QAbstractButton.clicked, this.model, &FolderStatusModel.on_signal_sync_all_pending_big_folders);
         connect (this.ui.big_folder_sync_none, &QAbstractButton.clicked, this.model, &FolderStatusModel.on_signal_sync_no_pending_big_folders);
 
-        connect (FolderMan.instance (), &FolderMan.folder_list_changed, this.model, &FolderStatusModel.on_signal_reset_folders);
+        connect (FolderMan.instance (), &FolderMan.signal_folder_list_changed, this.model, &FolderStatusModel.on_signal_reset_folders);
         connect (this, &AccountSettings.folder_changed, this.model, &FolderStatusModel.on_signal_reset_folders);
 
         // quota_progress_bar style now set in customize_style ()
@@ -453,7 +453,7 @@ class AccountSettings : Gtk.Widget {
             bool currently_paused = false;
 
             // this sets the folder status to disabled but does not interrupt it.
-            Folder f = folder_man.folder (alias);
+            Folder f = folder_man.folder_by_alias (alias);
             if (!f) {
                 return;
             }
@@ -492,7 +492,7 @@ class AccountSettings : Gtk.Widget {
 
     protected void on_signal_schedule_current_folder () {
         FolderMan folder_man = FolderMan.instance ();
-        if (var folder = folder_man.folder (selected_folder_alias ())) {
+        if (var folder = folder_man.folder_by_alias (selected_folder_alias ())) {
             folder_man.schedule_folder (folder);
         }
     }
@@ -500,7 +500,7 @@ class AccountSettings : Gtk.Widget {
 
     protected void on_signal_schedule_current_folder_force_remote_discovery () {
         FolderMan folder_man = FolderMan.instance ();
-        if (var folder = folder_man.folder (selected_folder_alias ())) {
+        if (var folder = folder_man.folder_by_alias (selected_folder_alias ())) {
             folder.on_signal_wipe_error_blocklist ();
             folder.journal_database ().force_remote_discovery_next_sync ();
             folder_man.schedule_folder (folder);
@@ -510,7 +510,7 @@ class AccountSettings : Gtk.Widget {
 
     protected void on_signal_force_sync_current_folder () {
         FolderMan folder_man = FolderMan.instance ();
-        if (var selected_folder = folder_man.folder (selected_folder_alias ())) {
+        if (var selected_folder = folder_man.folder_by_alias (selected_folder_alias ())) {
             // Terminate and reschedule any running sync
             for (var f : folder_man.map ()) {
                 if (f.is_sync_running ()) {
@@ -528,7 +528,7 @@ class AccountSettings : Gtk.Widget {
 
 
     protected void on_signal_remove_current_folder () {
-        var folder = FolderMan.instance ().folder (selected_folder_alias ());
+        var folder = FolderMan.instance ().folder_by_alias (selected_folder_alias ());
         QModelIndex selected = this.ui.folder_list.selection_model ().current_index ();
         if (selected.is_valid () && folder) {
             int row = selected.row ();
@@ -583,7 +583,7 @@ class AccountSettings : Gtk.Widget {
 
 
     protected void on_signal_edit_current_ignored_files () {
-        Folder f = FolderMan.instance ().folder (selected_folder_alias ());
+        Folder f = FolderMan.instance ().folder_by_alias (selected_folder_alias ());
         if (!f)
             return;
         open_ignored_files_dialog (f.path ());
@@ -608,7 +608,7 @@ class AccountSettings : Gtk.Widget {
             string result;
             if (classification == FolderStatusModel.ItemType.ROOT_FOLDER) {
                 const var alias = this.model.data (selected, DataRole.FOLDER_ALIAS_ROLE).to_string ();
-                if (var folder = FolderMan.instance ().folder (alias)) {
+                if (var folder = FolderMan.instance ().folder_by_alias (alias)) {
                     result = folder.path ();
                 }
             } else {
@@ -641,7 +641,7 @@ class AccountSettings : Gtk.Widget {
 
     protected void on_signal_enable_vfs_current_folder () {
         FolderMan folder_man = FolderMan.instance ();
-        QPointer<Folder> folder = folder_man.folder (selected_folder_alias ());
+        QPointer<Folder> folder = folder_man.folder_by_alias (selected_folder_alias ());
         QModelIndex selected = this.ui.folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || !folder)
             return;
@@ -688,7 +688,7 @@ class AccountSettings : Gtk.Widget {
             }
 
             if (folder.is_sync_running ()) {
-                *connection = connect (folder, &Folder.sync_finished, this, switch_vfs_on);
+                *connection = connect (folder, &Folder.signal_sync_finished, this, switch_vfs_on);
                 folder.vfs_on_signal_off_switch_pending (true);
                 folder.on_signal_terminate_sync ();
                 this.ui.folder_list.do_items_layout ();
@@ -701,7 +701,7 @@ class AccountSettings : Gtk.Widget {
 
     protected void on_signal_disable_vfs_current_folder () {
         FolderMan folder_man = FolderMan.instance ();
-        QPointer<Folder> folder = folder_man.folder (selected_folder_alias ());
+        QPointer<Folder> folder = folder_man.folder_by_alias (selected_folder_alias ());
         QModelIndex selected = this.ui.folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || !folder)
             return;
@@ -751,7 +751,7 @@ class AccountSettings : Gtk.Widget {
             }
 
             if (folder.is_sync_running ()) {
-                *connection = connect (folder, &Folder.sync_finished, this, switch_vfs_off);
+                *connection = connect (folder, &Folder.signal_sync_finished, this, switch_vfs_off);
                 folder.vfs_on_signal_off_switch_pending (true);
                 folder.on_signal_terminate_sync ();
                 this.ui.folder_list.do_items_layout ();
@@ -767,7 +767,7 @@ class AccountSettings : Gtk.Widget {
         //  ASSERT (state == PinState.VfsItemAvailability.ONLINE_ONLY || state == PinState.PinState.ALWAYS_LOCAL);
 
         FolderMan folder_man = FolderMan.instance ();
-        QPointer<Folder> folder = folder_man.folder (selected_folder_alias ());
+        QPointer<Folder> folder = folder_man.folder_by_alias (selected_folder_alias ());
         QModelIndex selected = this.ui.folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || !folder)
             return;
@@ -899,7 +899,7 @@ class AccountSettings : Gtk.Widget {
 
     protected void on_signal_refresh_selective_sync_status () {
         string message;
-        int cnt = 0;
+        int count = 0;
         const var folders = FolderMan.instance ().map ().values ();
         this.ui.big_folder_ui.visible (false);
         for (Folder folder : folders) {
@@ -912,7 +912,7 @@ class AccountSettings : Gtk.Widget {
             for (var it : undecided_list) {
                 // FIXME : add the folder alias in a hoover hint.
                 // folder.alias () + QLatin1String ("/")
-                if (cnt++) {
+                if (count++) {
                     message += QLatin1String (", ");
                 }
                 string my_folder = (it);
@@ -955,7 +955,7 @@ class AccountSettings : Gtk.Widget {
         const var path = folder_info.path;
         const var file_id = folder_info.file_id;
         const var encrypt_folder = [this, file_id, path, folder_alias] {
-            const var folder = FolderMan.instance ().folder (folder_alias);
+            const var folder = FolderMan.instance ().folder_by_alias (folder_alias);
             if (!folder) {
                 GLib.warning ("Could not encrypt folder because folder" + folder_alias + "does not exist anymore";
                 QMessageBox.warning (null, _("Encryption failed"), _("Could not encrypt folder because the folder does not exist anymore"));
@@ -1074,7 +1074,7 @@ class AccountSettings : Gtk.Widget {
         bool folder_paused = this.model.data (index, DataRole.FOLDER_SYNC_PAUSED).to_bool ();
         bool folder_connected = this.model.data (index, DataRole.FOLDER_ACCOUNT_CONNECTED).to_bool ();
         var folder_man = FolderMan.instance ();
-        QPointer<Folder> folder = folder_man.folder (alias);
+        QPointer<Folder> folder = folder_man.folder_by_alias (alias);
         if (!folder)
             return;
 
@@ -1214,7 +1214,7 @@ class AccountSettings : Gtk.Widget {
                 my_folder.chop (1);
 
             // Make sure the folder itself is expanded
-            Folder f = FolderMan.instance ().folder (alias);
+            Folder f = FolderMan.instance ().folder_by_alias (alias);
             QModelIndex folder_indx = this.model.index_for_path (f, "");
             if (!this.ui.folder_list.is_expanded (folder_indx)) {
                 this.ui.folder_list.expanded (folder_indx, true);

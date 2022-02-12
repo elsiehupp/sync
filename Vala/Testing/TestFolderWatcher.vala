@@ -86,7 +86,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         Utility.writeRandomFile ( this.rootPath+"/a1/movefile");
 
         this.watcher.on_signal_reset (new FolderWatcher);
-        this.watcher.on_signal_init (this.rootPath);
+        this.watcher.init (this.rootPath);
         this.pathChangedSpy.on_signal_reset (new QSignalSpy (this.watcher.data (), SIGNAL (pathChanged (string))));
     }
 
@@ -103,7 +103,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_init () {
+    private void init () {
         this.pathChangedSpy.clear ();
         CHECK_WATCH_COUNT (countFolders (this.rootPath) + 1);
     }

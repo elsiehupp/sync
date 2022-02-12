@@ -18,33 +18,14 @@ class FolderCreationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public FolderCreationDialog (string destination, Gtk.Widget parent = null);
-    ~FolderCreationDialog () override;
-
+    private string destination;
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_accept () override;
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_signal_new_folder_name_edit_text_edited ();
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private string this.destination;
-}
-
-
-    FolderCreationDialog.FolderCreationDialog (string destination, Gtk.Widget parent)
-        : Gtk.Dialog (parent)
-        , ui (new Ui.FolderCreationDialog)
-        this.destination (destination) {
+    public FolderCreationDialog (string destination, Gtk.Widget parent = null)
+        base (parent);
+        ui = new Ui.FolderCreationDialog ();
+        this.destination = destination;
         ui.up_ui (this);
 
         ui.label_error_message.visible (false);
@@ -73,11 +54,15 @@ class FolderCreationDialog : Gtk.Dialog {
         ui.new_folder_name_edit.select_all ();
     }
 
-    FolderCreationDialog.~FolderCreationDialog () {
+
+    ~FolderCreationDialog () {
         delete ui;
     }
 
-    void FolderCreationDialog.on_signal_accept () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_accept () {
         //  Q_ASSERT (!this.destination.ends_with ('/'));
 
         if (QDir (this.destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
@@ -92,7 +77,9 @@ class FolderCreationDialog : Gtk.Dialog {
         Gtk.Dialog.on_signal_accept ();
     }
 
-    void FolderCreationDialog.on_signal_new_folder_name_edit_text_edited () {
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_new_folder_name_edit_text_edited () {
         if (!ui.new_folder_name_edit.text ().is_empty () && QDir (this.destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
             ui.label_error_message.visible (true);
         } else {
@@ -100,5 +87,7 @@ class FolderCreationDialog : Gtk.Dialog {
         }
     }
 
-    }
-    
+} // class FolderCreationDialog
+
+} // namespace Ui
+} // namespace Occ

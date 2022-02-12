@@ -286,7 +286,7 @@ OwncloudGui.OwncloudGui (Application parent)
         &OwncloudGui.on_signal_update_progress);
 
     FolderMan folder_man = FolderMan.instance ();
-    connect (folder_man, &FolderMan.folder_sync_state_change,
+    connect (folder_man, &FolderMan.signal_folder_sync_state_change,
         this, &OwncloudGui.on_signal_sync_state_change);
 
     connect (Logger.instance (), &Logger.signal_gui_log,
@@ -548,7 +548,7 @@ void OwncloudGui.on_signal_show_optional_tray_message (string title, string mess
 open the folder with the given Alias
 ***********************************************************/
 void OwncloudGui.on_signal_folder_open_action (string alias) {
-    Folder f = FolderMan.instance ().folder (alias);
+    Folder f = FolderMan.instance ().folder_by_alias (alias);
     if (f) {
         GLib.info ("opening local url " + f.path ();
         GLib.Uri url = GLib.Uri.from_local_file (f.path ());
@@ -611,7 +611,7 @@ void OwncloudGui.on_signal_update_progress (string folder, ProgressInfo progress
         string time_str = QTime.current_time ().to_string ("hh:mm");
         string action_text = _("%1 (%2, %3)").arg (progress.last_completed_item.file, kind_str, time_str);
         var action = new QAction (action_text, this);
-        Folder f = FolderMan.instance ().folder (folder);
+        Folder f = FolderMan.instance ().folder_by_alias (folder);
         if (f) {
             string full_path = f.path () + '/' + progress.last_completed_item.file;
             if (GLib.File (full_path).exists ()) {
@@ -699,7 +699,7 @@ void OwncloudGui.on_signal_shutdown () {
 
 void OwncloudGui.on_signal_toggle_log_browser () {
     if (this.log_browser.is_null ()) {
-        // on_signal_init the log browser.
+        // init the log browser.
         this.log_browser = new Log_browser;
         // ## TODO : allow new log name maybe?
     }

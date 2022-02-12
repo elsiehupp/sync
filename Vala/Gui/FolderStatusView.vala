@@ -10,25 +10,21 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Folder_status_view class
+@brief The FolderStatusView class
 @ingroup gui
 ***********************************************************/
-class Folder_status_view : QTreeView {
+class FolderStatusView : QTreeView {
 
     /***********************************************************
     ***********************************************************/
-    public Folder_status_view (Gtk.Widget parent = null);
-
-    /***********************************************************
-    ***********************************************************/
-    public QModelIndex index_at (QPoint point) override;
-    public QRect visual_rect (QModelIndex index) override;
-}
-
-    Folder_status_view.Folder_status_view (Gtk.Widget parent) : QTreeView (parent) {
+    public FolderStatusView (Gtk.Widget parent = null) {
+        base (parent);
     }
 
-    QModelIndex Folder_status_view.index_at (QPoint point) {
+
+    /***********************************************************
+    ***********************************************************/
+    public QModelIndex index_at (QPoint point) {
         QModelIndex index = QTreeView.index_at (point);
         if (index.data (DataRole.ADD_BUTTON).to_bool () && !visual_rect (index).contains (point)) {
             return {};
@@ -36,7 +32,10 @@ class Folder_status_view : QTreeView {
         return index;
     }
 
-    QRect Folder_status_view.visual_rect (QModelIndex index) {
+
+    /***********************************************************
+    ***********************************************************/
+    public QRect visual_rect (QModelIndex index)  {
         QRect rect = QTreeView.visual_rect (index);
         if (index.data (DataRole.ADD_BUTTON).to_bool ()) {
             return FolderStatusDelegate.add_button_rect (rect, layout_direction ());
@@ -44,5 +43,7 @@ class Folder_status_view : QTreeView {
         return rect;
     }
 
-    } // namespace Occ
-    
+} // class FolderStatusView
+
+} // namespace Ui
+} // namespace Occ

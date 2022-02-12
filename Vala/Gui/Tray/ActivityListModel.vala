@@ -272,7 +272,7 @@ class ActivityListModel : QAbstractListModel {
         switch (role) {
         case DataRole.DISPLAY_PATH:
             if (!a.file.is_empty ()) {
-                var folder = FolderMan.instance ().folder (a.folder);
+                var folder = FolderMan.instance ().folder_by_alias (a.folder);
                 string rel_path (a.file);
                 if (folder) {
                     rel_path.prepend (folder.remote_path ());
@@ -289,7 +289,7 @@ class ActivityListModel : QAbstractListModel {
             return "";
         case DataRole.PATH:
             if (!a.file.is_empty ()) {
-                const var folder = FolderMan.instance ().folder (a.folder);
+                const var folder = FolderMan.instance ().folder_by_alias (a.folder);
 
                 string rel_path (a.file);
                 if (folder) {
@@ -317,7 +317,7 @@ class ActivityListModel : QAbstractListModel {
             }
             return "";
         case DataRole.ABSOLUTE_PATH: {
-            const var folder = FolderMan.instance ().folder (a.folder);
+            const var folder = FolderMan.instance ().folder_by_alias (a.folder);
             string rel_path (a.file);
             if (!a.file.is_empty ()) {
                 if (folder) {
@@ -443,7 +443,7 @@ class ActivityListModel : QAbstractListModel {
             //  Q_ASSERT (!activity.folder.is_empty ());
             //  Q_ASSERT (Utility.is_conflict_file (activity.file));
 
-            const var folder = FolderMan.instance ().folder (activity.folder);
+            const var folder = FolderMan.instance ().folder_by_alias (activity.folder);
 
             const var conflicted_relative_path = activity.file;
             const var base_relative_path = folder.journal_database ().conflict_file_base_name (conflicted_relative_path.to_utf8 ());
@@ -473,7 +473,7 @@ class ActivityListModel : QAbstractListModel {
                 this.current_invalid_filename_dialog.close ();
             }
 
-            var folder = FolderMan.instance ().folder (activity.folder);
+            var folder = FolderMan.instance ().folder_by_alias (activity.folder);
             const var folder_dir = QDir (folder.path ());
             this.current_invalid_filename_dialog = new InvalidFilenameDialog (this.account_state.account (), folder,
                 folder_dir.file_path (activity.file));

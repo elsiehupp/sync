@@ -388,7 +388,7 @@ SocketApi.SocketApi (GLib.Object parent) {
     connect (&this.local_server, &Socket_api_server.new_connection, this, &SocketApi.on_signal_new_connection);
 
     // folder watcher
-    connect (FolderMan.instance (), &FolderMan.folder_sync_state_change, this, &SocketApi.on_signal_update_folder_view);
+    connect (FolderMan.instance (), &FolderMan.signal_folder_sync_state_change, this, &SocketApi.on_signal_update_folder_view);
 }
 
 SocketApi.~SocketApi () {
@@ -533,7 +533,7 @@ void SocketApi.on_signal_register_path (string alias) {
     if (this.registered_aliases.contains (alias))
         return;
 
-    Folder f = FolderMan.instance ().folder (alias);
+    Folder f = FolderMan.instance ().folder_by_alias (alias);
     if (f) {
         const string message = build_register_path_message (remove_trailing_slash (f.path ()));
         for (var listener : q_as_const (this.listeners)) {
@@ -549,7 +549,7 @@ void SocketApi.on_signal_unregister_path (string alias) {
     if (!this.registered_aliases.contains (alias))
         return;
 
-    Folder f = FolderMan.instance ().folder (alias);
+    Folder f = FolderMan.instance ().folder_by_alias (alias);
     if (f)
         broadcast_message (build_message (QLatin1String ("UNREGISTER_PATH"), remove_trailing_slash (f.path ()), ""), true);
 

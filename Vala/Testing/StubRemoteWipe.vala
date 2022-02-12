@@ -22,6 +22,6 @@ void Occ.FolderMan.setSyncEnabled (bool) { }
 void Occ.FolderMan.slotSyncOnceFileUnlocks (string const&) { }
 void Occ.FolderMan.slotScheduleETagJob (string const&, Occ.RequestEtagJob*) { }
 Occ.Folder *Occ.FolderMan.folderForPath (string const&) { return null; }
-Occ.Folder* Occ.FolderMan.folder (string const&) { return null; }
+Occ.Folder* Occ.FolderMan.folder_by_alias (string const&) { return null; }
 void Occ.FolderMan.folderSyncStateChange (Occ.Folder*) { }
 const QMetaObject Occ.FolderMan.staticMetaObject = GLib.Object.staticMetaObject;

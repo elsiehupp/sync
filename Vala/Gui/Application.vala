@@ -430,7 +430,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
     this.gui.setup_cloud_providers ();
 //  #endif
 
-    FolderMan.instance ().setup_folders ();
+    FolderMan.instance ().set_up_folders ();
     this.proxy.on_signal_setup_qt_proxy_from_config (); // folders have to be defined first, than we set up the Qt proxy.
 
     connect (AccountManager.instance (), &AccountManager.on_signal_account_added,
@@ -864,7 +864,7 @@ void Application.on_signal_open_virtual_file (string filename) {
     folder.on_signal_implicitly_hydrate_file (relative_path);
     string normal_name = filename.left (filename.size () - virtual_file_ext.size ());
     var con = unowned<QMetaObject.Connection>.create ();
-    *con = connect (folder, &Folder.sync_finished, folder, [folder, con, normal_name] {
+    *con = connect (folder, &Folder.signal_sync_finished, folder, [folder, con, normal_name] {
         folder.disconnect (*con);
         if (GLib.File.exists (normal_name)) {
             QDesktopServices.open_url (GLib.Uri.from_local_file (normal_name));
