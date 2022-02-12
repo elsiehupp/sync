@@ -62,7 +62,7 @@ class OwncloudAdvancedSetupPage : QWizardPage {
         set_up_customization ();
 
         connect (this.ui.pb_select_local_folder, &QAbstractButton.clicked, this, &OwncloudAdvancedSetupPage.on_signal_select_folder);
-        button_text (QWizard.Finish_button, _("Connect"));
+        button_text (QWizard.FinishButton, _("Connect"));
 
         if (Theme.instance ().enforce_virtual_files_sync_folder ()) {
             this.ui.r_sync_everything.disabled (true);
@@ -132,7 +132,7 @@ class OwncloudAdvancedSetupPage : QWizardPage {
         update_status ();
 
         // ensure "next" gets the focus, not ob_select_local_folder
-        QTimer.single_shot (0, wizard ().button (QWizard.Finish_button), q_overload<> (&Gtk.Widget.focus));
+        QTimer.single_shot (0, wizard ().button (QWizard.FinishButton), q_overload<> (&Gtk.Widget.focus));
 
         var acc = static_cast<OwncloudWizard> (wizard ()).account ();
         var quota_job = new PropfindJob (acc, this.remote_folder, this);
@@ -158,7 +158,7 @@ class OwncloudAdvancedSetupPage : QWizardPage {
 
         customize_style ();
 
-        var next_button = qobject_cast<QPushButton> (this.oc_wizard.button (QWizard.Next_button));
+        var next_button = qobject_cast<QPushButton> (this.oc_wizard.button (QWizard.NextButton));
         if (next_button) {
             next_button.default (true);
         }
@@ -328,10 +328,10 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void on_signal_selective_sync_clicked () {
         AccountPointer acc = static_cast<OwncloudWizard> (wizard ()).account ();
-        var dlg = new Selective_sync_dialog (acc, this.remote_folder, this.selective_sync_blocklist, this);
+        var dlg = new SelectiveSyncDialog (acc, this.remote_folder, this.selective_sync_blocklist, this);
         dlg.attribute (Qt.WA_DeleteOnClose);
 
-        connect (dlg, &Selective_sync_dialog.on_signal_finished, this, [this, dlg]{
+        connect (dlg, &SelectiveSyncDialog.on_signal_finished, this, [this, dlg]{
             const int result = dlg.result ();
             bool update_blocklist = false;
 

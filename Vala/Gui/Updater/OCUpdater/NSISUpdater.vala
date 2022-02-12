@@ -149,7 +149,7 @@ class NSISUpdater : OCUpdater {
         msg_box.window_icon (info_icon);
 
         var layout = new QVBoxLayout (msg_box);
-        var hlayout = new QHBox_layout;
+        var hlayout = new QHBoxLayout;
         layout.add_layout (hlayout);
 
         msg_box.window_title (_("New Version Available"));
@@ -198,7 +198,7 @@ class NSISUpdater : OCUpdater {
         msg_box.window_icon (info_icon);
 
         var layout = new QVBoxLayout (msg_box);
-        var hlayout = new QHBox_layout;
+        var hlayout = new QHBoxLayout;
         layout.add_layout (hlayout);
 
         msg_box.window_title (_("Update Failed"));

@@ -48,22 +48,22 @@ class RemotePermissions {
     /***********************************************************
     ***********************************************************/
     public enum Permissions {
-        Can_write = 1,             // W
-        Can_delete = 2,            // D
-        Can_rename = 3,            // N
-        Can_move = 4,              // V
-        Can_add_file = 5,           // C
-        Can_add_sub_directories = 6, // K
-        Can_reshare = 7,           // R
-        // Note: on the server, this means Shared_with_me, but in discoveryphase.cpp we also set
+        CAN_WRITE = 1,             // W
+        CAN_DELETE = 2,            // D
+        CAN_RENAME = 3,            // N
+        CAN_MOVE = 4,              // V
+        CAN_ADD_FILE = 5,           // C
+        CAN_ADD_SUB_DIRECTORIES = 6, // K
+        CAN_RESHARE = 7,           // R
+        // Note: on the server, this means SHARED_WITH_ME, but in discoveryphase.cpp we also set
         // this permission when the server reports the any "share-types"
-        IsShared = 8,             // S
-        IsMounted = 9,            // M
-        IsMountedSub = 10,        // m (internal : set if the parent dir has IsMounted)
+        IS_SHARED = 8,             // S
+        IS_MOUNTED = 9,            // M
+        IS_MOUNTED_SUB = 10,        // m (internal : set if the parent dir has Permissions.IS_MOUNTED)
 
         // Note: when adding support for more permissions, we need to invalid the cache in the database.
         // (by setting force_remote_discovery in SyncJournalDb.check_connect)
-        PermissionsCount = IsMountedSub
+        PERMISSIONS_COUNT = Permissions.IS_MOUNTED_SUB
     }
 
 
@@ -80,8 +80,8 @@ class RemotePermissions {
         GLib.ByteArray result;
         if (is_null ())
             return result;
-        result.reserve (PermissionsCount);
-        for (uint32 i = 1; i <= PermissionsCount; ++i) {
+        result.reserve (Permissions.PERMISSIONS_COUNT);
+        for (uint32 i = 1; i <= Permissions.PERMISSIONS_COUNT; ++i) {
             if (this.value & (1 << i))
                 result.append (LETTERS[i]);
         }

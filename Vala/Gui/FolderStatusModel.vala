@@ -255,7 +255,7 @@ class FolderStatusModel : QAbstractItemModel {
             info.name = f.alias ();
             info.path = "/";
             info.folder = f;
-            info.checked = Qt.Partially_checked;
+            info.checked = Qt.PartiallyChecked;
             this.folders + info;
 
             connect (f, &Folder.progress_info, this, &FolderStatusModel.on_signal_progress, Qt.UniqueConnection);
@@ -352,7 +352,7 @@ class FolderStatusModel : QAbstractItemModel {
                 } else if (x.size > 0 && is_any_ancestor_encrypted (index)) {
                     return new Gtk.Icon (":/client/theme/lock-broken.svg");
                 }
-                return QFile_icon_provider ().icon (x.is_external ? QFile_icon_provider.Network : QFile_icon_provider.Folder);
+                return QFileIconProvider ().icon (x.is_external ? QFileIconProvider.Network : QFileIconProvider.Folder);
             }
             case Qt.Foreground_role:
                 if (x.is_undecided) {
@@ -509,7 +509,7 @@ class FolderStatusModel : QAbstractItemModel {
                         if (!has_unchecked) {
                             data (parent, Qt.Checked, Qt.CheckStateRole);
                         } else if (parent_info.checked == Qt.Unchecked) {
-                            data (parent, Qt.Partially_checked, Qt.CheckStateRole);
+                            data (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
                         }
                     }
                     // also check all the children
@@ -524,7 +524,7 @@ class FolderStatusModel : QAbstractItemModel {
                     QModelIndex parent = index.parent ();
                     var parent_info = info_for_index (parent);
                     if (parent_info && parent_info.checked == Qt.Checked) {
-                        data (parent, Qt.Partially_checked, Qt.CheckStateRole);
+                        data (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
                     }
 
                     // Uncheck all the children
@@ -535,11 +535,11 @@ class FolderStatusModel : QAbstractItemModel {
                     }
                 }
 
-                if (checked == Qt.Partially_checked) {
+                if (checked == Qt.PartiallyChecked) {
                     QModelIndex parent = index.parent ();
                     var parent_info = info_for_index (parent);
-                    if (parent_info && parent_info.checked != Qt.Partially_checked) {
-                        data (parent, Qt.Partially_checked, Qt.CheckStateRole);
+                    if (parent_info && parent_info.checked != Qt.PartiallyChecked) {
+                        data (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
                     }
                 }
             }
@@ -1211,7 +1211,7 @@ class FolderStatusModel : QAbstractItemModel {
         string[] selective_sync_block_list;
         bool ok1 = true;
         bool ok2 = true;
-        if (parent_info.checked == Qt.Partially_checked) {
+        if (parent_info.checked == Qt.PartiallyChecked) {
             selective_sync_block_list = parent_info.folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
         }
         var selective_sync_undecided_list = parent_info.folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok2);
@@ -1286,7 +1286,7 @@ class FolderStatusModel : QAbstractItemModel {
                         new_info.checked = Qt.Unchecked;
                         break;
                     } else if (string_value.starts_with (relative_path)) {
-                        new_info.checked = Qt.Partially_checked;
+                        new_info.checked = Qt.PartiallyChecked;
                     }
                 }
             }
@@ -1518,7 +1518,7 @@ class FolderStatusModel : QAbstractItemModel {
             return string[] (root.path);
         case Qt.Checked:
             return string[] ();
-        case Qt.Partially_checked:
+        case Qt.PartiallyChecked:
             break;
         }
 

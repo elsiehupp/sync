@@ -5,7 +5,7 @@ Copyright (C) by Klaas Freitag <freitag@kde.org>
 ***********************************************************/
 
 //  #include <QtGui>
-//  #include <Qt_network>
+//  #include <QtNetwork>
 //  #include <Qt_widgets>
 //  #include <QtCore>
 //  #include <Gtk.Dialog>

@@ -26,7 +26,7 @@ class WizardCommon {
         QPixmap pix = variant.value<QPixmap> ();
         if (!pix.is_null ()) {
             label.pixmap (pix);
-            label.alignment (Qt.Align_top | Qt.Align_right);
+            label.alignment (Qt.AlignTop | Qt.Align_right);
             label.visible (true);
         } else {
             string string_value = variant.to_string ();

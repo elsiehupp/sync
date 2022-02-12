@@ -88,7 +88,7 @@ class SlideShow : Gtk.Widget {
     ***********************************************************/
     public void draw_slide (QPainter painter, int index) {
         string label = this.labels.value (index);
-        QRect label_rect = style ().item_text_rect (font_metrics (), rect (), Qt.Align_bottom | Qt.Align_hCenter, is_enabled (), label);
+        QRect label_rect = style ().item_text_rect (font_metrics (), rect (), Qt.Align_bottom | Qt.AlignHCenter, is_enabled (), label);
         style ().draw_item_text (painter, label_rect, Qt.AlignCenter, palette (), is_enabled (), label, QPalette.Window_text);
 
         QPixmap pixmap = this.pixmaps.value (index);

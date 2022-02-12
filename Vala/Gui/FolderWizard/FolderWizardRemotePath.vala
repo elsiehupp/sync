@@ -39,8 +39,8 @@ protected slots:
     void on_signal_update_directories (string[] &);
     void on_signal_gather_encrypted_paths (string , GLib.HashMap<string, string> &);
     void on_signal_refresh_folders ();
-    void on_signal_item_expanded (QTree_widget_item *);
-    void on_signal_current_item_changed (QTree_widget_item *);
+    void on_signal_item_expanded (QTreeWidgetItem *);
+    void on_signal_current_item_changed (QTreeWidgetItem *);
     void on_signal_folder_entry_edited (string text);
     void on_signal_ls_col_folder_entry ();
     void on_signal_typed_path_found (string[] subpaths);
@@ -49,7 +49,7 @@ protected slots:
     /***********************************************************
     ***********************************************************/
     private LsColJob run_ls_col_job (string path);
-    private void recursive_insert (QTree_widget_item parent, string[] path_trail, string path);
+    private void recursive_insert (QTreeWidgetItem parent, string[] path_trail, string path);
     private bool select_by_path (string path);
     private Ui_Folder_wizard_target_page this.ui;
     private bool this.warn_was_visible;
@@ -74,25 +74,25 @@ protected slots:
         this.ui.warn_frame.hide ();
 
         this.ui.folder_tree_widget.sorting_enabled (true);
-        this.ui.folder_tree_widget.sort_by_column (0, Qt.Ascending_order);
+        this.ui.folder_tree_widget.sort_by_column (0, Qt.AscendingOrder);
 
         connect (this.ui.add_folder_button, &QAbstractButton.clicked, this, &Folder_wizard_remote_path.on_signal_add_remote_folder);
         connect (this.ui.refresh_button, &QAbstractButton.clicked, this, &Folder_wizard_remote_path.on_signal_refresh_folders);
-        connect (this.ui.folder_tree_widget, &QTree_widget.item_expanded, this, &Folder_wizard_remote_path.on_signal_item_expanded);
-        connect (this.ui.folder_tree_widget, &QTree_widget.current_item_changed, this, &Folder_wizard_remote_path.on_signal_current_item_changed);
+        connect (this.ui.folder_tree_widget, &QTreeWidget.item_expanded, this, &Folder_wizard_remote_path.on_signal_item_expanded);
+        connect (this.ui.folder_tree_widget, &QTreeWidget.current_item_changed, this, &Folder_wizard_remote_path.on_signal_current_item_changed);
         connect (this.ui.folder_entry, &QLineEdit.text_edited, this, &Folder_wizard_remote_path.on_signal_folder_entry_edited);
 
         this.lscol_timer.interval (500);
         this.lscol_timer.single_shot (true);
         connect (&this.lscol_timer, &QTimer.timeout, this, &Folder_wizard_remote_path.on_signal_ls_col_folder_entry);
 
-        this.ui.folder_tree_widget.header ().section_resize_mode (0, QHeaderView.Resize_to_contents);
+        this.ui.folder_tree_widget.header ().section_resize_mode (0, QHeaderView.ResizeToContents);
         // Make sure that there will be a scrollbar when the contents is too wide
         this.ui.folder_tree_widget.header ().stretch_last_section (false);
     }
 
     void Folder_wizard_remote_path.on_signal_add_remote_folder () {
-        QTree_widget_item current = this.ui.folder_tree_widget.current_item ();
+        QTreeWidgetItem current = this.ui.folder_tree_widget.current_item ();
 
         string parent ('/');
         if (current) {
@@ -112,7 +112,7 @@ protected slots:
         if (folder.is_empty ())
             return;
 
-        QTree_widget_item current = this.ui.folder_tree_widget.current_item ();
+        QTreeWidgetItem current = this.ui.folder_tree_widget.current_item ();
         string full_path;
         if (current) {
             full_path = current.data (0, Qt.USER_ROLE).to_string ();
@@ -164,9 +164,9 @@ protected slots:
 
     /***********************************************************
     ***********************************************************/
-    static QTree_widget_item find_first_child (QTree_widget_item parent, string text) {
+    static QTreeWidgetItem find_first_child (QTreeWidgetItem parent, string text) {
         for (int i = 0; i < parent.child_count (); ++i) {
-            QTree_widget_item child = parent.child (i);
+            QTreeWidgetItem child = parent.child (i);
             if (child.text (0) == text) {
                 return child;
             }
@@ -174,7 +174,7 @@ protected slots:
         return null;
     }
 
-    void Folder_wizard_remote_path.recursive_insert (QTree_widget_item parent, string[] path_trail, string path) {
+    void Folder_wizard_remote_path.recursive_insert (QTreeWidgetItem parent, string[] path_trail, string path) {
         if (path_trail.is_empty ())
             return;
 
@@ -186,16 +186,16 @@ protected slots:
         } else {
             folder_path = parent_path + "/" + folder_name;
         }
-        QTree_widget_item item = find_first_child (parent, folder_name);
+        QTreeWidgetItem item = find_first_child (parent, folder_name);
         if (!item) {
-            item = new QTree_widget_item (parent);
-            QFile_icon_provider prov;
-            QIcon folder_icon = prov.icon (QFile_icon_provider.Folder);
+            item = new QTreeWidgetItem (parent);
+            QFileIconProvider prov;
+            QIcon folder_icon = prov.icon (QFileIconProvider.Folder);
             item.icon (0, folder_icon);
             item.on_signal_text (0, folder_name);
             item.data (0, Qt.USER_ROLE, folder_path);
             item.tool_tip (0, folder_path);
-            item.child_indicator_policy (QTree_widget_item.Show_indicator);
+            item.child_indicator_policy (QTreeWidgetItem.ShowIndicator);
         }
 
         path_trail.remove_first ();
@@ -210,7 +210,7 @@ protected slots:
             path.chop (1);
         }
 
-        QTree_widget_item it = this.ui.folder_tree_widget.top_level_item (0);
+        QTreeWidgetItem it = this.ui.folder_tree_widget.top_level_item (0);
         if (!path.is_empty ()) {
             const string[] path_trail = path.split ('/');
             foreach (string path, path_trail) {
@@ -232,9 +232,9 @@ protected slots:
     void Folder_wizard_remote_path.on_signal_update_directories (string[] list) {
         string webdav_folder = GLib.Uri (this.account.dav_url ()).path ();
 
-        QTree_widget_item root = this.ui.folder_tree_widget.top_level_item (0);
+        QTreeWidgetItem root = this.ui.folder_tree_widget.top_level_item (0);
         if (!root) {
-            root = new QTree_widget_item (this.ui.folder_tree_widget);
+            root = new QTreeWidgetItem (this.ui.folder_tree_widget);
             root.on_signal_text (0, Theme.instance ().app_name_gui ());
             root.icon (0, Theme.instance ().application_icon ());
             root.tool_tip (0, _("Choose this to sync the entire account"));
@@ -279,12 +279,12 @@ protected slots:
         this.ui.folder_entry.clear ();
     }
 
-    void Folder_wizard_remote_path.on_signal_item_expanded (QTree_widget_item item) {
+    void Folder_wizard_remote_path.on_signal_item_expanded (QTreeWidgetItem item) {
         string dir = item.data (0, Qt.USER_ROLE).to_string ();
         run_ls_col_job (dir);
     }
 
-    void Folder_wizard_remote_path.on_signal_current_item_changed (QTree_widget_item item) {
+    void Folder_wizard_remote_path.on_signal_current_item_changed (QTreeWidgetItem item) {
         if (item) {
             string dir = item.data (0, Qt.USER_ROLE).to_string ();
 
@@ -363,7 +363,7 @@ protected slots:
         wizard ().property ("target_path", dir);
 
         Folder.Map map = FolderMan.instance ().map ();
-        Folder.Map.Const_iterator i = map.const_begin ();
+        Folder.Map.ConstIterator i = map.const_begin ();
         for (i = map.const_begin (); i != map.const_end (); i++) {
             var f = static_cast<Folder> (i.value ());
             if (f.account_state ().account () != this.account) {

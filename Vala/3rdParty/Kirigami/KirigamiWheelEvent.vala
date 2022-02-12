@@ -1,5 +1,5 @@
 /***********************************************************
-SPDX-File_copyright_text : 2019 Marco Martin <mart@kde.org>
+SPDX-FileCopyrightText : 2019 Marco Martin <mart@kde.org>
 
 LGPL-2.0-or-later
 ***********************************************************/
@@ -31,20 +31,20 @@ class KirigamiWheelEvent : GLib.Object {
     A positive value indicates it was rotated up/right, negative, bottom/left
     This value is more likely to be set in traditional mice.
     ***********************************************************/
-    //  Q_PROPERTY (QPoint_f angle_delta READ angle_delta CONSTANT)
+    //  Q_PROPERTY (QPointF angle_delta READ angle_delta CONSTANT)
 
     /***********************************************************
     pixel_delta : point
 
     provides the delta in screen pixels available on high resolution trackpads
     ***********************************************************/
-    //  Q_PROPERTY (QPoint_f pixel_delta READ pixel_delta CONSTANT)
+    //  Q_PROPERTY (QPointF pixel_delta READ pixel_delta CONSTANT)
 
     /***********************************************************
     buttons : int
 
     it contains an OR combination of the buttons that were pressed during the wheel, they can be:
-    Qt.Left_button, Qt.Middle_button, Qt.Right_button
+    Qt.LeftButton, Qt.MiddleButton, Qt.RightButton
     ***********************************************************/
     //  Q_PROPERTY (int buttons READ buttons CONSTANT)
 
@@ -52,9 +52,9 @@ class KirigamiWheelEvent : GLib.Object {
     modifiers : int
 
     Keyboard mobifiers that were pressed
-    Qt.No_modifier (def
-    Qt.Control_modifi
-    Qt.Shift_modifier
+    Qt.NoModifier (def
+    Qt.ControlModifi
+    Qt.ShiftModifier
     ...
     ***********************************************************/
     //  Q_PROPERTY (int modifiers READ modifiers CONSTANT)
@@ -123,7 +123,7 @@ class KirigamiWheelEvent : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QPoint_f pixel_del
+    public QPointF pixel_del
 
     /***********************************************************
     ***********************************************************/
@@ -151,10 +151,10 @@ class KirigamiWheelEvent : GLib.Object {
     ***********************************************************/
     private qreal m_x = 0;
     private qreal m_y = 0;
-    private QPoint_f m_angle_delta;
-    private QPoint_f m_pixel_delta;
-    private Qt.Mouse_buttons m_buttons = Qt.NoButton;
-    private Qt.Keyboard_modifiers m_modifiers = Qt.No_modifier;
+    private QPointF m_angle_delta;
+    private QPointF m_pixel_delta;
+    private Qt.MouseButtons m_buttons = Qt.NoButton;
+    private Qt.KeyboardModifiers m_modifiers = Qt.NoModifier;
     private bool m_inverted = false;
     private bool m_accepted = false;
 }
@@ -170,7 +170,7 @@ class KirigamiWheelEvent : GLib.Object {
 
     KirigamiWheelEvent.~KirigamiWheelEvent () = default;
 
-    void KirigamiWheelEvent.initialize_from_event (QWheel_event event) {
+    void KirigamiWheelEvent.initialize_from_event (QWheelEvent event) {
         m_x = event.position ().x ();
         m_y = event.position ().y ();
         m_angle_delta = event.angle_delta ();
@@ -189,11 +189,11 @@ class KirigamiWheelEvent : GLib.Object {
         return m_y;
     }
 
-    QPoint_f KirigamiWheelEvent.angle_delta () {
+    QPointF KirigamiWheelEvent.angle_delta () {
         return m_angle_delta;
     }
 
-    QPoint_f KirigamiWheelEvent.pixel_delta () {
+    QPointF KirigamiWheelEvent.pixel_delta () {
         return m_pixel_delta;
     }
 

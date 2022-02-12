@@ -60,7 +60,7 @@ class AvatarJob : AbstractNetworkJob {
 
         int dim = base_avatar.width ();
 
-        Gtk.Image avatar = new Gtk.Image (dim, dim, Gtk.Image.Format_ARGB32);
+        Gtk.Image avatar = new Gtk.Image (dim, dim, Gtk.Image.FormatARGB32);
         avatar.fill (Qt.transparent);
 
         QPainter painter = new QPainter (&avatar);

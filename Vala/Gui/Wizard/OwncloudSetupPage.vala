@@ -103,7 +103,7 @@ class OwncloudSetupPage : QWizardPage {
         this.auth_type_known = false;
         this.checking = false;
 
-        QAbstractButton next_button = wizard ().button (QWizard.Next_button);
+        QAbstractButton next_button = wizard ().button (QWizard.NextButton);
         var push_button = qobject_cast<QPushButton> (next_button);
         if (push_button) {
             push_button.default (true);
@@ -327,7 +327,7 @@ class OwncloudSetupPage : QWizardPage {
         // Need to set next button as default button here because
         // otherwise the on OSX the next button does not stay the default
         // button
-        var next_button = qobject_cast<QPushButton> (this.oc_wizard.button (QWizard.Next_button));
+        var next_button = qobject_cast<QPushButton> (this.oc_wizard.button (QWizard.NextButton));
         if (next_button) {
             next_button.default (true);
         }

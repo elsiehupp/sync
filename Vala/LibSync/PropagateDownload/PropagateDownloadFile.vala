@@ -612,7 +612,7 @@ class PropagateDownloadFile : PropagateItemJob {
         }
 
         // Apply the remote permissions
-        FileSystem.file_read_only_weak (this.tmp_file.filename (), !this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Can_write));
+        FileSystem.file_read_only_weak (this.tmp_file.filename (), !this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE));
 
         bool is_conflict = this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
             && (QFileInfo (fn).is_dir () || !FileSystem.file_equals (fn, this.tmp_file.filename ()));
@@ -732,7 +732,7 @@ class PropagateDownloadFile : PropagateItemJob {
         on_signal_done (is_conflict ? SyncFileItem.Status.CONFLICT : SyncFileItem.Status.SUCCESS);
 
         // handle the special recall file
-        if (!this.item.remote_perm.has_permission (RemotePermissions.IsShared)
+        if (!this.item.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED)
             && (this.item.file == QLatin1String (".sys.admin#recall#")
                 || this.item.file.has_suffix (QLatin1String ("/.sys.admin#recall#")))) {
             handle_recall_file (fn, propagator ().local_path (), *propagator ().journal);
@@ -802,7 +802,7 @@ class PropagateDownloadFile : PropagateItemJob {
             propagator ().journal.delete_file_record (this.item.original_file);
             update_metadata (false);
 
-            if (!this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Can_write)) {
+            if (!this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
                 // make sure ReadOnly flag is preserved for placeholder, similarly to regular files
                 FileSystem.file_read_only (propagator ().full_local_path (this.item.file), true);
             }
@@ -832,7 +832,7 @@ class PropagateDownloadFile : PropagateItemJob {
             }
             update_metadata (false);
 
-            if (!this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Can_write)) {
+            if (!this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
                 // make sure ReadOnly flag is preserved for placeholder, similarly to regular files
                 FileSystem.file_read_only (propagator ().full_local_path (this.item.file), true);
             }

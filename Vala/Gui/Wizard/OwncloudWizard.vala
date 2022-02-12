@@ -39,9 +39,9 @@ class OwncloudWizard : QWizard {
     private OwncloudSetupPage setup_page;
     private OwncloudHttpCredsPage http_creds_page;
     private OwncloudOAuthCredsPage browser_creds_page;
-    private Flow2AuthCredsPage flow2Creds_page;
+    private Flow2AuthCredsPage flow2creds_page;
     private OwncloudAdvancedSetupPage advanced_setup_page;
-    private Owncloud_wizard_result_page result_page;
+    private OwncloudWizardResultPage result_page;
     private AbstractCredentialsWizardPage credentials_page = null;
     private WebViewPage web_view_page = null;
 
@@ -110,7 +110,7 @@ class OwncloudWizard : QWizard {
         this.setup_page = new OwncloudSetupPage (this);
         this.http_creds_page = new OwncloudHttpCredsPage (this);
         this.browser_creds_page = new OwncloudOAuthCredsPage (this);
-        this.flow2Creds_page = new Flow2AuthCredsPage (this);
+        this.flow2creds_page = new Flow2AuthCredsPage (this);
         this.advanced_setup_page = new OwncloudAdvancedSetupPage (this);
     //  #ifdef WITH_WEBENGINE
         this.web_view_page = (new WebViewPage (this);
@@ -124,7 +124,7 @@ class OwncloudWizard : QWizard {
         page (WizardCommon.Pages.PAGE_SERVER_SETUP, this.setup_page);
         page (WizardCommon.Pages.PAGE_HTTP_CREDS, this.http_creds_page);
         page (WizardCommon.Pages.PAGE_OAUTH_CREDS, this.browser_creds_page);
-        page (WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS, this.flow2Creds_page);
+        page (WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS, this.flow2creds_page);
         page (WizardCommon.Pages.PAGE_ADVANCED_SETUP, this.advanced_setup_page);
     //  #ifdef WITH_WEBENGINE
         page (WizardCommon.Pages.PAGE_WEB_VIEW, this.web_view_page);
@@ -139,7 +139,7 @@ class OwncloudWizard : QWizard {
         connect (this.setup_page, &OwncloudSetupPage.determine_auth_type, this, &OwncloudWizard.determine_auth_type);
         connect (this.http_creds_page, &OwncloudHttpCredsPage.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
         connect (this.browser_creds_page, &OwncloudOAuthCredsPage.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
-        connect (this.flow2Creds_page, &Flow2AuthCredsPage.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
+        connect (this.flow2creds_page, &Flow2AuthCredsPage.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
     //  #ifdef WITH_WEBENGINE
         connect (this.web_view_page, &WebViewPage.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
     //  #endif WITH_WEBENGINE
@@ -149,28 +149,28 @@ class OwncloudWizard : QWizard {
 
         Theme theme = Theme.instance ();
         window_title (_("Add %1 account").arg (theme.app_name_gui ()));
-        wizard_style (QWizard.Modern_style);
-        option (QWizard.No_back_button_on_signal_start_page);
-        option (QWizard.No_back_button_on_signal_last_page);
-        option (QWizard.No_cancel_button);
-        button_text (QWizard.Custom_button1, _("Skip folders configuration"));
+        wizard_style (QWizard.ModernStyle);
+        option (QWizard.NoBackButtonOnStartPage);
+        option (QWizard.NoBackButtonOnLastPage);
+        option (QWizard.NoCancelButton);
+        button_text (QWizard.CustomButton1, _("Skip folders configuration"));
 
         // Change the next buttons size policy since we hide it on the
         // welcome page but want it to fill it's space that we don't get
         // flickering when the page changes
-        var next_button_size_policy = button (QWizard.Next_button).size_policy ();
+        var next_button_size_policy = button (QWizard.NextButton).size_policy ();
         next_button_size_policy.retain_size_when_hidden (true);
-        button (QWizard.Next_button).size_policy (next_button_size_policy);
+        button (QWizard.NextButton).size_policy (next_button_size_policy);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
         connect (this, &OwncloudWizard.style_changed, this.setup_page, &OwncloudSetupPage.on_signal_style_changed);
         connect (this, &OwncloudWizard.style_changed, this.advanced_setup_page, &OwncloudAdvancedSetupPage.on_signal_style_changed);
-        connect (this, &OwncloudWizard.style_changed, this.flow2Creds_page, &Flow2AuthCredsPage.on_signal_style_changed);
+        connect (this, &OwncloudWizard.style_changed, this.flow2creds_page, &Flow2AuthCredsPage.on_signal_style_changed);
 
         customize_style ();
 
         // allow Flow2 page to poll on window activation
-        connect (this, &OwncloudWizard.on_signal_activate, this.flow2Creds_page, &Flow2AuthCredsPage.on_signal_poll_now);
+        connect (this, &OwncloudWizard.on_signal_activate, this.flow2creds_page, &Flow2AuthCredsPage.on_signal_poll_now);
 
         adjust_wizard_size ();
         center_window ();
@@ -361,7 +361,7 @@ class OwncloudWizard : QWizard {
         if (type == DetermineAuthTypeJob.AuthType.OAUTH) {
             this.credentials_page = this.browser_creds_page;
         } else if (type == DetermineAuthTypeJob.AuthType.LOGIN_FLOW_V2) {
-            this.credentials_page = this.flow2Creds_page;
+            this.credentials_page = this.flow2creds_page;
     //  #ifdef WITH_WEBENGINE
         } else if (type == DetermineAuthTypeJob.WEB_VIEW_FLOW) {
             this.credentials_page = this.web_view_page;
@@ -395,7 +395,7 @@ class OwncloudWizard : QWizard {
         GLib.debug ("Current Wizard page changed to " + identifier;
 
         const var next_button_as_default = [this] () {
-            var next_button = qobject_cast<QPushButton> (button (QWizard.Next_button));
+            var next_button = qobject_cast<QPushButton> (button (QWizard.NextButton));
             if (next_button) {
                 next_button.default (true);
             }
@@ -403,7 +403,7 @@ class OwncloudWizard : QWizard {
 
         if (identifier == WizardCommon.Pages.PAGE_WELCOME) {
             // Set next button to just hidden so it retains it's layout
-            button (QWizard.Next_button).hidden (true);
+            button (QWizard.NextButton).hidden (true);
             // Need to set it from here, otherwise it has no effect
             this.welcome_page.login_button_default ();
         } else if (
@@ -413,21 +413,21 @@ class OwncloudWizard : QWizard {
             identifier == WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS) {
             button_layout ({
                 QWizard.Stretch,
-                QWizard.Back_button
+                QWizard.BackButton
             });
         } else if (identifier == WizardCommon.Pages.PAGE_ADVANCED_SETUP) {
             button_layout ({
                 QWizard.Stretch,
-                QWizard.Custom_button1,
-                QWizard.Back_button,
-                QWizard.Finish_button
+                QWizard.CustomButton1,
+                QWizard.BackButton,
+                QWizard.FinishButton
             });
             next_button_as_default ();
         } else {
             button_layout ({
                 QWizard.Stretch,
-                QWizard.Back_button,
-                QWizard.Next_button
+                QWizard.BackButton,
+                QWizard.NextButton
             });
             next_button_as_default ();
         }
@@ -436,10 +436,10 @@ class OwncloudWizard : QWizard {
             /* emit */ clear_pending_requests ();
         }
 
-        if (identifier == WizardCommon.Pages.PAGE_ADVANCED_SETUP && (this.credentials_page == this.browser_creds_page || this.credentials_page == this.flow2Creds_page)) {
+        if (identifier == WizardCommon.Pages.PAGE_ADVANCED_SETUP && (this.credentials_page == this.browser_creds_page || this.credentials_page == this.flow2creds_page)) {
             // For OAuth, disable the back button in the PAGE_ADVANCED_SETUP because we don't want
             // to re-open the browser.
-            button (QWizard.Back_button).enabled (false);
+            button (QWizard.BackButton).enabled (false);
         }
     }
 
@@ -459,7 +459,7 @@ class OwncloudWizard : QWizard {
             break;
 
         case WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS:
-            this.flow2Creds_page.connected ();
+            this.flow2creds_page.connected ();
             break;
 
     //  #ifdef WITH_WEBENGINE

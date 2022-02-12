@@ -9,11 +9,11 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 
 namespace Occ {
 
-class Vfs_suffix : Vfs {
+class VfsSuffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public Vfs_suffix (GLib.Object parent = new GLib.Object ()) {
+    public VfsSuffix (GLib.Object parent = new GLib.Object ()) {
         base (parent);
     }
 
@@ -198,7 +198,7 @@ class Vfs_suffix : Vfs {
         // It is unsafe for the database to contain any ".owncloud" file entries
         // that are not marked as a virtual file. These could be real .owncloud
         // files that were synced before vfs was enabled.
-        QByte_array_list to_wipe;
+        QByteArrayList to_wipe;
         parameters.journal.get_files_below_path ("", /*[&to_wipe]*/ (SyncJournalFileRecord record) => {
             if (!record.is_virtual_file () && record.path.has_suffix (APPLICATION_DOTVIRTUALFILE_SUFFIX))
                 to_wipe.append (record.path);
@@ -207,6 +207,6 @@ class Vfs_suffix : Vfs {
             parameters.journal.delete_file_record (path);
     }
 
-} // class Vfs_suffix
+} // class VfsSuffix
 
 } // namespace Occ

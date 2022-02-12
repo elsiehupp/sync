@@ -7,10 +7,10 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The Simple_sslErrorHandler class
+@brief The SimpleSslErrorHandler class
 @ingroup cmd
 ***********************************************************/
-class Simple_sslErrorHandler : Occ.AbstractSslErrorHandler {
+class SimpleSslErrorHandler : Occ.AbstractSslErrorHandler {
 
     /***********************************************************
     ***********************************************************/
@@ -18,7 +18,7 @@ class Simple_sslErrorHandler : Occ.AbstractSslErrorHandler {
 }
 
 
-    bool Simple_sslErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certificates, Occ.AccountPointer account) {
+    bool SimpleSslErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certificates, Occ.AccountPointer account) {
         (void)account;
         (void)conf;
 

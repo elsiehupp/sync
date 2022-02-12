@@ -1,16 +1,16 @@
 /***********************************************************
-SPDX-File_copyright_text : 2019 Marco Martin <mart@kde.org>
+SPDX-FileCopyrightText : 2019 Marco Martin <mart@kde.org>
 
 SPDX-License-Identifier : LGPL-2.0-or-later
 ***********************************************************/
 
 //  #pragma once
 
-//  #include <Qt_qml>
+//  #include <QtQml>
 //  #include <QPoint>
-//  #include <QQuick_item>
-//  #include <QWheel_event>
-//  #include <QQuick_item>
+//  #include <QQuickItem>
+//  #include <QWheelEvent>
+//  #include <QQuickItem>
 //  #include <QDebug>
 
 /***********************************************************
@@ -27,7 +27,7 @@ class WheelHandler : GLib.Object {
     the mouse wheel (or scrolls with the touchpad) on top
     of that item.
     ***********************************************************/
-    //  Q_PROPERTY (QQuick_item target READ target WRITE set_target NOTIFY target_changed)
+    //  Q_PROPERTY (QQuickItem target READ target WRITE set_target NOTIFY target_changed)
 
     /***********************************************************
     block_target_wheel : bool
@@ -55,7 +55,7 @@ class WheelHandler : GLib.Object {
     ***********************************************************/
     public 
 
-    public void set_target (QQuick_item target);
+    public void set_target (QQuickItem target);
 
 signals:
     void target_changed ();
@@ -66,7 +66,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<QQuick_item> m_target;
+    private QPointer<QQuickItem> m_target;
     private bool m_block_target_wheel = true;
     private bool m_scroll_flickable_target = true;
     private KirigamiWheelEvent m_wheel_event;
@@ -83,11 +83,11 @@ signals:
 
     WheelHandler.~WheelHandler () = default;
 
-    QQuick_item *WheelHandler.target () {
+    QQuickItem *WheelHandler.target () {
         return m_target;
     }
 
-    void WheelHandler.set_target (QQuick_item target) {
+    void WheelHandler.set_target (QQuickItem target) {
         if (m_target == target) {
             return;
         }

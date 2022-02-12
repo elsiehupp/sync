@@ -112,7 +112,7 @@ class SyncJournalDb : GLib.Object {
                 return {};
     
             PreparedSqlQuery query = this.database.query_manager.get (
-                PreparedSqlQueryManager.Get_raw_pin_state_query,
+                PreparedSqlQueryManager.Key.GET_RAW_PIN_STATE_QUERY,
                 "SELECT pin_state FROM flags WHERE path == ?1;",
                 this.database.database);
             //  ASSERT (query)
@@ -150,7 +150,7 @@ class SyncJournalDb : GLib.Object {
                 return {};
     
             PreparedSqlQuery query = this.database.query_manager.get (
-                PreparedSqlQueryManager.Get_effective_pin_state_query,
+                PreparedSqlQueryManager.Key.GET_EFFECTIVE_PIN_STATE_QUERY,
                 "SELECT pin_state FROM flags WHERE"
                 // explicitly allow "" to represent the root path
                 // (it'd be great if paths started with a / and "/" could be the root)
@@ -199,7 +199,7 @@ class SyncJournalDb : GLib.Object {
     
             // Find all the non-inherited pin states below the item
             PreparedSqlQuery query = this.database.query_manager.get (
-                PreparedSqlQueryManager.Get_sub_pins_query,
+                PreparedSqlQueryManager.Key.GET_SUB_PINS_QUERY,
                 "SELECT DISTINCT pin_state FROM flags WHERE"
                 + " (" + is_prefix_path_of ("?1", "path") + " OR ?1 == '')"
                 + " AND pin_state is not null and pin_state != 0;",
@@ -236,7 +236,7 @@ class SyncJournalDb : GLib.Object {
                 return;
     
             PreparedSqlQuery query = this.database.query_manager.get (
-                PreparedSqlQueryManager.Set_pin_state_query,
+                PreparedSqlQueryManager.Key.SET_PIN_STATE_QUERY,
                 // If we had sqlite >=3.24.0 everywhere this could be an upsert,
                 // making further flags columns easy
                 //"INSERT INTO flags (path, pin_state) VALUES (?1, ?2)"
@@ -264,7 +264,7 @@ class SyncJournalDb : GLib.Object {
                 return;
     
             PreparedSqlQuery query = this.database.query_manager.get (
-                PreparedSqlQueryManager.Wipe_pin_state_query,
+                PreparedSqlQueryManager.Key.WIPE_PIN_STATE_QUERY,
                 "DELETE FROM flags WHERE "
                 // Allow "" to delete everything
                 + " (" + is_prefix_path_or_equal ("?1", "path") + " OR ?1 == '');",
@@ -873,7 +873,7 @@ class SyncJournalDb : GLib.Object {
             return;
         }
 
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.SetKeyValueStoreQuery, QByteArrayLiteral ("INSERT OR REPLACE INTO key_value_store (key, value) VALUES (?1, ?2);"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.SET_KEY_VALUE_STORE_QUERY, QByteArrayLiteral ("INSERT OR REPLACE INTO key_value_store (key, value) VALUES (?1, ?2);"), this.database);
         if (!query) {
             return;
         }
@@ -892,7 +892,7 @@ class SyncJournalDb : GLib.Object {
             return default_value;
         }
 
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.GetKeyValueStoreQuery, QByteArrayLiteral ("SELECT value FROM key_value_store WHERE key=?1"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_KEY_VALUE_STORE_QUERY, QByteArrayLiteral ("SELECT value FROM key_value_store WHERE key=?1"), this.database);
         if (!query) {
             return default_value;
         }
@@ -912,7 +912,7 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void key_value_store_delete (string key) {
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.DeleteKeyValueStoreQuery, QByteArrayLiteral ("DELETE FROM key_value_store WHERE key=?1;"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_KEY_VALUE_STORE_QUERY, QByteArrayLiteral ("DELETE FROM key_value_store WHERE key=?1;"), this.database);
         if (!query) {
             GLib.warn ("Failed to init_or_reset this.delete_key_value_store_query");
             //  Q_ASSERT (false);
@@ -1042,7 +1042,7 @@ class SyncJournalDb : GLib.Object {
             return {};
 
         PreparedSqlQuery query = this.query_manager.get (
-            PreparedSqlQueryManager.Count_dehydrated_files_query,
+            PreparedSqlQueryManager.Key.COUNT_DEHYDRATED_FILES_QUERY,
             "SELECT DISTINCT type FROM metadata"
             + " WHERE (" + is_prefix_path_or_equal ("?1", "path") + " OR ?1 == '');",
             this.database);
@@ -1130,7 +1130,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         PreparedSqlQuery query = this.query_manager.get (
-            PreparedSqlQueryManager.SetErrorBlocklistQuery,
+            PreparedSqlQueryManager.Key.SET_ERROR_BLOCKLIST_QUERY,
             "INSERT OR REPLACE INTO blocklist "
             + " (path, last_try_etag, last_try_modtime, retrycount, errorstring, last_try_time, ignore_duration, rename_target, error_category, request_id) "
             + "VALUES ( ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
@@ -1482,7 +1482,7 @@ class SyncJournalDb : GLib.Object {
             return entry;
 
         if (check_connect ()) {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.GetErrorBlocklistQuery);
+            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_ERROR_BLOCKLIST_QUERY);
             query.bind_value (1, file);
             if (query.exec ()) {
                 if (query.next ().has_data) {
@@ -1662,7 +1662,7 @@ class SyncJournalDb : GLib.Object {
             return result;
         }
 
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Get_selective_sync_list_query, QByteArrayLiteral ("SELECT path FROM selectivesync WHERE type=?1"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_SELECTIVE_SYNC_LIST_QUERY, QByteArrayLiteral ("SELECT path FROM selectivesync WHERE type=?1"), this.database);
         if (!query) {
             *ok = false;
             return result;
@@ -1871,7 +1871,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         // Retrieve the identifier
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Get_checksum_type_query, QByteArrayLiteral ("SELECT name FROM checksumtype WHERE identifier=?1"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CHECKSUM_TYPE_QUERY, QByteArrayLiteral ("SELECT name FROM checksumtype WHERE identifier=?1"), this.database);
         if (!query) {
             return {};
         }
@@ -1898,8 +1898,8 @@ class SyncJournalDb : GLib.Object {
                 return;
             }
 
-            PreparedSqlQuery data_fingerprint_query1 = this.query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query1, QByteArrayLiteral ("DELETE FROM datafingerprint;"), this.database);
-            PreparedSqlQuery data_fingerprint_query2 = this.query_manager.get (PreparedSqlQueryManager.Set_data_fingerprint_query2, QByteArrayLiteral ("INSERT INTO datafingerprint (fingerprint) VALUES (?1);"), this.database);
+            PreparedSqlQuery data_fingerprint_query1 = this.query_manager.get (PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY1, QByteArrayLiteral ("DELETE FROM datafingerprint;"), this.database);
+            PreparedSqlQuery data_fingerprint_query2 = this.query_manager.get (PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY2, QByteArrayLiteral ("INSERT INTO datafingerprint (fingerprint) VALUES (?1);"), this.database);
             if (!data_fingerprint_query1 || !data_fingerprint_query2) {
                 return;
             }
@@ -1915,7 +1915,7 @@ class SyncJournalDb : GLib.Object {
                 return GLib.ByteArray ();
             }
 
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Get_data_fingerprint_query, QByteArrayLiteral ("SELECT fingerprint FROM datafingerprint"), this.database);
+            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_DATA_FINGERPRINT_QUERY, QByteArrayLiteral ("SELECT fingerprint FROM datafingerprint"), this.database);
             if (!query) {
                 return GLib.ByteArray ();
             }
@@ -1945,7 +1945,7 @@ class SyncJournalDb : GLib.Object {
             return;
 
         PreparedSqlQuery query = this.query_manager.get (
-            PreparedSqlQueryManager.Set_conflict_record_query,
+            PreparedSqlQueryManager.Key.SET_CONFLICT_RECORD_QUERY,
             "INSERT OR REPLACE INTO conflicts "
             + " (path, base_file_id, base_modtime, base_etag, base_path) "
             + "VALUES (?1, ?2, ?3, ?4, ?5);",
@@ -1970,7 +1970,7 @@ class SyncJournalDb : GLib.Object {
         if (!check_connect ()) {
             return entry;
         }
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Get_conflict_record_query, QByteArrayLiteral ("SELECT base_file_id, base_modtime, base_etag, base_path FROM conflicts WHERE path=?1;"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CONFLICT_RECORD_QUERY, QByteArrayLiteral ("SELECT base_file_id, base_modtime, base_etag, base_path FROM conflicts WHERE path=?1;"), this.database);
         //  ASSERT (query)
         query.bind_value (1, path);
         //  ASSERT (query.exec ())
@@ -1995,7 +1995,7 @@ class SyncJournalDb : GLib.Object {
         if (!check_connect ())
             return;
 
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Delete_conflict_record_query, QByteArrayLiteral ("DELETE FROM conflicts WHERE path=?1;"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_CONFLICT_RECORD_QUERY, QByteArrayLiteral ("DELETE FROM conflicts WHERE path=?1;"), this.database);
         //  ASSERT (query)
         query.bind_value (1, path);
         //  ASSERT (query.exec ())
@@ -2005,7 +2005,7 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     Return all paths of files with a conflict tag in the name and records in the database
     ***********************************************************/
-    public QByte_array_list conflict_record_paths () {
+    public QByteArrayList conflict_record_paths () {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         if (!check_connect ())
             return {};
@@ -2014,7 +2014,7 @@ class SyncJournalDb : GLib.Object {
         query.prepare ("SELECT path FROM conflicts");
         //  ASSERT (query.exec ());
 
-        QByte_array_list paths;
+        QByteArrayList paths;
         while (query.next ().has_data)
             paths.append (query.byte_array_value (0));
 
@@ -2801,7 +2801,7 @@ class SyncJournalDb : GLib.Object {
             // case insensitively
             sql += " COLLATE NOCASE";
         }
-        PreparedSqlQuery get_error_blocklist_query = this.query_manager.get (PreparedSqlQueryManager.GetErrorBlocklistQuery, sql, this.database);
+        PreparedSqlQuery get_error_blocklist_query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_ERROR_BLOCKLIST_QUERY, sql, this.database);
         if (!get_error_blocklist_query) {
             return sql_fail (QStringLiteral ("prepare this.get_error_blocklist_query"), *get_error_blocklist_query);
         }
@@ -2851,7 +2851,7 @@ class SyncJournalDb : GLib.Object {
 
         // Ensure the checksum type is in the database
         {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Insert_checksum_type_query, QByteArrayLiteral ("INSERT OR IGNORE INTO checksumtype (name) VALUES (?1)"), this.database);
+            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.INSERT_CHECKSUM_TYPE_QUERY, QByteArrayLiteral ("INSERT OR IGNORE INTO checksumtype (name) VALUES (?1)"), this.database);
             if (!query) {
                 return 0;
             }
@@ -2863,7 +2863,7 @@ class SyncJournalDb : GLib.Object {
 
         // Retrieve the identifier
         {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Get_checksum_type_id_query, QByteArrayLiteral ("SELECT identifier FROM checksumtype WHERE name=?1"), this.database);
+            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CHECKSUM_TYPE_ID_QUERY, QByteArrayLiteral ("SELECT identifier FROM checksumtype WHERE name=?1"), this.database);
             if (!query) {
                 return 0;
             }

@@ -5,7 +5,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 ***********************************************************/
 
 //  #include <QBuffer>
-//  #include <QFile_icon_provider>
+//  #include <QFileIconProvider>
 //  #include <QClipboard>
 //  #include <QFileInfo>
 //  #include <QAbstract_proxy_model>

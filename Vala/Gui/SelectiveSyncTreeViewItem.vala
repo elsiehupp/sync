@@ -7,18 +7,18 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 namespace Occ {
 namespace Ui {
 
-class Selective_sync_tree_view_item : QTree_widget_item {
+class SelectiveSyncTreeViewItem : QTreeWidgetItem {
 
     /***********************************************************
     ***********************************************************/
-    public Selective_sync_tree_view_item (int type = QTree_widget_item.Type)
-        : QTree_widget_item (type) {
+    public SelectiveSyncTreeViewItem (int type = QTreeWidgetItem.Type)
+        : QTreeWidgetItem (type) {
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Selective_sync_tree_view_item (string[] strings, int type = QTree_widget_item.Type)
+    public SelectiveSyncTreeViewItem (string[] strings, int type = QTreeWidgetItem.Type)
     }
 
 
@@ -30,20 +30,20 @@ class Selective_sync_tree_view_item : QTree_widget_item {
 
     /***********************************************************
     ***********************************************************/
-    public Tree_widget_item (view, type) {
+    public TreeWidgetItem (view, type) {
     }
-    public Selective_sync_tree_view_item (QTree_widget_item parent, int type = QTree_widget_item.Type)
-        : QTree_widget_item (parent, type) {
+    public SelectiveSyncTreeViewItem (QTreeWidgetItem parent, int type = QTreeWidgetItem.Type)
+        : QTreeWidgetItem (parent, type) {
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private bool operator< (QTree_widget_item other) override {
+    private bool operator< (QTreeWidgetItem other) override {
         int column = tree_widget ().sort_column ();
         if (column == 1) {
             return data (1, Qt.USER_ROLE).to_long_long () < other.data (1, Qt.USER_ROLE).to_long_long ();
         }
-        return QTree_widget_item.operator< (other);
+        return QTreeWidgetItem.operator< (other);
     }
 };

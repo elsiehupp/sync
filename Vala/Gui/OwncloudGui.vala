@@ -20,7 +20,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QQmlEngine>
 //  #include <QQml_component>
 //  #include <QQml_application_engine>
-//  #include <QQuick_item>
+//  #include <QQuickItem>
 //  #include <QQml_context>
 //  #include <QPointer
 //  #include <QActio
@@ -745,7 +745,7 @@ void OwncloudGui.on_signal_show_share_dialog (string share_path, string local_pa
     bool resharing_allowed = true; // lets assume the good
     if (folder.journal_database ().get_file_record (file, file_record) && file_record.is_valid ()) {
         // check the permission : Is resharing allowed?
-        if (!file_record.remote_perm.is_null () && !file_record.remote_perm.has_permission (RemotePermissions.Can_reshare)) {
+        if (!file_record.remote_perm.is_null () && !file_record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_RESHARE)) {
             resharing_allowed = false;
         }
     }

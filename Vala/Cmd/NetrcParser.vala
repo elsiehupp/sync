@@ -21,7 +21,7 @@ class NetrcParser {
 
     /***********************************************************
     ***********************************************************/
-    public using Login_pair = QPair<string, string>;
+    public LoginPair : QPair<string, string> { }
 
     /***********************************************************
     ***********************************************************/
@@ -35,14 +35,14 @@ class NetrcParser {
     ***********************************************************/
     public 
 
-    public Login_pair find (string machine);
+    public LoginPair find (string machine);
 
 
     /***********************************************************
     ***********************************************************/
-    private void try_add_entry_and_clear (string machine, Login_pair pair, bool is_default);
-    private GLib.HashMap<string, Login_pair> this.entries;
-    private Login_pair this.default;
+    private void try_add_entry_and_clear (string machine, LoginPair pair, bool is_default);
+    private GLib.HashMap<string, LoginPair> this.entries;
+    private LoginPair this.default;
     private string this.netrc_location;
 }
 
@@ -62,7 +62,7 @@ class NetrcParser {
         }
     }
 
-    void NetrcParser.try_add_entry_and_clear (string machine, Login_pair pair, bool is_default) {
+    void NetrcParser.try_add_entry_and_clear (string machine, LoginPair pair, bool is_default) {
         if (is_default) {
             this.default = pair;
         } else if (!machine.is_empty () && !pair.first.is_empty ()) {
@@ -83,7 +83,7 @@ class NetrcParser {
         QStringTokenizer tokenizer = new QStringTokenizer (content, " \n\t");
         tokenizer.quote_characters ("\"'");
 
-        Login_pair pair;
+        LoginPair pair;
         string machine;
         bool is_default = false;
         while (tokenizer.has_next ()) {
@@ -118,8 +118,8 @@ class NetrcParser {
         }
     }
 
-    NetrcParser.Login_pair NetrcParser.find (string machine) {
-        GLib.HashMap<string, Login_pair>.Const_iterator it = this.entries.find (machine);
+    NetrcParser.LoginPair NetrcParser.find (string machine) {
+        GLib.HashMap<string, LoginPair>.ConstIterator it = this.entries.find (machine);
         if (it != this.entries.end ()) {
             return it;
         } else {

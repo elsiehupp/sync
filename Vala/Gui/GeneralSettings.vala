@@ -8,7 +8,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QMessageBox>
 //  #include <QNetworkProxy>
 //  #include <QDir>
-//  #include <QScoped_value_rollback>
+//  #include <QScopedValueRollback>
 //  #include <QMessageBox>
 //  #include <private/qzipwriter_p.h>
 
@@ -181,7 +181,7 @@ General_settings.General_settings (Gtk.Widget parent)
 
     // setup about section
     string about = Theme.instance ().about ();
-    this.ui.about_label.text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
+    this.ui.about_label.text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.TextBrowserInteraction);
     this.ui.about_label.on_signal_text (about);
     this.ui.about_label.open_external_links (true);
 
@@ -241,7 +241,7 @@ QSize General_settings.size_hint () {
 }
 
 void General_settings.on_signal_load_misc_settings () {
-    QScoped_value_rollback<bool> scope (this.currently_loading, true);
+    QScopedValueRollback<bool> scope (this.currently_loading, true);
     ConfigFile cfg_file;
     this.ui.mono_icons_check_box.checked (cfg_file.mono_icons ());
     this.ui.server_notifications_check_box.checked (cfg_file.optional_server_notifications ());

@@ -16,7 +16,7 @@ See http://burtleburtle.net/bob/hash/evahash.html
 
 @brief Interface of the cynapses jhash implementation
 
-@defgroup cyn_jHash_internals cynapses libc jhash function
+@defgroup cyn_j_hash_internals cynapses libc jhash function
 @ingroup cyn_library_a_p_i
 
 @{

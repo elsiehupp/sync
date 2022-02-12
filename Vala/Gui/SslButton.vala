@@ -5,7 +5,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 //  #include <QMenu>
-//  #include <Qt_network>
+//  #include <QtNetwork>
 //  #include <QSslConfiguration>
 //  #include <QWidget_action>
 //  #include <Gtk.Label>

@@ -778,8 +778,8 @@ class SyncEngine : GLib.Object {
                 SyncJournalFileRecord prev;
                 if (this.journal.get_file_record (item.file, prev)
                     && prev.is_valid ()
-                    && prev.remote_perm.has_permission (RemotePermissions.Can_write) != item.remote_perm.has_permission (RemotePermissions.Can_write)) {
-                    const bool is_read_only = !item.remote_perm.is_null () && !item.remote_perm.has_permission (RemotePermissions.Can_write);
+                    && prev.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE) != item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
+                    const bool is_read_only = !item.remote_perm.is_null () && !item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE);
                     FileSystem.file_read_only_weak (file_path, is_read_only);
                 }
                 var record = item.to_sync_journal_file_record_with_inode (file_path);

@@ -240,7 +240,7 @@ class DiscoveryPhase : GLib.Object {
     void check_selective_sync_new_folder (string path, RemotePermissions remote_perm,
         std.function<void (bool)> callback) {
         if (this.sync_options.confirm_external_storage && this.sync_options.vfs.mode () == Vfs.Off
-            && remote_perm.has_permission (RemotePermissions.IsMounted)) {
+            && remote_perm.has_permission (RemotePermissions.Permissions.IS_MOUNTED)) {
             // external storage.
 
             // Note: DiscoverySingleDirectoryJob.on_signal_directory_listing_iterated_slot make sure that only the
@@ -500,7 +500,7 @@ class DiscoveryPhase : GLib.Object {
                     // But for our purpose, we want to know if the file is shared. It does not matter
                     // if we are the owner or not.
                     // Piggy back on the persmission field
-                    result.remote_perm.permission (RemotePermissions.IsShared);
+                    result.remote_perm.permission (RemotePermissions.Permissions.IS_SHARED);
                 }
             } else if (property == "is-encrypted" && value == QStringLiteral ("1")) {
                 result.is_e2e_encrypted = true;

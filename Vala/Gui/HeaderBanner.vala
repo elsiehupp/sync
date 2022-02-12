@@ -122,7 +122,7 @@ class HeaderBanner : Gtk.Widget {
     ***********************************************************/
     private Gtk.Label title_label;
     private Gtk.Label logo_label;
-    private QGrid_layout layout;
+    private QGridLayout layout;
     private QPixmap banner_pixmap;
 }
 
@@ -142,7 +142,7 @@ class HeaderBanner : Gtk.Widget {
         QFont font = title_label.font ();
         font.bold (true);
         title_label.font (font);
-        layout = new QGrid_layout (this);
+        layout = new QGridLayout (this);
         layout.contents_margins (QMargins ());
         layout.spacing (0);
         layout.row_minimum_height (3, 1);

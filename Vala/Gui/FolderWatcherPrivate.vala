@@ -87,10 +87,10 @@ protected slots:
             QDir.Filters filter = QDir.Dirs | QDir.NoDotAndDotDot | QDir.No_sym_links | QDir.Hidden;
             const string[] pathes = dir.entry_list (name_filter, filter);
 
-            string[].Const_iterator Const_iterator;
-            for (Const_iterator = pathes.const_begin (); Const_iterator != pathes.const_end ();
-                 ++Const_iterator) {
-                const string full_path (dir.path () + QLatin1String ("/") + (*Const_iterator));
+            string[].ConstIterator ConstIterator;
+            for (ConstIterator = pathes.const_begin (); ConstIterator != pathes.const_end ();
+                 ++ConstIterator) {
+                const string full_path (dir.path () + QLatin1String ("/") + (*ConstIterator));
                 full_list.append (full_path);
                 ok = find_folders_below (QDir (full_path), full_list);
             }

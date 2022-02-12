@@ -36,7 +36,7 @@ class Network_settings : Gtk.Widget {
     private void on_signal_check_account_localhost ();
 
 
-    protected void show_event (QShow_event event) override;
+    protected void show_event (QShowEvent event) override;
 
 
     /***********************************************************
@@ -240,7 +240,7 @@ class Network_settings : Gtk.Widget {
         }
     }
 
-    void Network_settings.show_event (QShow_event event) {
+    void Network_settings.show_event (QShowEvent event) {
         if (!event.spontaneous ()
             && this.ui.manual_proxy_radio_button.is_checked ()
             && this.ui.host_line_edit.text ().is_empty ()) {

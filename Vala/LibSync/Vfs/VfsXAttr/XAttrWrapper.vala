@@ -11,7 +11,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 
 namespace Occ {
 
-namespace XAttr_wrapper {
+namespace XAttrWrapper {
 
 bool has_nextcloud_placeholder_attributes (string path);
 Result<void, string> add_nextcloud_placeholder_attributes (string path);
@@ -44,7 +44,7 @@ bool xattr_set (GLib.ByteArray path, GLib.ByteArray name, GLib.ByteArray value) 
 
 }
 
-bool Occ.XAttr_wrapper.has_nextcloud_placeholder_attributes (string path) {
+bool Occ.XAttrWrapper.has_nextcloud_placeholder_attributes (string path) {
     var value = xattr_get (path.to_utf8 (), hydrate_exec_attribute_name);
     if (value) {
         return value == GLib.ByteArray (APPLICATION_EXECUTABLE);
@@ -53,7 +53,7 @@ bool Occ.XAttr_wrapper.has_nextcloud_placeholder_attributes (string path) {
     }
 }
 
-Occ.Result<void, string> Occ.XAttr_wrapper.add_nextcloud_placeholder_attributes (string path) {
+Occ.Result<void, string> Occ.XAttrWrapper.add_nextcloud_placeholder_attributes (string path) {
     var on_signal_success = xattr_set (path.to_utf8 (), hydrate_exec_attribute_name, APPLICATION_EXECUTABLE);
     if (!on_signal_success) {
         return QStringLiteral ("Failed to set the extended attribute");

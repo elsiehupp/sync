@@ -5,7 +5,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 //  #include <QtCore>
-//  #include <Qt_network>
+//  #include <QtNetwork>
 //  #include <QtGui>
 //  #include <Qt_widgets>
 //  #include <cstdio>

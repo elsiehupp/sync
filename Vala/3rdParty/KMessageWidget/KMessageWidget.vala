@@ -85,14 +85,14 @@ class KMessageWidget : QFrame {
     //  Q_PROPERTY (string text READ text WRITE on_set_text)
     //  Q_PROPERTY (bool word_wrap READ word_wrap WRITE set_word_wrap)
     //  Q_PROPERTY (bool close_button_visible READ is_close_button_visible WRITE set_close_button_visible)
-    //  Q_PROPERTY (Message_type message_type READ message_type WRITE set_message_type)
+    //  Q_PROPERTY (MessageType message_type READ message_type WRITE set_message_type)
     //  Q_PROPERTY (QIcon icon READ icon WRITE set_icon)
 
     /***********************************************************
     Available message types.
     The background colors are chosen depending on the message type.
     ***********************************************************/
-    public enum Message_type {
+    public enum MessageType {
         Positive,
         Information,
         Warning,
@@ -150,9 +150,9 @@ class KMessageWidget : QFrame {
     Get the type of this message.
     By default, the type is set to KMessageWidget.Information.
 
-    @see KMessageWidget.Message_type, set_message_type ()
+    @see KMessageWidget.MessageType, set_message_type ()
     ***********************************************************/
-    public Message_type message_type ();
+    public MessageType message_type ();
 
 
     /***********************************************************
@@ -170,7 +170,7 @@ class KMessageWidget : QFrame {
     Remove @p action from the message widget.
 
     @param action the action to remove
-    @see KMessageWidget.Message_type, add_action (), set_message_type ()
+    @see KMessageWidget.MessageType, add_action (), set_message_type ()
     ***********************************************************/
     public void remove_action (QAction action);
 
@@ -258,11 +258,11 @@ class KMessageWidget : QFrame {
     Set the message type to @p type.
     By default, the message type is set to KMessageWidget.Information.
     Appropriate colors are chosen to mimic the appearance of Kirigami's
-    Inline_message.
+    InlineMessage.
 
-    @see message_type (), KMessageWidget.Message_type
+    @see message_type (), KMessageWidget.MessageType
     ***********************************************************/
-    public on_ void set_message_type (KMessageWidget.Message_type type);
+    public on_ void set_message_type (KMessageWidget.MessageType type);
 
 
     /***********************************************************
@@ -333,7 +333,7 @@ signals:
     ***********************************************************/
     void show_animation_finished ();
 
-    protected void paint_event (QPaint_event event) override;
+    protected void paint_event (QPaintEvent event) override;
 
     protected bool event (QEvent event) override;
 
@@ -381,11 +381,11 @@ signals:
         update_geometry ();
     }
 
-    KMessageWidget.Message_type KMessageWidget.message_type () {
+    KMessageWidget.MessageType KMessageWidget.message_type () {
         return d.message_type;
     }
 
-    void KMessageWidget.set_message_type (KMessageWidget.Message_type type) {
+    void KMessageWidget.set_message_type (KMessageWidget.MessageType type) {
         d.message_type = type;
         d.apply_style_sheet ();
     }
@@ -417,7 +417,7 @@ signals:
     void KMessageWidget.resize_event (QResizeEvent event) {
         QFrame.resize_event (event);
 
-        if (d.time_line.state () == QTime_line.Not_running) {
+        if (d.time_line.state () == QTimeLine.NotRunning) {
             d.content.resize (width (), d.best_content_height ());
         }
     }
@@ -427,9 +427,9 @@ signals:
         return d.content.height_for_width (width);
     }
 
-    void KMessageWidget.paint_event (QPaint_event event) {
+    void KMessageWidget.paint_event (QPaintEvent event) {
         QFrame.paint_event (event);
-        if (d.time_line.state () == QTime_line.Running) {
+        if (d.time_line.state () == QTimeLine.Running) {
             QPainter painter (this);
             painter.set_opacity (d.time_line.current_value () * d.time_line.current_value ());
             painter.draw_pixmap (0, 0, d.content_snap_shot);
@@ -443,7 +443,7 @@ signals:
     void KMessageWidget.set_word_wrap (bool word_wrap) {
         d.word_wrap = word_wrap;
         d.text_label.set_word_wrap (word_wrap);
-        QSize_policy policy = size_policy ();
+        QSizePolicy policy = size_policy ();
         policy.set_height_for_width (word_wrap);
         set_size_policy (policy);
         d.update_layout ();
@@ -481,14 +481,14 @@ signals:
             /* emit */ hide_animation_finished ();
         }
 
-        if (!style ().style_hint (QStyle.SH_Widget_Animate, null, this)
+        if (!style ().style_hint (QStyle.SH_WidgetAnimate, null, this)
          || (parent_widget () && !parent_widget ().is_visible ())) {
             show ();
             /* emit */ show_animation_finished ();
             return;
         }
 
-        if (is_visible () && (d.time_line.state () == QTime_line.Not_running) && (height () == d.best_content_height ()) && (d.content.position ().y () == 0)) {
+        if (is_visible () && (d.time_line.state () == QTimeLine.NotRunning) && (height () == d.best_content_height ()) && (d.content.position ().y () == 0)) {
             /* emit */ show_animation_finished ();
             return;
         }
@@ -502,8 +502,8 @@ signals:
 
         d.update_snap_shot ();
 
-        d.time_line.set_direction (QTime_line.Forward);
-        if (d.time_line.state () == QTime_line.Not_running) {
+        d.time_line.set_direction (QTimeLine.Forward);
+        if (d.time_line.state () == QTimeLine.NotRunning) {
             d.time_line.on_start ();
         }
     }
@@ -517,7 +517,7 @@ signals:
             /* emit */ show_animation_finished ();
         }
 
-        if (!style ().style_hint (QStyle.SH_Widget_Animate, null, this)) {
+        if (!style ().style_hint (QStyle.SH_WidgetAnimate, null, this)) {
             hide ();
             /* emit */ hide_animation_finished ();
             return;
@@ -533,20 +533,20 @@ signals:
         d.content.move (0, -d.content.height ());
         d.update_snap_shot ();
 
-        d.time_line.set_direction (QTime_line.Backward);
-        if (d.time_line.state () == QTime_line.Not_running) {
+        d.time_line.set_direction (QTimeLine.Backward);
+        if (d.time_line.state () == QTimeLine.NotRunning) {
             d.time_line.on_start ();
         }
     }
 
     bool KMessageWidget.is_hide_animation_running () {
-        return (d.time_line.direction () == QTime_line.Backward)
-            && (d.time_line.state () == QTime_line.Running);
+        return (d.time_line.direction () == QTimeLine.Backward)
+            && (d.time_line.state () == QTimeLine.Running);
     }
 
     bool KMessageWidget.is_show_animation_running () {
-        return (d.time_line.direction () == QTime_line.Forward)
-            && (d.time_line.state () == QTime_line.Running);
+        return (d.time_line.direction () == QTimeLine.Forward)
+            && (d.time_line.state () == QTimeLine.Running);
     }
 
     QIcon KMessageWidget.icon () {
@@ -558,7 +558,7 @@ signals:
         if (d.icon.is_null ()) {
             d.icon_label.hide ();
         } else {
-            const int size = style ().pixel_metric (QStyle.PM_Tool_bar_icon_size);
+            const int size = style ().pixel_metric (QStyle.PM_ToolBarIconSize);
             d.icon_label.set_pixmap (d.icon.pixmap (size));
             d.icon_label.show ();
         }

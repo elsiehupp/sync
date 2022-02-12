@@ -36,7 +36,7 @@ class Folder_wizard_selective_sync : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private 
-    private Selective_sync_widget this.selective_sync;
+    private SelectiveSyncWidget this.selective_sync;
     private QCheckBox this.virtual_files_check_box = null;
 }
 
@@ -47,7 +47,7 @@ class Folder_wizard_selective_sync : QWizardPage {
 
     Folder_wizard_selective_sync.Folder_wizard_selective_sync (AccountPointer account) {
         var layout = new QVBoxLayout (this);
-        this.selective_sync = new Selective_sync_widget (account, this);
+        this.selective_sync = new SelectiveSyncWidget (account, this);
         layout.add_widget (this.selective_sync);
 
         if (Theme.instance ().show_virtual_files_option () && best_available_vfs_mode () != Vfs.Off) {

@@ -1,5 +1,5 @@
 /***********************************************************
-SPDX-File_copyright_text : 2019 Marco Martin <mart@kde.org>
+SPDX-FileCopyrightText : 2019 Marco Martin <mart@kde.org>
 
 LGPL-2.0-or-later
 ***********************************************************/
@@ -23,21 +23,21 @@ class GlobalWheelFilter : GLib.Object {
     ***********************************************************/
     public 
 
-    public void remove_item_handler_association (QQuick_item item, WheelHandler handler);
+    public void remove_item_handler_association (QQuickItem item, WheelHandler handler);
 
 
     protected bool event_filter (GLib.Object watched, QEvent event) override;
 
-    protected private void manage_wheel (QQuick_item target, QWheel_event wheel);
+    protected private void manage_wheel (QQuickItem target, QWheelEvent wheel);
 
-    protected private QMulti_hash<QQuick_item *, WheelHandler> m_handlers_for_item;
+    protected private QMultiHash<QQuickItem *, WheelHandler> m_handlers_for_item;
     protected private KirigamiWheelEvent m_wheel_event;
 }
 
 
 
 
-    Q_GLOBAL_STATIC (GlobalWheelFilter_singleton, private_global_wheel_filter_self)
+    Q_GLOBAL_STATIC (GlobalWheelFilterSingleton, private_global_wheel_filter_self)
 
     GlobalWheelFilter.GlobalWheelFilter (GLib.Object parent) {
         base (parent);
@@ -49,14 +49,14 @@ class GlobalWheelFilter : GLib.Object {
         return private_global_wheel_filter_self ().self;
     }
 
-    void GlobalWheelFilter.set_item_handler_association (QQuick_item item, WheelHandler handler) {
+    void GlobalWheelFilter.set_item_handler_association (QQuickItem item, WheelHandler handler) {
         if (!m_handlers_for_item.contains (handler.target ())) {
             handler.target ().install_event_filter (this);
         }
         m_handlers_for_item.insert (item, handler);
 
         connect (item, &GLib.Object.destroyed, this, [this] (GLib.Object obj) {
-            var item = static_cast<QQuick_item> (obj);
+            var item = static_cast<QQuickItem> (obj);
             m_handlers_for_item.remove (item);
         });
 
@@ -66,7 +66,7 @@ class GlobalWheelFilter : GLib.Object {
         });
     }
 
-    void GlobalWheelFilter.remove_item_handler_association (QQuick_item item, WheelHandler handler) {
+    void GlobalWheelFilter.remove_item_handler_association (QQuickItem item, WheelHandler handler) {
         if (!item || !handler) {
             return;
         }
@@ -78,11 +78,11 @@ class GlobalWheelFilter : GLib.Object {
 
     bool GlobalWheelFilter.event_filter (GLib.Object watched, QEvent event) {
         if (event.type () == QEvent.Wheel) {
-            var item = qobject_cast<QQuick_item> (watched);
+            var item = qobject_cast<QQuickItem> (watched);
             if (!item || !item.is_enabled ()) {
                 return GLib.Object.event_filter (watched, event);
             }
-            var we = static_cast<QWheel_event> (event);
+            var we = static_cast<QWheelEvent> (event);
             m_wheel_event.initialize_from_event (we);
 
             bool should_block = false;
@@ -109,7 +109,7 @@ class GlobalWheelFilter : GLib.Object {
         return GLib.Object.event_filter (watched, event);
     }
 
-    void GlobalWheelFilter.manage_wheel (QQuick_item target, QWheel_event event) {
+    void GlobalWheelFilter.manage_wheel (QQuickItem target, QWheelEvent event) {
         // Duck typing : accept everyhint that has all the properties we need
         if (target.meta_object ().index_of_property ("content_x") == -1
             || target.meta_object ().index_of_property ("content_y") == -1
@@ -146,7 +146,7 @@ class GlobalWheelFilter : GLib.Object {
             }
 
             // Scroll one page regardless of delta:
-            if ( (event.modifiers () & Qt.Control_modifier) || (event.modifiers () & Qt.Shift_modifier)) {
+            if ( (event.modifiers () & Qt.ControlModifier) || (event.modifiers () & Qt.ShiftModifier)) {
                 if (y > 0) {
                     y = target.height ();
                 } else if (y < 0) {
@@ -176,7 +176,7 @@ class GlobalWheelFilter : GLib.Object {
             }
 
             // Scroll one page regardless of delta:
-            if ( (event.modifiers () & Qt.Control_modifier) || (event.modifiers () & Qt.Shift_modifier)) {
+            if ( (event.modifiers () & Qt.ControlModifier) || (event.modifiers () & Qt.ShiftModifier)) {
                 if (x > 0) {
                     x = target.width ();
                 } else if (x < 0) {

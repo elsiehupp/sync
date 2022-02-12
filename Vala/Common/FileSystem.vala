@@ -52,7 +52,7 @@ namespace FileSystem {
         GLib.File.Permissions permissions = file.permissions ();
 
         GLib.File.Permissions all_write_permissions =
-            GLib.File.Write_user | GLib.File.Write_group | GLib.File.Write_other | GLib.File.Write_owner;
+            GLib.File.WriteUser | GLib.File.WriteGroup | GLib.File.WriteOther | GLib.File.WriteOwner;
         static GLib.File.Permissions default_write_permissions = get_default_write_permissions ();
 
         permissions &= ~all_write_permissions;
@@ -78,7 +78,7 @@ namespace FileSystem {
         GLib.File file = new GLib.File (filename);
         GLib.File.Permissions permissions = file.permissions ();
 
-        if (!read_only && (permissions & GLib.File.Write_owner)) {
+        if (!read_only && (permissions & GLib.File.WriteOwner)) {
             return; // already writable enough
         }
 
@@ -175,7 +175,7 @@ namespace FileSystem {
         bool on_signal_success = false;
         GLib.File orig (origin_filename);
         // We want a rename that also overwites.  GLib.File.rename does not overwite.
-        // Qt 5.1 has QSave_file.rename_overwrite we could use.
+        // Qt 5.1 has QSaveFile.rename_overwrite we could use.
         // ### FIXME
         on_signal_success = true;
         bool dest_exists = file_exists (destination_filename);
@@ -265,7 +265,7 @@ namespace FileSystem {
 
         // create file format for trash info file----- START
         GLib.File info_file;
-        if (file.exists (trash_info_path + f.filename () + ".trashinfo")) { //Trash_info file already exists, create "filename.1.trashinfo"
+        if (file.exists (trash_info_path + f.filename () + ".trashinfo")) { // TrashInfo file already exists, create "filename.1.trashinfo"
             string filename = trash_info_path + f.filename () + '.' + string.number (suffix_number) + ".trashinfo";
             info_file.filename (filename); //filename+.trashinfo //  create file information file in /.local/share/Trash/info/ folder
         } else {
@@ -281,7 +281,7 @@ namespace FileSystem {
                + "Path="
                + GLib.Uri.to_percent_encoding (f.absolute_file_path (), "~this.-./")
                + "\n"
-               + "Deletion_date="
+               + "DeletionDate="
                + GLib.DateTime.current_date_time ().to_string (Qt.ISODate)
                + '\n';
         info_file.close ();
@@ -367,14 +367,14 @@ namespace FileSystem {
     /***********************************************************
     ***********************************************************/
     private static GLib.File.Permissions get_default_write_permissions () {
-        GLib.File.Permissions result = GLib.File.Write_user;
+        GLib.File.Permissions result = GLib.File.WriteUser;
         mode_t mask = umask (0);
         umask (mask);
         if (! (mask & S_IWGRP)) {
-            result |= GLib.File.Write_group;
+            result |= GLib.File.WriteGroup;
         }
         if (! (mask & S_IWOTH)) {
-            result |= GLib.File.Write_other;
+            result |= GLib.File.WriteOther;
         }
         return result;
     }

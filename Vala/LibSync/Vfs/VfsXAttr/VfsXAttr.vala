@@ -7,16 +7,16 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 //  #include <QScopedPointer>
 
 //  namespace xattr {
-//      using namespace Occ.XAttr_wrapper;
+//      using namespace Occ.XAttrWrapper;
 //  }
 
 namespace Occ {
 
-class Vfs_xAttr : Vfs {
+class VfsXAttr : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public Vfs_xAttr (GLib.Object parent = new GLib.Object ()) {
+    public VfsXAttr (GLib.Object parent = new GLib.Object ()) {
         base (parent);
     }
 
@@ -35,17 +35,17 @@ class Vfs_xAttr : Vfs {
     /***********************************************************
     ***********************************************************/
     public void stop ();
-    void Vfs_xAttr.stop () {
+    void VfsXAttr.stop () {
     }
 
 
     /***********************************************************
     ***********************************************************/
     public 
-    void Vfs_xAttr.unregister_folder () {
+    void VfsXAttr.unregister_folder () {
     }
 
-    bool Vfs_xAttr.socket_api_pin_state_actions_shown () {
+    bool VfsXAttr.socket_api_pin_state_actions_shown () {
         return true;
     }
 
@@ -205,7 +205,7 @@ class Vfs_xAttr : Vfs {
         return;
     }
 
-} // class Vfs_xAttr
+} // class VfsXAttr
 
 } // namespace Occ
     

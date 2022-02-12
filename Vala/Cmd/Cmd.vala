@@ -200,7 +200,7 @@ void parse_options (string[] app_args, CmdOptions options) {
 
 /***********************************************************
 If the selective sync list is different from before, we need to disable the read from database
-  (The normal client does it in Selective_sync_dialog.accept*)
+  (The normal client does it in SelectiveSyncDialog.accept*)
 ***********************************************************/
 void selective_sync_fixup (Occ.SyncJournalDb journal, string[] new_list) {
     SqlDatabase database;
@@ -280,7 +280,7 @@ int main (int argc, char **argv) {
     if (options.use_netrc) {
         NetrcParser parser;
         if (parser.parse ()) {
-            NetrcParser.Login_pair pair = parser.find (host_url.host ());
+            NetrcParser.LoginPair pair = parser.find (host_url.host ());
             user = pair.first;
             password = pair.second;
         }
@@ -330,7 +330,7 @@ int main (int argc, char **argv) {
         }
     }
 
-    var ssl_error_handler = new Simple_sslErrorHandler;
+    var ssl_error_handler = new SimpleSslErrorHandler;
 
 #ifdef TOKEN_AUTH_ONLY
     var credentials = new TokenCredentials (user, password, "");

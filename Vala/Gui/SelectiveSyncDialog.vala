@@ -6,33 +6,33 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 //  #include <QDialogButtonBox>
 //  #include <QVBoxLayout>
-//  #include <QTree_widget>
+//  #include <QTreeWidget>
 //  #include <qpushbutton.h>
-//  #include <QFile_icon_provider>
+//  #include <QFileIconProvider>
 //  #include <QHeaderView>
 //  #include <QSettings>
-//  #include <QScoped_value_rollback>
-//  #include <QTree_widget_item>
+//  #include <QScopedValueRollback>
+//  #include <QTreeWidgetItem>
 //  #include <Gtk.Label>
 //  #include <QVBoxLayout>
 
 //  #include <Gtk.Dialog>
-//  #include <QTree_widget>
+//  #include <QTreeWidget>
 
 namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Selective_sync_dialog class
+@brief The SelectiveSyncDialog class
 @ingroup gui
 ***********************************************************/
-class Selective_sync_dialog : Gtk.Dialog {
+class SelectiveSyncDialog : Gtk.Dialog {
 
     // Dialog for a specific folder (used from the account settings button)
-    public Selective_sync_dialog (AccountPointer account, Folder folder, Gtk.Widget parent = null, Qt.Window_flags f = {});
+    public SelectiveSyncDialog (AccountPointer account, Folder folder, Gtk.Widget parent = null, Qt.Window_flags f = {});
 
     // Dialog for the whole account (Used from the wizard)
-    public Selective_sync_dialog (AccountPointer account, string folder, string[] blocklist, Gtk.Widget parent = null, Qt.Window_flags f = {});
+    public SelectiveSyncDialog (AccountPointer account, string folder, string[] blocklist, Gtk.Widget parent = null, Qt.Window_flags f = {});
 
     /***********************************************************
     ***********************************************************/
@@ -56,7 +56,7 @@ class Selective_sync_dialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private Selective_sync_widget this.selective_sync;
+    private SelectiveSyncWidget this.selective_sync;
 
     /***********************************************************
     ***********************************************************/
@@ -65,7 +65,7 @@ class Selective_sync_dialog : Gtk.Dialog {
 }
 
 
-    Selective_sync_dialog.Selective_sync_dialog (AccountPointer account, Folder folder, Gtk.Widget parent, Qt.Window_flags f)
+    SelectiveSyncDialog.SelectiveSyncDialog (AccountPointer account, Folder folder, Gtk.Widget parent, Qt.Window_flags f)
         : Gtk.Dialog (parent, f)
         this.folder (folder)
         this.ok_button (null) // defined in on_signal_init () {
@@ -81,7 +81,7 @@ class Selective_sync_dialog : Gtk.Dialog {
         connect (this.folder, &GLib.Object.destroyed, this, &GLib.Object.delete_later);
     }
 
-    Selective_sync_dialog.Selective_sync_dialog (AccountPointer account, string folder,
+    SelectiveSyncDialog.SelectiveSyncDialog (AccountPointer account, string folder,
         const string[] blocklist, Gtk.Widget parent, Qt.Window_flags f)
         : Gtk.Dialog (parent, f)
         this.folder (null) {
@@ -89,21 +89,21 @@ class Selective_sync_dialog : Gtk.Dialog {
         this.selective_sync.folder_info (folder, folder, blocklist);
     }
 
-    void Selective_sync_dialog.on_signal_init (AccountPointer account) {
+    void SelectiveSyncDialog.on_signal_init (AccountPointer account) {
         window_title (_("Choose What to Sync"));
         var layout = new QVBoxLayout (this);
-        this.selective_sync = new Selective_sync_widget (account, this);
+        this.selective_sync = new SelectiveSyncWidget (account, this);
         layout.add_widget (this.selective_sync);
         var button_box = new QDialogButtonBox (Qt.Horizontal);
         this.ok_button = button_box.add_button (QDialogButtonBox.Ok);
-        connect (this.ok_button, &QPushButton.clicked, this, &Selective_sync_dialog.accept);
+        connect (this.ok_button, &QPushButton.clicked, this, &SelectiveSyncDialog.accept);
         QPushButton button = null;
         button = button_box.add_button (QDialogButtonBox.Cancel);
         connect (button, &QAbstractButton.clicked, this, &Gtk.Dialog.reject);
         layout.add_widget (button_box);
     }
 
-    void Selective_sync_dialog.on_signal_accept () {
+    void SelectiveSyncDialog.on_signal_accept () {
         if (this.folder) {
             bool ok = false;
             var old_block_list_set = this.folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok).to_set ();
@@ -132,15 +132,15 @@ class Selective_sync_dialog : Gtk.Dialog {
         Gtk.Dialog.on_signal_accept ();
     }
 
-    string[] Selective_sync_dialog.create_block_list () {
+    string[] SelectiveSyncDialog.create_block_list () {
         return this.selective_sync.create_block_list ();
     }
 
-    string[] Selective_sync_dialog.old_block_list () {
+    string[] SelectiveSyncDialog.old_block_list () {
         return this.selective_sync.old_block_list ();
     }
 
-    int64 Selective_sync_dialog.estimated_size () {
+    int64 SelectiveSyncDialog.estimated_size () {
         return this.selective_sync.estimated_size ();
     }
     }

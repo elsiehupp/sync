@@ -256,7 +256,7 @@ class Theme : GLib.Object {
     /***********************************************************
     ***********************************************************/
 //  #ifndef TOKEN_AUTH_ONLY
-    public static string hidpi_filename (string filename, QPaint_device dev = null) {
+    public static string hidpi_filename (string filename, QPaintDevice dev = null) {
         if (!Theme.is_hidpi (dev)) {
             return filename;
         }
@@ -276,7 +276,7 @@ class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static string hidpi_filename_for_color (string icon_name, Gtk.Color background_color, QPaint_device dev = null) {
+    public static string hidpi_filename_for_color (string icon_name, Gtk.Color background_color, QPaintDevice dev = null) {
         var is_dark_background = Theme.is_dark_color (background_color);
 
         const string icon_path = Theme.theme_prefix + (is_dark_background ? "white/" : "black/") + icon_name;
@@ -287,7 +287,7 @@ class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static bool is_hidpi (QPaint_device dev = null) {
+    public static bool is_hidpi (QPaintDevice dev = null) {
         var device_pixel_ratio = dev ? dev.device_pixel_ratio () : Gtk.Application.primary_screen ().device_pixel_ratio ();
         return device_pixel_ratio > 1;
     }
@@ -913,14 +913,14 @@ class Theme : GLib.Object {
     un-branded owncloud servers.
     ***********************************************************/
     public string oauth_client_id () {
-        return "xd_xOt13JKxym1B1Qc_encf2XDk_lAex_m_bFwi_t9j6Efhh_hFJhs2KM9jbj_tmf8JBXE69";
+        return "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69";
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string oauth_client_secret () {
-        return "UBntm_lj_c2y_yCe_hwsyj73Uwo9TAaec_aet_rw_mw0x_ycv_nL9y_rd_l_s_ui0h_uAHfv_c_hFe_fh";
+        return "UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh";
     }
 
 
@@ -1044,17 +1044,17 @@ class Theme : GLib.Object {
     ***********************************************************/
     public static QIcon create_color_aware_icon (string name, QPalette palette = QGuiApplication.palette ()) {
         QSvgRenderer renderer = new QSvgRenderer (name);
-        Gtk.Image img = new Gtk.Image (64, 64, Gtk.Image.Format_ARGB32);
-        img.fill (Qt.Global_color.transparent);
+        Gtk.Image img = new Gtk.Image (64, 64, Gtk.Image.FormatARGB32);
+        img.fill (Qt.GlobalColor.transparent);
         QPainter img_painter = new QPainter  (&img);
-        Gtk.Image inverted = new Gtk.Image (64, 64, Gtk.Image.Format_ARGB32);
-        inverted.fill (Qt.Global_color.transparent);
+        Gtk.Image inverted = new Gtk.Image (64, 64, Gtk.Image.FormatARGB32);
+        inverted.fill (Qt.GlobalColor.transparent);
         QPainter inv_painter (&inverted);
 
         renderer.render (&img_painter);
         renderer.render (&inv_painter);
 
-        inverted.invert_pixels (Gtk.Image.Invert_rgb);
+        inverted.invert_pixels (Gtk.Image.InvertRgb);
 
         QIcon icon;
         if (Theme.is_dark_color (palette.color (QPalette.Base))) {
@@ -1062,7 +1062,7 @@ class Theme : GLib.Object {
         } else {
             icon.add_pixmap (QPixmap.from_image (img));
         }
-        if (Theme.is_dark_color (palette.color (QPalette.Highlighted_text))) {
+        if (Theme.is_dark_color (palette.color (QPalette.HighlightedText))) {
             icon.add_pixmap (QPixmap.from_image (img), QIcon.Normal, QIcon.On);
         } else {
             icon.add_pixmap (QPixmap.from_image (inverted), QIcon.Normal, QIcon.On);
@@ -1082,7 +1082,7 @@ class Theme : GLib.Object {
     public static QPixmap create_color_aware_pixmap (string name, QPalette palette = QGuiApplication.palette ()) {
         Gtk.Image img = new Gtk.Image (name);
         Gtk.Image inverted = new Gtk.Image (img);
-        inverted.invert_pixels (Gtk.Image.Invert_rgb);
+        inverted.invert_pixels (Gtk.Image.InvertRgb);
 
         QPixmap pixmap;
         if (Theme.is_dark_color (palette.color (QPalette.Base))) {
@@ -1116,7 +1116,7 @@ class Theme : GLib.Object {
 
 
     /***********************************************************
-    @return color for the Error_box text.
+    @return color for the ErrorBox text.
     ***********************************************************/
     public Gtk.Color error_box_text_color () {
         return new Gtk.Color ("white");
@@ -1124,7 +1124,7 @@ class Theme : GLib.Object {
 
 
     /***********************************************************
-    @return color for the Error_box background.
+    @return color for the ErrorBox background.
     ***********************************************************/
     public Gtk.Color error_box_background_color ();
     Gtk.Color Theme.error_box_background_color () {
@@ -1133,7 +1133,7 @@ class Theme : GLib.Object {
 
 
     /***********************************************************
-    @return color for the Error_box border.
+    @return color for the ErrorBox border.
     ***********************************************************/
     public Gtk.Color error_box_border_color () {
         return new Gtk.Color ("black");
@@ -1169,8 +1169,8 @@ class Theme : GLib.Object {
             const string svg_name = string (Theme.theme_prefix) + string.from_latin1 ("%1/%2.svg").arg (flavor).arg (name);
             QSvgRenderer renderer (svg_name);
             var create_pixmap_from_svg = [&renderer] (int size) {
-                Gtk.Image img (size, size, Gtk.Image.Format_ARGB32);
-                img.fill (Qt.Global_color.transparent);
+                Gtk.Image img (size, size, Gtk.Image.FormatARGB32);
+                img.fill (Qt.GlobalColor.transparent);
                 QPainter img_painter (&img);
                 renderer.render (&img_painter);
                 return QPixmap.from_image (img);
@@ -1194,7 +1194,7 @@ class Theme : GLib.Object {
                 }
                 // HACK, get rid of it by supporting FDO icon themes, this is really just emulating ubuntu-mono
                 if (qgetenv ("DESKTOP_SESSION") == "ubuntu") {
-                    QBitmap mask = px.create_mask_from_color (Qt.white, Qt.Mask_out_color);
+                    QBitmap mask = px.create_mask_from_color (Qt.white, Qt.MaskOutColor);
                     QPainter p (&px);
                     p.pen (Gtk.Color ("#dfdbd2"));
                     p.draw_pixmap (px.rect (), mask, mask.rect ());

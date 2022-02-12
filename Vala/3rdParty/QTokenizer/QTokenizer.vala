@@ -41,14 +41,14 @@ $QT_END_LICENSE$
 
 QT_BEGIN_NAMESPACE
 
-template <class T, class Const_iterator>
+template <class T, class ConstIterator>
 struct QTokenizerPrivate {
-    using char_type = typename T.value_type;
+    using CharType = typename T.value_type;
 
     struct State {
         bool in_quote = false;
         bool in_escape = false;
-        char_type quote_char = '\0';
+        CharType quote_char = '\0';
     }
 
     QTokenizerPrivate (T& this.string, T& this.delims) :
@@ -63,16 +63,16 @@ struct QTokenizerPrivate {
       , return_quotes (false) {
     }
 
-    bool is_delimiter (char_type c) {
+    bool is_delimiter (CharType c) {
         return delimiters.contains (c);
     }
 
-    bool is_quote (char_type c) {
+    bool is_quote (CharType c) {
         return quotes.contains (c);
     }
 
     // Returns true if a delimiter was not hit
-    bool next_char (State* state, char_type c) {
+    bool next_char (State* state, CharType c) {
         if (state.in_quote) {
             if (state.in_escape) {
                 state.in_escape = false;
@@ -91,10 +91,10 @@ struct QTokenizerPrivate {
 
     T string;
     // ### copies begin and end for performance, premature optimization?
-    Const_iterator begin;
-    Const_iterator end;
-    Const_iterator token_begin;
-    Const_iterator token_end;
+    ConstIterator begin;
+    ConstIterator end;
+    ConstIterator token_begin;
+    ConstIterator token_end;
     T delimiters;
     T quotes;
     bool is_delim;
@@ -102,17 +102,17 @@ struct QTokenizerPrivate {
     bool return_quotes;
 }
 
-template <class T, class Const_iterator = typename T.Const_iterator>
+template <class T, class ConstIterator = typename T.ConstIterator>
 class QTokenizer {
 
     /***********************************************************
     ***********************************************************/
-    public using char_type = typename T.value_type;
+    public CharType : typename T.value_type;
 
 
     /***********************************************************
     \class QTokenizer
-    \inmodule Qt_network
+    \inmodule QtNetwork
     \brief QTokenizer tokenizes Strings on string, GLib.ByteArray,
             std.string or std.wstring
 
@@ -136,7 +136,7 @@ class QTokenizer {
     \sa QStringTokenizer, QByte_array_tokenizer, String_tokenizer, WString_tokenizer
     ***********************************************************/
     public QTokenizer (T& string, T& delimiters)
-        : d (new QTokenizerPrivate<T, Const_iterator> (string, delimiters)) {}
+        : d (new QTokenizerPrivate<T, ConstIterator> (string, delimiters)) {}
 
 
     /***********************************************************
@@ -181,7 +181,7 @@ class QTokenizer {
     \sa next ()
     ***********************************************************/
     public bool has_next () {
-        typename QTokenizerPrivate<T, Const_iterator>.State state;
+        typename QTokenizerPrivate<T, ConstIterator>.State state;
         d.is_delim = false;
         for (;;) {
             d.token_begin = d.token_end;
@@ -226,7 +226,7 @@ class QTokenizer {
     ***********************************************************/
     public T next () {
         int len = std.distance (d.token_begin, d.token_end);
-        Const_iterator tmp_start = d.token_begin;
+        ConstIterator tmp_start = d.token_begin;
         if (!d.return_quotes && len > 1 && d.is_quote (*d.token_begin)) {
             tmp_start++;
             len -= 2;
@@ -238,7 +238,7 @@ class QTokenizer {
     /***********************************************************
     ***********************************************************/
     private friend class QStringTokenizer;
-    private unowned<QTokenizerPrivate<T, Const_iterator> > d;
+    private unowned<QTokenizerPrivate<T, ConstIterator> > d;
 }
 
 

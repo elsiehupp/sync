@@ -4,7 +4,7 @@ class QStringTokenizer : QTokenizer<string> {
     /***********************************************************
     ***********************************************************/
     public QStringTokenizer (string string, string delim) :
-        QTokenizer<string, string.Const_iterator> (string, delim) {}
+        QTokenizer<string, string.ConstIterator> (string, delim) {}
     /***********************************************************
     @brief Like \see next (), but returns a lightweight string reference
     @return A reference to the token within the string

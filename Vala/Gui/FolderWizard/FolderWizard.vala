@@ -8,11 +8,11 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 //  #include <QDir>
 //  #include <QFileDialog>
 //  #include <QFileInfo>
-//  #include <QFile_icon_provider>
+//  #include <QFileIconProvider>
 //  #include <QInputDialog>
 //  #include <QValidator>
 //  #include <QWizardPage>
-//  #include <QTree_widget>
+//  #include <QTreeWidget>
 //  #include <QVBoxLayout>
 //  #include <QEvent>
 //  #include <QCheckBox>
@@ -82,7 +82,7 @@ class FolderWizard : QWizard {
 
         window_title (_("Add Folder Sync Connection"));
         options (QWizard.Cancel_button_on_signal_left);
-        button_text (QWizard.Finish_button, _("Add Sync Connection"));
+        button_text (QWizard.FinishButton, _("Add Sync Connection"));
     }
 
     FolderWizard.~FolderWizard () = default;

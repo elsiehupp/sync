@@ -56,13 +56,13 @@ namespace {
 namespace Occ {
 namespace Ui {
 
-class Invalid_filename_dialog : Gtk.Dialog {
+class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public Invalid_filename_dialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent = null);
+    public InvalidFilenameDialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent = null);
 
-    ~Invalid_filename_dialog () override;
+    ~InvalidFilenameDialog () override;
 
     /***********************************************************
     ***********************************************************/
@@ -71,7 +71,7 @@ class Invalid_filename_dialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private std.unique_ptr<Ui.Invalid_filename_dialog> this.ui;
+    private std.unique_ptr<Ui.InvalidFilenameDialog> this.ui;
 
     /***********************************************************
     ***********************************************************/
@@ -93,9 +93,9 @@ class Invalid_filename_dialog : Gtk.Dialog {
 }
 
 
-    Invalid_filename_dialog.Invalid_filename_dialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent)
+    InvalidFilenameDialog.InvalidFilenameDialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent)
         : Gtk.Dialog (parent)
-        this.ui (new Ui.Invalid_filename_dialog)
+        this.ui (new Ui.InvalidFilenameDialog)
         this.account (account)
         this.folder (folder)
         this.file_path (std.move (file_path)) {
@@ -121,29 +121,29 @@ class Invalid_filename_dialog : Gtk.Dialog {
         connect (this.ui.button_box, &QDialogButtonBox.rejected, this, &Gtk.Dialog.reject);
 
         connect (this.ui.filename_line_edit, &QLineEdit.text_changed, this,
-            &Invalid_filename_dialog.on_signal_filename_line_edit_text_changed);
+            &InvalidFilenameDialog.on_signal_filename_line_edit_text_changed);
 
         check_if_allowed_to_rename ();
     }
 
-    Invalid_filename_dialog.~Invalid_filename_dialog () = default;
+    InvalidFilenameDialog.~InvalidFilenameDialog () = default;
 
-    void Invalid_filename_dialog.check_if_allowed_to_rename () {
+    void InvalidFilenameDialog.check_if_allowed_to_rename () {
         const var propfind_job = new PropfindJob (this.account, QDir.clean_path (this.folder.remote_path () + this.original_filename));
         propfind_job.properties ({
             "http://owncloud.org/ns:permissions"
         });
-        connect (propfind_job, &PropfindJob.result, this, &Invalid_filename_dialog.on_signal_propfind_permission_success);
+        connect (propfind_job, &PropfindJob.result, this, &InvalidFilenameDialog.on_signal_propfind_permission_success);
         propfind_job.on_signal_start ();
     }
 
-    void Invalid_filename_dialog.on_signal_propfind_permission_success (QVariantMap values) {
+    void InvalidFilenameDialog.on_signal_propfind_permission_success (QVariantMap values) {
         if (!values.contains ("permissions")) {
             return;
         }
         const var remote_permissions = RemotePermissions.from_server_string (values["permissions"].to_string ());
-        if (!remote_permissions.has_permission (remote_permissions.Can_rename)
-            || !remote_permissions.has_permission (remote_permissions.Can_move)) {
+        if (!remote_permissions.has_permission (remote_permissions.Permissions.CAN_RENAME)
+            || !remote_permissions.has_permission (remote_permissions.Permissions.CAN_MOVE)) {
             this.ui.error_label.on_signal_text (
                 _("You don't have the permission to rename this file. Please ask the author of the file to rename it."));
             this.ui.button_box.button (QDialogButtonBox.Ok).enabled (false);
@@ -151,15 +151,15 @@ class Invalid_filename_dialog : Gtk.Dialog {
         }
     }
 
-    void Invalid_filename_dialog.on_signal_accept () {
+    void InvalidFilenameDialog.on_signal_accept () {
         this.new_filename = this.relative_file_path + this.ui.filename_line_edit.text ().trimmed ();
         const var propfind_job = new PropfindJob (this.account, QDir.clean_path (this.folder.remote_path () + this.new_filename));
-        connect (propfind_job, &PropfindJob.result, this, &Invalid_filename_dialog.on_signal_remote_file_already_exists);
-        connect (propfind_job, &PropfindJob.finished_with_error, this, &Invalid_filename_dialog.on_signal_remote_file_does_not_exist);
+        connect (propfind_job, &PropfindJob.result, this, &InvalidFilenameDialog.on_signal_remote_file_already_exists);
+        connect (propfind_job, &PropfindJob.finished_with_error, this, &InvalidFilenameDialog.on_signal_remote_file_does_not_exist);
         propfind_job.on_signal_start ();
     }
 
-    void Invalid_filename_dialog.on_signal_filename_line_edit_text_changed (string text) {
+    void InvalidFilenameDialog.on_signal_filename_line_edit_text_changed (string text) {
         const var is_new_filename_different = text != this.original_filename;
         const var illegal_contained_characters = get_illegal_chars_from_string (text);
         const var contains_illegal_chars = !illegal_contained_characters.empty () || text.ends_with ('.');
@@ -176,7 +176,7 @@ class Invalid_filename_dialog : Gtk.Dialog {
             .enabled (is_text_valid);
     }
 
-    void Invalid_filename_dialog.on_signal_move_job_finished () {
+    void InvalidFilenameDialog.on_signal_move_job_finished () {
         const var job = qobject_cast<MoveJob> (sender ());
         const var error = job.reply ().error ();
 
@@ -188,21 +188,21 @@ class Invalid_filename_dialog : Gtk.Dialog {
         Gtk.Dialog.on_signal_accept ();
     }
 
-    void Invalid_filename_dialog.on_signal_remote_file_already_exists (QVariantMap values) {
+    void InvalidFilenameDialog.on_signal_remote_file_already_exists (QVariantMap values) {
         //  Q_UNUSED (values);
 
         this.ui.error_label.on_signal_text (_("Cannot rename file because a file with the same name does already exist on the server. Please pick another name."));
         this.ui.button_box.button (QDialogButtonBox.Ok).enabled (false);
     }
 
-    void Invalid_filename_dialog.on_signal_remote_file_does_not_exist (Soup.Reply reply) {
+    void InvalidFilenameDialog.on_signal_remote_file_does_not_exist (Soup.Reply reply) {
         //  Q_UNUSED (reply);
 
         // File does not exist. We can rename it.
         const var remote_source = QDir.clean_path (this.folder.remote_path () + this.original_filename);
         const var remote_destionation = QDir.clean_path (this.account.dav_url ().path () + this.folder.remote_path () + this.new_filename);
         const var move_job = new MoveJob (this.account, remote_source, remote_destionation, this);
-        connect (move_job, &MoveJob.finished_signal, this, &Invalid_filename_dialog.on_signal_move_job_finished);
+        connect (move_job, &MoveJob.finished_signal, this, &InvalidFilenameDialog.on_signal_move_job_finished);
         move_job.on_signal_start ();
     }
     }

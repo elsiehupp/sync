@@ -26,20 +26,20 @@ SOFTWARE.
 //  #include <Gtk.Color>
 
 /***********************************************************
-    \class QProgress_indicator
-    \brief The QProgress_indicator class lets an application display a progress indicator to show that a lengthy task is under way.
+    \class QProgressIndicator
+    \brief The QProgressIndicator class lets an application display a progress indicator to show that a lengthy task is under way.
 
     Progress indicators are indeterminate and do nothing more than spin to show that the application is busy.
     \sa QProgressBar
 ***********************************************************/
-class QProgress_indicator : Gtk.Widget {
+class QProgressIndicator : Gtk.Widget {
     //  Q_PROPERTY (int delay READ animation_delay WRITE on_set_animation_delay)
     //  Q_PROPERTY (bool displayed_when_stopped READ is_displayed_when_stopped WRITE on_set_displayed_when_stopped)
     //  Q_PROPERTY (Gtk.Color color READ color WRITE on_set_color)
 
     /***********************************************************
     ***********************************************************/
-    public QProgress_indicator (Gtk.Widget* parent = null);
+    public QProgressIndicator (Gtk.Widget* parent = null);
 
 
     /***********************************************************
@@ -121,7 +121,7 @@ class QProgress_indicator : Gtk.Widget {
     public void on_set_color (Gtk.Color & color);
 
     protected void timer_event (QTimerEvent * event) override;
-    protected void paint_event (QPaint_event * event) override;
+    protected void paint_event (QPaintEvent * event) override;
 
     /***********************************************************
     ***********************************************************/
@@ -167,34 +167,34 @@ SOFTWARE.
 
 //  #include <QPainter>
 
-QProgress_indicator.QProgress_indicator (Gtk.Widget* parent)
+QProgressIndicator.QProgressIndicator (Gtk.Widget* parent)
     : Gtk.Widget (parent) {
-    set_size_policy (QSize_policy.Fixed, QSize_policy.Fixed);
-    set_focus_policy (Qt.No_focus);
+    set_size_policy (QSizePolicy.Fixed, QSizePolicy.Fixed);
+    set_focus_policy (Qt.NoFocus);
 }
 
-bool QProgress_indicator.is_animated () {
+bool QProgressIndicator.is_animated () {
     return (m_timer_id != -1);
 }
 
-void QProgress_indicator.on_set_displayed_when_stopped (bool state) {
+void QProgressIndicator.on_set_displayed_when_stopped (bool state) {
     m_displayed_when_stopped = state;
 
     update ();
 }
 
-bool QProgress_indicator.is_displayed_when_stopped () {
+bool QProgressIndicator.is_displayed_when_stopped () {
     return m_displayed_when_stopped;
 }
 
-void QProgress_indicator.on_start_animation () {
+void QProgressIndicator.on_start_animation () {
     m_angle = 0;
 
     if (m_timer_id == -1)
         m_timer_id = start_timer (m_delay);
 }
 
-void QProgress_indicator.on_stop_animation () {
+void QProgressIndicator.on_stop_animation () {
     if (m_timer_id != -1)
         kill_timer (m_timer_id);
 
@@ -203,7 +203,7 @@ void QProgress_indicator.on_stop_animation () {
     update ();
 }
 
-void QProgress_indicator.on_set_animation_delay (int delay) {
+void QProgressIndicator.on_set_animation_delay (int delay) {
     if (m_timer_id != -1)
         kill_timer (m_timer_id);
 
@@ -213,27 +213,27 @@ void QProgress_indicator.on_set_animation_delay (int delay) {
         m_timer_id = start_timer (m_delay);
 }
 
-void QProgress_indicator.on_set_color (Gtk.Color & color) {
+void QProgressIndicator.on_set_color (Gtk.Color & color) {
     m_color = color;
 
     update ();
 }
 
-QSize QProgress_indicator.size_hint () {
+QSize QProgressIndicator.size_hint () {
     return {20, 20};
 }
 
-int QProgress_indicator.height_for_width (int w) {
+int QProgressIndicator.height_for_width (int w) {
     return w;
 }
 
-void QProgress_indicator.timer_event (QTimerEvent * /*event*/) {
+void QProgressIndicator.timer_event (QTimerEvent * /*event*/) {
     m_angle = (m_angle+30)%360;
 
     update ();
 }
 
-void QProgress_indicator.paint_event (QPaint_event * /*event*/) {
+void QProgressIndicator.paint_event (QPaintEvent * /*event*/) {
     if (!m_displayed_when_stopped && !is_animated ())
         return;
 
@@ -252,7 +252,7 @@ void QProgress_indicator.paint_event (QPaint_event * /*event*/) {
     for (int i=0; i<12; i++) {
         Gtk.Color color = m_color;
         color.set_alpha_f (1.0f - (static_cast<float> (i) / 12.0f));
-        p.set_pen (Qt.No_pen);
+        p.set_pen (Qt.NoPen);
         p.set_brush (color);
         p.save ();
         p.translate (rect ().center ());

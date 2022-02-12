@@ -134,7 +134,7 @@ class SyncFileStatusTracker : GLib.Object {
                 this.sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
             }
 
-            SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.IsShared) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
+            SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
             if (item.instruction != CSYNC_INSTRUCTION_NONE
                 && item.instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
                 && item.instruction != CSYNC_INSTRUCTION_IGNORE
@@ -182,7 +182,7 @@ class SyncFileStatusTracker : GLib.Object {
             this.sync_problems.erase (item.destination ());
         }
 
-        SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.IsShared) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
+        SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
         if (item.instruction != CSYNC_INSTRUCTION_NONE
             && item.instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
             && item.instruction != CSYNC_INSTRUCTION_IGNORE
@@ -373,7 +373,7 @@ class SyncFileStatusTracker : GLib.Object {
         // First look it up in the database to know if it's shared
         SyncJournalFileRecord record;
         if (this.sync_engine.journal ().get_file_record (relative_path, record) && record.is_valid ()) {
-            return resolve_sync_and_error_status (relative_path, record.remote_perm.has_permission (RemotePermissions.IsShared) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED);
+            return resolve_sync_and_error_status (relative_path, record.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED);
         }
 
         // Must be a new file not yet in the database, check if it's syncing or has an error.

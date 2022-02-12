@@ -161,7 +161,7 @@ class SyncOptions {
     A pattern like /own.*\/.*txt matching the full path
     ***********************************************************/
     public void path_pattern (string pattern) {
-        this.file_regex.pattern_options (Utility.fs_case_preserving () ? QRegularExpression.Case_insensitive_option : QRegularExpression.No_pattern_option);
+        this.file_regex.pattern_options (Utility.fs_case_preserving () ? QRegularExpression.CaseInsensitiveOption : QRegularExpression.NoPatternOption);
         this.file_regex.pattern (pattern);
     }
 

@@ -398,7 +398,7 @@ signals:
         // Can never manually be set to "partial".
         // This works because the state cycle for clicking is
         // unchecked . partial . checked . unchecked.
-        if (this.ui.permissions_edit.check_state () == Qt.Partially_checked) {
+        if (this.ui.permissions_edit.check_state () == Qt.PartiallyChecked) {
             this.ui.permissions_edit.check_state (Qt.Checked);
         }
 
@@ -569,7 +569,7 @@ signals:
                                              (perm & Share_permission_create && perm & Share_permission_delete))) {
             this.ui.permissions_edit.check_state (Qt.Checked);
         } else if (!this.is_file && perm & (Share_permission_update | Share_permission_create | Share_permission_delete)) {
-            this.ui.permissions_edit.check_state (Qt.Partially_checked);
+            this.ui.permissions_edit.check_state (Qt.PartiallyChecked);
         } else if (perm & Share_permission_read) {
             this.ui.permissions_edit.check_state (Qt.Unchecked);
         }

@@ -160,7 +160,7 @@ class OcsProfileConnector : GLib.Object {
         if (Occ.Theme.is_hidpi ()) {
             image_size = QSize{32, 32};
         }
-        Gtk.Image scaled_svg (image_size, Gtk.Image.Format_ARGB32);
+        Gtk.Image scaled_svg (image_size, Gtk.Image.FormatARGB32);
         scaled_svg.fill ("transparent");
         QPainter svg_painter{&scaled_svg};
         svg_renderer.render (&svg_painter);

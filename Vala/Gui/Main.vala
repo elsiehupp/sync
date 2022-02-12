@@ -63,7 +63,7 @@ int main (int argc, char **argv) {
 
     // OpenSSL 1.1.0 : No explicit initialisation or de-initialisation is necessary.
 
-    QCoreApplication.attribute (Qt.AA_Use_high_dpi_pixmaps, true);
+    QCoreApplication.attribute (Qt.AAUseHighDpiPixmaps, true);
     QCoreApplication.attribute (Qt.AA_Enable_high_dpi_scaling, true);
     Occ.Application app (argc, argv);
 

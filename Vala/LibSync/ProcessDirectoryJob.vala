@@ -409,9 +409,9 @@ class ProcessDirectoryJob : GLib.Object {
             if (!error_message.is_empty ()) {
                 var item = SyncFileItemPtr.create ();
                 if (entry.local_entry.is_directory) {
-                    item.type = CSync_enums.ItemTypeDirectory;
+                    item.type = CSyncEnums.ItemTypeDirectory;
                 } else {
-                    item.type = CSync_enums.ItemTypeFile;
+                    item.type = CSyncEnums.ItemTypeFile;
                 }
                 item.file = path.target;
                 item.original_file = path.target;
@@ -1249,7 +1249,7 @@ class ProcessDirectoryJob : GLib.Object {
                 && db_entry.modtime == local_entry.modtime
                 && local_entry.size == 1) {
                 // A suffix vfs file can be downloaded by renaming it to remove the suffix.
-                // This check leaks some details of Vfs_suffix, particularly the size of placeholders.
+                // This check leaks some details of VfsSuffix, particularly the size of placeholders.
                 item.direction = SyncFileItem.Direction.DOWN;
                 if (no_server_entry) {
                     item.instruction = CSYNC_INSTRUCTION_REMOVE;
@@ -1745,12 +1745,12 @@ class ProcessDirectoryJob : GLib.Object {
             if (perms.is_null ()) {
                 // No permissions set
                 return true;
-            } else if (item.is_directory () && !perms.has_permission (RemotePermissions.Can_add_sub_directories)) {
+            } else if (item.is_directory () && !perms.has_permission (RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES)) {
                 GLib.warning ("check_for_permission : ERROR" + item.file;
                 item.instruction = CSYNC_INSTRUCTION_ERROR;
                 item.error_string = _("Not allowed because you don't have permission to add subfolders to that folder");
                 return false;
-            } else if (!item.is_directory () && !perms.has_permission (RemotePermissions.Can_add_file)) {
+            } else if (!item.is_directory () && !perms.has_permission (RemotePermissions.Permissions.CAN_ADD_FILE)) {
                 GLib.warning ("check_for_permission : ERROR" + item.file;
                 item.instruction = CSYNC_INSTRUCTION_ERROR;
                 item.error_string = _("Not allowed because you don't have permission to add files in that folder");
@@ -1764,7 +1764,7 @@ class ProcessDirectoryJob : GLib.Object {
                 // No permissions set
                 return true;
             }
-            if (!perms.has_permission (RemotePermissions.Can_write)) {
+            if (!perms.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
                 item.instruction = CSYNC_INSTRUCTION_CONFLICT;
                 item.error_string = _("Not allowed to upload this file because it is read-only on the server, restoring");
                 item.direction = SyncFileItem.Direction.DOWN;
@@ -1797,7 +1797,7 @@ class ProcessDirectoryJob : GLib.Object {
                 // No permissions set
                 return true;
             }
-            if (!perms.has_permission (RemotePermissions.Can_delete)) {
+            if (!perms.has_permission (RemotePermissions.Permissions.CAN_DELETE)) {
                 item.instruction = CSYNC_INSTRUCTION_NEW;
                 item.direction = SyncFileItem.Direction.DOWN;
                 item.is_restoration = true;
@@ -1831,8 +1831,8 @@ class ProcessDirectoryJob : GLib.Object {
         bool destination_oK = true;
         bool destination_new_oK = true;
         if (dest_perms.is_null ()) {
-        } else if ( (is_directory && !dest_perms.has_permission (RemotePermissions.Can_add_sub_directories)) ||
-                  (!is_directory && !dest_perms.has_permission (RemotePermissions.Can_add_file))) {
+        } else if ( (is_directory && !dest_perms.has_permission (RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES)) ||
+                  (!is_directory && !dest_perms.has_permission (RemotePermissions.Permissions.CAN_ADD_FILE))) {
             destination_new_oK = false;
         }
         if (!is_rename && !destination_new_oK) {
@@ -1843,8 +1843,8 @@ class ProcessDirectoryJob : GLib.Object {
         // check if we are allowed to move from the source
         bool source_oK = true;
         if (!file_perms.is_null ()
-            && ( (is_rename && !file_perms.has_permission (RemotePermissions.Can_rename))
-                    || (!is_rename && !file_perms.has_permission (RemotePermissions.Can_move)))) {
+            && ( (is_rename && !file_perms.has_permission (RemotePermissions.Permissions.CAN_RENAME))
+                    || (!is_rename && !file_perms.has_permission (RemotePermissions.Permissions.CAN_MOVE)))) {
             // We are not allowed to move or rename this file
             source_oK = false;
         }

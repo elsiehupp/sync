@@ -243,7 +243,7 @@ GLib.List<GLib.Object> all_objects (GLib.List<Gtk.Widget> widgets) {
 GLib.Object find_widget (string query_string, GLib.List<Gtk.Widget> widgets = QApplication.all_widgets ()) {
     var objects = all_objects (widgets);
 
-    GLib.List<GLib.Object>.Const_iterator found_widget;
+    GLib.List<GLib.Object>.ConstIterator found_widget;
 
     if (query_string.contains ('>')) {
         GLib.debug ("query_string contains >";
@@ -376,7 +376,7 @@ SocketApi.SocketApi (GLib.Object parent) {
         GLib.debug ("creating" + info.dir ().path () + result;
         if (result) {
             GLib.File.permissions (socket_path,
-                GLib.File.Permissions (GLib.File.Read_owner + GLib.File.Write_owner + GLib.File.Exe_owner));
+                GLib.File.Permissions (GLib.File.Read_owner + GLib.File.WriteOwner + GLib.File.Exe_owner));
         }
     }
     if (!this.local_server.listen (socket_path)) {
@@ -913,8 +913,8 @@ void SocketApi.command_MOVE_ITEM (string local_file, Socket_listener *) {
     // If the parent doesn't accept new files, go to the root of the sync folder
     QFileInfo file_info (local_file);
     const var parent_record = parent_dir.journal_record ();
-    if ( (file_info.is_file () && !parent_record.remote_perm.has_permission (RemotePermissions.Can_add_file))
-        || (file_info.is_dir () && !parent_record.remote_perm.has_permission (RemotePermissions.Can_add_sub_directories))) {
+    if ( (file_info.is_file () && !parent_record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_ADD_FILE))
+        || (file_info.is_dir () && !parent_record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES))) {
         default_dir_and_name = QFileInfo (default_dir_and_name).filename ();
     }
 
@@ -1013,7 +1013,7 @@ void SocketApi.send_sharing_context_menu_options (File_data file_data, Socket_li
 
     // If sharing is globally disabled, do not show any sharing entries.
     // If there is no permission to share for this file, add a disabled entry saying so
-    if (is_on_signal_the_server && !record.remote_perm.is_null () && !record.remote_perm.has_permission (RemotePermissions.Can_reshare)) {
+    if (is_on_signal_the_server && !record.remote_perm.is_null () && !record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_RESHARE)) {
         listener.on_signal_send_message (QLatin1String ("MENU_ITEM:DISABLED:d:") + (!record.is_directory () ? _("Resharing this file is not allowed") : _("Resharing this folder is not allowed")));
     } else {
         listener.on_signal_send_message (QLatin1String ("MENU_ITEM:SHARE") + flag_string + _("Share options"));
@@ -1143,13 +1143,13 @@ void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener list
             const var parent_record = parent_dir.journal_record ();
             const bool can_add_to_dir =
                 !parent_record.is_valid () // We're likely at the root of the sync folder, got to assume we can add there
-                || (file_info.is_file () && parent_record.remote_perm.has_permission (RemotePermissions.Can_add_file))
-                || (file_info.is_dir () && parent_record.remote_perm.has_permission (RemotePermissions.Can_add_sub_directories));
+                || (file_info.is_file () && parent_record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_ADD_FILE))
+                || (file_info.is_dir () && parent_record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES));
             const bool can_change_file =
                 !is_on_signal_the_server
-                || (record.remote_perm.has_permission (RemotePermissions.Can_delete)
-                       && record.remote_perm.has_permission (RemotePermissions.Can_move)
-                       && record.remote_perm.has_permission (RemotePermissions.Can_rename));
+                || (record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_DELETE)
+                       && record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_MOVE)
+                       && record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_RENAME));
 
             if (is_conflict && can_change_file) {
                 if (can_add_to_dir) {

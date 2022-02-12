@@ -1,4 +1,4 @@
 
-class GlobalWheelFilter_singleton {
+class GlobalWheelFilterSingleton {
     public GlobalWheelFilter self;
 }

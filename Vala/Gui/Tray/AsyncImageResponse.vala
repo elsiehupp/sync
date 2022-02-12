@@ -88,7 +88,7 @@ private slots:
                 // SVG image needs proper scaling, let's do it with QPainter and QSvgRenderer
                 QSvgRenderer svg_renderer;
                 if (svg_renderer.on_signal_load (image_data)) {
-                    Gtk.Image scaled_svg (this.requested_image_size, Gtk.Image.Format_ARGB32);
+                    Gtk.Image scaled_svg (this.requested_image_size, Gtk.Image.FormatARGB32);
                     scaled_svg.fill ("transparent");
                     QPainter painter_for_svg (&scaled_svg);
                     svg_renderer.render (&painter_for_svg);

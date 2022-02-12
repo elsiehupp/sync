@@ -182,7 +182,7 @@ class FolderStatusDelegate : QStyledItemDelegate {
             // Hack : Windows Vista's light blue is not contrasting enough for white
 
             // (code from QWindows_vista_style.draw_control for CE_Item_view_item)
-            palette.on_signal_color (QPalette.All, QPalette.Highlighted_text, palette.color (QPalette.Active, QPalette.Text));
+            palette.on_signal_color (QPalette.All, QPalette.HighlightedText, palette.color (QPalette.Active, QPalette.Text));
             palette.on_signal_color (QPalette.All, QPalette.Highlight, palette.base ().color ().darker (108));
         }
 
@@ -193,7 +193,7 @@ class FolderStatusDelegate : QStyledItemDelegate {
             cg = QPalette.Inactive;
 
         if (option.state & QStyle.State_Selected) {
-            painter.pen (palette.color (cg, QPalette.Highlighted_text));
+            painter.pen (palette.color (cg, QPalette.HighlightedText));
         } else {
             painter.pen (palette.color (cg, QPalette.Text));
         }

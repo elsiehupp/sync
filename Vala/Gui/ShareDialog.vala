@@ -5,7 +5,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 ***********************************************************/
 
 //  #include <QFileInfo>
-//  #include <QFile_icon_provider>
+//  #include <QFileIconProvider>
 //  #include <QInputDialog>
 //  #include <QPointer>
 //  #include <QPushButton>
@@ -119,7 +119,7 @@ signals:
 
         // Set icon
         QFileInfo f_info (this.local_path);
-        QFile_icon_provider icon_provider;
+        QFileIconProvider icon_provider;
         QIcon icon = icon_provider.icon (f_info);
         var pixmap = icon.pixmap (thumbnail_size, thumbnail_size);
         if (pixmap.width () > 0) {

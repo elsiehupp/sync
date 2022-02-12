@@ -16,47 +16,47 @@ class PreparedSqlQueryManager {
     /***********************************************************
     ***********************************************************/
     public enum Key {
-        Key.GET_FILE_RECORD_QUERY,
-        Key.GET_FILE_RECORD_QUERY_BY_MANGLED_NAME,
-        Key.GET_FILE_RECORD_QUERY_BY_INODE,
-        Key.GET_FILE_RECORD_QUERY_BY_FILE_ID,
-        Key.GET_FILES_BELOW_PATH_QUERY,
-        Key.GET_ALL_FILES_QUERY,
-        Key.LIST_FILES_IN_PATH_QUERY,
-        Key.SET_FILE_RECORD_QUERY,
-        Key.SET_FILE_RECORD_CHECKSUM_QUERY,
-        Key.SET_FILE_LOCAL_METADATA_QUERY,
-        Key.GET_DOWNLOAD_INFO_QUERY,
-        Key.SET_DOWNLOAD_INFO_QUERY,
-        Key.DELETE_DOWNLOAD_INFO_QUERY,
-        Key.GET_UPLOAD_INFO_QUERY,
-        Key.SET_UPLOAD_INFO_QUERY,
-        Key.DELETE_UPLOAD_INFO_QUERY,
-        Key.DELETE_FILE_RECORD_PHASH,
-        Key.DELETE_FILE_RECORD_RECURSIVELY,
-        GetErrorBlocklistQuery,
-        SetErrorBlocklistQuery,
-        Get_selective_sync_list_query,
-        Get_checksum_type_id_query,
-        Get_checksum_type_query,
-        Insert_checksum_type_query,
-        Get_data_fingerprint_query,
-        Set_data_fingerprint_query1,
-        Set_data_fingerprint_query2,
-        SetKeyValueStoreQuery,
-        GetKeyValueStoreQuery,
-        DeleteKeyValueStoreQuery,
-        Get_conflict_record_query,
-        Set_conflict_record_query,
-        Delete_conflict_record_query,
-        Get_raw_pin_state_query,
-        Get_effective_pin_state_query,
-        Get_sub_pins_query,
-        Count_dehydrated_files_query,
-        Set_pin_state_query,
-        Wipe_pin_state_query,
+        GET_FILE_RECORD_QUERY,
+        GET_FILE_RECORD_QUERY_BY_MANGLED_NAME,
+        GET_FILE_RECORD_QUERY_BY_INODE,
+        GET_FILE_RECORD_QUERY_BY_FILE_ID,
+        GET_FILES_BELOW_PATH_QUERY,
+        GET_ALL_FILES_QUERY,
+        LIST_FILES_IN_PATH_QUERY,
+        SET_FILE_RECORD_QUERY,
+        SET_FILE_RECORD_CHECKSUM_QUERY,
+        SET_FILE_LOCAL_METADATA_QUERY,
+        GET_DOWNLOAD_INFO_QUERY,
+        SET_DOWNLOAD_INFO_QUERY,
+        DELETE_DOWNLOAD_INFO_QUERY,
+        GET_UPLOAD_INFO_QUERY,
+        SET_UPLOAD_INFO_QUERY,
+        DELETE_UPLOAD_INFO_QUERY,
+        DELETE_FILE_RECORD_PHASH,
+        DELETE_FILE_RECORD_RECURSIVELY,
+        GET_ERROR_BLOCKLIST_QUERY,
+        SET_ERROR_BLOCKLIST_QUERY,
+        GET_SELECTIVE_SYNC_LIST_QUERY,
+        GET_CHECKSUM_TYPE_ID_QUERY,
+        GET_CHECKSUM_TYPE_QUERY,
+        INSERT_CHECKSUM_TYPE_QUERY,
+        GET_DATA_FINGERPRINT_QUERY,
+        SET_DATA_FINGERPRINT_QUERY1,
+        SET_DATA_FINGERPRINT_QUERY2,
+        SET_KEY_VALUE_STORE_QUERY,
+        GET_KEY_VALUE_STORE_QUERY,
+        DELETE_KEY_VALUE_STORE_QUERY,
+        GET_CONFLICT_RECORD_QUERY,
+        SET_CONFLICT_RECORD_QUERY,
+        DELETE_CONFLICT_RECORD_QUERY,
+        GET_RAW_PIN_STATE_QUERY,
+        GET_EFFECTIVE_PIN_STATE_QUERY,
+        GET_SUB_PINS_QUERY,
+        COUNT_DEHYDRATED_FILES_QUERY,
+        SET_PIN_STATE_QUERY,
+        WIPE_PIN_STATE_QUERY,
 
-        Prepared_query_count
+        PREPARED_QUERY_COUNT
     }
 
 
@@ -71,7 +71,7 @@ class PreparedSqlQueryManager {
     public const PreparedSqlQuery get (Key key) {
         var query = this.queries[key];
         ENFORCE (query.stmt)
-        //  Q_ASSERT (!Sqlite3Stmt_busy (query.stmt));
+        //  Q_ASSERT (!Sqlite3StmtBusy (query.stmt));
         return {
             query
         }
@@ -83,7 +83,7 @@ class PreparedSqlQueryManager {
     ***********************************************************/
     public const PreparedSqlQuery get (Key key, GLib.ByteArray sql, SqlDatabase database) {
         var query = this.queries[key];
-        //  Q_ASSERT (!Sqlite3Stmt_busy (query.stmt));
+        //  Q_ASSERT (!Sqlite3StmtBusy (query.stmt));
         ENFORCE (!query.sqldb || database == query.sqldb)
         if (!query.stmt) {
             query.sqldb = database;
@@ -100,7 +100,7 @@ class PreparedSqlQueryManager {
 
     /***********************************************************
     ***********************************************************/
-    private SqlQuery this.queries[Prepared_query_count];
+    private SqlQuery this.queries[Key.PREPARED_QUERY_COUNT];
     private Q_DISABLE_COPY (PreparedSqlQueryManager)
 }
 

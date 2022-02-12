@@ -475,9 +475,9 @@ class ActivityListModel : QAbstractListModel {
 
             var folder = FolderMan.instance ().folder (activity.folder);
             const var folder_dir = QDir (folder.path ());
-            this.current_invalid_filename_dialog = new Invalid_filename_dialog (this.account_state.account (), folder,
+            this.current_invalid_filename_dialog = new InvalidFilenameDialog (this.account_state.account (), folder,
                 folder_dir.file_path (activity.file));
-            connect (this.current_invalid_filename_dialog, &Invalid_filename_dialog.accepted, folder, [folder] () {
+            connect (this.current_invalid_filename_dialog, &InvalidFilenameDialog.accepted, folder, [folder] () {
                 folder.schedule_this_folder_soon ();
             });
             this.current_invalid_filename_dialog.open ();

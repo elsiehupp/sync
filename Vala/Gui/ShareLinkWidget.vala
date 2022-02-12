@@ -188,7 +188,7 @@ signals:
     QAction this.unshare_link_action;
     QAction this.add_another_link_action;
     QAction this.note_link_action;
-    QHBox_layout this.share_link_layout{};
+    QHBoxLayout this.share_link_layout{};
     Gtk.Label this.share_link_label{};
     ElidedLabel this.share_link_elided_label{};
     QLineEdit this.share_link_edit{};
@@ -361,7 +361,7 @@ void Share_link_widget.setup_ui_options () {
     display_share_link_label ();
     this.ui.horizontal_layout.insert_widget (2, this.share_link_elided_label);
 
-    this.share_link_layout = new QHBox_layout (this);
+    this.share_link_layout = new QHBoxLayout (this);
 
     this.share_link_label = new Gtk.Label (this);
     this.share_link_label.pixmap (string (":/client/theme/black/edit.svg"));

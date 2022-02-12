@@ -182,14 +182,14 @@ class ExcludedFiles : GLib.Object {
     ***********************************************************/
     private CSYNC_EXCLUDE_TYPE full_pattern_match (string path, ItemType filetype);
 
-    // Our Base_path need to end with '/'
-    private class Base_path_string : string {
-        public Base_path_string (string other)
+    // Our BasePath need to end with '/'
+    private class BasePathString : string {
+        public BasePathString (string other)
             : string (std.move (other)) {
             //  Q_ASSERT (ends_with ('/'));
         }
 
-        public Base_path_string (string other)
+        public BasePathString (string other)
             : string (other) {
             //  Q_ASSERT (ends_with ('/'));
         }
@@ -225,7 +225,7 @@ class ExcludedFiles : GLib.Object {
     full matcher would exclude. Example: "b" is excluded. traversal ("b/c")
     returns not-excluded because "c" isn't a bname activation pattern.
     ***********************************************************/
-    private void prepare (Base_path_string base_path);
+    private void prepare (BasePathString base_path);
 
     /***********************************************************
     ***********************************************************/
@@ -241,21 +241,21 @@ class ExcludedFiles : GLib.Object {
     private string this.local_path;
 
     /// Files to load excludes from
-    private GLib.HashMap<Base_path_string, string[]> this.exclude_files;
+    private GLib.HashMap<BasePathString, string[]> this.exclude_files;
 
     /// Exclude patterns added with add_manual_exclude ()
-    private GLib.HashMap<Base_path_string, string[]> this.manual_excludes;
+    private GLib.HashMap<BasePathString, string[]> this.manual_excludes;
 
     /// List of all active exclude patterns
-    private GLib.HashMap<Base_path_string, string[]> this.all_excludes;
+    private GLib.HashMap<BasePathString, string[]> this.all_excludes;
 
     /// see prepare ()
-    private GLib.HashMap<Base_path_string, QRegularExpression> this.bname_traversal_regex_file;
-    private GLib.HashMap<Base_path_string, QRegularExpression> this.bname_traversal_regex_dir;
-    private GLib.HashMap<Base_path_string, QRegularExpression> this.full_traversal_regex_file;
-    private GLib.HashMap<Base_path_string, QRegularExpression> this.full_traversal_regex_dir;
-    private GLib.HashMap<Base_path_string, QRegularExpression> this.full_regex_file;
-    private GLib.HashMap<Base_path_string, QRegularExpression> this.full_regex_dir;
+    private GLib.HashMap<BasePathString, QRegularExpression> this.bname_traversal_regex_file;
+    private GLib.HashMap<BasePathString, QRegularExpression> this.bname_traversal_regex_dir;
+    private GLib.HashMap<BasePathString, QRegularExpression> this.full_traversal_regex_file;
+    private GLib.HashMap<BasePathString, QRegularExpression> this.full_traversal_regex_dir;
+    private GLib.HashMap<BasePathString, QRegularExpression> this.full_regex_file;
+    private GLib.HashMap<BasePathString, QRegularExpression> this.full_regex_dir;
 
     /***********************************************************
     ***********************************************************/
@@ -279,7 +279,7 @@ class ExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private friend class Test_excluded_files;
+    private friend class TestExcludedFiles;
 }
 
 
@@ -529,7 +529,7 @@ ExcludedFiles.ExcludedFiles (string local_path)
     : this.local_path (local_path)
     this.client_version (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH) {
     //  Q_ASSERT (this.local_path.ends_with (QStringLiteral ("/")));
-    // Windows used to use Path_match_spec which allows foo to match abc/deffoo.
+    // Windows used to use PathMatchSpec which allows foo to match abc/deffoo.
     this.wildcards_match_slash = Utility.is_windows ();
 
     // We're in a detached exclude probably coming from a partial sync or test
@@ -639,11 +639,11 @@ bool ExcludedFiles.on_signal_reload_exclude_files () {
 bool ExcludedFiles.version_directive_keep_next_line (GLib.ByteArray directive) {
     if (!directive.starts_with ("#!version"))
         return true;
-    QByte_array_list args = directive.split (' ');
+    QByteArrayList args = directive.split (' ');
     if (args.size () != 3)
         return true;
     GLib.ByteArray op = args[1];
-    QByte_array_list arg_versions = args[2].split ('.');
+    QByteArrayList arg_versions = args[2].split ('.');
     if (arg_versions.size () != 3)
         return true;
 
@@ -733,7 +733,7 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
     string base_path (this.local_path + path);
     while (base_path.size () > this.local_path.size ()) {
         base_path = left_include_last (base_path, '/');
-        QRegular_expression_match m;
+        QRegularExpressionMatch m;
         if (filetype == ItemTypeDirectory
             && this.bname_traversal_regex_dir.contains (base_path)) {
             m = this.bname_traversal_regex_dir[base_path].match (bname_str);
@@ -757,7 +757,7 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
     base_path = this.local_path + path;
     while (base_path.size () > this.local_path.size ()) {
         base_path = left_include_last (base_path, '/');
-        QRegular_expression_match m;
+        QRegularExpressionMatch m;
         if (filetype == ItemTypeDirectory
             && this.full_traversal_regex_dir.contains (base_path)) {
             m = this.full_traversal_regex_dir[base_path].match (path);
@@ -795,7 +795,7 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.full_pattern_match (string p, ItemType filetype
     string base_path (this.local_path + path);
     while (base_path.size () > this.local_path.size ()) {
         base_path = left_include_last (base_path, '/');
-        QRegular_expression_match m;
+        QRegularExpressionMatch m;
         if (filetype == ItemTypeDirectory
             && this.full_regex_dir.contains (base_path)) {
             m = this.full_regex_dir[base_path].match (p);
@@ -926,7 +926,7 @@ string ExcludedFiles.extract_bname_trigger (string exclude, bool wildcards_match
 
     // Otherwise it's more complicated. Examples:
     // - "foo*bar" can match "foo_x/Xbar", pattern is "*bar"
-    // - "foo*bar*" can match "foo_x/Xbar_x", pattern is "*bar*"
+    // - "foo*bar*" can match "foo_x/XbarX", pattern is "*bar*"
     // - "foo?bar" can match "foo/bar" but also "foo_xbar", pattern is "*bar"
 
     var is_wildcard = [] (char c) {
@@ -967,7 +967,7 @@ void ExcludedFiles.prepare () {
         prepare (base_path);
 }
 
-void ExcludedFiles.prepare (Base_path_string & base_path) {
+void ExcludedFiles.prepare (BasePathString & base_path) {
     //  Q_ASSERT (this.all_excludes.contains (base_path));
 
     // Build regular expressions for the different cases.
@@ -988,7 +988,7 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
     // * "]" patterns mean "EXCLUDE_AND_REMOVE", they get collected in the
     //   pattern strings ending in "Remove". The others go to "Keep".
     // * trailing-slash patterns match directories only. They get collected
-    //   in the pattern strings saying "Dir", the others go into "File_dir"
+    //   in the pattern strings saying "Dir", the others go into "FileDir"
     //   because they match files and directories.
 
     string full_file_dir_keep;
@@ -1137,9 +1137,9 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
                        " (?:^|/) (?:%7|%8) (?:$|/))")
             .arg (full_file_dir_keep, full_dir_keep, bname_file_dir_keep, bname_dir_keep, full_file_dir_remove, full_dir_remove, bname_file_dir_remove, bname_dir_remove));
 
-    QRegularExpression.Pattern_options pattern_options = QRegularExpression.No_pattern_option;
+    QRegularExpression.PatternOptions pattern_options = QRegularExpression.NoPatternOption;
     if (Occ.Utility.fs_case_preserving ())
-        pattern_options |= QRegularExpression.Case_insensitive_option;
+        pattern_options |= QRegularExpression.CaseInsensitiveOption;
     this.bname_traversal_regex_file[base_path].pattern_options (pattern_options);
     this.bname_traversal_regex_file[base_path].optimize ();
     this.bname_traversal_regex_dir[base_path].pattern_options (pattern_options);

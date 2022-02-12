@@ -150,14 +150,14 @@ Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fil
         }
 
         // render source image
-        Gtk.Image svg_image (req_size, Gtk.Image.Format_ARGB32); {
+        Gtk.Image svg_image (req_size, Gtk.Image.FormatARGB32); {
             QPainter svg_image_painter (&svg_image);
-            svg_image.fill (Qt.Global_color.transparent);
+            svg_image.fill (Qt.GlobalColor.transparent);
             svg_renderer.render (&svg_image_painter);
         }
 
         // draw target image with custom fill_color
-        Gtk.Image image (req_size, Gtk.Image.Format_ARGB32);
+        Gtk.Image image (req_size, Gtk.Image.FormatARGB32);
         image.fill (Gtk.Color (fill_color)); {
             QPainter image_painter (&image);
             image_painter.composition_mode (QPainter.Composition_mode_Destination_in);

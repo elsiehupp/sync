@@ -49,7 +49,7 @@ const int BITFIELD (size) : (size+1)
 const int BITFIELD (size) :size
 //  #endif
 
-namespace CSync_enums {
+namespace CSyncEnums {
 OCSYNC_EXPORT Q_NAMESPACE
 
 enum csync_status_codes_e {
@@ -159,8 +159,8 @@ enum ItemType {
 Q_ENUM_NS (ItemType)
 }
 
-using namespace CSync_enums;
-using CSYNC_STATUS = CSync_enums.csync_status_codes_e;
+using namespace CSyncEnums;
+using CSYNC_STATUS = CSyncEnums.csync_status_codes_e;
 typedef struct csync_file_stat_s csync_file_stat_t;
 
 struct OCSYNC_EXPORT csync_file_stat_s {

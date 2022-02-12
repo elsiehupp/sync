@@ -245,7 +245,7 @@ class SqlQuery {
     /***********************************************************
     ***********************************************************/
     public NextResult next () {
-        const bool first_step = !Sqlite3Stmt_busy (this.stmt);
+        const bool first_step = !Sqlite3StmtBusy (this.stmt);
 
         int n = 0;
         while (true) {

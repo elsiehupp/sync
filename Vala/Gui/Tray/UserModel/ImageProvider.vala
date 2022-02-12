@@ -18,8 +18,8 @@ class ImageProvider : QQuickImageProvider {
         //  Q_UNUSED (requested_size)
 
         const var make_icon = [] (string path) {
-            Gtk.Image image (128, 128, Gtk.Image.Format_ARGB32);
-            image.fill (Qt.Global_color.transparent);
+            Gtk.Image image (128, 128, Gtk.Image.FormatARGB32);
+            image.fill (Qt.GlobalColor.transparent);
             QPainter painter (&image);
             QSvgRenderer renderer (path);
             renderer.render (&painter);

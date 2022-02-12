@@ -11,12 +11,12 @@ Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
 //  #include <QAction>
 //  #include <QApplication>
 //  #include <QEvent>
-//  #include <QGrid_layout>
-//  #include <QHBox_layout>
+//  #include <QGridLayout>
+//  #include <QHBoxLayout>
 //  #include <QLabel>
 //  #include <QPainter>
-//  #include <QShow_event>
-//  #include <QTime_line>
+//  #include <QShowEvent>
+//  #include <QTimeLine>
 //  #include <QToolButton>
 //  #include <QStyle>
 
@@ -33,13 +33,13 @@ class KMessageWidgetPrivate {
     public QLabel icon_label = null;
     public QLabel text_label = null;
     public QToolButton close_button = null;
-    public QTime_line time_line = null;
+    public QTimeLine time_line = null;
     public QIcon icon;
     public bool ignore_show_event_doing_animated_show = false;
 
     /***********************************************************
     ***********************************************************/
-    public KMessageWidget.Message_type message_type;
+    public KMessageWidget.MessageType message_type;
     public bool word_wrap;
     public GLib.List<QToolButton> buttons;
     public QPixmap content_snap_shot;
@@ -81,26 +81,26 @@ class KMessageWidgetPrivate {
     void KMessageWidgetPrivate.on_init (KMessageWidget q_ptr) {
         q = q_ptr;
 
-        q.set_size_policy (QSize_policy.Minimum, QSize_policy.Fixed);
+        q.set_size_policy (QSizePolicy.Minimum, QSizePolicy.Fixed);
 
-        // Note: when changing the value 500, also update KMessage_widget_test
-        time_line = new QTime_line (500, q);
+        // Note: when changing the value 500, also update KMessageWidgetTest
+        time_line = new QTimeLine (500, q);
         GLib.Object.connect (time_line, SIGNAL (value_changed (qreal)), q, SLOT (on_time_line_changed (qreal)));
         GLib.Object.connect (time_line, SIGNAL (on_finished ()), q, SLOT (on_time_line_finished ()));
 
         content = new QFrame (q);
         content.set_object_name ("content_widget");
-        content.set_size_policy (QSize_policy.Expanding, QSize_policy.Fixed);
+        content.set_size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
 
         word_wrap = false;
 
         icon_label = new QLabel (content);
-        icon_label.set_size_policy (QSize_policy.Fixed, QSize_policy.Fixed);
+        icon_label.set_size_policy (QSizePolicy.Fixed, QSizePolicy.Fixed);
         icon_label.hide ();
 
         text_label = new QLabel (content);
-        text_label.set_size_policy (QSize_policy.Expanding, QSize_policy.Fixed);
-        text_label.set_text_interaction_flags (Qt.Text_browser_interaction);
+        text_label.set_size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
+        text_label.set_text_interaction_flags (Qt.TextBrowserInteraction);
         GLib.Object.connect (text_label, &QLabel.link_activated, q, &KMessageWidget.link_activated);
         GLib.Object.connect (text_label, &QLabel.link_hovered, q, &KMessageWidget.link_hovered);
 
@@ -129,27 +129,27 @@ class KMessageWidgetPrivate {
         Q_FOREACH (QAction action, q.actions ()) {
             var button = new QToolButton (content);
             button.set_default_action (action);
-            button.set_tool_button_style (Qt.Tool_button_text_beside_icon);
+            button.set_tool_button_style (Qt.ToolButtonTextBesideIcon);
             buttons.append (button);
         }
 
-        // Auto_raise reduces visual clutter, but we don't want to turn it on if
+        // AutoRaise reduces visual clutter, but we don't want to turn it on if
         // there are other buttons, otherwise the close button will look different
         // from the others.
         close_button.set_auto_raise (buttons.is_empty ());
 
         if (word_wrap) {
-            var layout = new QGrid_layout (content);
+            var layout = new QGridLayout (content);
             // Set alignment to make sure icon does not move down if text wraps
-            layout.add_widget (icon_label, 0, 0, 1, 1, Qt.Align_hCenter | Qt.Align_top);
+            layout.add_widget (icon_label, 0, 0, 1, 1, Qt.AlignHCenter | Qt.AlignTop);
             layout.add_widget (text_label, 0, 1);
 
             if (buttons.is_empty ()) {
                 // Use top-vertical alignment like the icon does.
-                layout.add_widget (close_button, 0, 2, 1, 1, Qt.Align_hCenter | Qt.Align_top);
+                layout.add_widget (close_button, 0, 2, 1, 1, Qt.AlignHCenter | Qt.AlignTop);
             } else {
                 // Use an additional layout in row 1 for the buttons.
-                var button_layout = new QHBox_layout;
+                var button_layout = new QHBoxLayout;
                 button_layout.add_stretch ();
                 Q_FOREACH (QToolButton button, buttons) {
                     // For some reason, calling show () is necessary if wordwrap is true,
@@ -162,7 +162,7 @@ class KMessageWidgetPrivate {
                 layout.add_item (button_layout, 1, 0, 1, 2);
             }
         } else {
-            var layout = new QHBox_layout (content);
+            var layout = new QHBoxLayout (content);
             layout.add_widget (icon_label);
             layout.add_widget (text_label);
 
@@ -182,21 +182,21 @@ class KMessageWidgetPrivate {
     void KMessageWidgetPrivate.apply_style_sheet () {
         Gtk.Color bg_base_color;
 
-        // We have to hardcode colors here because KWidgets_addons is a tier 1 framework
+        // We have to hardcode colors here because KWidgetsAddons is a tier 1 framework
         // and therefore can't depend on any other KDE Frameworks
         // The following RGB color values come from the "default" scheme in kcolorscheme
         switch (message_type) {
         case KMessageWidget.Positive:
-            bg_base_color.set_rgb (39, 174,  96); // Window : Foreground_positive
+            bg_base_color.set_rgb (39, 174,  96); // Window : ForegroundPositive
             break;
         case KMessageWidget.Information:
-            bg_base_color.set_rgb (61, 174, 233); // Window : Foreground_active
+            bg_base_color.set_rgb (61, 174, 233); // Window : ForegroundActive
             break;
         case KMessageWidget.Warning:
-            bg_base_color.set_rgb (246, 116, 0); // Window : Foreground_neutral
+            bg_base_color.set_rgb (246, 116, 0); // Window : ForegroundNeutral
             break;
         case KMessageWidget.Error:
-            bg_base_color.set_rgb (218, 68, 83); // Window : Foreground_negative
+            bg_base_color.set_rgb (218, 68, 83); // Window : ForegroundNegative
             break;
         }
         const qreal bg_base_color_alpha = 0.2;
@@ -225,8 +225,8 @@ class KMessageWidgetPrivate {
                                  )
             .arg (bg_final_color.name ())
             .arg (border.name ())
-            // Default_frame_width returns the size of the external margin + border width. We know our border is 1px, so we subtract this from the frame normal QStyle Frame_width to get our margin
-            .arg (q.style ().pixel_metric (QStyle.PM_Default_frame_width, null, q) - 1)
+            // DefaultFrameWidth returns the size of the external margin + border width. We know our border is 1px, so we subtract this from the frame normal QStyle FrameWidth to get our margin
+            .arg (q.style ().pixel_metric (QStyle.PM_DefaultFrameWidth, null, q) - 1)
             .arg (text_color.name ())
         );
     }
@@ -245,7 +245,7 @@ class KMessageWidgetPrivate {
         content_snap_shot = QPixmap (content.size () * q.device_pixel_ratio ());
         content_snap_shot.set_device_pixel_ratio (q.device_pixel_ratio ());
         content_snap_shot.fill (Qt.transparent);
-        content.render (&content_snap_shot, QPoint (), QRegion (), Gtk.Widget.Draw_children);
+        content.render (&content_snap_shot, QPoint (), QRegion (), Gtk.Widget.DrawChildren);
     }
 
     void KMessageWidgetPrivate.on_time_line_changed (qreal value) {
@@ -254,7 +254,7 @@ class KMessageWidgetPrivate {
     }
 
     void KMessageWidgetPrivate.on_time_line_finished () {
-        if (time_line.direction () == QTime_line.Forward) {
+        if (time_line.direction () == QTimeLine.Forward) {
             // Show
             // We set the whole geometry here, because it may be wrong if a
             // KMessageWidget is shown right when the toplevel window is created.
