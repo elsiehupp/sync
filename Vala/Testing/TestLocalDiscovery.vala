@@ -8,56 +8,58 @@ implied, as to its usefulness for any purpose.
 //  #include <syncengine.h>
 //  #include <localdiscoverytracker.h>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class TestLocalDiscovery : GLib.Object {
 
     // Check correct behavior when local discovery is partially drawn from the database
     private on_ void testLocalDiscoveryStyle () {
-        FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
+        FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 ());
 
         LocalDiscoveryTracker tracker;
-        connect (&fakeFolder.syncEngine (), &SyncEngine.itemCompleted, tracker, &LocalDiscoveryTracker.slotItemCompleted);
-        connect (&fakeFolder.syncEngine (), &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slotSyncFinished);
+        connect (&fakeFolder.sync_engine (), &SyncEngine.itemCompleted, tracker, &LocalDiscoveryTracker.slotItemCompleted);
+        connect (&fakeFolder.sync_engine (), &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slotSyncFinished);
 
         // More subdirectories are useful for testing
-        fakeFolder.localModifier ().mkdir ("A/X");
-        fakeFolder.localModifier ().mkdir ("A/Y");
-        fakeFolder.localModifier ().insert ("A/X/x1");
-        fakeFolder.localModifier ().insert ("A/Y/y1");
+        fakeFolder.local_modifier ().mkdir ("A/X");
+        fakeFolder.local_modifier ().mkdir ("A/Y");
+        fakeFolder.local_modifier ().insert ("A/X/x1");
+        fakeFolder.local_modifier ().insert ("A/Y/y1");
         tracker.addTouchedPath ("A/X");
 
         tracker.startSyncFullDiscovery ();
-        QVERIFY (fakeFolder.syncOnce ());
+        QVERIFY (fakeFolder.sync_once ());
 
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
         QVERIFY (tracker.localDiscoveryPaths ().empty ());
 
         // Test begins
-        fakeFolder.localModifier ().insert ("A/a3");
-        fakeFolder.localModifier ().insert ("A/X/x2");
-        fakeFolder.localModifier ().insert ("A/Y/y2");
-        fakeFolder.localModifier ().insert ("B/b3");
-        fakeFolder.remoteModifier ().insert ("C/c3");
-        fakeFolder.remoteModifier ().appendByte ("C/c1");
+        fakeFolder.local_modifier ().insert ("A/a3");
+        fakeFolder.local_modifier ().insert ("A/X/x2");
+        fakeFolder.local_modifier ().insert ("A/Y/y2");
+        fakeFolder.local_modifier ().insert ("B/b3");
+        fakeFolder.remote_modifier ().insert ("C/c3");
+        fakeFolder.remote_modifier ().append_byte ("C/c1");
         tracker.addTouchedPath ("A/X");
 
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
+        fakeFolder.sync_engine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
 
         tracker.startSyncPartialDiscovery ();
-        QVERIFY (fakeFolder.syncOnce ());
+        QVERIFY (fakeFolder.sync_once ());
 
-        QVERIFY (fakeFolder.currentRemoteState ().find ("A/a3"));
-        QVERIFY (fakeFolder.currentRemoteState ().find ("A/X/x2"));
-        QVERIFY (!fakeFolder.currentRemoteState ().find ("A/Y/y2"));
-        QVERIFY (!fakeFolder.currentRemoteState ().find ("B/b3"));
-        QVERIFY (fakeFolder.currentLocalState ().find ("C/c3"));
-        QCOMPARE (fakeFolder.syncEngine ().lastLocalDiscoveryStyle (), LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
+        QVERIFY (fakeFolder.current_remote_state ().find ("A/a3"));
+        QVERIFY (fakeFolder.current_remote_state ().find ("A/X/x2"));
+        QVERIFY (!fakeFolder.current_remote_state ().find ("A/Y/y2"));
+        QVERIFY (!fakeFolder.current_remote_state ().find ("B/b3"));
+        QVERIFY (fakeFolder.current_local_state ().find ("C/c3"));
+        QCOMPARE (fakeFolder.sync_engine ().lastLocalDiscoveryStyle (), LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
         QVERIFY (tracker.localDiscoveryPaths ().empty ());
 
-        QVERIFY (fakeFolder.syncOnce ());
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        QCOMPARE (fakeFolder.syncEngine ().lastLocalDiscoveryStyle (), LocalDiscoveryStyle.FILESYSTEM_ONLY);
+        QVERIFY (fakeFolder.sync_once ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
+        QCOMPARE (fakeFolder.sync_engine ().lastLocalDiscoveryStyle (), LocalDiscoveryStyle.FILESYSTEM_ONLY);
         QVERIFY (tracker.localDiscoveryPaths ().empty ());
     }
 
@@ -65,14 +67,14 @@ class TestLocalDiscovery : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testLocalDiscoveryDecision () {
-        FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        var engine = fakeFolder.syncEngine ();
+        FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 ());
+        var engine = fakeFolder.sync_engine ();
 
         QVERIFY (engine.shouldDiscoverLocally (""));
         QVERIFY (engine.shouldDiscoverLocally ("A"));
         QVERIFY (engine.shouldDiscoverLocally ("A/X"));
 
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (
+        fakeFolder.sync_engine ().setLocalDiscoveryOptions (
             LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, { "A/X", "A/X space", "A/X/beta", "foo bar space/touch", "foo/", "zzz", "zzzz" });
 
         QVERIFY (engine.shouldDiscoverLocally (""));
@@ -99,7 +101,7 @@ class TestLocalDiscovery : GLib.Object {
             "which is a prefix, and that prefix is followed by a character less than '/'", Continue);
         QVERIFY (!engine.shouldDiscoverLocally ("A/X o"));
 
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (
+        fakeFolder.sync_engine ().setLocalDiscoveryOptions (
             LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, {});
 
         QVERIFY (!engine.shouldDiscoverLocally (""));
@@ -108,52 +110,52 @@ class TestLocalDiscovery : GLib.Object {
     // Check whether item on_signal_success and item failure adjusts the
     // tracker correctly.
     private on_ void testTrackerItemCompletion () {
-        FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
+        FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 ());
 
         LocalDiscoveryTracker tracker;
-        connect (&fakeFolder.syncEngine (), &SyncEngine.itemCompleted, tracker, &LocalDiscoveryTracker.slotItemCompleted);
-        connect (&fakeFolder.syncEngine (), &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slotSyncFinished);
+        connect (&fakeFolder.sync_engine (), &SyncEngine.itemCompleted, tracker, &LocalDiscoveryTracker.slotItemCompleted);
+        connect (&fakeFolder.sync_engine (), &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slotSyncFinished);
         var trackerContains = [&] (char path) {
             return tracker.localDiscoveryPaths ().find (path) != tracker.localDiscoveryPaths ().end ();
         }
 
         tracker.addTouchedPath ("A/spurious");
 
-        fakeFolder.localModifier ().insert ("A/a3");
+        fakeFolder.local_modifier ().insert ("A/a3");
         tracker.addTouchedPath ("A/a3");
 
-        fakeFolder.localModifier ().insert ("A/a4");
-        fakeFolder.serverErrorPaths ().append ("A/a4");
+        fakeFolder.local_modifier ().insert ("A/a4");
+        fakeFolder.server_error_paths ().append ("A/a4");
         // We're not adding a4 as touched, it's in the same folder as a3 and will be seen.
         // And due to the error it should be added to the explicit list while a3 gets removed.
 
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
+        fakeFolder.sync_engine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
         tracker.startSyncPartialDiscovery ();
-        QVERIFY (!fakeFolder.syncOnce ());
+        QVERIFY (!fakeFolder.sync_once ());
 
-        QVERIFY (fakeFolder.currentRemoteState ().find ("A/a3"));
-        QVERIFY (!fakeFolder.currentRemoteState ().find ("A/a4"));
+        QVERIFY (fakeFolder.current_remote_state ().find ("A/a3"));
+        QVERIFY (!fakeFolder.current_remote_state ().find ("A/a4"));
         QVERIFY (!trackerContains ("A/a3"));
         QVERIFY (trackerContains ("A/a4"));
         QVERIFY (trackerContains ("A/spurious")); // not removed since overall sync not successful
 
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.FILESYSTEM_ONLY);
+        fakeFolder.sync_engine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.FILESYSTEM_ONLY);
         tracker.startSyncFullDiscovery ();
-        QVERIFY (!fakeFolder.syncOnce ());
+        QVERIFY (!fakeFolder.sync_once ());
 
-        QVERIFY (!fakeFolder.currentRemoteState ().find ("A/a4"));
+        QVERIFY (!fakeFolder.current_remote_state ().find ("A/a4"));
         QVERIFY (trackerContains ("A/a4")); // had an error, still here
         QVERIFY (!trackerContains ("A/spurious")); // removed due to full discovery
 
-        fakeFolder.serverErrorPaths ().clear ();
-        fakeFolder.syncJournal ().wipeErrorBlocklist ();
+        fakeFolder.server_error_paths ().clear ();
+        fakeFolder.sync_journal ().wipeErrorBlocklist ();
         tracker.addTouchedPath ("A/newspurious"); // will be removed due to successful sync
 
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
+        fakeFolder.sync_engine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
         tracker.startSyncPartialDiscovery ();
-        QVERIFY (fakeFolder.syncOnce ());
+        QVERIFY (fakeFolder.sync_once ());
 
-        QVERIFY (fakeFolder.currentRemoteState ().find ("A/a4"));
+        QVERIFY (fakeFolder.current_remote_state ().find ("A/a4"));
         QVERIFY (tracker.localDiscoveryPaths ().empty ());
     }
 
@@ -161,49 +163,49 @@ class TestLocalDiscovery : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testDirectoryAndSubDirectory () {
-        FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
+        FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 ());
 
-        fakeFolder.localModifier ().mkdir ("A/newDir");
-        fakeFolder.localModifier ().mkdir ("A/newDir/subDir");
-        fakeFolder.localModifier ().insert ("A/newDir/subDir/file", 10);
+        fakeFolder.local_modifier ().mkdir ("A/newDir");
+        fakeFolder.local_modifier ().mkdir ("A/newDir/subDir");
+        fakeFolder.local_modifier ().insert ("A/newDir/subDir/file", 10);
 
-        var expectedState = fakeFolder.currentLocalState ();
+        var expectedState = fakeFolder.current_local_state ();
 
         // Only "A" was modified according to the file system tracker
-        fakeFolder.syncEngine ().setLocalDiscoveryOptions (
+        fakeFolder.sync_engine ().setLocalDiscoveryOptions (
             LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, { "A" });
 
-        QVERIFY (fakeFolder.syncOnce ());
+        QVERIFY (fakeFolder.sync_once ());
 
-        QCOMPARE (fakeFolder.currentLocalState (), expectedState);
-        QCOMPARE (fakeFolder.currentRemoteState (), expectedState);
+        QCOMPARE (fakeFolder.current_local_state (), expectedState);
+        QCOMPARE (fakeFolder.current_remote_state (), expectedState);
     }
 
     // Tests the behavior of invalid filename detection
     private on_ void testServerBlocklist () {
-        FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
 
-        fakeFolder.syncEngine ().account ().setCapabilities ({ { "files",
+        fakeFolder.sync_engine ().account ().setCapabilities ({ { "files",
             QVariantMap { { "blocklisted_files", QVariantList { ".foo", "bar" } } } } });
-        fakeFolder.localModifier ().insert ("C/.foo");
-        fakeFolder.localModifier ().insert ("C/bar");
-        fakeFolder.localModifier ().insert ("C/moo");
-        fakeFolder.localModifier ().insert ("C/.moo");
+        fakeFolder.local_modifier ().insert ("C/.foo");
+        fakeFolder.local_modifier ().insert ("C/bar");
+        fakeFolder.local_modifier ().insert ("C/moo");
+        fakeFolder.local_modifier ().insert ("C/.moo");
 
-        QVERIFY (fakeFolder.syncOnce ());
-        QVERIFY (fakeFolder.currentRemoteState ().find ("C/moo"));
-        QVERIFY (fakeFolder.currentRemoteState ().find ("C/.moo"));
-        QVERIFY (!fakeFolder.currentRemoteState ().find ("C/.foo"));
-        QVERIFY (!fakeFolder.currentRemoteState ().find ("C/bar"));
+        QVERIFY (fakeFolder.sync_once ());
+        QVERIFY (fakeFolder.current_remote_state ().find ("C/moo"));
+        QVERIFY (fakeFolder.current_remote_state ().find ("C/.moo"));
+        QVERIFY (!fakeFolder.current_remote_state ().find ("C/.foo"));
+        QVERIFY (!fakeFolder.current_remote_state ().find ("C/bar"));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private on_ void testCreateFileWithTrailingSpaces_localAndRemoteTrimmedDoNotExist_renameAndUploadFile () {
-        FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
         const string fileWithSpaces1 (" foo");
         const string fileWithSpaces2 (" bar  ");
         const string fileWithSpaces3 ("bla ");
@@ -211,83 +213,83 @@ class TestLocalDiscovery : GLib.Object {
         const string fileWithSpaces5 ("A/ bar  ");
         const string fileWithSpaces6 ("A/bla ");
 
-        fakeFolder.localModifier ().insert (fileWithSpaces1);
-        fakeFolder.localModifier ().insert (fileWithSpaces2);
-        fakeFolder.localModifier ().insert (fileWithSpaces3);
-        fakeFolder.localModifier ().insert (fileWithSpaces4);
-        fakeFolder.localModifier ().insert (fileWithSpaces5);
-        fakeFolder.localModifier ().insert (fileWithSpaces6);
+        fakeFolder.local_modifier ().insert (fileWithSpaces1);
+        fakeFolder.local_modifier ().insert (fileWithSpaces2);
+        fakeFolder.local_modifier ().insert (fileWithSpaces3);
+        fakeFolder.local_modifier ().insert (fileWithSpaces4);
+        fakeFolder.local_modifier ().insert (fileWithSpaces5);
+        fakeFolder.local_modifier ().insert (fileWithSpaces6);
 
-        QVERIFY (fakeFolder.syncOnce ());
+        QVERIFY (fakeFolder.sync_once ());
 
-        QVERIFY (fakeFolder.currentRemoteState ().find (fileWithSpaces1.trimmed ()));
-        QVERIFY (!fakeFolder.currentRemoteState ().find (fileWithSpaces1));
-        QVERIFY (fakeFolder.currentLocalState ().find (fileWithSpaces1.trimmed ()));
-        QVERIFY (!fakeFolder.currentLocalState ().find (fileWithSpaces1));
+        QVERIFY (fakeFolder.current_remote_state ().find (fileWithSpaces1.trimmed ()));
+        QVERIFY (!fakeFolder.current_remote_state ().find (fileWithSpaces1));
+        QVERIFY (fakeFolder.current_local_state ().find (fileWithSpaces1.trimmed ()));
+        QVERIFY (!fakeFolder.current_local_state ().find (fileWithSpaces1));
 
-        QVERIFY (fakeFolder.currentRemoteState ().find (fileWithSpaces2.trimmed ()));
-        QVERIFY (!fakeFolder.currentRemoteState ().find (fileWithSpaces2));
-        QVERIFY (fakeFolder.currentLocalState ().find (fileWithSpaces2.trimmed ()));
-        QVERIFY (!fakeFolder.currentLocalState ().find (fileWithSpaces2));
+        QVERIFY (fakeFolder.current_remote_state ().find (fileWithSpaces2.trimmed ()));
+        QVERIFY (!fakeFolder.current_remote_state ().find (fileWithSpaces2));
+        QVERIFY (fakeFolder.current_local_state ().find (fileWithSpaces2.trimmed ()));
+        QVERIFY (!fakeFolder.current_local_state ().find (fileWithSpaces2));
 
-        QVERIFY (fakeFolder.currentRemoteState ().find (fileWithSpaces3.trimmed ()));
-        QVERIFY (!fakeFolder.currentRemoteState ().find (fileWithSpaces3));
-        QVERIFY (fakeFolder.currentLocalState ().find (fileWithSpaces3.trimmed ()));
-        QVERIFY (!fakeFolder.currentLocalState ().find (fileWithSpaces3));
+        QVERIFY (fakeFolder.current_remote_state ().find (fileWithSpaces3.trimmed ()));
+        QVERIFY (!fakeFolder.current_remote_state ().find (fileWithSpaces3));
+        QVERIFY (fakeFolder.current_local_state ().find (fileWithSpaces3.trimmed ()));
+        QVERIFY (!fakeFolder.current_local_state ().find (fileWithSpaces3));
 
-        QVERIFY (fakeFolder.currentRemoteState ().find ("A/foo"));
-        QVERIFY (!fakeFolder.currentRemoteState ().find (fileWithSpaces4));
-        QVERIFY (fakeFolder.currentLocalState ().find ("A/foo"));
-        QVERIFY (!fakeFolder.currentLocalState ().find (fileWithSpaces4));
+        QVERIFY (fakeFolder.current_remote_state ().find ("A/foo"));
+        QVERIFY (!fakeFolder.current_remote_state ().find (fileWithSpaces4));
+        QVERIFY (fakeFolder.current_local_state ().find ("A/foo"));
+        QVERIFY (!fakeFolder.current_local_state ().find (fileWithSpaces4));
 
-        QVERIFY (fakeFolder.currentRemoteState ().find ("A/bar"));
-        QVERIFY (!fakeFolder.currentRemoteState ().find (fileWithSpaces5));
-        QVERIFY (fakeFolder.currentLocalState ().find ("A/bar"));
-        QVERIFY (!fakeFolder.currentLocalState ().find (fileWithSpaces5));
+        QVERIFY (fakeFolder.current_remote_state ().find ("A/bar"));
+        QVERIFY (!fakeFolder.current_remote_state ().find (fileWithSpaces5));
+        QVERIFY (fakeFolder.current_local_state ().find ("A/bar"));
+        QVERIFY (!fakeFolder.current_local_state ().find (fileWithSpaces5));
 
-        QVERIFY (fakeFolder.currentRemoteState ().find ("A/bla"));
-        QVERIFY (!fakeFolder.currentRemoteState ().find (fileWithSpaces6));
-        QVERIFY (fakeFolder.currentLocalState ().find ("A/bla"));
-        QVERIFY (!fakeFolder.currentLocalState ().find (fileWithSpaces6));
+        QVERIFY (fakeFolder.current_remote_state ().find ("A/bla"));
+        QVERIFY (!fakeFolder.current_remote_state ().find (fileWithSpaces6));
+        QVERIFY (fakeFolder.current_local_state ().find ("A/bla"));
+        QVERIFY (!fakeFolder.current_local_state ().find (fileWithSpaces6));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private on_ void testCreateFileWithTrailingSpaces_localTrimmedDoesExist_dontRenameAndUploadFile () {
-        FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
         const string fileWithSpaces (" foo");
         const string fileTrimmed ("foo");
 
-        fakeFolder.localModifier ().insert (fileTrimmed);
-        QVERIFY (fakeFolder.syncOnce ());
-        fakeFolder.localModifier ().insert (fileWithSpaces);
-        QVERIFY (!fakeFolder.syncOnce ());
+        fakeFolder.local_modifier ().insert (fileTrimmed);
+        QVERIFY (fakeFolder.sync_once ());
+        fakeFolder.local_modifier ().insert (fileWithSpaces);
+        QVERIFY (!fakeFolder.sync_once ());
 
-        QVERIFY (fakeFolder.currentRemoteState ().find (fileTrimmed));
-        QVERIFY (!fakeFolder.currentRemoteState ().find (fileWithSpaces));
-        QVERIFY (fakeFolder.currentLocalState ().find (fileWithSpaces));
-        QVERIFY (fakeFolder.currentLocalState ().find (fileTrimmed));
+        QVERIFY (fakeFolder.current_remote_state ().find (fileTrimmed));
+        QVERIFY (!fakeFolder.current_remote_state ().find (fileWithSpaces));
+        QVERIFY (fakeFolder.current_local_state ().find (fileWithSpaces));
+        QVERIFY (fakeFolder.current_local_state ().find (fileTrimmed));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private on_ void testCreateFileWithTrailingSpaces_localTrimmedAlsoCreated_dontRenameAndUploadFile () {
-        FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
         const string fileWithSpaces (" foo");
         const string fileTrimmed ("foo");
 
-        fakeFolder.localModifier ().insert (fileTrimmed);
-        fakeFolder.localModifier ().insert (fileWithSpaces);
-        QVERIFY (!fakeFolder.syncOnce ());
+        fakeFolder.local_modifier ().insert (fileTrimmed);
+        fakeFolder.local_modifier ().insert (fileWithSpaces);
+        QVERIFY (!fakeFolder.sync_once ());
 
-        QVERIFY (fakeFolder.currentRemoteState ().find (fileTrimmed));
-        QVERIFY (!fakeFolder.currentRemoteState ().find (fileWithSpaces));
-        QVERIFY (fakeFolder.currentLocalState ().find (fileWithSpaces));
-        QVERIFY (fakeFolder.currentLocalState ().find (fileTrimmed));
+        QVERIFY (fakeFolder.current_remote_state ().find (fileTrimmed));
+        QVERIFY (!fakeFolder.current_remote_state ().find (fileWithSpaces));
+        QVERIFY (fakeFolder.current_local_state ().find (fileWithSpaces));
+        QVERIFY (fakeFolder.current_local_state ().find (fileTrimmed));
     }
 }
 

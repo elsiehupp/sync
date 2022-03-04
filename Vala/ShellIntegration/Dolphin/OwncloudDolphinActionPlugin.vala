@@ -49,8 +49,8 @@ class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         const var paths = helper.paths ();
         GLib.ByteArray files;
         for (var url : urls) {
-            QDir localPath (url.toLocalFile ());
-            var localFile = localPath.canonicalPath ();
+            QDir local_path (url.toLocalFile ());
+            var localFile = local_path.canonicalPath ();
             if (!std.any_of (paths.begin (), paths.end (), [&] (string s) {
                     return localFile.startsWith (s);
                 }))
@@ -96,7 +96,7 @@ class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
         menu.setTitle (helper.contextMenuTitle ());
         menu.setIcon (QIcon.fromTheme (helper.contextMenuIconName ()));
-        return { menu.menuAction () };
+        return { menu.menuAction ());
     }
 
 
@@ -106,8 +106,8 @@ class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         GLib.List<GLib.Uri> urls = fileItemInfos.urlList ();
         if (urls.count () != 1)
             return {};
-        QDir localPath (urls.first ().toLocalFile ());
-        var localFile = localPath.canonicalPath ();
+        QDir local_path (urls.first ().toLocalFile ());
+        var localFile = local_path.canonicalPath ();
         var helper = OwncloudDolphinPluginHelper.instance ();
         var menuaction = new QAction (parentWidget);
         menuaction.setText (helper.contextMenuTitle ());

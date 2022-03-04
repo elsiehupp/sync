@@ -6,7 +6,7 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-using namespace Occ;
+using Occ;
 
 //  #ifndef TOKEN_AUTH_ONLY
 class HttpCredentialsText : HttpCredentials {

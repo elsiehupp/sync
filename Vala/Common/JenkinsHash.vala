@@ -124,11 +124,11 @@ acceptable.  Do NOT use for cryptographic purposes.
            of the return value.  Every 1-bit and 2-bit delta achieves
            avalanche. About 36+6len instructions.
 ***********************************************************/
-static inline uint32_t c_jhash (uint8_t k, uint32_t length, uint32_t initval) {
-   uint32_t a = 0;
-   uint32_t b = 0;
-   uint32_t c = 0;
-   uint32_t len = 0;
+static inline uint32 c_jhash (uint8_t k, uint32 length, uint32 initval) {
+   uint32 a = 0;
+   uint32 b = 0;
+   uint32 c = 0;
+   uint32 len = 0;
 
    /* Set up the internal state */
    len = length;
@@ -136,9 +136,9 @@ static inline uint32_t c_jhash (uint8_t k, uint32_t length, uint32_t initval) {
    c = initval; /* the previous hash value */
 
    while (len >= 12) {
-      a += (k[0] + ( (uint32_t)k[1]<<8) + ( (uint32_t)k[2]<<16) + ( (uint32_t)k[3]<<24));
-      b += (k[4] + ( (uint32_t)k[5]<<8) + ( (uint32_t)k[6]<<16) + ( (uint32_t)k[7]<<24));
-      c += (k[8] + ( (uint32_t)k[9]<<8) + ( (uint32_t)k[10]<<16)+ ( (uint32_t)k[11]<<24));
+      a += (k[0] + ( (uint32)k[1]<<8) + ( (uint32)k[2]<<16) + ( (uint32)k[3]<<24));
+      b += (k[4] + ( (uint32)k[5]<<8) + ( (uint32)k[6]<<16) + ( (uint32)k[7]<<24));
+      c += (k[8] + ( (uint32)k[9]<<8) + ( (uint32)k[10]<<16)+ ( (uint32)k[11]<<24));
       this.c_mix (a,b,c);
       k += 12; len -= 12;
    }
@@ -147,17 +147,17 @@ static inline uint32_t c_jhash (uint8_t k, uint32_t length, uint32_t initval) {
    c += length;
    /* all the case statements fall through */
    switch (len) {
-     case 11 : c+= ( (uint32_t)k[10]<<24);
-     case 10 : c+= ( (uint32_t)k[9]<<16);
-     case 9 : c+= ( (uint32_t)k[8]<<8);
+     case 11 : c+= ( (uint32)k[10]<<24);
+     case 10 : c+= ( (uint32)k[9]<<16);
+     case 9 : c+= ( (uint32)k[8]<<8);
      /* the first byte of c is reserved for the length */
-     case 8 : b+= ( (uint32_t)k[7]<<24);
-     case 7 : b+= ( (uint32_t)k[6]<<16);
-     case 6 : b+= ( (uint32_t)k[5]<<8);
+     case 8 : b+= ( (uint32)k[7]<<24);
+     case 7 : b+= ( (uint32)k[6]<<16);
+     case 6 : b+= ( (uint32)k[5]<<8);
      case 5 : b+=k[4];
-     case 4 : a+= ( (uint32_t)k[3]<<24);
-     case 3 : a+= ( (uint32_t)k[2]<<16);
-     case 2 : a+= ( (uint32_t)k[1]<<8);
+     case 4 : a+= ( (uint32)k[3]<<24);
+     case 3 : a+= ( (uint32)k[2]<<16);
+     case 2 : a+= ( (uint32)k[1]<<8);
      case 1 : a+=k[0];
      /* case 0 : nothing left to add */
    }

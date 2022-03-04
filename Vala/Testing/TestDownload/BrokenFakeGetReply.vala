@@ -4,6 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
+namespace Testing {
+
 /***********************************************************
 A FakeGetReply that sends max 'fakeSize' bytes, but whose
 ContentLength has the corect size
@@ -15,16 +17,16 @@ class BrokenFakeGetReply : FakeGetReply {
 
     /***********************************************************
     ***********************************************************/
-    public int64 bytesAvailable () override {
+    public int64 bytes_available () override {
         if (aborted)
             return 0;
-        return std.min (size, fakeSize) + QIODevice.bytesAvailable (); // NOLINT : This is intended to simulare the brokeness
+        return std.min (size, fakeSize) + QIODevice.bytes_available (); // NOLINT : This is intended to simulare the brokeness
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public int64 readData (char data, int64 maxlen) override {
+    public int64 read_data (char data, int64 maxlen) override {
         int64 len = std.min (int64{ fakeSize }, maxlen);
         std.fill_n (data, len, payload);
         size -= len;

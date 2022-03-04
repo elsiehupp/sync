@@ -252,7 +252,7 @@ class OwncloudSetupPage : QWizardPage {
                     case OwncloudConnectionMethodDialog.Closed:
                     case OwncloudConnectionMethodDialog.Back:
                     default:
-                        // No-op.
+                        // No-operation.
                         break;
                     }
                 }

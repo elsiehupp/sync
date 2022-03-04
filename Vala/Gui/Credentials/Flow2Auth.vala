@@ -152,12 +152,12 @@ signals:
 
         // Step 1 : Initiate a login, do an anonymous POST request
         GLib.Uri url = Utility.concat_url_path (this.account.url ().to_string (), QLatin1String ("/index.php/login/v2"));
-        this.enforce_https = url.scheme () == QStringLiteral ("https");
+        this.enforce_https = url.scheme () == "https";
 
         // add 'Content-Length : 0' header (see https://github.com/nextcloud/desktop/issues/1473)
-        QNetworkRequest req;
-        req.header (QNetworkRequest.ContentLengthHeader, "0");
-        req.header (QNetworkRequest.UserAgentHeader, Utility.friendly_user_agent_string ());
+        Soup.Request req;
+        req.header (Soup.Request.ContentLengthHeader, "0");
+        req.header (Soup.Request.UserAgentHeader, Utility.friendly_user_agent_string ());
 
         var job = this.account.send_request ("POST", url, req);
         job.on_signal_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
@@ -172,7 +172,7 @@ signals:
                 && !json.is_empty ()) {
                 poll_token = json.value ("poll").to_object ().value ("token").to_string ();
                 poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_string ();
-                if (this.enforce_https && GLib.Uri (poll_endpoint).scheme () != QStringLiteral ("https")) {
+                if (this.enforce_https && GLib.Uri (poll_endpoint).scheme () != "https") {
                     GLib.warning ("Can not poll endpoint because the returned url" + poll_endpoint + "does not on_signal_start with https";
                     /* emit */ signal_result (Error, _("The polling URL does not on_signal_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
@@ -209,7 +209,7 @@ signals:
                 const var user_name = Utility.get_current_user_name ();
                 if (!user_name.is_empty ()) {
                     var query = QUrlQuery (this.login_url);
-                    query.add_query_item (QStringLiteral ("user"), user_name);
+                    query.add_query_item ("user", user_name);
                     this.login_url.query (query);
                 }
             }
@@ -264,8 +264,8 @@ signals:
         /* emit */ signal_status_changed (PollStatus.status_poll_now, 0);
 
         // Step 2 : Poll
-        QNetworkRequest req;
-        req.header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
+        Soup.Request req;
+        req.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         var request_body = new QBuffer;
         QUrlQuery arguments (string ("token=%1").arg (this.poll_token));
@@ -284,7 +284,7 @@ signals:
             if (reply.error () == Soup.Reply.NoError && json_parse_error.error == QJsonParseError.NoError
                 && !json.is_empty ()) {
                 server_url = json["server"].to_string ();
-                if (this.enforce_https && server_url.scheme () != QStringLiteral ("https")) {
+                if (this.enforce_https && server_url.scheme () != "https") {
                     GLib.warning ("Returned server url" + server_url + "does not on_signal_start with https";
                     /* emit */ signal_result (Error, _("The returned server URL does not on_signal_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;

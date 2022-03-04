@@ -315,7 +315,7 @@ class SelectiveSyncWidget : Gtk.Widget {
 
     void SelectiveSyncWidget.on_signal_gather_encrypted_paths (string path, GLib.HashMap<string, string> properties) {
         const var it = properties.find ("is-encrypted");
-        if (it == properties.cend () || *it != QStringLiteral ("1")) {
+        if (it == properties.cend () || *it != "1") {
             return;
         }
 
@@ -326,14 +326,14 @@ class SelectiveSyncWidget : Gtk.Widget {
     }
 
     void SelectiveSyncWidget.on_signal_item_expanded (QTreeWidgetItem item) {
-        string dir = item.data (0, Qt.USER_ROLE).to_string ();
-        if (dir.is_empty ())
+        string directory = item.data (0, Qt.USER_ROLE).to_string ();
+        if (directory.is_empty ())
             return;
         string prefix;
         if (!this.folder_path.is_empty ()) {
             prefix = this.folder_path + '/';
         }
-        var job = new LsColJob (this.account, prefix + dir, this);
+        var job = new LsColJob (this.account, prefix + directory, this);
         job.properties (GLib.List<GLib.ByteArray> ("resourcetype"
                                                + "http://owncloud.org/ns:size");
         connect (job, &LsColJob.directory_listing_subfolders,

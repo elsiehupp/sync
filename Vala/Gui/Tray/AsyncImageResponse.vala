@@ -47,7 +47,7 @@ class AsyncImageResponse : QQuickImageResponse {
             return;
         }
 
-        if (this.image_paths.at (this.index).starts_with (QStringLiteral (":/client"))) {
+        if (this.image_paths.at (this.index).starts_with (":/client")) {
             image_and_emit_finished (QIcon (this.image_paths.at (this.index)).pixmap (this.requested_image_size).to_image ());
             return;
         }

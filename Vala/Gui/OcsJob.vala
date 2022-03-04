@@ -143,7 +143,7 @@ signals:
     private GLib.ByteArray this.verb;
     private GLib.List<QPair<string, string>> this.params;
     private GLib.Vector<int> this.pass_status_codes;
-    private QNetworkRequest this.request;
+    private Soup.Request this.request;
 }
 
     Ocs_job.Ocs_job (AccountPointer account)
@@ -228,7 +228,7 @@ signals:
 
         // when it is null we might have a 304 so get status code from reply () and gives a warning...
         if (error.error != QJsonParseError.NoError) {
-            status_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+            status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             GLib.warning ("Could not parse reply to"
                              + this.verb
                              + Utility.concat_url_path (account ().url (), path ())

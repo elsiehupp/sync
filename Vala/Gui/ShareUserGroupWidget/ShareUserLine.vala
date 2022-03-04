@@ -609,9 +609,9 @@ signals:
     QPixmap Share_user_line.pixmap_for_sharee_type (Sharee.Type type, Gtk.Color background_color) {
         switch (type) {
         case Sharee.Room:
-            return Ui.IconUtils.pixmap_for_background (QStringLiteral ("talk-app.svg"), background_color);
+            return Ui.IconUtils.pixmap_for_background ("talk-app.svg", background_color);
         case Sharee.Email:
-            return Ui.IconUtils.pixmap_for_background (QStringLiteral ("email.svg"), background_color);
+            return Ui.IconUtils.pixmap_for_background ("email.svg", background_color);
         case Sharee.Group:
         case Sharee.Federated:
         case Sharee.Circle:

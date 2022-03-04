@@ -59,7 +59,7 @@ class RemotePermissions {
         // this permission when the server reports the any "share-types"
         IS_SHARED = 8,             // S
         IS_MOUNTED = 9,            // M
-        IS_MOUNTED_SUB = 10,        // m (internal : set if the parent dir has Permissions.IS_MOUNTED)
+        IS_MOUNTED_SUB = 10,        // m (internal : set if the parent directory has Permissions.IS_MOUNTED)
 
         // Note: when adding support for more permissions, we need to invalid the cache in the database.
         // (by setting force_remote_discovery in SyncJournalDb.check_connect)

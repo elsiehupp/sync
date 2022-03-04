@@ -79,7 +79,7 @@ class Folder_wizard_selective_sync : QWizardPage {
 
         if (this.virtual_files_check_box) {
             // TODO : remove when UX decision is made
-            if (Utility.is_path_windows_drive_partition_root (wizard ().field (QStringLiteral ("source_folder")).to_string ())) {
+            if (Utility.is_path_windows_drive_partition_root (wizard ().field ("source_folder").to_string ())) {
                 this.virtual_files_check_box.checked (false);
                 this.virtual_files_check_box.enabled (false);
                 this.virtual_files_check_box.on_signal_text (_("Virtual files are not supported for Windows partition roots as local folder. Please choose a valid subfolder under drive letter."));
@@ -102,7 +102,7 @@ class Folder_wizard_selective_sync : QWizardPage {
     bool Folder_wizard_selective_sync.validate_page () {
         const bool use_virtual_files = this.virtual_files_check_box && this.virtual_files_check_box.is_checked ();
         if (use_virtual_files) {
-            const var availability = Vfs.check_availability (wizard ().field (QStringLiteral ("source_folder")).to_string ());
+            const var availability = Vfs.check_availability (wizard ().field ("source_folder").to_string ());
             if (!availability) {
                 var message = new QMessageBox (QMessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error (), QMessageBox.Ok, this);
                 message.attribute (Qt.WA_DeleteOnClose);

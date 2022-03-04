@@ -103,20 +103,20 @@ protected slots:
         string sf = QStandardPaths.writable_location (QStandardPaths.Home_location);
         QDir d (sf);
 
-        // open the first entry of the home dir. Otherwise the dir picker comes
-        // up with the closed home dir icon, stupid Qt default...
+        // open the first entry of the home directory. Otherwise the directory picker comes
+        // up with the closed home directory icon, stupid Qt default...
         string[] dirs = d.entry_list (QDir.Dirs | QDir.NoDotAndDotDot | QDir.No_sym_links,
             QDir.Dirs_first | QDir.Name);
 
         if (dirs.count () > 0)
-            sf += "/" + dirs.at (0); // Take the first dir in home dir.
+            sf += "/" + dirs.at (0); // Take the first directory in home directory.
 
-        string dir = QFileDialog.get_existing_directory (this,
+        string directory = QFileDialog.get_existing_directory (this,
             _("Select the source folder"),
             sf);
-        if (!dir.is_empty ()) {
+        if (!directory.is_empty ()) {
             // set the last directory component name as alias
-            this.ui.local_folder_line_edit.on_signal_text (QDir.to_native_separators (dir));
+            this.ui.local_folder_line_edit.on_signal_text (QDir.to_native_separators (directory));
         }
         /* emit */ complete_changed ();
     }

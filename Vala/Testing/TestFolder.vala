@@ -6,7 +6,9 @@ implied, as to its usefulness for any purpose.
 
 //  #include <QtTest>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class TestFolder : public GLib.Object {
 

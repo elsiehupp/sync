@@ -298,7 +298,7 @@ protected slots:
     }
 
     void OCUpdater.check_for_update () {
-        Soup.Reply reply = this.access_manager.get (QNetworkRequest (this.update_url));
+        Soup.Reply reply = this.access_manager.get (Soup.Request (this.update_url));
         connect (this.timeout_watchdog, &QTimer.timeout, this, &OCUpdater.on_signal_timed_out);
         this.timeout_watchdog.on_signal_start (30 * 1000);
         connect (reply, &Soup.Reply.on_signal_finished, this, &OCUpdater.on_signal_version_info_arrived);

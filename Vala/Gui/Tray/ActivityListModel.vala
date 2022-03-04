@@ -448,9 +448,9 @@ class ActivityListModel : QAbstractListModel {
             const var conflicted_relative_path = activity.file;
             const var base_relative_path = folder.journal_database ().conflict_file_base_name (conflicted_relative_path.to_utf8 ());
 
-            const var dir = QDir (folder.path ());
-            const var conflicted_path = dir.file_path (conflicted_relative_path);
-            const var base_path = dir.file_path (base_relative_path);
+            const var directory = QDir (folder.path ());
+            const var conflicted_path = directory.file_path (conflicted_relative_path);
+            const var base_path = directory.file_path (base_relative_path);
 
             const var base_name = GLib.FileInfo (base_path).filename ();
 

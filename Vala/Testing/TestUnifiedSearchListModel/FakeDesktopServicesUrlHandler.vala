@@ -4,6 +4,8 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Testing {
+
 /***********************************************************
 @brief The FakeDesktopServicesUrlHandler
 overrides QDesktopServices.openUrl

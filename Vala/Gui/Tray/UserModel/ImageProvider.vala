@@ -26,12 +26,12 @@ class ImageProvider : QQuickImageProvider {
             return image;
         }
 
-        if (identifier == QLatin1String ("fallback_white")) {
-            return make_icon (QStringLiteral (":/client/theme/white/user.svg"));
+        if (identifier == "fallback_white") {
+            return make_icon (":/client/theme/white/user.svg");
         }
 
-        if (identifier == QLatin1String ("fallback_black")) {
-            return make_icon (QStringLiteral (":/client/theme/black/user.svg"));
+        if (identifier == "fallback_black"\) {
+            return make_icon (":/client/theme/black/user.svg");
         }
 
         const int uid = identifier.to_int ();

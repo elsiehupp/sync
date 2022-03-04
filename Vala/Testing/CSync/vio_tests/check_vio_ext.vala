@@ -17,6 +17,7 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
+
 //  #include <sys/types.h>
 //  #include <sys/stat.h>
 //  #include <fcntl.h>
@@ -25,8 +26,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 //  #include <cstdio>
 //  #include <QDir>
 
+namespace Testing {
+
 const var CSYNC_TEST_DIR = []{
-    return QStringLiteral ("%1/csync_test").arg (QDir.tempPath ());
+    return "%1/csync_test".arg (QDir.tempPath ());
 } ();
 
 namespace {
@@ -45,7 +48,7 @@ typedef struct {
 } statevar;
 
 /***********************************************************
-remove the complete test dir */
+remove the complete test directory */
 static int wipe_testdir () {
     QDir tmp (CSYNC_TEST_DIR);
     if (tmp.exists ()) {
@@ -60,13 +63,13 @@ static int setup_testenv (void **state) {
     rc = wipe_testdir ();
     assert_int_equal (rc, 0);
 
-    var dir = CSYNC_TEST_DIR;
-    rc = oc_mkdir (dir);
+    var directory = CSYNC_TEST_DIR;
+    rc = oc_mkdir (directory);
     assert_int_equal (rc, 0);
 
     assert_non_null (this.tgetcwd (wd_buffer, WD_BUFFER_SIZE));
 
-    rc = this.tchdir (dir.toLocal8Bit ().constData ());
+    rc = this.tchdir (directory.toLocal8Bit ().constData ());
 
     assert_int_equal (rc, 0);
 
@@ -101,7 +104,7 @@ and creates each sub directory.
 ***********************************************************/
 static void create_dirs (string path) {
     int rc = -1;
-    var this.mypath = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, string.fromUtf8 (path)).toUtf8 ();
+    var this.mypath = "%1/%2".arg (CSYNC_TEST_DIR, string.fromUtf8 (path)).toUtf8 ();
     char mypath = this.mypath.data ();
 
     char p = mypath + CSYNC_TEST_DIR.size () + 1; /* on_signal_start behind the offset */
@@ -136,7 +139,7 @@ The int parameter count contains the number of seen files (not dirs) in the
 whole tree.
 
 ***********************************************************/
-static void traverse_dir (void **state, string dir, int count) {
+static void traverse_dir (void **state, string directory, int count) {
     csync_vio_handle_t dh = null;
     std.unique_ptr<csync_file_stat_t> dirent;
     var sv = (statevar*) *state;
@@ -145,7 +148,7 @@ static void traverse_dir (void **state, string dir, int count) {
     int rc = -1;
     int is_dir = 0;
 
-    dh = csync_vio_local_opendir (dir);
+    dh = csync_vio_local_opendir (directory);
     assert_non_null (dh);
 
     Occ.Vfs vfs = null;
@@ -164,7 +167,7 @@ static void traverse_dir (void **state, string dir, int count) {
 
         is_dir = (dirent.type == ItemTypeDirectory) ? 1:0;
 
-        subdir = dir.toUtf8 () + "/" + dirent.path;
+        subdir = directory.toUtf8 () + "/" + dirent.path;
         subdir_out = (is_dir ? "<DIR> ":"      ") + subdir;
 
         if ( is_dir ) {
@@ -188,7 +191,7 @@ static void traverse_dir (void **state, string dir, int count) {
 }
 
 static void create_file (string path, string name, string content) {
-    GLib.File file = GLib.File.new_for_path (QStringLiteral ("%1/%2%3").arg (CSYNC_TEST_DIR, string.fromUtf8 (path), string.fromUtf8 (name)));
+    GLib.File file = GLib.File.new_for_path ("%1/%2%3".arg (CSYNC_TEST_DIR, string.fromUtf8 (path), string.fromUtf8 (name)));
     assert_int_equal (1, file.open (QIODevice.WriteOnly | QIODevice.NewOnly));
     file.write (content);
 }
@@ -236,7 +239,7 @@ static void check_readdir_with_content (void **state) {
             .constData ());
     /*                   "      %1/warum/nur/40/Räuber/Räuber Max.txt"
                          "      %1/warum/nur/40/Räuber/пя́тница.txt"; */
-    assert_int_equal (files_cnt, 2); /* Two files in the sub dir */
+    assert_int_equal (files_cnt, 2); /* Two files in the sub directory */
 }
 
 static void check_readdir_longtree (void **state) {
@@ -313,11 +316,11 @@ static void check_readdir_bigunicode (void **state) {
 //    3 : ? ASCII : 191 - BF
 //    4 : ASCII : 32    - 20
 
-    string p = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, QStringLiteral ("goodone/"));
+    string p = "%1/%2".arg (CSYNC_TEST_DIR, "goodone/");
     int rc = oc_mkdir (p);
     assert_int_equal (rc, 0);
 
-    p = QStringLiteral ("%1/goodone/ugly\xEF\xBB\xBF\x32.txt").arg (CSYNC_TEST_DIR); // file with encoding error
+    p = "%1/goodone/ugly\xEF\xBB\xBF\x32.txt".arg (CSYNC_TEST_DIR); // file with encoding error
 
     rc = oc_mkdir (p);
 
@@ -325,9 +328,9 @@ static void check_readdir_bigunicode (void **state) {
 
     int files_cnt = 0;
     traverse_dir (state, CSYNC_TEST_DIR, files_cnt);
-    const var expected_result = QStringLiteral ("<DIR> %1/goodone"
-                                                + "<DIR> %1/goodone/ugly\xEF\xBB\xBF\x32.txt")
-                                     .arg (CSYNC_TEST_DIR);
+    const var expected_result = "<DIR> %1/goodone"
+                              + "<DIR> %1/goodone/ugly\xEF\xBB\xBF\x32.txt"
+                              .arg (CSYNC_TEST_DIR);
     assert_string_equal (sv.result.constData (), expected_result.toUtf8 ().constData ());
 
     assert_int_equal (files_cnt, 0);

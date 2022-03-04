@@ -502,7 +502,7 @@ class DiscoveryPhase : GLib.Object {
                     // Piggy back on the persmission field
                     result.remote_perm.permission (RemotePermissions.Permissions.IS_SHARED);
                 }
-            } else if (property == "is-encrypted" && value == QStringLiteral ("1")) {
+            } else if (property == "is-encrypted" && value == "1") {
                 result.is_e2e_encrypted = true;
             }
         }

@@ -443,7 +443,7 @@ class AbstractNetworkJob : GLib.Object {
             return QLatin1String ("OK");
         } else {
             string enum_str = QMetaEnum.from_type<Soup.Reply.NetworkError> ().value_to_key (static_cast<int> (reply ().error ()));
-            return QStringLiteral ("%1 %2").arg (enum_str, error_string ());
+            return "%1 %2".arg (enum_str, error_string ());
         }
     }
 

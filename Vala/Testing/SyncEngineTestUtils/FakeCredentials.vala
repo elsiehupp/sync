@@ -1,19 +1,71 @@
 
+namespace Testing {
+
 class FakeCredentials : Occ.AbstractCredentials {
-    QNetworkAccessManager this.qnam;
+
+    QNetworkAccessManager qnam;
 
     /***********************************************************
     ***********************************************************/
-    public FakeCredentials (QNetworkAccessManager qnam) : this.qnam{qnam} { }
-    public string authType () override { return "test"; }
-    public string user () override { return "admin"; }
-    public string password () override { return "password"; }
-    public QNetworkAccessManager createQNAM () override { return this.qnam; }
-    public bool ready () override { return true; }
-    public void fetchFromKeychain () override { }
-    public void askFromUser () override { }
-    public bool stillValid (Soup.Reply *) override { return true; }
-    public void persist () override { }
-    public void invalidateToken () override { }
-    public void forgetSensitiveData () override { }
-};
+    public FakeCredentials (QNetworkAccessManager qnam) {
+        this.qnam = qnam;
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override string authentication_type () {
+        return "test";
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override string user () {
+        return "admin";
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override string password () {
+        return "password";
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override QNetworkAccessManager create_qnam () {
+        return this.qnam;
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override bool ready () {
+        return true;
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override void fetch_from_keychain () { }
+
+    /***********************************************************
+    ***********************************************************/
+    public override void ask_from_user () { }
+
+    /***********************************************************
+    ***********************************************************/
+    public override bool still_valid (Soup.Reply reply) {
+        return true;
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override void persist () { }
+
+    /***********************************************************
+    ***********************************************************/
+    public override void invalidateToken () { }
+
+    /***********************************************************
+    ***********************************************************/
+    public override void forgetSensitiveData () { }
+
+}
+}

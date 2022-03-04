@@ -151,7 +151,7 @@ signals:
         // remote_folder may be empty, which means /
         string local_folder = Theme.instance ().default_client_folder ();
 
-        // if its a relative path, prepend with users home dir, otherwise use as absolute path
+        // if its a relative path, prepend with users home directory, otherwise use as absolute path
 
         if (!QDir (local_folder).is_absolute ()) {
             local_folder = QDir.home_path () + '/' + local_folder;
@@ -279,7 +279,7 @@ signals:
         var permanent_redirects = std.make_shared<int> (0);
         connect (redirect_check_job, &AbstractNetworkJob.redirected, this,
             [permanent_redirects, account] (Soup.Reply reply, GLib.Uri target_url, int count) {
-                int http_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+                int http_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
                 if (count == *permanent_redirects && (http_code == 301 || http_code == 308)) {
                     GLib.info () + account.url (" was redirected to" + target_url;
                     account.url (target_url);
@@ -414,7 +414,7 @@ signals:
 
         // If there were redirects on the authed* requests, also store
         // the updated server URL, similar to redirects on status.php.
-        GLib.Uri redirect_url = reply.attribute (QNetworkRequest.RedirectionTargetAttribute).to_url ();
+        GLib.Uri redirect_url = reply.attribute (Soup.Request.RedirectionTargetAttribute).to_url ();
         if (!redirect_url.is_empty ()) {
             GLib.info ("Authed request was redirected to" + redirect_url.to_string ();
 
@@ -651,7 +651,7 @@ signals:
     }
 
     bool OwncloudSetupWizard.ensure_start_from_scratch (string local_folder) {
-        // first try to rename (backup) the current local dir.
+        // first try to rename (backup) the current local directory.
         bool rename_ok = false;
         while (!rename_ok) {
             rename_ok = FolderMan.instance ().start_from_scratch (local_folder);

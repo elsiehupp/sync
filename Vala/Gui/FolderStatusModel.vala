@@ -1087,10 +1087,10 @@ class FolderStatusModel : QAbstractItemModel {
             var filename = GLib.FileInfo (citm.item.file).filename ();
             if (all_filenames.length () > 0) {
                 // : Build a list of file names
-                all_filenames.append (QStringLiteral (", \"%1\"").arg (filename));
+                all_filenames.append (", \"%1\"".arg (filename));
             } else {
                 // : Argument is a file name
-                all_filenames.append (QStringLiteral ("\"%1\"").arg (filename));
+                all_filenames.append ("\"%1\"".arg (filename));
             }
         }
         if (cur_item_progress == -1) {
@@ -1250,7 +1250,7 @@ class FolderStatusModel : QAbstractItemModel {
             new_info.path_index = parent_info.path_index;
             new_info.path_index + new_subs.size ();
             new_info.is_external = permission_map.value (remove_trailing_slash (path)).to_string ().contains ("M");
-            new_info.is_encrypted = encryption_map.value (remove_trailing_slash (path)).to_string () == QStringLiteral ("1");
+            new_info.is_encrypted = encryption_map.value (remove_trailing_slash (path)).to_string () == "1";
             new_info.path = relative_path;
 
             SyncJournalFileRecord record;

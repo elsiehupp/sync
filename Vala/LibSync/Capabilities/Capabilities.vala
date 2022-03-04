@@ -286,7 +286,7 @@ class Capabilities {
     Returns true if the server supports client side encryption
     ***********************************************************/
     public bool client_side_encryption_available () {
-        var it = this.capabilities.const_find (QStringLiteral ("end-to-end-encryption"));
+        var it = this.capabilities.const_find ("end-to-end-encryption");
         if (it == this.capabilities.const_end ()) {
             return false;
         }
@@ -365,8 +365,8 @@ class Capabilities {
     ***********************************************************/
     public GLib.ByteArray preferred_upload_checksum_type () {
         return q_environment_variable ("OWNCLOUD_CONTENT_CHECKSUM_TYPE",
-            this.capabilities.value (QStringLiteral ("checksums")).to_map ()
-            .value (QStringLiteral ("preferred_upload_type"), QStringLiteral ("SHA1")).to_string ()).to_utf8 ();
+            this.capabilities.value ("checksums").to_map ()
+            .value ("preferred_upload_type", "SHA1").to_string ()).to_utf8 ();
     }
 
 
@@ -423,7 +423,7 @@ class Capabilities {
     Note that it just needs to be contained. The regex [ab] is contained in "car".
     ***********************************************************/
     public string invalid_filename_regex () {
-        return this.capabilities[QStringLiteral ("dav")].to_map ()[QStringLiteral ("invalid_filename_regex")].to_string ();
+        return this.capabilities["dav"].to_map ()["invalid_filename_regex"].to_string ();
     }
 
 

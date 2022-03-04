@@ -171,7 +171,7 @@ void OwncloudDolphinPluginHelper.tryConnect () {
 }
 
 void OwncloudDolphinPluginHelper.slotReadyRead () {
-    while (this.socket.bytesAvailable ()) {
+    while (this.socket.bytes_available ()) {
         this.line += this.socket.readLine ();
         if (!this.line.endsWith ("\n"))
             continue;

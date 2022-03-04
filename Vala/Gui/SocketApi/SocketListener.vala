@@ -19,10 +19,10 @@ class Socket_listener {
 
     public void on_signal_send_message (string message, bool do_wait = false);
     public void send_warning (string message, bool do_wait = false) {
-        on_signal_send_message (QStringLiteral ("WARNING:") + message, do_wait);
+        on_signal_send_message ("WARNING:" + message, do_wait);
     }
     public void send_error (string message, bool do_wait = false) {
-        on_signal_send_message (QStringLiteral ("ERROR:") + message, do_wait);
+        on_signal_send_message ("ERROR:" + message, do_wait);
     }
 
     public void send_message_if_directory_monitored (string message, uint32 system_directory_hash) {

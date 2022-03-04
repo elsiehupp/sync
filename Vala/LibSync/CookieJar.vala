@@ -71,8 +71,8 @@ class CookieJar : QNetworkCookieJar {
     ***********************************************************/
     public bool save (string filename) {
         const GLib.FileInfo info (filename);
-        if (!info.dir ().exists ()) {
-            info.dir ().mkpath (".");
+        if (!info.directory ().exists ()) {
+            info.directory ().mkpath (".");
         }
 
         GLib.debug (filename;

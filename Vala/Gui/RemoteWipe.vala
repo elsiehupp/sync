@@ -6,7 +6,7 @@ Copyright (C) by Camila Ayres <hello@camila.codes>
 
 //  #include <QJsonDocument>
 //  #include <QJsonObject>
-//  #include <QNetworkRequest>
+//  #include <Soup.Request>
 //  #include <QBuffer>
 //  #include <QNetworkAccessManager>
 
@@ -95,8 +95,8 @@ signals:
         this.app_password = pwd;
         GLib.Uri request_url = Utility.concat_url_path (this.account.url ().to_string (),
                                                  QLatin1String ("/index.php/core/wipe/check"));
-        QNetworkRequest request;
-        request.header (QNetworkRequest.ContentTypeHeader,
+        Soup.Request request;
+        request.header (Soup.Request.ContentTypeHeader,
                           "application/x-www-form-urlencoded");
         request.url (request_url);
         request.ssl_configuration (this.account.get_or_create_ssl_config ());
@@ -174,8 +174,8 @@ signals:
         if (this.account_removed && data_wiped && this.account == account_state.account ()) {
             GLib.Uri request_url = Utility.concat_url_path (this.account.url ().to_string (),
                                                      QLatin1String ("/index.php/core/wipe/on_signal_success"));
-            QNetworkRequest request;
-            request.header (QNetworkRequest.ContentTypeHeader,
+            Soup.Request request;
+            request.header (Soup.Request.ContentTypeHeader,
                               "application/x-www-form-urlencoded");
             request.url (request_url);
             request.ssl_configuration (this.account.get_or_create_ssl_config ());

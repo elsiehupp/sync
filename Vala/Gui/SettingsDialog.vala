@@ -31,10 +31,10 @@ namespace Ui {
 class SettingsDialog : Gtk.Dialog {
 
     const string TOOLBAR_CSS () {
-        return QStringLiteral ("QTool_bar { background : %1; margin : 0; padding : 0; border : none; border-bottom : 1px solid %2; spacing : 0; } "
-                               "QTool_bar QToolButton { background : %1; border : none; border-bottom : 1px solid %2; margin : 0; padding : 5px; } "
-                               "QTool_bar QTool_bar_extension { padding:0; } "
-                               "QTool_bar QToolButton:checked { background : %3; color : %4; }");
+        return "QTool_bar { background : %1; margin : 0; padding : 0; border : none; border-bottom : 1px solid %2; spacing : 0; } "
+             + "QTool_bar QToolButton { background : %1; border : none; border-bottom : 1px solid %2; margin : 0; padding : 5px; } "
+             + "QTool_bar QTool_bar_extension { padding:0; } "
+             + "QTool_bar QToolButton:checked { background : %3; color : %4; }";
     }
 
     const float button_size_ratio = 1.618f; // golden ratio
@@ -60,7 +60,7 @@ class SettingsDialog : Gtk.Dialog {
             host = fm.elided_text (host, Qt.Elide_middle, width);
             user = fm.elided_text (user, Qt.Elide_right, width);
         }
-        return QStringLiteral ("%1\n%2").arg (user, host);
+        return "%1\n%2".arg (user, host);
     }
 
     /***********************************************************

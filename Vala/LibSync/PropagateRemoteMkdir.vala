@@ -251,7 +251,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         propfind_job.properties ({"http://owncloud.org/ns:permissions"});
         connect (propfind_job, PropfindJob.result, this, [this, job_path] (GLib.HashTable<string, GLib.Variant> result) {
             propagator ().active_job_list.remove_one (this);
-            this.item.remote_perm = RemotePermissions.from_server_string (result.value (QStringLiteral ("permissions")).to_string ());
+            this.item.remote_perm = RemotePermissions.from_server_string (result.value ("permissions").to_string ());
 
             if (!this.upload_encrypted_helper && !this.item.is_encrypted) {
                 on_signal_success ();

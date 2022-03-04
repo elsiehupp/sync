@@ -7,7 +7,7 @@ Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
 //  #include <QApplication>
 //  #include <qt5keychain/keychain.h>
 
-using namespace QKeychain;
+using QKeychain;
 
 
 //  #include <QNetworkProxy>

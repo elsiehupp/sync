@@ -483,7 +483,7 @@ class BulkPropagatorJob : PropagatorJob {
 
         GLib.info (single_file.item.file + "file headers" + file_reply;
 
-        if (file_reply.contains ("error") && !file_reply[QStringLiteral ("error")].to_bool ()) {
+        if (file_reply.contains ("error") && !file_reply["error"].to_bool ()) {
             single_file.item.http_error_code = static_cast<uint16> (200);
         } else {
             single_file.item.http_error_code = static_cast<uint16> (412);
@@ -492,7 +492,7 @@ class BulkPropagatorJob : PropagatorJob {
         single_file.item.response_time_stamp = job.response_timestamp ();
         single_file.item.request_id = job.request_id ();
         if (single_file.item.http_error_code != 200) {
-            common_error_handling (single_file.item, file_reply[QStringLiteral ("message")].to_string ());
+            common_error_handling (single_file.item, file_reply["message"].to_string ());
             return;
         }
 

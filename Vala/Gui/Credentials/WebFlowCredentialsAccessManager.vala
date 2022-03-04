@@ -18,8 +18,8 @@ class WebFlowCredentialsAccessManager : AccessManager {
     }
 
 
-    protected Soup.Reply create_request (Operation op, QNetworkRequest request, QIODevice outgoing_data) override {
-        QNetworkRequest req (request);
+    protected Soup.Reply create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) override {
+        Soup.Request req (request);
         if (!req.attribute (WebFlowCredentials.DontAddCredentialsAttribute).to_bool ()) {
             if (this.credentials && !this.credentials.password ().is_empty ()) {
                 GLib.ByteArray cred_hash = GLib.ByteArray (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
@@ -41,7 +41,7 @@ class WebFlowCredentialsAccessManager : AccessManager {
             req.ssl_configuration (ssl_configuration);
         }
 
-        return AccessManager.create_request (op, req, outgoing_data);
+        return AccessManager.create_request (operation, req, outgoing_data);
     }
 
 

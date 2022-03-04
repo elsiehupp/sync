@@ -7,7 +7,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 //  #include <QScopedPointer>
 
 //  namespace xattr {
-//      using namespace Occ.XAttrWrapper;
+//      using Occ.XAttrWrapper;
 //  }
 
 namespace Occ {

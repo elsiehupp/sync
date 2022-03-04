@@ -7,7 +7,9 @@
 //  #include <QtTest>
 //  #include <sqlite3.h>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class TestSyncJournalDB : GLib.Object {
 
@@ -55,7 +57,7 @@ class TestSyncJournalDB : GLib.Object {
         record.modtime = dropMsecs (GLib.DateTime.currentDateTime ());
         record.type = ItemTypeDirectory;
         record.etag = "789789";
-        record.fileId = "abcd";
+        record.file_identifier = "abcd";
         record.remotePerm = RemotePermissions.fromDbValue ("RW");
         record.fileSize = 213089055;
         record.checksumHeader = "MD5:mychecksum";
@@ -77,7 +79,7 @@ class TestSyncJournalDB : GLib.Object {
         record.inode = std.numeric_limits<uint64>.max () - std.numeric_limits<uint32>.max () - 1;
         record.type = ItemTypeFile;
         record.etag = "789FFF";
-        record.fileId = "efg";
+        record.file_identifier = "efg";
         record.remotePerm = RemotePermissions.fromDbValue ("NV");
         record.fileSize = 289055;
         this.database.setFileRecord (record);
@@ -180,11 +182,11 @@ class TestSyncJournalDB : GLib.Object {
         SyncJournalFileRecord record;
 
         // Typical 8-digit padded identifier
-        record.fileId = "00000001abcd";
+        record.file_identifier = "00000001abcd";
         QCOMPARE (record.numericFileId (), GLib.ByteArray ("00000001"));
 
         // When the numeric identifier overflows the 8-digit boundary
-        record.fileId = "123456789ocidblaabcd";
+        record.file_identifier = "123456789ocidblaabcd";
         QCOMPARE (record.numericFileId (), GLib.ByteArray ("123456789"));
     }
 

@@ -134,7 +134,7 @@ class ConfigFile {
             }
             if (file_info.exists () && file_info.is_dir ()) {
                 dir_path = file_info.absolute_file_path ();
-                GLib.info ("Using custom config dir " + dir_path;
+                GLib.info ("Using custom config directory " + dir_path;
                 this.conf_dir = dir_path;
                 return true;
             }
@@ -183,11 +183,11 @@ class ConfigFile {
                 this.conf_dir = new_location;
             }
         }
-        string dir = this.conf_dir;
+        string directory = this.conf_dir;
 
-        if (!dir.has_suffix ('/'))
-            dir.append ('/');
-        return dir;
+        if (!directory.has_suffix ('/'))
+            directory.append ('/');
+        return directory;
     }
 
 
@@ -233,7 +233,7 @@ class ConfigFile {
 
 
     /***********************************************************
-    Doesn't access config dir
+    Doesn't access config directory
     ***********************************************************/
     public static string exclude_file_from_system () {
         GLib.FileInfo file_info;
@@ -845,13 +845,13 @@ class ConfigFile {
     /***********************************************************
     ***********************************************************/
     bool copy_dir_recursive (string from_dir, string to_dir) {
-        QDir dir;
-        dir.path (from_dir);
+        QDir directory;
+        directory.path (from_dir);
 
         from_dir += QDir.separator ();
         to_dir += QDir.separator ();
 
-        foreach (string copy_file in dir.entry_list (QDir.Files)) {
+        foreach (string copy_file in directory.entry_list (QDir.Files)) {
             string from = from_dir + copy_file;
             string to = to_dir + copy_file;
 
@@ -860,11 +860,11 @@ class ConfigFile {
             }
         }
 
-        foreach (string copy_dir in dir.entry_list (QDir.Dirs | QDir.NoDotAndDotDot)) {
+        foreach (string copy_dir in directory.entry_list (QDir.Dirs | QDir.NoDotAndDotDot)) {
             string from = from_dir + copy_dir;
             string to = to_dir + copy_dir;
 
-            if (dir.mkpath (to) == false) {
+            if (directory.mkpath (to) == false) {
                 return false;
             }
 
@@ -1132,14 +1132,14 @@ class ConfigFile {
     ***********************************************************/
     public string update_channel ();
     string ConfigFile.update_channel () {
-        string default_update_channel = QStringLiteral ("stable");
+        string default_update_channel = "stable";
         string suffix = string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX));
         if (suffix.starts_with ("daily")
             || suffix.starts_with ("nightly")
             || suffix.starts_with ("alpha")
             || suffix.starts_with ("rc")
             || suffix.starts_with ("beta")) {
-            default_update_channel = QStringLiteral ("beta");
+            default_update_channel = "beta";
         }
 
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);

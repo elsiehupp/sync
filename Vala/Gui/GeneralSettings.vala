@@ -114,8 +114,8 @@ GLib.Vector<Zip_entry> create_file_list () {
     if (!logger.log_dir ().is_empty ()) {
         list.append ({"", "logs"});
 
-        QDir dir (logger.log_dir ());
-        const var info_list = dir.entry_info_list (QDir.Files);
+        QDir directory (logger.log_dir ());
+        const var info_list = directory.entry_info_list (QDir.Files);
         std.transform (std.cbegin (info_list), std.cend (info_list),
                        std.back_inserter (list),
                        file_info_to_log_zip_entry);

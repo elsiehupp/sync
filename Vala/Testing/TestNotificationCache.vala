@@ -1,5 +1,7 @@
 // #include <QTest>
 
+namespace Testing {
+
 class TestNotificationCache : GLib.Object {
 
     /***********************************************************

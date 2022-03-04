@@ -8,7 +8,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <QSignalSpy>
 //  #include <memory>
 
-
+namespace Testing {
 
 class TestSetUserStatusDialog : GLib.Object {
 

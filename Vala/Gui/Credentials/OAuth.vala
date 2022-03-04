@@ -97,8 +97,8 @@ class OAuth : GLib.Object {
                     string code = rx_match.captured (1); // The 'code' is the first capture of the regexp
 
                     GLib.Uri request_token = Utility.concat_url_path (this.account.url ().to_string (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
-                    QNetworkRequest req;
-                    req.header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
+                    Soup.Request req;
+                    req.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
                     string basic_auth = string ("%1:%2").arg (
                         Theme.instance ().oauth_client_id (), Theme.instance ().oauth_client_secret ());

@@ -1167,7 +1167,7 @@ class SyncJournalDb : GLib.Object {
             query.prepare ("DELETE FROM blocklist WHERE path=?1");
             query.bind_value (1, file);
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("Deletion of blocklist item failed."), query);
+                sql_fail ("Deletion of blocklist item failed.", query);
             }
         }
     }
@@ -1183,7 +1183,7 @@ class SyncJournalDb : GLib.Object {
             query.prepare ("DELETE FROM blocklist WHERE error_category=?1");
             query.bind_value (1, category);
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("Deletion of blocklist category failed."), query);
+                sql_fail ("Deletion of blocklist category failed.", query);
             }
         }
     }
@@ -1199,7 +1199,7 @@ class SyncJournalDb : GLib.Object {
             query.prepare ("DELETE FROM blocklist");
 
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("Deletion of whole blocklist failed"), query);
+                sql_fail ("Deletion of whole blocklist failed", query);
                 return -1;
             }
             return query.num_rows_affected ();
@@ -1218,7 +1218,7 @@ class SyncJournalDb : GLib.Object {
             SqlQuery query = new SqlQuery ("SELECT count (*) FROM blocklist", this.database);
 
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("Count number of blocklist entries failed"), query);
+                sql_fail ("Count number of blocklist entries failed", query);
             }
             if (query.next ().has_data) {
                 re = query.int_value (0);
@@ -1330,7 +1330,7 @@ class SyncJournalDb : GLib.Object {
         }
         {
             PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY);
-            if (!delete_batch (*query, superfluous_paths, QStringLiteral ("downloadinfo"))) {
+            if (!delete_batch (*query, superfluous_paths, "downloadinfo")) {
                 return empty_result;
             }
         }
@@ -1349,7 +1349,7 @@ class SyncJournalDb : GLib.Object {
             SqlQuery query = new SqlQuery ("SELECT count (*) FROM downloadinfo", this.database);
 
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("Count number of downloadinfo entries failed"), query);
+                sql_fail ("Count number of downloadinfo entries failed", query);
             }
             if (query.next ().has_data) {
                 re = query.int_value (0);
@@ -1467,7 +1467,7 @@ class SyncJournalDb : GLib.Object {
         }
 
         PreparedSqlQuery delete_upload_info_query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY);
-        delete_batch (*delete_upload_info_query, superfluous_paths, QStringLiteral ("uploadinfo"));
+        delete_batch (*delete_upload_info_query, superfluous_paths, "uploadinfo");
         return ids;
     }
 
@@ -1532,7 +1532,7 @@ class SyncJournalDb : GLib.Object {
 
         SqlQuery del_query = new SqlQuery (this.database);
         del_query.prepare ("DELETE FROM blocklist WHERE path = ?");
-        return delete_batch (del_query, superfluous_paths, QStringLiteral ("blocklist"));
+        return delete_batch (del_query, superfluous_paths, "blocklist");
     }
 
 
@@ -2081,7 +2081,7 @@ class SyncJournalDb : GLib.Object {
         query.exec ();
 
         // We also must make sure we do not read the files from the database (same logic as in schedule_path_for_remote_discovery)
-        // This includes all the parents up to the root, but also all the directory within the selected dir.
+        // This includes all the parents up to the root, but also all the directory within the selected directory.
         static_assert (ItemTypeDirectory == 2, "");
         query.prepare (
             "UPDATE metadata SET md5='this.invalid_' WHERE "
@@ -2184,74 +2184,74 @@ class SyncJournalDb : GLib.Object {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN fileid VARCHAR (128);");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : Add column fileid"), query);
+                sql_fail ("update_metadata_table_structure : Add column fileid", query);
                 re = false;
             }
 
             query.prepare ("CREATE INDEX metadata_file_id ON metadata (fileid);");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : create index fileid"), query);
+                sql_fail ("update_metadata_table_structure : create index fileid", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add fileid col"));
+            commit_internal ("update database structure : add fileid col");
         }
         if (columns.index_of ("remote_perm") == -1) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN remote_perm VARCHAR (128);");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : add column remote_perm"), query);
+                sql_fail ("update_metadata_table_structure : add column remote_perm", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure (remote_perm)"));
+            commit_internal ("update database structure (remote_perm)");
         }
         if (columns.index_of ("filesize") == -1) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN filesize BIGINT;");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_database_structure : add column filesize"), query);
+                sql_fail ("update_database_structure : add column filesize", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add filesize col"));
+            commit_internal ("update database structure : add filesize col");
         }
 
         if (true) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("CREATE INDEX IF NOT EXISTS metadata_inode ON metadata (inode);");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : create index inode"), query);
+                sql_fail ("update_metadata_table_structure : create index inode", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add inode index"));
+            commit_internal ("update database structure : add inode index");
         }
 
         if (true) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("CREATE INDEX IF NOT EXISTS metadata_path ON metadata (path);");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : create index path"), query);
+                sql_fail ("update_metadata_table_structure : create index path", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add path index"));
+            commit_internal ("update database structure : add path index");
         }
 
         if (true) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("CREATE INDEX IF NOT EXISTS metadata_parent ON metadata (parent_hash (path));");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : create index parent"), query);
+                sql_fail ("update_metadata_table_structure : create index parent", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add parent index"));
+            commit_internal ("update database structure : add parent index");
         }
 
         if (columns.index_of ("ignored_children_remote") == -1) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN ignored_children_remote INT;");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : add ignored_children_remote column"), query);
+                sql_fail ("update_metadata_table_structure : add ignored_children_remote column", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add ignored_children_remote col"));
+            commit_internal ("update database structure : add ignored_children_remote col");
         }
 
         if (columns.index_of ("content_checksum") == -1) {

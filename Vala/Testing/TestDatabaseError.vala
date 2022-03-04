@@ -7,7 +7,9 @@ implied, as to its usefulness for any purpose.
 //  #include <QtTest>
 //  #include <syncengine.h>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class TestDatabaseError : GLib.Object {
 
@@ -26,47 +28,47 @@ class TestDatabaseError : GLib.Object {
             FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
             // Do a couple of changes
-            fakeFolder.remoteModifier ().insert ("A/a0");
-            fakeFolder.remoteModifier ().appendByte ("A/a1");
-            fakeFolder.remoteModifier ().remove ("A/a2");
-            fakeFolder.remoteModifier ().rename ("S/s1", "S/s1_renamed");
-            fakeFolder.remoteModifier ().mkdir ("D");
-            fakeFolder.remoteModifier ().mkdir ("D/subdir");
-            fakeFolder.remoteModifier ().insert ("D/subdir/file");
-            fakeFolder.localModifier ().insert ("B/b0");
-            fakeFolder.localModifier ().appendByte ("B/b1");
-            fakeFolder.remoteModifier ().remove ("B/b2");
-            fakeFolder.localModifier ().mkdir ("NewDir");
-            fakeFolder.localModifier ().rename ("C", "NewDir/C");
+            fakeFolder.remote_modifier ().insert ("A/a0");
+            fakeFolder.remote_modifier ().append_byte ("A/a1");
+            fakeFolder.remote_modifier ().remove ("A/a2");
+            fakeFolder.remote_modifier ().rename ("S/s1", "S/s1_renamed");
+            fakeFolder.remote_modifier ().mkdir ("D");
+            fakeFolder.remote_modifier ().mkdir ("D/subdir");
+            fakeFolder.remote_modifier ().insert ("D/subdir/file");
+            fakeFolder.local_modifier ().insert ("B/b0");
+            fakeFolder.local_modifier ().append_byte ("B/b1");
+            fakeFolder.remote_modifier ().remove ("B/b2");
+            fakeFolder.local_modifier ().mkdir ("NewDir");
+            fakeFolder.local_modifier ().rename ("C", "NewDir/C");
 
             // Set the counter
-            fakeFolder.syncJournal ().autotestFailCounter = count;
+            fakeFolder.sync_journal ().autotestFailCounter = count;
 
             // run the sync
-            bool result = fakeFolder.syncOnce ();
+            bool result = fakeFolder.sync_once ();
 
             qInfo ("Result of iteration" + count + "was" + result;
 
-            if (fakeFolder.syncJournal ().autotestFailCounter >= 0) {
+            if (fakeFolder.sync_journal ().autotestFailCounter >= 0) {
                 // No error was thrown, we are on_signal_finished
                 QVERIFY (result);
-                QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-                QCOMPARE (fakeFolder.currentRemoteState (), finalState);
+                QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
+                QCOMPARE (fakeFolder.current_remote_state (), finalState);
                 return;
             }
 
             if (!result) {
-                fakeFolder.syncJournal ().autotestFailCounter = -1;
+                fakeFolder.sync_journal ().autotestFailCounter = -1;
                 // Try again
-                QVERIFY (fakeFolder.syncOnce ());
+                QVERIFY (fakeFolder.sync_once ());
             }
 
-            QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+            QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
             if (count == 0) {
-                finalState = fakeFolder.currentRemoteState ();
+                finalState = fakeFolder.current_remote_state ();
             } else {
                 // the final state should be the same for every iteration
-                QCOMPARE (fakeFolder.currentRemoteState (), finalState);
+                QCOMPARE (fakeFolder.current_remote_state (), finalState);
             }
         }
     }

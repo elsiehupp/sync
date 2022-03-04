@@ -227,11 +227,11 @@ class FolderMan : GLib.Object {
                 settings.end_group ();
             }
     
-            process (QStringLiteral ("Folders"), true, false);
+            process ("Folders", true, false);
     
             // See Folder.save_to_settings for details about why these exists.
-            process (QStringLiteral ("Multifolders"), false, false);
-            process (QStringLiteral ("FoldersWithPlaceholders"), false, true);
+            process ("Multifolders", false, false);
+            process ("FoldersWithPlaceholders", false, true);
     
             settings.end_group (); // <account>
         }
@@ -255,10 +255,10 @@ class FolderMan : GLib.Object {
     
         GLib.info ("Setup folders from " + this.folder_config_path + " (migration)";
     
-        QDir dir (this.folder_config_path);
+        QDir directory (this.folder_config_path);
         //We need to include hidden files just in case the alias starts with '.'
-        dir.filter (QDir.Files | QDir.Hidden);
-        const var list = dir.entry_list ();
+        directory.filter (QDir.Files | QDir.Hidden);
+        const var list = directory.entry_list ();
     
         // Normally there should be only one account when migrating.
         AccountState account_state = AccountManager.instance ().accounts ().value (0).data ();
@@ -589,7 +589,7 @@ class FolderMan : GLib.Object {
         }
     
         GLib.FileInfo fi (local_folder);
-        QDir parent_dir (fi.dir ());
+        QDir parent_dir (fi.directory ());
         string folder_name = fi.filename ();
     
         // Adjust for case where local_folder ends with a /
@@ -600,12 +600,12 @@ class FolderMan : GLib.Object {
     
         if (fi.exists ()) {
             // It exists, but is empty . just reuse it.
-            if (fi.is_dir () && fi.dir ().count () == 0) {
+            if (fi.is_dir () && fi.directory ().count () == 0) {
                 GLib.debug ("start_from_scratch : Directory is empty!";
                 return true;
             }
             // Disconnect the socket api from the database to avoid that locking of the
-            // database file does not allow to move this dir.
+            // database file does not allow to move this directory.
             Folder folder = folder_for_path (local_folder);
             if (folder) {
                 if (local_folder.starts_with (folder.path ())) {
@@ -915,7 +915,7 @@ class FolderMan : GLib.Object {
         // possibly find a valid sync folder inside it.
         // Example: Someone syncs their home directory. Then ~/foobar is not
         // going to be an acceptable sync folder path for any value of foobar.
-        string parent_folder = GLib.FileInfo (folder).dir ().canonical_path ();
+        string parent_folder = GLib.FileInfo (folder).directory ().canonical_path ();
         if (FolderMan.instance ().folder_for_path (parent_folder)) {
             // Any path with that parent is going to be unacceptable,
             // so just keep it as-is.
@@ -1838,9 +1838,9 @@ class FolderMan : GLib.Object {
     
                 // Migration #2 : journal_path might be absolute (in DataAppDir most likely) move it back to the root of local tree
                 if (folder_definition.journal_path.at (0) != char ('.')) {
-                    GLib.File old_journal (folder_definition.journal_path);
-                    GLib.File old_journal_shm (folder_definition.journal_path + QStringLiteral ("-shm"));
-                    GLib.File old_journal_wal (folder_definition.journal_path + QStringLiteral ("-wal"));
+                    GLib.File old_journal = new GLib.File (folder_definition.journal_path);
+                    GLib.File old_journal_shm = new GLib.File (folder_definition.journal_path + "-shm");
+                    GLib.File old_journal_wal = new GLib.File (folder_definition.journal_path + "-wal");
     
                     folder_definition.journal_path = default_journal_path;
     
@@ -1853,10 +1853,10 @@ class FolderMan : GLib.Object {
                         journal_file_move_success &= old_journal.rename (folder_definition.local_path + "/" + folder_definition.journal_path);
                     }
                     if (old_journal_shm.exists ()) {
-                        journal_file_move_success &= old_journal_shm.rename (folder_definition.local_path + "/" + folder_definition.journal_path + QStringLiteral ("-shm"));
+                        journal_file_move_success &= old_journal_shm.rename (folder_definition.local_path + "/" + folder_definition.journal_path + "-shm");
                     }
                     if (old_journal_wal.exists ()) {
-                        journal_file_move_success &= old_journal_wal.rename (folder_definition.local_path + "/" + folder_definition.journal_path + QStringLiteral ("-wal"));
+                        journal_file_move_success &= old_journal_wal.rename (folder_definition.local_path + "/" + folder_definition.journal_path + "-wal");
                     }
     
                     if (!journal_file_move_success) {
@@ -2002,7 +2002,7 @@ class FolderMan : GLib.Object {
         const GLib.FileInfo sel_file (path);
     
         if (!sel_file.exists ()) {
-            string parent_path = sel_file.dir ().path ();
+            string parent_path = sel_file.directory ().path ();
             if (parent_path != path)
                 return check_path_validity_recursive (parent_path);
             return FolderMan._("The selected path does not exist!");
@@ -2028,7 +2028,7 @@ class FolderMan : GLib.Object {
     private static string canonical_path (string path) {
         GLib.FileInfo sel_file (path);
         if (!sel_file.exists ()) {
-            const var parent_path = sel_file.dir ().path ();
+            const var parent_path = sel_file.directory ().path ();
     
             // It's possible for the parent_path to match the path
             // (possibly we've arrived at a non-existant drive root on Windows)

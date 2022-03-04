@@ -103,9 +103,9 @@ class InvalidFilenameDialog : Gtk.Dialog {
         //  Q_ASSERT (this.folder);
 
         const var file_path_file_info = GLib.FileInfo (this.file_path);
-        this.relative_file_path = file_path_file_info.path () + QStringLiteral ("/");
-        this.relative_file_path = this.relative_file_path.replace (folder.path (), QStringLiteral (""));
-        this.relative_file_path = this.relative_file_path.is_empty () ? QStringLiteral ("") : this.relative_file_path + QStringLiteral ("/");
+        this.relative_file_path = file_path_file_info.path () + "/";
+        this.relative_file_path = this.relative_file_path.replace (folder.path (), "");
+        this.relative_file_path = this.relative_file_path.is_empty () ? "" : this.relative_file_path + "/";
 
         this.original_filename = this.relative_file_path + file_path_file_info.filename ();
 

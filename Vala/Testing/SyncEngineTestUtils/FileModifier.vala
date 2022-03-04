@@ -4,16 +4,18 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
+namespace Testing {
+
 class FileModifier {
 
     /***********************************************************
     ***********************************************************/
     public virtual ~FileModifier () = default;
-    public virtual void remove (string relativePath);
-    public virtual void insert (string relativePath, int64 size = 64, char contentChar = 'W');
-    public virtual void setContents (string relativePath, char contentChar);
-    public virtual void appendByte (string relativePath);
-    public virtual void mkdir (string relativePath);
-    public virtual void rename (string relativePath, string relativeDestinationDirectory);
-    public virtual void setModTime (string relativePath, GLib.DateTime modTime);
+    public virtual void remove (string relative_path);
+    public virtual void insert (string relative_path, int64 size = 64, char content_char = 'W');
+    public virtual void set_contents (string relative_path, char content_char);
+    public virtual void append_byte (string relative_path);
+    public virtual void mkdir (string relative_path);
+    public virtual void rename (string relative_path, string relativeDestinationDirectory);
+    public virtual void set_modification_time (string relative_path, GLib.DateTime modification_time);
 };

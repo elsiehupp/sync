@@ -23,7 +23,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <qsslconfiguration.h>
 //  #include <qt5keychain/keychain.h>
 
-//  using namespace QKeychain;
+//  using QKeychain;
 
 //  #include <QNetworkCookie>
 //  #include <Soup.Request>

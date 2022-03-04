@@ -186,16 +186,16 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     ***********************************************************/
     public void result_clicked (string provider_id, GLib.Uri resource_url) {
         const QUrlQuery url_query{resource_url};
-        const var dir = url_query.query_item_value (QStringLiteral ("dir"), GLib.Uri.Component_formatting_option.Fully_decoded);
+        const var directory = url_query.query_item_value (QStringLiteral ("directory"), GLib.Uri.Component_formatting_option.Fully_decoded);
         const var filename =
             url_query.query_item_value (QStringLiteral ("scrollto"), GLib.Uri.Component_formatting_option.Fully_decoded);
 
-        if (provider_id.contains (QStringLiteral ("file"), Qt.CaseInsensitive) && !dir.is_empty () && !filename.is_empty ()) {
+        if (provider_id.contains (QStringLiteral ("file"), Qt.CaseInsensitive) && !directory.is_empty () && !filename.is_empty ()) {
             if (!this.account_state || !this.account_state.account ()) {
                 return;
             }
 
-            const string relative_path = dir + '/' + filename;
+            const string relative_path = directory + '/' + filename;
             const var local_files =
                 FolderMan.instance ().find_file_in_local_folders (GLib.FileInfo (relative_path).path (), this.account_state.account ());
 

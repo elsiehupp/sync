@@ -7,10 +7,12 @@
 //  #include <QtTest>
 //  #include <QDebug>
 
-using namespace Occ;
+using Occ;
 namespace Occ {
 string createDownloadTmpFileName (string previous);
 }
+
+namespace Testing {
 
 class TestNextcloudPropagator : GLib.Object {
 
@@ -26,7 +28,7 @@ class TestNextcloudPropagator : GLib.Object {
     ***********************************************************/
     private on_ void testTmpDownloadFileNameGeneration () {
         string fn;
-        // without dir
+        // without directory
         for (int i = 1; i <= 1000; i++) {
             fn+="F";
             string tmpFileName = createDownloadTmpFileName (fn);
@@ -36,7 +38,7 @@ class TestNextcloudPropagator : GLib.Object {
             QVERIFY ( tmpFileName.length () > 0);
             QVERIFY ( tmpFileName.length () <= 254);
         }
-        // with absolute dir
+        // with absolute directory
         fn = "/Users/guruz/ownCloud/rocks/GPL";
         for (int i = 1; i < 1000; i++) {
             fn+="F";
@@ -47,7 +49,7 @@ class TestNextcloudPropagator : GLib.Object {
             QVERIFY ( tmpFileName.length () > 0);
             QVERIFY ( tmpFileName.length () <= 254);
         }
-        // with relative dir
+        // with relative directory
         fn = "rocks/GPL";
         for (int i = 1; i < 1000; i++) {
             fn+="F";

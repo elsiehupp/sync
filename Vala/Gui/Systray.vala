@@ -364,7 +364,7 @@ void Systray.closed () {
 void Systray.show_message (string title, string message, Message_icon icon) {
 #ifdef USE_FDO_NOTIFICATIONS
     if (QDBus_interface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid ()) {
-        const QVariantMap hints = {{QStringLiteral ("desktop-entry"), LINUX_APPLICATION_ID}};
+        const QVariantMap hints = {{"desktop-entry", LINUX_APPLICATION_ID}};
         GLib.List<GLib.Variant> args = GLib.List<GLib.Variant> () + APPLICATION_NAME + uint32 (0) + APPLICATION_ICON_NAME
                                                  + title + message + string[] () + hints + int32 (-1);
         QDBus_message method = QDBus_message.create_method_call (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE, "Notify");

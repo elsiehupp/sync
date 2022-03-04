@@ -4,13 +4,20 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
+namespace Testing {
+
 class FakeJsonErrorReply : FakeErrorReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeJsonErrorReply (QNetworkAccessManager.Operation op,
-                       const QNetworkRequest request,
-                       GLib.Object parent,
-                       int httpErrorCode,
-                       const QJsonDocument reply = QJsonDocument ());
-};
+    public FakeJsonErrorReply (
+        QNetworkAccessManager.Operation operation,
+        Soup.Request request,
+        GLib.Object parent,
+        int http_error_code,
+        QJsonDocument reply = QJsonDocument ()) {
+        base (operation, request, parent, http_error_code, reply.toJson ());
+    }
+
+}
+}

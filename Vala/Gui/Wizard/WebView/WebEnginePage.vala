@@ -29,7 +29,7 @@ class WebEnginePage : QWebEnginePage {
     ***********************************************************/
     public void url (GLib.Uri url) {
         QWebEnginePage.url (url);
-        this.enforce_https = url.scheme () == QStringLiteral ("https");
+        this.enforce_https = url.scheme () == "https";
     }
 
 
@@ -62,7 +62,7 @@ class WebEnginePage : QWebEnginePage {
         //  Q_UNUSED (type);
         //  Q_UNUSED (is_main_frame);
 
-        if (this.enforce_https && url.scheme () != QStringLiteral ("https") && url.scheme () != QStringLiteral ("nc")) {
+        if (this.enforce_https && url.scheme () != "https" && url.scheme () != "nc") {
             QMessageBox.warning (null, "Security warning", "Can not follow non https link on a https website. This might be a security issue. Please contact your administrator");
             return false;
         }

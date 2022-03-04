@@ -4,6 +4,8 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Testing {
+
 class FakeDateTimeProvider : Occ.DateTimeProvider {
 
     /***********************************************************

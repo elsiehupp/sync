@@ -23,7 +23,7 @@ namespace {
             return result;
         } else {
             for (var color : possible_colors) {
-                result = string{Occ.Theme.theme_prefix} + color + QStringLiteral ("/") + filename;
+                result = string{Occ.Theme.theme_prefix} + color + "/" + filename;
 
                 if (GLib.File.exists (result)) {
                     return result;
@@ -67,24 +67,28 @@ Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fil
         }
 
         // some icons are present in white or black only, so, we need to check both when needed
-        const var icon_base_colors = string[]{QStringLiteral ("black"), QStringLiteral ("white")};
+        const string[] icon_base_colors = {
+            "black", "white"
+        };
 
         // check if there is an existing image matching the custom color {
             const var custom_color_name = [&custom_color] () {
                 var result = custom_color.name ();
-                if (result.starts_with (QStringLiteral ("#"))) {
-                    if (result == QStringLiteral ("#000000")) {
-                        result = QStringLiteral ("black");
+                if (result.starts_with ("#")) {
+                    if (result == "#000000") {
+                        result = "black";
                     }
-                    if (result == QStringLiteral ("#ffffff")) {
-                        result = QStringLiteral ("white");
+                    if (result == "#ffffff") {
+                        result = "white";
                     }
                 }
                 return result;
             } ();
 
             if (icon_base_colors.contains (custom_color_name)) {
-                result = Gtk.Image{string{Occ.Theme.theme_prefix} + custom_color_name + QStringLiteral ("/") + filename};
+                result = new Gtk.Image (
+                    string (Occ.Theme.theme_prefix) + custom_color_name + "/" + filename
+                );
                 if (!result.is_null ()) {
                     return result;
                 }
@@ -115,7 +119,7 @@ Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fil
 
         const var custom_color_name = custom_color.name ();
 
-        const string cache_key = filename + QStringLiteral (",") + custom_color_name;
+        const string cache_key = filename + "," + custom_color_name;
 
         // check for existing QPixmap in cache
         if (QPixmapCache.find (cache_key, cached_pixmap)) {

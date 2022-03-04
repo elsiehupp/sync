@@ -21,7 +21,7 @@ class HttpCredentialsAccessManager : AccessManager {
     }
 
 
-    protected Soup.Reply create_request (Operation op, Soup.Request request, QIODevice outgoing_data) {
+    protected Soup.Reply create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) {
         Soup.Request request = new Soup.Request (request);
         if (!request.attribute (HttpCredentials.DontAddCredentialsAttribute).to_bool ()) {
             if (this.credentials && !this.credentials.password ().is_empty ()) {
@@ -47,7 +47,7 @@ class HttpCredentialsAccessManager : AccessManager {
             request.ssl_configuration (ssl_configuration);
         }
 
-        var reply = AccessManager.create_request (op, request, outgoing_data);
+        var reply = AccessManager.create_request (operation, request, outgoing_data);
 
         if (this.credentials.is_renewing_oauth_token) {
             // We know this is going to fail, but we have no way to queue it there, so we will

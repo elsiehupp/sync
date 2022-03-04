@@ -63,7 +63,7 @@ class FolderDefinition {
         settings.value (QLatin1String ("paused"), folder.paused);
         settings.value (QLatin1String ("ignore_hidden_files"), folder.ignore_hidden_files);
 
-        settings.value (QStringLiteral ("virtual_files_mode"), Vfs.Mode.to_string (folder.virtual_files_mode));
+        settings.value ("virtual_files_mode", Vfs.Mode.to_string (folder.virtual_files_mode));
 
         // Ensure new vfs modes won't be attempted by older clients
         if (folder.virtual_files_mode == Vfs.WindowsCfApi) {

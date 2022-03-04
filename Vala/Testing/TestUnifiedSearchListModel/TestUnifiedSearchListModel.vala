@@ -9,11 +9,25 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 //  #include <QSignalSpy>
 //  #include <QTest>
 
-namespace {
-
-}
+namespace Testing {
 
 class TestUnifiedSearchListmodel : GLib.Object {
+
+    /***********************************************************
+    ***********************************************************/
+    public const int SEARCH_RESULTS_REPLY_DELAY = 100;
+
+    /***********************************************************
+    ***********************************************************/
+    public QScopedPointer<FakeQNAM> fake_qnam;
+    public Occ.AccountPointer account;
+    public QScopedPointer<Occ.AccountState> account_state;
+    public QScopedPointer<Occ.UnifiedSearchResultsListModel> model;
+    public QScopedPointer<QAbstractItemModelTester> model_tester;
+
+    /***********************************************************
+    ***********************************************************/
+    public QScopedPointer<FakeDesktopServicesUrlHandler> fake_desktop_services_url_handler;
 
     /***********************************************************
     ***********************************************************/
@@ -21,31 +35,15 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QScopedPointer<FakeQNAM> fakeQnam;
-    public Occ.AccountPointer account;
-    public QScopedPointer<Occ.AccountState> accountState;
-    public QScopedPointer<Occ.UnifiedSearchResultsListModel> model;
-    public QScopedPointer<QAbstractItemModelTester> modelTester;
-
-    /***********************************************************
-    ***********************************************************/
-    public QScopedPointer<FakeDesktopServicesUrlHandler> fakeDesktopServicesUrlHandler;
-
-    /***********************************************************
-    ***********************************************************/
-    public const int searchResultsReplyDelay = 100;
-
-    /***********************************************************
-    ***********************************************************/
     private void on_signal_init_test_case () {
-        fakeQnam.on_signal_reset (new FakeQNAM ({}));
+        fake_qnam.on_signal_reset (new FakeQNAM ({}));
         account = Occ.Account.create ();
-        account.setCredentials (new FakeCredentials{fakeQnam.data ()});
+        account.setCredentials (new FakeCredentials{fake_qnam.data ()});
         account.setUrl (GLib.Uri ( ("http://example.de")));
 
-        accountState.on_signal_reset (new Occ.AccountState (account));
+        account_state.on_signal_reset (new Occ.AccountState (account));
 
-        fakeQnam.setOverride ([this] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice device) {
+        fake_qnam.set_override ([this] (QNetworkAccessManager.Operation operation, Soup.Request req, QIODevice device) {
             //  Q_UNUSED (device);
             Soup.Reply reply = null;
 
@@ -55,41 +53,41 @@ class TestUnifiedSearchListmodel : GLib.Object {
             const var searchTerm = urlQuery.queryItemValue (QStringLiteral ("term"));
             const var path = req.url ().path ();
 
-            if (!req.url ().toString ().startsWith (accountState.account ().url ().toString ())) {
-                reply = new FakeErrorReply (op, req, this, 404, fake404Response);
+            if (!req.url ().toString ().startsWith (account_state.account ().url ().toString ())) {
+                reply = new FakeErrorReply (operation, req, this, 404, fake404Response);
             }
             if (format != QStringLiteral ("json")) {
-                reply = new FakeErrorReply (op, req, this, 400, fake400Response);
+                reply = new FakeErrorReply (operation, req, this, 400, fake400Response);
             }
 
             // handle fetch of providers list
             if (path.startsWith (QStringLiteral ("/ocs/v2.php/search/providers")) && searchTerm.isEmpty ()) {
-                reply = new FakePayloadReply (op, req,
-                    FakeSearchResultsStorage.instance ().fakeProvidersResponseJson (), fakeQnam.data ());
+                reply = new FakePayloadReply (operation, req,
+                    FakeSearchResultsStorage.instance ().fakeProvidersResponseJson (), fake_qnam.data ());
             // handle search for provider
             } else if (path.startsWith (QStringLiteral ("/ocs/v2.php/search/providers")) && !searchTerm.isEmpty ()) {
                 const var pathSplit = path.mid (string (QStringLiteral ("/ocs/v2.php/search/providers")).size ())
                                            .split ('/', Qt.SkipEmptyParts);
 
                 if (!pathSplit.isEmpty () && path.contains (pathSplit.first ())) {
-                    reply = new FakePayloadReply (op, req,
+                    reply = new FakePayloadReply (operation, req,
                         FakeSearchResultsStorage.instance ().queryProvider (pathSplit.first (), searchTerm, cursor),
-                        searchResultsReplyDelay, fakeQnam.data ());
+                        SEARCH_RESULTS_REPLY_DELAY, fake_qnam.data ());
                 }
             }
 
             if (!reply) {
-                return qobject_cast<Soup.Reply> (new FakeErrorReply (op, req, this, 404, QByteArrayLiteral ("{error : \"Not found!\"}")));
+                return qobject_cast<Soup.Reply> (new FakeErrorReply (operation, req, this, 404, QByteArrayLiteral ("{error : \"Not found!\"}")));
             }
 
             return reply;
         });
 
-        model.on_signal_reset (new Occ.UnifiedSearchResultsListModel (accountState.data ()));
+        model.on_signal_reset (new Occ.UnifiedSearchResultsListModel (account_state.data ()));
 
-        modelTester.on_signal_reset (new QAbstractItemModelTester (model.data ()));
+        model_tester.on_signal_reset (new QAbstractItemModelTester (model.data ()));
 
-        fakeDesktopServicesUrlHandler.on_signal_reset (new FakeDesktopServicesUrlHandler);
+        fake_desktop_services_url_handler.on_signal_reset (new FakeDesktopServicesUrlHandler);
     }
 
 
@@ -312,10 +310,10 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
         QVERIFY (model.rowCount () != 0);
 
-        QDesktopServices.setUrlHandler ("http", fakeDesktopServicesUrlHandler.data (), "resultClicked");
-        QDesktopServices.setUrlHandler ("https", fakeDesktopServicesUrlHandler.data (), "resultClicked");
+        QDesktopServices.setUrlHandler ("http", fake_desktop_services_url_handler.data (), "resultClicked");
+        QDesktopServices.setUrlHandler ("https", fake_desktop_services_url_handler.data (), "resultClicked");
 
-        QSignalSpy resultClicked (fakeDesktopServicesUrlHandler.data (), &FakeDesktopServicesUrlHandler.resultClicked);
+        QSignalSpy resultClicked (fake_desktop_services_url_handler.data (), &FakeDesktopServicesUrlHandler.resultClicked);
 
         //  test click on a result item
         string urlForClickedResult;
@@ -383,6 +381,6 @@ class TestUnifiedSearchListmodel : GLib.Object {
     private void on_signal_cleanup_test_case () {
         FakeSearchResultsStorage.destroy ();
     }
-}
 
-QTEST_MAIN (TestUnifiedSearchListmodel)
+}
+}

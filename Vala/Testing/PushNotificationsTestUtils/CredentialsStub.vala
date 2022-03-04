@@ -4,86 +4,82 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-
 //  #include <functional>
 //  #include <QWebSocketS
 //  #include <QWebSocket>
 //  #include <QSignalSpy>
 
+namespace Testing {
+
 class CredentialsStub : Occ.AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public CredentialsStub (string user, string password);
+    private string user;
+    private string password;
 
     /***********************************************************
     ***********************************************************/
-    public string authType () override;
-    public string user () override;
-    public string password () override;
-    public QNetworkAccessManager createQNAM () override;
-    public bool ready () override;
-    public void fetchFromKeychain () override;
-    public void askFromUser () override;
+    public CredentialsStub (string user, string password) {
+        this.user = user;
+        this.password = password;
+    }
 
     /***********************************************************
     ***********************************************************/
-    public bool stillValid (Soup.Reply reply) override;
-    public void persist () override;
-    public void invalidateToken () override;
-    public void forgetSensitiveData () override;
-
+    public string authentication_type () {
+        return "";
+    }
 
     /***********************************************************
     ***********************************************************/
-    private string this.user;
-    private string this.password;
+    public string user () {
+        return this.user;
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public string password () {
+        return this.password;
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public QNetworkAccessManager create_qnam () {
+        return null;
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public bool ready () {
+        return false;
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public void fetch_from_keychain () { }
+
+    /***********************************************************
+    ***********************************************************/
+    public void ask_from_user () { }
+
+    /***********************************************************
+    ***********************************************************/
+    public bool still_valid (Soup.Reply reply) {
+        return false;
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public void persist () { }
+
+    /***********************************************************
+    ***********************************************************/
+    public void invalidateToken () { }
+
+    /***********************************************************
+    ***********************************************************/
+    public void forgetSensitiveData () { }
+
 }
-
-
-
-
-
-
-
-
-
-
-CredentialsStub.CredentialsStub (string user, string password)
-    : this.user (user)
-    this.password (password) {
 }
-
-string CredentialsStub.authType () {
-    return "";
-}
-
-string CredentialsStub.user () {
-    return this.user;
-}
-
-string CredentialsStub.password () {
-    return this.password;
-}
-
-QNetworkAccessManager *CredentialsStub.createQNAM () {
-    return null;
-}
-
-bool CredentialsStub.ready () {
-    return false;
-}
-
-void CredentialsStub.fetchFromKeychain () { }
-
-void CredentialsStub.askFromUser () { }
-
-bool CredentialsStub.stillValid (Soup.Reply * /*reply*/) {
-    return false;
-}
-
-void CredentialsStub.persist () { }
-
-void CredentialsStub.invalidateToken () { }
-
-void CredentialsStub.forgetSensitiveData () { }

@@ -307,7 +307,7 @@ protected slots:
             this.errors + job.error_string_parsing_body ();
 
             const int http_status =
-                reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+                reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (http_status == 503) {
                 this.errors.clear ();
                 stat = ServiceUnavailable;
@@ -380,7 +380,7 @@ protected slots:
         if (var job = qobject_cast<AbstractNetworkJob> (sender ())) {
             if (var reply = job.reply ()) {
                 this.account.http2Supported (
-                    reply.attribute (QNetworkRequest.HTTP2WasUsedAttribute).to_bool ());
+                    reply.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ());
             }
         }
     #endif

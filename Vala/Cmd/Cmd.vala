@@ -25,7 +25,7 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 //  #include <termios.h>
 //  #include <unistd.h>
 
-using namespace Occ;
+using Occ;
 
 /***********************************************************
 @brief Helper class for command line client
@@ -143,7 +143,7 @@ void parse_options (string[] app_args, CmdOptions options) {
     }
     GLib.FileInfo fi (options.source_dir);
     if (!fi.exists ()) {
-        std.cerr + "Source dir '" + q_printable (options.source_dir) + "' does not exist." + std.endl;
+        std.cerr + "Source directory '" + q_printable (options.source_dir) + "' does not exist." + std.endl;
         exit (1);
     }
     options.source_dir = fi.absolute_file_path ();

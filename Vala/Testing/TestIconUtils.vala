@@ -6,6 +6,8 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 //  #include <QTest>
 
+namespace Testing {
+
 class TestIconUtils : GLib.Object {
 
     /***********************************************************
@@ -19,30 +21,30 @@ class TestIconUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testDrawSvgWithCustomFillColor () {
-        const string blackSvgDirPath{string{Occ.Theme.themePrefix} + QStringLiteral ("black")};
+        const string blackSvgDirPath{string{Occ.Theme.themePrefix} + "black"};
         const QDir blackSvgDir (blackSvgDirPath);
         const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
 
         //  Q_ASSERT (!blackImages.isEmpty ());
 
-        QVERIFY (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (blackSvgDirPath + QStringLiteral ("/") + blackImages.at (0), QColorConstants.Svg.red).isNull ());
+        QVERIFY (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (blackSvgDirPath + "/" + blackImages.at (0), QColorConstants.Svg.red).isNull ());
 
-        QVERIFY (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (blackSvgDirPath + QStringLiteral ("/") + blackImages.at (0), QColorConstants.Svg.green).isNull ());
+        QVERIFY (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (blackSvgDirPath + "/" + blackImages.at (0), QColorConstants.Svg.green).isNull ());
 
-        const string whiteSvgDirPath{string{Occ.Theme.themePrefix} + QStringLiteral ("white")};
+        const string whiteSvgDirPath{string{Occ.Theme.themePrefix} + "white"};
         const QDir whiteSvgDir (whiteSvgDirPath);
         const string[] whiteImages = whiteSvgDir.entryList (string[] ("*.svg"));
 
         //  Q_ASSERT (!whiteImages.isEmpty ());
 
-        QVERIFY (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (whiteSvgDirPath + QStringLiteral ("/") + whiteImages.at (0), QColorConstants.Svg.blue).isNull ());
+        QVERIFY (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (whiteSvgDirPath + "/" + whiteImages.at (0), QColorConstants.Svg.blue).isNull ());
     }
 
 
     /***********************************************************
     ***********************************************************/
     private on_ void testCreateSvgPixmapWithCustomColor () {
-        const QDir blackSvgDir (string (string{Occ.Theme.themePrefix}) + QStringLiteral ("black"));
+        const QDir blackSvgDir (string (string{Occ.Theme.themePrefix}) + "black");
         const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
 
         QVERIFY (!blackImages.isEmpty ());
@@ -51,7 +53,7 @@ class TestIconUtils : GLib.Object {
 
         QVERIFY (!Occ.Ui.IconUtils.createSvgImageWithCustomColor (blackImages.at (0), QColorConstants.Svg.green).isNull ());
 
-        const QDir whiteSvgDir (string (string{Occ.Theme.themePrefix}) + QStringLiteral ("white"));
+        const QDir whiteSvgDir (string (string{Occ.Theme.themePrefix}) + "white");
         const string[] whiteImages = whiteSvgDir.entryList (string[] ("*.svg"));
 
         QVERIFY (!whiteImages.isEmpty ());
@@ -63,10 +65,10 @@ class TestIconUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private on_ void testPixmapForBackground () {
-        const QDir blackSvgDir (string (string{Occ.Theme.themePrefix}) + QStringLiteral ("black"));
+        const QDir blackSvgDir (string (string{Occ.Theme.themePrefix}) + "black");
         const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
 
-        const QDir whiteSvgDir (string (string{Occ.Theme.themePrefix}) + QStringLiteral ("white"));
+        const QDir whiteSvgDir (string (string{Occ.Theme.themePrefix}) + "white");
         const string[] whiteImages = whiteSvgDir.entryList (string[] ("*.svg"));
 
         QVERIFY (!blackImages.isEmpty ());

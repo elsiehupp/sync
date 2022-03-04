@@ -230,7 +230,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public AccountApp talk_app () {
-        return this.account.find_app (QStringLiteral ("spreed"));
+        return this.account.find_app ("spreed");
     }
 
 
@@ -278,7 +278,7 @@ class User : GLib.Object {
             return "";
         }
 
-        return QStringLiteral ("image://avatars/") + this.account.account ().identifier ();
+        return "image://avatars/" + this.account.account ().identifier ();
     }
 
 
@@ -497,7 +497,7 @@ class User : GLib.Object {
             return;
         }
 
-        int result_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+        int result_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
         on_signal_end_notification_request (result_code);
         GLib.warning ("Server notify job failed with code " + result_code;
@@ -549,7 +549,7 @@ class User : GLib.Object {
                     continue;
                 }
 
-                var path = GLib.FileInfo (activity.file).dir ().path ().to_utf8 ();
+                var path = GLib.FileInfo (activity.file).directory ().path ().to_utf8 ();
                 if (path == ".")
                     path.clear ();
 

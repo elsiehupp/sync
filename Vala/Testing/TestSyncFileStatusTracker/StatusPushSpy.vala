@@ -4,23 +4,24 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
+using Occ;
 
-using namespace Occ;
+namespace Testing {
 
 class StatusPushSpy : QSignalSpy {
-    SyncEngine this.syncEngine;
+    SyncEngine this.sync_engine;
 
     /***********************************************************
     ***********************************************************/
-    public StatusPushSpy (SyncEngine syncEngine)
-        : QSignalSpy (&syncEngine.syncFileStatusTracker (), SIGNAL (fileStatusChanged (string&, SyncFileStatus)))
-        this.syncEngine (syncEngine) { }
+    public StatusPushSpy (SyncEngine sync_engine)
+        : QSignalSpy (&sync_engine.syncFileStatusTracker (), SIGNAL (fileStatusChanged (string&, SyncFileStatus)))
+        this.sync_engine (sync_engine) { }
 
 
     /***********************************************************
     ***********************************************************/
-    public SyncFileStatus statusOf (string relativePath) {
-        GLib.FileInfo file (this.syncEngine.localPath (), relativePath);
+    public SyncFileStatus statusOf (string relative_path) {
+        GLib.FileInfo file (this.sync_engine.local_path (), relative_path);
         // Start from the end to get the latest status
         for (int i = size () - 1; i >= 0; --i) {
             if (GLib.FileInfo (at (i)[0].toString ()) == file)
@@ -33,8 +34,8 @@ class StatusPushSpy : QSignalSpy {
     /***********************************************************
     ***********************************************************/
     public bool statusEmittedBefore (string firstPath, string secondPath) {
-        GLib.FileInfo firstFile (this.syncEngine.localPath (), firstPath);
-        GLib.FileInfo secondFile (this.syncEngine.localPath (), secondPath);
+        GLib.FileInfo firstFile (this.sync_engine.local_path (), firstPath);
+        GLib.FileInfo secondFile (this.sync_engine.local_path (), secondPath);
         // Start from the end to get the latest status
         int i = size () - 1;
         for (; i >= 0; --i) {

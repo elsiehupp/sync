@@ -2,7 +2,6 @@
 subdir('Kirigami')
 subdir('KMessageWidget')
 subdir('QProgressIndicator')
-subdir('QtLockedFile')
 subdir('QTokenizer')
 subdir('QtSingleApplication')
 

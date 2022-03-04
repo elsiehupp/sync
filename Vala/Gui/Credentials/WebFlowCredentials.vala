@@ -1,6 +1,6 @@
 // #include <QSslCertificate>
 //  #include <QSslKey>
-//  #include <QNetworkRequest>
+//  #include <Soup.Request>
 //  #include <QQueue>
 //  #include <QAuthenticator>
 //  #include <QNetworkAccessManager>
@@ -13,7 +13,7 @@
 #ifdef WITH_WEBENGINE
 //  #endif // WITH_WEBENGINE
 
-using namespace QKeychain;
+using QKeychain;
 
 namespace QKeychain {
     class Job;
@@ -32,8 +32,8 @@ namespace KeychainChunk {
 class WebFlowCredentials : AbstractCredentials {
     friend class WebFlowCredentialsAccessManager;
 
-    /// Don't add credentials if this is set on a QNetworkRequest
-    public static constexpr QNetworkRequest.Attribute DontAddCredentialsAttribute = QNetworkRequest.User;
+    /// Don't add credentials if this is set on a Soup.Request
+    public static constexpr Soup.Request.Attribute DontAddCredentialsAttribute = Soup.Request.User;
 
     /***********************************************************
     ***********************************************************/

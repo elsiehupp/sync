@@ -12,7 +12,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QBuffer>
 //  #include <QMessageBox>
 
-using namespace QKeychain;
+using QKeychain;
 
 //  #include <QPointer>
 //  #include <QTcpServer>

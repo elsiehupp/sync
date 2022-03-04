@@ -111,7 +111,7 @@ class ConflictSolver : GLib.Object {
             return false;
         }
 
-        const var message = info.is_dir () ? _("Do you want to delete the directory <i>%1</i> and all its contents permanently?").arg (info.dir ().dir_name ())
+        const var message = info.is_dir () ? _("Do you want to delete the directory <i>%1</i> and all its contents permanently?").arg (info.directory ().dir_name ())
                                           : _("Do you want to delete the file <i>%1</i> permanently?").arg (info.filename ());
         const var result = QMessageBox.question (this.parent_widget, _("Confirm deletion"), message, QMessageBox.Yes, QMessageBox.No);
         if (result != QMessageBox.Yes)

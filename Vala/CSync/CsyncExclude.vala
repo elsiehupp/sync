@@ -158,8 +158,8 @@ class ExcludedFiles : GLib.Object {
     Returns true if the version directive indicates the next line
     should be skipped.
 
-    A version directive has the form "#!version <op> <version>"
-    where <op> c
+    A version directive has the form "#!version <operation> <version>"
+    where <operation> c
     like 2.5.
 
     Example:
@@ -523,7 +523,7 @@ static string left_include_last (string arr, char c) {
     return arr.left (arr.last_index_of (c, arr.size () - 2) + 1);
 }
 
-using namespace Occ;
+using Occ;
 
 ExcludedFiles.ExcludedFiles (string local_path)
     : this.local_path (local_path)
@@ -642,21 +642,21 @@ bool ExcludedFiles.version_directive_keep_next_line (GLib.ByteArray directive) {
     QByteArrayList args = directive.split (' ');
     if (args.size () != 3)
         return true;
-    GLib.ByteArray op = args[1];
+    GLib.ByteArray operation = args[1];
     QByteArrayList arg_versions = args[2].split ('.');
     if (arg_versions.size () != 3)
         return true;
 
     var arg_version = std.make_tuple (arg_versions[0].to_int (), arg_versions[1].to_int (), arg_versions[2].to_int ());
-    if (op == "<=")
+    if (operation == "<=")
         return this.client_version <= arg_version;
-    if (op == "<")
+    if (operation == "<")
         return this.client_version < arg_version;
-    if (op == ">")
+    if (operation == ">")
         return this.client_version > arg_version;
-    if (op == ">=")
+    if (operation == ">=")
         return this.client_version >= arg_version;
-    if (op == "==")
+    if (operation == "==")
         return this.client_version == arg_version;
     return true;
 }
@@ -1119,7 +1119,7 @@ void ExcludedFiles.prepare (BasePathString & base_path) {
                        // Simple bname patterns can be any path component
                        " (?:^|/) (?:%2) (?:$|/)|"
                        // When checking a file for exclusion we must check all parent paths
-                       // against the dir-only patterns as well.
+                       // against the directory-only patterns as well.
                        " (?:^|/) (?:%3)/)"
                        "|"
                        " (?P<excluderemove>"

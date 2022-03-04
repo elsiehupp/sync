@@ -57,11 +57,11 @@ class RequestEtagJob : AbstractNetworkJob {
         if (http_code == 207) {
             // Parse DAV response
             QXmlStreamReader reader = new QXmlStreamReader (reply ());
-            reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration (QStringLiteral ("d"), QStringLiteral ("DAV:")));
+            reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
             GLib.ByteArray etag;
             while (!reader.at_end ()) {
                 QXmlStreamReader.TokenType type = reader.read_next ();
-                if (type == QXmlStreamReader.StartElement && reader.namespace_uri () == QLatin1String ("DAV:")) {
+                if (type == QXmlStreamReader.StartElement && reader.namespace_uri () == "DAV:") {
                     string name = reader.name ().to_string ();
                     if (name == QLatin1String ("getetag")) {
                         var etag_text = reader.read_element_text ();

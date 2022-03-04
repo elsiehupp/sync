@@ -296,13 +296,13 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_select_folder () {
-        string dir = QFileDialog.get_existing_directory (null, _("Local Sync Folder"), QDir.home_path ());
-        if (!dir.is_empty ()) {
+        string directory = QFileDialog.get_existing_directory (null, _("Local Sync Folder"), QDir.home_path ());
+        if (!directory.is_empty ()) {
             // TODO : remove when UX decision is made
-            refresh_virtual_files_availibility (dir);
+            refresh_virtual_files_availibility (directory);
 
-            local_folder_push_button_path (dir);
-            wizard ().property ("local_folder", dir);
+            local_folder_push_button_path (directory);
+            wizard ().property ("local_folder", directory);
             update_status ();
         }
 

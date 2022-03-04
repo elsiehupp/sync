@@ -8,7 +8,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QDir>
 
 int main (int argc, char* argv[]) {
-   string dir="/tmp/linktest/";
-   QDir ().mkpath (dir);
-   Occ.Utility.setupFavLink (dir);
+   string directory="/tmp/linktest/";
+   QDir ().mkpath (directory);
+   Occ.Utility.setupFavLink (directory);
 }

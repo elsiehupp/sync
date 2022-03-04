@@ -8,7 +8,9 @@ implied, as to its usefulness for any purpose.
 //  #include <QTemporaryDir>
 //  #include <QtTest>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class TestAccount : public GLib.Object {
 

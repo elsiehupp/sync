@@ -6,7 +6,9 @@
 
 //  #include <QtTest>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class TestSyncFileItem : GLib.Object {
 

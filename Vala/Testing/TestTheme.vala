@@ -6,6 +6,8 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 //  #include <QTest>
 
+namespace Testing {
+
 class TestTheme : GLib.Object {
 
     /***********************************************************
@@ -46,7 +48,7 @@ class TestTheme : GLib.Object {
     ***********************************************************/
     private void on_signal_test_hidpi_filename_hidpi_device_return_hidpi_icon_path () {
         FakePaintDevice paintDevice;
-        paintDevice.setHidpi (true);
+        paintDevice.set_hidpi (true);
         const Gtk.Color backgroundColor ("#000000");
         const string iconName ("wizard-files");
 
@@ -93,14 +95,14 @@ class TestTheme : GLib.Object {
     ***********************************************************/
     private void on_signal_test_is_hidpi_hidpi_return_true () {
         FakePaintDevice paintDevice;
-        paintDevice.setHidpi (true);
+        paintDevice.set_hidpi (true);
 
         QCOMPARE (Occ.Theme.isHidpi (&paintDevice), true);
     }
 
     void testIsHidpi_lowdpi_returnFalse () {
         FakePaintDevice paintDevice;
-        paintDevice.setHidpi (false);
+        paintDevice.set_hidpi (false);
 
         QCOMPARE (Occ.Theme.isHidpi (&paintDevice), false);
     }

@@ -7,11 +7,13 @@
 //  #include <QtTest>
 //  #include <QTemporaryDir>
 
-using namespace Occ.Utility;
+using Occ.Utility;
 
-namespace Occ {
-OCSYNC_EXPORT extern bool fsCasePreserving_override;
-}
+//  namespace Occ {
+//  OCSYNC_EXPORT extern bool fsCasePreserving_override;
+//  }
+
+namespace Testing {
 
 class TestUtility : GLib.Object {
 
@@ -121,11 +123,11 @@ class TestUtility : GLib.Object {
     ***********************************************************/
     private void on_signal_test_version_of_installed_binary () {
         if (isLinux ()) {
-            // pass the cmd client from our build dir
+            // pass the cmd client from our build directory
             // this is a bit inaccurate as it does not test the "real thing"
             // but cmd and gui have the same --version handler by now
             // and cmd works without X in CI
-            string ver = versionOfInstalledBinary (QStringLiteral (OWNCLOUD_BIN_PATH  "/" APPLICATION_EXECUTABLE "cmd"));
+            string ver = versionOfInstalledBinary (OWNCLOUD_BIN_PATH + "/" + APPLICATION_EXECUTABLE + "cmd");
             GLib.debug ("Version of installed Nextcloud : " + ver;
             QVERIFY (!ver.isEmpty ());
 
@@ -179,9 +181,9 @@ class TestUtility : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_filenames_equal () {
-        QTemporaryDir dir;
-        QVERIFY (dir.isValid ());
-        QDir dir2 (dir.path ());
+        QTemporaryDir directory;
+        QVERIFY (directory.isValid ());
+        QDir dir2 (directory.path ());
         QVERIFY (dir2.mkpath ("test"));
         if ( !fsCasePreserving () ) {
         QVERIFY (dir2.mkpath ("TEST"));
@@ -189,8 +191,8 @@ class TestUtility : GLib.Object {
         QVERIFY (dir2.mkpath ("test/TESTI"));
         QVERIFY (dir2.mkpath ("TESTI"));
 
-        string a = dir.path ();
-        string b = dir.path ();
+        string a = directory.path ();
+        string b = directory.path ();
 
         QVERIFY (fileNamesEqual (a, b));
 
@@ -202,7 +204,7 @@ class TestUtility : GLib.Object {
 
         QVERIFY (!fileNamesEqual (a+"/test", b+"/test/TESTI")); // both are different
 
-        dir.remove ();
+        directory.remove ();
     }
 
 
@@ -260,6 +262,6 @@ const int CHECK_NORMALIZE_ETAG (TEST, EXPECT)
         QVERIFY (!isPathWindowsDrivePartitionRoot ("c:/"));
         QVERIFY (!isPathWindowsDrivePartitionRoot ("c:\\"));
     }
-}
 
-QTEST_GUILESS_MAIN (TestUtility)
+} // class TestUtility 
+} // namespace Testing

@@ -8,17 +8,19 @@ implied, as to its usefulness for any purpose.
 //  #include <QTemporaryDir>
 //  #include <QtTest>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class TestRemoteWipe : public GLib.Object {
 
     // TODO
     private on_ void testWipe () {
-//        QTemporaryDir dir;
-//        ConfigFile.setConfDir (dir.path ()); // we don't want to pollute the user's config file
-//        QVERIFY (dir.isValid ());
+//        QTemporaryDir directory;
+//        ConfigFile.setConfDir (directory.path ()); // we don't want to pollute the user's config file
+//        QVERIFY (directory.isValid ());
 
-//        QDir dirToRemove (dir.path ());
+//        QDir dirToRemove (directory.path ());
 //        QVERIFY (dirToRemove.mkpath ("nextcloud"));
 
 //        string dirPath = dirToRemove.canonicalPath ();

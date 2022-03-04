@@ -153,7 +153,7 @@ class SyncOptions {
     ***********************************************************/
     public void file_pattern (string pattern) {
         // full match or a path ending with this pattern
-        path_pattern (QStringLiteral (" (^|/|\\\\)") + pattern + '$');
+        path_pattern (" (^|/|\\\\)" + pattern + '$');
     }
 
 

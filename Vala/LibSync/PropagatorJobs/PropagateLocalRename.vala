@@ -29,7 +29,7 @@ class PropagateLocalRename : PropagateItemJob {
         string existing_file = propagator ().full_local_path (propagator ().adjust_renamed_path (this.item.file));
         string target_file = propagator ().full_local_path (this.item.rename_target);
 
-        // if the file is a file underneath a moved dir, the this.item.file is equal
+        // if the file is a file underneath a moved directory, the this.item.file is equal
         // to this.item.rename_target and the file is not moved as a result.
         if (this.item.file != this.item.rename_target) {
             propagator ().report_progress (*this.item, 0);

@@ -27,7 +27,7 @@ class VfsSuffix : Vfs {
     /***********************************************************
     ***********************************************************/
     public string file_suffix () {
-        return QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
+        return APPLICATION_DOTVIRTUALFILE_SUFFIX;
     }
 
     /***********************************************************

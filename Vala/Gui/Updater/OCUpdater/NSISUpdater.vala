@@ -123,8 +123,8 @@ class NSISUpdater : OCUpdater {
                 if (GLib.File (this.target_file).exists ()) {
                     download_state (Download_complete);
                 } else {
-                    var request = QNetworkRequest (GLib.Uri (url));
-                    request.attribute (QNetworkRequest.Redirect_policy_attribute, QNetworkRequest.No_less_safe_redirect_policy);
+                    var request = Soup.Request (GLib.Uri (url));
+                    request.attribute (Soup.Request.Redirect_policy_attribute, Soup.Request.No_less_safe_redirect_policy);
                     Soup.Reply reply = qnam ().get (request);
                     connect (reply, &QIODevice.ready_read, this, &NSISUpdater.on_signal_write_file);
                     connect (reply, &Soup.Reply.on_signal_finished, this, &NSISUpdater.on_signal_download_finished);

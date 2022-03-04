@@ -4,7 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 // Reply with a small delay
 class SlowFakePostReply : FakePostReply {

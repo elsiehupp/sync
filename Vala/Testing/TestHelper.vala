@@ -1,4 +1,7 @@
 
+
+namespace Testing {
+
 class HttpCredentialsTest : Occ.HttpCredentials {
 
     /***********************************************************
@@ -9,7 +12,7 @@ class HttpCredentialsTest : Occ.HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public void askFromUser () override {
+    public void ask_from_user () override {
 
     }
 }
@@ -26,7 +29,7 @@ Occ.FolderDefinition folderDefinition (string path);
 
 Occ.FolderDefinition folderDefinition (string path) {
     Occ.FolderDefinition d;
-    d.localPath = path;
+    d.local_path = path;
     d.targetPath = path;
     d.alias = path;
     return d;

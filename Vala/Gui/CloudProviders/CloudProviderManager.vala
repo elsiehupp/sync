@@ -7,7 +7,7 @@ Copyright (C) by Julius Härtl <jus@bitgrid.net>
 
 CloudProvidersProviderExporter this.provider_exporter;
 
-using namespace Occ;
+using Occ;
 
 
 class CloudProviderManager : GLib.Object {

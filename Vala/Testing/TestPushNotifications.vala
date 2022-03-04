@@ -8,6 +8,8 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <QWebSocketServer>
 //  #include <QSignalSpy>
 
+namespace Testing {
+
 const int RETURN_FALSE_on_signal_FAIL (expr)
     if (! (expr)) {
         return false;
@@ -32,7 +34,7 @@ bool failThreeAuthenticationAttempts (FakeWebSocketServer fakeServer, Occ.Accoun
     // Let three authentication attempts fail
     for (uint8_t i = 0; i < 3; ++i) {
         RETURN_FALSE_on_signal_FAIL (fakeServer.waitForTextMessages ());
-        RETURN_FALSE_on_signal_FAIL (fakeServer.textMessagesCount () == 2);
+        RETURN_FALSE_on_signal_FAIL (fakeServer.text_messages_count () == 2);
         var socket = fakeServer.socketForTextMessage (0);
         fakeServer.clearTextMessages ();
         socket.sendTextMessage ("err : Invalid credentials");
@@ -151,7 +153,7 @@ class TestPushNotifications : GLib.Object {
 
         // Wait for authentication attempt and then sent invalid credentials
         QVERIFY (fakeServer.waitForTextMessages ());
-        QCOMPARE (fakeServer.textMessagesCount (), 2);
+        QCOMPARE (fakeServer.text_messages_count (), 2);
         const var socket = fakeServer.socketForTextMessage (0);
         const var firstPasswordSent = fakeServer.textMessage (1);
         QCOMPARE (firstPasswordSent, account.credentials ().password ());
@@ -160,7 +162,7 @@ class TestPushNotifications : GLib.Object {
 
         // Wait for a new authentication attempt
         QVERIFY (fakeServer.waitForTextMessages ());
-        QCOMPARE (fakeServer.textMessagesCount (), 2);
+        QCOMPARE (fakeServer.text_messages_count (), 2);
         const var secondPasswordSent = fakeServer.textMessage (1);
         QCOMPARE (secondPasswordSent, account.credentials ().password ());
     }
@@ -177,7 +179,7 @@ class TestPushNotifications : GLib.Object {
 
         // Wait for authentication and then sent a network error
         QVERIFY (fakeServer.waitForTextMessages ());
-        QCOMPARE (fakeServer.textMessagesCount (), 2);
+        QCOMPARE (fakeServer.text_messages_count (), 2);
         var socket = fakeServer.socketForTextMessage (0);
         socket.on_signal_abort ();
 

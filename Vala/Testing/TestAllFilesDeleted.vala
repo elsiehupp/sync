@@ -8,10 +8,12 @@ implied, as to its usefulness for any purpose.
 //  #include <syncengine.h>
 //  #include <configfile.h>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 static void changeAllFileId (FileInfo info) {
-    info.fileId = generateFileId ();
+    info.file_identifier = generateFileId ();
     if (!info.isDir)
         return;
     info.etag = generateEtag ();
@@ -49,35 +51,35 @@ class TestAllFilesDeleted : GLib.Object {
         //Just set a blocklist so we can check it is still there. This directory does not exists but
         // that does not matter for our purposes.
         string[] selectiveSyncBlockList = { "Q/" };
-        fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
+        fakeFolder.sync_engine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                                                                 selectiveSyncBlockList);
 
-        var initialState = fakeFolder.currentLocalState ();
+        var initialState = fakeFolder.current_local_state ();
         int aboutToRemoveAllFilesCalled = 0;
-        GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
-            [&] (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
+        GLib.Object.connect (&fakeFolder.sync_engine (), &SyncEngine.aboutToRemoveAllFiles,
+            [&] (SyncFileItem.Direction directory, std.function<void (bool)> callback) {
                 QCOMPARE (aboutToRemoveAllFilesCalled, 0);
                 aboutToRemoveAllFilesCalled++;
-                QCOMPARE (dir, deleteOnRemote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP);
+                QCOMPARE (directory, deleteOnRemote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP);
                 callback (true);
-                fakeFolder.syncEngine ().journal ().clearFileTable (); // That's what Folder is doing
+                fakeFolder.sync_engine ().journal ().clearFileTable (); // That's what Folder is doing
             });
 
-        var modifier = deleteOnRemote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
-        for (var s : fakeFolder.currentRemoteState ().children.keys ())
+        var modifier = deleteOnRemote ? fakeFolder.remote_modifier () : fakeFolder.local_modifier ();
+        for (var s : fakeFolder.current_remote_state ().children.keys ())
             modifier.remove (s);
 
-        QVERIFY (!fakeFolder.syncOnce ()); // Should fail because we cancel the sync
+        QVERIFY (!fakeFolder.sync_once ()); // Should fail because we cancel the sync
         QCOMPARE (aboutToRemoveAllFilesCalled, 1);
 
         // Next sync should recover all files
-        QVERIFY (fakeFolder.syncOnce ());
-        QCOMPARE (fakeFolder.currentLocalState (), initialState);
-        QCOMPARE (fakeFolder.currentRemoteState (), initialState);
+        QVERIFY (fakeFolder.sync_once ());
+        QCOMPARE (fakeFolder.current_local_state (), initialState);
+        QCOMPARE (fakeFolder.current_remote_state (), initialState);
 
         // The selective sync blocklist should be not have been deleted.
         bool ok = true;
-        QCOMPARE (fakeFolder.syncEngine ().journal ().getSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok),
+        QCOMPARE (fakeFolder.sync_engine ().journal ().getSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok),
                  selectiveSyncBlockList);
     }
 
@@ -97,30 +99,30 @@ class TestAllFilesDeleted : GLib.Object {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
         int aboutToRemoveAllFilesCalled = 0;
-        GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
-            [&] (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
+        GLib.Object.connect (&fakeFolder.sync_engine (), &SyncEngine.aboutToRemoveAllFiles,
+            [&] (SyncFileItem.Direction directory, std.function<void (bool)> callback) {
                 QCOMPARE (aboutToRemoveAllFilesCalled, 0);
                 aboutToRemoveAllFilesCalled++;
-                QCOMPARE (dir, deleteOnRemote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP);
+                QCOMPARE (directory, deleteOnRemote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP);
                 callback (false);
             });
 
-        var modifier = deleteOnRemote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
-        for (var s : fakeFolder.currentRemoteState ().children.keys ())
+        var modifier = deleteOnRemote ? fakeFolder.remote_modifier () : fakeFolder.local_modifier ();
+        for (var s : fakeFolder.current_remote_state ().children.keys ())
             modifier.remove (s);
 
-        QVERIFY (fakeFolder.syncOnce ()); // Should succeed, and all files must then be deleted
+        QVERIFY (fakeFolder.sync_once ()); // Should succeed, and all files must then be deleted
 
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        QCOMPARE (fakeFolder.currentLocalState ().children.count (), 0);
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
+        QCOMPARE (fakeFolder.current_local_state ().children.count (), 0);
 
         // Try another sync to be sure.
 
-        QVERIFY (fakeFolder.syncOnce ()); // Should succeed (doing nothing)
+        QVERIFY (fakeFolder.sync_once ()); // Should succeed (doing nothing)
         QCOMPARE (aboutToRemoveAllFilesCalled, 1); // should not have been called.
 
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        QCOMPARE (fakeFolder.currentLocalState ().children.count (), 0);
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
+        QCOMPARE (fakeFolder.current_local_state ().children.count (), 0);
     }
 
 
@@ -134,24 +136,24 @@ class TestAllFilesDeleted : GLib.Object {
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         // We never remove all files.
-        GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
+        GLib.Object.connect (&fakeFolder.sync_engine (), &SyncEngine.aboutToRemoveAllFiles,
             [&] { QVERIFY (false); });
-        QVERIFY (fakeFolder.syncOnce ());
+        QVERIFY (fakeFolder.sync_once ());
 
-        for (var s : fakeFolder.currentRemoteState ().children.keys ())
-            fakeFolder.syncJournal ().avoidRenamesOnNextSync (s); // clears all the fileid and inodes.
-        fakeFolder.localModifier ().remove ("A/a1");
-        var expectedState = fakeFolder.currentLocalState ();
-        QVERIFY (fakeFolder.syncOnce ());
-        QCOMPARE (fakeFolder.currentLocalState (), expectedState);
-        QCOMPARE (fakeFolder.currentRemoteState (), expectedState);
+        for (var s : fakeFolder.current_remote_state ().children.keys ())
+            fakeFolder.sync_journal ().avoidRenamesOnNextSync (s); // clears all the fileid and inodes.
+        fakeFolder.local_modifier ().remove ("A/a1");
+        var expectedState = fakeFolder.current_local_state ();
+        QVERIFY (fakeFolder.sync_once ());
+        QCOMPARE (fakeFolder.current_local_state (), expectedState);
+        QCOMPARE (fakeFolder.current_remote_state (), expectedState);
 
-        fakeFolder.remoteModifier ().remove ("B/b1");
-        changeAllFileId (fakeFolder.remoteModifier ());
-        expectedState = fakeFolder.currentRemoteState ();
-        QVERIFY (fakeFolder.syncOnce ());
-        QCOMPARE (fakeFolder.currentLocalState (), expectedState);
-        QCOMPARE (fakeFolder.currentRemoteState (), expectedState);
+        fakeFolder.remote_modifier ().remove ("B/b1");
+        changeAllFileId (fakeFolder.remote_modifier ());
+        expectedState = fakeFolder.current_remote_state ();
+        QVERIFY (fakeFolder.sync_once ());
+        QCOMPARE (fakeFolder.current_local_state (), expectedState);
+        QCOMPARE (fakeFolder.current_remote_state (), expectedState);
     }
 
 
@@ -161,29 +163,29 @@ class TestAllFilesDeleted : GLib.Object {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
         int aboutToRemoveAllFilesCalled = 0;
-        GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
-            [&] (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
+        GLib.Object.connect (&fakeFolder.sync_engine (), &SyncEngine.aboutToRemoveAllFiles,
+            [&] (SyncFileItem.Direction directory, std.function<void (bool)> callback) {
                 QCOMPARE (aboutToRemoveAllFilesCalled, 0);
                 aboutToRemoveAllFilesCalled++;
-                QCOMPARE (dir, SyncFileItem.Direction.DOWN);
+                QCOMPARE (directory, SyncFileItem.Direction.DOWN);
                 callback (false);
             });
 
         // Some small changes
-        fakeFolder.localModifier ().mkdir ("Q");
-        fakeFolder.localModifier ().insert ("Q/q1");
-        fakeFolder.localModifier ().appendByte ("B/b1");
-        QVERIFY (fakeFolder.syncOnce ());
+        fakeFolder.local_modifier ().mkdir ("Q");
+        fakeFolder.local_modifier ().insert ("Q/q1");
+        fakeFolder.local_modifier ().append_byte ("B/b1");
+        QVERIFY (fakeFolder.sync_once ());
         QCOMPARE (aboutToRemoveAllFilesCalled, 0);
 
         // Do some change localy
-        fakeFolder.localModifier ().appendByte ("A/a1");
+        fakeFolder.local_modifier ().append_byte ("A/a1");
 
         // reset the server.
-        fakeFolder.remoteModifier () = FileInfo.A12_B12_C12_S12 ();
+        fakeFolder.remote_modifier () = FileInfo.A12_B12_C12_S12 ();
 
         // Now, aboutToRemoveAllFiles with down as a direction
-        QVERIFY (fakeFolder.syncOnce ());
+        QVERIFY (fakeFolder.sync_once ());
         QCOMPARE (aboutToRemoveAllFilesCalled, 1);
 
     }
@@ -202,20 +204,20 @@ class TestAllFilesDeleted : GLib.Object {
     ***********************************************************/
     private on_ void testDataFingetPrint () {
         QFETCH (bool, hasInitialFingerPrint);
-        FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        fakeFolder.remoteModifier ().setContents ("C/c1", 'N');
-        fakeFolder.remoteModifier ().setModTime ("C/c1", GLib.DateTime.currentDateTimeUtc ().addDays (-2));
-        fakeFolder.remoteModifier ().remove ("C/c2");
+        FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 ());
+        fakeFolder.remote_modifier ().set_contents ("C/c1", 'N');
+        fakeFolder.remote_modifier ().set_modification_time ("C/c1", GLib.DateTime.currentDateTimeUtc ().addDays (-2));
+        fakeFolder.remote_modifier ().remove ("C/c2");
         if (hasInitialFingerPrint) {
-            fakeFolder.remoteModifier ().extraDavProperties = "<oc:data-fingerprint>initial_finger_print</oc:data-fingerprint>";
+            fakeFolder.remote_modifier ().extraDavProperties = "<oc:data-fingerprint>initial_finger_print</oc:data-fingerprint>";
         } else {
             //Server support finger print, but none is set.
-            fakeFolder.remoteModifier ().extraDavProperties = "<oc:data-fingerprint></oc:data-fingerprint>";
+            fakeFolder.remote_modifier ().extraDavProperties = "<oc:data-fingerprint></oc:data-fingerprint>";
         }
 
         int fingerprintRequests = 0;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest request, QIODevice stream) . Soup.Reply * {
-            var verb = request.attribute (QNetworkRequest.CustomVerbAttribute);
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, Soup.Request request, QIODevice stream) . Soup.Reply * {
+            var verb = request.attribute (Soup.Request.CustomVerbAttribute);
             if (verb == "PROPFIND") {
                 var data = stream.readAll ();
                 if (data.contains ("data-fingerprint")) {
@@ -229,56 +231,56 @@ class TestAllFilesDeleted : GLib.Object {
             return null;
         });
 
-        QVERIFY (fakeFolder.syncOnce ());
+        QVERIFY (fakeFolder.sync_once ());
         QCOMPARE (fingerprintRequests, 1);
         // First sync, we did not change the finger print, so the file should be downloaded as normal
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        QCOMPARE (fakeFolder.currentRemoteState ().find ("C/c1").contentChar, 'N');
-        QVERIFY (!fakeFolder.currentRemoteState ().find ("C/c2"));
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
+        QCOMPARE (fakeFolder.current_remote_state ().find ("C/c1").content_char, 'N');
+        QVERIFY (!fakeFolder.current_remote_state ().find ("C/c2"));
 
         /* Simulate a backup restoration */
 
         // A/a1 is an old file
-        fakeFolder.remoteModifier ().setContents ("A/a1", 'O');
-        fakeFolder.remoteModifier ().setModTime ("A/a1", GLib.DateTime.currentDateTimeUtc ().addDays (-2));
+        fakeFolder.remote_modifier ().set_contents ("A/a1", 'O');
+        fakeFolder.remote_modifier ().set_modification_time ("A/a1", GLib.DateTime.currentDateTimeUtc ().addDays (-2));
         // B/b1 did not exist at the time of the backup
-        fakeFolder.remoteModifier ().remove ("B/b1");
+        fakeFolder.remote_modifier ().remove ("B/b1");
         // B/b2 was uploaded by another user in the mean time.
-        fakeFolder.remoteModifier ().setContents ("B/b2", 'N');
-        fakeFolder.remoteModifier ().setModTime ("B/b2", GLib.DateTime.currentDateTimeUtc ().addDays (2));
+        fakeFolder.remote_modifier ().set_contents ("B/b2", 'N');
+        fakeFolder.remote_modifier ().set_modification_time ("B/b2", GLib.DateTime.currentDateTimeUtc ().addDays (2));
 
         // C/c3 was removed since we made the backup
-        fakeFolder.remoteModifier ().insert ("C/c3_removed");
+        fakeFolder.remote_modifier ().insert ("C/c3_removed");
         // C/c4 was moved to A/a2 since we made the backup
-        fakeFolder.remoteModifier ().rename ("A/a2", "C/old_a2_location");
+        fakeFolder.remote_modifier ().rename ("A/a2", "C/old_a2_location");
 
         // The admin sets the data-fingerprint property
-        fakeFolder.remoteModifier ().extraDavProperties = "<oc:data-fingerprint>new_finger_print</oc:data-fingerprint>";
+        fakeFolder.remote_modifier ().extraDavProperties = "<oc:data-fingerprint>new_finger_print</oc:data-fingerprint>";
 
-        QVERIFY (fakeFolder.syncOnce ());
+        QVERIFY (fakeFolder.sync_once ());
         QCOMPARE (fingerprintRequests, 2);
-        var currentState = fakeFolder.currentLocalState ();
+        var currentState = fakeFolder.current_local_state ();
         // Altough the local file is kept as a conflict, the server file is downloaded
-        QCOMPARE (currentState.find ("A/a1").contentChar, 'O');
+        QCOMPARE (currentState.find ("A/a1").content_char, 'O');
         var conflict = findConflict (currentState, "A/a1");
         QVERIFY (conflict);
-        QCOMPARE (conflict.contentChar, 'W');
-        fakeFolder.localModifier ().remove (conflict.path ());
+        QCOMPARE (conflict.content_char, 'W');
+        fakeFolder.local_modifier ().remove (conflict.path ());
         // b1 was restored (re-uploaded)
         QVERIFY (currentState.find ("B/b1"));
 
         // b2 has the new content (was not restored), since its mode time goes forward in time
-        QCOMPARE (currentState.find ("B/b2").contentChar, 'N');
+        QCOMPARE (currentState.find ("B/b2").content_char, 'N');
         conflict = findConflict (currentState, "B/b2");
         QVERIFY (conflict); // Just to be sure, we kept the old file in a conflict
-        QCOMPARE (conflict.contentChar, 'W');
-        fakeFolder.localModifier ().remove (conflict.path ());
+        QCOMPARE (conflict.content_char, 'W');
+        fakeFolder.local_modifier ().remove (conflict.path ());
 
         // We actually do not remove files that technically should have been removed (we don't want data-loss)
         QVERIFY (currentState.find ("C/c3_removed"));
         QVERIFY (currentState.find ("C/old_a2_location"));
 
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
     }
 
 
@@ -288,24 +290,24 @@ class TestAllFilesDeleted : GLib.Object {
         FakeFolder fakeFolder{FileInfo{}};
 
         int aboutToRemoveAllFilesCalled = 0;
-        GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
+        GLib.Object.connect (&fakeFolder.sync_engine (), &SyncEngine.aboutToRemoveAllFiles,
             [&] (SyncFileItem.Direction , std.function<void (bool)> ) {
                 aboutToRemoveAllFilesCalled++;
                 QFAIL ("should not be called");
             });
 
         // add a single file
-        fakeFolder.localModifier ().insert ("hello.txt");
-        QVERIFY (fakeFolder.syncOnce ());
+        fakeFolder.local_modifier ().insert ("hello.txt");
+        QVERIFY (fakeFolder.sync_once ());
         QCOMPARE (aboutToRemoveAllFilesCalled, 0);
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
 
         // rename it
-        fakeFolder.localModifier ().rename ("hello.txt", "goodbye.txt");
+        fakeFolder.local_modifier ().rename ("hello.txt", "goodbye.txt");
 
-        QVERIFY (fakeFolder.syncOnce ());
+        QVERIFY (fakeFolder.sync_once ());
         QCOMPARE (aboutToRemoveAllFilesCalled, 0);
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
     }
 
 
@@ -316,22 +318,22 @@ class TestAllFilesDeleted : GLib.Object {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
         int aboutToRemoveAllFilesCalled = 0;
-        GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
+        GLib.Object.connect (&fakeFolder.sync_engine (), &SyncEngine.aboutToRemoveAllFiles,
             [&] (SyncFileItem.Direction , std.function<void (bool)>) {
                 aboutToRemoveAllFilesCalled++;
                 QFAIL ("should not be called");
             });
 
-        QVERIFY (fakeFolder.syncOnce ());
+        QVERIFY (fakeFolder.sync_once ());
         QCOMPARE (aboutToRemoveAllFilesCalled, 0);
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
 
-        fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
+        fakeFolder.sync_engine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
             string[] ("A/" + "B/" + "C/" + "S/");
 
-        QVERIFY (fakeFolder.syncOnce ());
-        QCOMPARE (fakeFolder.currentLocalState (), FileInfo{}); // all files should be one localy
-        QCOMPARE (fakeFolder.currentRemoteState (), FileInfo.A12_B12_C12_S12 ()); // Server not changed
+        QVERIFY (fakeFolder.sync_once ());
+        QCOMPARE (fakeFolder.current_local_state (), FileInfo{}); // all files should be one localy
+        QCOMPARE (fakeFolder.current_remote_state (), FileInfo.A12_B12_C12_S12 ()); // Server not changed
         QCOMPARE (aboutToRemoveAllFilesCalled, 0); // But we did not show the popup
     }
 

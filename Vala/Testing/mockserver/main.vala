@@ -4,6 +4,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Testing {
+
 //  #include <QCoreApplication>
 
 int main (int argc, char* argv[]) {

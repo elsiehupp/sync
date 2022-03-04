@@ -1,3 +1,7 @@
+
+
+namespace Testing {
+
 // stub to prevent linker error
 
 Q_GLOBAL_STATIC (GLib.Object, dummy)

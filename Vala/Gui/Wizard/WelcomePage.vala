@@ -133,7 +133,7 @@ class WelcomePage : QWizardPage {
     #else // WITH_WEBENGINE
         connect (this.ui.create_account_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
             this.oc_wizard.registration (true);
-            Utility.open_browser (QStringLiteral ("https://nextcloud.com/register"));
+            Utility.open_browser ("https://nextcloud.com/register");
         });
     #endif // WITH_WEBENGINE
     }

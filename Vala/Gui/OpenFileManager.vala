@@ -62,12 +62,12 @@ static string find_default_file_manager () {
 
     GLib.FileInfo fi;
     string[] dirs = xdg_data_dirs ();
-    string[] subdirs;
-    subdirs + "/applications/"
+    string[] subdirectories;
+    subdirectories + "/applications/"
             + "/applications/kde4/";
-    foreach (string dir, dirs) {
-        foreach (string subdir, subdirs) {
-            fi.file (dir + subdir + filename);
+    foreach (string directory, dirs) {
+        foreach (string subdir, subdirectories) {
+            fi.file (directory + subdir + filename);
             if (fi.exists ()) {
                 return fi.absolute_file_path ();
             }

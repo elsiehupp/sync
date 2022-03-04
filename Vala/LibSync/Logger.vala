@@ -75,7 +75,7 @@ class Logger : GLib.Object {
             return this.log_debug;
         }
         public set {
-            const GLib.List<string> rules = {value ? QStringLiteral ("nextcloud.*.debug=true") : ""};
+            const GLib.List<string> rules = {value ? "nextcloud.*.debug=true" : ""};
             if (value) {
                 add_log_rule (rules);
             } else {
@@ -225,7 +225,7 @@ class Logger : GLib.Object {
 
 
     /***********************************************************
-    Sets up default dir log setup.
+    Sets up default directory log setup.
 
     logdir: a temporary folder
     logexpire: 4 hours
@@ -234,13 +234,13 @@ class Logger : GLib.Object {
     Used in conjunction with ConfigFile.automatic_log_dir
     ***********************************************************/
     public void setup_temporary_folder_log_dir () {
-        var dir = temporary_folder_log_dir_path ();
-        if (!QDir ().mkpath (dir)) {
+        var directory = temporary_folder_log_dir_path ();
+        if (!QDir ().mkpath (directory)) {
             return;
         }
         this.log_debug = true;
         this.log_expire = 4; /*hours*/
-        this.log_directory = dir;
+        this.log_directory = directory;
         this.temporary_folder_log_dir = true;
     }
 
@@ -277,9 +277,9 @@ class Logger : GLib.Object {
     public void on_signal_enter_next_log_file () {
         if (!this.log_directory == "") {
 
-            QDir dir = new QDir (this.log_directory);
-            if (!dir.exists ()) {
-                dir.mkpath (".");
+            QDir directory = new QDir (this.log_directory);
+            if (!directory.exists ()) {
+                directory.mkpath (".");
             }
 
             // Tentative new log name, will be adjusted if one like this already exists
@@ -287,15 +287,15 @@ class Logger : GLib.Object {
             string new_log_name = now.to_string () + "yyyy_mMdd_HHmm" + "_owncloud.log";
 
             // Expire old log files and deal with conflicts
-            GLib.List<string> files = dir.entry_list (GLib.List<string> ("*owncloud.log.*"),
+            GLib.List<string> files = directory.entry_list (GLib.List<string> ("*owncloud.log.*"),
                 QDir.Files, QDir.Name);
             const QRegularExpression regex = new QRegularExpression (QRegularExpression.anchored_pattern (R" (.*owncloud\.log\. (\d+).*)"));
             int max_number = -1;
             foreach (string s in files) {
                 if (this.log_expire > 0) {
-                    GLib.FileInfo file_info = new GLib.FileInfo (dir.absolute_file_path (s));
+                    GLib.FileInfo file_info = new GLib.FileInfo (directory.absolute_file_path (s));
                     if (file_info.last_modified ().add_secs (60 * 60 * this.log_expire) < now) {
-                        dir.remove (s);
+                        directory.remove (s);
                     }
                 }
                 var rx_match = regex.match (s);
@@ -306,13 +306,13 @@ class Logger : GLib.Object {
             new_log_name.append ("." + string.number (max_number + 1));
 
             var previous_log = this.log_file_object.filename ();
-            this.log_file = dir.file_path (new_log_name);
+            this.log_file = directory.file_path (new_log_name);
 
             // Compress the previous log file. On a restart this can be the most recent
             // log file.
             var log_to_compress = previous_log;
             if (log_to_compress.is_empty () && files.size () > 0 && !files.last ().has_suffix (".gz"))
-                log_to_compress = dir.absolute_file_path (files.last ());
+                log_to_compress = directory.absolute_file_path (files.last ());
             if (!log_to_compress.is_empty ()) {
                 string compressed_name = log_to_compress + ".gz";
                 if (compress_log (log_to_compress, compressed_name)) {

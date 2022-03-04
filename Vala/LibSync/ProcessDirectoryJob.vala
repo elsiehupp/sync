@@ -154,7 +154,7 @@ class ProcessDirectoryJob : GLib.Object {
         bool destination_ok = false;
 
         /***********************************************************
-        Whether creating a new file/dir in the destination is ok
+        Whether creating a new file/directory in the destination is ok
         ***********************************************************/
         bool destination_new_ok = false;
     }
@@ -277,7 +277,7 @@ class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     For creating the root job
 
-    The base pin state is used if the root dir's pin state can't be retrieved.
+    The base pin state is used if the root directory's pin state can't be retrieved.
     ***********************************************************/
     public ProcessDirectoryJob.root_job (DiscoveryPhase data, PinState base_pin_state,
         int64 last_sync_timestamp, GLib.Object parent) {
@@ -1836,7 +1836,7 @@ class ProcessDirectoryJob : GLib.Object {
             destination_new_oK = false;
         }
         if (!is_rename && !destination_new_oK) {
-            // no need to check for the destination dir permission for renames
+            // no need to check for the destination directory permission for renames
             destination_oK = false;
         }
 

@@ -150,7 +150,7 @@ protected slots:
         // when not typing fast enough. It's still clear that a given path
         // was not found, because the 'Next' button is disabled and no entry
         // is selected in the tree view.
-        int http_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+        int http_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (http_code == 404) {
             show_warn (""); // hides the warning pane
             return;
@@ -263,7 +263,7 @@ protected slots:
 
     void Folder_wizard_remote_path.on_signal_gather_encrypted_paths (string path, GLib.HashMap<string, string> properties) {
         const var it = properties.find ("is-encrypted");
-        if (it == properties.cend () || *it != QStringLiteral ("1")) {
+        if (it == properties.cend () || *it != "1") {
             return;
         }
 
@@ -280,22 +280,22 @@ protected slots:
     }
 
     void Folder_wizard_remote_path.on_signal_item_expanded (QTreeWidgetItem item) {
-        string dir = item.data (0, Qt.USER_ROLE).to_string ();
-        run_ls_col_job (dir);
+        string directory = item.data (0, Qt.USER_ROLE).to_string ();
+        run_ls_col_job (directory);
     }
 
     void Folder_wizard_remote_path.on_signal_current_item_changed (QTreeWidgetItem item) {
         if (item) {
-            string dir = item.data (0, Qt.USER_ROLE).to_string ();
+            string directory = item.data (0, Qt.USER_ROLE).to_string ();
 
             // We don't want to allow creating subfolders in encrypted folders outside of the sync logic
-            const var encrypted = this.encrypted_paths.contains (dir);
+            const var encrypted = this.encrypted_paths.contains (directory);
             this.ui.add_folder_button.enabled (!encrypted);
 
-            if (!dir.starts_with ('/')) {
-                dir.prepend ('/');
+            if (!directory.starts_with ('/')) {
+                directory.prepend ('/');
             }
-            this.ui.folder_entry.on_signal_text (dir);
+            this.ui.folder_entry.on_signal_text (directory);
         }
 
         /* emit */ complete_changed ();
@@ -356,11 +356,11 @@ protected slots:
             return false;
 
         string[] warn_strings;
-        string dir = this.ui.folder_tree_widget.current_item ().data (0, Qt.USER_ROLE).to_string ();
-        if (!dir.starts_with ('/')) {
-            dir.prepend ('/');
+        string directory = this.ui.folder_tree_widget.current_item ().data (0, Qt.USER_ROLE).to_string ();
+        if (!directory.starts_with ('/')) {
+            directory.prepend ('/');
         }
-        wizard ().property ("target_path", dir);
+        wizard ().property ("target_path", directory);
 
         Folder.Map map = FolderMan.instance ().map ();
         Folder.Map.ConstIterator i = map.const_begin ();
@@ -370,12 +370,12 @@ protected slots:
                 continue;
             }
             string cur_dir = f.remote_path_trailing_slash ();
-            if (QDir.clean_path (dir) == QDir.clean_path (cur_dir)) {
+            if (QDir.clean_path (directory) == QDir.clean_path (cur_dir)) {
                 warn_strings.append (_("This folder is already being synced."));
-            } else if (dir.starts_with (cur_dir)) {
-                warn_strings.append (_("You are already syncing <i>%1</i>, which is a parent folder of <i>%2</i>.").arg (Utility.escape (cur_dir), Utility.escape (dir)));
-            } else if (cur_dir.starts_with (dir)) {
-                warn_strings.append (_("You are already syncing <i>%1</i>, which is a subfolder of <i>%2</i>.").arg (Utility.escape (cur_dir), Utility.escape (dir)));
+            } else if (directory.starts_with (cur_dir)) {
+                warn_strings.append (_("You are already syncing <i>%1</i>, which is a parent folder of <i>%2</i>.").arg (Utility.escape (cur_dir), Utility.escape (directory)));
+            } else if (cur_dir.starts_with (directory)) {
+                warn_strings.append (_("You are already syncing <i>%1</i>, which is a subfolder of <i>%2</i>.").arg (Utility.escape (cur_dir), Utility.escape (directory)));
             }
         }
 

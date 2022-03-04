@@ -350,7 +350,7 @@ class SyncEngine : GLib.Object {
         if (!QDir (this.local_path).exists ()) {
             this.another_sync_needed = AnotherSyncNeeded.DELAYED_FOLLOW_UP;
             // No this.tr, it should only occur in non-mirall
-            /* Q_EMIT */ sync_error (QStringLiteral ("Unable to find local sync folder."));
+            /* Q_EMIT */ sync_error ("Unable to find local sync folder.");
             on_signal_finalize (false);
             return;
         }
@@ -442,7 +442,7 @@ class SyncEngine : GLib.Object {
         this.discovery_phase.on_signal_reset (new DiscoveryPhase);
         this.discovery_phase.account = this.account;
         this.discovery_phase.excludes = this.excluded_files.data ();
-        const string exclude_file_path = this.local_path + QStringLiteral (".sync-exclude.lst");
+        const string exclude_file_path = this.local_path + ".sync-exclude.lst";
         if (GLib.File.exists (exclude_file_path)) {
             this.discovery_phase.excludes.add_exclude_file_path (exclude_file_path);
             this.discovery_phase.excludes.on_signal_reload_exclude_files ();
@@ -955,7 +955,7 @@ class SyncEngine : GLib.Object {
             }
 
             // do a database commit
-            this.journal.commit (QStringLiteral ("post treewalk"));
+            this.journal.commit ("post treewalk");
 
             this.propagator = new unowned OwncloudPropagator (
                 this.account, this.local_path, this.remote_path, this.journal, this.bulk_upload_block_list);
@@ -977,7 +977,7 @@ class SyncEngine : GLib.Object {
             delete_stale_download_infos (this.sync_items);
             delete_stale_upload_infos (this.sync_items);
             delete_stale_error_blocklist_entries (this.sync_items);
-            this.journal.commit (QStringLiteral ("post stale entry removal"));
+            this.journal.commit ("post stale entry removal");
 
             // Emit the started signal only after the propagator has been set up.
             if (this.needs_update)

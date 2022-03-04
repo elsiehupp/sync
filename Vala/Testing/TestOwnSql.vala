@@ -7,7 +7,9 @@
 //  #include <QtTest>
 //  #include <sqlite3.h>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class TestOwnSql : GLib.Object {
 

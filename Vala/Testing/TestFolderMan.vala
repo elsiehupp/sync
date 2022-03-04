@@ -8,24 +8,26 @@ implied, as to its usefulness for any purpose.
 //  #include <QTemporaryDir>
 //  #include <QtTest>
 
-using namespace Occ;
+using Occ;
 
-class TestFolderMan : public GLib.Object {
+namespace Testing {
+
+class TestFolderMan : GLib.Object {
 
     FolderMan this.fm;
 
     /***********************************************************
     ***********************************************************/
     private on_ void testCheckPathValidityForNewFolder () {
-        QTemporaryDir dir;
-        ConfigFile.setConfDir (dir.path ()); // we don't want to pollute the user's config file
-        QVERIFY (dir.isValid ());
-        QDir dir2 (dir.path ());
+        QTemporaryDir directory;
+        ConfigFile.setConfDir (directory.path ()); // we don't want to pollute the user's config file
+        QVERIFY (directory.isValid ());
+        QDir dir2 (directory.path ());
         QVERIFY (dir2.mkpath ("sub/ownCloud1/folder/f"));
         QVERIFY (dir2.mkpath ("ownCloud2"));
         QVERIFY (dir2.mkpath ("sub/free"));
         QVERIFY (dir2.mkpath ("free2/sub")); {
-            GLib.File f (dir.path () + "/sub/file.txt");
+            GLib.File f (directory.path () + "/sub/file.txt");
             f.open (GLib.File.WriteOnly);
             f.write ("hello");
         }
@@ -131,10 +133,10 @@ class TestFolderMan : public GLib.Object {
     private on_ void testFindGoodPathForNewSyncFolder () {
         // SETUP
 
-        QTemporaryDir dir;
-        ConfigFile.setConfDir (dir.path ()); // we don't want to pollute the user's config file
-        QVERIFY (dir.isValid ());
-        QDir dir2 (dir.path ());
+        QTemporaryDir directory;
+        ConfigFile.setConfDir (directory.path ()); // we don't want to pollute the user's config file
+        QVERIFY (directory.isValid ());
+        QDir dir2 (directory.path ());
         QVERIFY (dir2.mkpath ("sub/ownCloud1/folder/f"));
         QVERIFY (dir2.mkpath ("ownCloud"));
         QVERIFY (dir2.mkpath ("ownCloud2"));

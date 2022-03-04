@@ -145,7 +145,7 @@ class Updater : GLib.Object {
         query.add_query_item ("build_arch", QSysInfo.build_cpu_architecture ());
         query.add_query_item ("current_arch", QSysInfo.current_cpu_architecture ());
 
-        string suffix = QStringLiteral (MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX));
+        string suffix = MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX);
         query.add_query_item ("versionsuffix", suffix);
 
         var channel = ConfigFile ().update_channel ();

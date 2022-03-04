@@ -6,18 +6,20 @@ implied, as to its usefulness for any purpose.
 
 //  #include <QtTest>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class TestSyncFileStatusTracker : GLib.Object {
 
     void verifyThatPushMatchesPull (FakeFolder fakeFolder, StatusPushSpy statusSpy) {
-        string root = fakeFolder.localPath ();
+        string root = fakeFolder.local_path ();
         QDirIterator it (root, QDir.AllEntries | QDir.NoDotAndDotDot, QDirIterator.Subdirectories);
         while (it.hasNext ()) {
             string filePath = it.next ().mid (root.size ());
             SyncFileStatus pushedStatus = statusSpy.statusOf (filePath);
             if (pushedStatus != SyncFileStatus ())
-                QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus (filePath), pushedStatus);
+                QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus (filePath), pushedStatus);
         }
     }
 
@@ -26,25 +28,25 @@ class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private on_ void parentsGetSyncStatusUploadDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
-        fakeFolder.localModifier ().appendByte ("B/b1");
-        fakeFolder.remoteModifier ().appendByte ("C/c1");
-        StatusPushSpy statusSpy (fakeFolder.syncEngine ());
+        fakeFolder.local_modifier ().append_byte ("B/b1");
+        fakeFolder.remote_modifier ().append_byte ("C/c1");
+        StatusPushSpy statusSpy (fakeFolder.sync_engine ());
 
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("B/b1"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("C"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("C/c1"), SyncFileStatus (SyncFileStatus.StatusSync));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A/a1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("B/b2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("C/c2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A/a1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("B/b2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("C/c2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         statusSpy.clear ();
 
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
@@ -52,7 +54,7 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("C"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("C/c1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
 
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
     }
 
 
@@ -60,25 +62,25 @@ class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private on_ void parentsGetSyncStatusNewFileUploadDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
-        fakeFolder.localModifier ().insert ("B/b0");
-        fakeFolder.remoteModifier ().insert ("C/c0");
-        StatusPushSpy statusSpy (fakeFolder.syncEngine ());
+        fakeFolder.local_modifier ().insert ("B/b0");
+        fakeFolder.remote_modifier ().insert ("C/c0");
+        StatusPushSpy statusSpy (fakeFolder.sync_engine ());
 
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("B/b0"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("C"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("C/c0"), SyncFileStatus (SyncFileStatus.StatusSync));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A/a1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("B/b1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("C/c1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A/a1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("B/b1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("C/c1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         statusSpy.clear ();
 
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
@@ -86,7 +88,7 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("C"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("C/c0"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
 
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
     }
 
 
@@ -94,30 +96,30 @@ class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private on_ void parentsGetSyncStatusNewDirDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
-        fakeFolder.remoteModifier ().mkdir ("D");
-        fakeFolder.remoteModifier ().insert ("D/d0");
-        StatusPushSpy statusSpy (fakeFolder.syncEngine ());
+        fakeFolder.remote_modifier ().mkdir ("D");
+        fakeFolder.remote_modifier ().insert ("D/d0");
+        StatusPushSpy statusSpy (fakeFolder.sync_engine ());
 
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("D"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("D/d0"), SyncFileStatus (SyncFileStatus.StatusSync));
 
-        fakeFolder.execUntilItemCompleted ("D");
+        fakeFolder.exec_until_item_completed ("D");
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("D"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("D/d0"), SyncFileStatus (SyncFileStatus.StatusSync));
 
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("D"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("D/d0"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
 
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
     }
 
 
@@ -125,30 +127,30 @@ class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private on_ void parentsGetSyncStatusNewDirUpload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
-        fakeFolder.localModifier ().mkdir ("D");
-        fakeFolder.localModifier ().insert ("D/d0");
-        StatusPushSpy statusSpy (fakeFolder.syncEngine ());
+        fakeFolder.local_modifier ().mkdir ("D");
+        fakeFolder.local_modifier ().insert ("D/d0");
+        StatusPushSpy statusSpy (fakeFolder.sync_engine ());
 
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("D"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("D/d0"), SyncFileStatus (SyncFileStatus.StatusSync));
 
-        fakeFolder.execUntilItemCompleted ("D");
+        fakeFolder.exec_until_item_completed ("D");
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("D"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("D/d0"), SyncFileStatus (SyncFileStatus.StatusSync));
 
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("D"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("D/d0"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
 
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
     }
 
 
@@ -156,30 +158,30 @@ class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private on_ void parentsGetSyncStatusDeleteUpDown () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
-        fakeFolder.remoteModifier ().remove ("B/b1");
-        fakeFolder.localModifier ().remove ("C/c1");
-        StatusPushSpy statusSpy (fakeFolder.syncEngine ());
+        fakeFolder.remote_modifier ().remove ("B/b1");
+        fakeFolder.local_modifier ().remove ("C/c1");
+        StatusPushSpy statusSpy (fakeFolder.sync_engine ());
 
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusSync));
         // Discovered as remotely removed, pending for local removal.
         QCOMPARE (statusSpy.statusOf ("B/b1"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("C"), SyncFileStatus (SyncFileStatus.StatusSync));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("B/b2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("C/c2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("B/b2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("C/c2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         statusSpy.clear ();
 
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("C"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
 
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
     }
 
 
@@ -187,21 +189,21 @@ class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private on_ void warningStatusForExcludedFile () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
-        fakeFolder.syncEngine ().excludedFiles ().addManualExclude ("A/a1");
-        fakeFolder.syncEngine ().excludedFiles ().addManualExclude ("B");
-        fakeFolder.localModifier ().appendByte ("A/a1");
-        fakeFolder.localModifier ().appendByte ("B/b1");
-        StatusPushSpy statusSpy (fakeFolder.syncEngine ());
+        fakeFolder.sync_engine ().excludedFiles ().addManualExclude ("A/a1");
+        fakeFolder.sync_engine ().excludedFiles ().addManualExclude ("B");
+        fakeFolder.local_modifier ().append_byte ("A/a1");
+        fakeFolder.local_modifier ().append_byte ("B/b1");
+        StatusPushSpy statusSpy (fakeFolder.sync_engine ());
 
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf ("A/a1"), SyncFileStatus (SyncFileStatus.StatusExcluded));
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusExcluded));
         QEXPECT_FAIL ("", "csync will stop at ignored directories without traversing children, so we don't currently push the status for newly ignored children of an ignored directory.", Continue);
         QCOMPARE (statusSpy.statusOf ("B/b1"), SyncFileStatus (SyncFileStatus.StatusExcluded));
 
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf ("A/a1"), SyncFileStatus (SyncFileStatus.StatusExcluded));
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusExcluded));
@@ -209,14 +211,14 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("B/b1"), SyncFileStatus (SyncFileStatus.StatusExcluded));
         QEXPECT_FAIL ("", "csync will stop at ignored directories without traversing children, so we don't currently push the status for newly ignored children of an ignored directory.", Continue);
         QCOMPARE (statusSpy.statusOf ("B/b2"), SyncFileStatus (SyncFileStatus.StatusExcluded));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         statusSpy.clear ();
 
         // Clears the exclude expr above
-        fakeFolder.syncEngine ().excludedFiles ().clearManualExcludes ();
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.sync_engine ().excludedFiles ().clearManualExcludes ();
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("A"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("A/a1"), SyncFileStatus (SyncFileStatus.StatusSync));
@@ -224,7 +226,7 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("B/b1"), SyncFileStatus (SyncFileStatus.StatusSync));
         statusSpy.clear ();
 
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
@@ -232,7 +234,7 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("B/b1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
 
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
     }
 
 
@@ -240,20 +242,20 @@ class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private on_ void warningStatusForExcludedFile_CasePreserving () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
-        fakeFolder.syncEngine ().excludedFiles ().addManualExclude ("B");
-        fakeFolder.serverErrorPaths ().append ("A/a1");
-        fakeFolder.localModifier ().appendByte ("A/a1");
+        fakeFolder.sync_engine ().excludedFiles ().addManualExclude ("B");
+        fakeFolder.server_error_paths ().append ("A/a1");
+        fakeFolder.local_modifier ().append_byte ("A/a1");
 
-        fakeFolder.syncOnce ();
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus (""), SyncFileStatus (SyncFileStatus.StatusWarning));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("B"), SyncFileStatus (SyncFileStatus.StatusExcluded));
+        fakeFolder.sync_once ();
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus (""), SyncFileStatus (SyncFileStatus.StatusWarning));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("B"), SyncFileStatus (SyncFileStatus.StatusExcluded));
 
         // Should still get the status for different casing on macOS and Windows.
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("a"), SyncFileStatus (Utility.fsCasePreserving () ? SyncFileStatus.StatusWarning : SyncFileStatus.StatusNone));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A/A1"), SyncFileStatus (Utility.fsCasePreserving () ? SyncFileStatus.StatusError : SyncFileStatus.StatusNone));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("b"), SyncFileStatus (Utility.fsCasePreserving () ? SyncFileStatus.StatusExcluded : SyncFileStatus.StatusNone));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("a"), SyncFileStatus (Utility.fsCasePreserving () ? SyncFileStatus.StatusWarning : SyncFileStatus.StatusNone));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A/A1"), SyncFileStatus (Utility.fsCasePreserving () ? SyncFileStatus.StatusError : SyncFileStatus.StatusNone));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("b"), SyncFileStatus (Utility.fsCasePreserving () ? SyncFileStatus.StatusExcluded : SyncFileStatus.StatusNone));
     }
 
 
@@ -261,14 +263,14 @@ class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private on_ void parentsGetWarningStatusForError () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
-        fakeFolder.serverErrorPaths ().append ("A/a1");
-        fakeFolder.serverErrorPaths ().append ("B/b0");
-        fakeFolder.localModifier ().appendByte ("A/a1");
-        fakeFolder.localModifier ().insert ("B/b0");
-        StatusPushSpy statusSpy (fakeFolder.syncEngine ());
+        fakeFolder.server_error_paths ().append ("A/a1");
+        fakeFolder.server_error_paths ().append ("B/b0");
+        fakeFolder.local_modifier ().append_byte ("A/a1");
+        fakeFolder.local_modifier ().insert ("B/b0");
+        StatusPushSpy statusSpy (fakeFolder.sync_engine ());
 
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("A"), SyncFileStatus (SyncFileStatus.StatusSync));
@@ -277,20 +279,20 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("B/b0"), SyncFileStatus (SyncFileStatus.StatusSync));
         statusSpy.clear ();
 
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusWarning));
         QCOMPARE (statusSpy.statusOf ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
         QCOMPARE (statusSpy.statusOf ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A/a2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A/a2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusWarning));
         QCOMPARE (statusSpy.statusOf ("B/b0"), SyncFileStatus (SyncFileStatus.StatusError));
         statusSpy.clear ();
 
         // Remove the error and on_signal_start a second sync, the blocklist should kick in
-        fakeFolder.serverErrorPaths ().clear ();
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.server_error_paths ().clear ();
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         // A/a1 and B/b0 should be on the block list for the next few seconds
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusWarning));
@@ -299,20 +301,20 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusWarning));
         QCOMPARE (statusSpy.statusOf ("B/b0"), SyncFileStatus (SyncFileStatus.StatusError));
         statusSpy.clear ();
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusWarning));
         QCOMPARE (statusSpy.statusOf ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
         QCOMPARE (statusSpy.statusOf ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A/a2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A/a2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusWarning));
         QCOMPARE (statusSpy.statusOf ("B/b0"), SyncFileStatus (SyncFileStatus.StatusError));
         statusSpy.clear ();
 
         // Start a third sync, this time together with a real file to sync
-        fakeFolder.localModifier ().appendByte ("C/c1");
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.local_modifier ().append_byte ("C/c1");
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         // The root should show SYNC even though there is an error underneath,
         // since C/c1 is syncing and the SYNC status has priority.
@@ -324,12 +326,12 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("C"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("C/c1"), SyncFileStatus (SyncFileStatus.StatusSync));
         statusSpy.clear ();
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusWarning));
         QCOMPARE (statusSpy.statusOf ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
         QCOMPARE (statusSpy.statusOf ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A/a2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A/a2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusWarning));
         QCOMPARE (statusSpy.statusOf ("B/b0"), SyncFileStatus (SyncFileStatus.StatusError));
         QCOMPARE (statusSpy.statusOf ("C"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
@@ -337,10 +339,10 @@ class TestSyncFileStatusTracker : GLib.Object {
         statusSpy.clear ();
 
         // Another sync after clearing the blocklist entry, everything should return to order.
-        fakeFolder.syncEngine ().journal ().wipeErrorBlocklistEntry ("A/a1");
-        fakeFolder.syncEngine ().journal ().wipeErrorBlocklistEntry ("B/b0");
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.sync_engine ().journal ().wipeErrorBlocklistEntry ("A/a1");
+        fakeFolder.sync_engine ().journal ().wipeErrorBlocklistEntry ("B/b0");
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("A"), SyncFileStatus (SyncFileStatus.StatusSync));
@@ -348,7 +350,7 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("B/b0"), SyncFileStatus (SyncFileStatus.StatusSync));
         statusSpy.clear ();
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
@@ -356,7 +358,7 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("B/b0"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
 
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
     }
 
 
@@ -364,26 +366,26 @@ class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private on_ void parentsGetWarningStatusForError_SibblingStartsWithPath () {
         // A is a parent of A/a1, but A/a is not even if it's a substring of A/a1
-        FakeFolder fakeFolder{{string{},{ {QStringLiteral ("A"), { {QStringLiteral ("a"), 4}, {QStringLiteral ("a1"), 4}
+        FakeFolder fakeFolder{{string{},{ { "A", { { "a", 4}, { "a1", 4}
             }}}}};
-        fakeFolder.serverErrorPaths ().append ("A/a1");
-        fakeFolder.localModifier ().appendByte ("A/a1");
+        fakeFolder.server_error_paths ().append ("A/a1");
+        fakeFolder.local_modifier ().append_byte ("A/a1");
 
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         // The SyncFileStatusTraker won't push any status for all of them, test with a pull.
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusSync));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A/a1"), SyncFileStatus (SyncFileStatus.StatusSync));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A/a"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus (""), SyncFileStatus (SyncFileStatus.StatusSync));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusSync));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A/a1"), SyncFileStatus (SyncFileStatus.StatusSync));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A/a"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
 
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         // We use string matching for paths in the implementation,
         // an error should affect only parents and not every path that starts with the problem path.
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus (""), SyncFileStatus (SyncFileStatus.StatusWarning));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
-        QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("A/a"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus (""), SyncFileStatus (SyncFileStatus.StatusWarning));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
+        QCOMPARE (fakeFolder.sync_engine ().syncFileStatusTracker ().fileStatus ("A/a"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
     }
 
     // Even for status pushes immediately following each other, macOS
@@ -391,11 +393,11 @@ class TestSyncFileStatusTracker : GLib.Object {
     // children are marked as OK before their parents do.
     private on_ void childOKEmittedBeforeParent () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
-        fakeFolder.localModifier ().appendByte ("B/b1");
-        fakeFolder.remoteModifier ().appendByte ("C/c1");
-        StatusPushSpy statusSpy (fakeFolder.syncEngine ());
+        fakeFolder.local_modifier ().append_byte ("B/b1");
+        fakeFolder.remote_modifier ().append_byte ("C/c1");
+        StatusPushSpy statusSpy (fakeFolder.sync_engine ());
 
-        fakeFolder.syncOnce ();
+        fakeFolder.sync_once ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QVERIFY (statusSpy.statusEmittedBefore ("B/b1", "B"));
         QVERIFY (statusSpy.statusEmittedBefore ("C/c1", "C"));
@@ -416,17 +418,17 @@ class TestSyncFileStatusTracker : GLib.Object {
         sharedUpToDateStatus.setShared (true);
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
-        fakeFolder.remoteModifier ().insert ("S/s0");
-        fakeFolder.remoteModifier ().appendByte ("S/s1");
-        fakeFolder.remoteModifier ().insert ("B/b3");
-        fakeFolder.remoteModifier ().find ("B/b3").extraDavProperties = "<oc:share-types><oc:share-type>0</oc:share-type></oc:share-types>";
-        fakeFolder.remoteModifier ().find ("A/a1").isShared = true; // becomes shared
-        fakeFolder.remoteModifier ().find ("A", true); // change the etags of the parent
+        fakeFolder.remote_modifier ().insert ("S/s0");
+        fakeFolder.remote_modifier ().append_byte ("S/s1");
+        fakeFolder.remote_modifier ().insert ("B/b3");
+        fakeFolder.remote_modifier ().find ("B/b3").extraDavProperties = "<oc:share-types><oc:share-type>0</oc:share-type></oc:share-types>";
+        fakeFolder.remote_modifier ().find ("A/a1").isShared = true; // becomes shared
+        fakeFolder.remote_modifier ().find ("A", true); // change the etags of the parent
 
-        StatusPushSpy statusSpy (fakeFolder.syncEngine ());
+        StatusPushSpy statusSpy (fakeFolder.sync_engine ());
 
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusSync));
         // We don't care about the shared flag for the sync status,
@@ -435,7 +437,7 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("S/s0").tag (), SyncFileStatus.StatusSync);
         QCOMPARE (statusSpy.statusOf ("S/s1").tag (), SyncFileStatus.StatusSync);
 
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         QCOMPARE (statusSpy.statusOf ("S"), sharedUpToDateStatus);
@@ -446,7 +448,7 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("B/b3"), sharedUpToDateStatus);
         QCOMPARE (statusSpy.statusOf ("A/a1"), sharedUpToDateStatus);
 
-        QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
+        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
     }
 
 
@@ -454,13 +456,13 @@ class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private on_ void renameError () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
-        fakeFolder.serverErrorPaths ().append ("A/a1");
-        fakeFolder.localModifier ().rename ("A/a1", "A/a1m");
-        fakeFolder.localModifier ().rename ("B/b1", "B/b1m");
-        StatusPushSpy statusSpy (fakeFolder.syncEngine ());
+        fakeFolder.server_error_paths ().append ("A/a1");
+        fakeFolder.local_modifier ().rename ("A/a1", "A/a1m");
+        fakeFolder.local_modifier ().rename ("B/b1", "B/b1m");
+        StatusPushSpy statusSpy (fakeFolder.sync_engine ());
 
-        fakeFolder.scheduleSync ();
-        fakeFolder.execUntilBeforePropagation ();
+        fakeFolder.schedule_sync ();
+        fakeFolder.exec_until_before_propagation ();
 
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
 
@@ -471,7 +473,7 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("B"), SyncFileStatus (SyncFileStatus.StatusSync));
         QCOMPARE (statusSpy.statusOf ("B/b1m"), SyncFileStatus (SyncFileStatus.StatusSync));
 
-        fakeFolder.execUntilFinished ();
+        fakeFolder.exec_until_finished ();
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf ("A/a1m"), SyncFileStatus (SyncFileStatus.StatusError));
         QCOMPARE (statusSpy.statusOf ("A/a1"), statusSpy.statusOf ("A/a1notexist"));
@@ -481,10 +483,10 @@ class TestSyncFileStatusTracker : GLib.Object {
         QCOMPARE (statusSpy.statusOf ("B/b1m"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
         statusSpy.clear ();
 
-        QVERIFY (!fakeFolder.syncOnce ());
+        QVERIFY (!fakeFolder.sync_once ());
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         statusSpy.clear ();
-        QVERIFY (!fakeFolder.syncOnce ());
+        QVERIFY (!fakeFolder.sync_once ());
         verifyThatPushMatchesPull (fakeFolder, statusSpy);
         QCOMPARE (statusSpy.statusOf ("A/a1m"), SyncFileStatus (SyncFileStatus.StatusError));
         QCOMPARE (statusSpy.statusOf ("A/a1"), statusSpy.statusOf ("A/a1notexist"));

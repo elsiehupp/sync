@@ -678,7 +678,7 @@ void Application.parse_options (string[] options) {
             if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
                 this.log_dir = it.next ();
             } else {
-                show_hint ("Log dir not specified");
+                show_hint ("Log directory not specified");
             }
         } else if (option == QLatin1String ("--logexpire")) {
             if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {

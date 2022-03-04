@@ -6,7 +6,9 @@ any purpose.
 
 //  #include <QtTest>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class TestNetrcParser : GLib.Object {
 

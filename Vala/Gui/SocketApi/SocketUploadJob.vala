@@ -60,11 +60,11 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> job)
     var account = AccountManager.instance ().account (accname);
 
     if (!GLib.FileInfo (this.local_path).is_absolute ()) {
-        job.failure (QStringLiteral ("Local path must be a an absolute path"));
+        job.failure ("Local path must be a an absolute path");
         return;
     }
     if (!this.tmp.open ()) {
-        job.failure (QStringLiteral ("Failed to create temporary database"));
+        job.failure ("Failed to create temporary database");
         return;
     }
 
@@ -104,12 +104,12 @@ void Socket_upload_job.on_signal_start () {
     }
     this.engine.sync_options (opt);
 
-    // create the dir, fail if it already exists
+    // create the directory, fail if it already exists
     var mkdir = new Occ.MkColJob (this.engine.account (), this.remote_path);
     connect (mkdir, &Occ.MkColJob.finished_without_error, this.engine, &Occ.SyncEngine.on_signal_start_sync);
     connect (mkdir, &Occ.MkColJob.finished_with_error, this, [this] (Soup.Reply reply) {
         if (reply.error () == 202) {
-            this.api_job.failure (QStringLiteral ("Destination %1 already exists").arg (this.remote_path));
+            this.api_job.failure ("Destination %1 already exists".arg (this.remote_path));
         } else {
             this.api_job.failure (reply.error_string ());
         }

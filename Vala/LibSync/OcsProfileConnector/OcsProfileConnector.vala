@@ -42,7 +42,7 @@ class OcsProfileConnector : GLib.Object {
             /* emit */ error ();
             return;
         }
-        const string url = QStringLiteral ("/ocs/v2.php/hovercard/v1/%1").arg (user_id);
+        const string url = "/ocs/v2.php/hovercard/v1/%1".arg (user_id);
         var job = new JsonApiJob (this.account, url, this);
         JsonApiJob.signal_json_received.connect (job, this, OcsProfileConnector.on_signal_hovercard_fetched);
         job.on_signal_start ();
@@ -125,11 +125,11 @@ class OcsProfileConnector : GLib.Object {
 
 
     private static Occ.HovercardAction json_to_action (QJsonObject json_action_object) {
-        var icon_url = json_action_object.value (QStringLiteral ("icon")).to_string (QStringLiteral ("no-icon"));
+        var icon_url = json_action_object.value ("icon").to_string ("no-icon");
         QPixmap icon_pixmap;
         Occ.HovercardAction hovercard_action{
-            json_action_object.value (QStringLiteral ("title")).to_string (QStringLiteral ("No title")), icon_url,
-            json_action_object.value (QStringLiteral ("hyperlink")).to_string (QStringLiteral ("no-link"))};
+            json_action_object.value ("title").to_string ("No title"), icon_url,
+            json_action_object.value ("hyperlink").to_string ("no-link")};
         if (QPixmapCache.find (icon_url, icon_pixmap)) {
             hovercard_action.icon = icon_pixmap;
         }

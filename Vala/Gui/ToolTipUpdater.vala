@@ -59,7 +59,7 @@ class ToolTipUpdater : GLib.Object {
 
 
 
-using namespace Occ;
+using Occ;
 
 ToolTipUpdater.ToolTipUpdater (QTreeView tree_view)
     : GLib.Object (tree_view)

@@ -74,7 +74,7 @@ signals:
             GLib.warning ("Attempt to trigger invalid URL : " + this.link.to_string ();
             return;
         }
-        QNetworkRequest req;
+        Soup.Request req;
         req.raw_header ("Ocs-APIREQUEST", "true");
         req.raw_header ("Content-Type", "application/x-www-form-urlencoded");
 

@@ -154,8 +154,8 @@ class FolderWatcher : GLib.Object {
         GLib.FileInfo file_info (path);
         string[] paths (path);
         if (file_info.is_dir ()) {
-            QDir dir (path);
-            append_sub_paths (dir, paths);
+            QDir directory (path);
+            append_sub_paths (directory, paths);
         }
         on_signal_change_detected (paths);
     }
@@ -232,15 +232,15 @@ class FolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void append_sub_paths (QDir dir, string[]& sub_paths) {
-        string[] new_sub_paths = dir.entry_list (QDir.NoDotAndDotDot | QDir.Dirs | QDir.Files);
+    private void append_sub_paths (QDir directory, string[]& sub_paths) {
+        string[] new_sub_paths = directory.entry_list (QDir.NoDotAndDotDot | QDir.Dirs | QDir.Files);
         for (int i = 0; i < new_sub_paths.size (); i++) {
-            string path = dir.path () + "/" + new_sub_paths[i];
+            string path = directory.path () + "/" + new_sub_paths[i];
             GLib.FileInfo file_info (path);
             sub_paths.append (path);
             if (file_info.is_dir ()) {
-                QDir dir (path);
-                append_sub_paths (dir, sub_paths);
+                QDir directory (path);
+                append_sub_paths (directory, sub_paths);
             }
         }
     }

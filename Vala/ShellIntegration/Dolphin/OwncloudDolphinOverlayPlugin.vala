@@ -47,8 +47,8 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
             return string[] ();
         if (!url.isLocalFile ())
             return string[] ();
-        QDir localPath (url.toLocalFile ());
-        const GLib.ByteArray localFile = localPath.canonicalPath ().toUtf8 ();
+        QDir local_path (url.toLocalFile ());
+        const GLib.ByteArray localFile = local_path.canonicalPath ().toUtf8 ();
 
         helper.sendCommand (GLib.ByteArray ("RETRIEVE_FILE_STATUS:" + localFile + "\n"));
 

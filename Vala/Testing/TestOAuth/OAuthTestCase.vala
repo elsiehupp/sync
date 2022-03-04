@@ -4,7 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class OAuthTestCase : GLib.Object {
     DesktopServiceHook desktopServiceHook;
@@ -22,7 +24,7 @@ class OAuthTestCase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public FakeQNAM *fakeQnam = null;
+    public FakeQNAM *fake_qnam = null;
     public QNetworkAccessManager realQNAM;
     public QPointer<Soup.Reply> browserReply = null;
     public string code = generateEtag ();
@@ -39,15 +41,15 @@ class OAuthTestCase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public virtual void test () {
-        fakeQnam = new FakeQNAM ({});
+        fake_qnam = new FakeQNAM ({});
         account = Occ.Account.create ();
         account.setUrl (sOAuthTestServer);
-        account.setCredentials (new FakeCredentials{fakeQnam});
-        fakeQnam.setParent (this);
-        fakeQnam.setOverride ([this] (QNetworkAccessManager.Operation op, QNetworkRequest req, QIODevice device) {
+        account.setCredentials (new FakeCredentials{fake_qnam});
+        fake_qnam.setParent (this);
+        fake_qnam.set_override ([this] (QNetworkAccessManager.Operation operation, Soup.Request req, QIODevice device) {
             //  ASSERT (device);
-            //  ASSERT (device.bytesAvailable ()>0); // OAuth2 always sends around POST data.
-            return this.tokenReply (op, req);
+            //  ASSERT (device.bytes_available ()>0); // OAuth2 always sends around POST data.
+            return this.tokenReply (operation, req);
         });
 
         GLib.Object.connect (&desktopServiceHook, &DesktopServiceHook.hooked,
@@ -73,13 +75,13 @@ class OAuthTestCase : GLib.Object {
         GLib.Uri redirectUri (query.queryItemValue (QLatin1String ("redirect_uri")));
         QCOMPARE (redirectUri.host (), QLatin1String ("localhost"));
         redirectUri.setQuery ("code=" + code);
-        createBrowserReply (QNetworkRequest (redirectUri));
+        createBrowserReply (Soup.Request (redirectUri));
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public virtual Soup.Reply createBrowserReply (QNetworkRequest request) {
+    public virtual Soup.Reply createBrowserReply (Soup.Request request) {
         browserReply = realQNAM.get (request);
         GLib.Object.connect (browserReply, &Soup.Reply.on_signal_finished, this, &OAuthTestCase.browserReplyFinished);
         return browserReply;
@@ -98,15 +100,15 @@ class OAuthTestCase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual Soup.Reply tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest req) {
+    public virtual Soup.Reply tokenReply (QNetworkAccessManager.Operation operation, Soup.Request req) {
         //  ASSERT (state == BrowserOpened);
         state = TokenAsked;
-        //  ASSERT (op == QNetworkAccessManager.PostOperation);
+        //  ASSERT (operation == QNetworkAccessManager.PostOperation);
         //  ASSERT (req.url ().toString ().startsWith (sOAuthTestServer.toString ()));
         //  ASSERT (req.url ().path () == sOAuthTestServer.path () + "/index.php/apps/oauth2/api/v1/token");
         std.unique_ptr<QBuffer> payload (new QBuffer ());
         payload.setData (tokenReplyPayload ());
-        return new FakePostReply (op, req, std.move (payload), fakeQnam);
+        return new FakePostReply (operation, req, std.move (payload), fake_qnam);
     }
 
 

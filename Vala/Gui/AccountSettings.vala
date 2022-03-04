@@ -809,10 +809,10 @@ class AccountSettings : Gtk.Widget {
             definition.virtual_files_mode = best_available_vfs_mode ();
         }
         {
-            QDir dir (definition.local_path);
-            if (!dir.exists ()) {
+            QDir directory (definition.local_path);
+            if (!directory.exists ()) {
                 GLib.info ("Creating folder" + definition.local_path;
-                if (!dir.mkpath (".")) {
+                if (!directory.mkpath (".")) {
                     QMessageBox.warning (this, _("Folder creation failed"),
                         _("<p>Could not create local folder <i>%1</i>.</p>")
                             .arg (QDir.to_native_separators (definition.local_path)));

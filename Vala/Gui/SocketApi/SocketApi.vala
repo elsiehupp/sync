@@ -229,7 +229,7 @@ string[] split (string data) {
 
 #if GUI_TESTING
 
-using namespace Occ;
+using Occ;
 
 GLib.List<GLib.Object> all_objects (GLib.List<Gtk.Widget> widgets) {
     GLib.List<GLib.Object> objects;
@@ -371,9 +371,9 @@ SocketApi.SocketApi (GLib.Object parent) {
 
     Socket_api_server.remove_server (socket_path);
     GLib.FileInfo info (socket_path);
-    if (!info.dir ().exists ()) {
-        bool result = info.dir ().mkpath (".");
-        GLib.debug ("creating" + info.dir ().path () + result;
+    if (!info.directory ().exists ()) {
+        bool result = info.directory ().mkpath (".");
+        GLib.debug ("creating" + info.directory ().path () + result;
         if (result) {
             GLib.File.permissions (socket_path,
                 GLib.File.Permissions (GLib.File.Read_owner + GLib.File.WriteOwner + GLib.File.Exe_owner));
@@ -469,7 +469,7 @@ void SocketApi.on_signal_read_socket () {
             //  Q_ASSERT (static_qt_meta_object.normalized_signature (function_with_arguments) == function_with_arguments);
             const var out = static_meta_object.index_of_method (function_with_arguments);
             if (out == -1) {
-                listener.send_error (QStringLiteral ("Function %1 not found").arg (string.from_utf8 (function_with_arguments)));
+                listener.send_error ("Function %1 not found".arg (string.from_utf8 (function_with_arguments)));
             }
             //  ASSERT (out != -1)
             return out;
@@ -479,7 +479,7 @@ void SocketApi.on_signal_read_socket () {
         if (command.starts_with ("ASYNC_")) {
             var arguments = argument.split ('|');
             if (arguments.size () != 2) {
-                listener.send_error (QStringLiteral ("argument count is wrong"));
+                listener.send_error ("argument count is wrong");
                 return;
             }
 
@@ -496,7 +496,7 @@ void SocketApi.on_signal_read_socket () {
             } else {
                 GLib.warning ("The command is not supported by this version of the client:" + command
                                        + "with argument:" + argument;
-                socket_api_job.reject (QStringLiteral ("command not found"));
+                socket_api_job.reject ("command not found");
             }
         } else if (command.starts_with ("V2/")) {
             QJsonParseError error;
@@ -514,7 +514,7 @@ void SocketApi.on_signal_read_socket () {
             } else {
                 GLib.warning ("The command is not supported by this version of the client:" + command
                                        + "with argument:" + argument;
-                socket_api_job.failure (QStringLiteral ("command not found"));
+                socket_api_job.failure ("command not found");
             }
         } else {
             if (index_of_method != -1) {
@@ -874,9 +874,9 @@ void SocketApi.command_RESOLVE_CONFLICT (string local_file, Socket_listener *) {
     const var conflicted_relative_path = file_data.folder_relative_path;
     const var base_relative_path = file_data.folder.journal_database ().conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
 
-    const var dir = QDir (file_data.folder.path ());
-    const var conflicted_path = dir.file_path (conflicted_relative_path);
-    const var base_path = dir.file_path (base_relative_path);
+    const var directory = QDir (file_data.folder.path ());
+    const var conflicted_path = directory.file_path (conflicted_relative_path);
+    const var base_path = directory.file_path (base_relative_path);
 
     const var base_name = GLib.FileInfo (base_path).filename ();
 
@@ -1054,7 +1054,7 @@ SocketApi.File_data SocketApi.File_data.get (string local_file) {
 
     data.folder_relative_path = data.local_path.mid (data.folder.clean_path ().length () + 1);
     data.server_relative_path = QDir (data.folder.remote_path ()).file_path (data.folder_relative_path);
-    string virtual_file_ext = QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
+    string virtual_file_ext = APPLICATION_DOTVIRTUALFILE_SUFFIX;
     if (data.server_relative_path.ends_with (virtual_file_ext)) {
         data.server_relative_path.chop (virtual_file_ext.size ());
     }
@@ -1063,7 +1063,7 @@ SocketApi.File_data SocketApi.File_data.get (string local_file) {
 
 string SocketApi.File_data.folder_relative_path_no_vfs_suffix () {
     var result = folder_relative_path;
-    string virtual_file_ext = QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
+    string virtual_file_ext = APPLICATION_DOTVIRTUALFILE_SUFFIX;
     if (result.ends_with (virtual_file_ext)) {
         result.chop (virtual_file_ext.size ());
     }
@@ -1085,7 +1085,7 @@ SyncJournalFileRecord SocketApi.File_data.journal_record () {
 }
 
 SocketApi.File_data SocketApi.File_data.parent_folder () {
-    return File_data.get (GLib.FileInfo (local_path).dir ().path ().to_utf8 ());
+    return File_data.get (GLib.FileInfo (local_path).directory ().path ().to_utf8 ());
 }
 
 void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener listener) {
@@ -1159,7 +1159,7 @@ void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener list
                         // Uploaded conflict file in read-only directory
                         listener.on_signal_send_message (QLatin1String ("MENU_ITEM:MOVE_ITEM.") + _("Move and rename …"));
                     } else {
-                        // Local-only conflict file in a read-only dir
+                        // Local-only conflict file in a read-only directory
                         listener.on_signal_send_message (QLatin1String ("MENU_ITEM:MOVE_ITEM.") + _("Move, rename and upload …"));
                     }
                     listener.on_signal_send_message (QLatin1String ("MENU_ITEM:DELETE_ITEM.") + _("Delete local changes"));

@@ -10,7 +10,9 @@
 
 //  #include <common/constants.h>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class TestClientSideEncryption : GLib.Object {
 

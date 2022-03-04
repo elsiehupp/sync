@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 //  #include <QTemporaryFile>
 //  #include <QTest>
 
+namespace Testing {
+
 class TestLongWindowsPath : GLib.Object {
 
     /***********************************************************
@@ -28,10 +30,10 @@ class TestLongWindowsPath : GLib.Object {
     private on_ void testLongPathStat_data () {
         QTest.addColumn<string> ("name");
 
-        QTest.newRow ("long") + QStringLiteral ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
+        QTest.newRow ("long") + "/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                 "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                 "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
-                                                "olonglonglonglong/file.txt");
+                                                "olonglonglonglong/file.txt";
         QTest.newRow ("long emoji") + string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                          "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                          "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
@@ -60,7 +62,7 @@ class TestLongWindowsPath : GLib.Object {
 
         const var data = QByteArrayLiteral ("hello");
         GLib.debug () + longPath;
-        QVERIFY (longPath.dir ().mkpath ("."));
+        QVERIFY (longPath.directory ().mkpath ("."));
 
         GLib.File file = GLib.File.new_for_path (longPath.filePath ());
         QVERIFY (file.open (GLib.File.WriteOnly));

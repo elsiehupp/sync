@@ -56,7 +56,7 @@ bool Occ.XAttrWrapper.has_nextcloud_placeholder_attributes (string path) {
 Occ.Result<void, string> Occ.XAttrWrapper.add_nextcloud_placeholder_attributes (string path) {
     var on_signal_success = xattr_set (path.to_utf8 (), hydrate_exec_attribute_name, APPLICATION_EXECUTABLE);
     if (!on_signal_success) {
-        return QStringLiteral ("Failed to set the extended attribute");
+        return "Failed to set the extended attribute";
     } else {
         return {};
     }

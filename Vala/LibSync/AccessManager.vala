@@ -43,7 +43,7 @@ class AccessManager : QNetworkAccessManager {
 
     /***********************************************************
     ***********************************************************/
-    protected Soup.Reply create_request (QNetworkAccessManager.Operation op, Soup.Request request, QIODevice outgoing_data = null) {
+    protected Soup.Reply create_request (QNetworkAccessManager.Operation operation, Soup.Request request, QIODevice outgoing_data = null) {
         Soup.Request new_request = new Soup.Request (request);
 
         // Respect request specific user agent if any
@@ -55,7 +55,7 @@ class AccessManager : QNetworkAccessManager {
         new_request.raw_header (GLib.ByteArray ("Accept"), "*/*");
 
         GLib.ByteArray verb = new_request.attribute (Soup.Request.CustomVerbAttribute).to_byte_array ();
-        // For PROPFIND (assumed to be a WebDAV op), set xml/utf8 as content type/encoding
+        // For PROPFIND (assumed to be a WebDAV operation), set xml/utf8 as content type/encoding
         // This needs extension
         if (verb == "PROPFIND") {
             new_request.header (Soup.Request.ContentTypeHeader, QLatin1String ("text/xml; charset=utf-8"));
@@ -63,7 +63,7 @@ class AccessManager : QNetworkAccessManager {
 
         // Generate a new request identifier
         GLib.ByteArray request_id = generate_request_id ();
-        GLib.info (op + verb + new_request.url ().to_string () + "has X-Request-ID " + request_id);
+        GLib.info (operation + verb + new_request.url ().to_string () + "has X-Request-ID " + request_id);
         new_request.raw_header ("X-Request-ID", request_id);
 
     // #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 4)
@@ -76,8 +76,8 @@ class AccessManager : QNetworkAccessManager {
         }
     // #endif
 
-        var reply = QNetworkAccessManager.create_request (op, new_request, outgoing_data);
-        HttpLogger.log_request (reply, op, outgoing_data);
+        var reply = QNetworkAccessManager.create_request (operation, new_request, outgoing_data);
+        HttpLogger.log_request (reply, operation, outgoing_data);
         return reply;
     }
 } // class AccessManager

@@ -1,3 +1,7 @@
+
+
+namespace Testing {
+
 // stub to prevent linker error
 
 Occ.AccountManager *Occ.AccountManager.instance () { return static_cast<AccountManager> (new GLib.Object); }

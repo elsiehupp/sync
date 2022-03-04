@@ -4,7 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class FakePostReply : Soup.Reply {
 
@@ -17,12 +19,12 @@ class FakePostReply : Soup.Reply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePostReply (QNetworkAccessManager.Operation op, QNetworkRequest request,
+    public FakePostReply (QNetworkAccessManager.Operation operation, Soup.Request request,
                   std.unique_ptr<QIODevice> payload_, GLib.Object parent)
         : Soup.Reply{parent}, payload{std.move (payload_)} {
         setRequest (request);
         setUrl (request.url ());
-        setOperation (op);
+        setOperation (operation);
         open (QIODevice.ReadOnly);
         payload.open (QIODevice.ReadOnly);
         QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
@@ -35,28 +37,28 @@ class FakePostReply : Soup.Reply {
             /* emit */ finished ();
             return;
         } else if (redirectToPolicy) {
-            setHeader (QNetworkRequest.LocationHeader, "/my.policy");
-            setAttribute (QNetworkRequest.RedirectionTargetAttribute, "/my.policy");
-            setAttribute (QNetworkRequest.HttpStatusCodeAttribute, 302); // 302 might or might not lose POST data in rfc
-            setHeader (QNetworkRequest.ContentLengthHeader, 0);
+            setHeader (Soup.Request.LocationHeader, "/my.policy");
+            setAttribute (Soup.Request.RedirectionTargetAttribute, "/my.policy");
+            setAttribute (Soup.Request.HttpStatusCodeAttribute, 302); // 302 might or might not lose POST data in rfc
+            setHeader (Soup.Request.ContentLengthHeader, 0);
             /* emit */ metaDataChanged ();
             /* emit */ finished ();
             return;
         } else if (redirectToToken) {
             // Redirect to self
             GLib.Variant destination = GLib.Variant (sOAuthTestServer.toString ()+QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
-            setHeader (QNetworkRequest.LocationHeader, destination);
-            setAttribute (QNetworkRequest.RedirectionTargetAttribute, destination);
-            setAttribute (QNetworkRequest.HttpStatusCodeAttribute, 307); // 307 explicitly in rfc says to not lose POST data
-            setHeader (QNetworkRequest.ContentLengthHeader, 0);
+            setHeader (Soup.Request.LocationHeader, destination);
+            setAttribute (Soup.Request.RedirectionTargetAttribute, destination);
+            setAttribute (Soup.Request.HttpStatusCodeAttribute, 307); // 307 explicitly in rfc says to not lose POST data
+            setHeader (Soup.Request.ContentLengthHeader, 0);
             /* emit */ metaDataChanged ();
             /* emit */ finished ();
             return;
         }
-        setHeader (QNetworkRequest.ContentLengthHeader, payload.size ());
-        setAttribute (QNetworkRequest.HttpStatusCodeAttribute, 200);
+        setHeader (Soup.Request.ContentLengthHeader, payload.size ());
+        setAttribute (Soup.Request.HttpStatusCodeAttribute, 200);
         /* emit */ metaDataChanged ();
-        if (bytesAvailable ())
+        if (bytes_available ())
             /* emit */ readyRead ();
         /* emit */ finished ();
     }
@@ -71,13 +73,13 @@ class FakePostReply : Soup.Reply {
 
     /***********************************************************
     ***********************************************************/
-    public int64 bytesAvailable () override {
+    public int64 bytes_available () override {
         if (aborted)
             return 0;
-        return payload.bytesAvailable ();
+        return payload.bytes_available ();
     }
 
-    ipublic nt64 readData (char data, int64 maxlen) override {
+    ipublic nt64 read_data (char data, int64 maxlen) override {
         return payload.read (data, maxlen);
     }
 }

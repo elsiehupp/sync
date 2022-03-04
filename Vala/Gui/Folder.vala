@@ -917,14 +917,14 @@ class Folder : GLib.Object {
     /***********************************************************
     Connected to the corresponding signals in the SyncEngine
     ***********************************************************/
-    public void on_signal_about_to_remove_all_files (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
+    public void on_signal_about_to_remove_all_files (SyncFileItem.Direction directory, std.function<void (bool)> callback) {
         ConfigFile cfg_file;
         if (!cfg_file.prompt_delete_files ()) {
             callback (false);
             return;
         }
     
-        const string message = dir == SyncFileItem.Direction.DOWN
+        const string message = directory == SyncFileItem.Direction.DOWN
             ? _("All files in the sync folder \"%1\" folder were deleted on the server.\n"
               + "These deletes will be synchronized to your local sync folder, making such files "
               + "unavailable unless you have a right to restore. \n"
@@ -1033,7 +1033,7 @@ class Folder : GLib.Object {
         if (this.definition.virtual_files_mode == Vfs.Off) {
             return;
         }
-        const var placeholders_corrected_key = QStringLiteral ("placeholders_corrected");
+        const var placeholders_corrected_key = "placeholders_corrected";
         const var placeholders_corrected = this.journal.key_value_store_get_int (placeholders_corrected_key, 0);
         if (!placeholders_corrected) {
             GLib.debug ("Make sure all virtual files are placeholder files";
@@ -1088,7 +1088,7 @@ class Folder : GLib.Object {
 
 
     /***********************************************************
-    Triggered by the folder watcher when a file/dir in this
+    Triggered by the folder watcher when a file/directory in this
     folder changes. Needs to check whether this change should
     trigger a new sync run to be scheduled.
     ***********************************************************/
@@ -1615,8 +1615,8 @@ class Folder : GLib.Object {
         if (this.sync_result.first_item_renamed ()) {
             LogStatus status (Log_status_rename);
             // if the path changes it's rather a move
-            QDir ren_target = GLib.FileInfo (this.sync_result.first_item_renamed ().rename_target).dir ();
-            QDir ren_source = GLib.FileInfo (this.sync_result.first_item_renamed ().file).dir ();
+            QDir ren_target = GLib.FileInfo (this.sync_result.first_item_renamed ().rename_target).directory ();
+            QDir ren_source = GLib.FileInfo (this.sync_result.first_item_renamed ().file).directory ();
             if (ren_target != ren_source) {
                 status = Log_status_move;
             }

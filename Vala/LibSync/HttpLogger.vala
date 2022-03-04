@@ -72,7 +72,7 @@ static class HttpLogger {
 
 
     static bool is_text_body (string s) {
-        const QRegularExpression regexp (QStringLiteral ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))"));
+        const QRegularExpression regexp ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))");
         return regexp.match (s).has_match ();
     }
 

@@ -12,7 +12,7 @@ Copyright (C) by Julius Härtl <jus@bitgrid.net>
 //  #include <accountstate.h>
 //  #include <QDesktopServices>
 
-using namespace Occ;
+using Occ;
 
 GSimple_action_group action_group = null;
 
@@ -32,7 +32,7 @@ using GAction_group = this.GAction_group;
 using gchar = char;
 using gpointer = void*;
 
-using namespace Occ;
+using Occ;
 
 class CloudProviderWrapper : GLib.Object {
 

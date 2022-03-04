@@ -766,7 +766,7 @@ class OwncloudPropagator : GLib.Object {
             // Processing them now leads to problems with permissions:
             // check_for_permissions () has already run and used the permissions
             // of the file we're about to delete to decide whether uploading
-            // to the new dir is ok...
+            // to the new directory is ok...
             foreach (SyncFileItemPtr dir_item in items) {
                 if (dir_item.destination ().starts_with (item.destination () + "/")) {
                     dir_item.instruction = CSYNC_INSTRUCTION_NONE;
@@ -839,7 +839,7 @@ class OwncloudPropagator : GLib.Object {
             // Just check that there is no other file with the same name and different casing.
             GLib.FileInfo file_info = new GLib.FileInfo (file);
             const string fn = file_info.filename ();
-            const string[] list = file_info.dir ().entry_list ({
+            const string[] list = file_info.directory ().entry_list ({
                 fn
             });
             if (list.count () > 1 || (list.count () == 1 && list[0] != fn)) {

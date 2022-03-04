@@ -5,6 +5,8 @@ by Bob Jenkins, December 1996, Public Domain.
 See http://burtleburtle.net/bob/hash/evahash.html
 ***********************************************************/
 
+namespace Testing {
+
 const int HASHSTATE = 1
 const int HASHLEN   = 1
 const int MAXPAIR   = 80
@@ -12,17 +14,17 @@ const int MAXLEN    = 70
 
 static void check_c_jhash_trials (void **state) {
     uint8_t qa[MAXLEN+1], qb[MAXLEN+2], *a = qa[0], *b = qb[1];
-    uint32_t c[HASHSTATE];
-    uint32_t d[HASHSTATE];
-    uint32_t i = 0;
-    uint32_t j = 0;
-    uint32_t k = 0;
-    uint32_t l = 0;
-    uint32_t m = 0;
-    uint32_t z = 0;
-    uint32_t e[HASHSTATE],f[HASHSTATE],g[HASHSTATE],h[HASHSTATE];
-    uint32_t x[HASHSTATE],y[HASHSTATE];
-    uint32_t hlen = 0;
+    uint32 c[HASHSTATE];
+    uint32 d[HASHSTATE];
+    uint32 i = 0;
+    uint32 j = 0;
+    uint32 k = 0;
+    uint32 l = 0;
+    uint32 m = 0;
+    uint32 z = 0;
+    uint32 e[HASHSTATE],f[HASHSTATE],g[HASHSTATE],h[HASHSTATE];
+    uint32 x[HASHSTATE],y[HASHSTATE];
+    uint32 hlen = 0;
 
     (void) state; /* unused */
 
@@ -31,11 +33,11 @@ static void check_c_jhash_trials (void **state) {
         for (i=0; i<hlen; ++i) {    /*----------------------- for each input byte, */
             for (j=0; j<8; ++j) { /*------------------------ for each input bit, */
                 for (m=1; m<8; ++m) { /*------------ for serveral possible initvals, */
-                    for (l=0; l<HASHSTATE; ++l) e[l]=f[l]=g[l]=h[l]=x[l]=y[l]=~ ( (uint32_t)0);
+                    for (l=0; l<HASHSTATE; ++l) e[l]=f[l]=g[l]=h[l]=x[l]=y[l]=~ ( (uint32)0);
 
                     /*---- check that every output bit is affected by that input bit */
                     for (k=0; k<MAXPAIR; k+=2) {
-                        uint32_t on_signal_finished=1;
+                        uint32 on_signal_finished=1;
                         /* keys have one bit different */
                         for (l=0; l<hlen+1; ++l) {a[l] = b[l] = (uint8_t)0;}
                         /* have a and b be two keys differing in only one bit */
@@ -78,39 +80,39 @@ static void check_c_jhash_trials (void **state) {
 }
 
 static void check_c_jhash_alignment_problems (void **state) {
-    uint32_t test = 0;
+    uint32 test = 0;
     uint8_t buf[MAXLEN+20];
     uint8_t b = NULL;
-    uint32_t len = 0;
+    uint32 len = 0;
     uint8_t q = "This is the time for all good men to come to the aid of their country";
     uint8_t qq = "xThis is the time for all good men to come to the aid of their country";
     uint8_t qqq = "xxThis is the time for all good men to come to the aid of their country";
     uint8_t qqqq = "xxxThis is the time for all good men to come to the aid of their country";
-    uint32_t h = 0;
-    uint32_t i = 0;
-    uint32_t j = 0;
-    uint32_t ref = 0;
-    uint32_t x = 0;
-    uint32_t y = 0;
+    uint32 h = 0;
+    uint32 i = 0;
+    uint32 j = 0;
+    uint32 ref = 0;
+    uint32 x = 0;
+    uint32 y = 0;
 
     (void) state; /* unused */
 
-    test = c_jhash (q, sizeof (q)-1, (uint32_t)0);
-    assert_true (test == c_jhash (qq+1, sizeof (q)-1, (uint32_t)0));
-    assert_true (test == c_jhash (qq+1, sizeof (q)-1, (uint32_t)0));
-    assert_true (test == c_jhash (qqq+2, sizeof (q)-1, (uint32_t)0));
-    assert_true (test == c_jhash (qqqq+3, sizeof (q)-1, (uint32_t)0));
+    test = c_jhash (q, sizeof (q)-1, (uint32)0);
+    assert_true (test == c_jhash (qq+1, sizeof (q)-1, (uint32)0));
+    assert_true (test == c_jhash (qq+1, sizeof (q)-1, (uint32)0));
+    assert_true (test == c_jhash (qqq+2, sizeof (q)-1, (uint32)0));
+    assert_true (test == c_jhash (qqqq+3, sizeof (q)-1, (uint32)0));
     for (h=0, b=buf+1; h<8; ++h, ++b) {
         for (i=0; i<MAXLEN; ++i) {
             len = i;
             for (j=0; j<i; ++j) * (b+j)=0;
 
             /* these should all be equal */
-            ref = c_jhash (b, len, (uint32_t)1);
+            ref = c_jhash (b, len, (uint32)1);
             * (b+i)= (uint8_t)~0;
             * (b-1)= (uint8_t)~0;
-            x = c_jhash (b, len, (uint32_t)1);
-            y = c_jhash (b, len, (uint32_t)1);
+            x = c_jhash (b, len, (uint32)1);
+            y = c_jhash (b, len, (uint32)1);
             assert_false ( (ref != x) || (ref != y));
         }
     }
@@ -118,16 +120,16 @@ static void check_c_jhash_alignment_problems (void **state) {
 
 static void check_c_jhash_null_strings (void **state) {
     uint8_t buf[1];
-    uint32_t h = 0;
-    uint32_t i = 0;
-    uint32_t t = 0;
+    uint32 h = 0;
+    uint32 i = 0;
+    uint32 t = 0;
 
     (void) state; /* unused */
 
     buf[0] = ~0;
     for (i=0, h=0; i<8; ++i) {
         t = h;
-        h = c_jhash (buf, (uint32_t)0, h);
+        h = c_jhash (buf, (uint32)0, h);
         assert_false (t == h);
         // print_error ("0-byte-string check failed : t = %.8x, h = %.8x", t, h);
     }
@@ -200,7 +202,7 @@ static void check_c_jhash64_trials (void **state) {
                                                  (long long uint32) x[0],
                                                  (long long uint32) y[0]);
                          print_error ("i %d j %d m %d len %d\n",
-                                                 (uint32_t)i, (uint32_t)j, (uint32_t)m, (uint32_t)hlen);
+                                                 (uint32)i, (uint32)j, (uint32)m, (uint32)hlen);
 //  #endif
                     }
                     if (z == MAXPAIR) {
@@ -243,28 +245,28 @@ static void check_c_jhash64_alignment_problems (void **state) {
     h = c_jhash64 (q+0, (uint64) (sizeof (q)-1), (uint64)0);
     t = h;
     assert_true (t == h);
-    // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
+    // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (qq+1, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
-    // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
+    // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (qqq+2, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
-    // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
+    // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (qqqq+3, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
-    // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
+    // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (o+4, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
-    // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
+    // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (oo+5, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
-    // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
+    // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (ooo+6, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
-    // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
+    // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (oooo+7, (uint64) (sizeof (q)-1), (uint64)0);
     assert_true (t == h);
-    // , "%.8lx%.8lx\n", (uint32_t)h, (uint32_t) (h>>32));
+    // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     for (h=0, b=buf+1; h<8; ++h, ++b) {
         for (i=0; i<MAXLEN; ++i) {
             len = i;

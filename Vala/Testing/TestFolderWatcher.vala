@@ -6,6 +6,8 @@ implied, as to its usefulness for any purpose.
 
 //  #include <QtTest>
 
+namespace Testing {
+
 void touch (string file) {
     string cmd;
     cmd = string ("touch %1").arg (file);
@@ -37,7 +39,7 @@ void mv (string file1, string file2) {
     system (cmd.toLocal8Bit ());
 }
 
-using namespace Occ;
+using Occ;
 
 class TestFolderWatcher : GLib.Object {
 
@@ -71,15 +73,15 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     /***********************************************************
     ***********************************************************/
     public TestFolderWatcher () {
-        QDir rootDir (this.root.path ());
-        this.rootPath = rootDir.canonicalPath ();
+        QDir root_directory (this.root.path ());
+        this.rootPath = root_directory.canonicalPath ();
         GLib.debug ("creating test directory tree in " + this.rootPath;
 
-        rootDir.mkpath ("a1/b1/c1");
-        rootDir.mkpath ("a1/b1/c2");
-        rootDir.mkpath ("a1/b2/c1");
-        rootDir.mkpath ("a1/b3/c3");
-        rootDir.mkpath ("a2/b3/c3");
+        root_directory.mkpath ("a1/b1/c1");
+        root_directory.mkpath ("a1/b1/c2");
+        root_directory.mkpath ("a1/b2/c1");
+        root_directory.mkpath ("a1/b3/c3");
+        root_directory.mkpath ("a2/b3/c3");
         Utility.writeRandomFile ( this.rootPath+"/a1/random.bin");
         Utility.writeRandomFile ( this.rootPath+"/a1/b2/todelete.bin");
         Utility.writeRandomFile ( this.rootPath+"/a2/renamefile");
@@ -232,9 +234,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         touch (file);
         QVERIFY (waitForPathChanged (file));
 
-        string dir (this.rootPath+"/a1/brename/newfolder");
-        mkdir (dir);
-        QVERIFY (waitForPathChanged (dir));
+        string directory (this.rootPath+"/a1/brename/newfolder");
+        mkdir (directory);
+        QVERIFY (waitForPathChanged (directory));
     }
 
 
@@ -256,9 +258,9 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         touch (file);
         QVERIFY (waitForPathChanged (file));
 
-        string dir (this.rootPath+"/bren/newfolder2");
-        mkdir (dir);
-        QVERIFY (waitForPathChanged (dir));
+        string directory (this.rootPath+"/bren/newfolder2");
+        mkdir (directory);
+        QVERIFY (waitForPathChanged (directory));
     }
 }
 

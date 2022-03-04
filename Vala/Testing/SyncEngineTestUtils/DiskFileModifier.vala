@@ -4,20 +4,84 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
+namespace Testing {
+
 class DiskFileModifier : FileModifier {
-    QDir this.rootDir;
+
+    QDir root_directory;
 
     /***********************************************************
     ***********************************************************/
-    public DiskFileModifier (string rootDirPath) : this.rootDir (rootDirPath) { }
-    public void remove (string relativePath) override;
-    public void insert (string relativePath, int64 size = 64, char contentChar = 'W') override;
-    public void setContents (string relativePath, char contentChar) override;
-    public void appendByte (string relativePath) override;
+    public DiskFileModifier (string root_directory) {
+        this.root_directory = root_directory;
+    }
 
     /***********************************************************
     ***********************************************************/
-    public void mkdir (string relativePath) override;
-    public void rename (string from, string to) override;
-    public void setModTime (string relativePath, GLib.DateTime modTime) override;
-};
+    public override void remove (string relative_path) {
+        GLib.FileInfo fi { this.root_directory.filePath (relative_path));
+        if (fi.isFile ())
+            QVERIFY (this.root_directory.remove (relative_path));
+        else
+            QVERIFY (QDir { fi.filePath () }.removeRecursively ());
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override void insert (string relative_path, int64 size = 64, char content_char = 'W') {
+        GLib.File file = new GLib.File (this.root_directory.filePath (relative_path));
+        QVERIFY (!file.exists ());
+        file.open (GLib.File.WriteOnly);
+        GLib.ByteArray buf (1024, content_char);
+        for (int x = 0; x < size / buf.size (); ++x) {
+            file.write (buf);
+        }
+        file.write (buf.data (), size % buf.size ());
+        file.close ();
+        // Set the mtime 30 seconds in the past, for some tests that need to make sure that the mtime differs.
+        Occ.FileSystem.set_modification_time (file.fileName (), Occ.Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ().addSecs (-30)));
+        QCOMPARE (file.size (), size);
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override void set_contents (string relative_path, char content_char) {
+        GLib.File file = new GLib.File (this.root_directory.filePath (relative_path));
+        QVERIFY (file.exists ());
+        int64 size = file.size ();
+        file.open (GLib.File.WriteOnly);
+        file.write (GLib.ByteArray {}.fill (content_char, size));
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override void append_byte (string relative_path) {
+        GLib.File file = new GLib.File (this.root_directory.filePath (relative_path));
+        QVERIFY (file.exists ());
+        file.open (GLib.File.ReadWrite);
+        GLib.ByteArray contents = file.read (1);
+        file.seek (file.size ());
+        file.write (contents);
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override void mkdir (string relative_path) {
+        this.root_directory.mkpath (relative_path);
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override void rename (string from, string to) {
+        QVERIFY (this.root_directory.exists (from));
+        QVERIFY (this.root_directory.rename (from, to));
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override void set_modification_time (string relative_path, GLib.DateTime modification_time) {
+        Occ.FileSystem.set_modification_time (this.root_directory.filePath (relative_path), Occ.Utility.qDateTimeToTime_t (modification_time));
+    }
+
+}
+}

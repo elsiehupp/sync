@@ -6,7 +6,7 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-using namespace Occ;
+using Occ;
 
 class EchoDisabler {
 

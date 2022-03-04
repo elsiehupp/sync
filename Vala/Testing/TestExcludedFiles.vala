@@ -7,7 +7,9 @@ implied, as to its usefulness for any purpose.
 //  #include <QtTest>
 //  #include <QTemporaryDir>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 const int EXCLUDE_LIST_FILE SOURCEDIR "/../../sync-exclude.lst"
 
@@ -122,8 +124,8 @@ private on_ void check_csync_excluded () {
 
 
     /***********************************************************
-    * Test for patterns in subdirs. '.beagle' is defined as a pattern and has
-    * to be found in top dir as well as in directories underneath.
+    * Test for patterns in subdirectories. '.beagle' is defined as a pattern and has
+    * to be found in top directory as well as in directories underneath.
     */
     QCOMPARE (check_dir_full (".apdisk"), CSYNC_FILE_EXCLUDE_LIST);
     QCOMPARE (check_dir_full ("foo/.apdisk"), CSYNC_FILE_EXCLUDE_LIST);
@@ -131,10 +133,10 @@ private on_ void check_csync_excluded () {
 
     QCOMPARE (check_file_full (".java"), CSYNC_NOT_EXCLUDED);
 
-    /* Files in the ignored dir .java will also be ignored. */
+    /* Files in the ignored directory .java will also be ignored. */
     QCOMPARE (check_file_full (".apdisk/totally_amazing.jar"), CSYNC_FILE_EXCLUDE_LIST);
 
-    /* and also in subdirs */
+    /* and also in subdirectories */
     QCOMPARE (check_file_full ("projects/.apdisk/totally_amazing.jar"), CSYNC_FILE_EXCLUDE_LIST);
 
     /* csync-journal is ignored in general silently. */
@@ -276,8 +278,8 @@ private on_ void check_csync_excluded_traversal () {
 
 
     /***********************************************************
-    * Test for patterns in subdirs. '.beagle' is defined as a pattern and has
-    * to be found in top dir as well as in directories underneath.
+    * Test for patterns in subdirectories. '.beagle' is defined as a pattern and has
+    * to be found in top directory as well as in directories underneath.
     */
     QCOMPARE (check_dir_traversal (".apdisk"), CSYNC_FILE_EXCLUDE_LIST);
     QCOMPARE (check_dir_traversal ("foo/.apdisk"), CSYNC_FILE_EXCLUDE_LIST);
@@ -338,7 +340,7 @@ private on_ void check_csync_excluded_traversal () {
     excludedFiles.addManualExclude ("/exclude");
     excludedFiles.reloadExcludeFiles ();
 
-    /* Check toplevel dir, the pattern only works for toplevel dir. */
+    /* Check toplevel directory, the pattern only works for toplevel directory. */
     QCOMPARE (check_dir_traversal ("/exclude"), CSYNC_FILE_EXCLUDE_LIST);
     QCOMPARE (check_dir_traversal ("/foo/exclude"), CSYNC_NOT_EXCLUDED);
 
@@ -409,26 +411,26 @@ private on_ void check_csync_excluded_traversal () {
 private on_ void check_csync_dir_only () {
     up ();
     excludedFiles.addManualExclude ("filedir");
-    excludedFiles.addManualExclude ("dir/");
+    excludedFiles.addManualExclude ("directory/");
 
     QCOMPARE (check_file_traversal ("other"), CSYNC_NOT_EXCLUDED);
     QCOMPARE (check_file_traversal ("filedir"), CSYNC_FILE_EXCLUDE_LIST);
-    QCOMPARE (check_file_traversal ("dir"), CSYNC_NOT_EXCLUDED);
+    QCOMPARE (check_file_traversal ("directory"), CSYNC_NOT_EXCLUDED);
     QCOMPARE (check_file_traversal ("s/other"), CSYNC_NOT_EXCLUDED);
     QCOMPARE (check_file_traversal ("s/filedir"), CSYNC_FILE_EXCLUDE_LIST);
-    QCOMPARE (check_file_traversal ("s/dir"), CSYNC_NOT_EXCLUDED);
+    QCOMPARE (check_file_traversal ("s/directory"), CSYNC_NOT_EXCLUDED);
 
     QCOMPARE (check_dir_traversal ("other"), CSYNC_NOT_EXCLUDED);
     QCOMPARE (check_dir_traversal ("filedir"), CSYNC_FILE_EXCLUDE_LIST);
-    QCOMPARE (check_dir_traversal ("dir"), CSYNC_FILE_EXCLUDE_LIST);
+    QCOMPARE (check_dir_traversal ("directory"), CSYNC_FILE_EXCLUDE_LIST);
     QCOMPARE (check_dir_traversal ("s/other"), CSYNC_NOT_EXCLUDED);
     QCOMPARE (check_dir_traversal ("s/filedir"), CSYNC_FILE_EXCLUDE_LIST);
-    QCOMPARE (check_dir_traversal ("s/dir"), CSYNC_FILE_EXCLUDE_LIST);
+    QCOMPARE (check_dir_traversal ("s/directory"), CSYNC_FILE_EXCLUDE_LIST);
 
     QCOMPARE (check_dir_full ("filedir/foo"), CSYNC_FILE_EXCLUDE_LIST);
     QCOMPARE (check_file_full ("filedir/foo"), CSYNC_FILE_EXCLUDE_LIST);
-    QCOMPARE (check_dir_full ("dir/foo"), CSYNC_FILE_EXCLUDE_LIST);
-    QCOMPARE (check_file_full ("dir/foo"), CSYNC_FILE_EXCLUDE_LIST);
+    QCOMPARE (check_dir_full ("directory/foo"), CSYNC_FILE_EXCLUDE_LIST);
+    QCOMPARE (check_file_full ("directory/foo"), CSYNC_FILE_EXCLUDE_LIST);
 }
 
 private on_ void check_csync_pathes () {
@@ -436,7 +438,7 @@ private on_ void check_csync_pathes () {
     excludedFiles.addManualExclude ("/exclude");
     excludedFiles.reloadExcludeFiles ();
 
-    /* Check toplevel dir, the pattern only works for toplevel dir. */
+    /* Check toplevel directory, the pattern only works for toplevel directory. */
     QCOMPARE (check_dir_full ("/exclude"), CSYNC_FILE_EXCLUDE_LIST);
 
     QCOMPARE (check_dir_full ("/foo/exclude"), CSYNC_NOT_EXCLUDED);

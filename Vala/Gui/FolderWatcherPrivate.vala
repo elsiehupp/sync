@@ -39,7 +39,7 @@ protected slots:
     void on_signal_add_folder_recursive (string path);
 
 
-    protected bool find_folders_below (QDir dir, string[] full_list);
+    protected bool find_folders_below (QDir directory, string[] full_list);
     protected void inotify_register_path (string path);
     protected void remove_folders_below (string path);
 
@@ -76,21 +76,21 @@ protected slots:
     FolderWatcherPrivate.~FolderWatcherPrivate () = default;
 
     // attention : result list passed by reference!
-    bool FolderWatcherPrivate.find_folders_below (QDir dir, string[] full_list) {
+    bool FolderWatcherPrivate.find_folders_below (QDir directory, string[] full_list) {
         bool ok = true;
-        if (! (dir.exists () && dir.is_readable ())) {
-            GLib.debug ("Non existing path coming in : " + dir.absolute_path ();
+        if (! (directory.exists () && directory.is_readable ())) {
+            GLib.debug ("Non existing path coming in : " + directory.absolute_path ();
             ok = false;
         } else {
             string[] name_filter;
             name_filter + QLatin1String ("*");
             QDir.Filters filter = QDir.Dirs | QDir.NoDotAndDotDot | QDir.No_sym_links | QDir.Hidden;
-            const string[] pathes = dir.entry_list (name_filter, filter);
+            const string[] pathes = directory.entry_list (name_filter, filter);
 
             string[].ConstIterator ConstIterator;
             for (ConstIterator = pathes.const_begin (); ConstIterator != pathes.const_end ();
                  ++ConstIterator) {
-                const string full_path (dir.path () + QLatin1String ("/") + (*ConstIterator));
+                const string full_path (directory.path () + QLatin1String ("/") + (*ConstIterator));
                 full_list.append (full_path);
                 ok = find_folders_below (QDir (full_path), full_list);
             }
@@ -124,7 +124,7 @@ protected slots:
         if (this.path_to_watch.contains (path))
             return;
 
-        int subdirs = 0;
+        int subdirectories = 0;
         GLib.debug (" (+) Watcher:" + path;
 
         QDir in_path (path);
@@ -139,7 +139,7 @@ protected slots:
             string subfolder = subfolders_it.next ();
             QDir folder (subfolder);
             if (folder.exists () && !this.path_to_watch.contains (folder.absolute_path ())) {
-                subdirs++;
+                subdirectories++;
                 if (this.parent.path_is_ignored (subfolder)) {
                     GLib.debug ("* Not adding" + folder.path ();
                     continue;
@@ -150,8 +150,8 @@ protected slots:
             }
         }
 
-        if (subdirs > 0) {
-            GLib.debug ("    `. and" + subdirs + "subdirectories";
+        if (subdirectories > 0) {
+            GLib.debug ("    `. and" + subdirectories + "subdirectories";
         }
     }
 

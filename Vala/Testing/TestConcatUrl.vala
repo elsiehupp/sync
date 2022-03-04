@@ -6,8 +6,9 @@ implied, as to its usefulness for any purpose.
 
 //  #include <QtTest>
 
+using Occ;
 
-using namespace Occ;
+namespace Testing {
 
 using QueryItems = GLib.List<QPair<string, string>>;
 

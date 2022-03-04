@@ -167,9 +167,9 @@ class PropagateDownloadFile : PropagateItemJob {
         }
 
         // Delete the directory if it is empty!
-        QDir dir = new QDir (existing_dir);
-        if (dir.entry_list (QDir.NoDotAndDotDot | QDir.AllEntries).count () == 0) {
-            if (dir.rmdir (existing_dir)) {
+        QDir directory = new QDir (existing_dir);
+        if (directory.entry_list (QDir.NoDotAndDotDot | QDir.AllEntries).count () == 0) {
+            if (directory.rmdir (existing_dir)) {
                 return;
             }
             // on error, just try to move it away...
@@ -942,7 +942,7 @@ class PropagateDownloadFile : PropagateItemJob {
             return;
         }
         GLib.FileInfo existing_file = new GLib.FileInfo (file_path);
-        QDir base_dir = existing_file.dir ();
+        QDir base_dir = existing_file.directory ();
 
         while (!file.at_end ()) {
             GLib.ByteArray line = file.read_line ();

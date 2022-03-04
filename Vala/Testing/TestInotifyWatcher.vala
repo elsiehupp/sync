@@ -6,7 +6,9 @@
 
 //  #include <QtTest>
 
-using namespace Occ;
+using Occ;
+
+namespace Testing {
 
 class TestInotifyWatcher : public FolderWatcherPrivate {
 
@@ -19,13 +21,13 @@ class TestInotifyWatcher : public FolderWatcherPrivate {
     private void on_signal_init_test_case () {
         this.root = QDir.tempPath () + "/" + "test_" + string.number (Occ.Utility.rand ());
         GLib.debug ("creating test directory tree in " + this.root;
-        QDir rootDir (this.root);
+        QDir root_directory (this.root);
 
-        rootDir.mkpath (this.root + "/a1/b1/c1");
-        rootDir.mkpath (this.root + "/a1/b1/c2");
-        rootDir.mkpath (this.root + "/a1/b2/c1");
-        rootDir.mkpath (this.root + "/a1/b3/c3");
-        rootDir.mkpath (this.root + "/a2/b3/c3");
+        root_directory.mkpath (this.root + "/a1/b1/c1");
+        root_directory.mkpath (this.root + "/a1/b1/c2");
+        root_directory.mkpath (this.root + "/a1/b2/c1");
+        root_directory.mkpath (this.root + "/a1/b3/c3");
+        root_directory.mkpath (this.root + "/a2/b3/c3");
     }
 
     // Test the recursive path listing function findFoldersBelow

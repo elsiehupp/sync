@@ -242,7 +242,7 @@ signals:
         append_path (share_id);
         verb ("PUT");
 
-        add_param (QStringLiteral ("label"), label);
+        add_param ("label", label);
         this.value = label;
 
         on_signal_start ();

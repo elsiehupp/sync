@@ -159,7 +159,7 @@ enum ItemType {
 Q_ENUM_NS (ItemType)
 }
 
-using namespace CSyncEnums;
+using CSyncEnums;
 using CSYNC_STATUS = CSyncEnums.csync_status_codes_e;
 typedef struct csync_file_stat_s csync_file_stat_t;
 

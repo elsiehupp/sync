@@ -11,7 +11,7 @@ class TokenCredentialsAccessManager : AccessManager {
     }
 
 
-    protected Soup.Reply create_request (Operation op, Soup.Request request, QIODevice outgoing_data) {
+    protected Soup.Reply create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) {
         if (this.credentials.user ().is_empty () || this.credentials.password ().is_empty ()) {
             GLib.warning ("Empty user/password provided!";
         }
@@ -27,7 +27,7 @@ class TokenCredentialsAccessManager : AccessManager {
             raw_cookie (token, request.url ());
         }
 
-        return AccessManager.create_request (op, request, outgoing_data);
+        return AccessManager.create_request (operation, request, outgoing_data);
     }
 
 } // class TokenCredentialsAccessManager

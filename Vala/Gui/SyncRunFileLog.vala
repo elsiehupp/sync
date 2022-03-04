@@ -115,7 +115,7 @@ class SyncRunFileLog {
         if (!exists) {
             this.out + folder_path + endl;
             // We are creating a new file, add the note.
-            this.out + "# timestamp | duration | file | instruction | dir | modtime | etag | "
+            this.out + "# timestamp | duration | file | instruction | directory | modtime | etag | "
                     "size | file_id | status | error_string | http result code | "
                     "other size | other modtime | X-Request-ID"
                  + endl;
