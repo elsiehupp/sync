@@ -35,23 +35,23 @@ class TestInotifyWatcher : public FolderWatcherPrivate {
         string[] dirs;
 
         bool ok = findFoldersBelow (QDir (this.root), dirs);
-        QVERIFY ( dirs.indexOf (this.root + "/a1")>-1);
-        QVERIFY ( dirs.indexOf (this.root + "/a1/b1")>-1);
-        QVERIFY ( dirs.indexOf (this.root + "/a1/b1/c1")>-1);
-        QVERIFY ( dirs.indexOf (this.root + "/a1/b1/c2")>-1);
+        //  QVERIFY ( dirs.indexOf (this.root + "/a1")>-1);
+        //  QVERIFY ( dirs.indexOf (this.root + "/a1/b1")>-1);
+        //  QVERIFY ( dirs.indexOf (this.root + "/a1/b1/c1")>-1);
+        //  QVERIFY ( dirs.indexOf (this.root + "/a1/b1/c2")>-1);
 
-        QVERIFY (Utility.writeRandomFile (this.root+"/a1/rand1.dat"));
-        QVERIFY (Utility.writeRandomFile (this.root+"/a1/b1/rand2.dat"));
-        QVERIFY (Utility.writeRandomFile (this.root+"/a1/b1/c1/rand3.dat"));
+        //  QVERIFY (Utility.writeRandomFile (this.root+"/a1/rand1.dat"));
+        //  QVERIFY (Utility.writeRandomFile (this.root+"/a1/b1/rand2.dat"));
+        //  QVERIFY (Utility.writeRandomFile (this.root+"/a1/b1/c1/rand3.dat"));
 
-        QVERIFY ( dirs.indexOf (this.root + "/a1/b2")>-1);
-        QVERIFY ( dirs.indexOf (this.root + "/a1/b2/c1")>-1);
-        QVERIFY ( dirs.indexOf (this.root + "/a1/b3")>-1);
-        QVERIFY ( dirs.indexOf (this.root + "/a1/b3/c3")>-1);
+        //  QVERIFY ( dirs.indexOf (this.root + "/a1/b2")>-1);
+        //  QVERIFY ( dirs.indexOf (this.root + "/a1/b2/c1")>-1);
+        //  QVERIFY ( dirs.indexOf (this.root + "/a1/b3")>-1);
+        //  QVERIFY ( dirs.indexOf (this.root + "/a1/b3/c3")>-1);
 
-        QVERIFY ( dirs.indexOf (this.root + "/a2"));
-        QVERIFY ( dirs.indexOf (this.root + "/a2/b3"));
-        QVERIFY ( dirs.indexOf (this.root + "/a2/b3/c3"));
+        //  QVERIFY ( dirs.indexOf (this.root + "/a2"));
+        //  QVERIFY ( dirs.indexOf (this.root + "/a2/b3"));
+        //  QVERIFY ( dirs.indexOf (this.root + "/a2/b3/c3"));
 
         QVERIFY2 (dirs.count () == 11, "Directory count wrong.");
 

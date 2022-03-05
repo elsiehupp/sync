@@ -1,1 +1,0 @@
-const int OWNCLOUDSYNC_EXPORT

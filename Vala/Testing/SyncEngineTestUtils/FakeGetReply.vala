@@ -17,7 +17,7 @@ class FakeGetReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeGetReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent);
+    public FakeGetReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent);
 
     /***********************************************************
     ***********************************************************/
@@ -40,45 +40,45 @@ class FakeGetReply : FakeReply {
 
 
 
-FakeGetReply.FakeGetReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent)
-    : FakeReply { parent } {
-    setRequest (request);
-    setUrl (request.url ());
-    setOperation (operation);
+FakeGetReply.FakeGetReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent)
+    : FakeReply (parent); {
+    set_request (request);
+    set_url (request.url ());
+    set_operation (operation);
     open (QIODevice.ReadOnly);
 
-    string fileName = getFilePathFromUrl (request.url ());
+    string fileName = get_file_path_from_url (request.url ());
     //  Q_ASSERT (!fileName.isEmpty ());
     file_info = remote_root_file_info.find (fileName);
     if (!file_info) {
         GLib.debug ("meh;";
     }
     Q_ASSERT_X (file_info, Q_FUNC_INFO, "Could not find file on the remote");
-    QMetaObject.invokeMethod (this, &FakeGetReply.respond, Qt.QueuedConnection);
+    QMetaObject.invoke_method (this, &FakeGetReply.respond, Qt.QueuedConnection);
 }
 
 void FakeGetReply.respond () {
     if (aborted) {
-        setError (OperationCanceledError, "Operation Canceled");
-        /* emit */ metaDataChanged ();
-        /* emit */ finished ();
+        set_error (OperationCanceledError, "Operation Canceled");
+        /* emit */ signal_meta_data_changed ();
+        /* emit */ signal_finished ();
         return;
     }
     payload = file_info.content_char;
     size = file_info.size;
     setHeader (Soup.Request.ContentLengthHeader, size);
-    setAttribute (Soup.Request.HttpStatusCodeAttribute, 200);
+    set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
     setRawHeader ("OC-ETag", file_info.etag);
     setRawHeader ("ETag", file_info.etag);
     setRawHeader ("OC-FileId", file_info.file_identifier);
-    /* emit */ metaDataChanged ();
+    /* emit */ signal_meta_data_changed ();
     if (bytes_available ())
         /* emit */ readyRead ();
-    /* emit */ finished ();
+    /* emit */ signal_finished ();
 }
 
 void FakeGetReply.on_signal_abort () {
-    setError (OperationCanceledError, "Operation Canceled");
+    set_error (OperationCanceledError, "Operation Canceled");
     aborted = true;
 }
 

@@ -53,7 +53,7 @@ static error_t parse_opt (int key, char arg, struct argp_state state) {
     /* Get the input argument from argp_parse, which we
      * know is a pointer to our arguments structure.
      */
-    struct argument_s arguments = state.input;
+    struct Arguments arguments = state.input;
 
     /* arg is currently not used */
     (void) arg;
@@ -81,7 +81,7 @@ static struct argp argp = {options, parse_opt, args_doc, doc, NULL, NULL, NULL};
 static struct argp argp = {options, parse_opt, NULL, doc, NULL, NULL, NULL};
 //    #endif /* HAVE_ARGP_H */
 
-void torture_cmdline_parse (int argc, char **argv, struct argument_s arguments) {
+void torture_cmdline_parse (int argc, char **argv, struct Arguments arguments) {
     /***********************************************************
      * Parse our arguments; every option seen by parse_opt will
      * be reflected in arguments.

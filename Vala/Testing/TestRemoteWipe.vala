@@ -12,50 +12,50 @@ using Occ;
 
 namespace Testing {
 
-class TestRemoteWipe : public GLib.Object {
+class TestRemoteWipe : GLib.Object {
 
     // TODO
-    private on_ void testWipe () {
+    private void test_wipe () {
 //        QTemporaryDir directory;
 //        ConfigFile.setConfDir (directory.path ()); // we don't want to pollute the user's config file
-//        QVERIFY (directory.isValid ());
+//        //  QVERIFY (directory.isValid ());
 
 //        QDir dirToRemove (directory.path ());
-//        QVERIFY (dirToRemove.mkpath ("nextcloud"));
+//        //  QVERIFY (dirToRemove.mkpath ("nextcloud"));
 
 //        string dirPath = dirToRemove.canonicalPath ();
 
 //        AccountPointer account = Account.create ();
-//        QVERIFY (account);
+//        //  QVERIFY (account);
 
 //        var manager = AccountManager.instance ();
-//        QVERIFY (manager);
+//        //  QVERIFY (manager);
 
 //        AccountState newAccountState = manager.addAccount (account);
 //        manager.save ();
-//        QVERIFY (newAccountState);
+//        //  QVERIFY (newAccountState);
 
 //        GLib.Uri url ("http://example.de");
 //        HttpCredentialsTest credentials = new HttpCredentialsTest ("testuser", "secret");
 //        account.setCredentials (credentials);
-//        account.setUrl ( url );
+//        account.set_url ( url );
 
 //        FolderMan folderman = FolderMan.instance ();
 //        folderman.addFolder (newAccountState, folderDefinition (dirPath + "/sub/nextcloud/"));
 
 //        // check if account exists
 //        GLib.debug ("Does account exists?!";
-//        QVERIFY (!account.identifier ().isEmpty ());
+//        //  QVERIFY (!account.identifier ().isEmpty ());
 
 //        manager.deleteAccount (newAccountState);
 //        manager.save ();
 
 //        // check if account exists
 //        GLib.debug ("Does account exists yet?!";
-//        QVERIFY (account);
+//        //  QVERIFY (account);
 
 //        // check if folder exists
-//        QVERIFY (dirToRemove.exists ());
+//        //  QVERIFY (dirToRemove.exists ());
 
 //        // remote folders
 //        GLib.debug () +  "Removing folder for account " + newAccountState.account ().url ();
@@ -63,8 +63,7 @@ class TestRemoteWipe : public GLib.Object {
 //        folderman.slotWipeFolderForAccount (newAccountState);
 
 //        // check if folders dont exist anymore
-//        QCOMPARE (dirToRemove.exists (), false);
+//        //  QCOMPARE (dirToRemove.exists (), false);
     }
 }
-
-QTEST_APPLESS_MAIN (TestRemoteWipe)
+}

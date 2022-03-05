@@ -14,7 +14,7 @@ namespace Testing {
 const GLib.Uri sOAuthTestServer ("oauthtest://someserver/owncloud");
 
 
-class TestOAuth : public GLib.Object {
+class TestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -26,7 +26,7 @@ class TestOAuth : public GLib.Object {
     // Test for https://github.com/owncloud/client/pull/6057
     private on_ void testCloseBrowserDontCrash () {
         struct Test : OAuthTestCase {
-            Soup.Reply tokenReply (QNetworkAccessManager.Operation operation, Soup.Request & req) override {
+            Soup.Reply tokenReply (Soup.Operation operation, Soup.Request & request) override {
                 //  ASSERT (browserReply);
                 // simulate the fact that the browser is closing the connection
                 browserReply.on_signal_abort ();
@@ -37,12 +37,12 @@ class TestOAuth : public GLib.Object {
 
                 std.unique_ptr<QBuffer> payload (new QBuffer);
                 payload.setData (tokenReplyPayload ());
-                return new SlowFakePostReply (operation, req, std.move (payload), fake_qnam);
+                return new SlowFakePostReply (operation, request, std.move (payload), fake_qnam);
             }
 
             void browserReplyFinished () override {
-                QCOMPARE (sender (), browserReply.data ());
-                QCOMPARE (browserReply.error (), Soup.Reply.OperationCanceledError);
+                //  QCOMPARE (sender (), browserReply.data ());
+                //  QCOMPARE (browserReply.error (), Soup.Reply.OperationCanceledError);
                 replyToBrowserOk = true;
             }
         } test;
@@ -71,13 +71,13 @@ class TestOAuth : public GLib.Object {
                     foreach (var x, payloads) {
                         var socket = new QTcpSocket (this);
                         socket.connectToHost ("localhost", port);
-                        QVERIFY (socket.waitForConnected ());
+                        //  QVERIFY (socket.waitForConnected ());
                         socket.write (x);
                     }
 
                     // Do the actual request a bit later
                     QTimer.singleShot (100, this, [this, request] {
-                        QCOMPARE (state, CustomState);
+                        //  QCOMPARE (state, CustomState);
                         state = BrowserOpened;
                         this.OAuthTestCase.createBrowserReply (request);
                     });
@@ -85,17 +85,17 @@ class TestOAuth : public GLib.Object {
                return null;
             }
 
-            Soup.Reply tokenReply (QNetworkAccessManager.Operation operation, Soup.Request req) override {
+            Soup.Reply tokenReply (Soup.Operation operation, Soup.Request request) override {
                 if (state == CustomState)
-                    return new FakeErrorReply{operation, req, this, 500};
-                return OAuthTestCase.tokenReply (operation, req);
+                    return new FakeErrorReply{operation, request, this, 500};
+                return OAuthTestCase.tokenReply (operation, request);
             }
 
             void oauthResult (OAuth.Result result, string user, string token ,
                              const string refreshToken) override {
                 if (state != CustomState)
                     return OAuthTestCase.oauthResult (result, user, token, refreshToken);
-                QCOMPARE (result, OAuth.Error);
+                //  QCOMPARE (result, OAuth.Error);
             }
         } test;
         test.test ();
@@ -107,7 +107,7 @@ class TestOAuth : public GLib.Object {
     private on_ void testTokenUrlHasRedirect () {
         struct Test : OAuthTestCase {
             int redirectsDone = 0;
-            Soup.Reply tokenReply (QNetworkAccessManager.Operation operation, Soup.Request & request) override {
+            Soup.Reply tokenReply (Soup.Operation operation, Soup.Request & request) override {
                 //  ASSERT (browserReply);
                 // Kind of reproduces what we had in https://github.com/owncloud/enterprise/issues/2951 (not 1:1)
                 if (redirectsDone == 0) {

@@ -21,7 +21,7 @@ class FakeDateTimeProvider : Occ.DateTimeProvider {
     ***********************************************************/
     public 
 
-    public QDate currentDate () override { return this.dateTime.date (); }
+    public QDate currentDate () override ( return this.dateTime.date (); }
 
 
     /***********************************************************

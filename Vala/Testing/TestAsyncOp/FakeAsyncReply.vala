@@ -13,27 +13,27 @@ class FakeAsyncReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeAsyncReply (GLib.ByteArray pollLocation, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent)
-        : FakeReply { parent }
+    public FakeAsyncReply (GLib.ByteArray pollLocation, Soup.Operation operation, Soup.Request request, GLib.Object parent)
+        : FakeReply (parent);
         this.pollLocation (pollLocation) {
-        setRequest (request);
-        setUrl (request.url ());
-        setOperation (operation);
+        set_request (request);
+        set_url (request.url ());
+        set_operation (operation);
         open (QIODevice.ReadOnly);
 
-        QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
+        QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
     public void respond () {
-        setAttribute (Soup.Request.HttpStatusCodeAttribute, 202);
+        set_attribute (Soup.Request.HttpStatusCodeAttribute, 202);
         setRawHeader ("OC-JobStatus-Location", this.pollLocation);
-        /* emit */ metaDataChanged ();
-        /* emit */ finished ();
+        /* emit */ signal_meta_data_changed ();
+        /* emit */ signal_finished ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void on_signal_abort () override {}
-    public int64 read_data (char *, int64) override { return 0; }
+    public int64 read_data (char *, int64) override ( return 0; }
 }

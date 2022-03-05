@@ -14,7 +14,7 @@ class FakePropfindReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePropfindReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent);
+    public FakePropfindReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent);
 
     /***********************************************************
     ***********************************************************/
@@ -44,26 +44,26 @@ class FakePropfindReply : FakeReply {
 
 
 
-FakePropfindReply.FakePropfindReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent)
-    : FakeReply { parent } {
-    setRequest (request);
-    setUrl (request.url ());
-    setOperation (operation);
+FakePropfindReply.FakePropfindReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent)
+    : FakeReply (parent); {
+    set_request (request);
+    set_url (request.url ());
+    set_operation (operation);
     open (QIODevice.ReadOnly);
 
-    string fileName = getFilePathFromUrl (request.url ());
+    string fileName = get_file_path_from_url (request.url ());
     //  Q_ASSERT (!fileName.isNull ()); // for root, it should be empty
     const FileInfo file_info = remote_root_file_info.find (fileName);
     if (!file_info) {
-        QMetaObject.invokeMethod (this, "respond_404", Qt.QueuedConnection);
+        QMetaObject.invoke_method (this, "respond_404", Qt.QueuedConnection);
         return;
     }
     const string prefix = request.url ().path ().left (request.url ().path ().size () - fileName.size ());
 
     // Don't care about the request and just return a full propfind
-    const string davUri { QStringLiteral ("DAV:"));
-    const string ocUri { QStringLiteral ("http://owncloud.org/ns"));
-    QBuffer buffer { payload };
+    const string davUri ( QStringLiteral ("DAV:"));
+    const string ocUri ( QStringLiteral ("http://owncloud.org/ns"));
+    QBuffer buffer ( payload };
     buffer.open (QIODevice.WriteOnly);
     QXmlStreamWriter xml (&buffer);
     xml.writeNamespace (davUri, QStringLiteral ("d"));
@@ -110,25 +110,25 @@ FakePropfindReply.FakePropfindReply (FileInfo remote_root_file_info, QNetworkAcc
     xml.writeEndElement (); // multistatus
     xml.writeEndDocument ();
 
-    QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
+    QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
 }
 
 void FakePropfindReply.respond () {
     setHeader (Soup.Request.ContentLengthHeader, payload.size ());
     setHeader (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/xml; charset=utf-8"));
-    setAttribute (Soup.Request.HttpStatusCodeAttribute, 207);
+    set_attribute (Soup.Request.HttpStatusCodeAttribute, 207);
     setFinished (true);
-    /* emit */ metaDataChanged ();
+    /* emit */ signal_meta_data_changed ();
     if (bytes_available ())
         /* emit */ readyRead ();
-    /* emit */ finished ();
+    /* emit */ signal_finished ();
 }
 
 void FakePropfindReply.respond_404 () {
-    setAttribute (Soup.Request.HttpStatusCodeAttribute, 404);
-    setError (InternalServerError, QStringLiteral ("Not Found"));
-    /* emit */ metaDataChanged ();
-    /* emit */ finished ();
+    set_attribute (Soup.Request.HttpStatusCodeAttribute, 404);
+    set_error (InternalServerError, QStringLiteral ("Not Found"));
+    /* emit */ signal_meta_data_changed ();
+    /* emit */ signal_finished ();
 }
 
 int64 FakePropfindReply.bytes_available () {

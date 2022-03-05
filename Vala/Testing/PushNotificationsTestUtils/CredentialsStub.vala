@@ -45,7 +45,7 @@ class CredentialsStub : Occ.AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public QNetworkAccessManager create_qnam () {
+    public Soup create_qnam () {
         return null;
     }
 

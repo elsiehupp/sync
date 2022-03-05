@@ -1,18 +1,15 @@
-# project('com.elsiehupp.NextcloudVala', 'c', 'vala', version: '1.0.0')
+project('com.elsiehupp.NextcloudVala', 'c', 'vala', version: '1.0.0')
 
 srcs = files([
-    'Benchmarks/benchlargesync.vala',
+    'Benchmarks/BenchLargeSync.vala',
 
-    'CSync/cmdline.vala',
-    'CSync/std_tests/check_std_c_jhash.vala',
-    'CSync/torture.vala',
-    'CSync/vio_tests/check_vio_ext.vala',
+    'CSync/CommandLine.vala',
+    'CSync/CheckStdCJhash.vala',
+    'CSync/Torture.vala',
+    'CSync/CheckVioExt.vala',
 
-    'Manual/FavLink/main.vala',
-    'Manual/FavLink/owncloudlib.vala',
-
-    'mockserver/HttpServer.vala',
-    'mockserver/main.vala',
+    'MockServer/HttpServer.vala',
+    'MockServer/Main.vala',
 
     'PushNotificationsTestUtils/CredentialsStub.vala',
     'PushNotificationsTestUtils/FakeWebSocketServer.vala',

@@ -9,7 +9,7 @@ namespace Testing {
 //  #include <QCoreApplication>
 
 int main (int argc, char* argv[]) {
-  QCoreApplication app (argc, argv);
-  HttpServer server;
-  return app.exec ();
+    QCoreApplication app = new QCoreApplication (argc, argv);
+    HttpServer server;
+    return app.exec ();
 }

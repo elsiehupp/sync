@@ -9,22 +9,23 @@ using Occ;
 namespace Testing {
 
 class StatusPushSpy : QSignalSpy {
-    SyncEngine this.sync_engine;
+
+    SyncEngine sync_engine;
 
     /***********************************************************
     ***********************************************************/
-    public StatusPushSpy (SyncEngine sync_engine)
-        : QSignalSpy (&sync_engine.syncFileStatusTracker (), SIGNAL (fileStatusChanged (string&, SyncFileStatus)))
-        this.sync_engine (sync_engine) { }
-
+    public StatusPushSpy (SyncEngine sync_engine) {
+        base (sync_engine.syncFileStatusTracker (), SIGNAL (fileStatusChanged (string, SyncFileStatus)));
+        this.sync_engine (sync_engine);
+    }
 
     /***********************************************************
     ***********************************************************/
     public SyncFileStatus statusOf (string relative_path) {
-        GLib.FileInfo file (this.sync_engine.local_path (), relative_path);
+        GLib.FileInfo file_info = new GLib.FileInfo (this.sync_engine.local_path (), relative_path);
         // Start from the end to get the latest status
         for (int i = size () - 1; i >= 0; --i) {
-            if (GLib.FileInfo (at (i)[0].toString ()) == file)
+            if (GLib.FileInfo (at (i)[0].toString ()) == file_info)
                 return at (i)[1].value<SyncFileStatus> ();
         }
         return {};
@@ -34,8 +35,8 @@ class StatusPushSpy : QSignalSpy {
     /***********************************************************
     ***********************************************************/
     public bool statusEmittedBefore (string firstPath, string secondPath) {
-        GLib.FileInfo firstFile (this.sync_engine.local_path (), firstPath);
-        GLib.FileInfo secondFile (this.sync_engine.local_path (), secondPath);
+        GLib.FileInfo firstFile = new GLib.FileInfo (this.sync_engine.local_path (), firstPath);
+        GLib.FileInfo secondFile = new GLib.FileInfo (this.sync_engine.local_path (), secondPath);
         // Start from the end to get the latest status
         int i = size () - 1;
         for (; i >= 0; --i) {
@@ -50,4 +51,5 @@ class StatusPushSpy : QSignalSpy {
         }
         return false;
     }
-};
+}
+}

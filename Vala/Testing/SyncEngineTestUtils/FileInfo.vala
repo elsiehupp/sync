@@ -131,8 +131,8 @@ class FileInfo : FileModifier {
 
     /***********************************************************
     ***********************************************************/
-    public friend inline QDebug operator<< (QDebug dbg, FileInfo& fi) {
-        return dbg + "{ " + fi.path (" : " + fi.children;
+    public friend inline QDebug operator<< (QDebug dbg, FileInfo& file_info) {
+        return dbg + "{ " + file_info.path (" : " + file_info.children;
     }
 }
 
@@ -162,16 +162,16 @@ inline const FileInfo findConflict (FileInfo directory, string filename) {
 FileInfo FileInfo.A12_B12_C12_S12 () { { { QStringLiteral ("A"), { { QStringLiteral ("a1"), 4 }, { QStringLiteral ("a2"), 4 } } }, { QStringLiteral ("B"), { { QStringLiteral ("b1"), 16 }, { QStringLiteral ("b2"), 16 } } },
                                   { QStringLiteral ("C"), { { QStringLiteral ("c1"), 24 }, { QStringLiteral ("c2"), 24 } } },
                               } };
-    FileInfo sharedFolder { QStringLiteral ("S"), { { QStringLiteral ("s1"), 32 }, { QStringLiteral ("s2"), 32 } } };
+    FileInfo sharedFolder ( QStringLiteral ("S"), { { QStringLiteral ("s1"), 32 }, { QStringLiteral ("s2"), 32 } } };
     sharedFolder.isShared = true;
     sharedFolder.children[QStringLiteral ("s1")].isShared = true;
     sharedFolder.children[QStringLiteral ("s2")].isShared = true;
-    fi.children.insert (sharedFolder.name, std.move (sharedFolder));
-    return fi;
+    file_info.children.insert (sharedFolder.name, std.move (sharedFolder));
+    return file_info;
 }
 
 FileInfo.FileInfo (string name, std.initializer_list<FileInfo> children)
-    : name { name } {
+    : name ( name } {
     for (var source : children)
         addChild (source);
 }
@@ -183,11 +183,11 @@ void FileInfo.addChild (FileInfo info) {
 }
 
 void FileInfo.remove (string relative_path) {
-    const PathComponents pathComponents { relative_path };
+    const PathComponents pathComponents ( relative_path };
     FileInfo parent = findInvalidatingEtags (pathComponents.parentDirComponents ());
     //  Q_ASSERT (parent);
     parent.children.erase (std.find_if (parent.children.begin (), parent.children.end (),
-        [&pathComponents] (FileInfo fi) { return fi.name == pathComponents.fileName (); }));
+        [&pathComponents] (FileInfo file_info) { return file_info.name == pathComponents.fileName (); }));
 }
 
 void FileInfo.insert (string relative_path, int64 size, char content_char) {
@@ -211,18 +211,18 @@ void FileInfo.mkdir (string relative_path) {
 }
 
 void FileInfo.rename (string oldPath, string newPath) {
-    const PathComponents newPathComponents { newPath };
+    const PathComponents newPathComponents ( newPath };
     FileInfo directory = findInvalidatingEtags (newPathComponents.parentDirComponents ());
     //  Q_ASSERT (directory);
     //  Q_ASSERT (directory.isDir);
-    const PathComponents pathComponents { oldPath };
+    const PathComponents pathComponents ( oldPath };
     FileInfo parent = findInvalidatingEtags (pathComponents.parentDirComponents ());
     //  Q_ASSERT (parent);
-    FileInfo fi = parent.children.take (pathComponents.fileName ());
-    fi.parentPath = directory.path ();
-    fi.name = newPathComponents.fileName ();
-    fi.fixupParentPathRecursively ();
-    directory.children.insert (newPathComponents.fileName (), std.move (fi));
+    FileInfo file_info = parent.children.take (pathComponents.fileName ());
+    file_info.parentPath = directory.path ();
+    file_info.name = newPathComponents.fileName ();
+    file_info.fixupParentPathRecursively ();
+    directory.children.insert (newPathComponents.fileName (), std.move (file_info));
 }
 
 void FileInfo.set_modification_time (string relative_path, GLib.DateTime modification_time) {
@@ -252,20 +252,20 @@ FileInfo *FileInfo.find (PathComponents pathComponents, bool invalidateEtags) {
 }
 
 FileInfo *FileInfo.createDir (string relative_path) {
-    const PathComponents pathComponents { relative_path };
+    const PathComponents pathComponents ( relative_path };
     FileInfo parent = findInvalidatingEtags (pathComponents.parentDirComponents ());
     //  Q_ASSERT (parent);
-    FileInfo child = parent.children[pathComponents.fileName ()] = FileInfo { pathComponents.fileName ());
+    FileInfo child = parent.children[pathComponents.fileName ()] = FileInfo ( pathComponents.fileName ());
     child.parentPath = parent.path ();
     child.etag = generateEtag ();
     return child;
 }
 
 FileInfo *FileInfo.create (string relative_path, int64 size, char content_char) {
-    const PathComponents pathComponents { relative_path };
+    const PathComponents pathComponents ( relative_path };
     FileInfo parent = findInvalidatingEtags (pathComponents.parentDirComponents ());
     //  Q_ASSERT (parent);
-    FileInfo child = parent.children[pathComponents.fileName ()] = FileInfo { pathComponents.fileName (), size };
+    FileInfo child = parent.children[pathComponents.fileName ()] = FileInfo ( pathComponents.fileName (), size };
     child.parentPath = parent.path ();
     child.content_char = content_char;
     child.etag = generateEtag ();

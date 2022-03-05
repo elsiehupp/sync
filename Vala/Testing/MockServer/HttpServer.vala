@@ -40,13 +40,13 @@ class HttpServer : QTcpServer {
         if (socket.canReadLine ()) {
             string[] tokens = string (socket.readLine ()).split (QRegularExpression ("[ \r\n][ \r\n]*"));
             if (tokens[0] == "GET") {
-                QTextStream os (socket);
+                QTextStream os = new QTextStream (socket);
                 os.setAutoDetectUnicode (true);
-                os + "HTTP/1.0 200 Ok\r\n"
-                    "Content-Type : text/html; charset=\"utf-8\"\r\n"
-                    "\r\n"
-                    "<h1>Nothing to see here</h1>\n"
-                    + GLib.DateTime.currentDateTimeUtc ().toString ("\n";
+                os += "HTTP/1.0 200 Ok\r\n"
+                    + "Content-Type : text/html; charset=\"utf-8\"\r\n"
+                    + "\r\n"
+                    + "<h1>Nothing to see here</h1>\n"
+                    + GLib.DateTime.currentDateTimeUtc ().toString ("\n");
                 socket.close ();
 
                 QtServiceBase.instance ().logMessage ("Wrote to client");

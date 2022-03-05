@@ -18,11 +18,11 @@ class FakePutMultiFileReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePutMultiFileReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, string contentType, GLib.ByteArray putPayload, GLib.Object parent);
+    public FakePutMultiFileReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string content_type, GLib.ByteArray putPayload, GLib.Object parent);
 
     /***********************************************************
     ***********************************************************/
-    public static GLib.Vector<FileInfo> performMultiPart (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray putPayload, string contentType);
+    public static GLib.Vector<FileInfo> performMultiPart (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray putPayload, string content_type);
 
     /***********************************************************
     ***********************************************************/
@@ -49,22 +49,22 @@ class FakePutMultiFileReply : FakeReply {
 
 
 
-FakePutMultiFileReply.FakePutMultiFileReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, string contentType, GLib.ByteArray putPayload, GLib.Object parent)
-    : FakeReply { parent } {
-    setRequest (request);
-    setUrl (request.url ());
-    setOperation (operation);
+FakePutMultiFileReply.FakePutMultiFileReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string content_type, GLib.ByteArray putPayload, GLib.Object parent)
+    : FakeReply (parent); {
+    set_request (request);
+    set_url (request.url ());
+    set_operation (operation);
     open (QIODevice.ReadOnly);
-    this.allFileInfo = performMultiPart (remote_root_file_info, request, putPayload, contentType);
-    QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
+    this.allFileInfo = performMultiPart (remote_root_file_info, request, putPayload, content_type);
+    QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
 }
 
-GLib.Vector<FileInfo> FakePutMultiFileReply.performMultiPart (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray putPayload, string contentType) {
+GLib.Vector<FileInfo> FakePutMultiFileReply.performMultiPart (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray putPayload, string content_type) {
     GLib.Vector<FileInfo> result;
 
     var stringPutPayload = string.fromUtf8 (putPayload);
     const int boundaryPosition = sizeof ("multipart/related; boundary=");
-    const string boundaryValue = "--" + contentType.mid (boundaryPosition, contentType.length () - boundaryPosition - 1) + "\r\n";
+    const string boundaryValue = "--" + content_type.mid (boundaryPosition, content_type.length () - boundaryPosition - 1) + "\r\n";
     var stringPutPayloadRef = string{stringPutPayload}.left (stringPutPayload.size () - 2 - boundaryValue.size ());
     var allParts = stringPutPayloadRef.split (boundaryValue, Qt.SkipEmptyParts);
     for (var onePart : allParts) {
@@ -119,20 +119,20 @@ void FakePutMultiFileReply.respond () {
     reply.setObject (allFileInfoReply);
     this.payload = reply.toJson ();
 
-    setAttribute (Soup.Request.HttpStatusCodeAttribute, 200);
+    set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
 
     setFinished (true);
     if (bytes_available ()) {
         /* emit */ readyRead ();
     }
 
-    /* emit */ metaDataChanged ();
-    /* emit */ finished ();
+    /* emit */ signal_meta_data_changed ();
+    /* emit */ signal_finished ();
 }
 
 void FakePutMultiFileReply.on_signal_abort () {
-    setError (OperationCanceledError, "on_signal_abort");
-    /* emit */ finished ();
+    set_error (OperationCanceledError, "on_signal_abort");
+    /* emit */ signal_finished ();
 }
 
 int64 FakePutMultiFileReply.bytes_available () {

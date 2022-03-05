@@ -1,8 +1,8 @@
 
 
 // make public to give tests easy interface
-using Soup.Reply.setError;
-using Soup.Reply.setAttribute;
+using Soup.Reply.set_error;
+using Soup.Reply.set_attribute;
 
 namespace Testing {
 
@@ -14,8 +14,18 @@ class FakeErrorReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeErrorReply (QNetworkAccessManager.Operation operation, Soup.Request request,
-        GLib.Object parent, int http_error_code, GLib.ByteArray body = GLib.ByteArray ());
+    public FakeErrorReply (Soup.Operation operation, Soup.Request request,
+        GLib.Object parent, int http_error_code, GLib.ByteArray body = GLib.ByteArray ()) {
+            base (parent);
+            this.body = body;
+            set_request (request);
+            set_url (request.url ());
+            set_operation (operation);
+            open (QIODevice.ReadOnly);
+            set_attribute (Soup.Request.HttpStatusCodeAttribute, http_error_code);
+            set_error (InternalServerError, "Internal Server Fake Error");
+            QMetaObject.invoke_method (this, &FakeErrorReply.respond, Qt.QueuedConnection);
+        }
 
     /***********************************************************
     ***********************************************************/
@@ -36,27 +46,17 @@ class FakeErrorReply : FakeReply {
     /***********************************************************
     ***********************************************************/
     public override int64 bytes_available ();
-};
 
-
-
-
-
-
-FakeErrorReply.FakeErrorReply (QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent, int http_error_code, GLib.ByteArray body)
-    : FakeReply { parent }
-    this.body (body) {
-    setRequest (request);
-    setUrl (request.url ());
-    setOperation (operation);
-    open (QIODevice.ReadOnly);
-    setAttribute (Soup.Request.HttpStatusCodeAttribute, http_error_code);
-    setError (InternalServerError, "Internal Server Fake Error");
-    QMetaObject.invokeMethod (this, &FakeErrorReply.respond, Qt.QueuedConnection);
 }
 
+
+
+
+
+
+
 void FakeErrorReply.respond () {
-    /* emit */ metaDataChanged ();
+    /* emit */ signal_meta_data_changed ();
     /* emit */ readyRead ();
     // finishing can come strictly after readyRead was called
     QTimer.singleShot (5, this, &FakeErrorReply.on_signal_finished);
@@ -64,7 +64,7 @@ void FakeErrorReply.respond () {
 
 void FakeErrorReply.on_signal_finished () {
     setFinished (true);
-    /* emit */ finished ();
+    /* emit */ signal_finished ();
 }
 
 int64 FakeErrorReply.read_data (char buf, int64 max) {

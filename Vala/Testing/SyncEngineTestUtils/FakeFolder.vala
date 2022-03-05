@@ -23,7 +23,7 @@ class FakeFolder {
         }
     }
 
-    QTemporaryDir tempDir;
+    QTemporaryDir temporary_directory;
     DiskFileModifier local_modifier;
 
     // FIXME : Clarify ownership, double delete
@@ -35,7 +35,48 @@ class FakeFolder {
 
     /***********************************************************
     ***********************************************************/
-    public FakeFolder (FileInfo template_file_info, Occ.Optional<FileInfo> local_file_info = {}, string remote_path = {});
+    public FakeFolder (FileInfo template_file_info, Occ.Optional<FileInfo> local_file_info = new Occ.Optional<FileInfo> (), string remote_path = "") {
+        this.local_modifier = this.temporary_directory.path ();
+        // Needs to be done once
+        Occ.SyncEngine.minimumFileAgeForUpload = std.chrono.milliseconds (0);
+        Occ.Logger.instance ().setLogFile (QStringLiteral ("-"));
+        Occ.Logger.instance ().addLogRule ({ QStringLiteral ("sync.httplogger=true") });
+    
+        QDir root_directory = new QDir (this.temporary_directory.path ());
+        GLib.debug ("FakeFolder operating on " + root_directory);
+        if (local_file_info) {
+            to_disk (root_directory, *local_file_info);
+        } else {
+            to_disk (root_directory, template_file_info);
+        }
+    
+        this.fake_qnam = new FakeQNAM (template_file_info);
+        this.account = Occ.Account.create ();
+        this.account.set_url (GLib.Uri ("http://admin:admin@localhost/owncloud"));
+        this.account.setCredentials (new FakeCredentials (this.fake_qnam));
+        this.account.setDavDisplayName ("fakename");
+        this.account.setServerVersion ("10.0.0");
+    
+        this.journal_database = std.make_unique<Occ.SyncJournalDb> (local_path () + QStringLiteral (".sync_test.db"));
+        this.sync_engine = std.make_unique<Occ.SyncEngine> (this.account, local_path (), remote_path, this.journal_database.get ());
+        // Ignore temporary files from the download. (This is in the default exclude list, but we don't load it)
+        this.sync_engine.excludedFiles ().addManualExclude (QStringLiteral ("]*.~*"));
+    
+        // handle aboutToRemoveAllFiles with a timeout in case our test does not handle it
+        GLib.Object.connect (this.sync_engine.get (), &Occ.SyncEngine.aboutToRemoveAllFiles, this.sync_engine.get (), [this] (Occ.SyncFileItem.Direction, std.function<void (bool)> callback) {
+            QTimer.singleShot (1 * 1000, this.sync_engine.get (), [callback] {
+                callback (false);
+            });
+        });
+    
+        // Ensure we have a valid VfsOff instance "running"
+        switch_to_vfs (this.sync_engine.syncOptions ().vfs);
+    
+        // A new folder will update the local file state database on first sync.
+        // To have a state matching what users will encounter, we have to a sync
+        // using an identical local/remote file tree first.
+        ENFORCE (sync_once ());
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -100,17 +141,19 @@ class FakeFolder {
 
     /***********************************************************
     ***********************************************************/
-    public void setServerOverride (FakeQNAM.Override qnam_override) {
+    public void set_server_override (FakeQNAM.Override qnam_override) {
         this.fake_qnam.set_override(qnam_override);
     }
+
+    delegate QJsonObject ReplyFunction (GLib.HashMap<string, GLib.ByteArray> map);
 
     /***********************************************************
     ***********************************************************/
     public QJsonObject for_each_reply_part (
-        QIODevice outgoingData,
-        string contentType,
-        std.function<QJsonObject (GLib.HashMap<string, GLib.ByteArray>&)> replyFunction) {
-        return this.fake_qnam.for_each_reply_part (outgoingData, contentType, replyFunction);
+        QIODevice outgoing_data,
+        string content_type,
+        ReplyFunction reply_function) {
+        return this.fake_qnam.for_each_reply_part (outgoing_data, content_type, reply_function);
     }
 
     /***********************************************************
@@ -164,48 +207,6 @@ class FakeFolder {
 
 
 
-FakeFolder.FakeFolder (FileInfo template_file_info, Occ.Optional<FileInfo> local_file_info, string remote_path)
-    : this.local_modifier (this.tempDir.path ()) {
-    // Needs to be done once
-    Occ.SyncEngine.minimumFileAgeForUpload = std.chrono.milliseconds (0);
-    Occ.Logger.instance ().setLogFile (QStringLiteral ("-"));
-    Occ.Logger.instance ().addLogRule ({ QStringLiteral ("sync.httplogger=true") });
-
-    QDir root_directory { this.tempDir.path ());
-    GLib.debug ("FakeFolder operating on" + root_directory;
-    if (local_file_info) {
-        to_disk (root_directory, *local_file_info);
-    } else {
-        to_disk (root_directory, template_file_info);
-    }
-
-    this.fake_qnam = new FakeQNAM (template_file_info);
-    this.account = Occ.Account.create ();
-    this.account.setUrl (GLib.Uri (QStringLiteral ("http://admin:admin@localhost/owncloud")));
-    this.account.setCredentials (new FakeCredentials { this.fake_qnam });
-    this.account.setDavDisplayName (QStringLiteral ("fakename"));
-    this.account.setServerVersion (QStringLiteral ("10.0.0"));
-
-    this.journal_database = std.make_unique<Occ.SyncJournalDb> (local_path () + QStringLiteral (".sync_test.db"));
-    this.sync_engine = std.make_unique<Occ.SyncEngine> (this.account, local_path (), remote_path, this.journal_database.get ());
-    // Ignore temporary files from the download. (This is in the default exclude list, but we don't load it)
-    this.sync_engine.excludedFiles ().addManualExclude (QStringLiteral ("]*.~*"));
-
-    // handle aboutToRemoveAllFiles with a timeout in case our test does not handle it
-    GLib.Object.connect (this.sync_engine.get (), &Occ.SyncEngine.aboutToRemoveAllFiles, this.sync_engine.get (), [this] (Occ.SyncFileItem.Direction, std.function<void (bool)> callback) {
-        QTimer.singleShot (1 * 1000, this.sync_engine.get (), [callback] {
-            callback (false);
-        });
-    });
-
-    // Ensure we have a valid VfsOff instance "running"
-    switch_to_vfs (this.sync_engine.syncOptions ().vfs);
-
-    // A new folder will update the local file state database on first sync.
-    // To have a state matching what users will encounter, we have to a sync
-    // using an identical local/remote file tree first.
-    ENFORCE (sync_once ());
-}
 
 void FakeFolder.switch_to_vfs (unowned<Occ.Vfs> vfs) {
     var opts = this.sync_engine.syncOptions ();
@@ -232,7 +233,7 @@ void FakeFolder.switch_to_vfs (unowned<Occ.Vfs> vfs) {
 }
 
 FileInfo FakeFolder.current_local_state () {
-    QDir root_directory { this.tempDir.path ());
+    QDir root_directory ( this.temporary_directory.path ());
     FileInfo rootTemplate;
     from_disk (root_directory, rootTemplate);
     rootTemplate.fixupParentPathRecursively ();
@@ -241,19 +242,19 @@ FileInfo FakeFolder.current_local_state () {
 
 string FakeFolder.local_path () {
     // SyncEngine wants a trailing slash
-    if (this.tempDir.path ().endsWith ('/'))
-        return this.tempDir.path ();
-    return this.tempDir.path () + '/';
+    if (this.temporary_directory.path ().endsWith ('/'))
+        return this.temporary_directory.path ();
+    return this.temporary_directory.path () + '/';
 }
 
 void FakeFolder.schedule_sync () {
     // Have to be done async, else, an error before exec () does not terminate the event loop.
-    QMetaObject.invokeMethod (this.sync_engine.get (), "startSync", Qt.QueuedConnection);
+    QMetaObject.invoke_method (this.sync_engine.get (), "startSync", Qt.QueuedConnection);
 }
 
 void FakeFolder.exec_until_before_propagation () {
     QSignalSpy spy (this.sync_engine.get (), SIGNAL (aboutToPropagate (SyncFileItemVector &)));
-    QVERIFY (spy.wait ());
+    //  QVERIFY (spy.wait ());
 }
 
 void FakeFolder.exec_until_item_completed (string relative_path) {
@@ -262,14 +263,14 @@ void FakeFolder.exec_until_item_completed (string relative_path) {
     t.on_signal_start ();
     while (t.elapsed () < 5000) {
         spy.clear ();
-        QVERIFY (spy.wait ());
+        //  QVERIFY (spy.wait ());
         for (GLib.List<GLib.Variant> args : spy) {
             var item = args[0].value<Occ.SyncFileItemPtr> ();
             if (item.destination () == relative_path)
                 return;
         }
     }
-    QVERIFY (false);
+    //  QVERIFY (false);
 }
 
 void FakeFolder.to_disk (QDir directory, FileInfo template_file_info) {
@@ -294,10 +295,10 @@ void FakeFolder.from_disk (QDir directory, FileInfo template_file_info) {
         if (diskChild.isDir ()) {
             QDir subDir = directory;
             subDir.cd (diskChild.fileName ());
-            FileInfo subFi = template_file_info.children[diskChild.fileName ()] = FileInfo { diskChild.fileName ());
+            FileInfo subFi = template_file_info.children[diskChild.fileName ()] = FileInfo ( diskChild.fileName ());
             from_disk (subDir, subFi);
         } else {
-            GLib.File f { diskChild.filePath ());
+            GLib.File f ( diskChild.filePath ());
             f.open (GLib.File.ReadOnly);
             var content = f.read (1);
             if (content.size () == 0) {
@@ -305,7 +306,7 @@ void FakeFolder.from_disk (QDir directory, FileInfo template_file_info) {
                 continue;
             }
             char content_char = content.at (0);
-            template_file_info.children.insert (diskChild.fileName (), FileInfo { diskChild.fileName (), diskChild.size (), content_char });
+            template_file_info.children.insert (diskChild.fileName (), FileInfo ( diskChild.fileName (), diskChild.size (), content_char });
         }
     }
 }
@@ -318,7 +319,7 @@ static FileInfo findOrCreateDirs (FileInfo base, PathComponents components) {
     if (it != base.children.end ()) {
         return findOrCreateDirs (*it, components.subComponents ());
     }
-    var newDir = base.children[childName] = FileInfo { childName };
+    var newDir = base.children[childName] = FileInfo ( childName };
     newDir.parentPath = base.path ();
     return findOrCreateDirs (newDir, components.subComponents ());
 }

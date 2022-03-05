@@ -5,11 +5,26 @@ class FakeDeleteReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeDeleteReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent);
+    public FakeDeleteReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent) {
+        base (parent);
+        set_request (request);
+        set_url (request.url ());
+        set_operation (operation);
+        open (QIODevice.ReadOnly);
+    
+        string fileName = get_file_path_from_url (request.url ());
+        //  Q_ASSERT (!fileName.isEmpty ());
+        remote_root_file_info.remove (fileName);
+        QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
+    }
 
     /***********************************************************
     ***********************************************************/
-    public void respond ();
+    public void respond () {
+        set_attribute (Soup.Request.HttpStatusCodeAttribute, 204);
+        /* emit */ signal_meta_data_changed ();
+        /* emit */ signal_finished ();
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -21,27 +36,5 @@ class FakeDeleteReply : FakeReply {
         return 0;
     }
 
-}
-}
-
-
-
-
-FakeDeleteReply.FakeDeleteReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent)
-    : FakeReply { parent } {
-    setRequest (request);
-    setUrl (request.url ());
-    setOperation (operation);
-    open (QIODevice.ReadOnly);
-
-    string fileName = getFilePathFromUrl (request.url ());
-    //  Q_ASSERT (!fileName.isEmpty ());
-    remote_root_file_info.remove (fileName);
-    QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
-}
-
-void FakeDeleteReply.respond () {
-    setAttribute (Soup.Request.HttpStatusCodeAttribute, 204);
-    /* emit */ metaDataChanged ();
-    /* emit */ finished ();
-}
+} // class FakeDeleteReply
+} // namespace Testinh

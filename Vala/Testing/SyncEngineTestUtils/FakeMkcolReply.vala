@@ -12,7 +12,7 @@ class FakeMkcolReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeMkcolReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent);
+    public FakeMkcolReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent);
 
     public void respond ();
 
@@ -32,14 +32,14 @@ class FakeMkcolReply : FakeReply {
 
 
 
-FakeMkcolReply.FakeMkcolReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent)
-    : FakeReply { parent } {
-    setRequest (request);
-    setUrl (request.url ());
-    setOperation (operation);
+FakeMkcolReply.FakeMkcolReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent)
+    : FakeReply (parent); {
+    set_request (request);
+    set_url (request.url ());
+    set_operation (operation);
     open (QIODevice.ReadOnly);
 
-    string fileName = getFilePathFromUrl (request.url ());
+    string fileName = get_file_path_from_url (request.url ());
     //  Q_ASSERT (!fileName.isEmpty ());
     file_info = remote_root_file_info.createDir (fileName);
 
@@ -47,12 +47,12 @@ FakeMkcolReply.FakeMkcolReply (FileInfo remote_root_file_info, QNetworkAccessMan
         on_signal_abort ();
         return;
     }
-    QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
+    QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
 }
 
 void FakeMkcolReply.respond () {
     setRawHeader ("OC-FileId", file_info.file_identifier);
-    setAttribute (Soup.Request.HttpStatusCodeAttribute, 201);
-    /* emit */ metaDataChanged ();
-    /* emit */ finished ();
+    set_attribute (Soup.Request.HttpStatusCodeAttribute, 201);
+    /* emit */ signal_meta_data_changed ();
+    /* emit */ signal_finished ();
 }

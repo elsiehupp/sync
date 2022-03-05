@@ -10,22 +10,22 @@ using Occ;
 
 namespace Testing {
 
-class TestFolder : public GLib.Object {
+class TestFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
     private on_ void testFolder () {
-        QFETCH (string, folder);
-        QFETCH (string, expectedFolder);
+        //  QFETCH (string, folder);
+        //  QFETCH (string, expectedFolder);
         Folder f = new Folder ("alias", folder, "http://foo.bar.net");
-        QCOMPARE (f.path (), expectedFolder);
+        //  QCOMPARE (f.path (), expectedFolder);
         delete f;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testFolder_data () {
+    private on_ void on_test_folder_data () {
         QTest.addColumn<string> ("folder");
         QTest.addColumn<string> ("expectedFolder");
 

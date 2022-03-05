@@ -13,7 +13,7 @@ class FakeHangingReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeHangingReply (QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent);
+    public FakeHangingReply (Soup.Operation operation, Soup.Request request, GLib.Object parent);
 
     /***********************************************************
     ***********************************************************/
@@ -32,19 +32,19 @@ class FakeHangingReply : FakeReply {
 
 
 
-FakeHangingReply.FakeHangingReply (QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent)
+FakeHangingReply.FakeHangingReply (Soup.Operation operation, Soup.Request request, GLib.Object parent)
     : FakeReply (parent) {
-    setRequest (request);
-    setUrl (request.url ());
-    setOperation (operation);
+    set_request (request);
+    set_url (request.url ());
+    set_operation (operation);
     open (QIODevice.ReadOnly);
 }
 
 void FakeHangingReply.on_signal_abort () {
     // Follow more or less the implementation of QNetworkReplyImpl.on_signal_abort
     close ();
-    setError (OperationCanceledError, _("Operation canceled"));
+    set_error (OperationCanceledError, _("Operation canceled"));
     /* emit */ errorOccurred (OperationCanceledError);
     setFinished (true);
-    /* emit */ finished ();
+    /* emit */ signal_finished ();
 }

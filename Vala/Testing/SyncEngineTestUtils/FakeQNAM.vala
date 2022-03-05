@@ -6,7 +6,7 @@ implied, as to its usefulness for any purpose.
 
 namespace Testing {
 
-class FakeQNAM : QNetworkAccessManager {
+class FakeQNAM : Soup {
 
     /***********************************************************
     ***********************************************************/
@@ -64,9 +64,9 @@ class FakeQNAM : QNetworkAccessManager {
     public 
 
     public QJsonObject for_each_reply_part (
-        QIODevice outgoingData,
-        string contentType,
-        std.function<QJsonObject (GLib.HashMap<string, GLib.ByteArray> &)> replyFunction);
+        QIODevice outgoing_data,
+        string content_type,
+        std.function<QJsonObject (GLib.HashMap<string, GLib.ByteArray> &)> reply_function);
 
     /***********************************************************
     ***********************************************************/
@@ -76,7 +76,7 @@ class FakeQNAM : QNetworkAccessManager {
     /***********************************************************
     ***********************************************************/
     protected Soup.Reply createRequest (Operation operation, Soup.Request request,
-        QIODevice outgoingData = null) override;
+        QIODevice outgoing_data = null) override;
 
 }
 }
@@ -87,19 +87,19 @@ class FakeQNAM : QNetworkAccessManager {
 
 
 FakeQNAM.FakeQNAM (FileInfo initialRoot)
-    : this.remote_root_file_info { std.move (initialRoot) } {
+    : this.remote_root_file_info ( std.move (initialRoot) } {
     setCookieJar (new Occ.CookieJar);
 }
 
-QJsonObject FakeQNAM.for_each_reply_part (QIODevice outgoingData,
-                                       const string contentType,
-                                       std.function<QJsonObject (GLib.HashMap<string, GLib.ByteArray> &)> replyFunction) {
+QJsonObject FakeQNAM.for_each_reply_part (QIODevice outgoing_data,
+                                       const string content_type,
+                                       std.function<QJsonObject (GLib.HashMap<string, GLib.ByteArray> &)> reply_function) {
     var fullReply = QJsonObject{};
-    var putPayload = outgoingData.peek (outgoingData.bytes_available ());
-    outgoingData.on_signal_reset ();
+    var putPayload = outgoing_data.peek (outgoing_data.bytes_available ());
+    outgoing_data.on_signal_reset ();
     var stringPutPayload = string.fromUtf8 (putPayload);
     const int boundaryPosition = sizeof ("multipart/related; boundary=");
-    const string boundaryValue = QStringLiteral ("--") + contentType.mid (boundaryPosition, contentType.length () - boundaryPosition - 1) + QStringLiteral ("\r\n");
+    const string boundaryValue = QStringLiteral ("--") + content_type.mid (boundaryPosition, content_type.length () - boundaryPosition - 1) + QStringLiteral ("\r\n");
     var stringPutPayloadRef = string{stringPutPayload}.left (stringPutPayload.size () - 2 - boundaryValue.size ());
     var allParts = stringPutPayloadRef.split (boundaryValue, Qt.SkipEmptyParts);
     for (var onePart : qAsConst (allParts)) {
@@ -112,7 +112,7 @@ QJsonObject FakeQNAM.for_each_reply_part (QIODevice outgoingData,
             allHeaders[headerParts.at (0)] = headerParts.at (1).toLatin1 ();
         }
 
-        var reply = replyFunction (allHeaders);
+        var reply = reply_function (allHeaders);
         if (reply.contains (QStringLiteral ("error")) &&
                 reply.contains (QStringLiteral ("etag"))) {
             fullReply.insert (allHeaders[QStringLiteral ("X-File-Path")], reply);
@@ -122,18 +122,18 @@ QJsonObject FakeQNAM.for_each_reply_part (QIODevice outgoingData,
     return fullReply;
 }
 
-Soup.Reply *FakeQNAM.createRequest (QNetworkAccessManager.Operation operation, Soup.Request request, QIODevice outgoingData) {
+Soup.Reply *FakeQNAM.createRequest (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
     Soup.Reply reply = null;
     var newRequest = request;
     newRequest.setRawHeader ("X-Request-ID", Occ.AccessManager.generateRequestId ());
-    var contentType = request.header (Soup.Request.ContentTypeHeader).toString ();
+    var content_type = request.header (Soup.Request.ContentTypeHeader).toString ();
     if (this.override_value) {
-        if (var this.reply = this.override_value (operation, newRequest, outgoingData)) {
+        if (var this.reply = this.override_value (operation, newRequest, outgoing_data)) {
             reply = this.reply;
         }
     }
     if (!reply) {
-        reply = overrideReplyWithError (getFilePathFromUrl (newRequest.url ()), operation, newRequest);
+        reply = overrideReplyWithError (get_file_path_from_url (newRequest.url ()), operation, newRequest);
     }
     if (!reply) {
         const bool isUpload = newRequest.url ().path ().startsWith (sUploadUrl.path ());
@@ -141,39 +141,39 @@ Soup.Reply *FakeQNAM.createRequest (QNetworkAccessManager.Operation operation, S
 
         var verb = newRequest.attribute (Soup.Request.CustomVerbAttribute);
         if (verb == QLatin1String ("PROPFIND")) {
-            // Ignore outgoingData always returning somethign good enough, works for now.
-            reply = new FakePropfindReply { info, operation, newRequest, this };
-        } else if (verb == QLatin1String ("GET") || operation == QNetworkAccessManager.GetOperation) {
-            reply = new FakeGetReply { info, operation, newRequest, this };
-        } else if (verb == QLatin1String ("PUT") || operation == QNetworkAccessManager.PutOperation) {
-            reply = new FakePutReply { info, operation, newRequest, outgoingData.readAll (), this };
+            // Ignore outgoing_data always returning somethign good enough, works for now.
+            reply = new FakePropfindReply ( info, operation, newRequest, this };
+        } else if (verb == QLatin1String ("GET") || operation == Soup.GetOperation) {
+            reply = new FakeGetReply ( info, operation, newRequest, this };
+        } else if (verb == QLatin1String ("PUT") || operation == Soup.PutOperation) {
+            reply = new FakePutReply ( info, operation, newRequest, outgoing_data.readAll (), this };
         } else if (verb == QLatin1String ("MKCOL")) {
-            reply = new FakeMkcolReply { info, operation, newRequest, this };
-        } else if (verb == QLatin1String ("DELETE") || operation == QNetworkAccessManager.DeleteOperation) {
-            reply = new FakeDeleteReply { info, operation, newRequest, this };
+            reply = new FakeMkcolReply ( info, operation, newRequest, this };
+        } else if (verb == QLatin1String ("DELETE") || operation == Soup.DeleteOperation) {
+            reply = new FakeDeleteReply ( info, operation, newRequest, this };
         } else if (verb == QLatin1String ("MOVE") && !isUpload) {
-            reply = new FakeMoveReply { info, operation, newRequest, this };
+            reply = new FakeMoveReply ( info, operation, newRequest, this };
         } else if (verb == QLatin1String ("MOVE") && isUpload) {
-            reply = new FakeChunkMoveReply { info, this.remote_root_file_info, operation, newRequest, this };
-        } else if (verb == QLatin1String ("POST") || operation == QNetworkAccessManager.PostOperation) {
-            if (contentType.startsWith (QStringLiteral ("multipart/related; boundary="))) {
-                reply = new FakePutMultiFileReply { info, operation, newRequest, contentType, outgoingData.readAll (), this };
+            reply = new FakeChunkMoveReply ( info, this.remote_root_file_info, operation, newRequest, this };
+        } else if (verb == QLatin1String ("POST") || operation == Soup.PostOperation) {
+            if (content_type.startsWith (QStringLiteral ("multipart/related; boundary="))) {
+                reply = new FakePutMultiFileReply ( info, operation, newRequest, content_type, outgoing_data.readAll (), this };
             }
         } else {
-            GLib.debug () + verb + outgoingData;
+            GLib.debug () + verb + outgoing_data;
             Q_UNREACHABLE ();
         }
     }
-    Occ.HttpLogger.logRequest (reply, operation, outgoingData);
+    Occ.HttpLogger.logRequest (reply, operation, outgoing_data);
     return reply;
 }
 
-Soup.Reply * FakeQNAM.overrideReplyWithError (string fileName, QNetworkAccessManager.Operation operation, Soup.Request newRequest) {
+Soup.Reply * FakeQNAM.overrideReplyWithError (string fileName, Soup.Operation operation, Soup.Request newRequest) {
     Soup.Reply reply = null;
 
     //  Q_ASSERT (!fileName.isNull ());
     if (this.error_paths.contains (fileName)) {
-        reply = new FakeErrorReply { operation, newRequest, this, this.error_paths[fileName] };
+        reply = new FakeErrorReply ( operation, newRequest, this, this.error_paths[fileName] };
     }
 
     return reply;

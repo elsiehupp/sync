@@ -10,13 +10,15 @@ namespace Testing {
 @brief The FakeDesktopServicesUrlHandler
 overrides QDesktopServices.openUrl
 ***********************************************************/
- class FakeDesktopServicesUrlHandler : GLib.Object {
+class FakeDesktopServicesUrlHandler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public FakeDesktopServicesUrlHandler (GLib.Object parent = new GLib.Object ())
-        : GLib.Object (parent) {}
+    public FakeDesktopServicesUrlHandler (GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+    }
 
-signals:
-    void resultClicked (GLib.Uri url);
-};
+
+    signal void signal_result_clicked (GLib.Uri url);
+}
+}

@@ -7,13 +7,16 @@ See http://burtleburtle.net/bob/hash/evahash.html
 
 namespace Testing {
 
-const int HASHSTATE = 1
-const int HASHLEN   = 1
-const int MAXPAIR   = 80
-const int MAXLEN    = 70
+const int HASHSTATE = 1;
+const int HASHLEN   = 1;
+const int MAXPAIR   = 80;
+const int MAXLEN    = 70;
 
 static void check_c_jhash_trials (void **state) {
-    uint8_t qa[MAXLEN+1], qb[MAXLEN+2], *a = qa[0], *b = qb[1];
+    uint8 qa[MAXLEN+1];
+    uint8 qb[MAXLEN+2];
+    uint8 *a = qa[0];
+    uint8 *b = qb[1];
     uint32 c[HASHSTATE];
     uint32 d[HASHSTATE];
     uint32 i = 0;
@@ -26,7 +29,7 @@ static void check_c_jhash_trials (void **state) {
     uint32 x[HASHSTATE],y[HASHSTATE];
     uint32 hlen = 0;
 
-    (void) state; /* unused */
+    //  (void) state; /* unused */
 
     for (hlen=0; hlen < MAXLEN; ++hlen) {
         z=0;
@@ -136,8 +139,10 @@ static void check_c_jhash_null_strings (void **state) {
 }
 
 static void check_c_jhash64_trials (void **state) {
-    uint8_t qa[MAXLEN + 1], qb[MAXLEN + 2];
-    uint8_t a = NULL, *b = NULL;
+    uint8 qa[MAXLEN + 1];
+    uint8 qb[MAXLEN + 2];
+    uint8 *a = NULL;
+    uint8 *b = NULL;
     uint64 c[HASHSTATE];
     uint64 d[HASHSTATE];
     uint64 i = 0;

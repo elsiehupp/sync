@@ -40,7 +40,7 @@ class PathComponents : string[] {
 
 
 PathComponents.PathComponents (char path)
-    : PathComponents { string.fromUtf8 (path) } {
+    : PathComponents ( string.fromUtf8 (path) } {
 }
 
 PathComponents.PathComponents (string path)
@@ -52,9 +52,9 @@ PathComponents.PathComponents (string[] pathComponents)
 }
 
 PathComponents PathComponents.parentDirComponents () {
-    return PathComponents { mid (0, size () - 1));
+    return PathComponents ( mid (0, size () - 1));
 }
 
 PathComponents PathComponents.subComponents () & {
-    return PathComponents { mid (1));
+    return PathComponents ( mid (1));
 }

@@ -21,7 +21,7 @@ class TestBlocklist : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testBlocklistBasic_data () {
+    private void on_test_blocklist_basic_data () {
         QTest.addColumn<bool> ("remote");
         QTest.newRow ("remote") + true;
         QTest.newRow ("local") + false;
@@ -30,147 +30,149 @@ class TestBlocklist : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testBlocklistBasic () {
-        QFETCH (bool, remote);
+    private void on_test_blocklist_basic () {
+        //  QFETCH (bool, remote);
 
-        FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 ());
-        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
-        ItemCompletedSpy completeSpy (fakeFolder);
+        FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
+        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        ItemCompletedSpy completeSpy = new ItemCompletedSpy (fake_folder);
 
-        var modifier = remote ? fakeFolder.remote_modifier () : fakeFolder.local_modifier ();
+        var modifier = remote ? fake_folder.remote_modifier () : fake_folder.local_modifier ();
 
         int counter = 0;
-        const GLib.ByteArray testFileName = QByteArrayLiteral ("A/new");
+        const GLib.ByteArray testFileName = "A/new";
         GLib.ByteArray reqId;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation operation, Soup.Request req, QIODevice *) . Soup.Reply * {
-            if (req.url ().path ().endsWith (testFileName)) {
-                reqId = req.rawHeader ("X-Request-ID");
+        fake_folder.set_server_override ((Soup.Operation operation, Soup.Request request, QIODevice device) => { // Soup.Reply
+            if (request.url ().path ().endsWith (testFileName)) {
+                reqId = request.rawHeader ("X-Request-ID");
             }
-            if (!remote && operation == QNetworkAccessManager.PutOperation)
+            if (!remote && operation == Soup.PutOperation) {
                 ++counter;
-            if (remote && operation == QNetworkAccessManager.GetOperation)
+            }
+            if (remote && operation == Soup.GetOperation) {
                 ++counter;
-            return null;
+            }
+            return;
         });
 
         var on_signal_cleanup = [&] () {
             completeSpy.clear ();
         }
 
-        var initialEtag = journalRecord (fakeFolder, "A").etag;
-        QVERIFY (!initialEtag.isEmpty ());
+        var initialEtag = journalRecord (fake_folder, "A").etag;
+        //  QVERIFY (!initialEtag.isEmpty ());
 
         // The first sync and the download will fail - the item will be blocklisted
         modifier.insert (testFileName);
-        fakeFolder.server_error_paths ().append (testFileName, 500); // will be blocklisted
-        QVERIFY (!fakeFolder.sync_once ()); {
+        fake_folder.server_error_paths ().append (testFileName, 500); // will be blocklisted
+        //  QVERIFY (!fake_folder.sync_once ()); {
             var it = completeSpy.findItem (testFileName);
-            QVERIFY (it);
-            QCOMPARE (it.status, SyncFileItem.Status.NORMAL_ERROR); // initial error visible
-            QCOMPARE (it.instruction, CSYNC_INSTRUCTION_NEW);
+            //  QVERIFY (it);
+            //  QCOMPARE (it.status, SyncFileItem.Status.NORMAL_ERROR); // initial error visible
+            //  QCOMPARE (it.instruction, CSYNC_INSTRUCTION_NEW);
 
-            var entry = fakeFolder.sync_journal ().errorBlocklistEntry (testFileName);
-            QVERIFY (entry.isValid ());
-            QCOMPARE (entry.errorCategory, SyncJournalErrorBlocklistRecord.Normal);
-            QCOMPARE (entry.retryCount, 1);
-            QCOMPARE (counter, 1);
-            QVERIFY (entry.ignoreDuration > 0);
-            QCOMPARE (entry.requestId, reqId);
+            var entry = fake_folder.sync_journal ().errorBlocklistEntry (testFileName);
+            //  QVERIFY (entry.isValid ());
+            //  QCOMPARE (entry.errorCategory, SyncJournalErrorBlocklistRecord.Normal);
+            //  QCOMPARE (entry.retryCount, 1);
+            //  QCOMPARE (counter, 1);
+            //  QVERIFY (entry.ignoreDuration > 0);
+            //  QCOMPARE (entry.requestId, reqId);
 
             if (remote)
-                QCOMPARE (journalRecord (fakeFolder, "A").etag, initialEtag);
+                //  QCOMPARE (journalRecord (fake_folder, "A").etag, initialEtag);
         }
         on_signal_cleanup ();
 
         // Ignored during the second run - but soft errors are also errors
-        QVERIFY (!fakeFolder.sync_once ()); {
+        //  QVERIFY (!fake_folder.sync_once ()); {
             var it = completeSpy.findItem (testFileName);
-            QVERIFY (it);
-            QCOMPARE (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR);
-            QCOMPARE (it.instruction, CSYNC_INSTRUCTION_IGNORE); // no retry happened!
+            //  QVERIFY (it);
+            //  QCOMPARE (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR);
+            //  QCOMPARE (it.instruction, CSYNC_INSTRUCTION_IGNORE); // no retry happened!
 
-            var entry = fakeFolder.sync_journal ().errorBlocklistEntry (testFileName);
-            QVERIFY (entry.isValid ());
-            QCOMPARE (entry.errorCategory, SyncJournalErrorBlocklistRecord.Normal);
-            QCOMPARE (entry.retryCount, 1);
-            QCOMPARE (counter, 1);
-            QVERIFY (entry.ignoreDuration > 0);
-            QCOMPARE (entry.requestId, reqId);
+            var entry = fake_folder.sync_journal ().errorBlocklistEntry (testFileName);
+            //  QVERIFY (entry.isValid ());
+            //  QCOMPARE (entry.errorCategory, SyncJournalErrorBlocklistRecord.Normal);
+            //  QCOMPARE (entry.retryCount, 1);
+            //  QCOMPARE (counter, 1);
+            //  QVERIFY (entry.ignoreDuration > 0);
+            //  QCOMPARE (entry.requestId, reqId);
 
             if (remote)
-                QCOMPARE (journalRecord (fakeFolder, "A").etag, initialEtag);
+                //  QCOMPARE (journalRecord (fake_folder, "A").etag, initialEtag);
         }
         on_signal_cleanup ();
 
         // Let's expire the blocklist entry to verify it gets retried {
-            var entry = fakeFolder.sync_journal ().errorBlocklistEntry (testFileName);
+            var entry = fake_folder.sync_journal ().errorBlocklistEntry (testFileName);
             entry.ignoreDuration = 1;
             entry.lastTryTime -= 1;
-            fakeFolder.sync_journal ().setErrorBlocklistEntry (entry);
+            fake_folder.sync_journal ().setErrorBlocklistEntry (entry);
         }
-        QVERIFY (!fakeFolder.sync_once ()); {
+        //  QVERIFY (!fake_folder.sync_once ()); {
             var it = completeSpy.findItem (testFileName);
-            QVERIFY (it);
-            QCOMPARE (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR); // blocklisted as it's just a retry
-            QCOMPARE (it.instruction, CSYNC_INSTRUCTION_NEW); // retry!
+            //  QVERIFY (it);
+            //  QCOMPARE (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR); // blocklisted as it's just a retry
+            //  QCOMPARE (it.instruction, CSYNC_INSTRUCTION_NEW); // retry!
 
-            var entry = fakeFolder.sync_journal ().errorBlocklistEntry (testFileName);
-            QVERIFY (entry.isValid ());
-            QCOMPARE (entry.errorCategory, SyncJournalErrorBlocklistRecord.Normal);
-            QCOMPARE (entry.retryCount, 2);
-            QCOMPARE (counter, 2);
-            QVERIFY (entry.ignoreDuration > 0);
-            QCOMPARE (entry.requestId, reqId);
+            var entry = fake_folder.sync_journal ().errorBlocklistEntry (testFileName);
+            //  QVERIFY (entry.isValid ());
+            //  QCOMPARE (entry.errorCategory, SyncJournalErrorBlocklistRecord.Normal);
+            //  QCOMPARE (entry.retryCount, 2);
+            //  QCOMPARE (counter, 2);
+            //  QVERIFY (entry.ignoreDuration > 0);
+            //  QCOMPARE (entry.requestId, reqId);
 
             if (remote)
-                QCOMPARE (journalRecord (fakeFolder, "A").etag, initialEtag);
+                //  QCOMPARE (journalRecord (fake_folder, "A").etag, initialEtag);
         }
         on_signal_cleanup ();
 
         // When the file changes a retry happens immediately
         modifier.append_byte (testFileName);
-        QVERIFY (!fakeFolder.sync_once ()); {
+        //  QVERIFY (!fake_folder.sync_once ()); {
             var it = completeSpy.findItem (testFileName);
-            QVERIFY (it);
-            QCOMPARE (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR);
-            QCOMPARE (it.instruction, CSYNC_INSTRUCTION_NEW); // retry!
+            //  QVERIFY (it);
+            //  QCOMPARE (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR);
+            //  QCOMPARE (it.instruction, CSYNC_INSTRUCTION_NEW); // retry!
 
-            var entry = fakeFolder.sync_journal ().errorBlocklistEntry (testFileName);
-            QVERIFY (entry.isValid ());
-            QCOMPARE (entry.errorCategory, SyncJournalErrorBlocklistRecord.Normal);
-            QCOMPARE (entry.retryCount, 3);
-            QCOMPARE (counter, 3);
-            QVERIFY (entry.ignoreDuration > 0);
-            QCOMPARE (entry.requestId, reqId);
+            var entry = fake_folder.sync_journal ().errorBlocklistEntry (testFileName);
+            //  QVERIFY (entry.isValid ());
+            //  QCOMPARE (entry.errorCategory, SyncJournalErrorBlocklistRecord.Normal);
+            //  QCOMPARE (entry.retryCount, 3);
+            //  QCOMPARE (counter, 3);
+            //  QVERIFY (entry.ignoreDuration > 0);
+            //  QCOMPARE (entry.requestId, reqId);
 
             if (remote)
-                QCOMPARE (journalRecord (fakeFolder, "A").etag, initialEtag);
+                //  QCOMPARE (journalRecord (fake_folder, "A").etag, initialEtag);
         }
         on_signal_cleanup ();
 
         // When the error goes away and the item is retried, the sync succeeds
-        fakeFolder.server_error_paths ().clear (); {
-            var entry = fakeFolder.sync_journal ().errorBlocklistEntry (testFileName);
+        fake_folder.server_error_paths ().clear (); {
+            var entry = fake_folder.sync_journal ().errorBlocklistEntry (testFileName);
             entry.ignoreDuration = 1;
             entry.lastTryTime -= 1;
-            fakeFolder.sync_journal ().setErrorBlocklistEntry (entry);
+            fake_folder.sync_journal ().setErrorBlocklistEntry (entry);
         }
-        QVERIFY (fakeFolder.sync_once ()); {
+        //  QVERIFY (fake_folder.sync_once ()); {
             var it = completeSpy.findItem (testFileName);
-            QVERIFY (it);
-            QCOMPARE (it.status, SyncFileItem.Status.SUCCESS);
-            QCOMPARE (it.instruction, CSYNC_INSTRUCTION_NEW);
+            //  QVERIFY (it);
+            //  QCOMPARE (it.status, SyncFileItem.Status.SUCCESS);
+            //  QCOMPARE (it.instruction, CSYNC_INSTRUCTION_NEW);
 
-            var entry = fakeFolder.sync_journal ().errorBlocklistEntry (testFileName);
-            QVERIFY (!entry.isValid ());
-            QCOMPARE (counter, 4);
+            var entry = fake_folder.sync_journal ().errorBlocklistEntry (testFileName);
+            //  QVERIFY (!entry.isValid ());
+            //  QCOMPARE (counter, 4);
 
             if (remote)
-                QCOMPARE (journalRecord (fakeFolder, "A").etag, fakeFolder.current_remote_state ().find ("A").etag);
+                //  QCOMPARE (journalRecord (fake_folder, "A").etag, fake_folder.current_remote_state ().find ("A").etag);
         }
         on_signal_cleanup ();
 
-        QCOMPARE (fakeFolder.current_local_state (), fakeFolder.current_remote_state ());
+        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 }
 

@@ -8,12 +8,12 @@ class FakeChunkMoveReply : FakeReply {
     /***********************************************************
     ***********************************************************/
     public FakeChunkMoveReply (FileInfo uploads_file_info, FileInfo remote_root_file_info,
-        QNetworkAccessManager.Operation operation, Soup.Request request,
+        Soup.Operation operation, Soup.Request request,
         GLib.Object parent) {
         base (parent);
-        setRequest (request);
-        setUrl (request.url ());
-        setOperation (operation);
+        set_request (request);
+        set_url (request.url ());
+        set_operation (operation);
         open (QIODevice.ReadOnly);
         file_info = perform (uploads_file_info, remote_root_file_info, request);
         if (!file_info) {
@@ -25,9 +25,8 @@ class FakeChunkMoveReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public static FileInfo perform (FileInfo uploads_file_info, FileInfo remote_root_file_info, Soup.Request request);
-    FileInfo *FakeChunkMoveReply.perform (FileInfo uploads_file_info, FileInfo remote_root_file_info, Soup.Request request) {
-        string source = getFilePathFromUrl (request.url ());
+    public static FileInfo perform (FileInfo uploads_file_info, FileInfo remote_root_file_info, Soup.Request request) {
+        string source = get_file_path_from_url (request.url ());
         //  Q_ASSERT (!source.isEmpty ());
         //  Q_ASSERT (source.endsWith (QLatin1String ("/.file")));
         source = source.left (source.length () - static_cast<int> (qstrlen ("/.file")));
@@ -39,12 +38,12 @@ class FakeChunkMoveReply : FakeReply {
         int64 size = 0;
         char payload = '\0';
 
-        string fileName = getFilePathFromUrl (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
+        string fileName = get_file_path_from_url (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
         //  Q_ASSERT (!fileName.isEmpty ());
 
         // Compute the size and content from the chunks if possible
-        for (var chunkName : sourceFolder.children.keys ()) {
-            var x = sourceFolder.children[chunkName];
+        foreach (var chunk_name in sourceFolder.children.keys ()) {
+            var x = sourceFolder.children[chunk_name];
             //  Q_ASSERT (!x.isDir);
             //  Q_ASSERT (x.size > 0); // There should not be empty chunks
             size += x.size;
@@ -83,33 +82,33 @@ class FakeChunkMoveReply : FakeReply {
     /***********************************************************
     ***********************************************************/
     public virtual void respond () {
-        setAttribute (Soup.Request.HttpStatusCodeAttribute, 201);
+        set_attribute (Soup.Request.HttpStatusCodeAttribute, 201);
         setRawHeader ("OC-ETag", file_info.etag);
         setRawHeader ("ETag", file_info.etag);
         setRawHeader ("OC-FileId", file_info.file_identifier);
-        /* emit */ metaDataChanged ();
-        /* emit */ finished ();
+        /* emit */ signal_meta_data_changed ();
+        /* emit */ signal_finished ();
     }
 
     /***********************************************************
     ***********************************************************/
     public void respondPreconditionFailed () {
-        setAttribute (Soup.Request.HttpStatusCodeAttribute, 412);
-        setError (InternalServerError, "Precondition Failed");
-        /* emit */ metaDataChanged ();
-        /* emit */ finished ();
+        set_attribute (Soup.Request.HttpStatusCodeAttribute, 412);
+        set_error (InternalServerError, "Precondition Failed");
+        /* emit */ signal_meta_data_changed ();
+        /* emit */ signal_finished ();
     }
 
     /***********************************************************
     ***********************************************************/
     public override void on_signal_abort () {
-        setError (OperationCanceledError, "on_signal_abort");
-        /* emit */ finished ();
+        set_error (OperationCanceledError, "on_signal_abort");
+        /* emit */ signal_finished ();
     }
 
     /***********************************************************
     ***********************************************************/
-    public int64 read_data (char *, int64) override {
+    public override int64 read_data (char *characters, int64 number) {
         return 0;
     }
 

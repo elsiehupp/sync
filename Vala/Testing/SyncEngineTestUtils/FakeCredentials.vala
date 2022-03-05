@@ -3,11 +3,11 @@ namespace Testing {
 
 class FakeCredentials : Occ.AbstractCredentials {
 
-    QNetworkAccessManager qnam;
+    Soup qnam;
 
     /***********************************************************
     ***********************************************************/
-    public FakeCredentials (QNetworkAccessManager qnam) {
+    public FakeCredentials (Soup qnam) {
         this.qnam = qnam;
     }
 
@@ -31,7 +31,7 @@ class FakeCredentials : Occ.AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public override QNetworkAccessManager create_qnam () {
+    public override Soup create_qnam () {
         return this.qnam;
     }
 

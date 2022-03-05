@@ -31,13 +31,13 @@ class FakeWebSocketServer : GLib.Object {
     ***********************************************************/
     public FakeWebSocketServer (uint16 port = 12345, GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        this.web_socket_server = new QWebSocketServer ("Fake Server", QWebSocketServer.NonSecureMode, this));
+        this.web_socket_server = new QWebSocketServer ("Fake Server", QWebSocketServer.NonSecureMode, this);
         if (!this.web_socket_server.listen (QHostAddress.Any, port)) {
             Q_UNREACHABLE ();
         }
         connect (this.web_socket_server, &QWebSocketServer.newConnection, this, &FakeWebSocketServer.on_signal_new_connection);
         connect (this.web_socket_server, &QWebSocketServer.signal_closed, this, &FakeWebSocketServer.signal_closed);
-        qCInfo (lcFakeWebSocketServer) + "Open fake websocket server on port:" + port;
+        GLib.info (lcFakeWebSocketServer) + "Open fake websocket server on port:" + port;
         this.process_text_message_spy = std.make_unique<QSignalSpy> (this, &FakeWebSocketServer.signal_process_text_message);
     }
 
@@ -45,14 +45,17 @@ class FakeWebSocketServer : GLib.Object {
         close ();
     }
 
+    delegate void BeforeAuthentication (Occ.PushNotifications push_notifications);
+    delegate void AfterAuthentication ();
+
     /***********************************************************
     ***********************************************************/
-    public QWebSocket authenticateAccount (Occ.AccountPointer account, std.function<void (Occ.PushNotifications pushNotifications)> beforeAuthentication, std.function<void (void)> afterAuthentication) {
-        const var pushNotifications = account.pushNotifications ();
-        //  Q_ASSERT (pushNotifications);
-        QSignalSpy readySpy (pushNotifications, &Occ.PushNotifications.ready);
+    public QWebSocket authenticate_account (Occ.AccountPointer account, BeforeAuthentication before_authentication, AfterAuthentication after_authentication) {
+        var push_notifications = account.push_notifications ();
+        //  Q_ASSERT (push_notifications);
+        QSignalSpy ready_spy = new QSignalSpy (push_notifications, &Occ.PushNotifications.ready);
 
-        beforeAuthentication (pushNotifications);
+        before_authentication (push_notifications);
 
         // Wait for authentication
         if (!waitForTextMessages ()) {
@@ -64,11 +67,11 @@ class FakeWebSocketServer : GLib.Object {
             return null;
         }
 
-        const var socket = socketForTextMessage (0);
-        const var userSent = textMessage (0);
-        const var passwordSent = textMessage (1);
+        var socket = socketForTextMessage (0);
+        var user_sent = text_message (0);
+        var password_sent = text_message (1);
 
-        if (userSent != account.credentials ().user () || passwordSent != account.credentials ().password ()) {
+        if (user_sent != account.credentials ().user () || password_sent != account.credentials ().password ()) {
             return null;
         }
 
@@ -76,12 +79,12 @@ class FakeWebSocketServer : GLib.Object {
         socket.sendTextMessage ("authenticated");
 
         // Wait for ready signal
-        readySpy.wait ();
-        if (readySpy.count () != 1 || !account.pushNotifications ().isReady ()) {
+        ready_spy.wait ();
+        if (ready_spy.count () != 1 || !account.push_notifications ().isReady ()) {
             return null;
         }
 
-        afterAuthentication ();
+        after_authentication ();
 
         return socket;
     }
@@ -90,7 +93,7 @@ class FakeWebSocketServer : GLib.Object {
     ***********************************************************/
     public void close () {
         if (this.web_socket_server.isListening ()) {
-            qCInfo (lcFakeWebSocketServer) + "Close fake websocket server";
+            GLib.info (lcFakeWebSocketServer) + "Close fake websocket server";
 
             this.web_socket_server.close ();
             qDeleteAll (this.clients.begin (), this.clients.end ());
@@ -111,7 +114,7 @@ class FakeWebSocketServer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string textMessage (int message_number) {
+    public string text_message (int message_number) {
         //  Q_ASSERT (0 <= message_number && message_number < this.process_text_message_spy.count ());
         return this.process_text_message_spy.at (message_number).at (1).toString ();
     }
@@ -139,19 +142,19 @@ class FakeWebSocketServer : GLib.Object {
         typeList.append ("activities");
         typeList.append ("notifications");
 
-        string websocketUrl ("ws://localhost:12345");
+        string web_socket_url = "ws://localhost:12345";
 
-        QVariantMap endpointsMap;
-        endpointsMap["websocket"] = websocketUrl;
+        QVariantMap endpoints_map;
+        endpoints_map["websocket"] = web_socket_url;
 
-        QVariantMap notifyPushMap;
-        notifyPushMap["type"] = typeList;
-        notifyPushMap["endpoints"] = endpointsMap;
+        QVariantMap notify_push_map;
+        notify_push_map["type"] = typeList;
+        notify_push_map["endpoints"] = endpoints_map;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["notify_push"] = notifyPushMap;
+        QVariantMap capabilities_map;
+        capabilities_map["notify_push"] = notify_push_map;
 
-        account.setCapabilities (capabilitiesMap);
+        account.setCapabilities (capabilities_map);
 
         var credentials = new CredentialsStub (username, password);
         account.setCredentials (credentials);
@@ -163,19 +166,19 @@ class FakeWebSocketServer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_process_next_message_internal (string message) {
-        var client = qobject_cast<QWebSocket> (sender ());
+        var client = (QWebSocket) sender ();
         /* emit */ signal_process_text_message (client, message);
     }
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_new_connection () {
-        qCInfo (lcFakeWebSocketServer) + "New connection on fake websocket server";
+        GLib.info ("New connection on fake websocket server");
 
-        var socket = this.web_socket_server.nextPendingConnection ();
+        var socket = this.web_socket_server.next_pending_connection ();
 
-        connect (socket, &QWebSocket.textMessageReceived, this, &FakeWebSocketServer.on_signal_process_next_message_internal);
-        connect (socket, &QWebSocket.disconnected, this, &FakeWebSocketServer.on_signal_socket_disconnected);
+        connect (socket, QWebSocket.textMessageReceived, this, FakeWebSocketServer.on_signal_process_next_message_internal);
+        connect (socket, QWebSocket.disconnected, this, FakeWebSocketServer.on_signal_socket_disconnected);
 
         this.clients + socket;
     }
@@ -183,9 +186,9 @@ class FakeWebSocketServer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_socket_disconnected () {
-        qCInfo (lcFakeWebSocketServer) + "Socket disconnected";
+        GLib.info ("Socket disconnected");
 
-        var client = qobject_cast<QWebSocket> (sender ());
+        var client = (QWebSocket) sender ();
 
         if (client) {
             this.clients.removeAll (client);

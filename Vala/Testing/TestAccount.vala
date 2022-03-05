@@ -12,15 +12,14 @@ using Occ;
 
 namespace Testing {
 
-class TestAccount : public GLib.Object {
+class TestAccount : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testAccountDavPath_unitialized_noCrash () {
+    private void on_test_account_dav_path_unitialized_no_crash () {
         AccountPointer account = Account.create ();
         account.davPath ();
     }
-}
 
-QTEST_APPLESS_MAIN (TestAccount)
-#include "testaccount.moc"
+} // namespace Testing
+} // class TestAccount

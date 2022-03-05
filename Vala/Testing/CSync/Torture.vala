@@ -17,45 +17,6 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
-
-//  #include <stdarg.h> // NOLINT sometimes compiled in C mode
-//  #include <stddef.h> // NOLINT sometimes compiled in C mode
-//  #include <setjmp.h> // NOLINT sometimes compiled in C mode
-//  #include <cmocka.h>
-
-namespace Testing {
-
-/***********************************************************
-Used by main to communicate with parse_opt. */
-struct argument_s {
-  char args[2];
-  int verbose;
-}
-
-void torture_cmdline_parse (int argc, char **argv, struct argument_s arguments);
-
-int torture_csync_verbosity (void);
-
-/***********************************************************
-This function must be defined in every unit test file.
-***********************************************************/
-int torture_run_tests (void);
-
-#ifdef __cplusplus
-}
-//  #endif
-//  #endif
-#endif /* this.TORTURE_H */
-
-
-
-
-
-
-
-
-
-
 /***********************************************************
 libcsync -- a library to sync a directory with another
 
@@ -76,19 +37,45 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
-static int verbosity;
+//  #include <stdarg.h> // NOLINT sometimes compiled in C mode
+//  #include <stddef.h> // NOLINT sometimes compiled in C mode
+//  #include <setjmp.h> // NOLINT sometimes compiled in C mode
+//  #include <cmocka.h>
 
-int torture_csync_verbosity (void) {
-  return verbosity;
-}
+namespace Testing {
 
-int main (int argc, char **argv) {
-  struct argument_s arguments;
+class Torture {
 
-  arguments.verbose = 0;
-  torture_cmdline_parse (argc, argv, arguments);
-  verbosity = arguments.verbose;
+    /***********************************************************
+    Used by main to communicate with parse_opt.
+    ***********************************************************/
+    struct Arguments {
+        char args[2];
+        int verbose;
+    }
 
-  return torture_run_tests ();
-}
+    static int verbosity;
 
+    void torture_cmdline_parse (int argc, char **argv, Arguments arguments);
+
+    int torture_csync_verbosity () {
+        return verbosity;
+    }
+
+    /***********************************************************
+    This function must be defined in every unit test file.
+    ***********************************************************/
+    int torture_run_tests ();
+
+    int main (int argc, char **argv) {
+        Arguments arguments;
+
+        arguments.verbose = 0;
+        torture_cmdline_parse (argc, argv, arguments);
+        verbosity = arguments.verbose;
+
+        return torture_run_tests ();
+    }
+
+} // class Torture
+} // namespace Testing

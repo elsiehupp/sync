@@ -12,7 +12,7 @@ class FakePutReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePutReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.ByteArray putPayload, GLib.Object parent);
+    public FakePutReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.ByteArray putPayload, GLib.Object parent);
 
     /***********************************************************
     ***********************************************************/
@@ -42,18 +42,18 @@ class FakePutReply : FakeReply {
 
 
 
-FakePutReply.FakePutReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.ByteArray putPayload, GLib.Object parent)
-    : FakeReply { parent } {
-    setRequest (request);
-    setUrl (request.url ());
-    setOperation (operation);
+FakePutReply.FakePutReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.ByteArray putPayload, GLib.Object parent)
+    : FakeReply (parent); {
+    set_request (request);
+    set_url (request.url ());
+    set_operation (operation);
     open (QIODevice.ReadOnly);
     file_info = perform (remote_root_file_info, request, putPayload);
-    QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
+    QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
 }
 
 FileInfo *FakePutReply.perform (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray putPayload) {
-    string fileName = getFilePathFromUrl (request.url ());
+    string fileName = get_file_path_from_url (request.url ());
     //  Q_ASSERT (!fileName.isEmpty ());
     FileInfo file_info = remote_root_file_info.find (fileName);
     if (file_info) {
@@ -74,12 +74,12 @@ void FakePutReply.respond () {
     setRawHeader ("ETag", file_info.etag);
     setRawHeader ("OC-FileID", file_info.file_identifier);
     setRawHeader ("X-OC-MTime", "accepted"); // Prevents Q_ASSERT (!this.runningNow) since we'll call PropagateItemJob.done twice in that case.
-    setAttribute (Soup.Request.HttpStatusCodeAttribute, 200);
-    /* emit */ metaDataChanged ();
-    /* emit */ finished ();
+    set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
+    /* emit */ signal_meta_data_changed ();
+    /* emit */ signal_finished ();
 }
 
 void FakePutReply.on_signal_abort () {
-    setError (OperationCanceledError, "on_signal_abort");
-    /* emit */ finished ();
+    set_error (OperationCanceledError, "on_signal_abort");
+    /* emit */ signal_finished ();
 }

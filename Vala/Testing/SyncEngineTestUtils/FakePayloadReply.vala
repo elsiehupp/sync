@@ -18,7 +18,7 @@ class FakePayloadReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePayloadReply (QNetworkAccessManager.Operation operation, Soup.Request request,
+    public FakePayloadReply (Soup.Operation operation, Soup.Request request,
 
     /***********************************************************
     ***********************************************************/
@@ -53,28 +53,28 @@ class FakePayloadReply : FakeReply {
 
 
 
-FakePayloadReply.FakePayloadReply (QNetworkAccessManager.Operation operation, Soup.Request request, GLib.ByteArray body, GLib.Object parent)
+FakePayloadReply.FakePayloadReply (Soup.Operation operation, Soup.Request request, GLib.ByteArray body, GLib.Object parent)
     : FakePayloadReply (operation, request, body, FakePayloadReply.defaultDelay, parent) {
 }
 
 FakePayloadReply.FakePayloadReply (
-    QNetworkAccessManager.Operation operation, Soup.Request request, GLib.ByteArray body, int delay, GLib.Object parent)
+    Soup.Operation operation, Soup.Request request, GLib.ByteArray body, int delay, GLib.Object parent)
     : FakeReply{parent}
     this.body (body) {
-    setRequest (request);
-    setUrl (request.url ());
-    setOperation (operation);
+    set_request (request);
+    set_url (request.url ());
+    set_operation (operation);
     open (QIODevice.ReadOnly);
     QTimer.singleShot (delay, this, &FakePayloadReply.respond);
 }
 
 void FakePayloadReply.respond () {
-    setAttribute (Soup.Request.HttpStatusCodeAttribute, 200);
+    set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
     setHeader (Soup.Request.ContentLengthHeader, this.body.size ());
-    /* emit */ metaDataChanged ();
+    /* emit */ signal_meta_data_changed ();
     /* emit */ readyRead ();
     setFinished (true);
-    /* emit */ finished ();
+    /* emit */ signal_finished ();
 }
 
 int64 FakePayloadReply.read_data (char buf, int64 max) {

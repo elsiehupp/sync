@@ -11,7 +11,7 @@ class FakeJsonErrorReply : FakeErrorReply {
     /***********************************************************
     ***********************************************************/
     public FakeJsonErrorReply (
-        QNetworkAccessManager.Operation operation,
+        Soup.Operation operation,
         Soup.Request request,
         GLib.Object parent,
         int http_error_code,

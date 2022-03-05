@@ -10,7 +10,7 @@ class FakeMoveReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeMoveReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent);
+    public FakeMoveReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent);
 
     /***********************************************************
     ***********************************************************/
@@ -35,23 +35,23 @@ class FakeMoveReply : FakeReply {
 
 
 
-FakeMoveReply.FakeMoveReply (FileInfo remote_root_file_info, QNetworkAccessManager.Operation operation, Soup.Request request, GLib.Object parent)
-    : FakeReply { parent } {
-    setRequest (request);
-    setUrl (request.url ());
-    setOperation (operation);
+FakeMoveReply.FakeMoveReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent)
+    : FakeReply (parent); {
+    set_request (request);
+    set_url (request.url ());
+    set_operation (operation);
     open (QIODevice.ReadOnly);
 
-    string fileName = getFilePathFromUrl (request.url ());
+    string fileName = get_file_path_from_url (request.url ());
     //  Q_ASSERT (!fileName.isEmpty ());
-    string dest = getFilePathFromUrl (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
+    string dest = get_file_path_from_url (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
     //  Q_ASSERT (!dest.isEmpty ());
     remote_root_file_info.rename (fileName, dest);
-    QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
+    QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
 }
 
 void FakeMoveReply.respond () {
-    setAttribute (Soup.Request.HttpStatusCodeAttribute, 201);
-    /* emit */ metaDataChanged ();
-    /* emit */ finished ();
+    set_attribute (Soup.Request.HttpStatusCodeAttribute, 201);
+    /* emit */ signal_meta_data_changed ();
+    /* emit */ signal_finished ();
 }
