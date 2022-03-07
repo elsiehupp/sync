@@ -36,13 +36,13 @@ class TestSelectiveSync : GLib.Object {
 
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
-        fake_folder.remote_modifier ().createDir ("A/newBigDir");
-        fake_folder.remote_modifier ().createDir ("A/newBigDir/subDir");
+        fake_folder.remote_modifier ().create_directory ("A/newBigDir");
+        fake_folder.remote_modifier ().create_directory ("A/newBigDir/subDir");
         fake_folder.remote_modifier ().insert ("A/newBigDir/subDir/bigFile", options.newBigFolderSizeLimit + 10);
         fake_folder.remote_modifier ().insert ("A/newBigDir/subDir/smallFile", 10);
 
-        fake_folder.remote_modifier ().createDir ("B/newSmallDir");
-        fake_folder.remote_modifier ().createDir ("B/newSmallDir/subDir");
+        fake_folder.remote_modifier ().create_directory ("B/newSmallDir");
+        fake_folder.remote_modifier ().create_directory ("B/newSmallDir/subDir");
         fake_folder.remote_modifier ().insert ("B/newSmallDir/subDir/smallFile", 10);
 
         // Because the test system don't do that automatically

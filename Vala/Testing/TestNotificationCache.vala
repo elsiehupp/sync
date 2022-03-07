@@ -6,7 +6,7 @@ class TestNotificationCache : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testContains_doesNotContainNotification_returnsFalse () {
+    private void testContains_doesNotContainNotification_returnsFalse () {
         Occ.NotificationCache notificationCache;
 
         //  QVERIFY (!notificationCache.contains ({ "Title", { "Message" } }));
@@ -15,7 +15,7 @@ class TestNotificationCache : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testContains_doesContainNotification_returnTrue () {
+    private void testContains_doesContainNotification_returnTrue () {
         Occ.NotificationCache notificationCache;
         const Occ.NotificationCache.Notification notification { "Title", "message" };
 
@@ -27,7 +27,7 @@ class TestNotificationCache : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testClear_doesContainNotification_clearNotifications () {
+    private void testClear_doesContainNotification_clearNotifications () {
         Occ.NotificationCache notificationCache;
         const Occ.NotificationCache.Notification notification { "Title", "message" };
 

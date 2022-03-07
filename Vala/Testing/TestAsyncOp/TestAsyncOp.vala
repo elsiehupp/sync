@@ -15,7 +15,7 @@ class TestAsyncOp : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void asyncUploadOperations () {
+    private void asyncUploadOperations () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } } });
         // Reduce max chunk size a bit so we get more chunks
@@ -31,7 +31,7 @@ class TestAsyncOp : GLib.Object {
         // The testcase consist of the `pollRequest` which will be called when the sync engine
         // calls the poll url.
         struct TestCase {
-            using PollRequest_t = std.function<Soup.Reply * (TestCase *, Soup.Request request)>;
+            delegate PollRequest_t = std.function<Soup.Reply * (TestCase *, Soup.Request request)>;
             PollRequest_t pollRequest;
             std.function<FileInfo * ()> perform = null;
         }
@@ -193,7 +193,6 @@ class TestAsyncOp : GLib.Object {
         //  QCOMPARE (nDELETE, 0);
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
-}
 
-QTEST_GUILESS_MAIN (TestAsyncOp)
-#include "testasyncop.moc"
+} // class TestAsyncOp
+} // namespace Testing

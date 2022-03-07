@@ -12,34 +12,41 @@ ContentLength has the corect size
 ***********************************************************/
 class BrokenFakeGetReply : FakeGetReply {
 
-    using FakeGetReply.FakeGetReply;
+    //  using FakeGetReply.FakeGetReply;
     public int fakeSize = STOP_AFTER;
 
     /***********************************************************
     ***********************************************************/
-    public int64 bytes_available () override {
-        if (aborted)
+    public override int64 bytes_available () {
+        if (aborted) {
             return 0;
+        }
         return std.min (size, fakeSize) + QIODevice.bytes_available (); // NOLINT : This is intended to simulare the brokeness
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public int64 read_data (char data, int64 maxlen) override {
-        int64 len = std.min (int64{ fakeSize }, maxlen);
+    public override int64 read_data (char data, int64 maxlen) {
+        int64 len = std.min ((int64) fakeSize, maxlen);
         std.fill_n (data, len, payload);
         size -= len;
         fakeSize -= len;
         return len;
     }
-}
 
-SyncFileItemPtr getItem (QSignalSpy spy, string path) {
-    for (GLib.List<GLib.Variant> args : spy) {
-        var item = args[0].value<SyncFileItemPtr> ();
-        if (item.destination () == path)
-            return item;
+
+    /***********************************************************
+    ***********************************************************/
+    SyncFileItemPtr getItem (QSignalSpy spy, string path) {
+        foreach (GLib.List<GLib.Variant> args in spy) {
+            var item = args[0].value<SyncFileItemPtr> ();
+            if (item.destination () == path) {
+                return item;
+            }
+        }
+        return {};
     }
-    return {};
-}
+
+} // class BrokenFakeGetReply
+} // namespace Testing

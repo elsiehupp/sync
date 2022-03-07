@@ -1083,7 +1083,7 @@ class TestSyncCfApi : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testEmptyFolderInOnlineOnlyRoot () {
+    private void testEmptyFolderInOnlineOnlyRoot () {
         FakeFolder fake_folder = new FakeFolder ( FileInfo ());
         setupVfs (fake_folder);
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
@@ -1151,7 +1151,7 @@ class TestSyncCfApi : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testOpeningOnlineFileTriggersDownload_data () {
+    private void testOpeningOnlineFileTriggersDownload_data () {
         QTest.addColumn<int> ("errorKind");
         QTest.newRow ("no error") + static_cast<int> (NoError);
         QTest.newRow ("400") << 400;
@@ -1166,7 +1166,7 @@ class TestSyncCfApi : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testOpeningOnlineFileTriggersDownload () {
+    private void testOpeningOnlineFileTriggersDownload () {
         //  QFETCH (int, errorKind);
 
         FakeFolder fake_folder = new FakeFolder ( FileInfo ());

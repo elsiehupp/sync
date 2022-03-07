@@ -15,7 +15,7 @@ namespace Testing {
 class TestLocalDiscovery : GLib.Object {
 
     // Check correct behavior when local discovery is partially drawn from the database
-    private on_ void testLocalDiscoveryStyle () {
+    private void testLocalDiscoveryStyle () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         LocalDiscoveryTracker tracker;
@@ -66,7 +66,7 @@ class TestLocalDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testLocalDiscoveryDecision () {
+    private void testLocalDiscoveryDecision () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var engine = fake_folder.sync_engine ();
 
@@ -109,7 +109,7 @@ class TestLocalDiscovery : GLib.Object {
 
     // Check whether item on_signal_success and item failure adjusts the
     // tracker correctly.
-    private on_ void testTrackerItemCompletion () {
+    private void testTrackerItemCompletion () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         LocalDiscoveryTracker tracker;
@@ -162,7 +162,7 @@ class TestLocalDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDirectoryAndSubDirectory () {
+    private void testDirectoryAndSubDirectory () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         fake_folder.local_modifier ().mkdir ("A/newDir");
@@ -182,7 +182,7 @@ class TestLocalDiscovery : GLib.Object {
     }
 
     // Tests the behavior of invalid filename detection
-    private on_ void testServerBlocklist () {
+    private void testServerBlocklist () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
@@ -203,7 +203,7 @@ class TestLocalDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testCreateFileWithTrailingSpaces_localAndRemoteTrimmedDoNotExist_renameAndUploadFile () {
+    private void testCreateFileWithTrailingSpaces_localAndRemoteTrimmedDoNotExist_renameAndUploadFile () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
         const string fileWithSpaces1 (" foo");
@@ -256,7 +256,7 @@ class TestLocalDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testCreateFileWithTrailingSpaces_localTrimmedDoesExist_dontRenameAndUploadFile () {
+    private void testCreateFileWithTrailingSpaces_localTrimmedDoesExist_dontRenameAndUploadFile () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
         const string fileWithSpaces (" foo");
@@ -276,7 +276,7 @@ class TestLocalDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testCreateFileWithTrailingSpaces_localTrimmedAlsoCreated_dontRenameAndUploadFile () {
+    private void testCreateFileWithTrailingSpaces_localTrimmedAlsoCreated_dontRenameAndUploadFile () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
         const string fileWithSpaces (" foo");

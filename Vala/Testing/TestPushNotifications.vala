@@ -51,7 +51,7 @@ class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testTryReconnect_capabilitesReportPushNotificationsAvailable_reconnectForEver () {
+    private void testTryReconnect_capabilitesReportPushNotificationsAvailable_reconnectForEver () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
         account.setPushNotificationsReconnectInterval (0);
@@ -67,7 +67,7 @@ class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testSetup_correctCredentials_authenticateAndEmitReady () {
+    private void testSetup_correctCredentials_authenticateAndEmitReady () {
         FakeWebSocketServer fakeServer;
         std.unique_ptr<QSignalSpy> filesChangedSpy;
         std.unique_ptr<QSignalSpy> notificationsChangedSpy;
@@ -90,7 +90,7 @@ class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testOnWebSocketTextMessageReceived_notifyFileMessage_emitFilesChanged () {
+    private void testOnWebSocketTextMessageReceived_notifyFileMessage_emitFilesChanged () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
         const var socket = fakeServer.authenticateAccount (account);
@@ -107,7 +107,7 @@ class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testOnWebSocketTextMessageReceived_notifyActivityMessage_emitNotification () {
+    private void testOnWebSocketTextMessageReceived_notifyActivityMessage_emitNotification () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
         const var socket = fakeServer.authenticateAccount (account);
@@ -126,7 +126,7 @@ class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testOnWebSocketTextMessageReceived_notifyNotificationMessage_emitNotification () {
+    private void testOnWebSocketTextMessageReceived_notifyNotificationMessage_emitNotification () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
         const var socket = fakeServer.authenticateAccount (account);
@@ -145,7 +145,7 @@ class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testOnWebSocketTextMessageReceived_invalidCredentialsMessage_reconnectWebSocket () {
+    private void testOnWebSocketTextMessageReceived_invalidCredentialsMessage_reconnectWebSocket () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
         // Need to set reconnect timer interval to zero for tests
@@ -170,7 +170,7 @@ class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testOnWebSocketError_connectionLost_emitConnectionLost () {
+    private void testOnWebSocketError_connectionLost_emitConnectionLost () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
         QSignalSpy connectionLostSpy (account.pushNotifications (), &Occ.PushNotifications.connectionLost);
@@ -191,7 +191,7 @@ class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testSetup_maxConnectionAttemptsReached_disablePushNotifications () {
+    private void testSetup_maxConnectionAttemptsReached_disablePushNotifications () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
         QSignalSpy pushNotificationsDisabledSpy (account.data (), &Occ.Account.pushNotificationsDisabled);
@@ -204,7 +204,7 @@ class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testOnWebSocketSslError_sslError_disablePushNotifications () {
+    private void testOnWebSocketSslError_sslError_disablePushNotifications () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
         QSignalSpy pushNotificationsDisabledSpy (account.data (), &Occ.Account.pushNotificationsDisabled);
@@ -223,7 +223,7 @@ class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testAccount_web_socket_connectionLost_emitNotificationsDisabled () {
+    private void testAccount_web_socket_connectionLost_emitNotificationsDisabled () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
         // Need to set reconnect timer interval to zero for tests
@@ -252,7 +252,7 @@ class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testAccount_web_socket_authenticationFailed_emitNotificationsDisabled () {
+    private void testAccount_web_socket_authenticationFailed_emitNotificationsDisabled () {
         FakeWebSocketServer fakeServer;
         var account = FakeWebSocketServer.createAccount ();
         account.setPushNotificationsReconnectInterval (0);
@@ -270,7 +270,7 @@ class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testPingTimeout_pingTimedOut_reconnect () {
+    private void testPingTimeout_pingTimedOut_reconnect () {
         FakeWebSocketServer fakeServer;
         std.unique_ptr<QSignalSpy> filesChangedSpy;
         std.unique_ptr<QSignalSpy> notificationsChangedSpy;

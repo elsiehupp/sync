@@ -18,13 +18,13 @@ class TestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testBasic () {
+    private void testBasic () {
         OAuthTestCase test;
         test.test ();
     }
 
     // Test for https://github.com/owncloud/client/pull/6057
-    private on_ void testCloseBrowserDontCrash () {
+    private void testCloseBrowserDontCrash () {
         struct Test : OAuthTestCase {
             Soup.Reply tokenReply (Soup.Operation operation, Soup.Request & request) override {
                 //  ASSERT (browserReply);
@@ -52,7 +52,7 @@ class TestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testRandomConnections () {
+    private void testRandomConnections () {
         // Test that we can send random garbage to the litening socket and it does not prevent the connection
         struct Test : OAuthTestCase {
             Soup.Reply createBrowserReply (Soup.Request request) override {
@@ -104,7 +104,7 @@ class TestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testTokenUrlHasRedirect () {
+    private void testTokenUrlHasRedirect () {
         struct Test : OAuthTestCase {
             int redirectsDone = 0;
             Soup.Reply tokenReply (Soup.Operation operation, Soup.Request & request) override {

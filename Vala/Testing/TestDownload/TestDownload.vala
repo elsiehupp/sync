@@ -12,14 +12,13 @@ using Occ;
 
 namespace Testing {
 
-const int64 STOP_AFTER = 3'123'668;
-
-
 class TestDownload : GLib.Object {
+
+    const int64 STOP_AFTER = 3123668;
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testResume () {
+    private void testResume () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().setIgnoreHiddenFiles (true);
         QSignalSpy completeSpy (&fake_folder.sync_engine (), SIGNAL (itemCompleted (SyncFileItemPtr &)));
@@ -55,26 +54,26 @@ class TestDownload : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testErrorMessage () {
+    private void testErrorMessage () {
         // This test's main goal is to test that the error string from the server is shown in the UI
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().setIgnoreHiddenFiles (true);
-        QSignalSpy completeSpy (&fake_folder.sync_engine (), SIGNAL (itemCompleted (SyncFileItemPtr &)));
-        var size = 3'500'000;
+        QSignalSpy completeSpy = new QSignalSpy (&fake_folder.sync_engine (), SIGNAL (itemCompleted (SyncFileItemPtr &)));
+        var size = 3500000;
         fake_folder.remote_modifier ().insert ("A/broken", size);
 
-        GLib.ByteArray serverMessage = "The file was not downloaded because the tests wants so!";
+        GLib.ByteArray serverMessage = = new GLib.ByteArray ("The file was not downloaded because the tests wants so!");
 
         // First, download only the first 3 MB of the file
-        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
+        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) Soup.Reply * => {
             if (operation == Soup.GetOperation && request.url ().path ().endsWith ("A/broken")) {
                 return new FakeErrorReply (operation, request, this, 400,
                     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-                    "<d:error xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\">\n"
-                    "<s:exception>Sabre\\DAV\\Exception\\Forbidden</s:exception>\n"
-                    "<s:message>"+serverMessage+"</s:message>\n"
-                    "</d:error>");
+                    + "<d:error xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\">\n"
+                    + "<s:exception>Sabre\\DAV\\Exception\\Forbidden</s:exception>\n"
+                    + "<s:message>" + serverMessage + "</s:message>\n"
+                    + "</d:error>");
             }
             return null;
         });
@@ -90,19 +89,19 @@ class TestDownload : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void serverMaintenence () {
+    private void serverMaintenence () {
         // Server in maintenance must on_signal_abort the sync.
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().insert ("A/broken");
-        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
+        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) Soup.Reply * => {
             if (operation == Soup.GetOperation) {
                 return new FakeErrorReply (operation, request, this, 503,
                     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-                    "<d:error xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\">\n"
-                    "<s:exception>Sabre\\DAV\\Exception\\ServiceUnavailable</s:exception>\n"
-                    "<s:message>System in maintenance mode.</s:message>\n"
-                    "</d:error>");
+                    + "<d:error xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\">\n"
+                    + "<s:exception>Sabre\\DAV\\Exception\\ServiceUnavailable</s:exception>\n"
+                    + "<s:message>System in maintenance mode.</s:message>\n"
+                    + "</d:error>");
             }
             return null;
         });
@@ -117,7 +116,7 @@ class TestDownload : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testMoveFailsInAConflict () {
+    private void testMoveFailsInAConflict () {
         // Test for https://github.com/owncloud/client/issues/7015
         // We want to test the case in which the renaming of the original to the conflict file succeeds,
         // but renaming the temporary file fails.
@@ -132,9 +131,9 @@ class TestDownload : GLib.Object {
         bool propConnected = false;
         string conflictFile;
         var transProgress = connect (&fake_folder.sync_engine (), &SyncEngine.transmissionProgress,
-                                     [&] (ProgressInfo pi) {
+                                     [] (ProgressInfo progress_info) => {
             var propagator = fake_folder.sync_engine ().getPropagator ();
-            if (pi.status () != ProgressInfo.Status.PROPAGATION || propConnected || !propagator)
+            if (progress_info.status () != ProgressInfo.Status.PROPAGATION || propConnected || !propagator)
                 return;
             propConnected = true;
             connect (propagator.data (), &OwncloudPropagator.touchedFile, [&] (string s) {
@@ -177,7 +176,7 @@ class TestDownload : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testHttp2Resend () {
+    private void testHttp2Resend () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().insert ("A/resendme", 300);
 

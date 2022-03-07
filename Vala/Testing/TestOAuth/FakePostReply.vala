@@ -59,7 +59,7 @@ class FakePostReply : Soup.Reply {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
         /* emit */ signal_meta_data_changed ();
         if (bytes_available ())
-            /* emit */ readyRead ();
+            /* emit */ signal_ready_read ();
         /* emit */ signal_finished ();
     }
 

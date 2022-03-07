@@ -120,7 +120,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testACreate () { // create a new file
+    private void testACreate () { // create a new file
         string file (this.rootPath + "/foo.txt");
         string cmd;
         cmd = string ("echo \"xyz\" > %1").arg (file);
@@ -133,7 +133,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testATouch () { // touch an existing file.
+    private void testATouch () { // touch an existing file.
         string file (this.rootPath + "/a1/random.bin");
         touch (file);
         //  QVERIFY (waitForPathChanged (file));
@@ -142,7 +142,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testMove3LevelDirWithFile () {
+    private void testMove3LevelDirWithFile () {
         string file (this.rootPath + "/a0/b/c/empty.txt");
         mkdir (this.rootPath + "/a0");
         mkdir (this.rootPath + "/a0/b");
@@ -155,7 +155,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testCreateADir () {
+    private void testCreateADir () {
         string file (this.rootPath+"/a1/b1/new_dir");
         mkdir (file);
         //  QVERIFY (waitForPathChanged (file));
@@ -169,7 +169,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testRemoveADir () {
+    private void testRemoveADir () {
         string file (this.rootPath+"/a1/b3/c3");
         rmdir (file);
         //  QVERIFY (waitForPathChanged (file));
@@ -178,7 +178,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testRemoveAFile () {
+    private void testRemoveAFile () {
         string file (this.rootPath+"/a1/b2/todelete.bin");
         //  QVERIFY (GLib.File.exists (file));
         rm (file);
@@ -190,7 +190,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testRenameAFile () {
+    private void testRenameAFile () {
         string file1 (this.rootPath+"/a2/renamefile");
         string file2 (this.rootPath+"/a2/renamefile.renamed");
         //  QVERIFY (GLib.File.exists (file1));
@@ -204,7 +204,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testMoveAFile () {
+    private void testMoveAFile () {
         string old_file (this.rootPath+"/a1/movefile");
         string new_file (this.rootPath+"/a2/movefile.renamed");
         //  QVERIFY (GLib.File.exists (old_file));
@@ -218,7 +218,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testRenameDirectorySameBase () {
+    private void testRenameDirectorySameBase () {
         string old_file (this.rootPath+"/a1/b1");
         string new_file (this.rootPath+"/a1/brename");
         //  QVERIFY (GLib.File.exists (old_file));
@@ -242,7 +242,7 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testRenameDirectoryDifferentBase () {
+    private void testRenameDirectoryDifferentBase () {
         string old_file (this.rootPath+"/a1/brename");
         string new_file (this.rootPath+"/bren");
         //  QVERIFY (GLib.File.exists (old_file));

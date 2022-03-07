@@ -57,8 +57,8 @@ class FakeErrorReply : FakeReply {
 
 void FakeErrorReply.respond () {
     /* emit */ signal_meta_data_changed ();
-    /* emit */ readyRead ();
-    // finishing can come strictly after readyRead was called
+    /* emit */ signal_ready_read ();
+    // finishing can come strictly after signal_ready_read was called
     QTimer.singleShot (5, this, &FakeErrorReply.on_signal_finished);
 }
 

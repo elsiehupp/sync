@@ -11,12 +11,6 @@ using Occ;
 
 namespace Testing {
 
-SyncJournalFileRecord journalRecord (FakeFolder folder, GLib.ByteArray path) {
-    SyncJournalFileRecord record;
-    folder.sync_journal ().getFileRecord (path, record);
-    return record;
-}
-
 class TestBlocklist : GLib.Object {
 
     /***********************************************************
@@ -174,7 +168,12 @@ class TestBlocklist : GLib.Object {
 
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
-}
 
-QTEST_GUILESS_MAIN (TestBlocklist)
-#include "testblocklist.moc"
+    SyncJournalFileRecord journalRecord (FakeFolder folder, GLib.ByteArray path) {
+        SyncJournalFileRecord record;
+        folder.sync_journal ().getFileRecord (path, record);
+        return record;
+    }
+
+} // class TestBlocklist
+} // namespace Testing

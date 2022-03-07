@@ -14,7 +14,7 @@ class TestFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testFolder () {
+    private void testFolder () {
         //  QFETCH (string, folder);
         //  QFETCH (string, expectedFolder);
         Folder f = new Folder ("alias", folder, "http://foo.bar.net");
@@ -25,7 +25,7 @@ class TestFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void on_test_folder_data () {
+    private void on_test_folder_data () {
         QTest.addColumn<string> ("folder");
         QTest.addColumn<string> ("expectedFolder");
 

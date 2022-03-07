@@ -10,29 +10,16 @@ class FakeReply : Soup.Reply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeReply (GLib.Object parent);
+    public FakeReply (GLib.Object parent) {
+        base (parent);
+        set_raw_header (QByteArrayLiteral ("Date"), GLib.DateTime.currentDateTimeUtc ().toString (Qt.RFC2822Date).toUtf8 ());
+    }
 
-
-    ~FakeReply () override;
 
     /***********************************************************
     Useful to be public for testing
     ***********************************************************/
-    using Soup.Reply.setRawHeader;
+    //  using Soup.Reply.set_raw_header;
 
-}
-}
-
-
-
-
-
-
-
-
-FakeReply.FakeReply (GLib.Object parent)
-    : Soup.Reply (parent) {
-    setRawHeader (QByteArrayLiteral ("Date"), GLib.DateTime.currentDateTimeUtc ().toString (Qt.RFC2822Date).toUtf8 ());
-}
-
-FakeReply.~FakeReply () = default;
+} // class FakeReply
+} // namespace Testing

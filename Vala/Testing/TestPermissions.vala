@@ -58,7 +58,7 @@ class TestPermissions : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void t7pl () {
+    private void t7pl () {
         FakeFolder fake_folder = new FakeFolder ( FileInfo ());
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
@@ -94,7 +94,7 @@ class TestPermissions : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
         assertCsyncJournalOk (fake_folder.sync_journal ());
-        qInfo ("Do some changes and see how they propagate");
+        GLib.info ("Do some changes and see how they propagate");
 
         //1. remove the file than cannot be removed
         //  (they should be recovered)
@@ -151,10 +151,10 @@ class TestPermissions : GLib.Object {
         //  QCOMPARE (current_local_state.find ("normalDirectory_PERM_CKDNV_/cannotBeModified_PERM_DVN_.data").size, cannotBeModifiedSize);
         //  QCOMPARE (current_local_state.find ("readonlyDirectory_PERM_M_/cannotBeModified_PERM_DVN_.data").size, cannotBeModifiedSize);
         // and conflict created
-        var c1 = findConflict (current_local_state, "normalDirectory_PERM_CKDNV_/cannotBeModified_PERM_DVN_.data");
+        var c1 = find_conflict (current_local_state, "normalDirectory_PERM_CKDNV_/cannotBeModified_PERM_DVN_.data");
         //  QVERIFY (c1);
         //  QCOMPARE (c1.size, cannotBeModifiedSize + 1);
-        var c2 = findConflict (current_local_state, "readonlyDirectory_PERM_M_/cannotBeModified_PERM_DVN_.data");
+        var c2 = find_conflict (current_local_state, "readonlyDirectory_PERM_M_/cannotBeModified_PERM_DVN_.data");
         //  QVERIFY (c2);
         //  QCOMPARE (c2.size, cannotBeModifiedSize + 1);
         // remove the conflicts for the next state comparison
@@ -195,7 +195,7 @@ class TestPermissions : GLib.Object {
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         //######################################################################
-        qInfo ( "remove the read only directory" );
+        GLib.info ( "remove the read only directory" );
         // . It must be recovered
         fake_folder.local_modifier ().remove ("readonlyDirectory_PERM_M_");
         applyPermissionsFromName (fake_folder.remote_modifier ());
@@ -216,7 +216,7 @@ class TestPermissions : GLib.Object {
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         //######################################################################
-        qInfo ( "move a directory in a outside read only folder" );
+        GLib.info ( "move a directory in a outside read only folder" );
 
         //Missing directory should be restored
         //new directory should be uploaded
@@ -244,7 +244,7 @@ class TestPermissions : GLib.Object {
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         //######################################################################
-        qInfo ( "rename a directory in a read only folder and move a directory to a read-only" );
+        GLib.info ( "rename a directory in a read only folder and move a directory to a read-only" );
 
         // do a sync to update the database
         applyPermissionsFromName (fake_folder.remote_modifier ());
@@ -289,7 +289,7 @@ class TestPermissions : GLib.Object {
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         //######################################################################
-        qInfo ( "multiple restores of a file create different conflict files" );
+        GLib.info ( "multiple restores of a file create different conflict files" );
 
         fake_folder.remote_modifier ().insert ("readonlyDirectory_PERM_M_/cannotBeModified_PERM_DVN_.data");
         applyPermissionsFromName (fake_folder.remote_modifier ());
@@ -314,7 +314,7 @@ class TestPermissions : GLib.Object {
         // there should be two conflict files
         current_local_state = fake_folder.current_local_state ();
         int count = 0;
-        while (var i = findConflict (current_local_state, "readonlyDirectory_PERM_M_/cannotBeModified_PERM_DVN_.data")) {
+        while (var i = find_conflict (current_local_state, "readonlyDirectory_PERM_M_/cannotBeModified_PERM_DVN_.data")) {
             //  QVERIFY ( (i.content_char == 's') || (i.content_char == 'd'));
             fake_folder.local_modifier ().remove (i.path ());
             current_local_state = fake_folder.current_local_state ();
@@ -334,7 +334,7 @@ class TestPermissions : GLib.Object {
     }
 
     // What happens if the source can't be moved or the target can't be created?
-    private on_ void testForbiddenMoves () {
+    private void testForbiddenMoves () {
         FakeFolder fake_folder = new FakeFolder (FileInfo{}};
 
         // Some of this test depends on the order of discovery. With threading
@@ -453,7 +453,7 @@ class TestPermissions : GLib.Object {
     }
 
     // Test for issue #7293
-    private on_ void testAllowedMoveForbiddenDelete () {
+    private void testAllowedMoveForbiddenDelete () {
          FakeFolder fake_folder = new FakeFolder (FileInfo{}};
 
         // Some of this test depends on the order of discovery. With threading

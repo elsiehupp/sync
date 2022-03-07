@@ -6,38 +6,34 @@ implied, as to its usefulness for any purpose.
 
 namespace Testing {
 
-struct ItemCompletedSpy : QSignalSpy {
-    ItemCompletedSpy (FakeFolder folder)
-        : QSignalSpy (&folder.sync_engine (), &Occ.SyncEngine.itemCompleted) {}
+class ItemCompletedSpy : QSignalSpy {
 
-    Occ.SyncFileItemPtr findItem (string path);
-
-    Occ.SyncFileItemPtr findItemWithExpectedRank (string path, int rank);
-}
-
-
-
-
-
-
-
-Occ.SyncFileItemPtr ItemCompletedSpy.findItem (string path) {
-    for (GLib.List<GLib.Variant> args : *this) {
-        var item = args[0].value<Occ.SyncFileItemPtr> ();
-        if (item.destination () == path)
-            return item;
+    ItemCompletedSpy (FakeFolder folder) {
+        base (&folder.sync_engine (), &Occ.SyncEngine.itemCompleted);
     }
-    return Occ.SyncFileItemPtr.create ();
-}
 
-Occ.SyncFileItemPtr ItemCompletedSpy.findItemWithExpectedRank (string path, int rank) {
-    //  Q_ASSERT (size () > rank);
-    //  Q_ASSERT (! (*this)[rank].isEmpty ());
 
-    var item = (*this)[rank][0].value<Occ.SyncFileItemPtr> ();
-    if (item.destination () == path) {
-        return item;
-    } else {
+
+    Occ.SyncFileItemPtr findItem (string path) {
+        foreach (GLib.List<GLib.Variant> args in *this) {
+            var item = args[0].value<Occ.SyncFileItemPtr> ();
+            if (item.destination () == path)
+                return item;
+        }
         return Occ.SyncFileItemPtr.create ();
     }
+
+    Occ.SyncFileItemPtr findItemWithExpectedRank (string path, int rank) {
+        //  Q_ASSERT (size () > rank);
+        //  Q_ASSERT (! (*this)[rank].isEmpty ());
+
+        var item = (*this)[rank][0].value<Occ.SyncFileItemPtr> ();
+        if (item.destination () == path) {
+            return item;
+        } else {
+            return Occ.SyncFileItemPtr.create ();
+        }
+    }
+
+}
 }

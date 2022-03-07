@@ -49,7 +49,7 @@ srcs = files([
     'TestAsyncOp/FakeAsyncReply.vala',
     'TestAsyncOp/TestAsyncOp.vala',
 
-    'TestBlacklist.vala',
+    'TestBlocklist.vala',
     'TestCapabilities.vala',
     'TestChecksumValidator.vala',
     'TestChunkingNg.vala',

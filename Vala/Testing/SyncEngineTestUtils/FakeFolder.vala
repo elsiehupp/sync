@@ -317,11 +317,11 @@ static FileInfo findOrCreateDirs (FileInfo base, PathComponents components) {
     var childName = components.pathRoot ();
     var it = base.children.find (childName);
     if (it != base.children.end ()) {
-        return findOrCreateDirs (*it, components.subComponents ());
+        return findOrCreateDirs (*it, components.sub_components ());
     }
     var newDir = base.children[childName] = FileInfo ( childName };
     newDir.parentPath = base.path ();
-    return findOrCreateDirs (newDir, components.subComponents ());
+    return findOrCreateDirs (newDir, components.sub_components ());
 }
 
 FileInfo FakeFolder.database_state () {

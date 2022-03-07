@@ -15,7 +15,7 @@ class TestDatabaseError : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDatabaseError () {
+    private void testDatabaseError () {
         /* This test will make many iteration, at each iteration, the iᵗʰ database access will fail.
          * The test ensure that if there is a failure, the next sync recovers. And if there was
          * no error, then everything was sync'ed properly.
@@ -23,7 +23,7 @@ class TestDatabaseError : GLib.Object {
 
         FileInfo finalState;
         for (int count = 0; true; ++count) {
-            qInfo ("Starting Iteration" + count;
+            GLib.info ("Starting Iteration " + count);
 
             FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
@@ -47,7 +47,7 @@ class TestDatabaseError : GLib.Object {
             // run the sync
             bool result = fake_folder.sync_once ();
 
-            qInfo ("Result of iteration" + count + "was" + result;
+            GLib.info ("Result of iteration " + count + " was " + result);
 
             if (fake_folder.sync_journal ().autotestFailCounter >= 0) {
                 // No error was thrown, we are on_signal_finished
@@ -72,7 +72,6 @@ class TestDatabaseError : GLib.Object {
             }
         }
     }
-}
 
-QTEST_GUILESS_MAIN (TestDatabaseError)
-#include "testdatabaseerror.moc"
+} // class TestDatabaseError
+} // namespace Testing

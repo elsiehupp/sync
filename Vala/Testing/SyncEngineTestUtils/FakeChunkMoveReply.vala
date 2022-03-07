@@ -83,9 +83,9 @@ class FakeChunkMoveReply : FakeReply {
     ***********************************************************/
     public virtual void respond () {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 201);
-        setRawHeader ("OC-ETag", file_info.etag);
-        setRawHeader ("ETag", file_info.etag);
-        setRawHeader ("OC-FileId", file_info.file_identifier);
+        set_raw_header ("OC-ETag", file_info.etag);
+        set_raw_header ("ETag", file_info.etag);
+        set_raw_header ("OC-FileId", file_info.file_identifier);
         /* emit */ signal_meta_data_changed ();
         /* emit */ signal_finished ();
     }

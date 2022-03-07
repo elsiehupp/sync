@@ -55,7 +55,7 @@ static var check_dir_traversal (char path) {
     return excludedFiles.traversalPatternMatch (path, ItemTypeDirectory);
 }
 
-private on_ void testFun () {
+private void testFun () {
     ExcludedFiles excluded;
     bool excludeHidden = true;
     bool keepHidden = false;
@@ -79,7 +79,7 @@ private on_ void testFun () {
     //  QVERIFY (excluded.isExcluded ("/a/#b#", "/a", keepHidden));
 }
 
-private on_ void check_csync_exclude_add () {
+private void check_csync_exclude_add () {
     up ();
     excludedFiles.addManualExclude ("/tmp/check_csync1/*");
     //  QCOMPARE (check_file_full ("/tmp/check_csync1/foo"), CSYNC_FILE_EXCLUDE_LIST);
@@ -96,7 +96,7 @@ private on_ void check_csync_exclude_add () {
     //  QVERIFY (!excludedFiles.fullTraversalRegexFile["/"].pattern ().contains ("foo"));
 }
 
-private on_ void check_csync_exclude_add_per_dir () {
+private void check_csync_exclude_add_per_dir () {
     up ();
     excludedFiles.addManualExclude ("*", "/tmp/check_csync1/");
     //  QCOMPARE (check_file_full ("/tmp/check_csync1/foo"), CSYNC_FILE_EXCLUDE_LIST);
@@ -112,7 +112,7 @@ private on_ void check_csync_exclude_add_per_dir () {
     //  QVERIFY (!excludedFiles.bnameTraversalRegexFile["/tmp/check_csync1/"].pattern ().contains ("foo"));
 }
 
-private on_ void check_csync_excluded () {
+private void check_csync_excluded () {
     setup_init ();
     //  QCOMPARE (check_file_full (""), CSYNC_NOT_EXCLUDED);
     //  QCOMPARE (check_file_full ("/"), CSYNC_NOT_EXCLUDED);
@@ -217,7 +217,7 @@ private on_ void check_csync_excluded () {
     //  QCOMPARE (check_file_full ("c [d]"), CSYNC_FILE_EXCLUDE_LIST);
 }
 
-private on_ void check_csync_excluded_per_dir () {
+private void check_csync_excluded_per_dir () {
     const var temporary_directory = QStandardPaths.writableLocation (QStandardPaths.TempLocation);
     excludedFiles.on_signal_reset (new ExcludedFiles (temporary_directory + "/"));
     excludedFiles.setWildcardsMatchSlash (false);
@@ -255,7 +255,7 @@ private on_ void check_csync_excluded_per_dir () {
     //  QCOMPARE (check_file_full (GLib.ByteArray (foo_directory.toUtf8 () + "/baz")), CSYNC_NOT_EXCLUDED);
 }
 
-private on_ void check_csync_excluded_traversal_per_dir () {
+private void check_csync_excluded_traversal_per_dir () {
     setup_init ();
     //  QCOMPARE (check_file_traversal ("/"), CSYNC_NOT_EXCLUDED);
 
@@ -265,7 +265,7 @@ private on_ void check_csync_excluded_traversal_per_dir () {
     //  QCOMPARE (check_file_traversal ("latex/songbook/my_manuscript.tex.tmp"), CSYNC_FILE_EXCLUDE_LIST);
 }
 
-private on_ void check_csync_excluded_traversal () {
+private void check_csync_excluded_traversal () {
     setup_init ();
     //  QCOMPARE (check_file_traversal (""), CSYNC_NOT_EXCLUDED);
     //  QCOMPARE (check_file_traversal ("/"), CSYNC_NOT_EXCLUDED);
@@ -408,7 +408,7 @@ private on_ void check_csync_excluded_traversal () {
     //  QCOMPARE (check_file_traversal ("c [d]"), CSYNC_FILE_EXCLUDE_LIST);
 }
 
-private on_ void check_csync_dir_only () {
+private void check_csync_dir_only () {
     up ();
     excludedFiles.addManualExclude ("filedir");
     excludedFiles.addManualExclude ("directory/");
@@ -433,7 +433,7 @@ private on_ void check_csync_dir_only () {
     //  QCOMPARE (check_file_full ("directory/foo"), CSYNC_FILE_EXCLUDE_LIST);
 }
 
-private on_ void check_csync_pathes () {
+private void check_csync_pathes () {
     setup_init ();
     excludedFiles.addManualExclude ("/exclude");
     excludedFiles.reloadExcludeFiles ();
@@ -468,7 +468,7 @@ private on_ void check_csync_pathes () {
     //  QCOMPARE (check_dir_full ("/excludepath/withsubdir/foo"), CSYNC_FILE_EXCLUDE_LIST);
 }
 
-private on_ void check_csync_wildcards () {
+private void check_csync_wildcards () {
     up ();
     excludedFiles.addManualExclude ("a/foo*bar");
     excludedFiles.addManualExclude ("b/foo*bar*");
@@ -510,7 +510,7 @@ private on_ void check_csync_wildcards () {
     //  QCOMPARE (check_file_traversal ("e/foo/barA"), CSYNC_FILE_EXCLUDE_LIST);
 }
 
-private on_ void check_csync_regex_translation () {
+private void check_csync_regex_translation () {
     up ();
     GLib.ByteArray storage;
     var translate = [&storage] (char pattern) {
@@ -530,7 +530,7 @@ private on_ void check_csync_regex_translation () {
     //  QCOMPARE (translate ("?𠜎?"), "[^/]\\𠜎[^/]"); // 𠜎 is 4-byte utf8
 }
 
-private on_ void check_csync_bname_trigger () {
+private void check_csync_bname_trigger () {
     up ();
     bool wildcardsMatchSlash = false;
     GLib.ByteArray storage;
@@ -561,7 +561,7 @@ private on_ void check_csync_bname_trigger () {
     //  QCOMPARE (translate ("a/abc*/foo*"), "foo*");
 }
 
-private on_ void check_csync_is_windows_reserved_word () {
+private void check_csync_is_windows_reserved_word () {
     var csync_is_windows_reserved_word = [] (char fn) {
         string s = string.fromLatin1 (fn);
         extern bool csync_is_windows_reserved_word (QStringRef filename);
@@ -602,7 +602,7 @@ private on_ void check_csync_is_windows_reserved_word () {
 }
 
     /* QT_ENABLE_REGEXP_JIT=0 to get slower results :-) */
-    private on_ void check_csync_excluded_performance1 () {
+    private void check_csync_excluded_performance1 () {
         setup_init ();
         const int N = 1000;
         int totalRc = 0;
@@ -620,7 +620,7 @@ private on_ void check_csync_is_windows_reserved_word () {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void check_csync_excluded_performance2 () {
+    private void check_csync_excluded_performance2 () {
         const int N = 1000;
         int totalRc = 0;
 
@@ -636,7 +636,7 @@ private on_ void check_csync_is_windows_reserved_word () {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void check_csync_exclude_expand_escapes () {
+    private void check_csync_exclude_expand_escapes () {
         extern void csync_exclude_expand_escapes (GLib.ByteArray input);
 
         GLib.ByteArray line = R" (keep \' \" \? \\ \a \b \f \n \r \t \v \z \#)";
@@ -655,7 +655,7 @@ private on_ void check_csync_is_windows_reserved_word () {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void check_version_directive () {
+    private void check_version_directive () {
         ExcludedFiles excludes;
         excludes.setClientVersion (ExcludedFiles.Version (2, 5, 0));
 
@@ -669,7 +669,7 @@ private on_ void check_csync_is_windows_reserved_word () {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testAddExcludeFilePath_addSameFilePath_listSizeDoesNotIncrease () {
+    private void testAddExcludeFilePath_addSameFilePath_listSizeDoesNotIncrease () {
         excludedFiles.on_signal_reset (new ExcludedFiles ());
         const var filePath = string ("exclude/.sync-exclude.lst");
 
@@ -682,7 +682,7 @@ private on_ void check_csync_is_windows_reserved_word () {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testAddExcludeFilePath_addDifferentFilePaths_listSizeIncrease () {
+    private void testAddExcludeFilePath_addDifferentFilePaths_listSizeIncrease () {
         excludedFiles.on_signal_reset (new ExcludedFiles ());
 
         const var filePath1 = string ("exclude1/.sync-exclude.lst");
@@ -697,7 +697,7 @@ private on_ void check_csync_is_windows_reserved_word () {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testAddExcludeFilePath_addDefaultExcludeFile_returnCorrectMap () {
+    private void testAddExcludeFilePath_addDefaultExcludeFile_returnCorrectMap () {
         const string basePath ("syncFolder/");
         const string folder1 ("syncFolder/folder1/");
         const string folder2 (folder1 + "folder2/");
@@ -720,7 +720,7 @@ private on_ void check_csync_is_windows_reserved_word () {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testReloadExcludeFiles_fileDoesNotExist_returnFalse () {
+    private void testReloadExcludeFiles_fileDoesNotExist_returnFalse () {
         excludedFiles.on_signal_reset (new ExcludedFiles ());
         const string nonExistingFile ("directory/.sync-exclude.lst");
         excludedFiles.addExcludeFilePath (nonExistingFile);
@@ -731,7 +731,7 @@ private on_ void check_csync_is_windows_reserved_word () {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testReloadExcludeFiles_fileExists_returnTrue () {
+    private void testReloadExcludeFiles_fileExists_returnTrue () {
         const var temporary_directory = QStandardPaths.writableLocation (QStandardPaths.TempLocation);
         excludedFiles.on_signal_reset (new ExcludedFiles (temporary_directory + "/"));
 

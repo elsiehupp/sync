@@ -10,51 +10,53 @@ class PathComponents : string[] {
 
     /***********************************************************
     ***********************************************************/
-    public PathComponents (char path);
+    public PathComponents (char path) {
+        PathComponents (string.fromUtf8 (path))
+    }
 
     /***********************************************************
     ***********************************************************/
-    public 
+    public PathComponents (string path) {
+        string[] { path.split ('/', Qt.SkipEmptyParts) }
+    }
 
     /***********************************************************
     ***********************************************************/
-    public 
+    public PathComponents (string[] path_components) {
+        string[] { path_components }
+    }
 
     /***********************************************************
     ***********************************************************/
-    public PathComponents (string[] pathComponent
+    public PathComponents parentDirComponents () {
+        return PathComponents ( mid (0, size () - 1));
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public PathComponents parentDirComponents ();
+    public PathComponents sub_components () & {
+        return new PathComponents ( mid (1));
+    }
 
+    /***********************************************************
+    ***********************************************************/
+    public PathComponents sub_components () && {
+        remove_first ();
+        return std.move (*this);
+    }
 
-    public PathComponents subComponents () &;
-    public PathComponents subComponents () && { removeFirst (); return std.move (*this); }
-    public string pathRoot () { return first (); }
-    public string fileName () { return last (); }
-};
+    /***********************************************************
+    ***********************************************************/
+    public string pathRoot () {
+        return first ();
+    }
 
+    /***********************************************************
+    ***********************************************************/
+    public string fileName () {
+        return last ();
+    }
 
-
-
-
-PathComponents.PathComponents (char path)
-    : PathComponents ( string.fromUtf8 (path) } {
-}
-
-PathComponents.PathComponents (string path)
-    : string[] { path.split ('/', Qt.SkipEmptyParts) } {
-}
-
-PathComponents.PathComponents (string[] pathComponents)
-    : string[] { pathComponents } {
-}
-
-PathComponents PathComponents.parentDirComponents () {
-    return PathComponents ( mid (0, size () - 1));
-}
-
-PathComponents PathComponents.subComponents () & {
-    return PathComponents ( mid (1));
-}
+} // class PathComponents
+} // namespace Testing

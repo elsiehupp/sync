@@ -8,14 +8,13 @@ namespace Testing {
 
 class FakeAsyncReply : FakeReply {
 
-    GLib.ByteArray this.pollLocation;
-
+    GLib.ByteArray poll_location;
 
     /***********************************************************
     ***********************************************************/
-    public FakeAsyncReply (GLib.ByteArray pollLocation, Soup.Operation operation, Soup.Request request, GLib.Object parent)
-        : FakeReply (parent);
-        this.pollLocation (pollLocation) {
+    public FakeAsyncReply (GLib.ByteArray poll_location, Soup.Operation operation, Soup.Request request, GLib.Object parent) {
+        base (parent);
+        this.poll_location = poll_location;
         set_request (request);
         set_url (request.url ());
         set_operation (operation);
@@ -24,9 +23,12 @@ class FakeAsyncReply : FakeReply {
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     public void respond () {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 202);
-        setRawHeader ("OC-JobStatus-Location", this.pollLocation);
+        set_raw_header ("OC-JobStatus-Location", this.poll_location);
         /* emit */ signal_meta_data_changed ();
         /* emit */ signal_finished ();
     }
@@ -34,6 +36,16 @@ class FakeAsyncReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort () override {}
-    public int64 read_data (char *, int64) override ( return 0; }
-}
+    public override void on_signal_abort () {
+        return;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public override int64 read_data (char *data, int64 length) {
+        return 0;
+    }
+
+} // class FakeAsyncReply
+} // namespace Testing

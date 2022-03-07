@@ -12,37 +12,28 @@ using Occ;
 
 namespace Testing {
 
-static void changeAllFileId (FileInfo info) {
-    info.file_identifier = generateFileId ();
-    if (!info.isDir)
-        return;
-    info.etag = generateEtag ();
-    for (var child : info.children) {
-        changeAllFileId (child);
-    }
-}
-
 /***********************************************************
-This test ensure that the SyncEngine.aboutToRemoveAllFiles is correctly called and that when
-we the user choose to remove all files SyncJournalDb.clearFileTable makes works as expected
+This test ensure that the SyncEngine.aboutToRemoveAllFiles
+is correctly called and that when we the user choose to
+remove all files SyncJournalDb.clearFileTable makes works
+as expected
 ***********************************************************/
 class TestAllFilesDeleted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testAllFilesDeletedKeep_data () {
+    private void testAllFilesDeletedKeep_data () {
         QTest.addColumn<bool> ("deleteOnRemote");
         QTest.newRow ("local") + false;
         QTest.newRow ("remote") + true;
-
     }
 
 
     /***********************************************************
-     * In this test, all files are deleted in the client, or the server, and we simulate
-     * that the users press "keep"
-     */
-    private on_ void testAllFilesDeletedKeep () {
+    In this test, all files are deleted in the client, or the
+    server, and we simulate that the users press "keep"
+    ***********************************************************/
+    private void testAllFilesDeletedKeep () {
         //  QFETCH (bool, deleteOnRemote);
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ConfigFile config;
@@ -80,21 +71,21 @@ class TestAllFilesDeleted : GLib.Object {
         // The selective sync blocklist should be not have been deleted.
         bool ok = true;
         //  QCOMPARE (fake_folder.sync_engine ().journal ().getSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok),
-                 selectiveSyncBlockList);
+        //         selectiveSyncBlockList);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testAllFilesDeletedDelete_data () {
+    private void testAllFilesDeletedDelete_data () {
         testAllFilesDeletedKeep_data ();
     }
 
 
     /***********************************************************
-     * This test is like the previous one but we simulate that the user presses "delete"
-     */
-    private on_ void testAllFilesDeletedDelete () {
+    This test is like the previous one but we simulate that the user presses "delete"
+    ***********************************************************/
+    private void testAllFilesDeletedDelete () {
         //  QFETCH (bool, deleteOnRemote);
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
@@ -108,7 +99,7 @@ class TestAllFilesDeleted : GLib.Object {
             });
 
         var modifier = deleteOnRemote ? fake_folder.remote_modifier () : fake_folder.local_modifier ();
-        for (var s : fake_folder.current_remote_state ().children.keys ())
+        foreach (var s in fake_folder.current_remote_state ().children.keys ())
             modifier.remove (s);
 
         //  QVERIFY (fake_folder.sync_once ()); // Should succeed, and all files must then be deleted
@@ -127,12 +118,11 @@ class TestAllFilesDeleted : GLib.Object {
 
 
     /***********************************************************
+    This test make sure that we don't popup a file deleted
+    message if all the metadata have been updated (for example
+    when the server is upgraded or something)
     ***********************************************************/
-    private on_ void testNotDeleteMetaDataChange () {
-        /***********************************************************
-         * This test make sure that we don't popup a file deleted message if all the metadata have
-         * been updated (for example when the server is upgraded or something)
-         **/
+    private void testNotDeleteMetaDataChange () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         // We never remove all files.
@@ -140,7 +130,7 @@ class TestAllFilesDeleted : GLib.Object {
             [&] { QVERIFY (false); });
         //  QVERIFY (fake_folder.sync_once ());
 
-        for (var s : fake_folder.current_remote_state ().children.keys ())
+        foreach (var s in fake_folder.current_remote_state ().children.keys ())
             fake_folder.sync_journal ().avoidRenamesOnNextSync (s); // clears all the fileid and inodes.
         fake_folder.local_modifier ().remove ("A/a1");
         var expectedState = fake_folder.current_local_state ();
@@ -159,7 +149,7 @@ class TestAllFilesDeleted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testResetServer () {
+    private void testResetServer () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         int aboutToRemoveAllFilesCalled = 0;
@@ -193,7 +183,7 @@ class TestAllFilesDeleted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDataFingetPrint_data () {
+    private void testDataFingetPrint_data () {
         QTest.addColumn<bool> ("hasInitialFingerPrint");
         QTest.newRow ("initial finger print") + true;
         QTest.newRow ("no initial finger print") + false;
@@ -202,7 +192,7 @@ class TestAllFilesDeleted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDataFingetPrint () {
+    private void testDataFingetPrint () {
         //  QFETCH (bool, hasInitialFingerPrint);
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().set_contents ("C/c1", 'N');
@@ -262,7 +252,7 @@ class TestAllFilesDeleted : GLib.Object {
         var currentState = fake_folder.current_local_state ();
         // Altough the local file is kept as a conflict, the server file is downloaded
         //  QCOMPARE (currentState.find ("A/a1").content_char, 'O');
-        var conflict = findConflict (currentState, "A/a1");
+        var conflict = find_conflict (currentState, "A/a1");
         //  QVERIFY (conflict);
         //  QCOMPARE (conflict.content_char, 'W');
         fake_folder.local_modifier ().remove (conflict.path ());
@@ -271,7 +261,7 @@ class TestAllFilesDeleted : GLib.Object {
 
         // b2 has the new content (was not restored), since its mode time goes forward in time
         //  QCOMPARE (currentState.find ("B/b2").content_char, 'N');
-        conflict = findConflict (currentState, "B/b2");
+        conflict = find_conflict (currentState, "B/b2");
         //  QVERIFY (conflict); // Just to be sure, we kept the old file in a conflict
         //  QCOMPARE (conflict.content_char, 'W');
         fake_folder.local_modifier ().remove (conflict.path ());
@@ -286,7 +276,7 @@ class TestAllFilesDeleted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testSingleFileRenamed () {
+    private void testSingleFileRenamed () {
         FakeFolder fake_folder = new FakeFolder (FileInfo{}};
 
         int aboutToRemoveAllFilesCalled = 0;
@@ -313,7 +303,7 @@ class TestAllFilesDeleted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testSelectiveSyncNoPopup () {
+    private void testSelectiveSyncNoPopup () {
         // Unselecting all folder should not cause the popup to be shown
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
@@ -337,7 +327,17 @@ class TestAllFilesDeleted : GLib.Object {
         //  QCOMPARE (aboutToRemoveAllFilesCalled, 0); // But we did not show the popup
     }
 
-}
 
-QTEST_GUILESS_MAIN (TestAllFilesDeleted)
-#include "testallfilesdeleted.moc"
+    static void changeAllFileId (FileInfo info) {
+        info.file_identifier = generateFileId ();
+        if (!info.isDir) {
+            return;
+        }
+        info.etag = generateEtag ();
+        foreach (var child in info.children) {
+            changeAllFileId (child);
+        }
+    }
+
+} // class TestAllFilesDeleted
+} // namespace Testing

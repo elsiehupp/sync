@@ -36,12 +36,12 @@ string[] findConflicts (FileInfo directory) {
 }
 
 bool expectAndWipeConflict (FileModifier local, FileInfo state, string path) {
-    PathComponents pathComponents (path);
-    var base = state.find (pathComponents.parentDirComponents ());
+    PathComponents path_components (path);
+    var base = state.find (path_components.parentDirComponents ());
     if (!base)
         return false;
     for (var item : base.children) {
-        if (item.name.startsWith (pathComponents.fileName ()) && item.name.contains (" (conflicted copy")) {
+        if (item.name.startsWith (path_components.fileName ()) && item.name.contains (" (conflicted copy")) {
             local.remove (item.path ());
             return true;
         }
@@ -59,7 +59,7 @@ class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testNoUpload () {
+    private void testNoUpload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
@@ -83,7 +83,7 @@ class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testUploadAfterDownload () {
+    private void testUploadAfterDownload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
@@ -135,7 +135,7 @@ class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testSeparateUpload () {
+    private void testSeparateUpload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
@@ -205,7 +205,7 @@ class TestSyncConflict : GLib.Object {
     }
 
     // What happens if we download a conflict file? Is the metadata set up correctly?
-    private on_ void testDownloadingConflictFile () {
+    private void testDownloadingConflictFile () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
@@ -225,11 +225,11 @@ class TestSyncConflict : GLib.Object {
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
             if (operation == Soup.GetOperation) {
                 var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request, parent);
-                reply.setRawHeader ("OC-Conflict", "1");
-                reply.setRawHeader ("OC-ConflictBaseFileId", a2FileId);
-                reply.setRawHeader ("OC-ConflictBaseMtime", "1234");
-                reply.setRawHeader ("OC-ConflictBaseEtag", "etag");
-                reply.setRawHeader ("OC-ConflictInitialBasePath", "A/original");
+                reply.set_raw_header ("OC-Conflict", "1");
+                reply.set_raw_header ("OC-ConflictBaseFileId", a2FileId);
+                reply.set_raw_header ("OC-ConflictBaseMtime", "1234");
+                reply.set_raw_header ("OC-ConflictBaseEtag", "etag");
+                reply.set_raw_header ("OC-ConflictInitialBasePath", "A/original");
                 return reply;
             }
             return null;
@@ -246,7 +246,7 @@ class TestSyncConflict : GLib.Object {
     }
 
     // Check that conflict records are removed when the file is gone
-    private on_ void testConflictRecordRemoval1 () {
+    private void testConflictRecordRemoval1 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
@@ -273,7 +273,7 @@ class TestSyncConflict : GLib.Object {
     }
 
     // Same test, but with uploadConflictFiles == false
-    private on_ void testConflictRecordRemoval2 () {
+    private void testConflictRecordRemoval2 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "uploadConflictFiles", false } });
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
@@ -312,7 +312,7 @@ class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testConflictFileBaseName_data () {
+    private void testConflictFileBaseName_data () {
         QTest.addColumn<string> ("input");
         QTest.addColumn<string> ("output");
 
@@ -387,7 +387,7 @@ class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testConflictFileBaseName () {
+    private void testConflictFileBaseName () {
         //  QFETCH (string, input);
         //  QFETCH (string, output);
         //  QCOMPARE (Utility.conflictFileBaseNameFromPattern (input.toUtf8 ()), output.toUtf8 ());
@@ -396,7 +396,7 @@ class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testLocalDirRemoteFileConflict () {
+    private void testLocalDirRemoteFileConflict () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         ItemCompletedSpy completeSpy (fake_folder);
@@ -476,7 +476,7 @@ class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testLocalFileRemoteDirConflict () {
+    private void testLocalFileRemoteDirConflict () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         ItemCompletedSpy completeSpy (fake_folder);
@@ -530,7 +530,7 @@ class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testTypeConflictWithMove () {
+    private void testTypeConflictWithMove () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy completeSpy (fake_folder);
 
@@ -565,7 +565,7 @@ class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testTypeChange () {
+    private void testTypeChange () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy completeSpy (fake_folder);
 
@@ -604,7 +604,7 @@ class TestSyncConflict : GLib.Object {
     }
 
     // Test what happens if we remove entries both on the server, and locally
-    private on_ void testRemoveRemove () {
+    private void testRemoveRemove () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().remove ("A");
         fake_folder.local_modifier ().remove ("A");

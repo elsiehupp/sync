@@ -20,7 +20,7 @@ class TestIconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDrawSvgWithCustomFillColor () {
+    private void testDrawSvgWithCustomFillColor () {
         const string blackSvgDirPath{string{Occ.Theme.themePrefix} + "black"};
         const QDir blackSvgDir (blackSvgDirPath);
         const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
@@ -43,7 +43,7 @@ class TestIconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testCreateSvgPixmapWithCustomColor () {
+    private void testCreateSvgPixmapWithCustomColor () {
         const QDir blackSvgDir (string (string{Occ.Theme.themePrefix}) + "black");
         const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
 
@@ -64,7 +64,7 @@ class TestIconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testPixmapForBackground () {
+    private void testPixmapForBackground () {
         const QDir blackSvgDir (string (string{Occ.Theme.themePrefix}) + "black");
         const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
 

@@ -28,7 +28,7 @@ class HttpServer : QTcpServer {
         if (disabled)
             return;
         QTcpSocket* s = new QTcpSocket (this);
-        connect (s, SIGNAL (readyRead ()), this, SLOT (on_signal_read_client ()));
+        connect (s, SIGNAL (signal_ready_read ()), this, SLOT (on_signal_read_client ()));
         connect (s, SIGNAL (disconnected ()), this, SLOT (on_signal_discard_client ()));
         s.setSocketDescriptor (socket);
     }

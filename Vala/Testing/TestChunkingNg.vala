@@ -53,7 +53,7 @@ class TestChunkingNG : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testFileUpload () {
+    private void testFileUpload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
@@ -73,7 +73,7 @@ class TestChunkingNG : GLib.Object {
     }
 
     // Test resuming when there's a confusing chunk added
-    private on_ void testResume1 () {
+    private void testResume1 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 10 * 1000 * 1000; // 10 MB
@@ -109,7 +109,7 @@ class TestChunkingNG : GLib.Object {
     }
 
     // Test resuming when one of the uploaded chunks got removed
-    private on_ void testResume2 () {
+    private void testResume2 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
@@ -164,7 +164,7 @@ class TestChunkingNG : GLib.Object {
     }
 
     // Test resuming when all chunks are already present
-    private on_ void testResume3 () {
+    private void testResume3 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 30 * 1000 * 1000; // 30 MB
@@ -209,7 +209,7 @@ class TestChunkingNG : GLib.Object {
 
     // Test resuming (or rather not resuming!) for the error case of the sum of
     // chunk sizes being larger than the file size
-    private on_ void testResume4 () {
+    private void testResume4 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 30 * 1000 * 1000; // 30 MB
@@ -237,7 +237,7 @@ class TestChunkingNG : GLib.Object {
 
     // Check what happens when we on_signal_abort during the final MOVE and the
     // the final MOVE takes longer than the on_signal_abort-delay
-    private on_ void testLateAbortHard () {
+    private void testLateAbortHard () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
         const int size = 15 * 1000 * 1000; // 15 MB
@@ -316,7 +316,7 @@ class TestChunkingNG : GLib.Object {
 
     // Check what happens when we on_signal_abort during the final MOVE and the
     // the final MOVE is short enough for the on_signal_abort-delay to help
-    private on_ void testLateAbortRecoverable () {
+    private void testLateAbortRecoverable () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
         const int size = 15 * 1000 * 1000; // 15 MB
@@ -345,7 +345,7 @@ class TestChunkingNG : GLib.Object {
     }
 
     // We modify the file locally after it has been partially uploaded
-    private on_ void testRemoveStale1 () {
+    private void testRemoveStale1 () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
@@ -369,7 +369,7 @@ class TestChunkingNG : GLib.Object {
     }
 
     // We remove the file locally after it has been partially uploaded
-    private on_ void testRemoveStale2 () {
+    private void testRemoveStale2 () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
@@ -388,7 +388,7 @@ class TestChunkingNG : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testCreateConflictWhileSyncing () {
+    private void testCreateConflictWhileSyncing () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 10 * 1000 * 1000; // 10 MB
@@ -446,7 +446,7 @@ class TestChunkingNG : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testModifyLocalFileWhileUploading () {
+    private void testModifyLocalFileWhileUploading () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
@@ -487,7 +487,7 @@ class TestChunkingNG : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testResumeServerDeletedChunks () {
+    private void testResumeServerDeletedChunks () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
@@ -511,7 +511,7 @@ class TestChunkingNG : GLib.Object {
 
     // Check what happens when the connection is dropped on the PUT (non-chunking) or MOVE (chunking)
     // for on the issue #5106
-    private on_ void connectionDroppedBeforeEtagRecieved_data () {
+    private void connectionDroppedBeforeEtagRecieved_data () {
         QTest.addColumn<bool> ("chunking");
         QTest.newRow ("big file") + true;
         QTest.newRow ("small file") + false;
@@ -520,7 +520,7 @@ class TestChunkingNG : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void connectionDroppedBeforeEtagRecieved () {
+    private void connectionDroppedBeforeEtagRecieved () {
         //  QFETCH (bool, chunking);
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
@@ -578,7 +578,7 @@ class TestChunkingNG : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testPercentEncoding () {
+    private void testPercentEncoding () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 5 * 1000 * 1000;
@@ -595,7 +595,7 @@ class TestChunkingNG : GLib.Object {
     }
 
     // Test uploading large files (2.5GiB)
-    private on_ void testVeryBigFiles () {
+    private void testVeryBigFiles () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int64 size = 2.5 * 1024 * 1024 * 1024; // 2.5 GiB

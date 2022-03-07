@@ -18,7 +18,7 @@ class TestNextcloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testUpdateErrorFromSession () {
+    private void testUpdateErrorFromSession () {
         //OwncloudPropagator propagator (null, QLatin1String ("test1"), QLatin1String ("test2"), new ProgressDatabase);
         //  QVERIFY ( true );
     }
@@ -26,7 +26,7 @@ class TestNextcloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testTmpDownloadFileNameGeneration () {
+    private void testTmpDownloadFileNameGeneration () {
         string fn;
         // without directory
         for (int i = 1; i <= 1000; i++) {
@@ -65,7 +65,7 @@ class TestNextcloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testParseEtag () {
+    private void testParseEtag () {
         using Test = QPair<const char*, char>;
         GLib.List<Test> tests;
         tests.append (Test ("\"abcd\"", "abcd"));

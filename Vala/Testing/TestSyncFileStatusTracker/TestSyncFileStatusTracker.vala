@@ -26,7 +26,7 @@ class TestSyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void parentsGetSyncStatusUploadDownload () {
+    private void parentsGetSyncStatusUploadDownload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.local_modifier ().append_byte ("B/b1");
         fake_folder.remote_modifier ().append_byte ("C/c1");
@@ -60,7 +60,7 @@ class TestSyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void parentsGetSyncStatusNewFileUploadDownload () {
+    private void parentsGetSyncStatusNewFileUploadDownload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.local_modifier ().insert ("B/b0");
         fake_folder.remote_modifier ().insert ("C/c0");
@@ -94,7 +94,7 @@ class TestSyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void parentsGetSyncStatusNewDirDownload () {
+    private void parentsGetSyncStatusNewDirDownload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().mkdir ("D");
         fake_folder.remote_modifier ().insert ("D/d0");
@@ -125,7 +125,7 @@ class TestSyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void parentsGetSyncStatusNewDirUpload () {
+    private void parentsGetSyncStatusNewDirUpload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.local_modifier ().mkdir ("D");
         fake_folder.local_modifier ().insert ("D/d0");
@@ -156,7 +156,7 @@ class TestSyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void parentsGetSyncStatusDeleteUpDown () {
+    private void parentsGetSyncStatusDeleteUpDown () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().remove ("B/b1");
         fake_folder.local_modifier ().remove ("C/c1");
@@ -187,7 +187,7 @@ class TestSyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void warningStatusForExcludedFile () {
+    private void warningStatusForExcludedFile () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().excludedFiles ().addManualExclude ("A/a1");
         fake_folder.sync_engine ().excludedFiles ().addManualExclude ("B");
@@ -240,7 +240,7 @@ class TestSyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void warningStatusForExcludedFile_CasePreserving () {
+    private void warningStatusForExcludedFile_CasePreserving () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().excludedFiles ().addManualExclude ("B");
         fake_folder.server_error_paths ().append ("A/a1");
@@ -261,7 +261,7 @@ class TestSyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void parentsGetWarningStatusForError () {
+    private void parentsGetWarningStatusForError () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.server_error_paths ().append ("A/a1");
         fake_folder.server_error_paths ().append ("B/b0");
@@ -364,7 +364,7 @@ class TestSyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void parentsGetWarningStatusForError_SibblingStartsWithPath () {
+    private void parentsGetWarningStatusForError_SibblingStartsWithPath () {
         // A is a parent of A/a1, but A/a is not even if it's a substring of A/a1
         FakeFolder fake_folder = new FakeFolder ({string{},{ { "A", { { "a", 4}, { "a1", 4}
             }}}}};
@@ -391,7 +391,7 @@ class TestSyncFileStatusTracker : GLib.Object {
     // Even for status pushes immediately following each other, macOS
     // can sometimes have 1s delays between updates, so make sure that
     // children are marked as OK before their parents do.
-    private on_ void childOKEmittedBeforeParent () {
+    private void childOKEmittedBeforeParent () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.local_modifier ().append_byte ("B/b1");
         fake_folder.remote_modifier ().append_byte ("C/c1");
@@ -413,7 +413,7 @@ class TestSyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void sharedStatus () {
+    private void sharedStatus () {
         SyncFileStatus sharedUpToDateStatus (SyncFileStatus.StatusUpToDate);
         sharedUpToDateStatus.setShared (true);
 
@@ -454,7 +454,7 @@ class TestSyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void renameError () {
+    private void renameError () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.server_error_paths ().append ("A/a1");
         fake_folder.local_modifier ().rename ("A/a1", "A/a1m");

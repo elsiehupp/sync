@@ -14,7 +14,7 @@ class TestCookies : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testCookies () {
+    private void testCookies () {
         QTemporaryDir tmp;
         const string nonexistingPath = tmp.filePath ("someNonexistingDir/test.db");
         QNetworkCookie cookieA = QNetworkCookie ("foo", "bar");
@@ -36,6 +36,4 @@ class TestCookies : GLib.Object {
     }
 
 }
-
-QTEST_APPLESS_MAIN (TestCookies)
-#include "testcookies.moc"
+}

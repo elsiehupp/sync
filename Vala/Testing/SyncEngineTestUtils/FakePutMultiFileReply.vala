@@ -123,7 +123,7 @@ void FakePutMultiFileReply.respond () {
 
     setFinished (true);
     if (bytes_available ()) {
-        /* emit */ readyRead ();
+        /* emit */ signal_ready_read ();
     }
 
     /* emit */ signal_meta_data_changed ();

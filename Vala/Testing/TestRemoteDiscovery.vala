@@ -46,7 +46,7 @@ class TestRemoteDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testRemoteDiscoveryError_data () {
+    private void testRemoteDiscoveryError_data () {
         qRegisterMetaType<ErrorCategory> ();
         QTest.addColumn<int> ("errorKind");
         QTest.addColumn<string> ("expectedErrorString");
@@ -67,7 +67,7 @@ class TestRemoteDiscovery : GLib.Object {
     }
 
     // Check what happens when there is an error.
-    private on_ void testRemoteDiscoveryError () {
+    private void testRemoteDiscoveryError () {
         //  QFETCH (int, errorKind);
         //  QFETCH (string, expectedErrorString);
         //  QFETCH (bool, syncSucceeds);
@@ -138,7 +138,7 @@ class TestRemoteDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testMissingData () {
+    private void testMissingData () {
         FakeFolder fake_folder = new FakeFolder ( FileInfo ());
         fake_folder.remote_modifier ().insert ("good");
         fake_folder.remote_modifier ().insert ("noetag");

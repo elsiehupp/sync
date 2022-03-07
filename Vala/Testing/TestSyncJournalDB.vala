@@ -45,7 +45,7 @@ class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testFileRecord () {
+    private void testFileRecord () {
         SyncJournalFileRecord record;
         //  QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("nonexistant"), record));
         //  QVERIFY (!record.isValid ());
@@ -94,7 +94,7 @@ class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testFileRecordChecksum () { {// Try with and without a checksum
+    private void testFileRecordChecksum () { {// Try with and without a checksum
         {
             SyncJournalFileRecord record;
             record.path = "foo-checksum";
@@ -132,7 +132,7 @@ class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDownloadInfo () {
+    private void testDownloadInfo () {
         using Info = SyncJournalDb.DownloadInfo;
         Info record = this.database.getDownloadInfo ("nonexistant");
         //  QVERIFY (!record.valid);
@@ -154,7 +154,7 @@ class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testUploadInfo () {
+    private void testUploadInfo () {
         using Info = SyncJournalDb.UploadInfo;
         Info record = this.database.getUploadInfo ("nonexistant");
         //  QVERIFY (!record.valid);
@@ -178,7 +178,7 @@ class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testNumericId () {
+    private void testNumericId () {
         SyncJournalFileRecord record;
 
         // Typical 8-digit padded identifier
@@ -193,7 +193,7 @@ class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testConflictRecord () {
+    private void testConflictRecord () {
         ConflictRecord record;
         record.path = "abc";
         record.baseFileId = "def";
@@ -217,7 +217,7 @@ class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testAvoidReadFromDbOnNextSync () {
+    private void testAvoidReadFromDbOnNextSync () {
         var invalidEtag = GLib.ByteArray ("this.invalid_");
         var initialEtag = GLib.ByteArray ("etag");
         var makeEntry = [&] (GLib.ByteArray path, ItemType type) {
@@ -285,7 +285,7 @@ class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testRecursiveDelete () {
+    private void testRecursiveDelete () {
         var makeEntry = [&] (GLib.ByteArray path) {
             SyncJournalFileRecord record;
             record.path = path;
@@ -338,7 +338,7 @@ class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testPinState () {
+    private void testPinState () {
         var make = [&] (GLib.ByteArray path, PinState state) {
             this.database.internalPinStates ().setForPath (path, state);
             var pinState = this.database.internalPinStates ().rawForPath (path);

@@ -6,16 +6,23 @@ implied, as to its usefulness for any purpose.
 
 namespace Testing {
 
-class FileModifier {
+abstract class FileModifier {
 
     /***********************************************************
     ***********************************************************/
-    public virtual ~FileModifier () = default;
-    public virtual void remove (string relative_path);
-    public virtual void insert (string relative_path, int64 size = 64, char content_char = 'W');
-    public virtual void set_contents (string relative_path, char content_char);
-    public virtual void append_byte (string relative_path);
-    public virtual void mkdir (string relative_path);
-    public virtual void rename (string relative_path, string relativeDestinationDirectory);
-    public virtual void set_modification_time (string relative_path, GLib.DateTime modification_time);
-};
+    public abstract void remove (string relative_path);
+
+    public abstract void insert (string relative_path, int64 size = 64, char content_char = 'W');
+
+    public abstract void set_contents (string relative_path, char content_char);
+
+    public abstract void append_byte (string relative_path);
+
+    public abstract void mkdir (string relative_path);
+
+    public abstract void rename (string relative_path, string relativeDestinationDirectory);
+
+    public abstract void set_modification_time (string relative_path, GLib.DateTime modification_time);
+
+}
+}

@@ -10,7 +10,7 @@ class FakePayloadReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray this.body;
+    public GLib.ByteArray body;
 
     /***********************************************************
     ***********************************************************/
@@ -18,72 +18,55 @@ class FakePayloadReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePayloadReply (Soup.Operation operation, Soup.Request request,
+    public FakePayloadReply (Soup.Operation operation, Soup.Request request, GLib.ByteArray body, GLib.Object parent) {
+        FakePayloadReply (operation, request, body, FakePayloadReply.defaultDelay, parent);
+    }
 
     /***********************************************************
     ***********************************************************/
-    public 
+    public FakePayloadReply (
+        Soup.Operation operation, Soup.Request request, GLib.ByteArray body, int delay, GLib.Object parent) {
+        base (parent);
+        this.body = body;
+        set_request (request);
+        set_url (request.url ());
+        set_operation (operation);
+        open (QIODevice.ReadOnly);
+        QTimer.singleShot (delay, this, &FakePayloadReply.respond);
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public st GLib.ByteArra
+    public void respond () {
+        set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
+        setHeader (Soup.Request.ContentLengthHeader, this.body.size ());
+        /* emit */ signal_meta_data_changed ();
+        /* emit */ signal_ready_read ();
+        setFinished (true);
+        /* emit */ signal_finished ();
+    }
 
     /***********************************************************
     ***********************************************************/
-    public void respond ();
+    public override void on_signal_abort () {
+        return;
+    }
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort () override {}
+    public override int64 read_data (char buf, int64 max) {
+        max = qMin<int64> (max, this.body.size ());
+        memcpy (buf, this.body.constData (), max);
+        this.body = this.body.mid (max);
+        return max;
+    }
 
     /***********************************************************
     ***********************************************************/
-    public int64 read_data (char buf, int64 max) override;
+    public override int64 bytes_available () {
+        return this.body.size ();
+    }
 
-    /***********************************************************
-    ***********************************************************/
-    public int64 bytes_available () override;
-
-}
-}
-
-
-
-
-
-
-
-FakePayloadReply.FakePayloadReply (Soup.Operation operation, Soup.Request request, GLib.ByteArray body, GLib.Object parent)
-    : FakePayloadReply (operation, request, body, FakePayloadReply.defaultDelay, parent) {
-}
-
-FakePayloadReply.FakePayloadReply (
-    Soup.Operation operation, Soup.Request request, GLib.ByteArray body, int delay, GLib.Object parent)
-    : FakeReply{parent}
-    this.body (body) {
-    set_request (request);
-    set_url (request.url ());
-    set_operation (operation);
-    open (QIODevice.ReadOnly);
-    QTimer.singleShot (delay, this, &FakePayloadReply.respond);
-}
-
-void FakePayloadReply.respond () {
-    set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
-    setHeader (Soup.Request.ContentLengthHeader, this.body.size ());
-    /* emit */ signal_meta_data_changed ();
-    /* emit */ readyRead ();
-    setFinished (true);
-    /* emit */ signal_finished ();
-}
-
-int64 FakePayloadReply.read_data (char buf, int64 max) {
-    max = qMin<int64> (max, this.body.size ());
-    memcpy (buf, this.body.constData (), max);
-    this.body = this.body.mid (max);
-    return max;
-}
-
-int64 FakePayloadReply.bytes_available () {
-    return this.body.size ();
-}
+} // class FakePayloadReply
+} // namespace Testing

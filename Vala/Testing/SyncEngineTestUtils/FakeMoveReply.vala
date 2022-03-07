@@ -10,48 +10,40 @@ class FakeMoveReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeMoveReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent);
+    public FakeMoveReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent) {
+        base (parent);
+        set_request (request);
+        set_url (request.url ());
+        set_operation (operation);
+        open (QIODevice.ReadOnly);
+
+        string fileName = get_file_path_from_url (request.url ());
+        //  Q_ASSERT (!fileName.isEmpty ());
+        string dest = get_file_path_from_url (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
+        //  Q_ASSERT (!dest.isEmpty ());
+        remote_root_file_info.rename (fileName, dest);
+        QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
+    }
 
     /***********************************************************
     ***********************************************************/
-    public void respond ();
+    public void respond () {
+        set_attribute (Soup.Request.HttpStatusCodeAttribute, 201);
+        /* emit */ signal_meta_data_changed ();
+        /* emit */ signal_finished ();
+    }
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort () override { }
+    public override void on_signal_abort () {
+        return;
+    }
 
     /***********************************************************
     ***********************************************************/
-    public int64 read_data (char *, int64) override {
+    public override int64 read_data (char *data, int64 length) {
         return 0;
     }
 
-}
-}
-
-
-
-
-
-
-
-FakeMoveReply.FakeMoveReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent)
-    : FakeReply (parent); {
-    set_request (request);
-    set_url (request.url ());
-    set_operation (operation);
-    open (QIODevice.ReadOnly);
-
-    string fileName = get_file_path_from_url (request.url ());
-    //  Q_ASSERT (!fileName.isEmpty ());
-    string dest = get_file_path_from_url (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
-    //  Q_ASSERT (!dest.isEmpty ());
-    remote_root_file_info.rename (fileName, dest);
-    QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
-}
-
-void FakeMoveReply.respond () {
-    set_attribute (Soup.Request.HttpStatusCodeAttribute, 201);
-    /* emit */ signal_meta_data_changed ();
-    /* emit */ signal_finished ();
-}
+} // class FakeMoveReply
+} // namespace Testing

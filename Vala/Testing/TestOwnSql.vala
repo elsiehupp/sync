@@ -17,8 +17,8 @@ class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testOpenDb () {
-        GLib.FileInfo file_info ( this.temporary_directory.path () + "/testdatabase.sqlite" );
+    private void testOpenDb () {
+        GLib.FileInfo file_info = new GLib.FileInfo ( this.temporary_directory.path () + "/testdatabase.sqlite" );
         //  QVERIFY ( !file_info.exists () ); // must not exist
         this.database.openOrCreateReadWrite (file_info.filePath ());
         file_info.refresh ();
@@ -28,7 +28,7 @@ class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testCreate () {
+    private void testCreate () {
         const string sql = "CREATE TABLE addresses ( identifier INTEGER, name VARCHAR (4096), "
                 "address VARCHAR (4096), entered INTEGER (8), PRIMARY KEY (identifier));";
 
@@ -40,7 +40,7 @@ class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testIsSelect () {
+    private void testIsSelect () {
         SqlQuery q (this.database);
         q.prepare ("SELECT identifier FROM addresses;");
         //  QVERIFY ( q.isSelect () );
@@ -52,7 +52,7 @@ class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testInsert () {
+    private void testInsert () {
         const string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
                 " (1, 'Gonzo Alberto', 'Moriabata 24, Palermo', 1403100844);";
         SqlQuery q (this.database);
@@ -63,7 +63,7 @@ class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testInsert2 () {
+    private void testInsert2 () {
         const string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
                 " (?1, ?2, ?3, ?4);";
         SqlQuery q (this.database);
@@ -78,7 +78,7 @@ class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testSelect () {
+    private void testSelect () {
         const string sql = "SELECT * FROM addresses;";
 
         SqlQuery q (this.database);
@@ -94,7 +94,7 @@ class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testSelect2 () {
+    private void testSelect2 () {
         const string sql = "SELECT * FROM addresses WHERE identifier=?1";
         SqlQuery q (this.database);
         q.prepare (sql);
@@ -109,7 +109,7 @@ class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testPragma () {
+    private void testPragma () {
         const string sql = "PRAGMA table_info (addresses)";
 
         SqlQuery q (this.database);
@@ -124,7 +124,7 @@ class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testUnicode () {
+    private void testUnicode () {
         const string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
                 " (?1, ?2, ?3, ?4);";
         SqlQuery q (this.database);
@@ -139,7 +139,7 @@ class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testReadUnicode () {
+    private void testReadUnicode () {
         const string sql = "SELECT * FROM addresses WHERE identifier=3;";
         SqlQuery q (this.database);
         q.prepare (sql);
@@ -155,7 +155,7 @@ class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDestructor () {
+    private void testDestructor () {
         // This test make sure that the destructor of SqlQuery works even if the SqlDatabase
         // is destroyed before
         QScopedPointer<SqlDatabase> database (new SqlDatabase ());

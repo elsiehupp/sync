@@ -18,7 +18,7 @@ class TestFolderMan : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testCheckPathValidityForNewFolder () {
+    private void testCheckPathValidityForNewFolder () {
         QTemporaryDir directory;
         ConfigFile.setConfDir (directory.path ()); // we don't want to pollute the user's config file
         //  QVERIFY (directory.isValid ());
@@ -130,7 +130,7 @@ class TestFolderMan : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testFindGoodPathForNewSyncFolder () {
+    private void testFindGoodPathForNewSyncFolder () {
         // SETUP
 
         QTemporaryDir directory;

@@ -12,47 +12,45 @@ class FakeMkcolReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeMkcolReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent);
+    public FakeMkcolReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent) {
+        base (parent);
+        set_request (request);
+        set_url (request.url ());
+        set_operation (operation);
+        open (QIODevice.ReadOnly);
 
-    public void respond ();
+        string fileName = get_file_path_from_url (request.url ());
+        //  Q_ASSERT (!fileName.isEmpty ());
+        file_info = remote_root_file_info.create_directory (fileName);
+
+        if (!file_info) {
+            on_signal_abort ();
+            return;
+        }
+        QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public override void on_signal_abort () { }
+    public void respond () {
+        set_raw_header ("OC-FileId", file_info.file_identifier);
+        set_attribute (Soup.Request.HttpStatusCodeAttribute, 201);
+        /* emit */ signal_meta_data_changed ();
+        /* emit */ signal_finished ();
+    }
 
     /***********************************************************
     ***********************************************************/
-    public override int64 read_data (char *, int64) {
+    public override void on_signal_abort () {
+        return;
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public override int64 read_data (char * data, int64 length) {
         return 0;
     }
 
-}
-}
-
-
-
-
-FakeMkcolReply.FakeMkcolReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent)
-    : FakeReply (parent); {
-    set_request (request);
-    set_url (request.url ());
-    set_operation (operation);
-    open (QIODevice.ReadOnly);
-
-    string fileName = get_file_path_from_url (request.url ());
-    //  Q_ASSERT (!fileName.isEmpty ());
-    file_info = remote_root_file_info.createDir (fileName);
-
-    if (!file_info) {
-        on_signal_abort ();
-        return;
-    }
-    QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
-}
-
-void FakeMkcolReply.respond () {
-    setRawHeader ("OC-FileId", file_info.file_identifier);
-    set_attribute (Soup.Request.HttpStatusCodeAttribute, 201);
-    /* emit */ signal_meta_data_changed ();
-    /* emit */ signal_finished ();
-}
+} // class FakeMkcolReply
+} // namespace Testing

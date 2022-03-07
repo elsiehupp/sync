@@ -27,7 +27,7 @@ class TestLongWindowsPath : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testLongPathStat_data () {
+    private void testLongPathStat_data () {
         QTest.addColumn<string> ("name");
 
         QTest.newRow ("long") + "/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
@@ -55,7 +55,7 @@ class TestLongWindowsPath : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testLongPathStat () {
+    private void testLongPathStat () {
         QTemporaryDir tmp;
         //  QFETCH (string, name);
         const GLib.FileInfo longPath (tmp.path () + name);

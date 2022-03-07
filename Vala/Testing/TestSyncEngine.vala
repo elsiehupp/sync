@@ -67,7 +67,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testFileUpload () {
+    private void testFileUpload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy completeSpy (fake_folder);
         fake_folder.local_modifier ().insert ("A/a0");
@@ -79,7 +79,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDirDownload () {
+    private void testDirDownload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy completeSpy (fake_folder);
         fake_folder.remote_modifier ().mkdir ("Y");
@@ -95,7 +95,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDirUpload () {
+    private void testDirUpload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy completeSpy (fake_folder);
         fake_folder.local_modifier ().mkdir ("Y");
@@ -111,7 +111,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDirUploadWithDelayedAlgorithm () {
+    private void testDirUploadWithDelayedAlgorithm () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"bulkupload", "1.0"} } } });
 
@@ -145,7 +145,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testLocalDelete () {
+    private void testLocalDelete () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy completeSpy (fake_folder);
         fake_folder.remote_modifier ().remove ("A/a1");
@@ -157,7 +157,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testRemoteDelete () {
+    private void testRemoteDelete () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy completeSpy (fake_folder);
         fake_folder.local_modifier ().remove ("A/a1");
@@ -169,7 +169,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testEmlLocalChecksum () {
+    private void testEmlLocalChecksum () {
         FakeFolder fake_folder = new FakeFolder (FileInfo{}};
         fake_folder.local_modifier ().insert ("a1.eml", 64, 'A');
         fake_folder.local_modifier ().insert ("a2.eml", 64, 'A');
@@ -288,7 +288,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void abortAfterFailedMkdir () {
+    private void abortAfterFailedMkdir () {
         FakeFolder fake_folder = new FakeFolder (FileInfo{}};
         QSignalSpy finishedSpy (&fake_folder.sync_engine (), SIGNAL (on_signal_finished (bool)));
         fake_folder.server_error_paths ().append ("NewFolder");
@@ -302,7 +302,7 @@ class TestSyncEngine : GLib.Object {
 
     /** Verify that an incompletely propagated directory doesn't have the server's
      * etag stored in the database yet. */
-    private on_ void testDirEtagAfterIncompleteSync () {
+    private void testDirEtagAfterIncompleteSync () {
         FakeFolder fake_folder = new FakeFolder (FileInfo{}};
         QSignalSpy finishedSpy (&fake_folder.sync_engine (), SIGNAL (on_signal_finished (bool)));
         fake_folder.server_error_paths ().append ("NewFolder/foo");
@@ -320,7 +320,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDirDownloadWithError () {
+    private void testDirDownloadWithError () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy completeSpy (fake_folder);
         fake_folder.remote_modifier ().mkdir ("Y");
@@ -359,7 +359,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testFakeConflict_data () {
+    private void testFakeConflict_data () {
         QTest.addColumn<bool> ("sameMtime");
         QTest.addColumn<GLib.ByteArray> ("checksums");
 
@@ -401,7 +401,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testFakeConflict () {
+    private void testFakeConflict () {
         //  QFETCH (bool, sameMtime);
         //  QFETCH (GLib.ByteArray, checksums);
         //  QFETCH (int, expectedGET);
@@ -448,7 +448,7 @@ class TestSyncEngine : GLib.Object {
      * Checks whether SyncFileItems have the expected properties before on_signal_start
      * of propagation.
      */
-    private on_ void testSyncFileItemProperties () {
+    private void testSyncFileItemProperties () {
         var initialMtime = GLib.DateTime.currentDateTimeUtc ().addDays (-7);
         var changedMtime = GLib.DateTime.currentDateTimeUtc ().addDays (-4);
         var changedMtime2 = GLib.DateTime.currentDateTimeUtc ().addDays (-3);
@@ -526,7 +526,7 @@ class TestSyncEngine : GLib.Object {
     /***********************************************************
      * Checks whether subsequent large uploads are skipped after a 507 error
      */
-     private on_ void testInsufficientRemoteStorage () {
+     private void testInsufficientRemoteStorage () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         // Disable parallel uploads
@@ -573,7 +573,7 @@ class TestSyncEngine : GLib.Object {
     }
 
     // Checks whether downloads with bad checksums are accepted
-    private on_ void testChecksumValidation () {
+    private void testChecksumValidation () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.Object parent;
 
@@ -584,9 +584,9 @@ class TestSyncEngine : GLib.Object {
             if (operation == Soup.GetOperation) {
                 var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request, parent);
                 if (!checksumValue.isNull ())
-                    reply.setRawHeader ("OC-Checksum", checksumValue);
+                    reply.set_raw_header ("OC-Checksum", checksumValue);
                 if (!contentMd5Value.isNull ())
-                    reply.setRawHeader ("Content-MD5", contentMd5Value);
+                    reply.set_raw_header ("Content-MD5", contentMd5Value);
                 return reply;
             }
             return null;
@@ -640,7 +640,7 @@ class TestSyncEngine : GLib.Object {
     }
 
     // Tests the behavior of invalid filename detection
-    private on_ void testInvalidFilenameRegex () {
+    private void testInvalidFilenameRegex () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         // For current servers, no characters are forbidden
@@ -671,7 +671,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDiscoveryHiddenFile () {
+    private void testDiscoveryHiddenFile () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         //  QVERIFY (fake_folder.sync_once ());
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
@@ -699,7 +699,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testNoLocalEncoding () {
+    private void testNoLocalEncoding () {
         var utf8Locale = QTextCodec.codecForLocale ();
         if (utf8Locale.mibEnum () != 106) {
             QSKIP ("Test only works for UTF8 locale");
@@ -749,7 +749,7 @@ class TestSyncEngine : GLib.Object {
     }
 
     // Aborting has had bugs when there are parallel upload jobs
-    private on_ void testUploadV1Multiabort () {
+    private void testUploadV1Multiabort () {
         FakeFolder fake_folder = new FakeFolder ( FileInfo{} };
         SyncOptions options;
         options.initialChunkSize = 10;
@@ -777,7 +777,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testPropagatePermissions () {
+    private void testPropagatePermissions () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var perm = QFileDevice.Permission (0x7704); // user/owner : rwx, group : r, other : -
         GLib.File.setPermissions (fake_folder.local_path () + "A/a1", perm);
@@ -799,7 +799,7 @@ class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testEmptyLocalButHasRemote () {
+    private void testEmptyLocalButHasRemote () {
         FakeFolder fake_folder = new FakeFolder ( FileInfo{} };
         fake_folder.remote_modifier ().mkdir ("foo");
 
@@ -811,7 +811,7 @@ class TestSyncEngine : GLib.Object {
     }
 
     // Check that server mtime is set on directories on initial propagation
-    private on_ void testDirectoryInitialMtime () {
+    private void testDirectoryInitialMtime () {
         FakeFolder fake_folder = new FakeFolder ( FileInfo{} };
         fake_folder.remote_modifier ().mkdir ("foo");
         fake_folder.remote_modifier ().insert ("foo/bar");
@@ -829,7 +829,7 @@ class TestSyncEngine : GLib.Object {
     /***********************************************************
      * Checks whether subsequent large uploads are skipped after a 507 error
      */
-     private on_ void testErrorsWithBulkUpload () {
+     private void testErrorsWithBulkUpload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"bulkupload", "1.0"} } } });
 

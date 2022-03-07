@@ -13,38 +13,30 @@ class FakeHangingReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakeHangingReply (Soup.Operation operation, Soup.Request request, GLib.Object parent);
+    public FakeHangingReply (Soup.Operation operation, Soup.Request request, GLib.Object parent) {
+        base (parent);
+        set_request (request);
+        set_url (request.url ());
+        set_operation (operation);
+        open (QIODevice.ReadOnly);
+    }
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort () override;
+    public override void on_signal_abort () {
+        // Follow more or less the implementation of QNetworkReplyImpl.on_signal_abort
+        close ();
+        set_error (OperationCanceledError, _("Operation canceled"));
+        /* emit */ errorOccurred (OperationCanceledError);
+        setFinished (true);
+        /* emit */ signal_finished ();
+    }
 
     /***********************************************************
     ***********************************************************/
-    public int64 read_data (char *, int64) override {
+    public override int64 read_data (char * data, int64 value) {
         return 0;
     }
 
-}
-}
-
-
-
-
-
-FakeHangingReply.FakeHangingReply (Soup.Operation operation, Soup.Request request, GLib.Object parent)
-    : FakeReply (parent) {
-    set_request (request);
-    set_url (request.url ());
-    set_operation (operation);
-    open (QIODevice.ReadOnly);
-}
-
-void FakeHangingReply.on_signal_abort () {
-    // Follow more or less the implementation of QNetworkReplyImpl.on_signal_abort
-    close ();
-    set_error (OperationCanceledError, _("Operation canceled"));
-    /* emit */ errorOccurred (OperationCanceledError);
-    setFinished (true);
-    /* emit */ signal_finished ();
-}
+} // class FakeHangingReply
+} // namespace Testing

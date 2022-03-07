@@ -31,7 +31,7 @@ class TestInotifyWatcher : public FolderWatcherPrivate {
     }
 
     // Test the recursive path listing function findFoldersBelow
-    private on_ void testDirsBelowPath () {
+    private void testDirsBelowPath () {
         string[] dirs;
 
         bool ok = findFoldersBelow (QDir (this.root), dirs);

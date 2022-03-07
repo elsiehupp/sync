@@ -59,12 +59,12 @@ string[] findConflicts (FileInfo directory) {
 }
 
 bool expectAndWipeConflict (FileModifier local, FileInfo state, string path) {
-    PathComponents pathComponents (path);
-    var base = state.find (pathComponents.parentDirComponents ());
+    PathComponents path_components (path);
+    var base = state.find (path_components.parentDirComponents ());
     if (!base)
         return false;
     for (var item : base.children) {
-        if (item.name.startsWith (pathComponents.fileName ()) && item.name.contains (" (conflicted copy")) {
+        if (item.name.startsWith (path_components.fileName ()) && item.name.contains (" (conflicted copy")) {
             local.remove (item.path ());
             return true;
         }
@@ -108,7 +108,7 @@ class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testRemoteChangeInMovedFolder () {
+    private void testRemoteChangeInMovedFolder () {
         // issue #5192
         FakeFolder fake_folder = new FakeFolder ( FileInfo ("", { FileInfo (QStringLiteral ("folder"), { FileInfo (QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
 
@@ -132,7 +132,7 @@ class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testSelectiveSyncMovedFolder () {
+    private void testSelectiveSyncMovedFolder () {
         // issue #5224
         FakeFolder fake_folder = new FakeFolder ( FileInfo ("", { FileInfo (QStringLiteral ("parentFolder"), { FileInfo (QStringLiteral ("subFolderA"), { { QStringLiteral ("fileA.txt"), 400 } } }, FileInfo (QStringLiteral ("subFolderB"), { { QStringLiteral ("fileB.txt"), 400 } } } } } } } };
 
@@ -191,7 +191,7 @@ class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testLocalMoveDetection () {
+    private void testLocalMoveDetection () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         int nPUT = 0;
@@ -278,7 +278,7 @@ class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDuplicateFileId_data () {
+    private void testDuplicateFileId_data () {
         QTest.addColumn<string> ("prefix");
 
         // There have been bugs related to how the original
@@ -292,7 +292,7 @@ class TestSyncMove : GLib.Object {
     // user, the target user will see duplicate file ids. We need to make
     // sure the move detection and sync still do the right thing in that
     // case.
-    private on_ void testDuplicateFileId () {
+    private void testDuplicateFileId () {
         //  QFETCH (string, prefix);
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
@@ -304,7 +304,7 @@ class TestSyncMove : GLib.Object {
 
         // Duplicate every entry in A under O/A
         remote.mkdir (prefix);
-        remote.children[prefix].addChild (remote.children["A"]);
+        remote.children[prefix].add_child (remote.children["A"]);
 
         // This already checks that the rename detection doesn't get
         // horribly confused if we add new files that have the same
@@ -357,7 +357,7 @@ class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testMovePropagation () {
+    private void testMovePropagation () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var local = fake_folder.local_modifier ();
         var remote = fake_folder.remote_modifier ();
@@ -612,7 +612,7 @@ class TestSyncMove : GLib.Object {
     }
 
     // These renames can be troublesome on windows
-    private on_ void testRenameCaseOnly () {
+    private void testRenameCaseOnly () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var local = fake_folder.local_modifier ();
         var remote = fake_folder.remote_modifier ();
@@ -633,7 +633,7 @@ class TestSyncMove : GLib.Object {
     }
 
     // Check interaction of moves with file type changes
-    private on_ void testMoveAndTypeChange () {
+    private void testMoveAndTypeChange () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var local = fake_folder.local_modifier ();
         var remote = fake_folder.remote_modifier ();
@@ -654,7 +654,7 @@ class TestSyncMove : GLib.Object {
 
     // https://github.com/owncloud/client/issues/6629#issuecomment-402450691
     // When a file is moved and the server mtime was not in sync, the local mtime should be kept
-    private on_ void testMoveAndMTimeChange () {
+    private void testMoveAndMTimeChange () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         OperationCounter counter;
         fake_folder.set_server_override (counter.functor ());
@@ -684,7 +684,7 @@ class TestSyncMove : GLib.Object {
     }
 
     // Test for https://github.com/owncloud/client/issues/6694
-    private on_ void testInvertFolderHierarchy () {
+    private void testInvertFolderHierarchy () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().mkdir ("A/Empty");
         fake_folder.remote_modifier ().mkdir ("A/Empty/Foo");
@@ -745,7 +745,7 @@ class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDeepHierarchy_data () {
+    private void testDeepHierarchy_data () {
         QTest.addColumn<bool> ("local");
         QTest.newRow ("remote") + false;
         QTest.newRow ("local") + true;
@@ -754,7 +754,7 @@ class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testDeepHierarchy () {
+    private void testDeepHierarchy () {
         //  QFETCH (bool, local);
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var modifier = local ? fake_folder.local_modifier () : fake_folder.remote_modifier ();
@@ -798,7 +798,7 @@ class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void renameOnBothSides () {
+    private void renameOnBothSides () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         OperationCounter counter;
         fake_folder.set_server_override (counter.functor ());
@@ -839,7 +839,7 @@ class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void moveFileToDifferentFolderOnBothSides () {
+    private void moveFileToDifferentFolderOnBothSides () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         OperationCounter counter;
         fake_folder.set_server_override (counter.functor ());
@@ -867,7 +867,7 @@ class TestSyncMove : GLib.Object {
     }
 
     // Test that deletes don't run before renames
-    private on_ void testRenameParallelism () {
+    private void testRenameParallelism () {
         FakeFolder fake_folder = new FakeFolder ( FileInfo{} };
         fake_folder.remote_modifier ().mkdir ("A");
         fake_folder.remote_modifier ().insert ("A/file");
@@ -885,7 +885,7 @@ class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testMovedWithError_data () {
+    private void testMovedWithError_data () {
         QTest.addColumn<Vfs.Mode> ("vfsMode");
 
         QTest.newRow ("Vfs.Off") + Vfs.Off;
@@ -895,7 +895,7 @@ class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testMovedWithError () {
+    private void testMovedWithError () {
         //  QFETCH (Vfs.Mode, vfsMode);
         const var getName = [vfsMode] (string s) { {f (vfsMode == Vfs.WithSuffix)
             {

@@ -23,7 +23,7 @@ class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void shouldEncryptPrivateKeys () {
+    private void shouldEncryptPrivateKeys () {
         // GIVEN
         const var encryptionKey = QByteArrayLiteral ("foo");
         const var privateKey = QByteArrayLiteral ("bar");
@@ -52,7 +52,7 @@ class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void shouldDecryptPrivateKeys () {
+    private void shouldDecryptPrivateKeys () {
         // GIVEN
         const var encryptionKey = QByteArrayLiteral ("foo");
         const var originalPrivateKey = QByteArrayLiteral ("bar");
@@ -71,7 +71,7 @@ class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void shouldDecryptPrivateKeysInOldStorageFormat () {
+    private void shouldDecryptPrivateKeysInOldStorageFormat () {
         // GIVEN
         const var encryptionKey = QByteArrayLiteral ("foo");
         const var originalPrivateKey = QByteArrayLiteral ("bar");
@@ -90,7 +90,7 @@ class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void shouldSymmetricEncryptStrings () {
+    private void shouldSymmetricEncryptStrings () {
         // GIVEN
         const var encryptionKey = QByteArrayLiteral ("foo");
         const var data = QByteArrayLiteral ("bar");
@@ -116,7 +116,7 @@ class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void shouldSymmetricDecryptStrings () {
+    private void shouldSymmetricDecryptStrings () {
         // GIVEN
         const var encryptionKey = QByteArrayLiteral ("foo");
         const var originalData = QByteArrayLiteral ("bar");
@@ -132,7 +132,7 @@ class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void shouldSymmetricDecryptStringsInOldStorageFormat () {
+    private void shouldSymmetricDecryptStringsInOldStorageFormat () {
         // GIVEN
         const var encryptionKey = QByteArrayLiteral ("foo");
         const var originalData = QByteArrayLiteral ("bar");
@@ -148,7 +148,7 @@ class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testStreamingDecryptor_data () {
+    private void testStreamingDecryptor_data () {
         QTest.addColumn<int> ("totalBytes");
         QTest.addColumn<int> ("bytesToRead");
 
@@ -161,7 +161,7 @@ class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void testStreamingDecryptor () {
+    private void testStreamingDecryptor () {
         //  QFETCH (int, totalBytes);
 
         QTemporaryFile dummyInputFile;
@@ -172,7 +172,7 @@ class TestClientSideEncryption : GLib.Object {
 
         //  QCOMPARE (dummyInputFile.write (dummyFileRandomContents), dummyFileRandomContents.size ());
 
-        const var generateHash = [] (GLib.ByteArray data) {
+        const var generateHash = [] (GLib.ByteArray data) => {
             QCryptographicHash hash (QCryptographicHash.Sha1);
             hash.addData (data);
             return hash.result ();
