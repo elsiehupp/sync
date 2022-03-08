@@ -54,7 +54,7 @@ class TestSelectiveSync : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
 
         //  QCOMPARE (newBigFolder.count (), 1);
-        //  QCOMPARE (newBigFolder.first ()[0].toString (), string ("A/newBigDir"));
+        //  QCOMPARE (newBigFolder.first ()[0].to_string (), string ("A/newBigDir"));
         //  QCOMPARE (newBigFolder.first ()[1].to_bool (), false);
         newBigFolder.clear ();
 

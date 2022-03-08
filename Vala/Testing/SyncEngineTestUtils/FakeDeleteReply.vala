@@ -12,9 +12,9 @@ class FakeDeleteReply : FakeReply {
         set_operation (operation);
         open (QIODevice.ReadOnly);
     
-        string fileName = get_file_path_from_url (request.url ());
-        //  Q_ASSERT (!fileName.isEmpty ());
-        remote_root_file_info.remove (fileName);
+        string filename = get_file_path_from_url (request.url ());
+        //  Q_ASSERT (!filename.isEmpty ());
+        remote_root_file_info.remove (filename);
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 

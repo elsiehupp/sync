@@ -19,17 +19,17 @@ class TestNetrcParser : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_init_test_case () {
-        GLib.File netrc (testfileC);
+        GLib.File netrc = new GLib.File (testfileC);
         //  QVERIFY (netrc.open (QIODevice.WriteOnly));
         netrc.write ("machine foo login bar password baz\n");
         netrc.write ("machine broken login bar2 dontbelonghere password baz2 extratokens dontcare andanother\n");
         netrc.write ("machine\nfunnysplit\tlogin bar3 password baz3\n");
         netrc.write ("machine frob login \"user with spaces\" password 'space pwd'\n");
-        GLib.File netrcWithDefault (testfileWithDefaultC);
+        GLib.File netrcWithDefault = new GLib.File (testfileWithDefaultC);
         //  QVERIFY (netrcWithDefault.open (QIODevice.WriteOnly));
         netrcWithDefault.write ("machine foo login bar password baz\n");
         netrcWithDefault.write ("default login user password pass\n");
-        GLib.File netrcEmpty (testfileEmptyC);
+        GLib.File netrcEmpty = new GLib.File (testfileEmptyC);
         //  QVERIFY (netrcEmpty.open (QIODevice.WriteOnly));
     }
 
@@ -46,7 +46,7 @@ class TestNetrcParser : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_valid_netrc () {
-        NetrcParser parser (testfileC);
+        NetrcParser parser = new NetrcParser (testfileC);
         //  QVERIFY (parser.parse ());
         //  QCOMPARE (parser.find ("foo"), qMakePair (string ("bar"), string ("baz")));
         //  QCOMPARE (parser.find ("broken"), qMakePair (string ("bar2"), ""));
@@ -58,7 +58,7 @@ class TestNetrcParser : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_empty_netrc () {
-        NetrcParser parser (testfileEmptyC);
+        NetrcParser parser = new NetrcParser (testfileEmptyC);
         //  QVERIFY (!parser.parse ());
         //  QCOMPARE (parser.find ("foo"), qMakePair ("", ""));
     }
@@ -67,7 +67,7 @@ class TestNetrcParser : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_valid_netrcWithDefault () {
-        NetrcParser parser (testfileWithDefaultC);
+        NetrcParser parser = new NetrcParser (testfileWithDefaultC);
         //  QVERIFY (parser.parse ());
         //  QCOMPARE (parser.find ("foo"), qMakePair (string ("bar"), string ("baz")));
         //  QCOMPARE (parser.find ("dontknow"), qMakePair (string ("user"), string ("pass")));
@@ -77,9 +77,9 @@ class TestNetrcParser : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_invalid_netrc () {
-        NetrcParser parser ("/invalid");
+        NetrcParser parser = new NetrcParser ("/invalid");
         //  QVERIFY (!parser.parse ());
     }
-}
 
-QTEST_APPLESS_MAIN (TestNetrcParser)
+} // class TestNetrcParser
+} // namespace Testing

@@ -21,14 +21,14 @@ class FakePropfindReply : FakeReply {
         set_operation (operation);
         open (QIODevice.ReadOnly);
 
-        string fileName = get_file_path_from_url (request.url ());
-        //  Q_ASSERT (!fileName.isNull ()); // for root, it should be empty
-        const FileInfo file_info = remote_root_file_info.find (fileName);
+        string filename = get_file_path_from_url (request.url ());
+        //  Q_ASSERT (!filename.isNull ()); // for root, it should be empty
+        const FileInfo file_info = remote_root_file_info.find (filename);
         if (!file_info) {
             QMetaObject.invoke_method (this, "respond_404", Qt.QueuedConnection);
             return;
         }
-        const string prefix = request.url ().path ().left (request.url ().path ().size () - fileName.size ());
+        const string prefix = request.url ().path ().left (request.url ().path ().size () - filename.size ());
 
         // Don't care about the request and just return a full propfind
         const string davUri = "DAV:";
@@ -60,12 +60,12 @@ class FakePropfindReply : FakeReply {
                 xml.writeEmptyElement (davUri, "resourcetype");
             }
 
-            var gmtDate = file_info.lastModified.toUTC ();
-            var stringDate = QLocale.c ().toString (gmtDate, "ddd, dd MMM yyyy HH:mm:ss 'GMT'");
+            var gmtDate = file_info.last_modified.toUTC ();
+            var stringDate = QLocale.c ().to_string (gmtDate, "ddd, dd MMM yyyy HH:mm:ss 'GMT'");
             xml.writeTextElement (davUri, "getlastmodified", stringDate);
             xml.writeTextElement (davUri, "getcontentlength", string.number (file_info.size));
             xml.writeTextElement (davUri, "getetag", "\"%1\"".arg (string.fromLatin1 (file_info.etag)));
-            xml.writeTextElement (ocUri, "permissions", !file_info.permissions.isNull () ? string (file_info.permissions.toString ()) : file_info.isShared ? QStringLiteral ("SRDNVCKW") : QStringLiteral ("RDNVCKW"));
+            xml.writeTextElement (ocUri, "permissions", !file_info.permissions.isNull () ? string (file_info.permissions.to_string ()) : file_info.isShared ? QStringLiteral ("SRDNVCKW") : QStringLiteral ("RDNVCKW"));
             xml.writeTextElement (ocUri, "identifier", string.fromUtf8 (file_info.file_identifier));
             xml.writeTextElement (ocUri, "checksums", string.fromUtf8 (file_info.checksums));
             buffer.write (file_info.extraDavProperties);
@@ -125,7 +125,7 @@ class FakePropfindReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public override int64 read_data (char data, int64 maxlen) {
+    public override int64 read_data (char *data, int64 maxlen) {
         int64 len = std.min ((int64) payload.size (), maxlen);
         std.copy (payload.cbegin (), payload.cbegin () + len, data);
         payload.remove (0, static_cast<int> (len));

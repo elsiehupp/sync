@@ -6,31 +6,27 @@ class HttpCredentialsTest : Occ.HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public HttpCredentialsTest (string user, string password)
-    : HttpCredentials (user, password) {}
+    public HttpCredentialsTest (string user, string password) {
+        base (user, password);
+    }
 
 
     /***********************************************************
     ***********************************************************/
-    public void ask_from_user () override {
-
+    public override void ask_from_user () {
+        return;
     }
-}
-
-Occ.FolderDefinition folderDefinition (string path);
 
 
+    /***********************************************************
+    ***********************************************************/
+    public static Occ.FolderDefinition folder_definition (string path) {
+        Occ.FolderDefinition definition;
+        definition.local_path = path;
+        definition.target_path = path;
+        definition.alias = path;
+        return definition;
+    }
 
-
-
-
-
-
-
-Occ.FolderDefinition folderDefinition (string path) {
-    Occ.FolderDefinition d;
-    d.local_path = path;
-    d.targetPath = path;
-    d.alias = path;
-    return d;
-}
+} // class HttpCredentialsTest
+} // namespace Testing

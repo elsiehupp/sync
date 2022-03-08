@@ -69,7 +69,6 @@ srcs = files([
     'TestIconUtils.vala',
     'TestInotifyWatcher.vala',
     'TestLocalDiscovery.vala',
-    'TestLongWindowsPath.vala',
     'TestNetrcParser.vala',
     'TestNextcloudPropagator.vala',
     'TestNotificationCache.vala',

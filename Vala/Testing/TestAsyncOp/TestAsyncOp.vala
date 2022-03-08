@@ -13,28 +13,30 @@ namespace Testing {
 
 class TestAsyncOp : GLib.Object {
 
+    // This test is made of several testcases.
+    // the testCases maps a filename to a couple of callback.
+    // When a file is uploaded, the fake server will always return the 202 code, and will set
+    // the `perform` functor to what needs to be done to complete the transaction.
+    // The testcase consist of the `pollRequest` which will be called when the sync engine
+    // calls the poll url.
+    class TestCase {
+        delegate Soup.Reply PollRequest_t (TestCase case, Soup.Request request);
+        PollRequest_t pollRequest;
+        std.function<FileInfo> perform = null;
+    }
+
+
     /***********************************************************
     ***********************************************************/
     private void asyncUploadOperations () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } } });
+        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", new QVariantMap ( { "chunking", "1.0" } ) } });
         // Reduce max chunk size a bit so we get more chunks
         SyncOptions options;
         options.maxChunkSize = 20 * 1000;
         fake_folder.sync_engine ().setSyncOptions (options);
         int nGET = 0;
 
-        // This test is made of several testcases.
-        // the testCases maps a filename to a couple of callback.
-        // When a file is uploaded, the fake server will always return the 202 code, and will set
-        // the `perform` functor to what needs to be done to complete the transaction.
-        // The testcase consist of the `pollRequest` which will be called when the sync engine
-        // calls the poll url.
-        struct TestCase {
-            delegate PollRequest_t = std.function<Soup.Reply * (TestCase *, Soup.Request request)>;
-            PollRequest_t pollRequest;
-            std.function<FileInfo * ()> perform = null;
-        }
         GLib.HashMap<string, TestCase> testCases;
 
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) . Soup.Reply * {
@@ -53,9 +55,9 @@ class TestAsyncOp : GLib.Object {
                 //  Q_ASSERT (testCases.contains (file));
                 var testCase = testCases[file];
                 //  Q_ASSERT (!testCase.perform);
-                var putPayload = outgoing_data.readAll ();
-                testCase.perform = [putPayload, request, fake_folder] {
-                    return FakePutReply.perform (fake_folder.remote_modifier (), request, putPayload);
+                var put_payload = outgoing_data.readAll ();
+                testCase.perform = [put_payload, request, fake_folder] {
+                    return FakePutReply.perform (fake_folder.remote_modifier (), request, put_payload);
                 }
                 return new FakeAsyncReply ("/async-poll/" + file.toUtf8 (), operation, request, fake_folder.sync_engine ());
             } else if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {

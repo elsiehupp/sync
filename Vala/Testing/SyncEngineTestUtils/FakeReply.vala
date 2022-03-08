@@ -12,7 +12,7 @@ class FakeReply : Soup.Reply {
     ***********************************************************/
     public FakeReply (GLib.Object parent) {
         base (parent);
-        set_raw_header (QByteArrayLiteral ("Date"), GLib.DateTime.currentDateTimeUtc ().toString (Qt.RFC2822Date).toUtf8 ());
+        set_raw_header (QByteArrayLiteral ("Date"), GLib.DateTime.currentDateTimeUtc ().to_string (Qt.RFC2822Date).toUtf8 ());
     }
 
 

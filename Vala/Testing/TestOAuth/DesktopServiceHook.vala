@@ -9,12 +9,14 @@ using Occ;
 namespace Testing {
 
 class DesktopServiceHook : GLib.Object {
-signals:
-    void hooked (GLib.Uri );
+
+    signal void signal_hooked (GLib.Uri uri);
 
     /***********************************************************
     ***********************************************************/
     public DesktopServiceHook () {
-        QDesktopServices.setUrlHandler ("oauthtest", this, "hooked");
+        QDesktopServices.setUrlHandler ("oauthtest", this, "signal_hooked");
     }
-};
+
+} // class DesktopServiceHook
+} // namespace Testing

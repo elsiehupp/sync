@@ -12,31 +12,31 @@ class FakePutReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePutReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.ByteArray putPayload, GLib.Object parent) {
+    public FakePutReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.ByteArray put_payload, GLib.Object parent) {
         base (parent);
         set_request (request);
         set_url (request.url ());
         set_operation (operation);
         open (QIODevice.ReadOnly);
-        file_info = perform (remote_root_file_info, request, putPayload);
+        file_info = perform (remote_root_file_info, request, put_payload);
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
     /***********************************************************
     ***********************************************************/
-    public static FileInfo perform (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray putPayload) {
-        string fileName = get_file_path_from_url (request.url ());
-        //  Q_ASSERT (!fileName.isEmpty ());
-        FileInfo file_info = remote_root_file_info.find (fileName);
+    public static FileInfo perform (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray put_payload) {
+        string filename = get_file_path_from_url (request.url ());
+        //  Q_ASSERT (!filename.isEmpty ());
+        FileInfo file_info = remote_root_file_info.find (filename);
         if (file_info) {
-            file_info.size = putPayload.size ();
-            file_info.content_char = putPayload.at (0);
+            file_info.size = put_payload.size ();
+            file_info.content_char = put_payload.at (0);
         } else {
             // Assume that the file is filled with the same character
-            file_info = remote_root_file_info.create (fileName, putPayload.size (), putPayload.at (0));
+            file_info = remote_root_file_info.create (filename, put_payload.size (), put_payload.at (0));
         }
-        file_info.lastModified = Occ.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
-        remote_root_file_info.find (fileName, /*invalidateEtags=*/true);
+        file_info.last_modified = Occ.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
+        remote_root_file_info.find (filename, /*invalidateEtags=*/true);
         return file_info;
     }
 

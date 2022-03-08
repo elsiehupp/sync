@@ -27,7 +27,7 @@ class BrokenFakeGetReply : FakeGetReply {
 
     /***********************************************************
     ***********************************************************/
-    public override int64 read_data (char data, int64 maxlen) {
+    public override int64 read_data (char *data, int64 maxlen) {
         int64 len = std.min ((int64) fakeSize, maxlen);
         std.fill_n (data, len, payload);
         size -= len;

@@ -113,7 +113,7 @@ class TestRemoteDiscovery : GLib.Object {
         //  QCOMPARE (oldRemoteState.children["B"], fake_folder.current_remote_state ().children["B"]);
         if (!syncSucceeds) {
             //  QCOMPARE (errorSpy.size (), 1);
-            //  QCOMPARE (errorSpy[0][0].toString (), string (fatalErrorPrefix + expectedErrorString));
+            //  QCOMPARE (errorSpy[0][0].to_string (), string (fatalErrorPrefix + expectedErrorString));
         } else {
             //  QCOMPARE (completeSpy.findItem ("B").instruction, CSYNC_INSTRUCTION_IGNORE);
             //  QVERIFY (completeSpy.findItem ("B").errorString.contains (expectedErrorString));
@@ -132,7 +132,7 @@ class TestRemoteDiscovery : GLib.Object {
         errorSpy.clear ();
         //  QVERIFY (!fake_folder.sync_once ());
         //  QCOMPARE (errorSpy.size (), 1);
-        //  QCOMPARE (errorSpy[0][0].toString (), string (fatalErrorPrefix + expectedErrorString));
+        //  QCOMPARE (errorSpy[0][0].to_string (), string (fatalErrorPrefix + expectedErrorString));
     }
 
 

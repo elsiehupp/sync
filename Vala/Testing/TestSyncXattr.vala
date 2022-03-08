@@ -117,7 +117,7 @@ class TestSyncXAttr : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         XAVERIFY_VIRTUAL (fake_folder, "A/a1");
         //  QCOMPARE (dbRecord (fake_folder, "A/a1").fileSize, 64);
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_NEW));
         on_signal_cleanup ();
@@ -126,7 +126,7 @@ class TestSyncXAttr : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         XAVERIFY_VIRTUAL (fake_folder, "A/a1");
         //  QCOMPARE (dbRecord (fake_folder, "A/a1").fileSize, 64);
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (completeSpy.isEmpty ());
         on_signal_cleanup ();
@@ -136,7 +136,7 @@ class TestSyncXAttr : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         XAVERIFY_VIRTUAL (fake_folder, "A/a1");
         //  QCOMPARE (dbRecord (fake_folder, "A/a1").fileSize, 64);
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (completeSpy.isEmpty ());
         on_signal_cleanup ();
@@ -146,7 +146,7 @@ class TestSyncXAttr : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         XAVERIFY_VIRTUAL (fake_folder, "A/a1");
         //  QCOMPARE (dbRecord (fake_folder, "A/a1").fileSize, 65);
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_UPDATE_METADATA));
         //  QCOMPARE (dbRecord (fake_folder, "A/a1").fileSize, 65);
@@ -169,7 +169,7 @@ class TestSyncXAttr : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         XAVERIFY_VIRTUAL (fake_folder, "A/a1");
         //  QCOMPARE (dbRecord (fake_folder, "A/a1").fileSize, 65);
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_NEW));
         on_signal_cleanup ();
@@ -180,7 +180,7 @@ class TestSyncXAttr : GLib.Object {
         //  QVERIFY (!GLib.FileInfo (fake_folder.local_path () + "A/a1").exists ());
         XAVERIFY_VIRTUAL (fake_folder, "A/a1m");
         //  QCOMPARE (dbRecord (fake_folder, "A/a1m").fileSize, 65);
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1m").lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1m").last_modified (), someDate);
         //  QVERIFY (!fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1m"));
         //  QVERIFY (

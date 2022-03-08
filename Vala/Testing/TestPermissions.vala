@@ -11,49 +11,6 @@ using Occ;
 
 namespace Testing {
 
-static void applyPermissionsFromName (FileInfo info) {
-    static QRegularExpression rx ("this.PERM_ ([^this.]*)this.[^/]*$");
-    var m = rx.match (info.name);
-    if (m.hasMatch ()) {
-        info.permissions = RemotePermissions.fromServerString (m.captured (1));
-    }
-
-    for (FileInfo sub : info.children)
-        applyPermissionsFromName (sub);
-}
-
-// Check if the expected rows in the DB are non-empty. Note that in some cases they might be, then we cannot use this function
-// https://github.com/owncloud/client/issues/2038
-static void assertCsyncJournalOk (SyncJournalDb journal) {
-    // The DB is openend in locked mode : close to allow us to access.
-    journal.close ();
-
-    SqlDatabase database;
-    //  QVERIFY (database.openReadOnly (journal.databaseFilePath ()));
-    SqlQuery q ("SELECT count (*) from metadata where length (file_identifier) == 0", database);
-    //  QVERIFY (q.exec ());
-    //  QVERIFY (q.next ().hasData);
-    //  QCOMPARE (q.intValue (0), 0);
-}
-
-SyncFileItemPtr findDiscoveryItem (SyncFileItemVector spy, string path) {
-    for (var item : spy) {
-        if (item.destination () == path)
-            return item;
-    }
-    return SyncFileItemPtr (new SyncFileItem);
-}
-
-bool itemInstruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
-    var item = spy.findItem (path);
-    return item.instruction == instr;
-}
-
-bool discoveryInstruction (SyncFileItemVector spy, string path, SyncInstructions instr) {
-    var item = findDiscoveryItem (spy, path);
-    return item.instruction == instr;
-}
-
 class TestPermissions : GLib.Object {
 
     /***********************************************************
@@ -329,13 +286,13 @@ class TestPermissions : GLib.Object {
     ***********************************************************/
     private on_ static void setAllPerm (FileInfo file_info, RemotePermissions perm) {
         file_info.permissions = perm;
-        for (var subFi : file_info.children)
+        foreach (var subFi in file_info.children)
             setAllPerm (&subFi, perm);
     }
 
     // What happens if the source can't be moved or the target can't be created?
     private void testForbiddenMoves () {
-        FakeFolder fake_folder = new FakeFolder (FileInfo{}};
+        FakeFolder fake_folder = new FakeFolder (new FileInfo ());
 
         // Some of this test depends on the order of discovery. With threading
         // that order becomes effectively random, but we want to make sure to test
@@ -454,7 +411,7 @@ class TestPermissions : GLib.Object {
 
     // Test for issue #7293
     private void testAllowedMoveForbiddenDelete () {
-         FakeFolder fake_folder = new FakeFolder (FileInfo{}};
+         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
 
         // Some of this test depends on the order of discovery. With threading
         // that order becomes effectively random, but we want to make sure to test
@@ -494,6 +451,51 @@ class TestPermissions : GLib.Object {
         //  QCOMPARE (fake_folder.current_local_state (), expectedState);
         //  QCOMPARE (fake_folder.current_remote_state (), expectedState);
     }
-}
 
-QTEST_GUILESS_MAIN (TestPermissions)
+    static void applyPermissionsFromName (FileInfo info) {
+        QRegularExpression rx = new QRegularExpression ("this.PERM_ ([^this.]*)this.[^/]*$");
+        var m = rx.match (info.name);
+        if (m.hasMatch ()) {
+            info.permissions = RemotePermissions.fromServerString (m.captured (1));
+        }
+    
+        foreach (FileInfo sub in info.children) {
+            applyPermissionsFromName (sub);
+        }
+    }
+    
+    // Check if the expected rows in the DB are non-empty. Note that in some cases they might be, then we cannot use this function
+    // https://github.com/owncloud/client/issues/2038
+    static void assertCsyncJournalOk (SyncJournalDb journal) {
+        // The DB is openend in locked mode : close to allow us to access.
+        journal.close ();
+    
+        SqlDatabase database;
+        //  QVERIFY (database.openReadOnly (journal.databaseFilePath ()));
+        SqlQuery q = new SqlQuery ("SELECT count (*) from metadata where length (file_identifier) == 0", database);
+        //  QVERIFY (q.exec ());
+        //  QVERIFY (q.next ().hasData);
+        //  QCOMPARE (q.intValue (0), 0);
+    }
+    
+    SyncFileItemPtr findDiscoveryItem (SyncFileItemVector spy, string path) {
+        foreach (var item in spy) {
+            if (item.destination () == path) {
+                return item;
+            }
+        }
+        return new SyncFileItemPtr (new SyncFileItem ());
+    }
+    
+    bool itemInstruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
+        var item = spy.findItem (path);
+        return item.instruction == instr;
+    }
+    
+    bool discoveryInstruction (SyncFileItemVector spy, string path, SyncInstructions instr) {
+        var item = findDiscoveryItem (spy, path);
+        return item.instruction == instr;
+    }
+
+} // class TestPermissions
+} // namespace Testing

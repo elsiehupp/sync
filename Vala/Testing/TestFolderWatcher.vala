@@ -8,97 +8,65 @@ implied, as to its usefulness for any purpose.
 
 namespace Testing {
 
-void touch (string file) {
-    string cmd;
-    cmd = string ("touch %1").arg (file);
-    GLib.debug ("Command : " + cmd;
-    system (cmd.toLocal8Bit ());
-}
-
-void mkdir (string file) {
-    string cmd = string ("mkdir %1").arg (file);
-    GLib.debug ("Command : " + cmd;
-    system (cmd.toLocal8Bit ());
-}
-
-void rmdir (string file) {
-    string cmd = string ("rmdir %1").arg (file);
-    GLib.debug ("Command : " + cmd;
-    system (cmd.toLocal8Bit ());
-}
-
-void rm (string file) {
-    string cmd = string ("rm %1").arg (file);
-    GLib.debug ("Command : " + cmd;
-    system (cmd.toLocal8Bit ());
-}
-
-void mv (string file1, string file2) {
-    string cmd = string ("mv %1 %2").arg (file1, file2);
-    GLib.debug ("Command : " + cmd;
-    system (cmd.toLocal8Bit ());
-}
 
 using Occ;
 
 class TestFolderWatcher : GLib.Object {
 
-    QTemporaryDir this.root;
-    string this.rootPath;
-    QScopedPointer<FolderWatcher> this.watcher;
-    QScopedPointer<QSignalSpy> this.pathChangedSpy;
+    QTemporaryDir root;
+    string root_path;
+    QScopedPointer<FolderWatcher> watcher;
+    QScopedPointer<QSignalSpy> path_changed_spy;
 
-    bool waitForPathChanged (string path) {
-        QElapsedTimer t;
-        t.on_signal_start ();
-        while (t.elapsed () < 5000) {
+    bool wait_for_path_changed (string path) {
+        QElapsedTimer timer;
+        timer.on_signal_start ();
+        while (timer.elapsed () < 5000) {
             // Check if it was already reported as changed by the watcher
-            for (int i = 0; i < this.pathChangedSpy.size (); ++i) {
-                const var args = this.pathChangedSpy.at (i);
-                if (args.first ().toString () == path)
+            for (int i = 0; i < this.path_changed_spy.size (); ++i) {
+                const var args = this.path_changed_spy.at (i);
+                if (args.first ().to_string () == path) {
                     return true;
+                }
             }
             // Wait a bit and test again (don't bother checking if we timed out or not)
-            this.pathChangedSpy.wait (200);
+            this.path_changed_spy.wait (200);
         }
         return false;
     }
 
-#ifdef Q_OS_LINUX
-const int CHECK_WATCH_COUNT (n) QCOMPARE (this.watcher.testLinuxWatchCount (), (n))
-#else
-const int CHECK_WATCH_COUNT (n) do {} while (false)
-//  #endif
+
+
 
     /***********************************************************
     ***********************************************************/
     public TestFolderWatcher () {
-        QDir root_directory (this.root.path ());
-        this.rootPath = root_directory.canonicalPath ();
-        GLib.debug ("creating test directory tree in " + this.rootPath;
+        QDir root_directory = new QDir (this.root.path ());
+        this.root_path = root_directory.canonicalPath ();
+        GLib.debug ("creating test directory tree in " + this.root_path);
 
         root_directory.mkpath ("a1/b1/c1");
         root_directory.mkpath ("a1/b1/c2");
         root_directory.mkpath ("a1/b2/c1");
         root_directory.mkpath ("a1/b3/c3");
         root_directory.mkpath ("a2/b3/c3");
-        Utility.writeRandomFile ( this.rootPath+"/a1/random.bin");
-        Utility.writeRandomFile ( this.rootPath+"/a1/b2/todelete.bin");
-        Utility.writeRandomFile ( this.rootPath+"/a2/renamefile");
-        Utility.writeRandomFile ( this.rootPath+"/a1/movefile");
+        Utility.writeRandomFile (this.root_path + "/a1/random.bin");
+        Utility.writeRandomFile (this.root_path + "/a1/b2/todelete.bin");
+        Utility.writeRandomFile (this.root_path + "/a2/renamefile");
+        Utility.writeRandomFile (this.root_path + "/a1/movefile");
 
-        this.watcher.on_signal_reset (new FolderWatcher);
-        this.watcher.init (this.rootPath);
-        this.pathChangedSpy.on_signal_reset (new QSignalSpy (this.watcher.data (), SIGNAL (pathChanged (string))));
+        this.watcher.on_signal_reset (new FolderWatcher ());
+        this.watcher.init (this.root_path);
+        this.path_changed_spy.on_signal_reset (new QSignalSpy (this.watcher.data (), SIGNAL (pathChanged (string))));
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public int countFolders (string path) {
+    public int count_folders (string path) {
         int n = 0;
-        for (var sub : QDir (path).entryList (QDir.Dirs | QDir.NoDotAndDotDot))
-            n += 1 + countFolders (path + '/' + sub);
+        foreach (var sub in new QDir (path).entryList (QDir.Dirs | QDir.NoDotAndDotDot))
+            n += 1 + count_folders (path + '/' + sub);
         return n;
     }
 
@@ -106,164 +74,203 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
     /***********************************************************
     ***********************************************************/
     private void init () {
-        this.pathChangedSpy.clear ();
-        CHECK_WATCH_COUNT (countFolders (this.rootPath) + 1);
+        this.path_changed_spy.clear ();
+        check_watch_count (count_folders (this.root_path) + 1);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_cleanup () {
-        CHECK_WATCH_COUNT (countFolders (this.rootPath) + 1);
+        check_watch_count (count_folders (this.root_path) + 1);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testACreate () { // create a new file
-        string file (this.rootPath + "/foo.txt");
-        string cmd;
-        cmd = string ("echo \"xyz\" > %1").arg (file);
-        GLib.debug ("Command : " + cmd;
-        system (cmd.toLocal8Bit ());
+    private void test_a_create () { // create a new file
+        string file = this.root_path + "/foo.txt";
+        string command = "echo \"xyz\" > %1".arg (file);
+        GLib.debug ("Command: " + command);
+        system (command.toLocal8Bit ());
 
-        //  QVERIFY (waitForPathChanged (file));
+        //  QVERIFY (wait_for_path_changed (file));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testATouch () { // touch an existing file.
-        string file (this.rootPath + "/a1/random.bin");
+        string file = this.root_path + "/a1/random.bin";
         touch (file);
-        //  QVERIFY (waitForPathChanged (file));
+        //  QVERIFY (wait_for_path_changed (file));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testMove3LevelDirWithFile () {
-        string file (this.rootPath + "/a0/b/c/empty.txt");
-        mkdir (this.rootPath + "/a0");
-        mkdir (this.rootPath + "/a0/b");
-        mkdir (this.rootPath + "/a0/b/c");
+        string file = this.root_path + "/a0/b/c/empty.txt";
+        mkdir (this.root_path + "/a0");
+        mkdir (this.root_path + "/a0/b");
+        mkdir (this.root_path + "/a0/b/c");
         touch (file);
-        mv (this.rootPath + "/a0", this.rootPath + "/a");
-        //  QVERIFY (waitForPathChanged (this.rootPath + "/a/b/c/empty.txt"));
+        mv (this.root_path + "/a0", this.root_path + "/a");
+        //  QVERIFY (wait_for_path_changed (this.root_path + "/a/b/c/empty.txt"));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testCreateADir () {
-        string file (this.rootPath+"/a1/b1/new_dir");
+        string file = this.root_path + "/a1/b1/new_dir";
         mkdir (file);
-        //  QVERIFY (waitForPathChanged (file));
+        //  QVERIFY (wait_for_path_changed (file));
 
         // Notifications from that new folder arrive too
-        string file2 (this.rootPath + "/a1/b1/new_dir/contained");
+        string file2 = this.root_path + "/a1/b1/new_dir/contained";
         touch (file2);
-        //  QVERIFY (waitForPathChanged (file2));
+        //  QVERIFY (wait_for_path_changed (file2));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testRemoveADir () {
-        string file (this.rootPath+"/a1/b3/c3");
+        string file = this.root_path + "/a1/b3/c3";
         rmdir (file);
-        //  QVERIFY (waitForPathChanged (file));
+        //  QVERIFY (wait_for_path_changed (file));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testRemoveAFile () {
-        string file (this.rootPath+"/a1/b2/todelete.bin");
+        string file = this.root_path + "/a1/b2/todelete.bin";
         //  QVERIFY (GLib.File.exists (file));
         rm (file);
         //  QVERIFY (!GLib.File.exists (file));
 
-        //  QVERIFY (waitForPathChanged (file));
+        //  QVERIFY (wait_for_path_changed (file));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testRenameAFile () {
-        string file1 (this.rootPath+"/a2/renamefile");
-        string file2 (this.rootPath+"/a2/renamefile.renamed");
+        string file1 = this.root_path + "/a2/renamefile";
+        string file2 = this.root_path + "/a2/renamefile.renamed";
         //  QVERIFY (GLib.File.exists (file1));
         mv (file1, file2);
         //  QVERIFY (GLib.File.exists (file2));
 
-        //  QVERIFY (waitForPathChanged (file1));
-        //  QVERIFY (waitForPathChanged (file2));
+        //  QVERIFY (wait_for_path_changed (file1));
+        //  QVERIFY (wait_for_path_changed (file2));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testMoveAFile () {
-        string old_file (this.rootPath+"/a1/movefile");
-        string new_file (this.rootPath+"/a2/movefile.renamed");
+        string old_file = this.root_path + "/a1/movefile";
+        string new_file = this.root_path + "/a2/movefile.renamed";
         //  QVERIFY (GLib.File.exists (old_file));
         mv (old_file, new_file);
         //  QVERIFY (GLib.File.exists (new_file));
 
-        //  QVERIFY (waitForPathChanged (old_file));
-        //  QVERIFY (waitForPathChanged (new_file));
+        //  QVERIFY (wait_for_path_changed (old_file));
+        //  QVERIFY (wait_for_path_changed (new_file));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testRenameDirectorySameBase () {
-        string old_file (this.rootPath+"/a1/b1");
-        string new_file (this.rootPath+"/a1/brename");
+        string old_file = this.root_path + "/a1/b1";
+        string new_file = this.root_path + "/a1/brename";
         //  QVERIFY (GLib.File.exists (old_file));
         mv (old_file, new_file);
         //  QVERIFY (GLib.File.exists (new_file));
 
-        //  QVERIFY (waitForPathChanged (old_file));
-        //  QVERIFY (waitForPathChanged (new_file));
+        //  QVERIFY (wait_for_path_changed (old_file));
+        //  QVERIFY (wait_for_path_changed (new_file));
 
         // Verify that further notifications end up with the correct paths
 
-        string file (this.rootPath+"/a1/brename/c1/random.bin");
+        string file = this.root_path + "/a1/brename/c1/random.bin";
         touch (file);
-        //  QVERIFY (waitForPathChanged (file));
+        //  QVERIFY (wait_for_path_changed (file));
 
-        string directory (this.rootPath+"/a1/brename/newfolder");
+        string directory = this.root_path + "/a1/brename/newfolder";
         mkdir (directory);
-        //  QVERIFY (waitForPathChanged (directory));
+        //  QVERIFY (wait_for_path_changed (directory));
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testRenameDirectoryDifferentBase () {
-        string old_file (this.rootPath+"/a1/brename");
-        string new_file (this.rootPath+"/bren");
+    private void test_rename_directory_different_base () {
+
+        string old_file = this.root_path + "/a1/brename";
+        string new_file = this.root_path + "/bren";
         //  QVERIFY (GLib.File.exists (old_file));
         mv (old_file, new_file);
         //  QVERIFY (GLib.File.exists (new_file));
 
-        //  QVERIFY (waitForPathChanged (old_file));
-        //  QVERIFY (waitForPathChanged (new_file));
+        //  QVERIFY (wait_for_path_changed (old_file));
+        //  QVERIFY (wait_for_path_changed (new_file));
 
         // Verify that further notifications end up with the correct paths
 
-        string file (this.rootPath+"/bren/c1/random.bin");
+        string file = this.root_path + "/bren/c1/random.bin";
         touch (file);
-        //  QVERIFY (waitForPathChanged (file));
+        //  QVERIFY (wait_for_path_changed (file));
 
-        string directory (this.rootPath+"/bren/newfolder2");
+        string directory = this.root_path + "/bren/newfolder2";
         mkdir (directory);
-        //  QVERIFY (waitForPathChanged (directory));
+        //  QVERIFY (wait_for_path_changed (directory));
     }
+
+
+    int check_watch_count (int n) {
+        QCOMPARE (this.watcher.testLinuxWatchCount (), (n));
+    }
+
+
+    static void touch (string file) {
+        string command;
+        command = "touch %1".arg (file);
+        GLib.debug ("Command: " + command);
+        system (command.toLocal8Bit ());
+    }
+
+
+    static void mkdir (string file) {
+        string command = "mkdir %1".arg (file);
+        GLib.debug ("Command: " + command);
+        system (command.toLocal8Bit ());
+    }
+
+
+    static void rmdir (string file) {
+        string command = "rmdir %1".arg (file);
+        GLib.debug ("Command: " + command);
+        system (command.toLocal8Bit ());
+    }
+
+
+    static void rm (string file) {
+        string command = "rm %1".arg (file);
+        GLib.debug ("Command: " + command);
+        system (command.toLocal8Bit ());
+    }
+
+
+    static void mv (string file1, string file2) {
+        string command = "mv %1 %2".arg (file1, file2);
+        GLib.debug ("Command: " + command);
+        system (command.toLocal8Bit ());
+    }
+
 }
-
-    QTEST_GUILESS_MAIN (TestFolderWatcher)
-
-#include "testfolderwatcher.moc"
+}

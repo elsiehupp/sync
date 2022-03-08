@@ -53,7 +53,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
             const var searchTerm = url_query.queryItemValue (QStringLiteral ("term"));
             const var path = request.url ().path ();
 
-            if (!request.url ().toString ().startsWith (account_state.account ().url ().toString ())) {
+            if (!request.url ().to_string ().startsWith (account_state.account ().url ().to_string ())) {
                 reply = new FakeErrorReply (operation, request, this, 404, fake404Response);
             }
             if (format != QStringLiteral ("json")) {
@@ -217,7 +217,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
             if (type == Occ.UnifiedSearchResult.Type.FetchMoreTrigger) {
                 const var providerId =
                     model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
-                        .toString ();
+                        .to_string ();
                 model.fetchMoreTriggerClicked (providerId);
                 break;
             }
@@ -271,7 +271,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
             for (int i = 0; i < model.rowCount (); ++i) {
                 const var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
                 const var providerId =  model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
-                            .toString ();
+                            .to_string ();
                 if (type == Occ.UnifiedSearchResult.Type.FetchMoreTrigger
                     && providerId == providerIdFetchMoreTriggered) {
                     isFetchMoreTriggerFound = true;
@@ -324,8 +324,8 @@ class TestUnifiedSearchListmodel : GLib.Object {
             if (type == Occ.UnifiedSearchResult.Type.DEFAULT) {
                 const var providerId =
                     model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
-                        .toString ();
-                urlForClickedResult = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).toString ();
+                        .to_string ();
+                urlForClickedResult = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).to_string ();
 
                 if (!providerId.isEmpty () && !urlForClickedResult.isEmpty ()) {
                     model.signal_result_clicked (providerId, GLib.Uri (urlForClickedResult));
@@ -338,7 +338,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
         const var arguments = signal_result_clicked.takeFirst ();
 
-        const var urlOpenTriggeredViaDesktopServices = arguments.at (0).toString ();
+        const var urlOpenTriggeredViaDesktopServices = arguments.at (0).to_string ();
 
         //  QCOMPARE (urlOpenTriggeredViaDesktopServices, urlForClickedResult);
     }

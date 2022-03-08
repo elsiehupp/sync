@@ -26,9 +26,9 @@ class FakeGetWithDataReply : FakeReply {
 
         //  Q_ASSERT (!data.isEmpty ());
         payload = data;
-        string fileName = get_file_path_from_url (request.url ());
-        //  Q_ASSERT (!fileName.isEmpty ());
-        file_info = remote_root_file_info.find (fileName);
+        string filename = get_file_path_from_url (request.url ());
+        //  Q_ASSERT (!filename.isEmpty ());
+        file_info = remote_root_file_info.find (filename);
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
 
         if (request.hasRawHeader ("Range")) {
@@ -81,7 +81,7 @@ class FakeGetWithDataReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public override int64 read_data (char data, int64 maxlen) {
+    public override int64 read_data (char *data, int64 maxlen) {
         int64 len = std.min (payload.size () - offset, uint64 (maxlen));
         std.memcpy (data, payload.constData () + offset, len);
         offset += len;

@@ -20,8 +20,9 @@ class FakePostReply : Soup.Reply {
     /***********************************************************
     ***********************************************************/
     public FakePostReply (Soup.Operation operation, Soup.Request request,
-                  std.unique_ptr<QIODevice> payload_, GLib.Object parent)
-        : Soup.Reply{parent}, payload{std.move (payload_)} {
+        std.unique_ptr<QIODevice> payload_, GLib.Object parent) {
+        base (parent);
+        payload = std.move (payload_);
         set_request (request);
         set_url (request.url ());
         set_operation (operation);
@@ -46,7 +47,7 @@ class FakePostReply : Soup.Reply {
             return;
         } else if (redirectToToken) {
             // Redirect to self
-            GLib.Variant destination = GLib.Variant (sOAuthTestServer.toString ()+QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
+            GLib.Variant destination = GLib.Variant (sOAuthTestServer.to_string ()+QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
             setHeader (Soup.Request.LocationHeader, destination);
             set_attribute (Soup.Request.RedirectionTargetAttribute, destination);
             set_attribute (Soup.Request.HttpStatusCodeAttribute, 307); // 307 explicitly in rfc says to not lose POST data
@@ -66,20 +67,23 @@ class FakePostReply : Soup.Reply {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort () override {
+    public override void on_signal_abort () {
         aborted = true;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public int64 bytes_available () override {
-        if (aborted)
+    public override int64 bytes_available () {
+        if (aborted) {
             return 0;
+        }
         return payload.bytes_available ();
     }
 
-    ipublic nt64 read_data (char data, int64 maxlen) override {
+    public override int64 read_data (char *data, int64 maxlen) {
         return payload.read (data, maxlen);
     }
-}
+
+} // class FakePostReply
+} // namespace Testing

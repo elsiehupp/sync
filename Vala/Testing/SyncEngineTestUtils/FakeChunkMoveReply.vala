@@ -38,8 +38,8 @@ class FakeChunkMoveReply : FakeReply {
         int64 size = 0;
         char payload = '\0';
 
-        string fileName = get_file_path_from_url (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
-        //  Q_ASSERT (!fileName.isEmpty ());
+        string filename = get_file_path_from_url (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
+        //  Q_ASSERT (!filename.isEmpty ());
 
         // Compute the size and content from the chunks if possible
         foreach (var chunk_name in sourceFolder.children.keys ()) {
@@ -54,7 +54,7 @@ class FakeChunkMoveReply : FakeReply {
         //  Q_ASSERT (sourceFolder.children.count () == count); // There should not be holes or extra files
 
         // Note: This does not actually assemble the file data from the chunks!
-        FileInfo file_info = remote_root_file_info.find (fileName);
+        FileInfo file_info = remote_root_file_info.find (filename);
         if (file_info) {
             // The client should put this header
             //  Q_ASSERT (request.hasRawHeader ("If"));
@@ -71,10 +71,10 @@ class FakeChunkMoveReply : FakeReply {
         } else {
             //  Q_ASSERT (!request.hasRawHeader ("If"));
             // Assume that the file is filled with the same character
-            file_info = remote_root_file_info.create (fileName, size, payload);
+            file_info = remote_root_file_info.create (filename, size, payload);
         }
-        file_info.lastModified = Occ.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
-        remote_root_file_info.find (fileName, /*invalidateEtags=*/true);
+        file_info.last_modified = Occ.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
+        remote_root_file_info.find (filename, /*invalidateEtags=*/true);
 
         return file_info;
     }

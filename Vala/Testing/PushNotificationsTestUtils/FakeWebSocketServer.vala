@@ -116,7 +116,7 @@ class FakeWebSocketServer : GLib.Object {
     ***********************************************************/
     public string text_message (int message_number) {
         //  Q_ASSERT (0 <= message_number && message_number < this.process_text_message_spy.count ());
-        return this.process_text_message_spy.at (message_number).at (1).toString ();
+        return this.process_text_message_spy.at (message_number).at (1).to_string ();
     }
 
     /***********************************************************

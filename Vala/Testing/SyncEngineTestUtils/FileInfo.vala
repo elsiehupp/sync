@@ -15,7 +15,7 @@ class FileInfo : FileModifier {
     public bool isDir = true;
     public bool isShared = false;
     public Occ.RemotePermissions permissions; // When uset, defaults to everything
-    public GLib.DateTime lastModified = GLib.DateTime.currentDateTimeUtc ().addDays (-7);
+    public GLib.DateTime last_modified = GLib.DateTime.currentDateTimeUtc ().addDays (-7);
 
     public GLib.ByteArray checksums;
     public GLib.ByteArray extraDavProperties;
@@ -109,7 +109,7 @@ class FileInfo : FileModifier {
         //  Q_ASSERT (parent);
         parent.children.erase (std.find_if (parent.children.begin (), parent.children.end (),
             [&path_components] (FileInfo file_info) => {
-                return file_info.name == path_components.fileName ();
+                return file_info.name == path_components.filename ();
             }
         ));
     }
@@ -157,11 +157,11 @@ class FileInfo : FileModifier {
         const PathComponents path_components = new PathComponents (oldPath);
         FileInfo parent = find_invalidating_etags (path_components.parentDirComponents ());
         //  Q_ASSERT (parent);
-        FileInfo file_info = parent.children.take (path_components.fileName ());
+        FileInfo file_info = parent.children.take (path_components.filename ());
         file_info.parentPath = directory.path ();
-        file_info.name = newPathComponents.fileName ();
+        file_info.name = newPathComponents.filename ();
         file_info.fixupParentPathRecursively ();
-        directory.children.insert (newPathComponents.fileName (), std.move (file_info));
+        directory.children.insert (newPathComponents.filename (), std.move (file_info));
     }
 
 
@@ -170,7 +170,7 @@ class FileInfo : FileModifier {
     public override void set_modification_time (string relative_path, GLib.DateTime modification_time) {
         FileInfo file = find_invalidating_etags (relative_path);
         //  Q_ASSERT (file);
-        file.lastModified = modification_time;
+        file.last_modified = modification_time;
     }
 
 
@@ -203,7 +203,7 @@ class FileInfo : FileModifier {
         const PathComponents path_components = new PathComponents (relative_path);
         FileInfo parent = find_invalidating_etags (path_components.parentDirComponents ());
         //  Q_ASSERT (parent);
-        FileInfo child = parent.children[path_components.fileName ()] = FileInfo ( path_components.fileName ());
+        FileInfo child = parent.children[path_components.filename ()] = FileInfo ( path_components.filename ());
         child.parentPath = parent.path ();
         child.etag = generateEtag ();
         return child;
@@ -216,7 +216,7 @@ class FileInfo : FileModifier {
         const PathComponents path_components = new PathComponents (relative_path);
         FileInfo parent = find_invalidating_etags (path_components.parentDirComponents ());
         //  Q_ASSERT (parent);
-        FileInfo child = parent.children[path_components.fileName ()] = new FileInfo (path_components.fileName (), size);
+        FileInfo child = parent.children[path_components.filename ()] = new FileInfo (path_components.filename (), size);
         child.parentPath = parent.path ();
         child.content_char = content_char;
         child.etag = generateEtag ();

@@ -9,26 +9,33 @@ using Occ;
 namespace Testing {
 
 class OAuthTestCase : GLib.Object {
+
     DesktopServiceHook desktopServiceHook;
 
     /***********************************************************
     ***********************************************************/
-    public enum State ( StartState, BrowserOpened, TokenAsked, CustomState } state = StartState;
+    public enum State {
+        StartState,
+        BrowserOpened,
+        TokenAsked,
+        CustomState
+    }
+    
+    public State state = StartState;
 
     /***********************************************************
     ***********************************************************/
     public bool replyToBrowserOk = false;
     public bool gotAuthOk = false;
-    public virtual bool on_signal_done () { return replyToBrowserOk && gotAuthOk; }
-
 
     /***********************************************************
     ***********************************************************/
     public FakeQNAM *fake_qnam = null;
     public Soup realQNAM;
     public QPointer<Soup.Reply> browserReply = null;
-    public string code = generateEtag ();
 
+
+    public string code = generateEtag ();
 
     /***********************************************************
     ***********************************************************/
@@ -38,13 +45,19 @@ class OAuthTestCase : GLib.Object {
     ***********************************************************/
     public QScopedPointer<OAuth> oauth;
 
+
+    public virtual bool on_signal_done () {
+        return replyToBrowserOk && gotAuthOk;
+    }
+
+
     /***********************************************************
     ***********************************************************/
     public virtual void test () {
         fake_qnam = new FakeQNAM ({});
         account = Occ.Account.create ();
         account.set_url (sOAuthTestServer);
-        account.setCredentials (new FakeCredentials{fake_qnam});
+        account.setCredentials (new FakeCredentials (fake_qnam));
         fake_qnam.setParent (this);
         fake_qnam.set_override ([this] (Soup.Operation operation, Soup.Request request, QIODevice device) {
             //  ASSERT (device);
@@ -52,7 +65,7 @@ class OAuthTestCase : GLib.Object {
             return this.tokenReply (operation, request);
         });
 
-        GLib.Object.connect (&desktopServiceHook, &DesktopServiceHook.hooked,
+        GLib.Object.connect (&desktopServiceHook, &DesktopServiceHook.signal_hooked,
                          this, &OAuthTestCase.openBrowserHook);
 
         oauth.on_signal_reset (new OAuth (account.data (), null));
@@ -68,11 +81,11 @@ class OAuthTestCase : GLib.Object {
         //  QCOMPARE (state, StartState);
         state = BrowserOpened;
         //  QCOMPARE (url.path (), string (sOAuthTestServer.path () + "/index.php/apps/oauth2/authorize"));
-        //  QVERIFY (url.toString ().startsWith (sOAuthTestServer.toString ()));
-        QUrlQuery query (url);
+        //  QVERIFY (url.to_string ().startsWith (sOAuthTestServer.to_string ()));
+        QUrlQuery query = new QUrlQuery (url);
         //  QCOMPARE (query.queryItemValue (QLatin1String ("response_type")), QLatin1String ("code"));
         //  QCOMPARE (query.queryItemValue (QLatin1String ("client_id")), Theme.instance ().oauthClientId ());
-        GLib.Uri redirectUri (query.queryItemValue (QLatin1String ("redirect_uri")));
+        GLib.Uri redirectUri = new GLib.Uri (query.queryItemValue ("redirect_uri"));
         //  QCOMPARE (redirectUri.host (), QLatin1String ("localhost"));
         redirectUri.setQuery ("code=" + code);
         createBrowserReply (Soup.Request (redirectUri));
@@ -104,9 +117,9 @@ class OAuthTestCase : GLib.Object {
         //  ASSERT (state == BrowserOpened);
         state = TokenAsked;
         //  ASSERT (operation == Soup.PostOperation);
-        //  ASSERT (request.url ().toString ().startsWith (sOAuthTestServer.toString ()));
+        //  ASSERT (request.url ().to_string ().startsWith (sOAuthTestServer.to_string ()));
         //  ASSERT (request.url ().path () == sOAuthTestServer.path () + "/index.php/apps/oauth2/api/v1/token");
-        std.unique_ptr<QBuffer> payload (new QBuffer ());
+        std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
         payload.setData (tokenReplyPayload ());
         return new FakePostReply (operation, request, std.move (payload), fake_qnam);
     }
@@ -115,8 +128,13 @@ class OAuthTestCase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public virtual GLib.ByteArray tokenReplyPayload () {
-        QJsonDocument jsondata (QJsonObject{ { "access_token", "123" }, { "refresh_token" , "456" }, { "message_url",  "owncloud://on_signal_success"}, { "user_id", "789" }, { "token_type", "Bearer" }
-        });
+        QJsonDocument jsondata = new QJsonObject (
+            { "access_token", "123" },
+            { "refresh_token" , "456" },
+            { "message_url",  "owncloud://on_signal_success"},
+            { "user_id", "789" },
+            { "token_type", "Bearer" }
+        );
         return jsondata.toJson ();
     }
 
@@ -131,4 +149,6 @@ class OAuthTestCase : GLib.Object {
         //  QCOMPARE (refreshToken, string ("456"));
         gotAuthOk = true;
     }
-};
+
+} // class OAuthTestCase
+} // namespace Testing

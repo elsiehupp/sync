@@ -48,11 +48,11 @@ class TestChecksumValidator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static GLib.ByteArray shellSum (GLib.ByteArray cmd, string file) {
+    static GLib.ByteArray shellSum (GLib.ByteArray command, string file) {
         QProcess md5;
         string[] args;
         args.append (file);
-        md5.on_signal_start (cmd, args);
+        md5.on_signal_start (command, args);
         GLib.ByteArray sumShell;
         GLib.debug ("File : " + file);
 

@@ -18,11 +18,11 @@ class FakePutMultiFileReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePutMultiFileReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string content_type, GLib.ByteArray putPayload, GLib.Object parent);
+    public FakePutMultiFileReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string content_type, GLib.ByteArray put_payload, GLib.Object parent);
 
     /***********************************************************
     ***********************************************************/
-    public static GLib.Vector<FileInfo> performMultiPart (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray putPayload, string content_type);
+    public static GLib.Vector<FileInfo> performMultiPart (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray put_payload, string content_type);
 
     /***********************************************************
     ***********************************************************/
@@ -38,7 +38,7 @@ class FakePutMultiFileReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public int64 read_data (char data, int64 maxlen) override;
+    public int64 read_data (char *data, int64 maxlen) override;
 
 }
 }
@@ -49,46 +49,46 @@ class FakePutMultiFileReply : FakeReply {
 
 
 
-FakePutMultiFileReply.FakePutMultiFileReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string content_type, GLib.ByteArray putPayload, GLib.Object parent)
+FakePutMultiFileReply.FakePutMultiFileReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string content_type, GLib.ByteArray put_payload, GLib.Object parent)
     : FakeReply (parent); {
     set_request (request);
     set_url (request.url ());
     set_operation (operation);
     open (QIODevice.ReadOnly);
-    this.allFileInfo = performMultiPart (remote_root_file_info, request, putPayload, content_type);
+    this.allFileInfo = performMultiPart (remote_root_file_info, request, put_payload, content_type);
     QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
 }
 
-GLib.Vector<FileInfo> FakePutMultiFileReply.performMultiPart (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray putPayload, string content_type) {
+GLib.Vector<FileInfo> FakePutMultiFileReply.performMultiPart (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray put_payload, string content_type) {
     GLib.Vector<FileInfo> result;
 
-    var stringPutPayload = string.fromUtf8 (putPayload);
-    const int boundaryPosition = sizeof ("multipart/related; boundary=");
-    const string boundaryValue = "--" + content_type.mid (boundaryPosition, content_type.length () - boundaryPosition - 1) + "\r\n";
-    var stringPutPayloadRef = string{stringPutPayload}.left (stringPutPayload.size () - 2 - boundaryValue.size ());
-    var allParts = stringPutPayloadRef.split (boundaryValue, Qt.SkipEmptyParts);
-    for (var onePart : allParts) {
-        var headerEndPosition = onePart.indexOf ("\r\n\r\n");
-        var onePartHeaderPart = onePart.left (headerEndPosition);
-        var onePartBody = onePart.mid (headerEndPosition + 4, onePart.size () - headerEndPosition - 6);
-        var onePartHeaders = onePartHeaderPart.split ("\r\n");
-        GLib.HashMap<string, string> allHeaders;
-        for (var oneHeader : onePartHeaders) {
-            var headerParts = oneHeader.split (":");
-            allHeaders[headerParts.at (0)] = headerParts.at (1);
+    var string_put_payload = string.fromUtf8 (put_payload);
+    const int boundary_position = sizeof ("multipart/related; boundary=");
+    const string boundary_value = "--" + content_type.mid (boundary_position, content_type.length () - boundary_position - 1) + "\r\n";
+    var string_put_payload_reference = string{string_put_payload}.left (string_put_payload.size () - 2 - boundary_value.size ());
+    var all_parts = string_put_payload_reference.split (boundary_value, Qt.SkipEmptyParts);
+    for (var one_part : all_parts) {
+        var header_end_position = one_part.indexOf ("\r\n\r\n");
+        var one_part_header_part = one_part.left (header_end_position);
+        var onePartBody = one_part.mid (header_end_position + 4, one_part.size () - header_end_position - 6);
+        var one_part_header = one_part_header_part.split ("\r\n");
+        GLib.HashMap<string, string> all_headers;
+        for (var one_header : one_part_header) {
+            var header_parts = one_header.split (":");
+            all_headers[header_parts.at (0)] = header_parts.at (1);
         }
-        var fileName = allHeaders["X-File-Path"];
-        //  Q_ASSERT (!fileName.isEmpty ());
-        FileInfo file_info = remote_root_file_info.find (fileName);
+        var filename = all_headers["X-File-Path"];
+        //  Q_ASSERT (!filename.isEmpty ());
+        FileInfo file_info = remote_root_file_info.find (filename);
         if (file_info) {
             file_info.size = onePartBody.size ();
             file_info.content_char = onePartBody.at (0).toLatin1 ();
         } else {
             // Assume that the file is filled with the same character
-            file_info = remote_root_file_info.create (fileName, onePartBody.size (), onePartBody.at (0).toLatin1 ());
+            file_info = remote_root_file_info.create (filename, onePartBody.size (), onePartBody.at (0).toLatin1 ());
         }
-        file_info.lastModified = Occ.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
-        remote_root_file_info.find (fileName, /*invalidateEtags=*/true);
+        file_info.last_modified = Occ.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
+        remote_root_file_info.find (filename, /*invalidateEtags=*/true);
         result.push_back (file_info);
     }
     return result;
@@ -139,7 +139,7 @@ int64 FakePutMultiFileReply.bytes_available () {
     return this.payload.size () + QIODevice.bytes_available ();
 }
 
-int64 FakePutMultiFileReply.read_data (char data, int64 maxlen) {
+int64 FakePutMultiFileReply.read_data (char *data, int64 maxlen) {
     int64 len = std.min (int64 { this.payload.size () }, maxlen);
     std.copy (this.payload.cbegin (), this.payload.cbegin () + len, data);
     this.payload.remove (0, static_cast<int> (len));

@@ -285,7 +285,7 @@ void FakeFolder.to_disk (QDir directory, FileInfo template_file_info) {
             file.open (GLib.File.WriteOnly);
             file.write (GLib.ByteArray {}.fill (child.content_char, child.size));
             file.close ();
-            Occ.FileSystem.set_modification_time (file.fileName (), Occ.Utility.qDateTimeToTime_t (child.lastModified));
+            Occ.FileSystem.set_modification_time (file.filename (), Occ.Utility.qDateTimeToTime_t (child.last_modified));
         }
     }
 }
@@ -294,8 +294,8 @@ void FakeFolder.from_disk (QDir directory, FileInfo template_file_info) {
     foreach (GLib.FileInfo diskChild, directory.entryInfoList (QDir.AllEntries | QDir.NoDotAndDotDot)) {
         if (diskChild.isDir ()) {
             QDir subDir = directory;
-            subDir.cd (diskChild.fileName ());
-            FileInfo subFi = template_file_info.children[diskChild.fileName ()] = FileInfo ( diskChild.fileName ());
+            subDir.cd (diskChild.filename ());
+            FileInfo subFi = template_file_info.children[diskChild.filename ()] = FileInfo ( diskChild.filename ());
             from_disk (subDir, subFi);
         } else {
             GLib.File f ( diskChild.filePath ());
@@ -306,7 +306,7 @@ void FakeFolder.from_disk (QDir directory, FileInfo template_file_info) {
                 continue;
             }
             char content_char = content.at (0);
-            template_file_info.children.insert (diskChild.fileName (), FileInfo ( diskChild.fileName (), diskChild.size (), content_char });
+            template_file_info.children.insert (diskChild.filename (), FileInfo ( diskChild.filename (), diskChild.size (), content_char });
         }
     }
 }
@@ -329,7 +329,7 @@ FileInfo FakeFolder.database_state () {
     this.journal_database.getFilesBelowPath ("", [&] (Occ.SyncJournalFileRecord record) {
         var components = PathComponents (record.path ());
         var parentDir = findOrCreateDirs (result, components.parentDirComponents ());
-        var name = components.fileName ();
+        var name = components.filename ();
         var item = parentDir.children[name];
         item.name = name;
         item.parentPath = parentDir.path ();
@@ -337,7 +337,7 @@ FileInfo FakeFolder.database_state () {
         item.isDir = record.type == ItemTypeDirectory;
         item.permissions = record.remotePerm;
         item.etag = record.etag;
-        item.lastModified = Occ.Utility.qDateTimeFromTime_t (record.modtime);
+        item.last_modified = Occ.Utility.qDateTimeFromTime_t (record.modtime);
         item.file_identifier = record.file_identifier;
         item.checksums = record.checksumHeader;
         // item.content_char can't be set from the database

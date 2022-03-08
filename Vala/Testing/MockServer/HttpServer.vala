@@ -46,7 +46,7 @@ class HttpServer : QTcpServer {
                     + "Content-Type : text/html; charset=\"utf-8\"\r\n"
                     + "\r\n"
                     + "<h1>Nothing to see here</h1>\n"
-                    + GLib.DateTime.currentDateTimeUtc ().toString ("\n");
+                    + GLib.DateTime.currentDateTimeUtc ().to_string ("\n");
                 socket.close ();
 
                 QtServiceBase.instance ().logMessage ("Wrote to client");

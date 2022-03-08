@@ -11,7 +11,7 @@ class PathComponents : string[] {
     /***********************************************************
     ***********************************************************/
     public PathComponents (char path) {
-        PathComponents (string.fromUtf8 (path))
+        PathComponents (string.fromUtf8 (path));
     }
 
     /***********************************************************
@@ -54,7 +54,7 @@ class PathComponents : string[] {
 
     /***********************************************************
     ***********************************************************/
-    public string fileName () {
+    public string filename () {
         return last ();
     }
 

@@ -41,7 +41,7 @@ bool expectAndWipeConflict (FileModifier local, FileInfo state, string path) {
     if (!base)
         return false;
     for (var item : base.children) {
-        if (item.name.startsWith (path_components.fileName ()) && item.name.contains (" (conflicted copy")) {
+        if (item.name.startsWith (path_components.filename ()) && item.name.contains (" (conflicted copy")) {
             local.remove (item.path ());
             return true;
         }
@@ -93,7 +93,7 @@ class TestSyncConflict : GLib.Object {
             if (operation == Soup.PutOperation) {
                 if (request.rawHeader ("OC-Conflict") == "1") {
                     var baseFileId = request.rawHeader ("OC-ConflictBaseFileId");
-                    var components = request.url ().toString ().split ('/');
+                    var components = request.url ().to_string ().split ('/');
                     string conflictFile = components.mid (components.size () - 2).join ('/');
                     conflictMap[baseFileId] = conflictFile;
                     [&] {
@@ -145,7 +145,7 @@ class TestSyncConflict : GLib.Object {
             if (operation == Soup.PutOperation) {
                 if (request.rawHeader ("OC-Conflict") == "1") {
                     var baseFileId = request.rawHeader ("OC-ConflictBaseFileId");
-                    var components = request.url ().toString ().split ('/');
+                    var components = request.url ().to_string ().split ('/');
                     string conflictFile = components.mid (components.size () - 2).join ('/');
                     conflictMap[baseFileId] = conflictFile;
                     [&] {

@@ -23,7 +23,7 @@ class TestRemoteWipe : GLib.Object {
 //        QDir dirToRemove (directory.path ());
 //        //  QVERIFY (dirToRemove.mkpath ("nextcloud"));
 
-//        string dirPath = dirToRemove.canonicalPath ();
+//        string directory_path = dirToRemove.canonicalPath ();
 
 //        AccountPointer account = Account.create ();
 //        //  QVERIFY (account);
@@ -31,23 +31,23 @@ class TestRemoteWipe : GLib.Object {
 //        var manager = AccountManager.instance ();
 //        //  QVERIFY (manager);
 
-//        AccountState newAccountState = manager.addAccount (account);
+//        AccountState new_account_state = manager.addAccount (account);
 //        manager.save ();
-//        //  QVERIFY (newAccountState);
+//        //  QVERIFY (new_account_state);
 
 //        GLib.Uri url ("http://example.de");
 //        HttpCredentialsTest credentials = new HttpCredentialsTest ("testuser", "secret");
 //        account.setCredentials (credentials);
 //        account.set_url ( url );
 
-//        FolderMan folderman = FolderMan.instance ();
-//        folderman.addFolder (newAccountState, folderDefinition (dirPath + "/sub/nextcloud/"));
+//        FolderMan folder_manager = FolderMan.instance ();
+//        folder_manager.addFolder (new_account_state, folder_definition (directory_path + "/sub/nextcloud/"));
 
 //        // check if account exists
 //        GLib.debug ("Does account exists?!";
 //        //  QVERIFY (!account.identifier ().isEmpty ());
 
-//        manager.deleteAccount (newAccountState);
+//        manager.deleteAccount (new_account_state);
 //        manager.save ();
 
 //        // check if account exists
@@ -58,9 +58,9 @@ class TestRemoteWipe : GLib.Object {
 //        //  QVERIFY (dirToRemove.exists ());
 
 //        // remote folders
-//        GLib.debug () +  "Removing folder for account " + newAccountState.account ().url ();
+//        GLib.debug () +  "Removing folder for account " + new_account_state.account ().url ();
 
-//        folderman.slotWipeFolderForAccount (newAccountState);
+//        folder_manager.slotWipeFolderForAccount (new_account_state);
 
 //        // check if folders dont exist anymore
 //        //  QCOMPARE (dirToRemove.exists (), false);

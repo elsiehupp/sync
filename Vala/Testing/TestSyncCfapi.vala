@@ -134,7 +134,7 @@ class TestSyncCfApi : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         CFVERIFY_VIRTUAL (fake_folder, "A/a1");
         //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").size (), 64);
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_NEW));
         on_signal_cleanup ();
@@ -143,7 +143,7 @@ class TestSyncCfApi : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         CFVERIFY_VIRTUAL (fake_folder, "A/a1");
         //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").size (), 64);
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (completeSpy.isEmpty ());
         on_signal_cleanup ();
@@ -153,7 +153,7 @@ class TestSyncCfApi : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         CFVERIFY_VIRTUAL (fake_folder, "A/a1");
         //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").size (), 64);
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (completeSpy.isEmpty ());
         on_signal_cleanup ();
@@ -163,7 +163,7 @@ class TestSyncCfApi : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         CFVERIFY_VIRTUAL (fake_folder, "A/a1");
         //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").size (), 65);
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_UPDATE_METADATA));
         //  QCOMPARE (dbRecord (fake_folder, "A/a1").fileSize, 65);
@@ -186,7 +186,7 @@ class TestSyncCfApi : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         CFVERIFY_VIRTUAL (fake_folder, "A/a1");
         //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").size (), 65);
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_NEW));
         on_signal_cleanup ();
@@ -197,7 +197,7 @@ class TestSyncCfApi : GLib.Object {
         //  QVERIFY (!GLib.FileInfo (fake_folder.local_path () + "A/a1").exists ());
         CFVERIFY_VIRTUAL (fake_folder, "A/a1m");
         //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1m").size (), 65);
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1m").lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1m").last_modified (), someDate);
         //  QVERIFY (!fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1m"));
         //  QVERIFY (

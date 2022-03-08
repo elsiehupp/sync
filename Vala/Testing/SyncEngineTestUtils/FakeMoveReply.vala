@@ -17,11 +17,11 @@ class FakeMoveReply : FakeReply {
         set_operation (operation);
         open (QIODevice.ReadOnly);
 
-        string fileName = get_file_path_from_url (request.url ());
-        //  Q_ASSERT (!fileName.isEmpty ());
+        string filename = get_file_path_from_url (request.url ());
+        //  Q_ASSERT (!filename.isEmpty ());
         string dest = get_file_path_from_url (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
         //  Q_ASSERT (!dest.isEmpty ());
-        remote_root_file_info.rename (fileName, dest);
+        remote_root_file_info.rename (filename, dest);
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 

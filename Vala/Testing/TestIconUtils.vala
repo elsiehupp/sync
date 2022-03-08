@@ -21,9 +21,9 @@ class TestIconUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void testDrawSvgWithCustomFillColor () {
-        const string blackSvgDirPath{string{Occ.Theme.themePrefix} + "black"};
-        const QDir blackSvgDir (blackSvgDirPath);
-        const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
+        const string blackSvgDirPath = Occ.Theme.themePrefix + "black";
+        const QDir blackSvgDir = new QDir (blackSvgDirPath);
+        const string[] blackImages = blackSvgDir.entryList ("*.svg");
 
         //  Q_ASSERT (!blackImages.isEmpty ());
 
@@ -31,9 +31,9 @@ class TestIconUtils : GLib.Object {
 
         //  QVERIFY (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (blackSvgDirPath + "/" + blackImages.at (0), QColorConstants.Svg.green).isNull ());
 
-        const string whiteSvgDirPath{string{Occ.Theme.themePrefix} + "white"};
-        const QDir whiteSvgDir (whiteSvgDirPath);
-        const string[] whiteImages = whiteSvgDir.entryList (string[] ("*.svg"));
+        const string whiteSvgDirPath = Occ.Theme.themePrefix + "white";
+        const QDir whiteSvgDir = new QDir (whiteSvgDirPath);
+        const string[] whiteImages = whiteSvgDir.entryList ("*.svg");
 
         //  Q_ASSERT (!whiteImages.isEmpty ());
 
@@ -44,8 +44,8 @@ class TestIconUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void testCreateSvgPixmapWithCustomColor () {
-        const QDir blackSvgDir (string (string{Occ.Theme.themePrefix}) + "black");
-        const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
+        const QDir blackSvgDir = new QDir (Occ.Theme.themePrefix + "black");
+        const string[] blackImages = blackSvgDir.entryList ("*.svg");
 
         //  QVERIFY (!blackImages.isEmpty ());
 
@@ -53,8 +53,8 @@ class TestIconUtils : GLib.Object {
 
         //  QVERIFY (!Occ.Ui.IconUtils.createSvgImageWithCustomColor (blackImages.at (0), QColorConstants.Svg.green).isNull ());
 
-        const QDir whiteSvgDir (string (string{Occ.Theme.themePrefix}) + "white");
-        const string[] whiteImages = whiteSvgDir.entryList (string[] ("*.svg"));
+        const QDir whiteSvgDir = new QDir (Occ.Theme.themePrefix + "white");
+        const string[] whiteImages = whiteSvgDir.entryList ("*.svg");
 
         //  QVERIFY (!whiteImages.isEmpty ());
 
@@ -65,11 +65,11 @@ class TestIconUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void testPixmapForBackground () {
-        const QDir blackSvgDir (string (string{Occ.Theme.themePrefix}) + "black");
-        const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
+        const QDir blackSvgDir = new QDir (Occ.Theme.themePrefix + "black");
+        const string[] blackImages = blackSvgDir.entryList ("*.svg");
 
-        const QDir whiteSvgDir (string (string{Occ.Theme.themePrefix}) + "white");
-        const string[] whiteImages = whiteSvgDir.entryList (string[] ("*.svg"));
+        const QDir whiteSvgDir = new QDir (Occ.Theme.themePrefix + "white");
+        const string[] whiteImages = whiteSvgDir.entryList ("*.svg");
 
         //  QVERIFY (!blackImages.isEmpty ());
 
@@ -79,7 +79,6 @@ class TestIconUtils : GLib.Object {
 
         //  QVERIFY (!Occ.Ui.IconUtils.pixmapForBackground (blackImages.at (0), Gtk.Color ("yellow")).isNull ());
     }
-}
 
-QTEST_MAIN (TestIconUtils)
-#include "testiconutils.moc"
+} // class TestIconUtils
+} // namespace Testing

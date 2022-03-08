@@ -123,11 +123,11 @@ class TestUtility : GLib.Object {
     ***********************************************************/
     private void on_signal_test_version_of_installed_binary () {
         if (isLinux ()) {
-            // pass the cmd client from our build directory
+            // pass the command client from our build directory
             // this is a bit inaccurate as it does not test the "real thing"
-            // but cmd and gui have the same --version handler by now
-            // and cmd works without X in CI
-            string version = versionOfInstalledBinary (OWNCLOUD_BIN_PATH + "/" + APPLICATION_EXECUTABLE + "cmd");
+            // but command and gui have the same --version handler by now
+            // and command works without X in CI
+            string version = versionOfInstalledBinary (OWNCLOUD_BIN_PATH + "/" + APPLICATION_EXECUTABLE + "command");
             GLib.debug ("Version of installed Nextcloud: " + version);
             //  QVERIFY (!version.isEmpty ());
 

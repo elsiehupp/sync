@@ -24,9 +24,9 @@ class FakeGetReply : FakeReply {
         set_operation (operation);
         open (QIODevice.ReadOnly);
     
-        string fileName = get_file_path_from_url (request.url ());
-        //  Q_ASSERT (!fileName.isEmpty ());
-        file_info = remote_root_file_info.find (fileName);
+        string filename = get_file_path_from_url (request.url ());
+        //  Q_ASSERT (!filename.isEmpty ());
+        file_info = remote_root_file_info.find (filename);
         if (!file_info) {
             GLib.debug ("meh;");
         }
@@ -77,7 +77,7 @@ class FakeGetReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public override int64 read_data (char data, int64 maxlen) {
+    public override int64 read_data (char *data, int64 maxlen) {
         int64 len = std.min ((int64) size, maxlen);
         std.fill_n (data, len, payload);
         size -= len;

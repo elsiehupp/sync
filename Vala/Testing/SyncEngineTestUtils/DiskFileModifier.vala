@@ -40,7 +40,7 @@ class DiskFileModifier : FileModifier {
         file.write (buffer.data (), size % buffer.size ());
         file.close ();
         // Set the mtime 30 seconds in the past, for some tests that need to make sure that the mtime differs.
-        Occ.FileSystem.set_modification_time (file.fileName (), Occ.Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ().addSecs (-30)));
+        Occ.FileSystem.set_modification_time (file.filename (), Occ.Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ().addSecs (-30)));
         //  QCOMPARE (file.size (), size);
     }
 

@@ -14,7 +14,7 @@ namespace Testing {
 
 class TestFolderMan : GLib.Object {
 
-    FolderMan this.fm;
+    FolderMan folder_manager;
 
     /***********************************************************
     ***********************************************************/
@@ -22,109 +22,109 @@ class TestFolderMan : GLib.Object {
         QTemporaryDir directory;
         ConfigFile.setConfDir (directory.path ()); // we don't want to pollute the user's config file
         //  QVERIFY (directory.isValid ());
-        QDir dir2 (directory.path ());
-        //  QVERIFY (dir2.mkpath ("sub/ownCloud1/folder/f"));
+        QDir dir2 = new QDir (directory.path ());
+        //  QVERIFY (dir2.mkpath ("sub/ownCloud1/folder/file"));
         //  QVERIFY (dir2.mkpath ("ownCloud2"));
         //  QVERIFY (dir2.mkpath ("sub/free"));
         //  QVERIFY (dir2.mkpath ("free2/sub")); {
-            GLib.File f (directory.path () + "/sub/file.txt");
-            f.open (GLib.File.WriteOnly);
-            f.write ("hello");
-        }
-        string dirPath = dir2.canonicalPath ();
+        //      GLib.File file = new GLib.File (directory.path () + "/sub/file.txt");
+        //      file.open (GLib.File.WriteOnly);
+        //      file.write ("hello");
+        //  }
+        string directory_path = dir2.canonicalPath ();
 
         AccountPointer account = Account.create ();
-        GLib.Uri url ("http://example.de");
+        GLib.Uri url = new GLib.Uri ("http://example.de");
         var credentials = new HttpCredentialsTest ("testuser", "secret");
         account.setCredentials (credentials);
         account.set_url ( url );
 
-        AccountStatePtr newAccountState (new AccountState (account));
-        FolderMan folderman = FolderMan.instance ();
-        //  QCOMPARE (folderman, this.fm);
-        //  QVERIFY (folderman.addFolder (newAccountState.data (), folderDefinition (dirPath + "/sub/ownCloud1")));
-        //  QVERIFY (folderman.addFolder (newAccountState.data (), folderDefinition (dirPath + "/ownCloud2")));
+        AccountStatePtr new_account_state = new AccountStatePtr (new AccountState (account));
+        FolderMan folder_manager = FolderMan.instance ();
+        //  QCOMPARE (folder_manager, this.folder_manager);
+        //  QVERIFY (folder_manager.addFolder (new_account_state.data (), folder_definition (directory_path + "/sub/ownCloud1")));
+        //  QVERIFY (folder_manager.addFolder (new_account_state.data (), folder_definition (directory_path + "/ownCloud2")));
 
-        const var folderList = folderman.map ();
+        const var folder_list = folder_manager.map ();
 
-        for (var folder : folderList) {
-            //  QVERIFY (!folder.isSyncRunning ());
-        }
+        //  foreach (var folder in folder_list) {
+        //      QVERIFY (!folder.isSyncRunning ());
+        //  }
 
         // those should be allowed
         // string FolderMan.checkPathValidityForNewFolder (string path, GLib.Uri serverUrl, bool forNewDirectory)
 
-        //  QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free"), "");
-        //  QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/free2/"), "");
+        //  QCOMPARE (folder_manager.checkPathValidityForNewFolder (directory_path + "/sub/free"), "");
+        //  QCOMPARE (folder_manager.checkPathValidityForNewFolder (directory_path + "/free2/"), "");
         // Not an existing directory . Ok
-        //  QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/bliblablu"), "");
-        //  QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free/bliblablu"), "");
-        // QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/bliblablu/some/more"), "");
+        //  QCOMPARE (folder_manager.checkPathValidityForNewFolder (directory_path + "/sub/bliblablu"), "");
+        //  QCOMPARE (folder_manager.checkPathValidityForNewFolder (directory_path + "/sub/free/bliblablu"), "");
+        // QCOMPARE (folder_manager.checkPathValidityForNewFolder (directory_path + "/sub/bliblablu/some/more"), "");
 
         // A file . Error
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/file.txt").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/sub/file.txt").isNull ());
 
         // There are folders configured in those folders, url needs to be taken into account : . ERROR
-        GLib.Uri url2 (url);
+        GLib.Uri url2 = new GLib.Uri (url);
         const string user = account.credentials ().user ();
-        url2.setUserName (user);
+        url2.set_user_name (user);
 
         // The following both fail because they refer to the same account (user and url)
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1", url2).isNull ());
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/", url2).isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/sub/ownCloud1", url2).isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/ownCloud2/", url2).isNull ());
 
         // Now it will work because the account is different
-        GLib.Uri url3 ("http://anotherexample.org");
-        url3.setUserName ("dummy");
-        //  QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1", url3), "");
-        //  QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/", url3), "");
+        GLib.Uri url3 = new GLib.Uri ("http://anotherexample.org");
+        url3.set_user_name ("dummy");
+        //  QCOMPARE (folder_manager.checkPathValidityForNewFolder (directory_path + "/sub/ownCloud1", url3), "");
+        //  QCOMPARE (folder_manager.checkPathValidityForNewFolder (directory_path + "/ownCloud2/", url3), "");
 
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath).isNull ());
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1/folder").isNull ());
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1/folder/f").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path).isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/sub/ownCloud1/folder").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/sub/ownCloud1/folder/file").isNull ());
 
         // make a bunch of links
-        //  QVERIFY (GLib.File.link (dirPath + "/sub/free", dirPath + "/link1"));
-        //  QVERIFY (GLib.File.link (dirPath + "/sub", dirPath + "/link2"));
-        //  QVERIFY (GLib.File.link (dirPath + "/sub/ownCloud1", dirPath + "/link3"));
-        //  QVERIFY (GLib.File.link (dirPath + "/sub/ownCloud1/folder", dirPath + "/link4"));
+        //  QVERIFY (GLib.File.link (directory_path + "/sub/free", directory_path + "/link1"));
+        //  QVERIFY (GLib.File.link (directory_path + "/sub", directory_path + "/link2"));
+        //  QVERIFY (GLib.File.link (directory_path + "/sub/ownCloud1", directory_path + "/link3"));
+        //  QVERIFY (GLib.File.link (directory_path + "/sub/ownCloud1/folder", directory_path + "/link4"));
 
         // Ok
-        //  QVERIFY (folderman.checkPathValidityForNewFolder (dirPath + "/link1").isNull ());
-        //  QVERIFY (folderman.checkPathValidityForNewFolder (dirPath + "/link2/free").isNull ());
+        //  QVERIFY (folder_manager.checkPathValidityForNewFolder (directory_path + "/link1").isNull ());
+        //  QVERIFY (folder_manager.checkPathValidityForNewFolder (directory_path + "/link2/free").isNull ());
 
         // Not Ok
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/link2").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/link2").isNull ());
 
         // link 3 points to an existing sync folder. To make it fail, the account must be the same
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/link3", url2).isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/link3", url2).isNull ());
         // while with a different account, this is fine
-        //  QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/link3", url3), "");
+        //  QCOMPARE (folder_manager.checkPathValidityForNewFolder (directory_path + "/link3", url3), "");
 
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/link4").isNull ());
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/link3/folder").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/link4").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/link3/folder").isNull ());
 
         // test some non existing sub path (error)
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1/some/sub/path").isNull ());
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/blublu").isNull ());
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1/folder/g/h").isNull ());
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/link3/folder/neu_folder").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/sub/ownCloud1/some/sub/path").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/ownCloud2/blublu").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/sub/ownCloud1/folder/g/h").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/link3/folder/neu_folder").isNull ());
 
         // Subfolder of links
-        //  QVERIFY (folderman.checkPathValidityForNewFolder (dirPath + "/link1/subfolder").isNull ());
-        //  QVERIFY (folderman.checkPathValidityForNewFolder (dirPath + "/link2/free/subfolder").isNull ());
+        //  QVERIFY (folder_manager.checkPathValidityForNewFolder (directory_path + "/link1/subfolder").isNull ());
+        //  QVERIFY (folder_manager.checkPathValidityForNewFolder (directory_path + "/link2/free/subfolder").isNull ());
 
         // Should not have the rights
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder ("/").isNull ());
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder ("/usr/bin/somefolder").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder ("/").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder ("/usr/bin/somefolder").isNull ());
 
         // Invalid paths
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder ("").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder ("").isNull ());
 
         // REMOVE ownCloud2 from the filesystem, but keep a folder sync'ed to it.
-        QDir (dirPath + "/ownCloud2/").removeRecursively ();
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/blublu").isNull ());
-        //  QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/sub/subsub/sub").isNull ());
+        QDir (directory_path + "/ownCloud2/").removeRecursively ();
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/ownCloud2/blublu").isNull ());
+        //  QVERIFY (!folder_manager.checkPathValidityForNewFolder (directory_path + "/ownCloud2/sub/subsub/sub").isNull ());
     }
 
 
@@ -136,52 +136,51 @@ class TestFolderMan : GLib.Object {
         QTemporaryDir directory;
         ConfigFile.setConfDir (directory.path ()); // we don't want to pollute the user's config file
         //  QVERIFY (directory.isValid ());
-        QDir dir2 (directory.path ());
-        //  QVERIFY (dir2.mkpath ("sub/ownCloud1/folder/f"));
+        QDir dir2 = new QDir (directory.path ());
+        //  QVERIFY (dir2.mkpath ("sub/ownCloud1/folder/file"));
         //  QVERIFY (dir2.mkpath ("ownCloud"));
         //  QVERIFY (dir2.mkpath ("ownCloud2"));
         //  QVERIFY (dir2.mkpath ("ownCloud2/foo"));
         //  QVERIFY (dir2.mkpath ("sub/free"));
         //  QVERIFY (dir2.mkpath ("free2/sub"));
-        string dirPath = dir2.canonicalPath ();
+        string directory_path = dir2.canonicalPath ();
 
         AccountPointer account = Account.create ();
-        GLib.Uri url ("http://example.de");
+        GLib.Uri url = new GLib.Uri ("http://example.de");
         var credentials = new HttpCredentialsTest ("testuser", "secret");
         account.setCredentials (credentials);
-        account.set_url ( url );
-        url.setUserName (credentials.user ());
+        account.set_url (url);
+        url.set_user_name (credentials.user ());
 
-        AccountStatePtr newAccountState (new AccountState (account));
-        FolderMan folderman = FolderMan.instance ();
-        //  QCOMPARE (folderman, this.fm);
-        //  QVERIFY (folderman.addFolder (newAccountState.data (), folderDefinition (dirPath + "/sub/ownCloud/")));
-        //  QVERIFY (folderman.addFolder (newAccountState.data (), folderDefinition (dirPath + "/ownCloud2/")));
+        AccountStatePtr new_account_state = new AccountStatePtr (new AccountState (account));
+        FolderMan folder_manager = FolderMan.instance ();
+        //  QCOMPARE (folder_manager, this.folder_manager);
+        //  QVERIFY (folder_manager.addFolder (new_account_state.data (), folder_definition (directory_path + "/sub/ownCloud/")));
+        //  QVERIFY (folder_manager.addFolder (new_account_state.data (), folder_definition (directory_path + "/ownCloud2/")));
 
         // TEST
 
-        //  QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/oc", url),
-                 string (dirPath + "/oc"));
-        //  QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud", url),
-                 string (dirPath + "/ownCloud3"));
-        //  QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud2", url),
-                 string (dirPath + "/ownCloud22"));
-        //  QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud2/foo", url),
-                 string (dirPath + "/ownCloud2/foo"));
-        //  QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud2/bar", url),
-                 string (dirPath + "/ownCloud2/bar"));
-        //  QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/sub", url),
-                 string (dirPath + "/sub2"));
+        //  QCOMPARE (folder_manager.findGoodPathForNewSyncFolder (directory_path + "/oc", url),
+        //           string (directory_path + "/oc"));
+        //  QCOMPARE (folder_manager.findGoodPathForNewSyncFolder (directory_path + "/ownCloud", url),
+        //           string (directory_path + "/ownCloud3"));
+        //  QCOMPARE (folder_manager.findGoodPathForNewSyncFolder (directory_path + "/ownCloud2", url),
+        //           string (directory_path + "/ownCloud22"));
+        //  QCOMPARE (folder_manager.findGoodPathForNewSyncFolder (directory_path + "/ownCloud2/foo", url),
+        //           string (directory_path + "/ownCloud2/foo"));
+        //  QCOMPARE (folder_manager.findGoodPathForNewSyncFolder (directory_path + "/ownCloud2/bar", url),
+        //           string (directory_path + "/ownCloud2/bar"));
+        //  QCOMPARE (folder_manager.findGoodPathForNewSyncFolder (directory_path + "/sub", url),
+        //           string (directory_path + "/sub2"));
 
         // REMOVE ownCloud2 from the filesystem, but keep a folder sync'ed to it.
         // We should still not suggest this folder as a new folder.
-        QDir (dirPath + "/ownCloud2/").removeRecursively ();
-        //  QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud", url),
-            string (dirPath + "/ownCloud3"));
-        //  QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud2", url),
-            string (dirPath + "/ownCloud22"));
+        QDir (directory_path + "/ownCloud2/").removeRecursively ();
+        //  QCOMPARE (folder_manager.findGoodPathForNewSyncFolder (directory_path + "/ownCloud", url),
+        //      string (directory_path + "/ownCloud3"));
+        //  QCOMPARE (folder_manager.findGoodPathForNewSyncFolder (directory_path + "/ownCloud2", url),
+        //      string (directory_path + "/ownCloud22"));
     }
-}
 
-QTEST_APPLESS_MAIN (TestFolderMan)
-#include "testfolderman.moc"
+}
+}

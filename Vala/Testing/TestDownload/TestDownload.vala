@@ -21,7 +21,7 @@ class TestDownload : GLib.Object {
     private void testResume () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().setIgnoreHiddenFiles (true);
-        QSignalSpy completeSpy (&fake_folder.sync_engine (), SIGNAL (itemCompleted (SyncFileItemPtr &)));
+        QSignalSpy completeSpy = new QSignalSpy (fake_folder.sync_engine (), SIGNAL (itemCompleted (SyncFileItemPtr)));
         var size = 30 * 1000 * 1000;
         fake_folder.remote_modifier ().insert ("A/a0", size);
 

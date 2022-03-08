@@ -38,7 +38,5 @@ class TestFolder : GLib.Object {
         QTest.newRow ("windowsbwslash2") + "C:\\foo\\bar" + "C:/foo/bar";
     }
 
-}
-
-QTEST_APPLESS_MAIN (TestFolder)
-#include "testfolder.moc"
+} // class TestFolder
+} // namespace Testing

@@ -27,7 +27,7 @@ class TestLocalDiscovery : GLib.Object {
         fake_folder.local_modifier ().mkdir ("A/Y");
         fake_folder.local_modifier ().insert ("A/X/x1");
         fake_folder.local_modifier ().insert ("A/Y/y1");
-        tracker.addTouchedPath ("A/X");
+        tracker.add_touched_path ("A/X");
 
         tracker.startSyncFullDiscovery ();
         //  QVERIFY (fake_folder.sync_once ());
@@ -42,7 +42,7 @@ class TestLocalDiscovery : GLib.Object {
         fake_folder.local_modifier ().insert ("B/b3");
         fake_folder.remote_modifier ().insert ("C/c3");
         fake_folder.remote_modifier ().append_byte ("C/c1");
-        tracker.addTouchedPath ("A/X");
+        tracker.add_touched_path ("A/X");
 
         fake_folder.sync_engine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
 
@@ -97,8 +97,8 @@ class TestLocalDiscovery : GLib.Object {
         //  QVERIFY (engine.shouldDiscoverLocally ("zzzz/hello"));
         //  QVERIFY (!engine.shouldDiscoverLocally ("zzza/hello"));
 
-        QEXPECT_FAIL ("", "There is a possibility of false positives if the set contains a path "
-            "which is a prefix, and that prefix is followed by a character less than '/'", Continue);
+        //  QEXPECT_FAIL ("", "There is a possibility of false positives if the set contains a path "
+        //      "which is a prefix, and that prefix is followed by a character less than '/'", Continue);
         //  QVERIFY (!engine.shouldDiscoverLocally ("A/X o"));
 
         fake_folder.sync_engine ().setLocalDiscoveryOptions (
@@ -115,14 +115,14 @@ class TestLocalDiscovery : GLib.Object {
         LocalDiscoveryTracker tracker;
         connect (&fake_folder.sync_engine (), &SyncEngine.itemCompleted, tracker, &LocalDiscoveryTracker.slotItemCompleted);
         connect (&fake_folder.sync_engine (), &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slotSyncFinished);
-        var trackerContains = [&] (char path) {
+        var trackerContains = (char path) => {
             return tracker.localDiscoveryPaths ().find (path) != tracker.localDiscoveryPaths ().end ();
         }
 
-        tracker.addTouchedPath ("A/spurious");
+        tracker.add_touched_path ("A/spurious");
 
         fake_folder.local_modifier ().insert ("A/a3");
-        tracker.addTouchedPath ("A/a3");
+        tracker.add_touched_path ("A/a3");
 
         fake_folder.local_modifier ().insert ("A/a4");
         fake_folder.server_error_paths ().append ("A/a4");
@@ -149,7 +149,7 @@ class TestLocalDiscovery : GLib.Object {
 
         fake_folder.server_error_paths ().clear ();
         fake_folder.sync_journal ().wipeErrorBlocklist ();
-        tracker.addTouchedPath ("A/newspurious"); // will be removed due to successful sync
+        tracker.add_touched_path ("A/newspurious"); // will be removed due to successful sync
 
         fake_folder.sync_engine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
         tracker.startSyncPartialDiscovery ();

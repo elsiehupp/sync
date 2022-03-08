@@ -19,9 +19,9 @@ class FakeMkcolReply : FakeReply {
         set_operation (operation);
         open (QIODevice.ReadOnly);
 
-        string fileName = get_file_path_from_url (request.url ());
-        //  Q_ASSERT (!fileName.isEmpty ());
-        file_info = remote_root_file_info.create_directory (fileName);
+        string filename = get_file_path_from_url (request.url ());
+        //  Q_ASSERT (!filename.isEmpty ());
+        file_info = remote_root_file_info.create_directory (filename);
 
         if (!file_info) {
             on_signal_abort ();

@@ -64,7 +64,7 @@ bool expectAndWipeConflict (FileModifier local, FileInfo state, string path) {
     if (!base)
         return false;
     for (var item : base.children) {
-        if (item.name.startsWith (path_components.fileName ()) && item.name.contains (" (conflicted copy")) {
+        if (item.name.startsWith (path_components.filename ()) && item.name.contains (" (conflicted copy")) {
             local.remove (item.path ());
             return true;
         }
@@ -233,7 +233,7 @@ class TestSyncMove : GLib.Object {
         //  QCOMPARE (nDELETE, 2);
 
         // Move-and-change, size+content only
-        var mtime = fake_folder.remote_modifier ().find ("B/b2").lastModified;
+        var mtime = fake_folder.remote_modifier ().find ("B/b2").last_modified;
         fake_folder.local_modifier ().rename ("B/b2", "B/b2m");
         fake_folder.local_modifier ().append_byte ("B/b2m");
         fake_folder.local_modifier ().set_modification_time ("B/b2m", mtime);
@@ -245,7 +245,7 @@ class TestSyncMove : GLib.Object {
 
         // Move-and-change, content only -- c1 has no checksum, so we fail to detect this!
         // Note: This is an expected failure.
-        mtime = fake_folder.remote_modifier ().find ("C/c1").lastModified;
+        mtime = fake_folder.remote_modifier ().find ("C/c1").last_modified;
         fake_folder.local_modifier ().rename ("C/c1", "C/c1m");
         fake_folder.local_modifier ().set_contents ("C/c1m", 'C');
         fake_folder.local_modifier ().set_modification_time ("C/c1m", mtime);
@@ -264,7 +264,7 @@ class TestSyncMove : GLib.Object {
         //  QCOMPARE (nDELETE, 4);
 
         // Move-and-change, content only, this time while having a checksum
-        mtime = fake_folder.remote_modifier ().find ("C/c3").lastModified;
+        mtime = fake_folder.remote_modifier ().find ("C/c3").last_modified;
         fake_folder.local_modifier ().rename ("C/c3", "C/c3m");
         fake_folder.local_modifier ().set_contents ("C/c3m", 'C');
         fake_folder.local_modifier ().set_modification_time ("C/c3m", mtime);
@@ -660,8 +660,8 @@ class TestSyncMove : GLib.Object {
         fake_folder.set_server_override (counter.functor ());
 
         // Changing the mtime on the server (without invalidating the etag)
-        fake_folder.remote_modifier ().find ("A/a1").lastModified = GLib.DateTime.currentDateTimeUtc ().addSecs (-50000);
-        fake_folder.remote_modifier ().find ("A/a2").lastModified = GLib.DateTime.currentDateTimeUtc ().addSecs (-40000);
+        fake_folder.remote_modifier ().find ("A/a1").last_modified = GLib.DateTime.currentDateTimeUtc ().addSecs (-50000);
+        fake_folder.remote_modifier ().find ("A/a2").last_modified = GLib.DateTime.currentDateTimeUtc ().addSecs (-40000);
 
         // Move a few files
         fake_folder.remote_modifier ().rename ("A/a1", "A/a1_server_renamed");

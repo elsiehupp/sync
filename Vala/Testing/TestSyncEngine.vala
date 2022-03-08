@@ -816,13 +816,13 @@ class TestSyncEngine : GLib.Object {
         fake_folder.remote_modifier ().mkdir ("foo");
         fake_folder.remote_modifier ().insert ("foo/bar");
         var datetime = GLib.DateTime.currentDateTime ();
-        datetime.setSecsSinceEpoch (datetime.toSecsSinceEpoch ()); // wipe ms
-        fake_folder.remote_modifier ().find ("foo").lastModified = datetime;
+        datetime.setSecsSinceEpoch (datetime.to_seconds_since_epoch ()); // wipe ms
+        fake_folder.remote_modifier ().find ("foo").last_modified = datetime;
 
         //  QVERIFY (fake_folder.sync_once ());
         //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
-        //  QCOMPARE (GLib.new FileInfo (fake_folder.local_path () + "foo").lastModified (), datetime);
+        //  QCOMPARE (GLib.new FileInfo (fake_folder.local_path () + "foo").last_modified (), datetime);
     }
 
 
@@ -841,19 +841,19 @@ class TestSyncEngine : GLib.Object {
         int nPUT = 0;
         int nPOST = 0;
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) . Soup.Reply * {
-            var content_type = request.header (Soup.Request.ContentTypeHeader).toString ();
+            var content_type = request.header (Soup.Request.ContentTypeHeader).to_string ();
             if (operation == Soup.PostOperation) {
                 ++nPOST;
                 if (content_type.startsWith (QStringLiteral ("multipart/related; boundary="))) {
-                    var jsonReplyObject = fake_folder.for_each_reply_part (outgoing_data, content_type, [] (GLib.HashMap<string, GLib.ByteArray> allHeaders) . QJsonObject {
+                    var jsonReplyObject = fake_folder.for_each_reply_part (outgoing_data, content_type, [] (GLib.HashMap<string, GLib.ByteArray> all_headers) . QJsonObject {
                         var reply = QJsonObject{};
-                        const var fileName = allHeaders[QStringLiteral ("X-File-Path")];
-                        if (fileName.endsWith ("A/big2") ||
-                                fileName.endsWith ("A/big3") ||
-                                fileName.endsWith ("A/big4") ||
-                                fileName.endsWith ("A/big5") ||
-                                fileName.endsWith ("A/big7") ||
-                                fileName.endsWith ("B/big8")) {
+                        const var filename = all_headers[QStringLiteral ("X-File-Path")];
+                        if (filename.endsWith ("A/big2") ||
+                                filename.endsWith ("A/big3") ||
+                                filename.endsWith ("A/big4") ||
+                                filename.endsWith ("A/big5") ||
+                                filename.endsWith ("A/big7") ||
+                                filename.endsWith ("B/big8")) {
                             reply.insert (QStringLiteral ("error"), true);
                             reply.insert (QStringLiteral ("etag"), {});
                             return reply;
@@ -872,13 +872,13 @@ class TestSyncEngine : GLib.Object {
                 }
             } else if (operation == Soup.PutOperation) {
                 ++nPUT;
-                const var fileName = get_file_path_from_url (request.url ());
-                if (fileName.endsWith ("A/big2") ||
-                        fileName.endsWith ("A/big3") ||
-                        fileName.endsWith ("A/big4") ||
-                        fileName.endsWith ("A/big5") ||
-                        fileName.endsWith ("A/big7") ||
-                        fileName.endsWith ("B/big8")) {
+                const var filename = get_file_path_from_url (request.url ());
+                if (filename.endsWith ("A/big2") ||
+                        filename.endsWith ("A/big3") ||
+                        filename.endsWith ("A/big4") ||
+                        filename.endsWith ("A/big5") ||
+                        filename.endsWith ("A/big7") ||
+                        filename.endsWith ("B/big8")) {
                     return new FakeErrorReply (operation, request, this, 412);
                 }
                 return  null;

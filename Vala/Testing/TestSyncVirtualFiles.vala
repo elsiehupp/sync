@@ -94,7 +94,7 @@ class TestSyncVirtualFiles : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         //  QVERIFY (!fake_folder.current_local_state ().find ("A/a1"));
         //  QVERIFY (fake_folder.current_local_state ().find ("A/a1" DVSUFFIX));
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1" DVSUFFIX).lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1" DVSUFFIX).last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QVERIFY (itemInstruction (completeSpy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_NEW));
         //  QCOMPARE (dbRecord (fake_folder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
@@ -104,7 +104,7 @@ class TestSyncVirtualFiles : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         //  QVERIFY (!fake_folder.current_local_state ().find ("A/a1"));
         //  QVERIFY (fake_folder.current_local_state ().find ("A/a1" DVSUFFIX));
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1" DVSUFFIX).lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1" DVSUFFIX).last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QCOMPARE (dbRecord (fake_folder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
         //  QVERIFY (completeSpy.isEmpty ());
@@ -115,7 +115,7 @@ class TestSyncVirtualFiles : GLib.Object {
         //  QVERIFY (fake_folder.sync_once ());
         //  QVERIFY (!fake_folder.current_local_state ().find ("A/a1"));
         //  QVERIFY (fake_folder.current_local_state ().find ("A/a1" DVSUFFIX));
-        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1" DVSUFFIX).lastModified (), someDate);
+        //  QCOMPARE (GLib.FileInfo (fake_folder.local_path () + "A/a1" DVSUFFIX).last_modified (), someDate);
         //  QVERIFY (fake_folder.current_remote_state ().find ("A/a1"));
         //  QCOMPARE (dbRecord (fake_folder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
         //  QVERIFY (completeSpy.isEmpty ());
