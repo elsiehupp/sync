@@ -18,9 +18,9 @@ class FakeMoveReply : FakeReply {
         open (QIODevice.ReadOnly);
 
         string filename = get_file_path_from_url (request.url ());
-        //  Q_ASSERT (!filename.isEmpty ());
-        string dest = get_file_path_from_url (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
-        //  Q_ASSERT (!dest.isEmpty ());
+        GLib.assert_true (!filename.is_empty ());
+        string dest = get_file_path_from_url (GLib.Uri.from_encoded (request.raw_header ("Destination")));
+        GLib.assert_true (!dest.is_empty ());
         remote_root_file_info.rename (filename, dest);
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
     }

@@ -42,7 +42,7 @@ static void check_c_jhash_trials (void **state) {
                     for (k=0; k<MAXPAIR; k+=2) {
                         uint32 on_signal_finished=1;
                         /* keys have one bit different */
-                        for (l=0; l<hlen+1; ++l) {a[l] = b[l] = (uint8_t)0;}
+                        for (l=0; l<hlen+1; ++l) {a[l] = b[l] = (uint8)0;}
                         /* have a and b be two keys differing in only one bit */
                         a[i] ^= (k<<j);
                         a[i] ^= (k>> (8-j));
@@ -64,14 +64,14 @@ static void check_c_jhash_trials (void **state) {
                     }
                     if (k>z) z=k;
                     if (k==MAXPAIR) {
-                         print_error ("Some bit didn't change : ");
+                         print_error ("Some bit didn't change: ");
                          print_error ("%.8x %.8x %.8x %.8x %.8x %.8x    ",
                                         e[0], f[0], g[0], h[0], x[0], y[0]);
                          print_error ("i %d j %d m %d len %d\n",i,j,m,hlen);
                     }
                     if (z == MAXPAIR) {
                             if (z < MAXPAIR) {
-                                    assert_true (z < MAXPAIR);
+                                    GLib.assert_true (z < MAXPAIR);
                                     // print_error ("%u trials needed, should be less than 40\n", z/2);
                                     return;
                             }
@@ -84,13 +84,13 @@ static void check_c_jhash_trials (void **state) {
 
 static void check_c_jhash_alignment_problems (void **state) {
     uint32 test = 0;
-    uint8_t buf[MAXLEN+20];
-    uint8_t b = NULL;
+    uint8 buf[MAXLEN+20];
+    uint8 b = NULL;
     uint32 len = 0;
-    uint8_t q = "This is the time for all good men to come to the aid of their country";
-    uint8_t qq = "xThis is the time for all good men to come to the aid of their country";
-    uint8_t qqq = "xxThis is the time for all good men to come to the aid of their country";
-    uint8_t qqqq = "xxxThis is the time for all good men to come to the aid of their country";
+    uint8 q = "This is the time for all good men to come to the aid of their country";
+    uint8 qq = "xThis is the time for all good men to come to the aid of their country";
+    uint8 qqq = "xxThis is the time for all good men to come to the aid of their country";
+    uint8 qqqq = "xxxThis is the time for all good men to come to the aid of their country";
     uint32 h = 0;
     uint32 i = 0;
     uint32 j = 0;
@@ -101,10 +101,10 @@ static void check_c_jhash_alignment_problems (void **state) {
     (void) state; /* unused */
 
     test = c_jhash (q, sizeof (q)-1, (uint32)0);
-    assert_true (test == c_jhash (qq+1, sizeof (q)-1, (uint32)0));
-    assert_true (test == c_jhash (qq+1, sizeof (q)-1, (uint32)0));
-    assert_true (test == c_jhash (qqq+2, sizeof (q)-1, (uint32)0));
-    assert_true (test == c_jhash (qqqq+3, sizeof (q)-1, (uint32)0));
+    GLib.assert_true (test == c_jhash (qq+1, sizeof (q)-1, (uint32)0));
+    GLib.assert_true (test == c_jhash (qq+1, sizeof (q)-1, (uint32)0));
+    GLib.assert_true (test == c_jhash (qqq+2, sizeof (q)-1, (uint32)0));
+    GLib.assert_true (test == c_jhash (qqqq+3, sizeof (q)-1, (uint32)0));
     for (h=0, b=buf+1; h<8; ++h, ++b) {
         for (i=0; i<MAXLEN; ++i) {
             len = i;
@@ -112,8 +112,8 @@ static void check_c_jhash_alignment_problems (void **state) {
 
             /* these should all be equal */
             ref = c_jhash (b, len, (uint32)1);
-            * (b+i)= (uint8_t)~0;
-            * (b-1)= (uint8_t)~0;
+            * (b+i)= (uint8)~0;
+            * (b-1)= (uint8)~0;
             x = c_jhash (b, len, (uint32)1);
             y = c_jhash (b, len, (uint32)1);
             assert_false ( (ref != x) || (ref != y));
@@ -122,7 +122,7 @@ static void check_c_jhash_alignment_problems (void **state) {
 }
 
 static void check_c_jhash_null_strings (void **state) {
-    uint8_t buf[1];
+    uint8 buf[1];
     uint32 h = 0;
     uint32 i = 0;
     uint32 t = 0;
@@ -175,7 +175,7 @@ static void check_c_jhash64_trials (void **state) {
                     for (k=0; k<MAXPAIR; k+=2) {
                         uint64 on_signal_finished=1;
                         /* keys have one bit different */
-                        for (l=0; l<hlen+1; ++l) {a[l] = b[l] = (uint8_t)0;}
+                        for (l=0; l<hlen+1; ++l) {a[l] = b[l] = (uint8)0;}
                         /* have a and b be two keys differing in only one bit */
                         a[i] ^= (k<<j);
                         a[i] ^= (k>> (8-j));
@@ -198,7 +198,7 @@ static void check_c_jhash64_trials (void **state) {
                     if (k>z) z=k;
                     if (k==MAXPAIR) {
 #if 0
-                         print_error ("Some bit didn't change : ");
+                         print_error ("Some bit didn't change: ");
                          print_error ("%.8llx %.8llx %.8llx %.8llx %.8llx %.8llx    ",
                                                  (long long uint32) e[0],
                                                  (long long uint32) f[0],
@@ -215,7 +215,7 @@ static void check_c_jhash64_trials (void **state) {
 #if 0
                                     print_error ("%lu trials needed, should be less than 40", z/2);
 //  #endif
-                                    assert_true (z < MAXPAIR);
+                                    GLib.assert_true (z < MAXPAIR);
                             }
                             return;
                     }
@@ -226,17 +226,17 @@ static void check_c_jhash64_trials (void **state) {
 }
 
 static void check_c_jhash64_alignment_problems (void **state) {
-    uint8_t buf[MAXLEN+20];
-    uint8_t b = NULL;
+    uint8 buf[MAXLEN+20];
+    uint8 b = NULL;
     uint64 len = 0;
-    uint8_t q = "This is the time for all good men to come to the aid of their country";
-    uint8_t qq = "xThis is the time for all good men to come to the aid of their country";
-    uint8_t qqq = "xxThis is the time for all good men to come to the aid of their country";
-    uint8_t qqqq = "xxxThis is the time for all good men to come to the aid of their country";
-    uint8_t o = "xxxxThis is the time for all good men to come to the aid of their country";
-    uint8_t oo = "xxxxxThis is the time for all good men to come to the aid of their country";
-    uint8_t ooo = "xxxxxxThis is the time for all good men to come to the aid of their country";
-    uint8_t oooo = "xxxxxxxThis is the time for all good men to come to the aid of their country";
+    uint8 q = "This is the time for all good men to come to the aid of their country";
+    uint8 qq = "xThis is the time for all good men to come to the aid of their country";
+    uint8 qqq = "xxThis is the time for all good men to come to the aid of their country";
+    uint8 qqqq = "xxxThis is the time for all good men to come to the aid of their country";
+    uint8 o = "xxxxThis is the time for all good men to come to the aid of their country";
+    uint8 oo = "xxxxxThis is the time for all good men to come to the aid of their country";
+    uint8 ooo = "xxxxxxThis is the time for all good men to come to the aid of their country";
+    uint8 oooo = "xxxxxxxThis is the time for all good men to come to the aid of their country";
     uint64 h = 0;
     uint64 i = 0;
     uint64 j = 0;
@@ -249,28 +249,28 @@ static void check_c_jhash64_alignment_problems (void **state) {
 
     h = c_jhash64 (q+0, (uint64) (sizeof (q)-1), (uint64)0);
     t = h;
-    assert_true (t == h);
+    GLib.assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (qq+1, (uint64) (sizeof (q)-1), (uint64)0);
-    assert_true (t == h);
+    GLib.assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (qqq+2, (uint64) (sizeof (q)-1), (uint64)0);
-    assert_true (t == h);
+    GLib.assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (qqqq+3, (uint64) (sizeof (q)-1), (uint64)0);
-    assert_true (t == h);
+    GLib.assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (o+4, (uint64) (sizeof (q)-1), (uint64)0);
-    assert_true (t == h);
+    GLib.assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (oo+5, (uint64) (sizeof (q)-1), (uint64)0);
-    assert_true (t == h);
+    GLib.assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (ooo+6, (uint64) (sizeof (q)-1), (uint64)0);
-    assert_true (t == h);
+    GLib.assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     h = c_jhash64 (oooo+7, (uint64) (sizeof (q)-1), (uint64)0);
-    assert_true (t == h);
+    GLib.assert_true (t == h);
     // , "%.8lx%.8lx\n", (uint32)h, (uint32) (h>>32));
     for (h=0, b=buf+1; h<8; ++h, ++b) {
         for (i=0; i<MAXLEN; ++i) {
@@ -279,8 +279,8 @@ static void check_c_jhash64_alignment_problems (void **state) {
 
             /* these should all be equal */
             ref = c_jhash64 (b, len, (uint64)1);
-            * (b+i)= (uint8_t)~0;
-            * (b-1)= (uint8_t)~0;
+            * (b+i)= (uint8)~0;
+            * (b-1)= (uint8)~0;
             x = c_jhash64 (b, len, (uint64)1);
             y = c_jhash64 (b, len, (uint64)1);
             assert_false ( (ref != x) || (ref != y));
@@ -292,7 +292,7 @@ static void check_c_jhash64_alignment_problems (void **state) {
 }
 
 static void check_c_jhash64_null_strings (void **state) {
-    uint8_t buf[1];
+    uint8 buf[1];
     uint64 h = 0;
     uint64 i = 0;
     uint64 t = 0;

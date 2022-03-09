@@ -36,19 +36,19 @@ static GLib.Vector<Occ.UserStatus>
 createFakePredefinedStatuses (GLib.DateTime currentTime) {
     GLib.Vector<Occ.UserStatus> statuses;
 
-    const string userStatusId ("fake-identifier");
-    const string userStatusMessage ("Predefined status");
-    const string userStatusIcon ("🏖");
-    const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.Online);
-    const bool userStatusMessagePredefined (true);
-    Occ.Optional<Occ.ClearAt> userStatusClearAt;
+    const string user_statusId ("fake-identifier");
+    const string user_statusMessage ("Predefined status");
+    const string user_statusIcon ("🏖");
+    const Occ.UserStatus.OnlineStatus user_statusState (Occ.UserStatus.OnlineStatus.Online);
+    const bool user_statusMessagePredefined (true);
+    Occ.Optional<Occ.ClearAt> user_statusClearAt;
     Occ.ClearAt clearAt;
     clearAt.type = Occ.ClearAtType.Timestamp;
-    clearAt.timestamp = currentTime.addSecs (60 * 60).toTime_t ();
-    userStatusClearAt = clearAt;
+    clearAt.timestamp = currentTime.add_secs (60 * 60).toTime_t ();
+    user_statusClearAt = clearAt;
 
-    statuses.emplace_back (userStatusId, userStatusMessage, userStatusIcon,
-        userStatusState, userStatusMessagePredefined, userStatusClearAt);
+    statuses.emplace_back (user_statusId, user_statusMessage, user_statusIcon,
+        user_statusState, user_statusMessagePredefined, user_statusClearAt);
 
     return statuses;
 }

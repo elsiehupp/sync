@@ -23,10 +23,10 @@ class TestOwnSql : GLib.Object {
     ***********************************************************/
     private void testOpenDb () {
         GLib.FileInfo file_info = new GLib.FileInfo ( this.temporary_directory.path () + "/testdatabase.sqlite" );
-        //  QVERIFY ( !file_info.exists () ); // must not exist
-        this.database.openOrCreateReadWrite (file_info.filePath ());
+        GLib.assert_true ( !file_info.exists () ); // must not exist
+        this.database.openOrCreateReadWrite (file_info.file_path ());
         file_info.refresh ();
-        //  QVERIFY (file_info.exists ());
+        GLib.assert_true (file_info.exists ());
     }
 
 
@@ -38,7 +38,7 @@ class TestOwnSql : GLib.Object {
 
         SqlQuery query = new SqlQuery (this.database);
         query.prepare (sql);
-        //  QVERIFY (query.exec ());
+        GLib.assert_true (query.exec ());
     }
 
 
@@ -47,10 +47,10 @@ class TestOwnSql : GLib.Object {
     private void testIsSelect () {
         SqlQuery query = new SqlQuery (this.database);
         query.prepare ("SELECT identifier FROM addresses;");
-        //  QVERIFY ( query.isSelect () );
+        GLib.assert_true ( query.isSelect () );
 
         query.prepare ("UPDATE addresses SET identifier = 1;");
-        //  QVERIFY ( !query.isSelect ());
+        GLib.assert_true ( !query.isSelect ());
     }
 
 
@@ -61,7 +61,7 @@ class TestOwnSql : GLib.Object {
                          + " (1, 'Gonzo Alberto', 'Moriabata 24, Palermo', 1403100844);";
         SqlQuery query = new SqlQuery (this.database);
         query.prepare (sql);
-        //  QVERIFY (query.exec ());
+        GLib.assert_true (query.exec ());
     }
 
 
@@ -76,7 +76,7 @@ class TestOwnSql : GLib.Object {
         query.bindValue (2, "Brucely Lafayette");
         query.bindValue (3, "Nurderway5, New York");
         query.bindValue (4, 1403101224);
-        //  QVERIFY (query.exec ());
+        GLib.assert_true (query.exec ());
     }
 
 
@@ -137,7 +137,7 @@ class TestOwnSql : GLib.Object {
         query.bindValue (2, string.fromUtf8 ("пятницы"));
         query.bindValue (3, string.fromUtf8 ("проспект"));
         query.bindValue (4, 1403002224);
-        //  QVERIFY (query.exec ());
+        GLib.assert_true (query.exec ());
     }
 
 
@@ -151,8 +151,8 @@ class TestOwnSql : GLib.Object {
         if (query.next ().hasData) {
             string name = query.stringValue (1);
             string address = query.stringValue (2);
-            //  QVERIFY ( name == string.fromUtf8 ("пятницы") );
-            //  QVERIFY ( address == string.fromUtf8 ("проспект"));
+            GLib.assert_true ( name == string.fromUtf8 ("пятницы") );
+            GLib.assert_true ( address == string.fromUtf8 ("проспект"));
         }
     }
 
@@ -162,7 +162,7 @@ class TestOwnSql : GLib.Object {
     private void testDestructor () {
         // This test make sure that the destructor of SqlQuery works even if the SqlDatabase
         // is destroyed before
-        QScopedPointer<SqlDatabase> database = new QScopedPointer<SqlDatabase> (new SqlDatabase ());
+        SqlDatabase database = new SqlDatabase ();
         SqlQuery query_1 = new SqlQuery (this.database);
         SqlQuery query_2 = new SqlQuery (this.database);
         query_2.prepare ("SELECT * FROM addresses");

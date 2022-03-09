@@ -19,13 +19,13 @@ class TestSelectiveSync : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         SyncOptions options;
         options.newBigFolderSizeLimit = 20000; // 20 K
-        fake_folder.sync_engine ().setSyncOptions (options);
+        fake_folder.sync_engine ().set_sync_options (options);
 
         string[] sizeRequests;
         fake_folder.set_server_override ((Soup.Operation operation, Soup.Request request, QIODevice device) => {
             // Record what path we are querying for the size
             if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND") {
-                if (device.readAll ().contains ("<size ")) {
+                if (device.read_all ().contains ("<size ")) {
                     sizeRequests.append (request.url ().path ());
                 }
             }
@@ -34,52 +34,52 @@ class TestSelectiveSync : GLib.Object {
 
         QSignalSpy newBigFolder (&fake_folder.sync_engine (), &SyncEngine.newBigFolder);
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         fake_folder.remote_modifier ().create_directory ("A/newBigDir");
-        fake_folder.remote_modifier ().create_directory ("A/newBigDir/subDir");
-        fake_folder.remote_modifier ().insert ("A/newBigDir/subDir/bigFile", options.newBigFolderSizeLimit + 10);
-        fake_folder.remote_modifier ().insert ("A/newBigDir/subDir/smallFile", 10);
+        fake_folder.remote_modifier ().create_directory ("A/newBigDir/sub_directory");
+        fake_folder.remote_modifier ().insert ("A/newBigDir/sub_directory/bigFile", options.newBigFolderSizeLimit + 10);
+        fake_folder.remote_modifier ().insert ("A/newBigDir/sub_directory/smallFile", 10);
 
         fake_folder.remote_modifier ().create_directory ("B/newSmallDir");
-        fake_folder.remote_modifier ().create_directory ("B/newSmallDir/subDir");
-        fake_folder.remote_modifier ().insert ("B/newSmallDir/subDir/smallFile", 10);
+        fake_folder.remote_modifier ().create_directory ("B/newSmallDir/sub_directory");
+        fake_folder.remote_modifier ().insert ("B/newSmallDir/sub_directory/smallFile", 10);
 
         // Because the test system don't do that automatically
-        fake_folder.remote_modifier ().find ("A/newBigDir").extraDavProperties = "<oc:size>20020</oc:size>";
-        fake_folder.remote_modifier ().find ("A/newBigDir/subDir").extraDavProperties = "<oc:size>20020</oc:size>";
-        fake_folder.remote_modifier ().find ("B/newSmallDir").extraDavProperties = "<oc:size>10</oc:size>";
-        fake_folder.remote_modifier ().find ("B/newSmallDir/subDir").extraDavProperties = "<oc:size>10</oc:size>";
+        fake_folder.remote_modifier ().find ("A/newBigDir").extra_dav_properties = "<oc:size>20020</oc:size>";
+        fake_folder.remote_modifier ().find ("A/newBigDir/sub_directory").extra_dav_properties = "<oc:size>20020</oc:size>";
+        fake_folder.remote_modifier ().find ("B/newSmallDir").extra_dav_properties = "<oc:size>10</oc:size>";
+        fake_folder.remote_modifier ().find ("B/newSmallDir/sub_directory").extra_dav_properties = "<oc:size>10</oc:size>";
 
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
 
-        //  QCOMPARE (newBigFolder.count (), 1);
-        //  QCOMPARE (newBigFolder.first ()[0].to_string (), string ("A/newBigDir"));
-        //  QCOMPARE (newBigFolder.first ()[1].to_bool (), false);
+        GLib.assert_cmp (newBigFolder.count (), 1);
+        GLib.assert_cmp (newBigFolder.first ()[0].to_string (), string ("A/newBigDir"));
+        GLib.assert_cmp (newBigFolder.first ()[1].to_bool (), false);
         newBigFolder.clear ();
 
-        //  QCOMPARE (sizeRequests.count (), 2); // "A/newBigDir" and "B/newSmallDir";
-        //  QCOMPARE (sizeRequests.filter ("/subDir").count (), 0); // at no point we should request the size of the subdirectories
+        GLib.assert_cmp (sizeRequests.count (), 2); // "A/newBigDir" and "B/newSmallDir";
+        GLib.assert_cmp (sizeRequests.filter ("/sub_directory").count (), 0); // at no point we should request the size of the subdirectories
         sizeRequests.clear ();
 
         var oldSync = fake_folder.current_local_state ();
         // syncing again should do the same
         fake_folder.sync_engine ().journal ().schedulePathForRemoteDiscovery (string ("A/newBigDir"));
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), oldSync);
-        //  QCOMPARE (newBigFolder.count (), 1); // (since we don't have a real Folder, the files were not added to any list)
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), oldSync);
+        GLib.assert_cmp (newBigFolder.count (), 1); // (since we don't have a real Folder, the files were not added to any list)
         newBigFolder.clear ();
-        //  QCOMPARE (sizeRequests.count (), 1); // "A/newBigDir";
+        GLib.assert_cmp (sizeRequests.count (), 1); // "A/newBigDir";
         sizeRequests.clear ();
 
         // Simulate that we accept all files by seting a wildcard allow list
-        fake_folder.sync_engine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
-            string[] () + QLatin1String ("/"));
+        fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
+            string[] () + "/");
         fake_folder.sync_engine ().journal ().schedulePathForRemoteDiscovery (string ("A/newBigDir"));
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (newBigFolder.count (), 0);
-        //  QCOMPARE (sizeRequests.count (), 0);
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (newBigFolder.count (), 0);
+        GLib.assert_cmp (sizeRequests.count (), 0);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 }
 

@@ -59,17 +59,17 @@ void FakeErrorReply.respond () {
     /* emit */ signal_meta_data_changed ();
     /* emit */ signal_ready_read ();
     // finishing can come strictly after signal_ready_read was called
-    QTimer.singleShot (5, this, &FakeErrorReply.on_signal_finished);
+    QTimer.single_shot (5, this, &FakeErrorReply.on_signal_finished);
 }
 
 void FakeErrorReply.on_signal_finished () {
-    setFinished (true);
+    set_finished (true);
     /* emit */ signal_finished ();
 }
 
 int64 FakeErrorReply.read_data (char buf, int64 max) {
-    max = qMin<int64> (max, this.body.size ());
-    memcpy (buf, this.body.constData (), max);
+    max = q_min<int64> (max, this.body.size ());
+    memcpy (buf, this.body.const_data (), max);
     this.body = this.body.mid (max);
     return max;
 }

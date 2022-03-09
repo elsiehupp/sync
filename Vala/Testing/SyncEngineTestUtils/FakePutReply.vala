@@ -26,7 +26,7 @@ class FakePutReply : FakeReply {
     ***********************************************************/
     public static FileInfo perform (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray put_payload) {
         string filename = get_file_path_from_url (request.url ());
-        //  Q_ASSERT (!filename.isEmpty ());
+        GLib.assert_true (!filename.is_empty ());
         FileInfo file_info = remote_root_file_info.find (filename);
         if (file_info) {
             file_info.size = put_payload.size ();
@@ -35,19 +35,19 @@ class FakePutReply : FakeReply {
             // Assume that the file is filled with the same character
             file_info = remote_root_file_info.create (filename, put_payload.size (), put_payload.at (0));
         }
-        file_info.last_modified = Occ.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
-        remote_root_file_info.find (filename, /*invalidateEtags=*/true);
+        file_info.last_modified = Occ.Utility.date_time_from_time_t (request.raw_header ("X-OC-Mtime").to_int64 ());
+        remote_root_file_info.find (filename, /*invalidate_etags=*/true);
         return file_info;
     }
 
     /***********************************************************
     ***********************************************************/
     public virtual void respond () {
-        /* emit */ uploadProgress (file_info.size, file_info.size);
+        /* emit */ upload_progress (file_info.size, file_info.size);
         set_raw_header ("OC-ETag", file_info.etag);
         set_raw_header ("ETag", file_info.etag);
         set_raw_header ("OC-FileID", file_info.file_identifier);
-        set_raw_header ("X-OC-MTime", "accepted"); // Prevents Q_ASSERT (!this.runningNow) since we'll call PropagateItemJob.done twice in that case.
+        set_raw_header ("X-OC-MTime", "accepted"); // Prevents GLib.assert_true (!this.running_now) since we'll call PropagateItemJob.done twice in that case.
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
         /* emit */ signal_meta_data_changed ();
         /* emit */ signal_finished ();

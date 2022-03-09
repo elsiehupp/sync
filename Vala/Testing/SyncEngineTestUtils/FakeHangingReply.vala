@@ -27,8 +27,8 @@ class FakeHangingReply : FakeReply {
         // Follow more or less the implementation of QNetworkReplyImpl.on_signal_abort
         close ();
         set_error (OperationCanceledError, _("Operation canceled"));
-        /* emit */ errorOccurred (OperationCanceledError);
-        setFinished (true);
+        /* emit */ error_occurred (OperationCanceledError);
+        set_finished (true);
         /* emit */ signal_finished ();
     }
 

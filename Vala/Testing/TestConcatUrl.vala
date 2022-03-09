@@ -19,57 +19,57 @@ class TestConcatUrl : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_test_folder () {
-        //  QFETCH (string, base);
-        //  QFETCH (string, concat);
-        //  QFETCH (QueryItems, query);
-        //  QFETCH (string, expected);
+        QFETCH (string, base);
+        QFETCH (string, concat);
+        QFETCH (QueryItems, query);
+        QFETCH (string, expected);
         GLib.Uri base_url = new GLib.Uri ("http://example.com" + base);
         QUrlQuery url_query;
         url_query.setQueryItems (query);
-        GLib.Uri resultUrl = Utility.concatUrlPath (base_url, concat, url_query);
+        GLib.Uri resultUrl = Utility.concat_url_path (base_url, concat, url_query);
         string result = string.fromUtf8 (resultUrl.toEncoded ());
         string expectedFull = "http://example.com" + expected;
-        //  QCOMPARE (result, expectedFull);
+        GLib.assert_cmp (result, expectedFull);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_test_folder_data () {
-        QTest.addColumn<string> ("base");
-        QTest.addColumn<string> ("concat");
-        QTest.addColumn<QueryItems> ("query");
-        QTest.addColumn<string> ("expected");
+        QTest.add_column<string> ("base");
+        QTest.add_column<string> ("concat");
+        QTest.add_column<QueryItems> ("query");
+        QTest.add_column<string> ("expected");
 
         // Tests about slashes
-        QTest.newRow ("noslash1")  + "/baa"  + "foo"  + make ("/baa/foo");
-        QTest.newRow ("noslash2")  + ""      + "foo"  + make ("/foo");
-        QTest.newRow ("noslash3")  + "/foo"  + ""     + make ("/foo");
-        QTest.newRow ("noslash4")  + ""      + ""     + make ("");
-        QTest.newRow ("oneslash1") + "/bar/" + "foo"  + make ("/bar/foo");
-        QTest.newRow ("oneslash2") + "/"     + "foo"  + make ("/foo");
-        QTest.newRow ("oneslash3") + "/foo"  + "/"    + make ("/foo/");
-        QTest.newRow ("oneslash4") + ""      + "/"    + make ("/");
-        QTest.newRow ("twoslash1") + "/bar/" + "/foo" + make ("/bar/foo");
-        QTest.newRow ("twoslash2") + "/"     + "/foo" + make ("/foo");
-        QTest.newRow ("twoslash3") + "/foo/" + "/"    + make ("/foo/");
-        QTest.newRow ("twoslash4") + "/"     + "/"    + make ("/");
+        QTest.new_row ("noslash1")  + "/baa"  + "foo"  + make ("/baa/foo");
+        QTest.new_row ("noslash2")  + ""      + "foo"  + make ("/foo");
+        QTest.new_row ("noslash3")  + "/foo"  + ""     + make ("/foo");
+        QTest.new_row ("noslash4")  + ""      + ""     + make ("");
+        QTest.new_row ("oneslash1") + "/bar/" + "foo"  + make ("/bar/foo");
+        QTest.new_row ("oneslash2") + "/"     + "foo"  + make ("/foo");
+        QTest.new_row ("oneslash3") + "/foo"  + "/"    + make ("/foo/");
+        QTest.new_row ("oneslash4") + ""      + "/"    + make ("/");
+        QTest.new_row ("twoslash1") + "/bar/" + "/foo" + make ("/bar/foo");
+        QTest.new_row ("twoslash2") + "/"     + "/foo" + make ("/foo");
+        QTest.new_row ("twoslash3") + "/foo/" + "/"    + make ("/foo/");
+        QTest.new_row ("twoslash4") + "/"     + "/"    + make ("/");
 
         // Tests about path encoding
-        QTest.newRow ("encodepath")
+        QTest.new_row ("encodepath")
                 + "/a f/b"
                 + "/a f/c"
                 + make ()
                 + "/a%20f/b/a%20f/c";
 
         // Tests about query args
-        QTest.newRow ("query1")
+        QTest.new_row ("query1")
                 + "/baa"
                 + "/foo"
                 + make_keys_values ("a=a", "b=b",
                         "c", "d")
                 + "/baa/foo?a%3Da=b%3Db&c=d";
-        QTest.newRow ("query2")
+        QTest.new_row ("query2")
                 + ""
                 + ""
                 + make_key_value ("foo", "bar")

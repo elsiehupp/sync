@@ -26,17 +26,17 @@ class TestSyncDelete : GLib.Object {
         fake_folder.local_modifier ().remove ("B");
         fake_folder.remote_modifier ().insert ("B/hello.txt");
 
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
 
         // A/a1 must be gone because the directory was removed on the server, but hello.txt must be there
-        //  QVERIFY (!fake_folder.current_remote_state ().find ("A/a1"));
-        //  QVERIFY (fake_folder.current_remote_state ().find ("A/hello.txt"));
+        GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a1"));
+        GLib.assert_true (fake_folder.current_remote_state ().find ("A/hello.txt"));
 
         // Symetry
-        //  QVERIFY (!fake_folder.current_remote_state ().find ("B/b1"));
-        //  QVERIFY (fake_folder.current_remote_state ().find ("B/hello.txt"));
+        GLib.assert_true (!fake_folder.current_remote_state ().find ("B/b1"));
+        GLib.assert_true (fake_folder.current_remote_state ().find ("B/hello.txt"));
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
 
@@ -46,15 +46,15 @@ class TestSyncDelete : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         fake_folder.local_modifier ().remove ("B");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Add a directory that was just removed in the previous sync:
         fake_folder.local_modifier ().mkdir ("B");
         fake_folder.local_modifier ().insert ("B/b1");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QVERIFY (fake_folder.current_remote_state ().find ("B/b1"));
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.current_remote_state ().find ("B/b1"));
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
 }

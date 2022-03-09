@@ -19,8 +19,8 @@ class TestNextcloudPropagator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void testUpdateErrorFromSession () {
-        //OwncloudPropagator propagator (null, QLatin1String ("test1"), QLatin1String ("test2"), new ProgressDatabase);
-        //  QVERIFY ( true );
+        //OwncloudPropagator propagator (null, "test1", "test2", new ProgressDatabase);
+        GLib.assert_true ( true );
     }
 
 
@@ -33,10 +33,10 @@ class TestNextcloudPropagator : GLib.Object {
             fn+="F";
             string tmpFileName = createDownloadTmpFileName (fn);
             if (tmpFileName.contains ('/')) {
-                tmpFileName = tmpFileName.mid (tmpFileName.lastIndexOf ('/')+1);
+                tmpFileName = tmpFileName.mid (tmpFileName.last_index_of ('/')+1);
             }
-            //  QVERIFY ( tmpFileName.length () > 0);
-            //  QVERIFY ( tmpFileName.length () <= 254);
+            GLib.assert_true ( tmpFileName.length () > 0);
+            GLib.assert_true ( tmpFileName.length () <= 254);
         }
         // with absolute directory
         fn = "/Users/guruz/ownCloud/rocks/GPL";
@@ -44,10 +44,10 @@ class TestNextcloudPropagator : GLib.Object {
             fn+="F";
             string tmpFileName = createDownloadTmpFileName (fn);
             if (tmpFileName.contains ('/')) {
-                tmpFileName = tmpFileName.mid (tmpFileName.lastIndexOf ('/')+1);
+                tmpFileName = tmpFileName.mid (tmpFileName.last_index_of ('/')+1);
             }
-            //  QVERIFY ( tmpFileName.length () > 0);
-            //  QVERIFY ( tmpFileName.length () <= 254);
+            GLib.assert_true ( tmpFileName.length () > 0);
+            GLib.assert_true ( tmpFileName.length () <= 254);
         }
         // with relative directory
         fn = "rocks/GPL";
@@ -55,10 +55,10 @@ class TestNextcloudPropagator : GLib.Object {
             fn+="F";
             string tmpFileName = createDownloadTmpFileName (fn);
             if (tmpFileName.contains ('/')) {
-                tmpFileName = tmpFileName.mid (tmpFileName.lastIndexOf ('/')+1);
+                tmpFileName = tmpFileName.mid (tmpFileName.last_index_of ('/')+1);
             }
-            //  QVERIFY ( tmpFileName.length () > 0);
-            //  QVERIFY ( tmpFileName.length () <= 254);
+            GLib.assert_true ( tmpFileName.length () > 0);
+            GLib.assert_true ( tmpFileName.length () <= 254);
         }
     }
 
@@ -74,7 +74,7 @@ class TestNextcloudPropagator : GLib.Object {
         tests.append (Test ("W/\"foo\"", "foo"));
 
         foreach (var& test, tests) {
-            //  QCOMPARE (parseEtag (test.first), GLib.ByteArray (test.second));
+            GLib.assert_cmp (parseEtag (test.first), GLib.ByteArray (test.second));
         }
     }
 }

@@ -19,59 +19,59 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QScopedPointer<FakeQNAM> fake_qnam;
+    public FakeQNAM fake_qnam;
     public Occ.AccountPointer account;
-    public QScopedPointer<Occ.AccountState> account_state;
-    public QScopedPointer<Occ.UnifiedSearchResultsListModel> model;
-    public QScopedPointer<QAbstractItemModelTester> model_tester;
+    public Occ.AccountState account_state;
+    public Occ.UnifiedSearchResultsListModel model;
+    public QAbstractItemModelTester model_tester;
 
     /***********************************************************
     ***********************************************************/
-    public QScopedPointer<FakeDesktopServicesUrlHandler> fake_desktop_services_url_handler;
+    public FakeDesktopServicesUrlHandler fake_desktop_services_url_handler;
 
     /***********************************************************
     ***********************************************************/
-    public TestUnifiedSearchListmodel () = default;
+    //  public TestUnifiedSearchListmodel ();
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_init_test_case () {
         fake_qnam.on_signal_reset (new FakeQNAM ({}));
         account = Occ.Account.create ();
-        account.setCredentials (new FakeCredentials{fake_qnam.data ()});
-        account.set_url (GLib.Uri ( ("http://example.de")));
+        account.set_credentials (new FakeCredentials (fake_qnam.data ()));
+        account.set_url (GLib.Uri ("http://example.de"));
 
         account_state.on_signal_reset (new Occ.AccountState (account));
 
         fake_qnam.set_override ([this] (Soup.Operation operation, Soup.Request request, QIODevice device) {
-            //  Q_UNUSED (device);
+            Q_UNUSED (device);
             Soup.Reply reply = null;
 
-            const var url_query = QUrlQuery (request.url ());
-            const var format = url_query.queryItemValue (QStringLiteral ("format"));
-            const var cursor = url_query.queryItemValue (QStringLiteral ("cursor")).toInt ();
-            const var searchTerm = url_query.queryItemValue (QStringLiteral ("term"));
-            const var path = request.url ().path ();
+            var url_query = QUrlQuery (request.url ());
+            var format = url_query.query_item_value ("format");
+            var cursor = url_query.query_item_value ("cursor").to_int ();
+            var search_term = url_query.query_item_value ("term");
+            var path = request.url ().path ();
 
-            if (!request.url ().to_string ().startsWith (account_state.account ().url ().to_string ())) {
+            if (!request.url ().to_string ().starts_with (account_state.account ().url ().to_string ())) {
                 reply = new FakeErrorReply (operation, request, this, 404, fake404Response);
             }
-            if (format != QStringLiteral ("json")) {
+            if (format != "json") {
                 reply = new FakeErrorReply (operation, request, this, 400, fake400Response);
             }
 
             // handle fetch of providers list
-            if (path.startsWith (QStringLiteral ("/ocs/v2.php/search/providers")) && searchTerm.isEmpty ()) {
+            if (path.starts_with ("/ocs/v2.php/search/providers") && search_term.is_empty ()) {
                 reply = new FakePayloadReply (operation, request,
-                    FakeSearchResultsStorage.instance ().fakeProvidersResponseJson (), fake_qnam.data ());
+                    FakeSearchResultsStorage.instance ().fake_providers_response_json (), fake_qnam.data ());
             // handle search for provider
-            } else if (path.startsWith (QStringLiteral ("/ocs/v2.php/search/providers")) && !searchTerm.isEmpty ()) {
-                const var pathSplit = path.mid (string (QStringLiteral ("/ocs/v2.php/search/providers")).size ())
+            } else if (path.starts_with ("/ocs/v2.php/search/providers") && !search_term.is_empty ()) {
+                var path_split = path.mid ("/ocs/v2.php/search/providers".size ())
                                            .split ('/', Qt.SkipEmptyParts);
 
-                if (!pathSplit.isEmpty () && path.contains (pathSplit.first ())) {
+                if (!path_split.is_empty () && path.contains (path_split.first ())) {
                     reply = new FakePayloadReply (operation, request,
-                        FakeSearchResultsStorage.instance ().queryProvider (pathSplit.first (), searchTerm, cursor),
+                        FakeSearchResultsStorage.instance ().query_provider (path_split.first (), search_term, cursor),
                         SEARCH_RESULTS_REPLY_DELAY, fake_qnam.data ());
                 }
             }
@@ -95,34 +95,34 @@ class TestUnifiedSearchListmodel : GLib.Object {
     ***********************************************************/
     private void on_signal_test_search_term_start_stop_search () {
         // make sure the model is empty
-        model.setSearchTerm (QStringLiteral (""));
-        //  QVERIFY (model.rowCount () == 0);
+        model.set_search_term ("");
+        GLib.assert_true (model.row_count () == 0);
 
-        // #1 test setSearchTerm actually sets the search term and the signal is emitted
-        QSignalSpy searhTermChanged (model.data (), &Occ.UnifiedSearchResultsListModel.searchTermChanged);
-        model.setSearchTerm (QStringLiteral ("dis"));
-        //  QCOMPARE (searhTermChanged.count (), 1);
-        //  QCOMPARE (model.searchTerm (), QStringLiteral ("dis"));
+        // #1 test set_search_term actually sets the search term and the signal is emitted
+        QSignalSpy search_term_changed = new QSignalSpy (model.data (), Occ.UnifiedSearchResultsListModel.search_term_changed);
+        model.set_search_term ("dis");
+        GLib.assert_cmp (search_term_changed.count (), 1);
+        GLib.assert_cmp (model.search_term (), "dis");
 
-        // #2 test setSearchTerm actually sets the search term and the signal is emitted
-        searhTermChanged.clear ();
-        model.setSearchTerm (model.searchTerm () + QStringLiteral ("cuss"));
-        //  QCOMPARE (model.searchTerm (), QStringLiteral ("discuss"));
-        //  QCOMPARE (searhTermChanged.count (), 1);
+        // #2 test set_search_term actually sets the search term and the signal is emitted
+        search_term_changed.clear ();
+        model.set_search_term (model.search_term () + "cuss");
+        GLib.assert_cmp (model.search_term (), "discuss");
+        GLib.assert_cmp (search_term_changed.count (), 1);
 
         // #3 test that model has not started search yet
-        //  QVERIFY (!model.isSearchInProgress ());
+        GLib.assert_true (!model.is_search_in_progress ());
 
         // #4 test that model has started the search after specific delay
-        QSignalSpy searchInProgressChanged (model.data (), &Occ.UnifiedSearchResultsListModel.isSearchInProgressChanged);
+        QSignalSpy search_in_progress_changed = new QSignalSpy (model.data (), &Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
         // allow search jobs to get created within the model
-        //  QVERIFY (searchInProgressChanged.wait ());
-        //  QCOMPARE (searchInProgressChanged.count (), 1);
-        //  QVERIFY (model.isSearchInProgress ());
+        GLib.assert_true (search_in_progress_changed.wait ());
+        GLib.assert_cmp (search_in_progress_changed.count (), 1);
+        GLib.assert_true (model.is_search_in_progress ());
 
         // #5 test that model has stopped the search after setting empty search term
-        model.setSearchTerm (QStringLiteral (""));
-        //  QVERIFY (!model.isSearchInProgress ());
+        model.set_search_term ("");
+        GLib.assert_true (!model.is_search_in_progress ());
     }
 
 
@@ -130,27 +130,27 @@ class TestUnifiedSearchListmodel : GLib.Object {
     ***********************************************************/
     private void on_signal_test_search_term_results_found () {
         // make sure the model is empty
-        model.setSearchTerm (QStringLiteral (""));
-        //  QVERIFY (model.rowCount () == 0);
+        model.set_search_term ("");
+        GLib.assert_true (model.row_count () == 0);
 
         // test that search term gets set, search gets started and enough results get returned
-        model.setSearchTerm (model.searchTerm () + QStringLiteral ("discuss"));
+        model.set_search_term (model.search_term () + "discuss");
 
-        QSignalSpy searchInProgressChanged (
-            model.data (), &Occ.UnifiedSearchResultsListModel.isSearchInProgressChanged);
+        QSignalSpy search_in_progress_changed = new QSignalSpy (
+            model.data (), Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
-        //  QVERIFY (searchInProgressChanged.wait ());
+        GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has started
-        //  QCOMPARE (searchInProgressChanged.count (), 1);
-        //  QVERIFY (model.isSearchInProgress ());
+        GLib.assert_cmp (search_in_progress_changed.count (), 1);
+        GLib.assert_true (model.is_search_in_progress ());
 
-        //  QVERIFY (searchInProgressChanged.wait ());
+        GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has on_signal_finished
-        //  QVERIFY (!model.isSearchInProgress ());
+        GLib.assert_true (!model.is_search_in_progress ());
 
-        //  QVERIFY (model.rowCount () > 0);
+        GLib.assert_true (model.row_count () > 0);
     }
 
 
@@ -158,27 +158,27 @@ class TestUnifiedSearchListmodel : GLib.Object {
     ***********************************************************/
     private void on_signal_test_search_term_results_not_found () {
         // make sure the model is empty
-        model.setSearchTerm (QStringLiteral (""));
-        //  QVERIFY (model.rowCount () == 0);
+        model.set_search_term ("");
+        GLib.assert_true (model.row_count () == 0);
 
         // test that search term gets set, search gets started and enough results get returned
-        model.setSearchTerm (model.searchTerm () + QStringLiteral ("[empty]"));
+        model.set_search_term (model.search_term () + "[empty]");
 
-        QSignalSpy searchInProgressChanged (
-            model.data (), &Occ.UnifiedSearchResultsListModel.isSearchInProgressChanged);
+        QSignalSpy search_in_progress_changed = new QSignalSpy (
+            model.data (), Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
-        //  QVERIFY (searchInProgressChanged.wait ());
+        GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has started
-        //  QCOMPARE (searchInProgressChanged.count (), 1);
-        //  QVERIFY (model.isSearchInProgress ());
+        GLib.assert_cmp (search_in_progress_changed.count (), 1);
+        GLib.assert_true (model.is_search_in_progress ());
 
-        //  QVERIFY (searchInProgressChanged.wait ());
+        GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has on_signal_finished
-        //  QVERIFY (!model.isSearchInProgress ());
+        GLib.assert_true (!model.is_search_in_progress ());
 
-        //  QVERIFY (model.rowCount () == 0);
+        GLib.assert_true (model.row_count () == 0);
     }
 
 
@@ -186,100 +186,100 @@ class TestUnifiedSearchListmodel : GLib.Object {
     ***********************************************************/
     private void on_signal_test_fetch_more_clicked () {
         // make sure the model is empty
-        model.setSearchTerm (QStringLiteral (""));
-        //  QVERIFY (model.rowCount () == 0);
+        model.set_search_term ("");
+        GLib.assert_true (model.row_count () == 0);
 
-        QSignalSpy searchInProgressChanged (
-            model.data (), &Occ.UnifiedSearchResultsListModel.isSearchInProgressChanged);
+        QSignalSpy search_in_progress_changed = new QSignalSpy (
+            model.data (), Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
         // test that search term gets set, search gets started and enough results get returned
-        model.setSearchTerm (model.searchTerm () + QStringLiteral ("whatever"));
+        model.set_search_term (model.search_term () + "whatever");
 
-        //  QVERIFY (searchInProgressChanged.wait ());
+        GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has started
-        //  QVERIFY (model.isSearchInProgress ());
+        GLib.assert_true (model.is_search_in_progress ());
 
-        //  QVERIFY (searchInProgressChanged.wait ());
+        GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has on_signal_finished
-        //  QVERIFY (!model.isSearchInProgress ());
+        GLib.assert_true (!model.is_search_in_progress ());
 
-        const var numRowsInModelPrev = model.rowCount ();
+        var number_of_rows_in_mmodel_previous = model.row_count ();
 
         // test fetch more results
-        QSignalSpy currentFetchMoreInProgressProviderIdChanged (
-            model.data (), &Occ.UnifiedSearchResultsListModel.currentFetchMoreInProgressProviderIdChanged);
-        QSignalSpy rowsInserted (model.data (), &Occ.UnifiedSearchResultsListModel.rowsInserted);
-        for (int i = 0; i < model.rowCount (); ++i) {
-            const var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
+        QSignalSpy current_fetch_more_in_progress_provider_id_changed = new QSignalSpy (
+            model.data (), &Occ.UnifiedSearchResultsListModel.current_fetch_more_in_progress_provider_id_changed);
+        QSignalSpy rows_inserted = new QSignalSpy (model.data (), &Occ.UnifiedSearchResultsListModel.rows_inserted);
+        for (int i = 0; i < model.row_count (); ++i) {
+            var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
 
             if (type == Occ.UnifiedSearchResult.Type.FetchMoreTrigger) {
-                const var providerId =
+                var provider_id =
                     model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                         .to_string ();
-                model.fetchMoreTriggerClicked (providerId);
+                model.fetch_more_trigger_clicked (provider_id);
                 break;
             }
         }
 
-        // make sure the currentFetchMoreInProgressProviderId was set back and forth and correct number fows has been inserted
-        //  QCOMPARE (currentFetchMoreInProgressProviderIdChanged.count (), 1);
+        // make sure the current_fetch_more_in_progress_provider_id was set back and forth and correct number fows has been inserted
+        GLib.assert_cmp (current_fetch_more_in_progress_provider_id_changed.count (), 1);
 
-        const var providerIdFetchMoreTriggered = model.currentFetchMoreInProgressProviderId ();
+        var provider_id_fetch_more_triggered = model.current_fetch_more_in_progress_provider_id ();
 
-        //  QVERIFY (!providerIdFetchMoreTriggered.isEmpty ());
+        GLib.assert_true (!provider_id_fetch_more_triggered.is_empty ());
 
-        //  QVERIFY (currentFetchMoreInProgressProviderIdChanged.wait ());
+        GLib.assert_true (current_fetch_more_in_progress_provider_id_changed.wait ());
 
-        //  QVERIFY (model.currentFetchMoreInProgressProviderId ().isEmpty ());
+        GLib.assert_true (model.current_fetch_more_in_progress_provider_id ().is_empty ());
 
-        //  QCOMPARE (rowsInserted.count (), 1);
+        GLib.assert_cmp (rows_inserted.count (), 1);
 
-        const var arguments = rowsInserted.takeFirst ();
+        var arguments = rows_inserted.take_first ();
 
-        //  QVERIFY (arguments.size () > 0);
+        GLib.assert_true (arguments.size () > 0);
 
-        const var first = arguments.at (0).toInt ();
-        const var last = arguments.at (1).toInt ();
+        var first = arguments.at (0).to_int ();
+        var last = arguments.at (1).to_int ();
 
-        const int numInsertedExpected = last - first;
+        const int nuiber_of_inserted_expected = last - first;
 
-        //  QCOMPARE (model.rowCount () - numRowsInModelPrev, numInsertedExpected);
+        GLib.assert_cmp (model.row_count () - number_of_rows_in_mmodel_previous, nuiber_of_inserted_expected);
 
         // make sure the FetchMoreTrigger gets removed when no more results available
-        if (!providerIdFetchMoreTriggered.isEmpty ()) {
-            currentFetchMoreInProgressProviderIdChanged.clear ();
-            rowsInserted.clear ();
+        if (!provider_id_fetch_more_triggered.is_empty ()) {
+            current_fetch_more_in_progress_provider_id_changed.clear ();
+            rows_inserted.clear ();
 
-            QSignalSpy rowsRemoved (model.data (), &Occ.UnifiedSearchResultsListModel.rowsRemoved);
+            QSignalSpy rows_removed = new QSignalSpy (model.data (), &Occ.UnifiedSearchResultsListModel.rows_removed);
 
             for (int i = 0; i < 10; ++i) {
-                model.fetchMoreTriggerClicked (providerIdFetchMoreTriggered);
+                model.fetch_more_trigger_clicked (provider_id_fetch_more_triggered);
 
-                //  QVERIFY (currentFetchMoreInProgressProviderIdChanged.wait ());
+                GLib.assert_true (current_fetch_more_in_progress_provider_id_changed.wait ());
 
-                if (rowsRemoved.count () > 0) {
+                if (rows_removed.count () > 0) {
                     break;
                 }
             }
 
-            //  QCOMPARE (rowsRemoved.count (), 1);
+            GLib.assert_cmp (rows_removed.count (), 1);
 
-            bool isFetchMoreTriggerFound = false;
+            bool is_fetch_more_trigger_found = false;
 
-            for (int i = 0; i < model.rowCount (); ++i) {
-                const var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
-                const var providerId =  model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
+            for (int i = 0; i < model.row_count (); ++i) {
+                var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
+                var provider_id =  model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                             .to_string ();
                 if (type == Occ.UnifiedSearchResult.Type.FetchMoreTrigger
-                    && providerId == providerIdFetchMoreTriggered) {
-                    isFetchMoreTriggerFound = true;
+                    && provider_id == provider_id_fetch_more_triggered) {
+                    is_fetch_more_trigger_found = true;
                     break;
                 }
             }
 
-            //  QVERIFY (!isFetchMoreTriggerFound);
+            GLib.assert_true (!is_fetch_more_trigger_found);
         }
     }
 
@@ -288,59 +288,59 @@ class TestUnifiedSearchListmodel : GLib.Object {
     ***********************************************************/
     private void on_signal_test_search_term_result_tickled () {
         // make sure the model is empty
-        model.setSearchTerm (QStringLiteral (""));
-        //  QVERIFY (model.rowCount () == 0);
+        model.set_search_term ("");
+        GLib.assert_true (model.row_count () == 0);
 
         // test that search term gets set, search gets started and enough results get returned
-        model.setSearchTerm (model.searchTerm () + QStringLiteral ("discuss"));
+        model.set_search_term (model.search_term () + "discuss");
 
-        QSignalSpy searchInProgressChanged (
-            model.data (), &Occ.UnifiedSearchResultsListModel.isSearchInProgressChanged);
+        QSignalSpy search_in_progress_changed = new QSignalSpy (
+            model.data (), Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
-        //  QVERIFY (searchInProgressChanged.wait ());
+        GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has started
-        //  QCOMPARE (searchInProgressChanged.count (), 1);
-        //  QVERIFY (model.isSearchInProgress ());
+        GLib.assert_cmp (search_in_progress_changed.count (), 1);
+        GLib.assert_true (model.is_search_in_progress ());
 
-        //  QVERIFY (searchInProgressChanged.wait ());
+        GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has on_signal_finished and some results has been received
-        //  QVERIFY (!model.isSearchInProgress ());
+        GLib.assert_true (!model.is_search_in_progress ());
 
-        //  QVERIFY (model.rowCount () != 0);
+        GLib.assert_true (model.row_count () != 0);
 
-        QDesktopServices.setUrlHandler ("http", fake_desktop_services_url_handler.data (), "signal_result_clicked");
-        QDesktopServices.setUrlHandler ("https", fake_desktop_services_url_handler.data (), "signal_result_clicked");
+        QDesktopServices.set_url_handler ("http", fake_desktop_services_url_handler.data (), "signal_result_clicked");
+        QDesktopServices.set_url_handler ("https", fake_desktop_services_url_handler.data (), "signal_result_clicked");
 
-        QSignalSpy signal_result_clicked (fake_desktop_services_url_handler.data (), &FakeDesktopServicesUrlHandler.signal_result_clicked);
+        QSignalSpy signal_result_clicked = new QSignalSpy (fake_desktop_services_url_handler.data (), &FakeDesktopServicesUrlHandler.signal_result_clicked);
 
         //  test click on a result item
-        string urlForClickedResult;
+        string url_for_clicked_result;
 
-        for (int i = 0; i < model.rowCount (); ++i) {
-            const var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
+        for (int i = 0; i < model.row_count (); ++i) {
+            var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
 
             if (type == Occ.UnifiedSearchResult.Type.DEFAULT) {
-                const var providerId =
+                var provider_id =
                     model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                         .to_string ();
-                urlForClickedResult = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).to_string ();
+                url_for_clicked_result = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).to_string ();
 
-                if (!providerId.isEmpty () && !urlForClickedResult.isEmpty ()) {
-                    model.signal_result_clicked (providerId, GLib.Uri (urlForClickedResult));
+                if (!provider_id.is_empty () && !url_for_clicked_result.is_empty ()) {
+                    model.signal_result_clicked (provider_id, GLib.Uri (url_for_clicked_result));
                     break;
                 }
             }
         }
 
-        //  QCOMPARE (signal_result_clicked.count (), 1);
+        GLib.assert_cmp (signal_result_clicked.count (), 1);
 
-        const var arguments = signal_result_clicked.takeFirst ();
+        var arguments = signal_result_clicked.take_first ();
 
-        const var urlOpenTriggeredViaDesktopServices = arguments.at (0).to_string ();
+        var url_open_triggered_via_desktop_services = arguments.at (0).to_string ();
 
-        //  QCOMPARE (urlOpenTriggeredViaDesktopServices, urlForClickedResult);
+        GLib.assert_cmp (url_open_triggered_via_desktop_services, url_for_clicked_result);
     }
 
 
@@ -348,31 +348,31 @@ class TestUnifiedSearchListmodel : GLib.Object {
     ***********************************************************/
     private void on_signal_test_search_term_results_error () {
         // make sure the model is empty
-        model.setSearchTerm (QStringLiteral (""));
-        //  QVERIFY (model.rowCount () == 0);
+        model.set_search_term (QStringLiteral (""));
+        GLib.assert_true (model.row_count () == 0);
 
-        QSignalSpy errorStringChanged (model.data (), &Occ.UnifiedSearchResultsListModel.errorStringChanged);
-        QSignalSpy searchInProgressChanged (
-            model.data (), &Occ.UnifiedSearchResultsListModel.isSearchInProgressChanged);
+        QSignalSpy error_string_changed = new QSignalSpy (model.data (), &Occ.UnifiedSearchResultsListModel.error_string_changed);
+        QSignalSpy search_in_progress_changed = new QSignalSpy (
+            model.data (), &Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
-        model.setSearchTerm (model.searchTerm () + QStringLiteral ("[HTTP500]"));
+        model.set_search_term (model.search_term () + QStringLiteral ("[HTTP500]"));
 
-        //  QVERIFY (searchInProgressChanged.wait ());
+        GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has started
-        //  QVERIFY (model.isSearchInProgress ());
+        GLib.assert_true (model.is_search_in_progress ());
 
-        //  QVERIFY (searchInProgressChanged.wait ());
+        GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has on_signal_finished
-        //  QVERIFY (!model.isSearchInProgress ());
+        GLib.assert_true (!model.is_search_in_progress ());
 
         // make sure the model is empty and an error string has been set
-        //  QVERIFY (model.rowCount () == 0);
+        GLib.assert_true (model.row_count () == 0);
 
-        //  QVERIFY (errorStringChanged.count () > 0);
+        GLib.assert_true (error_string_changed.count () > 0);
 
-        //  QVERIFY (!model.errorString ().isEmpty ());
+        GLib.assert_true (!model.error_string ().is_empty ());
     }
 
 

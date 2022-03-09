@@ -17,9 +17,9 @@ class FakeChunkMoveReply : FakeReply {
         open (QIODevice.ReadOnly);
         file_info = perform (uploads_file_info, remote_root_file_info, request);
         if (!file_info) {
-            QTimer.singleShot (0, this, &FakeChunkMoveReply.respondPreconditionFailed);
+            QTimer.single_shot (0, this, &FakeChunkMoveReply.respond_precondition_failed);
         } else {
-            QTimer.singleShot (0, this, &FakeChunkMoveReply.respond);
+            QTimer.single_shot (0, this, &FakeChunkMoveReply.respond);
         }
     }
 
@@ -27,54 +27,54 @@ class FakeChunkMoveReply : FakeReply {
     ***********************************************************/
     public static FileInfo perform (FileInfo uploads_file_info, FileInfo remote_root_file_info, Soup.Request request) {
         string source = get_file_path_from_url (request.url ());
-        //  Q_ASSERT (!source.isEmpty ());
-        //  Q_ASSERT (source.endsWith (QLatin1String ("/.file")));
+        GLib.assert_true (!source.is_empty ());
+        GLib.assert_true (source.ends_with ("/.file"));
         source = source.left (source.length () - static_cast<int> (qstrlen ("/.file")));
 
-        var sourceFolder = uploads_file_info.find (source);
-        //  Q_ASSERT (sourceFolder);
-        //  Q_ASSERT (sourceFolder.isDir);
+        var source_folder = uploads_file_info.find (source);
+        GLib.assert_true (source_folder);
+        GLib.assert_true (source_folder.is_directory);
         int count = 0;
         int64 size = 0;
         char payload = '\0';
 
-        string filename = get_file_path_from_url (GLib.Uri.fromEncoded (request.rawHeader ("Destination")));
-        //  Q_ASSERT (!filename.isEmpty ());
+        string filename = get_file_path_from_url (GLib.Uri.from_encoded (request.raw_header ("Destination")));
+        GLib.assert_true (!filename.is_empty ());
 
         // Compute the size and content from the chunks if possible
-        foreach (var chunk_name in sourceFolder.children.keys ()) {
-            var x = sourceFolder.children[chunk_name];
-            //  Q_ASSERT (!x.isDir);
-            //  Q_ASSERT (x.size > 0); // There should not be empty chunks
+        foreach (var chunk_name in source_folder.children.keys ()) {
+            var x = source_folder.children[chunk_name];
+            GLib.assert_true (!x.is_directory);
+            GLib.assert_true (x.size > 0); // There should not be empty chunks
             size += x.size;
-            //  Q_ASSERT (!payload || payload == x.content_char);
+            GLib.assert_true (!payload || payload == x.content_char);
             payload = x.content_char;
             ++count;
         }
-        //  Q_ASSERT (sourceFolder.children.count () == count); // There should not be holes or extra files
+        GLib.assert_true (source_folder.children.count () == count); // There should not be holes or extra files
 
         // Note: This does not actually assemble the file data from the chunks!
         FileInfo file_info = remote_root_file_info.find (filename);
         if (file_info) {
             // The client should put this header
-            //  Q_ASSERT (request.hasRawHeader ("If"));
+            GLib.assert_true (request.has_raw_header ("If"));
 
             // And it should condition on the destination file
-            var on_signal_start = GLib.ByteArray ("<" + request.rawHeader ("Destination") + ">");
-            //  Q_ASSERT (request.rawHeader ("If").startsWith (on_signal_start));
+            var on_signal_start = GLib.ByteArray ("<" + request.raw_header ("Destination") + ">");
+            GLib.assert_true (request.raw_header ("If").starts_with (on_signal_start));
 
-            if (request.rawHeader ("If") != on_signal_start + " ([\"" + file_info.etag + "\"])") {
+            if (request.raw_header ("If") != on_signal_start + " ([\"" + file_info.etag + "\"])") {
                 return null;
             }
             file_info.size = size;
             file_info.content_char = payload;
         } else {
-            //  Q_ASSERT (!request.hasRawHeader ("If"));
+            GLib.assert_true (!request.has_raw_header ("If"));
             // Assume that the file is filled with the same character
             file_info = remote_root_file_info.create (filename, size, payload);
         }
-        file_info.last_modified = Occ.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
-        remote_root_file_info.find (filename, /*invalidateEtags=*/true);
+        file_info.last_modified = Occ.Utility.date_time_from_time_t (request.raw_header ("X-OC-Mtime").to_int64 ());
+        remote_root_file_info.find (filename, /*invalidate_etags=*/true);
 
         return file_info;
     }
@@ -92,7 +92,7 @@ class FakeChunkMoveReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public void respondPreconditionFailed () {
+    public void respond_precondition_failed () {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 412);
         set_error (InternalServerError, "Precondition Failed");
         /* emit */ signal_meta_data_changed ();

@@ -14,77 +14,79 @@ namespace Testing {
 /***********************************************************
 Upload a 1/3 of a file of given size.
 fake_folder needs to be synchronized */
-static void partialUpload (FakeFolder fake_folder, string name, int64 size) {
-    //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-    //  QCOMPARE (fake_folder.upload_state ().children.count (), 0); // The state should be clean
+static void partial_upload (FakeFolder fake_folder, string name, int64 size) {
+    GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+    GLib.assert_cmp (fake_folder.upload_state ().children.count (), 0); // The state should be clean
 
     fake_folder.local_modifier ().insert (name, size);
     // Abort when the upload is at 1/3
-    int64 sizeWhenAbort = -1;
-    var con = GLib.Object.connect (&fake_folder.sync_engine (),  &SyncEngine.transmissionProgress,
-                                    [&] (ProgressInfo progress) {
-                if (progress.completedSize () > (progress.totalSize () /3 )) {
-                    sizeWhenAbort = progress.completedSize ();
-                    fake_folder.sync_engine ().on_signal_abort ();
-                }
+    int64 size_when_abort = -1;
+    var con = GLib.Object.connect (
+        fake_folder.sync_engine (),
+        SyncEngine.transmission_progress,
+        [&] (ProgressInfo progress) {
+            if (progress.completed_size () > (progress.total_size () /3 )) {
+                size_when_abort = progress.completed_size ();
+                fake_folder.sync_engine ().on_signal_abort ();
+            }
     });
 
-    //  QVERIFY (!fake_folder.sync_once ()); // there should have been an error
+    GLib.assert_true (!fake_folder.sync_once ()); // there should have been an error
     GLib.Object.disconnect (con);
-    //  QVERIFY (sizeWhenAbort > 0);
-    //  QVERIFY (sizeWhenAbort < size);
+    GLib.assert_true (size_when_abort > 0);
+    GLib.assert_true (size_when_abort < size);
 
-    //  QCOMPARE (fake_folder.upload_state ().children.count (), 1); // the transfer was done with chunking
-    var upStateChildren = fake_folder.upload_state ().children.first ().children;
-    //  QCOMPARE (sizeWhenAbort, std.accumulate (upStateChildren.cbegin (), upStateChildren.cend (), 0,
+    GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1); // the transfer was done with chunking
+    var up_state_children = fake_folder.upload_state ().children.first ().children;
+    GLib.assert_cmp (size_when_abort, std.accumulate (up_state_children.cbegin (), up_state_children.cend (), 0,
                                             [] (int s, FileInfo i) { return s + i.size; }));
 }
 
 // Reduce max chunk size a bit so we get more chunks
-static void setChunkSize (SyncEngine engine, int64 size) {
+static void set_chunk_size (SyncEngine engine, int64 size) {
     SyncOptions options;
-    options.maxChunkSize = size;
-    options.initialChunkSize = size;
-    options.minChunkSize = size;
-    engine.setSyncOptions (options);
+    options.max_chunk_size = size;
+    options.initial_chunk_size = size;
+    options.min_chunk_size = size;
+    engine.set_sync_options (options);
 }
 
 class TestChunkingNG : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testFileUpload () {
+    private void test_file_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
         const int size = 10 * 1000 * 1000; // 10 MB
 
         fake_folder.local_modifier ().insert ("A/a0", size);
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1); // the transfer was done with chunking
-        //  QCOMPARE (fake_folder.current_remote_state ().find ("A/a0").size, size);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1); // the transfer was done with chunking
+        GLib.assert_cmp (fake_folder.current_remote_state ().find ("A/a0").size, size);
 
         // Check that another upload of the same file also work.
         fake_folder.local_modifier ().append_byte ("A/a0");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 2); // the transfer was done with chunking
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 2); // the transfer was done with chunking
     }
 
     // Test resuming when there's a confusing chunk added
-    private void testResume1 () {
+    private void test_resume1 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 10 * 1000 * 1000; // 10 MB
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
 
-        partialUpload (fake_folder, "A/a0", size);
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        var chunkingId = fake_folder.upload_state ().children.first ().name;
-        const var chunkMap = fake_folder.upload_state ().children.first ().children;
-        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
-        //  QVERIFY (uploadedSize > 2 * 1000 * 1000); // at least 2 MB
+        partial_upload (fake_folder, "A/a0", size);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        var chunking_identifier = fake_folder.upload_state ().children.first ().name;
+        var chunk_map = fake_folder.upload_state ().children.first ().children;
+        int64 uploaded_size = std.accumulate (chunk_map.begin (), chunk_map.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
+        GLib.assert_true (uploaded_size > 2 * 1000 * 1000); // at least 2 MB
 
         // Add a fake chunk to make sure it gets deleted
         fake_folder.upload_state ().children.first ().insert ("10000", size);
@@ -92,536 +94,534 @@ class TestChunkingNG : GLib.Object {
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
             if (operation == Soup.PutOperation) {
                 // Test that we properly resuming and are not sending past data again.
-                //  Q_ASSERT (request.rawHeader ("OC-Chunk-Offset").toLongLong () >= uploadedSize);
+                GLib.assert_true (request.raw_header ("OC-Chunk-Offset").to_int64 () >= uploaded_size);
             } else if (operation == Soup.DeleteOperation) {
-                //  Q_ASSERT (request.url ().path ().endsWith ("/10000"));
+                GLib.assert_true (request.url ().path ().ends_with ("/10000"));
             }
             return null;
         });
 
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (fake_folder.current_remote_state ().find ("A/a0").size, size);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_remote_state ().find ("A/a0").size, size);
         // The same chunk identifier was re-used
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        //  QCOMPARE (fake_folder.upload_state ().children.first ().name, chunkingId);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        GLib.assert_cmp (fake_folder.upload_state ().children.first ().name, chunking_identifier);
     }
 
     // Test resuming when one of the uploaded chunks got removed
-    private void testResume2 () {
+    private void test_resume2 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
         const int size = 30 * 1000 * 1000; // 30 MB
-        partialUpload (fake_folder, "A/a0", size);
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        var chunkingId = fake_folder.upload_state ().children.first ().name;
-        const var chunkMap = fake_folder.upload_state ().children.first ().children;
-        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
-        //  QVERIFY (uploadedSize > 2 * 1000 * 1000); // at least 50 MB
-        //  QVERIFY (chunkMap.size () >= 3); // at least three chunks
+        partial_upload (fake_folder, "A/a0", size);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        var chunking_identifier = fake_folder.upload_state ().children.first ().name;
+        var chunk_map = fake_folder.upload_state ().children.first ().children;
+        int64 uploaded_size = std.accumulate (chunk_map.begin (), chunk_map.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
+        GLib.assert_true (uploaded_size > 2 * 1000 * 1000); // at least 50 MB
+        GLib.assert_true (chunk_map.size () >= 3); // at least three chunks
 
-        string[] chunksToDelete;
+        string[] chunks_to_delete;
 
         // Remove the second chunk, so all further chunks will be deleted and resent
-        var firstChunk = chunkMap.first ();
-        var secondChunk = * (chunkMap.begin () + 1);
-        for (var& name : chunkMap.keys ().mid (2)) {
-            chunksToDelete.append (name);
+        var first_chunk = chunk_map.first ();
+        var second_chunk = * (chunk_map.begin () + 1);
+        foreach (var name in chunk_map.keys ().mid (2)) {
+            chunks_to_delete.append (name);
         }
-        fake_folder.upload_state ().children.first ().remove (secondChunk.name);
+        fake_folder.upload_state ().children.first ().remove (second_chunk.name);
 
-        string[] deletedPaths;
+        string[] deleted_paths;
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
             if (operation == Soup.PutOperation) {
                 // Test that we properly resuming, not resending the first chunk
-                //  Q_ASSERT (request.rawHeader ("OC-Chunk-Offset").toLongLong () >= firstChunk.size);
+                GLib.assert_true (request.raw_header ("OC-Chunk-Offset").to_int64 () >= first_chunk.size);
             } else if (operation == Soup.DeleteOperation) {
-                deletedPaths.append (request.url ().path ());
+                deleted_paths.append (request.url ().path ());
             }
             return null;
         });
 
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
 
-        for (var& toDelete : chunksToDelete) {
-            bool wasDeleted = false;
-            for (var& deleted : deletedPaths) {
-                if (deleted.mid (deleted.lastIndexOf ('/') + 1) == toDelete) {
-                    wasDeleted = true;
+        foreach (var to_delete in chunks_to_delete) {
+            bool was_deleted = false;
+            foreach (var deleted in deleted_paths) {
+                if (deleted.mid (deleted.last_index_of ('/') + 1) == to_delete) {
+                    was_deleted = true;
                     break;
                 }
             }
-            //  QVERIFY (wasDeleted);
+            GLib.assert_true (was_deleted);
         }
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (fake_folder.current_remote_state ().find ("A/a0").size, size);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_remote_state ().find ("A/a0").size, size);
         // The same chunk identifier was re-used
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        //  QCOMPARE (fake_folder.upload_state ().children.first ().name, chunkingId);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        GLib.assert_cmp (fake_folder.upload_state ().children.first ().name, chunking_identifier);
     }
 
     // Test resuming when all chunks are already present
-    private void testResume3 () {
+    private void test_resume3 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 30 * 1000 * 1000; // 30 MB
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
 
-        partialUpload (fake_folder, "A/a0", size);
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        var chunkingId = fake_folder.upload_state ().children.first ().name;
-        const var chunkMap = fake_folder.upload_state ().children.first ().children;
-        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
-        //  QVERIFY (uploadedSize > 5 * 1000 * 1000); // at least 5 MB
+        partial_upload (fake_folder, "A/a0", size);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        var chunking_identifier = fake_folder.upload_state ().children.first ().name;
+        var chunk_map = fake_folder.upload_state ().children.first ().children;
+        int64 uploaded_size = std.accumulate (chunk_map.begin (), chunk_map.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
+        GLib.assert_true (uploaded_size > 5 * 1000 * 1000); // at least 5 MB
 
         // Add a chunk that makes the file completely uploaded
         fake_folder.upload_state ().children.first ().insert (
-            string.number (chunkMap.size ()).rightJustified (16, '0'), size - uploadedSize);
+            string.number (chunk_map.size ()).right_justified (16, '0'), size - uploaded_size);
 
-        bool sawPut = false;
-        bool sawDelete = false;
-        bool sawMove = false;
+        bool saw_put = false;
+        bool saw_delete = false;
+        bool saw_move = false;
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
             if (operation == Soup.PutOperation) {
-                sawPut = true;
+                saw_put = true;
             } else if (operation == Soup.DeleteOperation) {
-                sawDelete = true;
+                saw_delete = true;
             } else if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {
-                sawMove = true;
+                saw_move = true;
             }
             return null;
         });
 
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QVERIFY (sawMove);
-        //  QVERIFY (!sawPut);
-        //  QVERIFY (!sawDelete);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_true (saw_move);
+        GLib.assert_true (!saw_put);
+        GLib.assert_true (!saw_delete);
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (fake_folder.current_remote_state ().find ("A/a0").size, size);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_remote_state ().find ("A/a0").size, size);
         // The same chunk identifier was re-used
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        //  QCOMPARE (fake_folder.upload_state ().children.first ().name, chunkingId);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        GLib.assert_cmp (fake_folder.upload_state ().children.first ().name, chunking_identifier);
     }
 
     // Test resuming (or rather not resuming!) for the error case of the sum of
     // chunk sizes being larger than the file size
-    private void testResume4 () {
+    private void test_resume4 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 30 * 1000 * 1000; // 30 MB
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
 
-        partialUpload (fake_folder, "A/a0", size);
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        var chunkingId = fake_folder.upload_state ().children.first ().name;
-        const var chunkMap = fake_folder.upload_state ().children.first ().children;
-        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
-        //  QVERIFY (uploadedSize > 5 * 1000 * 1000); // at least 5 MB
+        partial_upload (fake_folder, "A/a0", size);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        var chunking_identifier = fake_folder.upload_state ().children.first ().name;
+        var chunk_map = fake_folder.upload_state ().children.first ().children;
+        int64 uploaded_size = std.accumulate (chunk_map.begin (), chunk_map.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
+        GLib.assert_true (uploaded_size > 5 * 1000 * 1000); // at least 5 MB
 
         // Add a chunk that makes the file more than completely uploaded
         fake_folder.upload_state ().children.first ().insert (
-            string.number (chunkMap.size ()).rightJustified (16, '0'), size - uploadedSize + 100);
+            string.number (chunk_map.size ()).right_justified (16, '0'), size - uploaded_size + 100);
 
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (fake_folder.current_remote_state ().find ("A/a0").size, size);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_remote_state ().find ("A/a0").size, size);
         // Used a new transfer identifier but wiped the old one
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        //  QVERIFY (fake_folder.upload_state ().children.first ().name != chunkingId);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        GLib.assert_true (fake_folder.upload_state ().children.first ().name != chunking_identifier);
     }
 
     // Check what happens when we on_signal_abort during the final MOVE and the
     // the final MOVE takes longer than the on_signal_abort-delay
-    private void testLateAbortHard () {
+    private void test_late_abort_hard () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
         const int size = 15 * 1000 * 1000; // 15 MB
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
 
         // Make the MOVE never reply, but trigger a client-on_signal_abort and apply the change remotely
         GLib.Object parent;
-        GLib.ByteArray moveChecksumHeader;
-        int nGET = 0;
-        int responseDelay = 100000; // bigger than on_signal_abort-wait timeout
+        GLib.ByteArray move_checksum_header;
+        int n_get = 0;
+        int response_delay = 100000; // bigger than on_signal_abort-wait timeout
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
             if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {
-                QTimer.singleShot (50, parent, [&] () { fake_folder.sync_engine ().on_signal_abort (); });
-                moveChecksumHeader = request.rawHeader ("OC-Checksum");
-                return new DelayedReply<FakeChunkMoveReply> (responseDelay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, parent);
+                QTimer.single_shot (50, parent, [&] () { fake_folder.sync_engine ().on_signal_abort (); });
+                move_checksum_header = request.raw_header ("OC-Checksum");
+                return new DelayedReply<FakeChunkMoveReply> (response_delay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, parent);
             } else if (operation == Soup.GetOperation) {
-                nGET++;
+                n_get++;
             }
             return null;
         });
 
         // Test 1 : NEW file aborted
         fake_folder.local_modifier ().insert ("A/a0", size);
-        //  QVERIFY (!fake_folder.sync_once ()); // error : on_signal_abort!
+        GLib.assert_true (!fake_folder.sync_once ()); // error : on_signal_abort!
 
         // Now the next sync gets a NEW/NEW conflict and since there's no checksum
         // it just becomes a UPDATE_METADATA
-        var checkEtagUpdated = [&] (SyncFileItemVector items) {
-            //  QCOMPARE (items.size (), 1);
-            //  QCOMPARE (items[0].file, QLatin1String ("A"));
+        var check_etag_updated = [&] (SyncFileItemVector items) {
+            GLib.assert_cmp (items.size (), 1);
+            GLib.assert_cmp (items[0].file, "A");
             SyncJournalFileRecord record;
-            //  QVERIFY (fake_folder.sync_journal ().getFileRecord (GLib.ByteArray ("A/a0"), record));
-            //  QCOMPARE (record.etag, fake_folder.remote_modifier ().find ("A/a0").etag);
+            GLib.assert_true (fake_folder.sync_journal ().get_file_record (GLib.ByteArray ("A/a0"), record));
+            GLib.assert_cmp (record.etag, fake_folder.remote_modifier ().find ("A/a0").etag);
         }
-        var connection = connect (&fake_folder.sync_engine (), &SyncEngine.aboutToPropagate, checkEtagUpdated);
-        //  QVERIFY (fake_folder.sync_once ());
+        var connection = connect (&fake_folder.sync_engine (), &SyncEngine.about_to_propagate, check_etag_updated);
+        GLib.assert_true (fake_folder.sync_once ());
         disconnect (connection);
-        //  QCOMPARE (nGET, 0);
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (n_get, 0);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Test 2 : modified file upload aborted
         fake_folder.local_modifier ().append_byte ("A/a0");
-        //  QVERIFY (!fake_folder.sync_once ()); // error : on_signal_abort!
+        GLib.assert_true (!fake_folder.sync_once ()); // error : on_signal_abort!
 
         // An EVAL/EVAL conflict is also UPDATE_METADATA when there's no checksums
-        connection = connect (&fake_folder.sync_engine (), &SyncEngine.aboutToPropagate, checkEtagUpdated);
-        //  QVERIFY (fake_folder.sync_once ());
+        connection = connect (&fake_folder.sync_engine (), &SyncEngine.about_to_propagate, check_etag_updated);
+        GLib.assert_true (fake_folder.sync_once ());
         disconnect (connection);
-        //  QCOMPARE (nGET, 0);
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (n_get, 0);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Test 3 : modified file upload aborted, with good checksums
         fake_folder.local_modifier ().append_byte ("A/a0");
-        //  QVERIFY (!fake_folder.sync_once ()); // error : on_signal_abort!
+        GLib.assert_true (!fake_folder.sync_once ()); // error : on_signal_abort!
 
         // Set the remote checksum -- the test setup doesn't do it automatically
-        //  QVERIFY (!moveChecksumHeader.isEmpty ());
-        fake_folder.remote_modifier ().find ("A/a0").checksums = moveChecksumHeader;
+        GLib.assert_true (!move_checksum_header.is_empty ());
+        fake_folder.remote_modifier ().find ("A/a0").checksums = move_checksum_header;
 
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
         disconnect (connection);
-        //  QCOMPARE (nGET, 0); // no new download, just a metadata update!
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (n_get, 0); // no new download, just a metadata update!
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Test 4 : New file, that gets deleted locally before the next sync
         fake_folder.local_modifier ().insert ("A/a3", size);
-        //  QVERIFY (!fake_folder.sync_once ()); // error : on_signal_abort!
+        GLib.assert_true (!fake_folder.sync_once ()); // error : on_signal_abort!
         fake_folder.local_modifier ().remove ("A/a3");
 
         // bug : in this case we must expect a re-download of A/A3
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (nGET, 1);
-        //  QVERIFY (fake_folder.current_local_state ().find ("A/a3"));
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (n_get, 1);
+        GLib.assert_true (fake_folder.current_local_state ().find ("A/a3"));
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
     // Check what happens when we on_signal_abort during the final MOVE and the
     // the final MOVE is short enough for the on_signal_abort-delay to help
-    private void testLateAbortRecoverable () {
+    private void test_late_abort_recoverable () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
         const int size = 15 * 1000 * 1000; // 15 MB
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
 
         // Make the MOVE never reply, but trigger a client-on_signal_abort and apply the change remotely
         GLib.Object parent;
-        int responseDelay = 200; // smaller than on_signal_abort-wait timeout
+        int response_delay = 200; // smaller than on_signal_abort-wait timeout
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
             if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {
-                QTimer.singleShot (50, parent, [&] () { fake_folder.sync_engine ().on_signal_abort (); });
-                return new DelayedReply<FakeChunkMoveReply> (responseDelay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, parent);
+                QTimer.single_shot (50, parent, [&] () { fake_folder.sync_engine ().on_signal_abort (); });
+                return new DelayedReply<FakeChunkMoveReply> (response_delay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, parent);
             }
             return null;
         });
 
         // Test 1 : NEW file aborted
         fake_folder.local_modifier ().insert ("A/a0", size);
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Test 2 : modified file upload aborted
         fake_folder.local_modifier ().append_byte ("A/a0");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
     // We modify the file locally after it has been partially uploaded
-    private void testRemoveStale1 () {
+    private void test_remove_stale1 () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 10 * 1000 * 1000; // 10 MB
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
 
-        partialUpload (fake_folder, "A/a0", size);
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        var chunkingId = fake_folder.upload_state ().children.first ().name;
+        partial_upload (fake_folder, "A/a0", size);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        var chunking_identifier = fake_folder.upload_state ().children.first ().name;
 
         fake_folder.local_modifier ().set_contents ("A/a0", 'B');
         fake_folder.local_modifier ().append_byte ("A/a0");
 
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (fake_folder.current_remote_state ().find ("A/a0").size, size + 1);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_remote_state ().find ("A/a0").size, size + 1);
         // A different chunk identifier was used, and the previous one is removed
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        //  QVERIFY (fake_folder.upload_state ().children.first ().name != chunkingId);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        GLib.assert_true (fake_folder.upload_state ().children.first ().name != chunking_identifier);
     }
 
     // We remove the file locally after it has been partially uploaded
-    private void testRemoveStale2 () {
+    private void test_remove_stale2 () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 10 * 1000 * 1000; // 10 MB
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
 
-        partialUpload (fake_folder, "A/a0", size);
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
+        partial_upload (fake_folder, "A/a0", size);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
 
         fake_folder.local_modifier ().remove ("A/a0");
 
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 0);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 0);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testCreateConflictWhileSyncing () {
+    private void test_create_conflict_while_syncing () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 10 * 1000 * 1000; // 10 MB
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
 
         // Put a file on the server and download it.
         fake_folder.remote_modifier ().insert ("A/a0", size);
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Modify the file localy and on_signal_start the upload
         fake_folder.local_modifier ().set_contents ("A/a0", 'B');
         fake_folder.local_modifier ().append_byte ("A/a0");
 
         // But in the middle of the sync, modify the file on the server
-        QMetaObject.Connection con = GLib.Object.connect (&fake_folder.sync_engine (), &SyncEngine.transmissionProgress,
+        QMetaObject.Connection con = GLib.Object.connect (&fake_folder.sync_engine (), &SyncEngine.transmission_progress,
                                     [&] (ProgressInfo progress) {
-                if (progress.completedSize () > (progress.totalSize () / 2 )) {
+                if (progress.completed_size () > (progress.total_size () / 2 )) {
                     fake_folder.remote_modifier ().set_contents ("A/a0", 'C');
                     GLib.Object.disconnect (con);
                 }
         });
 
-        //  QVERIFY (!fake_folder.sync_once ());
+        GLib.assert_true (!fake_folder.sync_once ());
         // There was a precondition failed error, this means wen need to sync again
-        //  QCOMPARE (fake_folder.sync_engine ().isAnotherSyncNeeded (), ImmediateFollowUp);
+        GLib.assert_cmp (fake_folder.sync_engine ().is_another_sync_needed (), ImmediateFollowUp);
 
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1); // We did not clean the chunks at this point
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1); // We did not clean the chunks at this point
 
         // Now we will download the server file and create a conflict
-        //  QVERIFY (fake_folder.sync_once ());
-        var localState = fake_folder.current_local_state ();
+        GLib.assert_true (fake_folder.sync_once ());
+        var local_state = fake_folder.current_local_state ();
 
         // A0 is the one from the server
-        //  QCOMPARE (localState.find ("A/a0").size, size);
-        //  QCOMPARE (localState.find ("A/a0").content_char, 'C');
+        GLib.assert_cmp (local_state.find ("A/a0").size, size);
+        GLib.assert_cmp (local_state.find ("A/a0").content_char, 'C');
 
         // There is a conflict file with our version
-        var stateAChildren = localState.find ("A").children;
-        var it = std.find_if (stateAChildren.cbegin (), stateAChildren.cend (), [&] (FileInfo file_info) {
-            return file_info.name.startsWith ("a0 (conflicted copy");
+        var state_a_children = local_state.find ("A").children;
+        var it = std.find_if (state_a_children.cbegin (), state_a_children.cend (), [&] (FileInfo file_info) {
+            return file_info.name.starts_with ("a0 (conflicted copy");
         });
-        //  QVERIFY (it != stateAChildren.cend ());
-        //  QCOMPARE (it.content_char, 'B');
-        //  QCOMPARE (it.size, size+1);
+        GLib.assert_true (it != state_a_children.cend ());
+        GLib.assert_cmp (it.content_char, 'B');
+        GLib.assert_cmp (it.size, size+1);
 
         // Remove the conflict file so the comparison works!
         fake_folder.local_modifier ().remove ("A/" + it.name);
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 0); // The last sync cleaned the chunks
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 0); // The last sync cleaned the chunks
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testModifyLocalFileWhileUploading () {
+    private void test_modify_local_file_while_uploading () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 10 * 1000 * 1000; // 10 MB
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
 
         fake_folder.local_modifier ().insert ("A/a0", size);
 
         // middle of the sync, modify the file
-        QMetaObject.Connection con = GLib.Object.connect (&fake_folder.sync_engine (), &SyncEngine.transmissionProgress,
+        QMetaObject.Connection con = GLib.Object.connect (&fake_folder.sync_engine (), &SyncEngine.transmission_progress,
                                     [&] (ProgressInfo progress) {
-                if (progress.completedSize () > (progress.totalSize () / 2 )) {
+                if (progress.completed_size () > (progress.total_size () / 2 )) {
                     fake_folder.local_modifier ().set_contents ("A/a0", 'B');
                     fake_folder.local_modifier ().append_byte ("A/a0");
                     GLib.Object.disconnect (con);
                 }
         });
 
-        //  QVERIFY (!fake_folder.sync_once ());
+        GLib.assert_true (!fake_folder.sync_once ());
 
         // There should be a followup sync
-        //  QCOMPARE (fake_folder.sync_engine ().isAnotherSyncNeeded (), ImmediateFollowUp);
+        GLib.assert_cmp (fake_folder.sync_engine ().is_another_sync_needed (), ImmediateFollowUp);
 
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1); // We did not clean the chunks at this point
-        var chunkingId = fake_folder.upload_state ().children.first ().name;
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1); // We did not clean the chunks at this point
+        var chunking_identifier = fake_folder.upload_state ().children.first ().name;
 
         // Now we make a new sync which should upload the file for good.
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (fake_folder.current_remote_state ().find ("A/a0").size, size+1);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_remote_state ().find ("A/a0").size, size+1);
 
         // A different chunk identifier was used, and the previous one is removed
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        //  QVERIFY (fake_folder.upload_state ().children.first ().name != chunkingId);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        GLib.assert_true (fake_folder.upload_state ().children.first ().name != chunking_identifier);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testResumeServerDeletedChunks () {
+    private void test_resume_server_deleted_chunks () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 30 * 1000 * 1000; // 30 MB
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
-        partialUpload (fake_folder, "A/a0", size);
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        var chunkingId = fake_folder.upload_state ().children.first ().name;
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        partial_upload (fake_folder, "A/a0", size);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        var chunking_identifier = fake_folder.upload_state ().children.first ().name;
 
         // Delete the chunks on the server
         fake_folder.upload_state ().children.clear ();
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (fake_folder.current_remote_state ().find ("A/a0").size, size);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_remote_state ().find ("A/a0").size, size);
 
         // A different chunk identifier was used
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        //  QVERIFY (fake_folder.upload_state ().children.first ().name != chunkingId);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        GLib.assert_true (fake_folder.upload_state ().children.first ().name != chunking_identifier);
     }
 
     // Check what happens when the connection is dropped on the PUT (non-chunking) or MOVE (chunking)
     // for on the issue #5106
-    private void connectionDroppedBeforeEtagRecieved_data () {
-        QTest.addColumn<bool> ("chunking");
-        QTest.newRow ("big file") + true;
-        QTest.newRow ("small file") + false;
+    private void connection_dropped_before_etag_recieved_data () {
+        QTest.add_column<bool> ("chunking");
+        QTest.new_row ("big file") + true;
+        QTest.new_row ("small file") + false;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void connectionDroppedBeforeEtagRecieved () {
-        //  QFETCH (bool, chunking);
+    private void connection_dropped_before_etag_recieved () {
+        QFETCH (bool, chunking);
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
         const int size = chunking ? 1 * 1000 * 1000 : 300;
-        setChunkSize (fake_folder.sync_engine (), 300 * 1000);
+        set_chunk_size (fake_folder.sync_engine (), 300 * 1000);
 
         // Make the MOVE never reply, but trigger a client-on_signal_abort and apply the change remotely
-        GLib.ByteArray checksumHeader;
-        int nGET = 0;
-        QScopedValueRollback<int> setHttpTimeout (AbstractNetworkJob.httpTimeout, 1);
-        int responseDelay = AbstractNetworkJob.httpTimeout * 1000 * 1000; // much bigger than http timeout (so a timeout will occur)
+        GLib.ByteArray checksum_header;
+        int n_get = 0;
+        QScopedValueRollback<int> set_http_timeout (AbstractNetworkJob.http_timeout, 1);
+        int response_delay = AbstractNetworkJob.http_timeout * 1000 * 1000; // much bigger than http timeout (so a timeout will occur)
         // This will perform the operation on the server, but the reply will not come to the client
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) . Soup.Reply * {
             if (!chunking) {
-                //  Q_ASSERT (!request.url ().path ().contains ("/uploads/")
+                GLib.assert_true (!request.url ().path ().contains ("/uploads/")
                     && "Should not touch uploads endpoint when not chunking");
             }
             if (!chunking && operation == Soup.PutOperation) {
-                checksumHeader = request.rawHeader ("OC-Checksum");
-                return new DelayedReply<FakePutReply> (responseDelay, fake_folder.remote_modifier (), operation, request, outgoing_data.readAll (), fake_folder.sync_engine ());
+                checksum_header = request.raw_header ("OC-Checksum");
+                return new DelayedReply<FakePutReply> (response_delay, fake_folder.remote_modifier (), operation, request, outgoing_data.read_all (), fake_folder.sync_engine ());
             } else if (chunking && request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {
-                checksumHeader = request.rawHeader ("OC-Checksum");
-                return new DelayedReply<FakeChunkMoveReply> (responseDelay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, fake_folder.sync_engine ());
+                checksum_header = request.raw_header ("OC-Checksum");
+                return new DelayedReply<FakeChunkMoveReply> (response_delay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, fake_folder.sync_engine ());
             } else if (operation == Soup.GetOperation) {
-                nGET++;
+                n_get++;
             }
             return null;
         });
 
         // Test 1 : a NEW file
         fake_folder.local_modifier ().insert ("A/a0", size);
-        //  QVERIFY (!fake_folder.sync_once ()); // timeout!
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ()); // but the upload succeeded
-        //  QVERIFY (!checksumHeader.isEmpty ());
-        fake_folder.remote_modifier ().find ("A/a0").checksums = checksumHeader; // The test system don't do that automatically
+        GLib.assert_true (!fake_folder.sync_once ()); // timeout!
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ()); // but the upload succeeded
+        GLib.assert_true (!checksum_header.is_empty ());
+        fake_folder.remote_modifier ().find ("A/a0").checksums = checksum_header; // The test system don't do that automatically
         // Should be resolved properly
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (nGET, 0);
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (n_get, 0);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Test 2 : Modify the file further
         fake_folder.local_modifier ().append_byte ("A/a0");
-        //  QVERIFY (!fake_folder.sync_once ()); // timeout!
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ()); // but the upload succeeded
-        fake_folder.remote_modifier ().find ("A/a0").checksums = checksumHeader;
+        GLib.assert_true (!fake_folder.sync_once ()); // timeout!
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ()); // but the upload succeeded
+        fake_folder.remote_modifier ().find ("A/a0").checksums = checksum_header;
         // modify again, should not cause conflict
         fake_folder.local_modifier ().append_byte ("A/a0");
-        //  QVERIFY (!fake_folder.sync_once ()); // now it's trying to upload the modified file
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        fake_folder.remote_modifier ().find ("A/a0").checksums = checksumHeader;
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (nGET, 0);
+        GLib.assert_true (!fake_folder.sync_once ()); // now it's trying to upload the modified file
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        fake_folder.remote_modifier ().find ("A/a0").checksums = checksum_header;
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (n_get, 0);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testPercentEncoding () {
+    private void test_percent_encoding () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 5 * 1000 * 1000;
-        setChunkSize (fake_folder.sync_engine (), 1 * 1000 * 1000);
+        set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
 
         fake_folder.local_modifier ().insert ("A/file % \u20ac", size);
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Only the second upload contains an "If" header
         fake_folder.local_modifier ().append_byte ("A/file % \u20ac");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
     // Test uploading large files (2.5GiB)
-    private void testVeryBigFiles () {
+    private void test_very_big_files () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int64 size = 2.5 * 1024 * 1024 * 1024; // 2.5 GiB
 
         // Partial upload of big files
-        partialUpload (fake_folder, "A/a0", size);
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        var chunkingId = fake_folder.upload_state ().children.first ().name;
+        partial_upload (fake_folder, "A/a0", size);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        var chunking_identifier = fake_folder.upload_state ().children.first ().name;
 
         // Now resume
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (fake_folder.current_remote_state ().find ("A/a0").size, size);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_remote_state ().find ("A/a0").size, size);
 
         // The same chunk identifier was re-used
-        //  QCOMPARE (fake_folder.upload_state ().children.count (), 1);
-        //  QCOMPARE (fake_folder.upload_state ().children.first ().name, chunkingId);
+        GLib.assert_cmp (fake_folder.upload_state ().children.count (), 1);
+        GLib.assert_cmp (fake_folder.upload_state ().children.first ().name, chunking_identifier);
 
         // Upload another file again, this time without interruption
         fake_folder.local_modifier ().append_byte ("A/a0");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (fake_folder.current_remote_state ().find ("A/a0").size, size + 1);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_remote_state ().find ("A/a0").size, size + 1);
     }
 
 }
-
-QTEST_GUILESS_MAIN (TestChunkingNG)
-#include "testchunkingng.moc"
+}

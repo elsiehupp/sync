@@ -20,14 +20,14 @@ class TestSyncJournalDB : GLib.Object {
     ***********************************************************/
     public TestSyncJournalDB ()
         : this.database ( (this.temporary_directory.path () + "/sync.db")) {
-        //  QVERIFY (this.temporary_directory.isValid ());
+        GLib.assert_true (this.temporary_directory.is_valid ());
     }
 
 
     /***********************************************************
     ***********************************************************/
     public int64 dropMsecs (GLib.DateTime time) {
-        return Utility.qDateTimeToTime_t (time);
+        return Utility.date_time_to_time_t (time);
     }
 
 
@@ -47,8 +47,8 @@ class TestSyncJournalDB : GLib.Object {
     ***********************************************************/
     private void testFileRecord () {
         SyncJournalFileRecord record;
-        //  QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("nonexistant"), record));
-        //  QVERIFY (!record.isValid ());
+        GLib.assert_true (this.database.get_file_record (QByteArrayLiteral ("nonexistant"), record));
+        GLib.assert_true (!record.is_valid ());
 
         record.path = "foo";
         // Use a value that exceeds uint32 and isn't representable by the
@@ -58,37 +58,37 @@ class TestSyncJournalDB : GLib.Object {
         record.type = ItemTypeDirectory;
         record.etag = "789789";
         record.file_identifier = "abcd";
-        record.remotePerm = RemotePermissions.fromDbValue ("RW");
-        record.fileSize = 213089055;
-        record.checksumHeader = "MD5:mychecksum";
-        //  QVERIFY (this.database.setFileRecord (record));
+        record.remote_perm = RemotePermissions.fromDbValue ("RW");
+        record.file_size = 213089055;
+        record.checksum_header = "MD5:mychecksum";
+        GLib.assert_true (this.database.setFileRecord (record));
 
         SyncJournalFileRecord storedRecord;
-        //  QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo"), storedRecord));
-        //  QVERIFY (storedRecord == record);
+        GLib.assert_true (this.database.get_file_record (QByteArrayLiteral ("foo"), storedRecord));
+        GLib.assert_true (storedRecord == record);
 
         // Update checksum
-        record.checksumHeader = "Adler32:newchecksum";
+        record.checksum_header = "Adler32:newchecksum";
         this.database.updateFileRecordChecksum ("foo", "newchecksum", "Adler32");
-        //  QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo"), storedRecord));
-        //  QVERIFY (storedRecord == record);
+        GLib.assert_true (this.database.get_file_record (QByteArrayLiteral ("foo"), storedRecord));
+        GLib.assert_true (storedRecord == record);
 
         // Update metadata
-        record.modtime = dropMsecs (GLib.DateTime.currentDateTime ().addDays (1));
+        record.modtime = dropMsecs (GLib.DateTime.currentDateTime ().add_days (1));
         // try a value that only fits uint64, not int64
         record.inode = std.numeric_limits<uint64>.max () - std.numeric_limits<uint32>.max () - 1;
         record.type = ItemTypeFile;
         record.etag = "789FFF";
         record.file_identifier = "efg";
-        record.remotePerm = RemotePermissions.fromDbValue ("NV");
-        record.fileSize = 289055;
+        record.remote_perm = RemotePermissions.fromDbValue ("NV");
+        record.file_size = 289055;
         this.database.setFileRecord (record);
-        //  QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo"), storedRecord));
-        //  QVERIFY (storedRecord == record);
+        GLib.assert_true (this.database.get_file_record (QByteArrayLiteral ("foo"), storedRecord));
+        GLib.assert_true (storedRecord == record);
 
-        //  QVERIFY (this.database.deleteFileRecord ("foo"));
-        //  QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo"), record));
-        //  QVERIFY (!record.isValid ());
+        GLib.assert_true (this.database.deleteFileRecord ("foo"));
+        GLib.assert_true (this.database.get_file_record (QByteArrayLiteral ("foo"), record));
+        GLib.assert_true (!record.is_valid ());
     }
 
 
@@ -98,34 +98,34 @@ class TestSyncJournalDB : GLib.Object {
         {
             SyncJournalFileRecord record;
             record.path = "foo-checksum";
-            record.remotePerm = RemotePermissions.fromDbValue (" ");
-            record.checksumHeader = "MD5:mychecksum";
-            record.modtime = Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ());
-            //  QVERIFY (this.database.setFileRecord (record));
+            record.remote_perm = RemotePermissions.fromDbValue (" ");
+            record.checksum_header = "MD5:mychecksum";
+            record.modtime = Utility.date_time_to_time_t (GLib.DateTime.current_date_time_utc ());
+            GLib.assert_true (this.database.setFileRecord (record));
 
             SyncJournalFileRecord storedRecord;
-            //  QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo-checksum"), storedRecord));
-            //  QVERIFY (storedRecord.path == record.path);
-            //  QVERIFY (storedRecord.remotePerm == record.remotePerm);
-            //  QVERIFY (storedRecord.checksumHeader == record.checksumHeader);
+            GLib.assert_true (this.database.get_file_record (QByteArrayLiteral ("foo-checksum"), storedRecord));
+            GLib.assert_true (storedRecord.path == record.path);
+            GLib.assert_true (storedRecord.remote_perm == record.remote_perm);
+            GLib.assert_true (storedRecord.checksum_header == record.checksum_header);
 
             // GLib.debug ()<< "OOOOO " + storedRecord.modtime.toTime_t () + record.modtime.toTime_t ();
 
             // Attention : compare time_t types here, as GLib.DateTime seem to maintain
             // milliseconds internally, which disappear in sqlite. Go for full seconds here.
-            //  QVERIFY (storedRecord.modtime == record.modtime);
-            //  QVERIFY (storedRecord == record);
+            GLib.assert_true (storedRecord.modtime == record.modtime);
+            GLib.assert_true (storedRecord == record);
         } {
             SyncJournalFileRecord record;
             record.path = "foo-nochecksum";
-            record.remotePerm = RemotePermissions.fromDbValue ("RW");
-            record.modtime = Utility.qDateTimeToTime_t (GLib.DateTime.currentDateTimeUtc ());
+            record.remote_perm = RemotePermissions.fromDbValue ("RW");
+            record.modtime = Utility.date_time_to_time_t (GLib.DateTime.current_date_time_utc ());
 
-            //  QVERIFY (this.database.setFileRecord (record));
+            GLib.assert_true (this.database.setFileRecord (record));
 
             SyncJournalFileRecord storedRecord;
-            //  QVERIFY (this.database.getFileRecord (QByteArrayLiteral ("foo-nochecksum"), storedRecord));
-            //  QVERIFY (storedRecord == record);
+            GLib.assert_true (this.database.get_file_record (QByteArrayLiteral ("foo-nochecksum"), storedRecord));
+            GLib.assert_true (storedRecord == record);
         }
     }
 
@@ -135,7 +135,7 @@ class TestSyncJournalDB : GLib.Object {
     private void testDownloadInfo () {
         using Info = SyncJournalDb.DownloadInfo;
         Info record = this.database.getDownloadInfo ("nonexistant");
-        //  QVERIFY (!record.valid);
+        GLib.assert_true (!record.valid);
 
         record.errorCount = 5;
         record.etag = "ABCDEF";
@@ -144,11 +144,11 @@ class TestSyncJournalDB : GLib.Object {
         this.database.setDownloadInfo ("foo", record);
 
         Info storedRecord = this.database.getDownloadInfo ("foo");
-        //  QVERIFY (storedRecord == record);
+        GLib.assert_true (storedRecord == record);
 
         this.database.setDownloadInfo ("foo", Info ());
         Info wipedRecord = this.database.getDownloadInfo ("foo");
-        //  QVERIFY (!wipedRecord.valid);
+        GLib.assert_true (!wipedRecord.valid);
     }
 
 
@@ -157,7 +157,7 @@ class TestSyncJournalDB : GLib.Object {
     private void testUploadInfo () {
         using Info = SyncJournalDb.UploadInfo;
         Info record = this.database.getUploadInfo ("nonexistant");
-        //  QVERIFY (!record.valid);
+        GLib.assert_true (!record.valid);
 
         record.errorCount = 5;
         record.chunk = 12;
@@ -168,11 +168,11 @@ class TestSyncJournalDB : GLib.Object {
         this.database.setUploadInfo ("foo", record);
 
         Info storedRecord = this.database.getUploadInfo ("foo");
-        //  QVERIFY (storedRecord == record);
+        GLib.assert_true (storedRecord == record);
 
         this.database.setUploadInfo ("foo", Info ());
         Info wipedRecord = this.database.getUploadInfo ("foo");
-        //  QVERIFY (!wipedRecord.valid);
+        GLib.assert_true (!wipedRecord.valid);
     }
 
 
@@ -183,11 +183,11 @@ class TestSyncJournalDB : GLib.Object {
 
         // Typical 8-digit padded identifier
         record.file_identifier = "00000001abcd";
-        //  QCOMPARE (record.numericFileId (), GLib.ByteArray ("00000001"));
+        GLib.assert_cmp (record.numericFileId (), GLib.ByteArray ("00000001"));
 
         // When the numeric identifier overflows the 8-digit boundary
         record.file_identifier = "123456789ocidblaabcd";
-        //  QCOMPARE (record.numericFileId (), GLib.ByteArray ("123456789"));
+        GLib.assert_cmp (record.numericFileId (), GLib.ByteArray ("123456789"));
     }
 
 
@@ -200,18 +200,18 @@ class TestSyncJournalDB : GLib.Object {
         record.baseModtime = 1234;
         record.baseEtag = "ghi";
 
-        //  QVERIFY (!this.database.conflictRecord (record.path).isValid ());
+        GLib.assert_true (!this.database.conflictRecord (record.path).is_valid ());
 
         this.database.setConflictRecord (record);
         var newRecord = this.database.conflictRecord (record.path);
-        //  QVERIFY (newRecord.isValid ());
-        //  QCOMPARE (newRecord.path, record.path);
-        //  QCOMPARE (newRecord.baseFileId, record.baseFileId);
-        //  QCOMPARE (newRecord.baseModtime, record.baseModtime);
-        //  QCOMPARE (newRecord.baseEtag, record.baseEtag);
+        GLib.assert_true (newRecord.is_valid ());
+        GLib.assert_cmp (newRecord.path, record.path);
+        GLib.assert_cmp (newRecord.baseFileId, record.baseFileId);
+        GLib.assert_cmp (newRecord.baseModtime, record.baseModtime);
+        GLib.assert_cmp (newRecord.baseEtag, record.baseEtag);
 
         this.database.deleteConflictRecord (record.path);
-        //  QVERIFY (!this.database.conflictRecord (record.path).isValid ());
+        GLib.assert_true (!this.database.conflictRecord (record.path).is_valid ());
     }
 
 
@@ -219,18 +219,18 @@ class TestSyncJournalDB : GLib.Object {
     ***********************************************************/
     private void testAvoidReadFromDbOnNextSync () {
         var invalidEtag = GLib.ByteArray ("this.invalid_");
-        var initialEtag = GLib.ByteArray ("etag");
+        var initial_etag = GLib.ByteArray ("etag");
         var makeEntry = [&] (GLib.ByteArray path, ItemType type) {
             SyncJournalFileRecord record;
             record.path = path;
             record.type = type;
-            record.etag = initialEtag;
-            record.remotePerm = RemotePermissions.fromDbValue ("RW");
+            record.etag = initial_etag;
+            record.remote_perm = RemotePermissions.fromDbValue ("RW");
             this.database.setFileRecord (record);
         }
         var getEtag = [&] (GLib.ByteArray path) {
             SyncJournalFileRecord record;
-            this.database.getFileRecord (path, record);
+            this.database.get_file_record (path, record);
             return record.etag;
         }
 
@@ -251,35 +251,35 @@ class TestSyncJournalDB : GLib.Object {
         this.database.schedulePathForRemoteDiscovery (GLib.ByteArray ("foodir/subdir"));
 
         // Direct effects of parent directories being set to this.invalid_
-        //  QCOMPARE (getEtag ("foodir"), invalidEtag);
-        //  QCOMPARE (getEtag ("foodir/subdir"), invalidEtag);
-        //  QCOMPARE (getEtag ("foodir/subdir/subsubdir"), initialEtag);
+        GLib.assert_cmp (getEtag ("foodir"), invalidEtag);
+        GLib.assert_cmp (getEtag ("foodir/subdir"), invalidEtag);
+        GLib.assert_cmp (getEtag ("foodir/subdir/subsubdir"), initial_etag);
 
-        //  QCOMPARE (getEtag ("foodir/file"), initialEtag);
-        //  QCOMPARE (getEtag ("foodir/subdir/file"), initialEtag);
-        //  QCOMPARE (getEtag ("foodir/subdir/subsubdir/file"), initialEtag);
+        GLib.assert_cmp (getEtag ("foodir/file"), initial_etag);
+        GLib.assert_cmp (getEtag ("foodir/subdir/file"), initial_etag);
+        GLib.assert_cmp (getEtag ("foodir/subdir/subsubdir/file"), initial_etag);
 
-        //  QCOMPARE (getEtag ("fo"), initialEtag);
-        //  QCOMPARE (getEtag ("foo%"), initialEtag);
-        //  QCOMPARE (getEtag ("foodi_"), initialEtag);
-        //  QCOMPARE (getEtag ("otherdir"), initialEtag);
-        //  QCOMPARE (getEtag ("foodir/otherdir"), initialEtag);
-        //  QCOMPARE (getEtag ("foodir/sub"), initialEtag);
-        //  QCOMPARE (getEtag ("foodir/subdir/otherdir"), initialEtag);
+        GLib.assert_cmp (getEtag ("fo"), initial_etag);
+        GLib.assert_cmp (getEtag ("foo%"), initial_etag);
+        GLib.assert_cmp (getEtag ("foodi_"), initial_etag);
+        GLib.assert_cmp (getEtag ("otherdir"), initial_etag);
+        GLib.assert_cmp (getEtag ("foodir/otherdir"), initial_etag);
+        GLib.assert_cmp (getEtag ("foodir/sub"), initial_etag);
+        GLib.assert_cmp (getEtag ("foodir/subdir/otherdir"), initial_etag);
 
         // Indirect effects : setFileRecord () calls filter etags
-        initialEtag = "etag2";
+        initial_etag = "etag2";
 
         makeEntry ("foodir", ItemTypeDirectory);
-        //  QCOMPARE (getEtag ("foodir"), invalidEtag);
+        GLib.assert_cmp (getEtag ("foodir"), invalidEtag);
         makeEntry ("foodir/subdir", ItemTypeDirectory);
-        //  QCOMPARE (getEtag ("foodir/subdir"), invalidEtag);
+        GLib.assert_cmp (getEtag ("foodir/subdir"), invalidEtag);
         makeEntry ("foodir/subdir/subsubdir", ItemTypeDirectory);
-        //  QCOMPARE (getEtag ("foodir/subdir/subsubdir"), initialEtag);
+        GLib.assert_cmp (getEtag ("foodir/subdir/subsubdir"), initial_etag);
         makeEntry ("fo", ItemTypeDirectory);
-        //  QCOMPARE (getEtag ("fo"), initialEtag);
+        GLib.assert_cmp (getEtag ("fo"), initial_etag);
         makeEntry ("foodir/sub", ItemTypeDirectory);
-        //  QCOMPARE (getEtag ("foodir/sub"), initialEtag);
+        GLib.assert_cmp (getEtag ("foodir/sub"), initial_etag);
     }
 
 
@@ -289,7 +289,7 @@ class TestSyncJournalDB : GLib.Object {
         var makeEntry = [&] (GLib.ByteArray path) {
             SyncJournalFileRecord record;
             record.path = path;
-            record.remotePerm = RemotePermissions.fromDbValue ("RW");
+            record.remote_perm = RemotePermissions.fromDbValue ("RW");
             this.database.setFileRecord (record);
         }
 
@@ -311,9 +311,9 @@ class TestSyncJournalDB : GLib.Object {
             bool ok = true;
             for (var& elem : elements) {
                 SyncJournalFileRecord record;
-                this.database.getFileRecord (elem, record);
-                if (!record.isValid ()) {
-                    qWarning ("Missing record : " + elem;
+                this.database.get_file_record (elem, record);
+                if (!record.is_valid ()) {
+                    GLib.warn ("Missing record: " + elem;
                     ok = false;
                 }
             }
@@ -321,18 +321,18 @@ class TestSyncJournalDB : GLib.Object {
         }
 
         this.database.deleteFileRecord ("moo", true);
-        elements.removeAll ("moo");
-        elements.removeAll ("moo/file");
-        //  QVERIFY (checkElements ());
+        elements.remove_all ("moo");
+        elements.remove_all ("moo/file");
+        GLib.assert_true (checkElements ());
 
         this.database.deleteFileRecord ("fo_", true);
-        elements.removeAll ("fo_");
-        elements.removeAll ("fo_/file");
-        //  QVERIFY (checkElements ());
+        elements.remove_all ("fo_");
+        elements.remove_all ("fo_/file");
+        GLib.assert_true (checkElements ());
 
         this.database.deleteFileRecord ("foo%bar", true);
-        elements.removeAll ("foo%bar");
-        //  QVERIFY (checkElements ());
+        elements.remove_all ("foo%bar");
+        GLib.assert_true (checkElements ());
     }
 
 
@@ -342,8 +342,8 @@ class TestSyncJournalDB : GLib.Object {
         var make = [&] (GLib.ByteArray path, PinState state) {
             this.database.internalPinStates ().setForPath (path, state);
             var pinState = this.database.internalPinStates ().rawForPath (path);
-            //  QVERIFY (pinState);
-            //  QCOMPARE (*pinState, state);
+            GLib.assert_true (pinState);
+            GLib.assert_cmp (*pinState, state);
         }
         var get = [&] (GLib.ByteArray path) . PinState {
             var state = this.database.internalPinStates ().effectiveForPath (path);
@@ -372,7 +372,7 @@ class TestSyncJournalDB : GLib.Object {
 
         this.database.internalPinStates ().wipeForPathAndBelow ("");
         var list = this.database.internalPinStates ().rawList ();
-        //  QCOMPARE (list.size (), 0);
+        GLib.assert_cmp (list.size (), 0);
 
         // Make a thrice-nested setup
         make ("", PinState.PinState.ALWAYS_LOCAL);
@@ -392,82 +392,82 @@ class TestSyncJournalDB : GLib.Object {
         }
 
         list = this.database.internalPinStates ().rawList ();
-        //  QCOMPARE (list.size (), 4 + 9 + 27);
+        GLib.assert_cmp (list.size (), 4 + 9 + 27);
 
         // Baseline direct checks (the fallback for unset root pinstate is PinState.ALWAYS_LOCAL)
-        //  QCOMPARE (get (""), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("local"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("online"), PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (get ("inherit"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("nonexistant"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("online/local"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("local/online"), PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (get ("inherit/local"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("inherit/online"), PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (get ("inherit/inherit"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("inherit/nonexistant"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get (""), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("local"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("online"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("inherit"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("nonexistant"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("online/local"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("local/online"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("inherit/local"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("inherit/online"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("inherit/inherit"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("inherit/nonexistant"), PinState.PinState.ALWAYS_LOCAL);
 
         // Inheriting checks, level 1
-        //  QCOMPARE (get ("local/inherit"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("local/nonexistant"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("online/inherit"), PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (get ("online/nonexistant"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("local/inherit"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("local/nonexistant"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("online/inherit"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("online/nonexistant"), PinState.VfsItemAvailability.ONLINE_ONLY);
 
         // Inheriting checks, level 2
-        //  QCOMPARE (get ("local/inherit/inherit"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("local/local/inherit"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("local/local/nonexistant"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("local/online/inherit"), PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (get ("local/online/nonexistant"), PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (get ("online/inherit/inherit"), PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (get ("online/local/inherit"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("online/local/nonexistant"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("online/online/inherit"), PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (get ("online/online/nonexistant"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("local/inherit/inherit"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("local/local/inherit"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("local/local/nonexistant"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("local/online/inherit"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("local/online/nonexistant"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("online/inherit/inherit"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("online/local/inherit"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("online/local/nonexistant"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("online/online/inherit"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("online/online/nonexistant"), PinState.VfsItemAvailability.ONLINE_ONLY);
 
         // Spot check the recursive variant
-        //  QCOMPARE (getRecursive (""), PinState.PinState.INHERITED);
-        //  QCOMPARE (getRecursive ("local"), PinState.PinState.INHERITED);
-        //  QCOMPARE (getRecursive ("online"), PinState.PinState.INHERITED);
-        //  QCOMPARE (getRecursive ("inherit"), PinState.PinState.INHERITED);
-        //  QCOMPARE (getRecursive ("online/local"), PinState.PinState.INHERITED);
-        //  QCOMPARE (getRecursive ("online/local/inherit"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (getRecursive ("inherit/inherit/inherit"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (getRecursive ("inherit/online/inherit"), PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (getRecursive ("inherit/online/local"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (getRecursive (""), PinState.PinState.INHERITED);
+        GLib.assert_cmp (getRecursive ("local"), PinState.PinState.INHERITED);
+        GLib.assert_cmp (getRecursive ("online"), PinState.PinState.INHERITED);
+        GLib.assert_cmp (getRecursive ("inherit"), PinState.PinState.INHERITED);
+        GLib.assert_cmp (getRecursive ("online/local"), PinState.PinState.INHERITED);
+        GLib.assert_cmp (getRecursive ("online/local/inherit"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (getRecursive ("inherit/inherit/inherit"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (getRecursive ("inherit/online/inherit"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (getRecursive ("inherit/online/local"), PinState.PinState.ALWAYS_LOCAL);
         make ("local/local/local/local", PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (getRecursive ("local/local/local"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (getRecursive ("local/local/local/local"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (getRecursive ("local/local/local"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (getRecursive ("local/local/local/local"), PinState.PinState.ALWAYS_LOCAL);
 
         // Check changing the root pin state
         make ("", PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (get ("local"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("online"), PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (get ("inherit"), PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (get ("nonexistant"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("local"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("online"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("inherit"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("nonexistant"), PinState.VfsItemAvailability.ONLINE_ONLY);
         make ("", PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("local"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("online"), PinState.VfsItemAvailability.ONLINE_ONLY);
-        //  QCOMPARE (get ("inherit"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (get ("nonexistant"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("local"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("online"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_cmp (get ("inherit"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (get ("nonexistant"), PinState.PinState.ALWAYS_LOCAL);
 
         // Wiping
-        //  QCOMPARE (getRaw ("local/local"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (getRaw ("local/local"), PinState.PinState.ALWAYS_LOCAL);
         this.database.internalPinStates ().wipeForPathAndBelow ("local/local");
-        //  QCOMPARE (getRaw ("local"), PinState.PinState.ALWAYS_LOCAL);
-        //  QCOMPARE (getRaw ("local/local"), PinState.PinState.INHERITED);
-        //  QCOMPARE (getRaw ("local/local/local"), PinState.PinState.INHERITED);
-        //  QCOMPARE (getRaw ("local/local/online"), PinState.PinState.INHERITED);
+        GLib.assert_cmp (getRaw ("local"), PinState.PinState.ALWAYS_LOCAL);
+        GLib.assert_cmp (getRaw ("local/local"), PinState.PinState.INHERITED);
+        GLib.assert_cmp (getRaw ("local/local/local"), PinState.PinState.INHERITED);
+        GLib.assert_cmp (getRaw ("local/local/online"), PinState.PinState.INHERITED);
         list = this.database.internalPinStates ().rawList ();
-        //  QCOMPARE (list.size (), 4 + 9 + 27 - 4);
+        GLib.assert_cmp (list.size (), 4 + 9 + 27 - 4);
 
         // Wiping everything
         this.database.internalPinStates ().wipeForPathAndBelow ("");
-        //  QCOMPARE (getRaw (""), PinState.PinState.INHERITED);
-        //  QCOMPARE (getRaw ("local"), PinState.PinState.INHERITED);
-        //  QCOMPARE (getRaw ("online"), PinState.PinState.INHERITED);
+        GLib.assert_cmp (getRaw (""), PinState.PinState.INHERITED);
+        GLib.assert_cmp (getRaw ("local"), PinState.PinState.INHERITED);
+        GLib.assert_cmp (getRaw ("online"), PinState.PinState.INHERITED);
         list = this.database.internalPinStates ().rawList ();
-        //  QCOMPARE (list.size (), 0);
+        GLib.assert_cmp (list.size (), 0);
     }
 
 

@@ -12,35 +12,35 @@ using Occ;
 namespace Testing {
 
 struct OperationCounter {
-    int nGET = 0;
-    int nPUT = 0;
-    int nMOVE = 0;
-    int nDELETE = 0;
+    int n_get = 0;
+    int number_of_put = 0;
+    int number_of_move = 0;
+    int number_of_delete = 0;
 
     void on_signal_reset () { *this = {}; }
 
     var functor () {
         return [&] (Soup.Operation operation, Soup.Request request, QIODevice *) {
             if (operation == Soup.GetOperation)
-                ++nGET;
+                ++n_get;
             if (operation == Soup.PutOperation)
-                ++nPUT;
+                ++number_of_put;
             if (operation == Soup.DeleteOperation)
-                ++nDELETE;
+                ++number_of_delete;
             if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE")
-                ++nMOVE;
+                ++number_of_move;
             return null;
         }
     }
 }
 
 bool itemSuccessful (ItemCompletedSpy spy, string path, SyncInstructions instr) {
-    var item = spy.findItem (path);
+    var item = spy.find_item (path);
     return item.status == SyncFileItem.Status.SUCCESS && item.instruction == instr;
 }
 
 bool itemConflict (ItemCompletedSpy spy, string path) {
-    var item = spy.findItem (path);
+    var item = spy.find_item (path);
     return item.status == SyncFileItem.Status.CONFLICT && item.instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
@@ -60,11 +60,11 @@ string[] findConflicts (FileInfo directory) {
 
 bool expectAndWipeConflict (FileModifier local, FileInfo state, string path) {
     PathComponents path_components (path);
-    var base = state.find (path_components.parentDirComponents ());
+    var base = state.find (path_components.parent_directory_components ());
     if (!base)
         return false;
     for (var item : base.children) {
-        if (item.name.startsWith (path_components.filename ()) && item.name.contains (" (conflicted copy")) {
+        if (item.name.starts_with (path_components.filename ()) && item.name.contains (" (conflicted copy")) {
             local.remove (item.path ());
             return true;
         }
@@ -77,32 +77,31 @@ class TestSyncMove : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_move_custom_remote_root () {
-        FileInfo subFolder (QStringLiteral ("AS"), { { QStringLiteral ("f1"), 4 } });
-        FileInfo folder (QStringLiteral ("A"), { subFolder });
-        FileInfo file_info ({}, { folder });
+        FileInfo subFolder = new FileInfo ("AS", { { "f1", 4 } });
+        FileInfo folder = new FileInfo ("A", { subFolder });
+        FileInfo file_info = new FileInfo ({}, { folder });
 
-        FakeFolder fake_folder (file_info, folder, QStringLiteral ("/A"));
+        FakeFolder fake_folder = new FakeFolder (file_info, folder, "/A");
         var local_modifier = fake_folder.local_modifier ();
 
         OperationCounter counter;
         fake_folder.set_server_override (counter.functor ());
 
-        // Move file and then move it back again {
-            counter.on_signal_reset ();
-            local_modifier.rename (QStringLiteral ("AS/f1"), QStringLiteral ("f1"));
+        // Move file and then move it back again
+        counter.on_signal_reset ();
+        local_modifier.rename ("AS/f1", "f1");
 
-            ItemCompletedSpy completeSpy (fake_folder);
-            //  QVERIFY (fake_folder.sync_once ());
+        ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
+        GLib.assert_true (fake_folder.sync_once ());
 
-            //  QCOMPARE (counter.nGET, 0);
-            //  QCOMPARE (counter.nPUT, 0);
-            //  QCOMPARE (counter.nMOVE, 1);
-            //  QCOMPARE (counter.nDELETE, 0);
+        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_cmp (counter.number_of_put, 0);
+        GLib.assert_cmp (counter.number_of_move, 1);
+        GLib.assert_cmp (counter.number_of_delete, 0);
 
-            //  QVERIFY (itemSuccessful (completeSpy, "f1", CSYNC_INSTRUCTION_RENAME));
-            //  QVERIFY (fake_folder.current_remote_state ().find ("A/f1"));
-            //  QVERIFY (!fake_folder.current_remote_state ().find ("A/AS/f1"));
-        }
+        GLib.assert_true (itemSuccessful (complete_spy, "f1", CSYNC_INSTRUCTION_RENAME));
+        GLib.assert_true (fake_folder.current_remote_state ().find ("A/f1"));
+        GLib.assert_true (!fake_folder.current_remote_state ().find ("A/AS/f1"));
     }
 
 
@@ -110,23 +109,31 @@ class TestSyncMove : GLib.Object {
     ***********************************************************/
     private void testRemoteChangeInMovedFolder () {
         // issue #5192
-        FakeFolder fake_folder = new FakeFolder ( FileInfo ("", { FileInfo (QStringLiteral ("folder"), { FileInfo (QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
+        FakeFolder fake_folder = new FakeFolder (
+            new FileInfo ("", {
+                new FileInfo ("folder", {
+                    new FileInfo ("folderA", {
+                        { "file.txt", 400 }
+                    } ),
+                "folderB" } )
+            } )
+        );
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Edit a file in a moved directory.
         fake_folder.remote_modifier ().set_contents ("folder/folderA/file.txt", 'a');
         fake_folder.remote_modifier ().rename ("folder/folderA", "folder/folderB/folderA");
         fake_folder.sync_once ();
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
         var oldState = fake_folder.current_local_state ();
-        //  QVERIFY (oldState.find ("folder/folderB/folderA/file.txt"));
-        //  QVERIFY (!oldState.find ("folder/folderA/file.txt"));
+        GLib.assert_true (oldState.find ("folder/folderB/folderA/file.txt"));
+        GLib.assert_true (!oldState.find ("folder/folderA/file.txt"));
 
         // This sync should not remove the file
         fake_folder.sync_once ();
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (fake_folder.current_local_state (), oldState);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_local_state (), oldState);
     }
 
 
@@ -134,23 +141,34 @@ class TestSyncMove : GLib.Object {
     ***********************************************************/
     private void testSelectiveSyncMovedFolder () {
         // issue #5224
-        FakeFolder fake_folder = new FakeFolder ( FileInfo ("", { FileInfo (QStringLiteral ("parentFolder"), { FileInfo (QStringLiteral ("subFolderA"), { { QStringLiteral ("fileA.txt"), 400 } } }, FileInfo (QStringLiteral ("subFolderB"), { { QStringLiteral ("fileB.txt"), 400 } } } } } } } };
+        FakeFolder fake_folder = new FakeFolder (
+            new FileInfo ("", {
+                new FileInfo ("parentFolder", {
+                    new FileInfo ("subFolderA", {
+                        { "fileA.txt", 400 }
+                    } ),
+                    new FileInfo ("subFolderB", {
+                        { "fileB.txt", 400 }
+                    } )
+                } )
+            } )
+        );
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
         var expectedServerState = fake_folder.current_remote_state ();
 
         // Remove subFolderA with selectiveSync:
-        fake_folder.sync_engine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, { "parentFolder/subFolderA/" });
+        fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, { "parentFolder/subFolderA/" });
         fake_folder.sync_engine ().journal ().schedulePathForRemoteDiscovery (QByteArrayLiteral ("parentFolder/subFolderA/"));
 
         fake_folder.sync_once ();
  {
             // Nothing changed on the server
-            //  QCOMPARE (fake_folder.current_remote_state (), expectedServerState);
+            GLib.assert_cmp (fake_folder.current_remote_state (), expectedServerState);
             // The local state should not have subFolderA
             var remoteState = fake_folder.current_remote_state ();
             remoteState.remove ("parentFolder/subFolderA");
-            //  QCOMPARE (fake_folder.current_local_state (), remoteState);
+            GLib.assert_cmp (fake_folder.current_local_state (), remoteState);
         }
 
         // Rename parentFolder on the server
@@ -158,13 +176,13 @@ class TestSyncMove : GLib.Object {
         expectedServerState = fake_folder.current_remote_state ();
         fake_folder.sync_once ();
  {
-            //  QCOMPARE (fake_folder.current_remote_state (), expectedServerState);
+            GLib.assert_cmp (fake_folder.current_remote_state (), expectedServerState);
             var remoteState = fake_folder.current_remote_state ();
             // The subFolderA should still be there on the server.
-            //  QVERIFY (remoteState.find ("parentFolderRenamed/subFolderA/fileA.txt"));
+            GLib.assert_true (remoteState.find ("parentFolderRenamed/subFolderA/fileA.txt"));
             // But not on the client because of the selective sync
             remoteState.remove ("parentFolderRenamed/subFolderA");
-            //  QCOMPARE (fake_folder.current_local_state (), remoteState);
+            GLib.assert_cmp (fake_folder.current_local_state (), remoteState);
         }
 
         // Rename it again, locally this time.
@@ -173,18 +191,18 @@ class TestSyncMove : GLib.Object {
  {
             var remoteState = fake_folder.current_remote_state ();
             // The subFolderA should still be there on the server.
-            //  QVERIFY (remoteState.find ("parentThirdName/subFolderA/fileA.txt"));
+            GLib.assert_true (remoteState.find ("parentThirdName/subFolderA/fileA.txt"));
             // But not on the client because of the selective sync
             remoteState.remove ("parentThirdName/subFolderA");
-            //  QCOMPARE (fake_folder.current_local_state (), remoteState);
+            GLib.assert_cmp (fake_folder.current_local_state (), remoteState);
 
             expectedServerState = fake_folder.current_remote_state ();
-            ItemCompletedSpy completeSpy (fake_folder);
+            ItemCompletedSpy complete_spy (fake_folder);
             fake_folder.sync_once (); // This sync should do nothing
-            //  QCOMPARE (completeSpy.count (), 0);
+            GLib.assert_cmp (complete_spy.count (), 0);
 
-            //  QCOMPARE (fake_folder.current_remote_state (), expectedServerState);
-            //  QCOMPARE (fake_folder.current_local_state (), remoteState);
+            GLib.assert_cmp (fake_folder.current_remote_state (), expectedServerState);
+            GLib.assert_cmp (fake_folder.current_local_state (), remoteState);
         }
     }
 
@@ -194,13 +212,13 @@ class TestSyncMove : GLib.Object {
     private void testLocalMoveDetection () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
-        int nPUT = 0;
-        int nDELETE = 0;
+        int number_of_put = 0;
+        int number_of_delete = 0;
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request &, QIODevice *) {
             if (operation == Soup.PutOperation)
-                ++nPUT;
+                ++number_of_put;
             if (operation == Soup.DeleteOperation)
-                ++nDELETE;
+                ++number_of_delete;
             return null;
         });
 
@@ -209,39 +227,39 @@ class TestSyncMove : GLib.Object {
 
         // Simple move causing a remote rename
         fake_folder.local_modifier ().rename ("A/a1", "A/a1m");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), remoteInfo);
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (remoteInfo));
-        //  QCOMPARE (nPUT, 0);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), remoteInfo);
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (remoteInfo));
+        GLib.assert_cmp (number_of_put, 0);
 
         // Move-and-change, causing a upload and delete
         fake_folder.local_modifier ().rename ("A/a2", "A/a2m");
         fake_folder.local_modifier ().append_byte ("A/a2m");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), remoteInfo);
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (remoteInfo));
-        //  QCOMPARE (nPUT, 1);
-        //  QCOMPARE (nDELETE, 1);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), remoteInfo);
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (remoteInfo));
+        GLib.assert_cmp (number_of_put, 1);
+        GLib.assert_cmp (number_of_delete, 1);
 
         // Move-and-change, mtime+content only
         fake_folder.local_modifier ().rename ("B/b1", "B/b1m");
         fake_folder.local_modifier ().set_contents ("B/b1m", 'C');
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), remoteInfo);
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (remoteInfo));
-        //  QCOMPARE (nPUT, 2);
-        //  QCOMPARE (nDELETE, 2);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), remoteInfo);
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (remoteInfo));
+        GLib.assert_cmp (number_of_put, 2);
+        GLib.assert_cmp (number_of_delete, 2);
 
         // Move-and-change, size+content only
         var mtime = fake_folder.remote_modifier ().find ("B/b2").last_modified;
         fake_folder.local_modifier ().rename ("B/b2", "B/b2m");
         fake_folder.local_modifier ().append_byte ("B/b2m");
         fake_folder.local_modifier ().set_modification_time ("B/b2m", mtime);
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), remoteInfo);
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (remoteInfo));
-        //  QCOMPARE (nPUT, 3);
-        //  QCOMPARE (nDELETE, 3);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), remoteInfo);
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (remoteInfo));
+        GLib.assert_cmp (number_of_put, 3);
+        GLib.assert_cmp (number_of_delete, 3);
 
         // Move-and-change, content only -- c1 has no checksum, so we fail to detect this!
         // Note: This is an expected failure.
@@ -249,43 +267,43 @@ class TestSyncMove : GLib.Object {
         fake_folder.local_modifier ().rename ("C/c1", "C/c1m");
         fake_folder.local_modifier ().set_contents ("C/c1m", 'C');
         fake_folder.local_modifier ().set_modification_time ("C/c1m", mtime);
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (nPUT, 3);
-        //  QCOMPARE (nDELETE, 3);
-        //  QVERIFY (! (fake_folder.current_local_state () == remoteInfo));
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (number_of_put, 3);
+        GLib.assert_cmp (number_of_delete, 3);
+        GLib.assert_true (! (fake_folder.current_local_state () == remoteInfo));
 
         // on_signal_cleanup, and upload a file that will have a checksum in the database
         fake_folder.local_modifier ().remove ("C/c1m");
         fake_folder.local_modifier ().insert ("C/c3");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), remoteInfo);
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (remoteInfo));
-        //  QCOMPARE (nPUT, 4);
-        //  QCOMPARE (nDELETE, 4);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), remoteInfo);
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (remoteInfo));
+        GLib.assert_cmp (number_of_put, 4);
+        GLib.assert_cmp (number_of_delete, 4);
 
         // Move-and-change, content only, this time while having a checksum
         mtime = fake_folder.remote_modifier ().find ("C/c3").last_modified;
         fake_folder.local_modifier ().rename ("C/c3", "C/c3m");
         fake_folder.local_modifier ().set_contents ("C/c3m", 'C');
         fake_folder.local_modifier ().set_modification_time ("C/c3m", mtime);
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (nPUT, 5);
-        //  QCOMPARE (nDELETE, 5);
-        //  QCOMPARE (fake_folder.current_local_state (), remoteInfo);
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (remoteInfo));
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (number_of_put, 5);
+        GLib.assert_cmp (number_of_delete, 5);
+        GLib.assert_cmp (fake_folder.current_local_state (), remoteInfo);
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (remoteInfo));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testDuplicateFileId_data () {
-        QTest.addColumn<string> ("prefix");
+        QTest.add_column<string> ("prefix");
 
         // There have been bugs related to how the original
         // folder and the folder with the duplicate tree are
         // ordered. Test both cases here.
-        QTest.newRow ("first ordering") + "O"; // "O" > "A"
-        QTest.newRow ("second ordering") + "0"; // "0" < "A"
+        QTest.new_row ("first ordering") + "O"; // "O" > "A"
+        QTest.new_row ("second ordering") + "0"; // "0" < "A"
     }
 
     // If the same folder is shared in two different ways with the same
@@ -293,7 +311,7 @@ class TestSyncMove : GLib.Object {
     // sure the move detection and sync still do the right thing in that
     // case.
     private void testDuplicateFileId () {
-        //  QFETCH (string, prefix);
+        QFETCH (string, prefix);
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var remote = fake_folder.remote_modifier ();
@@ -309,8 +327,8 @@ class TestSyncMove : GLib.Object {
         // This already checks that the rename detection doesn't get
         // horribly confused if we add new files that have the same
         // fileid as existing ones
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         OperationCounter counter;
         fake_folder.set_server_override (counter.functor ());
@@ -318,39 +336,39 @@ class TestSyncMove : GLib.Object {
         // Try a remote file move
         remote.rename ("A/a1", "A/W/a1m");
         remote.rename (prefix + "/A/a1", prefix + "/A/W/a1m");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (counter.nGET, 0);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (counter.n_get, 0);
 
         // And a remote directory move
         remote.rename ("A/W", "A/Q/W");
         remote.rename (prefix + "/A/W", prefix + "/A/Q/W");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (counter.nGET, 0);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (counter.n_get, 0);
 
         // Partial file removal (in practice, A/a2 may be moved to O/a2, but we don't care)
         remote.rename (prefix + "/A/a2", prefix + "/a2");
         remote.remove ("A/a2");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (counter.nGET, 0);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (counter.n_get, 0);
 
         // Local change plus remote move at the same time
         fake_folder.local_modifier ().append_byte (prefix + "/a2");
         remote.rename (prefix + "/a2", prefix + "/a3");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (counter.nGET, 1);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (counter.n_get, 1);
         counter.on_signal_reset ();
 
         // remove localy, and remote move at the same time
         fake_folder.local_modifier ().remove ("A/Q/W/a1m");
         remote.rename ("A/Q/W/a1m", "A/Q/W/a1p");
         remote.rename (prefix + "/A/Q/W/a1m", prefix + "/A/Q/W/a1p");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (counter.nGET, 1);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (counter.n_get, 1);
         counter.on_signal_reset ();
     }
 
@@ -369,19 +387,19 @@ class TestSyncMove : GLib.Object {
             counter.on_signal_reset ();
             local.rename ("A/a1", "A/a1m");
             remote.rename ("B/b1", "B/b1m");
-            ItemCompletedSpy completeSpy (fake_folder);
-            //  QVERIFY (fake_folder.sync_once ());
-            //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-            //  QCOMPARE (counter.nGET, 0);
-            //  QCOMPARE (counter.nPUT, 0);
-            //  QCOMPARE (counter.nMOVE, 1);
-            //  QCOMPARE (counter.nDELETE, 0);
-            //  QVERIFY (itemSuccessfulMove (completeSpy, "A/a1m"));
-            //  QVERIFY (itemSuccessfulMove (completeSpy, "B/b1m"));
-            //  QCOMPARE (completeSpy.findItem ("A/a1m").file, QStringLiteral ("A/a1"));
-            //  QCOMPARE (completeSpy.findItem ("A/a1m").renameTarget, QStringLiteral ("A/a1m"));
-            //  QCOMPARE (completeSpy.findItem ("B/b1m").file, QStringLiteral ("B/b1"));
-            //  QCOMPARE (completeSpy.findItem ("B/b1m").renameTarget, QStringLiteral ("B/b1m"));
+            ItemCompletedSpy complete_spy (fake_folder);
+            GLib.assert_true (fake_folder.sync_once ());
+            GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+            GLib.assert_cmp (counter.n_get, 0);
+            GLib.assert_cmp (counter.number_of_put, 0);
+            GLib.assert_cmp (counter.number_of_move, 1);
+            GLib.assert_cmp (counter.number_of_delete, 0);
+            GLib.assert_true (itemSuccessfulMove (complete_spy, "A/a1m"));
+            GLib.assert_true (itemSuccessfulMove (complete_spy, "B/b1m"));
+            GLib.assert_cmp (complete_spy.find_item ("A/a1m").file, "A/a1");
+            GLib.assert_cmp (complete_spy.find_item ("A/a1m").renameTarget, "A/a1m");
+            GLib.assert_cmp (complete_spy.find_item ("B/b1m").file, "B/b1");
+            GLib.assert_cmp (complete_spy.find_item ("B/b1m").renameTarget, "B/b1m");
         }
 
         // Touch+Move on same side
@@ -390,15 +408,15 @@ class TestSyncMove : GLib.Object {
         local.set_contents ("A/a2m", 'A');
         remote.rename ("B/b2", "B/b2m");
         remote.set_contents ("B/b2m", 'A');
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (fake_folder.current_remote_state ()));
-        //  QCOMPARE (counter.nGET, 1);
-        //  QCOMPARE (counter.nPUT, 1);
-        //  QCOMPARE (counter.nMOVE, 0);
-        //  QCOMPARE (counter.nDELETE, 1);
-        //  QCOMPARE (remote.find ("A/a2m").content_char, 'A');
-        //  QCOMPARE (remote.find ("B/b2m").content_char, 'A');
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_cmp (counter.n_get, 1);
+        GLib.assert_cmp (counter.number_of_put, 1);
+        GLib.assert_cmp (counter.number_of_move, 0);
+        GLib.assert_cmp (counter.number_of_delete, 1);
+        GLib.assert_cmp (remote.find ("A/a2m").content_char, 'A');
+        GLib.assert_cmp (remote.find ("B/b2m").content_char, 'A');
 
         // Touch+Move on opposite sides
         counter.on_signal_reset ();
@@ -406,21 +424,21 @@ class TestSyncMove : GLib.Object {
         remote.set_contents ("A/a1m", 'B');
         remote.rename ("B/b1m", "B/b1m2");
         local.set_contents ("B/b1m", 'B');
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (fake_folder.current_remote_state ()));
-        //  QCOMPARE (counter.nGET, 2);
-        //  QCOMPARE (counter.nPUT, 2);
-        //  QCOMPARE (counter.nMOVE, 0);
-        //  QCOMPARE (counter.nDELETE, 0);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_cmp (counter.n_get, 2);
+        GLib.assert_cmp (counter.number_of_put, 2);
+        GLib.assert_cmp (counter.number_of_move, 0);
+        GLib.assert_cmp (counter.number_of_delete, 0);
         // All these files existing afterwards is debatable. Should we propagate
         // the rename in one direction and grab the new contents in the other?
         // Currently there's no propagation job that would do that, and this does
         // at least not lose data.
-        //  QCOMPARE (remote.find ("A/a1m").content_char, 'B');
-        //  QCOMPARE (remote.find ("B/b1m").content_char, 'B');
-        //  QCOMPARE (remote.find ("A/a1m2").content_char, 'W');
-        //  QCOMPARE (remote.find ("B/b1m2").content_char, 'W');
+        GLib.assert_cmp (remote.find ("A/a1m").content_char, 'B');
+        GLib.assert_cmp (remote.find ("B/b1m").content_char, 'B');
+        GLib.assert_cmp (remote.find ("A/a1m2").content_char, 'W');
+        GLib.assert_cmp (remote.find ("B/b1m2").content_char, 'W');
 
         // Touch+create on one side, move on the other {
             counter.on_signal_reset ();
@@ -430,20 +448,20 @@ class TestSyncMove : GLib.Object {
             remote.append_byte ("B/b1m");
             remote.insert ("B/b1mt");
             local.rename ("B/b1m", "B/b1mt");
-            ItemCompletedSpy completeSpy (fake_folder);
-            //  QVERIFY (fake_folder.sync_once ());
-            //  QVERIFY (expectAndWipeConflict (local, fake_folder.current_local_state (), "A/a1mt"));
-            //  QVERIFY (expectAndWipeConflict (local, fake_folder.current_local_state (), "B/b1mt"));
-            //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-            //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (fake_folder.current_remote_state ()));
-            //  QCOMPARE (counter.nGET, 3);
-            //  QCOMPARE (counter.nPUT, 1);
-            //  QCOMPARE (counter.nMOVE, 0);
-            //  QCOMPARE (counter.nDELETE, 0);
-            //  QVERIFY (itemSuccessful (completeSpy, "A/a1m", CSYNC_INSTRUCTION_NEW));
-            //  QVERIFY (itemSuccessful (completeSpy, "B/b1m", CSYNC_INSTRUCTION_NEW));
-            //  QVERIFY (itemConflict (completeSpy, "A/a1mt"));
-            //  QVERIFY (itemConflict (completeSpy, "B/b1mt"));
+            ItemCompletedSpy complete_spy (fake_folder);
+            GLib.assert_true (fake_folder.sync_once ());
+            GLib.assert_true (expectAndWipeConflict (local, fake_folder.current_local_state (), "A/a1mt"));
+            GLib.assert_true (expectAndWipeConflict (local, fake_folder.current_local_state (), "B/b1mt"));
+            GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+            GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+            GLib.assert_cmp (counter.n_get, 3);
+            GLib.assert_cmp (counter.number_of_put, 1);
+            GLib.assert_cmp (counter.number_of_move, 0);
+            GLib.assert_cmp (counter.number_of_delete, 0);
+            GLib.assert_true (itemSuccessful (complete_spy, "A/a1m", CSYNC_INSTRUCTION_NEW));
+            GLib.assert_true (itemSuccessful (complete_spy, "B/b1m", CSYNC_INSTRUCTION_NEW));
+            GLib.assert_true (itemConflict (complete_spy, "A/a1mt"));
+            GLib.assert_true (itemConflict (complete_spy, "B/b1mt"));
         }
 
         // Create new on one side, move to new on the other {
@@ -452,66 +470,66 @@ class TestSyncMove : GLib.Object {
             remote.rename ("A/a1mt", "A/a1N");
             remote.insert ("B/b1N", 13);
             local.rename ("B/b1mt", "B/b1N");
-            ItemCompletedSpy completeSpy (fake_folder);
-            //  QVERIFY (fake_folder.sync_once ());
-            //  QVERIFY (expectAndWipeConflict (local, fake_folder.current_local_state (), "A/a1N"));
-            //  QVERIFY (expectAndWipeConflict (local, fake_folder.current_local_state (), "B/b1N"));
-            //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-            //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (fake_folder.current_remote_state ()));
-            //  QCOMPARE (counter.nGET, 2);
-            //  QCOMPARE (counter.nPUT, 0);
-            //  QCOMPARE (counter.nMOVE, 0);
-            //  QCOMPARE (counter.nDELETE, 1);
-            //  QVERIFY (itemSuccessful (completeSpy, "A/a1mt", CSYNC_INSTRUCTION_REMOVE));
-            //  QVERIFY (itemSuccessful (completeSpy, "B/b1mt", CSYNC_INSTRUCTION_REMOVE));
-            //  QVERIFY (itemConflict (completeSpy, "A/a1N"));
-            //  QVERIFY (itemConflict (completeSpy, "B/b1N"));
+            ItemCompletedSpy complete_spy (fake_folder);
+            GLib.assert_true (fake_folder.sync_once ());
+            GLib.assert_true (expectAndWipeConflict (local, fake_folder.current_local_state (), "A/a1N"));
+            GLib.assert_true (expectAndWipeConflict (local, fake_folder.current_local_state (), "B/b1N"));
+            GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+            GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+            GLib.assert_cmp (counter.n_get, 2);
+            GLib.assert_cmp (counter.number_of_put, 0);
+            GLib.assert_cmp (counter.number_of_move, 0);
+            GLib.assert_cmp (counter.number_of_delete, 1);
+            GLib.assert_true (itemSuccessful (complete_spy, "A/a1mt", CSYNC_INSTRUCTION_REMOVE));
+            GLib.assert_true (itemSuccessful (complete_spy, "B/b1mt", CSYNC_INSTRUCTION_REMOVE));
+            GLib.assert_true (itemConflict (complete_spy, "A/a1N"));
+            GLib.assert_true (itemConflict (complete_spy, "B/b1N"));
         }
 
         // Local move, remote move
         counter.on_signal_reset ();
         local.rename ("C/c1", "C/c1mL");
         remote.rename ("C/c1", "C/c1mR");
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
         // end up with both files
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (fake_folder.current_remote_state ()));
-        //  QCOMPARE (counter.nGET, 1);
-        //  QCOMPARE (counter.nPUT, 1);
-        //  QCOMPARE (counter.nMOVE, 0);
-        //  QCOMPARE (counter.nDELETE, 0);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_cmp (counter.n_get, 1);
+        GLib.assert_cmp (counter.number_of_put, 1);
+        GLib.assert_cmp (counter.number_of_move, 0);
+        GLib.assert_cmp (counter.number_of_delete, 0);
 
         // Rename/rename conflict on a folder
         counter.on_signal_reset ();
         remote.rename ("C", "CMR");
         local.rename ("C", "CML");
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
         // End up with both folders
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (fake_folder.current_remote_state ()));
-        //  QCOMPARE (counter.nGET, 3); // 3 files in C
-        //  QCOMPARE (counter.nPUT, 3);
-        //  QCOMPARE (counter.nMOVE, 0);
-        //  QCOMPARE (counter.nDELETE, 0);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_cmp (counter.n_get, 3); // 3 files in C
+        GLib.assert_cmp (counter.number_of_put, 3);
+        GLib.assert_cmp (counter.number_of_move, 0);
+        GLib.assert_cmp (counter.number_of_delete, 0);
 
         // Folder move {
             counter.on_signal_reset ();
             local.rename ("A", "AM");
             remote.rename ("B", "BM");
-            ItemCompletedSpy completeSpy (fake_folder);
-            //  QVERIFY (fake_folder.sync_once ());
-            //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-            //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (fake_folder.current_remote_state ()));
-            //  QCOMPARE (counter.nGET, 0);
-            //  QCOMPARE (counter.nPUT, 0);
-            //  QCOMPARE (counter.nMOVE, 1);
-            //  QCOMPARE (counter.nDELETE, 0);
-            //  QVERIFY (itemSuccessfulMove (completeSpy, "AM"));
-            //  QVERIFY (itemSuccessfulMove (completeSpy, "BM"));
-            //  QCOMPARE (completeSpy.findItem ("AM").file, QStringLiteral ("A"));
-            //  QCOMPARE (completeSpy.findItem ("AM").renameTarget, QStringLiteral ("AM"));
-            //  QCOMPARE (completeSpy.findItem ("BM").file, QStringLiteral ("B"));
-            //  QCOMPARE (completeSpy.findItem ("BM").renameTarget, QStringLiteral ("BM"));
+            ItemCompletedSpy complete_spy (fake_folder);
+            GLib.assert_true (fake_folder.sync_once ());
+            GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+            GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+            GLib.assert_cmp (counter.n_get, 0);
+            GLib.assert_cmp (counter.number_of_put, 0);
+            GLib.assert_cmp (counter.number_of_move, 1);
+            GLib.assert_cmp (counter.number_of_delete, 0);
+            GLib.assert_true (itemSuccessfulMove (complete_spy, "AM"));
+            GLib.assert_true (itemSuccessfulMove (complete_spy, "BM"));
+            GLib.assert_cmp (complete_spy.find_item ("AM").file, "A");
+            GLib.assert_cmp (complete_spy.find_item ("AM").renameTarget, "AM");
+            GLib.assert_cmp (complete_spy.find_item ("BM").file, "B");
+            GLib.assert_cmp (complete_spy.find_item ("BM").renameTarget, "BM");
         }
 
         // Folder move with contents touched on the same side {
@@ -521,22 +539,22 @@ class TestSyncMove : GLib.Object {
             // (Previous version of the client (<=2.5) would not need this because it was always doing
             // checksum comparison for all renames. But newer version no longer does it if the file is
             // renamed because the parent folder is renamed)
-            local.set_modification_time ("AM/a2m", GLib.DateTime.currentDateTimeUtc ().addDays (3));
+            local.set_modification_time ("AM/a2m", GLib.DateTime.current_date_time_utc ().add_days (3));
             local.rename ("AM", "A2");
             remote.set_contents ("BM/b2m", 'C');
             remote.rename ("BM", "B2");
-            ItemCompletedSpy completeSpy (fake_folder);
-            //  QVERIFY (fake_folder.sync_once ());
-            //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-            //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (fake_folder.current_remote_state ()));
-            //  QCOMPARE (counter.nGET, 1);
-            //  QCOMPARE (counter.nPUT, 1);
-            //  QCOMPARE (counter.nMOVE, 1);
-            //  QCOMPARE (counter.nDELETE, 0);
-            //  QCOMPARE (remote.find ("A2/a2m").content_char, 'C');
-            //  QCOMPARE (remote.find ("B2/b2m").content_char, 'C');
-            //  QVERIFY (itemSuccessfulMove (completeSpy, "A2"));
-            //  QVERIFY (itemSuccessfulMove (completeSpy, "B2"));
+            ItemCompletedSpy complete_spy (fake_folder);
+            GLib.assert_true (fake_folder.sync_once ());
+            GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+            GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+            GLib.assert_cmp (counter.n_get, 1);
+            GLib.assert_cmp (counter.number_of_put, 1);
+            GLib.assert_cmp (counter.number_of_move, 1);
+            GLib.assert_cmp (counter.number_of_delete, 0);
+            GLib.assert_cmp (remote.find ("A2/a2m").content_char, 'C');
+            GLib.assert_cmp (remote.find ("B2/b2m").content_char, 'C');
+            GLib.assert_true (itemSuccessfulMove (complete_spy, "A2"));
+            GLib.assert_true (itemSuccessfulMove (complete_spy, "B2"));
         }
 
         // Folder rename with contents touched on the other tree
@@ -549,15 +567,15 @@ class TestSyncMove : GLib.Object {
         local.set_contents ("B2/b2m", 'D');
         local.append_byte ("B2/b2m");
         remote.rename ("B2", "B3");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (fake_folder.current_remote_state ()));
-        //  QCOMPARE (counter.nGET, 1);
-        //  QCOMPARE (counter.nPUT, 1);
-        //  QCOMPARE (counter.nMOVE, 1);
-        //  QCOMPARE (counter.nDELETE, 0);
-        //  QCOMPARE (remote.find ("A3/a2m").content_char, 'D');
-        //  QCOMPARE (remote.find ("B3/b2m").content_char, 'D');
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_cmp (counter.n_get, 1);
+        GLib.assert_cmp (counter.number_of_put, 1);
+        GLib.assert_cmp (counter.number_of_move, 1);
+        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_cmp (remote.find ("A3/a2m").content_char, 'D');
+        GLib.assert_cmp (remote.find ("B3/b2m").content_char, 'D');
 
         // Folder rename with contents touched on both ends
         counter.on_signal_reset ();
@@ -573,28 +591,28 @@ class TestSyncMove : GLib.Object {
         local.append_byte ("B3/b2m");
         local.append_byte ("B3/b2m");
         remote.rename ("B3", "B4");
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
         var currentLocal = fake_folder.current_local_state ();
         var conflicts = findConflicts (currentLocal.children["A4"]);
-        //  QCOMPARE (conflicts.size (), 1);
+        GLib.assert_cmp (conflicts.size (), 1);
         for (var& c : conflicts) {
-            //  QCOMPARE (currentLocal.find (c).content_char, 'L');
+            GLib.assert_cmp (currentLocal.find (c).content_char, 'L');
             local.remove (c);
         }
         conflicts = findConflicts (currentLocal.children["B4"]);
-        //  QCOMPARE (conflicts.size (), 1);
+        GLib.assert_cmp (conflicts.size (), 1);
         for (var& c : conflicts) {
-            //  QCOMPARE (currentLocal.find (c).content_char, 'L');
+            GLib.assert_cmp (currentLocal.find (c).content_char, 'L');
             local.remove (c);
         }
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (fake_folder.current_remote_state ()));
-        //  QCOMPARE (counter.nGET, 2);
-        //  QCOMPARE (counter.nPUT, 0);
-        //  QCOMPARE (counter.nMOVE, 1);
-        //  QCOMPARE (counter.nDELETE, 0);
-        //  QCOMPARE (remote.find ("A4/a2m").content_char, 'R');
-        //  QCOMPARE (remote.find ("B4/b2m").content_char, 'R');
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_cmp (counter.n_get, 2);
+        GLib.assert_cmp (counter.number_of_put, 0);
+        GLib.assert_cmp (counter.number_of_move, 1);
+        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_cmp (remote.find ("A4/a2m").content_char, 'R');
+        GLib.assert_cmp (remote.find ("B4/b2m").content_char, 'R');
 
         // Rename a folder and rename the contents at the same time
         counter.on_signal_reset ();
@@ -602,13 +620,13 @@ class TestSyncMove : GLib.Object {
         local.rename ("A4", "A5");
         remote.rename ("B4/b2m", "B4/b2m2");
         remote.rename ("B4", "B5");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (fake_folder.current_remote_state ()));
-        //  QCOMPARE (counter.nGET, 0);
-        //  QCOMPARE (counter.nPUT, 0);
-        //  QCOMPARE (counter.nMOVE, 2);
-        //  QCOMPARE (counter.nDELETE, 0);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_cmp (counter.number_of_put, 0);
+        GLib.assert_cmp (counter.number_of_move, 2);
+        GLib.assert_cmp (counter.number_of_delete, 0);
     }
 
     // These renames can be troublesome on windows
@@ -623,13 +641,13 @@ class TestSyncMove : GLib.Object {
         local.rename ("A/a1", "A/A1");
         remote.rename ("A/a2", "A/A2");
 
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), remote);
-        //  QCOMPARE (printDbData (fake_folder.database_state ()), printDbData (fake_folder.current_remote_state ()));
-        //  QCOMPARE (counter.nGET, 0);
-        //  QCOMPARE (counter.nPUT, 0);
-        //  QCOMPARE (counter.nMOVE, 1);
-        //  QCOMPARE (counter.nDELETE, 0);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), remote);
+        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_cmp (counter.number_of_put, 0);
+        GLib.assert_cmp (counter.number_of_move, 1);
+        GLib.assert_cmp (counter.number_of_delete, 0);
     }
 
     // Check interaction of moves with file type changes
@@ -645,10 +663,10 @@ class TestSyncMove : GLib.Object {
             remote.append_byte ("B/b1");
             local.rename ("B/b1", "B/b1mq");
             local.mkdir ("B/b1");
-            ItemCompletedSpy completeSpy (fake_folder);
-            //  QVERIFY (fake_folder.sync_once ());
+            ItemCompletedSpy complete_spy (fake_folder);
+            GLib.assert_true (fake_folder.sync_once ());
             // BUG : This doesn't behave right
-            //QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+            //GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
         }
     }
 
@@ -660,27 +678,27 @@ class TestSyncMove : GLib.Object {
         fake_folder.set_server_override (counter.functor ());
 
         // Changing the mtime on the server (without invalidating the etag)
-        fake_folder.remote_modifier ().find ("A/a1").last_modified = GLib.DateTime.currentDateTimeUtc ().addSecs (-50000);
-        fake_folder.remote_modifier ().find ("A/a2").last_modified = GLib.DateTime.currentDateTimeUtc ().addSecs (-40000);
+        fake_folder.remote_modifier ().find ("A/a1").last_modified = GLib.DateTime.current_date_time_utc ().add_secs (-50000);
+        fake_folder.remote_modifier ().find ("A/a2").last_modified = GLib.DateTime.current_date_time_utc ().add_secs (-40000);
 
         // Move a few files
         fake_folder.remote_modifier ().rename ("A/a1", "A/a1_server_renamed");
         fake_folder.local_modifier ().rename ("A/a2", "A/a2_local_renamed");
 
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (counter.nGET, 0);
-        //  QCOMPARE (counter.nPUT, 0);
-        //  QCOMPARE (counter.nMOVE, 1);
-        //  QCOMPARE (counter.nDELETE, 0);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_cmp (counter.number_of_put, 0);
+        GLib.assert_cmp (counter.number_of_move, 1);
+        GLib.assert_cmp (counter.number_of_delete, 0);
 
         // Another sync should do nothing
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (counter.nGET, 0);
-        //  QCOMPARE (counter.nPUT, 0);
-        //  QCOMPARE (counter.nMOVE, 1);
-        //  QCOMPARE (counter.nDELETE, 0);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_cmp (counter.number_of_put, 0);
+        GLib.assert_cmp (counter.number_of_move, 1);
+        GLib.assert_cmp (counter.number_of_delete, 0);
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
     // Test for https://github.com/owncloud/client/issues/6694
@@ -694,7 +712,7 @@ class TestSyncMove : GLib.Object {
         fake_folder.remote_modifier ().insert ("A/Empty/Foo/f2");
         fake_folder.remote_modifier ().mkdir ("C/AllEmpty/f3");
         fake_folder.remote_modifier ().mkdir ("C/AllEmpty/Bar/f4");
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
 
         OperationCounter counter;
         fake_folder.set_server_override (counter.functor ());
@@ -707,55 +725,55 @@ class TestSyncMove : GLib.Object {
         fake_folder.local_modifier ().rename ("C/AllEmpty", "AllEmpty");
         fake_folder.local_modifier ().rename ("C", "AllEmpty/C");
 
-        var expectedState = fake_folder.current_local_state ();
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), expectedState);
-        //  QCOMPARE (fake_folder.current_remote_state (), expectedState);
-        //  QCOMPARE (counter.nDELETE, 0);
-        //  QCOMPARE (counter.nGET, 0);
-        //  QCOMPARE (counter.nPUT, 0);
+        var expected_state = fake_folder.current_local_state ();
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), expected_state);
+        GLib.assert_cmp (fake_folder.current_remote_state (), expected_state);
+        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_cmp (counter.number_of_put, 0);
 
         // Now, the revert, but "crossed"
         fake_folder.local_modifier ().rename ("Empty/A", "A");
         fake_folder.local_modifier ().rename ("AllEmpty/C", "C");
         fake_folder.local_modifier ().rename ("Empty", "C/Empty");
         fake_folder.local_modifier ().rename ("AllEmpty", "A/AllEmpty");
-        expectedState = fake_folder.current_local_state ();
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), expectedState);
-        //  QCOMPARE (fake_folder.current_remote_state (), expectedState);
-        //  QCOMPARE (counter.nDELETE, 0);
-        //  QCOMPARE (counter.nGET, 0);
-        //  QCOMPARE (counter.nPUT, 0);
+        expected_state = fake_folder.current_local_state ();
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), expected_state);
+        GLib.assert_cmp (fake_folder.current_remote_state (), expected_state);
+        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_cmp (counter.number_of_put, 0);
 
         // Reverse on remote
         fake_folder.remote_modifier ().rename ("A/AllEmpty", "AllEmpty");
         fake_folder.remote_modifier ().rename ("C/Empty", "Empty");
         fake_folder.remote_modifier ().rename ("C", "AllEmpty/C");
         fake_folder.remote_modifier ().rename ("A", "Empty/A");
-        expectedState = fake_folder.current_remote_state ();
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), expectedState);
-        //  QCOMPARE (fake_folder.current_remote_state (), expectedState);
-        //  QCOMPARE (counter.nDELETE, 0);
-        //  QCOMPARE (counter.nGET, 0);
-        //  QCOMPARE (counter.nPUT, 0);
+        expected_state = fake_folder.current_remote_state ();
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), expected_state);
+        GLib.assert_cmp (fake_folder.current_remote_state (), expected_state);
+        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_cmp (counter.number_of_put, 0);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testDeepHierarchy_data () {
-        QTest.addColumn<bool> ("local");
-        QTest.newRow ("remote") + false;
-        QTest.newRow ("local") + true;
+        QTest.add_column<bool> ("local");
+        QTest.new_row ("remote") + false;
+        QTest.new_row ("local") + true;
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testDeepHierarchy () {
-        //  QFETCH (bool, local);
+        QFETCH (bool, local);
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var modifier = local ? fake_folder.local_modifier () : fake_folder.remote_modifier ();
 
@@ -769,7 +787,7 @@ class TestSyncMove : GLib.Object {
         modifier.insert ("FolA/FolB/FolC/FileC.txt");
         modifier.insert ("FolA/FolB/FolC/FolD/FileD.txt");
         modifier.insert ("FolA/FolB/FolC/FolD/FolE/FileE.txt");
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
 
         OperationCounter counter;
         fake_folder.set_server_override (counter.functor ());
@@ -786,13 +804,13 @@ class TestSyncMove : GLib.Object {
         modifier.mkdir ("FolB_Renamed/New");
         modifier.rename ("FolA/FolD_Renamed/FolE", "FolB_Renamed/New/FolE");
         var expected = local ? fake_folder.current_local_state () : fake_folder.current_remote_state ();
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), expected);
-        //  QCOMPARE (fake_folder.current_remote_state (), expected);
-        //  QCOMPARE (counter.nDELETE, local ? 1 : 0); // FolC was is renamed to an existing name, so it is not considered as renamed
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), expected);
+        GLib.assert_cmp (fake_folder.current_remote_state (), expected);
+        GLib.assert_cmp (counter.number_of_delete, local ? 1 : 0); // FolC was is renamed to an existing name, so it is not considered as renamed
         // There was 5 inserts
-        //  QCOMPARE (counter.nGET, local ? 0 : 5);
-        //  QCOMPARE (counter.nPUT, local ? 5 : 0);
+        GLib.assert_cmp (counter.n_get, local ? 0 : 5);
+        GLib.assert_cmp (counter.number_of_put, local ? 5 : 0);
     }
 
 
@@ -811,14 +829,14 @@ class TestSyncMove : GLib.Object {
         fake_folder.local_modifier ().rename ("B/b1", "B/b1m");
         fake_folder.remote_modifier ().rename ("B", "this.B");
 
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_remote_state (), fake_folder.current_remote_state ());
-        //  QVERIFY (fake_folder.current_remote_state ().find ("this.A/a1m"));
-        //  QVERIFY (fake_folder.current_remote_state ().find ("this.B/b1m"));
-        //  QCOMPARE (counter.nDELETE, 0);
-        //  QCOMPARE (counter.nGET, 0);
-        //  QCOMPARE (counter.nPUT, 0);
-        //  QCOMPARE (counter.nMOVE, 2);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_remote_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_remote_state ().find ("this.A/a1m"));
+        GLib.assert_true (fake_folder.current_remote_state ().find ("this.B/b1m"));
+        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_cmp (counter.number_of_put, 0);
+        GLib.assert_cmp (counter.number_of_move, 2);
         counter.on_signal_reset ();
 
         // 2) move alphabetically after
@@ -826,14 +844,14 @@ class TestSyncMove : GLib.Object {
         fake_folder.local_modifier ().rename ("this.B/b2", "this.B/b2m");
         fake_folder.local_modifier ().rename ("this.A", "S/A");
         fake_folder.remote_modifier ().rename ("this.B", "S/B");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_remote_state (), fake_folder.current_remote_state ());
-        //  QVERIFY (fake_folder.current_remote_state ().find ("S/A/a2m"));
-        //  QVERIFY (fake_folder.current_remote_state ().find ("S/B/b2m"));
-        //  QCOMPARE (counter.nDELETE, 0);
-        //  QCOMPARE (counter.nGET, 0);
-        //  QCOMPARE (counter.nPUT, 0);
-        //  QCOMPARE (counter.nMOVE, 2);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_remote_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_remote_state ().find ("S/A/a2m"));
+        GLib.assert_true (fake_folder.current_remote_state ().find ("S/B/b2m"));
+        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_cmp (counter.number_of_put, 0);
+        GLib.assert_cmp (counter.number_of_move, 2);
     }
 
 
@@ -852,16 +870,16 @@ class TestSyncMove : GLib.Object {
         fake_folder.local_modifier ().rename ("B/b2", "A/b2");
         fake_folder.remote_modifier ().rename ("B/b2", "C/b2");
 
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_remote_state (), fake_folder.current_remote_state ());
-        //  QVERIFY (fake_folder.current_remote_state ().find ("A/b1"));
-        //  QVERIFY (fake_folder.current_remote_state ().find ("C/b1"));
-        //  QVERIFY (fake_folder.current_remote_state ().find ("A/b2"));
-        //  QVERIFY (fake_folder.current_remote_state ().find ("C/b2"));
-        //  QCOMPARE (counter.nMOVE, 0); // Unfortunately, we can't really make a move in this case
-        //  QCOMPARE (counter.nGET, 2);
-        //  QCOMPARE (counter.nPUT, 2);
-        //  QCOMPARE (counter.nDELETE, 0);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_remote_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_remote_state ().find ("A/b1"));
+        GLib.assert_true (fake_folder.current_remote_state ().find ("C/b1"));
+        GLib.assert_true (fake_folder.current_remote_state ().find ("A/b2"));
+        GLib.assert_true (fake_folder.current_remote_state ().find ("C/b2"));
+        GLib.assert_cmp (counter.number_of_move, 0); // Unfortunately, we can't really make a move in this case
+        GLib.assert_cmp (counter.n_get, 2);
+        GLib.assert_cmp (counter.number_of_put, 2);
+        GLib.assert_cmp (counter.number_of_delete, 0);
         counter.on_signal_reset ();
 
     }
@@ -871,50 +889,57 @@ class TestSyncMove : GLib.Object {
         FakeFolder fake_folder = new FakeFolder ( FileInfo{} };
         fake_folder.remote_modifier ().mkdir ("A");
         fake_folder.remote_modifier ().insert ("A/file");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         fake_folder.local_modifier ().mkdir ("B");
         fake_folder.local_modifier ().rename ("A/file", "B/file");
         fake_folder.local_modifier ().remove ("A");
 
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testMovedWithError_data () {
-        QTest.addColumn<Vfs.Mode> ("vfsMode");
+        QTest.add_column<Vfs.Mode> ("vfsMode");
 
-        QTest.newRow ("Vfs.Off") + Vfs.Off;
-        QTest.newRow ("Vfs.WithSuffix") + Vfs.WithSuffix;
+        QTest.new_row ("Vfs.Off") + Vfs.Off;
+        QTest.new_row ("Vfs.WithSuffix") + Vfs.WithSuffix;
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testMovedWithError () {
-        //  QFETCH (Vfs.Mode, vfsMode);
-        const var getName = [vfsMode] (string s) { {f (vfsMode == Vfs.WithSuffix)
+        QFETCH (Vfs.Mode, vfsMode);
+        var getName = [vfsMode] (string s) { {f (vfsMode == Vfs.WithSuffix)
             {
-                return QStringLiteral ("%1" APPLICATION_DOTVIRTUALFILE_SUFFIX).arg (s);
+                return s + APPLICATION_DOTVIRTUALFILE_SUFFIX;
             }
             return s;
         }
         const string src = "folder/folderA/file.txt";
         const string dest = "folder/folderB/file.txt";
-        FakeFolder fake_folder = new FakeFolder ( FileInfo ("", { FileInfo (QStringLiteral ("folder"), { FileInfo (QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
-        var syncOpts = fake_folder.sync_engine ().syncOptions ();
+        FakeFolder fake_folder = new FakeFolder (
+            new FileInfo ("", {
+                new FileInfo ("folder", {
+                    new FileInfo ("folderA", {
+                        { "file.txt", 400 }
+                    } ), "folderB" } )
+                } )
+            );
+        var syncOpts = fake_folder.sync_engine ().sync_options ();
         syncOpts.parallelNetworkJobs = 0;
-        fake_folder.sync_engine ().setSyncOptions (syncOpts);
+        fake_folder.sync_engine ().set_sync_options (syncOpts);
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         if (vfsMode != Vfs.Off) {
             var vfs = unowned<Vfs> (createVfsFromPlugin (vfsMode).release ());
-            //  QVERIFY (vfs);
+            GLib.assert_true (vfs);
             fake_folder.switch_to_vfs (vfs);
             fake_folder.sync_journal ().internalPinStates ().setForPath ("", PinState.VfsItemAvailability.ONLINE_ONLY);
 
@@ -924,10 +949,10 @@ class TestSyncMove : GLib.Object {
 
         fake_folder.server_error_paths ().append (src, 403);
         fake_folder.local_modifier ().rename (getName (src), getName (dest));
-        //  QVERIFY (!fake_folder.current_local_state ().find (getName (src)));
-        //  QVERIFY (fake_folder.current_local_state ().find (getName (dest)));
-        //  QVERIFY (fake_folder.current_remote_state ().find (src));
-        //  QVERIFY (!fake_folder.current_remote_state ().find (dest));
+        GLib.assert_true (!fake_folder.current_local_state ().find (getName (src)));
+        GLib.assert_true (fake_folder.current_local_state ().find (getName (dest)));
+        GLib.assert_true (fake_folder.current_remote_state ().find (src));
+        GLib.assert_true (!fake_folder.current_remote_state ().find (dest));
 
         // sync1 file gets detected as error, instruction is still NEW_FILE
         fake_folder.sync_once ();
@@ -940,14 +965,14 @@ class TestSyncMove : GLib.Object {
             fake_folder.sync_once ();
         }
 
-        //  QVERIFY (!fake_folder.current_local_state ().find (src));
-        //  QVERIFY (fake_folder.current_local_state ().find (getName (dest)));
+        GLib.assert_true (!fake_folder.current_local_state ().find (src));
+        GLib.assert_true (fake_folder.current_local_state ().find (getName (dest)));
         if (vfsMode == Vfs.WithSuffix) {
             // the placeholder was not restored as it is still in error state
-            //  QVERIFY (!fake_folder.current_local_state ().find (dest));
+            GLib.assert_true (!fake_folder.current_local_state ().find (dest));
         }
-        //  QVERIFY (fake_folder.current_remote_state ().find (src));
-        //  QVERIFY (!fake_folder.current_remote_state ().find (dest));
+        GLib.assert_true (fake_folder.current_remote_state ().find (src));
+        GLib.assert_true (!fake_folder.current_remote_state ().find (dest));
     }
 
 }

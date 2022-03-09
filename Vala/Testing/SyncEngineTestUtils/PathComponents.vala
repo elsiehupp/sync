@@ -11,7 +11,7 @@ class PathComponents : string[] {
     /***********************************************************
     ***********************************************************/
     public PathComponents (char path) {
-        PathComponents (string.fromUtf8 (path));
+        PathComponents (path.to_string ());
     }
 
     /***********************************************************
@@ -28,7 +28,7 @@ class PathComponents : string[] {
 
     /***********************************************************
     ***********************************************************/
-    public PathComponents parentDirComponents () {
+    public PathComponents parent_directory_components () {
         return PathComponents ( mid (0, size () - 1));
     }
 
@@ -48,7 +48,7 @@ class PathComponents : string[] {
 
     /***********************************************************
     ***********************************************************/
-    public string pathRoot () {
+    public string path_root () {
         return first ();
     }
 

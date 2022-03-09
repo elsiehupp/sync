@@ -5,7 +5,7 @@ namespace Testing {
 // stub to prevent linker error
 class StubFolderMan : Occ.AccountManager {
 
-    //  const QMetaObject staticMetaObject = GLib.Object.staticMetaObject;
+    //  const QMetaObject static_meta_object = GLib.Object.static_meta_object;
 
     Occ.AccountManager instance () {
         return (AccountManager) dummy ();
@@ -33,21 +33,21 @@ class StubFolderMan : Occ.AccountManager {
     // From StubRemoteWipe ???
     //
     //  Occ.FolderMan *Occ.FolderMan.instance () { return static_cast<FolderMan> (new GLib.Object); }
-    //  void Occ.FolderMan.wipeDone (Occ.AccountState*, bool) { }
-    //  Occ.Folder* Occ.FolderMan.addFolder (Occ.AccountState*, Occ.FolderDefinition const &) { return null; }
-    //  void Occ.FolderMan.slotWipeFolderForAccount (Occ.AccountState*) { }
-    //  string Occ.FolderMan.unescapeAlias (string const&) { return ""; }
-    //  string Occ.FolderMan.escapeAlias (string const&) { return ""; }
-    //  void Occ.FolderMan.scheduleFolder (Occ.Folder*) { }
-    //  Occ.SocketApi *Occ.FolderMan.socketApi () { return new SocketApi;  }
+    //  void Occ.FolderMan.wipe_done (Occ.AccountState*, bool) { }
+    //  Occ.Folder* Occ.FolderMan.add_folder (Occ.AccountState*, Occ.FolderDefinition const &) { return null; }
+    //  void Occ.FolderMan.slot_wipe_folder_for_account (Occ.AccountState*) { }
+    //  string Occ.FolderMan.unescape_alias (string const&) { return ""; }
+    //  string Occ.FolderMan.escape_alias (string const&) { return ""; }
+    //  void Occ.FolderMan.schedule_folder (Occ.Folder*) { }
+    //  Occ.SocketApi *Occ.FolderMan.socket_api () { return new SocketApi;  }
     //  const Occ.Folder.Map &Occ.FolderMan.map () { return Occ.Folder.Map (); }
-    //  void Occ.FolderMan.setSyncEnabled (bool) { }
-    //  void Occ.FolderMan.slotSyncOnceFileUnlocks (string const&) { }
-    //  void Occ.FolderMan.slotScheduleETagJob (string const&, Occ.RequestEtagJob*) { }
-    //  Occ.Folder *Occ.FolderMan.folderForPath (string const&) { return null; }
+    //  void Occ.FolderMan.set_sync_enabled (bool) { }
+    //  void Occ.FolderMan.slot_sync_once_file_unlocks (string const&) { }
+    //  void Occ.FolderMan.slot_schedule_etag_job (string const&, Occ.RequestEtagJob*) { }
+    //  Occ.Folder *Occ.FolderMan.folder_for_path (string const&) { return null; }
     //  Occ.Folder* Occ.FolderMan.folder_by_alias (string const&) { return null; }
-    //  void Occ.FolderMan.folderSyncStateChange (Occ.Folder*) { }
-    //  const QMetaObject Occ.FolderMan.staticMetaObject = GLib.Object.staticMetaObject;
+    //  void Occ.FolderMan.folder_sync_state_change (Occ.Folder*) { }
+    //  const QMetaObject Occ.FolderMan.static_meta_object = GLib.Object.static_meta_object;
 
 
 

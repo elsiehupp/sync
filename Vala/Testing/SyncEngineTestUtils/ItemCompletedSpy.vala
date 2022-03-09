@@ -9,12 +9,11 @@ namespace Testing {
 class ItemCompletedSpy : QSignalSpy {
 
     ItemCompletedSpy (FakeFolder folder) {
-        base (&folder.sync_engine (), &Occ.SyncEngine.itemCompleted);
+        base (&folder.sync_engine (), &Occ.SyncEngine.item_completed);
     }
 
 
-
-    Occ.SyncFileItemPtr findItem (string path) {
+    Occ.SyncFileItemPtr find_item (string path) {
         foreach (GLib.List<GLib.Variant> args in *this) {
             var item = args[0].value<Occ.SyncFileItemPtr> ();
             if (item.destination () == path)
@@ -23,9 +22,10 @@ class ItemCompletedSpy : QSignalSpy {
         return Occ.SyncFileItemPtr.create ();
     }
 
-    Occ.SyncFileItemPtr findItemWithExpectedRank (string path, int rank) {
-        //  Q_ASSERT (size () > rank);
-        //  Q_ASSERT (! (*this)[rank].isEmpty ());
+
+    Occ.SyncFileItemPtr find_item_with_expected_rank (string path, int rank) {
+        GLib.assert_true (size () > rank);
+        GLib.assert_true (! (*this)[rank].is_empty ());
 
         var item = (*this)[rank][0].value<Occ.SyncFileItemPtr> ();
         if (item.destination () == path) {

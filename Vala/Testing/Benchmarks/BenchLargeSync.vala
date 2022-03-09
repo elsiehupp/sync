@@ -10,39 +10,39 @@ using Occ;
 
 namespace Testing {
 
-int numDirs = 0;
-int numFiles = 0;
+int number_of_directories = 0;
+int number_of_files = 0;
 
-//  template<int filesPerDir, int dirPerDir, int maxDepth>
-void addBunchOfFiles (int depth, string path, FileModifier file_info) {
-    for (int fileNum = 1; fileNum <= filesPerDir; ++fileNum) {
-        string name = "file" + string.number (fileNum);
-        file_info.insert (path.isEmpty () ? name : path + "/" + name);
-        numFiles++;
+//  template<int files_per_directory, int directories_per_directory, int max_depth>
+void add_a_bunch_of_files (int depth, string path, FileModifier file_info) {
+    for (int file_number = 1; file_number <= files_per_directory; ++file_number) {
+        string name = "file" + file_number.to_string ();
+        file_info.insert (path.is_empty () ? name : path + "/" + name);
+        number_of_files++;
     }
-    if (depth >= maxDepth)
+    if (depth >= max_depth)
         return;
-    for (int dirNum = 1; dirNum <= dirPerDir; ++dirNum) {
-        string name = "directory" + string.number (dirNum);
-        string subPath = path.isEmpty () ? name : path + "/" + name;
-        file_info.mkdir (subPath);
-        numDirs++;
-        addBunchOfFiles<filesPerDir, dirPerDir, maxDepth> (depth + 1, subPath, file_info);
+    for (int directory_number = 1; directory_number <= directories_per_directory; ++directory_number) {
+        string name = "directory" + directory_number.to_string ();
+        string sub_path = path.is_empty () ? name : path + "/" + name;
+        file_info.mkdir (sub_path);
+        number_of_directories++;
+        add_a_bunch_of_files<files_per_directory, directories_per_directory, max_depth> (depth + 1, sub_path, file_info);
     }
 }
 
 int main (int argc, char argv[]) {
     QCoreApplication app = new QCoreApplication (argc, argv);
     FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-    //  addBunchOfFiles<10, 8, 4> (0, "", fake_folder.local_modifier ());
+    //  add_a_bunch_of_files<10, 8, 4> (0, "", fake_folder.local_modifier ());
 
-    GLib.debug ("NUMFILES " + numFiles);
-    GLib.debug ("NUMDIRS " + numDirs);
+    GLib.debug ("NUMFILES " + number_of_files);
+    GLib.debug ("NUMDIRS " + number_of_directories);
     QElapsedTimer timer;
     timer.on_signal_start ();
     bool result1 = fake_folder.sync_once ();
-    GLib.debug ("FIRST SYNC : " + result1 + timer.restart ());
+    GLib.debug ("FIRST SYNC: " + result1 + timer.restart ());
     bool result2 = fake_folder.sync_once ();
-    GLib.debug ("SECOND SYNC : " + result2 + timer.restart ());
+    GLib.debug ("SECOND SYNC: " + result2 + timer.restart ());
     return (result1 && result2) ? 0 : -1;
 }

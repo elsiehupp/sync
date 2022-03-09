@@ -20,7 +20,7 @@ abstract class FileModifier {
 
     public abstract void mkdir (string relative_path);
 
-    public abstract void rename (string relative_path, string relativeDestinationDirectory);
+    public abstract void rename (string relative_path, string relative_destination_directory);
 
     public abstract void set_modification_time (string relative_path, GLib.DateTime modification_time);
 

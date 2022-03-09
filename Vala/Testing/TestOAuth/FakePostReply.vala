@@ -38,25 +38,25 @@ class FakePostReply : Soup.Reply {
             /* emit */ signal_finished ();
             return;
         } else if (redirectToPolicy) {
-            setHeader (Soup.Request.LocationHeader, "/my.policy");
+            set_header (Soup.Request.LocationHeader, "/my.policy");
             set_attribute (Soup.Request.RedirectionTargetAttribute, "/my.policy");
             set_attribute (Soup.Request.HttpStatusCodeAttribute, 302); // 302 might or might not lose POST data in rfc
-            setHeader (Soup.Request.ContentLengthHeader, 0);
+            set_header (Soup.Request.ContentLengthHeader, 0);
             /* emit */ signal_meta_data_changed ();
             /* emit */ signal_finished ();
             return;
         } else if (redirectToToken) {
             // Redirect to self
-            GLib.Variant destination = GLib.Variant (sOAuthTestServer.to_string ()+QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
-            setHeader (Soup.Request.LocationHeader, destination);
+            GLib.Variant destination = GLib.Variant (sOAuthTestServer.to_string () + "/index.php/apps/oauth2/api/v1/token");
+            set_header (Soup.Request.LocationHeader, destination);
             set_attribute (Soup.Request.RedirectionTargetAttribute, destination);
             set_attribute (Soup.Request.HttpStatusCodeAttribute, 307); // 307 explicitly in rfc says to not lose POST data
-            setHeader (Soup.Request.ContentLengthHeader, 0);
+            set_header (Soup.Request.ContentLengthHeader, 0);
             /* emit */ signal_meta_data_changed ();
             /* emit */ signal_finished ();
             return;
         }
-        setHeader (Soup.Request.ContentLengthHeader, payload.size ());
+        set_header (Soup.Request.ContentLengthHeader, payload.size ());
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
         /* emit */ signal_meta_data_changed ();
         if (bytes_available ())

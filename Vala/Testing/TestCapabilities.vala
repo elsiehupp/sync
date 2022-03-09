@@ -6,286 +6,286 @@ class TestCapabilities : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testPushNotificationsAvailable_pushNotificationsForActivitiesAvailable_returnTrue () {
-        string[] typeList;
-        typeList.append ("activities");
+    private void test_push_notifications_available_push_notifications_for_activities_available_return_true () {
+        string[] type_list;
+        type_list.append ("activities");
 
-        QVariantMap notifyPushMap;
-        notifyPushMap["type"] = typeList;
+        QVariantMap notify_push_map;
+        notify_push_map["type"] = type_list;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["notify_push"] = notifyPushMap;
+        QVariantMap capabilities_map;
+        capabilities_map["notify_push"] = notify_push_map;
 
-        const var capabilities = Occ.Capabilities (capabilitiesMap);
-        const var activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.ACTIVITIES);
+        var capabilities = Occ.Capabilities (capabilities_map);
+        var activities_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.ACTIVITIES);
 
-        //  QCOMPARE (activitiesPushNotificationsAvailable, true);
+        GLib.assert_cmp (activities_push_notifications_available, true);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testPushNotificationsAvailable_pushNotificationsForActivitiesNotAvailable_returnFalse () {
-        string[] typeList;
-        typeList.append ("noactivities");
+    private void test_push_notifications_available_push_notifications_for_activities_not_available_return_false () {
+        string[] type_list;
+        type_list.append ("noactivities");
 
-        QVariantMap notifyPushMap;
-        notifyPushMap["type"] = typeList;
+        QVariantMap notify_push_map;
+        notify_push_map["type"] = type_list;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["notify_push"] = notifyPushMap;
+        QVariantMap capabilities_map;
+        capabilities_map["notify_push"] = notify_push_map;
 
-        const var capabilities = Occ.Capabilities (capabilitiesMap);
-        const var activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.ACTIVITIES);
+        var capabilities = Occ.Capabilities (capabilities_map);
+        var activities_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.ACTIVITIES);
 
-        //  QCOMPARE (activitiesPushNotificationsAvailable, false);
+        GLib.assert_cmp (activities_push_notifications_available, false);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testPushNotificationsAvailable_pushNotificationsForFilesAvailable_returnTrue () {
-        string[] typeList;
-        typeList.append ("files");
+    private void test_push_notifications_available_push_notifications_for_files_available_return_true () {
+        string[] type_list;
+        type_list.append ("files");
 
-        QVariantMap notifyPushMap;
-        notifyPushMap["type"] = typeList;
+        QVariantMap notify_push_map;
+        notify_push_map["type"] = type_list;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["notify_push"] = notifyPushMap;
+        QVariantMap capabilities_map;
+        capabilities_map["notify_push"] = notify_push_map;
 
-        const var capabilities = Occ.Capabilities (capabilitiesMap);
-        const var filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.FILES);
+        var capabilities = Occ.Capabilities (capabilities_map);
+        var files_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.FILES);
 
-        //  QCOMPARE (filesPushNotificationsAvailable, true);
+        GLib.assert_cmp (files_push_notifications_available, true);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testPushNotificationsAvailable_pushNotificationsForFilesNotAvailable_returnFalse () {
-        string[] typeList;
-        typeList.append ("nofiles");
+    private void test_push_notifications_available_push_notifications_for_files_not_available_return_false () {
+        string[] type_list;
+        type_list.append ("nofiles");
 
-        QVariantMap notifyPushMap;
-        notifyPushMap["type"] = typeList;
+        QVariantMap notify_push_map;
+        notify_push_map["type"] = type_list;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["notify_push"] = notifyPushMap;
+        QVariantMap capabilities_map;
+        capabilities_map["notify_push"] = notify_push_map;
 
-        const var capabilities = Occ.Capabilities (capabilitiesMap);
-        const var filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.FILES);
+        var capabilities = Occ.Capabilities (capabilities_map);
+        var files_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.FILES);
 
-        //  QCOMPARE (filesPushNotificationsAvailable, false);
+        GLib.assert_cmp (files_push_notifications_available, false);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testPushNotificationsAvailable_pushNotificationsForNotificationsAvailable_returnTrue () {
-        string[] typeList;
-        typeList.append ("notifications");
+    private void test_push_notifications_available_push_notifications_for_notifications_available_return_true () {
+        string[] type_list;
+        type_list.append ("notifications");
 
-        QVariantMap notifyPushMap;
-        notifyPushMap["type"] = typeList;
+        QVariantMap notify_push_map;
+        notify_push_map["type"] = type_list;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["notify_push"] = notifyPushMap;
+        QVariantMap capabilities_map;
+        capabilities_map["notify_push"] = notify_push_map;
 
-        const var capabilities = Occ.Capabilities (capabilitiesMap);
-        const var notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.NOTIFICATIONS);
+        var capabilities = Occ.Capabilities (capabilities_map);
+        var notifications_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.NOTIFICATIONS);
 
-        //  QCOMPARE (notificationsPushNotificationsAvailable, true);
+        GLib.assert_cmp (notifications_push_notifications_available, true);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testPushNotificationsAvailable_pushNotificationsForNotificationsNotAvailable_returnFalse () {
-        string[] typeList;
-        typeList.append ("nonotifications");
+    private void test_push_notifications_available_push_notifications_for_notifications_not_available_return_false () {
+        string[] type_list;
+        type_list.append ("nonotifications");
 
-        QVariantMap notifyPushMap;
-        notifyPushMap["type"] = typeList;
+        QVariantMap notify_push_map;
+        notify_push_map["type"] = type_list;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["notify_push"] = notifyPushMap;
+        QVariantMap capabilities_map;
+        capabilities_map["notify_push"] = notify_push_map;
 
-        const var capabilities = Occ.Capabilities (capabilitiesMap);
-        const var notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.NOTIFICATIONS);
+        var capabilities = Occ.Capabilities (capabilities_map);
+        var notifications_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.NOTIFICATIONS);
 
-        //  QCOMPARE (notificationsPushNotificationsAvailable, false);
+        GLib.assert_cmp (notifications_push_notifications_available, false);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testPushNotificationsAvailable_pushNotificationsNotAvailable_returnFalse () {
-        const var capabilities = Occ.Capabilities (QVariantMap ());
-        const var activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.ACTIVITIES);
-        const var filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.FILES);
-        const var notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.NOTIFICATIONS);
+    private void test_push_notifications_available_push_notifications_not_available_return_false () {
+        var capabilities = Occ.Capabilities (QVariantMap ());
+        var activities_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.ACTIVITIES);
+        var files_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.FILES);
+        var notifications_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.NOTIFICATIONS);
 
-        //  QCOMPARE (activitiesPushNotificationsAvailable, false);
-        //  QCOMPARE (filesPushNotificationsAvailable, false);
-        //  QCOMPARE (notificationsPushNotificationsAvailable, false);
+        GLib.assert_cmp (activities_push_notifications_available, false);
+        GLib.assert_cmp (files_push_notifications_available, false);
+        GLib.assert_cmp (notifications_push_notifications_available, false);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testPushNotificationsWebSocketUrl_urlAvailable_returnUrl () {
-        string websocketUrl = "testurl";
+    private void test_push_notifications_web_socket_url_url_available_return_url () {
+        string websocket_url = "testurl";
 
-        QVariantMap endpointsMap;
-        endpointsMap["websocket"] = websocketUrl;
+        QVariantMap endpoints_map;
+        endpoints_map["websocket"] = websocket_url;
 
-        QVariantMap notifyPushMap;
-        notifyPushMap["endpoints"] = endpointsMap;
+        QVariantMap notify_push_map;
+        notify_push_map["endpoints"] = endpoints_map;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["notify_push"] = notifyPushMap;
+        QVariantMap capabilities_map;
+        capabilities_map["notify_push"] = notify_push_map;
 
-        const var capabilities = Occ.Capabilities (capabilitiesMap);
+        var capabilities = Occ.Capabilities (capabilities_map);
 
-        //  QCOMPARE (capabilities.pushNotificationsWebSocketUrl (), websocketUrl);
+        GLib.assert_cmp (capabilities.push_notifications_web_socket_url (), websocket_url);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testUserStatus_userStatusAvailable_returnTrue () {
-        QVariantMap userStatusMap;
-        userStatusMap["enabled"] = true;
+    private void test_user_status_user_status_available_return_true () {
+        QVariantMap user_status_map;
+        user_status_map["enabled"] = true;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["user_status"] = userStatusMap;
+        QVariantMap capabilities_map;
+        capabilities_map["user_status"] = user_status_map;
 
-        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilities_map);
 
-        //  QVERIFY (capabilities.userStatus ());
+        GLib.assert_true (capabilities.user_status ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testUserStatus_userStatusNotAvailable_returnFalse () {
-        QVariantMap userStatusMap;
-        userStatusMap["enabled"] = false;
+    private void test_user_status_user_status_not_available_return_false () {
+        QVariantMap user_status_map;
+        user_status_map["enabled"] = false;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["user_status"] = userStatusMap;
+        QVariantMap capabilities_map;
+        capabilities_map["user_status"] = user_status_map;
 
-        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilities_map);
 
-        //  QVERIFY (!capabilities.userStatus ());
+        GLib.assert_true (!capabilities.user_status ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testUserStatus_userStatusNotInCapabilites_returnFalse () {
-        QVariantMap capabilitiesMap;
+    private void test_user_status_user_status_not_in_capabilites_return_false () {
+        QVariantMap capabilities_map;
 
-        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilities_map);
 
-        //  QVERIFY (!capabilities.userStatus ());
+        GLib.assert_true (!capabilities.user_status ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testUserStatusSupportsEmoji_supportsEmojiAvailable_returnTrue () {
-        QVariantMap userStatusMap;
-        userStatusMap["enabled"] = true;
-        userStatusMap["supports_emoji"] = true;
+    private void test_user_status_supports_emoji_supports_emoji_available_return_true () {
+        QVariantMap user_status_map;
+        user_status_map["enabled"] = true;
+        user_status_map["supports_emoji"] = true;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["user_status"] = userStatusMap;
+        QVariantMap capabilities_map;
+        capabilities_map["user_status"] = user_status_map;
 
-        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilities_map);
 
-        //  QVERIFY (capabilities.userStatus ());
+        GLib.assert_true (capabilities.user_status ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testUserStatusSupportsEmoji_supportsEmojiNotAvailable_returnFalse () {
-        QVariantMap userStatusMap;
-        userStatusMap["enabled"] = true;
-        userStatusMap["supports_emoji"] = false;
+    private void test_user_status_supports_emoji_supports_emoji_not_available_return_false () {
+        QVariantMap user_status_map;
+        user_status_map["enabled"] = true;
+        user_status_map["supports_emoji"] = false;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["user_status"] = userStatusMap;
+        QVariantMap capabilities_map;
+        capabilities_map["user_status"] = user_status_map;
 
-        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilities_map);
 
-        //  QVERIFY (!capabilities.userStatusSupportsEmoji ());
+        GLib.assert_true (!capabilities.user_status_supports_emoji ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testUserStatusSupportsEmoji_supportsEmojiNotInCapabilites_returnFalse () {
-        QVariantMap userStatusMap;
-        userStatusMap["enabled"] = true;
+    private void test_user_status_supports_emoji_supports_emoji_not_in_capabilites_return_false () {
+        QVariantMap user_status_map;
+        user_status_map["enabled"] = true;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["user_status"] = userStatusMap;
+        QVariantMap capabilities_map;
+        capabilities_map["user_status"] = user_status_map;
 
-        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilities_map);
 
-        //  QVERIFY (!capabilities.userStatusSupportsEmoji ());
+        GLib.assert_true (!capabilities.user_status_supports_emoji ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testShareDefaultPermissions_defaultSharePermissionsNotInCapabilities_returnZero () {
-        QVariantMap filesSharingMap;
-        filesSharingMap["api_enabled"] = false;
+    private void test_share_default_permissions_default_share_permissions_not_in_capabilities_return_zero () {
+        QVariantMap file_sharing_map;
+        file_sharing_map["api_enabled"] = false;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["files_sharing"] = filesSharingMap;
+        QVariantMap capabilities_map;
+        capabilities_map["files_sharing"] = file_sharing_map;
 
-        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilitiesMap);
-        const var defaultSharePermissionsNotInCapabilities = capabilities.shareDefaultPermissions ();
+        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilities_map);
+        var default_share_permissions_not_in_capabilities = capabilities.share_default_permissions ();
 
-        //  QCOMPARE (defaultSharePermissionsNotInCapabilities, {});
+        GLib.assert_cmp (default_share_permissions_not_in_capabilities, {});
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testShareDefaultPermissions_defaultSharePermissionsAvailable_returnPermissions () {
-        QVariantMap filesSharingMap;
-        filesSharingMap["api_enabled"] = true;
-        filesSharingMap["default_permissions"] = 31;
+    private void test_share_default_permissions_default_share_permissions_available_return_permissions () {
+        QVariantMap file_sharing_map;
+        file_sharing_map["api_enabled"] = true;
+        file_sharing_map["default_permissions"] = 31;
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["files_sharing"] = filesSharingMap;
+        QVariantMap capabilities_map;
+        capabilities_map["files_sharing"] = file_sharing_map;
 
-        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilitiesMap);
-        const var defaultSharePermissionsAvailable = capabilities.shareDefaultPermissions ();
+        const Occ.Capabilities capabilities = new Occ.Capabilities (capabilities_map);
+        var default_share_permissions_available = capabilities.share_default_permissions ();
 
-        //  QCOMPARE (defaultSharePermissionsAvailable, 31);
+        GLib.assert_cmp (default_share_permissions_available, 31);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testBulkUploadAvailable_bulkUploadAvailable_returnTrue () {
-        QVariantMap bulkuploadMap;
-        bulkuploadMap["bulkupload"] = "1.0";
+    private void test_bulk_upload_available_bulk_upload_available_return_true () {
+        QVariantMap bulkupload_map;
+        bulkupload_map["bulkupload"] = "1.0";
 
-        QVariantMap capabilitiesMap;
-        capabilitiesMap["dav"] = bulkuploadMap;
+        QVariantMap capabilities_map;
+        capabilities_map["dav"] = bulkupload_map;
 
-        const var capabilities = Occ.Capabilities (capabilitiesMap);
-        const var bulkuploadAvailable = capabilities.bulkUpload ();
+        var capabilities = Occ.Capabilities (capabilities_map);
+        var bulkupload_available = capabilities.bulk_upload ();
 
-        //  QCOMPARE (bulkuploadAvailable, true);
+        GLib.assert_cmp (bulkupload_available, true);
     }
 
 } // class TestCapabilities

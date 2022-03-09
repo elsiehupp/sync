@@ -16,13 +16,13 @@ class TestUpdater : GLib.Object {
     ***********************************************************/
     private void on_signal_test_version_to_int () {
         int64 lowVersion = Updater.Helper.versionToInt (1,2,80,3000);
-        //  QCOMPARE (Updater.Helper.stringVersionToInt ("1.2.80.3000"), lowVersion);
+        GLib.assert_cmp (Updater.Helper.stringVersionToInt ("1.2.80.3000"), lowVersion);
 
         int64 highVersion = Updater.Helper.versionToInt (99,2,80,3000);
         int64 currVersion = Updater.Helper.currentVersionToInt ();
-        //  QVERIFY (currVersion > 0);
-        //  QVERIFY (currVersion > lowVersion);
-        //  QVERIFY (currVersion < highVersion);
+        GLib.assert_true (currVersion > 0);
+        GLib.assert_true (currVersion > lowVersion);
+        GLib.assert_true (currVersion < highVersion);
     }
 
 }

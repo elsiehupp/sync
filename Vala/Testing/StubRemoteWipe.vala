@@ -5,7 +5,7 @@ namespace Testing {
 // stub to prevent linker error
 class StubRemoteWipe : Occ.AccountManager {
 
-    //  const QMetaObject staticMetaObject = GLib.Object.staticMetaObject;
+    //  const QMetaObject static_meta_object = GLib.Object.static_meta_object;
 
     Occ.AccountManager instance () {
         return (AccountManager) new GLib.Object ();
@@ -13,13 +13,13 @@ class StubRemoteWipe : Occ.AccountManager {
 
     void save (bool value) { }
 
-    Occ.AccountState addAccount (AccountPointer account) {
+    Occ.AccountState add_account (AccountPointer account) {
         return new Occ.AccountState (account);
     }
 
-    void deleteAccount (AccountState state) { }
+    void delete_account (AccountState state) { }
 
-    void accountRemoved (Occ.AccountState state) { }
+    void account_removed (Occ.AccountState state) { }
 
     GLib.List<Occ.AccountStatePtr> accounts () {
         return new GLib.List<Occ.AccountStatePtr> ();

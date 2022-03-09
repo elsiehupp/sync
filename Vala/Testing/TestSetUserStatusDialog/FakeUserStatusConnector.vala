@@ -14,7 +14,7 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
         if (this.couldNotFetchUserStatus) {
             /* emit */ error (Error.CouldNotFetchUserStatus);
             return;
-        } else if (this.userStatusNotSupported) {
+        } else if (this.user_statusNotSupported) {
             /* emit */ error (Error.UserStatusNotSupported);
             return;
         } else if (this.emojisNotSupported) {
@@ -22,7 +22,7 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
             return;
         }
 
-        /* emit */ userStatusFetched (this.userStatus);
+        /* emit */ user_statusFetched (this.user_status);
     }
 
 
@@ -39,14 +39,14 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    public void setUserStatus (Occ.UserStatus userStatus) override {
+    public void setUserStatus (Occ.UserStatus user_status) override {
         if (this.couldNotSetUserStatusMessage) {
             /* emit */ error (Error.CouldNotSetUserStatus);
             return;
         }
 
-        this.userStatusSetByCallerOfSetUserStatus = userStatus;
-        /* emit */ UserStatusConnector.userStatusSet ();
+        this.user_statusSetByCallerOfSetUserStatus = user_status;
+        /* emit */ UserStatusConnector.user_statusSet ();
     }
 
 
@@ -63,15 +63,15 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    public Occ.UserStatus userStatus () override {
+    public Occ.UserStatus user_status () override {
         return {}; // Not implemented
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void setFakeUserStatus (Occ.UserStatus userStatus) {
-        this.userStatus = userStatus;
+    public void setFakeUserStatus (Occ.UserStatus user_status) {
+        this.user_status = user_status;
     }
 
 
@@ -85,7 +85,7 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    public Occ.UserStatus userStatusSetByCallerOfSetUserStatus () { return this.userStatusSetByCallerOfSetUserStatus; }
+    public Occ.UserStatus user_statusSetByCallerOfSetUserStatus () { return this.user_statusSetByCallerOfSetUserStatus; }
 
 
     /***********************************************************
@@ -118,7 +118,7 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
     /***********************************************************
     ***********************************************************/
     public void setErrorUserStatusNotSupported (bool value) {
-        this.userStatusNotSupported = value;
+        this.user_statusNotSupported = value;
     }
 
 
@@ -138,14 +138,14 @@ class FakeUserStatusConnector : Occ.UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    private Occ.UserStatus this.userStatusSetByCallerOfSetUserStatus;
-    private Occ.UserStatus this.userStatus;
+    private Occ.UserStatus this.user_statusSetByCallerOfSetUserStatus;
+    private Occ.UserStatus this.user_status;
     private GLib.Vector<Occ.UserStatus> this.predefinedStatuses;
     private bool this.isMessageCleared = false;
     private bool this.couldNotFetchPredefinedUserStatuses = false;
     private bool this.couldNotFetchUserStatus = false;
     private bool this.couldNotSetUserStatusMessage = false;
-    private bool this.userStatusNotSupported = false;
+    private bool this.user_statusNotSupported = false;
     private bool this.emojisNotSupported = false;
     private bool this.couldNotClearUserStatusMessage = false;
 };

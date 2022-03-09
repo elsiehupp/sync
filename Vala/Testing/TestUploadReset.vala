@@ -18,7 +18,7 @@ class TestUploadReset : GLib.Object {
     private void on_signal_test_file_upload_ng () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
-        fake_folder.sync_engine ().account ().setCapabilities ({
+        fake_folder.sync_engine ().account ().set_capabilities ({
             { "dav", new QVariantMap (
                 {"chunking", "1.0"},
                 {"httpErrorCodesThatResetFailingChunkedUploads", new QVariantList (500)
@@ -34,40 +34,40 @@ class TestUploadReset : GLib.Object {
         SyncJournalDb.UploadInfo uploadInfo;
         uploadInfo.transferid = 1;
         uploadInfo.valid = true;
-        uploadInfo.modtime = Utility.qDateTimeToTime_t (modification_time);
+        uploadInfo.modtime = Utility.date_time_to_time_t (modification_time);
         uploadInfo.size = size;
         fake_folder.sync_engine ().journal ().setUploadInfo ("A/a0", uploadInfo);
 
         fake_folder.upload_state ().mkdir ("1");
         fake_folder.server_error_paths ().append ("1/.file");
 
-        //  QVERIFY (!fake_folder.sync_once ());
+        GLib.assert_true (!fake_folder.sync_once ());
 
         uploadInfo = fake_folder.sync_engine ().journal ().getUploadInfo ("A/a0");
-        //  QCOMPARE (uploadInfo.errorCount, 1);
-        //  QCOMPARE (uploadInfo.transferid, 1U);
+        GLib.assert_cmp (uploadInfo.errorCount, 1);
+        GLib.assert_cmp (uploadInfo.transferid, 1U);
 
-        fake_folder.sync_engine ().journal ().wipeErrorBlocklist ();
-        //  QVERIFY (!fake_folder.sync_once ());
-
-        uploadInfo = fake_folder.sync_engine ().journal ().getUploadInfo ("A/a0");
-        //  QCOMPARE (uploadInfo.errorCount, 2);
-        //  QCOMPARE (uploadInfo.transferid, 1U);
-
-        fake_folder.sync_engine ().journal ().wipeErrorBlocklist ();
-        //  QVERIFY (!fake_folder.sync_once ());
+        fake_folder.sync_engine ().journal ().wipe_error_blocklist ();
+        GLib.assert_true (!fake_folder.sync_once ());
 
         uploadInfo = fake_folder.sync_engine ().journal ().getUploadInfo ("A/a0");
-        //  QCOMPARE (uploadInfo.errorCount, 3);
-        //  QCOMPARE (uploadInfo.transferid, 1U);
+        GLib.assert_cmp (uploadInfo.errorCount, 2);
+        GLib.assert_cmp (uploadInfo.transferid, 1U);
 
-        fake_folder.sync_engine ().journal ().wipeErrorBlocklist ();
-        //  QVERIFY (!fake_folder.sync_once ());
+        fake_folder.sync_engine ().journal ().wipe_error_blocklist ();
+        GLib.assert_true (!fake_folder.sync_once ());
 
         uploadInfo = fake_folder.sync_engine ().journal ().getUploadInfo ("A/a0");
-        //  QCOMPARE (uploadInfo.errorCount, 0);
-        //  QCOMPARE (uploadInfo.transferid, 0U);
-        //  QVERIFY (!uploadInfo.valid);
+        GLib.assert_cmp (uploadInfo.errorCount, 3);
+        GLib.assert_cmp (uploadInfo.transferid, 1U);
+
+        fake_folder.sync_engine ().journal ().wipe_error_blocklist ();
+        GLib.assert_true (!fake_folder.sync_once ());
+
+        uploadInfo = fake_folder.sync_engine ().journal ().getUploadInfo ("A/a0");
+        GLib.assert_cmp (uploadInfo.errorCount, 0);
+        GLib.assert_cmp (uploadInfo.transferid, 0U);
+        GLib.assert_true (!uploadInfo.valid);
     }
 
 }

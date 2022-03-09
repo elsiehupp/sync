@@ -235,11 +235,11 @@ class AccountManager : GLib.Object {
     ***********************************************************/
     public static void backward_migration_settings_keys (string[] delete_keys, string[] ignore_keys) {
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
-        const int accounts_version = settings.value (QLatin1String (VERSION_C)).to_int ();
+        const int accounts_version = settings.value (VERSION_C).to_int ();
         if (accounts_version <= MAX_ACCOUNTS_VERSION) {
             foreach (var account_id in settings.child_groups ()) {
                 settings.begin_group (account_id);
-                const int account_version = settings.value (QLatin1String (VERSION_C), 1).to_int ();
+                const int account_version = settings.value (VERSION_C, 1).to_int ();
                 if (account_version > MAX_ACCOUNT_VERSION) {
                     ignore_keys.append (settings.group ());
                 }
@@ -255,10 +255,10 @@ class AccountManager : GLib.Object {
     ***********************************************************/
     // saving and loading Account to settings
     private void save_account_helper (Account account, QSettings settings, bool save_credentials = true) {
-        settings.value (QLatin1String (VERSION_C), MAX_ACCOUNT_VERSION);
-        settings.value (QLatin1String (URL_C), acc.url.to_string ());
-        settings.value (QLatin1String (DAV_USER_C), acc.dav_user);
-        settings.value (QLatin1String (SERVER_VERSION_C), acc.server_version);
+        settings.value (VERSION_C, MAX_ACCOUNT_VERSION);
+        settings.value (URL_C, acc.url.to_string ());
+        settings.value (DAV_USER_C, acc.dav_user);
+        settings.value (SERVER_VERSION_C, acc.server_version);
         if (acc.credentials) {
             if (save_credentials) {
                 // Only persist the credentials if the parameter is set, on migration from 1.8.x
@@ -267,10 +267,10 @@ class AccountManager : GLib.Object {
                 // re-persisting them)
                 acc.credentials.persist ();
             }
-            for (var key : acc.settings_map.keys ()) {
+            foreach (var key in acc.settings_map.keys ()) {
                 settings.value (key, acc.settings_map.value (key));
             }
-            settings.value (QLatin1String (AUTH_TYPE_C), acc.credentials.auth_type ());
+            settings.value (AUTH_TYPE_C, acc.credentials.auth_type ());
 
             // HACK : Save http_user also as user
             if (acc.settings_map.contains (HTTP_USER_C))
@@ -278,14 +278,14 @@ class AccountManager : GLib.Object {
         }
 
         // Save accepted certificates.
-        settings.begin_group (QLatin1String ("General"));
-        GLib.info ("Saving " + acc.approved_certificates ().count (" unknown certificates.";
+        settings.begin_group ("General");
+        GLib.info ("Saving " + acc.approved_certificates ().count (" unknown certificates.");
         GLib.ByteArray certificates;
         foreach (var cert in acc.approved_certificates ()) {
             certificates += cert.to_pem () + '\n';
         }
         if (!certificates.is_empty ()) {
-            settings.value (QLatin1String (CA_CERTS_KEY_C), certificates);
+            settings.value (CA_CERTS_KEY_C, certificates);
         }
         settings.end_group ();
 
@@ -305,7 +305,7 @@ class AccountManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private AccountPointer load_account_helper (QSettings settings) {
-        var url_config = settings.value (QLatin1String (URL_C));
+        var url_config = settings.value (URL_C);
         if (!url_config.is_valid ()) {
             // No URL probably means a corrupted entry in the account settings
             GLib.warning ("No URL for account " + settings.group ();
@@ -314,14 +314,14 @@ class AccountManager : GLib.Object {
 
         var acc = create_account ();
 
-        string auth_type = settings.value (QLatin1String (AUTH_TYPE_C)).to_string ();
+        string auth_type = settings.value (AUTH_TYPE_C).to_string ();
 
         // There was an account-type saving bug when 'skip folder config' was used
         // See #5408. This attempts to fix up the "dummy" auth_type
-        if (auth_type == QLatin1String ("dummy")) {
-            if (settings.contains (QLatin1String ("http_user"))) {
+        if (auth_type == "dummy") {
+            if (settings.contains ("http_user")) {
                 auth_type = "http";
-            } else if (settings.contains (QLatin1String ("shibboleth_shib_user"))) {
+            } else if (settings.contains ("shibboleth_shib_user")) {
                 auth_type = "shibboleth";
             }
         }

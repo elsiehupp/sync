@@ -25,9 +25,9 @@ class TestOAuth : GLib.Object {
     class TestCloseBrowserDontCrash : OAuthTestCase {
 
         override Soup.Reply tokenReply (Soup.Operation operation, Soup.Request request) {
-            //  ASSERT (browserReply);
+            //  ASSERT (browser_reply);
             // simulate the fact that the browser is closing the connection
-            browserReply.on_signal_abort ();
+            browser_reply.on_signal_abort ();
             QCoreApplication.processEvents ();
 
             //  ASSERT (state == BrowserOpened);
@@ -39,9 +39,9 @@ class TestOAuth : GLib.Object {
         }
 
         override void browserReplyFinished () {
-            //  QCOMPARE (sender (), browserReply.data ());
-            //  QCOMPARE (browserReply.error (), Soup.Reply.OperationCanceledError);
-            replyToBrowserOk = true;
+            GLib.assert_cmp (sender (), browser_reply.data ());
+            GLib.assert_cmp (browser_reply.error (), Soup.Reply.OperationCanceledError);
+            reply_to_browser_ok = true;
         }
     }
 
@@ -54,7 +54,7 @@ class TestOAuth : GLib.Object {
 
     class TestRandomConnections : OAuthTestCase {
         override Soup.Reply createBrowserReply (Soup.Request request) {
-            QTimer.singleShot (0, this, [this, request] {
+            QTimer.single_shot (0, this, [this, request] {
                 var port = request.url ().port ();
                 state = CustomState;
                 GLib.Vector<GLib.ByteArray> payloads = {
@@ -69,13 +69,13 @@ class TestOAuth : GLib.Object {
                 foreach (var x in payloads) {
                     var socket = new QTcpSocket (this);
                     socket.connectToHost ("localhost", port);
-                    //  QVERIFY (socket.waitForConnected ());
+                    GLib.assert_true (socket.waitForConnected ());
                     socket.write (x);
                 }
 
                 // Do the actual request a bit later
-                QTimer.singleShot (100, this, [this, request] {
-                    //  QCOMPARE (state, CustomState);
+                QTimer.single_shot (100, this, [this, request] {
+                    GLib.assert_cmp (state, CustomState);
                     state = BrowserOpened;
                     this.OAuthTestCase.createBrowserReply (request);
                 });
@@ -95,7 +95,7 @@ class TestOAuth : GLib.Object {
             if (state != CustomState) {
                 return OAuthTestCase.oauthResult (result, user, token, refreshToken);
             }
-            //  QCOMPARE (result, OAuth.Error);
+            GLib.assert_cmp (result, OAuth.Error);
         }
     }
 
@@ -114,7 +114,7 @@ class TestOAuth : GLib.Object {
         int redirectsDone = 0;
 
         override Soup.Reply tokenReply (Soup.Operation operation, Soup.Request request) {
-            //  ASSERT (browserReply);
+            //  ASSERT (browser_reply);
             // Kind of reproduces what we had in https://github.com/owncloud/enterprise/issues/2951 (not 1:1)
             if (redirectsDone == 0) {
                 std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());

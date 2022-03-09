@@ -24,20 +24,20 @@ class FakeGetWithDataReply : FakeReply {
         set_operation (operation);
         open (QIODevice.ReadOnly);
 
-        //  Q_ASSERT (!data.isEmpty ());
+        GLib.assert_true (!data.is_empty ());
         payload = data;
         string filename = get_file_path_from_url (request.url ());
-        //  Q_ASSERT (!filename.isEmpty ());
+        GLib.assert_true (!filename.is_empty ());
         file_info = remote_root_file_info.find (filename);
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
 
-        if (request.hasRawHeader ("Range")) {
-            const string range = string.fromUtf8 (request.rawHeader ("Range"));
-            const QRegularExpression bytesPattern = new QRegularExpression ("bytes= (?<on_signal_start>\\d+)- (?<end>\\d+)");
-            const QRegularExpressionMatch match = bytesPattern.match (range);
-            if (match.hasMatch ()) {
-                const int on_signal_start = match.captured ("on_signal_start").toInt ();
-                const int end = match.captured ("end").toInt ();
+        if (request.has_raw_header ("Range")) {
+            const string range = request.raw_header ("Range").to_string ();
+            const QRegularExpression bytes_pattern = new QRegularExpression ("bytes= (?<on_signal_start>\\d+)- (?<end>\\d+)");
+            const QRegularExpressionMatch match = bytes_pattern.match (range);
+            if (match.has_match ()) {
+                const int on_signal_start = match.captured ("on_signal_start").to_int ();
+                const int end = match.captured ("end").to_int ();
                 payload = payload.mid (on_signal_start, end - on_signal_start + 1);
             }
         }
@@ -50,7 +50,7 @@ class FakeGetWithDataReply : FakeReply {
             /* emit */ signal_finished ();
             return;
         }
-        setHeader (Soup.Request.ContentLengthHeader, payload.size ());
+        set_header (Soup.Request.ContentLengthHeader, payload.size ());
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
         set_raw_header ("OC-ETag", file_info.etag);
         set_raw_header ("ETag", file_info.etag);
@@ -83,7 +83,7 @@ class FakeGetWithDataReply : FakeReply {
     ***********************************************************/
     public override int64 read_data (char *data, int64 maxlen) {
         int64 len = std.min (payload.size () - offset, uint64 (maxlen));
-        std.memcpy (data, payload.constData () + offset, len);
+        std.memcpy (data, payload.const_data () + offset, len);
         offset += len;
         return len;
     }

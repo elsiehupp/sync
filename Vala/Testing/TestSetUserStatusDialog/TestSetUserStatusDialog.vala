@@ -17,48 +17,48 @@ class TestSetUserStatusDialog : GLib.Object {
     private void testCtor_fetchStatusAndPredefinedStatuses () {
         const GLib.DateTime currentDateTime (GLib.DateTime.currentDateTime ());
 
-        const string userStatusId ("fake-identifier");
-        const string userStatusMessage ("Some status");
-        const string userStatusIcon ("❤");
-        const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.DoNotDisturb);
-        const bool userStatusMessagePredefined (false);
-        Occ.Optional<Occ.ClearAt> userStatusClearAt; {
+        const string user_statusId ("fake-identifier");
+        const string user_statusMessage ("Some status");
+        const string user_statusIcon ("❤");
+        const Occ.UserStatus.OnlineStatus user_statusState (Occ.UserStatus.OnlineStatus.DoNotDisturb);
+        const bool user_statusMessagePredefined (false);
+        Occ.Optional<Occ.ClearAt> user_statusClearAt; {
             Occ.ClearAt clearAt;
             clearAt.type = Occ.ClearAtType.Timestamp;
-            clearAt.timestamp = currentDateTime.addDays (1).toTime_t ();
-            userStatusClearAt = clearAt;
+            clearAt.timestamp = currentDateTime.add_days (1).toTime_t ();
+            user_statusClearAt = clearAt;
         }
 
-        const Occ.UserStatus userStatus (userStatusId, userStatusMessage,
-            userStatusIcon, userStatusState, userStatusMessagePredefined, userStatusClearAt);
+        const Occ.UserStatus user_status (user_statusId, user_statusMessage,
+            user_statusIcon, user_statusState, user_statusMessagePredefined, user_statusClearAt);
 
-        const var fakePredefinedStatuses = createFakePredefinedStatuses (createDateTime ());
+        var fakePredefinedStatuses = createFakePredefinedStatuses (createDateTime ());
 
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
         fakeDateTimeProvider.setCurrentDateTime (currentDateTime);
-        fakeUserStatusJob.setFakeUserStatus (userStatus);
+        fakeUserStatusJob.setFakeUserStatus (user_status);
         fakeUserStatusJob.setFakePredefinedStatuses (fakePredefinedStatuses);
         Occ.UserStatusSelectorModel model (fakeUserStatusJob, std.move (fakeDateTimeProvider));
 
         // Was user status set correctly?
-        //  QCOMPARE (model.userStatusMessage (), userStatusMessage);
-        //  QCOMPARE (model.userStatusEmoji (), userStatusIcon);
-        //  QCOMPARE (model.onlineStatus (), userStatusState);
-        //  QCOMPARE (model.clearAt (), _("1 day"));
+        GLib.assert_cmp (model.user_statusMessage (), user_statusMessage);
+        GLib.assert_cmp (model.user_statusEmoji (), user_statusIcon);
+        GLib.assert_cmp (model.onlineStatus (), user_statusState);
+        GLib.assert_cmp (model.clearAt (), _("1 day"));
 
         // Were predefined statuses fetched correctly?
-        const var predefinedStatusesCount = model.predefinedStatusesCount ();
-        //  QCOMPARE (predefinedStatusesCount, fakePredefinedStatuses.size ());
+        var predefinedStatusesCount = model.predefinedStatusesCount ();
+        GLib.assert_cmp (predefinedStatusesCount, fakePredefinedStatuses.size ());
         for (int i = 0; i < predefinedStatusesCount; ++i) {
-            const var predefinedStatus = model.predefinedStatus (i);
-            //  QCOMPARE (predefinedStatus.identifier (),
+            var predefinedStatus = model.predefinedStatus (i);
+            GLib.assert_cmp (predefinedStatus.identifier (),
                 fakePredefinedStatuses[i].identifier ());
-            //  QCOMPARE (predefinedStatus.message (),
+            GLib.assert_cmp (predefinedStatus.message (),
                 fakePredefinedStatuses[i].message ());
-            //  QCOMPARE (predefinedStatus.icon (),
+            GLib.assert_cmp (predefinedStatus.icon (),
                 fakePredefinedStatuses[i].icon ());
-            //  QCOMPARE (predefinedStatus.messagePredefined (),
+            GLib.assert_cmp (predefinedStatus.messagePredefined (),
                 fakePredefinedStatuses[i].messagePredefined ());
         }
     }
@@ -69,9 +69,9 @@ class TestSetUserStatusDialog : GLib.Object {
     private void testCtor_noStatusSet_showSensibleDefaults () {
         Occ.UserStatusSelectorModel model (null, null);
 
-        //  QCOMPARE (model.userStatusMessage (), "");
-        //  QCOMPARE (model.userStatusEmoji (), "😀");
-        //  QCOMPARE (model.clearAt (), _("Don't clear"));
+        GLib.assert_cmp (model.user_statusMessage (), "");
+        GLib.assert_cmp (model.user_statusEmoji (), "😀");
+        GLib.assert_cmp (model.clearAt (), _("Don't clear"));
     }
 
 
@@ -83,10 +83,10 @@ class TestSetUserStatusDialog : GLib.Object {
             Occ.UserStatus.OnlineStatus.Offline, false, {} });
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
 
-        //  QCOMPARE (model.onlineStatus (), Occ.UserStatus.OnlineStatus.Online);
-        //  QCOMPARE (model.userStatusMessage (), "");
-        //  QCOMPARE (model.userStatusEmoji (), "😀");
-        //  QCOMPARE (model.clearAt (), _("Don't clear"));
+        GLib.assert_cmp (model.onlineStatus (), Occ.UserStatus.OnlineStatus.Online);
+        GLib.assert_cmp (model.user_statusMessage (), "");
+        GLib.assert_cmp (model.user_statusEmoji (), "😀");
+        GLib.assert_cmp (model.clearAt (), _("Don't clear"));
     }
 
 
@@ -101,98 +101,98 @@ class TestSetUserStatusDialog : GLib.Object {
 
         model.setOnlineStatus (onlineStatus);
 
-        //  QCOMPARE (onlineStatusChangedSpy.count (), 1);
+        GLib.assert_cmp (onlineStatusChangedSpy.count (), 1);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testSetUserStatus_setCustomMessage_userStatusSetCorrect () {
+    private void testSetUserStatus_setCustomMessage_user_statusSetCorrect () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.on_signal_finished);
 
-        const string userStatusMessage ("Some status");
-        const string userStatusIcon ("❤");
-        const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.Online);
+        const string user_statusMessage ("Some status");
+        const string user_statusIcon ("❤");
+        const Occ.UserStatus.OnlineStatus user_statusState (Occ.UserStatus.OnlineStatus.Online);
 
-        model.setOnlineStatus (userStatusState);
-        model.setUserStatusMessage (userStatusMessage);
-        model.setUserStatusEmoji (userStatusIcon);
+        model.setOnlineStatus (user_statusState);
+        model.setUserStatusMessage (user_statusMessage);
+        model.setUserStatusEmoji (user_statusIcon);
         model.setClearAt (1);
 
         model.setUserStatus ();
-        //  QCOMPARE (finishedSpy.count (), 1);
+        GLib.assert_cmp (finishedSpy.count (), 1);
 
-        const var userStatusSet = fakeUserStatusJob.userStatusSetByCallerOfSetUserStatus ();
-        //  QCOMPARE (userStatusSet.icon (), userStatusIcon);
-        //  QCOMPARE (userStatusSet.message (), userStatusMessage);
-        //  QCOMPARE (userStatusSet.state (), userStatusState);
-        //  QCOMPARE (userStatusSet.messagePredefined (), false);
-        const var clearAt = userStatusSet.clearAt ();
-        //  QVERIFY (clearAt.isValid ());
-        //  QCOMPARE (clearAt.type, Occ.ClearAtType.Period);
-        //  QCOMPARE (clearAt.period, 60 * 30);
+        var user_statusSet = fakeUserStatusJob.user_statusSetByCallerOfSetUserStatus ();
+        GLib.assert_cmp (user_statusSet.icon (), user_statusIcon);
+        GLib.assert_cmp (user_statusSet.message (), user_statusMessage);
+        GLib.assert_cmp (user_statusSet.state (), user_statusState);
+        GLib.assert_cmp (user_statusSet.messagePredefined (), false);
+        var clearAt = user_statusSet.clearAt ();
+        GLib.assert_true (clearAt.is_valid ());
+        GLib.assert_cmp (clearAt.type, Occ.ClearAtType.Period);
+        GLib.assert_cmp (clearAt.period, 60 * 30);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testSetUserStatusMessage_predefinedStatusWasSet_userStatusSetCorrect () {
-        var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
-        fakeUserStatusJob.setFakePredefinedStatuses (createFakePredefinedStatuses (createDateTime ()));
-        Occ.UserStatusSelectorModel model (fakeUserStatusJob);
-        model.setPredefinedStatus (0);
-        QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.on_signal_finished);
-
-        const string userStatusMessage ("Some status");
-        const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.Online);
-
-        model.setOnlineStatus (userStatusState);
-        model.setUserStatusMessage (userStatusMessage);
-        model.setClearAt (1);
-
-        model.setUserStatus ();
-        //  QCOMPARE (finishedSpy.count (), 1);
-
-        const var userStatusSet = fakeUserStatusJob.userStatusSetByCallerOfSetUserStatus ();
-        //  QCOMPARE (userStatusSet.message (), userStatusMessage);
-        //  QCOMPARE (userStatusSet.state (), userStatusState);
-        //  QCOMPARE (userStatusSet.messagePredefined (), false);
-        const var clearAt = userStatusSet.clearAt ();
-        //  QVERIFY (clearAt.isValid ());
-        //  QCOMPARE (clearAt.type, Occ.ClearAtType.Period);
-        //  QCOMPARE (clearAt.period, 60 * 30);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void testSetUserStatusEmoji_predefinedStatusWasSet_userStatusSetCorrect () {
+    private void testSetUserStatusMessage_predefinedStatusWasSet_user_statusSetCorrect () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         fakeUserStatusJob.setFakePredefinedStatuses (createFakePredefinedStatuses (createDateTime ()));
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         model.setPredefinedStatus (0);
         QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.on_signal_finished);
 
-        const string userStatusIcon ("❤");
-        const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.Online);
+        const string user_statusMessage ("Some status");
+        const Occ.UserStatus.OnlineStatus user_statusState (Occ.UserStatus.OnlineStatus.Online);
 
-        model.setOnlineStatus (userStatusState);
-        model.setUserStatusEmoji (userStatusIcon);
+        model.setOnlineStatus (user_statusState);
+        model.setUserStatusMessage (user_statusMessage);
         model.setClearAt (1);
 
         model.setUserStatus ();
-        //  QCOMPARE (finishedSpy.count (), 1);
+        GLib.assert_cmp (finishedSpy.count (), 1);
 
-        const var userStatusSet = fakeUserStatusJob.userStatusSetByCallerOfSetUserStatus ();
-        //  QCOMPARE (userStatusSet.icon (), userStatusIcon);
-        //  QCOMPARE (userStatusSet.state (), userStatusState);
-        //  QCOMPARE (userStatusSet.messagePredefined (), false);
-        const var clearAt = userStatusSet.clearAt ();
-        //  QVERIFY (clearAt.isValid ());
-        //  QCOMPARE (clearAt.type, Occ.ClearAtType.Period);
-        //  QCOMPARE (clearAt.period, 60 * 30);
+        var user_statusSet = fakeUserStatusJob.user_statusSetByCallerOfSetUserStatus ();
+        GLib.assert_cmp (user_statusSet.message (), user_statusMessage);
+        GLib.assert_cmp (user_statusSet.state (), user_statusState);
+        GLib.assert_cmp (user_statusSet.messagePredefined (), false);
+        var clearAt = user_statusSet.clearAt ();
+        GLib.assert_true (clearAt.is_valid ());
+        GLib.assert_cmp (clearAt.type, Occ.ClearAtType.Period);
+        GLib.assert_cmp (clearAt.period, 60 * 30);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void testSetUserStatusEmoji_predefinedStatusWasSet_user_statusSetCorrect () {
+        var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
+        fakeUserStatusJob.setFakePredefinedStatuses (createFakePredefinedStatuses (createDateTime ()));
+        Occ.UserStatusSelectorModel model (fakeUserStatusJob);
+        model.setPredefinedStatus (0);
+        QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.on_signal_finished);
+
+        const string user_statusIcon ("❤");
+        const Occ.UserStatus.OnlineStatus user_statusState (Occ.UserStatus.OnlineStatus.Online);
+
+        model.setOnlineStatus (user_statusState);
+        model.setUserStatusEmoji (user_statusIcon);
+        model.setClearAt (1);
+
+        model.setUserStatus ();
+        GLib.assert_cmp (finishedSpy.count (), 1);
+
+        var user_statusSet = fakeUserStatusJob.user_statusSetByCallerOfSetUserStatus ();
+        GLib.assert_cmp (user_statusSet.icon (), user_statusIcon);
+        GLib.assert_cmp (user_statusSet.state (), user_statusState);
+        GLib.assert_cmp (user_statusSet.messagePredefined (), false);
+        var clearAt = user_statusSet.clearAt ();
+        GLib.assert_true (clearAt.is_valid ());
+        GLib.assert_cmp (clearAt.type, Occ.ClearAtType.Period);
+        GLib.assert_cmp (clearAt.period, 60 * 30);
     }
 
 
@@ -201,30 +201,30 @@ class TestSetUserStatusDialog : GLib.Object {
     private void testSetPredefinedStatus_emitUserStatusChangedAndSetUserStatus () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
-        const var currentTime = createDateTime ();
+        var currentTime = createDateTime ();
         fakeDateTimeProvider.setCurrentDateTime (currentTime);
-        const var fakePredefinedStatuses = createFakePredefinedStatuses (currentTime);
+        var fakePredefinedStatuses = createFakePredefinedStatuses (currentTime);
         fakeUserStatusJob.setFakePredefinedStatuses (fakePredefinedStatuses);
         Occ.UserStatusSelectorModel model (std.move (fakeUserStatusJob),
             std.move (fakeDateTimeProvider));
 
-        QSignalSpy userStatusChangedSpy (&model,
-            &Occ.UserStatusSelectorModel.userStatusChanged);
+        QSignalSpy user_statusChangedSpy (&model,
+            &Occ.UserStatusSelectorModel.user_statusChanged);
         QSignalSpy clearAtChangedSpy (&model,
             &Occ.UserStatusSelectorModel.clearAtChanged);
 
-        const var fakePredefinedUserStatusIndex = 0;
+        var fakePredefinedUserStatusIndex = 0;
         model.setPredefinedStatus (fakePredefinedUserStatusIndex);
 
-        //  QCOMPARE (userStatusChangedSpy.count (), 1);
-        //  QCOMPARE (clearAtChangedSpy.count (), 1);
+        GLib.assert_cmp (user_statusChangedSpy.count (), 1);
+        GLib.assert_cmp (clearAtChangedSpy.count (), 1);
 
         // Was user status set correctly?
-        const var fakePredefinedUserStatus = fakePredefinedStatuses[fakePredefinedUserStatusIndex];
-        //  QCOMPARE (model.userStatusMessage (), fakePredefinedUserStatus.message ());
-        //  QCOMPARE (model.userStatusEmoji (), fakePredefinedUserStatus.icon ());
-        //  QCOMPARE (model.onlineStatus (), fakePredefinedUserStatus.state ());
-        //  QCOMPARE (model.clearAt (), _("1 hour"));
+        var fakePredefinedUserStatus = fakePredefinedStatuses[fakePredefinedUserStatusIndex];
+        GLib.assert_cmp (model.user_statusMessage (), fakePredefinedUserStatus.message ());
+        GLib.assert_cmp (model.user_statusEmoji (), fakePredefinedUserStatus.icon ());
+        GLib.assert_cmp (model.onlineStatus (), fakePredefinedUserStatus.state ());
+        GLib.assert_cmp (model.clearAt (), _("1 hour"));
     }
 
 
@@ -235,11 +235,11 @@ class TestSetUserStatusDialog : GLib.Object {
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         QSignalSpy clearAtChangedSpy (&model, &Occ.UserStatusSelectorModel.clearAtChanged);
 
-        const var clearAtIndex = 0;
+        var clearAtIndex = 0;
         model.setClearAt (clearAtIndex);
 
-        //  QCOMPARE (clearAtChangedSpy.count (), 1);
-        //  QCOMPARE (model.clearAt (), _("Don't clear"));
+        GLib.assert_cmp (clearAtChangedSpy.count (), 1);
+        GLib.assert_cmp (model.clearAt (), _("Don't clear"));
     }
 
 
@@ -250,11 +250,11 @@ class TestSetUserStatusDialog : GLib.Object {
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         QSignalSpy clearAtChangedSpy (&model, &Occ.UserStatusSelectorModel.clearAtChanged);
 
-        const var clearAtIndex = 1;
+        var clearAtIndex = 1;
         model.setClearAt (clearAtIndex);
 
-        //  QCOMPARE (clearAtChangedSpy.count (), 1);
-        //  QCOMPARE (model.clearAt (), _("30 minutes"));
+        GLib.assert_cmp (clearAtChangedSpy.count (), 1);
+        GLib.assert_cmp (model.clearAt (), _("30 minutes"));
     }
 
 
@@ -265,11 +265,11 @@ class TestSetUserStatusDialog : GLib.Object {
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         QSignalSpy clearAtChangedSpy (&model, &Occ.UserStatusSelectorModel.clearAtChanged);
 
-        const var clearAtIndex = 2;
+        var clearAtIndex = 2;
         model.setClearAt (clearAtIndex);
 
-        //  QCOMPARE (clearAtChangedSpy.count (), 1);
-        //  QCOMPARE (model.clearAt (), _("1 hour"));
+        GLib.assert_cmp (clearAtChangedSpy.count (), 1);
+        GLib.assert_cmp (model.clearAt (), _("1 hour"));
     }
 
 
@@ -280,11 +280,11 @@ class TestSetUserStatusDialog : GLib.Object {
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         QSignalSpy clearAtChangedSpy (&model, &Occ.UserStatusSelectorModel.clearAtChanged);
 
-        const var clearAtIndex = 3;
+        var clearAtIndex = 3;
         model.setClearAt (clearAtIndex);
 
-        //  QCOMPARE (clearAtChangedSpy.count (), 1);
-        //  QCOMPARE (model.clearAt (), _("4 hours"));
+        GLib.assert_cmp (clearAtChangedSpy.count (), 1);
+        GLib.assert_cmp (model.clearAt (), _("4 hours"));
     }
 
 
@@ -295,11 +295,11 @@ class TestSetUserStatusDialog : GLib.Object {
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         QSignalSpy clearAtChangedSpy (&model, &Occ.UserStatusSelectorModel.clearAtChanged);
 
-        const var clearAtIndex = 4;
+        var clearAtIndex = 4;
         model.setClearAt (clearAtIndex);
 
-        //  QCOMPARE (clearAtChangedSpy.count (), 1);
-        //  QCOMPARE (model.clearAt (), _("Today"));
+        GLib.assert_cmp (clearAtChangedSpy.count (), 1);
+        GLib.assert_cmp (model.clearAt (), _("Today"));
     }
 
 
@@ -310,11 +310,11 @@ class TestSetUserStatusDialog : GLib.Object {
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         QSignalSpy clearAtChangedSpy (&model, &Occ.UserStatusSelectorModel.clearAtChanged);
 
-        const var clearAtIndex = 5;
+        var clearAtIndex = 5;
         model.setClearAt (clearAtIndex);
 
-        //  QCOMPARE (clearAtChangedSpy.count (), 1);
-        //  QCOMPARE (model.clearAt (), _("This week"));
+        GLib.assert_cmp (clearAtChangedSpy.count (), 1);
+        GLib.assert_cmp (model.clearAt (), _("This week"));
     }
 
 
@@ -324,16 +324,16 @@ class TestSetUserStatusDialog : GLib.Object {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
 
-        //  QCOMPARE (model.clearAt (), _("Don't clear"));
-        const var clearAtValues = model.clearAtValues ();
-        //  QCOMPARE (clearAtValues.count (), 6);
+        GLib.assert_cmp (model.clearAt (), _("Don't clear"));
+        var clearAtValues = model.clearAtValues ();
+        GLib.assert_cmp (clearAtValues.count (), 6);
 
-        //  QCOMPARE (clearAtValues[0], _("Don't clear"));
-        //  QCOMPARE (clearAtValues[1], _("30 minutes"));
-        //  QCOMPARE (clearAtValues[2], _("1 hour"));
-        //  QCOMPARE (clearAtValues[3], _("4 hours"));
-        //  QCOMPARE (clearAtValues[4], _("Today"));
-        //  QCOMPARE (clearAtValues[5], _("This week"));
+        GLib.assert_cmp (clearAtValues[0], _("Don't clear"));
+        GLib.assert_cmp (clearAtValues[1], _("30 minutes"));
+        GLib.assert_cmp (clearAtValues[2], _("1 hour"));
+        GLib.assert_cmp (clearAtValues[3], _("4 hours"));
+        GLib.assert_cmp (clearAtValues[4], _("Today"));
+        GLib.assert_cmp (clearAtValues[5], _("This week"));
     }
 
 
@@ -341,102 +341,102 @@ class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void testClearAt_clearAtTimestamp () { {onst var currentTime = createDateTime ();
         {
-            Occ.UserStatus userStatus;
+            Occ.UserStatus user_status;
             Occ.ClearAt clearAt;
             clearAt.type = Occ.ClearAtType.Timestamp;
-            clearAt.timestamp = currentTime.addSecs (30).toTime_t ();
-            userStatus.setClearAt (clearAt);
+            clearAt.timestamp = currentTime.add_secs (30).toTime_t ();
+            user_status.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
             fakeDateTimeProvider.setCurrentDateTime (currentTime);
 
-            Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
+            Occ.UserStatusSelectorModel model (user_status, std.move (fakeDateTimeProvider));
 
-            //  QCOMPARE (model.clearAt (), _("Less than a minute"));
+            GLib.assert_cmp (model.clearAt (), _("Less than a minute"));
         }
  {
-            Occ.UserStatus userStatus;
+            Occ.UserStatus user_status;
             Occ.ClearAt clearAt;
             clearAt.type = Occ.ClearAtType.Timestamp;
-            clearAt.timestamp = currentTime.addSecs (60).toTime_t ();
-            userStatus.setClearAt (clearAt);
+            clearAt.timestamp = currentTime.add_secs (60).toTime_t ();
+            user_status.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
             fakeDateTimeProvider.setCurrentDateTime (currentTime);
 
-            Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
+            Occ.UserStatusSelectorModel model (user_status, std.move (fakeDateTimeProvider));
 
-            //  QCOMPARE (model.clearAt (), _("1 minute"));
+            GLib.assert_cmp (model.clearAt (), _("1 minute"));
         }
  {
-            Occ.UserStatus userStatus;
+            Occ.UserStatus user_status;
             Occ.ClearAt clearAt;
             clearAt.type = Occ.ClearAtType.Timestamp;
-            clearAt.timestamp = currentTime.addSecs (60 * 30).toTime_t ();
-            userStatus.setClearAt (clearAt);
+            clearAt.timestamp = currentTime.add_secs (60 * 30).toTime_t ();
+            user_status.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
             fakeDateTimeProvider.setCurrentDateTime (currentTime);
 
-            Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
+            Occ.UserStatusSelectorModel model (user_status, std.move (fakeDateTimeProvider));
 
-            //  QCOMPARE (model.clearAt (), _("30 minutes"));
+            GLib.assert_cmp (model.clearAt (), _("30 minutes"));
         }
  {
-            Occ.UserStatus userStatus;
+            Occ.UserStatus user_status;
             Occ.ClearAt clearAt;
             clearAt.type = Occ.ClearAtType.Timestamp;
-            clearAt.timestamp = currentTime.addSecs (60 * 60).toTime_t ();
-            userStatus.setClearAt (clearAt);
+            clearAt.timestamp = currentTime.add_secs (60 * 60).toTime_t ();
+            user_status.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
             fakeDateTimeProvider.setCurrentDateTime (currentTime);
 
-            Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
+            Occ.UserStatusSelectorModel model (user_status, std.move (fakeDateTimeProvider));
 
-            //  QCOMPARE (model.clearAt (), _("1 hour"));
+            GLib.assert_cmp (model.clearAt (), _("1 hour"));
         }
  {
-            Occ.UserStatus userStatus;
+            Occ.UserStatus user_status;
             Occ.ClearAt clearAt;
             clearAt.type = Occ.ClearAtType.Timestamp;
-            clearAt.timestamp = currentTime.addSecs (60 * 60 * 4).toTime_t ();
-            userStatus.setClearAt (clearAt);
+            clearAt.timestamp = currentTime.add_secs (60 * 60 * 4).toTime_t ();
+            user_status.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
             fakeDateTimeProvider.setCurrentDateTime (currentTime);
 
-            Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
+            Occ.UserStatusSelectorModel model (user_status, std.move (fakeDateTimeProvider));
 
-            //  QCOMPARE (model.clearAt (), _("4 hours"));
+            GLib.assert_cmp (model.clearAt (), _("4 hours"));
         }
  {
-            Occ.UserStatus userStatus;
+            Occ.UserStatus user_status;
             Occ.ClearAt clearAt;
             clearAt.type = Occ.ClearAtType.Timestamp;
-            clearAt.timestamp = currentTime.addDays (1).toTime_t ();
-            userStatus.setClearAt (clearAt);
+            clearAt.timestamp = currentTime.add_days (1).toTime_t ();
+            user_status.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
             fakeDateTimeProvider.setCurrentDateTime (currentTime);
 
-            Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
+            Occ.UserStatusSelectorModel model (user_status, std.move (fakeDateTimeProvider));
 
-            //  QCOMPARE (model.clearAt (), _("1 day"));
+            GLib.assert_cmp (model.clearAt (), _("1 day"));
         }
  {
-            Occ.UserStatus userStatus;
+            Occ.UserStatus user_status;
             Occ.ClearAt clearAt;
             clearAt.type = Occ.ClearAtType.Timestamp;
-            clearAt.timestamp = currentTime.addDays (7).toTime_t ();
-            userStatus.setClearAt (clearAt);
+            clearAt.timestamp = currentTime.add_days (7).toTime_t ();
+            user_status.setClearAt (clearAt);
 
             var fakeDateTimeProvider = std.make_unique<FakeDateTimeProvider> ();
             fakeDateTimeProvider.setCurrentDateTime (currentTime);
 
-            Occ.UserStatusSelectorModel model (userStatus, std.move (fakeDateTimeProvider));
+            Occ.UserStatusSelectorModel model (user_status, std.move (fakeDateTimeProvider));
 
-            //  QCOMPARE (model.clearAt (), _("7 days"));
+            GLib.assert_cmp (model.clearAt (), _("7 days"));
         }
     }
 
@@ -444,26 +444,26 @@ class TestSetUserStatusDialog : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void testClearAt_clearAtEndOf () { {
-            Occ.UserStatus userStatus;
+            Occ.UserStatus user_status;
             Occ.ClearAt clearAt;
             clearAt.type = Occ.ClearAtType.EndOf;
             clearAt.endof = "day";
-            userStatus.setClearAt (clearAt);
+            user_status.setClearAt (clearAt);
 
-            Occ.UserStatusSelectorModel model (userStatus);
+            Occ.UserStatusSelectorModel model (user_status);
 
-            //  QCOMPARE (model.clearAt (), _("Today"));
+            GLib.assert_cmp (model.clearAt (), _("Today"));
         }
  {
-            Occ.UserStatus userStatus;
+            Occ.UserStatus user_status;
             Occ.ClearAt clearAt;
             clearAt.type = Occ.ClearAtType.EndOf;
             clearAt.endof = "week";
-            userStatus.setClearAt (clearAt);
+            user_status.setClearAt (clearAt);
 
-            Occ.UserStatusSelectorModel model (userStatus);
+            Occ.UserStatusSelectorModel model (user_status);
 
-            //  QCOMPARE (model.clearAt (), _("This week"));
+            GLib.assert_cmp (model.clearAt (), _("This week"));
         }
     }
 
@@ -471,26 +471,26 @@ class TestSetUserStatusDialog : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void testClearAt_clearAtAfterPeriod () { {
-            Occ.UserStatus userStatus;
+            Occ.UserStatus user_status;
             Occ.ClearAt clearAt;
             clearAt.type = Occ.ClearAtType.Period;
             clearAt.period = 60 * 30;
-            userStatus.setClearAt (clearAt);
+            user_status.setClearAt (clearAt);
 
-            Occ.UserStatusSelectorModel model (userStatus);
+            Occ.UserStatusSelectorModel model (user_status);
 
-            //  QCOMPARE (model.clearAt (), _("30 minutes"));
+            GLib.assert_cmp (model.clearAt (), _("30 minutes"));
         }
  {
-            Occ.UserStatus userStatus;
+            Occ.UserStatus user_status;
             Occ.ClearAt clearAt;
             clearAt.type = Occ.ClearAtType.Period;
             clearAt.period = 60 * 60;
-            userStatus.setClearAt (clearAt);
+            user_status.setClearAt (clearAt);
 
-            Occ.UserStatusSelectorModel model (userStatus);
+            Occ.UserStatusSelectorModel model (user_status);
 
-            //  QCOMPARE (model.clearAt (), _("1 hour"));
+            GLib.assert_cmp (model.clearAt (), _("1 hour"));
         }
     }
 
@@ -503,7 +503,7 @@ class TestSetUserStatusDialog : GLib.Object {
 
         model.clearUserStatus ();
 
-        //  QVERIFY (fakeUserStatusJob.messageCleared ());
+        GLib.assert_true (fakeUserStatusJob.messageCleared ());
     }
 
 
@@ -514,7 +514,7 @@ class TestSetUserStatusDialog : GLib.Object {
         fakeUserStatusJob.setErrorCouldNotFetchPredefinedUserStatuses (true);
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
 
-        //  QCOMPARE (model.errorMessage (),
+        GLib.assert_cmp (model.errorMessage (),
             _("Could not fetch predefined statuses. Make sure you are connected to the server."));
     }
 
@@ -526,19 +526,19 @@ class TestSetUserStatusDialog : GLib.Object {
         fakeUserStatusJob.setErrorCouldNotFetchUserStatus (true);
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
 
-        //  QCOMPARE (model.errorMessage (),
+        GLib.assert_cmp (model.errorMessage (),
             _("Could not fetch user status. Make sure you are connected to the server."));
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testError_userStatusNotSupported_emitError () {
+    private void testError_user_statusNotSupported_emitError () {
         var fakeUserStatusJob = std.make_shared<FakeUserStatusConnector> ();
         fakeUserStatusJob.setErrorUserStatusNotSupported (true);
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
 
-        //  QCOMPARE (model.errorMessage (),
+        GLib.assert_cmp (model.errorMessage (),
             _("User status feature is not supported. You will not be able to set your user status."));
     }
 
@@ -551,7 +551,7 @@ class TestSetUserStatusDialog : GLib.Object {
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         model.setUserStatus ();
 
-        //  QCOMPARE (model.errorMessage (),
+        GLib.assert_cmp (model.errorMessage (),
             _("Could not set user status. Make sure you are connected to the server."));
     }
 
@@ -563,7 +563,7 @@ class TestSetUserStatusDialog : GLib.Object {
         fakeUserStatusJob.setErrorEmojisNotSupported (true);
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
 
-        //  QCOMPARE (model.errorMessage (),
+        GLib.assert_cmp (model.errorMessage (),
             _("Emojis feature is not supported. Some user status functionality may not work."));
     }
 
@@ -576,7 +576,7 @@ class TestSetUserStatusDialog : GLib.Object {
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         model.clearUserStatus ();
 
-        //  QCOMPARE (model.errorMessage (),
+        GLib.assert_cmp (model.errorMessage (),
             _("Could not clear user status message. Make sure you are connected to the server."));
     }
 
@@ -589,10 +589,10 @@ class TestSetUserStatusDialog : GLib.Object {
 
         fakeUserStatusJob.setErrorCouldNotSetUserStatusMessage (true);
         model.setUserStatus ();
-        //  QVERIFY (!model.errorMessage ().isEmpty ());
+        GLib.assert_true (!model.errorMessage ().is_empty ());
         fakeUserStatusJob.setErrorCouldNotSetUserStatusMessage (false);
         model.setUserStatus ();
-        //  QVERIFY (model.errorMessage ().isEmpty ());
+        GLib.assert_true (model.errorMessage ().is_empty ());
     }
 
 
@@ -604,10 +604,10 @@ class TestSetUserStatusDialog : GLib.Object {
 
         fakeUserStatusJob.setErrorCouldNotSetUserStatusMessage (true);
         model.setUserStatus ();
-        //  QVERIFY (!model.errorMessage ().isEmpty ());
+        GLib.assert_true (!model.errorMessage ().is_empty ());
         fakeUserStatusJob.setErrorCouldNotSetUserStatusMessage (false);
         model.clearUserStatus ();
-        //  QVERIFY (model.errorMessage ().isEmpty ());
+        GLib.assert_true (model.errorMessage ().is_empty ());
     }
 }
 

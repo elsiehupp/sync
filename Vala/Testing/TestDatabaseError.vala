@@ -51,24 +51,24 @@ class TestDatabaseError : GLib.Object {
 
             if (fake_folder.sync_journal ().autotestFailCounter >= 0) {
                 // No error was thrown, we are on_signal_finished
-                //  QVERIFY (result);
-                //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-                //  QCOMPARE (fake_folder.current_remote_state (), finalState);
+                GLib.assert_true (result);
+                GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+                GLib.assert_cmp (fake_folder.current_remote_state (), finalState);
                 return;
             }
 
             if (!result) {
                 fake_folder.sync_journal ().autotestFailCounter = -1;
                 // Try again
-                //  QVERIFY (fake_folder.sync_once ());
+                GLib.assert_true (fake_folder.sync_once ());
             }
 
-            //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+            GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
             if (count == 0) {
                 finalState = fake_folder.current_remote_state ();
             } else {
                 // the final state should be the same for every iteration
-                //  QCOMPARE (fake_folder.current_remote_state (), finalState);
+                GLib.assert_cmp (fake_folder.current_remote_state (), finalState);
             }
         }
     }

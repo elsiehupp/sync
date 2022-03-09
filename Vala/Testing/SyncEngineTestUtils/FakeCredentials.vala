@@ -61,11 +61,11 @@ class FakeCredentials : Occ.AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public override void invalidateToken () { }
+    public override void invalidate_token () { }
 
     /***********************************************************
     ***********************************************************/
-    public override void forgetSensitiveData () { }
+    public override void forget_sensitive_data () { }
 
 }
 }

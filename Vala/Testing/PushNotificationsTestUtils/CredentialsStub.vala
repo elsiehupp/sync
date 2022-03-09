@@ -75,11 +75,11 @@ class CredentialsStub : Occ.AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public void invalidateToken () { }
+    public void invalidate_token () { }
 
     /***********************************************************
     ***********************************************************/
-    public void forgetSensitiveData () { }
+    public void forget_sensitive_data () { }
 
 }
 }

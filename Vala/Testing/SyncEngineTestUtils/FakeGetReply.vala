@@ -25,7 +25,7 @@ class FakeGetReply : FakeReply {
         open (QIODevice.ReadOnly);
     
         string filename = get_file_path_from_url (request.url ());
-        //  Q_ASSERT (!filename.isEmpty ());
+        GLib.assert_true (!filename.is_empty ());
         file_info = remote_root_file_info.find (filename);
         if (!file_info) {
             GLib.debug ("meh;");
@@ -45,7 +45,7 @@ class FakeGetReply : FakeReply {
         }
         payload = file_info.content_char;
         size = file_info.size;
-        setHeader (Soup.Request.ContentLengthHeader, size);
+        set_header (Soup.Request.ContentLengthHeader, size);
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
         set_raw_header ("OC-ETag", file_info.etag);
         set_raw_header ("ETag", file_info.etag);

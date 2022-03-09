@@ -24,7 +24,7 @@ class DelayedReply : OriginalReply {
     /***********************************************************
     ***********************************************************/
     public void respond () {
-        QTimer.singleShot (this.delay_milliseconds, static_cast<OriginalReply> (this), () => {
+        QTimer.single_shot (this.delay_milliseconds, static_cast<OriginalReply> (this), () => {
             // Explicit call to bases's respond ();
             this.OriginalReply.respond ();
         });

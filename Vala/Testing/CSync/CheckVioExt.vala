@@ -33,7 +33,7 @@ class CheckVioExt {
     const int WD_BUFFER_SIZE = 255;
 
     string csync_test_dir () {
-        return QDir.tempPath () + "/csync_test";
+        return QDir.temporary_path () + "/csync_test";
     }
 
     int oc_mkdir (string path) {
@@ -52,7 +52,7 @@ class CheckVioExt {
     static int wipe_testdir () {
         QDir tmp = new QDir (csync_test_dir ());
         if (tmp.exists ()) {
-            return tmp.removeRecursively () ? 0 : 1;
+            return tmp.remove_recursively () ? 0 : 1;
         }
         return 0;
     }
@@ -61,17 +61,17 @@ class CheckVioExt {
         int rc = 0;
 
         rc = wipe_testdir ();
-        assert_int_equal (rc, 0);
+        GLib.assert_true (rc == 0);
 
         var directory = csync_test_dir ();
         rc = oc_mkdir (directory);
-        assert_int_equal (rc, 0);
+        GLib.assert_true (rc == 0);
 
         assert_non_null (this.tgetcwd (wd_buffer, WD_BUFFER_SIZE));
 
-        rc = this.tchdir (directory.toLocal8Bit ().constData ());
+        rc = this.tchdir (directory.to_local_8_bit ().const_data ());
 
-        assert_int_equal (rc, 0);
+        GLib.assert_true (rc == 0);
 
         /* --- initialize csync */
         var mystate = StateVar ();
@@ -89,12 +89,12 @@ class CheckVioExt {
         output ("================== Tearing down!\n");
 
         rc = this.tchdir (wd_buffer);
-        assert_int_equal (rc, 0);
+        GLib.assert_true (rc == 0);
 
         rc = wipe_testdir ();
-        assert_int_equal (rc, 0);
+        GLib.assert_true (rc == 0);
 
-        delete reinterpret_cast<StateVar> (*state);
+        delete (StateVar) state;
         return 0;
     }
 
@@ -104,7 +104,7 @@ class CheckVioExt {
     ***********************************************************/
     static void create_dirs (string path) {
         int rc = -1;
-        var mypath = "%1/%2".arg (csync_test_dir (), string.fromUtf8 (path)).toUtf8 ();
+        var mypath = "%1/%2".arg (csync_test_dir (), path);
         char mypath = mypath.data ();
 
         char p = mypath + csync_test_dir ().size () + 1; /* on_signal_start behind the offset */
@@ -116,12 +116,12 @@ class CheckVioExt {
             if ( * (p+i) == '/' ) {
                 p[i] = '\0';
 
-                var mb_dir = string.fromUtf8 (mypath);
+                var mb_dir = mypath;
                 rc = oc_mkdir (mb_dir);
                 if (rc) {
                     rc = errno;
                 }
-                assert_int_equal (rc, 0);
+                GLib.assert_true (rc == 0);
                 p[i] = '/';
             }
             i++;
@@ -154,12 +154,12 @@ class CheckVioExt {
         Occ.Vfs vfs = null;
         while ( (dirent = csync_vio_local_readdir (dh, vfs)) ) {
             assert_non_null (dirent.get ());
-            if (!dirent.original_path.isEmpty ()) {
+            if (!dirent.original_path.is_empty ()) {
                 sv.ignored_dir = dirent.original_path;
                 continue;
             }
 
-            assert_false (dirent.path.isEmpty ());
+            assert_false (dirent.path.is_empty ());
 
             if ( dirent.path == ".." || dirent.path == "." ) {
             continue;
@@ -167,11 +167,11 @@ class CheckVioExt {
 
             is_dir = (dirent.type == ItemTypeDirectory) ? 1:0;
 
-            subdir = directory.toUtf8 () + "/" + dirent.path;
+            subdir = directory + "/" + dirent.path;
             subdir_out = (is_dir ? "<DIR> ":"      ") + subdir;
 
             if ( is_dir ) {
-                if ( sv.result.isNull () ) {
+                if ( sv.result.is_null () ) {
                 sv.result = subdir_out;
                 } else {
                 sv.result += subdir_out;
@@ -179,20 +179,20 @@ class CheckVioExt {
             } else {
                 *count = *count +1;
             }
-            output (subdir_out.constData ());
+            output (subdir_out.const_data ());
             if ( is_dir ) {
-                traverse_dir (state, string.fromUtf8 (subdir), count);
+                traverse_dir (state, subdir, count);
             }
         }
 
         rc = csync_vio_local_closedir (dh);
-        assert_int_equal (rc, 0);
+        GLib.assert_true (rc == 0);
 
     }
 
     static void create_file (string path, string name, string content) {
-        GLib.File file = GLib.File.new_for_path ("%1/%2%3".arg (csync_test_dir (), string.fromUtf8 (path), string.fromUtf8 (name)));
-        assert_int_equal (1, file.open (QIODevice.WriteOnly | QIODevice.NewOnly));
+        GLib.File file = GLib.File.new_for_path ("%1/%2%3".arg (csync_test_dir (), path, name));
+        GLib.assert_true (1 == file.open (QIODevice.WriteOnly | QIODevice.NewOnly));
         file.write (content);
     }
 
@@ -201,25 +201,24 @@ class CheckVioExt {
 
         const string t1 = "alibaba/und/die/vierzig/räuber/";
         create_dirs ( t1 );
-        int files_cnt = 0;
+        int file_count = 0;
 
-        traverse_dir (state, csync_test_dir (), files_cnt);
+        traverse_dir (state, csync_test_dir (), file_count);
 
-        assert_string_equal (sv.result.constData (),
-            string.fromUtf8 ("<DIR> %1/alibaba"
-                            + "<DIR> %1/alibaba/und"
-                            + "<DIR> %1/alibaba/und/die"
-                            + "<DIR> %1/alibaba/und/die/vierzig"
-                            + "<DIR> %1/alibaba/und/die/vierzig/räuber")
-                .arg (csync_test_dir ())
-                .toUtf8 ()
-                .constData ());
-        assert_int_equal (files_cnt, 0);
+        GLib.assert_true (sv.result.const_data () ==
+            "<DIR> %1/alibaba"
+            + "<DIR> %1/alibaba/und"
+            + "<DIR> %1/alibaba/und/die"
+            + "<DIR> %1/alibaba/und/die/vierzig"
+            + "<DIR> %1/alibaba/und/die/vierzig/räuber"
+            .arg (csync_test_dir ())
+            .const_data ());
+        GLib.assert_true (file_count == 0);
     }
 
     static void check_readdir_with_content (void **state) {
         var sv = (StateVar*) *state;
-        int files_cnt = 0;
+        int file_count = 0;
 
         const string t1 = "warum/nur/40/Räuber/";
         create_dirs ( t1 );
@@ -227,19 +226,18 @@ class CheckVioExt {
         create_file ( t1, "Räuber Max.txt", "Der Max ist ein schlimmer finger");
         create_file ( t1, "пя́тница.txt", "Am Freitag tanzt der Ürk");
 
-        traverse_dir (state, csync_test_dir (), files_cnt);
+        traverse_dir (state, csync_test_dir (), file_count);
 
-        assert_string_equal (sv.result.constData (),
-            string.fromUtf8 ("<DIR> %1/warum"
-                            + "<DIR> %1/warum/nur"
-                            + "<DIR> %1/warum/nur/40"
-                            + "<DIR> %1/warum/nur/40/Räuber")
+        GLib.assert_true (sv.result.const_data () ==
+            "<DIR> %1/warum"
+            + "<DIR> %1/warum/nur"
+            + "<DIR> %1/warum/nur/40"
+            + "<DIR> %1/warum/nur/40/Räuber"
                 .arg (csync_test_dir ())
-                .toUtf8 ()
-                .constData ());
+                .const_data ());
         /*                   "      %1/warum/nur/40/Räuber/Räuber Max.txt"
                             "      %1/warum/nur/40/Räuber/пя́тница.txt"; */
-        assert_int_equal (files_cnt, 2); /* Two files in the sub directory */
+        GLib.assert_true (file_count == 2); /* Two files in the sub directory */
     }
 
     static void check_readdir_longtree (void **state) {
@@ -301,11 +299,11 @@ class CheckVioExt {
 
         /* assemble the result string ... */
         const string result = r1 + r2 + r3;
-        int files_cnt = 0;
-        traverse_dir (state, csync_test_dir (), files_cnt);
-        assert_int_equal (files_cnt, 0);
+        int file_count = 0;
+        traverse_dir (state, csync_test_dir (), file_count);
+        GLib.assert_true (file_count == 0);
         /* and compare. */
-        assert_string_equal (sv.result.constData (), result.constData ());
+        GLib.assert_string_equal (sv.result.const_data (), result.const_data ());
     }
 
     // https://github.com/owncloud/client/issues/3128 https://github.com/owncloud/client/issues/2777
@@ -318,22 +316,22 @@ class CheckVioExt {
 
         string p = "%1/%2".arg (csync_test_dir (), "goodone/");
         int rc = oc_mkdir (p);
-        assert_int_equal (rc, 0);
+        GLib.assert_true (rc == 0);
 
         p = "%1/goodone/ugly\xEF\xBB\xBF\x32.txt".arg (csync_test_dir ()); // file with encoding error
 
         rc = oc_mkdir (p);
 
-        assert_int_equal (rc, 0);
+        GLib.assert_true (rc == 0);
 
-        int files_cnt = 0;
-        traverse_dir (state, csync_test_dir (), files_cnt);
-        const var expected_result = "<DIR> %1/goodone"
+        int file_count = 0;
+        traverse_dir (state, csync_test_dir (), file_count);
+        var expected_result = "<DIR> %1/goodone"
                                 + "<DIR> %1/goodone/ugly\xEF\xBB\xBF\x32.txt"
                                 .arg (csync_test_dir ());
-        assert_string_equal (sv.result.constData (), expected_result.toUtf8 ().constData ());
+        GLib.assert_string_equal (sv.result.const_data (), expected_result.const_data ());
 
-        assert_int_equal (files_cnt, 0);
+        GLib.assert_true (file_count == 0);
     }
 
     CMUnitTest[] tests;

@@ -27,7 +27,7 @@ class TestTheme : GLib.Object {
 
         const string icon_path = Occ.Theme.hidpiFileName (icon_name + ".png", background_color, paint_device);
 
-        //  QCOMPARE (icon_path, ":/client/theme/white/" + icon_name + ".png");
+        GLib.assert_cmp (icon_path, ":/client/theme/white/" + icon_name + ".png");
     }
 
 
@@ -38,9 +38,9 @@ class TestTheme : GLib.Object {
         const Gtk.Color background_color = new Gtk.Color ("#ffffff");
         const string icon_name = "icon-name";
 
-        const var icon_path = Occ.Theme.hidpiFileName (icon_name + ".png", background_color, paint_device);
+        var icon_path = Occ.Theme.hidpiFileName (icon_name + ".png", background_color, paint_device);
 
-        //  QCOMPARE (icon_path, ":/client/theme/black/" + icon_name + ".png");
+        GLib.assert_cmp (icon_path, ":/client/theme/black/" + icon_name + ".png");
     }
 
 
@@ -52,9 +52,9 @@ class TestTheme : GLib.Object {
         const Gtk.Color background_color = new Gtk.Color ("#000000");
         const string icon_name = "wizard-files";
 
-        const var icon_path = Occ.Theme.hidpiFileName (icon_name + ".png", background_color, paint_device);
+        var icon_path = Occ.Theme.hidpiFileName (icon_name + ".png", background_color, paint_device);
 
-        //  QCOMPARE (icon_path, ":/client/theme/white/" + icon_name + "@2x.png");
+        GLib.assert_cmp (icon_path, ":/client/theme/white/" + icon_name + "@2x.png");
     }
 
 
@@ -63,9 +63,9 @@ class TestTheme : GLib.Object {
     private void on_signal_test_is_dark_color_nextcloud_blue_return_true () {
         const Gtk.Color color = new Gtk.Color (0, 130, 201);
 
-        const var result = Occ.Theme.isDarkColor (color);
+        var result = Occ.Theme.isDarkColor (color);
 
-        //  QCOMPARE (result, true);
+        GLib.assert_cmp (result, true);
     }
 
 
@@ -74,9 +74,9 @@ class TestTheme : GLib.Object {
     private void on_signal_test_is_dark_color_light_color_return_false () {
         const Gtk.Color color = new Gtk.Color (255, 255, 255);
 
-        const var result = Occ.Theme.isDarkColor (color);
+        var result = Occ.Theme.isDarkColor (color);
 
-        //  QCOMPARE (result, false);
+        GLib.assert_cmp (result, false);
     }
 
 
@@ -85,9 +85,9 @@ class TestTheme : GLib.Object {
     private void on_signal_test_is_dark_color_dark_color_return_true () {
         const Gtk.Color color = new Gtk.Color (0, 0, 0);
 
-        const var result = Occ.Theme.isDarkColor (color);
+        var result = Occ.Theme.isDarkColor (color);
 
-        //  QCOMPARE (result, true);
+        GLib.assert_cmp (result, true);
     }
 
 
@@ -97,14 +97,14 @@ class TestTheme : GLib.Object {
         FakePaintDevice paint_device;
         paint_device.set_hidpi (true);
 
-        //  QCOMPARE (Occ.Theme.isHidpi (&paint_device), true);
+        GLib.assert_cmp (Occ.Theme.isHidpi (&paint_device), true);
     }
 
-    void testIsHidpi_lowdpi_returnFalse () {
+    void testIsHidpi_lowdpi_return_false () {
         FakePaintDevice paint_device;
         paint_device.set_hidpi (false);
 
-        //  QCOMPARE (Occ.Theme.isHidpi (&paint_device), false);
+        GLib.assert_cmp (Occ.Theme.isHidpi (&paint_device), false);
     }
 }
 }

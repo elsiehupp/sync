@@ -12,7 +12,7 @@ using Occ;
 namespace Testing {
 
 bool itemDidComplete (ItemCompletedSpy spy, string path) {
-    var item = spy.findItem (path);
+    var item = spy.find_item (path);
     if (item) {
         return item.instruction != CSYNC_INSTRUCTION_NONE && item.instruction != CSYNC_INSTRUCTION_UPDATE_METADATA;
     }
@@ -20,12 +20,12 @@ bool itemDidComplete (ItemCompletedSpy spy, string path) {
 }
 
 bool itemInstruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
-    var item = spy.findItem (path);
+    var item = spy.find_item (path);
     return item.instruction == instr;
 }
 
 bool itemDidCompleteSuccessfully (ItemCompletedSpy spy, string path) {
-    var item = spy.findItem (path);
+    var item = spy.find_item (path);
     if (item) {
         return item.status == SyncFileItem.Status.SUCCESS;
     }
@@ -33,7 +33,7 @@ bool itemDidCompleteSuccessfully (ItemCompletedSpy spy, string path) {
 }
 
 bool itemDidCompleteSuccessfullyWithExpectedRank (ItemCompletedSpy spy, string path, int rank) {
-    var item = spy.findItemWithExpectedRank (path, rank);
+    var item = spy.find_item_with_expected_rank (path, rank);
     if (item) {
         return item.status == SyncFileItem.Status.SUCCESS;
     }
@@ -57,23 +57,23 @@ class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void on_testFileDownload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        ItemCompletedSpy completeSpy (fake_folder);
+        ItemCompletedSpy complete_spy (fake_folder);
         fake_folder.remote_modifier ().insert ("A/a0");
         fake_folder.sync_once ();
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "A/a0"));
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "A/a0"));
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testFileUpload () {
+    private void test_file_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        ItemCompletedSpy completeSpy (fake_folder);
+        ItemCompletedSpy complete_spy (fake_folder);
         fake_folder.local_modifier ().insert ("A/a0");
         fake_folder.sync_once ();
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "A/a0"));
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "A/a0"));
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
 
@@ -81,15 +81,15 @@ class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void testDirDownload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        ItemCompletedSpy completeSpy (fake_folder);
+        ItemCompletedSpy complete_spy (fake_folder);
         fake_folder.remote_modifier ().mkdir ("Y");
         fake_folder.remote_modifier ().mkdir ("Z");
         fake_folder.remote_modifier ().insert ("Z/d0");
         fake_folder.sync_once ();
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "Y"));
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "Z"));
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "Z/d0"));
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "Y"));
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "Z"));
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "Z/d0"));
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
 
@@ -97,15 +97,15 @@ class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void testDirUpload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        ItemCompletedSpy completeSpy (fake_folder);
+        ItemCompletedSpy complete_spy (fake_folder);
         fake_folder.local_modifier ().mkdir ("Y");
         fake_folder.local_modifier ().mkdir ("Z");
         fake_folder.local_modifier ().insert ("Z/d0");
         fake_folder.sync_once ();
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "Y"));
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "Z"));
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "Z/d0"));
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "Y"));
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "Z"));
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "Z/d0"));
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
 
@@ -113,9 +113,9 @@ class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void testDirUploadWithDelayedAlgorithm () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"bulkupload", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"bulkupload", "1.0"} } } });
 
-        ItemCompletedSpy completeSpy (fake_folder);
+        ItemCompletedSpy complete_spy (fake_folder);
         fake_folder.local_modifier ().mkdir ("Y");
         fake_folder.local_modifier ().insert ("Y/d0");
         fake_folder.local_modifier ().mkdir ("Z");
@@ -125,21 +125,21 @@ class TestSyncEngine : GLib.Object {
         fake_folder.local_modifier ().insert ("r0");
         fake_folder.local_modifier ().insert ("r1");
         fake_folder.sync_once ();
-        //  QVERIFY (itemDidCompleteSuccessfullyWithExpectedRank (completeSpy, "Y", 0));
-        //  QVERIFY (itemDidCompleteSuccessfullyWithExpectedRank (completeSpy, "Z", 1));
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "Y/d0"));
-        //  QVERIFY (itemSuccessfullyCompletedGetRank (completeSpy, "Y/d0") > 1);
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "Z/d0"));
-        //  QVERIFY (itemSuccessfullyCompletedGetRank (completeSpy, "Z/d0") > 1);
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "A/a0"));
-        //  QVERIFY (itemSuccessfullyCompletedGetRank (completeSpy, "A/a0") > 1);
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "B/b0"));
-        //  QVERIFY (itemSuccessfullyCompletedGetRank (completeSpy, "B/b0") > 1);
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "r0"));
-        //  QVERIFY (itemSuccessfullyCompletedGetRank (completeSpy, "r0") > 1);
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "r1"));
-        //  QVERIFY (itemSuccessfullyCompletedGetRank (completeSpy, "r1") > 1);
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (itemDidCompleteSuccessfullyWithExpectedRank (complete_spy, "Y", 0));
+        GLib.assert_true (itemDidCompleteSuccessfullyWithExpectedRank (complete_spy, "Z", 1));
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "Y/d0"));
+        GLib.assert_true (itemSuccessfullyCompletedGetRank (complete_spy, "Y/d0") > 1);
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "Z/d0"));
+        GLib.assert_true (itemSuccessfullyCompletedGetRank (complete_spy, "Z/d0") > 1);
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "A/a0"));
+        GLib.assert_true (itemSuccessfullyCompletedGetRank (complete_spy, "A/a0") > 1);
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "B/b0"));
+        GLib.assert_true (itemSuccessfullyCompletedGetRank (complete_spy, "B/b0") > 1);
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "r0"));
+        GLib.assert_true (itemSuccessfullyCompletedGetRank (complete_spy, "r0") > 1);
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "r1"));
+        GLib.assert_true (itemSuccessfullyCompletedGetRank (complete_spy, "r1") > 1);
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
 
@@ -147,11 +147,11 @@ class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void testLocalDelete () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        ItemCompletedSpy completeSpy (fake_folder);
+        ItemCompletedSpy complete_spy (fake_folder);
         fake_folder.remote_modifier ().remove ("A/a1");
         fake_folder.sync_once ();
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "A/a1"));
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "A/a1"));
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
 
@@ -159,11 +159,11 @@ class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void testRemoteDelete () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        ItemCompletedSpy completeSpy (fake_folder);
+        ItemCompletedSpy complete_spy (fake_folder);
         fake_folder.local_modifier ().remove ("A/a1");
         fake_folder.sync_once ();
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "A/a1"));
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "A/a1"));
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
 
@@ -181,18 +181,18 @@ class TestSyncEngine : GLib.Object {
 
         var getDbChecksum = [&] (string path) {
             SyncJournalFileRecord record;
-            fake_folder.sync_journal ().getFileRecord (path, record);
-            return record.checksumHeader;
+            fake_folder.sync_journal ().get_file_record (path, record);
+            return record.checksum_header;
         }
 
         // printf 'A%.0s' {1..64} | sha1sum -
         GLib.ByteArray referenceChecksum ("SHA1:30b86e44e6001403827a62c58b08893e77cf121f");
-        //  QCOMPARE (getDbChecksum ("a1.eml"), referenceChecksum);
-        //  QCOMPARE (getDbChecksum ("a2.eml"), referenceChecksum);
-        //  QCOMPARE (getDbChecksum ("a3.eml"), referenceChecksum);
-        //  QCOMPARE (getDbChecksum ("b3.txt"), referenceChecksum);
+        GLib.assert_cmp (getDbChecksum ("a1.eml"), referenceChecksum);
+        GLib.assert_cmp (getDbChecksum ("a2.eml"), referenceChecksum);
+        GLib.assert_cmp (getDbChecksum ("a3.eml"), referenceChecksum);
+        GLib.assert_cmp (getDbChecksum ("b3.txt"), referenceChecksum);
 
-        ItemCompletedSpy completeSpy (fake_folder);
+        ItemCompletedSpy complete_spy (fake_folder);
         // Touch the file without changing the content, shouldn't upload
         fake_folder.local_modifier ().set_contents ("a1.eml", 'A');
         // Change the content/size
@@ -201,15 +201,15 @@ class TestSyncEngine : GLib.Object {
         fake_folder.local_modifier ().append_byte ("b3.txt");
         fake_folder.sync_once ();
 
-        //  QCOMPARE (getDbChecksum ("a1.eml"), referenceChecksum);
-        //  QCOMPARE (getDbChecksum ("a2.eml"), GLib.ByteArray ("SHA1:84951fc23a4dafd10020ac349da1f5530fa65949"));
-        //  QCOMPARE (getDbChecksum ("a3.eml"), GLib.ByteArray ("SHA1:826b7e7a7af8a529ae1c7443c23bf185c0ad440c"));
-        //  QCOMPARE (getDbChecksum ("b3.eml"), getDbChecksum ("a3.txt"));
+        GLib.assert_cmp (getDbChecksum ("a1.eml"), referenceChecksum);
+        GLib.assert_cmp (getDbChecksum ("a2.eml"), GLib.ByteArray ("SHA1:84951fc23a4dafd10020ac349da1f5530fa65949"));
+        GLib.assert_cmp (getDbChecksum ("a3.eml"), GLib.ByteArray ("SHA1:826b7e7a7af8a529ae1c7443c23bf185c0ad440c"));
+        GLib.assert_cmp (getDbChecksum ("b3.eml"), getDbChecksum ("a3.txt"));
 
-        //  QVERIFY (!itemDidComplete (completeSpy, "a1.eml"));
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "a2.eml"));
-        //  QVERIFY (itemDidCompleteSuccessfully (completeSpy, "a3.eml"));
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (!itemDidComplete (complete_spy, "a1.eml"));
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "a2.eml"));
+        GLib.assert_true (itemDidCompleteSuccessfully (complete_spy, "a3.eml"));
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
 
@@ -240,20 +240,20 @@ class TestSyncEngine : GLib.Object {
             })
         }));
 
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
         var expectedServerState = fake_folder.current_remote_state ();
 
         // Remove subFolderA with selectiveSync:
-        fake_folder.sync_engine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {"parentFolder/subFolderA/"});
+        fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {"parentFolder/subFolderA/"});
         fake_folder.sync_engine ().journal ().schedulePathForRemoteDiscovery (QByteArrayLiteral ("parentFolder/subFolderA/"));
         var getEtag = (GLib.ByteArray file) => {
             SyncJournalFileRecord record;
-            fake_folder.sync_journal ().getFileRecord (file, record);
+            fake_folder.sync_journal ().get_file_record (file, record);
             return record.etag;
         }
-        //  QVERIFY (getEtag ("parentFolder") == "this.invalid_");
-        //  QVERIFY (getEtag ("parentFolder/subFolderA") == "this.invalid_");
-        //  QVERIFY (getEtag ("parentFolder/subFolderA/subsubFolder") != "this.invalid_");
+        GLib.assert_true (getEtag ("parentFolder") == "this.invalid_");
+        GLib.assert_true (getEtag ("parentFolder/subFolderA") == "this.invalid_");
+        GLib.assert_true (getEtag ("parentFolder/subFolderA/subsubFolder") != "this.invalid_");
 
         // But touch local file before the next sync, such that the local folder
         // can't be removed
@@ -269,18 +269,18 @@ class TestSyncEngine : GLib.Object {
             fake_folder.sync_once ();
  {
                 // Nothing changed on the server
-                //  QCOMPARE (fake_folder.current_remote_state (), expectedServerState);
+                GLib.assert_cmp (fake_folder.current_remote_state (), expectedServerState);
                 // The local state should still have subFolderA
                 var local = fake_folder.current_local_state ();
-                //  QVERIFY (local.find ("parentFolder/subFolderA"));
-                //  QVERIFY (!local.find ("parentFolder/subFolderA/fileA.txt"));
-                //  QVERIFY (local.find ("parentFolder/subFolderA/fileB.txt"));
-                //  QVERIFY (!local.find ("parentFolder/subFolderA/subsubFolder/fileC.txt"));
-                //  QVERIFY (local.find ("parentFolder/subFolderA/subsubFolder/fileD.txt"));
-                //  QVERIFY (!local.find ("parentFolder/subFolderA/anotherFolder/subsubFolder/fileE.txt"));
-                //  QVERIFY (local.find ("parentFolder/subFolderA/anotherFolder/subsubFolder/fileF.txt"));
-                //  QVERIFY (!local.find ("parentFolder/subFolderA/anotherFolder/emptyFolder"));
-                //  QVERIFY (local.find ("parentFolder/subFolderB"));
+                GLib.assert_true (local.find ("parentFolder/subFolderA"));
+                GLib.assert_true (!local.find ("parentFolder/subFolderA/fileA.txt"));
+                GLib.assert_true (local.find ("parentFolder/subFolderA/fileB.txt"));
+                GLib.assert_true (!local.find ("parentFolder/subFolderA/subsubFolder/fileC.txt"));
+                GLib.assert_true (local.find ("parentFolder/subFolderA/subsubFolder/fileD.txt"));
+                GLib.assert_true (!local.find ("parentFolder/subFolderA/anotherFolder/subsubFolder/fileE.txt"));
+                GLib.assert_true (local.find ("parentFolder/subFolderA/anotherFolder/subsubFolder/fileF.txt"));
+                GLib.assert_true (!local.find ("parentFolder/subFolderA/anotherFolder/emptyFolder"));
+                GLib.assert_true (local.find ("parentFolder/subFolderB"));
             }
         }
     }
@@ -296,8 +296,8 @@ class TestSyncEngine : GLib.Object {
         // This should be aborted and would otherwise fail in FileInfo.create.
         fake_folder.local_modifier ().insert ("NewFolder/NewFile");
         fake_folder.sync_once ();
-        //  QCOMPARE (finishedSpy.size (), 1);
-        //  QCOMPARE (finishedSpy.first ().first ().to_bool (), false);
+        GLib.assert_cmp (finishedSpy.size (), 1);
+        GLib.assert_cmp (finishedSpy.first ().first ().to_bool (), false);
     }
 
     /** Verify that an incompletely propagated directory doesn't have the server's
@@ -308,13 +308,13 @@ class TestSyncEngine : GLib.Object {
         fake_folder.server_error_paths ().append ("NewFolder/foo");
         fake_folder.remote_modifier ().mkdir ("NewFolder");
         fake_folder.remote_modifier ().insert ("NewFolder/foo");
-        //  QVERIFY (!fake_folder.sync_once ());
+        GLib.assert_true (!fake_folder.sync_once ());
 
         SyncJournalFileRecord record;
-        fake_folder.sync_journal ().getFileRecord (QByteArrayLiteral ("NewFolder"), record);
-        //  QVERIFY (record.isValid ());
-        //  QCOMPARE (record.etag, QByteArrayLiteral ("this.invalid_"));
-        //  QVERIFY (!record.file_identifier.isEmpty ());
+        fake_folder.sync_journal ().get_file_record (QByteArrayLiteral ("NewFolder"), record);
+        GLib.assert_true (record.is_valid ());
+        GLib.assert_cmp (record.etag, QByteArrayLiteral ("this.invalid_"));
+        GLib.assert_true (!record.file_identifier.is_empty ());
     }
 
 
@@ -322,7 +322,7 @@ class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void testDirDownloadWithError () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        ItemCompletedSpy completeSpy (fake_folder);
+        ItemCompletedSpy complete_spy (fake_folder);
         fake_folder.remote_modifier ().mkdir ("Y");
         fake_folder.remote_modifier ().mkdir ("Y/Z");
         fake_folder.remote_modifier ().insert ("Y/Z/d0");
@@ -337,21 +337,21 @@ class TestSyncEngine : GLib.Object {
         fake_folder.remote_modifier ().insert ("Y/Z/d9");
         fake_folder.server_error_paths ().append ("Y/Z/d2", 503);
         fake_folder.server_error_paths ().append ("Y/Z/d3", 503);
-        //  QVERIFY (!fake_folder.sync_once ());
+        GLib.assert_true (!fake_folder.sync_once ());
         QCoreApplication.processEvents (); // should not crash
 
         GLib.Set<string> seen;
-        for (GLib.List<GLib.Variant> args : completeSpy) {
+        for (GLib.List<GLib.Variant> args : complete_spy) {
             var item = args[0].value<SyncFileItemPtr> ();
             GLib.debug () + item.file + item.isDirectory () + item.status;
-            //  QVERIFY (!seen.contains (item.file)); // signal only sent once per item
+            GLib.assert_true (!seen.contains (item.file)); // signal only sent once per item
             seen.insert (item.file);
             if (item.file == "Y/Z/d2") {
-                //  QVERIFY (item.status == SyncFileItem.Status.NORMAL_ERROR);
+                GLib.assert_true (item.status == SyncFileItem.Status.NORMAL_ERROR);
             } else if (item.file == "Y/Z/d3") {
-                //  QVERIFY (item.status != SyncFileItem.Status.SUCCESS);
+                GLib.assert_true (item.status != SyncFileItem.Status.SUCCESS);
             } else if (!item.isDirectory ()) {
-                //  QVERIFY (item.status == SyncFileItem.Status.SUCCESS);
+                GLib.assert_true (item.status == SyncFileItem.Status.SUCCESS);
             }
         }
     }
@@ -360,40 +360,40 @@ class TestSyncEngine : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void testFakeConflict_data () {
-        QTest.addColumn<bool> ("sameMtime");
-        QTest.addColumn<GLib.ByteArray> ("checksums");
+        QTest.add_column<bool> ("sameMtime");
+        QTest.add_column<GLib.ByteArray> ("checksums");
 
-        QTest.addColumn<int> ("expectedGET");
+        QTest.add_column<int> ("expectedGET");
 
-        QTest.newRow ("Same mtime, but no server checksum . ignored in reconcile")
+        QTest.new_row ("Same mtime, but no server checksum . ignored in reconcile")
             + true + GLib.ByteArray ()
             << 0;
 
-        QTest.newRow ("Same mtime, weak server checksum differ . downloaded")
+        QTest.new_row ("Same mtime, weak server checksum differ . downloaded")
             + true + GLib.ByteArray ("Adler32:bad")
             << 1;
 
-        QTest.newRow ("Same mtime, matching weak checksum . skipped")
+        QTest.new_row ("Same mtime, matching weak checksum . skipped")
             + true + GLib.ByteArray ("Adler32:2a2010d")
             << 0;
 
-        QTest.newRow ("Same mtime, strong server checksum differ . downloaded")
+        QTest.new_row ("Same mtime, strong server checksum differ . downloaded")
             + true + GLib.ByteArray ("SHA1:bad")
             << 1;
 
-        QTest.newRow ("Same mtime, matching strong checksum . skipped")
+        QTest.new_row ("Same mtime, matching strong checksum . skipped")
             + true + GLib.ByteArray ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
             << 0;
 
-        QTest.newRow ("mtime changed, but no server checksum . download")
+        QTest.new_row ("mtime changed, but no server checksum . download")
             + false + GLib.ByteArray ()
             << 1;
 
-        QTest.newRow ("mtime changed, weak checksum match . download anyway")
+        QTest.new_row ("mtime changed, weak checksum match . download anyway")
             + false + GLib.ByteArray ("Adler32:2a2010d")
             << 1;
 
-        QTest.newRow ("mtime changed, strong checksum match . skip")
+        QTest.new_row ("mtime changed, strong checksum match . skip")
             + false + GLib.ByteArray ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
             << 0;
     }
@@ -402,16 +402,16 @@ class TestSyncEngine : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void testFakeConflict () {
-        //  QFETCH (bool, sameMtime);
-        //  QFETCH (GLib.ByteArray, checksums);
-        //  QFETCH (int, expectedGET);
+        QFETCH (bool, sameMtime);
+        QFETCH (GLib.ByteArray, checksums);
+        QFETCH (int, expectedGET);
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
-        int nGET = 0;
+        int n_get = 0;
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request &, QIODevice *) {
             if (operation == Soup.GetOperation)
-                ++nGET;
+                ++n_get;
             return null;
         });
 
@@ -419,28 +419,28 @@ class TestSyncEngine : GLib.Object {
         var remoteInfo = fake_folder.remote_modifier ();
 
         // Base mtime with no ms content (filesystem is seconds only)
-        var mtime = GLib.DateTime.currentDateTimeUtc ().addDays (-4);
-        mtime.setMSecsSinceEpoch (mtime.toMSecsSinceEpoch () / 1000 * 1000);
+        var mtime = GLib.DateTime.current_date_time_utc ().add_days (-4);
+        mtime.setMSecsSinceEpoch (mtime.to_m_secs_since_epoch () / 1000 * 1000);
 
         fake_folder.local_modifier ().set_contents ("A/a1", 'C');
         fake_folder.local_modifier ().set_modification_time ("A/a1", mtime);
         fake_folder.remote_modifier ().set_contents ("A/a1", 'C');
         if (!sameMtime)
-            mtime = mtime.addDays (1);
+            mtime = mtime.add_days (1);
         fake_folder.remote_modifier ().set_modification_time ("A/a1", mtime);
         remoteInfo.find ("A/a1").checksums = checksums;
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (nGET, expectedGET);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (n_get, expectedGET);
 
         // check that mtime in journal and filesystem agree
         string a1path = fake_folder.local_path () + "A/a1";
         SyncJournalFileRecord a1record;
-        fake_folder.sync_journal ().getFileRecord (GLib.ByteArray ("A/a1"), a1record);
-        //  QCOMPARE (a1record.modtime, (int64)FileSystem.getModTime (a1path));
+        fake_folder.sync_journal ().get_file_record (GLib.ByteArray ("A/a1"), a1record);
+        GLib.assert_cmp (a1record.modtime, (int64)FileSystem.getModTime (a1path));
 
         // Extra sync reads from database, no difference
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (nGET, expectedGET);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (n_get, expectedGET);
     }
 
 
@@ -449,14 +449,14 @@ class TestSyncEngine : GLib.Object {
      * of propagation.
      */
     private void testSyncFileItemProperties () {
-        var initialMtime = GLib.DateTime.currentDateTimeUtc ().addDays (-7);
-        var changedMtime = GLib.DateTime.currentDateTimeUtc ().addDays (-4);
-        var changedMtime2 = GLib.DateTime.currentDateTimeUtc ().addDays (-3);
+        var initialMtime = GLib.DateTime.current_date_time_utc ().add_days (-7);
+        var changedMtime = GLib.DateTime.current_date_time_utc ().add_days (-4);
+        var changedMtime2 = GLib.DateTime.current_date_time_utc ().add_days (-3);
 
         // Base mtime with no ms content (filesystem is seconds only)
-        initialMtime.setMSecsSinceEpoch (initialMtime.toMSecsSinceEpoch () / 1000 * 1000);
-        changedMtime.setMSecsSinceEpoch (changedMtime.toMSecsSinceEpoch () / 1000 * 1000);
-        changedMtime2.setMSecsSinceEpoch (changedMtime2.toMSecsSinceEpoch () / 1000 * 1000);
+        initialMtime.setMSecsSinceEpoch (initialMtime.to_m_secs_since_epoch () / 1000 * 1000);
+        changedMtime.setMSecsSinceEpoch (changedMtime.to_m_secs_since_epoch () / 1000 * 1000);
+        changedMtime2.setMSecsSinceEpoch (changedMtime2.to_m_secs_since_epoch () / 1000 * 1000);
 
         // Ensure the initial mtimes are as expected
         var initialFileInfo = FileInfo.A12_B12_C12_S12 ();
@@ -479,7 +479,7 @@ class TestSyncEngine : GLib.Object {
         fake_folder.remote_modifier ().append_byte ("C/c1");
         fake_folder.remote_modifier ().set_modification_time ("C/c1", changedMtime2);
 
-        connect (&fake_folder.sync_engine (), &SyncEngine.aboutToPropagate, [&] (SyncFileItemVector items) {
+        connect (&fake_folder.sync_engine (), &SyncEngine.about_to_propagate, [&] (SyncFileItemVector items) {
             SyncFileItemPtr a1, b1, c1;
             for (var item : items) {
                 if (item.file == "A/a1")
@@ -491,35 +491,35 @@ class TestSyncEngine : GLib.Object {
             }
 
             // a1 : should have local size and modtime
-            //  QVERIFY (a1);
-            //  QCOMPARE (a1.instruction, CSYNC_INSTRUCTION_SYNC);
-            //  QCOMPARE (a1.direction, SyncFileItem.Direction.UP);
-            //  QCOMPARE (a1.size, int64 (5));
+            GLib.assert_true (a1);
+            GLib.assert_cmp (a1.instruction, CSYNC_INSTRUCTION_SYNC);
+            GLib.assert_cmp (a1.direction, SyncFileItem.Direction.UP);
+            GLib.assert_cmp (a1.size, int64 (5));
 
-            //  QCOMPARE (Utility.qDateTimeFromTime_t (a1.modtime), changedMtime);
-            //  QCOMPARE (a1.previousSize, int64 (4));
-            //  QCOMPARE (Utility.qDateTimeFromTime_t (a1.previousModtime), initialMtime);
+            GLib.assert_cmp (Utility.date_time_from_time_t (a1.modtime), changedMtime);
+            GLib.assert_cmp (a1.previousSize, int64 (4));
+            GLib.assert_cmp (Utility.date_time_from_time_t (a1.previousModtime), initialMtime);
 
             // b2 : should have remote size and modtime
-            //  QVERIFY (b1);
-            //  QCOMPARE (b1.instruction, CSYNC_INSTRUCTION_SYNC);
-            //  QCOMPARE (b1.direction, SyncFileItem.Direction.DOWN);
-            //  QCOMPARE (b1.size, int64 (17));
-            //  QCOMPARE (Utility.qDateTimeFromTime_t (b1.modtime), changedMtime);
-            //  QCOMPARE (b1.previousSize, int64 (16));
-            //  QCOMPARE (Utility.qDateTimeFromTime_t (b1.previousModtime), initialMtime);
+            GLib.assert_true (b1);
+            GLib.assert_cmp (b1.instruction, CSYNC_INSTRUCTION_SYNC);
+            GLib.assert_cmp (b1.direction, SyncFileItem.Direction.DOWN);
+            GLib.assert_cmp (b1.size, int64 (17));
+            GLib.assert_cmp (Utility.date_time_from_time_t (b1.modtime), changedMtime);
+            GLib.assert_cmp (b1.previousSize, int64 (16));
+            GLib.assert_cmp (Utility.date_time_from_time_t (b1.previousModtime), initialMtime);
 
             // c1 : conflicts are downloads, so remote size and modtime
-            //  QVERIFY (c1);
-            //  QCOMPARE (c1.instruction, CSYNC_INSTRUCTION_CONFLICT);
-            //  QCOMPARE (c1.direction, SyncFileItem.Direction.NONE);
-            //  QCOMPARE (c1.size, int64 (25));
-            //  QCOMPARE (Utility.qDateTimeFromTime_t (c1.modtime), changedMtime2);
-            //  QCOMPARE (c1.previousSize, int64 (26));
-            //  QCOMPARE (Utility.qDateTimeFromTime_t (c1.previousModtime), changedMtime);
+            GLib.assert_true (c1);
+            GLib.assert_cmp (c1.instruction, CSYNC_INSTRUCTION_CONFLICT);
+            GLib.assert_cmp (c1.direction, SyncFileItem.Direction.NONE);
+            GLib.assert_cmp (c1.size, int64 (25));
+            GLib.assert_cmp (Utility.date_time_from_time_t (c1.modtime), changedMtime2);
+            GLib.assert_cmp (c1.previousSize, int64 (26));
+            GLib.assert_cmp (Utility.date_time_from_time_t (c1.previousModtime), changedMtime);
         });
 
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
     }
 
 
@@ -530,20 +530,20 @@ class TestSyncEngine : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         // Disable parallel uploads
-        SyncOptions syncOptions;
-        syncOptions.parallelNetworkJobs = 0;
-        fake_folder.sync_engine ().setSyncOptions (syncOptions);
+        SyncOptions sync_options;
+        sync_options.parallelNetworkJobs = 0;
+        fake_folder.sync_engine ().set_sync_options (sync_options);
 
         // Produce an error based on upload size
         int remoteQuota = 1000;
-        int n507 = 0, nPUT = 0;
+        int n507 = 0, number_of_put = 0;
         GLib.Object parent;
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) . Soup.Reply * {
-            //  Q_UNUSED (outgoing_data)
+            Q_UNUSED (outgoing_data)
 
             if (operation == Soup.PutOperation) {
-                nPUT++;
-                if (request.rawHeader ("OC-Total-Length").toInt () > remoteQuota) {
+                number_of_put++;
+                if (request.raw_header ("OC-Total-Length").to_int () > remoteQuota) {
                     n507++;
                     return new FakeErrorReply (operation, request, parent, 507);
                 }
@@ -552,11 +552,11 @@ class TestSyncEngine : GLib.Object {
         });
 
         fake_folder.local_modifier ().insert ("A/big", 800);
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (nPUT, 1);
-        //  QCOMPARE (n507, 0);
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (number_of_put, 1);
+        GLib.assert_cmp (n507, 0);
 
-        nPUT = 0;
+        number_of_put = 0;
         fake_folder.local_modifier ().insert ("A/big1", 500); // ok
         fake_folder.local_modifier ().insert ("A/big2", 1200); // 507 (quota guess now 1199)
         fake_folder.local_modifier ().insert ("A/big3", 1200); // skipped
@@ -567,9 +567,9 @@ class TestSyncEngine : GLib.Object {
         fake_folder.local_modifier ().insert ("A/big8", 199); // ok (quota guess now 0)
 
         fake_folder.local_modifier ().insert ("B/big8", 1150); // 507
-        //  QVERIFY (!fake_folder.sync_once ());
-        //  QCOMPARE (nPUT, 6);
-        //  QCOMPARE (n507, 3);
+        GLib.assert_true (!fake_folder.sync_once ());
+        GLib.assert_cmp (number_of_put, 6);
+        GLib.assert_cmp (n507, 3);
     }
 
     // Checks whether downloads with bad checksums are accepted
@@ -583,9 +583,9 @@ class TestSyncEngine : GLib.Object {
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
             if (operation == Soup.GetOperation) {
                 var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request, parent);
-                if (!checksumValue.isNull ())
+                if (!checksumValue.is_null ())
                     reply.set_raw_header ("OC-Checksum", checksumValue);
-                if (!contentMd5Value.isNull ())
+                if (!contentMd5Value.is_null ())
                     reply.set_raw_header ("Content-MD5", contentMd5Value);
                 return reply;
             }
@@ -594,49 +594,49 @@ class TestSyncEngine : GLib.Object {
 
         // Basic case
         fake_folder.remote_modifier ().create ("A/a3", 16, 'A');
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Bad OC-Checksum
         checksumValue = "SHA1:bad";
         fake_folder.remote_modifier ().create ("A/a4", 16, 'A');
-        //  QVERIFY (!fake_folder.sync_once ());
+        GLib.assert_true (!fake_folder.sync_once ());
 
         // Good OC-Checksum
         checksumValue = "SHA1:19b1928d58a2030d08023f3d7054516dbc186f20"; // printf 'A%.0s' {1..16} | sha1sum -
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
         checksumValue = GLib.ByteArray ();
 
         // Bad Content-MD5
         contentMd5Value = "bad";
         fake_folder.remote_modifier ().create ("A/a5", 16, 'A');
-        //  QVERIFY (!fake_folder.sync_once ());
+        GLib.assert_true (!fake_folder.sync_once ());
 
         // Good Content-MD5
         contentMd5Value = "d8a73157ce10cd94a91c2079fc9a92c8"; // printf 'A%.0s' {1..16} | md5sum -
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Invalid OC-Checksum is ignored
         checksumValue = "garbage";
         // contentMd5Value is still good
         fake_folder.remote_modifier ().create ("A/a6", 16, 'A');
-        //  QVERIFY (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.sync_once ());
         contentMd5Value = "bad";
         fake_folder.remote_modifier ().create ("A/a7", 16, 'A');
-        //  QVERIFY (!fake_folder.sync_once ());
+        GLib.assert_true (!fake_folder.sync_once ());
         contentMd5Value.clear ();
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // OC-Checksum contains Unsupported checksums
         checksumValue = "Unsupported:XXXX SHA1:invalid Invalid:XxX";
         fake_folder.remote_modifier ().create ("A/a8", 16, 'A');
-        //  QVERIFY (!fake_folder.sync_once ()); // Since the supported SHA1 checksum is invalid, no download
+        GLib.assert_true (!fake_folder.sync_once ()); // Since the supported SHA1 checksum is invalid, no download
         checksumValue =  "Unsupported:XXXX SHA1:19b1928d58a2030d08023f3d7054516dbc186f20 Invalid:XxX";
-        //  QVERIFY (fake_folder.sync_once ()); // The supported SHA1 checksum is valid now, so the file are downloaded
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ()); // The supported SHA1 checksum is valid now, so the file are downloaded
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
     // Tests the behavior of invalid filename detection
@@ -644,28 +644,28 @@ class TestSyncEngine : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         // For current servers, no characters are forbidden
-        fake_folder.sync_engine ().account ().setServerVersion ("10.0.0");
+        fake_folder.sync_engine ().account ().set_server_version ("10.0.0");
         fake_folder.local_modifier ().insert ("A/\\:?*\"<>|.txt");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // For legacy servers, some characters were forbidden by the client
-        fake_folder.sync_engine ().account ().setServerVersion ("8.0.0");
+        fake_folder.sync_engine ().account ().set_server_version ("8.0.0");
         fake_folder.local_modifier ().insert ("B/\\:?*\"<>|.txt");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QVERIFY (!fake_folder.current_remote_state ().find ("B/\\:?*\"<>|.txt"));
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_true (!fake_folder.current_remote_state ().find ("B/\\:?*\"<>|.txt"));
 
         // We can override that by setting the capability
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "invalidFilenameRegex", "" } } } });
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ { "invalidFilenameRegex", "" } } } });
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Check that new servers also accept the capability
-        fake_folder.sync_engine ().account ().setServerVersion ("10.0.0");
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "invalidFilenameRegex", "my[fgh]ile" } } } });
+        fake_folder.sync_engine ().account ().set_server_version ("10.0.0");
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ { "invalidFilenameRegex", "my[fgh]ile" } } } });
         fake_folder.local_modifier ().insert ("C/myfile.txt");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QVERIFY (!fake_folder.current_remote_state ().find ("C/myfile.txt"));
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_true (!fake_folder.current_remote_state ().find ("C/myfile.txt"));
     }
 
 
@@ -673,8 +673,8 @@ class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void testDiscoveryHiddenFile () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // We can't depend on current_local_state for hidden files since
         // it should rightfully skip things like download temporaries
@@ -685,15 +685,15 @@ class TestSyncEngine : GLib.Object {
         fake_folder.sync_engine ().setIgnoreHiddenFiles (true);
         fake_folder.remote_modifier ().insert ("A/.hidden");
         fake_folder.local_modifier ().insert ("B/.hidden");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QVERIFY (!localFileExists ("A/.hidden"));
-        //  QVERIFY (!fake_folder.current_remote_state ().find ("B/.hidden"));
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_true (!localFileExists ("A/.hidden"));
+        GLib.assert_true (!fake_folder.current_remote_state ().find ("B/.hidden"));
 
         fake_folder.sync_engine ().setIgnoreHiddenFiles (false);
         fake_folder.sync_journal ().forceRemoteDiscoveryNextSync ();
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QVERIFY (localFileExists ("A/.hidden"));
-        //  QVERIFY (fake_folder.current_remote_state ().find ("B/.hidden"));
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_true (localFileExists ("A/.hidden"));
+        GLib.assert_true (fake_folder.current_remote_state ().find ("B/.hidden"));
     }
 
 
@@ -706,44 +706,44 @@ class TestSyncEngine : GLib.Object {
         }
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
         // Utf8 locale can sync both
         fake_folder.remote_modifier ().insert ("A/tößt");
         fake_folder.remote_modifier ().insert ("A/t𠜎t");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QVERIFY (fake_folder.current_local_state ().find ("A/tößt"));
-        //  QVERIFY (fake_folder.current_local_state ().find ("A/t𠜎t"));
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.current_local_state ().find ("A/tößt"));
+        GLib.assert_true (fake_folder.current_local_state ().find ("A/t𠜎t"));
 
         // Try again with a locale that can represent ö but not 𠜎 (4-byte utf8).
         QTextCodec.setCodecForLocale (QTextCodec.codecForName ("ISO-8859-15"));
-        //  QVERIFY (QTextCodec.codecForLocale ().mibEnum () == 111);
+        GLib.assert_true (QTextCodec.codecForLocale ().mibEnum () == 111);
 
         fake_folder.remote_modifier ().insert ("B/tößt");
         fake_folder.remote_modifier ().insert ("B/t𠜎t");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QVERIFY (fake_folder.current_local_state ().find ("B/tößt"));
-        //  QVERIFY (!fake_folder.current_local_state ().find ("B/t𠜎t"));
-        //  QVERIFY (!fake_folder.current_local_state ().find ("B/t?t"));
-        //  QVERIFY (!fake_folder.current_local_state ().find ("B/t??t"));
-        //  QVERIFY (!fake_folder.current_local_state ().find ("B/t???t"));
-        //  QVERIFY (!fake_folder.current_local_state ().find ("B/t????t"));
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QVERIFY (fake_folder.current_remote_state ().find ("B/tößt"));
-        //  QVERIFY (fake_folder.current_remote_state ().find ("B/t𠜎t"));
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.current_local_state ().find ("B/tößt"));
+        GLib.assert_true (!fake_folder.current_local_state ().find ("B/t𠜎t"));
+        GLib.assert_true (!fake_folder.current_local_state ().find ("B/t?t"));
+        GLib.assert_true (!fake_folder.current_local_state ().find ("B/t??t"));
+        GLib.assert_true (!fake_folder.current_local_state ().find ("B/t???t"));
+        GLib.assert_true (!fake_folder.current_local_state ().find ("B/t????t"));
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.current_remote_state ().find ("B/tößt"));
+        GLib.assert_true (fake_folder.current_remote_state ().find ("B/t𠜎t"));
 
         // Try again with plain ascii
         QTextCodec.setCodecForLocale (QTextCodec.codecForName ("ASCII"));
-        //  QVERIFY (QTextCodec.codecForLocale ().mibEnum () == 3);
+        GLib.assert_true (QTextCodec.codecForLocale ().mibEnum () == 3);
 
         fake_folder.remote_modifier ().insert ("C/tößt");
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QVERIFY (!fake_folder.current_local_state ().find ("C/tößt"));
-        //  QVERIFY (!fake_folder.current_local_state ().find ("C/t??t"));
-        //  QVERIFY (!fake_folder.current_local_state ().find ("C/t????t"));
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QVERIFY (fake_folder.current_remote_state ().find ("C/tößt"));
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_true (!fake_folder.current_local_state ().find ("C/tößt"));
+        GLib.assert_true (!fake_folder.current_local_state ().find ("C/t??t"));
+        GLib.assert_true (!fake_folder.current_local_state ().find ("C/t????t"));
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_true (fake_folder.current_remote_state ().find ("C/tößt"));
 
         QTextCodec.setCodecForLocale (utf8Locale);
     }
@@ -752,26 +752,26 @@ class TestSyncEngine : GLib.Object {
     private void testUploadV1Multiabort () {
         FakeFolder fake_folder = new FakeFolder ( FileInfo{} };
         SyncOptions options;
-        options.initialChunkSize = 10;
-        options.maxChunkSize = 10;
-        options.minChunkSize = 10;
-        fake_folder.sync_engine ().setSyncOptions (options);
+        options.initial_chunk_size = 10;
+        options.max_chunk_size = 10;
+        options.min_chunk_size = 10;
+        fake_folder.sync_engine ().set_sync_options (options);
 
         GLib.Object parent;
-        int nPUT = 0;
+        int number_of_put = 0;
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
             if (operation == Soup.PutOperation) {
-                ++nPUT;
+                ++number_of_put;
                 return new FakeHangingReply (operation, request, parent);
             }
             return null;
         });
 
         fake_folder.local_modifier ().insert ("file", 100, 'W');
-        QTimer.singleShot (100, fake_folder.sync_engine (), [&] () { fake_folder.sync_engine ().on_signal_abort (); });
-        //  QVERIFY (!fake_folder.sync_once ());
+        QTimer.single_shot (100, fake_folder.sync_engine (), [&] () { fake_folder.sync_engine ().on_signal_abort (); });
+        GLib.assert_true (!fake_folder.sync_once ());
 
-        //  QCOMPARE (nPUT, 3);
+        GLib.assert_cmp (number_of_put, 3);
     }
 
 
@@ -788,12 +788,12 @@ class TestSyncEngine : GLib.Object {
         fake_folder.local_modifier ().append_byte ("A/a2");
         fake_folder.local_modifier ().append_byte ("A/a2");
         fake_folder.sync_once (); // perms should be preserved
-        //  QCOMPARE (GLib.new FileInfo (fake_folder.local_path () + "A/a1").permissions (), perm);
-        //  QCOMPARE (GLib.new FileInfo (fake_folder.local_path () + "A/a2").permissions (), perm);
+        GLib.assert_cmp (GLib.new FileInfo (fake_folder.local_path () + "A/a1").permissions (), perm);
+        GLib.assert_cmp (GLib.new FileInfo (fake_folder.local_path () + "A/a2").permissions (), perm);
 
         var conflictName = fake_folder.sync_journal ().conflictRecord (fake_folder.sync_journal ().conflictRecordPaths ().first ()).path;
-        //  QVERIFY (conflictName.contains ("A/a2"));
-        //  QCOMPARE (GLib.new FileInfo (fake_folder.local_path () + conflictName).permissions (), perm);
+        GLib.assert_true (conflictName.contains ("A/a2"));
+        GLib.assert_cmp (GLib.new FileInfo (fake_folder.local_path () + conflictName).permissions (), perm);
     }
 
 
@@ -803,10 +803,10 @@ class TestSyncEngine : GLib.Object {
         FakeFolder fake_folder = new FakeFolder ( FileInfo{} };
         fake_folder.remote_modifier ().mkdir ("foo");
 
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
-        //  QVERIFY (fake_folder.current_local_state ().find ("foo"));
+        GLib.assert_true (fake_folder.current_local_state ().find ("foo"));
 
     }
 
@@ -819,10 +819,10 @@ class TestSyncEngine : GLib.Object {
         datetime.setSecsSinceEpoch (datetime.to_seconds_since_epoch ()); // wipe ms
         fake_folder.remote_modifier ().find ("foo").last_modified = datetime;
 
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
-        //  QCOMPARE (GLib.new FileInfo (fake_folder.local_path () + "foo").last_modified (), datetime);
+        GLib.assert_cmp (GLib.new FileInfo (fake_folder.local_path () + "foo").last_modified (), datetime);
     }
 
 
@@ -831,54 +831,54 @@ class TestSyncEngine : GLib.Object {
      */
      private void testErrorsWithBulkUpload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"bulkupload", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"bulkupload", "1.0"} } } });
 
         // Disable parallel uploads
-        SyncOptions syncOptions;
-        syncOptions.parallelNetworkJobs = 0;
-        fake_folder.sync_engine ().setSyncOptions (syncOptions);
+        SyncOptions sync_options;
+        sync_options.parallelNetworkJobs = 0;
+        fake_folder.sync_engine ().set_sync_options (sync_options);
 
-        int nPUT = 0;
+        int number_of_put = 0;
         int nPOST = 0;
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) . Soup.Reply * {
             var content_type = request.header (Soup.Request.ContentTypeHeader).to_string ();
             if (operation == Soup.PostOperation) {
                 ++nPOST;
-                if (content_type.startsWith (QStringLiteral ("multipart/related; boundary="))) {
+                if (content_type.starts_with ("multipart/related; boundary=")) {
                     var jsonReplyObject = fake_folder.for_each_reply_part (outgoing_data, content_type, [] (GLib.HashMap<string, GLib.ByteArray> all_headers) . QJsonObject {
                         var reply = QJsonObject{};
-                        const var filename = all_headers[QStringLiteral ("X-File-Path")];
-                        if (filename.endsWith ("A/big2") ||
-                                filename.endsWith ("A/big3") ||
-                                filename.endsWith ("A/big4") ||
-                                filename.endsWith ("A/big5") ||
-                                filename.endsWith ("A/big7") ||
-                                filename.endsWith ("B/big8")) {
-                            reply.insert (QStringLiteral ("error"), true);
-                            reply.insert (QStringLiteral ("etag"), {});
+                        var filename = all_headers["X-File-Path"];
+                        if (filename.ends_with ("A/big2") ||
+                                filename.ends_with ("A/big3") ||
+                                filename.ends_with ("A/big4") ||
+                                filename.ends_with ("A/big5") ||
+                                filename.ends_with ("A/big7") ||
+                                filename.ends_with ("B/big8")) {
+                            reply.insert ("error", true);
+                            reply.insert ("etag", {});
                             return reply;
                         } else {
-                            reply.insert (QStringLiteral ("error"), false);
-                            reply.insert (QStringLiteral ("etag"), {});
+                            reply.insert ("error", false);
+                            reply.insert ("etag", {});
                         }
                         return reply;
                     });
                     if (jsonReplyObject.size ()) {
                         var jsonReply = QJsonDocument{};
-                        jsonReply.setObject (jsonReplyObject);
+                        jsonReply.set_object (jsonReplyObject);
                         return new FakeJsonErrorReply{operation, request, this, 200, jsonReply};
                     }
                     return  null;
                 }
             } else if (operation == Soup.PutOperation) {
-                ++nPUT;
-                const var filename = get_file_path_from_url (request.url ());
-                if (filename.endsWith ("A/big2") ||
-                        filename.endsWith ("A/big3") ||
-                        filename.endsWith ("A/big4") ||
-                        filename.endsWith ("A/big5") ||
-                        filename.endsWith ("A/big7") ||
-                        filename.endsWith ("B/big8")) {
+                ++number_of_put;
+                var filename = get_file_path_from_url (request.url ());
+                if (filename.ends_with ("A/big2") ||
+                        filename.ends_with ("A/big3") ||
+                        filename.ends_with ("A/big4") ||
+                        filename.ends_with ("A/big5") ||
+                        filename.ends_with ("A/big7") ||
+                        filename.ends_with ("B/big8")) {
                     return new FakeErrorReply (operation, request, this, 412);
                 }
                 return  null;
@@ -887,10 +887,10 @@ class TestSyncEngine : GLib.Object {
         });
 
         fake_folder.local_modifier ().insert ("A/big", 1);
-        //  QVERIFY (fake_folder.sync_once ());
-        //  QCOMPARE (nPUT, 0);
-        //  QCOMPARE (nPOST, 1);
-        nPUT = 0;
+        GLib.assert_true (fake_folder.sync_once ());
+        GLib.assert_cmp (number_of_put, 0);
+        GLib.assert_cmp (nPOST, 1);
+        number_of_put = 0;
         nPOST = 0;
 
         fake_folder.local_modifier ().insert ("A/big1", 1); // ok
@@ -903,15 +903,15 @@ class TestSyncEngine : GLib.Object {
         fake_folder.local_modifier ().insert ("A/big8", 1); // ok
         fake_folder.local_modifier ().insert ("B/big8", 1); // ko
 
-        //  QVERIFY (!fake_folder.sync_once ());
-        //  QCOMPARE (nPUT, 0);
-        //  QCOMPARE (nPOST, 1);
-        nPUT = 0;
+        GLib.assert_true (!fake_folder.sync_once ());
+        GLib.assert_cmp (number_of_put, 0);
+        GLib.assert_cmp (nPOST, 1);
+        number_of_put = 0;
         nPOST = 0;
 
-        //  QVERIFY (!fake_folder.sync_once ());
-        //  QCOMPARE (nPUT, 6);
-        //  QCOMPARE (nPOST, 0);
+        GLib.assert_true (!fake_folder.sync_once ());
+        GLib.assert_cmp (number_of_put, 6);
+        GLib.assert_cmp (nPOST, 0);
     }
 }
 

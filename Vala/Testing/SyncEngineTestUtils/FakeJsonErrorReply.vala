@@ -16,7 +16,7 @@ class FakeJsonErrorReply : FakeErrorReply {
         GLib.Object parent,
         int http_error_code,
         QJsonDocument reply = QJsonDocument ()) {
-        base (operation, request, parent, http_error_code, reply.toJson ());
+        base (operation, request, parent, http_error_code, reply.to_json ());
     }
 
 }

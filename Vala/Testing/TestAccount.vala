@@ -18,7 +18,7 @@ class TestAccount : GLib.Object {
     ***********************************************************/
     private void on_test_account_dav_path_unitialized_no_crash () {
         AccountPointer account = Account.create ();
-        account.davPath ();
+        account.dav_path ();
     }
 
 } // namespace Testing

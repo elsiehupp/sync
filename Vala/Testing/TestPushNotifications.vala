@@ -16,15 +16,15 @@ class TestPushNotifications : GLib.Object {
     ***********************************************************/
     private void testTryReconnect_capabilitesReportPushNotificationsAvailable_reconnectForEver () {
         FakeWebSocketServer fakeServer;
-        var account = FakeWebSocketServer.createAccount ();
+        var account = FakeWebSocketServer.create_account ();
         account.setPushNotificationsReconnectInterval (0);
 
         // Let if fail a few times
-        //  QVERIFY (failThreeAuthenticationAttempts (fakeServer, account));
-        //  QVERIFY (failThreeAuthenticationAttempts (fakeServer, account));
+        GLib.assert_true (failThreeAuthenticationAttempts (fakeServer, account));
+        GLib.assert_true (failThreeAuthenticationAttempts (fakeServer, account));
 
         // Push notifications should try to reconnect
-        //  QVERIFY (fakeServer.authenticateAccount (account));
+        GLib.assert_true (fakeServer.authenticateAccount (account));
     }
 
 
@@ -35,18 +35,18 @@ class TestPushNotifications : GLib.Object {
         std.unique_ptr<QSignalSpy> filesChangedSpy;
         std.unique_ptr<QSignalSpy> notificationsChangedSpy;
         std.unique_ptr<QSignalSpy> activitiesChangedSpy;
-        var account = FakeWebSocketServer.createAccount ();
+        var account = FakeWebSocketServer.create_account ();
 
-        //  QVERIFY (fakeServer.authenticateAccount (
-        //      account, [&] (Occ.PushNotifications pushNotifications) {
-        //          filesChangedSpy.on_signal_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.filesChanged));
-        //          notificationsChangedSpy.on_signal_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.notificationsChanged));
-        //          activitiesChangedSpy.on_signal_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.activitiesChanged));
+        GLib.assert_true (fakeServer.authenticateAccount (
+        //      account, [&] (Occ.PushNotifications push_notifications) {
+        //          filesChangedSpy.on_signal_reset (new QSignalSpy (push_notifications, &Occ.PushNotifications.filesChanged));
+        //          notificationsChangedSpy.on_signal_reset (new QSignalSpy (push_notifications, &Occ.PushNotifications.notificationsChanged));
+        //          activitiesChangedSpy.on_signal_reset (new QSignalSpy (push_notifications, &Occ.PushNotifications.activitiesChanged));
         //      },
         //      [&] {
-        //          //  QVERIFY (verifyCalledOnceWithAccount (*filesChangedSpy, account));
-        //          //  QVERIFY (verifyCalledOnceWithAccount (*notificationsChangedSpy, account));
-        //          //  QVERIFY (verifyCalledOnceWithAccount (*activitiesChangedSpy, account));
+        //          GLib.assert_true (verifyCalledOnceWithAccount (*filesChangedSpy, account));
+        //          GLib.assert_true (verifyCalledOnceWithAccount (*notificationsChangedSpy, account));
+        //          GLib.assert_true (verifyCalledOnceWithAccount (*activitiesChangedSpy, account));
         //      }));
     }
 
@@ -55,16 +55,16 @@ class TestPushNotifications : GLib.Object {
     ***********************************************************/
     private void testOnWebSocketTextMessageReceived_notifyFileMessage_emitFilesChanged () {
         FakeWebSocketServer fakeServer;
-        var account = FakeWebSocketServer.createAccount ();
-        const var socket = fakeServer.authenticateAccount (account);
-        //  QVERIFY (socket);
-        QSignalSpy filesChangedSpy = new QSignalSpy (account.pushNotifications (), &Occ.PushNotifications.filesChanged);
+        var account = FakeWebSocketServer.create_account ();
+        var socket = fakeServer.authenticateAccount (account);
+        GLib.assert_true (socket);
+        QSignalSpy filesChangedSpy = new QSignalSpy (account.push_notifications (), &Occ.PushNotifications.filesChanged);
 
-        socket.sendTextMessage ("notify_file");
+        socket.send_text_message ("notify_file");
 
         // filesChanged signal should be emitted
-        //  QVERIFY (filesChangedSpy.wait ());
-        //  QVERIFY (verifyCalledOnceWithAccount (filesChangedSpy, account));
+        GLib.assert_true (filesChangedSpy.wait ());
+        GLib.assert_true (verifyCalledOnceWithAccount (filesChangedSpy, account));
     }
 
 
@@ -72,18 +72,18 @@ class TestPushNotifications : GLib.Object {
     ***********************************************************/
     private void testOnWebSocketTextMessageReceived_notifyActivityMessage_emitNotification () {
         FakeWebSocketServer fakeServer;
-        var account = FakeWebSocketServer.createAccount ();
-        const var socket = fakeServer.authenticateAccount (account);
-        //  QVERIFY (socket);
-        QSignalSpy activitySpy = new QSignalSpy (account.pushNotifications (), &Occ.PushNotifications.activitiesChanged);
-        //  QVERIFY (activitySpy.isValid ());
+        var account = FakeWebSocketServer.create_account ();
+        var socket = fakeServer.authenticateAccount (account);
+        GLib.assert_true (socket);
+        QSignalSpy activitySpy = new QSignalSpy (account.push_notifications (), &Occ.PushNotifications.activitiesChanged);
+        GLib.assert_true (activitySpy.is_valid ());
 
         // Send notify_file push notification
-        socket.sendTextMessage ("notify_activity");
+        socket.send_text_message ("notify_activity");
 
         // notification signal should be emitted
-        //  QVERIFY (activitySpy.wait ());
-        //  QVERIFY (verifyCalledOnceWithAccount (activitySpy, account));
+        GLib.assert_true (activitySpy.wait ());
+        GLib.assert_true (verifyCalledOnceWithAccount (activitySpy, account));
     }
 
 
@@ -91,18 +91,18 @@ class TestPushNotifications : GLib.Object {
     ***********************************************************/
     private void testOnWebSocketTextMessageReceived_notifyNotificationMessage_emitNotification () {
         FakeWebSocketServer fakeServer;
-        var account = FakeWebSocketServer.createAccount ();
-        const var socket = fakeServer.authenticateAccount (account);
-        //  QVERIFY (socket);
-        QSignalSpy notificationSpy = new QSignalSpy (account.pushNotifications (), &Occ.PushNotifications.notificationsChanged);
-        //  QVERIFY (notificationSpy.isValid ());
+        var account = FakeWebSocketServer.create_account ();
+        var socket = fakeServer.authenticateAccount (account);
+        GLib.assert_true (socket);
+        QSignalSpy notificationSpy = new QSignalSpy (account.push_notifications (), &Occ.PushNotifications.notificationsChanged);
+        GLib.assert_true (notificationSpy.is_valid ());
 
         // Send notify_file push notification
-        socket.sendTextMessage ("notify_notification");
+        socket.send_text_message ("notify_notification");
 
         // notification signal should be emitted
-        //  QVERIFY (notificationSpy.wait ());
-        //  QVERIFY (verifyCalledOnceWithAccount (notificationSpy, account));
+        GLib.assert_true (notificationSpy.wait ());
+        GLib.assert_true (verifyCalledOnceWithAccount (notificationSpy, account));
     }
 
 
@@ -110,24 +110,24 @@ class TestPushNotifications : GLib.Object {
     ***********************************************************/
     private void testOnWebSocketTextMessageReceived_invalidCredentialsMessage_reconnectWebSocket () {
         FakeWebSocketServer fakeServer;
-        var account = FakeWebSocketServer.createAccount ();
+        var account = FakeWebSocketServer.create_account ();
         // Need to set reconnect timer interval to zero for tests
-        account.pushNotifications ().setReconnectTimerInterval (0);
+        account.push_notifications ().setReconnectTimerInterval (0);
 
         // Wait for authentication attempt and then sent invalid credentials
-        //  QVERIFY (fakeServer.waitForTextMessages ());
-        //  QCOMPARE (fakeServer.text_messages_count (), 2);
-        const var socket = fakeServer.socketForTextMessage (0);
-        const var firstPasswordSent = fakeServer.textMessage (1);
-        //  QCOMPARE (firstPasswordSent, account.credentials ().password ());
-        fakeServer.clearTextMessages ();
-        socket.sendTextMessage ("err : Invalid credentials");
+        GLib.assert_true (fakeServer.wait_for_text_messages ());
+        GLib.assert_cmp (fakeServer.text_messages_count (), 2);
+        var socket = fakeServer.socket_for_text_message (0);
+        var firstPasswordSent = fakeServer.textMessage (1);
+        GLib.assert_cmp (firstPasswordSent, account.credentials ().password ());
+        fakeServer.clear_text_messages ();
+        socket.send_text_message ("err : Invalid credentials");
 
         // Wait for a new authentication attempt
-        //  QVERIFY (fakeServer.waitForTextMessages ());
-        //  QCOMPARE (fakeServer.text_messages_count (), 2);
-        const var secondPasswordSent = fakeServer.textMessage (1);
-        //  QCOMPARE (secondPasswordSent, account.credentials ().password ());
+        GLib.assert_true (fakeServer.wait_for_text_messages ());
+        GLib.assert_cmp (fakeServer.text_messages_count (), 2);
+        var secondPasswordSent = fakeServer.textMessage (1);
+        GLib.assert_cmp (secondPasswordSent, account.credentials ().password ());
     }
 
 
@@ -135,20 +135,20 @@ class TestPushNotifications : GLib.Object {
     ***********************************************************/
     private void testOnWebSocketError_connectionLost_emitConnectionLost () {
         FakeWebSocketServer fakeServer;
-        var account = FakeWebSocketServer.createAccount ();
-        QSignalSpy connectionLostSpy = new QSignalSpy (account.pushNotifications (), &Occ.PushNotifications.connectionLost);
-        QSignalSpy pushNotificationsDisabledSpy = new QSignalSpy (account.data (), &Occ.Account.pushNotificationsDisabled);
-        //  QVERIFY (connectionLostSpy.isValid ());
+        var account = FakeWebSocketServer.create_account ();
+        QSignalSpy connectionLostSpy = new QSignalSpy (account.push_notifications (), &Occ.PushNotifications.connectionLost);
+        QSignalSpy push_notificationsDisabledSpy = new QSignalSpy (account.data (), &Occ.Account.push_notificationsDisabled);
+        GLib.assert_true (connectionLostSpy.is_valid ());
 
         // Wait for authentication and then sent a network error
-        //  QVERIFY (fakeServer.waitForTextMessages ());
-        //  QCOMPARE (fakeServer.text_messages_count (), 2);
-        var socket = fakeServer.socketForTextMessage (0);
+        GLib.assert_true (fakeServer.wait_for_text_messages ());
+        GLib.assert_cmp (fakeServer.text_messages_count (), 2);
+        var socket = fakeServer.socket_for_text_message (0);
         socket.on_signal_abort ();
 
-        //  QVERIFY (connectionLostSpy.wait ());
+        GLib.assert_true (connectionLostSpy.wait ());
         // Account handled connectionLost signal and disabled push notifications
-        //  QCOMPARE (pushNotificationsDisabledSpy.count (), 1);
+        GLib.assert_cmp (push_notificationsDisabledSpy.count (), 1);
     }
 
 
@@ -156,12 +156,12 @@ class TestPushNotifications : GLib.Object {
     ***********************************************************/
     private void testSetup_maxConnectionAttemptsReached_disablePushNotifications () {
         FakeWebSocketServer fakeServer;
-        var account = FakeWebSocketServer.createAccount ();
-        QSignalSpy pushNotificationsDisabledSpy = new QSignalSpy (account.data (), &Occ.Account.pushNotificationsDisabled);
+        var account = FakeWebSocketServer.create_account ();
+        QSignalSpy push_notificationsDisabledSpy = new QSignalSpy (account.data (), &Occ.Account.push_notificationsDisabled);
 
-        //  QVERIFY (failThreeAuthenticationAttempts (fakeServer, account));
+        GLib.assert_true (failThreeAuthenticationAttempts (fakeServer, account));
         // Account disabled the push notifications
-        //  QCOMPARE (pushNotificationsDisabledSpy.count (), 1);
+        GLib.assert_cmp (push_notificationsDisabledSpy.count (), 1);
     }
 
 
@@ -169,18 +169,18 @@ class TestPushNotifications : GLib.Object {
     ***********************************************************/
     private void testOnWebSocketSslError_sslError_disablePushNotifications () {
         FakeWebSocketServer fakeServer;
-        var account = FakeWebSocketServer.createAccount ();
-        QSignalSpy pushNotificationsDisabledSpy = new QSignalSpy (account.data (), &Occ.Account.pushNotificationsDisabled);
+        var account = FakeWebSocketServer.create_account ();
+        QSignalSpy push_notificationsDisabledSpy = new QSignalSpy (account.data (), &Occ.Account.push_notificationsDisabled);
 
-        //  QVERIFY (fakeServer.waitForTextMessages ());
+        GLib.assert_true (fakeServer.wait_for_text_messages ());
         // FIXME : This a little bit ugly but I had no better idea how to trigger a error on the websocket client.
         // The websocket that is retrived through the server is not connected to the ssl error signal.
-        var pushNotificationsWebSocketChildren = account.pushNotifications ().findChildren<QWebSocket> ();
-        //  QVERIFY (pushNotificationsWebSocketChildren.size () == 1);
-        /* emit */ pushNotificationsWebSocketChildren[0].sslErrors (GLib.List<QSslError> ());
+        var push_notificationsWebSocketChildren = account.push_notifications ().findChildren<QWebSocket> ();
+        GLib.assert_true (push_notificationsWebSocketChildren.size () == 1);
+        /* emit */ push_notificationsWebSocketChildren[0].sslErrors (GLib.List<QSslError> ());
 
         // Account handled connectionLost signal and the authenticationFailed Signal should be emitted
-        //  QCOMPARE (pushNotificationsDisabledSpy.count (), 1);
+        GLib.assert_cmp (push_notificationsDisabledSpy.count (), 1);
     }
 
 
@@ -188,28 +188,28 @@ class TestPushNotifications : GLib.Object {
     ***********************************************************/
     private void testAccount_web_socket_connectionLost_emitNotificationsDisabled () {
         FakeWebSocketServer fakeServer;
-        var account = FakeWebSocketServer.createAccount ();
+        var account = FakeWebSocketServer.create_account ();
         // Need to set reconnect timer interval to zero for tests
-        account.pushNotifications ().setReconnectTimerInterval (0);
-        const var socket = fakeServer.authenticateAccount (account);
-        //  QVERIFY (socket);
+        account.push_notifications ().setReconnectTimerInterval (0);
+        var socket = fakeServer.authenticateAccount (account);
+        GLib.assert_true (socket);
 
-        QSignalSpy connectionLostSpy = new QSignalSpy (account.pushNotifications (), &Occ.PushNotifications.connectionLost);
-        //  QVERIFY (connectionLostSpy.isValid ());
+        QSignalSpy connectionLostSpy = new QSignalSpy (account.push_notifications (), &Occ.PushNotifications.connectionLost);
+        GLib.assert_true (connectionLostSpy.is_valid ());
 
-        QSignalSpy pushNotificationsDisabledSpy = new QSignalSpy (account.data (), &Occ.Account.pushNotificationsDisabled);
-        //  QVERIFY (pushNotificationsDisabledSpy.isValid ());
+        QSignalSpy push_notificationsDisabledSpy = new QSignalSpy (account.data (), &Occ.Account.push_notificationsDisabled);
+        GLib.assert_true (push_notificationsDisabledSpy.is_valid ());
 
         // Wait for authentication and then sent a network error
         socket.on_signal_abort ();
 
-        //  QVERIFY (pushNotificationsDisabledSpy.wait ());
-        //  QCOMPARE (pushNotificationsDisabledSpy.count (), 1);
+        GLib.assert_true (push_notificationsDisabledSpy.wait ());
+        GLib.assert_cmp (push_notificationsDisabledSpy.count (), 1);
 
-        //  QCOMPARE (connectionLostSpy.count (), 1);
+        GLib.assert_cmp (connectionLostSpy.count (), 1);
 
-        var accountSent = pushNotificationsDisabledSpy.at (0).at (0).value<Occ.Account> ();
-        //  QCOMPARE (accountSent, account.data ());
+        var accountSent = push_notificationsDisabledSpy.at (0).at (0).value<Occ.Account> ();
+        GLib.assert_cmp (accountSent, account.data ());
     }
 
 
@@ -217,17 +217,17 @@ class TestPushNotifications : GLib.Object {
     ***********************************************************/
     private void testAccount_web_socket_authenticationFailed_emitNotificationsDisabled () {
         FakeWebSocketServer fakeServer;
-        var account = FakeWebSocketServer.createAccount ();
+        var account = FakeWebSocketServer.create_account ();
         account.setPushNotificationsReconnectInterval (0);
-        QSignalSpy pushNotificationsDisabledSpy = new QSignalSpy (account.data (), &Occ.Account.pushNotificationsDisabled);
-        //  QVERIFY (pushNotificationsDisabledSpy.isValid ());
+        QSignalSpy push_notificationsDisabledSpy = new QSignalSpy (account.data (), &Occ.Account.push_notificationsDisabled);
+        GLib.assert_true (push_notificationsDisabledSpy.is_valid ());
 
-        //  QVERIFY (failThreeAuthenticationAttempts (fakeServer, account));
+        GLib.assert_true (failThreeAuthenticationAttempts (fakeServer, account));
 
-        // Now the pushNotificationsDisabled Signal should be emitted
-        //  QCOMPARE (pushNotificationsDisabledSpy.count (), 1);
-        var accountSent = pushNotificationsDisabledSpy.at (0).at (0).value<Occ.Account> ();
-        //  QCOMPARE (accountSent, account.data ());
+        // Now the push_notificationsDisabled Signal should be emitted
+        GLib.assert_cmp (push_notificationsDisabledSpy.count (), 1);
+        var accountSent = push_notificationsDisabledSpy.at (0).at (0).value<Occ.Account> ();
+        GLib.assert_cmp (accountSent, account.data ());
     }
 
 
@@ -238,22 +238,22 @@ class TestPushNotifications : GLib.Object {
         std.unique_ptr<QSignalSpy> filesChangedSpy;
         std.unique_ptr<QSignalSpy> notificationsChangedSpy;
         std.unique_ptr<QSignalSpy> activitiesChangedSpy;
-        var account = FakeWebSocketServer.createAccount ();
-        //  QVERIFY (fakeServer.authenticateAccount (account));
+        var account = FakeWebSocketServer.create_account ();
+        GLib.assert_true (fakeServer.authenticateAccount (account));
 
         // Set the ping timeout interval to zero and check if the server attemps to authenticate again
-        fakeServer.clearTextMessages ();
-        account.pushNotifications ().setPingInterval (0);
-        //  QVERIFY (fakeServer.authenticateAccount (
-        //      account, [&] (Occ.PushNotifications pushNotifications) {
-        //          filesChangedSpy.on_signal_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.filesChanged));
-        //          notificationsChangedSpy.on_signal_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.notificationsChanged));
-        //          activitiesChangedSpy.on_signal_reset (new QSignalSpy (pushNotifications, &Occ.PushNotifications.activitiesChanged));
+        fakeServer.clear_text_messages ();
+        account.push_notifications ().setPingInterval (0);
+        GLib.assert_true (fakeServer.authenticateAccount (
+        //      account, [&] (Occ.PushNotifications push_notifications) {
+        //          filesChangedSpy.on_signal_reset (new QSignalSpy (push_notifications, &Occ.PushNotifications.filesChanged));
+        //          notificationsChangedSpy.on_signal_reset (new QSignalSpy (push_notifications, &Occ.PushNotifications.notificationsChanged));
+        //          activitiesChangedSpy.on_signal_reset (new QSignalSpy (push_notifications, &Occ.PushNotifications.activitiesChanged));
         //      },
         //      [&] {
-        //          //  QVERIFY (verifyCalledOnceWithAccount (*filesChangedSpy, account));
-        //          //  QVERIFY (verifyCalledOnceWithAccount (*notificationsChangedSpy, account));
-        //          //  QVERIFY (verifyCalledOnceWithAccount (*activitiesChangedSpy, account));
+        //          GLib.assert_true (verifyCalledOnceWithAccount (*filesChangedSpy, account));
+        //          GLib.assert_true (verifyCalledOnceWithAccount (*notificationsChangedSpy, account));
+        //          GLib.assert_true (verifyCalledOnceWithAccount (*activitiesChangedSpy, account));
         //      }));
     }
 
@@ -273,19 +273,19 @@ class TestPushNotifications : GLib.Object {
     
     static bool failThreeAuthenticationAttempts (FakeWebSocketServer fakeServer, Occ.AccountPointer account) {
         return_false_on_fail (account);
-        return_false_on_fail (account.pushNotifications ());
+        return_false_on_fail (account.push_notifications ());
     
-        account.pushNotifications ().setReconnectTimerInterval (0);
+        account.push_notifications ().setReconnectTimerInterval (0);
     
-        QSignalSpy authenticationFailedSpy = new QSignalSpy (account.pushNotifications (), &Occ.PushNotifications.authenticationFailed);
+        QSignalSpy authenticationFailedSpy = new QSignalSpy (account.push_notifications (), &Occ.PushNotifications.authenticationFailed);
     
         // Let three authentication attempts fail
         for (uint8 i = 0; i < 3; ++i) {
-            return_false_on_fail (fakeServer.waitForTextMessages ());
+            return_false_on_fail (fakeServer.wait_for_text_messages ());
             return_false_on_fail (fakeServer.text_messages_count () == 2);
-            var socket = fakeServer.socketForTextMessage (0);
-            fakeServer.clearTextMessages ();
-            socket.sendTextMessage ("err : Invalid credentials");
+            var socket = fakeServer.socket_for_text_message (0);
+            fakeServer.clear_text_messages ();
+            socket.send_text_message ("err : Invalid credentials");
         }
     
         // Now the authenticationFailed Signal should be emitted

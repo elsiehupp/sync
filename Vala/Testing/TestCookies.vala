@@ -16,22 +16,22 @@ class TestCookies : GLib.Object {
     ***********************************************************/
     private void testCookies () {
         QTemporaryDir tmp;
-        const string nonexistingPath = tmp.filePath ("someNonexistingDir/test.db");
+        const string nonexistingPath = tmp.file_path ("someNonexistingDir/test.db");
         QNetworkCookie cookieA = QNetworkCookie ("foo", "bar");
         // tomorrow rounded
-        cookieA.setExpirationDate (GLib.DateTime.currentDateTimeUtc ().addDays (1).date ().startOfDay ());
+        cookieA.setExpirationDate (GLib.DateTime.current_date_time_utc ().add_days (1).date ().startOfDay ());
         const GLib.List<QNetworkCookie> cookies = {cookieA, QNetworkCookie ("foo2", "bar")};
         CookieJar jar;
         jar.setAllCookies (cookies);
-        //  QCOMPARE (cookies, jar.allCookies ());
-        //  QVERIFY (jar.save (tmp.filePath ("test.db")));
+        GLib.assert_cmp (cookies, jar.allCookies ());
+        GLib.assert_true (jar.save (tmp.file_path ("test.db")));
         // ensure we are able to create a cookie jar in a non exisitning folder (mkdir)
-        //  QVERIFY (jar.save (nonexistingPath));
+        GLib.assert_true (jar.save (nonexistingPath));
 
         CookieJar jar2;
-        //  QVERIFY (jar2.restore (nonexistingPath));
+        GLib.assert_true (jar2.restore (nonexistingPath));
         // here we should have  only cookieA as the second one was a session cookie
-        //  QCOMPARE (GLib.List<QNetworkCookie>{cookieA}, jar2.allCookies ());
+        GLib.assert_cmp (GLib.List<QNetworkCookie>{cookieA}, jar2.allCookies ());
 
     }
 

@@ -14,12 +14,12 @@ class FakePayloadReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public const int defaultDelay = 10;
+    public const int DEFAULT_DELAY = 10;
 
     /***********************************************************
     ***********************************************************/
     public FakePayloadReply (Soup.Operation operation, Soup.Request request, GLib.ByteArray body, GLib.Object parent) {
-        FakePayloadReply (operation, request, body, FakePayloadReply.defaultDelay, parent);
+        FakePayloadReply (operation, request, body, FakePayloadReply.DEFAULT_DELAY, parent);
     }
 
     /***********************************************************
@@ -32,7 +32,7 @@ class FakePayloadReply : FakeReply {
         set_url (request.url ());
         set_operation (operation);
         open (QIODevice.ReadOnly);
-        QTimer.singleShot (delay, this, &FakePayloadReply.respond);
+        QTimer.single_shot (delay, this, &FakePayloadReply.respond);
     }
 
 
@@ -40,10 +40,10 @@ class FakePayloadReply : FakeReply {
     ***********************************************************/
     public void respond () {
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
-        setHeader (Soup.Request.ContentLengthHeader, this.body.size ());
+        set_header (Soup.Request.ContentLengthHeader, this.body.size ());
         /* emit */ signal_meta_data_changed ();
         /* emit */ signal_ready_read ();
-        setFinished (true);
+        set_finished (true);
         /* emit */ signal_finished ();
     }
 
@@ -56,8 +56,8 @@ class FakePayloadReply : FakeReply {
     /***********************************************************
     ***********************************************************/
     public override int64 read_data (char buf, int64 max) {
-        max = qMin<int64> (max, this.body.size ());
-        memcpy (buf, this.body.constData (), max);
+        max = q_min<int64> (max, this.body.size ());
+        memcpy (buf, this.body.const_data (), max);
         this.body = this.body.mid (max);
         return max;
     }

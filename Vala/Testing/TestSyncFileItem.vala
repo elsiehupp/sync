@@ -34,43 +34,43 @@ class TestSyncFileItem : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void testComparator_data () {
-        QTest.addColumn<SyncFileItem> ("a");
-        QTest.addColumn<SyncFileItem> ("b");
-        QTest.addColumn<SyncFileItem> ("c");
+        QTest.add_column<SyncFileItem> ("a");
+        QTest.add_column<SyncFileItem> ("b");
+        QTest.add_column<SyncFileItem> ("c");
 
-        QTest.newRow ("a1") + createItem ("client") + createItem ("client/build") + createItem ("client-build") ;
-        QTest.newRow ("a2") + createItem ("test/t1") + createItem ("test/t2") + createItem ("test/t3") ;
-        QTest.newRow ("a3") + createItem ("ABCD") + createItem ("abcd") + createItem ("zzzz");
+        QTest.new_row ("a1") + createItem ("client") + createItem ("client/build") + createItem ("client-build") ;
+        QTest.new_row ("a2") + createItem ("test/t1") + createItem ("test/t2") + createItem ("test/t3") ;
+        QTest.new_row ("a3") + createItem ("ABCD") + createItem ("abcd") + createItem ("zzzz");
 
         SyncFileItem movedItem1;
         movedItem1.file = "folder/source/file.f";
         movedItem1.renameTarget = "folder/destination/file.f";
         movedItem1.instruction = CSYNC_INSTRUCTION_RENAME;
 
-        QTest.newRow ("move1") + createItem ("folder/destination") + movedItem1 << createItem ("folder/destination-2");
-        QTest.newRow ("move2") + createItem ("folder/destination/1") + movedItem1 << createItem ("folder/source");
-        QTest.newRow ("move3") + createItem ("abc") + movedItem1 << createItem ("ijk");
+        QTest.new_row ("move1") + createItem ("folder/destination") + movedItem1 << createItem ("folder/destination-2");
+        QTest.new_row ("move2") + createItem ("folder/destination/1") + movedItem1 << createItem ("folder/source");
+        QTest.new_row ("move3") + createItem ("abc") + movedItem1 << createItem ("ijk");
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void testComparator () {
-        //  QFETCH ( SyncFileItem , a );
-        //  QFETCH ( SyncFileItem , b );
-        //  QFETCH ( SyncFileItem , c );
+        QFETCH ( SyncFileItem , a );
+        QFETCH ( SyncFileItem , b );
+        QFETCH ( SyncFileItem , c );
 
-        //  QVERIFY (a < b);
-        //  QVERIFY (b < c);
-        //  QVERIFY (a < c);
+        GLib.assert_true (a < b);
+        GLib.assert_true (b < c);
+        GLib.assert_true (a < c);
 
-        //  QVERIFY (! (b < a));
-        //  QVERIFY (! (c < b));
-        //  QVERIFY (! (c < a));
+        GLib.assert_true (! (b < a));
+        GLib.assert_true (! (c < b));
+        GLib.assert_true (! (c < a));
 
-        //  QVERIFY (! (a < a));
-        //  QVERIFY (! (b < b));
-        //  QVERIFY (! (c < c));
+        GLib.assert_true (! (a < a));
+        GLib.assert_true (! (b < b));
+        GLib.assert_true (! (c < c));
     }
 }
 }
