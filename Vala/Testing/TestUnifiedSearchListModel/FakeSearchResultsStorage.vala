@@ -10,23 +10,46 @@ namespace Testing {
 @brief The FakeSearchResultsStorage
 emulates the real server storage that contains all the results that UnifiedSearchListmodel will search for
 ***********************************************************/
-class FakeSearchResultsStorage { {lass Provider {
+class FakeSearchResultsStorage {
+
+    /***********************************************************
+    ***********************************************************/
+    private static FakeSearchResultsStorage instance;
+
+    /***********************************************************
+    ***********************************************************/
+    private const int page_size = 5;
+
+    /***********************************************************
+    ***********************************************************/
+    private GLib.HashMap<string, Provider> search_results_data;
+
+    /***********************************************************
+    ***********************************************************/
+    private GLib.ByteArray providers_response = fake_404_response;
+
+    /***********************************************************
+    ***********************************************************/
+    private QVariantMap meta_success;
+    
+    class Provider {
+
         public class SearchResult {
 
-            public string this.thumbnailUrl;
-            public string this.title;
-            public string this.subline;
-            public string this.resourceUrl;
-            public string this.icon;
-            public bool this.rounded;
+            public string thumbnail_url;
+            public string title;
+            public string subline;
+            public string resource_url;
+            public string icon;
+            public bool rounded;
         }
 
-        string this.identifier;
-        string this.name;
-        int32 this.order = std.numeric_limits<int32>.max ();
-        int32 this.cursor = 0;
-        bool this.isPaginated = false;
-        GLib.Vector<SearchResult> this.results;
+        string identifier;
+        string name;
+        int32 order = std.numeric_limits<int32>.max ();
+        int32 cursor = 0;
+        bool  is_paginated = false;
+        GLib.Vector<SearchResult> results;
     }
 
     FakeSearchResultsStorage () = default;
@@ -57,11 +80,11 @@ class FakeSearchResultsStorage { {lass Provider {
     /***********************************************************
     ***********************************************************/
     public void on_signal_init () {
-        if (!this.searchResultsData.is_empty ()) {
+        if (!this.search_results_data.is_empty ()) {
             return;
         }
 
-        this.metaSuccess = {
+        this.meta_success = {
             {
                 "status", "ok"
             },
@@ -73,62 +96,67 @@ class FakeSearchResultsStorage { {lass Provider {
             }
         };
 
-        initProvidersResponse ();
+        init_providers_response ();
 
-        initSearchResultsData ();
+        init_search_results_data ();
     }
 
-    // initialize the JSON response containing the fake list of providers and their properties
-    public void initProvidersResponse () {
-        GLib.List<GLib.Variant> providersList;
+    /***********************************************************
+    Initialize the JSON response containing the fake list of
+    providers and their properties.
+    ***********************************************************/
+    public void init_providers_response () {
 
-        foreach (var fakeProviderInitInfo in fakeProvidersInitInfo) {
-            providersList.push_back (new QVariantMap ({
+        GLib.List<GLib.Variant> providers_list;
+
+        foreach (var fake_provider_init_info in fake_providers_init_info) {
+            providers_list.push_back (new QVariantMap ({
                 {
-                    "identifier", fakeProviderInitInfo.id
+                    "identifier", fake_provider_init_info.id
                 },
                 {
-                    "name", fakeProviderInitInfo.name
+                    "name", fake_provider_init_info.name
                 },
                 {
-                    "order", fakeProviderInitInfo.order
+                    "order", fake_provider_init_info.order
                 },
             }));
         }
 
-        const QVariantMap ocsMap = {
+        const QVariantMap ocs_map = {
             {
-                "meta", this.metaSuccess
+                "meta", this.meta_success
             },
             {
-                "data", providersList
+                "data", providers_list
             }
         }
 
-        this.providersResponse =
-            QJsonDocument.fromVariant (new QVariantMap ({
+        this.providers_response = QJsonDocument.from_variant (
+            new QVariantMap ({
                 {
-                    "ocs", ocsMap
+                    "ocs", ocs_map
                 }
-            }).to_json (QJsonDocument.Compact);
+            }).to_json (QJsonDocument.Compact)
+        );
     }
 
     // on_signal_init the map of fake search results for each provider
-    public void initSearchResultsData () {
-        foreach (var fakeProvider in fakeProvidersInitInfo) {
-            var providerData = this.searchResultsData[fakeProvider.id];
-            providerData.id = fakeProvider.id;
-            providerData.name = fakeProvider.name;
-            providerData.order = fakeProvider.order;
-            if (fakeProvider.numItemsToInsert > pageSize) {
-                providerData.isPaginated = true;
+    public void init_search_results_data () {
+        foreach (var fake_provider in fake_providers_init_info) {
+            var provider_data = this.search_results_data[fake_provider.id];
+            provider_data.id = fake_provider.id;
+            provider_data.name = fake_provider.name;
+            provider_data.order = fake_provider.order;
+            if (fake_provider.number_of_items_to_insert > page_size) {
+                provider_data.is_paginated = true;
             }
-            for (uint32 i = 0; i < fakeProvider.numItemsToInsert; ++i) {
-                providerData.results.push_back (
+            for (uint32 i = 0; i < fake_provider.number_of_items_to_insert; ++i) {
+                provider_data.results.push_back (
                     {
                         "http://example.de/avatar/john/64",
-                        "John Doe in " + fakeProvider.name,
-                        "We a discussion about " + fakeProvider.name + " already. But, let's have a follow up tomorrow afternoon.",
+                        "John Doe in " + fake_provider.name,
+                        "We a discussion about " + fake_provider.name + " already. But, let's have a follow up tomorrow afternoon.",
                         "http://example.de/call/abcde12345#message_12345",
                         "icon-talk",
                         true
@@ -141,18 +169,36 @@ class FakeSearchResultsStorage { {lass Provider {
 
     /***********************************************************
     ***********************************************************/
-    public const GLib.List<GLib.Variant> resultsForProvider (string provider_id, int cursor) {
+    public const GLib.List<GLib.Variant> results_for_provider (string provider_id, int cursor) {
         GLib.List<GLib.Variant> list;
 
-        var results = resultsForProviderAsVector (provider_id, cursor);
+        var results = results_for_provider_as_vector (provider_id, cursor);
 
         if (results.is_empty ()) {
             return list;
         }
 
-        for (var result : results) {
-            list.push_back (QVariantMap{ {"thumbnailUrl", result.thumbnailUrl}, {"title", result.title}, {"subline", result.subline}, {"resourceUrl", result.resourceUrl}, {"icon", result.icon}, {"rounded", result.rounded}
-            });
+        foreach (var result in results) {
+            list.push_back (new QVariantMap (
+                {
+                    "thumbnail_url", result.thumbnail_url
+                },
+                {
+                    "title", result.title
+                },
+                {
+                    "subline", result.subline
+                },
+                {
+                    "resource_url", result.resource_url
+                },
+                {
+                    "icon", result.icon
+                },
+                {
+                    "rounded", result.rounded
+                }
+            ));
         }
 
         return list;
@@ -161,18 +207,18 @@ class FakeSearchResultsStorage { {lass Provider {
 
     /***********************************************************
     ***********************************************************/
-    public const GLib.Vector<Provider.SearchResult> resultsForProviderAsVector (string provider_id, int cursor) {
+    public const GLib.Vector<Provider.SearchResult> results_for_provider_as_vector (string provider_id, int cursor) {
         GLib.Vector<Provider.SearchResult> results;
 
-        var provider = this.searchResultsData.value (provider_id, Provider ());
+        var provider = this.search_results_data.value (provider_id, Provider ());
 
         if (provider.id.is_empty () || cursor > provider.results.size ()) {
             return results;
         }
 
-        const int n = cursor + pageSize > provider.results.size ()
+        const int n = cursor + page_size > provider.results.size ()
             ? 0
-            : cursor + pageSize;
+            : cursor + page_size;
 
         for (int i = cursor; i < n; ++i) {
             results.push_back (provider.results[i]);
@@ -185,8 +231,8 @@ class FakeSearchResultsStorage { {lass Provider {
     /***********************************************************
     ***********************************************************/
     public const GLib.ByteArray query_provider (string provider_id, string search_term, int cursor) {
-        if (!this.searchResultsData.contains (provider_id)) {
-            return fake404Response;
+        if (!this.search_results_data.contains (provider_id)) {
+            return fake_404_response;
         }
 
         if (search_term == "[HTTP500]") {
@@ -194,12 +240,12 @@ class FakeSearchResultsStorage { {lass Provider {
         }
 
         if (search_term == "[empty]") {
-            QVariantMap dataMap = {
+            QVariantMap data_map = {
                 {
-                    "name", this.searchResultsData[provider_id].name
+                    "name", this.search_results_data[provider_id].name
                 },
                 {
-                    "isPaginated", false
+                    "is_paginated", false
                 },
                 {
                     "cursor", 0
@@ -209,56 +255,56 @@ class FakeSearchResultsStorage { {lass Provider {
                 }
             };
 
-            QVariantMap ocsMap = {
+            QVariantMap ocs_map = {
                 {
-                    "meta", this.metaSuccess
+                    "meta", this.meta_success
                 },
                 {
-                    "data", dataMap
+                    "data", data_map
                 }
             };
 
-            return QJsonDocument.fromVariant (
+            return QJsonDocument.from_variant (
                 new QVariantMap (
                     {
-                        "ocs", ocsMap
+                        "ocs", ocs_map
                     }
                 )
             ).to_json (QJsonDocument.Compact);
         }
 
-        var provider = this.searchResultsData.value (provider_id, Provider ());
+        var provider = this.search_results_data.value (provider_id, Provider ());
 
-        var nextCursor = cursor + pageSize;
+        var next_cursor = cursor + page_size;
 
-        const QVariantMap dataMap = {
+        const QVariantMap data_map = {
             {
-                "name", this.searchResultsData[provider_id].name
+                "name", this.search_results_data[provider_id].name
             },
             {
-                "isPaginated", this.searchResultsData[provider_id].isPaginated
+                "is_paginated", this.search_results_data[provider_id].is_paginated
             },
             {
-                "cursor", nextCursor
+                "cursor", next_cursor
             },
             {
-                "entries", resultsForProvider (provider_id, cursor)
+                "entries", results_for_provider (provider_id, cursor)
             }
         };
 
-        QVariantMap ocsMap = {
+        QVariantMap ocs_map = {
             {
-                "meta", this.metaSuccess
+                "meta", this.meta_success
             },
             {
-                "data", dataMap
+                "data", data_map
             }
         };
 
-        return new QJsonDocument.fromVariant (
+        return new QJsonDocument.from_variant (
             new QVariantMap (
                 {
-                    "ocs"), ocsMap
+                    "ocs"), ocs_map
                 }
             )
         ).to_json (QJsonDocument.Compact);
@@ -267,28 +313,9 @@ class FakeSearchResultsStorage { {lass Provider {
 
     /***********************************************************
     ***********************************************************/
-    public const GLib.ByteArray fake_providers_response_json () { return this.providersResponse; }
+    public const GLib.ByteArray fake_providers_response_json () {
+        return this.providers_response;
+    }
 
-
-    /***********************************************************
-    ***********************************************************/
-    private static FakeSearchResultsStorage this.instance;
-
-    /***********************************************************
-    ***********************************************************/
-    private const int pageSize = 5;
-
-    /***********************************************************
-    ***********************************************************/
-    private GLib.HashMap<string, Provider> this.searchResultsData;
-
-    /***********************************************************
-    ***********************************************************/
-    private GLib.ByteArray this.providersResponse = fake404Response;
-
-    /***********************************************************
-    ***********************************************************/
-    private QVariantMap this.metaSuccess;
 }
-
-FakeSearchResultsStorage *FakeSearchResultsStorage.instance = null;
+}

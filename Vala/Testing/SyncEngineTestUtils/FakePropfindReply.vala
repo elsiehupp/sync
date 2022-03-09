@@ -89,7 +89,7 @@ class FakePropfindReply : FakeReply {
     ***********************************************************/
     public void respond () {
         set_header (Soup.Request.ContentLengthHeader, payload.size ());
-        set_header (Soup.Request.ContentTypeHeader, QByteArrayLiteral ("application/xml; charset=utf-8"));
+        set_header (Soup.Request.ContentTypeHeader, new GLib.ByteArray ("application/xml; charset=utf-8"));
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 207);
         set_finished (true);
         /* emit */ signal_meta_data_changed ();
@@ -128,7 +128,7 @@ class FakePropfindReply : FakeReply {
     public override int64 read_data (char *data, int64 maxlen) {
         int64 len = std.min ((int64) payload.size (), maxlen);
         std.copy (payload.cbegin (), payload.cbegin () + len, data);
-        payload.remove (0, static_cast<int> (len));
+        payload.remove (0, (int) (len));
         return len;
     }
 

@@ -8,7 +8,7 @@ namespace Testing {
 
 /***********************************************************
 @brief The FakeDesktopServicesUrlHandler
-overrides QDesktopServices.openUrl
+overrides QDesktopServices.open_url
 ***********************************************************/
 class FakeDesktopServicesUrlHandler : GLib.Object {
 
@@ -20,5 +20,6 @@ class FakeDesktopServicesUrlHandler : GLib.Object {
 
 
     signal void signal_result_clicked (GLib.Uri url);
+
 }
 }

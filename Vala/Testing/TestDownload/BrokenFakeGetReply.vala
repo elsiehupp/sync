@@ -7,13 +7,13 @@ implied, as to its usefulness for any purpose.
 namespace Testing {
 
 /***********************************************************
-A FakeGetReply that sends max 'fakeSize' bytes, but whose
+A FakeGetReply that sends max 'fake_size' bytes, but whose
 ContentLength has the corect size
 ***********************************************************/
 class BrokenFakeGetReply : FakeGetReply {
 
     //  using FakeGetReply.FakeGetReply;
-    public int fakeSize = STOP_AFTER;
+    public int fake_size = STOP_AFTER;
 
     /***********************************************************
     ***********************************************************/
@@ -21,24 +21,24 @@ class BrokenFakeGetReply : FakeGetReply {
         if (aborted) {
             return 0;
         }
-        return std.min (size, fakeSize) + QIODevice.bytes_available (); // NOLINT : This is intended to simulare the brokeness
+        return std.min (size, fake_size) + QIODevice.bytes_available (); // NOLINT : This is intended to simulare the brokeness
     }
 
 
     /***********************************************************
     ***********************************************************/
     public override int64 read_data (char *data, int64 maxlen) {
-        int64 len = std.min ((int64) fakeSize, maxlen);
+        int64 len = std.min ((int64) fake_size, maxlen);
         std.fill_n (data, len, payload);
         size -= len;
-        fakeSize -= len;
+        fake_size -= len;
         return len;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    SyncFileItemPtr getItem (QSignalSpy spy, string path) {
+    SyncFileItemPtr get_item (QSignalSpy spy, string path) {
         foreach (GLib.List<GLib.Variant> args in spy) {
             var item = args[0].value<SyncFileItemPtr> ();
             if (item.destination () == path) {

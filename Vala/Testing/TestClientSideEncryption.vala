@@ -16,99 +16,99 @@ namespace Testing {
 
 class TestClientSideEncryption : GLib.Object {
 
-    GLib.ByteArray convertToOldStorageFormat (GLib.ByteArray data) {
+    GLib.ByteArray convert_to_old_storage_format (GLib.ByteArray data) {
         return data.split ('|').join ("fA==");
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void shouldEncryptPrivateKeys () {
+    private void should_encrypt_private_keys () {
         // GIVEN
-        var encryptionKey = QByteArrayLiteral ("foo");
-        var privateKey = QByteArrayLiteral ("bar");
-        var originalSalt = QByteArrayLiteral ("baz");
+        var encryption_key = new GLib.ByteArray ("foo");
+        var private_key = new GLib.ByteArray ("bar");
+        var original_salt = new GLib.ByteArray ("baz");
 
         // WHEN
-        var cipher = EncryptionHelper.encryptPrivateKey (encryptionKey, privateKey, originalSalt);
+        var cipher = EncryptionHelper.encrypt_private_key (encryption_key, private_key, original_salt);
 
         // THEN
         var parts = cipher.split ('|');
         GLib.assert_cmp (parts.size (), 3);
 
-        var encryptedKey = GLib.ByteArray.fromBase64 (parts[0]);
-        var iv = GLib.ByteArray.fromBase64 (parts[1]);
-        var salt = GLib.ByteArray.fromBase64 (parts[2]);
+        var encrypted_key = GLib.ByteArray.from_base64 (parts[0]);
+        var iv = GLib.ByteArray.from_base64 (parts[1]);
+        var salt = GLib.ByteArray.from_base64 (parts[2]);
 
         // We're not here to check the merits of the encryption but at least make sure it's been
         // somewhat ciphered
-        GLib.assert_true (!encryptedKey.is_empty ());
-        GLib.assert_true (encryptedKey != privateKey);
+        GLib.assert_true (!encrypted_key.is_empty ());
+        GLib.assert_true (encrypted_key != private_key);
 
         GLib.assert_true (!iv.is_empty ());
-        GLib.assert_cmp (salt, originalSalt);
+        GLib.assert_cmp (salt, original_salt);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void shouldDecryptPrivateKeys () {
+    private void should_decrypt_private_keys () {
         // GIVEN
-        var encryptionKey = QByteArrayLiteral ("foo");
-        var originalPrivateKey = QByteArrayLiteral ("bar");
-        var originalSalt = QByteArrayLiteral ("baz");
-        var cipher = EncryptionHelper.encryptPrivateKey (encryptionKey, originalPrivateKey, originalSalt);
+        var encryption_key = new GLib.ByteArray ("foo");
+        var original_private_key = new GLib.ByteArray ("bar");
+        var original_salt = new GLib.ByteArray ("baz");
+        var cipher = EncryptionHelper.encrypt_private_key (encryption_key, original_private_key, original_salt);
 
         // WHEN
-        var privateKey = EncryptionHelper.decryptPrivateKey (encryptionKey, cipher);
-        var salt = EncryptionHelper.extractPrivateKeySalt (cipher);
+        var private_key = EncryptionHelper.decrypt_private_key (encryption_key, cipher);
+        var salt = EncryptionHelper.extract_private_key_salt (cipher);
 
         // THEN
-        GLib.assert_cmp (privateKey, originalPrivateKey);
-        GLib.assert_cmp (salt, originalSalt);
+        GLib.assert_cmp (private_key, original_private_key);
+        GLib.assert_cmp (salt, original_salt);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void shouldDecryptPrivateKeysInOldStorageFormat () {
+    private void should_decrypt_private_keys_in_old_storage_format () {
         // GIVEN
-        var encryptionKey = QByteArrayLiteral ("foo");
-        var originalPrivateKey = QByteArrayLiteral ("bar");
-        var originalSalt = QByteArrayLiteral ("baz");
-        var cipher = convertToOldStorageFormat (EncryptionHelper.encryptPrivateKey (encryptionKey, originalPrivateKey, originalSalt));
+        var encryption_key = new GLib.ByteArray ("foo");
+        var original_private_key = new GLib.ByteArray ("bar");
+        var original_salt = new GLib.ByteArray ("baz");
+        var cipher = convert_to_old_storage_format (EncryptionHelper.encrypt_private_key (encryption_key, original_private_key, original_salt));
 
         // WHEN
-        var privateKey = EncryptionHelper.decryptPrivateKey (encryptionKey, cipher);
-        var salt = EncryptionHelper.extractPrivateKeySalt (cipher);
+        var private_key = EncryptionHelper.decrypt_private_key (encryption_key, cipher);
+        var salt = EncryptionHelper.extract_private_key_salt (cipher);
 
         // THEN
-        GLib.assert_cmp (privateKey, originalPrivateKey);
-        GLib.assert_cmp (salt, originalSalt);
+        GLib.assert_cmp (private_key, original_private_key);
+        GLib.assert_cmp (salt, original_salt);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void shouldSymmetricEncryptStrings () {
+    private void should_symmetric_encrypt_strings () {
         // GIVEN
-        var encryptionKey = QByteArrayLiteral ("foo");
-        var data = QByteArrayLiteral ("bar");
+        var encryption_key = new GLib.ByteArray ("foo");
+        var data = new GLib.ByteArray ("bar");
 
         // WHEN
-        var cipher = EncryptionHelper.encryptStringSymmetric (encryptionKey, data);
+        var cipher = EncryptionHelper.encrypt_string_symmetric (encryption_key, data);
 
         // THEN
         var parts = cipher.split ('|');
         GLib.assert_cmp (parts.size (), 2);
 
-        var encryptedData = GLib.ByteArray.fromBase64 (parts[0]);
-        var iv = GLib.ByteArray.fromBase64 (parts[1]);
+        var encrypted_data = GLib.ByteArray.from_base64 (parts[0]);
+        var iv = GLib.ByteArray.from_base64 (parts[1]);
 
         // We're not here to check the merits of the encryption but at least make sure it's been
         // somewhat ciphered
-        GLib.assert_true (!encryptedData.is_empty ());
-        GLib.assert_true (encryptedData != data);
+        GLib.assert_true (!encrypted_data.is_empty ());
+        GLib.assert_true (encrypted_data != data);
 
         GLib.assert_true (!iv.is_empty ());
     }
@@ -116,41 +116,41 @@ class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void shouldSymmetricDecryptStrings () {
+    private void should_symmetric_decrypt_strings () {
         // GIVEN
-        var encryptionKey = QByteArrayLiteral ("foo");
-        var originalData = QByteArrayLiteral ("bar");
-        var cipher = EncryptionHelper.encryptStringSymmetric (encryptionKey, originalData);
+        var encryption_key = new GLib.ByteArray ("foo");
+        var original_data = new GLib.ByteArray ("bar");
+        var cipher = EncryptionHelper.encrypt_string_symmetric (encryption_key, original_data);
 
         // WHEN
-        var data = EncryptionHelper.decryptStringSymmetric (encryptionKey, cipher);
+        var data = EncryptionHelper.decrypt_string_symmetric (encryption_key, cipher);
 
         // THEN
-        GLib.assert_cmp (data, originalData);
+        GLib.assert_cmp (data, original_data);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void shouldSymmetricDecryptStringsInOldStorageFormat () {
+    private void should_symmetric_decrypt_strings_in_old_storage_format () {
         // GIVEN
-        var encryptionKey = QByteArrayLiteral ("foo");
-        var originalData = QByteArrayLiteral ("bar");
-        var cipher = convertToOldStorageFormat (EncryptionHelper.encryptStringSymmetric (encryptionKey, originalData));
+        var encryption_key = new GLib.ByteArray ("foo");
+        var original_data = new GLib.ByteArray ("bar");
+        var cipher = convert_to_old_storage_format (EncryptionHelper.encrypt_string_symmetric (encryption_key, original_data));
 
         // WHEN
-        var data = EncryptionHelper.decryptStringSymmetric (encryptionKey, cipher);
+        var data = EncryptionHelper.decrypt_string_symmetric (encryption_key, cipher);
 
         // THEN
-        GLib.assert_cmp (data, originalData);
+        GLib.assert_cmp (data, original_data);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testStreamingDecryptor_data () {
-        QTest.add_column<int> ("totalBytes");
-        QTest.add_column<int> ("bytesToRead");
+    private void test_streaming_decryptor_data () {
+        QTest.add_column<int> ("total_bytes");
+        QTest.add_column<int> ("bytes_to_read");
 
         QTest.new_row ("data1") << 64  << 2;
         QTest.new_row ("data2") << 32  << 8;
@@ -161,104 +161,103 @@ class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testStreamingDecryptor () {
-        QFETCH (int, totalBytes);
+    private void test_streaming_decryptor () {
+        QFETCH (int, total_bytes);
 
-        QTemporaryFile dummyInputFile;
+        QTemporaryFile dummy_input_file;
 
-        GLib.assert_true (dummyInputFile.open ());
+        GLib.assert_true (dummy_input_file.open ());
 
-        var dummyFileRandomContents = EncryptionHelper.generateRandom (totalBytes);
+        var dummy_file_random_contents = EncryptionHelper.generate_random (total_bytes);
 
-        GLib.assert_cmp (dummyInputFile.write (dummyFileRandomContents), dummyFileRandomContents.size ());
+        GLib.assert_cmp (dummy_input_file.write (dummy_file_random_contents), dummy_file_random_contents.size ());
 
-        var generateHash = [] (GLib.ByteArray data) => {
-            QCryptographicHash hash (QCryptographicHash.Sha1);
-            hash.addData (data);
+        var generate_hash = [] (GLib.ByteArray data) => {
+            QCryptographicHash hash = new QCryptographicHash (QCryptographicHash.Sha1);
+            hash.add_data (data);
             return hash.result ();
         }
 
-        const GLib.ByteArray originalFileHash = generateHash (dummyFileRandomContents);
+        const GLib.ByteArray original_file_hash = generate_hash (dummy_file_random_contents);
 
-        GLib.assert_true (!originalFileHash.is_empty ());
+        GLib.assert_true (!original_file_hash.is_empty ());
 
-        dummyInputFile.close ();
-        GLib.assert_true (!dummyInputFile.isOpen ());
+        dummy_input_file.close ();
+        GLib.assert_true (!dummy_input_file.is_open ());
 
-        var encryptionKey = EncryptionHelper.generateRandom (16);
-        var initializationVector = EncryptionHelper.generateRandom (16);
+        var encryption_key = EncryptionHelper.generate_random (16);
+        var initialization_vector = EncryptionHelper.generate_random (16);
 
         // test normal file encryption/decryption
-        QTemporaryFile dummyEncryptionOutputFile;
+        QTemporaryFile dummy_encryption_output_file;
 
         GLib.ByteArray tag;
 
-        GLib.assert_true (EncryptionHelper.fileEncryption (encryptionKey, initializationVector, dummyInputFile, dummyEncryptionOutputFile, tag));
-        dummyInputFile.close ();
-        GLib.assert_true (!dummyInputFile.isOpen ());
+        GLib.assert_true (EncryptionHelper.file_encryption (encryption_key, initialization_vector, dummy_input_file, dummy_encryption_output_file, tag));
+        dummy_input_file.close ();
+        GLib.assert_true (!dummy_input_file.is_open ());
 
-        dummyEncryptionOutputFile.close ();
-        GLib.assert_true (!dummyEncryptionOutputFile.isOpen ());
+        dummy_encryption_output_file.close ();
+        GLib.assert_true (!dummy_encryption_output_file.is_open ());
 
-        QTemporaryFile dummyDecryptionOutputFile;
+        QTemporaryFile dummy_decryption_output_file;
 
-        GLib.assert_true (EncryptionHelper.fileDecryption (encryptionKey, initializationVector, dummyEncryptionOutputFile, dummyDecryptionOutputFile));
-        GLib.assert_true (dummyDecryptionOutputFile.open ());
-        var dummyDecryptionOutputFileHash = generateHash (dummyDecryptionOutputFile.read_all ());
-        GLib.assert_cmp (dummyDecryptionOutputFileHash, originalFileHash);
+        GLib.assert_true (EncryptionHelper.file_decryption (encryption_key, initialization_vector, dummy_encryption_output_file, dummy_decryption_output_file));
+        GLib.assert_true (dummy_decryption_output_file.open ());
+        var dummy_decryption_output_file_hash = generate_hash (dummy_decryption_output_file.read_all ());
+        GLib.assert_cmp (dummy_decryption_output_file_hash, original_file_hash);
 
         // test streaming decryptor
-        EncryptionHelper.StreamingDecryptor streamingDecryptor (encryptionKey, initializationVector, dummyEncryptionOutputFile.size ());
-        GLib.assert_true (streamingDecryptor.isInitialized ());
+        EncryptionHelper.StreamingDecryptor streaming_decryptor (encryption_key, initialization_vector, dummy_encryption_output_file.size ());
+        GLib.assert_true (streaming_decryptor.is_initialized ());
 
-        QBuffer chunkedOutputDecrypted;
-        GLib.assert_true (chunkedOutputDecrypted.open (QBuffer.WriteOnly));
+        QBuffer chunked_output_decrypted;
+        GLib.assert_true (chunked_output_decrypted.open (QBuffer.WriteOnly));
 
-        GLib.assert_true (dummyEncryptionOutputFile.open ());
+        GLib.assert_true (dummy_encryption_output_file.open ());
 
-        GLib.ByteArray pendingBytes;
+        GLib.ByteArray pending_bytes;
 
-        QFETCH (int, bytesToRead);
+        QFETCH (int, bytes_to_read);
 
-        while (dummyEncryptionOutputFile.position () < dummyEncryptionOutputFile.size ()) {
-            var bytesRemaining = dummyEncryptionOutputFile.size () - dummyEncryptionOutputFile.position ();
-            var toRead = bytesRemaining > bytesToRead ? bytesToRead : bytesRemaining;
+        while (dummy_encryption_output_file.position () < dummy_encryption_output_file.size ()) {
+            var bytes_remaining = dummy_encryption_output_file.size () - dummy_encryption_output_file.position ();
+            var to_read = bytes_remaining > bytes_to_read ? bytes_to_read : bytes_remaining;
 
-            if (dummyEncryptionOutputFile.position () + toRead > dummyEncryptionOutputFile.size ()) {
-                toRead = dummyEncryptionOutputFile.size () - dummyEncryptionOutputFile.position ();
+            if (dummy_encryption_output_file.position () + to_read > dummy_encryption_output_file.size ()) {
+                to_read = dummy_encryption_output_file.size () - dummy_encryption_output_file.position ();
             }
 
-            if (bytesRemaining - toRead != 0 && bytesRemaining - toRead < Occ.Constants.e2EeTagSize) {
+            if (bytes_remaining - to_read != 0 && bytes_remaining - to_read < Occ.Constants.e2EeTagSize) {
                 // decryption is going to fail if last chunk does not include or does not equal to Occ.Constants.e2EeTagSize bytes tag
                 // since we are emulating random size of network packets, we may end up reading beyond Occ.Constants.e2EeTagSize bytes tag at the end
                 // in that case, we don't want to try and decrypt less than Occ.Constants.e2EeTagSize ending bytes of tag, we will accumulate all the incoming data till the end
                 // and then, we are going to decrypt the entire chunk containing Occ.Constants.e2EeTagSize bytes at the end
-                pendingBytes += dummyEncryptionOutputFile.read (bytesRemaining);
+                pending_bytes += dummy_encryption_output_file.read (bytes_remaining);
                 continue;
             }
 
-            var decryptedChunk = streamingDecryptor.chunkDecryption (dummyEncryptionOutputFile.read (toRead).const_data (), toRead);
+            var decrypted_chunk = streaming_decryptor.chunk_decryption (dummy_encryption_output_file.read (to_read).const_data (), to_read);
 
-            GLib.assert_true (decryptedChunk.size () == toRead || streamingDecryptor.isFinished () || !pendingBytes.is_empty ());
+            GLib.assert_true (decrypted_chunk.size () == to_read || streaming_decryptor.is_finished () || !pending_bytes.is_empty ());
 
-            chunkedOutputDecrypted.write (decryptedChunk);
+            chunked_output_decrypted.write (decrypted_chunk);
         }
 
-        if (!pendingBytes.is_empty ()) {
-            var decryptedChunk = streamingDecryptor.chunkDecryption (pendingBytes.const_data (), pendingBytes.size ());
+        if (!pending_bytes.is_empty ()) {
+            var decrypted_chunk = streaming_decryptor.chunk_decryption (pending_bytes.const_data (), pending_bytes.size ());
 
-            GLib.assert_true (decryptedChunk.size () == pendingBytes.size () || streamingDecryptor.isFinished ());
+            GLib.assert_true (decrypted_chunk.size () == pending_bytes.size () || streaming_decryptor.is_finished ());
 
-            chunkedOutputDecrypted.write (decryptedChunk);
+            chunked_output_decrypted.write (decrypted_chunk);
         }
 
-        chunkedOutputDecrypted.close ();
+        chunked_output_decrypted.close ();
 
-        GLib.assert_true (chunkedOutputDecrypted.open (QBuffer.ReadOnly));
-        GLib.assert_cmp (generateHash (chunkedOutputDecrypted.read_all ()), originalFileHash);
-        chunkedOutputDecrypted.close ();
+        GLib.assert_true (chunked_output_decrypted.open (QBuffer.ReadOnly));
+        GLib.assert_cmp (generate_hash (chunked_output_decrypted.read_all ()), original_file_hash);
+        chunked_output_decrypted.close ();
     }
-}
 
-QTEST_APPLESS_MAIN (TestClientSideEncryption)
-#include "testclientsideencryption.moc"
+}
+}

@@ -1,8 +1,8 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-      support, and with no warranty, express or implied, as to its usefulness for
-         any purpose.
-         */
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
+***********************************************************/
 
 //  #include <QtTest>
 
@@ -24,7 +24,7 @@ class TestSyncFileItem : GLib.Object {
 
 
     //  private
-    private SyncFileItem createItem (string file ) {
+    private SyncFileItem create_item (string file ) {
         SyncFileItem i;
         i.file = file;
         return i;
@@ -33,29 +33,29 @@ class TestSyncFileItem : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testComparator_data () {
+    private void test_comparator_data () {
         QTest.add_column<SyncFileItem> ("a");
         QTest.add_column<SyncFileItem> ("b");
         QTest.add_column<SyncFileItem> ("c");
 
-        QTest.new_row ("a1") + createItem ("client") + createItem ("client/build") + createItem ("client-build") ;
-        QTest.new_row ("a2") + createItem ("test/t1") + createItem ("test/t2") + createItem ("test/t3") ;
-        QTest.new_row ("a3") + createItem ("ABCD") + createItem ("abcd") + createItem ("zzzz");
+        QTest.new_row ("a1") + create_item ("client") + create_item ("client/build") + create_item ("client-build") ;
+        QTest.new_row ("a2") + create_item ("test/t1") + create_item ("test/t2") + create_item ("test/t3") ;
+        QTest.new_row ("a3") + create_item ("ABCD") + create_item ("abcd") + create_item ("zzzz");
 
-        SyncFileItem movedItem1;
-        movedItem1.file = "folder/source/file.f";
-        movedItem1.renameTarget = "folder/destination/file.f";
-        movedItem1.instruction = CSYNC_INSTRUCTION_RENAME;
+        SyncFileItem moved_item1;
+        moved_item1.file = "folder/source/file.f";
+        moved_item1.rename_target = "folder/destination/file.f";
+        moved_item1.instruction = CSYNC_INSTRUCTION_RENAME;
 
-        QTest.new_row ("move1") + createItem ("folder/destination") + movedItem1 << createItem ("folder/destination-2");
-        QTest.new_row ("move2") + createItem ("folder/destination/1") + movedItem1 << createItem ("folder/source");
-        QTest.new_row ("move3") + createItem ("abc") + movedItem1 << createItem ("ijk");
+        QTest.new_row ("move1") + create_item ("folder/destination") + moved_item1 << create_item ("folder/destination-2");
+        QTest.new_row ("move2") + create_item ("folder/destination/1") + moved_item1 << create_item ("folder/source");
+        QTest.new_row ("move3") + create_item ("abc") + moved_item1 << create_item ("ijk");
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testComparator () {
+    private void test_comparator () {
         QFETCH ( SyncFileItem , a );
         QFETCH ( SyncFileItem , b );
         QFETCH ( SyncFileItem , c );
@@ -72,5 +72,6 @@ class TestSyncFileItem : GLib.Object {
         GLib.assert_true (! (b < b));
         GLib.assert_true (! (c < c));
     }
+
 }
 }

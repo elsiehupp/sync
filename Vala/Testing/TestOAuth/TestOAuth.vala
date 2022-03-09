@@ -13,32 +13,32 @@ namespace Testing {
 
 class TestOAuth : GLib.Object {
 
-    const GLib.Uri sOAuthTestServer = new GLib.Uri ("oauthtest://someserver/owncloud");
+    const GLib.Uri s_oauth_test_server = new GLib.Uri ("oauthtest://someserver/owncloud");
 
     /***********************************************************
     ***********************************************************/
-    private void testBasic () {
+    private void test_basic () {
         OAuthTestCase test;
         test.test ();
     }
 
     class TestCloseBrowserDontCrash : OAuthTestCase {
 
-        override Soup.Reply tokenReply (Soup.Operation operation, Soup.Request request) {
+        override Soup.Reply token_reply (Soup.Operation operation, Soup.Request request) {
             //  ASSERT (browser_reply);
             // simulate the fact that the browser is closing the connection
             browser_reply.on_signal_abort ();
-            QCoreApplication.processEvents ();
+            QCoreApplication.process_events ();
 
             //  ASSERT (state == BrowserOpened);
             state = TokenAsked;
 
             std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
-            payload.setData (tokenReplyPayload ());
+            payload.set_data (token_reply_payload ());
             return new SlowFakePostReply (operation, request, std.move (payload), fake_qnam);
         }
 
-        override void browserReplyFinished () {
+        override void browser_reply_finished () {
             GLib.assert_cmp (sender (), browser_reply.data ());
             GLib.assert_cmp (browser_reply.error (), Soup.Reply.OperationCanceledError);
             reply_to_browser_ok = true;
@@ -46,14 +46,14 @@ class TestOAuth : GLib.Object {
     }
 
     // Test for https://github.com/owncloud/client/pull/6057
-    private void testCloseBrowserDontCrash () {
+    private void test_close_browser_dont_crash () {
         TestCloseBrowserDontCrash test;
         test.test ();
     }
 
 
     class TestRandomConnections : OAuthTestCase {
-        override Soup.Reply createBrowserReply (Soup.Request request) {
+        override Soup.Reply create_browser_reply (Soup.Request request) {
             QTimer.single_shot (0, this, [this, request] {
                 var port = request.url ().port ();
                 state = CustomState;
@@ -68,32 +68,36 @@ class TestOAuth : GLib.Object {
                 }
                 foreach (var x in payloads) {
                     var socket = new QTcpSocket (this);
-                    socket.connectToHost ("localhost", port);
-                    GLib.assert_true (socket.waitForConnected ());
+                    socket.connect_to_host ("localhost", port);
+                    GLib.assert_true (socket.wait_for_connected ());
                     socket.write (x);
                 }
 
                 // Do the actual request a bit later
-                QTimer.single_shot (100, this, [this, request] {
-                    GLib.assert_cmp (state, CustomState);
-                    state = BrowserOpened;
-                    this.OAuthTestCase.createBrowserReply (request);
-                });
+                QTimer.single_shot (
+                    100,
+                    this,
+                    [this, request] () => {
+                        GLib.assert_cmp (state, CustomState);
+                        state = BrowserOpened;
+                        this.OAuthTestCase.create_browser_reply (request);
+                    }
+                );
            });
            return null;
         }
 
-        override Soup.Reply tokenReply (Soup.Operation operation, Soup.Request request) {
+        override Soup.Reply token_reply (Soup.Operation operation, Soup.Request request) {
             if (state == CustomState) {
                 return new FakeErrorReply (operation, request, this, 500);
             }
-            return OAuthTestCase.tokenReply (operation, request);
+            return OAuthTestCase.token_reply (operation, request);
         }
 
-        override void oauthResult (OAuth.Result result, string user, string token ,
-                        string refreshToken) {
+        override void oauth_result (OAuth.Result result, string user, string token ,
+                        string refresh_token) {
             if (state != CustomState) {
-                return OAuthTestCase.oauthResult (result, user, token, refreshToken);
+                return OAuthTestCase.oauth_result (result, user, token, refresh_token);
             }
             GLib.assert_cmp (result, OAuth.Error);
         }
@@ -102,7 +106,7 @@ class TestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testRandomConnections () {
+    private void test_random_connections () {
         // Test that we can send random garbage to the litening socket and it does not prevent the connection
         TestRandomConnections test;
         test.test ();
@@ -111,30 +115,30 @@ class TestOAuth : GLib.Object {
 
     struct TestTokenUrlHasRedirect : OAuthTestCase {
 
-        int redirectsDone = 0;
+        int redirects_done = 0;
 
-        override Soup.Reply tokenReply (Soup.Operation operation, Soup.Request request) {
+        override Soup.Reply token_reply (Soup.Operation operation, Soup.Request request) {
             //  ASSERT (browser_reply);
             // Kind of reproduces what we had in https://github.com/owncloud/enterprise/issues/2951 (not 1:1)
-            if (redirectsDone == 0) {
+            if (redirects_done == 0) {
                 std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
-                payload.setData ("");
+                payload.set_data ("");
                 var reply = new SlowFakePostReply (operation, request, std.move (payload), this);
-                reply.redirectToPolicy = true;
-                redirectsDone++;
+                reply.redirect_to_policy = true;
+                redirects_done++;
                 return reply;
-            } else if  (redirectsDone == 1) {
+            } else if  (redirects_done == 1) {
                 std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
-                payload.setData ("");
+                payload.set_data ("");
                 var reply = new SlowFakePostReply (operation, request, std.move (payload), this);
-                reply.redirectToToken = true;
-                redirectsDone++;
+                reply.redirect_to_token = true;
+                redirects_done++;
                 return reply;
             } else {
                 // ^^ This is with a custom reply and not actually HTTP, so we're testing the HTTP redirect code
-                // we have in AbstractNetworkJob.slotFinished ()
-                redirectsDone++;
-                return OAuthTestCase.tokenReply (operation, request);
+                // we have in AbstractNetworkJob.slot_finished ()
+                redirects_done++;
+                return OAuthTestCase.token_reply (operation, request);
             }
         }
     }
@@ -142,7 +146,7 @@ class TestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testTokenUrlHasRedirect () {
+    private void test_token_url_has_redirect () {
         TestTokenUrlHasRedirect test;
         test.test ();
     }

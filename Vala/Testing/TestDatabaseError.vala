@@ -15,13 +15,13 @@ class TestDatabaseError : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testDatabaseError () {
+    private void test_database_error () {
         /* This test will make many iteration, at each iteration, the iᵗʰ database access will fail.
          * The test ensure that if there is a failure, the next sync recovers. And if there was
          * no error, then everything was sync'ed properly.
          */
 
-        FileInfo finalState;
+        FileInfo final_state;
         for (int count = 0; true; ++count) {
             GLib.info ("Starting Iteration " + count);
 
@@ -42,33 +42,33 @@ class TestDatabaseError : GLib.Object {
             fake_folder.local_modifier ().rename ("C", "NewDir/C");
 
             // Set the counter
-            fake_folder.sync_journal ().autotestFailCounter = count;
+            fake_folder.sync_journal ().autotest_fail_counter = count;
 
             // run the sync
             bool result = fake_folder.sync_once ();
 
-            GLib.info ("Result of iteration " + count + " was " + result);
+            GLib.info ("Result of iteration " + count.to_string () + " was " + result);
 
-            if (fake_folder.sync_journal ().autotestFailCounter >= 0) {
+            if (fake_folder.sync_journal ().autotest_fail_counter >= 0) {
                 // No error was thrown, we are on_signal_finished
                 GLib.assert_true (result);
                 GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-                GLib.assert_cmp (fake_folder.current_remote_state (), finalState);
+                GLib.assert_cmp (fake_folder.current_remote_state (), final_state);
                 return;
             }
 
             if (!result) {
-                fake_folder.sync_journal ().autotestFailCounter = -1;
+                fake_folder.sync_journal ().autotest_fail_counter = -1;
                 // Try again
                 GLib.assert_true (fake_folder.sync_once ());
             }
 
             GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
             if (count == 0) {
-                finalState = fake_folder.current_remote_state ();
+                final_state = fake_folder.current_remote_state ();
             } else {
                 // the final state should be the same for every iteration
-                GLib.assert_cmp (fake_folder.current_remote_state (), finalState);
+                GLib.assert_cmp (fake_folder.current_remote_state (), final_state);
             }
         }
     }

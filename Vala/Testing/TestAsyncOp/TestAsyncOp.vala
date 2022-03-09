@@ -90,7 +90,7 @@ class TestAsyncOp : GLib.Object {
         // Callback that simulate an error.
         var error_callback = [] (TestCase tc, Soup.Request request) {
             tc.poll_request = [] (TestCase *, Soup.Request &) . Soup.Reply * { std.on_signal_abort (); }; // shall no longer be called;
-            GLib.ByteArray body = "{\"status\":\"error\",\"errorCode\":500,\"errorMessage\":\"TestingErrors\"}\n";
+            GLib.ByteArray body = "{\"status\":\"error\",\"errorCode\":500,\"error_message\":\"TestingErrors\"}\n";
             return new FakePayloadReply (Soup.GetOperation, request, body, null);
         }
         // This lambda takes another functor as a parameter, and returns a callback that will

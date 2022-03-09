@@ -42,7 +42,7 @@ class TestFolderWatcher : GLib.Object {
     ***********************************************************/
     public TestFolderWatcher () {
         QDir root_directory = new QDir (this.root.path ());
-        this.root_path = root_directory.canonicalPath ();
+        this.root_path = root_directory.canonical_path ();
         GLib.debug ("creating test directory tree in " + this.root_path);
 
         root_directory.mkpath ("a1/b1/c1");
@@ -57,7 +57,7 @@ class TestFolderWatcher : GLib.Object {
 
         this.watcher.on_signal_reset (new FolderWatcher ());
         this.watcher.init (this.root_path);
-        this.path_changed_spy.on_signal_reset (new QSignalSpy (this.watcher.data (), SIGNAL (pathChanged (string))));
+        this.path_changed_spy.on_signal_reset (new QSignalSpy (this.watcher.data (), SIGNAL (path_changed (string))));
     }
 
 
@@ -65,7 +65,7 @@ class TestFolderWatcher : GLib.Object {
     ***********************************************************/
     public int count_folders (string path) {
         int n = 0;
-        foreach (var sub in new QDir (path).entryList (QDir.Dirs | QDir.NoDotAndDotDot))
+        foreach (var sub in new QDir (path).entry_list (QDir.Dirs | QDir.NoDotAndDotDot))
             n += 1 + count_folders (path + '/' + sub);
         return n;
     }
@@ -100,7 +100,7 @@ class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testATouch () { // touch an existing file.
+    private void test_a_touch () { // touch an existing file.
         string file = this.root_path + "/a1/random.bin";
         touch (file);
         GLib.assert_true (wait_for_path_changed (file));
@@ -109,7 +109,7 @@ class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testMove3LevelDirWithFile () {
+    private void test_move3_level_dir_with_file () {
         string file = this.root_path + "/a0/b/c/empty.txt";
         mkdir (this.root_path + "/a0");
         mkdir (this.root_path + "/a0/b");
@@ -122,7 +122,7 @@ class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testCreateADir () {
+    private void test_create_a_dir () {
         string file = this.root_path + "/a1/b1/new_dir";
         mkdir (file);
         GLib.assert_true (wait_for_path_changed (file));
@@ -136,7 +136,7 @@ class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testRemoveADir () {
+    private void test_remove_a_dir () {
         string file = this.root_path + "/a1/b3/c3";
         rmdir (file);
         GLib.assert_true (wait_for_path_changed (file));
@@ -145,7 +145,7 @@ class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testRemoveAFile () {
+    private void test_remove_a_file () {
         string file = this.root_path + "/a1/b2/todelete.bin";
         GLib.assert_true (GLib.File.exists (file));
         rm (file);
@@ -157,7 +157,7 @@ class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testRenameAFile () {
+    private void test_rename_a_file () {
         string file1 = this.root_path + "/a2/renamefile";
         string file2 = this.root_path + "/a2/renamefile.renamed";
         GLib.assert_true (GLib.File.exists (file1));
@@ -171,7 +171,7 @@ class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testMoveAFile () {
+    private void test_move_a_file () {
         string old_file = this.root_path + "/a1/movefile";
         string new_file = this.root_path + "/a2/movefile.renamed";
         GLib.assert_true (GLib.File.exists (old_file));
@@ -185,7 +185,7 @@ class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testRenameDirectorySameBase () {
+    private void test_rename_directory_same_base () {
         string old_file = this.root_path + "/a1/b1";
         string new_file = this.root_path + "/a1/brename";
         GLib.assert_true (GLib.File.exists (old_file));
@@ -233,7 +233,7 @@ class TestFolderWatcher : GLib.Object {
 
 
     int check_watch_count (int n) {
-        GLib.assert_cmp (this.watcher.testLinuxWatchCount (), (n));
+        GLib.assert_cmp (this.watcher.test_linux_watch_count (), (n));
     }
 
 

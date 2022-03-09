@@ -15,14 +15,14 @@ class TestUpdater : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_version_to_int () {
-        int64 lowVersion = Updater.Helper.versionToInt (1,2,80,3000);
-        GLib.assert_cmp (Updater.Helper.stringVersionToInt ("1.2.80.3000"), lowVersion);
+        int64 low_version = Updater.Helper.version_to_int (1,2,80,3000);
+        GLib.assert_cmp (Updater.Helper.string_version_to_int ("1.2.80.3000"), low_version);
 
-        int64 highVersion = Updater.Helper.versionToInt (99,2,80,3000);
-        int64 currVersion = Updater.Helper.currentVersionToInt ();
-        GLib.assert_true (currVersion > 0);
-        GLib.assert_true (currVersion > lowVersion);
-        GLib.assert_true (currVersion < highVersion);
+        int64 high_version = Updater.Helper.version_to_int (99,2,80,3000);
+        int64 current_version = Updater.Helper.current_version_to_int ();
+        GLib.assert_true (current_version > 0);
+        GLib.assert_true (current_version > low_version);
+        GLib.assert_true (current_version < high_version);
     }
 
 }

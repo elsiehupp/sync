@@ -14,11 +14,11 @@ class TestFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testFolder () {
+    private void test_folder () {
         QFETCH (string, folder);
-        QFETCH (string, expectedFolder);
+        QFETCH (string, expected_folder);
         Folder f = new Folder ("alias", folder, "http://foo.bar.net");
-        GLib.assert_cmp (f.path (), expectedFolder);
+        GLib.assert_cmp (f.path (), expected_folder);
         delete f;
     }
 
@@ -27,7 +27,7 @@ class TestFolder : GLib.Object {
     ***********************************************************/
     private void on_test_folder_data () {
         QTest.add_column<string> ("folder");
-        QTest.add_column<string> ("expectedFolder");
+        QTest.add_column<string> ("expected_folder");
 
         QTest.new_row ("unixcase") + "/foo/bar" + "/foo/bar";
         QTest.new_row ("doubleslash") + "/foo//bar" + "/foo/bar";

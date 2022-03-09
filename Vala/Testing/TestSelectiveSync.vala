@@ -15,70 +15,70 @@ class TestSelectiveSync : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testSelectiveSyncBigFolders () {
+    private void test_selective_sync_big_folders () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         SyncOptions options;
-        options.newBigFolderSizeLimit = 20000; // 20 K
+        options.new_big_folder_size_limit = 20000; // 20 K
         fake_folder.sync_engine ().set_sync_options (options);
 
-        string[] sizeRequests;
+        string[] size_requests;
         fake_folder.set_server_override ((Soup.Operation operation, Soup.Request request, QIODevice device) => {
             // Record what path we are querying for the size
             if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND") {
                 if (device.read_all ().contains ("<size ")) {
-                    sizeRequests.append (request.url ().path ());
+                    size_requests.append (request.url ().path ());
                 }
             }
             return null;
         });
 
-        QSignalSpy newBigFolder (&fake_folder.sync_engine (), &SyncEngine.newBigFolder);
+        QSignalSpy new_big_folder (&fake_folder.sync_engine (), &SyncEngine.new_big_folder);
 
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
-        fake_folder.remote_modifier ().create_directory ("A/newBigDir");
-        fake_folder.remote_modifier ().create_directory ("A/newBigDir/sub_directory");
-        fake_folder.remote_modifier ().insert ("A/newBigDir/sub_directory/bigFile", options.newBigFolderSizeLimit + 10);
-        fake_folder.remote_modifier ().insert ("A/newBigDir/sub_directory/smallFile", 10);
+        fake_folder.remote_modifier ().create_directory ("A/new_big_dir");
+        fake_folder.remote_modifier ().create_directory ("A/new_big_dir/sub_directory");
+        fake_folder.remote_modifier ().insert ("A/new_big_dir/sub_directory/big_file", options.new_big_folder_size_limit + 10);
+        fake_folder.remote_modifier ().insert ("A/new_big_dir/sub_directory/small_file", 10);
 
-        fake_folder.remote_modifier ().create_directory ("B/newSmallDir");
-        fake_folder.remote_modifier ().create_directory ("B/newSmallDir/sub_directory");
-        fake_folder.remote_modifier ().insert ("B/newSmallDir/sub_directory/smallFile", 10);
+        fake_folder.remote_modifier ().create_directory ("B/new_small_dir");
+        fake_folder.remote_modifier ().create_directory ("B/new_small_dir/sub_directory");
+        fake_folder.remote_modifier ().insert ("B/new_small_dir/sub_directory/small_file", 10);
 
         // Because the test system don't do that automatically
-        fake_folder.remote_modifier ().find ("A/newBigDir").extra_dav_properties = "<oc:size>20020</oc:size>";
-        fake_folder.remote_modifier ().find ("A/newBigDir/sub_directory").extra_dav_properties = "<oc:size>20020</oc:size>";
-        fake_folder.remote_modifier ().find ("B/newSmallDir").extra_dav_properties = "<oc:size>10</oc:size>";
-        fake_folder.remote_modifier ().find ("B/newSmallDir/sub_directory").extra_dav_properties = "<oc:size>10</oc:size>";
+        fake_folder.remote_modifier ().find ("A/new_big_dir").extra_dav_properties = "<oc:size>20020</oc:size>";
+        fake_folder.remote_modifier ().find ("A/new_big_dir/sub_directory").extra_dav_properties = "<oc:size>20020</oc:size>";
+        fake_folder.remote_modifier ().find ("B/new_small_dir").extra_dav_properties = "<oc:size>10</oc:size>";
+        fake_folder.remote_modifier ().find ("B/new_small_dir/sub_directory").extra_dav_properties = "<oc:size>10</oc:size>";
 
         GLib.assert_true (fake_folder.sync_once ());
 
-        GLib.assert_cmp (newBigFolder.count (), 1);
-        GLib.assert_cmp (newBigFolder.first ()[0].to_string (), string ("A/newBigDir"));
-        GLib.assert_cmp (newBigFolder.first ()[1].to_bool (), false);
-        newBigFolder.clear ();
+        GLib.assert_cmp (new_big_folder.count (), 1);
+        GLib.assert_cmp (new_big_folder.first ()[0].to_string (), string ("A/new_big_dir"));
+        GLib.assert_cmp (new_big_folder.first ()[1].to_bool (), false);
+        new_big_folder.clear ();
 
-        GLib.assert_cmp (sizeRequests.count (), 2); // "A/newBigDir" and "B/newSmallDir";
-        GLib.assert_cmp (sizeRequests.filter ("/sub_directory").count (), 0); // at no point we should request the size of the subdirectories
-        sizeRequests.clear ();
+        GLib.assert_cmp (size_requests.count (), 2); // "A/new_big_dir" and "B/new_small_dir";
+        GLib.assert_cmp (size_requests.filter ("/sub_directory").count (), 0); // at no point we should request the size of the subdirectories
+        size_requests.clear ();
 
-        var oldSync = fake_folder.current_local_state ();
+        var old_sync = fake_folder.current_local_state ();
         // syncing again should do the same
-        fake_folder.sync_engine ().journal ().schedulePathForRemoteDiscovery (string ("A/newBigDir"));
+        fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery (string ("A/new_big_dir"));
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), oldSync);
-        GLib.assert_cmp (newBigFolder.count (), 1); // (since we don't have a real Folder, the files were not added to any list)
-        newBigFolder.clear ();
-        GLib.assert_cmp (sizeRequests.count (), 1); // "A/newBigDir";
-        sizeRequests.clear ();
+        GLib.assert_cmp (fake_folder.current_local_state (), old_sync);
+        GLib.assert_cmp (new_big_folder.count (), 1); // (since we don't have a real Folder, the files were not added to any list)
+        new_big_folder.clear ();
+        GLib.assert_cmp (size_requests.count (), 1); // "A/new_big_dir";
+        size_requests.clear ();
 
         // Simulate that we accept all files by seting a wildcard allow list
         fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
             string[] () + "/");
-        fake_folder.sync_engine ().journal ().schedulePathForRemoteDiscovery (string ("A/newBigDir"));
+        fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery (string ("A/new_big_dir"));
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (newBigFolder.count (), 0);
-        GLib.assert_cmp (sizeRequests.count (), 0);
+        GLib.assert_cmp (new_big_folder.count (), 0);
+        GLib.assert_cmp (size_requests.count (), 0);
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 }

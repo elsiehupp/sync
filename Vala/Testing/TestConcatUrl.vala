@@ -25,11 +25,11 @@ class TestConcatUrl : GLib.Object {
         QFETCH (string, expected);
         GLib.Uri base_url = new GLib.Uri ("http://example.com" + base);
         QUrlQuery url_query;
-        url_query.setQueryItems (query);
-        GLib.Uri resultUrl = Utility.concat_url_path (base_url, concat, url_query);
-        string result = string.fromUtf8 (resultUrl.toEncoded ());
-        string expectedFull = "http://example.com" + expected;
-        GLib.assert_cmp (result, expectedFull);
+        url_query.set_query_items (query);
+        GLib.Uri result_url = Utility.concat_url_path (base_url, concat, url_query);
+        string result = result_url.to_string ();
+        string expected_full = "http://example.com" + expected;
+        GLib.assert_cmp (result, expected_full);
     }
 
 
@@ -82,15 +82,15 @@ class TestConcatUrl : GLib.Object {
 
     static QueryItems make_key_value (string key, string value) {
         QueryItems query_items;
-        query_items.append (qMakePair (key, value));
+        query_items.append (new Pair<string, string>  (key, value));
         return query_items;
     }
 
     static QueryItems make_keys_values (string key1, string value1,
                         string key2, string value2) {
         QueryItems query_items;
-        query_items.append (qMakePair (key1, value1));
-        query_items.append (qMakePair (key2, value2));
+        query_items.append (new Pair<string, string>  (key1, value1));
+        query_items.append (new Pair<string, string>  (key2, value2));
         return query_items;
     }
 

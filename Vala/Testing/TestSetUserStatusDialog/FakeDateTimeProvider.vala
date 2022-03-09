@@ -10,57 +10,59 @@ class FakeDateTimeProvider : Occ.DateTimeProvider {
 
     /***********************************************************
     ***********************************************************/
-    public void setCurrentDateTime (GLib.DateTime dateTime) { this.dateTime = dateTime; }
+    private GLib.DateTime date_time;
+
+    /***********************************************************
+    ***********************************************************/
+    public void set_current_date_time (GLib.DateTime date_time) {
+        this.date_time = date_time;
+    }
 
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    public QDate currentDate () override ( return this.dateTime.date (); }
+    public override QDate current_date () {
+        return this.date_time.date ();
+    }
 
 
     /***********************************************************
     ***********************************************************/
-    private GLib.DateTime this.dateTime;
+    static GLib.Vector<Occ.UserStatus> create_fake_predefined_statuses (GLib.DateTime current_time) {
+        GLib.Vector<Occ.UserStatus> statuses;
+
+        const string user_status_id = "fake-identifier";
+        const string user_status_message = "Predefined status";
+        const string user_status_icon = "🏖";
+        const Occ.UserStatus.OnlineStatus user_status_state = Occ.UserStatus.OnlineStatus.Online;
+        const bool user_status_message_predefined = true;
+        Occ.Optional<Occ.ClearAt> user_status_clear_at;
+        Occ.ClearAt clear_at;
+        clear_at.type = Occ.ClearAtType.Timestamp;
+        clear_at.timestamp = current_time.add_secs (60 * 60).to_time_t ();
+        user_status_clear_at = clear_at;
+
+        statuses.emplace_back (user_status_id, user_status_message, user_status)icon,
+            user_status_state, user_status_message_predefined, user_status_clear_at);
+
+        return statuses;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    static GLib.DateTime create_date_time (
+        int year = 2021, int month = 7, int day = 27,
+        int hour = 12, int minute = 0, int second = 0) {
+        QDate fake_date = new QDate (year, month, day);
+        QTime fake_time = new QTime (hour, minute, second);
+        GLib.DateTime fake_date_time;
+
+        fake_date_time.set_date (fake_date);
+        fake_date_time.set_time (fake_time);
+
+        return fake_date_time;
+    }
+
 }
-
-
-
-
-static GLib.Vector<Occ.UserStatus>
-createFakePredefinedStatuses (GLib.DateTime currentTime) {
-    GLib.Vector<Occ.UserStatus> statuses;
-
-    const string user_statusId ("fake-identifier");
-    const string user_statusMessage ("Predefined status");
-    const string user_statusIcon ("🏖");
-    const Occ.UserStatus.OnlineStatus user_statusState (Occ.UserStatus.OnlineStatus.Online);
-    const bool user_statusMessagePredefined (true);
-    Occ.Optional<Occ.ClearAt> user_statusClearAt;
-    Occ.ClearAt clearAt;
-    clearAt.type = Occ.ClearAtType.Timestamp;
-    clearAt.timestamp = currentTime.add_secs (60 * 60).toTime_t ();
-    user_statusClearAt = clearAt;
-
-    statuses.emplace_back (user_statusId, user_statusMessage, user_statusIcon,
-        user_statusState, user_statusMessagePredefined, user_statusClearAt);
-
-    return statuses;
-}
-
-static GLib.DateTime createDateTime (int year = 2021, int month = 7, int day = 27,
-    int hour = 12, int minute = 0, int second = 0) {
-    QDate fakeDate (year, month, day);
-    QTime fakeTime (hour, minute, second);
-    GLib.DateTime fakeDateTime;
-
-    fakeDateTime.setDate (fakeDate);
-    fakeDateTime.setTime (fakeTime);
-
-    return fakeDateTime;
 }

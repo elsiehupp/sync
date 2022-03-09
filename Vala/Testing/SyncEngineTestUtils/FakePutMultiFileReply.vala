@@ -123,7 +123,7 @@ class FakePutMultiFileReply : FakeReply {
     public override int64 read_data (char *data, int64 maxlen) {
         int64 len = std.min (int64 { this.payload.size () }, maxlen);
         std.copy (this.payload.cbegin (), this.payload.cbegin () + len, data);
-        this.payload.remove (0, static_cast<int> (len));
+        this.payload.remove (0, (int) (len));
         return len;
     }
 

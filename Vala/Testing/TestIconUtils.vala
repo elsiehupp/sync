@@ -20,64 +20,64 @@ class TestIconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testDrawSvgWithCustomFillColor () {
-        const string blackSvgDirPath = Occ.Theme.themePrefix + "black";
-        const QDir blackSvgDir = new QDir (blackSvgDirPath);
-        const string[] blackImages = blackSvgDir.entryList ("*.svg");
+    private void test_draw_svg_with_custom_fill_color () {
+        const string black_svg_dir_path = Occ.Theme.theme_prefix + "black";
+        const QDir black_svg_dir = new QDir (black_svg_dir_path);
+        const string[] black_images = black_svg_dir.entry_list ("*.svg");
 
-        GLib.assert_true (!blackImages.is_empty ());
+        GLib.assert_true (!black_images.is_empty ());
 
-        GLib.assert_true (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (blackSvgDirPath + "/" + blackImages.at (0), QColorConstants.Svg.red).is_null ());
+        GLib.assert_true (!Occ.Ui.IconUtils.draw_svg_with_custom_fill_color (black_svg_dir_path + "/" + black_images.at (0), QColorConstants.Svg.red).is_null ());
 
-        GLib.assert_true (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (blackSvgDirPath + "/" + blackImages.at (0), QColorConstants.Svg.green).is_null ());
+        GLib.assert_true (!Occ.Ui.IconUtils.draw_svg_with_custom_fill_color (black_svg_dir_path + "/" + black_images.at (0), QColorConstants.Svg.green).is_null ());
 
-        const string whiteSvgDirPath = Occ.Theme.themePrefix + "white";
-        const QDir whiteSvgDir = new QDir (whiteSvgDirPath);
-        const string[] whiteImages = whiteSvgDir.entryList ("*.svg");
+        const string white_svg_dir_path = Occ.Theme.theme_prefix + "white";
+        const QDir white_svg_dir = new QDir (white_svg_dir_path);
+        const string[] white_images = white_svg_dir.entry_list ("*.svg");
 
-        GLib.assert_true (!whiteImages.is_empty ());
+        GLib.assert_true (!white_images.is_empty ());
 
-        GLib.assert_true (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (whiteSvgDirPath + "/" + whiteImages.at (0), QColorConstants.Svg.blue).is_null ());
+        GLib.assert_true (!Occ.Ui.IconUtils.draw_svg_with_custom_fill_color (white_svg_dir_path + "/" + white_images.at (0), QColorConstants.Svg.blue).is_null ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testCreateSvgPixmapWithCustomColor () {
-        const QDir blackSvgDir = new QDir (Occ.Theme.themePrefix + "black");
-        const string[] blackImages = blackSvgDir.entryList ("*.svg");
+    private void test_create_svg_pixmap_with_custom_color () {
+        const QDir black_svg_dir = new QDir (Occ.Theme.theme_prefix + "black");
+        const string[] black_images = black_svg_dir.entry_list ("*.svg");
 
-        GLib.assert_true (!blackImages.is_empty ());
+        GLib.assert_true (!black_images.is_empty ());
 
-        GLib.assert_true (!Occ.Ui.IconUtils.createSvgImageWithCustomColor (blackImages.at (0), QColorConstants.Svg.red).is_null ());
+        GLib.assert_true (!Occ.Ui.IconUtils.create_svg_image_with_custom_color (black_images.at (0), QColorConstants.Svg.red).is_null ());
 
-        GLib.assert_true (!Occ.Ui.IconUtils.createSvgImageWithCustomColor (blackImages.at (0), QColorConstants.Svg.green).is_null ());
+        GLib.assert_true (!Occ.Ui.IconUtils.create_svg_image_with_custom_color (black_images.at (0), QColorConstants.Svg.green).is_null ());
 
-        const QDir whiteSvgDir = new QDir (Occ.Theme.themePrefix + "white");
-        const string[] whiteImages = whiteSvgDir.entryList ("*.svg");
+        const QDir white_svg_dir = new QDir (Occ.Theme.theme_prefix + "white");
+        const string[] white_images = white_svg_dir.entry_list ("*.svg");
 
-        GLib.assert_true (!whiteImages.is_empty ());
+        GLib.assert_true (!white_images.is_empty ());
 
-        GLib.assert_true (!Occ.Ui.IconUtils.createSvgImageWithCustomColor (whiteImages.at (0), QColorConstants.Svg.blue).is_null ());
+        GLib.assert_true (!Occ.Ui.IconUtils.create_svg_image_with_custom_color (white_images.at (0), QColorConstants.Svg.blue).is_null ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testPixmapForBackground () {
-        const QDir blackSvgDir = new QDir (Occ.Theme.themePrefix + "black");
-        const string[] blackImages = blackSvgDir.entryList ("*.svg");
+    private void test_pixmap_for_background () {
+        const QDir black_svg_dir = new QDir (Occ.Theme.theme_prefix + "black");
+        const string[] black_images = black_svg_dir.entry_list ("*.svg");
 
-        const QDir whiteSvgDir = new QDir (Occ.Theme.themePrefix + "white");
-        const string[] whiteImages = whiteSvgDir.entryList ("*.svg");
+        const QDir white_svg_dir = new QDir (Occ.Theme.theme_prefix + "white");
+        const string[] white_images = white_svg_dir.entry_list ("*.svg");
 
-        GLib.assert_true (!blackImages.is_empty ());
+        GLib.assert_true (!black_images.is_empty ());
 
-        GLib.assert_true (!Occ.Ui.IconUtils.pixmapForBackground (whiteImages.at (0), Gtk.Color ("blue")).is_null ());
+        GLib.assert_true (!Occ.Ui.IconUtils.pixmap_for_background (white_images.at (0), Gtk.Color ("blue")).is_null ());
 
-        GLib.assert_true (!whiteImages.is_empty ());
+        GLib.assert_true (!white_images.is_empty ());
 
-        GLib.assert_true (!Occ.Ui.IconUtils.pixmapForBackground (blackImages.at (0), Gtk.Color ("yellow")).is_null ());
+        GLib.assert_true (!Occ.Ui.IconUtils.pixmap_for_background (black_images.at (0), Gtk.Color ("yellow")).is_null ());
     }
 
 } // class TestIconUtils

@@ -20,14 +20,14 @@ class TestExcludedFiles : GLib.Object {
     
     static void up () {
         excluded_files.on_signal_reset (new ExcludedFiles ());
-        excluded_files.setWildcardsMatchSlash (false);
+        excluded_files.set_wildcards_match_slash (false);
     }
     
     static void setup_init () {
         up ();
     
-        excluded_files.addExcludeFilePath (EXCLUDE_LIST_FILE);
-        GLib.assert_true (excluded_files.reloadExcludeFiles ());
+        excluded_files.add_exclude_file_path (EXCLUDE_LIST_FILE);
+        GLib.assert_true (excluded_files.reload_exclude_files ());
     
         /* and add some unicode stuff */
         excluded_files.add_manual_exclude ("*.💩"); // is this source file utf8 encoded?
@@ -36,47 +36,47 @@ class TestExcludedFiles : GLib.Object {
         excluded_files.add_manual_exclude ("latex*/*.run.xml");
         excluded_files.add_manual_exclude ("latex/*/*.tex.tmp");
     
-        GLib.assert_true (excluded_files.reloadExcludeFiles ());
+        GLib.assert_true (excluded_files.reload_exclude_files ());
     }
 
     static ExcludedFiles check_file_full (char path) {
-        return excluded_files.fullPatternMatch (path, ItemTypeFile);
+        return excluded_files.full_pattern_match (path, ItemTypeFile);
     }
 
     static ExcludedFiles check_dir_full (char path) {
-        return excluded_files.fullPatternMatch (path, ItemTypeDirectory);
+        return excluded_files.full_pattern_match (path, ItemTypeDirectory);
     }
 
     static ExcludedFiles check_file_traversal (char path) {
-        return excluded_files.traversalPatternMatch (path, ItemTypeFile);
+        return excluded_files.traversal_pattern_match (path, ItemTypeFile);
     }
 
     static ExcludedFiles check_dir_traversal (char path) {
-        return excluded_files.traversalPatternMatch (path, ItemTypeDirectory);
+        return excluded_files.traversal_pattern_match (path, ItemTypeDirectory);
     }
 
-    private void testFun () {
+    private void test_fun () {
         ExcludedFiles excluded;
-        bool excludeHidden = true;
-        bool keepHidden = false;
+        bool exclude_hidden = true;
+        bool keep_hidden = false;
 
-        GLib.assert_true (!excluded.isExcluded ("/a/b", "/a", keepHidden));
-        GLib.assert_true (!excluded.isExcluded ("/a/b~", "/a", keepHidden));
-        GLib.assert_true (!excluded.isExcluded ("/a/.b", "/a", keepHidden));
-        GLib.assert_true (excluded.isExcluded ("/a/.b", "/a", excludeHidden));
+        GLib.assert_true (!excluded.is_excluded ("/a/b", "/a", keep_hidden));
+        GLib.assert_true (!excluded.is_excluded ("/a/b~", "/a", keep_hidden));
+        GLib.assert_true (!excluded.is_excluded ("/a/.b", "/a", keep_hidden));
+        GLib.assert_true (excluded.is_excluded ("/a/.b", "/a", exclude_hidden));
 
-        excluded.addExcludeFilePath (EXCLUDE_LIST_FILE);
-        excluded.reloadExcludeFiles ();
+        excluded.add_exclude_file_path (EXCLUDE_LIST_FILE);
+        excluded.reload_exclude_files ();
 
-        GLib.assert_true (!excluded.isExcluded ("/a/b", "/a", keepHidden));
-        GLib.assert_true (excluded.isExcluded ("/a/b~", "/a", keepHidden));
-        GLib.assert_true (!excluded.isExcluded ("/a/.b", "/a", keepHidden));
-        GLib.assert_true (excluded.isExcluded ("/a/.Trashes", "/a", keepHidden));
-        GLib.assert_true (excluded.isExcluded ("/a/foo_conflict-bar", "/a", keepHidden));
-        GLib.assert_true (excluded.isExcluded ("/a/foo (conflicted copy bar)", "/a", keepHidden));
-        GLib.assert_true (excluded.isExcluded ("/a/.b", "/a", excludeHidden));
+        GLib.assert_true (!excluded.is_excluded ("/a/b", "/a", keep_hidden));
+        GLib.assert_true (excluded.is_excluded ("/a/b~", "/a", keep_hidden));
+        GLib.assert_true (!excluded.is_excluded ("/a/.b", "/a", keep_hidden));
+        GLib.assert_true (excluded.is_excluded ("/a/.Trashes", "/a", keep_hidden));
+        GLib.assert_true (excluded.is_excluded ("/a/foo_conflict-bar", "/a", keep_hidden));
+        GLib.assert_true (excluded.is_excluded ("/a/foo (conflicted copy bar)", "/a", keep_hidden));
+        GLib.assert_true (excluded.is_excluded ("/a/.b", "/a", exclude_hidden));
 
-        GLib.assert_true (excluded.isExcluded ("/a/#b#", "/a", keepHidden));
+        GLib.assert_true (excluded.is_excluded ("/a/#b#", "/a", keep_hidden));
     }
 
     private void check_csync_exclude_add () {
@@ -84,16 +84,16 @@ class TestExcludedFiles : GLib.Object {
         excluded_files.add_manual_exclude ("/tmp/check_csync1/*");
         GLib.assert_cmp (check_file_full ("/tmp/check_csync1/foo"), CSYNC_FILE_EXCLUDE_LIST);
         GLib.assert_cmp (check_file_full ("/tmp/check_csync2/foo"), CSYNC_NOT_EXCLUDED);
-        GLib.assert_true (excluded_files.allExcludes["/"].contains ("/tmp/check_csync1/*"));
+        GLib.assert_true (excluded_files.all_excludes["/"].contains ("/tmp/check_csync1/*"));
 
-        GLib.assert_true (excluded_files.fullRegexFile["/"].pattern ().contains ("csync1"));
-        GLib.assert_true (excluded_files.fullTraversalRegexFile["/"].pattern ().contains ("csync1"));
-        GLib.assert_true (!excluded_files.bnameTraversalRegexFile["/"].pattern ().contains ("csync1"));
+        GLib.assert_true (excluded_files.full_regex_file["/"].pattern ().contains ("csync1"));
+        GLib.assert_true (excluded_files.full_traversal_regex_file["/"].pattern ().contains ("csync1"));
+        GLib.assert_true (!excluded_files.bname_traversal_regex_file["/"].pattern ().contains ("csync1"));
 
         excluded_files.add_manual_exclude ("foo");
-        GLib.assert_true (excluded_files.bnameTraversalRegexFile["/"].pattern ().contains ("foo"));
-        GLib.assert_true (excluded_files.fullRegexFile["/"].pattern ().contains ("foo"));
-        GLib.assert_true (!excluded_files.fullTraversalRegexFile["/"].pattern ().contains ("foo"));
+        GLib.assert_true (excluded_files.bname_traversal_regex_file["/"].pattern ().contains ("foo"));
+        GLib.assert_true (excluded_files.full_regex_file["/"].pattern ().contains ("foo"));
+        GLib.assert_true (!excluded_files.full_traversal_regex_file["/"].pattern ().contains ("foo"));
     }
 
     private void check_csync_exclude_add_per_dir () {
@@ -101,15 +101,15 @@ class TestExcludedFiles : GLib.Object {
         excluded_files.add_manual_exclude ("*", "/tmp/check_csync1/");
         GLib.assert_cmp (check_file_full ("/tmp/check_csync1/foo"), CSYNC_FILE_EXCLUDE_LIST);
         GLib.assert_cmp (check_file_full ("/tmp/check_csync2/foo"), CSYNC_NOT_EXCLUDED);
-        GLib.assert_true (excluded_files.allExcludes["/tmp/check_csync1/"].contains ("*"));
+        GLib.assert_true (excluded_files.all_excludes["/tmp/check_csync1/"].contains ("*"));
 
         excluded_files.add_manual_exclude ("foo");
-        GLib.assert_true (excluded_files.fullRegexFile["/"].pattern ().contains ("foo"));
+        GLib.assert_true (excluded_files.full_regex_file["/"].pattern ().contains ("foo"));
 
         excluded_files.add_manual_exclude ("foo/bar", "/tmp/check_csync1/");
-        GLib.assert_true (excluded_files.fullRegexFile["/tmp/check_csync1/"].pattern ().contains ("bar"));
-        GLib.assert_true (excluded_files.fullTraversalRegexFile["/tmp/check_csync1/"].pattern ().contains ("bar"));
-        GLib.assert_true (!excluded_files.bnameTraversalRegexFile["/tmp/check_csync1/"].pattern ().contains ("foo"));
+        GLib.assert_true (excluded_files.full_regex_file["/tmp/check_csync1/"].pattern ().contains ("bar"));
+        GLib.assert_true (excluded_files.full_traversal_regex_file["/tmp/check_csync1/"].pattern ().contains ("bar"));
+        GLib.assert_true (!excluded_files.bname_traversal_regex_file["/tmp/check_csync1/"].pattern ().contains ("foo"));
     }
 
     private void check_csync_excluded () {
@@ -180,14 +180,14 @@ class TestExcludedFiles : GLib.Object {
 
         /* ? character */
         excluded_files.add_manual_exclude ("bond00?");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
         GLib.assert_cmp (check_file_full ("bond00"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_full ("bond007"), CSYNC_FILE_EXCLUDE_LIST);
         GLib.assert_cmp (check_file_full ("bond0071"), CSYNC_NOT_EXCLUDED);
 
         /* brackets */
         excluded_files.add_manual_exclude ("a [bc] d");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
         GLib.assert_cmp (check_file_full ("a d d"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_full ("a  d"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_full ("a b d"), CSYNC_FILE_EXCLUDE_LIST);
@@ -197,7 +197,7 @@ class TestExcludedFiles : GLib.Object {
         excluded_files.add_manual_exclude ("a \\*");
         excluded_files.add_manual_exclude ("b \\?");
         excluded_files.add_manual_exclude ("c \\[d]");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
         GLib.assert_cmp (check_file_full ("a \\*"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_full ("a bc"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_full ("a *"), CSYNC_FILE_EXCLUDE_LIST);
@@ -210,24 +210,24 @@ class TestExcludedFiles : GLib.Object {
     }
 
     private void check_csync_excluded_per_dir () {
-        var temporary_directory = QStandardPaths.writableLocation (QStandardPaths.TempLocation);
+        var temporary_directory = QStandardPaths.writable_location (QStandardPaths.TempLocation);
         excluded_files.on_signal_reset (new ExcludedFiles (temporary_directory + "/"));
-        excluded_files.setWildcardsMatchSlash (false);
+        excluded_files.set_wildcards_match_slash (false);
         excluded_files.add_manual_exclude ("A");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
 
         GLib.assert_cmp (check_file_full ("A"), CSYNC_FILE_EXCLUDE_LIST);
 
-        excluded_files.clearManualExcludes ();
+        excluded_files.clear_manual_excludes ();
         excluded_files.add_manual_exclude ("A", temporary_directory + "/B/");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
 
         GLib.assert_cmp (check_file_full ("A"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_full ("B/A"), CSYNC_FILE_EXCLUDE_LIST);
 
-        excluded_files.clearManualExcludes ();
+        excluded_files.clear_manual_excludes ();
         excluded_files.add_manual_exclude ("A/a1", temporary_directory + "/B/");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
 
         GLib.assert_cmp (check_file_full ("A"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_full ("B/A/a1"), CSYNC_FILE_EXCLUDE_LIST);
@@ -236,13 +236,13 @@ class TestExcludedFiles : GLib.Object {
         GLib.assert_true (QDir (temporary_directory).mkpath (foo_directory));
 
         const string foo_exclude_list = temporary_directory + '/' + foo_directory + "/.sync-exclude.lst";
-        GLib.File excludeList = new GLib.File (foo_exclude_list);
-        GLib.assert_true (excludeList.open (GLib.File.WriteOnly));
-        GLib.assert_cmp (excludeList.write ("bar"), 3);
-        excludeList.close ();
+        GLib.File exclude_list = new GLib.File (foo_exclude_list);
+        GLib.assert_true (exclude_list.open (GLib.File.WriteOnly));
+        GLib.assert_cmp (exclude_list.write ("bar"), 3);
+        exclude_list.close ();
 
-        excluded_files.addExcludeFilePath (foo_exclude_list);
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.add_exclude_file_path (foo_exclude_list);
+        excluded_files.reload_exclude_files ();
         GLib.assert_cmp (check_file_full (GLib.ByteArray (foo_directory + "/bar")), CSYNC_FILE_EXCLUDE_LIST);
         GLib.assert_cmp (check_file_full (GLib.ByteArray (foo_directory + "/baz")), CSYNC_NOT_EXCLUDED);
     }
@@ -323,7 +323,7 @@ class TestExcludedFiles : GLib.Object {
         /* From here the actual traversal tests */
 
         excluded_files.add_manual_exclude ("/exclude");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
 
         /* Check toplevel directory, the pattern only works for toplevel directory. */
         GLib.assert_cmp (check_dir_traversal ("/exclude"), CSYNC_FILE_EXCLUDE_LIST);
@@ -335,7 +335,7 @@ class TestExcludedFiles : GLib.Object {
 
         /* Add an exclude for directories only : excl/ */
         excluded_files.add_manual_exclude ("excl/");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
         GLib.assert_cmp (check_dir_traversal ("/excl"), CSYNC_FILE_EXCLUDE_LIST);
         GLib.assert_cmp (check_dir_traversal ("meep/excl"), CSYNC_FILE_EXCLUDE_LIST);
 
@@ -344,7 +344,7 @@ class TestExcludedFiles : GLib.Object {
         GLib.assert_cmp (check_file_traversal ("/excl"), CSYNC_NOT_EXCLUDED);
 
         excluded_files.add_manual_exclude ("/excludepath/withsubdir");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
 
         GLib.assert_cmp (check_dir_traversal ("/excludepath/withsubdir"), CSYNC_FILE_EXCLUDE_LIST);
         GLib.assert_cmp (check_file_traversal ("/excludepath/withsubdir"), CSYNC_FILE_EXCLUDE_LIST);
@@ -355,23 +355,23 @@ class TestExcludedFiles : GLib.Object {
 
         /* Check ending of pattern */
         GLib.assert_cmp (check_file_traversal ("/exclude"), CSYNC_FILE_EXCLUDE_LIST);
-        GLib.assert_cmp (check_file_traversal ("/excludeX"), CSYNC_NOT_EXCLUDED);
+        GLib.assert_cmp (check_file_traversal ("/exclude_x"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_traversal ("exclude"), CSYNC_NOT_EXCLUDED);
 
         excluded_files.add_manual_exclude ("exclude");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
         GLib.assert_cmp (check_file_traversal ("exclude"), CSYNC_FILE_EXCLUDE_LIST);
 
         /* ? character */
         excluded_files.add_manual_exclude ("bond00?");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
         GLib.assert_cmp (check_file_traversal ("bond00"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_traversal ("bond007"), CSYNC_FILE_EXCLUDE_LIST);
         GLib.assert_cmp (check_file_traversal ("bond0071"), CSYNC_NOT_EXCLUDED);
 
         /* brackets */
         excluded_files.add_manual_exclude ("a [bc] d");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
         GLib.assert_cmp (check_file_traversal ("a d d"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_traversal ("a  d"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_traversal ("a b d"), CSYNC_FILE_EXCLUDE_LIST);
@@ -381,7 +381,7 @@ class TestExcludedFiles : GLib.Object {
         excluded_files.add_manual_exclude ("a \\*");
         excluded_files.add_manual_exclude ("b \\?");
         excluded_files.add_manual_exclude ("c \\[d]");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
         GLib.assert_cmp (check_file_traversal ("a \\*"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_traversal ("a bc"), CSYNC_NOT_EXCLUDED);
         GLib.assert_cmp (check_file_traversal ("a *"), CSYNC_FILE_EXCLUDE_LIST);
@@ -421,7 +421,7 @@ class TestExcludedFiles : GLib.Object {
     private void check_csync_pathes () {
         setup_init ();
         excluded_files.add_manual_exclude ("/exclude");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
 
         /* Check toplevel directory, the pattern only works for toplevel directory. */
         GLib.assert_cmp (check_dir_full ("/exclude"), CSYNC_FILE_EXCLUDE_LIST);
@@ -435,7 +435,7 @@ class TestExcludedFiles : GLib.Object {
 
         /* Add an exclude for directories only : excl/ */
         excluded_files.add_manual_exclude ("excl/");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
         GLib.assert_cmp (check_dir_full ("/excl"), CSYNC_FILE_EXCLUDE_LIST);
         GLib.assert_cmp (check_dir_full ("meep/excl"), CSYNC_FILE_EXCLUDE_LIST);
         GLib.assert_cmp (check_file_full ("meep/excl/file"), CSYNC_FILE_EXCLUDE_LIST);
@@ -443,7 +443,7 @@ class TestExcludedFiles : GLib.Object {
         GLib.assert_cmp (check_file_full ("/excl"), CSYNC_NOT_EXCLUDED);
 
         excluded_files.add_manual_exclude ("/excludepath/withsubdir");
-        excluded_files.reloadExcludeFiles ();
+        excluded_files.reload_exclude_files ();
 
         GLib.assert_cmp (check_dir_full ("/excludepath/withsubdir"), CSYNC_FILE_EXCLUDE_LIST);
         GLib.assert_cmp (check_file_full ("/excludepath/withsubdir"), CSYNC_FILE_EXCLUDE_LIST);
@@ -463,43 +463,43 @@ class TestExcludedFiles : GLib.Object {
         excluded_files.add_manual_exclude ("g/bar*");
         excluded_files.add_manual_exclude ("h/bar?");
 
-        excluded_files.setWildcardsMatchSlash (false);
+        excluded_files.set_wildcards_match_slash (false);
 
-        GLib.assert_cmp (check_file_traversal ("a/fooXYZbar"), CSYNC_FILE_EXCLUDE_LIST);
-        GLib.assert_cmp (check_file_traversal ("a/fooX/Zbar"), CSYNC_NOT_EXCLUDED);
+        GLib.assert_cmp (check_file_traversal ("a/foo_xyz_bar"), CSYNC_FILE_EXCLUDE_LIST);
+        GLib.assert_cmp (check_file_traversal ("a/foo_x/z_bar"), CSYNC_NOT_EXCLUDED);
 
-        GLib.assert_cmp (check_file_traversal ("b/fooXYZbarABC"), CSYNC_FILE_EXCLUDE_LIST);
-        GLib.assert_cmp (check_file_traversal ("b/fooX/ZbarABC"), CSYNC_NOT_EXCLUDED);
+        GLib.assert_cmp (check_file_traversal ("b/foo_xyz_bar_abc"), CSYNC_FILE_EXCLUDE_LIST);
+        GLib.assert_cmp (check_file_traversal ("b/foo_x/z_bar_abc"), CSYNC_NOT_EXCLUDED);
 
-        GLib.assert_cmp (check_file_traversal ("c/fooXbar"), CSYNC_FILE_EXCLUDE_LIST);
+        GLib.assert_cmp (check_file_traversal ("c/foo_x_bar"), CSYNC_FILE_EXCLUDE_LIST);
         GLib.assert_cmp (check_file_traversal ("c/foo/bar"), CSYNC_NOT_EXCLUDED);
 
-        GLib.assert_cmp (check_file_traversal ("d/fooXbarABC"), CSYNC_FILE_EXCLUDE_LIST);
-        GLib.assert_cmp (check_file_traversal ("d/foo/barABC"), CSYNC_NOT_EXCLUDED);
+        GLib.assert_cmp (check_file_traversal ("d/foo_x_bar_abc"), CSYNC_FILE_EXCLUDE_LIST);
+        GLib.assert_cmp (check_file_traversal ("d/foo/bar_abc"), CSYNC_NOT_EXCLUDED);
 
-        GLib.assert_cmp (check_file_traversal ("e/fooXbarA"), CSYNC_FILE_EXCLUDE_LIST);
-        GLib.assert_cmp (check_file_traversal ("e/foo/barA"), CSYNC_NOT_EXCLUDED);
+        GLib.assert_cmp (check_file_traversal ("e/foo_x_bar_a"), CSYNC_FILE_EXCLUDE_LIST);
+        GLib.assert_cmp (check_file_traversal ("e/foo/bar_a"), CSYNC_NOT_EXCLUDED);
 
-        GLib.assert_cmp (check_file_traversal ("g/barABC"), CSYNC_FILE_EXCLUDE_LIST);
-        GLib.assert_cmp (check_file_traversal ("g/XbarABC"), CSYNC_NOT_EXCLUDED);
+        GLib.assert_cmp (check_file_traversal ("g/bar_abc"), CSYNC_FILE_EXCLUDE_LIST);
+        GLib.assert_cmp (check_file_traversal ("g/x_bar_abc"), CSYNC_NOT_EXCLUDED);
 
-        GLib.assert_cmp (check_file_traversal ("h/barZ"), CSYNC_FILE_EXCLUDE_LIST);
-        GLib.assert_cmp (check_file_traversal ("h/XbarZ"), CSYNC_NOT_EXCLUDED);
+        GLib.assert_cmp (check_file_traversal ("h/bar_z"), CSYNC_FILE_EXCLUDE_LIST);
+        GLib.assert_cmp (check_file_traversal ("h/x_bar_z"), CSYNC_NOT_EXCLUDED);
 
-        excluded_files.setWildcardsMatchSlash (true);
+        excluded_files.set_wildcards_match_slash (true);
 
-        GLib.assert_cmp (check_file_traversal ("a/fooX/Zbar"), CSYNC_FILE_EXCLUDE_LIST);
-        GLib.assert_cmp (check_file_traversal ("b/fooX/ZbarABC"), CSYNC_FILE_EXCLUDE_LIST);
+        GLib.assert_cmp (check_file_traversal ("a/foo_x/z_bar"), CSYNC_FILE_EXCLUDE_LIST);
+        GLib.assert_cmp (check_file_traversal ("b/foo_x/z_bar_abc"), CSYNC_FILE_EXCLUDE_LIST);
         GLib.assert_cmp (check_file_traversal ("c/foo/bar"), CSYNC_FILE_EXCLUDE_LIST);
-        GLib.assert_cmp (check_file_traversal ("d/foo/barABC"), CSYNC_FILE_EXCLUDE_LIST);
-        GLib.assert_cmp (check_file_traversal ("e/foo/barA"), CSYNC_FILE_EXCLUDE_LIST);
+        GLib.assert_cmp (check_file_traversal ("d/foo/bar_abc"), CSYNC_FILE_EXCLUDE_LIST);
+        GLib.assert_cmp (check_file_traversal ("e/foo/bar_a"), CSYNC_FILE_EXCLUDE_LIST);
     }
 
     private void check_csync_regex_translation () {
         up ();
         GLib.ByteArray storage;
         var translate = [&storage] (char pattern) {
-            storage = ExcludedFiles.convertToRegexpSyntax (pattern, false);
+            storage = ExcludedFiles.convert_to_regexp_syntax (pattern, false);
             return storage.const_data ();
         }
 
@@ -517,10 +517,10 @@ class TestExcludedFiles : GLib.Object {
 
     private void check_csync_bname_trigger () {
         up ();
-        bool wildcardsMatchSlash = false;
+        bool wildcards_match_slash = false;
         GLib.ByteArray storage;
-        var translate = [&storage, wildcardsMatchSlash] (char pattern) => {
-            storage = ExcludedFiles.extractBnameTrigger (pattern, wildcardsMatchSlash);
+        var translate = [&storage, wildcards_match_slash] (char pattern) => {
+            storage = ExcludedFiles.extract_bname_trigger (pattern, wildcards_match_slash);
             return storage.const_data ();
         }
 
@@ -531,7 +531,7 @@ class TestExcludedFiles : GLib.Object {
         GLib.assert_cmp (translate ("a/foo*"), "foo*");
         GLib.assert_cmp (translate ("a/abc*foo*"), "abc*foo*");
 
-        wildcardsMatchSlash = true;
+        wildcards_match_slash = true;
 
         GLib.assert_cmp (translate (""), "");
         GLib.assert_cmp (translate ("a/b/"), "");
@@ -548,7 +548,7 @@ class TestExcludedFiles : GLib.Object {
 
     private void check_csync_is_windows_reserved_word () {
         var csync_is_windows_reserved_word = [] (char fn) {
-            string s = string.fromLatin1 (fn);
+            string s = fn;
             extern bool csync_is_windows_reserved_word (QStringRef filename);
             return csync_is_windows_reserved_word (&s);
         }
@@ -590,15 +590,15 @@ class TestExcludedFiles : GLib.Object {
     private void check_csync_excluded_performance1 () {
         setup_init ();
         const int N = 1000;
-        int totalRc = 0;
+        int total_rc = 0;
 
         QBENCHMARK {
 
             for (int i = 0; i < N; ++i) {
-                totalRc += check_dir_full ("/this/is/quite/a/long/path/with/many/components");
-                totalRc += check_file_full ("/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/29");
+                total_rc += check_dir_full ("/this/is/quite/a/long/path/with/many/components");
+                total_rc += check_file_full ("/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/29");
             }
-            GLib.assert_cmp (totalRc, 0); // mainly to avoid optimization
+            GLib.assert_cmp (total_rc, 0); // mainly to avoid optimization
         }
     }
 
@@ -607,14 +607,14 @@ class TestExcludedFiles : GLib.Object {
     ***********************************************************/
     private void check_csync_excluded_performance2 () {
         const int N = 1000;
-        int totalRc = 0;
+        int total_rc = 0;
 
         QBENCHMARK {
             for (int i = 0; i < N; ++i) {
-                totalRc += check_dir_traversal ("/this/is/quite/a/long/path/with/many/components");
-                totalRc += check_file_traversal ("/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/29");
+                total_rc += check_dir_traversal ("/this/is/quite/a/long/path/with/many/components");
+                total_rc += check_file_traversal ("/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/29");
             }
-            GLib.assert_cmp (totalRc, 0); // mainly to avoid optimization
+            GLib.assert_cmp (total_rc, 0); // mainly to avoid optimization
         }
     }
 
@@ -642,95 +642,95 @@ class TestExcludedFiles : GLib.Object {
     ***********************************************************/
     private void check_version_directive () {
         ExcludedFiles excludes;
-        excludes.setClientVersion (ExcludedFiles.Version (2, 5, 0));
+        excludes.set_client_version (ExcludedFiles.Version (2, 5, 0));
 
         GLib.Vector<std.pair<const char *, bool>> tests = { { "#!version == 2.5.0", true }, { "#!version == 2.6.0", false }, { "#!version < 2.6.0", true }, { "#!version <= 2.6.0", true }, { "#!version > 2.6.0", false }, { "#!version >= 2.6.0", false }, { "#!version < 2.4.0", false }, { "#!version <= 2.4.0", false }, { "#!version > 2.4.0", true }, { "#!version >= 2.4.0", true }, { "#!version < 2.5.0", false }, { "#!version <= 2.5.0", true }, { "#!version > 2.5.0", false }, { "#!version >= 2.5.0", true },
         }
         for (var test : tests) {
-            GLib.assert_true (excludes.versionDirectiveKeepNextLine (test.first) == test.second);
+            GLib.assert_true (excludes.version_directive_keep_next_line (test.first) == test.second);
         }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testAddExcludeFilePath_addSameFilePath_listSizeDoesNotIncrease () {
+    private void test_add_exclude_file_path_add_same_file_path_list_size_does_not_increase () {
         excluded_files.on_signal_reset (new ExcludedFiles ());
-        var file_path = string ("exclude/.sync-exclude.lst");
+        var file_path = "exclude/.sync-exclude.lst";
 
-        excluded_files.addExcludeFilePath (file_path);
-        excluded_files.addExcludeFilePath (file_path);
+        excluded_files.add_exclude_file_path (file_path);
+        excluded_files.add_exclude_file_path (file_path);
 
-        GLib.assert_cmp (excluded_files.excludeFiles.size (), 1);
+        GLib.assert_cmp (excluded_files.exclude_files.size (), 1);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testAddExcludeFilePath_addDifferentFilePaths_listSizeIncrease () {
+    private void test_add_exclude_file_path_add_different_file_paths_list_size_increase () {
         excluded_files.on_signal_reset (new ExcludedFiles ());
 
-        var filePath1 = string ("exclude1/.sync-exclude.lst");
-        var filePath2 = string ("exclude2/.sync-exclude.lst");
+        var file_path1 = "exclude1/.sync-exclude.lst";
+        var file_path2 = "exclude2/.sync-exclude.lst";
 
-        excluded_files.addExcludeFilePath (filePath1);
-        excluded_files.addExcludeFilePath (filePath2);
+        excluded_files.add_exclude_file_path (file_path1);
+        excluded_files.add_exclude_file_path (file_path2);
 
-        GLib.assert_cmp (excluded_files.excludeFiles.size (), 2);
+        GLib.assert_cmp (excluded_files.exclude_files.size (), 2);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testAddExcludeFilePath_addDefaultExcludeFile_returnCorrectMap () {
-        const string basePath ("syncFolder/");
-        const string folder1 ("syncFolder/folder1/");
-        const string folder2 (folder1 + "folder2/");
-        excluded_files.on_signal_reset (new ExcludedFiles (basePath));
+    private void test_add_exclude_file_path_add_default_exclude_file_return_correct_map () {
+        const string base_path = "sync_folder/";
+        const string folder1 = "sync_folder/folder1/";
+        const string folder2 = folder1 + "folder2/";
+        excluded_files.on_signal_reset (new ExcludedFiles (base_path));
 
-        const string defaultExcludeList ("desktop-client/config-folder/sync-exclude.lst");
-        const string folder1ExcludeList (folder1 + ".sync-exclude.lst");
-        const string folder2ExcludeList (folder2 + ".sync-exclude.lst");
+        const string default_exclude_list = "desktop-client/config-folder/sync-exclude.lst";
+        const string folder1_exclude_list = folder1 + ".sync-exclude.lst";
+        const string folder2_exclude_list = folder2 + ".sync-exclude.lst";
 
-        excluded_files.addExcludeFilePath (defaultExcludeList);
-        excluded_files.addExcludeFilePath (folder1ExcludeList);
-        excluded_files.addExcludeFilePath (folder2ExcludeList);
+        excluded_files.add_exclude_file_path (default_exclude_list);
+        excluded_files.add_exclude_file_path (folder1_exclude_list);
+        excluded_files.add_exclude_file_path (folder2_exclude_list);
 
-        GLib.assert_cmp (excluded_files.excludeFiles.size (), 3);
-        GLib.assert_cmp (excluded_files.excludeFiles[basePath].first (), defaultExcludeList);
-        GLib.assert_cmp (excluded_files.excludeFiles[folder1].first (), folder1ExcludeList);
-        GLib.assert_cmp (excluded_files.excludeFiles[folder2].first (), folder2ExcludeList);
+        GLib.assert_cmp (excluded_files.exclude_files.size (), 3);
+        GLib.assert_cmp (excluded_files.exclude_files[base_path].first (), default_exclude_list);
+        GLib.assert_cmp (excluded_files.exclude_files[folder1].first (), folder1_exclude_list);
+        GLib.assert_cmp (excluded_files.exclude_files[folder2].first (), folder2_exclude_list);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testReloadExcludeFiles_fileDoesNotExist_return_false () {
+    private void test_reload_exclude_files_file_does_not_exist_return_false () {
         excluded_files.on_signal_reset (new ExcludedFiles ());
-        const string nonExistingFile ("directory/.sync-exclude.lst");
-        excluded_files.addExcludeFilePath (nonExistingFile);
-        GLib.assert_cmp (excluded_files.reloadExcludeFiles (), false);
-        GLib.assert_cmp (excluded_files.allExcludes.size (), 0);
+        const string non_existing_file = "directory/.sync-exclude.lst";
+        excluded_files.add_exclude_file_path (non_existing_file);
+        GLib.assert_cmp (excluded_files.reload_exclude_files (), false);
+        GLib.assert_cmp (excluded_files.all_excludes.size (), 0);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testReloadExcludeFiles_fileExists_return_true () {
-        var temporary_directory = QStandardPaths.writableLocation (QStandardPaths.TempLocation);
+    private void test_reload_exclude_files_file_exists_return_true () {
+        var temporary_directory = QStandardPaths.writable_location (QStandardPaths.TempLocation);
         excluded_files.on_signal_reset (new ExcludedFiles (temporary_directory + "/"));
 
-        const string subTempDir = "exclude";
-        GLib.assert_true (QDir (temporary_directory).mkpath (subTempDir));
+        const string sub_temp_dir = "exclude";
+        GLib.assert_true (QDir (temporary_directory).mkpath (sub_temp_dir));
 
-        var existingFilePath = string (temporary_directory + '/' + subTempDir + "/.sync-exclude.lst");
-        GLib.File excludeList (existingFilePath);
-        GLib.assert_true (excludeList.open (GLib.File.WriteOnly));
-        excludeList.close ();
+        string existing_file_path = temporary_directory + '/' + sub_temp_dir + "/.sync-exclude.lst";
+        GLib.File exclude_list = new GLib.File (existing_file_path);
+        GLib.assert_true (exclude_list.open (GLib.File.WriteOnly));
+        exclude_list.close ();
 
-        excluded_files.addExcludeFilePath (existingFilePath);
-        GLib.assert_cmp (excluded_files.reloadExcludeFiles (), true);
-        GLib.assert_cmp (excluded_files.allExcludes.size (), 1);
+        excluded_files.add_exclude_file_path (existing_file_path);
+        GLib.assert_cmp (excluded_files.reload_exclude_files (), true);
+        GLib.assert_cmp (excluded_files.all_excludes.size (), 1);
     }
 
 } // class TestExcludedFiles

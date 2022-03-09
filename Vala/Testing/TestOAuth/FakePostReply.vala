@@ -14,8 +14,8 @@ class FakePostReply : Soup.Reply {
     ***********************************************************/
     public std.unique_ptr<QIODevice> payload;
     public bool aborted = false;
-    public bool redirectToPolicy = false;
-    public bool redirectToToken = false;
+    public bool redirect_to_policy = false;
+    public bool redirect_to_token = false;
 
     /***********************************************************
     ***********************************************************/
@@ -37,7 +37,7 @@ class FakePostReply : Soup.Reply {
             /* emit */ signal_meta_data_changed ();
             /* emit */ signal_finished ();
             return;
-        } else if (redirectToPolicy) {
+        } else if (redirect_to_policy) {
             set_header (Soup.Request.LocationHeader, "/my.policy");
             set_attribute (Soup.Request.RedirectionTargetAttribute, "/my.policy");
             set_attribute (Soup.Request.HttpStatusCodeAttribute, 302); // 302 might or might not lose POST data in rfc
@@ -45,9 +45,9 @@ class FakePostReply : Soup.Reply {
             /* emit */ signal_meta_data_changed ();
             /* emit */ signal_finished ();
             return;
-        } else if (redirectToToken) {
+        } else if (redirect_to_token) {
             // Redirect to self
-            GLib.Variant destination = GLib.Variant (sOAuthTestServer.to_string () + "/index.php/apps/oauth2/api/v1/token");
+            GLib.Variant destination = GLib.Variant (s_oauth_test_server.to_string () + "/index.php/apps/oauth2/api/v1/token");
             set_header (Soup.Request.LocationHeader, destination);
             set_attribute (Soup.Request.RedirectionTargetAttribute, destination);
             set_attribute (Soup.Request.HttpStatusCodeAttribute, 307); // 307 explicitly in rfc says to not lose POST data

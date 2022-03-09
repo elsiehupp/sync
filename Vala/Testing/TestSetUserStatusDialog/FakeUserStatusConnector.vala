@@ -8,144 +8,150 @@ namespace Testing {
 
 class FakeUserStatusConnector : Occ.UserStatusConnector {
 
+
     /***********************************************************
     ***********************************************************/
-    public void fetchUserStatus () override {
-        if (this.couldNotFetchUserStatus) {
+    private Occ.UserStatus user_status_set_by_caller_of_set_user_status;
+    private Occ.UserStatus user_status;
+    private GLib.Vector<Occ.UserStatus> predefined_statuses;
+    private bool is_message_cleared = false;
+    private bool could_not_fetch_predefined_user_statuses = false;
+    private bool could_not_fetch_user_status = false;
+    private bool could_not_set_user_status_message = false;
+    private bool user_status_not_supported = false;
+    private bool emojis_not_supported = false;
+    private bool could_not_clear_user_status_message = false;
+
+    /***********************************************************
+    ***********************************************************/
+    public override void fetch_user_status () {
+        if (this.could_not_fetch_user_status) {
             /* emit */ error (Error.CouldNotFetchUserStatus);
             return;
-        } else if (this.user_statusNotSupported) {
+        } else if (this.user_status_not_supported) {
             /* emit */ error (Error.UserStatusNotSupported);
             return;
-        } else if (this.emojisNotSupported) {
+        } else if (this.emojis_not_supported) {
             /* emit */ error (Error.EmojisNotSupported);
             return;
         }
 
-        /* emit */ user_statusFetched (this.user_status);
+        /* emit */ user_status_fetched (this.user_status);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void fetchPredefinedStatuses () override {
-        if (this.couldNotFetchPredefinedUserStatuses) {
+    public override void fetch_predefined_statuses () {
+        if (this.could_not_fetch_predefined_user_statuses) {
             /* emit */ error (Error.CouldNotFetchPredefinedUserStatuses);
             return;
         }
-        /* emit */ predefinedStatusesFetched (this.predefinedStatuses);
+        /* emit */ predefined_statuses_fetched (this.predefined_statuses);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void setUserStatus (Occ.UserStatus user_status) override {
-        if (this.couldNotSetUserStatusMessage) {
+    public override void set_user_status (Occ.UserStatus user_status) {
+        if (this.could_not_set_user_status_message) {
             /* emit */ error (Error.CouldNotSetUserStatus);
             return;
         }
 
-        this.user_statusSetByCallerOfSetUserStatus = user_status;
-        /* emit */ UserStatusConnector.user_statusSet ();
+        this.user_status_set_by_caller_of_set_user_status = user_status;
+        /* emit */ UserStatusConnector.user_status_set ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void clearMessage () override {
-        if (this.couldNotClearUserStatusMessage) {
+    public override void clear_message () {
+        if (this.could_not_clear_user_status_message) {
             /* emit */ error (Error.CouldNotClearMessage);
         } else {
-            this.isMessageCleared = true;
+            this.is_message_cleared = true;
         }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Occ.UserStatus user_status () override {
+    public override Occ.UserStatus user_status () {
         return {}; // Not implemented
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void setFakeUserStatus (Occ.UserStatus user_status) {
+    public void set_fake_user_status (Occ.UserStatus user_status) {
         this.user_status = user_status;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void setFakePredefinedStatuses (
+    public void set_fake_predefined_statuses (
         const GLib.Vector<Occ.UserStatus> statuses) {
-        this.predefinedStatuses = statuses;
+        this.predefined_statuses = statuses;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Occ.UserStatus user_statusSetByCallerOfSetUserStatus () { return this.user_statusSetByCallerOfSetUserStatus; }
+    public Occ.UserStatus user_status_set_by_caller_of_set_user_status () {
+        return this.user_status_set_by_caller_of_set_user_status;
+    }
 
+
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  public 
+
+    //  /***********************************************************
+    //  ***********************************************************/
+    //  public 
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    public void setErrorCouldNotFetchPredefinedUserStatuses (bool value) {
-        this.couldNotFetchPredefinedUserStatuses = value;
+    public void set_error_could_not_fetch_predefined_user_statuses (bool value) {
+        this.could_not_fetch_predefined_user_statuses = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void setErrorCouldNotFetchUserStatus (bool value) {
-        this.couldNotFetchUserStatus = value;
+    public void set_error_could_not_fetch_user_status (bool value) {
+        this.could_not_fetch_user_status = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void setErrorCouldNotSetUserStatusMessage (bool value) {
-        this.couldNotSetUserStatusMessage = value;
+    public void set_error_could_not_set_user_status_message (bool value) {
+        this.could_not_set_user_status_message = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void setErrorUserStatusNotSupported (bool value) {
-        this.user_statusNotSupported = value;
+    public void set_error_user_status_not_supported (bool value) {
+        this.user_status_not_supported = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void setErrorEmojisNotSupported (bool value) {
-        this.emojisNotSupported = value;
+    public void set_error_emojis_not_supported (bool value) {
+        this.emojis_not_supported = value;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void setErrorCouldNotClearUserStatusMessage (bool value) {
-        this.couldNotClearUserStatusMessage = value;
+    public void set_error_could_not_clear_user_status_message (bool value) {
+        this.could_not_clear_user_status_message = value;
     }
 
-
-    /***********************************************************
-    ***********************************************************/
-    private Occ.UserStatus this.user_statusSetByCallerOfSetUserStatus;
-    private Occ.UserStatus this.user_status;
-    private GLib.Vector<Occ.UserStatus> this.predefinedStatuses;
-    private bool this.isMessageCleared = false;
-    private bool this.couldNotFetchPredefinedUserStatuses = false;
-    private bool this.couldNotFetchUserStatus = false;
-    private bool this.couldNotSetUserStatusMessage = false;
-    private bool this.user_statusNotSupported = false;
-    private bool this.emojisNotSupported = false;
-    private bool this.couldNotClearUserStatusMessage = false;
-};
+}
+}

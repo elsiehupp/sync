@@ -15,12 +15,12 @@ namespace Testing {
 class TestLocalDiscovery : GLib.Object {
 
     // Check correct behavior when local discovery is partially drawn from the database
-    private void testLocalDiscoveryStyle () {
+    private void test_local_discovery_style () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         LocalDiscoveryTracker tracker;
-        connect (&fake_folder.sync_engine (), &SyncEngine.item_completed, tracker, &LocalDiscoveryTracker.slotItemCompleted);
-        connect (&fake_folder.sync_engine (), &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slotSyncFinished);
+        connect (&fake_folder.sync_engine (), &SyncEngine.item_completed, tracker, &LocalDiscoveryTracker.slot_item_completed);
+        connect (&fake_folder.sync_engine (), &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slot_sync_finished);
 
         // More subdirectories are useful for testing
         fake_folder.local_modifier ().mkdir ("A/X");
@@ -29,11 +29,11 @@ class TestLocalDiscovery : GLib.Object {
         fake_folder.local_modifier ().insert ("A/Y/y1");
         tracker.add_touched_path ("A/X");
 
-        tracker.startSyncFullDiscovery ();
+        tracker.start_sync_full_discovery ();
         GLib.assert_true (fake_folder.sync_once ());
 
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_true (tracker.localDiscoveryPaths ().empty ());
+        GLib.assert_true (tracker.local_discovery_paths ().empty ());
 
         // Test begins
         fake_folder.local_modifier ().insert ("A/a3");
@@ -44,9 +44,9 @@ class TestLocalDiscovery : GLib.Object {
         fake_folder.remote_modifier ().append_byte ("C/c1");
         tracker.add_touched_path ("A/X");
 
-        fake_folder.sync_engine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
+        fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.local_discovery_paths ());
 
-        tracker.startSyncPartialDiscovery ();
+        tracker.start_sync_partial_discovery ();
         GLib.assert_true (fake_folder.sync_once ());
 
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a3"));
@@ -54,69 +54,82 @@ class TestLocalDiscovery : GLib.Object {
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/Y/y2"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/b3"));
         GLib.assert_true (fake_folder.current_local_state ().find ("C/c3"));
-        GLib.assert_cmp (fake_folder.sync_engine ().lastLocalDiscoveryStyle (), LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
-        GLib.assert_true (tracker.localDiscoveryPaths ().empty ());
+        GLib.assert_cmp (fake_folder.sync_engine ().last_local_discovery_style (), LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
+        GLib.assert_true (tracker.local_discovery_paths ().empty ());
 
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (fake_folder.sync_engine ().lastLocalDiscoveryStyle (), LocalDiscoveryStyle.FILESYSTEM_ONLY);
-        GLib.assert_true (tracker.localDiscoveryPaths ().empty ());
+        GLib.assert_cmp (fake_folder.sync_engine ().last_local_discovery_style (), LocalDiscoveryStyle.FILESYSTEM_ONLY);
+        GLib.assert_true (tracker.local_discovery_paths ().empty ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testLocalDiscoveryDecision () {
+    private void test_local_discovery_decision () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var engine = fake_folder.sync_engine ();
 
-        GLib.assert_true (engine.shouldDiscoverLocally (""));
-        GLib.assert_true (engine.shouldDiscoverLocally ("A"));
-        GLib.assert_true (engine.shouldDiscoverLocally ("A/X"));
+        GLib.assert_true (engine.should_discover_locally (""));
+        GLib.assert_true (engine.should_discover_locally ("A"));
+        GLib.assert_true (engine.should_discover_locally ("A/X"));
 
-        fake_folder.sync_engine ().setLocalDiscoveryOptions (
+        fake_folder.sync_engine ().set_local_discovery_options (
             LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, { "A/X", "A/X space", "A/X/beta", "foo bar space/touch", "foo/", "zzz", "zzzz" });
 
-        GLib.assert_true (engine.shouldDiscoverLocally (""));
-        GLib.assert_true (engine.shouldDiscoverLocally ("A"));
-        GLib.assert_true (engine.shouldDiscoverLocally ("A/X"));
-        GLib.assert_true (!engine.shouldDiscoverLocally ("B"));
-        GLib.assert_true (!engine.shouldDiscoverLocally ("A B"));
-        GLib.assert_true (!engine.shouldDiscoverLocally ("B/X"));
-        GLib.assert_true (engine.shouldDiscoverLocally ("foo bar space"));
-        GLib.assert_true (engine.shouldDiscoverLocally ("foo"));
-        GLib.assert_true (!engine.shouldDiscoverLocally ("foo bar"));
-        GLib.assert_true (!engine.shouldDiscoverLocally ("foo bar/touch"));
+        GLib.assert_true (engine.should_discover_locally (""));
+        GLib.assert_true (engine.should_discover_locally ("A"));
+        GLib.assert_true (engine.should_discover_locally ("A/X"));
+        GLib.assert_true (!engine.should_discover_locally ("B"));
+        GLib.assert_true (!engine.should_discover_locally ("A B"));
+        GLib.assert_true (!engine.should_discover_locally ("B/X"));
+        GLib.assert_true (engine.should_discover_locally ("foo bar space"));
+        GLib.assert_true (engine.should_discover_locally ("foo"));
+        GLib.assert_true (!engine.should_discover_locally ("foo bar"));
+        GLib.assert_true (!engine.should_discover_locally ("foo bar/touch"));
         // These are within "A/X" so they should be discovered
-        GLib.assert_true (engine.shouldDiscoverLocally ("A/X/alpha"));
-        GLib.assert_true (engine.shouldDiscoverLocally ("A/X beta"));
-        GLib.assert_true (engine.shouldDiscoverLocally ("A/X/Y"));
-        GLib.assert_true (engine.shouldDiscoverLocally ("A/X space"));
-        GLib.assert_true (engine.shouldDiscoverLocally ("A/X space/alpha"));
-        GLib.assert_true (!engine.shouldDiscoverLocally ("A/Xylo/foo"));
-        GLib.assert_true (engine.shouldDiscoverLocally ("zzzz/hello"));
-        GLib.assert_true (!engine.shouldDiscoverLocally ("zzza/hello"));
+        GLib.assert_true (engine.should_discover_locally ("A/X/alpha"));
+        GLib.assert_true (engine.should_discover_locally ("A/X beta"));
+        GLib.assert_true (engine.should_discover_locally ("A/X/Y"));
+        GLib.assert_true (engine.should_discover_locally ("A/X space"));
+        GLib.assert_true (engine.should_discover_locally ("A/X space/alpha"));
+        GLib.assert_true (!engine.should_discover_locally ("A/Xylo/foo"));
+        GLib.assert_true (engine.should_discover_locally ("zzzz/hello"));
+        GLib.assert_true (!engine.should_discover_locally ("zzza/hello"));
 
         QEXPECT_FAIL ("", "There is a possibility of false positives if the set contains a path "
-        //      "which is a prefix, and that prefix is followed by a character less than '/'", Continue);
-        GLib.assert_true (!engine.shouldDiscoverLocally ("A/X o"));
+            "which is a prefix, and that prefix is followed by a character less than '/'", Continue);
+        GLib.assert_true (!engine.should_discover_locally ("A/X o"));
 
-        fake_folder.sync_engine ().setLocalDiscoveryOptions (
+        fake_folder.sync_engine ().set_local_discovery_options (
             LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, {});
 
-        GLib.assert_true (!engine.shouldDiscoverLocally (""));
+        GLib.assert_true (!engine.should_discover_locally (""));
     }
 
-    // Check whether item on_signal_success and item failure adjusts the
-    // tracker correctly.
-    private void testTrackerItemCompletion () {
+
+    /***********************************************************
+    Check whether item on_signal_success and item failure
+    adjusts the tracker correctly.
+    ***********************************************************/
+    private void test_tracker_item_completion () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         LocalDiscoveryTracker tracker;
-        connect (&fake_folder.sync_engine (), &SyncEngine.item_completed, tracker, &LocalDiscoveryTracker.slotItemCompleted);
-        connect (&fake_folder.sync_engine (), &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slotSyncFinished);
-        var trackerContains = (char path) => {
-            return tracker.localDiscoveryPaths ().find (path) != tracker.localDiscoveryPaths ().end ();
+        connect (
+            fake_folder.sync_engine (),
+            SyncEngine.item_completed,
+            tracker,
+            LocalDiscoveryTracker.slot_item_completed
+        );
+        connect (
+            fake_folder.sync_engine (),
+            SyncEngine.on_signal_finished,
+            tracker,
+            LocalDiscoveryTracker.slot_sync_finished
+        );
+        var tracker_contains = (char path) => {
+            return tracker.local_discovery_paths ().find (path) != tracker.local_discovery_paths ().end ();
         }
 
         tracker.add_touched_path ("A/spurious");
@@ -129,40 +142,40 @@ class TestLocalDiscovery : GLib.Object {
         // We're not adding a4 as touched, it's in the same folder as a3 and will be seen.
         // And due to the error it should be added to the explicit list while a3 gets removed.
 
-        fake_folder.sync_engine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
-        tracker.startSyncPartialDiscovery ();
+        fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.local_discovery_paths ());
+        tracker.start_sync_partial_discovery ();
         GLib.assert_true (!fake_folder.sync_once ());
 
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a3"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a4"));
-        GLib.assert_true (!trackerContains ("A/a3"));
-        GLib.assert_true (trackerContains ("A/a4"));
-        GLib.assert_true (trackerContains ("A/spurious")); // not removed since overall sync not successful
+        GLib.assert_true (!tracker_contains ("A/a3"));
+        GLib.assert_true (tracker_contains ("A/a4"));
+        GLib.assert_true (tracker_contains ("A/spurious")); // not removed since overall sync not successful
 
-        fake_folder.sync_engine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.FILESYSTEM_ONLY);
-        tracker.startSyncFullDiscovery ();
+        fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.FILESYSTEM_ONLY);
+        tracker.start_sync_full_discovery ();
         GLib.assert_true (!fake_folder.sync_once ());
 
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a4"));
-        GLib.assert_true (trackerContains ("A/a4")); // had an error, still here
-        GLib.assert_true (!trackerContains ("A/spurious")); // removed due to full discovery
+        GLib.assert_true (tracker_contains ("A/a4")); // had an error, still here
+        GLib.assert_true (!tracker_contains ("A/spurious")); // removed due to full discovery
 
         fake_folder.server_error_paths ().clear ();
         fake_folder.sync_journal ().wipe_error_blocklist ();
         tracker.add_touched_path ("A/newspurious"); // will be removed due to successful sync
 
-        fake_folder.sync_engine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.localDiscoveryPaths ());
-        tracker.startSyncPartialDiscovery ();
+        fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.local_discovery_paths ());
+        tracker.start_sync_partial_discovery ();
         GLib.assert_true (fake_folder.sync_once ());
 
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a4"));
-        GLib.assert_true (tracker.localDiscoveryPaths ().empty ());
+        GLib.assert_true (tracker.local_discovery_paths ().empty ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testDirectoryAndSubDirectory () {
+    private void test_directory_and_sub_directory () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         fake_folder.local_modifier ().mkdir ("A/new_directory");
@@ -172,7 +185,7 @@ class TestLocalDiscovery : GLib.Object {
         var expected_state = fake_folder.current_local_state ();
 
         // Only "A" was modified according to the file system tracker
-        fake_folder.sync_engine ().setLocalDiscoveryOptions (
+        fake_folder.sync_engine ().set_local_discovery_options (
             LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, { "A" });
 
         GLib.assert_true (fake_folder.sync_once ());
@@ -181,8 +194,11 @@ class TestLocalDiscovery : GLib.Object {
         GLib.assert_cmp (fake_folder.current_remote_state (), expected_state);
     }
 
-    // Tests the behavior of invalid filename detection
-    private void testServerBlocklist () {
+
+    /***********************************************************
+    Tests the behavior of invalid filename detection
+    ***********************************************************/
+    private void test_server_blocklist () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
@@ -203,93 +219,93 @@ class TestLocalDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void testCreateFileWithTrailingSpaces_localAndRemoteTrimmedDoNotExist_renameAndUploadFile () {
+    private void test_create_file_with_trailing_spaces_local_and_remote_trimmed_do_not_exist_rename_and_upload_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        const string fileWithSpaces1 (" foo");
-        const string fileWithSpaces2 (" bar  ");
-        const string fileWithSpaces3 ("bla ");
-        const string fileWithSpaces4 ("A/ foo");
-        const string fileWithSpaces5 ("A/ bar  ");
-        const string fileWithSpaces6 ("A/bla ");
+        const string file_with_spaces_1 = " foo";
+        const string file_with_spaces_2 = " bar  ";
+        const string file_with_spaces_3 = "bla ";
+        const string file_with_spaces_4 = "A/ foo";
+        const string file_with_spaces_5 = "A/ bar  ";
+        const string file_with_spaces_6 = "A/bla ";
 
-        fake_folder.local_modifier ().insert (fileWithSpaces1);
-        fake_folder.local_modifier ().insert (fileWithSpaces2);
-        fake_folder.local_modifier ().insert (fileWithSpaces3);
-        fake_folder.local_modifier ().insert (fileWithSpaces4);
-        fake_folder.local_modifier ().insert (fileWithSpaces5);
-        fake_folder.local_modifier ().insert (fileWithSpaces6);
+        fake_folder.local_modifier ().insert (file_with_spaces_1);
+        fake_folder.local_modifier ().insert (file_with_spaces_2);
+        fake_folder.local_modifier ().insert (file_with_spaces_3);
+        fake_folder.local_modifier ().insert (file_with_spaces_4);
+        fake_folder.local_modifier ().insert (file_with_spaces_5);
+        fake_folder.local_modifier ().insert (file_with_spaces_6);
 
         GLib.assert_true (fake_folder.sync_once ());
 
-        GLib.assert_true (fake_folder.current_remote_state ().find (fileWithSpaces1.trimmed ()));
-        GLib.assert_true (!fake_folder.current_remote_state ().find (fileWithSpaces1));
-        GLib.assert_true (fake_folder.current_local_state ().find (fileWithSpaces1.trimmed ()));
-        GLib.assert_true (!fake_folder.current_local_state ().find (fileWithSpaces1));
+        GLib.assert_true (fake_folder.current_remote_state ().find (file_with_spaces_1.trimmed ()));
+        GLib.assert_true (!fake_folder.current_remote_state ().find (file_with_spaces_1));
+        GLib.assert_true (fake_folder.current_local_state ().find (file_with_spaces_1.trimmed ()));
+        GLib.assert_true (!fake_folder.current_local_state ().find (file_with_spaces_1));
 
-        GLib.assert_true (fake_folder.current_remote_state ().find (fileWithSpaces2.trimmed ()));
-        GLib.assert_true (!fake_folder.current_remote_state ().find (fileWithSpaces2));
-        GLib.assert_true (fake_folder.current_local_state ().find (fileWithSpaces2.trimmed ()));
-        GLib.assert_true (!fake_folder.current_local_state ().find (fileWithSpaces2));
+        GLib.assert_true (fake_folder.current_remote_state ().find (file_with_spaces_2.trimmed ()));
+        GLib.assert_true (!fake_folder.current_remote_state ().find (file_with_spaces_2));
+        GLib.assert_true (fake_folder.current_local_state ().find (file_with_spaces_2.trimmed ()));
+        GLib.assert_true (!fake_folder.current_local_state ().find (file_with_spaces_2));
 
-        GLib.assert_true (fake_folder.current_remote_state ().find (fileWithSpaces3.trimmed ()));
-        GLib.assert_true (!fake_folder.current_remote_state ().find (fileWithSpaces3));
-        GLib.assert_true (fake_folder.current_local_state ().find (fileWithSpaces3.trimmed ()));
-        GLib.assert_true (!fake_folder.current_local_state ().find (fileWithSpaces3));
+        GLib.assert_true (fake_folder.current_remote_state ().find (file_with_spaces_3.trimmed ()));
+        GLib.assert_true (!fake_folder.current_remote_state ().find (file_with_spaces_3));
+        GLib.assert_true (fake_folder.current_local_state ().find (file_with_spaces_3.trimmed ()));
+        GLib.assert_true (!fake_folder.current_local_state ().find (file_with_spaces_3));
 
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/foo"));
-        GLib.assert_true (!fake_folder.current_remote_state ().find (fileWithSpaces4));
+        GLib.assert_true (!fake_folder.current_remote_state ().find (file_with_spaces_4));
         GLib.assert_true (fake_folder.current_local_state ().find ("A/foo"));
-        GLib.assert_true (!fake_folder.current_local_state ().find (fileWithSpaces4));
+        GLib.assert_true (!fake_folder.current_local_state ().find (file_with_spaces_4));
 
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/bar"));
-        GLib.assert_true (!fake_folder.current_remote_state ().find (fileWithSpaces5));
+        GLib.assert_true (!fake_folder.current_remote_state ().find (file_with_spaces_5));
         GLib.assert_true (fake_folder.current_local_state ().find ("A/bar"));
-        GLib.assert_true (!fake_folder.current_local_state ().find (fileWithSpaces5));
+        GLib.assert_true (!fake_folder.current_local_state ().find (file_with_spaces_5));
 
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/bla"));
-        GLib.assert_true (!fake_folder.current_remote_state ().find (fileWithSpaces6));
+        GLib.assert_true (!fake_folder.current_remote_state ().find (file_with_spaces_6));
         GLib.assert_true (fake_folder.current_local_state ().find ("A/bla"));
-        GLib.assert_true (!fake_folder.current_local_state ().find (fileWithSpaces6));
+        GLib.assert_true (!fake_folder.current_local_state ().find (file_with_spaces_6));
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testCreateFileWithTrailingSpaces_localTrimmedDoesExist_dontRenameAndUploadFile () {
+    private void test_create_file_with_trailing_spaces_local_trimmed_does_exist_dont_rename_and_upload_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        const string fileWithSpaces (" foo");
-        const string fileTrimmed ("foo");
+        const string file_with_spaces = " foo";
+        const string file_trimmed "foo";
 
-        fake_folder.local_modifier ().insert (fileTrimmed);
+        fake_folder.local_modifier ().insert (file_trimmed);
         GLib.assert_true (fake_folder.sync_once ());
-        fake_folder.local_modifier ().insert (fileWithSpaces);
+        fake_folder.local_modifier ().insert (file_with_spaces);
         GLib.assert_true (!fake_folder.sync_once ());
 
-        GLib.assert_true (fake_folder.current_remote_state ().find (fileTrimmed));
-        GLib.assert_true (!fake_folder.current_remote_state ().find (fileWithSpaces));
-        GLib.assert_true (fake_folder.current_local_state ().find (fileWithSpaces));
-        GLib.assert_true (fake_folder.current_local_state ().find (fileTrimmed));
+        GLib.assert_true (fake_folder.current_remote_state ().find (file_trimmed));
+        GLib.assert_true (!fake_folder.current_remote_state ().find (file_with_spaces));
+        GLib.assert_true (fake_folder.current_local_state ().find (file_with_spaces));
+        GLib.assert_true (fake_folder.current_local_state ().find (file_trimmed));
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void testCreateFileWithTrailingSpaces_localTrimmedAlsoCreated_dontRenameAndUploadFile () {
+    private void test_create_file_with_trailing_spaces_local_trimmed_also_created_dont_rename_and_upload_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        const string fileWithSpaces (" foo");
-        const string fileTrimmed ("foo");
+        const string file_with_spaces (" foo");
+        const string file_trimmed ("foo");
 
-        fake_folder.local_modifier ().insert (fileTrimmed);
-        fake_folder.local_modifier ().insert (fileWithSpaces);
+        fake_folder.local_modifier ().insert (file_trimmed);
+        fake_folder.local_modifier ().insert (file_with_spaces);
         GLib.assert_true (!fake_folder.sync_once ());
 
-        GLib.assert_true (fake_folder.current_remote_state ().find (fileTrimmed));
-        GLib.assert_true (!fake_folder.current_remote_state ().find (fileWithSpaces));
-        GLib.assert_true (fake_folder.current_local_state ().find (fileWithSpaces));
-        GLib.assert_true (fake_folder.current_local_state ().find (fileTrimmed));
+        GLib.assert_true (fake_folder.current_remote_state ().find (file_trimmed));
+        GLib.assert_true (!fake_folder.current_remote_state ().find (file_with_spaces));
+        GLib.assert_true (fake_folder.current_local_state ().find (file_with_spaces));
+        GLib.assert_true (fake_folder.current_local_state ().find (file_trimmed));
     }
 }
 

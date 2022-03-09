@@ -54,7 +54,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
             var path = request.url ().path ();
 
             if (!request.url ().to_string ().starts_with (account_state.account ().url ().to_string ())) {
-                reply = new FakeErrorReply (operation, request, this, 404, fake404Response);
+                reply = new FakeErrorReply (operation, request, this, 404, fake_404_response);
             }
             if (format != "json") {
                 reply = new FakeErrorReply (operation, request, this, 400, fake400Response);
@@ -77,7 +77,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
             }
 
             if (!reply) {
-                return qobject_cast<Soup.Reply> (new FakeErrorReply (operation, request, this, 404, QByteArrayLiteral ("{error : \"Not found!\"}")));
+                return qobject_cast<Soup.Reply> (new FakeErrorReply (operation, request, this, 404, new GLib.ByteArray ("{error : \"Not found!\"}")));
             }
 
             return reply;

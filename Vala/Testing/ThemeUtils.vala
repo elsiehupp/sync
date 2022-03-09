@@ -24,7 +24,7 @@ class FakePaintDevice : QPaintDevice {
 
     /***********************************************************
     ***********************************************************/
-    public QPaintEngine paintEngine () {
+    public QPaintEngine paint_engine () {
         return null;
     }
 
