@@ -724,7 +724,7 @@ class BulkPropagatorJob : PropagatorJob {
             propagator ().another_sync_needed = true;
             if (!finished) {
                 abort_with_error (item, SyncFileItem.Status.SOFT_ERROR, _("Local file changed during sync."));
-                // FIXME :  the legacy code was retrying for a few seconds.
+                // FIXME:  the legacy code was retrying for a few seconds.
                 //         and also checking that after the last chunk, and removed the file in case of INSTRUCTION_NEW
                 return false;
             }

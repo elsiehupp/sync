@@ -217,7 +217,7 @@ protected slots:
         string server_version = CheckServerJob.version (info);
 
         // status.php was found.
-        GLib.info ("** Application : own_cloud found : "
+        GLib.info ("** Application : own_cloud found: "
                                       + url + " with version "
                                       + CheckServerJob.version_string (info)
                                       + " (" + server_version + ")";

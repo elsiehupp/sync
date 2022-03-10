@@ -801,7 +801,7 @@ class AccountSettings : Gtk.Widget {
 
         FolderDefinition definition;
         definition.local_path = FolderDefinition.prepare_local_path (
-            folder_wizard.field (QLatin1String ("source_folder")).to_string ());
+            folder_wizard.field ("source_folder").to_string ());
         definition.target_path = FolderDefinition.prepare_target_path (
             folder_wizard.property ("target_path").to_string ());
 
@@ -846,7 +846,7 @@ class AccountSettings : Gtk.Widget {
 
             // The user already accepted the selective sync dialog. everything is in the allow list
             f.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
-                string[] () + QLatin1String ("/"));
+                string[] () + "/");
             folder_man.schedule_all_folders ();
             /* emit */ folder_changed ();
         }
@@ -910,10 +910,10 @@ class AccountSettings : Gtk.Widget {
             bool ok = false;
             const var undecided_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok);
             for (var it : undecided_list) {
-                // FIXME : add the folder alias in a hoover hint.
-                // folder.alias () + QLatin1String ("/")
+                // FIXME: add the folder alias in a hoover hint.
+                // folder.alias () + "/"
                 if (count++) {
-                    message += QLatin1String (", ");
+                    message += ", ";
                 }
                 string my_folder = (it);
                 if (my_folder.ends_with ('/')) {
@@ -932,10 +932,10 @@ class AccountSettings : Gtk.Widget {
         if (!message.is_empty ()) {
             ConfigFile config;
             string info = !config.confirm_external_storage ()
-                    ? _("There are folders that were not synchronized because they are too big : ")
+                    ? _("There are folders that were not synchronized because they are too big: ")
                     : !config.new_big_folder_size_limit ().first
-                      ? _("There are folders that were not synchronized because they are external storages : ")
-                      : _("There are folders that were not synchronized because they are too big or external storages : ");
+                      ? _("There are folders that were not synchronized because they are external storages: ")
+                      : _("There are folders that were not synchronized because they are too big or external storages: ");
 
             this.ui.selective_sync_notification.on_signal_text (info + message);
             this.ui.big_folder_ui.visible (true);
@@ -1206,7 +1206,7 @@ class AccountSettings : Gtk.Widget {
     protected void on_signal_link_activated (string link) {
         // Parse folder alias and filename from the link, calculate the index
         // and select it if it exists.
-        const string[] li = link.split (QLatin1String ("?folder="));
+        const string[] li = link.split ("?folder=");
         if (li.count () > 1) {
             string my_folder = li[0];
             const string alias = li[1];
@@ -1292,7 +1292,7 @@ class AccountSettings : Gtk.Widget {
 
         const bool show_warning = this.model.is_dirty () && this.account_state.is_connected () && info.checked == Qt.Unchecked;
 
-        // FIXME : the model is not precise enough to handle extra cases
+        // FIXME: the model is not precise enough to handle extra cases
         // e.g. the user clicked on the same checkbox 2x without applying the change in between.
         // We don't know which checkbox changed to be able to toggle the selective_sync_label display.
         if (show_warning) {
@@ -1332,9 +1332,9 @@ class AccountSettings : Gtk.Widget {
     ***********************************************************/
     private void show_connection_label (string message,
         string[] errors = string[] ()) {
-        const string err_style = QLatin1String ("color:#ffffff; background-color:#bb4d4d;padding:5px;"
-                                                "border-width : 1px; border-style : solid; border-color : #aaaaaa;"
-                                                "border-radius:5px;");
+        const string err_style = "color: #ffffff; background-color: #bb4d4d; padding: 5px;"
+                               + "border-width: 1px; border-style: solid; border-color: #aaaaaa;"
+                               + "border-radius: 5px;";
         if (errors.is_empty ()) {
             string message = message;
             Theme.replace_link_color_string_background_aware (message);
@@ -1343,7 +1343,7 @@ class AccountSettings : Gtk.Widget {
             this.ui.connect_label.style_sheet ("");
         } else {
             errors.prepend (message);
-            string message = errors.join (QLatin1String ("\n"));
+            string message = errors.join ("\n");
             GLib.debug () + message;
             Theme.replace_link_color_string (message, Gtk.Color ("#c1c8e6"));
             this.ui.connect_label.on_signal_text (message);

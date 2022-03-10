@@ -55,13 +55,13 @@ class GlobalWheelFilter : GLib.Object {
         }
         m_handlers_for_item.insert (item, handler);
 
-        connect (item, &GLib.Object.destroyed, this, [this] (GLib.Object obj) {
-            var item = static_cast<QQuickItem> (obj);
+        connect (item, &GLib.Object.destroyed, this, [this] (GLib.Object object) {
+            var item = static_cast<QQuickItem> (object);
             m_handlers_for_item.remove (item);
         });
 
-        connect (handler, &GLib.Object.destroyed, this, [this] (GLib.Object obj) {
-            var handler = static_cast<WheelHandler> (obj);
+        connect (handler, &GLib.Object.destroyed, this, [this] (GLib.Object object) {
+            var handler = static_cast<WheelHandler> (object);
             remove_item_handler_association (handler.target (), handler);
         });
     }

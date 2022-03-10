@@ -13,7 +13,7 @@ namespace Ui {
 
 Fetching enabled apps from the OCS Apps API
 ***********************************************************/
-class OcsNavigationAppsJob : Ocs_job {
+class OcsNavigationAppsJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/
@@ -42,9 +42,9 @@ signals:
 }
 
     OcsNavigationAppsJob.OcsNavigationAppsJob (AccountPointer account)
-        : Ocs_job (account) {
+        : OcsJob (account) {
         path ("ocs/v2.php/core/navigation/apps");
-        connect (this, &OcsNavigationAppsJob.job_finished, this, &OcsNavigationAppsJob.on_signal_job_done);
+        connect (this, &OcsNavigationAppsJob.signal_job_finished, this, &OcsNavigationAppsJob.on_signal_job_done);
     }
 
     void OcsNavigationAppsJob.get_navigation_apps () {

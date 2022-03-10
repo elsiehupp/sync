@@ -113,7 +113,7 @@ class Application : SharedTools.QtSingleApplication {
 signals:
     void folder_removed ();
     void folder_state_changed (Folder *);
-    void is_showing_settings_dialog ();
+    void signal_is_showing_settings_dialog ();
 
 protected slots:
     void on_signal_parse_message (string , GLib.Object *);
@@ -299,14 +299,13 @@ Application.Application (int argc, char **argv)
     qsrand (std.random_device () ());
 
     // TODO : Can't set this without breaking current config paths
-    //    organization_name (QLatin1String (APPLICATION_VENDOR));
-    organization_domain (QLatin1String (APPLICATION_REV_DOMAIN));
+    //    organization_name (APPLICATION_VENDOR);
+    organization_domain (APPLICATION_REV_DOMAIN);
 
     // desktop_filename to provide wayland compatibility (in general : conformance with naming standards)
     // but only on Qt >= 5.7, where desktop_filename was introduced
-#if (QT_VERSION >= 0x050700)
-    string desktop_filename = string (QLatin1String (LINUX_APPLICATION_ID)
-                                        + QLatin1String (".desktop"));
+//  #if (QT_VERSION >= 0x050700)
+    string desktop_filename = LINUX_APPLICATION_ID + ".desktop";
     desktop_filename (desktop_filename);
 //  #endif
 
@@ -470,8 +469,8 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
     // Cleanup at Quit.
     connect (this, &QCoreApplication.about_to_quit, this, &Application.on_signal_cleanup);
 
-    // Allow other classes to hook into is_showing_settings_dialog () signals (re-auth widgets, for example)
-    connect (this.gui.data (), &OwncloudGui.is_showing_settings_dialog, this, &Application.on_signal_gui_is_showing_settings);
+    // Allow other classes to hook into signal_is_showing_settings_dialog () signals (re-auth widgets, for example)
+    connect (this.gui.data (), &OwncloudGui.signal_is_showing_settings_dialog, this, &Application.on_signal_gui_is_showing_settings);
 
     this.gui.create_tray ();
 }
@@ -532,7 +531,7 @@ void Application.on_signal_cleanup () {
     this.gui.delete_later ();
 }
 
-// FIXME : This is not ideal yet since a ConnectionValidator might already be running and is in
+// FIXME: This is not ideal yet since a ConnectionValidator might already be running and is in
 // progress of timing out in some seconds.
 // Maybe we need 2 validators, one triggered by timer, one by network configuration changes?
 void Application.on_signal_system_online_configuration_changed (QNetworkConfiguration cnf) {
@@ -635,7 +634,7 @@ void Application.on_signal_parse_message (string message, GLib.Object *) {
             Gtk.Application.quit ();
         }
 
-    } else if (message.starts_with (QLatin1String ("MSG_SHOWMAINDIALOG"))) {
+    } else if (message.starts_with ("MSG_SHOWMAINDIALOG")) {
         GLib.info ("Running for" + this.started_at.elapsed () / 1000.0 << "sec";
         if (this.started_at.elapsed () < 10 * 1000) {
             // This call is mirrored with the one in int main ()
@@ -661,37 +660,37 @@ void Application.parse_options (string[] options) {
     //parse options; if help or bad option exit
     while (it.has_next ()) {
         string option = it.next ();
-        if (option == QLatin1String ("--help") || option == QLatin1String ("-h")) {
+        if (option == "--help" || option == "-h") {
             help ();
             break;
-        } else if (option == QLatin1String ("--quit") || option == QLatin1String ("-q")) {
+        } else if (option == "--quit" || option == "-q") {
             this.quit_instance = true;
-        } else if (option == QLatin1String ("--logwindow") || option == QLatin1String ("-l")) {
+        } else if (option == "--logwindow" || option == "-l") {
             this.show_log_window = true;
-        } else if (option == QLatin1String ("--logfile")) {
-            if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
+        } else if (option == "--logfile") {
+            if (it.has_next () && !it.peek_next ().starts_with ("--")) {
                 this.log_file = it.next ();
             } else {
                 show_hint ("Log file not specified");
             }
-        } else if (option == QLatin1String ("--logdir")) {
-            if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
+        } else if (option == "--logdir") {
+            if (it.has_next () && !it.peek_next ().starts_with ("--")) {
                 this.log_dir = it.next ();
             } else {
                 show_hint ("Log directory not specified");
             }
-        } else if (option == QLatin1String ("--logexpire")) {
-            if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
+        } else if (option == "--logexpire") {
+            if (it.has_next () && !it.peek_next ().starts_with ("--")) {
                 this.log_expire = it.next ().to_int ();
             } else {
                 show_hint ("Log expiration not specified");
             }
-        } else if (option == QLatin1String ("--logflush")) {
+        } else if (option == "--logflush") {
             this.log_flush = true;
-        } else if (option == QLatin1String ("--logdebug")) {
+        } else if (option == "--logdebug") {
             this.log_debug = true;
-        } else if (option == QLatin1String ("--confdir")) {
-            if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
+        } else if (option == "--confdir") {
+            if (it.has_next () && !it.peek_next ().starts_with ("--")) {
                 string conf_dir = it.next ();
                 if (!ConfigFile.conf_dir (conf_dir)) {
                     show_hint ("Invalid path passed to --confdir");
@@ -727,18 +726,19 @@ void Application.show_help () {
     help ();
     string help_text;
     QTextStream stream (&help_text);
-    stream + this.theme.app_name ()
-           + QLatin1String (" version ")
+    stream +=  this.theme.app_name ()
+           + " version "
            + this.theme.version () + endl;
 
-    stream + QLatin1String ("File synchronisation desktop utility.") + endl
+    stream += "File synchronisation desktop utility." + endl
            + endl
-           + QLatin1String (options_c);
+           + options_c;
 
-    if (this.theme.app_name () == QLatin1String ("own_cloud"))
-        stream + endl
+    if (this.theme.app_name () == "own_cloud") {
+        stream += endl
                + "For more information, see http://www.owncloud.org" + endl
                + endl;
+    }
 
     display_help_text (help_text);
 }
@@ -772,11 +772,13 @@ string subst_lang (string lang) {
     // transifex translation conventions.
 
     // Simplified Chinese
-    if (lang == QLatin1String ("zh_Hans"))
-        return QLatin1String ("zh_CN");
+    if (lang == "zh_Hans") {
+        return "zh_CN";
+    }
     // Traditional Chinese
-    if (lang == QLatin1String ("zh_Hant"))
-        return QLatin1String ("zh_TW");
+    if (lang == "zh_Hant") {
+        return "zh_TW";
+    }
     return lang;
 }
 
@@ -797,7 +799,7 @@ void Application.setup_translations () {
         lang = subst_lang (lang);
         const string tr_path = application_tr_path ();
         const string tr_file = "client_" + lang;
-        if (translator.on_signal_load (tr_file, tr_path) || lang.starts_with (QLatin1String ("en"))) {
+        if (translator.on_signal_load (tr_file, tr_path) || lang.starts_with ("en")) {
             // Permissive approach : Qt and keychain translations
             // may be missing, but Qt translations must be there in order
             // for us to accept the language. Otherwise, we try with the next.
@@ -806,8 +808,8 @@ void Application.setup_translations () {
             GLib.info ("Using" + lang + "translation";
             property ("ui_lang", lang);
             const string qt_tr_path = QLibraryInfo.location (QLibraryInfo.TranslationsPath);
-            const string qt_tr_file = QLatin1String ("qt_") + lang;
-            const string qt_base_tr_file = QLatin1String ("qtbase_") + lang;
+            const string qt_tr_file = "qt_" + lang;
+            const string qt_base_tr_file = "qtbase_" + lang;
             if (!qt_translator.on_signal_load (qt_tr_file, qt_tr_path)) {
                 if (!qt_translator.on_signal_load (qt_tr_file, tr_path)) {
                     if (!qt_translator.on_signal_load (qt_base_tr_file, qt_tr_path)) {
@@ -815,7 +817,7 @@ void Application.setup_translations () {
                     }
                 }
             }
-            const string qtkeychain_tr_file = QLatin1String ("qtkeychain_") + lang;
+            const string qtkeychain_tr_file = "qtkeychain_" + lang;
             if (!qtkeychain_translator.on_signal_load (qtkeychain_tr_file, qt_tr_path)) {
                 qtkeychain_translator.on_signal_load (qtkeychain_tr_file, tr_path);
             }
@@ -845,7 +847,7 @@ void Application.show_main_dialog () {
 }
 
 void Application.on_signal_gui_is_showing_settings () {
-    /* emit */ is_showing_settings_dialog ();
+    /* emit */ signal_is_showing_settings_dialog ();
 }
 
 void Application.on_signal_open_virtual_file (string filename) {

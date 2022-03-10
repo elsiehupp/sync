@@ -26,7 +26,7 @@ class FakeFolder {
     QTemporaryDir temporary_directory;
     DiskFileModifier local_modifier;
 
-    // FIXME : Clarify ownership, double delete
+    // FIXME: Clarify ownership, double delete
     FakeQNAM fake_qnam;
     Occ.AccountPointer account;
     std.unique_ptr<Occ.SyncJournalDb> journal_database;

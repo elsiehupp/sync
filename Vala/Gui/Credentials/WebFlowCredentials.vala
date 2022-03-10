@@ -105,7 +105,7 @@ class WebFlowCredentials : AbstractCredentials {
     Windows : Workaround for CredWriteW used by QtKeychain
 
              Saving all client CA's within one credential may result in:
-             Error : "Credential size exceeds maximum size of 2560"
+             Error: "Credential size exceeds maximum size of 2560"
     ***********************************************************/
     private void read_single_client_ca_cert_pem ();
     private void write_single_client_ca_cert_pem ();

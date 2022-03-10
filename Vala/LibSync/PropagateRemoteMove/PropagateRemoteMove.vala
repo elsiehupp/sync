@@ -45,7 +45,7 @@ class PropagateRemoteMove : PropagateItemJob {
 
                 var path = this.item.file;
                 var slash_position = path.last_index_of ('/');
-                var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+                var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
                 SyncJournalFileRecord parent_rec;
                 bool ok = propagator ().journal.get_file_record (parent_path, parent_rec);
@@ -57,7 +57,7 @@ class PropagateRemoteMove : PropagateItemJob {
                 var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
 
                 var last_slash_position = this.item.encrypted_filename.last_index_of ('/');
-                var encrypted_name = last_slash_position >= 0 ? this.item.encrypted_filename.mid (last_slash_position + 1) : "";
+                var encrypted_name = last_slash_position >= 0 ? this.item.encrypted_filename.mid (last_slash_position + 1): "";
 
                 if (!encrypted_name.is_empty ()) {
                     this.item.encrypted_filename = remote_parent_path + "/" + encrypted_name;
@@ -243,7 +243,7 @@ class PropagateRemoteMove : PropagateItemJob {
         if (old_record.is_valid ()) {
             new_item.checksum_header = old_record.checksum_header;
             if (new_item.size != old_record.file_size) {
-                GLib.warning ("File sizes differ on server vs sync journal : " + new_item.size + old_record.file_size;
+                GLib.warning ("File sizes differ on server vs sync journal: " + new_item.size + old_record.file_size;
 
                 // the server might have claimed a different size, we take the old one from the DB
                 new_item.size = old_record.file_size;

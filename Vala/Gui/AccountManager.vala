@@ -338,9 +338,9 @@ class AccountManager : GLib.Object {
         }
 
         // Migrate to webflow
-        if (auth_type == QLatin1String ("http")) {
+        if (auth_type == "http") {
             auth_type = "webflow";
-            settings.value (QLatin1String (AUTH_TYPE_C), auth_type);
+            settings.value (AUTH_TYPE_C, auth_type);
 
             foreach (string key in settings.child_keys ()) {
                 if (!key.starts_with ("http_"))
@@ -353,11 +353,11 @@ class AccountManager : GLib.Object {
 
         GLib.info ("Account for" + acc.url ("using auth type" + auth_type;
 
-        acc.server_version = settings.value (QLatin1String (SERVER_VERSION_C)).to_string ();
-        acc.dav_user = settings.value (QLatin1String (DAV_USER_C), "").to_string ();
+        acc.server_version = settings.value (SERVER_VERSION_C).to_string ();
+        acc.dav_user = settings.value (DAV_USER_C, "").to_string ();
 
         // We want to only restore settings for that auth type and the user value
-        acc.settings_map.insert (QLatin1String (USER_C), settings.value (USER_C));
+        acc.settings_map.insert (USER_C, settings.value (USER_C));
         string auth_type_prefix = auth_type + "this.";
         foreach (var key in settings.child_keys ()) {
             if (!key.starts_with (auth_type_prefix))
@@ -368,9 +368,9 @@ class AccountManager : GLib.Object {
         acc.credentials (CredentialsFactory.create (auth_type));
 
         // now the server cert, it is in the general group
-        settings.begin_group (QLatin1String ("General"));
+        settings.begin_group ("General");
         const var certificates = QSslCertificate.from_data (settings.value (CA_CERTS_KEY_C).to_byte_array ());
-        GLib.info ("Restored : " + certificates.count (" unknown certificates.";
+        GLib.info ("Restored: " + certificates.count () + " unknown certificates.");
         acc.approved_certificates (certificates);
         settings.end_group ();
 
@@ -395,14 +395,14 @@ class AccountManager : GLib.Object {
             // replace the last two segments with own_cloud/owncloud.config
             o_c_cfg_file = o_c_cfg_file.left (o_c_cfg_file.last_index_of ('/'));
             o_c_cfg_file = o_c_cfg_file.left (o_c_cfg_file.last_index_of ('/'));
-            o_c_cfg_file += QLatin1String ("/own_cloud/owncloud.config");
+            o_c_cfg_file += "/own_cloud/owncloud.config";
 
             GLib.info ("Migrate : checking old config " + o_c_cfg_file;
 
             GLib.FileInfo fi (o_c_cfg_file);
             if (fi.is_readable ()) {
                 std.unique_ptr<QSettings> o_c_settings (new QSettings (o_c_cfg_file, QSettings.IniFormat));
-                o_c_settings.begin_group (QLatin1String ("own_cloud"));
+                o_c_settings.begin_group ("own_cloud");
 
                 // Check the theme url to see if it is the same url that the o_c config was for
                 string override_url = Theme.instance ().override_server_url ();
@@ -410,7 +410,7 @@ class AccountManager : GLib.Object {
                     if (override_url.ends_with ('/')) {
                         override_url.chop (1);
                     }
-                    string oc_url = o_c_settings.value (QLatin1String (URL_C)).to_string ();
+                    string oc_url = o_c_settings.value (URL_C).to_string ();
                     if (oc_url.ends_with ('/')) {
                         oc_url.chop (1);
                     }
@@ -418,7 +418,7 @@ class AccountManager : GLib.Object {
                     // in case the urls are equal reset the settings object to read from
                     // the own_cloud settings object
                     GLib.info ("Migrate o_c config if " + oc_url + " == " + override_url + ":"
-                                             + (oc_url == override_url ? "Yes" : "No");
+                                             + (oc_url == override_url ? "Yes": "No");
                     if (oc_url == override_url) {
                         settings = std.move (o_c_settings);
                     }
@@ -457,7 +457,7 @@ class AccountManager : GLib.Object {
     ***********************************************************/
     public void on_signal_save_account (Account a) {
         GLib.debug ("Saving account" + a.url ().to_string ();
-        var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
+        var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
         settings.begin_group (a.identifier ());
         save_account_helper (a, *settings, false); // don't save credentials they might not have been loaded yet
         settings.end_group ();
@@ -472,7 +472,7 @@ class AccountManager : GLib.Object {
     ***********************************************************/
     public void on_signal_save_account_state (AccountState a) {
         GLib.debug ("Saving account state" + a.account ().url ().to_string ();
-        var settings = ConfigFile.settings_with_group (QLatin1String (ACCOUNTS_C));
+        var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
         settings.begin_group (a.account ().identifier ());
         a.write_to_settings (*settings);
         settings.end_group ();

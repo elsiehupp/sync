@@ -107,7 +107,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
         this.uploading_encrypted = false;
         var path = this.item.file;
         var slash_position = path.last_index_of ('/');
-        var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+        var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         SyncJournalFileRecord parent_rec;
         bool ok = propagator.journal.get_file_record (parent_path, parent_rec);
@@ -123,7 +123,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
     public void on_signal_start () {
         var path = this.item.file;
         var slash_position = path.last_index_of ('/');
-        var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+        var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         if (!this.item.rename_target.is_empty () && this.item.file != this.item.rename_target) {
             // Try to rename the file

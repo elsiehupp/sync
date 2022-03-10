@@ -115,10 +115,10 @@ class Link_share : Share {
 
 
     /***********************************************************
-    Create Ocs_share_job and connect to signal/slots
+    Create OcsShareJob and connect to signal/slots
     ***********************************************************/
     public template <typename Link_share_slot>
-    public Ocs_share_job create_share_job (Link_share_slot on_signal_function);
+    public OcsShareJob create_share_job (Link_share_slot on_signal_function);
 
 signals:
     void expire_date_set ();
@@ -190,7 +190,7 @@ bool Link_share.get_public_upload () {
 }
 
 bool Link_share.get_show_file_listing () {
-    return this.permissions & Share_permission_read;
+    return this.permissions & SharePermissionRead;
 }
 
 string Link_share.get_name () {
@@ -231,10 +231,10 @@ void Link_share.label (string label) {
 }
 
 template <typename Link_share_slot>
-Ocs_share_job *Link_share.create_share_job (Link_share_slot on_signal_function) {
-    var job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_share_job.share_job_finished, this, on_signal_function);
-    connect (job, &Ocs_job.ocs_error, this, &Link_share.on_signal_ocs_error);
+OcsShareJob *Link_share.create_share_job (Link_share_slot on_signal_function) {
+    var job = new OcsShareJob (this.account);
+    connect (job, &OcsShareJob.share_job_finished, this, on_signal_function);
+    connect (job, &OcsJob.ocs_error, this, &Link_share.on_signal_ocs_error);
     return job;
 }
 

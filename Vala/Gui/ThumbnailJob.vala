@@ -11,19 +11,26 @@ namespace Ui {
 @brief Job to fetch a thumbnail for a file
 @ingroup gui
 
-Job that allows fetching a preview (of 150x150 for now) of a given file.
-Once the job has on_signal_finished the job_finished signal will be emitted.
+Job that allows fetching a preview (of 150x150 for now) of
+a given file. Once the job has finished the
+signal_job_finished signal will be emitted.
 ***********************************************************/
-class Thumbnail_job : AbstractNetworkJob {
+class ThumbnailJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public Thumbnail_job (string path, AccountPointer account, GLib.Object parent = new GLib.Object ());
+    public ThumbnailJob (string path, AccountPointer account, GLib.Object parent = new GLib.Object ()) {
+        base (account, "index.php/apps/files/api/v1/thumbnail/150/150/" + path, parent);
+        ignore_credential_failure (true);
+    }
 
     /***********************************************************
     ***********************************************************/
-    public on_ void on_signal_start () override;
-signals:
+    public override void on_signal_start () {
+        send_request ("GET", make_account_url (path ()));
+        AbstractNetworkJob.on_signal_start ();
+    }
+
     /***********************************************************
     @param status_code the HTTP status code
     @param reply the content of the reply
@@ -32,27 +39,17 @@ signals:
     will contain the image data in PNG. If the status code is different the content
     of reply is undefined.
     ***********************************************************/
-    void job_finished (int status_code, GLib.ByteArray reply);
+    void signal_job_finished (int status_code, GLib.ByteArray reply);
 
     /***********************************************************
     ***********************************************************/
-    private bool on_signal_finished () override;
-}
-
-
-    Thumbnail_job.Thumbnail_job (string path, AccountPointer account, GLib.Object parent)
-        : base (account, QLatin1String ("index.php/apps/files/api/v1/thumbnail/150/150/") + path, parent) {
-        ignore_credential_failure (true);
-    }
-
-    void Thumbnail_job.on_signal_start () {
-        send_request ("GET", make_account_url (path ()));
-        AbstractNetworkJob.on_signal_start ();
-    }
-
-    bool Thumbnail_job.on_signal_finished () {
-        /* emit */ job_finished (reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int (), reply ().read_all ());
+    private override bool on_signal_finished () {
+        /* emit */ signal_job_finished (reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int (), reply ().read_all ());
         return true;
     }
-    }
+
+} // class ThumbnailJob
+
+} // namespace Ui
+} // namespace Occ
     

@@ -236,7 +236,7 @@ class OwncloudSetupPage : QWizardPage {
 
                     OwncloudConnectionMethodDialog dialog;
                     dialog.url (url);
-                    // FIXME : Synchronous dialogs are not so nice because of event loop recursion
+                    // FIXME: Synchronous dialogs are not so nice because of event loop recursion
                     int ret_val = dialog.exec ();
 
                     switch (ret_val) {
@@ -302,7 +302,7 @@ class OwncloudSetupPage : QWizardPage {
             this.oc_wizard.client_cert_bundle = cert_data;
             this.oc_wizard.client_cert_password = cert_password;
 
-            add_cert_dial.reinit (); // FIXME : Why not just have this only created on use?
+            add_cert_dial.reinit (); // FIXME: Why not just have this only created on use?
 
             // The extracted SSL key and cert gets added to the QSslConfiguration in check_server ()
             validate_page ();

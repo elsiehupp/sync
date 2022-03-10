@@ -58,7 +58,7 @@ class AccessManager : QNetworkAccessManager {
         // For PROPFIND (assumed to be a WebDAV operation), set xml/utf8 as content type/encoding
         // This needs extension
         if (verb == "PROPFIND") {
-            new_request.header (Soup.Request.ContentTypeHeader, QLatin1String ("text/xml; charset=utf-8"));
+            new_request.header (Soup.Request.ContentTypeHeader, "text/xml; charset=utf-8");
         }
 
         // Generate a new request identifier

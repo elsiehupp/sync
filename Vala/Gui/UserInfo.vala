@@ -142,7 +142,7 @@ class UserInfo : GLib.Object {
         }
 
         AccountPointer account = this.account_state.account ();
-        this.job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"), this);
+        this.job = new JsonApiJob (account, "ocs/v1.php/cloud/user", this);
         this.job.on_signal_timeout (20 * 1000);
         connect (this.job.data (), &JsonApiJob.json_received, this, &UserInfo.on_signal_update_last_info);
         connect (this.job.data (), &AbstractNetworkJob.network_error, this, &UserInfo.on_signal_request_failed);

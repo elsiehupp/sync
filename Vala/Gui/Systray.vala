@@ -6,15 +6,15 @@ Copyright (C) by Cédric Bellegarde <gnumdk@gmail.com>
 
 //  #include <QCursor>
 //  #include <QGuiApplication>
-//  #include <QQml_application_engine>
+//  #include <QQmlApplicationEngine>
 //  #include <QQml_context>
 //  #include <QQuick_window>
 //  #include <QScreen>
 //  #include <QMenu>
 
 //  #ifdef USE_FDO_NOTIFICATIONS
-//  #include <QDBus_connection>
-//  #include <QDBus_interface>
+//  #include <QDBusConnection>
+//  #include <QDBusInterface>
 //  #include <QDBus_message>
 //  #include <QDBus_pending_call>
 const int NOTIFICATIONS_SERVICE "org.freedesktop.Notifications"
@@ -68,7 +68,7 @@ class Systray
 
     /***********************************************************
     ***********************************************************/
-    public void tray_engine (QQml_application_engine tray_engine);
+    public void tray_engine (QQmlApplicationEngine tray_engine);
 
     /***********************************************************
     ***********************************************************/
@@ -177,7 +177,7 @@ signals:
     ***********************************************************/
     private bool this.is_open = false;
     private bool this.sync_is_paused = true;
-    private QPointer<QQml_application_engine> this.tray_engine;
+    private QPointer<QQmlApplicationEngine> this.tray_engine;
 
     /***********************************************************
     ***********************************************************/
@@ -194,19 +194,19 @@ Systray *Systray.instance () {
     return this.instance;
 }
 
-void Systray.tray_engine (QQml_application_engine tray_engine) {
+void Systray.tray_engine (QQmlApplicationEngine tray_engine) {
     this.tray_engine = tray_engine;
 
     this.tray_engine.network_access_manager_factory (&this.access_manager_factory);
 
     this.tray_engine.add_import_path ("qrc:/qml/theme");
-    this.tray_engine.add_ImageProvider ("avatars", new ImageProvider);
-    this.tray_engine.add_ImageProvider (QLatin1String ("svgimage-custom-color"), new Occ.Ui.SvgImageProvider);
-    this.tray_engine.add_ImageProvider (QLatin1String ("unified-search-result-icon"), new UnifiedSearchResultImageProvider);
+    this.tray_engine.add_ImageProvider ("avatars", new ImageProvider ());
+    this.tray_engine.add_ImageProvider ("svgimage-custom-color", new Occ.Ui.SvgImageProvider);
+    this.tray_engine.add_ImageProvider ("unified-search-result-icon", new UnifiedSearchResultImageProvider);
 }
 
-Systray.Systray ()
-    : QSystemTrayIcon (null) {
+Systray.Systray () {
+    base (null);
     qml_register_singleton_type<UserModel> ("com.nextcloud.desktopclient", 1, 0, "UserModel",
         [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
             return UserModel.instance ();
@@ -363,13 +363,13 @@ void Systray.closed () {
 
 void Systray.show_message (string title, string message, Message_icon icon) {
 #ifdef USE_FDO_NOTIFICATIONS
-    if (QDBus_interface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid ()) {
+    if (QDBusInterface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid ()) {
         const QVariantMap hints = {{"desktop-entry", LINUX_APPLICATION_ID}};
         GLib.List<GLib.Variant> args = GLib.List<GLib.Variant> () + APPLICATION_NAME + uint32 (0) + APPLICATION_ICON_NAME
                                                  + title + message + string[] () + hints + int32 (-1);
         QDBus_message method = QDBus_message.create_method_call (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE, "Notify");
         method.arguments (args);
-        QDBus_connection.session_bus ().async_call (method);
+        QDBusConnection.session_bus ().async_call (method);
     } else
 //  #endif
 #ifdef Q_OS_OSX

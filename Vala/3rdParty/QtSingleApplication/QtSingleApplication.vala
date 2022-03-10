@@ -131,7 +131,7 @@ namespace SharedTools {
         const bool created = instances.create (instances_size);
         if (!created) {
             if (!instances.attach ()) {
-                q_warning () << "Failed to initialize instances shared memory : "
+                q_warning () << "Failed to initialize instances shared memory: "
                            << instances.error_string ();
                 delete instances;
                 instances = null;

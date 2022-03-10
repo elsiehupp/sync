@@ -132,7 +132,7 @@ const int this.tgetcwd       getcwd
 //  #endif
 
 /***********************************************************
-FIXME : Implement TLS for OS X */
+FIXME: Implement TLS for OS X */
 #if defined (__GNUC__) && !defined (__APPLE__)
 # define CSYNC_THREAD __thread
 #elif defined (this.MSC_VER)

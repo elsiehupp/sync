@@ -194,7 +194,7 @@ class FolderMetadata {
 
         QJsonDocument debug_helper;
         debug_helper.object (metadata_keys);
-        GLib.debug ("Keys : " + debug_helper.to_json (QJsonDocument.Compact);
+        GLib.debug ("Keys: " + debug_helper.to_json (QJsonDocument.Compact);
 
         // Iterate over the document to store the keys. I'm unsure that the keys are in order,
         // perhaps it's better to store a map instead of a vector, perhaps this just doesn't matter.
@@ -215,7 +215,7 @@ class FolderMetadata {
         }
 
         // Cool, We actually have the key, we can decrypt the rest of the metadata.
-        GLib.debug ("Sharing : " + sharing;
+        GLib.debug ("Sharing: " + sharing;
         if (sharing.size ()) {
             var sharing_decrypted = decrypt_json_object (sharing, this.metadata_keys.last ());
             GLib.debug ("Sharing Decrypted" + sharing_decrypted;
@@ -278,8 +278,8 @@ class FolderMetadata {
     /***********************************************************
     AES/GCM/No_padding (128 bit key size)
     ***********************************************************/
-    private GLib.ByteArray encrypt_json_object (GLib.ByteArray obj, GLib.ByteArray pass) {
-        return EncryptionHelper.encrypt_string_symmetric (pass, obj);
+    private GLib.ByteArray encrypt_json_object (GLib.ByteArray object, GLib.ByteArray pass) {
+        return EncryptionHelper.encrypt_string_symmetric (pass, object);
     }
 
 

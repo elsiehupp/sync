@@ -115,17 +115,22 @@ class Ssl_error_dialog : Gtk.Dialog {
     }
 
     string Ssl_error_dialog.style_sheet () {
-        const string style = QLatin1String (
+        const string style =
             "#cert {margin-left : 5px;} "
-            "#ca_error { color:#a00011; margin-left:5px; margin-right:5px; }"
-            "#ca_error p { margin-top : 2px; margin-bottom:2px; }"
-            "#ccert { margin-left : 5px; }"
-            "#issuer { margin-left : 5px; }"
-            "tt { font-size : small; }");
+            + "#ca_error { color:#a00011; margin-left:5px; margin-right:5px; }"
+            + "#ca_error p { margin-top : 2px; margin-bottom:2px; }"
+            + "#ccert { margin-left : 5px; }"
+            + "#issuer { margin-left : 5px; }"
+            + "tt { font-size : small; }");
 
         return style;
     }
-    const int QL (x) QLatin1String (x)
+
+
+    const int QL (int x) {
+        return x;
+    }
+
 
     bool Ssl_error_dialog.check_failing_certificates_known (GLib.List<QSslError> errors) {
         // check if unknown certificates caused errors.
@@ -259,7 +264,7 @@ class Ssl_error_dialog : Gtk.Dialog {
             return true;
 
         bool stat = (this.ui.cb_trust_connect.check_state () == Qt.Checked);
-        GLib.info ("SSL-Connection is trusted : " + stat;
+        GLib.info ("SSL-Connection is trusted: " + stat;
 
         return stat;
     }

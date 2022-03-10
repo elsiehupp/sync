@@ -384,7 +384,7 @@ class OwncloudWizard : QWizard {
     ***********************************************************/
     public void on_signal_append_to_configuration_log (string message, LogType type) {
         this.setup_log + message;
-        GLib.debug ("Setup-Log : " + message;
+        GLib.debug ("Setup-Log: " + message;
     }
 
 

@@ -89,7 +89,7 @@ class LocalDiscoveryTracker : GLib.Object {
             string[] paths;
             foreach (var path in this.local_discovery_paths)
                 paths.append (path);
-            GLib.debug ("partial discovery with paths : " + paths;
+            GLib.debug ("partial discovery with paths: " + paths;
         }
 
         this.previous_local_discovery_paths = std.move (this.local_discovery_paths);

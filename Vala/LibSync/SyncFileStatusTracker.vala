@@ -235,7 +235,7 @@ class SyncFileStatusTracker : GLib.Object {
                 return SyncFileStatus.SyncFileStatusTag.STATUS_WARNING;
             } else if (!path_starts_with (problem_path, path_to_match)) {
                 // Starting at lower_bound we get the first path that is not smaller,
-                // since : "a/" < "a/aa" < "a/aa/aaa" < "a/ab/aba"
+                // since: "a/" < "a/aa" < "a/aa/aaa" < "a/ab/aba"
                 // If problem_map keys are ["a/aa/aaa", "a/ab/aba"] and path_to_match == "a/aa",
                 // lower_bound (path_to_match) will point to "a/aa/aaa", and the moment that
                 // problem_path.starts_with (path_to_match) == false, we know that we've looked

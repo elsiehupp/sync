@@ -183,7 +183,7 @@ signals:
         spacer.size_policy (QSizePolicy.Minimum_expanding, QSizePolicy.Minimum);
         this.tool_bar.add_widget (spacer);
 
-        QAction general_action = create_color_aware_action (QLatin1String (":/client/theme/settings.svg"), _("General"));
+        QAction general_action = create_color_aware_action (":/client/theme/settings.svg", _("General"));
         this.action_group.add_action (general_action);
         this.tool_bar.add_action (general_action);
         var general_settings = new General_settings;
@@ -192,7 +192,7 @@ signals:
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
         connect (this, &SettingsDialog.style_changed, general_settings, &General_settings.on_signal_style_changed);
 
-        QAction network_action = create_color_aware_action (QLatin1String (":/client/theme/network.svg"), _("Network"));
+        QAction network_action = create_color_aware_action (":/client/theme/network.svg", _("Network"));
         this.action_group.add_action (network_action);
         this.tool_bar.add_action (network_action);
         var network_settings = new Network_settings;
@@ -293,7 +293,7 @@ signals:
         Gtk.Image avatar = s.account ().avatar ();
         const string action_text = branding_single_account ? _("Account") : s.account ().display_name ();
         if (avatar.is_null ()) {
-            account_action = create_color_aware_action (QLatin1String (":/client/theme/account.svg"),
+            account_action = create_color_aware_action (":/client/theme/account.svg",
                 action_text);
         } else {
             QIcon icon (QPixmap.from_image (AvatarJob.make_circular_avatar (avatar)));
@@ -307,7 +307,7 @@ signals:
 
         this.tool_bar.insert_action (this.tool_bar.actions ().at (0), account_action);
         var account_settings = new AccountSettings (s, this);
-        string object_name = QLatin1String ("account_settings_");
+        string object_name = "account_settings_";
         object_name += s.account ().display_name ();
         account_settings.object_name (object_name);
         this.ui.stack.insert_widget (0 , account_settings);
@@ -423,7 +423,7 @@ signals:
             }
 
             var btn = new QToolButton (parent);
-            string object_name = QLatin1String ("settingsdialog_toolbutton_");
+            string object_name = "settingsdialog_toolbutton_";
             object_name += text ();
             btn.object_name (object_name);
 

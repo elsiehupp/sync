@@ -181,7 +181,7 @@ protected slots:
         const string parent_path = parent.data (0, Qt.USER_ROLE).to_string ();
         const string folder_name = path_trail.first ();
         string folder_path;
-        if (parent_path == QLatin1String ("/")) {
+        if (parent_path == "/") {
             folder_path = folder_name;
         } else {
             folder_path = parent_path + "/" + folder_name;

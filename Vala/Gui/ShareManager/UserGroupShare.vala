@@ -16,7 +16,7 @@ class User_group_share : Share {
         const string owner,
         const string owner_display_name,
         const string path,
-        const Share_type share_type,
+        const ShareType share_type,
         bool is_password_set,
         const Permissions permissions,
         const unowned<Sharee> share_with,
@@ -70,7 +70,7 @@ User_group_share.User_group_share (AccountPointer account,
     const string owner,
     const string owner_display_name,
     const string path,
-    const Share_type share_type,
+    const ShareType share_type,
     bool is_password_set,
     const Permissions permissions,
     const unowned<Sharee> share_with,
@@ -84,9 +84,9 @@ User_group_share.User_group_share (AccountPointer account,
 }
 
 void User_group_share.note (string note) {
-    var job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_share_job.share_job_finished, this, &User_group_share.on_signal_note_set);
-    connect (job, &Ocs_job.ocs_error, this, &User_group_share.note_error);
+    var job = new OcsShareJob (this.account);
+    connect (job, &OcsShareJob.share_job_finished, this, &User_group_share.on_signal_note_set);
+    connect (job, &OcsJob.ocs_error, this, &User_group_share.note_error);
     job.note (get_id (), note);
 }
 
@@ -109,9 +109,9 @@ void User_group_share.expire_date (QDate date) {
         return;
     }
 
-    var job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_share_job.share_job_finished, this, &User_group_share.on_signal_expire_date_set);
-    connect (job, &Ocs_job.ocs_error, this, &User_group_share.on_signal_ocs_error);
+    var job = new OcsShareJob (this.account);
+    connect (job, &OcsShareJob.share_job_finished, this, &User_group_share.on_signal_expire_date_set);
+    connect (job, &OcsJob.ocs_error, this, &User_group_share.on_signal_ocs_error);
     job.expire_date (get_id (), date);
 }
 

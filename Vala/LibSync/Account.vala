@@ -942,7 +942,7 @@ class Account : GLib.Object {
                 if (http_code != 200) {
                     GLib.warning ("AppToken remove failed for user: " + display_name () + " with code: " + http_code);
                 } else {
-                    GLib.info ("AppToken for user : " + display_name () + " has been removed.");
+                    GLib.info ("AppToken for user: " + display_name () + " has been removed.");
                 }
             } else {
                 //  Q_ASSERT (false);

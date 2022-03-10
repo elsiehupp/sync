@@ -75,7 +75,7 @@ class WebViewPage : AbstractCredentialsWizardPage {
             }
             url += "index.php/login/flow";
         }
-        GLib.info ()) + "Url to auth at : " + url;
+        GLib.info ()) + "Url to auth at: " + url;
         this.web_view.url (GLib.Uri (url));
 
         this.original_wizard_size = this.oc_wizard.size ();
@@ -122,7 +122,7 @@ class WebViewPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_url_catched (string user, string pass, string host) {
-        GLib.info ()) + "Got user : " + user + ", server : " + host;
+        GLib.info ()) + "Got user: " + user + ", server: " + host;
 
         this.user = user;
         this.pass = pass;
@@ -130,7 +130,7 @@ class WebViewPage : AbstractCredentialsWizardPage {
         AccountPointer account = this.oc_wizard.account ();
         account.url (host);
 
-        GLib.info ()) + "URL : " + field ("OCUrl").to_string ();
+        GLib.info ()) + "URL: " + field ("OCUrl").to_string ();
         /* emit */ connect_to_oc_url (host);
     }
 

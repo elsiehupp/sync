@@ -421,7 +421,7 @@ class SyncEngine : GLib.Object {
         var selective_sync_block_list = this.journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (ok) {
             bool using_selective_sync = (!selective_sync_block_list.is_empty ());
-            GLib.info (using_selective_sync ? "Using Selective Sync" : "NOT Using Selective Sync");
+            GLib.info (using_selective_sync ? "Using Selective Sync": "NOT Using Selective Sync");
         } else {
             GLib.warning ("Could not retrieve selective sync list from DB");
             /* Q_EMIT */ sync_error (_("Unable to read the blocklist from the local database"));
@@ -435,7 +435,7 @@ class SyncEngine : GLib.Object {
 
         GLib.info ("#### Discovery on_signal_start ####################################################");
         GLib.info ("Server" + account ().server_version ()
-                         + (account ().is_http2Supported () ? "Using HTTP/2" : ""));
+                         + (account ().is_http2Supported () ? "Using HTTP/2": ""));
         this.progress_info.status = ProgressInfo.Status.DISCOVERY;
         /* emit */ transmission_progress (*this.progress_info);
 
@@ -907,7 +907,7 @@ class SyncEngine : GLib.Object {
         this.progress_info.status = ProgressInfo.Status.RECONCILE;
         /* emit */ transmission_progress (*this.progress_info);
 
-        //    GLib.info ("Permissions of the root folder : " + this.csync_ctx.remote.root_perms.to_string ();
+        //    GLib.info ("Permissions of the root folder: " + this.csync_ctx.remote.root_perms.to_string ();
         var finish = [this]{
             var database_fingerprint = this.journal.data_fingerprint ();
             // If database_fingerprint is empty, this means that there was no information in the database
@@ -943,7 +943,7 @@ class SyncEngine : GLib.Object {
         // #ifndef NDEBUG
                 const string script = q_environment_variable ("OWNCLOUD_POST_UPDATE_SCRIPT");
 
-                GLib.debug ("Post Update Script : " + script);
+                GLib.debug ("Post Update Script: " + script);
                 var script_args = script.split (QRegularExpression ("\\s+"), Qt.SkipEmptyParts);
                 if (script_args.size () > 0) {
                     var script_executable = script_args.take_first ();
@@ -1188,7 +1188,7 @@ class SyncEngine : GLib.Object {
         }
 
         int64 wait_seconds = entry.last_try_time + entry.ignore_duration - now;
-        GLib.info ("Item is on blocklist : " + entry.file
+        GLib.info ("Item is on blocklist: " + entry.file
                 + "retries:" + entry.retry_count
                 + "for another" + wait_seconds + "s");
 
@@ -1230,7 +1230,7 @@ class SyncEngine : GLib.Object {
             this.journal.get_and_delete_stale_download_infos (download_file_paths);
         foreach (SyncJournalDb.DownloadInfo deleted_info in deleted_infos) {
             const string temporary_path = this.propagator.full_local_path (deleted_info.tmpfile);
-            GLib.info ("Deleting stale temporary file : " + temporary_path);
+            GLib.info ("Deleting stale temporary file: " + temporary_path);
             FileSystem.remove (temporary_path);
         }
     }

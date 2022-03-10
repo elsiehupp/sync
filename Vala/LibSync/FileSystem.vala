@@ -141,8 +141,8 @@ static class FileSystem {
         const time_t actual_mtime = get_mod_time (filename);
         if ( (actual_size != previous_size && actual_mtime > 0) || (actual_mtime != previous_mtime && previous_mtime > 0 && actual_mtime > 0)) {
             GLib.info ("File" + filename + "has changed:"
-                                    + "size : " + previous_size + "<." + actual_size
-                                    + ", mtime : " + previous_mtime + "<." + actual_mtime;
+                                    + "size: " + previous_size + "<." + actual_size
+                                    + ", mtime: " + previous_mtime + "<." + actual_mtime;
             return false;
         }
         return true;

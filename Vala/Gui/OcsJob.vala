@@ -13,7 +13,7 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Ocs_share_job class
+@brief The OcsShareJob class
 @ingroup gui
 
 Base class for jobs that talk to the OCS endpoints on th
@@ -21,7 +21,7 @@ All the communication logic is handled in this class.
 
 All OCS jobs (e.g. sharing) should extend this class.
 ***********************************************************/
-class Ocs_job : AbstractNetworkJob {
+class OcsJob : AbstractNetworkJob {
 
     const int OCS_SUCCESS_STATUS_CODE 100
     // Apparantly the v2.php URLs can return that
@@ -30,7 +30,7 @@ class Ocs_job : AbstractNetworkJob {
     const int OCS_NOT_MODIFIED_STATUS_CODE_V2 304
     
 
-    protected Ocs_job (AccountPointer account);
+    protected OcsJob (AccountPointer account);
 
 
     /***********************************************************
@@ -71,7 +71,7 @@ class Ocs_job : AbstractNetworkJob {
 
 
     /***********************************************************
-    The base path for an Ocs_job is always the same. But it could be the case that
+    The base path for an OcsJob is always the same. But it could be the case that
     certain operations need to append something to the URL.
 
     This function appends the common identifier. so <PATH>/<ID>
@@ -111,7 +111,7 @@ signals:
 
     @param reply the reply
     ***********************************************************/
-    void job_finished (QJsonDocument reply, int status_code);
+    void signal_job_finished (QJsonDocument reply, int status_code);
 
 
     /***********************************************************
@@ -146,7 +146,7 @@ signals:
     private Soup.Request this.request;
 }
 
-    Ocs_job.Ocs_job (AccountPointer account)
+    OcsJob.OcsJob (AccountPointer account)
         : base (account, "") {
         this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE);
         this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE_V2);
@@ -154,23 +154,23 @@ signals:
         ignore_credential_failure (true);
     }
 
-    void Ocs_job.verb (GLib.ByteArray verb) {
+    void OcsJob.verb (GLib.ByteArray verb) {
         this.verb = verb;
     }
 
-    void Ocs_job.add_param (string name, string value) {
+    void OcsJob.add_param (string name, string value) {
         this.params.append (q_make_pair (name, value));
     }
 
-    void Ocs_job.add_pass_status_code (int code) {
+    void OcsJob.add_pass_status_code (int code) {
         this.pass_status_codes.append (code);
     }
 
-    void Ocs_job.append_path (string identifier) {
+    void OcsJob.append_path (string identifier) {
         path (path () + '/' + identifier);
     }
 
-    void Ocs_job.add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
+    void OcsJob.add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
         this.request.raw_header (header_name, value);
     }
 
@@ -190,7 +190,7 @@ signals:
         return result;
     }
 
-    void Ocs_job.on_signal_start () {
+    void OcsJob.on_signal_start () {
         add_raw_header ("Ocs-APIREQUEST", "true");
         add_raw_header ("Content-Type", "application/x-www-form-urlencoded");
 
@@ -212,13 +212,13 @@ signals:
             }
             buffer.data (post_data);
         }
-        query_items.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
+        query_items.add_query_item ("format", "json");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path (), query_items);
         send_request (this.verb, url, this.request, buffer);
         AbstractNetworkJob.on_signal_start ();
     }
 
-    bool Ocs_job.on_signal_finished () {
+    bool OcsJob.on_signal_finished () {
         const GLib.ByteArray reply_data = reply ().read_all ();
 
         QJsonParseError error;
@@ -253,12 +253,12 @@ signals:
             if (reply ().raw_header_list ().contains ("ETag"))
                 /* emit */ etag_response_header_received (reply ().raw_header ("ETag"), status_code);
 
-            /* emit */ job_finished (json, status_code);
+            /* emit */ signal_job_finished (json, status_code);
         }
         return true;
     }
 
-    int Ocs_job.get_json_return_code (QJsonDocument json, string message) {
+    int OcsJob.get_json_return_code (QJsonDocument json, string message) {
         //TODO proper checking
         var meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
         int code = meta.value ("statuscode").to_int ();

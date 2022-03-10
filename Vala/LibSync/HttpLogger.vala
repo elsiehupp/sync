@@ -82,11 +82,11 @@ static class HttpLogger {
         var content_length = device ? device.size () : 0;
         string message;
         QTextStream stream = new QTextStream (&message);
-        stream += identifier + " : ";
+        stream += identifier + ": ";
         if (!reply) {
-            stream += "Request : ";
+            stream += "Request: ";
         } else {
-            stream += "Response : ";
+            stream += "Response: ";
         }
         stream += verb;
         if (reply) {
@@ -94,9 +94,9 @@ static class HttpLogger {
         }
         stream += " " + url + " Header: { ";
         foreach (var it  header) {
-            stream + it.first + " : ";
+            stream + it.first + ": ";
             if (it.first == "Authorization") {
-                stream += (it.second.starts_with ("Bearer ") ? "Bearer" : "Basic");
+                stream += (it.second.starts_with ("Bearer ") ? "Bearer": "Basic");
                 stream += " [redacted]";
             } else {
                 stream + it.second;

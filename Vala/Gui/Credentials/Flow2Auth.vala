@@ -151,7 +151,7 @@ signals:
         /* emit */ signal_status_changed (PollStatus.status_fetch_token, 0);
 
         // Step 1 : Initiate a login, do an anonymous POST request
-        GLib.Uri url = Utility.concat_url_path (this.account.url ().to_string (), QLatin1String ("/index.php/login/v2"));
+        GLib.Uri url = Utility.concat_url_path (this.account.url ().to_string (), "/index.php/login/v2");
         this.enforce_https = url.scheme () == "https";
 
         // add 'Content-Length : 0' header (see https://github.com/nextcloud/desktop/issues/1473)
@@ -328,7 +328,7 @@ signals:
             this.poll_timer.stop ();
 
             // Success
-            GLib.info ("Success getting the app_password for user : " + login_name + ", server : " + server_url.to_string ();
+            GLib.info ("Success getting the app_password for user: " + login_name + ", server: " + server_url.to_string ();
 
             this.account.url (server_url);
 

@@ -32,7 +32,7 @@ class ToolTipUpdater : GLib.Object {
     public ToolTipUpdater (QTreeView tree_view);
 
 
-    protected bool event_filter (GLib.Object obj, QEvent ev) override;
+    protected bool event_filter (GLib.Object object, QEvent ev) override;
 
 
     /***********************************************************
@@ -69,7 +69,7 @@ ToolTipUpdater.ToolTipUpdater (QTreeView tree_view)
     this.tree_view.viewport ().install_event_filter (this);
 }
 
-bool ToolTipUpdater.event_filter (GLib.Object * /*obj*/, QEvent ev) {
+bool ToolTipUpdater.event_filter (GLib.Object * /*object*/, QEvent ev) {
     if (ev.type () == QEvent.Tool_tip) {
         var help_event = static_cast<QHelp_event> (ev);
         this.tool_tip_pos = help_event.global_pos ();

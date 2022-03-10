@@ -464,7 +464,7 @@ signals:
             }
         }
 
-        this.manager.create_share (this.share_path, Share.Share_type (sharee.type ()),
+        this.manager.create_share (this.share_path, Share.ShareType (sharee.type ()),
             sharee.share_with (), this.max_sharing_permissions, password);
 
         this.ui.sharee_line_edit.enabled (false);

@@ -151,13 +151,13 @@ void HttpCredentialsGui.on_signal_show_dialog () {
 
     string req_txt = request_app_password_text (this.account);
     if (!req_txt.is_empty ()) {
-        message += QLatin1String ("<br>") + req_txt + QLatin1String ("<br>");
+        message += "<br>" + req_txt + "<br>";
     }
     if (!this.fetch_error_string.is_empty ()) {
-        message += QLatin1String ("<br>")
+        message += "<br>"
             + _("Reading from keychain failed with error : \"%1\"")
                   .arg (Utility.escape (this.fetch_error_string))
-            + QLatin1String ("<br>");
+            + "<br>";
     }
 
     var dialog = new QInputDialog ();
@@ -190,11 +190,11 @@ string HttpCredentialsGui.request_app_password_text (Account account) {
         url.chop (1);
 
     if (version >= Account.make_server_version (13, 0, 0)) {
-        url += QLatin1String ("/index.php/settings/user/security");
+        url += "/index.php/settings/user/security";
     } else if (version >= Account.make_server_version (12, 0, 0)) {
-        url += QLatin1String ("/index.php/settings/personal#security");
+        url += "/index.php/settings/personal#security";
     } else if (version >= Account.make_server_version (11, 0, 0)) {
-        url += QLatin1String ("/index.php/settings/user/security#security");
+        url += "/index.php/settings/user/security#security";
     } else {
         return "";
     }

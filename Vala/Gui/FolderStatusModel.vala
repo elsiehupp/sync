@@ -336,10 +336,10 @@ class FolderStatusModel : QAbstractItemModel {
 
             switch (role) {
             case Qt.Display_role:
-                // : Example text : "File.txt (23KB)"
+                // : Example text: "File.txt (23KB)"
                 return x.size < 0 ? x.name : _("%1 (%2)").arg (x.name, Utility.octets_to_string (x.size));
             case Qt.ToolTipRole:
-                return string ("<qt>" + Utility.escape (x.size < 0 ? x.name : _("%1 (%2)").arg (x.name, Utility.octets_to_string (x.size))) + QLatin1String ("</qt>"));
+                return string ("<qt>" + Utility.escape (x.size < 0 ? x.name : _("%1 (%2)").arg (x.name, Utility.octets_to_string (x.size))) + "</qt>");
             case Qt.CheckStateRole:
                 if (supports_selective_sync) {
                     return x.checked;
@@ -671,18 +671,18 @@ class FolderStatusModel : QAbstractItemModel {
         // info.path always contains non-mangled name, so we need to use mangled when requesting nested folders for encrypted subfolders as required by LsColJob
         const string info_path = (info.is_encrypted && !info.e2e_mangled_name.is_empty ()) ? info.e2e_mangled_name : info.path;
 
-        if (info_path != QLatin1String ("/")) {
+        if (info_path != "/") {
             path += info_path;
         }
 
         var job = new LsColJob (this.account_state.account (), path, this);
         info.fetching_job = job;
         var props = GLib.List<GLib.ByteArray> ("resourcetype"
-                                        + "http://owncloud.org/ns:size"
-                                        + "http://owncloud.org/ns:permissions"
-                                        + "http://owncloud.org/ns:fileid";
+                                              + "http://owncloud.org/ns:size"
+                                              + "http://owncloud.org/ns:permissions"
+                                              + "http://owncloud.org/ns:fileid");
         if (this.account_state.account ().capabilities ().client_side_encryption_available ()) {
-            props + "http://nextcloud.org/ns:is-encrypted";
+            props += "http://nextcloud.org/ns:is-encrypted";
         }
         job.properties (props);
 
@@ -1107,13 +1107,13 @@ class FolderStatusModel : QAbstractItemModel {
             //uint64 estimated_bw = progress.file_progress (cur_item).estimated_bandwidth;
             if (estimated_up_bw || estimated_down_bw) {
                 /***********************************************************
-                // : Example text : "uploading foobar.png (1MB of 2MB) time left 2 minutes at a rate of 24Kb/s"
+                // : Example text: "uploading foobar.png (1MB of 2MB) time left 2 minutes at a rate of 24Kb/s"
                 file_progress_string = _("%1 %2 (%3 of %4) %5 left at a rate of %6/s")
                     .arg (kind_string, item_filename, s1, s2,
                         Utility.duration_to_descriptive_string (progress.file_progress (cur_item).estimated_eta),
                         Utility.octets_to_string (estimated_bw) );
                 */
-                // : Example text : "Syncing 'foo.txt', 'bar.txt'"
+                // : Example text: "Syncing 'foo.txt', 'bar.txt'"
                 file_progress_string = _("Syncing %1").arg (all_filenames);
                 if (estimated_down_bw > 0) {
                     file_progress_string.append (_(", "));
@@ -1127,11 +1127,11 @@ class FolderStatusModel : QAbstractItemModel {
                                                 .arg (Utility.octets_to_string (estimated_up_bw)));
                 }
             } else {
-                // : Example text : "uploading foobar.png (2MB of 2MB)"
+                // : Example text: "uploading foobar.png (2MB of 2MB)"
                 file_progress_string = _("%1 %2 (%3 of %4)").arg (kind_string, item_filename, s1, s2);
             }
         } else if (!kind_string.is_empty ()) {
-            // : Example text : "uploading foobar.png"
+            // : Example text: "uploading foobar.png"
             file_progress_string = _("%1 %2").arg (kind_string, item_filename);
         }
         pi.progress_string = file_progress_string;
@@ -1148,7 +1148,7 @@ class FolderStatusModel : QAbstractItemModel {
             string s2 = Utility.octets_to_string (total_size);
 
             if (progress.trust_eta ()) {
-                // : Example text : "5 minutes left, 12 MB of 345 MB, file 6 of 7"
+                // : Example text: "5 minutes left, 12 MB of 345 MB, file 6 of 7"
                 overall_sync_string = _("%5 left, %1 of %2, file %3 of %4")
                                         .arg (s1, s2)
                                         .arg (current_file)
@@ -1156,7 +1156,7 @@ class FolderStatusModel : QAbstractItemModel {
                                         .arg (Utility.duration_to_descriptive_string1 (progress.total_progress ().estimated_eta));
 
             } else {
-                // : Example text : "12 MB of 345 MB, file 6 of 7"
+                // : Example text: "12 MB of 345 MB, file 6 of 7"
                 overall_sync_string = _("%1 of %2, file %3 of %4")
                                         .arg (s1, s2)
                                         .arg (current_file)
@@ -1223,7 +1223,7 @@ class FolderStatusModel : QAbstractItemModel {
 
         GLib.Set<string> selective_sync_undecided_set; // not GLib.Set because it's not sorted
         foreach (string string_value, selective_sync_undecided_list) {
-            if (string_value.starts_with (parent_info.path) || parent_info.path == QLatin1String ("/")) {
+            if (string_value.starts_with (parent_info.path) || parent_info.path == "/") {
                 selective_sync_undecided_set.insert (string_value);
             }
         }
@@ -1282,7 +1282,7 @@ class FolderStatusModel : QAbstractItemModel {
                 new_info.checked = Qt.Checked;
             } else {
                 foreach (string string_value, selective_sync_block_list) {
-                    if (string_value == relative_path || string_value == QLatin1String ("/")) {
+                    if (string_value == relative_path || string_value == "/") {
                         new_info.checked = Qt.Unchecked;
                         break;
                     } else if (string_value.starts_with (relative_path)) {

@@ -185,7 +185,7 @@ class SelectiveSyncWidget : Gtk.Widget {
                     || parent.check_state (0) == Qt.PartiallyChecked) {
                     item.check_state (0, Qt.Checked);
                     foreach (string string_value, this.old_block_list) {
-                        if (string_value == path || string_value == QLatin1String ("/")) {
+                        if (string_value == path || string_value == "/") {
                             item.check_state (0, Qt.Unchecked);
                             break;
                         } else if (string_value.starts_with (path)) {

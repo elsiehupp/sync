@@ -120,7 +120,7 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flo
     }
 
     var app = static_cast<Application> (Gtk.Application);
-    connect (app, &Application.is_showing_settings_dialog, this, &WebFlowCredentialsDialog.on_signal_show_settings_dialog);
+    connect (app, &Application.signal_is_showing_settings_dialog, this, &WebFlowCredentialsDialog.on_signal_show_settings_dialog);
 
     this.error_label = new Gtk.Label ();
     this.error_label.hide ();

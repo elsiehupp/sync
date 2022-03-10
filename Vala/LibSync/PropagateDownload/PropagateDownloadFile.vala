@@ -115,7 +115,7 @@ class PropagateDownloadFile : PropagateItemJob {
 
         var path = this.item.file;
         var slash_position = path.last_index_of ('/');
-        var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+        var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         SyncJournalFileRecord parent_rec;
         propagator ().journal.get_file_record (parent_path, parent_rec);

@@ -16,7 +16,7 @@ namespace Occ {
 ***********************************************************/
 class IconJob : GLib.Object {
 
-    signal void job_finished (GLib.ByteArray icon_data);
+    signal void signal_job_finished (GLib.ByteArray icon_data);
     signal void error (Soup.Reply.NetworkError error_type);
 
 
@@ -48,7 +48,7 @@ class IconJob : GLib.Object {
             return;
         }
 
-        /* emit */ job_finished (reply.read_all ());
+        /* emit */ signal_job_finished (reply.read_all ());
     }
 
 } // class IconJob

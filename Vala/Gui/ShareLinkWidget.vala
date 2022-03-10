@@ -333,18 +333,18 @@ void Share_link_widget.setup_ui_options () {
     permissions_group.exclusive (true);
 
     if (this.is_file) {
-        checked = (perm & Share_permission_read) && (perm & Share_permission_update);
+        checked = (perm & SharePermissionRead) && (perm & Share_permission_update);
         this.allow_editing_link_action = this.link_context_menu.add_action (_("Allow editing"));
         this.allow_editing_link_action.checkable (true);
         this.allow_editing_link_action.checked (checked);
 
     } else {
-        checked = (perm == Share_permission_read);
+        checked = (perm == SharePermissionRead);
         this.read_only_link_action = permissions_group.add_action (_("View only"));
         this.read_only_link_action.checkable (true);
         this.read_only_link_action.checked (checked);
 
-        checked = (perm & Share_permission_read) && (perm & Share_permission_create)
+        checked = (perm & SharePermissionRead) && (perm & Share_permission_create)
             && (perm & Share_permission_update) && (perm & Share_permission_delete);
         this.allow_upload_editing_link_action = permissions_group.add_action (_("Allow upload and editing"));
         this.allow_upload_editing_link_action.checkable (true);
@@ -580,7 +580,7 @@ void Share_link_widget.toggle_note_options (bool enable) {
     this.ui.note_label.visible (enable);
     this.ui.text_edit_note.visible (enable);
     this.ui.confirm_note.visible (enable);
-    this.ui.text_edit_note.on_signal_text (enable && this.link_share ? this.link_share.get_note () : "");
+    this.ui.text_edit_note.on_signal_text (enable && this.link_share ? this.link_share.get_note (): "");
 
     if (!enable && this.link_share && !this.link_share.get_note ().is_empty ()) {
         this.link_share.note ({});
@@ -694,7 +694,7 @@ void Share_link_widget.on_signal_context_menu_button_clicked () {
 
 void Share_link_widget.on_signal_link_context_menu_action_triggered (QAction action) {
     const var state = action.is_checked ();
-    Share_permissions perm = Share_permission_read;
+    Share_permissions perm = SharePermissionRead;
 
     if (action == this.add_another_link_action) {
         /* emit */ create_link_share ();

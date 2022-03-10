@@ -67,7 +67,7 @@ protected slots:
             this.socket.on_signal_reset (new QSocket_notifier (this.fd, QSocket_notifier.Read));
             connect (this.socket.data (), &QSocket_notifier.activated, this, &FolderWatcherPrivate.on_signal_received_notification);
         } else {
-            GLib.warning ("notify_init () failed : " + strerror (errno);
+            GLib.warning ("notify_init () failed: " + strerror (errno);
         }
 
         QMetaObject.invoke_method (this, "on_signal_add_folder_recursive", Q_ARG (string, path));
@@ -79,18 +79,18 @@ protected slots:
     bool FolderWatcherPrivate.find_folders_below (QDir directory, string[] full_list) {
         bool ok = true;
         if (! (directory.exists () && directory.is_readable ())) {
-            GLib.debug ("Non existing path coming in : " + directory.absolute_path ();
+            GLib.debug ("Non existing path coming in: " + directory.absolute_path ();
             ok = false;
         } else {
             string[] name_filter;
-            name_filter + QLatin1String ("*");
+            name_filter + "*";
             QDir.Filters filter = QDir.Dirs | QDir.NoDotAndDotDot | QDir.No_sym_links | QDir.Hidden;
             const string[] pathes = directory.entry_list (name_filter, filter);
 
             string[].ConstIterator ConstIterator;
             for (ConstIterator = pathes.const_begin (); ConstIterator != pathes.const_end ();
                  ++ConstIterator) {
-                const string full_path (directory.path () + QLatin1String ("/") + (*ConstIterator));
+                const string full_path (directory.path () + "/" + (*ConstIterator));
                 full_list.append (full_path);
                 ok = find_folders_below (QDir (full_path), full_list);
             }

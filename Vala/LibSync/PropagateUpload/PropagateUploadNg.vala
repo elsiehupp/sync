@@ -235,7 +235,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         var device = std.make_unique<UploadDevice> (
                 filename, this.sent, this.current_chunk_size, propagator ().bandwidth_manager);
         if (!device.open (QIODevice.ReadOnly)) {
-            GLib.warning ("Could not prepare upload device : " + device.error_string ();
+            GLib.warning ("Could not prepare upload device: " + device.error_string ();
 
             // Soft error because this is likely caused by the user modifying his files while syncing
             abort_with_error (SyncFileItem.Status.SOFT_ERROR, device.error_string ());

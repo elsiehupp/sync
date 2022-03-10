@@ -45,7 +45,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 // The second number should be changed when there are new features.
 const int MIRALL_SOCKET_API_VERSION "1.1"
 
-#include "sharedialog.h" // for the Share_dialog_start_page
+#include "sharedialog.h" // for the ShareDialogStartPage
 
 //  #include <QLocal_server>
 using Socket_api_server = QLocal_server;
@@ -83,7 +83,7 @@ class SocketApi : GLib.Object {
     public void on_signal_broadcast_status_push_message (string system_path, SyncFileStatus file_status);
 
 signals:
-    void share_command_received (string share_path, string local_path, Share_dialog_start_page start_page);
+    void share_command_received (string share_path, string local_path, ShareDialogStartPage start_page);
     void file_activity_command_received (string share_path, string local_path);
 
 
@@ -91,7 +91,7 @@ signals:
     ***********************************************************/
     private void on_signal_new_connection ();
     private void on_signal_lost_connection ();
-    private void on_signal_socket_destroyed (GLib.Object obj);
+    private void on_signal_socket_destroyed (GLib.Object object);
     private void on_signal_read_socket ();
 
     /***********************************************************
@@ -127,7 +127,7 @@ signals:
     private void broadcast_message (string message, bool do_wait = false);
 
     // opens share dialog, sends reply
-    private void process_share_request (string local_file, Socket_listener listener, Share_dialog_start_page start_page);
+    private void process_share_request (string local_file, Socket_listener listener, ShareDialogStartPage start_page);
     private void process_file_activity_request (string local_file);
 
     private void command_RETRIEVE_FOLDER_STATUS (string argument, Socket_listener listener);
@@ -252,7 +252,7 @@ GLib.Object find_widget (string query_string, GLib.List<Gtk.Widget> widgets = QA
         //  Q_ASSERT (sub_queries.count () == 2);
 
         var parent_query_string = sub_queries[0].trimmed ();
-        GLib.debug ("Find parent : " + parent_query_string;
+        GLib.debug ("Find parent: " + parent_query_string;
         var parent = find_widget (parent_query_string);
 
         if (!parent) {
@@ -261,12 +261,12 @@ GLib.Object find_widget (string query_string, GLib.List<Gtk.Widget> widgets = QA
 
         var child_query_string = sub_queries[1].trimmed ();
         var child = find_widget (child_query_string, parent.find_children<Gtk.Widget> ());
-        GLib.debug ("found child : " + !!child;
+        GLib.debug ("found child: " + !!child;
         return child;
 
     } else if (query_string.starts_with ('#')) {
         var object_name = query_string.mid (1);
-        GLib.debug ("find object_name : " + object_name;
+        GLib.debug ("find object_name: " + object_name;
         found_widget = std.find_if (objects.const_begin (), objects.const_end (), [&] (GLib.Object widget) {
             return widget.object_name () == object_name;
         });
@@ -279,7 +279,7 @@ GLib.Object find_widget (string query_string, GLib.List<Gtk.Widget> widgets = QA
         std.for_each (matches.const_begin (), matches.const_end (), [] (GLib.Object w) {
             if (!w)
                 return;
-            GLib.debug ("WIDGET : " + w.object_name () + w.meta_object ().class_name ();
+            GLib.debug ("WIDGET: " + w.object_name () + w.meta_object ().class_name ();
         });
 
         if (matches.empty ()) {
@@ -358,8 +358,8 @@ SocketApi.SocketApi (GLib.Object parent) {
         // + Theme.instance ().app_name ();
     } else if (Utility.is_mac ()) {
         // This must match the code signing Team setting of the extension
-        // Example for developer builds (with ad-hoc signing identity) : "" "com.owncloud.desktopclient" ".socket_api"
-        // Example for official signed packages : "9B5WD74GWJ." "com.owncloud.desktopclient" ".socket_api"
+        // Example for developer builds (with ad-hoc signing identity): "" "com.owncloud.desktopclient" ".socket_api"
+        // Example for official signed packages: "9B5WD74GWJ." "com.owncloud.desktopclient" ".socket_api"
         socket_path = SOCKETAPI_TEAM_IDENTIFIER_PREFIX APPLICATION_REV_DOMAIN ".socket_api";
     } else if (Utility.is_linux () || Utility.is_bsd ()) {
         string runtime_dir;
@@ -433,8 +433,8 @@ void SocketApi.on_signal_lost_connection () {
     this.listeners.remove (socket);
 }
 
-void SocketApi.on_signal_socket_destroyed (GLib.Object obj) {
-    var socket = static_cast<QIODevice> (obj);
+void SocketApi.on_signal_socket_destroyed (GLib.Object object) {
+    var socket = static_cast<QIODevice> (object);
     this.listeners.remove (socket);
 }
 
@@ -590,7 +590,7 @@ void SocketApi.process_file_activity_request (string local_file) {
     /* emit */ file_activity_command_received (file_data.server_relative_path, file_data.local_path);
 }
 
-void SocketApi.process_share_request (string local_file, Socket_listener listener, Share_dialog_start_page start_page) {
+void SocketApi.process_share_request (string local_file, Socket_listener listener, ShareDialogStartPage start_page) {
     var theme = Theme.instance ();
 
     var file_data = File_data.get (local_file);
@@ -666,7 +666,7 @@ void SocketApi.command_RETRIEVE_FILE_STATUS (string argument, Socket_listener li
 }
 
 void SocketApi.command_SHARE (string local_file, Socket_listener listener) {
-    process_share_request (local_file, listener, Share_dialog_start_page.Users_and_groups);
+    process_share_request (local_file, listener, ShareDialogStartPage.USERS_AND_GROUPS);
 }
 
 void SocketApi.command_ACTIVITY (string local_file, Socket_listener listener) {
@@ -676,7 +676,7 @@ void SocketApi.command_ACTIVITY (string local_file, Socket_listener listener) {
 }
 
 void SocketApi.command_MANAGE_PUBLIC_LINKS (string local_file, Socket_listener listener) {
-    process_share_request (local_file, listener, Share_dialog_start_page.Public_links);
+    process_share_request (local_file, listener, ShareDialogStartPage.PUBLIC_LINKS);
 }
 
 void SocketApi.command_VERSION (string , Socket_listener listener) {
@@ -736,7 +736,7 @@ void SocketApi.command_COPY_PUBLIC_LINK (string local_file, Socket_listener *) {
         });
     connect (job, &Get_or_create_public_link_share.error, this,
         [=] () {
-            /* emit */ share_command_received (file_data.server_relative_path, file_data.local_path, Share_dialog_start_page.Public_links);
+            /* emit */ share_command_received (file_data.server_relative_path, file_data.local_path, ShareDialogStartPage.PUBLIC_LINKS);
         });
     job.run ();
 }
@@ -1428,7 +1428,7 @@ void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned<Socket_api_job> job) 
     if (value.name () == icon_name) {
         job.resolve ();
     } else {
-        job.reject ("icon_name " + icon_name + " does not match : " + value.name ());
+        job.reject ("icon_name " + icon_name + " does not match: " + value.name ());
     }
 }
 //  #endif

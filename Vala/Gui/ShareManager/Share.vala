@@ -13,7 +13,7 @@ class Share : GLib.Object {
     Possible share types
     Need to be in sync with Sharee.Type
     ***********************************************************/
-    public enum Share_type {
+    public enum ShareType {
         Type_user = Sharee.User,
         Type_group = Sharee.Group,
         Type_link = 3,
@@ -36,7 +36,7 @@ class Share : GLib.Object {
         const string owner,
         const string owner_display_name,
         const string path,
-        const Share_type share_type,
+        const ShareType share_type,
         bool is_password_set = false,
         const Permissions permissions = Share_permission_default,
         const unowned<Sharee> share_with = unowned<Sharee> (null));
@@ -73,7 +73,7 @@ class Share : GLib.Object {
     /***********************************************************
     Get the share_type
     ***********************************************************/
-    public Share_type get_share_type ();
+    public ShareType get_share_type ();
 
 
     /***********************************************************
@@ -122,7 +122,7 @@ class Share : GLib.Object {
     /***********************************************************
     Is it a share with a user or group (local or remote)
     ***********************************************************/
-    public static bool is_share_type_user_group_email_room_or_remote (Share_type type);
+    public static bool is_share_type_user_group_email_room_or_remote (ShareType type);
 
 signals:
     void permissions_set ();
@@ -137,7 +137,7 @@ signals:
     protected string this.uidowner;
     protected string this.owner_display_name;
     protected string this.path;
-    protected Share_type this.share_type;
+    protected ShareType this.share_type;
     protected bool this.is_password_set;
     protected Permissions this.permissions;
     protected unowned<Sharee> this.share_with;
@@ -163,7 +163,7 @@ Share.Share (AccountPointer account,
     const string uidowner,
     const string owner_display_name,
     const string path,
-    const Share_type share_type,
+    const ShareType share_type,
     bool is_password_set,
     const Permissions permissions,
     const unowned<Sharee> share_with)
@@ -198,7 +198,7 @@ string Share.get_owner_display_name () {
     return this.owner_display_name;
 }
 
-Share.Share_type Share.get_share_type () {
+Share.ShareType Share.get_share_type () {
     return this.share_type;
 }
 
@@ -207,9 +207,9 @@ unowned<Sharee> Share.get_share_with () {
 }
 
 void Share.password (string password) {
-    var * const job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_share_job.share_job_finished, this, &Share.on_signal_password_set);
-    connect (job, &Ocs_job.ocs_error, this, &Share.on_signal_password_error);
+    var * const job = new OcsShareJob (this.account);
+    connect (job, &OcsShareJob.share_job_finished, this, &Share.on_signal_password_set);
+    connect (job, &OcsJob.ocs_error, this, &Share.on_signal_password_error);
     job.password (get_id (), password);
 }
 
@@ -218,9 +218,9 @@ bool Share.is_password_set () {
 }
 
 void Share.permissions (Permissions permissions) {
-    var job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_share_job.share_job_finished, this, &Share.on_signal_permissions_set);
-    connect (job, &Ocs_job.ocs_error, this, &Share.on_signal_ocs_error);
+    var job = new OcsShareJob (this.account);
+    connect (job, &OcsShareJob.share_job_finished, this, &Share.on_signal_permissions_set);
+    connect (job, &OcsJob.ocs_error, this, &Share.on_signal_ocs_error);
     job.permissions (get_id (), permissions);
 }
 
@@ -234,13 +234,13 @@ Share.Permissions Share.get_permissions () {
 }
 
 void Share.delete_share () {
-    var job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_share_job.share_job_finished, this, &Share.on_signal_deleted);
-    connect (job, &Ocs_job.ocs_error, this, &Share.on_signal_ocs_error);
+    var job = new OcsShareJob (this.account);
+    connect (job, &OcsShareJob.share_job_finished, this, &Share.on_signal_deleted);
+    connect (job, &OcsJob.ocs_error, this, &Share.on_signal_ocs_error);
     job.delete_share (get_id ());
 }
 
-bool Share.is_share_type_user_group_email_room_or_remote (Share_type type) {
+bool Share.is_share_type_user_group_email_room_or_remote (ShareType type) {
     return (type == Share.Type_user || type == Share.Type_group || type == Share.Type_email || type == Share.Type_room
         || type == Share.Type_remote);
 }

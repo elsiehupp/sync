@@ -45,7 +45,7 @@ signals:
 
     @param reply the reply
     ***********************************************************/
-    void job_finished (string reply, int reply_code);
+    void signal_job_finished (string reply, int reply_code);
 
 
     /***********************************************************
@@ -71,7 +71,7 @@ signals:
 
     void Notification_confirm_job.on_signal_start () {
         if (!this.link.is_valid ()) {
-            GLib.warning ("Attempt to trigger invalid URL : " + this.link.to_string ();
+            GLib.warning ("Attempt to trigger invalid URL: " + this.link.to_string ();
             return;
         }
         Soup.Request req;
@@ -85,7 +85,7 @@ signals:
 
     bool Notification_confirm_job.on_signal_finished () {
         int reply_code = 0;
-        // FIXME : check for the reply code!
+        // FIXME: check for the reply code!
         const string reply_str = reply ().read_all ();
 
         if (reply_str.contains ("<?xml version=\"1.0\"?>")) {
@@ -96,7 +96,7 @@ signals:
                 reply_code = rex_match.captured (1).to_int ();
             }
         }
-        /* emit */ job_finished (reply_str, reply_code);
+        /* emit */ signal_job_finished (reply_str, reply_code);
 
         return true;
     }

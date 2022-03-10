@@ -27,7 +27,7 @@ class PropagateItemJob : PropagatorJob {
     ***********************************************************/
     string restore_job_msg {
         protected get {
-            return this.item.is_restoration ? this.item.error_string : "";
+            return this.item.is_restoration ? this.item.error_string: "";
         }
         protected set {
             this.item.is_restoration = true;
@@ -71,7 +71,7 @@ class PropagateItemJob : PropagatorJob {
 
         var path = this.item.file;
         var slash_position = path.last_index_of ('/');
-        var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+        var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         var path_components = parent_path.split ('/');
         while (!path_components.is_empty ()) {

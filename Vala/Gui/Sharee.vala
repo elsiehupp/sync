@@ -17,7 +17,7 @@ namespace Ui {
 
 class Sharee {
 
-    // Keep in sync with Share.Share_type
+    // Keep in sync with Share.ShareType
     public enum Type {
         User = 0,
         Group = 1,
@@ -73,15 +73,15 @@ class Sharee {
         string formatted = this.display_name;
 
         if (this.type == Type.Group) {
-            formatted += QLatin1String (" (group)");
+            formatted += " (group)";
         } else if (this.type == Type.Email) {
-            formatted += QLatin1String (" (email)");
+            formatted += " (email)";
         } else if (this.type == Type.Federated) {
-            formatted += QLatin1String (" (remote)");
+            formatted += " (remote)";
         } else if (this.type == Type.Circle) {
-            formatted += QLatin1String (" (circle)");
+            formatted += " (circle)";
         } else if (this.type == Type.Room) {
-            formatted += QLatin1String (" (conversation)");
+            formatted += " (conversation)";
         }
 
         return formatted;

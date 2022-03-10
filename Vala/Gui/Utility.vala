@@ -59,15 +59,15 @@ class Utility {
     ***********************************************************/
     public static bool open_email_composer (string subject, string body,
         Gtk.Widget error_widget_parent) {
-        GLib.Uri url (QLatin1String ("mailto:"));
+        GLib.Uri url ("mailto:");
         QUrlQuery query;
         query.query_items ({
             {
-                QLatin1String ("subject"),
+                "subject",
                 subject
             },
             {
-                QLatin1String ("body"),
+                "body",
                 body
             }
         });

@@ -211,9 +211,9 @@ class SqlDatabase {
         if (this.err_id != SQLITE_OK) {
             GLib.warning ("Error:" + this.error + "for" + filename);
             if (this.err_id == SQLITE_CANTOPEN) {
-                //  GLib.warning ("CANTOPEN extended errcode : " + sqlite3_extended_errcode (this.database);
+                //  GLib.warning ("CANTOPEN extended errcode: " + sqlite3_extended_errcode (this.database);
     //  #if SQLITE_VERSION_NUMBER >= 3012000
-                GLib.warning ("CANTOPEN system errno : " + sqlite3_system_errno (this.database));
+                GLib.warning ("CANTOPEN system errno: " + sqlite3_system_errno (this.database));
     //  #endif
             }
             close ();

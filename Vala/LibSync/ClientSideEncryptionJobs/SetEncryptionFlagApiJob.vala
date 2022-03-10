@@ -53,9 +53,9 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
         request.raw_header ("OCS-APIREQUEST", "true");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
 
-        GLib.info ("marking the file with identifier" + this.file_identifier + "as" + (this.flag_action == Set ? "encrypted" : "non-encrypted") + ".");
+        GLib.info ("marking the file with identifier" + this.file_identifier + "as" + (this.flag_action == Set ? "encrypted": "non-encrypted") + ".");
 
-        send_request (this.flag_action == Set ? "PUT" : "DELETE", url, request);
+        send_request (this.flag_action == Set ? "PUT": "DELETE", url, request);
 
         AbstractNetworkJob.on_signal_start ();
     }

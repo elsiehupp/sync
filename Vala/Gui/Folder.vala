@@ -316,7 +316,7 @@ class Folder : GLib.Object {
     path instead
     ***********************************************************/
     public string short_gui_remote_path_or_app_name () {
-        if (remote_path ().length () > 0 && remote_path () != QLatin1String ("/")) {
+        if (remote_path ().length () > 0 && remote_path () != "/") {
             string a = GLib.File (remote_path ()).filename ();
             if (a.starts_with ('/')) {
                 a = a.remove (0, 1);
@@ -691,13 +691,13 @@ class Folder : GLib.Object {
     ***********************************************************/
     public void remove_from_settings () {
         var settings = this.account_state.settings ();
-        settings.begin_group (QLatin1String ("Folders"));
+        settings.begin_group ("Folders");
         settings.remove (FolderMan.escape_alias (this.definition.alias));
         settings.end_group ();
-        settings.begin_group (QLatin1String ("Multifolders"));
+        settings.begin_group ("Multifolders");
         settings.remove (FolderMan.escape_alias (this.definition.alias));
         settings.end_group ();
-        settings.begin_group (QLatin1String ("FoldersWithPlaceholders"));
+        settings.begin_group ("FoldersWithPlaceholders");
         settings.remove (FolderMan.escape_alias (this.definition.alias));
     }
 
@@ -774,7 +774,7 @@ class Folder : GLib.Object {
         connect (this.folder_watcher.data (), &FolderWatcher.signal_became_unreliable,
             this, &Folder.on_signal_watcher_unreliable);
         this.folder_watcher.init (path ());
-        this.folder_watcher.start_notificaton_test (path () + QLatin1String (".owncloudsync.log"));
+        this.folder_watcher.start_notificaton_test (path () + ".owncloudsync.log");
     }
 
 
@@ -1053,7 +1053,7 @@ class Folder : GLib.Object {
             this.journal.get_and_delete_stale_download_infos (keep_nothing);
         for (var deleted_info : deleted_infos) {
             const string tmppath = folderpath.file_path (deleted_info.tmpfile);
-            GLib.info ("Deleting temporary file : " + tmppath;
+            GLib.info ("Deleting temporary file: " + tmppath;
             FileSystem.remove (tmppath);
         }
         return deleted_infos.size ();
@@ -1635,7 +1635,7 @@ class Folder : GLib.Object {
             create_gui_log (this.sync_result.first_item_locked ().file, Log_status_file_locked, locked_count);
         }
     
-        GLib.info ("Folder" + this.sync_result.folder ("sync result : " + this.sync_result.status ();
+        GLib.info ("Folder" + this.sync_result.folder ("sync result: " + this.sync_result.status ();
     }
 
 

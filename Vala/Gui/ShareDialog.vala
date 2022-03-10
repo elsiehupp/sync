@@ -27,7 +27,7 @@ class Share_dialog : Gtk.Dialog {
         const string local_path,
         Share_permissions max_sharing_permissions,
         const GLib.ByteArray numeric_file_id,
-        Share_dialog_start_page start_page,
+        ShareDialogStartPage start_page,
         Gtk.Widget parent = null);
     ~Share_dialog () override;
 
@@ -77,7 +77,7 @@ signals:
     private Share_permissions this.max_sharing_permissions;
     private GLib.ByteArray this.numeric_file_id;
     private string this.private_link_url;
-    private Share_dialog_start_page this.start_page;
+    private ShareDialogStartPage this.start_page;
     private Share_manager this.manager = null;
 
     /***********************************************************
@@ -98,7 +98,7 @@ signals:
         const string local_path,
         Share_permissions max_sharing_permissions,
         const GLib.ByteArray numeric_file_id,
-        Share_dialog_start_page start_page,
+        ShareDialogStartPage start_page,
         Gtk.Widget parent)
         : Gtk.Dialog (parent)
         this.ui (new Ui.Share_dialog)
@@ -159,8 +159,8 @@ signals:
         }
 
         if (GLib.FileInfo (this.local_path).is_file ()) {
-            var job = new Thumbnail_job (this.share_path, this.account_state.account (), this);
-            connect (job, &Thumbnail_job.job_finished, this, &Share_dialog.on_signal_thumbnail_fetched);
+            var job = new ThumbnailJob (this.share_path, this.account_state.account (), this);
+            connect (job, &ThumbnailJob.signal_job_finished, this, &Share_dialog.on_signal_thumbnail_fetched);
             job.on_signal_start ();
         }
 
@@ -358,7 +358,7 @@ signals:
     void Share_dialog.on_signal_create_link_share () {
         if (this.manager) {
             const var ask_optional_password = this.account_state.account ().capabilities ().share_public_link_ask_optional_password ();
-            const var password = ask_optional_password ? create_random_password () : "";
+            const var password = ask_optional_password ? create_random_password (): "";
             this.manager.create_link_share (this.share_path, "", password);
         }
     }
@@ -417,7 +417,7 @@ signals:
 
     void Share_dialog.on_signal_thumbnail_fetched (int status_code, GLib.ByteArray reply) {
         if (status_code != 200) {
-            GLib.warning ("Thumbnail status code : " + status_code;
+            GLib.warning ("Thumbnail status code: " + status_code;
             return;
         }
 

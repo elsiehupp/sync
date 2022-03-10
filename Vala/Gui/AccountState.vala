@@ -492,7 +492,7 @@ class AccountState : GLib.Object, QSharedData {
     ***********************************************************/
     private void state (State state) {
         if (this.state != state) {
-            GLib.info ("AccountState state change : "
+            GLib.info ("AccountState state change: "
                                    + state_string (this.state) + "." + state_string (state);
             State old_state = this.state;
             this.state = state;
@@ -559,7 +559,7 @@ class AccountState : GLib.Object, QSharedData {
         }
 
         if (this.connection_status != status) {
-            GLib.info ("AccountState connection status change : "
+            GLib.info ("AccountState connection status change: "
                                    + this.connection_status + "."
                                    + status;
             this.connection_status = status;
@@ -711,7 +711,7 @@ class AccountState : GLib.Object, QSharedData {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_ocs_error (int status_code, string message) {
-        GLib.debug ("Error " + status_code + " while fetching new navigation apps : " + message;
+        GLib.debug ("Error " + status_code + " while fetching new navigation apps: " + message;
     }
 
 } // class AccountState

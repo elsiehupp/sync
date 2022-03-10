@@ -594,7 +594,7 @@ class User : GLib.Object {
                 job.property ("activity_row", GLib.Variant.from_value (row));
                 connect (job, &AbstractNetworkJob.network_error,
                     this, &User.on_signal_notify_network_error);
-                connect (job, &Notification_confirm_job.job_finished,
+                connect (job, &Notification_confirm_job.signal_job_finished,
                     this, &User.on_signal_notify_server_finished);
                 job.on_signal_start ();
 
@@ -681,7 +681,7 @@ class User : GLib.Object {
 
         // Fetch Activities only if visible and if last check is longer than 15 secs ago
         if (timer.is_valid () && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {
-            GLib.debug ("Do not check as last check is only secs ago : " + timer.elapsed () / 1000;
+            GLib.debug ("Do not check as last check is only secs ago: " + timer.elapsed () / 1000;
             return;
         }
         if (this.account.data () && this.account.data ().is_connected ()) {

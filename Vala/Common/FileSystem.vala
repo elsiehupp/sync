@@ -153,7 +153,7 @@ namespace FileSystem {
             GLib.warning (
                 "Error renaming file" + origin_filename
                 + "to" + destination_filename
-                + "failed : " + error;
+                + "failed: " + error;
             if (error_string) {
                 *error_string = error;
             }
@@ -190,7 +190,7 @@ namespace FileSystem {
         }
         if (!success) {
             *error_string = orig.error_string ();
-            GLib.warning ("Renaming temp file to final failed : " + *error_string;
+            GLib.warning ("Renaming temp file to final failed: " + *error_string;
             return false;
         }
 

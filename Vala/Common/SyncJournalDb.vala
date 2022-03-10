@@ -577,7 +577,7 @@ class SyncJournalDb : GLib.Object {
             var next = query.next ();
             if (!next.ok) {
                 string err = query.error ();
-                GLib.warning ("No journal entry found for mangled name" + mangled_name + "Error : " + err);
+                GLib.warning ("No journal entry found for mangled name" + mangled_name + "Error: " + err);
                 close ();
                 return false;
             }
@@ -2130,7 +2130,7 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void commit_internal (string context, bool start_trans) {
-        GLib.debug ("Transaction commit" + context + (start_trans ? "and starting new transaction" : ""));
+        GLib.debug ("Transaction commit" + context + (start_trans ? "and starting new transaction": ""));
         commit_transaction ();
 
         if (start_trans) {
@@ -2923,7 +2923,7 @@ class SyncJournalDb : GLib.Object {
             return true;
 
         GLib.debug ("Removing stale" + name + "entries:" + entries.join (", "));
-        // FIXME : Was ported from exec_batch, check if correct!
+        // FIXME: Was ported from exec_batch, check if correct!
         foreach (string entry in entries) {
             query.reset_and_clear_bindings ();
             query.bind_value (1, entry);

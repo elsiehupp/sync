@@ -71,9 +71,9 @@ class SyncRunFileLog {
             QDir ().mkdir (logpath);
         }
 
-        int length = folder_path.split (QLatin1String ("/")).length ();
-        string filename_single = folder_path.split (QLatin1String ("/")).at (length - 2);
-        string filename = logpath + QLatin1String ("/") + filename_single + QLatin1String ("this.sync.log");
+        int length = folder_path.split ("/").length ();
+        string filename_single = folder_path.split ("/").at (length - 2);
+        string filename = logpath + "/" + filename_single + "this.sync.log";
 
         int depth_index = 2;
         while (GLib.File.exists (filename)) {
@@ -86,24 +86,24 @@ class SyncRunFileLog {
             if (string.compare (folder_path,line,Qt.CaseSensitive)!=0) {
                 depth_index++;
                 if (depth_index <= length) {
-                    filename_single = folder_path.split (QLatin1String ("/")).at (length - depth_index) + string ("this.") ///
+                    filename_single = folder_path.split ("/").at (length - depth_index) + string ("this.") ///
                             + filename_single;
-                    filename = logpath+ QLatin1String ("/") + filename_single + QLatin1String ("this.sync.log");
+                    filename = logpath + "/" + filename_single + "this.sync.log";
                 }
                 else {
-                    filename_single = filename_single + QLatin1String ("this.1");
-                    filename = logpath + QLatin1String ("/") + filename_single + QLatin1String ("this.sync.log");
+                    filename_single = filename_single + "this.1";
+                    filename = logpath + "/" + filename_single + "this.sync.log";
                 }
             }
             else break;
         }
 
         // When the file is too big, just rename it to an old name.
-        GLib.FileInfo info (filename);
+        GLib.FileInfo info = new GLib.FileInfo (filename);
         bool exists = info.exists ();
         if (exists && info.size () > logfile_max_size) {
             exists = false;
-            string new_filename = filename + QLatin1String (".1");
+            string new_filename = filename + ".1";
             GLib.File.remove (new_filename);
             GLib.File.rename (filename, new_filename);
         }
@@ -148,7 +148,7 @@ class SyncRunFileLog {
         if (item.instruction != CSYNC_INSTRUCTION_RENAME) {
             this.out + item.destination () + L;
         } else {
-            this.out + item.file + QLatin1String (" . ") + item.rename_target + L;
+            this.out + item.file + " . " + item.rename_target + L;
         }
         this.out + item.instruction + L;
         this.out + item.direction + L;
@@ -168,14 +168,14 @@ class SyncRunFileLog {
 
     void SyncRunFileLog.log_lap (string name) {
         this.out + "#=#=#=#=# " + name + " " + date_time_str (GLib.DateTime.current_date_time_utc ())
-             + " (last step : " + this.lap_duration.restart (" msec"
-             + ", total : " + this.total_duration.elapsed (" msec)" + endl;
+             + " (last step: " + this.lap_duration.restart (" msec"
+             + ", total: " + this.total_duration.elapsed (" msec)" + endl;
     }
 
     void SyncRunFileLog.finish () {
         this.out + "#=#=#=# Syncrun on_signal_finished " + date_time_str (GLib.DateTime.current_date_time_utc ())
-             + " (last step : " + this.lap_duration.elapsed (" msec"
-             + ", total : " + this.total_duration.elapsed (" msec)" + endl;
+             + " (last step: " + this.lap_duration.elapsed (" msec"
+             + ", total: " + this.total_duration.elapsed (" msec)" + endl;
         this.file.close ();
     }
     }

@@ -195,7 +195,7 @@ class AbstractNetworkJob : GLib.Object {
         const GLib.Uri url = account ().url ();
         const string display_url = string ("%1://%2%3").arg (url.scheme ()).arg (url.host ()).arg (url.path ());
 
-        string parent_meta_object_name = parent () ? parent ().meta_object ().class_name () : "";
+        string parent_meta_object_name = parent () ? parent ().meta_object ().class_name (): "";
         GLib.info (meta_object ().class_name ("created for" + display_url + "+" + path () + parent_meta_object_name;
     }
 
@@ -465,7 +465,7 @@ class AbstractNetworkJob : GLib.Object {
         this.timer.stop ();
 
         if (this.reply.error () == Soup.Reply.SslHandshakeFailedError) {
-            GLib.warning ("SslHandshakeFailedError : " + error_string (" : can be caused by a webserver wanting SSL client certificates";
+            GLib.warning ("SslHandshakeFailedError: " + error_string (" : can be caused by a webserver wanting SSL client certificates";
         }
         // Qt doesn't yet transparently resend HTTP2 requests, do so here
         var max_http2Resends = 3;

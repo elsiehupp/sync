@@ -27,111 +27,92 @@ namespace Ui {
 class OwncloudSetupWizard : GLib.Object {
 
     /***********************************************************
-    Run the wizard
     ***********************************************************/
-    public static void run_wizard (GLib.Object obj, char amember, Gtk.Widget parent = null);
+    static QPointer<OwncloudSetupWizard> wiz = null;
+
+    /***********************************************************
+    ***********************************************************/
+    private OwncloudWizard oc_wizard;
+    private string init_local_folder;
+    private string remote_folder;
+
+
+    /***********************************************************
+    Overall dialog close signal
+    ***********************************************************/
+    signal void signal_own_cloud_wizard_done (int);
 
 
     /***********************************************************
     ***********************************************************/
-    public static bool bring_wizard_to_front_if_visible ();
-signals:
-    // overall dialog close signal.
-    void own_cloud_wizard_done (int);
+    private OwncloudSetupWizard (GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        this.oc_wizard = new OwncloudWizard ();
+        this.remote_folder ();
 
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_signal_check_server (string );
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private void on_signal_find_server ();
-    private void on_signal_find_server_behind_redirect ();
-    private void on_signal_found_server (GLib.Uri , QJsonObject &);
-    private void on_signal_no_server_found (Soup.Reply reply);
-    private void on_signal_no_server_found_timeout (GLib.Uri url);
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_signal_determine_auth_type ();
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_signal_connect_to_oCUrl (string );
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private void on_signal_create_local_and_remote_folders (string , string );
-    private void on_signal_remote_folder_exists (Soup.Reply *);
-    private void on_signal_create_remote_folder_finished (Soup.Reply reply);
-    private void on_signal_assistant_finished (int);
-    private void on_signal_skip_folder_configuration ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private OwncloudSetupWizard (GLib.Object parent = new GLib.Object ());
-    ~OwncloudSetupWizard () override;
-    private void start_wizard ();
-    private void test_owncloud_connect ();
-    private void create_remote_folder ();
-    private void finalize_setup (bool);
-    private bool ensure_start_from_scratch (string local_folder);
-    private AccountState apply_account_changes ();
-    private bool check_downgrade_advised (Soup.Reply reply);
-
-    /***********************************************************
-    ***********************************************************/
-    private OwncloudWizard this.oc_wizard;
-    private string this.init_local_folder;
-    private string this.remote_folder;
-}
-
-
-    OwncloudSetupWizard.OwncloudSetupWizard (GLib.Object parent)
-        : GLib.Object (parent)
-        this.oc_wizard (new OwncloudWizard)
-        this.remote_folder () {
-        connect (this.oc_wizard, &OwncloudWizard.determine_auth_type,
-            this, &OwncloudSetupWizard.on_signal_check_server);
-        connect (this.oc_wizard, &OwncloudWizard.connect_to_oc_url,
-            this, &OwncloudSetupWizard.on_signal_connect_to_oCUrl);
-        connect (this.oc_wizard, &OwncloudWizard.create_local_and_remote_folders,
-            this, &OwncloudSetupWizard.on_signal_create_local_and_remote_folders);
+        connect (
+            this.oc_wizard,
+            OwncloudWizard.determine_auth_type,
+            this,
+            OwncloudSetupWizard.on_signal_check_server);
+        connect (
+            this.oc_wizard,
+            OwncloudWizard.connect_to_oc_url,
+            this,
+            OwncloudSetupWizard.on_signal_connect_to_oc_url);
+        connect (
+            this.oc_wizard,
+            OwncloudWizard.create_local_and_remote_folders,
+            this,
+            OwncloudSetupWizard.on_signal_create_local_and_remote_folders);
         /* basic_setup_finished might be called from a reply from the network.
            on_signal_assistant_finished might destroy the temporary QNetworkAccessManager.
            Therefore Qt.QueuedConnection is required */
-        connect (this.oc_wizard, &OwncloudWizard.basic_setup_finished,
-            this, &OwncloudSetupWizard.on_signal_assistant_finished, Qt.QueuedConnection);
-        connect (this.oc_wizard, &Gtk.Dialog.on_signal_finished, this, &GLib.Object.delete_later);
-        connect (this.oc_wizard, &OwncloudWizard.skip_folder_configuration, this, &OwncloudSetupWizard.on_signal_skip_folder_configuration);
+        connect (
+            this.oc_wizard,
+            OwncloudWizard.basic_setup_finished,
+            this,
+            OwncloudSetupWizard.on_signal_assistant_finished,
+            Qt.QueuedConnection);
+        connect (
+            this.oc_wizard,
+            Gtk.Dialog.on_signal_finished,
+            this,
+            GLib.Object.delete_later);
+        connect (
+            this.oc_wizard,
+            OwncloudWizard.skip_folder_configuration,
+            this,
+            OwncloudSetupWizard.on_signal_skip_folder_configuration);
     }
 
-    OwncloudSetupWizard.~OwncloudSetupWizard () {
+
+    /***********************************************************
+    ***********************************************************/
+    ~OwncloudSetupWizard () {
         this.oc_wizard.delete_later ();
     }
 
 
     /***********************************************************
+    Run the wizard
     ***********************************************************/
-    static QPointer<OwncloudSetupWizard> wiz = null;
-
-    void OwncloudSetupWizard.run_wizard (GLib.Object obj, char amember, Gtk.Widget parent) {
+    public static void run_wizard (GLib.Object object, char amember, Gtk.Widget parent = null) {
         if (!wiz.is_null ()) {
             bring_wizard_to_front_if_visible ();
             return;
         }
 
         wiz = new OwncloudSetupWizard (parent);
-        connect (wiz, SIGNAL (own_cloud_wizard_done (int)), obj, amember);
+        connect (wiz, SIGNAL (signal_own_cloud_wizard_done (int)), object, amember);
         FolderMan.instance ().sync_enabled (false);
         wiz.start_wizard ();
     }
 
-    bool OwncloudSetupWizard.bring_wizard_to_front_if_visible () {
+
+    /***********************************************************
+    ***********************************************************/
+    public static bool bring_wizard_to_front_if_visible () {
         if (wiz.is_null ()) {
             return false;
         }
@@ -140,50 +121,12 @@ signals:
         return true;
     }
 
-    void OwncloudSetupWizard.start_wizard () {
-        AccountPointer account = AccountManager.create_account ();
-        account.credentials (CredentialsFactory.create ("dummy"));
-        account.url (Theme.instance ().override_server_url ());
-        this.oc_wizard.account (account);
-        this.oc_wizard.oc_url (account.url ().to_string ());
 
-        this.remote_folder = Theme.instance ().default_server_folder ();
-        // remote_folder may be empty, which means /
-        string local_folder = Theme.instance ().default_client_folder ();
-
-        // if its a relative path, prepend with users home directory, otherwise use as absolute path
-
-        if (!QDir (local_folder).is_absolute ()) {
-            local_folder = QDir.home_path () + '/' + local_folder;
-        }
-
-        this.oc_wizard.property ("local_folder", local_folder);
-
-        // remember the local folder to compare later if it changed, but clean first
-        string lf = QDir.from_native_separators (local_folder);
-        if (!lf.ends_with ('/')) {
-            lf.append ('/');
-        }
-
-        this.init_local_folder = lf;
-
-        this.oc_wizard.on_signal_remote_folder (this.remote_folder);
-
-    #ifdef WITH_PROVIDERS
-        const var start_page = WizardCommon.Pages.PAGE_WELCOME;
-    #else // WITH_PROVIDERS
-        const var start_page = WizardCommon.Pages.PAGE_SERVER_SETUP;
-    #endif // WITH_PROVIDERS
-        this.oc_wizard.start_id (start_page);
-
-        this.oc_wizard.restart ();
-
-        this.oc_wizard.open ();
-        this.oc_wizard.raise ();
-    }
-
-    // also checks if an installation is valid and determines auth type in a second step
-    void OwncloudSetupWizard.on_signal_check_server (string url_string) {
+    /***********************************************************
+    Also checks if an installation is valid and determines auth
+    type in a second step
+    ***********************************************************/
+    private void on_signal_check_server (string url_string) {
         string fixed_url = url_string;
         GLib.Uri url = GLib.Uri.from_user_input (fixed_url);
         // from_user_input defaults to http, not http if no scheme is specified
@@ -216,7 +159,7 @@ signals:
 
         // Lookup system proxy in a thread https://github.com/owncloud/client/issues/2993
         if (ClientProxy.is_using_system_default ()) {
-            GLib.debug ("Trying to look up system proxy";
+            GLib.debug ("Trying to look up system proxy.");
             ClientProxy.lookup_system_proxy_async (account.url (),
                 this, SLOT (on_signal_system_proxy_lookup_done (QNetworkProxy)));
         } else {
@@ -227,19 +170,10 @@ signals:
         }
     }
 
-    void OwncloudSetupWizard.on_signal_system_proxy_lookup_done (QNetworkProxy proxy) {
-        if (proxy.type () != QNetworkProxy.NoProxy) {
-            GLib.info ("Setting QNAM proxy to be system proxy" + ClientProxy.print_q_network_proxy (proxy);
-        } else {
-            GLib.info ("No system proxy set by OS";
-        }
-        AccountPointer account = this.oc_wizard.account ();
-        account.network_access_manager ().proxy (proxy);
 
-        on_signal_find_server ();
-    }
-
-    void OwncloudSetupWizard.on_signal_find_server () {
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_find_server () {
         AccountPointer account = this.oc_wizard.account ();
 
         // Set fake credentials before we check what credential it actually is.
@@ -252,7 +186,7 @@ signals:
         // 2. Check the url for permanent redirects (like url shorteners)
         // 3. Check redirected-url/status.php with CheckServerJob
 
-        // Step 1 : Check url/status.php
+        // Step 1: Check url/status.php
         var job = new CheckServerJob (account, this);
         job.ignore_credential_failure (true);
         connect (job, &CheckServerJob.instance_found, this, &OwncloudSetupWizard.on_signal_found_server);
@@ -264,10 +198,13 @@ signals:
         // Step 2 and 3 are in on_signal_find_server_behind_redirect ()
     }
 
-    void OwncloudSetupWizard.on_signal_find_server_behind_redirect () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_find_server_behind_redirect () {
         AccountPointer account = this.oc_wizard.account ();
 
-        // Step 2 : Resolve any permanent redirect chains on the base url
+        // Step 2: Resolve any permanent redirect chains on the base url
         var redirect_check_job = account.send_request ("GET", account.url ());
 
         // Use a significantly reduced timeout for this redirect check:
@@ -287,7 +224,7 @@ signals:
                 }
             });
 
-        // Step 3 : When done, on_signal_start checking status.php.
+        // Step 3: When done, on_signal_start checking status.php.
         connect (redirect_check_job, &SimpleNetworkJob.finished_signal, this,
             [this, account] () {
                 var job = new CheckServerJob (account, this);
@@ -300,7 +237,10 @@ signals:
         });
     }
 
-    void OwncloudSetupWizard.on_signal_found_server (GLib.Uri url, QJsonObject info) {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_found_server (GLib.Uri url, QJsonObject info) {
         var server_version = CheckServerJob.version (info);
 
         this.oc_wizard.on_signal_append_to_configuration_log (_("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
@@ -322,7 +262,10 @@ signals:
         on_signal_determine_auth_type ();
     }
 
-    void OwncloudSetupWizard.on_signal_no_server_found (Soup.Reply reply) {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_no_server_found (Soup.Reply reply) {
         var job = qobject_cast<CheckServerJob> (sender ());
 
         // Do this early because reply might be deleted in message box event loop
@@ -345,22 +288,31 @@ signals:
         this.oc_wizard.account ().reset_rejected_certificates ();
     }
 
-    void OwncloudSetupWizard.on_signal_no_server_found_timeout (GLib.Uri url) {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_no_server_found_timeout (GLib.Uri url) {
         this.oc_wizard.on_signal_display_error (
             _("Timeout while trying to connect to %1 at %2.")
                 .arg (Utility.escape (Theme.instance ().app_name_gui ()), Utility.escape (url.to_string ())),
                     false);
     }
 
-    void OwncloudSetupWizard.on_signal_determine_auth_type () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_determine_auth_type () {
         var job = new DetermineAuthTypeJob (this.oc_wizard.account (), this);
         connect (job, &DetermineAuthTypeJob.auth_type,
             this.oc_wizard, &OwncloudWizard.on_signal_auth_type);
         job.on_signal_start ();
     }
 
-    void OwncloudSetupWizard.on_signal_connect_to_oCUrl (string url) {
-        GLib.info ("Connect to url : " + url;
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_connect_to_oc_url (string url) {
+        GLib.info ("Connect to url: " + url);
         AbstractCredentials creds = this.oc_wizard.get_credentials ();
         this.oc_wizard.account ().credentials (creds);
 
@@ -378,7 +330,7 @@ signals:
             this.oc_wizard.account ().dav_user (user_id);
             this.oc_wizard.account ().dav_display_name (display_name);
 
-            this.oc_wizard.field (QLatin1String ("OCUrl"), url);
+            this.oc_wizard.field ("OCUrl", url);
             this.oc_wizard.on_signal_append_to_configuration_log (_("Trying to connect to %1 at %2 …")
                                                     .arg (Theme.instance ().app_name_gui ())
                                                     .arg (url));
@@ -388,105 +340,11 @@ signals:
         fetch_user_name_job.on_signal_start ();
     }
 
-    void OwncloudSetupWizard.test_owncloud_connect () {
-        AccountPointer account = this.oc_wizard.account ();
 
-        var job = new PropfindJob (account, "/", this);
-        job.ignore_credential_failure (true);
-        // There is custom redirect handling in the error handler,
-        // so don't automatically follow redirects.
-        job.follow_redirects (false);
-        job.properties (GLib.List<GLib.ByteArray> ("getlastmodified");
-        connect (job, &PropfindJob.result, this.oc_wizard, &OwncloudWizard.on_signal_successful_step);
-        connect (job, &PropfindJob.finished_with_error, this, &OwncloudSetupWizard.on_signal_auth_error);
-        job.on_signal_start ();
-    }
-
-    void OwncloudSetupWizard.on_signal_auth_error () {
-        string error_msg;
-
-        var job = qobject_cast<PropfindJob> (sender ());
-        if (!job) {
-            GLib.warning ("Cannot check for authed redirects. This slot should be invoked from PropfindJob!";
-            return;
-        }
-        Soup.Reply reply = job.reply ();
-
-        // If there were redirects on the authed* requests, also store
-        // the updated server URL, similar to redirects on status.php.
-        GLib.Uri redirect_url = reply.attribute (Soup.Request.RedirectionTargetAttribute).to_url ();
-        if (!redirect_url.is_empty ()) {
-            GLib.info ("Authed request was redirected to" + redirect_url.to_string ();
-
-            // strip the expected path
-            string path = redirect_url.path ();
-            static string expected_path = "/" + this.oc_wizard.account ().dav_path ();
-            if (path.ends_with (expected_path)) {
-                path.chop (expected_path.size ());
-                redirect_url.path (path);
-
-                GLib.info ("Setting account url to" + redirect_url.to_string ();
-                this.oc_wizard.account ().url (redirect_url);
-                test_owncloud_connect ();
-                return;
-            }
-            error_msg = _("The authenticated request to the server was redirected to "
-                          "\"%1\". The URL is bad, the server is misconfigured.")
-                           .arg (Utility.escape (redirect_url.to_string ()));
-
-            // A 404 is actually a on_signal_success : we were authorized to know that the folder does
-            // not exist. It will be created later...
-        } else if (reply.error () == Soup.Reply.ContentNotFoundError) {
-            this.oc_wizard.on_signal_successful_step ();
-            return;
-
-            // Provide messages for other errors, such as invalid credentials.
-        } else if (reply.error () != Soup.Reply.NoError) {
-            if (!this.oc_wizard.account ().credentials ().still_valid (reply)) {
-                error_msg = _("Access forbidden by server. To verify that you have proper access, "
-                              "<a href=\"%1\">click here</a> to access the service with your browser.")
-                               .arg (Utility.escape (this.oc_wizard.account ().url ().to_string ()));
-            } else {
-                error_msg = job.error_string_parsing_body ();
-            }
-
-            // Something else went wrong, maybe the response was 200 but with invalid data.
-        } else {
-            error_msg = _("There was an invalid response to an authenticated WebDAV request");
-        }
-
-        // bring wizard to top
-        this.oc_wizard.bring_to_top ();
-        if (this.oc_wizard.current_id () == WizardCommon.Pages.PAGE_OAUTH_CREDS || this.oc_wizard.current_id () == WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS) {
-            this.oc_wizard.back ();
-        }
-        this.oc_wizard.on_signal_display_error (error_msg, this.oc_wizard.current_id () == WizardCommon.Pages.PAGE_SERVER_SETUP && check_downgrade_advised (reply));
-    }
-
-    bool OwncloudSetupWizard.check_downgrade_advised (Soup.Reply reply) {
-        if (reply.url ().scheme () != QLatin1String ("https")) {
-            return false;
-        }
-
-        switch (reply.error ()) {
-        case Soup.Reply.NoError:
-        case Soup.Reply.ContentNotFoundError:
-        case Soup.Reply.AuthenticationRequiredError:
-        case Soup.Reply.Host_not_found_error:
-            return false;
-        default:
-            break;
-        }
-
-        // Adhere to HSTS, even though we do not parse it properly
-        if (reply.has_raw_header ("Strict-Transport-Security")) {
-            return false;
-        }
-        return true;
-    }
-
-    void OwncloudSetupWizard.on_signal_create_local_and_remote_folders (string local_folder, string remote_folder) {
-        GLib.info ("Setup local sync folder for new o_c connection " + local_folder;
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_create_local_and_remote_folders (string local_folder, string remote_folder) {
+        GLib.info ("Setup local sync folder for new o_c connection " + local_folder);
         const QDir fi (local_folder);
 
         bool next_step = true;
@@ -555,15 +413,19 @@ signals:
         }
     }
 
-    // ### TODO move into EntityExistsJob once we decide if/how to return gui strings from jobs
-    void OwncloudSetupWizard.on_signal_remote_folder_exists (Soup.Reply reply) {
+
+    /***********************************************************
+    TODO move into EntityExistsJob once we decide if/how to
+    return gui strings from jobs
+    ***********************************************************/
+    private void on_signal_remote_folder_exists (Soup.Reply reply) {
         var job = qobject_cast<EntityExistsJob> (sender ());
         bool ok = true;
         string error;
         Soup.Reply.NetworkError err_id = reply.error ();
 
         if (err_id == Soup.Reply.NoError) {
-            GLib.info ("Remote folder found, all cool!";
+            GLib.info ("Remote folder found, all cool!");
         } else if (err_id == Soup.Reply.ContentNotFoundError) {
             if (this.remote_folder.is_empty ()) {
                 error = _("No remote folder specified!");
@@ -572,7 +434,7 @@ signals:
                 create_remote_folder ();
             }
         } else {
-            error = _("Error : %1").arg (job.error_string ());
+            error = _("Error: %1").arg (job.error_string ());
             ok = false;
         }
 
@@ -583,21 +445,12 @@ signals:
         finalize_setup (ok);
     }
 
-    void OwncloudSetupWizard.create_remote_folder () {
-        this.oc_wizard.on_signal_append_to_configuration_log (_("creating folder on Nextcloud : %1").arg (this.remote_folder));
 
-        var job = new MkColJob (this.oc_wizard.account (), this.remote_folder, this);
-        connect (job, &MkColJob.finished_with_error, this, &OwncloudSetupWizard.on_signal_create_remote_folder_finished);
-        connect (job, &MkColJob.finished_without_error, this, [this] {
-            this.oc_wizard.on_signal_append_to_configuration_log (_("Remote folder %1 created successfully.").arg (this.remote_folder));
-            finalize_setup (true);
-        });
-        job.on_signal_start ();
-    }
-
-    void OwncloudSetupWizard.on_signal_create_remote_folder_finished (Soup.Reply reply) {
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_create_remote_folder_finished (Soup.Reply reply) {
         var error = reply.error ();
-        GLib.debug ("** webdav mkdir request on_signal_finished " + error;
+        GLib.debug ("** webdav mkdir request finished " + error);
         //    disconnect (own_cloud_info.instance (), SIGNAL (webdav_col_created (Soup.Reply.NetworkError)),
         //               this, SLOT (on_signal_create_remote_folder_finished (Soup.Reply.NetworkError)));
 
@@ -627,53 +480,16 @@ signals:
         finalize_setup (on_signal_success);
     }
 
-    void OwncloudSetupWizard.finalize_setup (bool on_signal_success) {
-        const string local_folder = this.oc_wizard.property ("local_folder").to_string ();
-        if (on_signal_success) {
-            if (! (local_folder.is_empty () || this.remote_folder.is_empty ())) {
-                this.oc_wizard.on_signal_append_to_configuration_log (
-                    _("A sync connection from %1 to remote directory %2 was set up.")
-                        .arg (local_folder, this.remote_folder));
-            }
-            this.oc_wizard.on_signal_append_to_configuration_log (QLatin1String (" "));
-            this.oc_wizard.on_signal_append_to_configuration_log (QLatin1String ("<p><font color=\"green\"><b>")
-                + _("Successfully connected to %1!")
-                      .arg (Theme.instance ().app_name_gui ())
-                + QLatin1String ("</b></font></p>"));
-            this.oc_wizard.on_signal_successful_step ();
-        } else {
-            // ### this is not quite true, pass in the real problem as optional parameter
-            this.oc_wizard.on_signal_append_to_configuration_log (QLatin1String ("<p><font color=\"red\">")
-                + _("Connection to %1 could not be established. Please check again.")
-                      .arg (Theme.instance ().app_name_gui ())
-                + QLatin1String ("</font></p>"));
-        }
-    }
 
-    bool OwncloudSetupWizard.ensure_start_from_scratch (string local_folder) {
-        // first try to rename (backup) the current local directory.
-        bool rename_ok = false;
-        while (!rename_ok) {
-            rename_ok = FolderMan.instance ().start_from_scratch (local_folder);
-            if (!rename_ok) {
-                QMessageBox.StandardButton but = QMessageBox.question (null, _("Folder rename failed"),
-                    _("Cannot remove and back up the folder because the folder or a file in it is open in another program."
-                       " Please close the folder or file and hit retry or cancel the setup."),
-                    QMessageBox.Retry | QMessageBox.Abort, QMessageBox.Retry);
-                if (but == QMessageBox.Abort) {
-                    break;
-                }
-            }
-        }
-        return rename_ok;
-    }
-
-    // Method executed when the user end has on_signal_finished the basic setup.
-    void OwncloudSetupWizard.on_signal_assistant_finished (int result) {
+    /***********************************************************
+    Method executed when the user end has finished the basic
+    setup.
+    ***********************************************************/
+    private void on_signal_assistant_finished (int result) {
         FolderMan folder_man = FolderMan.instance ();
 
         if (result == Gtk.Dialog.Rejected) {
-            GLib.info ("Rejected the new config, use the old!";
+            GLib.info ("Rejected the new config, use the old!");
 
         } else if (result == Gtk.Dialog.Accepted) {
             // This may or may not wipe all folder definitions, depending
@@ -706,7 +522,7 @@ signals:
                     if (!this.oc_wizard.is_confirm_big_folder_checked ()) {
                         // The user already accepted the selective sync dialog. everything is in the allow list
                         f.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
-                            string[] () + QLatin1String ("/"));
+                            string[] () + "/");
                     }
                 }
                 this.oc_wizard.on_signal_append_to_configuration_log (_("<font color=\"green\"><b>Local sync folder %1 successfully created!</b></font>").arg (local_folder));
@@ -715,19 +531,250 @@ signals:
 
         // notify others.
         this.oc_wizard.on_signal_done (QWizard.Accepted);
-        /* emit */ own_cloud_wizard_done (result);
+        /* emit */ signal_own_cloud_wizard_done (result);
     }
 
-    void OwncloudSetupWizard.on_signal_skip_folder_configuration () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_skip_folder_configuration () {
         apply_account_changes ();
 
         disconnect (this.oc_wizard, &OwncloudWizard.basic_setup_finished,
             this, &OwncloudSetupWizard.on_signal_assistant_finished);
         this.oc_wizard.close ();
-        /* emit */ own_cloud_wizard_done (Gtk.Dialog.Accepted);
+        /* emit */ signal_own_cloud_wizard_done (Gtk.Dialog.Accepted);
     }
 
-    AccountState *OwncloudSetupWizard.apply_account_changes () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_system_proxy_lookup_done (QNetworkProxy proxy) {
+        if (proxy.type () != QNetworkProxy.NoProxy) {
+            GLib.info ("Setting QNAM proxy to be system proxy " + ClientProxy.print_q_network_proxy (proxy));
+        } else {
+            GLib.info ("No system proxy set by OS.");
+        }
+        AccountPointer account = this.oc_wizard.account ();
+        account.network_access_manager ().proxy (proxy);
+
+        on_signal_find_server ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_auth_error () {
+        string error_msg;
+
+        var job = qobject_cast<PropfindJob> (sender ());
+        if (!job) {
+            GLib.warning ("Cannot check for authed redirects. This slot should be invoked from PropfindJob!");
+            return;
+        }
+        Soup.Reply reply = job.reply ();
+
+        // If there were redirects on the authed* requests, also store
+        // the updated server URL, similar to redirects on status.php.
+        GLib.Uri redirect_url = reply.attribute (Soup.Request.RedirectionTargetAttribute).to_url ();
+        if (!redirect_url.is_empty ()) {
+            GLib.info ("Authed request was redirected to " + redirect_url.to_string ());
+
+            // strip the expected path
+            string path = redirect_url.path ();
+            static string expected_path = "/" + this.oc_wizard.account ().dav_path ();
+            if (path.ends_with (expected_path)) {
+                path.chop (expected_path.size ());
+                redirect_url.path (path);
+
+                GLib.info ("Setting account url to " + redirect_url.to_string ());
+                this.oc_wizard.account ().url (redirect_url);
+                test_owncloud_connect ();
+                return;
+            }
+            error_msg = _("The authenticated request to the server was redirected to "
+                          "\"%1\". The URL is bad, the server is misconfigured.")
+                           .arg (Utility.escape (redirect_url.to_string ()));
+
+            // A 404 is actually a on_signal_success : we were authorized to know that the folder does
+            // not exist. It will be created later...
+        } else if (reply.error () == Soup.Reply.ContentNotFoundError) {
+            this.oc_wizard.on_signal_successful_step ();
+            return;
+
+            // Provide messages for other errors, such as invalid credentials.
+        } else if (reply.error () != Soup.Reply.NoError) {
+            if (!this.oc_wizard.account ().credentials ().still_valid (reply)) {
+                error_msg = _("Access forbidden by server. To verify that you have proper access, "
+                              "<a href=\"%1\">click here</a> to access the service with your browser.")
+                               .arg (Utility.escape (this.oc_wizard.account ().url ().to_string ()));
+            } else {
+                error_msg = job.error_string_parsing_body ();
+            }
+
+            // Something else went wrong, maybe the response was 200 but with invalid data.
+        } else {
+            error_msg = _("There was an invalid response to an authenticated WebDAV request");
+        }
+
+        // bring wizard to top
+        this.oc_wizard.bring_to_top ();
+        if (this.oc_wizard.current_id () == WizardCommon.Pages.PAGE_OAUTH_CREDS || this.oc_wizard.current_id () == WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS) {
+            this.oc_wizard.back ();
+        }
+        this.oc_wizard.on_signal_display_error (error_msg, this.oc_wizard.current_id () == WizardCommon.Pages.PAGE_SERVER_SETUP && check_downgrade_advised (reply));
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void start_wizard () {
+        AccountPointer account = AccountManager.create_account ();
+        account.credentials (CredentialsFactory.create ("dummy"));
+        account.url (Theme.instance ().override_server_url ());
+        this.oc_wizard.account (account);
+        this.oc_wizard.oc_url (account.url ().to_string ());
+
+        this.remote_folder = Theme.instance ().default_server_folder ();
+        // remote_folder may be empty, which means /
+        string local_folder = Theme.instance ().default_client_folder ();
+
+        // if its a relative path, prepend with users home directory, otherwise use as absolute path
+
+        if (!QDir (local_folder).is_absolute ()) {
+            local_folder = QDir.home_path () + '/' + local_folder;
+        }
+
+        this.oc_wizard.property ("local_folder", local_folder);
+
+        // remember the local folder to compare later if it changed, but clean first
+        string lf = QDir.from_native_separators (local_folder);
+        if (!lf.ends_with ('/')) {
+            lf.append ('/');
+        }
+
+        this.init_local_folder = lf;
+
+        this.oc_wizard.on_signal_remote_folder (this.remote_folder);
+
+    #ifdef WITH_PROVIDERS
+        const var start_page = WizardCommon.Pages.PAGE_WELCOME;
+    #else // WITH_PROVIDERS
+        const var start_page = WizardCommon.Pages.PAGE_SERVER_SETUP;
+    #endif // WITH_PROVIDERS
+        this.oc_wizard.start_id (start_page);
+
+        this.oc_wizard.restart ();
+
+        this.oc_wizard.open ();
+        this.oc_wizard.raise ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void test_owncloud_connect () {
+        AccountPointer account = this.oc_wizard.account ();
+
+        var job = new PropfindJob (account, "/", this);
+        job.ignore_credential_failure (true);
+        // There is custom redirect handling in the error handler,
+        // so don't automatically follow redirects.
+        job.follow_redirects (false);
+        job.properties (GLib.List<GLib.ByteArray> ("getlastmodified");
+        connect (
+            job,
+            PropfindJob.result,
+            this.oc_wizard,
+            OwncloudWizard.on_signal_successful_step
+        );
+        connect (
+            job,
+            PropfindJob.finished_with_error,
+            this,
+            OwncloudSetupWizard.on_signal_auth_error
+        );
+        job.on_signal_start ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void create_remote_folder () {
+        this.oc_wizard.on_signal_append_to_configuration_log (_("creating folder on Nextcloud : %1").arg (this.remote_folder));
+
+        var job = new MkColJob (this.oc_wizard.account (), this.remote_folder, this);
+        connect (
+            job,
+            MkColJob.finished_with_error,
+            this,
+            OwncloudSetupWizard.on_signal_create_remote_folder_finished
+        );
+        connect (
+            job,
+            MkColJob.finished_without_error,
+            this,
+            [this] () {
+                this.oc_wizard.on_signal_append_to_configuration_log (_("Remote folder %1 created successfully.").arg (this.remote_folder));
+                finalize_setup (true);
+            }
+        );
+        job.on_signal_start ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void finalize_setup (bool on_signal_success) {
+        const string local_folder = this.oc_wizard.property ("local_folder").to_string ();
+        if (on_signal_success) {
+            if (! (local_folder.is_empty () || this.remote_folder.is_empty ())) {
+                this.oc_wizard.on_signal_append_to_configuration_log (
+                    _("A sync connection from %1 to remote directory %2 was set up.")
+                        .arg (local_folder, this.remote_folder));
+            }
+            this.oc_wizard.on_signal_append_to_configuration_log (" ");
+            this.oc_wizard.on_signal_append_to_configuration_log (
+                "<p><font color=\"green\"><b>"
+                + _("Successfully connected to %1!")
+                    .arg (Theme.instance ().app_name_gui ())
+                + "</b></font></p>");
+            this.oc_wizard.on_signal_successful_step ();
+        } else {
+            // ### this is not quite true, pass in the real problem as optional parameter
+            this.oc_wizard.on_signal_append_to_configuration_log (
+                "<p><font color=\"red\">"
+                + _("Connection to %1 could not be established. Please check again.")
+                    .arg (Theme.instance ().app_name_gui ())
+                + "</font></p>");
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private bool ensure_start_from_scratch (string local_folder) {
+        // first try to rename (backup) the current local directory.
+        bool rename_ok = false;
+        while (!rename_ok) {
+            rename_ok = FolderMan.instance ().start_from_scratch (local_folder);
+            if (!rename_ok) {
+                QMessageBox.StandardButton but = QMessageBox.question (null, _("Folder rename failed"),
+                    _("Cannot remove and back up the folder because the folder or a file in it is open in another program."
+                       " Please close the folder or file and hit retry or cancel the setup."),
+                    QMessageBox.Retry | QMessageBox.Abort, QMessageBox.Retry);
+                if (but == QMessageBox.Abort) {
+                    break;
+                }
+            }
+        }
+        return rename_ok;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private AccountState apply_account_changes () {
         AccountPointer new_account = this.oc_wizard.account ();
 
         // Detach the account that is going to be saved from the
@@ -743,5 +790,33 @@ signals:
         return new_state;
     }
 
-    } // namespace Occ
+
+    /***********************************************************
+    ***********************************************************/
+    private bool check_downgrade_advised (Soup.Reply reply) {
+        if (reply.url ().scheme () != "https") {
+            return false;
+        }
+
+        switch (reply.error ()) {
+        case Soup.Reply.NoError:
+        case Soup.Reply.ContentNotFoundError:
+        case Soup.Reply.AuthenticationRequiredError:
+        case Soup.Reply.Host_not_found_error:
+            return false;
+        default:
+            break;
+        }
+
+        // Adhere to HSTS, even though we do not parse it properly
+        if (reply.has_raw_header ("Strict-Transport-Security")) {
+            return false;
+        }
+        return true;
+    }
+
+} // class OwncloudSetupWizard
+
+} // namespace Ui
+} // namespace Occ
     

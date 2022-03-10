@@ -624,7 +624,7 @@ class HttpCredentials : AbstractCredentials {
             // we come here if the password is empty or any other keychain
             // error happend.
 
-            this.fetch_error_string = job.error () != QKeychain.EntryNotFound ? job.error_string () : "";
+            this.fetch_error_string = job.error () != QKeychain.EntryNotFound ? job.error_string (): "";
 
             this.password = "";
             this.ready = false;

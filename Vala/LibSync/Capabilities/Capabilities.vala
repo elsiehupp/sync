@@ -344,7 +344,7 @@ class Capabilities {
 
     Path : checksums/supported_types
     Default: []
-    Possible entries : "Adler32", "MD5", "SHA1"
+    Possible entries: "Adler32", "MD5", "SHA1"
     ***********************************************************/
     public GLib.List<GLib.ByteArray> supported_checksum_types () {
         GLib.List<GLib.ByteArray> list;

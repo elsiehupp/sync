@@ -53,7 +53,7 @@ class Share_manager : GLib.Object {
     In case of a server error the on_signal_server_error signal is emitted
     ***********************************************************/
     public void create_share (string path,
-        const Share.Share_type share_type,
+        const Share.ShareType share_type,
         const string share_with,
         const Share.Permissions permissions,
         const string password = "");
@@ -135,15 +135,15 @@ Share_manager.Share_manager (AccountPointer account, GLib.Object parent)
 void Share_manager.create_link_share (string path,
     const string name,
     const string password) {
-    var job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_signal_link_share_created);
-    connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_signal_ocs_error);
+    var job = new OcsShareJob (this.account);
+    connect (job, &OcsShareJob.share_job_finished, this, &Share_manager.on_signal_link_share_created);
+    connect (job, &OcsJob.ocs_error, this, &Share_manager.on_signal_ocs_error);
     job.create_link_share (path, name, password);
 }
 
 void Share_manager.on_signal_link_share_created (QJsonDocument reply) {
     string message;
-    int code = Ocs_share_job.get_json_return_code (reply, message);
+    int code = OcsShareJob.get_json_return_code (reply, message);
 
 
     /***********************************************************
@@ -165,13 +165,13 @@ void Share_manager.on_signal_link_share_created (QJsonDocument reply) {
 }
 
 void Share_manager.create_share (string path,
-    const Share.Share_type share_type,
+    const Share.ShareType share_type,
     const string share_with,
     const Share.Permissions desired_permissions,
     const string password) {
-    var job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_signal_ocs_error);
-    connect (job, &Ocs_share_job.share_job_finished, this,
+    var job = new OcsShareJob (this.account);
+    connect (job, &OcsJob.ocs_error, this, &Share_manager.on_signal_ocs_error);
+    connect (job, &OcsShareJob.share_job_finished, this,
         [=] (QJsonDocument reply) {
             // Find existing share permissions (if this was shared with us)
             Share.Permissions existing_permissions = Share_permission_default;
@@ -191,9 +191,9 @@ void Share_manager.create_share (string path,
                 valid_permissions &= existing_permissions;
             }
 
-            var job = new Ocs_share_job (this.account);
-            connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_signal_share_created);
-            connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_signal_ocs_error);
+            var job = new OcsShareJob (this.account);
+            connect (job, &OcsShareJob.share_job_finished, this, &Share_manager.on_signal_share_created);
+            connect (job, &OcsJob.ocs_error, this, &Share_manager.on_signal_ocs_error);
             job.create_share (path, share_type, share_with, valid_permissions, password);
         });
     job.get_shared_with_me ();
@@ -210,9 +210,9 @@ void Share_manager.on_signal_share_created (QJsonDocument reply) {
 }
 
 void Share_manager.fetch_shares (string path) {
-    var job = new Ocs_share_job (this.account);
-    connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_signal_shares_fetched);
-    connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_signal_ocs_error);
+    var job = new OcsShareJob (this.account);
+    connect (job, &OcsShareJob.share_job_finished, this, &Share_manager.on_signal_shares_fetched);
+    connect (job, &OcsJob.ocs_error, this, &Share_manager.on_signal_ocs_error);
     job.on_signal_get_shares (path);
 }
 
@@ -232,7 +232,7 @@ void Share_manager.on_signal_shares_fetched (QJsonDocument reply) {
 
         if (share_type == Share.Type_link) {
             new_share = parse_link_share (data);
-        } else if (Share.is_share_type_user_group_email_room_or_remote (static_cast <Share.Share_type> (share_type))) {
+        } else if (Share.is_share_type_user_group_email_room_or_remote (static_cast <Share.ShareType> (share_type))) {
             new_share = parse_user_group_share (data);
         } else {
             new_share = parse_share (data);
@@ -265,7 +265,7 @@ unowned<User_group_share> Share_manager.parse_user_group_share (QJsonObject data
         data.value ("uid_owner").to_variant ().to_string (),
         data.value ("displayname_owner").to_variant ().to_string (),
         data.value ("path").to_string (),
-        static_cast<Share.Share_type> (data.value ("share_type").to_int ()),
+        static_cast<Share.ShareType> (data.value ("share_type").to_int ()),
         !data.value ("password").to_string ().is_empty (),
         static_cast<Share.Permissions> (data.value ("permissions").to_int ()),
         sharee,
@@ -324,7 +324,7 @@ unowned<Share> Share_manager.parse_share (QJsonObject data) {
         data.value ("uid_owner").to_variant ().to_string (),
         data.value ("displayname_owner").to_variant ().to_string (),
         data.value ("path").to_string (),
-        (Share.Share_type)data.value ("share_type").to_int (),
+        (Share.ShareType)data.value ("share_type").to_int (),
         !data.value ("password").to_string ().is_empty (),
         (Share.Permissions)data.value ("permissions").to_int (),
         sharee));

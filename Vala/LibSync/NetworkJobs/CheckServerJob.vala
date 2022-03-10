@@ -154,7 +154,7 @@ class CheckServerJob : AbstractNetworkJob {
                 GLib.warning ("status.php from server is not valid JSON!" + body + reply ().request ().url () + error.error_string ();
             }
 
-            GLib.info ("status.php returns : " + status + " " + reply ().error (" Reply : " + reply ();
+            GLib.info ("status.php returns: " + status + " " + reply ().error (" Reply: " + reply ();
             if (status.object ().contains ("installed")) {
                 /* emit */ instance_found (this.server_url, status.object ());
             } else {

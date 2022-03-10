@@ -57,26 +57,27 @@ class FolderDefinition {
     Saves the folder definition into the current settings group.
     ***********************************************************/
     public static void save (QSettings settings, FolderDefinition folder) {
-        settings.value (QLatin1String ("local_path"), folder.local_path);
-        settings.value (QLatin1String ("journal_path"), folder.journal_path);
-        settings.value (QLatin1String ("target_path"), folder.target_path);
-        settings.value (QLatin1String ("paused"), folder.paused);
-        settings.value (QLatin1String ("ignore_hidden_files"), folder.ignore_hidden_files);
+        settings.value ("local_path", folder.local_path);
+        settings.value ("journal_path", folder.journal_path);
+        settings.value ("target_path", folder.target_path);
+        settings.value ("paused", folder.paused);
+        settings.value ("ignore_hidden_files", folder.ignore_hidden_files);
 
         settings.value ("virtual_files_mode", Vfs.Mode.to_string (folder.virtual_files_mode));
 
         // Ensure new vfs modes won't be attempted by older clients
         if (folder.virtual_files_mode == Vfs.WindowsCfApi) {
-            settings.value (QLatin1String (VERSION_C), 3);
+            settings.value (VERSION_C, 3);
         } else {
-            settings.value (QLatin1String (VERSION_C), 2);
+            settings.value (VERSION_C, 2);
         }
 
         // Happens only on Windows when the explorer integration is enabled.
-        if (!folder.navigation_pane_clsid.is_null ())
-            settings.value (QLatin1String ("navigation_pane_clsid"), folder.navigation_pane_clsid);
-        else
-            settings.remove (QLatin1String ("navigation_pane_clsid"));
+        if (!folder.navigation_pane_clsid.is_null ()) {
+            settings.value ("navigation_pane_clsid", folder.navigation_pane_clsid);
+        } else {
+            settings.remove ("navigation_pane_clsid");
+        }
     }
 
     /***********************************************************

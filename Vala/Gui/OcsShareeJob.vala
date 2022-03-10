@@ -15,7 +15,7 @@ namespace Ui {
 
 Fetching sharees from the OCS Sharee API
 ***********************************************************/
-class Ocs_sharee_job : Ocs_job {
+class Ocs_sharee_job : OcsJob {
 
     /***********************************************************
     ***********************************************************/
@@ -44,9 +44,9 @@ signals:
 }
 
     Ocs_sharee_job.Ocs_sharee_job (AccountPointer account)
-        : Ocs_job (account) {
+        : OcsJob (account) {
         path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
-        connect (this, &Ocs_job.job_finished, this, &Ocs_sharee_job.on_signal_job_done);
+        connect (this, &OcsJob.signal_job_finished, this, &Ocs_sharee_job.on_signal_job_done);
     }
 
     void Ocs_sharee_job.get_sharees (string search,

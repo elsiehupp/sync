@@ -126,7 +126,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private bool enforce_expiration_date_for_share (Share.Share_type type);
+    private bool enforce_expiration_date_for_share (Share.ShareType type);
 
     /***********************************************************
     ***********************************************************/
@@ -194,7 +194,7 @@ signals:
 
         show_note_options (false);
 
-        const bool is_note_supported = this.share.get_share_type () != Share.Share_type.Type_email && this.share.get_share_type () != Share.Share_type.Type_room;
+        const bool is_note_supported = this.share.get_share_type () != Share.ShareType.Type_email && this.share.get_share_type () != Share.ShareType.Type_room;
 
         if (is_note_supported) {
             this.note_link_action = new QAction (_("Note to recipient"));
@@ -209,7 +209,7 @@ signals:
 
         show_expire_date_options (false);
 
-        const bool is_expiration_date_supported = this.share.get_share_type () != Share.Share_type.Type_email;
+        const bool is_expiration_date_supported = this.share.get_share_type () != Share.ShareType.Type_email;
 
         if (is_expiration_date_supported) {
             // email shares do not support expiration dates
@@ -364,7 +364,7 @@ signals:
         if (!pixmap.is_null ()) {
             this.ui.avatar.pixmap (pixmap);
         } else {
-            GLib.debug ("pixmap is null for share type : " + this.share.get_share_with ().type ();
+            GLib.debug ("pixmap is null for share type: " + this.share.get_share_with ().type ();
 
             // The avatar label is the first character of the user name.
             const var text = this.share.get_share_with ().display_name ();
@@ -402,7 +402,7 @@ signals:
             this.ui.permissions_edit.check_state (Qt.Checked);
         }
 
-        Share.Permissions permissions = Share_permission_read;
+        Share.Permissions permissions = SharePermissionRead;
 
         //  folders edit = CREATE, READ, UPDATE, DELETE
         //  files edit = READ + UPDATE
@@ -432,7 +432,7 @@ signals:
     void Share_user_line.on_signal_permissions_changed () {
         enabled (false);
 
-        Share.Permissions permissions = Share_permission_read;
+        Share.Permissions permissions = SharePermissionRead;
 
         if (this.permission_reshare.is_checked ())
             permissions |= Share_permission_share;
@@ -570,7 +570,7 @@ signals:
             this.ui.permissions_edit.check_state (Qt.Checked);
         } else if (!this.is_file && perm & (Share_permission_update | Share_permission_create | Share_permission_delete)) {
             this.ui.permissions_edit.check_state (Qt.PartiallyChecked);
-        } else if (perm & Share_permission_read) {
+        } else if (perm & SharePermissionRead) {
             this.ui.permissions_edit.check_state (Qt.Unchecked);
         }
 
@@ -740,11 +740,11 @@ signals:
         enable_progess_indicator_animation (false);
     }
 
-    QDate Share_user_line.max_expiration_date_for_share (Share.Share_type type, QDate fallback_date) {
+    QDate Share_user_line.max_expiration_date_for_share (Share.ShareType type, QDate fallback_date) {
         var days_to_expire = 0;
-        if (type == Share.Share_type.Type_remote) {
+        if (type == Share.ShareType.Type_remote) {
             days_to_expire = this.account.capabilities ().share_remote_expire_date_days ();
-        } else if (type == Share.Share_type.Type_email) {
+        } else if (type == Share.ShareType.Type_email) {
            days_to_expire = this.account.capabilities ().share_public_link_expire_date_days ();
         } else {
             days_to_expire = this.account.capabilities ().share_internal_expire_date_days ();
@@ -757,10 +757,10 @@ signals:
         return fallback_date;
     }
 
-    bool Share_user_line.enforce_expiration_date_for_share (Share.Share_type type) {
-        if (type == Share.Share_type.Type_remote) {
+    bool Share_user_line.enforce_expiration_date_for_share (Share.ShareType type) {
+        if (type == Share.ShareType.Type_remote) {
             return this.account.capabilities ().share_remote_enforce_expire_date ();
-        } else if (type == Share.Share_type.Type_email) {
+        } else if (type == Share.ShareType.Type_email) {
             return this.account.capabilities ().share_public_link_enforce_expire_date ();
         }
 

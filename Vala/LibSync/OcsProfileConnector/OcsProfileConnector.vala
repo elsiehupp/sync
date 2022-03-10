@@ -88,7 +88,7 @@ class OcsProfileConnector : GLib.Object {
     private void start_fetch_icon_job (size_t hovercard_action_index) {
         var hovercard_action = this.current_hovercard.actions[hovercard_action_index];
         var icon_job = new IconJob{this.account, hovercard_action.icon_url, this};
-        connect (icon_job, IconJob.job_finished,
+        connect (icon_job, IconJob.signal_job_finished,
             [this, hovercard_action_index] (GLib.ByteArray icon_data) {
                 load_hovercard_action_icon (hovercard_action_index, icon_data);
             });

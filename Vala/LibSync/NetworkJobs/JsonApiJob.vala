@@ -143,7 +143,7 @@ class JsonApiJob : AbstractNetworkJob {
         int status_code = 0;
         int http_status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warning ("Network error : " + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute));
+            GLib.warning ("Network error: " + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute));
             status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             /* emit */ signal_json_received (QJsonDocument (), status_code);
             return true;
@@ -162,7 +162,7 @@ class JsonApiJob : AbstractNetworkJob {
             status_code = http_status_code;
         } else {
             const QRegularExpression regex = new QRegularExpression (" (\"statuscode\" : (\\d+))");
-            // example : "{"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"version":{"major":8,"minor":"... (504)
+            // example: "{"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"version":{"major":8,"minor":"... (504)
             var rx_match = regex.match (json_str);
             if (rx_match.has_match ()) {
                 status_code = rx_match.captured (1).to_int ();

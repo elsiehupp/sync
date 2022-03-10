@@ -212,7 +212,7 @@ class TestXmlParse : GLib.Object {
         GLib.assert_true (!this.success);
         GLib.assert_true (sizes.size () == 0 ); // No quota info in the XML
 
-        GLib.assert_true (this.items.size () == 0 ); // FIXME : We should change the parser to not emit during parsing but at the end
+        GLib.assert_true (this.items.size () == 0 ); // FIXME: We should change the parser to not emit during parsing but at the end
 
         GLib.assert_true (this.subdirectories.size () == 0);
     }
@@ -238,7 +238,7 @@ class TestXmlParse : GLib.Object {
         GLib.assert_true (!this.success);
         GLib.assert_true (sizes.size () == 0 ); // No quota info in the XML
 
-        GLib.assert_true (this.items.size () == 0 ); // FIXME : We should change the parser to not emit during parsing but at the end
+        GLib.assert_true (this.items.size () == 0 ); // FIXME: We should change the parser to not emit during parsing but at the end
         GLib.assert_true (this.subdirectories.size () == 0);
     }
 
@@ -263,7 +263,7 @@ class TestXmlParse : GLib.Object {
         GLib.assert_true (!this.success);
         GLib.assert_true (sizes.size () == 0 ); // No quota info in the XML
 
-        GLib.assert_true (this.items.size () == 0 ); // FIXME : We should change the parser to not emit during parsing but at the end
+        GLib.assert_true (this.items.size () == 0 ); // FIXME: We should change the parser to not emit during parsing but at the end
         GLib.assert_true (this.subdirectories.size () == 0);
     }
 

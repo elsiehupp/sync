@@ -75,7 +75,7 @@ class Logger : GLib.Object {
             return this.log_debug;
         }
         public set {
-            const GLib.List<string> rules = {value ? "nextcloud.*.debug=true" : ""};
+            const GLib.List<string> rules = {value ? "nextcloud.*.debug=true": ""};
             if (value) {
                 add_log_rule (rules);
             } else {

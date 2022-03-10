@@ -154,7 +154,7 @@ class ActivityListModel : QAbstractListModel {
     ***********************************************************/
     public void add_notification_to_activity_list (Activity activity);
     void ActivityListModel.add_notification_to_activity_list (Activity activity) {
-        GLib.info ("Notification successfully added to the notification list : " + activity.subject;
+        GLib.info ("Notification successfully added to the notification list: " + activity.subject;
         this.notification_lists.prepend (activity);
         combine_activity_lists ();
     }
@@ -171,7 +171,7 @@ class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void add_error_to_activity_list (Activity activity) {
-        GLib.info ("Error successfully added to the notification list : " + activity.subject;
+        GLib.info ("Error successfully added to the notification list: " + activity.subject;
         this.notification_errors_lists.prepend (activity);
         combine_activity_lists ();
     }
@@ -181,7 +181,7 @@ class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void add_sync_file_item_to_activity_list (Activity activity) {
-        GLib.info ("Successfully added to the activity list : " + activity.subject;
+        GLib.info ("Successfully added to the activity list: " + activity.subject;
         this.sync_file_item_lists.prepend (activity);
         combine_activity_lists ();
     }
@@ -189,7 +189,7 @@ class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void add_ignored_file_to_list (Activity new_activity) {
-        GLib.info ("First checking for duplicates then add file to the notification list of ignored files : " + new_activity.file;
+        GLib.info ("First checking for duplicates then add file to the notification list of ignored files: " + new_activity.file;
 
         bool duplicate = false;
         if (this.list_of_ignored_files.size () == 0) {
@@ -231,7 +231,7 @@ class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void remove_activity_from_activity_list (Activity activity) {
-        GLib.info ("Activity/Notification/Error successfully dismissed : " + activity.subject;
+        GLib.info ("Activity/Notification/Error successfully dismissed: " + activity.subject;
         GLib.info ("Trying to remove Activity/Notification/Error from view... ";
 
         int index = -1;
@@ -399,7 +399,7 @@ class ActivityListModel : QAbstractListModel {
         case DataRole.ACTION_TEXT:
             return a.subject;
         case DataRole.ACTION_TEXT_COLOR:
-            return a.id == -1 ? QLatin1String ("#808080") : QLatin1String ("#222");   // FIXME : This is a temporary workaround for this.show_more_activities_available_entry
+            return a.id == -1 ? QLatin1String ("#808080") : QLatin1String ("#222");   // FIXME: This is a temporary workaround for this.show_more_activities_available_entry
         case DataRole.MESSAGE:
             return a.message;
         case DataRole.LINK: {

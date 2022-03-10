@@ -219,9 +219,9 @@ class SqlQuery {
                 this.error = string.from_utf8 (sqlite3_errmsg (this.database));
                 GLib.warning ("Sqlite exec statement error:" + this.err_id + this.error + "in" + this.sql;
                 if (this.err_id == SQLITE_IOERR) {
-                    GLib.warning ("IOERR extended errcode : " + sqlite3_extended_errcode (this.database);
+                    GLib.warning ("IOERR extended errcode: " + sqlite3_extended_errcode (this.database);
     #if SQLITE_VERSION_NUMBER >= 3012000
-                    GLib.warning ("IOERR system errno : " + sqlite3_system_errno (this.database);
+                    GLib.warning ("IOERR system errno: " + sqlite3_system_errno (this.database);
     #endif
                 }
             } else {

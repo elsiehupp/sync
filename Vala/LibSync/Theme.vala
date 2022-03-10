@@ -279,7 +279,7 @@ class Theme : GLib.Object {
     public static string hidpi_filename_for_color (string icon_name, Gtk.Color background_color, QPaintDevice dev = null) {
         var is_dark_background = Theme.is_dark_color (background_color);
 
-        const string icon_path = Theme.theme_prefix + (is_dark_background ? "white/" : "black/") + icon_name;
+        const string icon_path = Theme.theme_prefix + (is_dark_background ? "white/": "black/") + icon_name;
 
         return Theme.hidpi_filename (icon_path, dev);
     }
@@ -297,7 +297,7 @@ class Theme : GLib.Object {
     Get an sync state icon
     ***********************************************************/
     public QIcon sync_state_icon (SyncResult.Status status, bool sys_tray = false) {
-        // FIXME : Mind the size!
+        // FIXME: Mind the size!
         string status_icon;
 
         switch (status) {
@@ -322,7 +322,7 @@ class Theme : GLib.Object {
             break;
         case SyncResult.Status.ERROR:
         case SyncResult.Status.SETUP_ERROR:
-        // FIXME : Use state-problem once we have an icon.
+        // FIXME: Use state-problem once we have an icon.
         default:
             status_icon = "state-error";
         }
@@ -529,7 +529,7 @@ class Theme : GLib.Object {
     public string systray_icon_flavor (bool mono) {
         string flavor;
         if (mono) {
-            flavor = Utility.has_dark_systray () ? "white" : "black";
+            flavor = Utility.has_dark_systray () ? "white": "black";
         } else {
             flavor = "colored";
         }
@@ -692,12 +692,12 @@ class Theme : GLib.Object {
     ***********************************************************/
     public string about () {
         //  return MIRALL_VERSION_STRING;
-        // Shorten Qt's OS name : "macOS Mojave (10.14)" . "macOS"
+        // Shorten Qt's OS name: "macOS Mojave (10.14)" . "macOS"
         string[] os_string_list = Utility.platform_name ().split (' ');
         string os_name = os_string_list.at (0);
 
         string dev_string;
-        // : Example text : "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
+        // : Example text: "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
         dev_string = _("<p>%1 Desktop Client</p>")
                 .arg (APPLICATION_NAME);
 
@@ -959,7 +959,7 @@ class Theme : GLib.Object {
     (actually 2019/09/13 only systray theming).
     ***********************************************************/
 	public QIcon ui_theme_icon (string icon_name, bool ui_has_dark_background) {
-        string icon_path = string (Theme.theme_prefix) + (ui_has_dark_background ? "white/" : "black/") + icon_name;
+        string icon_path = string (Theme.theme_prefix) + (ui_has_dark_background ? "white/": "black/") + icon_name;
         string icn_path = icon_path.to_utf8 ().const_data ();
         return new Gtk.Icon (QPixmap (icon_path));
     }
@@ -1215,7 +1215,7 @@ class Theme : GLib.Object {
     @return string image path in the resources
     ***********************************************************/
     protected string theme_image_path (string name, int size = -1, bool sys_tray = false) {
-        var flavor = (!is_branded () && sys_tray) ? systray_icon_flavor (this.mono) : "colored";
+        var flavor = (!is_branded () && sys_tray) ? systray_icon_flavor (this.mono): "colored";
         var use_svg = should_prefer_svg ();
 
         // branded client may have several sizes of the same icon

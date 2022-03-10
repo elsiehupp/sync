@@ -27,7 +27,7 @@ signals:
     void on_signal_finished ();
 
 
-    private void do_finish (QJsonObject obj);
+    private void do_finish (QJsonObject object);
 
     private unowned<Socket_listener> this.socket_listener;
     private const GLib.ByteArray this.command;
@@ -58,13 +58,13 @@ void Socket_api_job_v2.failure (string error) {
     });
 }
 
-void Socket_api_job_v2.do_finish (QJsonObject obj) {
+void Socket_api_job_v2.do_finish (QJsonObject object) {
     this.socket_listener.on_signal_send_message (this.command + "this.RESULT:" + QJsonDocument ({
         {
             "identifier", this.job_id
         },
         {
-            "arguments", obj
+            "arguments", object
         }
     }).to_json (QJsonDocument.Compact));
     /* Q_EMIT */ on_signal_finished ();

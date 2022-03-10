@@ -76,7 +76,7 @@ CmdOptions opts = null;
 
 string query_password (string user) {
     EchoDisabler disabler;
-    std.cout + "Password for user " + q_printable (user) + " : ";
+    std.cout + "Password for user " + q_printable (user) + ": ";
     std.string s;
     std.getline (std.cin, s);
     return string.from_std_string (s);
@@ -88,7 +88,7 @@ void help () {
 
     std.cout + binary_name + " - command line " APPLICATION_NAME " client tool" + std.endl;
     std.cout + "" + std.endl;
-    std.cout + "Usage : " + binary_name + " [OPTION] <source_dir> <server_url>" + std.endl;
+    std.cout + "Usage: " + binary_name + " [OPTION] <source_dir> <server_url>" + std.endl;
     std.cout + "" + std.endl;
     std.cout + "A proxy can either be set manually using --httpproxy." + std.endl;
     std.cout + "Otherwise, the setting from a configured sync client will be used." + std.endl;
@@ -288,7 +288,7 @@ int main (int argc, char **argv) {
 
     if (options.interactive) {
         if (user.is_empty ()) {
-            std.cout + "Please enter user name : ";
+            std.cout + "Please enter user name: ";
             std.string s;
             std.getline (std.cin, s);
             user = string.from_std_string (s);
@@ -385,7 +385,7 @@ restart_sync:
     if (!options.unsyncedfolders.is_empty ()) {
         GLib.File f (options.unsyncedfolders);
         if (!f.open (GLib.File.ReadOnly)) {
-            q_critical ("Could not open file containing the list of unsynced folders : " + options.unsyncedfolders;
+            q_critical ("Could not open file containing the list of unsynced folders: " + options.unsyncedfolders;
         } else {
             // filter out empty lines and comments
             selective_sync_list = string.from_utf8 (f.read_all ()).split ('\n').filter (QRegularExpression ("\\S+")).filter (QRegularExpression ("^[^#]"));

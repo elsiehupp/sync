@@ -571,7 +571,7 @@ class ProcessDirectoryJob : GLib.Object {
         bool is_hidden, bool is_symlink) {
         var excluded = this.discovery_data.excludes.traversal_pattern_match (path, is_directory ? ItemTypeDirectory : ItemTypeFile);
 
-        // FIXME : move to ExcludedFiles 's regexp ?
+        // FIXME: move to ExcludedFiles 's regexp ?
         bool is_invalid_pattern = false;
         if (excluded == CSYNC_NOT_EXCLUDED && !this.discovery_data.invalid_filename_rx.pattern ().is_empty ()) {
             if (path.contains (this.discovery_data.invalid_filename_rx)) {
@@ -691,20 +691,20 @@ class ProcessDirectoryJob : GLib.Object {
     private void process_file (PathTuple path,
         LocalInfo local_entry, RemoteInfo server_entry,
         SyncJournalFileRecord db_entry) {
-        const string has_server = server_entry.is_valid () ? "true" : this.query_server == PARENT_NOT_CHANGED ? "database" : "false";
-        const string has_local = local_entry.is_valid () ? "true" : this.query_local == PARENT_NOT_CHANGED ? "database" : "false";
+        const string has_server = server_entry.is_valid () ? "true" : this.query_server == PARENT_NOT_CHANGED ? "database": "false";
+        const string has_local = local_entry.is_valid () ? "true" : this.query_local == PARENT_NOT_CHANGED ? "database": "false";
         GLib.info ().nospace ("Processing " + path.original
-                                  + " | valid : " + db_entry.is_valid ("/" + has_local + "/" + has_server
-                                  + " | mtime : " + db_entry.modtime + "/" + local_entry.modtime + "/" + server_entry.modtime
-                                  + " | size : " + db_entry.file_size + "/" + local_entry.size + "/" + server_entry.size
-                                  + " | etag : " + db_entry.etag + "//" + server_entry.etag
-                                  + " | checksum : " + db_entry.checksum_header + "//" + server_entry.checksum_header
-                                  + " | perm : " + db_entry.remote_perm + "//" + server_entry.remote_perm
-                                  + " | fileid : " + db_entry.file_id + "//" + server_entry.file_identifier
-                                  + " | inode : " + db_entry.inode + "/" + local_entry.inode + "/"
-                                  + " | type : " + db_entry.type + "/" + local_entry.type + "/" + (server_entry.is_directory ? ItemTypeDirectory : ItemTypeFile)
-                                  + " | e2ee : " + db_entry.is_e2e_encrypted + "/" + server_entry.is_e2e_encrypted
-                                  + " | e2ee_mangled_name : " + db_entry.e2e_mangled_name ("/" + server_entry.e2e_mangled_name;
+                                  + " | valid: " + db_entry.is_valid ("/" + has_local + "/" + has_server
+                                  + " | mtime: " + db_entry.modtime + "/" + local_entry.modtime + "/" + server_entry.modtime
+                                  + " | size: " + db_entry.file_size + "/" + local_entry.size + "/" + server_entry.size
+                                  + " | etag: " + db_entry.etag + "//" + server_entry.etag
+                                  + " | checksum: " + db_entry.checksum_header + "//" + server_entry.checksum_header
+                                  + " | perm: " + db_entry.remote_perm + "//" + server_entry.remote_perm
+                                  + " | fileid: " + db_entry.file_id + "//" + server_entry.file_identifier
+                                  + " | inode: " + db_entry.inode + "/" + local_entry.inode + "/"
+                                  + " | type: " + db_entry.type + "/" + local_entry.type + "/" + (server_entry.is_directory ? ItemTypeDirectory : ItemTypeFile)
+                                  + " | e2ee: " + db_entry.is_e2e_encrypted + "/" + server_entry.is_e2e_encrypted
+                                  + " | e2ee_mangled_name: " + db_entry.e2e_mangled_name ("/" + server_entry.e2e_mangled_name;
 
         if (local_entry.is_valid ()
             && !server_entry.is_valid ()
@@ -1302,7 +1302,7 @@ class ProcessDirectoryJob : GLib.Object {
                 if (is_eml_file && db_entry.file_size == local_entry.size && !db_entry.checksum_header.is_empty ()) {
                     if (compute_local_checksum (db_entry.checksum_header, this.discovery_data.local_dir + path.local, item)
                             && item.checksum_header == db_entry.checksum_header) {
-                        GLib.info ("Note: Checksums are identical, file did not actually change : " + path.local;
+                        GLib.info ("Note: Checksums are identical, file did not actually change: " + path.local;
                         item.instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
                     }
                 }

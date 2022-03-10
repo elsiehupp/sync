@@ -36,7 +36,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         this.upload_encrypted_helper = null;
         var path = this.item.file;
         var slash_position = path.last_index_of ('/');
-        var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+        var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         SyncJournalFileRecord parent_rec;
         bool ok = propagator.journal.get_file_record (parent_path, parent_rec);
@@ -94,7 +94,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
     private void on_signal_mkdir () {
         var path = this.item.file;
         var slash_position = path.last_index_of ('/');
-        var parent_path = slash_position >= 0 ? path.left (slash_position) : "";
+        var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         SyncJournalFileRecord parent_rec;
         bool ok = propagator ().journal.get_file_record (parent_path, parent_rec);

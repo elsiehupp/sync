@@ -485,7 +485,7 @@ class OwncloudPropagator : GLib.Object {
         entry.ignore_duration = old.ignore_duration * 5;
 
         if (item.http_error_code == 403) {
-            GLib.warning ("Probably firewall error : " + item.http_error_code + ", blocklisting up to 1h only";
+            GLib.warning ("Probably firewall error: " + item.http_error_code + ", blocklisting up to 1h only";
             entry.ignore_duration = q_min (entry.ignore_duration, int64 (60 * 60));
 
         } else if (item.http_error_code == 413 || item.http_error_code == 415) {

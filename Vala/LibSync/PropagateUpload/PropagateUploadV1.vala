@@ -192,7 +192,7 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
         var device = std.make_unique<UploadDevice> (
                 filename, chunk_start, current_chunk_size, propagator ().bandwidth_manager);
         if (!device.open (QIODevice.ReadOnly)) {
-            GLib.warning ("Could not prepare upload device : " + device.error_string ();
+            GLib.warning ("Could not prepare upload device: " + device.error_string ();
 
             // Soft error because this is likely caused by the user modifying his files while syncing
             abort_with_error (SyncFileItem.Status.SOFT_ERROR, device.error_string ());
@@ -316,7 +316,7 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
             propagator ().another_sync_needed = true;
             if (!this.finished) {
                 abort_with_error (SyncFileItem.Status.SOFT_ERROR, _("Local file changed during sync."));
-                // FIXME :  the legacy code was retrying for a few seconds.
+                // FIXME:  the legacy code was retrying for a few seconds.
                 //         and also checking that after the last chunk, and removed the file in case of INSTRUCTION_NEW
                 return;
             }
@@ -404,7 +404,7 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
         // amount is the number of bytes already sent by all the other chunks that were sent
         // not including this one.
-        // FIXME : this assumes all chunks have the same size, which is true only if the last chunk
+        // FIXME: this assumes all chunks have the same size, which is true only if the last chunk
         // has not been on_signal_finished (which should not happen because the last chunk is sent sequentially)
         int64 amount = progress_chunk * chunk_size ();
 

@@ -96,7 +96,7 @@ class OAuth : GLib.Object {
 
                     string code = rx_match.captured (1); // The 'code' is the first capture of the regexp
 
-                    GLib.Uri request_token = Utility.concat_url_path (this.account.url ().to_string (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
+                    GLib.Uri request_token = Utility.concat_url_path (this.account.url ().to_string (), "/index.php/apps/oauth2/api/v1/token");
                     Soup.Request req;
                     req.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
@@ -167,7 +167,7 @@ class OAuth : GLib.Object {
                         const string login_successfull_html = "<h1>Login Successful</h1><p>You can close this window.</p>";
                         if (message_url.is_valid ()) {
                             http_reply_and_close (socket, "303 See Other", login_successfull_html,
-                                GLib.ByteArray ("Location : " + message_url.to_encoded ()).const_data ());
+                                GLib.ByteArray ("Location: " + message_url.to_encoded ()).const_data ());
                         } else {
                             http_reply_and_close (socket, "200 OK", login_successfull_html);
                         }
@@ -199,7 +199,7 @@ class OAuth : GLib.Object {
             return; // socket can have been deleted if the browser was closed
         socket.write ("HTTP/1.1 ");
         socket.write (code);
-        socket.write ("\r\n_content-Type : text/html\r\n_connection : close\r\n_content-Length : ");
+        socket.write ("\r\n_content-Type : text/html\r\n_connection : close\r\n_content-Length: ");
         socket.write (GLib.ByteArray.number (qstrlen (html)));
         if (more_headers) {
             socket.write ("\r\n");

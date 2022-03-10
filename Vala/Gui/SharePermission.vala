@@ -11,7 +11,7 @@ namespace Ui {
 Possible permissions, must match the server permission constants
 ***********************************************************/
 enum Share_permission {
-    Share_permission_read     = 1 << 0,
+    SharePermissionRead     = 1 << 0,
     Share_permission_update   = 1 << 1,
     Share_permission_create   = 1 << 2,
     Share_permission_delete   = 1 << 3,

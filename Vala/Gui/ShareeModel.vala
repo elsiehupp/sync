@@ -22,7 +22,7 @@ class Sharee_model : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public using Sharee_set = GLib.Vector<unowned<Sharee>>; // FIXME : make it a GLib.Set<Sharee> when Sharee can be compared
+    public using Sharee_set = GLib.Vector<unowned<Sharee>>; // FIXME: make it a GLib.Set<Sharee> when Sharee can be compared
     public void fetch (string search, Sharee_set blocklist, Lookup_mode lookup_mode);
 
 
@@ -82,7 +82,7 @@ signals:
         this.sharee_blocklist = blocklist;
         var job = new Ocs_sharee_job (this.account);
         connect (job, &Ocs_sharee_job.sharee_job_finished, this, &Sharee_model.on_signal_sharees_fetched);
-        connect (job, &Ocs_job.ocs_error, this, &Sharee_model.display_error_message);
+        connect (job, &OcsJob.ocs_error, this, &Sharee_model.display_error_message);
         job.get_sharees (this.search, this.type, 1, 50, lookup_mode == Global_search ? true : false);
     }
 

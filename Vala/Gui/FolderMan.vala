@@ -195,7 +195,7 @@ class FolderMan : GLib.Object {
         string[] skip_settings_keys;
         backward_migration_settings_keys (&skip_settings_keys, skip_settings_keys);
     
-        var settings = ConfigFile.settings_with_group (QLatin1String ("Accounts"));
+        var settings = ConfigFile.settings_with_group ("Accounts");
         const var accounts_with_settings = settings.child_groups ();
         if (accounts_with_settings.is_empty ()) {
             int r = setup_folders_migration ();
@@ -251,7 +251,7 @@ class FolderMan : GLib.Object {
     public int setup_folders_migration () {
         ConfigFile config;
         QDir storage_dir (config.config_path ());
-        this.folder_config_path = config.config_path () + QLatin1String ("folders");
+        this.folder_config_path = config.config_path () + "folders";
     
         GLib.info ("Setup folders from " + this.folder_config_path + " (migration)";
     
@@ -282,15 +282,15 @@ class FolderMan : GLib.Object {
     from future versions.
     ***********************************************************/
     public static void backward_migration_settings_keys (string[] delete_keys, string[] ignore_keys) {
-        var settings = ConfigFile.settings_with_group (QLatin1String ("Accounts"));
+        var settings = ConfigFile.settings_with_group ("Accounts");
     
         var process_subgroup = [&] (string name) {
             settings.begin_group (name);
-            const int folders_version = settings.value (QLatin1String (VERSION_C), 1).to_int ();
+            const int folders_version = settings.value (VERSION_C, 1).to_int ();
             if (folders_version <= MAX_FOLDERS_VERSION) {
                 foreach (var folder_alias, settings.child_groups ()) {
                     settings.begin_group (folder_alias);
-                    const int folder_version = settings.value (QLatin1String (VERSION_C), 1).to_int ();
+                    const int folder_version = settings.value (VERSION_C, 1).to_int ();
                     if (folder_version > FolderDefinition.max_settings_version ()) {
                         ignore_keys.append (settings.group ());
                     }
@@ -497,7 +497,7 @@ class FolderMan : GLib.Object {
         }
     
         QSettings settings = new QSettings (this.folder_config_path + '/' + escaped_alias, QSettings.IniFormat);
-        GLib.info ("    . file path : " + settings.filename ();
+        GLib.info ("    . file path: " + settings.filename ();
     
         // Check if the filename is equal to the group setting. If not, use the group
         // name as an alias.
@@ -509,15 +509,15 @@ class FolderMan : GLib.Object {
     
         settings.begin_group (escaped_alias); // read the group with the same name as the file which is the folder alias
     
-        string path = settings.value (QLatin1String ("local_path")).to_string ();
-        string backend = settings.value (QLatin1String ("backend")).to_string ();
-        string target_path = settings.value (QLatin1String ("target_path")).to_string ();
-        bool paused = settings.value (QLatin1String ("paused"), false).to_bool ();
-        // string connection = settings.value ( QLatin1String ("connection") ).to_string ();
+        string path = settings.value ("local_path").to_string ();
+        string backend = settings.value ("backend").to_string ();
+        string target_path = settings.value ("target_path").to_string ();
+        bool paused = settings.value ("paused", false).to_bool ();
+        // string connection = settings.value ("connection").to_string ();
         string alias = unescape_alias (escaped_alias);
     
-        if (backend.is_empty () || backend != QLatin1String ("owncloud")) {
-            GLib.warning ("obsolete configuration of type" + backend;
+        if (backend.is_empty () || backend != "owncloud") {
+            GLib.warning ("obsolete configuration of type" + backend);
             return null;
         }
     
@@ -540,12 +540,12 @@ class FolderMan : GLib.Object {
     
         folder = add_folder_internal (folder_definition, account_state, std.make_unique<VfsOff> ());
         if (folder) {
-            string[] block_list = settings.value (QLatin1String ("block_list")).to_string_list ();
+            string[] block_list = settings.value ("block_list").to_string_list ();
             if (!block_list.empty ()) {
-                //migrate settings
+                // migrate settings
                 folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
-                settings.remove (QLatin1String ("block_list"));
-                // FIXME : If you remove this codepath, you need to provide another way to do
+                settings.remove ("block_list");
+                // FIXME: If you remove this codepath, you need to provide another way to do
                 // this via theme.h or the normal FolderMan.set_up_folders
             }
     
@@ -1421,7 +1421,7 @@ class FolderMan : GLib.Object {
             return;
         }
     
-        GLib.debug ("folder_queue size : " + this.scheduled_folders.count ();
+        GLib.debug ("folder_queue size: " + this.scheduled_folders.count ();
         if (this.scheduled_folders.is_empty ()) {
             return;
         }
@@ -1908,17 +1908,19 @@ class FolderMan : GLib.Object {
                         folder.switch_to_virtual_files ();
                     }
                     // Migrate the old "use_placeholders" setting to the root folder pin state
-                    if (settings.value (QLatin1String (VERSION_C), 1).to_int () == 1
-                        && settings.value (QLatin1String ("use_placeholders"), false).to_bool ()) {
-                        GLib.info ("Migrate : From use_placeholders to PinState.VfsItemAvailability.ONLINE_ONLY";
+                    if (settings.value (VERSION_C, 1).to_int () == 1
+                        && settings.value ("use_placeholders", false).to_bool ()) {
+                        GLib.info ("Migrate: From use_placeholders to PinState.VfsItemAvailability.ONLINE_ONLY");
                         folder.root_pin_state (PinState.VfsItemAvailability.ONLINE_ONLY);
                     }
     
-                    // Migration : Mark folders that shall be saved in a backwards-compatible way
-                    if (backwards_compatible)
+                    // Migration: Mark folders that shall be saved in a backwards-compatible way
+                    if (backwards_compatible) {
                         folder.save_backwards_compatible (true);
-                    if (folders_with_placeholders)
+                    }
+                    if (folders_with_placeholders) {
                         folder.save_in_folders_with_placeholders ();
+                    }
     
                     schedule_folder (folder);
                     /* emit */ signal_folder_sync_state_change (folder);
