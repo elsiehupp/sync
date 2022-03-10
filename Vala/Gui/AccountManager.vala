@@ -164,7 +164,7 @@ class AccountManager : GLib.Object {
     /***********************************************************
     remove all accounts
     ***********************************************************/
-    public void shutdown ();
+    public void signal_shutdown ();
 
 
     /***********************************************************
@@ -481,6 +481,7 @@ class AccountManager : GLib.Object {
         GLib.debug ("Saved account state settings, status:" + settings.status ();
     }
 
+
     /***********************************************************
     Display a Box with the mnemonic so the user can copy it to a
     safe place.
@@ -521,7 +522,7 @@ class AccountManager : GLib.Object {
         widget.resize (widget.size_hint ());
     }
 
-    void AccountManager.shutdown () {
+    void AccountManager.signal_shutdown () {
         const var accounts_copy = this.accounts;
         this.accounts.clear ();
         for (var acc : accounts_copy) {

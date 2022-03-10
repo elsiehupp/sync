@@ -19,51 +19,28 @@ namespace Ui {
 @brief The SyncRunFileLog class
 @ingroup gui
 ***********************************************************/
-class SyncRunFileLog {
+class SyncRunFileLog : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public SyncRunFileLog ();
+    private QScopedPointer<GLib.File> file;
+    private QTextStream out;
+    private QElapsedTimer total_duration;
+    private QElapsedTimer lap_duration;
+
+    /***********************************************************
+    ***********************************************************/
+    //  public SyncRunFileLog ();
+
 
     /***********************************************************
     ***********************************************************/
     public 
 
-    /***********************************************************
-    ***********************************************************/
-    public 
 
     /***********************************************************
     ***********************************************************/
-    public void log_item (SyncFileItem 
-
-    /***********************************************************
-    ***********************************************************/
-    public void log_lap (string name);
-
-
-    public void finish ();
-
-    /***********************************************************
-    ***********************************************************/
-    private string date_time_str (GLib.DateTime dt);
-
-    /***********************************************************
-    ***********************************************************/
-    private QScopedPointer<GLib.File> this.file;
-    private QTextStream this.out;
-    private QElapsedTimer this.total_duration;
-    private QElapsedTimer this.lap_duration;
-}
-
-
-    SyncRunFileLog.SyncRunFileLog () = default;
-
-    string SyncRunFileLog.date_time_str (GLib.DateTime dt) {
-        return dt.to_string (Qt.ISODate);
-    }
-
-    void SyncRunFileLog.on_signal_start (string folder_path) {
+    public void on_signal_start (string folder_path) {
         const int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
 
         const string logpath = QStandardPaths.writable_location (QStandardPaths.AppDataLocation);
@@ -127,7 +104,11 @@ class SyncRunFileLog {
         this.lap_duration.on_signal_start ();
         this.out + "#=#=#=# Syncrun started " + date_time_str (GLib.DateTime.current_date_time_utc ()) + endl;
     }
-    void SyncRunFileLog.log_item (SyncFileItem item) {
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void log_item (SyncFileItem item) {
         // don't log the directory items that are in the list
         if (item.direction == SyncFileItem.Direction.NONE
             || item.instruction == CSYNC_INSTRUCTION_IGNORE) {
@@ -166,17 +147,33 @@ class SyncRunFileLog {
         this.out + endl;
     }
 
-    void SyncRunFileLog.log_lap (string name) {
-        this.out + "#=#=#=#=# " + name + " " + date_time_str (GLib.DateTime.current_date_time_utc ())
-             + " (last step: " + this.lap_duration.restart (" msec"
-             + ", total: " + this.total_duration.elapsed (" msec)" + endl;
+
+    /***********************************************************
+    ***********************************************************/
+    public void log_lap (string name) {
+        this.out += "#=#=#=#=# " + name + " " + date_time_str (GLib.DateTime.current_date_time_utc ())
+                 + " (last step: " + this.lap_duration.restart (" msec"
+                 + ", total: " + this.total_duration.elapsed (" msec)" + endl;
     }
 
-    void SyncRunFileLog.finish () {
-        this.out + "#=#=#=# Syncrun on_signal_finished " + date_time_str (GLib.DateTime.current_date_time_utc ())
-             + " (last step: " + this.lap_duration.elapsed (" msec"
-             + ", total: " + this.total_duration.elapsed (" msec)" + endl;
+
+    /***********************************************************
+    ***********************************************************/
+    public void finish () {
+        this.out += "#=#=#=# Syncrun on_signal_finished " + date_time_str (GLib.DateTime.current_date_time_utc ())
+                 + " (last step: " + this.lap_duration.elapsed (" msec"
+                 + ", total: " + this.total_duration.elapsed (" msec)" + endl;
         this.file.close ();
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private static string date_time_str (GLib.DateTime date_time) {
+        return date_time.to_string (Qt.ISODate);
     }
-    
+
+} // class SyncRunFileLog
+
+} // namespace Ui
+} // namespace Occ

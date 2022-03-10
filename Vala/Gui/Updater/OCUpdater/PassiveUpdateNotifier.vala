@@ -14,37 +14,14 @@ The implementation does not show popups
 
 @ingroup gui
 ***********************************************************/
-class Passive_update_notifier : OCUpdater {
+class PassiveUpdateNotifier : OCUpdater {
+
+    private GLib.ByteArray running_app_version;
 
     /***********************************************************
     ***********************************************************/
-    public Passive_update_notifier (GLib.Uri url);
-
-    /***********************************************************
-    ***********************************************************/
-    public bool handle_startup () override {
-        return false;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void background_check_for_update () override;
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void version_info_arrived (UpdateInfo info) override;
-    private GLib.ByteArray this.running_app_version;
-}
-
-
-
-
-
-
-    Passive_update_notifier.Passive_update_notifier (GLib.Uri url)
-        : OCUpdater (url) {
+    public PassiveUpdateNotifier (GLib.Uri url) {
+        base (url);
         // remember the version of the currently running binary. On Linux it might happen that the
         // package management updates the package while the app is running. This is detected in the
         // updater slot : If the installed binary on the hd has a different version than the one
@@ -52,20 +29,32 @@ class Passive_update_notifier : OCUpdater {
         this.running_app_version = Utility.version_of_installed_binary ();
     }
 
-    void Passive_update_notifier.background_check_for_update () {
+    /***********************************************************
+    ***********************************************************/
+    public override bool handle_startup () {
+        return false;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public override void on_signal_background_check_for_update () {
         if (Utility.is_linux ()) {
             // on linux, check if the installed binary is still the same version
             // as the one that is running. If not, restart if possible.
             const GLib.ByteArray fs_version = Utility.version_of_installed_binary ();
             if (! (fs_version.is_empty () || this.running_app_version.is_empty ()) && fs_version != this.running_app_version) {
-                /* emit */ request_restart ();
+                /* emit */ signal_request_restart ();
             }
         }
 
-        OCUpdater.background_check_for_update ();
+        OCUpdater.on_signal_background_check_for_update ();
     }
 
-    void Passive_update_notifier.version_info_arrived (UpdateInfo info) {
+
+    /***********************************************************
+    ***********************************************************/
+    private override void version_info_arrived (UpdateInfo info) {
         int64 current_ver = Helper.current_version_to_int ();
         int64 remote_ver = Helper.string_version_to_int (info.version ());
 
@@ -76,3 +65,8 @@ class Passive_update_notifier : OCUpdater {
             download_state (Update_only_available_through_system);
         }
     }
+
+} // class PassiveUpdateNotifier
+
+} // namespace Ui
+} // namespace Occ

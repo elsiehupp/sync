@@ -105,7 +105,7 @@ class AccountSettings : Gtk.Widget {
     signal void show_issues_list (AccountState account);
     signal void request_mnemonic ();
     signal void remove_account_folders (AccountState account);
-    signal void style_changed ();
+    signal void signal_style_changed ();
 
     /***********************************************************
     ***********************************************************/
@@ -124,8 +124,8 @@ class AccountSettings : Gtk.Widget {
         var delegate = new FolderStatusDelegate;
         delegate.parent (this);
 
-        // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &AccountSettings.style_changed, delegate, &FolderStatusDelegate.on_signal_style_changed);
+        // Connect signal_style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
+        connect (this, &AccountSettings.signal_style_changed, delegate, &FolderStatusDelegate.on_signal_style_changed);
 
         this.ui.folder_list.header ().hide ();
         this.ui.folder_list.item_delegate (delegate);
@@ -256,6 +256,7 @@ class AccountSettings : Gtk.Widget {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     public 
@@ -290,6 +291,7 @@ class AccountSettings : Gtk.Widget {
             }
         }
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -363,7 +365,7 @@ class AccountSettings : Gtk.Widget {
                 break;
             case AccountState.State.DISCONNECTED:
                 // we can't end up here as the whole block is ifdeffed
-                Q_UNREACHABLE ();
+                GLib.assert_not_reached ();
                 break;
             }
         } else {
@@ -392,7 +394,7 @@ class AccountSettings : Gtk.Widget {
         on_signal_refresh_selective_sync_status ();
 
         if (state == AccountState.State.Connected) {
-            /* TODO : We should probably do something better here.
+            /* TODO: We should probably do something better here.
             Verify if the user has a private key already uploaded to the server,
             if it has, do not offer to create one.
              */
@@ -405,13 +407,14 @@ class AccountSettings : Gtk.Widget {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void on_signal_style_changed () {
         customize_style ();
 
         // Notify the other widgets (Dark-/Light-Mode switching)
-        /* emit */ style_changed ();
+        /* emit */ signal_style_changed ();
     }
 
 
@@ -1137,7 +1140,7 @@ class AccountSettings : Gtk.Widget {
             const var mode = best_available_vfs_mode ();
             if (mode == Vfs.WindowsCfApi || ConfigFile ().show_experimental_options ()) {
                 ac = menu.add_action (_("Enable virtual file support %1 …").arg (mode == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
-                // TODO : remove when UX decision is made
+                // TODO: remove when UX decision is made
                 ac.enabled (!Utility.is_path_windows_drive_partition_root (folder.path ()));
                 //
                 connect (ac, &QAction.triggered, this, &AccountSettings.on_signal_enable_vfs_current_folder);

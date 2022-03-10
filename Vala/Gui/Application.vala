@@ -298,7 +298,7 @@ Application.Application (int argc, char **argv)
 
     qsrand (std.random_device () ());
 
-    // TODO : Can't set this without breaking current config paths
+    // TODO: Can't set this without breaking current config paths
     //    organization_name (APPLICATION_VENDOR);
     organization_domain (APPLICATION_REV_DOMAIN);
 
@@ -440,10 +440,10 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         on_signal_account_state_added (ai.data ());
     }
 
-    connect (FolderMan.instance ().socket_api (), &SocketApi.share_command_received,
+    connect (FolderMan.instance ().socket_api (), &SocketApi.signal_share_command_received,
         this.gui.data (), &OwncloudGui.on_signal_show_share_dialog);
 
-    connect (FolderMan.instance ().socket_api (), &SocketApi.file_activity_command_received,
+    connect (FolderMan.instance ().socket_api (), &SocketApi.signal_file_activity_command_received,
         Systray.instance (), &Systray.show_file_activity_dialog);
 
     // startup procedure.
@@ -460,9 +460,9 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
 #if defined (BUILD_UPDATER)
     // Update checks
     var updater_scheduler = new UpdaterScheduler (this);
-    connect (updater_scheduler, &UpdaterScheduler.updater_announcement,
+    connect (updater_scheduler, &UpdaterScheduler.signal_updater_announcement,
         this.gui.data (), &OwncloudGui.on_signal_show_tray_message);
-    connect (updater_scheduler, &UpdaterScheduler.request_restart,
+    connect (updater_scheduler, &UpdaterScheduler.signal_request_restart,
         this.folder_manager.data (), &FolderMan.on_signal_schedule_app_restart);
 //  #endif
 
@@ -485,7 +485,7 @@ Application.~Application () {
     // Remove the account from the account manager so it can be deleted.
     disconnect (AccountManager.instance (), &AccountManager.on_signal_account_removed,
         this, &Application.on_signal_account_state_removed);
-    AccountManager.instance ().shutdown ();
+    AccountManager.instance ().signal_shutdown ();
 }
 
 void Application.on_signal_account_state_removed (AccountState account_state) {
@@ -859,7 +859,7 @@ void Application.on_signal_open_virtual_file (string filename) {
     var folder = FolderMan.instance ().folder_for_path (filename);
     if (!folder) {
         q_warning ("Can't find sync folder for" + filename;
-        // TODO : show a QMessageBox for errors
+        // TODO: show a QMessageBox for errors
         return;
     }
     string relative_path = QDir.clean_path (filename).mid (folder.clean_path ().length () + 1);

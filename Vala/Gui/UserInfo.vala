@@ -60,27 +60,30 @@ class UserInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<AccountState> this.account_state;
-    private bool this.allow_disconnected_account_state;
-    private bool this.fetch_avatar_image;
+    private QPointer<AccountState> account_state;
+    private bool allow_disconnected_account_state;
+    private bool fetch_avatar_image;
 
     /***********************************************************
     ***********************************************************/
-    private int64 this.last_quota_total_bytes;
-    private int64 this.last_quota_used_bytes;
-    private QTimer this.job_restart_timer;
+    private int64 last_quota_total_bytes;
+    private int64 last_quota_used_bytes;
+    private QTimer job_restart_timer;
+
     /***********************************************************
     The time at which the user info and quota was received last
     ***********************************************************/
-    private GLib.DateTime this.last_info_received;
+    private GLib.DateTime last_info_received;
+
     /***********************************************************
     If we should check at regular interval (when the UI is visible)
     ***********************************************************/
-    private bool this.active;
+    private bool active;
+
     /***********************************************************
     The currently running job
     ***********************************************************/
-    private QPointer<JsonApiJob> this.job;
+    private QPointer<JsonApiJob> job;
 
 
     signal void quota_updated (int64 total, int64 used);

@@ -96,6 +96,7 @@ class ProxyAuthHandler : GLib.Object {
         delete this.dialog;
     }
 
+
     /***********************************************************
     Intended for QNetworkAccessManager.proxy_authentication_required ()
     ***********************************************************/
@@ -185,6 +186,7 @@ class ProxyAuthHandler : GLib.Object {
         this.gave_credentials_to.remove (object);
     }
 
+
     /***********************************************************
     ***********************************************************/
     private ProxyAuthHandler () {
@@ -195,6 +197,7 @@ class ProxyAuthHandler : GLib.Object {
         this.settings.begin_group ("Proxy");
         this.settings.begin_group ("Credentials");
     }
+
 
     /***********************************************************
     Runs the Proxy_auth_dialog and returns true if new
@@ -226,6 +229,7 @@ class ProxyAuthHandler : GLib.Object {
         }
         return false;
     }
+
 
     /***********************************************************
     Checks the keychain for credentials of the current proxy.
@@ -273,6 +277,7 @@ class ProxyAuthHandler : GLib.Object {
         return false;
     }
 
+
     /***********************************************************
     Stores the current credentials in the keychain.
     ***********************************************************/
@@ -304,6 +309,7 @@ class ProxyAuthHandler : GLib.Object {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     //  private template<class T, typename PointerToMemberFunction>
@@ -323,6 +329,7 @@ class ProxyAuthHandler : GLib.Object {
         wait_loop.exec (flags);
         --counter;
     }
+
 
     /***********************************************************
     ***********************************************************/

@@ -78,7 +78,7 @@ class Folder_wizard_selective_sync : QWizardPage {
         this.selective_sync.folder_info (target_path, alias, initial_blocklist);
 
         if (this.virtual_files_check_box) {
-            // TODO : remove when UX decision is made
+            // TODO: remove when UX decision is made
             if (Utility.is_path_windows_drive_partition_root (wizard ().field ("source_folder").to_string ())) {
                 this.virtual_files_check_box.checked (false);
                 this.virtual_files_check_box.enabled (false);

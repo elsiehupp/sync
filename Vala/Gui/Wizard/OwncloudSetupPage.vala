@@ -40,7 +40,7 @@ class OwncloudSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private QProgressIndicator progress_indi;
+    private QProgressIndicator progress_indicator;
     private OwncloudWizard oc_wizard;
     private AddCertificateDialog add_cert_dial = null;
 
@@ -52,7 +52,7 @@ class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     public OwncloudSetupPage (Gtk.Widget parent = null) {
         base ();
-        this.progress_indi = new QProgressIndicator (this);
+        this.progress_indicator = new QProgressIndicator (this);
         this.oc_wizard = (OwncloudWizard)parent;
         this.ui.up_ui (this);
 
@@ -68,11 +68,11 @@ class OwncloudSetupPage : QWizardPage {
 
         register_field (QLatin1String ("OCUrl*"), this.ui.le_url);
 
-        var size_policy = this.progress_indi.size_policy ();
+        var size_policy = this.progress_indicator.size_policy ();
         size_policy.retain_size_when_hidden (true);
-        this.progress_indi.size_policy (size_policy);
+        this.progress_indicator.size_policy (size_policy);
 
-        this.ui.progress_layout.add_widget (this.progress_indi);
+        this.ui.progress_layout.add_widget (this.progress_indicator);
         on_signal_stop_spinner ();
 
         set_up_customization ();
@@ -130,6 +130,7 @@ class OwncloudSetupPage : QWizardPage {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     public bool validate_page () {
@@ -176,7 +177,7 @@ class OwncloudSetupPage : QWizardPage {
         case DetermineAuthTypeJob.NO_AUTH_TYPE:
             return WizardCommon.Pages.PAGE_HTTP_CREDS;
         }
-        Q_UNREACHABLE ();
+        GLib.assert_not_reached ();
     }
 
 
@@ -240,17 +241,17 @@ class OwncloudSetupPage : QWizardPage {
                     int ret_val = dialog.exec ();
 
                     switch (ret_val) {
-                    case OwncloudConnectionMethodDialog.No_TLS: {
+                    case OwncloudConnectionMethodDialog.Method.NO_TLS: {
                         url.scheme ("http");
                         this.ui.le_url.full_text (url.to_string ());
                         // skip ahead to next page, since the user would expect us to retry automatically
                         wizard ().next ();
                     } break;
-                    case OwncloudConnectionMethodDialog.Client_Side_TLS:
+                    case OwncloudConnectionMethodDialog.Method.CLIENT_SIDE_TLS:
                         add_cert_dial.show ();
                         break;
-                    case OwncloudConnectionMethodDialog.Closed:
-                    case OwncloudConnectionMethodDialog.Back:
+                    case OwncloudConnectionMethodDialog.Method.CLOSED:
+                    case OwncloudConnectionMethodDialog.Method.BACK:
                     default:
                         // No-operation.
                         break;
@@ -271,8 +272,8 @@ class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     public void on_signal_start_spinner () {
         this.ui.progress_layout.enabled (true);
-        this.progress_indi.visible (true);
-        this.progress_indi.on_signal_start_animation ();
+        this.progress_indicator.visible (true);
+        this.progress_indicator.on_signal_start_animation ();
     }
 
 
@@ -280,8 +281,8 @@ class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     public void on_signal_stop_spinner () {
         this.ui.progress_layout.enabled (false);
-        this.progress_indi.visible (false);
-        this.progress_indi.on_signal_stop_animation ();
+        this.progress_indicator.visible (false);
+        this.progress_indicator.on_signal_stop_animation ();
     }
 
 
@@ -403,12 +404,12 @@ class OwncloudSetupPage : QWizardPage {
     private void customize_style () {
         logo ();
 
-        if (this.progress_indi) {
+        if (this.progress_indicator) {
             const var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
-                this.progress_indi.on_signal_color (Qt.white);
+                this.progress_indicator.on_signal_color (Qt.white);
             } else {
-                this.progress_indi.on_signal_color (Qt.black);
+                this.progress_indicator.on_signal_color (Qt.black);
             }
         }
 

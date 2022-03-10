@@ -9,22 +9,25 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 namespace Ui {
 
-class Listener_closure : GLib.Object {
+class ListenerClosure : GLib.Object {
 
-    public using Callback_function = std.function<void ()>;
-    public Listener_closure (Callback_function callback)
-        : callback_ (callback) {
+    public delegate void CallbackFunction ();
+
+    private CallbackFunction callback;
+
+    public ListenerClosure (CallbackFunction callback) {
+        this.callback = callback;
     }
 
 
-/***********************************************************
-***********************************************************/
-public slots:
-    void closure_slot () {
-        callback_ ();
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_closure () {
+        this.callback ();
         delete_later ();
     }
 
+} // class ListenerClosure
 
-    private Callback_function callback_;
-};
+} // namespace Ui
+} // namespace Occ

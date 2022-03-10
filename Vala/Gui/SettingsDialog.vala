@@ -4,7 +4,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <Gtk.Label>
 //  #include <QStandard_item_model>
 //  #include <QStacked_widget>
 //  #include <QPushButton>
@@ -63,6 +62,7 @@ class SettingsDialog : Gtk.Dialog {
         return "%1\n%2".arg (user, host);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public SettingsDialog (OwncloudGui gui, Gtk.Widget parent = null);
@@ -97,7 +97,7 @@ class SettingsDialog : Gtk.Dialog {
     public void on_signal_account_display_name_changed ();
 
 signals:
-    void style_changed ();
+    void signal_style_changed ();
     void on_signal_activate ();
 
 
@@ -189,8 +189,8 @@ signals:
         var general_settings = new General_settings;
         this.ui.stack.add_widget (general_settings);
 
-        // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &SettingsDialog.style_changed, general_settings, &General_settings.on_signal_style_changed);
+        // Connect signal_style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
+        connect (this, &SettingsDialog.signal_style_changed, general_settings, &General_settings.on_signal_style_changed);
 
         QAction network_action = create_color_aware_action (":/client/theme/network.svg", _("Network"));
         this.action_group.add_action (network_action);
@@ -254,7 +254,7 @@ signals:
             customize_style ();
 
             // Notify the other widgets (Dark-/Light-Mode switching)
-            /* emit */ style_changed ();
+            /* emit */ signal_style_changed ();
             break;
         case QEvent.ActivationChange:
             if (is_active_window ())
@@ -324,8 +324,8 @@ signals:
         connect (s.account ().data (), &Account.account_changed_avatar, this, &SettingsDialog.on_signal_account_avatar_changed);
         connect (s.account ().data (), &Account.account_changed_display_name, this, &SettingsDialog.on_signal_account_display_name_changed);
 
-        // Connect style_changed event, to adapt (Dark-/Light-Mode switching)
-        connect (this, &SettingsDialog.style_changed, account_settings, &AccountSettings.on_signal_style_changed);
+        // Connect signal_style_changed event, to adapt (Dark-/Light-Mode switching)
+        connect (this, &SettingsDialog.signal_style_changed, account_settings, &AccountSettings.on_signal_style_changed);
     }
 
     void SettingsDialog.on_signal_account_avatar_changed () {

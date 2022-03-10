@@ -51,12 +51,19 @@ Simple class diagram of the updater:
                +-------------+
 ***********************************************************/
 
-
 /***********************************************************
 @brief Class that uses an own_cloud proprietary XML format to fetch update information
 @ingroup gui
 ***********************************************************/
 class OCUpdater : Updater {
+
+    /***********************************************************
+    ***********************************************************/
+    const string update_available_c = "Updater/update_available";
+    const string update_target_version_c = "Updater/update_target_version";
+    const string update_target_version_string_c = "Updater/update_target_version_string";
+    const string seen_version_c = "Updater/seen_version";
+    const string auto_update_attempted_c = "Updater/auto_update_attempted";
 
     /***********************************************************
     ***********************************************************/
@@ -71,104 +78,54 @@ class OCUpdater : Updater {
         Update_only_available_through_system
     }
 
+
     /***********************************************************
     ***********************************************************/
     public enum Update_status_string_format {
         PlainText,
         Html,
     }
-    public OCUpdater (GLib.Uri url);
-
-    /***********************************************************
-    ***********************************************************/
-    public void update_url (GLib.Uri url);
-
-    /***********************************************************
-    ***********************************************************/
-    public bool perform_update ();
-
-    /***********************************************************
-    ***********************************************************/
-    public void check_for_update () override;
-
-    /***********************************************************
-    ***********************************************************/
-    public string status_string (Update_status_string_format format = PlainText);
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    public void download_state (Download_state state);
-
-signals:
-    void download_state_changed ();
-    void new_update_available (string header, string message);
-    void request_restart ();
-
-
-    // FIXME Maybe this should be in the NSISUpdater which should have been called Windows_updater
-    public void on_signal_start_installer ();
-
-protected slots:
-    void background_check_for_update () override;
-    void on_signal_open_update_url ();
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_version_info_arrived ();
-    private void on_signal_timed_out ();
+    private GLib.Uri update_url;
+    private int state;
+    private QNetworkAccessManager access_manager;
+
+    /***********************************************************
+    Timer to guard the timeout of an individual network request
+    ***********************************************************/
+    private QTimer timeout_watchdog;
+    private UpdateInfo update_info;
 
 
-    protected virtual void version_info_arrived (UpdateInfo info);
-    protected bool update_succeeded ();
-    protected QNetworkAccessManager qnam () {
-        return this.access_manager;
-    }
-    protected UpdateInfo update_info () {
-        return this.update_info;
+    signal void signal_download_state_changed ();
+    signal void signal_new_update_available (string header, string message);
+    signal void signal_request_restart ();
+
+
+    /***********************************************************
+    ***********************************************************/
+    public OCUpdater (GLib.Uri url) {
+        base ();
+        this.update_url = url;
+        this.state = Unknown;
+        this.access_manager = new AccessManager (this);
+        this.timeout_watchdog = new QTimer (this);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Uri this.update_url;
-    private int this.state;
-    private QNetworkAccessManager this.access_manager;
-    private QTimer this.timeout_watchdog; /** Timer to guard the timeout of an individual network request */
-    private UpdateInfo this.update_info;
-}
-
-
-
-
-    /***********************************************************
-    ***********************************************************/
-    const string update_available_c = "Updater/update_available";
-    const string update_target_version_c = "Updater/update_target_version";
-    const string update_target_version_string_c = "Updater/update_target_version_string";
-    const string seen_version_c = "Updater/seen_version";
-    const string auto_update_attempted_c = "Updater/auto_update_attempted";
-
-
-    OCUpdater.OCUpdater (GLib.Uri url)
-        : Updater ()
-        this.update_url (url)
-        this.state (Unknown)
-        this.access_manager (new AccessManager (this))
-        this.timeout_watchdog (new QTimer (this)) {
-    }
-
-    void OCUpdater.update_url (GLib.Uri url) {
+    public void update_url (GLib.Uri url) {
         this.update_url = url;
     }
 
-    bool OCUpdater.perform_update () {
+
+    /***********************************************************
+    ***********************************************************/
+    public bool perform_update () {
         ConfigFile config;
         QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         string update_file = settings.value (update_available_c).to_string ();
@@ -192,28 +149,22 @@ protected slots:
         return false;
     }
 
-    void OCUpdater.background_check_for_update () {
-        int dl_state = download_state ();
 
-        // do the real update check depending on the internal state of updater.
-        switch (dl_state) {
-        case Unknown:
-        case Up_to_date:
-        case Download_failed:
-        case Download_timed_out:
-            GLib.info ("Checking for available update";
-            check_for_update ();
-            break;
-        case Download_complete:
-            GLib.info ("Update is downloaded, skip new check.";
-            break;
-        case Update_only_available_through_system:
-            GLib.info ("Update is only available through system, skip check.";
-            break;
-        }
+    /***********************************************************
+    ***********************************************************/
+    public override void check_for_update () {
+        Soup.Reply reply = this.access_manager.get (Soup.Request (this.update_url));
+        connect (this.timeout_watchdog, &QTimer.timeout, this, &OCUpdater.on_signal_timed_out);
+        this.timeout_watchdog.on_signal_start (30 * 1000);
+        connect (reply, &Soup.Reply.on_signal_finished, this, &OCUpdater.on_signal_version_info_arrived);
+
+        download_state (Checking_server);
     }
 
-    string OCUpdater.status_string (Update_status_string_format format) {
+
+    /***********************************************************
+    ***********************************************************/
+    public string status_string (Update_status_string_format format = PlainText) {
         string update_version = this.update_info.version_string ();
 
         switch (download_state ()) {
@@ -246,24 +197,35 @@ protected slots:
         }
     }
 
-    int OCUpdater.download_state () {
-        return this.state;
-    }
 
-    void OCUpdater.download_state (Download_state state) {
+    /***********************************************************
+    ***********************************************************/
+    public void download_state (Download_state state) {
         var old_state = this.state;
         this.state = state;
-        /* emit */ download_state_changed ();
+        /* emit */ signal_download_state_changed ();
 
         // show the notification if the download is complete (on every check)
         // or once for system based updates.
         if (this.state == OCUpdater.Download_complete || (old_state != OCUpdater.Update_only_available_through_system
                                                          && this.state == OCUpdater.Update_only_available_through_system)) {
-            /* emit */ new_update_available (_("Update Check"), status_string ());
+            /* emit */ signal_new_update_available (_("Update Check"), status_string ());
         }
     }
 
-    void OCUpdater.on_signal_start_installer () {
+
+    /***********************************************************
+    ***********************************************************/
+    public int download_state () {
+        return this.state;
+    }
+
+
+    /***********************************************************
+    FIXME: Maybe this should be in the NSISUpdater which should
+    have been called Windows_updater
+    ***********************************************************/
+    public void on_signal_start_installer () {
         ConfigFile config;
         QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         string update_file = settings.value (update_available_c).to_string ();
@@ -297,29 +259,41 @@ protected slots:
         Gtk.Application.quit ();
     }
 
-    void OCUpdater.check_for_update () {
-        Soup.Reply reply = this.access_manager.get (Soup.Request (this.update_url));
-        connect (this.timeout_watchdog, &QTimer.timeout, this, &OCUpdater.on_signal_timed_out);
-        this.timeout_watchdog.on_signal_start (30 * 1000);
-        connect (reply, &Soup.Reply.on_signal_finished, this, &OCUpdater.on_signal_version_info_arrived);
 
-        download_state (Checking_server);
+    /***********************************************************
+    ***********************************************************/
+    protected override void on_signal_background_check_for_update () {
+        int dl_state = download_state ();
+
+        // do the real update check depending on the internal state of updater.
+        switch (dl_state) {
+        case Unknown:
+        case Up_to_date:
+        case Download_failed:
+        case Download_timed_out:
+            GLib.info ("Checking for available update";
+            check_for_update ();
+            break;
+        case Download_complete:
+            GLib.info ("Update is downloaded, skip new check.";
+            break;
+        case Update_only_available_through_system:
+            GLib.info ("Update is only available through system, skip check.";
+            break;
+        }
     }
 
-    void OCUpdater.on_signal_open_update_url () {
+
+    /***********************************************************
+    ***********************************************************/
+    protected void on_signal_open_update_url () {
         QDesktopServices.open_url (this.update_info.web ());
     }
 
-    bool OCUpdater.update_succeeded () {
-        ConfigFile config;
-        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
 
-        int64 target_version_int = Helper.string_version_to_int (settings.value (update_target_version_c).to_string ());
-        int64 current_version = Helper.current_version_to_int ();
-        return current_version >= target_version_int;
-    }
-
-    void OCUpdater.on_signal_version_info_arrived () {
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_version_info_arrived () {
         this.timeout_watchdog.stop ();
         var reply = qobject_cast<Soup.Reply> (sender ());
         reply.delete_later ();
@@ -341,10 +315,46 @@ protected slots:
         }
     }
 
-    void OCUpdater.on_signal_timed_out () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_timed_out () {
         download_state (Download_timed_out);
     }
 
 
-} // namespace mirall
+    /***********************************************************
+    ***********************************************************/
+    protected virtual void version_info_arrived (UpdateInfo info);
+
+
+    /***********************************************************
+    ***********************************************************/
+    protected bool update_succeeded () {
+        ConfigFile config;
+        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
+
+        int64 target_version_int = Helper.string_version_to_int (settings.value (update_target_version_c).to_string ());
+        int64 current_version = Helper.current_version_to_int ();
+        return current_version >= target_version_int;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    protected QNetworkAccessManager qnam () {
+        return this.access_manager;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    protected UpdateInfo update_info () {
+        return this.update_info;
+    }
+
+} // class OCUpdater
+
+} // namespace Ui
+} // namespace Occ
     

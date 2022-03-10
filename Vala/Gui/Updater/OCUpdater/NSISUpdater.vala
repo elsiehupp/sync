@@ -15,57 +15,60 @@ class NSISUpdater : OCUpdater {
 
     /***********************************************************
     ***********************************************************/
-    public NSISUpdater (GLib.Uri url);
+    private QScopedPointer<QTemporary_file> file;
+    private string target_file;
 
     /***********************************************************
     ***********************************************************/
-    public bool handle_startup () override;
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_signal_seen_version ();
-    private void on_signal_download_finished ();
-    private void on_signal_write_file ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void wipe_update_data ();
-    private void show_no_url_dialog (UpdateInfo info);
-    private void show_update_error_dialog (string target_version);
-    private void version_info_arrived (UpdateInfo info) override;
-    private QScopedPointer<QTemporary_file> this.file;
-    private string this.target_file;
-}
-
-
-
-
-
-    NSISUpdater.NSISUpdater (GLib.Uri url)
-        : OCUpdater (url) {
+    public NSISUpdater (GLib.Uri url) {
+        base (url);
     }
 
-    void NSISUpdater.on_signal_write_file () {
-        var reply = qobject_cast<Soup.Reply> (sender ());
-        if (this.file.is_open ()) {
-            this.file.write (reply.read_all ());
-        }
-    }
-
-    void NSISUpdater.wipe_update_data () {
+    /***********************************************************
+    ***********************************************************/
+    public override bool handle_startup () {
         ConfigFile config;
         QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         string update_filename = settings.value (update_available_c).to_string ();
-        if (!update_filename.is_empty ())
-            GLib.File.remove (update_filename);
-        settings.remove (update_available_c);
-        settings.remove (update_target_version_c);
-        settings.remove (update_target_version_string_c);
-        settings.remove (auto_update_attempted_c);
+        // has the previous run downloaded an update?
+        if (!update_filename.is_empty () && GLib.File (update_filename).exists ()) {
+            GLib.info ("An updater file is available";
+            // did it try to execute the update?
+            if (settings.value (auto_update_attempted_c, false).to_bool ()) {
+                if (update_succeeded ()) {
+                    // on_signal_success : clean up
+                    GLib.info ("The requested update attempt has succeeded"
+                            + Helper.current_version_to_int ();
+                    wipe_update_data ();
+                    return false;
+                } else {
+                    // var update failed. Ask user what to do
+                    GLib.info ("The requested update attempt has failed"
+                            + settings.value (update_target_version_c).to_string ();
+                    show_update_error_dialog (settings.value (update_target_version_string_c).to_string ());
+                    return false;
+                }
+            } else {
+                GLib.info ("Triggering an update";
+                return perform_update ();
+            }
+        }
+        return false;
     }
 
-    void NSISUpdater.on_signal_download_finished () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_seen_version () {
+        ConfigFile config;
+        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
+        settings.value (seen_version_c, update_info ().version ());
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_download_finished () {
         var reply = qobject_cast<Soup.Reply> (sender ());
         reply.delete_later ();
         if (reply.error () != Soup.Reply.NoError) {
@@ -93,51 +96,35 @@ class NSISUpdater : OCUpdater {
         settings.value (update_available_c, this.target_file);
     }
 
-    void NSISUpdater.version_info_arrived (UpdateInfo info) {
-        ConfigFile config;
-        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
-        int64 info_version = Helper.string_version_to_int (info.version ());
-        var seen_string = settings.value (seen_version_c).to_string ();
-        int64 seen_version = Helper.string_version_to_int (seen_string);
-        int64 curr_version = Helper.current_version_to_int ();
-        GLib.info ("Version info arrived:"
-                + "Your version:" + curr_version
-                + "Skipped version:" + seen_version + seen_string
-                + "Available version:" + info_version + info.version ()
-                + "Available version string:" + info.version_string ()
-                + "Web url:" + info.web ()
-                + "Download url:" + info.download_url ();
-        if (info.version ().is_empty ()) {
-            GLib.info ("No version information available at the moment";
-            download_state (Up_to_date);
-        } else if (info_version <= curr_version
-                   || info_version <= seen_version) {
-            GLib.info ("Client is on latest version!";
-            download_state (Up_to_date);
-        } else {
-            string url = info.download_url ();
-            if (url.is_empty ()) {
-                show_no_url_dialog (info);
-            } else {
-                this.target_file = config.config_path () + url.mid (url.last_index_of ('/')+1);
-                if (GLib.File (this.target_file).exists ()) {
-                    download_state (Download_complete);
-                } else {
-                    var request = Soup.Request (GLib.Uri (url));
-                    request.attribute (Soup.Request.Redirect_policy_attribute, Soup.Request.No_less_safe_redirect_policy);
-                    Soup.Reply reply = qnam ().get (request);
-                    connect (reply, &QIODevice.ready_read, this, &NSISUpdater.on_signal_write_file);
-                    connect (reply, &Soup.Reply.on_signal_finished, this, &NSISUpdater.on_signal_download_finished);
-                    download_state (Downloading);
-                    this.file.on_signal_reset (new QTemporary_file);
-                    this.file.auto_remove (true);
-                    this.file.open ();
-                }
-            }
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_write_file () {
+        var reply = qobject_cast<Soup.Reply> (sender ());
+        if (this.file.is_open ()) {
+            this.file.write (reply.read_all ());
         }
     }
 
-    void NSISUpdater.show_no_url_dialog (UpdateInfo info) {
+
+    /***********************************************************
+    ***********************************************************/
+    private void wipe_update_data () {
+        ConfigFile config;
+        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
+        string update_filename = settings.value (update_available_c).to_string ();
+        if (!update_filename.is_empty ())
+            GLib.File.remove (update_filename);
+        settings.remove (update_available_c);
+        settings.remove (update_target_version_c);
+        settings.remove (update_target_version_string_c);
+        settings.remove (auto_update_attempted_c);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void show_no_url_dialog (UpdateInfo info) {
         // if the version tag is set, there is a newer version.
         var msg_box = new Gtk.Dialog;
         msg_box.attribute (Qt.WA_DeleteOnClose);
@@ -187,7 +174,10 @@ class NSISUpdater : OCUpdater {
         msg_box.open ();
     }
 
-    void NSISUpdater.show_update_error_dialog (string target_version) {
+
+    /***********************************************************
+    ***********************************************************/
+    private void show_update_error_dialog (string target_version) {
         var msg_box = new Gtk.Dialog;
         msg_box.attribute (Qt.WA_DeleteOnClose);
         msg_box.window_flags (msg_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
@@ -247,38 +237,54 @@ class NSISUpdater : OCUpdater {
         msg_box.open ();
     }
 
-    bool NSISUpdater.handle_startup () {
+
+    /***********************************************************
+    ***********************************************************/
+    private override void version_info_arrived (UpdateInfo info) {
         ConfigFile config;
         QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
-        string update_filename = settings.value (update_available_c).to_string ();
-        // has the previous run downloaded an update?
-        if (!update_filename.is_empty () && GLib.File (update_filename).exists ()) {
-            GLib.info ("An updater file is available";
-            // did it try to execute the update?
-            if (settings.value (auto_update_attempted_c, false).to_bool ()) {
-                if (update_succeeded ()) {
-                    // on_signal_success : clean up
-                    GLib.info ("The requested update attempt has succeeded"
-                            + Helper.current_version_to_int ();
-                    wipe_update_data ();
-                    return false;
-                } else {
-                    // var update failed. Ask user what to do
-                    GLib.info ("The requested update attempt has failed"
-                            + settings.value (update_target_version_c).to_string ();
-                    show_update_error_dialog (settings.value (update_target_version_string_c).to_string ());
-                    return false;
-                }
+        int64 info_version = Helper.string_version_to_int (info.version ());
+        var seen_string = settings.value (seen_version_c).to_string ();
+        int64 seen_version = Helper.string_version_to_int (seen_string);
+        int64 curr_version = Helper.current_version_to_int ();
+        GLib.info ("Version info arrived:"
+                + "Your version:" + curr_version
+                + "Skipped version:" + seen_version + seen_string
+                + "Available version:" + info_version + info.version ()
+                + "Available version string:" + info.version_string ()
+                + "Web url:" + info.web ()
+                + "Download url:" + info.download_url ();
+        if (info.version ().is_empty ()) {
+            GLib.info ("No version information available at the moment";
+            download_state (Up_to_date);
+        } else if (info_version <= curr_version
+                   || info_version <= seen_version) {
+            GLib.info ("Client is on latest version!";
+            download_state (Up_to_date);
+        } else {
+            string url = info.download_url ();
+            if (url.is_empty ()) {
+                show_no_url_dialog (info);
             } else {
-                GLib.info ("Triggering an update";
-                return perform_update ();
+                this.target_file = config.config_path () + url.mid (url.last_index_of ('/')+1);
+                if (GLib.File (this.target_file).exists ()) {
+                    download_state (Download_complete);
+                } else {
+                    var request = Soup.Request (GLib.Uri (url));
+                    request.attribute (Soup.Request.Redirect_policy_attribute, Soup.Request.No_less_safe_redirect_policy);
+                    Soup.Reply reply = qnam ().get (request);
+                    connect (reply, &QIODevice.ready_read, this, &NSISUpdater.on_signal_write_file);
+                    connect (reply, &Soup.Reply.on_signal_finished, this, &NSISUpdater.on_signal_download_finished);
+                    download_state (Downloading);
+                    this.file.on_signal_reset (new QTemporary_file);
+                    this.file.auto_remove (true);
+                    this.file.open ();
+                }
             }
         }
-        return false;
     }
 
-    void NSISUpdater.on_signal_seen_version () {
-        ConfigFile config;
-        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
-        settings.value (seen_version_c, update_info ().version ());
-    }
+} // class NSISUpdater
+
+} // namespace Ui
+} // namespace Occ

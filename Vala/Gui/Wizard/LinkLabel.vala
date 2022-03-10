@@ -4,8 +4,6 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <Gtk.Label>
-
 namespace Occ {
 namespace Ui {
 
@@ -13,24 +11,14 @@ class LinkLabel : Gtk.Label {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Uri url;
-
+    GLib.Uri url { private get; public set; }
 
     signal void clicked ();
-
 
     /***********************************************************
     ***********************************************************/
     public LinkLabel (Gtk.Widget parent = null) {
         base (parent);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void url (GLib.Uri url);
-    void LinkLabel.url (GLib.Uri url) {
-        this.url = url;
     }
 
 

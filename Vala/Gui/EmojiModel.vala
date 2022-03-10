@@ -4324,6 +4324,7 @@ class EmojiModel : GLib.Object {
         return this.settings.value ("Editor/emojis", QVariantList ()).to_list ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void category (string category) {
@@ -4354,6 +4355,7 @@ class EmojiModel : GLib.Object {
 
         /* emit */ signal_history_changed ();
     }
+
 
     /***********************************************************
     ***********************************************************/

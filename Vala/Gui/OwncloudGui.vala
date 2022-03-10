@@ -47,6 +47,7 @@ class OwncloudGui : GLib.Object {
         PUBLIC_LINKS,
     }
 
+
     /***********************************************************
     ***********************************************************/
     private QPointer<Systray> tray;
@@ -101,19 +102,19 @@ class OwncloudGui : GLib.Object {
         connect (this.tray.data (), &QSystemTrayIcon.activated,
             this, &OwncloudGui.on_signal_tray_clicked);
 
-        connect (this.tray.data (), &Systray.open_help,
+        connect (this.tray.data (), &Systray.signal_open_help,
             this, &OwncloudGui.on_signal_help);
 
-        connect (this.tray.data (), &Systray.open_account_wizard,
+        connect (this.tray.data (), &Systray.signal_open_account_wizard,
             this, &OwncloudGui.on_signal_new_account_wizard);
 
-        connect (this.tray.data (), &Systray.open_main_dialog,
+        connect (this.tray.data (), &Systray.signal_open_main_dialog,
             this, &OwncloudGui.on_signal_open_main_dialog);
 
-        connect (this.tray.data (), &Systray.open_settings,
+        connect (this.tray.data (), &Systray.signal_open_settings,
             this, &OwncloudGui.on_signal_show_settings);
 
-        connect (this.tray.data (), &Systray.shutdown,
+        connect (this.tray.data (), &Systray.signal_shutdown,
             this, &OwncloudGui.on_signal_shutdown);
 
         connect (this.tray.data (), &Systray.open_share_dialog,
@@ -142,7 +143,7 @@ class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool check_account_exists (bool open_settings);
+    public bool check_account_exists (bool signal_open_settings);
 
 
     /***********************************************************
@@ -518,7 +519,7 @@ class OwncloudGui : GLib.Object {
     ***********************************************************/
     public void on_signal_shutdown () {
         // explicitly close windows. This is somewhat of a hack to ensure
-        // that saving the geometries happens ASAP during a OS shutdown
+        // that saving the geometries happens ASAP during a OS signal_shutdown
 
         // those do delete on close
         if (!this.settings_dialog.is_null ())
@@ -535,7 +536,7 @@ class OwncloudGui : GLib.Object {
         if (this.log_browser.is_null ()) {
             // init the log browser.
             this.log_browser = new Log_browser;
-            // ## TODO : allow new log name maybe?
+            // ## TODO: allow new log name maybe?
         }
 
         if (this.log_browser.is_visible ()) {
@@ -663,7 +664,7 @@ class OwncloudGui : GLib.Object {
             }
         }
 
-        var max_sharing_permissions = resharing_allowed? Share_permissions (account_state.account ().capabilities ().share_default_permissions ()) : Share_permissions ({});
+        var max_sharing_permissions = resharing_allowed? SharePermissions (account_state.account ().capabilities ().share_default_permissions ()) : SharePermissions ({});
 
         Share_dialog w = null;
         if (this.share_dialogs.contains (local_path) && this.share_dialogs[local_path]) {
@@ -714,6 +715,7 @@ class OwncloudGui : GLib.Object {
             }
         }
     }
+
 
     /***********************************************************
     ***********************************************************/

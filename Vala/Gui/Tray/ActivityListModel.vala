@@ -24,7 +24,6 @@ Simple list model to provide the list view with data.
 ***********************************************************/
 class ActivityListModel : QAbstractListModel {
 
-
     /***********************************************************
     ***********************************************************/
     public enum DataRole {
@@ -89,29 +88,24 @@ class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public ActivityListModel (AccountState account_state = null,
+    public ActivityListModel (
+        AccountState account_state = null,
         GLib.Object parent) {
         base (parent);
         this.account_state = account_state;
     }
 
-    /***********************************************************
-    ***********************************************************/
-    public 
-
 
     /***********************************************************
     ***********************************************************/
-    public int row_count (QModelIndex parent = QModelIndex ()) override;
-    int ActivityListModel.row_count (QModelIndex &) {
+    public override int row_count (QModelIndex parent = new QModelIndex ()) {
         return this.final_list.count ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool can_fetch_more (QModelIndex &) override;
-    bool ActivityListModel.can_fetch_more (QModelIndex &) {
+    public override bool can_fetch_more (QModelIndex index) {
         // We need to be connected to be able to fetch more
         if (this.account_state && this.account_state.is_connected ()) {
             // If the fetching is reported to be done or we are currently fetching we can't fetch more
@@ -126,8 +120,7 @@ class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public void fetch_more (QModelIndex &) override;
-    void ActivityListModel.fetch_more (QModelIndex &) {
+    public override void fetch_more (QModelIndex index) {
         if (can_fetch_activities ()) {
             start_fetch_job ();
         } else {
@@ -147,14 +140,14 @@ class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public ActivityList errors_list () {
+        return;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void add_notification_to_activity_list (Activity activity);
-    void ActivityListModel.add_notification_to_activity_list (Activity activity) {
-        GLib.info ("Notification successfully added to the notification list: " + activity.subject;
+    public void add_notification_to_activity_list (Activity activity) {
+        GLib.info ("Notification successfully added to the notification list: " + activity.subject);
         this.notification_lists.prepend (activity);
         combine_activity_lists ();
     }
@@ -163,15 +156,16 @@ class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void clear_notifications () {
-        GLib.info ("Clear the notifications";
+        GLib.info ("Clearing the notifications.");
         this.notification_lists.clear ();
         combine_activity_lists ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void add_error_to_activity_list (Activity activity) {
-        GLib.info ("Error successfully added to the notification list: " + activity.subject;
+        GLib.info ("Error successfully added to the notification list: " + activity.subject);
         this.notification_errors_lists.prepend (activity);
         combine_activity_lists ();
     }
@@ -181,15 +175,16 @@ class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void add_sync_file_item_to_activity_list (Activity activity) {
-        GLib.info ("Successfully added to the activity list: " + activity.subject;
+        GLib.info ("Successfully added to the activity list: " + activity.subject);
         this.sync_file_item_lists.prepend (activity);
         combine_activity_lists ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void add_ignored_file_to_list (Activity new_activity) {
-        GLib.info ("First checking for duplicates then add file to the notification list of ignored files: " + new_activity.file;
+        GLib.info ("First checking for duplicates then add file to the notification list of ignored files: " + new_activity.file);
 
         bool duplicate = false;
         if (this.list_of_ignored_files.size () == 0) {
@@ -199,7 +194,7 @@ class ActivityListModel : QAbstractListModel {
             return;
         }
 
-        foreach (Activity activity, this.list_of_ignored_files) {
+        foreach (Activity activity in this.list_of_ignored_files) {
             if (activity.file == new_activity.file) {
                 duplicate = true;
                 break;
@@ -211,13 +206,6 @@ class ActivityListModel : QAbstractListModel {
         }
     }
 
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
 
     /***********************************************************
     ***********************************************************/
@@ -255,6 +243,7 @@ class ActivityListModel : QAbstractListModel {
             combine_activity_lists ();
         }
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -426,6 +415,7 @@ class ActivityListModel : QAbstractListModel {
         return GLib.Variant ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void trigger_default_action (int activity_index) {
@@ -492,6 +482,7 @@ class ActivityListModel : QAbstractListModel {
             Utility.open_browser (link);
         }
     }
+
 
     /***********************************************************
     ***********************************************************/

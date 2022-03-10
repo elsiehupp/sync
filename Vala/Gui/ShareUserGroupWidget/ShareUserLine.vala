@@ -10,20 +10,20 @@ namespace Ui {
 /***********************************************************
 The widget displayed for each user/group share
 ***********************************************************/
-class Share_user_line : Gtk.Widget {
+class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public Share_user_line (AccountPointer account,
+    public ShareUserLine (AccountPointer account,
         unowned<User_group_share> Share,
-        Share_permissions max_sharing_permissions,
+        SharePermissions max_sharing_permissions,
         bool is_file,
         Gtk.Widget parent = null);
-    ~Share_user_line () override;
+    ~ShareUserLine () override;
 
     /***********************************************************
     ***********************************************************/
-    public unowned<Share> share ();
+    public unowned Share share ();
 
 signals:
     void visual_deletion_done ();
@@ -130,7 +130,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private Ui.Share_user_line this.ui;
+    private Ui.ShareUserLine this.ui;
     private AccountPointer this.account;
     private unowned<User_group_share> this.share;
     private bool this.is_file;
@@ -153,10 +153,10 @@ signals:
 
 
 
-    Share_user_line.Share_user_line (AccountPointer account, unowned<User_group_share> share,
-        Share_permissions max_sharing_permissions, bool is_file, Gtk.Widget parent)
+    ShareUserLine.ShareUserLine (AccountPointer account, unowned<User_group_share> share,
+        SharePermissions max_sharing_permissions, bool is_file, Gtk.Widget parent)
         : Gtk.Widget (parent)
-        this.ui (new Ui.Share_user_line)
+        this.ui (new Ui.ShareUserLine)
         this.account (account)
         this.share (share)
         this.is_file (is_file)
@@ -173,16 +173,16 @@ signals:
         if (!this.is_file) enabled = enabled && (max_sharing_permissions & Share_permission_create &&
                                           max_sharing_permissions & Share_permission_delete);
         this.ui.permissions_edit.enabled (enabled);
-        connect (this.ui.permissions_edit, &QAbstractButton.clicked, this, &Share_user_line.on_signal_edit_permissions_changed);
-        connect (this.ui.note_confirm_button, &QAbstractButton.clicked, this, &Share_user_line.on_signal_note_confirm_button_clicked);
-        connect (this.ui.calendar, &QDate_time_edit.date_changed, this, &Share_user_line.expire_date);
+        connect (this.ui.permissions_edit, &QAbstractButton.clicked, this, &ShareUserLine.on_signal_edit_permissions_changed);
+        connect (this.ui.note_confirm_button, &QAbstractButton.clicked, this, &ShareUserLine.on_signal_note_confirm_button_clicked);
+        connect (this.ui.calendar, &QDate_time_edit.date_changed, this, &ShareUserLine.expire_date);
 
-        connect (this.share.data (), &User_group_share.note_set, this, &Share_user_line.disable_progess_indicator_animation);
-        connect (this.share.data (), &User_group_share.note_error, this, &Share_user_line.disable_progess_indicator_animation);
-        connect (this.share.data (), &User_group_share.expire_date_set, this, &Share_user_line.disable_progess_indicator_animation);
+        connect (this.share.data (), &User_group_share.note_set, this, &ShareUserLine.disable_progess_indicator_animation);
+        connect (this.share.data (), &User_group_share.note_error, this, &ShareUserLine.disable_progess_indicator_animation);
+        connect (this.share.data (), &User_group_share.expire_date_set, this, &ShareUserLine.disable_progess_indicator_animation);
 
-        connect (this.ui.confirm_password, &QToolButton.clicked, this, &Share_user_line.on_signal_confirm_password_clicked);
-        connect (this.ui.line_edit_password, &QLineEdit.return_pressed, this, &Share_user_line.on_signal_line_edit_password_return_pressed);
+        connect (this.ui.confirm_password, &QToolButton.clicked, this, &ShareUserLine.on_signal_confirm_password_clicked);
+        connect (this.ui.line_edit_password, &QLineEdit.return_pressed, this, &ShareUserLine.on_signal_line_edit_password_return_pressed);
 
         // create menu with checkable permissions
         var menu = new QMenu (this);
@@ -190,7 +190,7 @@ signals:
         this.permission_reshare.checkable (true);
         this.permission_reshare.enabled (max_sharing_permissions & Share_permission_share);
         menu.add_action (this.permission_reshare);
-        connect (this.permission_reshare, &QAction.triggered, this, &Share_user_line.on_signal_permissions_changed);
+        connect (this.permission_reshare, &QAction.triggered, this, &ShareUserLine.on_signal_permissions_changed);
 
         show_note_options (false);
 
@@ -200,7 +200,7 @@ signals:
             this.note_link_action = new QAction (_("Note to recipient"));
             this.note_link_action.checkable (true);
             menu.add_action (this.note_link_action);
-            connect (this.note_link_action, &QAction.triggered, this, &Share_user_line.toggle_note_options);
+            connect (this.note_link_action, &QAction.triggered, this, &ShareUserLine.toggle_note_options);
             if (!this.share.get_note ().is_empty ()) {
                 this.note_link_action.checked (true);
                 show_note_options (true);
@@ -216,7 +216,7 @@ signals:
             this.expiration_date_link_action = new QAction (_("Set expiration date"));
             this.expiration_date_link_action.checkable (true);
             menu.add_action (this.expiration_date_link_action);
-            connect (this.expiration_date_link_action, &QAction.triggered, this, &Share_user_line.toggle_expire_date_options);
+            connect (this.expiration_date_link_action, &QAction.triggered, this, &ShareUserLine.toggle_expire_date_options);
             const var expire_date = this.share.get_expire_date ().is_valid () ? share.data ().get_expire_date () : QDate ();
             if (!expire_date.is_null ()) {
                 this.expiration_date_link_action.checked (true);
@@ -231,7 +231,7 @@ signals:
           this.delete_share_button= new QAction (deleteicon,_("Unshare"), this);
 
         menu.add_action (this.delete_share_button);
-        connect (this.delete_share_button, &QAction.triggered, this, &Share_user_line.on_signal_delete_share_button_clicked);
+        connect (this.delete_share_button, &QAction.triggered, this, &ShareUserLine.on_signal_delete_share_button_clicked);
 
         /***********************************************************
         Files can't have create or delete permissions
@@ -241,19 +241,19 @@ signals:
             this.permission_create.checkable (true);
             this.permission_create.enabled (max_sharing_permissions & Share_permission_create);
             menu.add_action (this.permission_create);
-            connect (this.permission_create, &QAction.triggered, this, &Share_user_line.on_signal_permissions_changed);
+            connect (this.permission_create, &QAction.triggered, this, &ShareUserLine.on_signal_permissions_changed);
 
             this.permission_change = new QAction (_("Can change"), this);
             this.permission_change.checkable (true);
             this.permission_change.enabled (max_sharing_permissions & Share_permission_update);
             menu.add_action (this.permission_change);
-            connect (this.permission_change, &QAction.triggered, this, &Share_user_line.on_signal_permissions_changed);
+            connect (this.permission_change, &QAction.triggered, this, &ShareUserLine.on_signal_permissions_changed);
 
             this.permission_delete = new QAction (_("Can delete"), this);
             this.permission_delete.checkable (true);
             this.permission_delete.enabled (max_sharing_permissions & Share_permission_delete);
             menu.add_action (this.permission_delete);
-            connect (this.permission_delete, &QAction.triggered, this, &Share_user_line.on_signal_permissions_changed);
+            connect (this.permission_delete, &QAction.triggered, this, &ShareUserLine.on_signal_permissions_changed);
         }
 
         // Adds action to display password widget (check box)
@@ -265,12 +265,12 @@ signals:
             this.password_protect_link_action.enabled (!this.share.is_password_set () || !this.account.capabilities ().share_email_password_enforced ());
 
             menu.add_action (this.password_protect_link_action);
-            connect (this.password_protect_link_action, &QAction.triggered, this, &Share_user_line.on_signal_password_checkbox_changed);
+            connect (this.password_protect_link_action, &QAction.triggered, this, &ShareUserLine.on_signal_password_checkbox_changed);
 
             on_signal_refresh_password_line_edit_placeholder ();
 
-            connect (this.share.data (), &Share.password_set, this, &Share_user_line.on_signal_password_set);
-            connect (this.share.data (), &Share.password_error, this, &Share_user_line.on_signal_password_error);
+            connect (this.share.data (), &Share.password_set, this, &ShareUserLine.on_signal_password_set);
+            connect (this.share.data (), &Share.password_error, this, &ShareUserLine.on_signal_password_error);
         }
 
         on_signal_refresh_password_options ();
@@ -296,15 +296,15 @@ signals:
             this.ui.permission_tool_button.visible (false);
         }
 
-        connect (share.data (), &Share.permissions_set, this, &Share_user_line.on_signal_permissions_set);
-        connect (share.data (), &Share.share_deleted, this, &Share_user_line.on_signal_share_deleted);
+        connect (share.data (), &Share.permissions_set, this, &ShareUserLine.on_signal_permissions_set);
+        connect (share.data (), &Share.share_deleted, this, &ShareUserLine.on_signal_share_deleted);
 
         if (!share.account ().capabilities ().share_resharing ()) {
             this.permission_reshare.visible (false);
         }
 
-        const var avatar_event_filter = new Avatar_event_filter (this.ui.avatar);
-        connect (avatar_event_filter, &Avatar_event_filter.context_menu, this, &Share_user_line.on_signal_avatar_context_menu);
+        const var avatar_event_filter = new AvatarEventFilter (this.ui.avatar);
+        connect (avatar_event_filter, &AvatarEventFilter.context_menu, this, &ShareUserLine.on_signal_avatar_context_menu);
         this.ui.avatar.install_event_filter (avatar_event_filter);
 
         load_avatar ();
@@ -312,13 +312,13 @@ signals:
         customize_style ();
     }
 
-    void Share_user_line.on_signal_avatar_context_menu (QPoint global_position) {
+    void ShareUserLine.on_signal_avatar_context_menu (QPoint global_position) {
         if (this.share.get_share_type () == Share.Type_user) {
             this.profile_page_menu.exec (global_position);
         }
     }
 
-    void Share_user_line.load_avatar () {
+    void ShareUserLine.load_avatar () {
         const int avatar_size = 36;
 
         // Set size of the placeholder
@@ -336,12 +336,12 @@ signals:
          */
         if (this.share.get_share_with ().type () == Sharee.User) {
             var job = new AvatarJob (this.share.account (), this.share.get_share_with ().share_with (), avatar_size, this);
-            connect (job, &AvatarJob.avatar_pixmap, this, &Share_user_line.on_signal_avatar_loaded);
+            connect (job, &AvatarJob.avatar_pixmap, this, &ShareUserLine.on_signal_avatar_loaded);
             job.on_signal_start ();
         }
     }
 
-    void Share_user_line.default_avatar (int avatar_size) {
+    void ShareUserLine.default_avatar (int avatar_size) {
         /* Create the fallback avatar.
 
         This will be shown until the avatar image data arrives.
@@ -372,7 +372,7 @@ signals:
         }
     }
 
-    void Share_user_line.on_signal_avatar_loaded (Gtk.Image avatar) {
+    void ShareUserLine.on_signal_avatar_loaded (Gtk.Image avatar) {
         if (avatar.is_null ())
             return;
 
@@ -383,16 +383,16 @@ signals:
         this.ui.avatar.style_sheet ("");
     }
 
-    void Share_user_line.on_signal_delete_share_button_clicked () {
+    void ShareUserLine.on_signal_delete_share_button_clicked () {
         enabled (false);
         this.share.delete_share ();
     }
 
-    Share_user_line.~Share_user_line () {
+    ShareUserLine.~ShareUserLine () {
         delete this.ui;
     }
 
-    void Share_user_line.on_signal_edit_permissions_changed () {
+    void ShareUserLine.on_signal_edit_permissions_changed () {
         enabled (false);
 
         // Can never manually be set to "partial".
@@ -429,7 +429,7 @@ signals:
         this.share.permissions (permissions);
     }
 
-    void Share_user_line.on_signal_permissions_changed () {
+    void ShareUserLine.on_signal_permissions_changed () {
         enabled (false);
 
         Share.Permissions permissions = SharePermissionRead;
@@ -452,7 +452,7 @@ signals:
         this.share.permissions (permissions);
     }
 
-    void Share_user_line.on_signal_password_checkbox_changed () {
+    void ShareUserLine.on_signal_password_checkbox_changed () {
         if (!this.password_protect_link_action.is_checked ()) {
             this.ui.error_label.hide ();
             this.ui.error_label.clear ();
@@ -474,7 +474,7 @@ signals:
         }
     }
 
-    void Share_user_line.on_signal_delete_animation_finished () {
+    void ShareUserLine.on_signal_delete_animation_finished () {
         /* emit */ resize_requested ();
         /* emit */ visual_deletion_done ();
         delete_later ();
@@ -485,7 +485,7 @@ signals:
         connect (this, SIGNAL (destroyed (GLib.Object *)), parent_widget (), SLOT (repaint ()));
     }
 
-    void Share_user_line.on_signal_refresh_password_options () {
+    void ShareUserLine.on_signal_refresh_password_options () {
         const bool is_password_enabled = this.share.get_share_type () == Share.Type_email && this.password_protect_link_action.is_checked ();
 
         this.ui.password_label.visible (is_password_enabled);
@@ -496,15 +496,15 @@ signals:
         /* emit */ resize_requested ();
     }
 
-    void Share_user_line.on_signal_refresh_password_line_edit_placeholder () {
+    void ShareUserLine.on_signal_refresh_password_line_edit_placeholder () {
         if (this.share.is_password_set ()) {
-            this.ui.line_edit_password.placeholder_text (string.from_utf8 (password_is_placeholder));
+            this.ui.line_edit_password.placeholder_text (string.from_utf8 (PASSWORD_IS_PLACEHOLDER));
         } else {
             this.ui.line_edit_password.placeholder_text ("");
         }
     }
 
-    void Share_user_line.on_signal_password_set () {
+    void ShareUserLine.on_signal_password_set () {
         toggle_password_progress_animation (false);
         this.ui.line_edit_password.enabled (true);
         this.ui.confirm_password.enabled (true);
@@ -518,7 +518,7 @@ signals:
         on_signal_refresh_password_options ();
     }
 
-    void Share_user_line.on_signal_password_error (int status_code, string message) {
+    void ShareUserLine.on_signal_password_error (int status_code, string message) {
         GLib.warning ("Error from server" + status_code + message;
 
         toggle_password_progress_animation (false);
@@ -538,29 +538,29 @@ signals:
         /* emit */ resize_requested ();
     }
 
-    void Share_user_line.on_signal_share_deleted () {
+    void ShareUserLine.on_signal_share_deleted () {
         var animation = new QPropertyAnimation (this, "maximum_height", this);
 
         animation.duration (500);
         animation.start_value (height ());
         animation.end_value (0);
 
-        connect (animation, &QAbstractAnimation.on_signal_finished, this, &Share_user_line.on_signal_delete_animation_finished);
-        connect (animation, &QVariantAnimation.value_changed, this, &Share_user_line.resize_requested);
+        connect (animation, &QAbstractAnimation.on_signal_finished, this, &ShareUserLine.on_signal_delete_animation_finished);
+        connect (animation, &QVariantAnimation.value_changed, this, &ShareUserLine.resize_requested);
 
         animation.on_signal_start ();
     }
 
-    void Share_user_line.on_signal_permissions_set () {
+    void ShareUserLine.on_signal_permissions_set () {
         display_permissions ();
         enabled (true);
     }
 
-    unowned<Share> Share_user_line.share () {
+    unowned Share ShareUserLine.share () {
         return this.share;
     }
 
-    void Share_user_line.display_permissions () {
+    void ShareUserLine.display_permissions () {
         var perm = this.share.get_permissions ();
 
     //  folders edit = CREATE, READ, UPDATE, DELETE
@@ -585,15 +585,15 @@ signals:
         }
     }
 
-    void Share_user_line.on_signal_style_changed () {
+    void ShareUserLine.on_signal_style_changed () {
         customize_style ();
     }
 
-    void Share_user_line.on_signal_focus_password_line_edit () {
+    void ShareUserLine.on_signal_focus_password_line_edit () {
         this.ui.line_edit_password.focus ();
     }
 
-    void Share_user_line.customize_style () {
+    void ShareUserLine.customize_style () {
         this.ui.permission_tool_button.icon (Theme.create_color_aware_icon (":/client/theme/more.svg"));
 
         QIcon deleteicon = QIcon.from_theme (QLatin1String ("user-trash"),Theme.create_color_aware_icon (QLatin1String (":/client/theme/delete.svg")));
@@ -606,7 +606,7 @@ signals:
         this.ui.error_label.background_role (QPalette.Window_text);
     }
 
-    QPixmap Share_user_line.pixmap_for_sharee_type (Sharee.Type type, Gtk.Color background_color) {
+    QPixmap ShareUserLine.pixmap_for_sharee_type (Sharee.Type type, Gtk.Color background_color) {
         switch (type) {
         case Sharee.Room:
             return Ui.IconUtils.pixmap_for_background ("talk-app.svg", background_color);
@@ -622,7 +622,7 @@ signals:
         return {};
     }
 
-    Gtk.Color Share_user_line.background_color_for_sharee_type (Sharee.Type type) {
+    Gtk.Color ShareUserLine.background_color_for_sharee_type (Sharee.Type type) {
         switch (type) {
         case Sharee.Room:
             return Theme.instance ().wizard_header_background_color ();
@@ -649,7 +649,7 @@ signals:
         return calculate_background_based_on_signal_text ();
     }
 
-    void Share_user_line.show_note_options (bool show) {
+    void ShareUserLine.show_note_options (bool show) {
         this.ui.note_label.visible (show);
         this.ui.note_text_edit.visible (show);
         this.ui.note_confirm_button.visible (show);
@@ -663,7 +663,7 @@ signals:
         /* emit */ resize_requested ();
     }
 
-    void Share_user_line.toggle_note_options (bool enable) {
+    void ShareUserLine.toggle_note_options (bool enable) {
         show_note_options (enable);
 
         if (!enable) {
@@ -672,16 +672,16 @@ signals:
         }
     }
 
-    void Share_user_line.on_signal_note_confirm_button_clicked () {
+    void ShareUserLine.on_signal_note_confirm_button_clicked () {
         note (this.ui.note_text_edit.to_plain_text ());
     }
 
-    void Share_user_line.note (string note) {
+    void ShareUserLine.note (string note) {
         enable_progess_indicator_animation (true);
         this.share.note (note);
     }
 
-    void Share_user_line.toggle_expire_date_options (bool enable) {
+    void ShareUserLine.toggle_expire_date_options (bool enable) {
         show_expire_date_options (enable);
 
         if (!enable) {
@@ -689,7 +689,7 @@ signals:
         }
     }
 
-    void Share_user_line.show_expire_date_options (bool show, QDate initial_date) {
+    void ShareUserLine.show_expire_date_options (bool show, QDate initial_date) {
         this.ui.expiration_label.visible (show);
         this.ui.calendar.visible (show);
 
@@ -708,12 +708,12 @@ signals:
         /* emit */ resize_requested ();
     }
 
-    void Share_user_line.expire_date () {
+    void ShareUserLine.expire_date () {
         enable_progess_indicator_animation (true);
         this.share.expire_date (this.ui.calendar.date ());
     }
 
-    void Share_user_line.enable_progess_indicator_animation (bool enable) {
+    void ShareUserLine.enable_progess_indicator_animation (bool enable) {
         if (enable) {
             if (!this.ui.progress_indicator.is_animated ()) {
                 this.ui.progress_indicator.on_signal_start_animation ();
@@ -723,7 +723,7 @@ signals:
         }
     }
 
-    void Share_user_line.toggle_password_progress_animation (bool show) {
+    void ShareUserLine.toggle_password_progress_animation (bool show) {
         // button and progress indicator are interchanged depending on if the network request is in progress or not
         this.ui.confirm_password.visible (!show && this.password_protect_link_action.is_checked ());
         this.ui.password_progress_indicator.visible (show);
@@ -736,11 +736,11 @@ signals:
         }
     }
 
-    void Share_user_line.disable_progess_indicator_animation () {
+    void ShareUserLine.disable_progess_indicator_animation () {
         enable_progess_indicator_animation (false);
     }
 
-    QDate Share_user_line.max_expiration_date_for_share (Share.ShareType type, QDate fallback_date) {
+    QDate ShareUserLine.max_expiration_date_for_share (Share.ShareType type, QDate fallback_date) {
         var days_to_expire = 0;
         if (type == Share.ShareType.Type_remote) {
             days_to_expire = this.account.capabilities ().share_remote_expire_date_days ();
@@ -757,7 +757,7 @@ signals:
         return fallback_date;
     }
 
-    bool Share_user_line.enforce_expiration_date_for_share (Share.ShareType type) {
+    bool ShareUserLine.enforce_expiration_date_for_share (Share.ShareType type) {
         if (type == Share.ShareType.Type_remote) {
             return this.account.capabilities ().share_remote_enforce_expire_date ();
         } else if (type == Share.ShareType.Type_email) {
@@ -767,7 +767,7 @@ signals:
         return this.account.capabilities ().share_internal_enforce_expire_date ();
     }
 
-    void Share_user_line.on_signal_password_confirmed () {
+    void ShareUserLine.on_signal_password_confirmed () {
         if (this.ui.line_edit_password.text ().is_empty ()) {
             return;
         }
@@ -782,10 +782,10 @@ signals:
         this.share.password (this.ui.line_edit_password.text ());
     }
 
-    void Share_user_line.on_signal_line_edit_password_return_pressed () {
+    void ShareUserLine.on_signal_line_edit_password_return_pressed () {
         on_signal_password_confirmed ();
     }
 
-    void Share_user_line.on_signal_confirm_password_clicked () {
+    void ShareUserLine.on_signal_confirm_password_clicked () {
         on_signal_password_confirmed ();
     }

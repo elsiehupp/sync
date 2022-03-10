@@ -77,6 +77,7 @@ class FolderCreationDialog : Gtk.Dialog {
         Gtk.Dialog.on_signal_accept ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     private void on_signal_new_folder_name_edit_text_edited () {

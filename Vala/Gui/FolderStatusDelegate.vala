@@ -48,6 +48,7 @@ class FolderStatusDelegate : QStyledItemDelegate {
         DATA_ROLE_COUNT
     }
 
+
     /***********************************************************
     ***********************************************************/
     private QIcon icon_more;

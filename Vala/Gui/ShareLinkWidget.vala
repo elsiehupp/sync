@@ -17,7 +17,6 @@ Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 //  #include <Gtk.Dialog
 //  #include <QToolBu
 //  #include <QHBox_layo
-//  #include <Gtk.Label>
 //  #include <QLineEdit>
 //  #include <QWidget_action>
 
@@ -30,14 +29,14 @@ namespace Ui {
 ***********************************************************/
 class Share_link_widget : Gtk.Widget {
 
-    const string password_is_placeholder = "●●●●●●●●";
+    const string PASSWORD_IS_PLACEHOLDER = "●●●●●●●●";
 
     /***********************************************************
     ***********************************************************/
     public Share_link_widget (AccountPointer account,
         const string share_path,
         const string local_path,
-        Share_permissions max_sharing_permissions,
+        SharePermissions max_sharing_permissions,
         Gtk.Widget parent = null);
     ~Share_link_widget () override;
 
@@ -202,7 +201,7 @@ signals:
 Share_link_widget.Share_link_widget (AccountPointer account,
     const string share_path,
     const string local_path,
-    Share_permissions max_sharing_permissions,
+    SharePermissions max_sharing_permissions,
     Gtk.Widget parent)
     : Gtk.Widget (parent)
     this.ui (new Ui.Share_link_widget)
@@ -322,7 +321,7 @@ void Share_link_widget.setup_ui_options () {
 
     // Prepare permissions check and create group action
     const QDate expire_date = this.link_share.data ().get_expire_date ().is_valid () ? this.link_share.data ().get_expire_date () : QDate ();
-    const Share_permissions perm = this.link_share.data ().get_permissions ();
+    const SharePermissions perm = this.link_share.data ().get_permissions ();
     var checked = false;
     var permissions_group = new QAction_group (this);
 
@@ -416,7 +415,7 @@ void Share_link_widget.setup_ui_options () {
 
     if (this.link_share.data ().is_password_set ()) {
         this.password_protect_link_action.checked (true);
-        this.ui.line_edit_password.placeholder_text (string.from_utf8 (password_is_placeholder));
+        this.ui.line_edit_password.placeholder_text (string.from_utf8 (PASSWORD_IS_PLACEHOLDER));
         toggle_password_options ();
     }
 
@@ -534,7 +533,7 @@ void Share_link_widget.on_signal_password_set () {
 
     if (this.link_share.is_password_set ()) {
         this.ui.line_edit_password.enabled (true);
-        this.ui.line_edit_password.placeholder_text (string.from_utf8 (password_is_placeholder));
+        this.ui.line_edit_password.placeholder_text (string.from_utf8 (PASSWORD_IS_PLACEHOLDER));
     } else {
         this.ui.line_edit_password.placeholder_text ({});
     }
@@ -694,7 +693,7 @@ void Share_link_widget.on_signal_context_menu_button_clicked () {
 
 void Share_link_widget.on_signal_link_context_menu_action_triggered (QAction action) {
     const var state = action.is_checked ();
-    Share_permissions perm = SharePermissionRead;
+    SharePermissions perm = SharePermissionRead;
 
     if (action == this.add_another_link_action) {
         /* emit */ create_link_share ();

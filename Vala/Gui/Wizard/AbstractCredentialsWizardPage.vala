@@ -31,6 +31,7 @@ class AbstractCredentialsWizardPage : QWizardPage {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     public virtual AbstractCredentials get_credentials ();

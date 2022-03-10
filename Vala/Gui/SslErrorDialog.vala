@@ -15,81 +15,25 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Ssl_error_dialog class
+@brief The SslErrorDialog class
 @ingroup gui
 ***********************************************************/
-class Ssl_error_dialog : Gtk.Dialog {
+class SslErrorDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public Ssl_error_dialog (AccountPointer account, Gtk.Widget parent = null);
-    ~Ssl_error_dialog () override;
-    public bool check_failing_certificates_known (GLib.List<QSslError> errors);
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool trust_connection ();
+    private GLib.List<QSslCertificate> unknown_certificates;
+    private string custom_config_handle;
+    private Ui.SslErrorDialog ui;
+    private AccountPointer account;
 
     /***********************************************************
     ***********************************************************/
-    public GLib.List<QSslCertificate> unknown_certificates () {
-        return this.unknown_certificates;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private string style_sheet ();
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private GLib.List<QSslCertificate> this.unknown_certificates;
-    private string this.custom_config_handle;
-    private Ui.Ssl_error_dialog this.ui;
-    private AccountPointer this.account;
-}
-
-    namespace Utility {
-        //  Used for QSSLCertificate.subject_info which returns a string[] in Qt5, but a string in Qt4
-        string escape (string[] l) {
-            return escape (l.join (';'));
-        }
-    }
-
-    bool SslDialogErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certificates, AccountPointer account) {
-        (void)conf;
-        if (!certificates) {
-            GLib.critical ("Certs parameter required but is NULL!";
-            return false;
-        }
-
-        Ssl_error_dialog dlg (account);
-        // whether the failing certificates have previously been accepted
-        if (dlg.check_failing_certificates_known (errors)) {
-            *certificates = dlg.unknown_certificates ();
-            return true;
-        }
-        // whether the user accepted the certificates
-        if (dlg.exec () == Gtk.Dialog.Accepted) {
-            if (dlg.trust_connection ()) {
-                *certificates = dlg.unknown_certificates ();
-                return true;
-            }
-        }
-        return false;
-    }
-
-    Ssl_error_dialog.Ssl_error_dialog (AccountPointer account, Gtk.Widget parent)
-        : Gtk.Dialog (parent)
-        this.all_trusted (false)
-        this.ui (new Ui.Ssl_error_dialog)
-        this.account (account) {
+    public SslErrorDialog (AccountPointer account, Gtk.Widget parent = new Gtk.Widget ()) {
+        base (parent);
+        this.all_trusted = false;
+        this.ui = new Ui.SslErrorDialog ();
+        this.account = account;
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         this.ui.up_ui (this);
         window_title (_("Untrusted Certificate"));
@@ -110,29 +54,17 @@ class Ssl_error_dialog : Gtk.Dialog {
         }
     }
 
-    Ssl_error_dialog.~Ssl_error_dialog () {
+
+    /***********************************************************
+    ***********************************************************/
+    override ~SslErrorDialog () {
         delete this.ui;
     }
 
-    string Ssl_error_dialog.style_sheet () {
-        const string style =
-            "#cert {margin-left : 5px;} "
-            + "#ca_error { color:#a00011; margin-left:5px; margin-right:5px; }"
-            + "#ca_error p { margin-top : 2px; margin-bottom:2px; }"
-            + "#ccert { margin-left : 5px; }"
-            + "#issuer { margin-left : 5px; }"
-            + "tt { font-size : small; }");
 
-        return style;
-    }
-
-
-    const int QL (int x) {
-        return x;
-    }
-
-
-    bool Ssl_error_dialog.check_failing_certificates_known (GLib.List<QSslError> errors) {
+    /***********************************************************
+    ***********************************************************/
+    public bool check_failing_certificates_known (GLib.List<QSslError> errors) {
         // check if unknown certificates caused errors.
         this.unknown_certificates.clear ();
 
@@ -207,7 +139,42 @@ class Ssl_error_dialog : Gtk.Dialog {
         return false;
     }
 
-    string Ssl_error_dialog.cert_div (QSslCertificate cert) {
+
+    /***********************************************************
+    ***********************************************************/
+    public bool trust_connection () {
+        if (this.all_trusted)
+            return true;
+
+        bool stat = (this.ui.cb_trust_connect.check_state () == Qt.Checked);
+        GLib.info ("SSL-Connection is trusted: " + stat;
+
+        return stat;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public GLib.List<QSslCertificate> unknown_certificates () {
+        return this.unknown_certificates;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private string style_sheet () {
+        return "#cert {margin-left : 5px;} "
+            + "#ca_error { color:#a00011; margin-left:5px; margin-right:5px; }"
+            + "#ca_error p { margin-top : 2px; margin-bottom:2px; }"
+            + "#ccert { margin-left : 5px; }"
+            + "#issuer { margin-left : 5px; }"
+            + "tt { font-size : small; }";
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private string cert_div (QSslCertificate cert) {
         string message;
         message += QL ("<div identifier=\"cert\">");
         message += QL ("<h3>") + _("with Certificate %1").arg (Utility.escape (cert.subject_info (QSslCertificate.Common_name))) + QL ("</h3>");
@@ -259,15 +226,24 @@ class Ssl_error_dialog : Gtk.Dialog {
         return message;
     }
 
-    bool Ssl_error_dialog.trust_connection () {
-        if (this.all_trusted)
-            return true;
 
-        bool stat = (this.ui.cb_trust_connect.check_state () == Qt.Checked);
-        GLib.info ("SSL-Connection is trusted: " + stat;
-
-        return stat;
+    /***********************************************************
+    Used for QSSLCertificate.subject_info which returns a
+    string[] in Qt5, but a string in Qt4
+    ***********************************************************/
+    private static string escape (string[] l) {
+        return escape (l.join (';'));
     }
 
-    } // end namespace
+
+    /***********************************************************
+    ***********************************************************/
+    private static int QL (int x) {
+        return x;
+    }
+
+}
+
+}
+}
     

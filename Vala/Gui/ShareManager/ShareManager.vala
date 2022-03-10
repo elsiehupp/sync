@@ -19,11 +19,11 @@ The share manager allows for creating, retrieving and deletion
 of shares. It abstracts away from the OCS Share API, all the usages
 shares should talk to this manager and not use OCS Share Job directly
 ***********************************************************/
-class Share_manager : GLib.Object {
+class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Share_manager (AccountPointer this.account, GLib.Object parent = new GLib.Object ());
+    public ShareManager (AccountPointer this.account, GLib.Object parent = new GLib.Object ());
 
 
     /***********************************************************
@@ -70,9 +70,9 @@ class Share_manager : GLib.Object {
     public void fetch_shares (string path);
 
 signals:
-    void share_created (unowned<Share> share);
+    void share_created (unowned Share share);
     void on_signal_link_share_created (unowned<Link_share> share);
-    void on_signal_shares_fetched (GLib.List<unowned<Share>> shares);
+    void on_signal_shares_fetched (GLib.List<unowned Share> shares);
     void on_signal_server_error (int code, string message);
 
 
@@ -97,7 +97,7 @@ signals:
     ***********************************************************/
     private unowned<Link_share> parse_link_share (QJsonObject data);
     private unowned<User_group_share> parse_user_group_share (QJsonObject data);
-    private unowned<Share> parse_share (QJsonObject data);
+    private unowned Share parse_share (QJsonObject data);
 
     /***********************************************************
     ***********************************************************/
@@ -127,21 +127,21 @@ static void update_folder (AccountPointer account, string path) {
 }
 
 
-Share_manager.Share_manager (AccountPointer account, GLib.Object parent)
+ShareManager.ShareManager (AccountPointer account, GLib.Object parent)
     : GLib.Object (parent)
     this.account (account) {
 }
 
-void Share_manager.create_link_share (string path,
+void ShareManager.create_link_share (string path,
     const string name,
     const string password) {
     var job = new OcsShareJob (this.account);
-    connect (job, &OcsShareJob.share_job_finished, this, &Share_manager.on_signal_link_share_created);
-    connect (job, &OcsJob.ocs_error, this, &Share_manager.on_signal_ocs_error);
+    connect (job, &OcsShareJob.share_job_finished, this, &ShareManager.on_signal_link_share_created);
+    connect (job, &OcsJob.ocs_error, this, &ShareManager.on_signal_ocs_error);
     job.create_link_share (path, name, password);
 }
 
-void Share_manager.on_signal_link_share_created (QJsonDocument reply) {
+void ShareManager.on_signal_link_share_created (QJsonDocument reply) {
     string message;
     int code = OcsShareJob.get_json_return_code (reply, message);
 
@@ -164,13 +164,13 @@ void Share_manager.on_signal_link_share_created (QJsonDocument reply) {
     update_folder (this.account, share.path ());
 }
 
-void Share_manager.create_share (string path,
+void ShareManager.create_share (string path,
     const Share.ShareType share_type,
     const string share_with,
     const Share.Permissions desired_permissions,
     const string password) {
     var job = new OcsShareJob (this.account);
-    connect (job, &OcsJob.ocs_error, this, &Share_manager.on_signal_ocs_error);
+    connect (job, &OcsJob.ocs_error, this, &ShareManager.on_signal_ocs_error);
     connect (job, &OcsShareJob.share_job_finished, this,
         [=] (QJsonDocument reply) {
             // Find existing share permissions (if this was shared with us)
@@ -192,43 +192,43 @@ void Share_manager.create_share (string path,
             }
 
             var job = new OcsShareJob (this.account);
-            connect (job, &OcsShareJob.share_job_finished, this, &Share_manager.on_signal_share_created);
-            connect (job, &OcsJob.ocs_error, this, &Share_manager.on_signal_ocs_error);
+            connect (job, &OcsShareJob.share_job_finished, this, &ShareManager.on_signal_share_created);
+            connect (job, &OcsJob.ocs_error, this, &ShareManager.on_signal_ocs_error);
             job.create_share (path, share_type, share_with, valid_permissions, password);
         });
     job.get_shared_with_me ();
 }
 
-void Share_manager.on_signal_share_created (QJsonDocument reply) {
+void ShareManager.on_signal_share_created (QJsonDocument reply) {
     //Parse share
     var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
-    unowned<Share> share (parse_share (data));
+    unowned Share share (parse_share (data));
 
     /* emit */ share_created (share);
 
     update_folder (this.account, share.path ());
 }
 
-void Share_manager.fetch_shares (string path) {
+void ShareManager.fetch_shares (string path) {
     var job = new OcsShareJob (this.account);
-    connect (job, &OcsShareJob.share_job_finished, this, &Share_manager.on_signal_shares_fetched);
-    connect (job, &OcsJob.ocs_error, this, &Share_manager.on_signal_ocs_error);
+    connect (job, &OcsShareJob.share_job_finished, this, &ShareManager.on_signal_shares_fetched);
+    connect (job, &OcsJob.ocs_error, this, &ShareManager.on_signal_ocs_error);
     job.on_signal_get_shares (path);
 }
 
-void Share_manager.on_signal_shares_fetched (QJsonDocument reply) {
+void ShareManager.on_signal_shares_fetched (QJsonDocument reply) {
     var tmp_shares = reply.object ().value ("ocs").to_object ().value ("data").to_array ();
     const string version_string = this.account.server_version ();
     GLib.debug () + version_string + "Fetched" + tmp_shares.count ("shares";
 
-    GLib.List<unowned<Share>> shares;
+    GLib.List<unowned Share> shares;
 
     foreach (var share, tmp_shares) {
         var data = share.to_object ();
 
         var share_type = data.value ("share_type").to_int ();
 
-        unowned<Share> new_share;
+        unowned Share new_share;
 
         if (share_type == Share.Type_link) {
             new_share = parse_link_share (data);
@@ -238,14 +238,14 @@ void Share_manager.on_signal_shares_fetched (QJsonDocument reply) {
             new_share = parse_share (data);
         }
 
-        shares.append (unowned<Share> (new_share));
+        shares.append (unowned Share (new_share));
     }
 
     GLib.debug ("Sending " + shares.count ("shares";
     /* emit */ shares_fetched (shares);
 }
 
-unowned<User_group_share> Share_manager.parse_user_group_share (QJsonObject data) {
+unowned<User_group_share> ShareManager.parse_user_group_share (QJsonObject data) {
     unowned<Sharee> sharee (new Sharee (data.value ("share_with").to_string (),
         data.value ("share_with_displayname").to_string (),
         static_cast<Sharee.Type> (data.value ("share_type").to_int ())));
@@ -273,7 +273,7 @@ unowned<User_group_share> Share_manager.parse_user_group_share (QJsonObject data
         note));
 }
 
-unowned<Link_share> Share_manager.parse_link_share (QJsonObject data) {
+unowned<Link_share> ShareManager.parse_link_share (QJsonObject data) {
     GLib.Uri url;
 
     // From own_cloud server 8.2 the url field is always set for public shares
@@ -314,12 +314,12 @@ unowned<Link_share> Share_manager.parse_link_share (QJsonObject data) {
         data.value ("label").to_string ()));
 }
 
-unowned<Share> Share_manager.parse_share (QJsonObject data) {
+unowned Share ShareManager.parse_share (QJsonObject data) {
     unowned<Sharee> sharee (new Sharee (data.value ("share_with").to_string (),
         data.value ("share_with_displayname").to_string (),
         (Sharee.Type)data.value ("share_type").to_int ()));
 
-    return unowned<Share> (new Share (this.account,
+    return unowned Share (new Share (this.account,
         data.value ("identifier").to_variant ().to_string (), // "identifier" used to be an integer, support both
         data.value ("uid_owner").to_variant ().to_string (),
         data.value ("displayname_owner").to_variant ().to_string (),
@@ -330,7 +330,7 @@ unowned<Share> Share_manager.parse_share (QJsonObject data) {
         sharee));
 }
 
-void Share_manager.on_signal_ocs_error (int status_code, string message) {
+void ShareManager.on_signal_ocs_error (int status_code, string message) {
     /* emit */ server_error (status_code, message);
 }
 }

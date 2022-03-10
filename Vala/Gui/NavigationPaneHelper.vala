@@ -15,37 +15,32 @@ class NavigationPaneHelper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public NavigationPaneHelper (FolderMan folder_man);
-
-    /***********************************************************
-    ***********************************************************/
-    public bool show_in_explorer_navigation_pane () {
-        return this.show_in_explorer_navigation_pane;
+    private FolderMan folder_man;
+    bool show_in_explorer_navigation_pane {
+        public get {
+            
+        }
+        public set {
+            if (this.show_in_explorer_navigation_pane == value) {
+                return;
+            }
+    
+            this.show_in_explorer_navigation_pane = value;
+            // Re-generate a new CLSID when enabling, possibly throwing away the old one.
+            // update_cloud_storage_registry will take care of removing any unknown CLSID our application owns from the registry.
+            foreach (Folder folder in this.folder_man.map ()) {
+                folder.navigation_pane_clsid (value ? QUuid.create_uuid () : QUuid ());
+            }
+    
+            schedule_update_cloud_storage_registry ();
+        }
     }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void show_in_explorer_navigation_pane (bool show);
+    private QTimer update_cloud_storage_registry_timer;
 
     /***********************************************************
     ***********************************************************/
-    public void schedule_update_cloud_storage_registry ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void update_cloud_storage_registry ();
-
-    /***********************************************************
-    ***********************************************************/
-    private FolderMan this.folder_man;
-    private bool this.show_in_explorer_navigation_pane;
-    private QTimer this.update_cloud_storage_registry_timer;
-}
-
-    NavigationPaneHelper.NavigationPaneHelper (FolderMan folder_man)
-        : this.folder_man (folder_man) {
+    public NavigationPaneHelper (FolderMan folder_man) {
+        this.folder_man = folder_man;
         ConfigFile config;
         this.show_in_explorer_navigation_pane = config.show_in_explorer_navigation_pane ();
 
@@ -58,26 +53,20 @@ class NavigationPaneHelper : GLib.Object {
         show_in_explorer_navigation_pane (!this.show_in_explorer_navigation_pane);
     }
 
-    void NavigationPaneHelper.show_in_explorer_navigation_pane (bool show) {
-        if (this.show_in_explorer_navigation_pane == show)
-            return;
 
-        this.show_in_explorer_navigation_pane = show;
-        // Re-generate a new CLSID when enabling, possibly throwing away the old one.
-        // update_cloud_storage_registry will take care of removing any unknown CLSID our application owns from the registry.
-        foreach (Folder folder, this.folder_man.map ())
-            folder.navigation_pane_clsid (show ? QUuid.create_uuid () : QUuid ());
-
-        schedule_update_cloud_storage_registry ();
-    }
-
-    void NavigationPaneHelper.schedule_update_cloud_storage_registry () {
+    /***********************************************************
+    ***********************************************************/
+    public void schedule_update_cloud_storage_registry () {
         // Schedule the update to happen a bit later to avoid doing the update multiple times in a row.
-        if (!this.update_cloud_storage_registry_timer.is_active ())
+        if (!this.update_cloud_storage_registry_timer.is_active ()) {
             this.update_cloud_storage_registry_timer.on_signal_start (500);
+        }
     }
 
-    void NavigationPaneHelper.update_cloud_storage_registry () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void update_cloud_storage_registry () {
         // Start by looking at every registered namespace extension for the sidebar, and look for an "Application_name" value
         // that matches ours when we saved.
         GLib.Vector<QUuid> entries_to_remove;
@@ -104,7 +93,7 @@ class NavigationPaneHelper : GLib.Object {
                     string icon_path = QDir.to_native_separators (Gtk.Application.application_file_path ());
                     string target_folder_path = QDir.to_native_separators (folder.clean_path ());
 
-                    GLib.info ("Explorer Cloud storage provider : saving path" + target_folder_path + "to CLSID" + clsid_str;
+                    GLib.info ("Explorer Cloud storage provider: saving path " + target_folder_path + " to CLSID " + clsid_str);
 
                     // This code path should only occur on Windows (the config will be false, and the checkbox invisible on other platforms).
                     // Add runtime checks rather than #ifdefing out the whole code to help catch breakages when developing on other platforms.
@@ -122,9 +111,12 @@ class NavigationPaneHelper : GLib.Object {
             string clsid_path_wow64 = "" % R" (Software\Classes\Wow6432Node\CLSID\)" % clsid_str;
             string namespace_path = "" % R" (Software\Microsoft\Windows\Current_version\Explorer\Desktop\Name_space\)" % clsid_str;
 
-            GLib.info ("Explorer Cloud storage provider : now unused, removing own CLSID" + clsid_str;
+            GLib.info ("Explorer Cloud storage provider: now unused, removing own CLSID " + clsid_str);
         }
     }
 
-    } // namespace Occ
+} // class NavigationPaneHelper
+
+} // namespace Ui
+} // namespace Occ
     

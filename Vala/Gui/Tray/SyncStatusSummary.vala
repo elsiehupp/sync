@@ -38,6 +38,7 @@ class SyncStatusSummary : GLib.Object {
         connect (folder_man, &FolderMan.signal_folder_sync_state_change, this, &SyncStatusSummary.on_signal_folder_sync_state_changed);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public double sync_progress () {
@@ -73,11 +74,13 @@ class SyncStatusSummary : GLib.Object {
         return status;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public bool syncing () {
         return this.is_syncing;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -114,16 +117,14 @@ class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string sync_status_detail_string ();
-    string SyncStatusSummary.sync_status_detail_string () {
+    public string sync_status_detail_string () {
         return this.sync_status_detail_string;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void sync_status_detail_string (string value);
-    void SyncStatusSummary.sync_status_detail_string (string value) {
+    private void sync_status_detail_string (string value) {
         if (this.sync_status_detail_string == value) {
             return;
         }
@@ -289,16 +290,14 @@ class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void mark_folder_as_success (Folder folder);
-    void SyncStatusSummary.mark_folder_as_success (Folder folder) {
+    private void mark_folder_as_success (Folder folder) {
         this.folders_with_errors.erase (folder.alias ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private bool folder_errors ();
-    bool SyncStatusSummary.folder_errors () {
+    private bool folder_errors () {
         return this.folders_with_errors.size () != 0;
     }
 
@@ -315,7 +314,6 @@ class SyncStatusSummary : GLib.Object {
     private void clear_folder_errors () {
         this.folders_with_errors.clear ();
     }
-
 
 
     /***********************************************************
@@ -360,7 +358,7 @@ class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void syncing (bool value);
+    //  private void syncing (bool value);
 
 
     /***********************************************************
@@ -408,6 +406,7 @@ class SyncStatusSummary : GLib.Object {
         overall_percent = q_bound (0, overall_percent, 100);
         return overall_percent / 100.0;
     }
+
 } // class SyncStatusSummary
 
 } // namespace Ui

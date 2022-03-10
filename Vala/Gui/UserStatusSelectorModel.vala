@@ -36,17 +36,16 @@ class UserStatusSelectorModel : GLib.Object {
         WEEK
     }
 
-
     /***********************************************************
     ***********************************************************/
-    private std.shared_ptr<UserStatusConnector> user_status_connector {};
+    private std.shared_ptr<UserStatusConnector> user_status_connector = new UserStatusConnector ();
     private GLib.Vector<UserStatus> predefined_statuses;
     private UserStatus user_status;
-    private std.unique_ptr<DateTimeProvider> date_time_provider;
+    private std.unique_ptr<DateTimeProvider> date_time_provider = new DateTimeProvider ();
 
     /***********************************************************
     ***********************************************************/
-    private string error_message;
+    string error_message { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -79,7 +78,9 @@ class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> user_status_connector, GLib.Object parent = new GLib.Object ()) {
+    public UserStatusSelectorModel.with_connector (
+        std.shared_ptr<UserStatusConnector> user_status_connector,
+        GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.user_status_connector (user_status_connector)
         this.user_status ("no-identifier", "", "😀", UserStatus.OnlineStatus.Online, false, {})
@@ -91,8 +92,9 @@ class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> user_status_connector,
-        std.unique_ptr<DateTimeProvider> date_time_provider,
+    public UserStatusSelectorModel.with_connector_and_provider (
+        std.shared_ptr<UserStatusConnector> user_status_connector,
+        std.unique_ptr<DateTimeProvider> date_time_provider = new DateTimeProvider (),
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.user_status_connector = user_status_connector;
@@ -104,7 +106,8 @@ class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public UserStatusSelectorModel (UserStatus user_status,
+    public UserStatusSelectorModel.with_provider (
+        UserStatus user_status,
         std.unique_ptr<DateTimeProvider> date_time_provider,
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
@@ -116,7 +119,8 @@ class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public UserStatusSelectorModel (UserStatus user_status,
+    public UserStatusSelectorModel (
+        UserStatus user_status,
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.user_status = user_status;
@@ -124,22 +128,18 @@ class UserStatusSelectorModel : GLib.Object {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public UserStatus.OnlineStatus online_status () {
-        return this.user_status.state ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void online_status (UserStatus.OnlineStatus status) {
-        if (status == this.user_status.state ()) {
-            return;
+    UserStatus.OnlineStatus online_status {
+        public get {
+            return this.user_status.state ();
         }
-
-        this.user_status.state (status);
-        /* emit */ online_status_changed ();
+        public set {
+            if (value == this.user_status.state ()) {
+                return;
+            }
+    
+            this.user_status.state (value);
+            /* emit */ online_status_changed ();
+        }
     }
 
 
@@ -173,36 +173,27 @@ class UserStatusSelectorModel : GLib.Object {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public string user_status_message () {
-        return this.user_status.message ();
+    string user_status_message {
+        public get {
+            return this.user_status.message ();
+        }
+        public set {
+            this.user_status.message (value);
+            this.user_status.message_predefined (false);
+            /* emit */ user_status_changed ();
+        }
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public void user_status_message (string message) {
-        this.user_status.message (message);
-        this.user_status.message_predefined (false);
-        /* emit */ user_status_changed ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void user_status_emoji (string emoji) {
-        this.user_status.icon (emoji);
-        this.user_status.message_predefined (false);
-        /* emit */ user_status_changed ();
-    }
-
-
-    /***********************************************************
-    Q_REQUIRED_RESULT
-    ***********************************************************/
-    public string user_status_emoji () {
-        return this.user_status.icon ();
+    string user_status_emoji {
+        public get {
+            return this.user_status.icon ();
+        }
+        public set {
+            this.user_status.icon (value);
+            this.user_status.message_predefined (false);
+            /* emit */ user_status_changed ();
+        }
     }
 
 
@@ -238,12 +229,14 @@ class UserStatusSelectorModel : GLib.Object {
         return static_cast<int> (this.predefined_statuses.size ());
     }
 
+
     /***********************************************************
     ***********************************************************/
-    public UserStatus predefined_status (int index) {
+    public UserStatus predefined_status_for_index (int index) {
         //  Q_ASSERT (0 <= index && index < static_cast<int> (this.predefined_statuses.size ()));
         return this.predefined_statuses[index];
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -294,19 +287,12 @@ class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void clear_at (int index) {
+    public void clear_at_for_index (int index) {
         //  Q_ASSERT (0 <= index && index < static_cast<int> (this.clear_stages.size ()));
         this.user_status.clear_at (clear_stage_type_to_date_time (this.clear_stages[index]));
         /* emit */ clear_at_changed ();
     }
 
-
-    /***********************************************************
-    Q_REQUIRED_RESULT
-    ***********************************************************/
-    public string error_message () {
-        return this.error_message;
-    }
 
     /***********************************************************
     ***********************************************************/
@@ -315,16 +301,36 @@ class UserStatusSelectorModel : GLib.Object {
             return;
         }
 
-        connect (this.user_status_connector.get (), &UserStatusConnector.user_status_fetched, this,
-            &UserStatusSelectorModel.on_signal_user_status_fetched);
-        connect (this.user_status_connector.get (), &UserStatusConnector.predefined_statuses_fetched, this,
-            &UserStatusSelectorModel.on_signal_predefined_statuses_fetched);
-        connect (this.user_status_connector.get (), &UserStatusConnector.error, this,
-            &UserStatusSelectorModel.on_signal_error);
-        connect (this.user_status_connector.get (), &UserStatusConnector.user_status_set, this,
-            &UserStatusSelectorModel.on_signal_user_status_set);
-        connect (this.user_status_connector.get (), &UserStatusConnector.message_cleared, this,
-            &UserStatusSelectorModel.on_signal_message_cleared);
+        connect (
+            this.user_status_connector.get (),
+            UserStatusConnector.user_status_fetched,
+            this,
+            UserStatusSelectorModel.on_signal_user_status_fetched
+        );
+        connect (
+            this.user_status_connector.get (),
+            UserStatusConnector.predefined_statuses_fetched,
+            this,
+            UserStatusSelectorModel.on_signal_predefined_statuses_fetched
+        );
+        connect (
+            this.user_status_connector.get (),
+            UserStatusConnector.error,
+            this,
+            UserStatusSelectorModel.on_signal_error
+        );
+        connect (
+            this.user_status_connector.get (),
+            UserStatusConnector.user_status_set,
+            this,
+            UserStatusSelectorModel.on_signal_user_status_set
+        );
+        connect (
+            this.user_status_connector.get (),
+            UserStatusConnector.message_cleared,
+            this,
+            UserStatusSelectorModel.on_signal_message_cleared
+        );
 
         this.user_status_connector.fetch_user_status ();
         this.user_status_connector.fetch_predefined_statuses ();
@@ -333,7 +339,7 @@ class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void .on_signal_load (int identifier) {
+    private void on_signal_load (int identifier) {
         on_signal_reset ();
         this.user_status_connector = UserModel.instance ().user_status_connector (identifier);
         on_signal_init ();
@@ -433,7 +439,7 @@ class UserStatusSelectorModel : GLib.Object {
             return;
         }
 
-        Q_UNREACHABLE ();
+        GLib.assert_not_reached ();
     }
 
 
@@ -461,7 +467,7 @@ class UserStatusSelectorModel : GLib.Object {
             return _("This week");
 
         default:
-            Q_UNREACHABLE ();
+            GLib.assert_not_reached ();
         }
     }
 
@@ -487,11 +493,11 @@ class UserStatusSelectorModel : GLib.Object {
                 } else if (clear_at.endof == "week") {
                     return _("This week");
                 }
-                Q_UNREACHABLE ();
+                GLib.assert_not_reached ();
             }
 
             default:
-                Q_UNREACHABLE ();
+                GLib.assert_not_reached ();
             }
         }
         return _("Don't clear");
@@ -573,7 +579,7 @@ class UserStatusSelectorModel : GLib.Object {
         }
 
         default:
-            Q_UNREACHABLE ();
+            GLib.assert_not_reached ();
         }
     }
 

@@ -49,41 +49,112 @@ class User : GLib.Object {
         this.activity_model = new ActivityListModel (this.account.data (), this);
         this.unified_search_results_model = new UnifiedSearchResultsListModel (this.account.data (), this);
         this.notification_requests_running = 0;
-        connect (ProgressDispatcher.instance (), &ProgressDispatcher.progress_info,
-            this, &User.on_signal_progress_info);
-        connect (ProgressDispatcher.instance (), &ProgressDispatcher.item_completed,
-            this, &User.on_signal_item_completed);
-        connect (ProgressDispatcher.instance (), &ProgressDispatcher.sync_error,
-            this, &User.on_signal_add_error);
-        connect (ProgressDispatcher.instance (), &ProgressDispatcher.add_error_to_gui,
-            this, &User.on_signal_add_error_to_gui);
+        connect (
+            ProgressDispatcher.instance (),
+            ProgressDispatcher.progress_info,
+            this,
+            User.on_signal_progress_info
+        );
+        connect (
+            ProgressDispatcher.instance (),
+            ProgressDispatcher.item_completed,
+            this,
+            User.on_signal_item_completed
+        );
+        connect (
+            ProgressDispatcher.instance (),
+            ProgressDispatcher.sync_error,
+            this,
+            User.on_signal_add_error
+        );
+        connect (
+            ProgressDispatcher.instance (),
+            ProgressDispatcher.add_error_to_gui,
+            this,
+            User.on_signal_add_error_to_gui
+        );
 
-        connect (&this.notification_check_timer, &QTimer.timeout,
-            this, &User.on_signal_refresh);
+        connect (
+            this.notification_check_timer,
+            QTimer.timeout,
+            this,
+            User.on_signal_refresh
+        );
 
-        connect (&this.expired_activities_check_timer, &QTimer.timeout,
-            this, &User.on_signal_check_expired_activities);
+        connect (
+            this.expired_activities_check_timer,
+            QTimer.timeout,
+            this,
+            User.on_signal_check_expired_activities
+        );
 
-        connect (this.account.data (), &AccountState.state_changed,
-                [=] () {
-                    if (is_connected ()) {
-                        on_signal_refresh_immediately ();
-                    }
-                });
-        connect (this.account.data (), &AccountState.state_changed, this, &User.signal_account_state_changed);
-        connect (this.account.data (), &AccountState.has_fetched_navigation_apps,
-            this, &User.on_signal_rebuild_navigation_app_list);
-        connect (this.account.account ().data (), &Account.account_changed_display_name, this, &User.signal_name_changed);
+        connect (
+            this.account.data (),
+            AccountState.state_changed,
+            [=] () {
+                if (is_connected ()) {
+                    on_signal_refresh_immediately ();
+                }
+            }
+        );
+        connect (
+            this.account.data (),
+            AccountState.state_changed,
+            this,
+            User.signal_account_state_changed
+        );
+        connect (
+            this.account.data (),
+            AccountState.has_fetched_navigation_apps,
+            this,
+            User.on_signal_rebuild_navigation_app_list
+        );
+        connect (
+            this.account.account ().data (),
+            Account.account_changed_display_name,
+            this,
+            User.signal_name_changed
+        );
 
-        connect (FolderMan.instance (), &FolderMan.signal_folder_list_changed, this, &User.signal_has_local_folder_changed);
+        connect (
+            FolderMan.instance (),
+            FolderMan.signal_folder_list_changed,
+            this,
+            User.signal_has_local_folder_changed
+        );
 
-        connect (this, &User.signal_gui_log, Logger.instance (), &Logger.signal_gui_log);
+        connect (
+            this,
+            User.signal_gui_log,
+            Logger.instance (),
+            Logger.signal_gui_log
+        );
 
-        connect (this.account.account ().data (), &Account.account_changed_avatar, this, &User.signal_avatar_changed);
-        connect (this.account.account ().data (), &Account.user_status_changed, this, &User.signal_status_changed);
-        connect (this.account.data (), &AccountState.signal_desktop_notifications_allowed_changed, this, &User.signal_desktop_notifications_allowed_changed);
+        connect (
+            this.account.account ().data (),
+            Account.account_changed_avatar,
+            this,
+            User.signal_avatar_changed
+        );
+        connect (
+            this.account.account ().data (),
+            Account.user_status_changed,
+            this,
+            User.signal_status_changed
+        );
+        connect (
+            this.account.data (),
+            AccountState.signal_desktop_notifications_allowed_changed,
+            this,
+            User.signal_desktop_notifications_allowed_changed
+        );
 
-        connect (this.activity_model, &ActivityListModel.send_notification_request, this, &User.on_signal_send_notification_request);
+        connect (
+            this.activity_model,
+            ActivityListModel.send_notification_request,
+            this,
+            User.on_signal_send_notification_request
+        );
     }
 
 
@@ -639,10 +710,10 @@ class User : GLib.Object {
 
 
     /***********************************************************
+    Starts a server notification handler if no notification
+    requests are running
     ***********************************************************/
     public void on_signal_refresh_notifications () {
-        // on_signal_start a server notification handler if no notification requests
-        // are running
         if (this.notification_requests_running == 0) {
             var snh = new ServerNotificationHandler (this.account.data ());
             connect (snh, &ServerNotificationHandler.signal_new_notification_list,
@@ -795,10 +866,28 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void connect_push_notifications () {
-        connect (this.account.account ().data (), &Account.push_notifications_disabled, this, &User.on_signal_disconnect_push_notifications, Qt.UniqueConnection);
+        connect (
+            this.account.account ().data (),
+            Account.push_notifications_disabled,
+            this,
+            User.on_signal_disconnect_push_notifications,
+            Qt.UniqueConnection
+        );
 
-        connect (this.account.account ().push_notifications (), &PushNotifications.notifications_changed, this, &User.on_signal_received_push_notification, Qt.UniqueConnection);
-        connect (this.account.account ().push_notifications (), &PushNotifications.activities_changed, this, &User.on_signal_received_push_activity, Qt.UniqueConnection);
+        connect (
+            this.account.account ().push_notifications (),
+            PushNotifications.notifications_changed,
+            this,
+            User.on_signal_received_push_notification,
+            Qt.UniqueConnection
+        );
+        connect (
+            this.account.account ().push_notifications (),
+            PushNotifications.activities_changed,
+            this,
+            User.on_signal_received_push_activity,
+            Qt.UniqueConnection
+        );
     }
 
 
@@ -827,7 +916,7 @@ class User : GLib.Object {
         }
 
         // after one hour, clear the gui log notification store
-        constexpr int64 clear_gui_log_interval = 60 * 60 * 1000;
+        const int64 clear_gui_log_interval = 60 * 60 * 1000;
         if (this.gui_log_timer.elapsed () > clear_gui_log_interval) {
             this.notification_cache.clear ();
         }

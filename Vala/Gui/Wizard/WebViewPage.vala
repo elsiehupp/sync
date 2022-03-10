@@ -3,7 +3,7 @@
 //  #include <QProgressBar>
 //  #include <QVBoxLayout>
 //  #include <QNetworkProxyFactory>
-//  #include <QScreen>
+//  #include <Gdk.Screen>
 
 namespace Occ {
 namespace Ui {
@@ -13,10 +13,6 @@ class WebViewPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     private OwncloudWizard oc_wizard;
-
-    /***********************************************************
-    ***********************************************************/
-    private 
 
     /***********************************************************
     ***********************************************************/
@@ -30,7 +26,9 @@ class WebViewPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     private QSize original_wizard_size;
 
-    signal void connect_to_oc_url (string&);
+    /***********************************************************
+    ***********************************************************/
+    signal void connect_to_oc_url (string value);
 
     /***********************************************************
     ***********************************************************/

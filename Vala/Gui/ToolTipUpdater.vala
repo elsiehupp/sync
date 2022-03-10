@@ -29,67 +29,53 @@ class ToolTipUpdater : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ToolTipUpdater (QTreeView tree_view);
+    private QTreeView tree_view;
+    private QPoint tool_tip_pos;
 
-
-    protected bool event_filter (GLib.Object object, QEvent ev) override;
+    /***********************************************************
+    ***********************************************************/
+    public ToolTipUpdater (QTreeView tree_view) {
+        base (tree_view);
+        this.tree_view = tree_view;
+        connect (
+            this.tree_view.model (),
+            QAbstractItemModel.on_signal_data_changed,
+            this,
+            ToolTipUpdater.on_signal_data_changed
+        );
+        this.tree_view.viewport ().install_event_filter (this);
+    }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_data_changed (QModelIndex top_left, QModelIndex bottom_right, GLib.Vector<int> roles);
+    protected override bool event_filter (GLib.Object object, QEvent ev) {
+        if (ev.type () == QEvent.Tool_tip) {
+            var help_event = static_cast<QHelp_event> (ev);
+            this.tool_tip_pos = help_event.global_pos ();
+        }
+        return false;
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    private 
-    private QTreeView this.tree_view;
-    private QPoint this.tool_tip_pos;
-}
+    private void on_signal_data_changed (QModelIndex top_left, QModelIndex bottom_right, GLib.Vector<int> roles) {
+        if (!QToolTip.is_visible () || !roles.contains (Qt.ToolTipRole) || this.tool_tip_pos.is_null ()) {
+            return;
+        }
 
+        // Was it the item under the cursor that changed?
+        var index = this.tree_view.index_at (this.tree_view.map_from_global (QCursor.position ()));
+        if (top_left == bottom_right && index != top_left) {
+            return;
+        }
+
+        // Update the currently active tooltip
+        QToolTip.show_text (this.tool_tip_pos, this.tree_view.model ().data (index, Qt.ToolTipRole).to_string ());
+    }
+
+} // class ToolTipUpdater
+
+} // namespace Ui
 } // namespace Occ
-
-
-
-
-
-
-
-
-
-
-
-
-using Occ;
-
-ToolTipUpdater.ToolTipUpdater (QTreeView tree_view)
-    : GLib.Object (tree_view)
-    this.tree_view (tree_view) {
-    connect (this.tree_view.model (), &QAbstractItemModel.on_signal_data_changed,
-        this, &ToolTipUpdater.on_signal_data_changed);
-    this.tree_view.viewport ().install_event_filter (this);
-}
-
-bool ToolTipUpdater.event_filter (GLib.Object * /*object*/, QEvent ev) {
-    if (ev.type () == QEvent.Tool_tip) {
-        var help_event = static_cast<QHelp_event> (ev);
-        this.tool_tip_pos = help_event.global_pos ();
-    }
-    return false;
-}
-
-void ToolTipUpdater.on_signal_data_changed (QModelIndex top_left,
-    const QModelIndex bottom_right,
-    const GLib.Vector<int> roles) {
-    if (!QToolTip.is_visible () || !roles.contains (Qt.ToolTipRole) || this.tool_tip_pos.is_null ()) {
-        return;
-    }
-
-    // Was it the item under the cursor that changed?
-    var index = this.tree_view.index_at (this.tree_view.map_from_global (QCursor.position ()));
-    if (top_left == bottom_right && index != top_left) {
-        return;
-    }
-
-    // Update the currently active tooltip
-    QToolTip.show_text (this.tool_tip_pos, this.tree_view.model ().data (index, Qt.ToolTipRole).to_string ());
-}

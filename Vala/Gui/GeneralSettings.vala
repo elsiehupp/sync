@@ -265,7 +265,7 @@ void General_settings.on_signal_update_info () {
     // Note: the sparkle-updater is not an OCUpdater
     var ocupdater = qobject_cast<OCUpdater> (Updater.instance ());
     if (ocupdater) {
-        connect (ocupdater, &OCUpdater.download_state_changed, this, &General_settings.on_signal_update_info, Qt.UniqueConnection);
+        connect (ocupdater, &OCUpdater.signal_download_state_changed, this, &General_settings.on_signal_update_info, Qt.UniqueConnection);
         connect (this.ui.restart_button, &QAbstractButton.clicked, ocupdater, &OCUpdater.on_signal_start_installer, Qt.UniqueConnection);
         connect (this.ui.restart_button, &QAbstractButton.clicked, Gtk.Application, &QApplication.quit, Qt.UniqueConnection);
         connect (this.ui.update_button, &QAbstractButton.clicked, this, &General_settings.on_signal_update_check_now, Qt.UniqueConnection);

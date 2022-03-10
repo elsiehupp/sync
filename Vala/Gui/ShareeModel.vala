@@ -7,23 +7,24 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-class Sharee_model : QAbstractListModel {
+class ShareeModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public enum Lookup_mode {
+    public enum LookupMode {
         Local_search = 0,
         Global_search = 1
     }
 
+
     /***********************************************************
     ***********************************************************/
-    public Sharee_model (AccountPointer account, string type, GLib.Object parent = new GLib.Object ());
+    public ShareeModel (AccountPointer account, string type, GLib.Object parent = new GLib.Object ());
 
     /***********************************************************
     ***********************************************************/
     public using Sharee_set = GLib.Vector<unowned<Sharee>>; // FIXME: make it a GLib.Set<Sharee> when Sharee can be compared
-    public void fetch (string search, Sharee_set blocklist, Lookup_mode lookup_mode);
+    public void fetch (string search, Sharee_set blocklist, LookupMode lookup_mode);
 
 
     /***********************************************************
@@ -71,22 +72,22 @@ signals:
 
 
 
-    Sharee_model.Sharee_model (AccountPointer account, string type, GLib.Object parent)
+    ShareeModel.ShareeModel (AccountPointer account, string type, GLib.Object parent)
         : QAbstractListModel (parent)
         this.account (account)
         this.type (type) {
     }
 
-    void Sharee_model.fetch (string search, Sharee_set blocklist, Lookup_mode lookup_mode) {
+    void ShareeModel.fetch (string search, Sharee_set blocklist, LookupMode lookup_mode) {
         this.search = search;
         this.sharee_blocklist = blocklist;
         var job = new Ocs_sharee_job (this.account);
-        connect (job, &Ocs_sharee_job.sharee_job_finished, this, &Sharee_model.on_signal_sharees_fetched);
-        connect (job, &OcsJob.ocs_error, this, &Sharee_model.display_error_message);
+        connect (job, &Ocs_sharee_job.sharee_job_finished, this, &ShareeModel.on_signal_sharees_fetched);
+        connect (job, &OcsJob.ocs_error, this, &ShareeModel.display_error_message);
         job.get_sharees (this.search, this.type, 1, 50, lookup_mode == Global_search ? true : false);
     }
 
-    void Sharee_model.on_signal_sharees_fetched (QJsonDocument reply) {
+    void ShareeModel.on_signal_sharees_fetched (QJsonDocument reply) {
         GLib.Vector<unowned<Sharee>> new_sharees;
      {
             const string[] sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
@@ -124,7 +125,7 @@ signals:
         sharees_ready ();
     }
 
-    unowned<Sharee> Sharee_model.parse_sharee (QJsonObject data) {
+    unowned<Sharee> ShareeModel.parse_sharee (QJsonObject data) {
         string display_name = data.value ("label").to_string ();
         const string share_with = data.value ("value").to_object ().value ("share_with").to_string ();
         Sharee.Type type = (Sharee.Type)data.value ("value").to_object ().value ("share_type").to_int ();
@@ -152,7 +153,7 @@ signals:
 
         Do that while preserving the model index so the selection stays
     ***********************************************************/
-    void Sharee_model.new_sharees (GLib.Vector<unowned<Sharee>> new_sharees) {
+    void ShareeModel.new_sharees (GLib.Vector<unowned<Sharee>> new_sharees) {
         layout_about_to_be_changed ();
         const var persistent = persistent_index_list ();
         GLib.Vector<unowned<Sharee>> old_persistant_sharee;
@@ -181,11 +182,11 @@ signals:
         layout_changed ();
     }
 
-    int Sharee_model.row_count (QModelIndex &) {
+    int ShareeModel.row_count (QModelIndex &) {
         return this.sharees.size ();
     }
 
-    GLib.Variant Sharee_model.data (QModelIndex index, int role) {
+    GLib.Variant ShareeModel.data (QModelIndex index, int role) {
         if (index.row () < 0 || index.row () > this.sharees.size ()) {
             return GLib.Variant ();
         }
@@ -208,7 +209,7 @@ signals:
         return GLib.Variant ();
     }
 
-    unowned<Sharee> Sharee_model.get_sharee (int at) {
+    unowned<Sharee> ShareeModel.get_sharee (int at) {
         if (at < 0 || at > this.sharees.size ()) {
             return unowned<Sharee> (null);
         }

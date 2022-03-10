@@ -17,11 +17,11 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     private Ui.OwncloudHttpCredsPage ui;
     private bool connected;
-    private QProgressIndicator progress_indi;
+    private QProgressIndicator progress_indicator;
     private OwncloudWizard oc_wizard;
 
 
-    signal void connect_to_oc_url (string );
+    signal void connect_to_oc_url (string value);
 
 
     /***********************************************************
@@ -30,7 +30,7 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         base ();
         this.ui ();
         this.connected = false;
-        this.progress_indi = new QProgressIndicator (this);
+        this.progress_indicator = new QProgressIndicator (this);
         this.ui.up_ui (this);
 
         if (parent) {
@@ -59,7 +59,7 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         title (WizardCommon.title_template ().arg (_("Connect to %1").arg (Theme.instance ().app_name_gui ())));
         sub_title (WizardCommon.sub_title_template ().arg (_("Enter user credentials")));
 
-        this.ui.result_layout.add_widget (this.progress_indi);
+        this.ui.result_layout.add_widget (this.progress_indicator);
         on_signal_stop_spinner ();
         set_up_customization ();
     }
@@ -190,8 +190,8 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     private void on_signal_start_spinner () {
         this.ui.result_layout.enabled (true);
-        this.progress_indi.visible (true);
-        this.progress_indi.on_signal_start_animation ();
+        this.progress_indicator.visible (true);
+        this.progress_indicator.on_signal_start_animation ();
     }
 
 
@@ -199,8 +199,8 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     private void on_signal_stop_spinner () {
         this.ui.result_layout.enabled (false);
-        this.progress_indi.visible (false);
-        this.progress_indi.on_signal_stop_animation ();
+        this.progress_indicator.visible (false);
+        this.progress_indicator.on_signal_stop_animation ();
     }
 
 
@@ -225,8 +225,9 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     private void customize_style () {
-        if (this.progress_indi)
-            this.progress_indi.on_signal_color (QGuiApplication.palette ().color (QPalette.Text));
+        if (this.progress_indicator) {
+            this.progress_indicator.on_signal_color (QGuiApplication.palette ().color (QPalette.Text));
+        }
     }
 
 } // class OwncloudHttpCredsPage

@@ -23,7 +23,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <Gtk.Dialog>
 //  #include <QLineEdit>
 //  #include <QPushButton>
-//  #include <Gtk.Label>
 
 namespace Occ {
 namespace Ui {

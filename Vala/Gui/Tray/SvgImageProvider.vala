@@ -18,6 +18,7 @@ class SvgImageProvider : QQuickImageProvider {
         base (QQuickImageProvider.Image);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public Gtk.Image request_image (string identifier, QSize size, QSize requested_size) {

@@ -23,9 +23,10 @@ class Share : GLib.Object {
         Type_room = Sharee.Room
     }
 
+
     /***********************************************************
     ***********************************************************/
-    public using Permissions = Share_permissions;
+    public using Permissions = SharePermissions;
 
 
     /***********************************************************

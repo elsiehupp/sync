@@ -25,7 +25,7 @@ class Share_dialog : Gtk.Dialog {
     public Share_dialog (QPointer<AccountState> account_state,
         const string share_path,
         const string local_path,
-        Share_permissions max_sharing_permissions,
+        SharePermissions max_sharing_permissions,
         const GLib.ByteArray numeric_file_id,
         ShareDialogStartPage start_page,
         Gtk.Widget parent = null);
@@ -42,7 +42,7 @@ class Share_dialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_shares_fetched (GLib.List<unowned<Share>> shares);
+    private void on_signal_shares_fetched (GLib.List<unowned Share> shares);
     private void on_signal_add_link_share_widget (unowned<Link_share> link_share);
     private void on_signal_delete_share ();
     private void on_signal_create_link_share ();
@@ -53,7 +53,7 @@ class Share_dialog : Gtk.Dialog {
 
 signals:
     void toggle_share_link_animation (bool on_signal_start);
-    void style_changed ();
+    void signal_style_changed ();
 
 
     protected void change_event (QEvent *) override;
@@ -74,17 +74,17 @@ signals:
     private QPointer<AccountState> this.account_state;
     private string this.share_path;
     private string this.local_path;
-    private Share_permissions this.max_sharing_permissions;
+    private SharePermissions this.max_sharing_permissions;
     private GLib.ByteArray this.numeric_file_id;
     private string this.private_link_url;
     private ShareDialogStartPage this.start_page;
-    private Share_manager this.manager = null;
+    private ShareManager this.manager = null;
 
     /***********************************************************
     ***********************************************************/
     private GLib.List<Share_link_widget> this.link_widget_list;
     private Share_link_widget* this.empty_share_link_widget = null;
-    private Share_user_group_widget this.user_group_widget = null;
+    private ShareUserGroupWidget this.user_group_widget = null;
     private QProgressIndicator this.progress_indicator = null;
 }
 
@@ -96,7 +96,7 @@ signals:
     Share_dialog.Share_dialog (QPointer<AccountState> account_state,
         const string share_path,
         const string local_path,
-        Share_permissions max_sharing_permissions,
+        SharePermissions max_sharing_permissions,
         const GLib.ByteArray numeric_file_id,
         ShareDialogStartPage start_page,
         Gtk.Widget parent)
@@ -185,10 +185,10 @@ signals:
         }
 
         if (sharing_possible) {
-            this.manager = new Share_manager (account_state.account (), this);
-            connect (this.manager, &Share_manager.on_signal_shares_fetched, this, &Share_dialog.on_signal_shares_fetched);
-            connect (this.manager, &Share_manager.on_signal_link_share_created, this, &Share_dialog.on_signal_add_link_share_widget);
-            connect (this.manager, &Share_manager.on_signal_link_share_requires_password, this, &Share_dialog.on_signal_link_share_requires_password);
+            this.manager = new ShareManager (account_state.account (), this);
+            connect (this.manager, &ShareManager.on_signal_shares_fetched, this, &Share_dialog.on_signal_shares_fetched);
+            connect (this.manager, &ShareManager.on_signal_link_share_created, this, &Share_dialog.on_signal_add_link_share_widget);
+            connect (this.manager, &ShareManager.on_signal_link_share_requires_password, this, &Share_dialog.on_signal_link_share_requires_password);
         }
     }
 
@@ -202,7 +202,7 @@ signals:
         connect (link_share.data (), &Share.share_deleted, link_share_widget, &Share_link_widget.on_signal_delete_share_fetched);
 
         if (this.manager) {
-            connect (this.manager, &Share_manager.on_signal_server_error, link_share_widget, &Share_link_widget.on_signal_server_error);
+            connect (this.manager, &ShareManager.on_signal_server_error, link_share_widget, &Share_link_widget.on_signal_server_error);
         }
 
         // Connect all shares signals to gui slots
@@ -213,8 +213,8 @@ signals:
 
         //connect (this.link_widget_list.at (index), &Share_link_widget.resize_requested, this, &Share_dialog.on_signal_adjust_scroll_widget_size);
 
-        // Connect style_changed events to our widget, so it can adapt (Dark-/Light-Mode switching)
-        connect (this, &Share_dialog.style_changed, link_share_widget, &Share_link_widget.on_signal_style_changed);
+        // Connect signal_style_changed events to our widget, so it can adapt (Dark-/Light-Mode switching)
+        connect (this, &Share_dialog.signal_style_changed, link_share_widget, &Share_link_widget.on_signal_style_changed);
 
         this.ui.vertical_layout.insert_widget (this.link_widget_list.size () + 1, link_share_widget);
         link_share_widget.setup_ui_options ();
@@ -253,7 +253,7 @@ signals:
         /* emit */ toggle_share_link_animation (false);
     }
 
-    void Share_dialog.on_signal_shares_fetched (GLib.List<unowned<Share>> shares) {
+    void Share_dialog.on_signal_shares_fetched (GLib.List<unowned Share> shares) {
         /* emit */ toggle_share_link_animation (true);
 
         const string version_string = this.account_state.account ().server_version ();
@@ -294,7 +294,7 @@ signals:
     void Share_dialog.on_signal_propfind_received (QVariantMap result) {
         const GLib.Variant received_permissions = result["share-permissions"];
         if (!received_permissions.to_string ().is_empty ()) {
-            this.max_sharing_permissions = static_cast<Share_permissions> (received_permissions.to_int ());
+            this.max_sharing_permissions = static_cast<SharePermissions> (received_permissions.to_int ());
             GLib.info ("Received sharing permissions for" + this.share_path + this.max_sharing_permissions;
         }
         var private_link_url = result["privatelink"].to_string ();
@@ -339,10 +339,10 @@ signals:
             && this.account_state.account ().server_version_int () >= Account.make_server_version (8, 2, 0);
 
         if (user_group_sharing) {
-            this.user_group_widget = new Share_user_group_widget (this.account_state.account (), this.share_path, this.local_path, this.max_sharing_permissions, this.private_link_url, this);
+            this.user_group_widget = new ShareUserGroupWidget (this.account_state.account (), this.share_path, this.local_path, this.max_sharing_permissions, this.private_link_url, this);
 
-            // Connect style_changed events to our widget, so it can adapt (Dark-/Light-Mode switching)
-            connect (this, &Share_dialog.style_changed, this.user_group_widget, &Share_user_group_widget.on_signal_style_changed);
+            // Connect signal_style_changed events to our widget, so it can adapt (Dark-/Light-Mode switching)
+            connect (this, &Share_dialog.signal_style_changed, this.user_group_widget, &ShareUserGroupWidget.on_signal_style_changed);
 
             this.ui.vertical_layout.insert_widget (1, this.user_group_widget);
             this.user_group_widget.on_signal_get_shares ();
@@ -367,7 +367,7 @@ signals:
         const var share_link_widget = qobject_cast<Share_link_widget> (sender ());
         //  Q_ASSERT (share_link_widget);
         if (share_link_widget) {
-            connect (this.manager, &Share_manager.on_signal_link_share_requires_password, share_link_widget, &Share_link_widget.on_signal_create_share_requires_password);
+            connect (this.manager, &ShareManager.on_signal_link_share_requires_password, share_link_widget, &Share_link_widget.on_signal_create_share_requires_password);
             connect (share_link_widget, &Share_link_widget.create_password_processed, this, &Share_dialog.on_signal_create_password_for_link_share_processed);
             share_link_widget.get_link_share ().password (password);
         } else {
@@ -379,7 +379,7 @@ signals:
         const var share_link_widget = qobject_cast<Share_link_widget> (sender ());
         //  Q_ASSERT (share_link_widget);
         if (share_link_widget) {
-            disconnect (this.manager, &Share_manager.on_signal_link_share_requires_password, share_link_widget, &Share_link_widget.on_signal_create_share_requires_password);
+            disconnect (this.manager, &ShareManager.on_signal_link_share_requires_password, share_link_widget, &Share_link_widget.on_signal_create_share_requires_password);
             disconnect (share_link_widget, &Share_link_widget.create_password_processed, this, &Share_dialog.on_signal_create_password_for_link_share_processed);
         } else {
             GLib.critical ("share_link_widget is not a sender!";
@@ -449,7 +449,7 @@ signals:
         case QEvent.PaletteChange:
         case QEvent.ThemeChange:
             // Notify the other widgets (Dark-/Light-Mode switching)
-            /* emit */ style_changed ();
+            /* emit */ signal_style_changed ();
             break;
         default:
             break;

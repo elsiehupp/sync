@@ -46,6 +46,7 @@ class UserModel : QAbstractListModel {
         }
     }
 
+
     /***********************************************************
     Time span in milliseconds which must elapse between
     sequential refreshes of the notifications
@@ -80,7 +81,7 @@ class UserModel : QAbstractListModel {
             this.instance = value;
         }
     }
-    private GLib.List<User> this.users;
+    private GLib.List<User> users;
     /***********************************************************
     ***********************************************************/
     int current_user_id {
@@ -95,7 +96,7 @@ class UserModel : QAbstractListModel {
         }
     }
 
-    private bool this.init = true;
+    private bool init = true;
 
 
     signal void signal_add_account ();
@@ -106,7 +107,7 @@ class UserModel : QAbstractListModel {
     ***********************************************************/
     private UserModel (GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        // TODO : Remember selected user from last quit via settings file
+        // TODO: Remember selected user from last quit via settings file
         if (AccountManager.instance ().accounts ().size () > 0) {
             build_user_list ();
         }
@@ -125,6 +126,7 @@ class UserModel : QAbstractListModel {
         return this.users[identifier].is_connected ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public string current_user_server () {
@@ -141,12 +143,14 @@ class UserModel : QAbstractListModel {
         return this.current_user_id;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public int row_count (QModelIndex index = QModelIndex ()) {
         //  Q_UNUSED (index);
         return this.users.count ();
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -191,6 +195,7 @@ class UserModel : QAbstractListModel {
         return this.users[identifier].avatar ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public User current_user () {
@@ -199,6 +204,7 @@ class UserModel : QAbstractListModel {
 
         return this.users[current_user_id ()];
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -214,6 +220,7 @@ class UserModel : QAbstractListModel {
         const var identifier = std.distance (std.cbegin (this.users), it);
         return identifier;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -242,29 +249,50 @@ class UserModel : QAbstractListModel {
 
             User u = new User (user, is_current);
 
-            connect (u, &User.signal_avatar_changed, this, [this, row] {
-            /* emit */ data_changed (index (row, 0), index (row, 0), {UserModel.UserRoles.AVATAR});
-            });
+            connect (
+                u,
+                User.signal_avatar_changed,
+                this,
+                [this, row] () => {
+                    /* emit */ data_changed (index (row, 0), index (row, 0), {UserModel.UserRoles.AVATAR});
+                }
+            );
 
-            connect (u, &User.signal_status_changed, this, [this, row] {
-                /* emit */ data_changed (index (row, 0), index (row, 0), {UserModel.UserRoles.STATUS_ICON,
+            connect (
+                u,
+                User.signal_status_changed,
+                this,
+                [this, row] () => {
+                    /* emit */ data_changed (index (row, 0), index (row, 0), {UserModel.UserRoles.STATUS_ICON,
                                         UserModel.UserRoles.STATUS_EMOJI,
                                                                 UserModel.UserRoles.STATUS_MESSAGE});
-            });
+                }
+            );
 
-            connect (u, &User.signal_desktop_notifications_allowed_changed, this, [this, row] {
-                /* emit */ data_changed (index (row, 0), index (row, 0), {
-                    UserModel.UserRoles.DESKTOP_NOTIFICATION
-                });
-            });
+            connect (
+                u,
+                User.signal_desktop_notifications_allowed_changed,
+                this,
+                [this, row] () => {
+                    /* emit */ data_changed (index (row, 0), index (row, 0), {
+                        UserModel.UserRoles.DESKTOP_NOTIFICATION
+                    });
+                }
+            );
 
-            connect (u, &User.signal_account_state_changed, this, [this, row] {
-                /* emit */ data_changed (index (row, 0), index (row, 0), {
-                    UserModel.UserRoles.IS_CONNECTED
-                });
-            });
+            connect (
+                u,
+                User.signal_account_state_changed,
+                this,
+                [this, row] () => {
+                    /* emit */ data_changed (index (row, 0), index (row, 0), {
+                        UserModel.UserRoles.IS_CONNECTED
+                    });
+                }
+            );
 
-            this.users + u;
+            this.users += u;
+
             if (is_current) {
                 this.current_user_id = this.users.index_of (this.users.last ());
             }
@@ -278,14 +306,10 @@ class UserModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void open_current_
-    void UserModel.open_current_account_local_folder () {
-        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
+    public void open_current_account_local_folder () {
+        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
             return;
+        }
 
         this.users[this.current_user_id].open_local_folder ();
     }
@@ -293,10 +317,10 @@ class UserModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    void UserModel.open_current_account_talk () {
-        if (!current_user ())
+    public void open_current_account_talk () {
+        if (!current_user ()) {
             return;
+        }
 
         const var talk_app = current_user ().talk_app ();
         if (talk_app) {
@@ -309,10 +333,10 @@ class UserModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    void UserModel.open_current_account_server () {
-        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
+    public void open_current_account_server () {
+        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
             return;
+        }
 
         string url = this.users[this.current_user_id].server (false);
         if (!url.starts_with ("http://") && !url.starts_with ("https://")) {
@@ -322,34 +346,20 @@ class UserModel : QAbstractListModel {
         QDesktopServices.open_url (url);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public int number_of_users () {
         return this.users.size ();
     }
 
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
 
     /***********************************************************
     ***********************************************************/
     public void switch_current_user (int identifier) {
-        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
+        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
             return;
+        }
 
         this.users[this.current_user_id].is_current_user (false);
         this.users[identifier].is_current_user (true);
@@ -357,11 +367,13 @@ class UserModel : QAbstractListModel {
         /* emit */ signal_new_user_selected ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void log_in (int identifier) {
-        if (identifier < 0 || identifier >= this.users.size ())
+        if (identifier < 0 || identifier >= this.users.size ()) {
             return;
+        }
 
         this.users[identifier].log_in ();
     }
@@ -369,10 +381,10 @@ class UserModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public void log_out (int identifier);
-    void UserModel.log_out (int identifier) {
-        if (identifier < 0 || identifier >= this.users.size ())
+    public void log_out (int identifier) {
+        if (identifier < 0 || identifier >= this.users.size ()) {
             return;
+        }
 
         this.users[identifier].log_out ();
     }

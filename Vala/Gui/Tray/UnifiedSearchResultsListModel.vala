@@ -118,6 +118,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
         this.account_state = account_state;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public GLib.Variant data (QModelIndex index, int role) {
@@ -149,13 +150,6 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
         return {};
     }
 
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
 
     /***********************************************************
     ***********************************************************/
@@ -225,8 +219,6 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
             start_search_for_provider (provider_id, provider_info.cursor);
         }
     }
-
-
 
 
     /***********************************************************
@@ -365,7 +357,6 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     }
 
 
-
     /***********************************************************
     Append initial search results to the list
     ***********************************************************/
@@ -409,7 +400,6 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
         std.copy (std.begin (results), std.end (results), std.inserter (this.results, it_to_insert_to));
         end_insert_rows ();
     }
-
 
 
     /***********************************************************
@@ -497,7 +487,6 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
             /* emit */ signal_current_fetch_more_in_progress_provider_id_changed ();
         }
     }
-
 
 
     /***********************************************************
@@ -657,6 +646,8 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static string image_placeholder_url_for_provider_id (string provider_id) {
         if (provider_id.contains (QStringLiteral ("message"), Qt.CaseInsensitive)
             || provider_id.contains (QStringLiteral ("talk"), Qt.CaseInsensitive)) {
@@ -677,6 +668,8 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static string local_icon_path_from_icon_prefix (string icon_name_with_prefix) {
         if (icon_name_with_prefix.contains (QStringLiteral ("message"), Qt.CaseInsensitive)
             || icon_name_with_prefix.contains (QStringLiteral ("talk"), Qt.CaseInsensitive)) {
@@ -697,6 +690,8 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static string icon_url_for_default_icon_name (string default_icon_name) {
         const GLib.Uri url_for_icon{default_icon_name};
 
@@ -732,6 +727,8 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static string generate_url_for_thumbnail (string thumbnail_url, GLib.Uri server_url) {
         var server_url_copy = server_url;
         var thumbnail_url_copy = thumbnail_url;
@@ -754,6 +751,8 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static string generate_url_for_icon (string fallack_icon, GLib.Uri server_url) {
         var server_url_copy = server_url;
 
@@ -782,6 +781,8 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static string icons_from_thumbnail_and_fallback_icon (string thumbnail_url, string fallack_icon, GLib.Uri server_url) {
         if (thumbnail_url.is_empty () && fallack_icon.is_empty ()) {
             return {};

@@ -80,6 +80,7 @@ class FolderDefinition {
         }
     }
 
+
     /***********************************************************
     Reads a folder definition from the current settings group.
     ***********************************************************/
@@ -131,6 +132,7 @@ class FolderDefinition {
         return 3;
     }
 
+
     /***********************************************************
     Ensure / as separator and trailing /.
     ***********************************************************/
@@ -141,6 +143,7 @@ class FolderDefinition {
         }
         return p;
     }
+
 
     /***********************************************************
     Remove ending /, then ensure starting '/' : so "/foo/bar" and "/".
@@ -158,6 +161,7 @@ class FolderDefinition {
         return p;
     }
 
+
     /***********************************************************
     journal_path relative to local_path.
     ***********************************************************/
@@ -165,6 +169,7 @@ class FolderDefinition {
     string FolderDefinition.absolute_journal_path () {
         return QDir (local_path).file_path (journal_path);
     }
+
 
     /***********************************************************
     Returns the relative journal path that's appropriate for

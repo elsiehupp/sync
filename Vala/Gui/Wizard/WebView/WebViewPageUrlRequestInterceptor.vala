@@ -11,6 +11,7 @@ class WebViewPageUrlRequestInterceptor : QWebEngineUrlRequestInterceptor {
         base (parent);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void intercept_request (QWebEngineUrlRequestInfo info)  {

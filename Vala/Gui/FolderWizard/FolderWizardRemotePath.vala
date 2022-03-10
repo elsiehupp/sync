@@ -99,13 +99,13 @@ protected slots:
             parent = current.data (0, Qt.USER_ROLE).to_string ();
         }
 
-        var dlg = new QInputDialog (this);
+        var dialog = new QInputDialog (this);
 
-        dlg.window_title (_("Create Remote Folder"));
-        dlg.label_text (_("Enter the name of the new folder to be created below \"%1\":")
+        dialog.window_title (_("Create Remote Folder"));
+        dialog.label_text (_("Enter the name of the new folder to be created below \"%1\":")
                               .arg (parent));
-        dlg.open (this, SLOT (on_signal_create_remote_folder (string)));
-        dlg.attribute (Qt.WA_DeleteOnClose);
+        dialog.open (this, SLOT (on_signal_create_remote_folder (string)));
+        dialog.attribute (Qt.WA_DeleteOnClose);
     }
 
     void Folder_wizard_remote_path.on_signal_create_remote_folder (string folder) {

@@ -6,30 +6,57 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// don't pull the share manager into socketapi unittests
-//  #ifndef OWNCLOUD_TEST
-
 namespace Occ {
 namespace Ui {
 
-class Get_or_create_public_link_share : GLib.Object {
+/***********************************************************
+Don't pull the share manager into socketapi unittests
+#ifndef OWNCLOUD_TEST
+***********************************************************/
+class GetOrCreatePublicLinkShare : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Get_or_create_public_link_share (AccountPointer account, string local_file,
-        GLib.Object parent)
-        : GLib.Object (parent)
-        this.account (account)
-        this.share_manager (account)
-        this.local_file (local_file) {
-        connect (&this.share_manager, &Share_manager.on_signal_shares_fetched,
-            this, &Get_or_create_public_link_share.on_signal_shares_fetched);
-        connect (&this.share_manager, &Share_manager.on_signal_link_share_created,
-            this, &Get_or_create_public_link_share.on_signal_link_share_created);
-        connect (&this.share_manager, &Share_manager.on_signal_link_share_requires_password,
-            this, &Get_or_create_public_link_share.on_signal_link_share_requires_password);
-        connect (&this.share_manager, &Share_manager.on_signal_server_error,
-            this, &Get_or_create_public_link_share.on_signal_server_error);
+    private AccountPointer account;
+    private ShareManager share_manager;
+    private string local_file;
+
+
+    signal void signal_done (string link);
+    signal void signal_error (string message);
+
+    /***********************************************************
+    ***********************************************************/
+    public GetOrCreatePublicLinkShare (AccountPointer account, string local_file,
+        GLib.Object parent) {
+        base (parent);
+        this.account = account;
+        this.share_manager = account;
+        this.local_file = local_file;
+        connect (
+            this.share_manager,
+            ShareManager.on_signal_shares_fetched,
+            this,
+            GetOrCreatePublicLinkShare.on_signal_shares_fetched
+        );
+        connect (
+            this.share_manager,
+            ShareManager.on_signal_link_share_created,
+            this,
+            GetOrCreatePublicLinkShare.on_signal_link_share_created
+        );
+        connect (
+            this.share_manager,
+            ShareManager.on_signal_link_share_requires_password,
+            this,
+            GetOrCreatePublicLinkShare.on_signal_link_share_requires_password
+        );
+        connect (
+            this.share_manager,
+            ShareManager.on_signal_server_error,
+            this,
+            GetOrCreatePublicLinkShare.on_signal_server_error
+        );
     }
 
 
@@ -43,7 +70,7 @@ class Get_or_create_public_link_share : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_shares_fetched (GLib.List<unowned<Share>> shares) {
+    private void on_signal_shares_fetched (GLib.List<unowned Share> shares) {
         var share_name = SocketApi._("Context menu share");
 
         // If there already is a context menu share, reuse it
@@ -116,10 +143,6 @@ class Get_or_create_public_link_share : GLib.Object {
         delete_later ();
     }
 
-signals:
-    void on_signal_done (string link);
-    void error (string message);
-
 
     /***********************************************************
     ***********************************************************/
@@ -128,29 +151,7 @@ signals:
         delete_later ();
     }
 
+} // class GetOrCreatePublicLinkShare
 
-    /***********************************************************
-    ***********************************************************/
-    private AccountPointer this.account;
-    private Share_manager this.share_manager;
-    private string this.local_file;
-}
-
-#else
-
-class Get_or_create_public_link_share : GLib.Object {
-
-    /***********************************************************
-    ***********************************************************/
-    public Get_or_create_public_link_share (AccountPointer &, string ,
-        std.function<void (string link)>, GLib.Object *) {
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void run () {
-    }
-}
-
-//  #endif
+} // namespace Ui
+} // namespace Occ

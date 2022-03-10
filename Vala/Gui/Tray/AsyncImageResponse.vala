@@ -15,6 +15,11 @@ namespace Ui {
 
 class AsyncImageResponse : QQuickImageResponse {
 
+    Gtk.Image image;
+    string[] image_paths;
+    QSize requested_image_size;
+    int index = 0;
+
     public AsyncImageResponse (string identifier, QSize requested_size) {
         if (identifier.is_empty ()) {
             image_and_emit_finished ();
@@ -31,16 +36,24 @@ class AsyncImageResponse : QQuickImageResponse {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     public void image_and_emit_finished (Gtk.Image image = {}) {
         this.image = image;
         /* emit */ finished ();
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     public QQuick_texture_factory texture_factory () override {
         return QQuick_texture_factory.texture_factory_for_image (this.image);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void process_next_image () {
         if (this.index < 0 || this.index >= this.image_paths.size ()) {
             image_and_emit_finished ();
@@ -68,10 +81,9 @@ class AsyncImageResponse : QQuickImageResponse {
     }
 
 
-/***********************************************************
-***********************************************************/
-private slots:
-    void on_signal_process_network_reply () {
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_process_network_reply () {
         const var reply = qobject_cast<Soup.Reply> (sender ());
         if (!reply) {
             image_and_emit_finished ();
@@ -103,9 +115,8 @@ private slots:
         }
     }
 
-    Gtk.Image this.image;
-    string[] this.image_paths;
-    QSize this.requested_image_size;
-    int this.index = 0;
-}
+} // class AsyncImageResponse
+
+} // namespace Ui
+} // namespace Occ
     

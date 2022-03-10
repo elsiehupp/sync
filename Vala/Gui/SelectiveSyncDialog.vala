@@ -13,7 +13,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QSettings>
 //  #include <QScopedValueRollback>
 //  #include <QTreeWidgetItem>
-//  #include <Gtk.Label>
 //  #include <QVBoxLayout>
 
 //  #include <Gtk.Dialog>

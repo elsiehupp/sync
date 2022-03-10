@@ -84,7 +84,7 @@ class ServerNotificationHandler : GLib.Object {
 
         ActivityList list;
 
-        foreach (var element, notifies) {
+        foreach (var element in notifies) {
             Activity a;
             var json = element.to_object ();
             a.type = Activity.Type.NOTIFICATION;

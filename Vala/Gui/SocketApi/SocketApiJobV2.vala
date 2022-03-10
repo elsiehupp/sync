@@ -9,63 +9,71 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 namespace Ui {
 
-class Socket_api_job_v2 : GLib.Object {
+class SocketApiJobV2 : GLib.Object {
 
-    public Socket_api_job_v2 (unowned<Socket_listener> socket_listener, GLib.ByteArray command, QJsonObject arguments);
+    private unowned SocketListener this.socket_listener;
+    private const GLib.ByteArray this.command;
+    private string this.job_id;
+    private QJsonObject this.arguments;
 
-    public void on_signal_success (QJsonObject response);
-    public void failure (string error);
+    signal void signal_finished ();
 
+    public SocketApiJobV2 (unowned SocketListener socket_listener, GLib.ByteArray command, QJsonObject arguments) {
+        this.socket_listener = socket_listener;
+        this.command = command;
+        this.job_id = arguments["identifier"].to_string ();
+        this.arguments = arguments["arguments"].to_object ());
+        //  ASSERT (!this.job_id.is_empty ())
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_success (QJsonObject response) {
+        do_finish (response);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void failure (string error) {
+        do_finish ({
+            {
+                "error", error
+            }
+        });
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
     public const QJsonObject arguments () {
         return this.arguments;
     }
+
+
+    /***********************************************************
+    ***********************************************************/
     public GLib.ByteArray command () {
         return this.command;
     }
 
-signals:
-    void on_signal_finished ();
 
+    /***********************************************************
+    ***********************************************************/
+    private void do_finish (QJsonObject object) {
+        this.socket_listener.on_signal_send_message (this.command + "this.RESULT:" + QJsonDocument ({
+            {
+                "identifier", this.job_id
+            },
+            {
+                "arguments", object
+            }
+        }).to_json (QJsonDocument.Compact));
+        /* Q_EMIT */ on_signal_finished ();
+    }
 
-    private void do_finish (QJsonObject object);
+} // class SocketApiJobV2
 
-    private unowned<Socket_listener> this.socket_listener;
-    private const GLib.ByteArray this.command;
-    private string this.job_id;
-    private QJsonObject this.arguments;
-}
-
-
-
-
-Socket_api_job_v2.Socket_api_job_v2 (unowned<Socket_listener> socket_listener, GLib.ByteArray command, QJsonObject arguments)
-    : this.socket_listener (socket_listener)
-    this.command (command)
-    this.job_id (arguments["identifier"].to_string ())
-    this.arguments (arguments["arguments"].to_object ()) {
-    //  ASSERT (!this.job_id.is_empty ())
-}
-
-void Socket_api_job_v2.on_signal_success (QJsonObject response) {
-    do_finish (response);
-}
-
-void Socket_api_job_v2.failure (string error) {
-    do_finish ({
-        {
-            "error", error
-        }
-    });
-}
-
-void Socket_api_job_v2.do_finish (QJsonObject object) {
-    this.socket_listener.on_signal_send_message (this.command + "this.RESULT:" + QJsonDocument ({
-        {
-            "identifier", this.job_id
-        },
-        {
-            "arguments", object
-        }
-    }).to_json (QJsonDocument.Compact));
-    /* Q_EMIT */ on_signal_finished ();
-}
+} // namespace Ui
+} // namespace Occ

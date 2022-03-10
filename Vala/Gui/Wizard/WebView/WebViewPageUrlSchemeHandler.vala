@@ -13,6 +13,7 @@ class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
         base (parent);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void request_started (QWebEngineUrlRequestJob request) {

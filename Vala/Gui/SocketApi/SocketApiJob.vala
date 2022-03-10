@@ -9,42 +9,49 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 namespace Ui {
 
-class Socket_api_job : GLib.Object {
+class SocketApiJob : GLib.Object {
 
-    public Socket_api_job (string job_id, unowned<Socket_listener> socket_listener, QJsonObject arguments)
-        : this.job_id (job_id)
-        this.socket_listener (socket_listener)
-        this.arguments (arguments) {
+    protected string job_id;
+    protected unowned SocketListener socket_listener;
+    protected QJsonObject arguments;
+
+    public SocketApiJob (string job_id, unowned SocketListener  socket_listener, QJsonObject arguments) {
+        this.job_id = job_id;
+        this.socket_listener = socket_listener;
+        this.arguments = arguments;
     }
 
-    public void resolve (string response = "");
 
-    public void resolve (QJsonObject response);
+    /***********************************************************
+    ***********************************************************/
+    public void resolve (string response = "") {
+        this.socket_listener.on_signal_send_message ("RESOLVE|" + this.job_id + '|' + response);
+    }
 
-    public const QJsonObject arguments () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void resolve (QJsonObject response) {
+        resolve (QJsonDocument {
+            response
+        }.to_json ());
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public QJsonObject arguments () {
         return this.arguments;
     }
 
-    public void reject (string response);
 
-    protected string this.job_id;
-    protected unowned<Socket_listener> this.socket_listener;
-    protected QJsonObject this.arguments;
-}
+    /***********************************************************
+    ***********************************************************/
+    public void reject (string response) {
+        this.socket_listener.on_signal_send_message ("REJECT|" + this.job_id + '|' + response);
+    }
 
+} // class SocketApiJob
 
-
-
-void Socket_api_job.resolve (string response) {
-    this.socket_listener.on_signal_send_message ("RESOLVE|" + this.job_id + '|' + response);
-}
-
-void Socket_api_job.resolve (QJsonObject response) {
-    resolve (QJsonDocument {
-        response
-    }.to_json ());
-}
-
-void Socket_api_job.reject (string response) {
-    this.socket_listener.on_signal_send_message ("REJECT|" + this.job_id + '|' + response);
-}
+} // namespace Ui
+} // namespace Occ

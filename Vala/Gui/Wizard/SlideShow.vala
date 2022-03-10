@@ -39,7 +39,6 @@ class SlideShow : Gtk.Widget {
     private GLib.Vector<QPixmap> pixmaps;
     private QPointer<QVariantAnimation> animation = null;
 
-
     signal void clicked ();
     signal void current_slide_changed (int index);
 
@@ -84,6 +83,7 @@ class SlideShow : Gtk.Widget {
         maybe_restart_timer ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void draw_slide (QPainter painter, int index) {
@@ -96,11 +96,13 @@ class SlideShow : Gtk.Widget {
         style ().draw_item_pixmap (painter, pixmap_rect, Qt.AlignCenter, pixmap);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public int current_slide () {
         return this.current_index;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -157,6 +159,7 @@ class SlideShow : Gtk.Widget {
             this.interval = interval;
         this.timer.on_signal_start (this.interval, this);
     }
+
 
     /***********************************************************
     ***********************************************************/

@@ -4,7 +4,6 @@ Copyright (C) 2014 by Daniel Molkentin <danimo@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <Gtk.Label>
 //  #include <QLineEdit>
 //  #include <QVBoxLayout>
 //  #include <QFormLayout>

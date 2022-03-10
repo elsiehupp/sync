@@ -30,9 +30,9 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     private bool checking = false;
     private bool created = false;
     private bool local_folder_valid = false;
-    private QProgressIndicator progress_indi;
+    private QProgressIndicator progress_indicator;
     private string remote_folder;
-    private string[] selective_sync_blocklist;
+    string[] selective_sync_blocklist { public get; private set; }
     private int64 r_size = -1;
     private int64 r_selected_size = -1;
     private OwncloudWizard oc_wizard;
@@ -45,7 +45,7 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     public OwncloudAdvancedSetupPage (OwncloudWizard wizard) {
         base ();
-        this.progress_indi = new QProgressIndicator (this);
+        this.progress_indicator = new QProgressIndicator (this);
         this.oc_wizard = wizard;
         this.ui.up_ui (this);
 
@@ -53,11 +53,11 @@ class OwncloudAdvancedSetupPage : QWizardPage {
 
         register_field (QLatin1String ("OCSync_from_scratch"), this.ui.cb_sync_from_scratch);
 
-        var size_policy = this.progress_indi.size_policy ();
+        var size_policy = this.progress_indicator.size_policy ();
         size_policy.retain_size_when_hidden (true);
-        this.progress_indi.size_policy (size_policy);
+        this.progress_indicator.size_policy (size_policy);
 
-        this.ui.result_layout.add_widget (this.progress_indi);
+        this.ui.result_layout.add_widget (this.progress_indicator);
         on_signal_stop_spinner ();
         set_up_customization ();
 
@@ -70,16 +70,41 @@ class OwncloudAdvancedSetupPage : QWizardPage {
             this.ui.b_selective_sync.disabled (true);
         }
 
-        connect (this.ui.r_sync_everything, &QAbstractButton.clicked, this, &OwncloudAdvancedSetupPage.on_signal_sync_everything_clicked);
-        connect (this.ui.r_selective_sync, &QAbstractButton.clicked, this, &OwncloudAdvancedSetupPage.on_signal_selective_sync_clicked);
-        connect (this.ui.r_virtual_file_sync, &QAbstractButton.clicked, this, &OwncloudAdvancedSetupPage.on_signal_virtual_file_sync_clicked);
-        connect (this.ui.r_virtual_file_sync, &QRadioButton.toggled, this, [this] (bool checked) {
-            if (checked) {
-                this.ui.l_selective_sync_size_label.clear ();
-                this.selective_sync_blocklist.clear ();
+        connect (
+            this.ui.r_sync_everything,
+            QAbstractButton.clicked,
+            this,
+            OwncloudAdvancedSetupPage.on_signal_sync_everything_clicked
+        );
+        connect (
+            this.ui.r_selective_sync,
+            QAbstractButton.clicked,
+            this,
+            OwncloudAdvancedSetupPage.on_signal_selective_sync_clicked
+        );
+        connect (
+            this.ui.r_virtual_file_sync,
+            QAbstractButton.clicked,
+            this,
+            OwncloudAdvancedSetupPage.on_signal_virtual_file_sync_clicked
+        );
+        connect (
+            this.ui.r_virtual_file_sync,
+            QRadioButton.toggled,
+            this,
+            [this] (bool checked) {
+                if (checked) {
+                    this.ui.l_selective_sync_size_label.clear ();
+                    this.selective_sync_blocklist.clear ();
+                }
             }
-        });
-        connect (this.ui.b_selective_sync, &QAbstractButton.clicked, this, &OwncloudAdvancedSetupPage.on_signal_selective_sync_clicked);
+        );
+        connect (
+            this.ui.b_selective_sync,
+            QAbstractButton.clicked,
+            this,
+            OwncloudAdvancedSetupPage.on_signal_selective_sync_clicked
+        );
 
         const var theme = Theme.instance ();
         const var app_icon = theme.application_icon ();
@@ -221,20 +246,10 @@ class OwncloudAdvancedSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public string[] selective_sync_blocklist () {
-        return this.selective_sync_blocklist;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public bool use_virtual_file_sync () {
         return this.ui.r_virtual_file_sync.is_checked ();
     }
 
-    /***********************************************************
-    ***********************************************************/
-    public 
 
     /***********************************************************
     ***********************************************************/
@@ -242,10 +257,6 @@ class OwncloudAdvancedSetupPage : QWizardPage {
         return this.ui.r_sync_everything.is_checked () && this.ui.conf_check_box_size.is_checked ();
     }
 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
 
     /***********************************************************
     ***********************************************************/
@@ -287,8 +298,7 @@ class OwncloudAdvancedSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_style_changed ();
-    void OwncloudAdvancedSetupPage.on_signal_style_changed () {
+    public void on_signal_style_changed () {
         customize_style ();
     }
 
@@ -298,7 +308,7 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     private void on_signal_select_folder () {
         string directory = QFileDialog.get_existing_directory (null, _("Local Sync Folder"), QDir.home_path ());
         if (!directory.is_empty ()) {
-            // TODO : remove when UX decision is made
+            // TODO: remove when UX decision is made
             refresh_virtual_files_availibility (directory);
 
             local_folder_push_button_path (directory);
@@ -328,47 +338,52 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void on_signal_selective_sync_clicked () {
         AccountPointer acc = static_cast<OwncloudWizard> (wizard ()).account ();
-        var dlg = new SelectiveSyncDialog (acc, this.remote_folder, this.selective_sync_blocklist, this);
-        dlg.attribute (Qt.WA_DeleteOnClose);
+        var dialog = new SelectiveSyncDialog (acc, this.remote_folder, this.selective_sync_blocklist, this);
+        dialog.attribute (Qt.WA_DeleteOnClose);
 
-        connect (dlg, &SelectiveSyncDialog.on_signal_finished, this, [this, dlg]{
-            const int result = dlg.result ();
-            bool update_blocklist = false;
+        connect (
+            dialog,
+            SelectiveSyncDialog.on_signal_finished,
+            this,
+            [this, dialog] () => {
+                const int result = dialog.result ();
+                bool update_blocklist = false;
 
-            // We need to update the selective sync blocklist either when the dialog
-            // was accepted in that
-            // case the stub blocklist of / was expanded to the actual list of top
-            // level folders by the selective sync dialog.
-            if (result == Gtk.Dialog.Accepted) {
-                this.selective_sync_blocklist = dlg.create_block_list ();
-                update_blocklist = true;
-            } else if (result == Gtk.Dialog.Rejected && this.selective_sync_blocklist == string[] ("/")) {
-                this.selective_sync_blocklist = dlg.old_block_list ();
-                update_blocklist = true;
-            }
+                // We need to update the selective sync blocklist either when the dialog
+                // was accepted in that
+                // case the stub blocklist of / was expanded to the actual list of top
+                // level folders by the selective sync dialog.
+                if (result == Gtk.Dialog.Accepted) {
+                    this.selective_sync_blocklist = dialog.create_block_list ();
+                    update_blocklist = true;
+                } else if (result == Gtk.Dialog.Rejected && this.selective_sync_blocklist == string[] ("/")) {
+                    this.selective_sync_blocklist = dialog.old_block_list ();
+                    update_blocklist = true;
+                }
 
-            if (update_blocklist) {
-                if (!this.selective_sync_blocklist.is_empty ()) {
-                    this.ui.r_selective_sync.block_signals (true);
-                    radio_checked (this.ui.r_selective_sync);
-                    this.ui.r_selective_sync.block_signals (false);
-                    var s = dlg.estimated_size ();
-                    if (s > 0) {
-                        this.ui.l_selective_sync_size_label.on_signal_text (_(" (%1)").arg (Utility.octets_to_string (s)));
+                if (update_blocklist) {
+                    if (!this.selective_sync_blocklist.is_empty ()) {
+                        this.ui.r_selective_sync.block_signals (true);
+                        radio_checked (this.ui.r_selective_sync);
+                        this.ui.r_selective_sync.block_signals (false);
+                        var s = dialog.estimated_size ();
+                        if (s > 0) {
+                            this.ui.l_selective_sync_size_label.on_signal_text (_(" (%1)").arg (Utility.octets_to_string (s)));
+                        } else {
+                            this.ui.l_selective_sync_size_label.on_signal_text ("");
+                        }
                     } else {
+                        radio_checked (this.ui.r_sync_everything);
                         this.ui.l_selective_sync_size_label.on_signal_text ("");
                     }
-                } else {
-                    radio_checked (this.ui.r_sync_everything);
-                    this.ui.l_selective_sync_size_label.on_signal_text ("");
+                    wizard ().property ("blocklist", this.selective_sync_blocklist);
                 }
-                wizard ().property ("blocklist", this.selective_sync_blocklist);
+
+                update_status ();
+
             }
-
-            update_status ();
-
-        });
-        dlg.open ();
+        );
+        a.open ();
     }
 
 
@@ -404,10 +419,12 @@ class OwncloudAdvancedSetupPage : QWizardPage {
         radio.checkable (true);
         radio.checked (true);
 
-        if (radio != this.ui.r_selective_sync)
+        if (radio != this.ui.r_selective_sync) {
             this.ui.r_selective_sync.checkable (false);
-        if (radio != this.ui.r_virtual_file_sync)
+        }
+        if (radio != this.ui.r_virtual_file_sync) {
             this.ui.r_virtual_file_sync.checkable (false);
+        }
     }
 
 
@@ -498,8 +515,8 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void on_signal_start_spinner () {
         this.ui.result_layout.enabled (true);
-        this.progress_indi.visible (true);
-        this.progress_indi.on_signal_start_animation ();
+        this.progress_indicator.visible (true);
+        this.progress_indicator.on_signal_start_animation ();
     }
 
 
@@ -507,8 +524,8 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void on_signal_stop_spinner () {
         this.ui.result_layout.enabled (false);
-        this.progress_indi.visible (false);
-        this.progress_indi.on_signal_stop_animation ();
+        this.progress_indicator.visible (false);
+        this.progress_indicator.on_signal_stop_animation ();
     }
 
 
@@ -546,12 +563,12 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void customize_style () {
-        if (this.progress_indi) {
+        if (this.progress_indicator) {
             const var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
-                this.progress_indi.on_signal_color (Qt.white);
+                this.progress_indicator.on_signal_color (Qt.white);
             } else {
-                this.progress_indi.on_signal_color (Qt.block);
+                this.progress_indicator.on_signal_color (Qt.block);
             }
         }
 
@@ -672,7 +689,7 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     TODO: remove when UX decision is made
     ***********************************************************/
     private void refresh_virtual_files_availibility (string path) {
-        // TODO : remove when UX decision is made
+        // TODO: remove when UX decision is made
         if (!this.ui.r_virtual_file_sync.is_visible ()) {
             return;
         }

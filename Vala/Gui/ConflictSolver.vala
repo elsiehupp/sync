@@ -20,6 +20,7 @@ class ConflictSolver : GLib.Object {
         KEEP_BOTH_VERSION
     }
 
+
     /***********************************************************
     ***********************************************************/
     private Gtk.Widget parent_widget;
@@ -70,7 +71,7 @@ class ConflictSolver : GLib.Object {
         case Solution.KEEP_BOTH_VERSION:
             return rename_local_version ();
         }
-        Q_UNREACHABLE ();
+        GLib.assert_not_reached ();
         return false;
     }
 

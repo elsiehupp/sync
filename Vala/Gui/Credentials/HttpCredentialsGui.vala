@@ -6,7 +6,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 ***********************************************************/
 
 //  #include <QInputDialog>
-//  #include <Gtk.Label>
 //  #include <QDesktopServices>
 //  #include <QTimer>
 //  #include <QBuffer>

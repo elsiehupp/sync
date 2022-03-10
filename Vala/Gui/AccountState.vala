@@ -30,10 +30,12 @@ class AccountState : GLib.Object, QSharedData {
     class AccountStatePtr : unowned AccountState { }
     class AccountAppList : GLib.List<AccountApp> { }
 
+
     /***********************************************************
     The actual current connectivity status.
     ***********************************************************/
     public class ConnectionStatus : ConnectionValidator.Status { }
+
 
     /***********************************************************
     ***********************************************************/

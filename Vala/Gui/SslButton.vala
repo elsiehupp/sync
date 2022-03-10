@@ -8,7 +8,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QtNetwork>
 //  #include <QSslConfiguration>
 //  #include <QWidget_action>
-//  #include <Gtk.Label>
 //  #include <QToolButt
 //  #include <QPointer>
 //  #include <QSsl>
@@ -17,67 +16,129 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Ssl_button class
+@brief The SslButton class
 @ingroup gui
 ***********************************************************/
-class Ssl_button : QToolButton {
+class SslButton : QToolButton {
 
     /***********************************************************
     ***********************************************************/
-    public Ssl_button (Gtk.Widget parent = null);
+    private QPointer<AccountState> account_state;
+    private QMenu menu;
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    public void on_signal_update_menu ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private QMenu build_cert_menu (QMenu parent, QSslCertificate cert,
-        const GLib.List<QSslCertificate> user_approved, int position, GLib.List<QSslCertificate> system_ca_certificates);
-    private QPointer<AccountState> this.account_state;
-    private QMenu this.menu;
-}
-
-
-    Ssl_button.Ssl_button (Gtk.Widget parent)
-        : QToolButton (parent) {
+    public SslButton (Gtk.Widget parent = null) {
+        base (parent);
         popup_mode (QToolButton.Instant_popup);
         auto_raise (true);
 
         this.menu = new QMenu (this);
-        GLib.Object.connect (this.menu, &QMenu.about_to_show,
-            this, &Ssl_button.on_signal_update_menu);
+        GLib.Object.connect (
+            this.menu,
+            QMenu.about_to_show,
+            this,SslButton.on_signal_update_menu
+        );
         menu (this.menu);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    static string add_cert_details_field (string key, string value) {
-        if (value.is_empty ()) {
-            return "";
+    public void update_account_state (AccountState account_state) {
+        if (!account_state || !account_state.is_connected ()) {
+            visible (false);
+            return;
+        } else {
+            visible (true);
+        }
+        this.account_state = account_state;
+
+        AccountPointer account = this.account_state.account ();
+        if (account.url ().scheme () == "https") {
+            icon (QIcon (":/client/theme/lock-https.svg"));
+            QSslCipher cipher = account.session_cipher;
+            tool_tip (_("This connection is encrypted using %1 bit %2.\n").arg (cipher.used_bits ()).arg (cipher.name ()));
+        } else {
+            icon (QIcon (":/client/theme/lock-http.svg"));
+            tool_tip (_("This connection is NOT secure as it is not encrypted.\n"));
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_update_menu () {
+        this.menu.clear ();
+
+        if (!this.account_state) {
+            return;
         }
 
-        return "<tr><td style=\"vertical-align : top;\"><b>" + key
-             + "</b></td><td style=\"vertical-align : bottom;\">" + value
-             + "</td></tr>";
+        AccountPointer account = this.account_state.account ();
+
+        this.menu.add_action (_("Server version : %1").arg (account.server_version ())).enabled (false);
+
+        if (account.is_http2Supported ()) {
+            this.menu.add_action ("HTTP/2").enabled (false);
+        }
+
+        if (account.url ().scheme () == "https") {
+            string ssl_version = account.session_cipher.protocol_""
+                + ", " + account.session_cipher.authentication_method ()
+                + ", " + account.session_cipher.key_exchange_method ()
+                + ", " + account.session_cipher.encryption_method ();
+            this.menu.add_action (ssl_version).enabled (false);
+
+            if (account.session_ticket.is_empty ()) {
+                this.menu.add_action (_("No support for SSL session tickets/identifiers")).enabled (false);
+            }
+
+            GLib.List<QSslCertificate> chain = account.peer_certificate_chain;
+
+            if (chain.is_empty ()) {
+                GLib.warning ("Empty certificate chain";
+                return;
+            }
+
+            this.menu.add_action (_("Certificate information:")).enabled (false);
+
+            const var system_certificates = QSslConfiguration.system_ca_certificates ();
+
+            GLib.List<QSslCertificate> tmp_chain;
+            foreach (QSslCertificate cert, chain) {
+                tmp_chain + cert;
+                if (system_certificates.contains (cert))
+                    break;
+            }
+            chain = tmp_chain;
+
+            // find trust anchor (informational only, verification is done by QSslSocket!)
+            for (QSslCertificate root_cA : system_certificates) {
+                if (root_cA.issuer_info (QSslCertificate.Common_name) == chain.last ().issuer_info (QSslCertificate.Common_name)
+                    && root_cA.issuer_info (QSslCertificate.Organization) == chain.last ().issuer_info (QSslCertificate.Organization)) {
+                    chain.append (root_cA);
+                    break;
+                }
+            }
+
+            QList_iterator<QSslCertificate> it (chain);
+            it.to_back ();
+            int i = 0;
+            while (it.has_previous ()) {
+                this.menu.add_menu (build_cert_menu (this.menu, it.previous (), account.approved_certificates (), i, system_certificates));
+                i++;
+            }
+        } else {
+            this.menu.add_action (_("The connection is not secure")).enabled (false);
+        }
     }
 
-    // necessary indication only, not sufficient for primary validation!
-    static bool is_self_signed (QSslCertificate certificate) {
-        return certificate.issuer_info (QSslCertificate.Common_name) == certificate.subject_info (QSslCertificate.Common_name)
-            && certificate.issuer_info (QSslCertificate.Organizational_unit_name) == certificate.subject_info (QSslCertificate.Organizational_unit_name);
-    }
 
-    QMenu *Ssl_button.build_cert_menu (QMenu parent, QSslCertificate cert,
-        const GLib.List<QSslCertificate> user_approved, int position, GLib.List<QSslCertificate> system_ca_certificates) {
+    /***********************************************************
+    ***********************************************************/
+    private QMenu build_cert_menu (QMenu parent, QSslCertificate cert,
+        GLib.List<QSslCertificate> user_approved, int position, GLib.List<QSslCertificate> system_ca_certificates) {
         string cn = string[] (cert.subject_info (QSslCertificate.Common_name)).join (char (';'));
         string ou = string[] (cert.subject_info (QSslCertificate.Organizational_unit_name)).join (char (';'));
         string org = string[] (cert.subject_info (QSslCertificate.Organization)).join (char (';'));
@@ -174,91 +235,30 @@ class Ssl_button : QToolButton {
         return menu;
     }
 
-    void Ssl_button.update_account_state (AccountState account_state) {
-        if (!account_state || !account_state.is_connected ()) {
-            visible (false);
-            return;
-        } else {
-            visible (true);
-        }
-        this.account_state = account_state;
 
-        AccountPointer account = this.account_state.account ();
-        if (account.url ().scheme () == "https") {
-            icon (QIcon (":/client/theme/lock-https.svg"));
-            QSslCipher cipher = account.session_cipher;
-            tool_tip (_("This connection is encrypted using %1 bit %2.\n").arg (cipher.used_bits ()).arg (cipher.name ()));
-        } else {
-            icon (QIcon (":/client/theme/lock-http.svg"));
-            tool_tip (_("This connection is NOT secure as it is not encrypted.\n"));
+    /***********************************************************
+    ***********************************************************/
+    private static string add_cert_details_field (string key, string value) {
+        if (value.is_empty ()) {
+            return "";
         }
+
+        return "<tr><td style=\"vertical-align : top;\"><b>" + key
+             + "</b></td><td style=\"vertical-align : bottom;\">" + value
+             + "</td></tr>";
     }
 
-    void Ssl_button.on_signal_update_menu () {
-        this.menu.clear ();
-
-        if (!this.account_state) {
-            return;
-        }
-
-        AccountPointer account = this.account_state.account ();
-
-        this.menu.add_action (_("Server version : %1").arg (account.server_version ())).enabled (false);
-
-        if (account.is_http2Supported ()) {
-            this.menu.add_action ("HTTP/2").enabled (false);
-        }
-
-        if (account.url ().scheme () == "https") {
-            string ssl_version = account.session_cipher.protocol_""
-                + ", " + account.session_cipher.authentication_method ()
-                + ", " + account.session_cipher.key_exchange_method ()
-                + ", " + account.session_cipher.encryption_method ();
-            this.menu.add_action (ssl_version).enabled (false);
-
-            if (account.session_ticket.is_empty ()) {
-                this.menu.add_action (_("No support for SSL session tickets/identifiers")).enabled (false);
-            }
-
-            GLib.List<QSslCertificate> chain = account.peer_certificate_chain;
-
-            if (chain.is_empty ()) {
-                GLib.warning ("Empty certificate chain";
-                return;
-            }
-
-            this.menu.add_action (_("Certificate information:")).enabled (false);
-
-            const var system_certificates = QSslConfiguration.system_ca_certificates ();
-
-            GLib.List<QSslCertificate> tmp_chain;
-            foreach (QSslCertificate cert, chain) {
-                tmp_chain + cert;
-                if (system_certificates.contains (cert))
-                    break;
-            }
-            chain = tmp_chain;
-
-            // find trust anchor (informational only, verification is done by QSslSocket!)
-            for (QSslCertificate root_cA : system_certificates) {
-                if (root_cA.issuer_info (QSslCertificate.Common_name) == chain.last ().issuer_info (QSslCertificate.Common_name)
-                    && root_cA.issuer_info (QSslCertificate.Organization) == chain.last ().issuer_info (QSslCertificate.Organization)) {
-                    chain.append (root_cA);
-                    break;
-                }
-            }
-
-            QList_iterator<QSslCertificate> it (chain);
-            it.to_back ();
-            int i = 0;
-            while (it.has_previous ()) {
-                this.menu.add_menu (build_cert_menu (this.menu, it.previous (), account.approved_certificates (), i, system_certificates));
-                i++;
-            }
-        } else {
-            this.menu.add_action (_("The connection is not secure")).enabled (false);
-        }
+    /***********************************************************
+    Necessary indication only, not sufficient for primary
+    validation!
+    ***********************************************************/
+    private static bool is_self_signed (QSslCertificate certificate) {
+        return certificate.issuer_info (QSslCertificate.Common_name) == certificate.subject_info (QSslCertificate.Common_name)
+            && certificate.issuer_info (QSslCertificate.Organizational_unit_name) == certificate.subject_info (QSslCertificate.Organizational_unit_name);
     }
 
-    } // namespace Occ
+} // class SslButton
+
+} // namespace Ui
+} // namespace Occ
     

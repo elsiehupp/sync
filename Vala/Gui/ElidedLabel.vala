@@ -5,7 +5,6 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 ***********************************************************/
 
 //  #include <QResizeEvent>
-//  #include <Gtk.Label>
 
 
 namespace Occ {

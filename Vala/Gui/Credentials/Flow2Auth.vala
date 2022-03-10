@@ -40,6 +40,7 @@ class Flow2Auth : GLib.Object {
         status_copy_link_to_clipboard
     }
 
+
     /***********************************************************
     ***********************************************************/
     public Flow2Auth (Account account, GLib.Object parent);
@@ -51,6 +52,7 @@ class Flow2Auth : GLib.Object {
         LoggedIn,
         Error
     }
+
 
     /***********************************************************
     ***********************************************************/

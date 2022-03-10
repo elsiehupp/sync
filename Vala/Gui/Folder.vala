@@ -30,12 +30,14 @@ class Folder : GLib.Object {
     class Map : GLib.HashMap<string, Folder> { }
     class MapIterator : QMapIterator<string, Folder> { }
 
+
     /***********************************************************
     ***********************************************************/
     public enum ChangeReason {
         Other,
         //  UnLock
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -326,6 +328,7 @@ class Folder : GLib.Object {
             return Theme.instance ().app_name_gui ();
         }
     }
+
 
     /***********************************************************
     Short local path to display on the GUI (native separators)
@@ -802,7 +805,7 @@ class Folder : GLib.Object {
         }
     
         if (new_mode != this.definition.virtual_files_mode) {
-            // TODO : Must wait for current sync to finish!
+            // TODO: Must wait for current sync to finish!
             SyncEngine.wipe_virtual_files (path (), this.journal, this.vfs);
     
             this.vfs.stop ();
@@ -822,6 +825,7 @@ class Folder : GLib.Object {
             save_to_settings ();
         }
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -877,6 +881,7 @@ class Folder : GLib.Object {
         return !virtual_files_enabled () && !is_vfs_on_signal_off_switch_pending ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public string file_from_local_path (string local_path) {
@@ -913,6 +918,7 @@ class Folder : GLib.Object {
             sync_state (SyncResult.Status.SYNC_ABORT_REQUESTED);
         }
     }
+
 
     /***********************************************************
     Connected to the corresponding signals in the SyncEngine
@@ -1565,7 +1571,7 @@ class Folder : GLib.Object {
         if (this.engine.is_sync_running ()) {
             on_signal_terminate_sync ();
             schedule_this_folder_soon ();
-            // TODO : This sets the sync state to Abort_requested on done, we don't want that
+            // TODO: This sets the sync state to Abort_requested on done, we don't want that
         }
     
         // Let everyone know we're syncing

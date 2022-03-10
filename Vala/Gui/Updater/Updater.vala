@@ -28,6 +28,7 @@ class Updater : GLib.Object {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     public struct Helper {
@@ -50,6 +51,7 @@ class Updater : GLib.Object {
             return major << 56 | minor << 48 | patch << 40 | build;
         }
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -84,7 +86,7 @@ class Updater : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual void background_check_for_update ();
+    public virtual void on_signal_background_check_for_update ();
 
 
     /***********************************************************
@@ -95,7 +97,7 @@ class Updater : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected static string client_version () {
-        return string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION_FULL));
+        return MIRALL_STRINGIFY (MIRALL_VERSION_FULL);
     }
 
 
@@ -161,6 +163,7 @@ class Updater : GLib.Object {
         return query;
     }
 
+
     /***********************************************************
     To test, cmake with -DAPPLICATION_UPDATE_URL="http://127.0.0.1:8080/test.rss"
     ***********************************************************/
@@ -172,7 +175,7 @@ class Updater : GLib.Object {
             return null;
         }
         // the best we can do is notify about updates
-        return new Passive_update_notifier (url);
+        return new PassiveUpdateNotifier (url);
     }
 
 } // class Updater

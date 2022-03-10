@@ -69,7 +69,6 @@ Here follows the state machine
     \endcode
 ***********************************************************/
 
-
 class ConnectionValidator : GLib.Object {
 
     /***********************************************************

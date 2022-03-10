@@ -40,6 +40,7 @@ class FolderWizard : QWizard {
         Page_Selective_sync
     }
 
+
     /***********************************************************
     ***********************************************************/
     public FolderWizard (AccountPointer account, Gtk.Widget parent = null);

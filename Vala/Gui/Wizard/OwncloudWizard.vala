@@ -34,7 +34,7 @@ class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer account;
+    AccountPointer account { public get; public set; }
     private WelcomePage welcome_page;
     private OwncloudSetupPage setup_page;
     private OwncloudHttpCredsPage http_creds_page;
@@ -47,9 +47,27 @@ class OwncloudWizard : QWizard {
 
     string[] setup_log;
 
+    string oc_url {
+        public get {
+            return field ("OCUrl").to_string ().simplified ();
+        }
+        public set {
+            this.setup_page.server_url (value);
+        }
+    }
+
+    bool registration {
+        public get {
+            return this.registration;
+        }
+        public set {
+            this.registration = value;
+        }
+    }
+
     bool registration = false;
 
-    friend class OwncloudSetupWizard;
+    //  friend class OwncloudSetupWizard;
 
     /***********************************************************
     FIXME: Can those be local variables?
@@ -63,41 +81,37 @@ class OwncloudWizard : QWizard {
     ***********************************************************/
     public GLib.ByteArray client_cert_bundle;
 
-
     /***********************************************************
     Password for the pkcs12
     ***********************************************************/
     public GLib.ByteArray client_cert_password;
-
 
     /***********************************************************
     Key extracted from pkcs12
     ***********************************************************/
     public QSslKey client_ssl_key;
 
-
     /***********************************************************
     Cert extracted from pkcs12
     ***********************************************************/
     public QSslCertificate client_ssl_certificate;
 
-
     /***********************************************************
     ***********************************************************/
     public GLib.List<QSslCertificate> client_ssl_ca_certificates;
 
-
     signal void clear_pending_requests ();
-    signal void determine_auth_type (string );
-    signal void connect_to_oc_url (string );
-    signal void create_local_and_remote_folders (string , string );
+    signal void determine_auth_type (string value);
+    signal void connect_to_oc_url (string value);
+    signal void create_local_and_remote_folders (string value1, string value2);
+
     /***********************************************************
     Make sure to connect to this, rather than on_signal_finished (int)!!
     ***********************************************************/
-    signal void basic_setup_finished (int);
+    signal void basic_setup_finished (int value);
     signal void skip_folder_configuration ();
     signal void need_certificate ();
-    signal void style_changed ();
+    signal void signal_style_changed ();
     signal void on_signal_activate ();
 
 
@@ -113,7 +127,7 @@ class OwncloudWizard : QWizard {
         this.flow2creds_page = new Flow2AuthCredsPage (this);
         this.advanced_setup_page = new OwncloudAdvancedSetupPage (this);
     //  #ifdef WITH_WEBENGINE
-        this.web_view_page = (new WebViewPage (this);
+        this.web_view_page = new WebViewPage (this);
     //  #else // WITH_WEBENGINE
     //      this.web_view_page (null)
     //  #endif // WITH_WEBENGINE {
@@ -130,22 +144,64 @@ class OwncloudWizard : QWizard {
         page (WizardCommon.Pages.PAGE_WEB_VIEW, this.web_view_page);
     //  #endif WITH_WEBENGINE
 
-        connect (this, &Gtk.Dialog.on_signal_finished, this, &OwncloudWizard.basic_setup_finished);
+        connect (
+            this,
+            Gtk.Dialog.on_signal_finished,
+            this,
+            OwncloudWizard.basic_setup_finished
+        );
 
-        // note: on_signal_start Id is set by the calling class depending on if the
+        // note: start id is set by the calling class depending on if the
         // welcome text is to be shown or not.
 
-        connect (this, &QWizard.current_id_changed, this, &OwncloudWizard.on_signal_current_page_changed);
-        connect (this.setup_page, &OwncloudSetupPage.determine_auth_type, this, &OwncloudWizard.determine_auth_type);
-        connect (this.http_creds_page, &OwncloudHttpCredsPage.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
-        connect (this.browser_creds_page, &OwncloudOAuthCredsPage.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
-        connect (this.flow2creds_page, &Flow2AuthCredsPage.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
-    //  #ifdef WITH_WEBENGINE
-        connect (this.web_view_page, &WebViewPage.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
-    //  #endif WITH_WEBENGINE
-        connect (this.advanced_setup_page, &OwncloudAdvancedSetupPage.create_local_and_remote_folders,
-            this, &OwncloudWizard.create_local_and_remote_folders);
-        connect (this, &QWizard.custom_button_clicked, this, &OwncloudWizard.skip_folder_configuration);
+        connect (
+            this,
+            QWizard.current_id_changed,
+            this,
+            OwncloudWizard.on_signal_current_page_changed
+        );
+        connect (
+            this.setup_page,
+            OwncloudSetupPage.determine_auth_type,
+            this,
+            OwncloudWizard.determine_auth_type
+        );
+        connect (
+            this.http_creds_page,
+            OwncloudHttpCredsPage.connect_to_oc_url,
+            this,
+            OwncloudWizard.connect_to_oc_url
+        );
+        connect (
+            this.browser_creds_page,
+            OwncloudOAuthCredsPage.connect_to_oc_url,
+            this,
+            OwncloudWizard.connect_to_oc_url
+        );
+        connect (
+            this.flow2creds_page,
+            Flow2AuthCredsPage.connect_to_oc_url,
+            this,
+            OwncloudWizard.connect_to_oc_url
+        );
+        connect (
+            this.web_view_page,
+            WebViewPage.connect_to_oc_url,
+            this,
+            OwncloudWizard.connect_to_oc_url
+        );
+        connect (
+            this.advanced_setup_page,
+            OwncloudAdvancedSetupPage.create_local_and_remote_folders,
+            this,
+            OwncloudWizard.create_local_and_remote_folders
+        );
+        connect (
+            this,
+            QWizard.custom_button_clicked,
+            this,
+            OwncloudWizard.skip_folder_configuration
+        );
 
         Theme theme = Theme.instance ();
         window_title (_("Add %1 account").arg (theme.app_name_gui ()));
@@ -162,15 +218,35 @@ class OwncloudWizard : QWizard {
         next_button_size_policy.retain_size_when_hidden (true);
         button (QWizard.NextButton).size_policy (next_button_size_policy);
 
-        // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &OwncloudWizard.style_changed, this.setup_page, &OwncloudSetupPage.on_signal_style_changed);
-        connect (this, &OwncloudWizard.style_changed, this.advanced_setup_page, &OwncloudAdvancedSetupPage.on_signal_style_changed);
-        connect (this, &OwncloudWizard.style_changed, this.flow2creds_page, &Flow2AuthCredsPage.on_signal_style_changed);
+        // Connect signal_style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
+        connect (
+            this,
+            OwncloudWizard.signal_style_changed,
+            this.setup_page,
+            OwncloudSetupPage.on_signal_style_changed
+        );
+        connect (
+            this,
+            OwncloudWizard.signal_style_changed,
+            this.advanced_setup_page,
+            OwncloudAdvancedSetupPage.on_signal_style_changed
+        );
+        connect (
+            this,
+            OwncloudWizard.signal_style_changed,
+            this.flow2creds_page,
+            Flow2AuthCredsPage.on_signal_style_changed
+        );
 
         customize_style ();
 
         // allow Flow2 page to poll on window activation
-        connect (this, &OwncloudWizard.on_signal_activate, this.flow2creds_page, &Flow2AuthCredsPage.on_signal_poll_now);
+        connect (
+            this,
+            OwncloudWizard.on_signal_activate,
+            this.flow2creds_page,
+            Flow2AuthCredsPage.on_signal_poll_now
+        );
 
         adjust_wizard_size ();
         center_window ();
@@ -179,52 +255,10 @@ class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public void account (AccountPointer account) {
-        this.account = account;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public AccountPointer account () {
-        return this.account;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void oc_url (string url) {
-        this.setup_page.server_url (url);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void oc_url () {
-        string url = field ("OCUrl").to_string ().simplified ();
-        return url;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool registration () {
-        return this.registration;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void registration (bool registration) {
-        this.registration = registration;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public string[] selective_sync_blocklist () {
         return this.advanced_setup_page.selective_sync_blocklist ();
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -342,7 +376,7 @@ class OwncloudWizard : QWizard {
             break;
         case Vfs.XAttr:
         case Vfs.Off:
-            Q_UNREACHABLE ();
+            GLib.assert_not_reached ();
         }
 
         connect (msg_box, &QMessageBox.accepted, receiver, [callback, msg_box, accept_button] {
@@ -372,13 +406,6 @@ class OwncloudWizard : QWizard {
         next ();
     }
 
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
 
     /***********************************************************
     ***********************************************************/
@@ -498,7 +525,7 @@ class OwncloudWizard : QWizard {
             customize_style ();
 
             // Notify the other widgets (Dark-/Light-Mode switching)
-            /* emit */ style_changed ();
+            /* emit */ signal_style_changed ();
             break;
         case QEvent.ActivationChange:
             if (is_active_window ())

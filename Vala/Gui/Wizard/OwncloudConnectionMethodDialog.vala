@@ -19,10 +19,10 @@ class OwncloudConnectionMethodDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public enum Method {
-        Closed = 0,
-        No_TLS,
-        Client_Side_TLS,
-        Back
+        CLOSED = 0,
+        NO_TLS,
+        CLIENT_SIDE_TLS,
+        BACK
     }
 
 
@@ -34,13 +34,28 @@ class OwncloudConnectionMethodDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public OwncloudConnectionMethodDialog (Gtk.Widget parent = null) {
-        base (parent, Qt.Customize_window_hint | Qt.Window_title_hint | Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint);
-        , ui (new Ui.OwncloudConnectionMethodDialog) {
+        base (parent, Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint);
+        this.ui = new Ui.OwncloudConnectionMethodDialog ();
         ui.up_ui (this);
 
-        connect (ui.btn_no_tLS, &QAbstractButton.clicked, this, &OwncloudConnectionMethodDialog.on_signal_return_no_tls);
-        connect (ui.btn_client_side_tLS, &QAbstractButton.clicked, this, &OwncloudConnectionMethodDialog.on_signal_return_client_side_tls);
-        connect (ui.btn_back, &QAbstractButton.clicked, this, &OwncloudConnectionMethodDialog.return_back);
+        connect (
+            ui.btn_no_tls,
+            QAbstractButton.clicked,
+            this,
+            OwncloudConnectionMethodDialog.on_signal_return_no_tls
+        );
+        connect (
+            ui.btn_client_side_tLS,
+            QAbstractButton.clicked,
+            this,
+            OwncloudConnectionMethodDialog.on_signal_return_client_side_tls
+        );
+        connect (
+            ui.btn_back,
+            QAbstractButton.clicked,
+            this,
+            OwncloudConnectionMethodDialog.return_back
+        );
     }
 
 
@@ -62,21 +77,21 @@ class OwncloudConnectionMethodDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public void on_signal_return_no_tls () {
-        on_signal_done (No_TLS);
+        on_signal_done (Method.NO_TLS);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void on_signal_return_client_side_tls () {
-        on_signal_done (Client_Side_TLS);
+        on_signal_done (Method.CLIENT_SIDE_TLS);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void return_back () {
-        on_signal_done (Back);
+        on_signal_done (Method.BACK);
     }
 
 } // class OwncloudConnectionMethodDialog

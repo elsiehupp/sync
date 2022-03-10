@@ -14,23 +14,19 @@ namespace Ui {
 
 class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
 
-
     /***********************************************************
     ***********************************************************/
     public string user;
     public string app_password;
-
 
     /***********************************************************
     ***********************************************************/
     private Flow2AuthWidget flow_2_auth_widget = null;
     private QVBoxLayout layout = null;
 
-
     signal void connect_to_oc_url (string value);
     signal void poll_now ();
-    signal void style_changed ();
-
+    signal void signal_style_changed ();
 
     /***********************************************************
     ***********************************************************/
@@ -41,13 +37,28 @@ class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
         this.flow_2_auth_widget = new Flow2AuthWidget ();
         this.layout.add_widget (this.flow_2_auth_widget);
 
-        connect (this.flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &Flow2AuthCredsPage.on_signal_flow_2_auth_result);
+        connect (
+            this.flow_2_auth_widget,
+            Flow2AuthWidget.auth_result,
+            this,
+            Flow2AuthCredsPage.on_signal_flow_2_auth_result
+        );
 
-        // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &Flow2AuthCredsPage.style_changed, this.flow_2_auth_widget, &Flow2AuthWidget.on_signal_style_changed);
+        // Connect signal_style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
+        connect (
+            this,
+            Flow2AuthCredsPage.signal_style_changed,
+            this.flow_2_auth_widget,
+            Flow2AuthWidget.on_signal_style_changed
+        );
 
         // allow Flow2 page to poll on window activation
-        connect (this, &Flow2AuthCredsPage.poll_now, this.flow_2_auth_widget, &Flow2AuthWidget.on_signal_poll_now);
+        connect (
+            this,
+            Flow2AuthCredsPage.poll_now,
+            this.flow_2_auth_widget,
+            Flow2AuthWidget.on_signal_poll_now
+        );
     }
 
 
@@ -121,36 +132,38 @@ class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
         return false; /* We can never go forward manually */
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void on_signal_flow_2_auth_result (Flow2Auth.Result result, string error_string, string user, string app_password) {
         //  Q_UNUSED (error_string)
         switch (result) {
-        case Flow2Auth.NotSupported: {
-            /* Flow2Auth not supported (can't open browser) */
-            wizard ().show ();
+            case Flow2Auth.NotSupported: {
+                /* Flow2Auth not supported (can't open browser) */
+                wizard ().show ();
 
-            /* Don't fallback to HTTP credentials */
-            /*OwncloudWizard oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-            oc_wizard.back ();
-            oc_wizard.on_signal_auth_type (DetermineAuthTypeJob.AuthType.BASIC);*/
-            break;
-        }
-        case Flow2Auth.Error:
-            /* Error while getting the access token.  (Timeout, or the server did not accept our client credentials */
-            wizard ().show ();
-            break;
-        case Flow2Auth.LoggedIn: {
-            this.user = user;
-            this.app_password = app_password;
-            var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-            //  Q_ASSERT (oc_wizard);
+                /* Don't fallback to HTTP credentials */
+                /*OwncloudWizard oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+                oc_wizard.back ();
+                oc_wizard.on_signal_auth_type (DetermineAuthTypeJob.AuthType.BASIC);*/
+                break;
+            }
+            case Flow2Auth.Error:
+                /* Error while getting the access token.  (Timeout, or the server did not accept our client credentials */
+                wizard ().show ();
+                break;
+            case Flow2Auth.LoggedIn: {
+                this.user = user;
+                this.app_password = app_password;
+                var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+                //  Q_ASSERT (oc_wizard);
 
-            /* emit */ connect_to_oc_url (oc_wizard.account ().url ().to_string ());
-            break;
-        }
+                /* emit */ connect_to_oc_url (oc_wizard.account ().url ().to_string ());
+                break;
+            }
         }
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -162,7 +175,7 @@ class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     public void on_signal_style_changed () {
-        /* emit */ style_changed ();
+        /* emit */ signal_style_changed ();
     }
 
 } // class Flow2AuthCredsPage

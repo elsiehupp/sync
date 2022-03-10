@@ -19,6 +19,7 @@ class Activity {
     ***********************************************************/
     public class Identifier : Pair<int64, string> { }
 
+
     /***********************************************************
     @brief The ActivityList
     @ingroup gui
@@ -26,6 +27,7 @@ class Activity {
     A GLib.List based list of Activities
     ***********************************************************/
     public class ActivityList : GLib.List<Activity> { }
+
 
     /***********************************************************
     ***********************************************************/
@@ -35,6 +37,7 @@ class Activity {
         SYNC_RESULT,
         SYNC_FILE_ITEM
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -51,7 +54,6 @@ class Activity {
     public int64 expire_at_msecs = -1;
     public string acc_name;
     public string icon;
-
 
     /***********************************************************
     Stores information about the error

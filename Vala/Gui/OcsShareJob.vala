@@ -100,6 +100,7 @@ class OcsShareJob : OcsJob {
         on_signal_start ();
     }
 
+
     /***********************************************************
     Set note a share
 

@@ -109,7 +109,7 @@ class Utility {
         case VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY:
             return _("utility", "Available online only");
         }
-        Q_UNREACHABLE ();
+        GLib.assert_not_reached ();
     }
 
 

@@ -1361,6 +1361,7 @@ class FolderMan : GLib.Object {
             start_scheduled_sync_soon ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     private void on_signal_run_one_etag_job () {
@@ -1898,7 +1899,7 @@ class FolderMan : GLib.Object {
     
                 var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
                 if (!vfs) {
-                    // TODO : Must do better error handling
+                    // TODO: Must do better error handling
                     q_fatal ("Could not load plugin");
                 }
     

@@ -1,7 +1,6 @@
 
 //  #include <Gtk.Dialog>
 //  #include <QVBoxLayout>
-//  #include <Gtk.Label>
 
 namespace Occ {
 namespace Ui {
@@ -47,7 +46,7 @@ class WebFlowCredentialsDialog : Gtk.Dialog {
 
 signals:
     void on_signal_url_catched (string user, string pass, string host);
-    void style_changed ();
+    void signal_style_changed ();
     void on_signal_activate ();
     void on_signal_close ();
 
@@ -103,8 +102,8 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flo
 
         connect (this.flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &WebFlowCredentialsDialog.on_signal_flow_2_auth_result);
 
-        // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &WebFlowCredentialsDialog.style_changed, this.flow_2_auth_widget, &Flow2AuthWidget.on_signal_style_changed);
+        // Connect signal_style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
+        connect (this, &WebFlowCredentialsDialog.signal_style_changed, this.flow_2_auth_widget, &Flow2AuthWidget.on_signal_style_changed);
 
         // allow Flow2 page to poll on window activation
         connect (this, &WebFlowCredentialsDialog.on_signal_activate, this.flow_2_auth_widget, &Flow2AuthWidget.on_signal_poll_now);
@@ -193,7 +192,7 @@ void WebFlowCredentialsDialog.change_event (QEvent e) {
         customize_style ();
 
         // Notify the other widgets (Dark-/Light-Mode switching)
-        /* emit */ style_changed ();
+        /* emit */ signal_style_changed ();
         break;
     case QEvent.ActivationChange:
         if (is_active_window ())

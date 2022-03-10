@@ -296,7 +296,7 @@ Window {
                             text: qsTr("Exit");
                             font.pixelSize: Style.topLinePixelSize
                             hoverEnabled: true
-                            onClicked: Systray.shutdown()
+                            onClicked: Systray.signal_shutdown()
 
                             background: Item {
                                 height: parent.height

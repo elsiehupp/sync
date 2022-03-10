@@ -8,7 +8,6 @@
 //  #include <QTimer>
 //  #include <Gtk.Dialog>
 //  #include <QVBoxLayout>
-//  #include <Gtk.Label>
 
 #ifdef WITH_WEBENGINE
 //  #endif // WITH_WEBENGINE
@@ -644,7 +643,7 @@ void WebFlowCredentials.delete_keychain_entries (bool old_keychain_entries) {
     start_delete_job (this.user);
 
     /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
-    TODO : For "Log out" & "Remove account" : Remove client CA certificates and KEY!
+    TODO: For "Log out" & "Remove account" : Remove client CA certificates and KEY!
 
           Disabled as long as selecting another cert is not supported by the UI.
 

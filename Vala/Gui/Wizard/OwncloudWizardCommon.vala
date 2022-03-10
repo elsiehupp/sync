@@ -5,7 +5,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <Gtk.Label>
 //  #include <QPixmap>
 //  #include <QRadioButton>
 //  #include <QAbstractButton>
@@ -16,6 +15,30 @@ namespace Occ {
 namespace Ui {
 
 class WizardCommon {
+
+
+    /***********************************************************
+    ***********************************************************/
+    public enum SyncMode {
+        SELECTIVE_MODE,
+        BOX_MODE
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public enum Pages {
+        PAGE_WELCOME,
+        PAGE_SERVER_SETUP,
+        PAGE_HTTP_CREDS,
+        PAGE_OAUTH_CREDS,
+        PAGE_FLOW2AUTH_CREDS,
+//  #ifdef WITH_WEBENGINE
+        PAGE_WEB_VIEW,
+//  #endif WITH_WEBENGINE
+        PAGE_ADVANCED_SETUP,
+    }
+
 
     /***********************************************************
     ***********************************************************/
@@ -77,29 +100,6 @@ class WizardCommon {
         text_color.alpha (128);
         palette.on_signal_color (QPalette.Text, text_color);
         label.palette (palette);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public enum SyncMode {
-        SELECTIVE_MODE,
-        BOX_MODE
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public enum Pages {
-        PAGE_WELCOME,
-        PAGE_SERVER_SETUP,
-        PAGE_HTTP_CREDS,
-        PAGE_OAUTH_CREDS,
-        PAGE_FLOW2AUTH_CREDS,
-//  #ifdef WITH_WEBENGINE
-        PAGE_WEB_VIEW,
-//  #endif WITH_WEBENGINE
-        PAGE_ADVANCED_SETUP,
     }
 
 } // class WizardCommon
