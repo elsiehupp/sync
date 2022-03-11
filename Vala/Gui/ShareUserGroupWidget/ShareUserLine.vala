@@ -137,7 +137,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private Profile_page_menu this.profile_page_menu;
+    private ProfilePageMenu this.profile_page_menu;
 
     // this.permission_edit is a checkbox
     private QAction this.permission_reshare;

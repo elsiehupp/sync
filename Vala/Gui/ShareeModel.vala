@@ -10,30 +10,70 @@ namespace Ui {
 class ShareeModel : QAbstractListModel {
 
     /***********************************************************
+    FIXME: make it a GLib.Set<Sharee> when Sharee can be compared
+    ***********************************************************/
+    public class ShareeSet : GLib.Vector<unowned Sharee> { }
+
+    /***********************************************************
     ***********************************************************/
     public enum LookupMode {
-        Local_search = 0,
-        Global_search = 1
+        LOCAL_SEARCH = 0,
+        GLOBAL_SEARCH = 1
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public ShareeModel (AccountPointer account, string type, GLib.Object parent = new GLib.Object ());
+    struct FindShareeHelper {
+
+        const Sharee sharee;
+
+        bool operator (unowned Sharee s2) {
+            return s2.format () == sharee.format () && s2.display_name () == sharee.format ();
+        }
+    }
 
     /***********************************************************
     ***********************************************************/
-    public using Sharee_set = GLib.Vector<unowned<Sharee>>; // FIXME: make it a GLib.Set<Sharee> when Sharee can be compared
-    public void fetch (string search, Sharee_set blocklist, LookupMode lookup_mode);
+    private AccountPointer account;
+    private string search;
+    private string type;
+
+    /***********************************************************
+    ***********************************************************/
+    private GLib.Vector<unowned Sharee> sharees;
+    private GLib.Vector<unowned Sharee> sharee_blocklist;
+
+    signal void signal_sharees_ready ();
+    signal void signal_display_error_message (int code, string value);
+
+    /***********************************************************
+    ***********************************************************/
+    public ShareeModel (AccountPointer account, string type, GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        this.account = account;
+        this.type = type;
+    }
 
 
     /***********************************************************
     ***********************************************************/
-    public int row_count (QModelIndex parent = QModelIndex ()) override;
+    public void fetch (string search, ShareeSet blocklist, LookupMode lookup_mode) {
+        this.search = search;
+        this.sharee_blocklist = blocklist;
+        var job = new OcsShareeJob (this.account);
+        connect (job, &OcsShareeJob.signal_sharee_job_finished, this, &ShareeModel.on_signal_sharees_fetched);
+        connect (job, &OcsJob.ocs_error, this, &ShareeModel.signal_display_error_message);
+        job.get_sharees (this.search, this.type, 1, 50, lookup_mode == LookupMode.GLOBAL_SEARCH ? true : false);
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    public 
+    public override int row_count (QModelIndex parent = QModelIndex ()) {
+        return this.sharees.size ();
+    }
+
 
     /***********************************************************
     ***********************************************************/
@@ -41,58 +81,15 @@ class ShareeModel : QAbstractListModel {
         return this.search;
     }
 
-signals:
-    void sharees_ready ();
-    void display_error_message (int code, string );
-
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_sharees_fetched (QJsonDocument reply);
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-
-    /***********************************************************
-    ***********************************************************/
-    private void new_sharees (GLib.Vector<unowned<Sharee>> new_sharees);
-
-    /***********************************************************
-    ***********************************************************/
-    private AccountPointer this.account;
-    private string this.search;
-    private string this.type;
-
-    /***********************************************************
-    ***********************************************************/
-    private GLib.Vector<unowned<Sharee>> this.sharees;
-    private GLib.Vector<unowned<Sharee>> this.sharee_blocklist;
-}
-
-
-
-    ShareeModel.ShareeModel (AccountPointer account, string type, GLib.Object parent)
-        : QAbstractListModel (parent)
-        this.account (account)
-        this.type (type) {
-    }
-
-    void ShareeModel.fetch (string search, Sharee_set blocklist, LookupMode lookup_mode) {
-        this.search = search;
-        this.sharee_blocklist = blocklist;
-        var job = new Ocs_sharee_job (this.account);
-        connect (job, &Ocs_sharee_job.sharee_job_finished, this, &ShareeModel.on_signal_sharees_fetched);
-        connect (job, &OcsJob.ocs_error, this, &ShareeModel.display_error_message);
-        job.get_sharees (this.search, this.type, 1, 50, lookup_mode == Global_search ? true : false);
-    }
-
-    void ShareeModel.on_signal_sharees_fetched (QJsonDocument reply) {
-        GLib.Vector<unowned<Sharee>> new_sharees;
-     {
+    private void on_signal_sharees_fetched (QJsonDocument reply) {
+        GLib.Vector<unowned Sharee> new_sharees;
+        {
             const string[] sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
 
-            const var append_sharees = [this, sharee_types] (QJsonObject data, GLib.Vector<unowned<Sharee>>& out) {
+            const var append_sharees = [this, sharee_types] (QJsonObject data, GLib.Vector<unowned Sharee>& out) {
                 for (var sharee_type : sharee_types) {
                     const var category = data.value (sharee_type).to_array ();
                     for (var sharee : category) {
@@ -106,7 +103,7 @@ signals:
         }
 
         // Filter sharees that we have already shared with
-        GLib.Vector<unowned<Sharee>> filtered_sharees;
+        GLib.Vector<unowned Sharee> filtered_sharees;
         foreach (var sharee, new_sharees) {
             bool found = false;
             foreach (var blocklist_sharee, this.sharee_blocklist) {
@@ -122,41 +119,19 @@ signals:
         }
 
         new_sharees (filtered_sharees);
-        sharees_ready ();
+        signal_sharees_ready ();
     }
 
-    unowned<Sharee> ShareeModel.parse_sharee (QJsonObject data) {
-        string display_name = data.value ("label").to_string ();
-        const string share_with = data.value ("value").to_object ().value ("share_with").to_string ();
-        Sharee.Type type = (Sharee.Type)data.value ("value").to_object ().value ("share_type").to_int ();
-        const string additional_info = data.value ("value").to_object ().value ("share_with_additional_info").to_string ();
-        if (!additional_info.is_empty ()) {
-            display_name = _("%1 (%2)", "sharee (share_with_additional_info)").arg (display_name, additional_info);
-        }
 
-        return unowned<Sharee> (new Sharee (share_with, display_name, type));
-    }
+    /***********************************************************
+    Set the new sharee
 
-    // Helper function for new_sharees   (could be a lambda when we can use them)
-    static unowned<Sharee> sharee_from_model_index (QModelIndex index) {
-        return index.data (Qt.USER_ROLE).value<unowned<Sharee>> ();
-    }
-
-    struct Find_sharee_helper {
-        const unowned<Sharee> sharee;
-        bool operator () (unowned<Sharee> s2) {
-            return s2.format () == sharee.format () && s2.display_name () == sharee.format ();
-        }
-    }
-
-    /* Set the new sharee
-
-        Do that while preserving the model index so the selection stays
+    Do that while preserving the model index so the selection stays
     ***********************************************************/
-    void ShareeModel.new_sharees (GLib.Vector<unowned<Sharee>> new_sharees) {
+    private void new_sharees (GLib.Vector<unowned Sharee> new_sharees) {
         layout_about_to_be_changed ();
         const var persistent = persistent_index_list ();
-        GLib.Vector<unowned<Sharee>> old_persistant_sharee;
+        GLib.Vector<unowned Sharee> old_persistant_sharee;
         old_persistant_sharee.reserve (persistent.size ());
 
         std.transform (persistent.begin (), persistent.end (), std.back_inserter (old_persistant_sharee),
@@ -166,8 +141,8 @@ signals:
 
         QModel_index_list new_persistant;
         new_persistant.reserve (persistent.size ());
-        foreach (unowned<Sharee> sharee, old_persistant_sharee) {
-            Find_sharee_helper helper = {
+        foreach (unowned Sharee sharee, old_persistant_sharee) {
+            FindShareeHelper helper = {
                 sharee
             }
             var it = std.find_if (this.sharees.const_begin (), this.sharees.const_end (), helper);
@@ -182,11 +157,25 @@ signals:
         layout_changed ();
     }
 
-    int ShareeModel.row_count (QModelIndex &) {
-        return this.sharees.size ();
+
+    /***********************************************************
+    ***********************************************************/
+    private unowned Sharee parse_sharee (QJsonObject data) {
+        string display_name = data.value ("label").to_string ();
+        const string share_with = data.value ("value").to_object ().value ("share_with").to_string ();
+        Sharee.Type type = (Sharee.Type)data.value ("value").to_object ().value ("share_type").to_int ();
+        const string additional_info = data.value ("value").to_object ().value ("share_with_additional_info").to_string ();
+        if (!additional_info.is_empty ()) {
+            display_name = _("%1 (%2)", "sharee (share_with_additional_info)").arg (display_name, additional_info);
+        }
+
+        return unowned Sharee (new Sharee (share_with, display_name, type));
     }
 
-    GLib.Variant ShareeModel.data (QModelIndex index, int role) {
+
+    /***********************************************************
+    ***********************************************************/
+    private GLib.Variant data (QModelIndex index, int role) {
         if (index.row () < 0 || index.row () > this.sharees.size ()) {
             return GLib.Variant ();
         }
@@ -209,10 +198,26 @@ signals:
         return GLib.Variant ();
     }
 
-    unowned<Sharee> ShareeModel.get_sharee (int at) {
+
+    /***********************************************************
+    ***********************************************************/
+    private unowned Sharee get_sharee (int at) {
         if (at < 0 || at > this.sharees.size ()) {
-            return unowned<Sharee> (null);
+            return unowned Sharee (null);
         }
 
         return this.sharees.at (at);
     }
+
+    
+    /***********************************************************
+    Helper function for new_sharees (could be a lambda when we can use them)
+    ***********************************************************/
+    private static unowned Sharee sharee_from_model_index (QModelIndex index) {
+        return index.data (Qt.USER_ROLE).value<unowned Sharee> ();
+    }
+
+} // class ShareeModel
+
+} // namespace Ui
+} // namespace Occ

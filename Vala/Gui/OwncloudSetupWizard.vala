@@ -14,8 +14,9 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QApplication>
 //  #include <Gtk.Widget>
 //  #include <QProcess>
-using Soup;
 //  #include <QPointer>
+
+using Soup;
 
 namespace Occ {
 namespace Ui {
@@ -41,7 +42,6 @@ class OwncloudSetupWizard : GLib.Object {
     Overall dialog close signal
     ***********************************************************/
     signal void signal_own_cloud_wizard_done (int);
-
 
     /***********************************************************
     ***********************************************************/
@@ -345,10 +345,10 @@ class OwncloudSetupWizard : GLib.Object {
     ***********************************************************/
     private void on_signal_create_local_and_remote_folders (string local_folder, string remote_folder) {
         GLib.info ("Setup local sync folder for new o_c connection " + local_folder);
-        const QDir fi (local_folder);
+        const QDir file_info (local_folder);
 
         bool next_step = true;
-        if (fi.exists ()) {
+        if (file_info.exists ()) {
             FileSystem.folder_minimum_permissions (local_folder);
             Utility.setup_fav_link (local_folder);
             // there is an existing local folder. If its non empty, it can only be synced if the
@@ -358,13 +358,13 @@ class OwncloudSetupWizard : GLib.Object {
                     .arg (Utility.escape (local_folder)));
         } else {
             string res = _("Creating local sync folder %1 …").arg (local_folder);
-            if (fi.mkpath (local_folder)) {
+            if (file_info.mkpath (local_folder)) {
                 FileSystem.folder_minimum_permissions (local_folder);
                 Utility.setup_fav_link (local_folder);
                 res += _("OK");
             } else {
                 res += _("failed.");
-                GLib.warning ("Failed to create " + fi.path ();
+                GLib.warning ("Failed to create " + file_info.path ();
                 this.oc_wizard.on_signal_display_error (_("Could not create local folder %1").arg (Utility.escape (local_folder)), false);
                 next_step = false;
             }

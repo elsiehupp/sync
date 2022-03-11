@@ -23,14 +23,43 @@ All OCS jobs (e.g. sharing) should extend this class.
 ***********************************************************/
 class OcsJob : AbstractNetworkJob {
 
-    const int OCS_SUCCESS_STATUS_CODE 100
-    // Apparantly the v2.php URLs can return that
-    const int OCS_SUCCESS_STATUS_CODE_V2 200
-    // not modified when using  ETag
-    const int OCS_NOT_MODIFIED_STATUS_CODE_V2 304
+    private const int OCS_SUCCESS_STATUS_CODE = 100;
+
+    /***********************************************************
+    Apparantly the v2.php URLs can return that
+    ***********************************************************/
+    private const int OCS_SUCCESS_STATUS_CODE_V2 = 200;
+
+    /***********************************************************
+    Not modified when using ETag
+    ***********************************************************/
+    private const int OCS_NOT_MODIFIED_STATUS_CODE_V2 = 304;
+
+    /***********************************************************
+    ***********************************************************/
+    private GLib.ByteArray verb;
+    private GLib.List<QPair<string, string>> params;
+    private GLib.Vector<int> pass_status_codes;
+    private Soup.Request request;
+
+
+    /***********************************************************
+    Result of the OCS request
+
+    @param reply the reply
+    ***********************************************************/
+    signal void signal_job_finished (QJsonDocument reply, int status_code);
     
 
-    protected OcsJob (AccountPointer account);
+    /***********************************************************
+    ***********************************************************/
+    protected OcsJob (AccountPointer account) {
+        base (account, "");
+        this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE);
+        this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE_V2);
+        this.pass_status_codes.append (OCS_NOT_MODIFIED_STATUS_CODE_V2);
+        ignore_credential_failure (true);
+    }
 
 
     /***********************************************************
@@ -38,7 +67,9 @@ class OcsJob : AbstractNetworkJob {
 
     @param verb currently supported PUT POST DELETE
     ***********************************************************/
-    protected void verb (GLib.ByteArray verb);
+    protected void verb (GLib.ByteArray verb) {
+        this.verb = verb;
+    }
 
 
     /***********************************************************
@@ -48,7 +79,9 @@ class OcsJob : AbstractNetworkJob {
     @param name The name of the parameter
     @param value The value of the parameter
     ***********************************************************/
-    protected void add_param (string name, string value);
+    protected void add_param (string name, string value) {
+        this.params.append (q_make_pair (name, value));
+    }
 
 
     /***********************************************************
@@ -67,7 +100,9 @@ class OcsJob : AbstractNetworkJob {
 
     @param code Accepted status code
     ***********************************************************/
-    protected void add_pass_status_code (int code);
+    protected void add_pass_status_code (int code) {
+        this.pass_status_codes.append (code);
+    }
 
 
     /***********************************************************
@@ -76,18 +111,27 @@ class OcsJob : AbstractNetworkJob {
 
     This function appends the common identifier. so <PATH>/<ID>
     ***********************************************************/
-    protected void append_path (string identifier);
+    protected void append_path (string identifier) {
+        path (path () + '/' + identifier);
+    }
 
 
     /***********************************************************
-    Parse the response and return the status code and the message of the
-    reply (metadata)
+    Parse the response and return the status code and the
+    message of the reply (metadata)
 
     @param json The reply from OCS
     @param message The message that is set in the metadata
     @return The statuscode of the OCS response
     ***********************************************************/
-    public static int get_json_return_code (QJsonDocument json, string message);
+    public static int get_json_return_code (QJsonDocument json, string message) {
+        // TODO proper checking
+        var meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
+        int code = meta.value ("statuscode").to_int ();
+        message = meta.value ("message").to_string ();
+
+        return code;
+    }
 
 
     /***********************************************************
@@ -95,102 +139,15 @@ class OcsJob : AbstractNetworkJob {
     @param header_name a string with the header name
     @param value a string with the value
     ***********************************************************/
-    public void add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value);
-
-protected slots:
-
-    /***********************************************************
-    Start the OCS request
-    ***********************************************************/
-    void on_signal_start () override;
-
-signals:
-
-    /***********************************************************
-    Result of the OCS request
-
-    @param reply the reply
-    ***********************************************************/
-    void signal_job_finished (QJsonDocument reply, int status_code);
-
-
-    /***********************************************************
-    The status code was not one of the expected (passing)
-    status code for this command
-
-    @param status_code The actual status code
-    @param message The message provided by the server
-    ***********************************************************/
-    void ocs_error (int status_code, string message);
-
-
-    /***********************************************************
-    @brief etag_response_header_received - signal to report the ETag response header value
-    from ocs api v2
-    @param value - the ETag response header value
-    @param status_code - the OCS status code : 100 (!) for on_signal_success
-    ***********************************************************/
-    void etag_response_header_received (GLib.ByteArray value, int status_code);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private bool on_signal_finished () override;
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private GLib.ByteArray this.verb;
-    private GLib.List<QPair<string, string>> this.params;
-    private GLib.Vector<int> this.pass_status_codes;
-    private Soup.Request this.request;
-}
-
-    OcsJob.OcsJob (AccountPointer account)
-        : base (account, "") {
-        this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE);
-        this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE_V2);
-        this.pass_status_codes.append (OCS_NOT_MODIFIED_STATUS_CODE_V2);
-        ignore_credential_failure (true);
-    }
-
-    void OcsJob.verb (GLib.ByteArray verb) {
-        this.verb = verb;
-    }
-
-    void OcsJob.add_param (string name, string value) {
-        this.params.append (q_make_pair (name, value));
-    }
-
-    void OcsJob.add_pass_status_code (int code) {
-        this.pass_status_codes.append (code);
-    }
-
-    void OcsJob.append_path (string identifier) {
-        path (path () + '/' + identifier);
-    }
-
-    void OcsJob.add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
+    public void add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
         this.request.raw_header (header_name, value);
     }
 
 
     /***********************************************************
+    Start the OCS request
     ***********************************************************/
-    static QUrlQuery percent_encode_query_items (
-        const GLib.List<QPair<string, string>> items) {
-        QUrlQuery result;
-        // Note: QUrlQuery.query_items () does not fully percent encode
-        // the query items, see #5042
-        foreach (var item, items) {
-            result.add_query_item (
-                GLib.Uri.to_percent_encoding (item.first),
-                GLib.Uri.to_percent_encoding (item.second));
-        }
-        return result;
-    }
-
-    void OcsJob.on_signal_start () {
+    protected override void on_signal_start () {
         add_raw_header ("Ocs-APIREQUEST", "true");
         add_raw_header ("Content-Type", "application/x-www-form-urlencoded");
 
@@ -218,7 +175,29 @@ signals:
         AbstractNetworkJob.on_signal_start ();
     }
 
-    bool OcsJob.on_signal_finished () {
+
+    /***********************************************************
+    The status code was not one of the expected (passing)
+    status code for this command
+
+    @param status_code The actual status code
+    @param message The message provided by the server
+    ***********************************************************/
+    private void ocs_error (int status_code, string message);
+
+
+    /***********************************************************
+    @brief etag_response_header_received - signal to report the ETag response header value
+    from ocs api v2
+    @param value - the ETag response header value
+    @param status_code - the OCS status code : 100 (!) for on_signal_success
+    ***********************************************************/
+    private void etag_response_header_received (GLib.ByteArray value, int status_code);
+
+
+    /***********************************************************
+    ***********************************************************/
+    private override bool on_signal_finished () {
         const GLib.ByteArray reply_data = reply ().read_all ();
 
         QJsonParseError error;
@@ -258,13 +237,23 @@ signals:
         return true;
     }
 
-    int OcsJob.get_json_return_code (QJsonDocument json, string message) {
-        //TODO proper checking
-        var meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
-        int code = meta.value ("statuscode").to_int ();
-        message = meta.value ("message").to_string ();
 
-        return code;
+    /***********************************************************
+    ***********************************************************/
+    private static QUrlQuery percent_encode_query_items (
+        const GLib.List<QPair<string, string>> items) {
+        QUrlQuery result;
+        // Note: QUrlQuery.query_items () does not fully percent encode
+        // the query items, see #5042
+        foreach (var item, items) {
+            result.add_query_item (
+                GLib.Uri.to_percent_encoding (item.first),
+                GLib.Uri.to_percent_encoding (item.second));
+        }
+        return result;
     }
-    }
-    
+
+} // class OcsJob
+
+} // namespace Ui
+} // namespace Occ

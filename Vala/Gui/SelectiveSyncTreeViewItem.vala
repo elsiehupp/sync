@@ -11,14 +11,22 @@ class SelectiveSyncTreeViewItem : QTreeWidgetItem {
 
     /***********************************************************
     ***********************************************************/
-    public SelectiveSyncTreeViewItem (int type = QTreeWidgetItem.Type)
-        : QTreeWidgetItem (type) {
+    public SelectiveSyncTreeViewItem (int type = QTreeWidgetItem.Type) {
+        base (type);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public SelectiveSyncTreeViewItem (string[] strings, int type = QTreeWidgetItem.Type)
+    public SelectiveSyncTreeViewItem.with_parent (QTreeWidgetItem parent, int type = QTreeWidgetItem.Type) {
+        base (parent, type);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public SelectiveSyncTreeViewItem.for_string_list (string[] strings, int type = QTreeWidgetItem.Type) {
+
     }
 
 
@@ -31,19 +39,21 @@ class SelectiveSyncTreeViewItem : QTreeWidgetItem {
     /***********************************************************
     ***********************************************************/
     public TreeWidgetItem (view, type) {
-    }
-    public SelectiveSyncTreeViewItem (QTreeWidgetItem parent, int type = QTreeWidgetItem.Type)
-        : QTreeWidgetItem (parent, type) {
+
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private bool operator< (QTreeWidgetItem other) override {
-        int column = tree_widget ().sort_column ();
-        if (column == 1) {
-            return data (1, Qt.USER_ROLE).to_long_long () < other.data (1, Qt.USER_ROLE).to_long_long ();
-        }
-        return QTreeWidgetItem.operator< (other);
-    }
-};
+    //  private bool operator< (QTreeWidgetItem other) override {
+    //      int column = tree_widget ().sort_column ();
+    //      if (column == 1) {
+    //          return data (1, Qt.USER_ROLE).to_long_long () < other.data (1, Qt.USER_ROLE).to_long_long ();
+    //      }
+    //      return QTreeWidgetItem.operator< (other);
+    //  }
+
+}
+
+}
+}

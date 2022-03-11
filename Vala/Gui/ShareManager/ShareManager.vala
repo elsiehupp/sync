@@ -71,7 +71,7 @@ class ShareManager : GLib.Object {
 
 signals:
     void share_created (unowned Share share);
-    void on_signal_link_share_created (unowned<Link_share> share);
+    void on_signal_link_share_created (unowned LinkShare share);
     void on_signal_shares_fetched (GLib.List<unowned Share> shares);
     void on_signal_server_error (int code, string message);
 
@@ -95,7 +95,7 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private unowned<Link_share> parse_link_share (QJsonObject data);
+    private unowned LinkShare parse_link_share (QJsonObject data);
     private unowned<User_group_share> parse_user_group_share (QJsonObject data);
     private unowned Share parse_share (QJsonObject data);
 
@@ -133,8 +133,8 @@ ShareManager.ShareManager (AccountPointer account, GLib.Object parent)
 }
 
 void ShareManager.create_link_share (string path,
-    const string name,
-    const string password) {
+    private const string name,
+    private const string password) {
     var job = new OcsShareJob (this.account);
     connect (job, &OcsShareJob.share_job_finished, this, &ShareManager.on_signal_link_share_created);
     connect (job, &OcsJob.ocs_error, this, &ShareManager.on_signal_ocs_error);
@@ -157,7 +157,7 @@ void ShareManager.on_signal_link_share_created (QJsonDocument reply) {
 
     //Parse share
     var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
-    unowned<Link_share> share (parse_link_share (data));
+    unowned LinkShare share (parse_link_share (data));
 
     /* emit */ link_share_created (share);
 
@@ -166,8 +166,8 @@ void ShareManager.on_signal_link_share_created (QJsonDocument reply) {
 
 void ShareManager.create_share (string path,
     const Share.ShareType share_type,
-    const string share_with,
-    const Share.Permissions desired_permissions,
+    private const string share_with,
+    private const string ermissions desired_permissions,
     const string password) {
     var job = new OcsShareJob (this.account);
     connect (job, &OcsJob.ocs_error, this, &ShareManager.on_signal_ocs_error);
@@ -218,7 +218,7 @@ void ShareManager.fetch_shares (string path) {
 
 void ShareManager.on_signal_shares_fetched (QJsonDocument reply) {
     var tmp_shares = reply.object ().value ("ocs").to_object ().value ("data").to_array ();
-    const string version_string = this.account.server_version ();
+    private const string version_string = this.account.server_version ();
     GLib.debug () + version_string + "Fetched" + tmp_shares.count ("shares";
 
     GLib.List<unowned Share> shares;
@@ -246,7 +246,7 @@ void ShareManager.on_signal_shares_fetched (QJsonDocument reply) {
 }
 
 unowned<User_group_share> ShareManager.parse_user_group_share (QJsonObject data) {
-    unowned<Sharee> sharee (new Sharee (data.value ("share_with").to_string (),
+    unowned Sharee sharee (new Sharee (data.value ("share_with").to_string (),
         data.value ("share_with_displayname").to_string (),
         static_cast<Sharee.Type> (data.value ("share_type").to_int ())));
 
@@ -273,7 +273,7 @@ unowned<User_group_share> ShareManager.parse_user_group_share (QJsonObject data)
         note));
 }
 
-unowned<Link_share> ShareManager.parse_link_share (QJsonObject data) {
+unowned LinkShare ShareManager.parse_link_share (QJsonObject data) {
     GLib.Uri url;
 
     // From own_cloud server 8.2 the url field is always set for public shares
@@ -299,7 +299,7 @@ unowned<Link_share> ShareManager.parse_link_share (QJsonObject data) {
         note = data.value ("note").to_string ();
     }
 
-    return unowned<Link_share> (new Link_share (this.account,
+    return unowned LinkShare (new LinkShare (this.account,
         data.value ("identifier").to_variant ().to_string (), // "identifier" used to be an integer, support both
         data.value ("uid_owner").to_string (),
         data.value ("displayname_owner").to_string (),
@@ -315,7 +315,7 @@ unowned<Link_share> ShareManager.parse_link_share (QJsonObject data) {
 }
 
 unowned Share ShareManager.parse_share (QJsonObject data) {
-    unowned<Sharee> sharee (new Sharee (data.value ("share_with").to_string (),
+    unowned Sharee sharee (new Sharee (data.value ("share_with").to_string (),
         data.value ("share_with_displayname").to_string (),
         (Sharee.Type)data.value ("share_type").to_int ()));
 

@@ -64,13 +64,13 @@ class AccountSettings : Gtk.Widget {
     }
 
 
-    const string PROPERTY_FOLDER = "folder";
-    const string PROPERTY_PATH = "path";
+    private const string PROPERTY_FOLDER = "folder";
+    private const string PROPERTY_PATH = "path";
 
 
     /***********************************************************
     ***********************************************************/
-    const string PROGRESS_BAR_STYLE_C
+    private const string PROGRESS_BAR_STYLE_C
         = "QProgressBar {"
         + "border : 1px solid grey;"
         + "border-radius : 5px;"
@@ -102,7 +102,7 @@ class AccountSettings : Gtk.Widget {
 
     signal void folder_changed ();
     signal void open_folder_alias (string );
-    signal void show_issues_list (AccountState account);
+    signal void on_signal_show_issues_list (AccountState account);
     signal void request_mnemonic ();
     signal void remove_account_folders (AccountState account);
     signal void signal_style_changed ();
@@ -1183,7 +1183,7 @@ class AccountSettings : Gtk.Widget {
                 return;
             }
             if (FolderStatusDelegate.errors_list_rect (tv.visual_rect (index)).contains (position)) {
-                /* emit */ show_issues_list (this.account_state);
+                /* emit */ on_signal_show_issues_list (this.account_state);
                 return;
             }
 

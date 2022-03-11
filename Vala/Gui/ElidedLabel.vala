@@ -78,8 +78,8 @@ class ElidedLabel : Gtk.Label {
     void ElidedLabel.resize_event (QResizeEvent event) {
         Gtk.Label.resize_event (event);
 
-        QFontMetrics fm = font_metrics ();
-        string elided = fm.elided_text (this.text, this.elide_mode, event.size ().width ());
+        QFontMetrics font_metrics = font_metrics ();
+        string elided = font_metrics.elided_text (this.text, this.elide_mode, event.size ().width ());
         Gtk.Label.on_signal_text (elided);
     }
     }

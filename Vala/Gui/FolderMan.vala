@@ -41,21 +41,21 @@ A folder is scheduled if:
 ***********************************************************/
 class FolderMan : GLib.Object {
 
-    const string VERSION_C = "version";
+    private const string VERSION_C = "version";
     const int MAX_FOLDERS_VERSION = 1;
 
-    const string SLASH_TAG = "__SLASH__";
-    const string BSLASH_TAG = "__BSLASH__";
-    const string QMARK_TAG = "__QMARK__";
-    const string PERCENT_TAG = "__PERCENT__";
-    const string STAR_TAG = "__STAR__";
-    const string COLON_TAG = "__COLON__";
-    const string PIPE_TAG = "__PIPE__";
-    const string QUOTE_TAG = "__QUOTE__";
-    const string LT_TAG = "__LESS_THAN__";
-    const string GT_TAG = "__GREATER_THAN__";
-    const string PAR_O_TAG = "__PAR_OPEN__";
-    const string PAR_C_TAG = "__PAR_CLOSE__";
+    private const string SLASH_TAG = "__SLASH__";
+    private const string BSLASH_TAG = "__BSLASH__";
+    private const string QMARK_TAG = "__QMARK__";
+    private const string PERCENT_TAG = "__PERCENT__";
+    private const string STAR_TAG = "__STAR__";
+    private const string COLON_TAG = "__COLON__";
+    private const string PIPE_TAG = "__PIPE__";
+    private const string QUOTE_TAG = "__QUOTE__";
+    private const string LT_TAG = "__LESS_THAN__";
+    private const string GT_TAG = "__GREATER_THAN__";
+    private const string PAR_O_TAG = "__PAR_OPEN__";
+    private const string PAR_C_TAG = "__PAR_CLOSE__";
 
     private FolderMan instance = null;
 
@@ -588,19 +588,19 @@ class FolderMan : GLib.Object {
             return false;
         }
     
-        GLib.FileInfo fi (local_folder);
-        QDir parent_dir (fi.directory ());
-        string folder_name = fi.filename ();
+        GLib.FileInfo file_info (local_folder);
+        QDir parent_dir (file_info.directory ());
+        string folder_name = file_info.filename ();
     
         // Adjust for case where local_folder ends with a /
-        if (fi.is_dir ()) {
+        if (file_info.is_dir ()) {
             folder_name = parent_dir.dir_name ();
             parent_dir.cd_up ();
         }
     
-        if (fi.exists ()) {
+        if (file_info.exists ()) {
             // It exists, but is empty . just reuse it.
-            if (fi.is_dir () && fi.directory ().count () == 0) {
+            if (file_info.is_dir () && file_info.directory ().count () == 0) {
                 GLib.debug ("start_from_scratch : Directory is empty!";
                 return true;
             }
@@ -618,15 +618,15 @@ class FolderMan : GLib.Object {
             // Make a backup of the folder/file.
             string new_name = get_backup_name (parent_dir.absolute_file_path (folder_name));
             string rename_error;
-            if (!FileSystem.rename (fi.absolute_file_path (), new_name, rename_error)) {
-                GLib.warning ("start_from_scratch : Could not rename" + fi.absolute_file_path ()
+            if (!FileSystem.rename (file_info.absolute_file_path (), new_name, rename_error)) {
+                GLib.warning ("start_from_scratch : Could not rename" + file_info.absolute_file_path ()
                                        + "to" + new_name + "error:" + rename_error;
                 return false;
             }
         }
     
-        if (!parent_dir.mkdir (fi.absolute_file_path ())) {
-            GLib.warning ("start_from_scratch : Could not mkdir" + fi.absolute_file_path ();
+        if (!parent_dir.mkdir (file_info.absolute_file_path ())) {
+            GLib.warning ("start_from_scratch : Could not mkdir" + file_info.absolute_file_path ();
             return false;
         }
     
@@ -1767,14 +1767,14 @@ class FolderMan : GLib.Object {
             return "";
     
         string new_name = full_path_name + _(" (backup)");
-        GLib.FileInfo fi (new_name);
+        GLib.FileInfo file_info (new_name);
         int count = 2;
         do {
-            if (fi.exists ()) {
+            if (file_info.exists ()) {
                 new_name = full_path_name + _(" (backup %1)").arg (count++);
-                fi.file (new_name);
+                file_info.file (new_name);
             }
-        } while (fi.exists ());
+        } while (file_info.exists ());
     
         return new_name;
     }

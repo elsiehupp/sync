@@ -60,7 +60,7 @@ class ProxyAuthHandler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<Proxy_auth_dialog> dialog;
+    private QPointer<ProxyAuthDialog> dialog;
 
     /***********************************************************
     The QSettings instance to securely store username/password
@@ -190,7 +190,7 @@ class ProxyAuthHandler : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private ProxyAuthHandler () {
-        this.dialog = new Proxy_auth_dialog ();
+        this.dialog = new ProxyAuthDialog ();
 
         this.config_file.on_signal_reset (new ConfigFile);
         this.settings.on_signal_reset (new QSettings (this.config_file.config_file (), QSettings.IniFormat));
@@ -200,7 +200,7 @@ class ProxyAuthHandler : GLib.Object {
 
 
     /***********************************************************
-    Runs the Proxy_auth_dialog and returns true if new
+    Runs the ProxyAuthDialog and returns true if new
     credentials were entered.
     ***********************************************************/
     private bool get_creds_from_dialog () {
@@ -337,6 +337,9 @@ class ProxyAuthHandler : GLib.Object {
         return "%1/username".arg (this.proxy);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private string keychain_password_key () {
         return "%1/password".arg (this.proxy);
     }

@@ -270,21 +270,9 @@ class OcsShareJob : OcsJob {
     private void on_signal_job_done (QJsonDocument reply) {
         /* emit */ share_job_finished (reply, this.value);
     }
-}
 
+} // class OcsShareJob
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    }
+} // namespace Ui
+} // namespace Occ
     

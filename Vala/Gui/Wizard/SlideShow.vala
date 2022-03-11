@@ -131,13 +131,13 @@ class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public QSize size_hint () {
-        QFontMetrics fm = font_metrics ();
-        QSize label_size (0, fm.height ());
+        QFontMetrics font_metrics = font_metrics ();
+        QSize label_size (0, font_metrics.height ());
         for (string label : this.labels) {
     //  #if (HASQT5_11)
-            label_size.width (std.max (fm.horizontal_advance (label), label_size.width ()));
+            label_size.width (std.max (font_metrics.horizontal_advance (label), label_size.width ()));
     //  #else
-    //          label_size.width (std.max (fm.width (label), label_size.width ()));
+    //          label_size.width (std.max (font_metrics.width (label), label_size.width ()));
     //  #endif
         }
         QSize pixmap_size;

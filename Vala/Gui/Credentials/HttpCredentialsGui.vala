@@ -115,7 +115,7 @@ void HttpCredentialsGui.on_signal_ask_from_user_async () {
 }
 
 void HttpCredentialsGui.on_signal_async_auth_result (OAuth.Result r, string user,
-    const string token, string refresh_token) {
+    private const string token, string refresh_token) {
     switch (r) {
     case OAuth.NotSupported:
         on_signal_show_dialog ();

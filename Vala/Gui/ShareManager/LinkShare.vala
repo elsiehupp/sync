@@ -12,11 +12,11 @@ A Link share is just like a regular share but then slightly different.
 There are several methods in the API that either work differently for
 link shares or are only available to link shares.
 ***********************************************************/
-class Link_share : Share {
+class LinkShare : Share {
 
     /***********************************************************
     ***********************************************************/
-    public Link_share (AccountPointer account,
+    public LinkShare (AccountPointer account,
         const string identifier,
         const string uidowner,
         const string owner_display_name,
@@ -149,33 +149,33 @@ signals:
 
 
 
-GLib.Uri Link_share.get_link () {
+GLib.Uri LinkShare.get_link () {
     return this.url;
 }
 
-GLib.Uri Link_share.get_direct_download_link () {
+GLib.Uri LinkShare.get_direct_download_link () {
     GLib.Uri url = this.url;
     url.path (url.path () + "/download");
     return url;
 }
 
-QDate Link_share.get_expire_date () {
+QDate LinkShare.get_expire_date () {
     return this.expire_date;
 }
 
-Link_share.Link_share (AccountPointer account,
-    const string identifier,
-    const string uidowner,
-    const string owner_display_name,
-    const string path,
-    const string name,
-    const string token,
+LinkShare.LinkShare (AccountPointer account,
+    private const string identifier,
+    private const string uidowner,
+    private const string owner_display_name,
+    private const string path,
+    private const string name,
+    private const string token,
     Permissions permissions,
     bool is_password_set,
     const GLib.Uri url,
     const QDate expire_date,
-    const string note,
-    const string label)
+    private const string note,
+    private const string label)
     : Share (account, identifier, uidowner, owner_display_name, path, Share.Type_link, is_password_set, permissions)
     this.name (name)
     this.token (token)
@@ -185,60 +185,60 @@ Link_share.Link_share (AccountPointer account,
     this.label (label) {
 }
 
-bool Link_share.get_public_upload () {
+bool LinkShare.get_public_upload () {
     return this.permissions & Share_permission_create;
 }
 
-bool Link_share.get_show_file_listing () {
+bool LinkShare.get_show_file_listing () {
     return this.permissions & SharePermissionRead;
 }
 
-string Link_share.get_name () {
+string LinkShare.get_name () {
     return this.name;
 }
 
-string Link_share.get_note () {
+string LinkShare.get_note () {
     return this.note;
 }
 
-string Link_share.get_label () {
+string LinkShare.get_label () {
     return this.label;
 }
 
-void Link_share.name (string name) {
-    create_share_job (&Link_share.on_signal_name_set).name (get_id (), name);
+void LinkShare.name (string name) {
+    create_share_job (&LinkShare.on_signal_name_set).name (get_id (), name);
 }
 
-void Link_share.note (string note) {
-    create_share_job (&Link_share.on_signal_note_set).note (get_id (), note);
+void LinkShare.note (string note) {
+    create_share_job (&LinkShare.on_signal_note_set).note (get_id (), note);
 }
 
-void Link_share.on_signal_note_set (QJsonDocument &, GLib.Variant note) {
+void LinkShare.on_signal_note_set (QJsonDocument &, GLib.Variant note) {
     this.note = note.to_string ();
     /* emit */ note_set ();
 }
 
-string Link_share.get_token () {
+string LinkShare.get_token () {
     return this.token;
 }
 
-void Link_share.expire_date (QDate date) {
-    create_share_job (&Link_share.on_signal_expire_date_set).expire_date (get_id (), date);
+void LinkShare.expire_date (QDate date) {
+    create_share_job (&LinkShare.on_signal_expire_date_set).expire_date (get_id (), date);
 }
 
-void Link_share.label (string label) {
-    create_share_job (&Link_share.on_signal_label_set).label (get_id (), label);
+void LinkShare.label (string label) {
+    create_share_job (&LinkShare.on_signal_label_set).label (get_id (), label);
 }
 
 template <typename Link_share_slot>
-OcsShareJob *Link_share.create_share_job (Link_share_slot on_signal_function) {
+OcsShareJob *LinkShare.create_share_job (Link_share_slot on_signal_function) {
     var job = new OcsShareJob (this.account);
     connect (job, &OcsShareJob.share_job_finished, this, on_signal_function);
-    connect (job, &OcsJob.ocs_error, this, &Link_share.on_signal_ocs_error);
+    connect (job, &OcsJob.ocs_error, this, &LinkShare.on_signal_ocs_error);
     return job;
 }
 
-void Link_share.on_signal_expire_date_set (QJsonDocument reply, GLib.Variant value) {
+void LinkShare.on_signal_expire_date_set (QJsonDocument reply, GLib.Variant value) {
     var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
 
 
@@ -254,12 +254,12 @@ void Link_share.on_signal_expire_date_set (QJsonDocument reply, GLib.Variant val
     /* emit */ expire_date_set ();
 }
 
-void Link_share.on_signal_name_set (QJsonDocument &, GLib.Variant value) {
+void LinkShare.on_signal_name_set (QJsonDocument &, GLib.Variant value) {
     this.name = value.to_string ();
     /* emit */ name_set ();
 }
 
-void Link_share.on_signal_label_set (QJsonDocument &, GLib.Variant label) {
+void LinkShare.on_signal_label_set (QJsonDocument &, GLib.Variant label) {
     if (this.label != label.to_string ()) {
         this.label = label.to_string ();
         /* emit */ label_set ();

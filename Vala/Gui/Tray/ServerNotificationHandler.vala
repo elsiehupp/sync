@@ -8,8 +8,8 @@ namespace Ui {
 
 class ServerNotificationHandler : GLib.Object {
 
-    const string NOTIFICATIONS_PATH = "ocs/v2.php/apps/notifications/api/v2/notifications";
-    const string PROPERTY_ACCOUNT_STATE = "oc_account_state";
+    private const string NOTIFICATIONS_PATH = "ocs/v2.php/apps/notifications/api/v2/notifications";
+    private const string PROPERTY_ACCOUNT_STATE = "oc_account_state";
     const int SUCCESS_STATUS_CODE = 200;
     const int NOT_MODIFIED_STATUS_CODE = 304;
 

@@ -435,7 +435,7 @@ void WebFlowCredentials.forget_sensitive_data () {
 
     this.account.delete_app_password ();
 
-    const string kck = keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ());
+    private const string kck = keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ());
     if (kck.is_empty ()) {
         GLib.debug ()) + "InvalidateToken : User is empty, bailing out!";
         return;
@@ -586,7 +586,7 @@ void WebFlowCredentials.on_signal_read_client_ca_certificates_pem_job_done (Keyc
     }
 
     // Now fetch the actual server password
-    const string kck = keychain_key (
+    private const string kck = keychain_key (
         this.account.url ().to_string (),
         this.user,
         this.keychain_migration ? "" : this.account.identifier ());

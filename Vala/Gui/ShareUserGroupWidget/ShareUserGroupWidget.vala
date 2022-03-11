@@ -37,12 +37,12 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Share_dialog (user/group) class
+@brief The ShareDialog (user/group) class
 @ingroup gui
 ***********************************************************/
 class ShareUserGroupWidget : Gtk.Widget {
 
-    const string PASSWORD_IS_PLACEHOLDER = "●●●●●●●●";
+    private const string PASSWORD_IS_PLACEHOLDER = "●●●●●●●●";
 
     /***********************************************************
     ***********************************************************/
@@ -110,8 +110,8 @@ class ShareUserGroupWidget : Gtk.Widget {
         this.completer_model = new ShareeModel (this.account,
             this.is_file ? QLatin1String ("file") : QLatin1String ("folder"),
             this.completer);
-        connect (this.completer_model, &ShareeModel.sharees_ready, this, &ShareUserGroupWidget.on_signal_sharees_ready);
-        connect (this.completer_model, &ShareeModel.display_error_message, this, &ShareUserGroupWidget.on_signal_display_error);
+        connect (this.completer_model, &ShareeModel.signal_sharees_ready, this, &ShareUserGroupWidget.on_signal_sharees_ready);
+        connect (this.completer_model, &ShareeModel.signal_display_error_message, this, &ShareUserGroupWidget.on_signal_display_error);
 
         this.completer.model (this.completer_model);
         this.completer.case_sensitivity (Qt.CaseInsensitive);
@@ -123,7 +123,7 @@ class ShareUserGroupWidget : Gtk.Widget {
         search_globally_action.tool_tip (_("Search globally"));
 
         connect (search_globally_action, &QAction.triggered, this, [this] () {
-            on_signal_search_for_sharees (ShareeModel.Global_search);
+            on_signal_search_for_sharees (ShareeModel.LookupMode.GLOBAL_SEARCH);
         });
 
         this.ui.sharee_line_edit.add_action (search_globally_action, QLineEdit.Leading_position);
@@ -134,7 +134,7 @@ class ShareUserGroupWidget : Gtk.Widget {
         connect (this.manager, &ShareManager.on_signal_server_error, this, &ShareUserGroupWidget.on_signal_display_error);
         connect (this.ui.sharee_line_edit, &QLineEdit.return_pressed, this, &ShareUserGroupWidget.on_signal_line_edit_return);
         connect (this.ui.confirm_share, &QAbstractButton.clicked, this, &ShareUserGroupWidget.on_signal_line_edit_return);
-        //TODO connect (this.ui.private_link_text, &Gtk.Label.link_activated, this, &ShareUserGroupWidget.on_signal_private_link_share);
+        // TODO connect (this.ui.private_link_text, &Gtk.Label.link_activated, this, &ShareUserGroupWidget.on_signal_private_link_share);
 
         // By making the next two Queued_connections we can override
         // the strings the completer sets on the line edit.
@@ -148,7 +148,7 @@ class ShareUserGroupWidget : Gtk.Widget {
             this, &ShareUserGroupWidget.on_signal_line_edit_text_edited, Qt.QueuedConnection);
         this.ui.sharee_line_edit.install_event_filter (this);
         connect (&this.completion_timer, &QTimer.timeout, this, [this] () {
-            on_signal_search_for_sharees (ShareeModel.Local_search);
+            on_signal_search_for_sharees (ShareeModel.LookupMode.LOCAL_SEARCH);
         });
         this.completion_timer.single_shot (true);
         this.completion_timer.interval (600);
@@ -297,10 +297,10 @@ class ShareUserGroupWidget : Gtk.Widget {
         this.ui.sharee_line_edit.enabled (false);
         this.completion_timer.stop ();
         this.pi_sharee.on_signal_start_animation ();
-        ShareeModel.Sharee_set blocklist;
+        ShareeModel.ShareeSet blocklist;
 
         // Add the current user to this.sharees since we can't share with ourself
-        unowned<Sharee> current_user (new Sharee (this.account.credentials ().user (), "", Sharee.Type.User));
+        unowned Sharee current_user (new Sharee (this.account.credentials ().user (), "", Sharee.Type.User));
         blocklist + current_user;
 
         foreach (var sw, this.parent_scroll_area.find_children<ShareUserLine> ()) {
@@ -355,7 +355,7 @@ class ShareUserGroupWidget : Gtk.Widget {
             return;
         // The index is an index from the QCompletion model which is itelf a proxy
         // model proxying the this.completer_model
-        var sharee = qvariant_cast<unowned<Sharee>> (index.data (Qt.USER_ROLE));
+        var sharee = qvariant_cast<unowned Sharee> (index.data (Qt.USER_ROLE));
         if (sharee.is_null ()) {
             return;
         }

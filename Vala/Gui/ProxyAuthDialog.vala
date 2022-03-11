@@ -14,62 +14,58 @@ namespace Ui {
 
 Used by ProxyAuthHandler.
 ***********************************************************/
-class Proxy_auth_dialog : Gtk.Dialog {
+class ProxyAuthDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public Proxy_auth_dialog (Gtk.Widget parent = null);
+    private Ui.ProxyAuthDialog ui;
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    public string password ();
-
-    /// Resets the dialog for new credential entry.
-    public void on_signal_reset ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private Ui.Proxy_auth_dialog ui;
-}
-
-    Proxy_auth_dialog.Proxy_auth_dialog (Gtk.Widget parent)
-        : Gtk.Dialog (parent)
-        , ui (new Ui.Proxy_auth_dialog) {
+    public ProxyAuthDialog (Gtk.Widget parent = null) {
+        base (parent);
+        this.ui = new Ui.ProxyAuthDialog ();
         ui.up_ui (this);
     }
 
-    Proxy_auth_dialog.~Proxy_auth_dialog () {
+
+    ~ProxyAuthDialog () {
         delete ui;
     }
 
-    void Proxy_auth_dialog.proxy_address (string address) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void proxy_address (string address) {
         ui.proxy_address.on_signal_text (address);
     }
 
-    string Proxy_auth_dialog.username () {
+
+    /***********************************************************
+    ***********************************************************/
+    public string username () {
         return ui.username_edit.text ();
     }
 
-    string Proxy_auth_dialog.password () {
+
+    /***********************************************************
+    ***********************************************************/
+    public string password () {
         return ui.password_edit.text ();
     }
 
-    void Proxy_auth_dialog.on_signal_reset () {
+
+    /***********************************************************
+    Resets the dialog for new credential entry.
+    ***********************************************************/
+    public void on_signal_reset () {
         ui.username_edit.focus ();
         ui.username_edit.clear ();
         ui.password_edit.clear ();
     }
 
-    } // namespace Occ
+} // class ProxyAuthDialog
+
+} // namespace Ui
+} // namespace Occ
     

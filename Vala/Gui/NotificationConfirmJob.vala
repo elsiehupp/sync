@@ -11,18 +11,34 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Notification_confirm_job class
+@brief The NotificationConfirmJob class
 @ingroup gui
 
-Class to call an action-link of a notification coming from the server.
-All the communication logic is handled in this class.
+Class to call an action-link of a notification coming from
+the server. All the communication logic is handled in this
+class.
 
 ***********************************************************/
-class Notification_confirm_job : AbstractNetworkJob {
+class NotificationConfirmJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public Notification_confirm_job (AccountPointer account);
+    private GLib.ByteArray verb;
+    private GLib.Uri link;
+
+    /***********************************************************
+    Result of the OCS request
+
+    @param reply the reply
+    ***********************************************************/
+    signal void signal_job_finished (string reply, int reply_code);
+
+    /***********************************************************
+    ***********************************************************/
+    public NotificationConfirmJob (AccountPointer account) {
+        base (account, "");
+        ignore_credential_failure (true);
+    }
 
 
     /***********************************************************
@@ -30,46 +46,16 @@ class Notification_confirm_job : AbstractNetworkJob {
 
     @param verb currently supported GET PUT POST DELETE
     ***********************************************************/
-    public void link_and_verb (GLib.Uri link, GLib.ByteArray verb);
+    public void link_and_verb (GLib.Uri link, GLib.ByteArray verb) {
+        this.link = link;
+        this.verb = verb;
+    }
 
 
     /***********************************************************
     @brief Start the OCS request
     ***********************************************************/
-    public void on_signal_start () override;
-
-signals:
-
-    /***********************************************************
-    Result of the OCS request
-
-    @param reply the reply
-    ***********************************************************/
-    void signal_job_finished (string reply, int reply_code);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private bool on_signal_finished () override;
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private GLib.ByteArray this.verb;
-    private GLib.Uri this.link;
-}
-
-    Notification_confirm_job.Notification_confirm_job (AccountPointer account)
-        : base (account, "") {
-        ignore_credential_failure (true);
-    }
-
-    void Notification_confirm_job.link_and_verb (GLib.Uri link, GLib.ByteArray verb) {
-        this.link = link;
-        this.verb = verb;
-    }
-
-    void Notification_confirm_job.on_signal_start () {
+    public override void on_signal_start () {
         if (!this.link.is_valid ()) {
             GLib.warning ("Attempt to trigger invalid URL: " + this.link.to_string ();
             return;
@@ -83,7 +69,10 @@ signals:
         AbstractNetworkJob.on_signal_start ();
     }
 
-    bool Notification_confirm_job.on_signal_finished () {
+
+    /***********************************************************
+    ***********************************************************/
+    private override bool on_signal_finished () {
         int reply_code = 0;
         // FIXME: check for the reply code!
         const string reply_str = reply ().read_all ();
@@ -100,5 +89,8 @@ signals:
 
         return true;
     }
-    }
-    
+
+} // class NotificationConfirmJob
+
+} // namespace Ui
+} // namespace Occ

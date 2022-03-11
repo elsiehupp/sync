@@ -528,7 +528,7 @@ class AccountState : GLib.Object, QSharedData {
     private void fetch_navigation_apps () {
         var job = new OcsNavigationAppsJob (this.account);
         job.add_raw_header ("If-None-Match", navigation_apps_etag_response_header ());
-        connect (job, &OcsNavigationAppsJob.apps_job_finished, this, &AccountState.on_signal_navigation_apps_fetched);
+        connect (job, &OcsNavigationAppsJob.signal_apps_job_finished, this, &AccountState.on_signal_navigation_apps_fetched);
         connect (job, &OcsNavigationAppsJob.etag_response_header_received, this, &AccountState.on_signal_etag_response_header_received);
         connect (job, &OcsNavigationAppsJob.ocs_error, this, &AccountState.on_signal_ocs_error);
         job.get_navigation_apps ();

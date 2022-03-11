@@ -1411,9 +1411,9 @@ class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private string build_register_path_message (string path) {
-        GLib.FileInfo fi (path);
+        GLib.FileInfo file_info (path);
         string message = "REGISTER_PATH:";
-        message.append (QDir.to_native_separators (fi.absolute_file_path ()));
+        message.append (QDir.to_native_separators (file_info.absolute_file_path ()));
         return message;
     }
 
@@ -1517,8 +1517,8 @@ class SocketApi : GLib.Object {
         }
         if (!path.is_empty ()) {
             message.append (':');
-            GLib.FileInfo fi (path);
-            message.append (QDir.to_native_separators (fi.absolute_file_path ()));
+            GLib.FileInfo file_info (path);
+            message.append (QDir.to_native_separators (file_info.absolute_file_path ()));
         }
         return message;
     }

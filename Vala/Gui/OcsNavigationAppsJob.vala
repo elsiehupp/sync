@@ -16,45 +16,40 @@ Fetching enabled apps from the OCS Apps API
 class OcsNavigationAppsJob : OcsJob {
 
     /***********************************************************
+    Result of the OCS request
+
+    @param reply The reply
+    @param status_code the status code of the response
     ***********************************************************/
-    public OcsNavigationAppsJob (AccountPointer account);
+    signal void signal_apps_job_finished (QJsonDocument reply, int status_code);
+
+    /***********************************************************
+    ***********************************************************/
+    public OcsNavigationAppsJob (AccountPointer account) {
+        base (account);
+        path ("ocs/v2.php/core/navigation/apps");
+        connect (this, &OcsNavigationAppsJob.signal_job_finished, this, &OcsNavigationAppsJob.on_signal_job_done);
+    }
 
 
     /***********************************************************
     Get a list of enabled apps and external sites
     visible in the Navigation menu
     ***********************************************************/
-    public void get_navigation_apps ();
-
-signals:
-    /***********************************************************
-    Result of the OCS request
-
-    @param reply The reply
-    @param status_code the status code of the response
-    ***********************************************************/
-    void apps_job_finished (QJsonDocument reply, int status_code);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_signal_job_done (QJsonDocument reply, int status_code);
-}
-
-    OcsNavigationAppsJob.OcsNavigationAppsJob (AccountPointer account)
-        : OcsJob (account) {
-        path ("ocs/v2.php/core/navigation/apps");
-        connect (this, &OcsNavigationAppsJob.signal_job_finished, this, &OcsNavigationAppsJob.on_signal_job_done);
-    }
-
-    void OcsNavigationAppsJob.get_navigation_apps () {
+    public void get_navigation_apps () {
         verb ("GET");
         add_param ("absolute", "true");
         on_signal_start ();
     }
 
-    void OcsNavigationAppsJob.on_signal_job_done (QJsonDocument reply, int status_code) {
-        /* emit */ apps_job_finished (reply, status_code);
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_job_done (QJsonDocument reply, int status_code) {
+        /* emit */ signal_apps_job_finished (reply, status_code);
     }
-    }
-    
+
+} // class OcsNavigationAppsJob
+
+} // namespace Ui
+} // namespace Occ

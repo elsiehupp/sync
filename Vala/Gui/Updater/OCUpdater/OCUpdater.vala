@@ -59,11 +59,11 @@ class OCUpdater : Updater {
 
     /***********************************************************
     ***********************************************************/
-    const string update_available_c = "Updater/update_available";
-    const string update_target_version_c = "Updater/update_target_version";
-    const string update_target_version_string_c = "Updater/update_target_version_string";
-    const string seen_version_c = "Updater/seen_version";
-    const string auto_update_attempted_c = "Updater/auto_update_attempted";
+    private const string update_available_c = "Updater/update_available";
+    private const string update_target_version_c = "Updater/update_target_version";
+    private const string update_target_version_string_c = "Updater/update_target_version_string";
+    private const string seen_version_c = "Updater/seen_version";
+    private const string auto_update_attempted_c = "Updater/auto_update_attempted";
 
     /***********************************************************
     ***********************************************************/

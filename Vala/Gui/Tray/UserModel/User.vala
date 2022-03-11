@@ -563,7 +563,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_notify_network_error (Soup.Reply reply) {
-        var job = qobject_cast<Notification_confirm_job> (sender ());
+        var job = qobject_cast<NotificationConfirmJob> (sender ());
         if (!job) {
             return;
         }
@@ -659,13 +659,13 @@ class User : GLib.Object {
         if (valid_verbs.contains (verb)) {
             AccountStatePtr acc = AccountManager.instance ().account (account_name);
             if (acc) {
-                var job = new Notification_confirm_job (acc.account ());
+                var job = new NotificationConfirmJob (acc.account ());
                 GLib.Uri l (link);
                 job.link_and_verb (l, verb);
                 job.property ("activity_row", GLib.Variant.from_value (row));
                 connect (job, &AbstractNetworkJob.network_error,
                     this, &User.on_signal_notify_network_error);
-                connect (job, &Notification_confirm_job.signal_job_finished,
+                connect (job, &NotificationConfirmJob.signal_job_finished,
                     this, &User.on_signal_notify_server_finished);
                 job.on_signal_start ();
 
@@ -682,7 +682,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_notify_server_finished (string reply, int reply_code) {
-        var job = qobject_cast<Notification_confirm_job> (sender ());
+        var job = qobject_cast<NotificationConfirmJob> (sender ());
         if (!job) {
             return;
         }

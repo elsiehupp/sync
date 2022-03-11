@@ -7,7 +7,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QMenu>
 //  #include <QtNetwork>
 //  #include <QSslConfiguration>
-//  #include <QWidget_action>
+//  #include <QWidgetAction>
 //  #include <QToolButt
 //  #include <QPointer>
 //  #include <QSsl>
@@ -225,7 +225,7 @@ class SslButton : QToolButton {
         label.on_signal_text (details);
 
         // plug label into widget action
-        var action = new QWidget_action (parent);
+        var action = new QWidgetAction (parent);
         action.default_widget (label);
         // plug action into menu
         var menu = new QMenu (parent);

@@ -321,18 +321,18 @@ class FolderStatusDelegate : QStyledItemDelegate {
         QFont alias_font = make_alias_font (option.font);
         QFont font = option.font;
 
-        QFontMetrics fm (font);
+        QFontMetrics font_metrics (font);
         QFontMetrics alias_fm (alias_font);
 
         var classif = static_cast<const FolderStatusModel> (index.model ()).classify (index);
         if (classif == FolderStatusModel.ItemType.ADD_BUTTON) {
             const int margins = alias_fm.height (); // same as 2*alias_margin of paint
-            QFontMetrics fm (Gtk.Application.font ("QPushButton"));
+            QFontMetrics font_metrics (Gtk.Application.font ("QPushButton"));
             QStyle_option_button opt;
             static_cast<QStyle_option &> (opt) = option;
             opt.text = add_folder_text ();
             return QApplication.style ().size_from_contents (
-                                            QStyle.CT_Push_button, opt, fm.size (Qt.Text_single_line, opt.text))
+                                            QStyle.CT_Push_button, opt, font_metrics.size (Qt.Text_single_line, opt.text))
                     .expanded_to (QApplication.global_strut ())
                 + QSize (0, margins);
         }
@@ -342,15 +342,15 @@ class FolderStatusDelegate : QStyledItemDelegate {
         }
 
         // calc height
-        int h = root_folder_height_without_errors (fm, alias_fm);
+        int h = root_folder_height_without_errors (font_metrics, alias_fm);
         // this already includes the bottom margin
 
         // add some space for the message boxes.
-        int margin = fm.height () / 4;
+        int margin = font_metrics.height () / 4;
         for (var role: {Folder_conflict_msg, Folder_error_msg, Folder_info_msg}) {
             var msgs = qvariant_cast<string[]> (index.data (role));
             if (!msgs.is_empty ()) {
-                h += margin + 2 * margin + msgs.count () * fm.height ();
+                h += margin + 2 * margin + msgs.count () * font_metrics.height ();
             }
         }
 
@@ -393,9 +393,9 @@ class FolderStatusDelegate : QStyledItemDelegate {
     public static QRect options_button_rect (QRect within, Qt.Layout_direction direction) {
         QFont font = QFont ();
         QFont alias_font = make_alias_font (font);
-        QFontMetrics fm (font);
+        QFontMetrics font_metrics (font);
         QFontMetrics alias_fm (alias_font);
-        within.height (FolderStatusDelegate.root_folder_height_without_errors (fm, alias_fm));
+        within.height (FolderStatusDelegate.root_folder_height_without_errors (font_metrics, alias_fm));
 
         QStyle_option_tool_button opt;
         int e = QApplication.style ().pixel_metric (QStyle.PM_Button_icon_size);
@@ -413,10 +413,10 @@ class FolderStatusDelegate : QStyledItemDelegate {
     /***********************************************************
     ***********************************************************/
     public static QRect add_button_rect (QRect within, Qt.Layout_direction direction) {
-        QFontMetrics fm (Gtk.Application.font ("QPushButton"));
+        QFontMetrics font_metrics (Gtk.Application.font ("QPushButton"));
         QStyle_option_button opt;
         opt.text = add_folder_text ();
-        QSize size = QApplication.style ().size_from_contents (QStyle.CT_Push_button, opt, fm.size (Qt.Text_single_line, opt.text)).expanded_to (QApplication.global_strut ());
+        QSize size = QApplication.style ().size_from_contents (QStyle.CT_Push_button, opt, font_metrics.size (Qt.Text_single_line, opt.text)).expanded_to (QApplication.global_strut ());
         QRect r (QPoint (within.left (), within.top () + within.height () / 2 - size.height () / 2), size);
         return QStyle.visual_rect (direction, within, r);
     }
@@ -427,9 +427,9 @@ class FolderStatusDelegate : QStyledItemDelegate {
     public QRect errors_list_rect (QRect within) {
         QFont font = QFont ();
         QFont alias_font = make_alias_font (font);
-        QFontMetrics fm (font);
+        QFontMetrics font_metrics (font);
         QFontMetrics alias_fm (alias_font);
-        within.top (within.top () + FolderStatusDelegate.root_folder_height_without_errors (fm, alias_fm));
+        within.top (within.top () + FolderStatusDelegate.root_folder_height_without_errors (font_metrics, alias_fm));
         return within;
     }
 
@@ -450,16 +450,16 @@ class FolderStatusDelegate : QStyledItemDelegate {
 
     /***********************************************************
     ***********************************************************/
-    public static int root_folder_height_without_errors (QFontMetrics fm, QFontMetrics alias_fm) {
+    public static int root_folder_height_without_errors (QFontMetrics font_metrics, QFontMetrics alias_fm) {
         const int alias_margin = alias_fm.height () / 2;
-        const int margin = fm.height () / 4;
+        const int margin = font_metrics.height () / 4;
 
         int h = alias_margin; // margin to top
         h += alias_fm.height (); // alias
         h += margin; // between alias and local path
-        h += fm.height (); // local path
+        h += font_metrics.height (); // local path
         h += margin; // between local and remote path
-        h += fm.height (); // remote path
+        h += font_metrics.height (); // remote path
         h += margin; // bottom margin
         return h;
     }

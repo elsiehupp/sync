@@ -180,9 +180,9 @@ class FolderStatusModel : QAbstractItemModel {
     }
 
 
-    const string PROPERTY_PARENT_INDEX_C = "oc_parent_index";
-    const string PROPERTY_PERMISSION_MAP = "oc_permission_map";
-    const string PROPERTY_ENCRYPTION_MAP = "nc_encryption_map";
+    private const string PROPERTY_PARENT_INDEX_C = "oc_parent_index";
+    private const string PROPERTY_PERMISSION_MAP = "oc_permission_map";
+    private const string PROPERTY_ENCRYPTION_MAP = "nc_encryption_map";
 
 
     /***********************************************************

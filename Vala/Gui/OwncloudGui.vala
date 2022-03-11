@@ -40,7 +40,7 @@ namespace Ui {
 ***********************************************************/
 class OwncloudGui : GLib.Object {
 
-    const string PROPERTY_ACCOUNT_C = "oc_account";
+    private const string PROPERTY_ACCOUNT_C = "oc_account";
 
     enum ShareDialogStartPage {
         USERS_AND_GROUPS,
@@ -58,7 +58,7 @@ class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.HashMap<string, QPointer<Share_dialog>> share_dialogs;
+    private GLib.HashMap<string, QPointer<ShareDialog>> share_dialogs;
 
     /***********************************************************
     ***********************************************************/
@@ -143,7 +143,7 @@ class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool check_account_exists (bool signal_open_settings);
+    //  public bool check_account_exists (bool signal_open_settings);
 
 
     /***********************************************************
@@ -167,7 +167,7 @@ class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void setup_overlay_icons ();
+    //  public void setup_overlay_icons ();
 
 
     /***********************************************************
@@ -461,7 +461,7 @@ class OwncloudGui : GLib.Object {
                 // brought wizard to front
             } else if (this.share_dialogs.size () > 0) {
                 // Share dialog (s) be hidden by other apps, bring them back
-                Q_FOREACH (QPointer<Share_dialog> share_dialog, this.share_dialogs) {
+                Q_FOREACH (QPointer<ShareDialog> share_dialog, this.share_dialogs) {
                     //  Q_ASSERT (share_dialog.data ());
                     raise_dialog (share_dialog);
                 }
@@ -666,13 +666,13 @@ class OwncloudGui : GLib.Object {
 
         var max_sharing_permissions = resharing_allowed? SharePermissions (account_state.account ().capabilities ().share_default_permissions ()) : SharePermissions ({});
 
-        Share_dialog w = null;
+        ShareDialog w = null;
         if (this.share_dialogs.contains (local_path) && this.share_dialogs[local_path]) {
             GLib.info ("Raising share dialog" + share_path + local_path;
             w = this.share_dialogs[local_path];
         } else {
             GLib.info ("Opening share dialog" + share_path + local_path + max_sharing_permissions;
-            w = new Share_dialog (account_state, share_path, local_path, max_sharing_permissions, file_record.numeric_file_id (), start_page);
+            w = new ShareDialog (account_state, share_path, local_path, max_sharing_permissions, file_record.numeric_file_id (), start_page);
             w.attribute (Qt.WA_DeleteOnClose, true);
 
             this.share_dialogs[local_path] = w;
@@ -685,7 +685,7 @@ class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_remove_destroyed_share_dialogs () {
-        QMutable_map_iterator<string, QPointer<Share_dialog>> it (this.share_dialogs);
+        QMutable_map_iterator<string, QPointer<ShareDialog>> it (this.share_dialogs);
         while (it.has_next ()) {
             it.next ();
             if (!it.value () || it.value () == sender ()) {

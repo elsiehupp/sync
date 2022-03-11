@@ -75,7 +75,7 @@ class GetOrCreatePublicLinkShare : GLib.Object {
 
         // If there already is a context menu share, reuse it
         for (var share : shares) {
-            const var link_share = q_shared_pointer_dynamic_cast<Link_share> (share);
+            const var link_share = q_shared_pointer_dynamic_cast<LinkShare> (share);
             if (!link_share)
                 continue;
 
@@ -93,7 +93,7 @@ class GetOrCreatePublicLinkShare : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_link_share_created (unowned<Link_share> share) {
+    private void on_signal_link_share_created (unowned LinkShare share) {
         GLib.debug ("New share created";
         on_signal_success (share.get_link ().to_string ());
     }

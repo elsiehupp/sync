@@ -40,7 +40,7 @@ class Share : GLib.Object {
         const ShareType share_type,
         bool is_password_set = false,
         const Permissions permissions = Share_permission_default,
-        const unowned<Sharee> share_with = unowned<Sharee> (null));
+        const unowned Sharee share_with = unowned Sharee (null));
 
 
     /***********************************************************
@@ -80,7 +80,7 @@ class Share : GLib.Object {
     /***********************************************************
     Get the share_with
     ***********************************************************/
-    public unowned<Sharee> get_share_with ();
+    public unowned Sharee get_share_with ();
 
 
     /***********************************************************
@@ -141,7 +141,7 @@ signals:
     protected ShareType this.share_type;
     protected bool this.is_password_set;
     protected Permissions this.permissions;
-    protected unowned<Sharee> this.share_with;
+    protected unowned Sharee this.share_with;
 
 protected slots:
     void on_signal_ocs_error (int status_code, string message);
@@ -160,14 +160,14 @@ protected slots:
 
 
 Share.Share (AccountPointer account,
-    const string identifier,
-    const string uidowner,
-    const string owner_display_name,
-    const string path,
+    private const string identifier,
+    private const string uidowner,
+    private const string owner_display_name,
+    private const string path,
     const ShareType share_type,
     bool is_password_set,
     const Permissions permissions,
-    const unowned<Sharee> share_with)
+    const unowned Sharee share_with)
     : this.account (account)
     this.identifier (identifier)
     this.uidowner (uidowner)
@@ -203,7 +203,7 @@ Share.ShareType Share.get_share_type () {
     return this.share_type;
 }
 
-unowned<Sharee> Share.get_share_with () {
+unowned Sharee Share.get_share_with () {
     return this.share_with;
 }
 

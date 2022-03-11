@@ -10,16 +10,28 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Ocs_sharee_job class
+@brief The OcsShareeJob class
 @ingroup gui
 
 Fetching sharees from the OCS Sharee API
 ***********************************************************/
-class Ocs_sharee_job : OcsJob {
+class OcsShareeJob : OcsJob {
+
+    /***********************************************************
+    Result of the OCS request
+
+    @param reply The reply
+    ***********************************************************/
+    signal void signal_sharee_job_finished (QJsonDocument reply);
 
     /***********************************************************
     ***********************************************************/
-    public Ocs_sharee_job (AccountPointer account);
+    public OcsShareeJob (AccountPointer account);
+    OcsShareeJob.OcsShareeJob (AccountPointer account)
+        : OcsJob (account) {
+        path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
+        connect (this, &OcsJob.signal_job_finished, this, &OcsShareeJob.on_signal_job_done);
+    }
 
 
     /***********************************************************
@@ -27,33 +39,7 @@ class Ocs_sharee_job : OcsJob {
 
     @param path Path to request shares for (default all shares)
     ***********************************************************/
-    public void get_sharees (string search, string item_type, int page = 1, int per_page = 50, bool lookup = false);
-
-signals:
-    /***********************************************************
-    Result of the OCS request
-
-    @param reply The reply
-    ***********************************************************/
-    void sharee_job_finished (QJsonDocument reply);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_signal_job_done (QJsonDocument reply);
-}
-
-    Ocs_sharee_job.Ocs_sharee_job (AccountPointer account)
-        : OcsJob (account) {
-        path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
-        connect (this, &OcsJob.signal_job_finished, this, &Ocs_sharee_job.on_signal_job_done);
-    }
-
-    void Ocs_sharee_job.get_sharees (string search,
-        const string item_type,
-        int page,
-        int per_page,
-        bool lookup) {
+    public void get_sharees (string search, string item_type, int page = 1, int per_page = 50, bool lookup = false) {
         verb ("GET");
 
         add_param (string.from_latin1 ("search"), search);
@@ -65,8 +51,15 @@ signals:
         on_signal_start ();
     }
 
-    void Ocs_sharee_job.on_signal_job_done (QJsonDocument reply) {
-        /* emit */ sharee_job_finished (reply);
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_job_done (QJsonDocument reply) {
+        /* emit */ signal_sharee_job_finished (reply);
     }
-    }
-    
+
+} // class OcsShareeJob
+
+} // namespace Ui
+} // namespace Occ

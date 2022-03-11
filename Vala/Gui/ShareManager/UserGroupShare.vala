@@ -19,7 +19,7 @@ class User_group_share : Share {
         const ShareType share_type,
         bool is_password_set,
         const Permissions permissions,
-        const unowned<Sharee> share_with,
+        const unowned Sharee share_with,
         const QDate expire_date,
         const string note);
 
@@ -66,16 +66,16 @@ signals:
 
 
 User_group_share.User_group_share (AccountPointer account,
-    const string identifier,
-    const string owner,
-    const string owner_display_name,
-    const string path,
+    private const string identifier,
+    private const string owner,
+    private const string owner_display_name,
+    private const string path,
     const ShareType share_type,
     bool is_password_set,
     const Permissions permissions,
-    const unowned<Sharee> share_with,
+    const unowned Sharee share_with,
     const QDate expire_date,
-    const string note)
+    private const string note)
     : Share (account, identifier, owner, owner_display_name, path, share_type, is_password_set, permissions, share_with)
     this.note (note)
     this.expire_date (expire_date) {

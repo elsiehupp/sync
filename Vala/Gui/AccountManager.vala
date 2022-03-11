@@ -22,15 +22,15 @@ namespace Occ {
 ***********************************************************/
 class AccountManager : GLib.Object {
 
-    const string URL_C = "url";
-    const string AUTH_TYPE_C = "auth_type";
-    const string USER_C = "user";
-    const string HTTP_USER_C = "http_user";
-    const string DAV_USER_C = "dav_user";
-    const string CA_CERTS_KEY_C = "CaCertificates";
-    const string ACCOUNTS_C = "Accounts";
-    const string VERSION_C = "version";
-    const string SERVER_VERSION_C = "server_version";
+    private const string URL_C = "url";
+    private const string AUTH_TYPE_C = "auth_type";
+    private const string USER_C = "user";
+    private const string HTTP_USER_C = "http_user";
+    private const string DAV_USER_C = "dav_user";
+    private const string CA_CERTS_KEY_C = "CaCertificates";
+    private const string ACCOUNTS_C = "Accounts";
+    private const string VERSION_C = "version";
+    private const string SERVER_VERSION_C = "server_version";
 
     /***********************************************************
     ***********************************************************/
@@ -399,8 +399,8 @@ class AccountManager : GLib.Object {
 
             GLib.info ("Migrate : checking old config " + o_c_cfg_file;
 
-            GLib.FileInfo fi (o_c_cfg_file);
-            if (fi.is_readable ()) {
+            GLib.FileInfo file_info (o_c_cfg_file);
+            if (file_info.is_readable ()) {
                 std.unique_ptr<QSettings> o_c_settings (new QSettings (o_c_cfg_file, QSettings.IniFormat));
                 o_c_settings.begin_group ("own_cloud");
 

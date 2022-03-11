@@ -52,7 +52,7 @@ class Folder : GLib.Object {
         //  Log_status_file_locked
     }
 
-    const string VERSION_C = "version";
+    private const string VERSION_C = "version";
 
     /***********************************************************
     ***********************************************************/
@@ -1520,8 +1520,8 @@ class Folder : GLib.Object {
         // Note: This assumes we're getting file watcher notifications
         // for folders only on creation and deletion - if we got a notification
         // on content change that would create spurious warnings.
-        GLib.FileInfo fi (this.canonical_local_path + path);
-        if (!fi.exists ())
+        GLib.FileInfo file_info (this.canonical_local_path + path);
+        if (!file_info.exists ())
             return;
     
         bool ok = false;
@@ -1531,13 +1531,13 @@ class Folder : GLib.Object {
         if (!blocklist.contains (path + "/"))
             return;
     
-        const var message = fi.is_dir ()
+        const var message = file_info.is_dir ()
             ? _("The folder %1 was created but was excluded from synchronization previously. "
                  "Data inside it will not be synchronized.")
-                  .arg (fi.file_path ())
+                  .arg (file_info.file_path ())
             : _("The file %1 was created but was excluded from synchronization previously. "
                  "It will not be synchronized.")
-                  .arg (fi.file_path ());
+                  .arg (file_info.file_path ());
     
         Logger.instance ().post_optional_gui_log (Theme.instance ().app_name_gui (), message);
     }
@@ -1648,8 +1648,8 @@ class Folder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void check_local_path () {
-        const GLib.FileInfo fi (this.definition.local_path);
-        this.canonical_local_path = fi.canonical_file_path ();
+        const GLib.FileInfo file_info (this.definition.local_path);
+        this.canonical_local_path = file_info.canonical_file_path ();
         if (this.canonical_local_path.is_empty ()) {
             GLib.warning ("Broken symlink:" + this.definition.local_path;
             this.canonical_local_path = this.definition.local_path;
@@ -1657,17 +1657,17 @@ class Folder : GLib.Object {
             this.canonical_local_path.append ('/');
         }
     
-        if (fi.is_dir () && fi.is_readable ()) {
+        if (file_info.is_dir () && file_info.is_readable ()) {
             GLib.debug ("Checked local path ok";
         } else {
             // Check directory again
-            if (!FileSystem.file_exists (this.definition.local_path, fi)) {
+            if (!FileSystem.file_exists (this.definition.local_path, file_info)) {
                 this.sync_result.append_error_string (_("Local folder %1 does not exist.").arg (this.definition.local_path));
                 this.sync_result.status (SyncResult.Status.SETUP_ERROR);
-            } else if (!fi.is_dir ()) {
+            } else if (!file_info.is_dir ()) {
                 this.sync_result.append_error_string (_("%1 should be a folder but is not.").arg (this.definition.local_path));
                 this.sync_result.status (SyncResult.Status.SETUP_ERROR);
-            } else if (!fi.is_readable ()) {
+            } else if (!file_info.is_readable ()) {
                 this.sync_result.append_error_string (_("%1 is not readable.").arg (this.definition.local_path));
                 this.sync_result.status (SyncResult.Status.SETUP_ERROR);
             }

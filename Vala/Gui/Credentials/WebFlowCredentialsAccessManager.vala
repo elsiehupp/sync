@@ -5,10 +5,10 @@ namespace Occ {
 namespace Ui {
 
 class WebFlowCredentialsAccessManager : AccessManager {
-    const string USER_C = "user";
-    const string CLIENT_CERTIFICATE_PEM_C = "this.client_certificate_pem";
-    const string CLIENT_KEY_PEM_C = "this.client_key_pem";
-    const string client_ca_certificate_pemC = "this.client_ca_certificate_pem";
+    private const string USER_C = "user";
+    private const string CLIENT_CERTIFICATE_PEM_C = "this.client_certificate_pem";
+    private const string CLIENT_KEY_PEM_C = "this.client_key_pem";
+    private const string client_ca_certificate_pemC = "this.client_ca_certificate_pem";
 
     /***********************************************************
     ***********************************************************/

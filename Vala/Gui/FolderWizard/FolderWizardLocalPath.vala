@@ -27,8 +27,8 @@ class Folder_wizard_local_path : Format_warnings_wizard_page {
 
     /***********************************************************
     ***********************************************************/
-    public void folder_map (Folder.Map fm) {
-        this.folder_map = fm;
+    public void folder_map (Folder.Map font_metrics) {
+        this.folder_map = font_metrics;
     }
 protected slots:
     void on_signal_choose_local_folder ();
